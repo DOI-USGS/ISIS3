@@ -149,7 +149,7 @@ namespace Isis {
       }
     }
     else {
-      QString msg = "Invalid PDS export type.";
+      QString msg = "Invalid PDS export type";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -263,7 +263,7 @@ namespace Isis {
       }
     }
     else {
-      QString msg = "Labels must be detached for JP2 files.";
+      QString msg = "Labels must be detached for JP2 files";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     FileName outFile(sImageFile);
@@ -277,7 +277,7 @@ namespace Isis {
     cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.name());
     int storagebytes = InputCubes[0]->sampleCount() * InputCubes[0]->lineCount();
     if(p_pixelType == Isis::Real) {
-      QString msg = "JPEG2000 does not support floating point data.";
+      QString msg = "JPEG2000 does not support floating point data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
@@ -354,7 +354,7 @@ namespace Isis {
       }
     }
     else {
-      QString msg = "Labels must be detached for JP2 files.";
+      QString msg = "Labels must be detached for JP2 files";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     FileName outFile(sImageFile);
@@ -368,7 +368,7 @@ namespace Isis {
     cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.name());
     int storagebytes = InputCubes[0]->sampleCount() * InputCubes[0]->lineCount();
     if(p_pixelType == Isis::Real) {
-      QString msg = "JPEG2000 does not support floating point data.";
+      QString msg = "JPEG2000 does not support floating point data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
@@ -690,6 +690,10 @@ namespace Isis {
     if(inputLabel->hasObject("IsisCube") &&
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
+    // Translate the common keywords for a PDS IMAGE_MAP_PROJECTION
+    PvlToPvlTranslationManager xlatGenProj(*inputLabel,
+                                      "$base/translations/pdsExportAllMapping.trn");
+    xlatGenProj.Auto(outputPvl);
 
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
     QString projName = ProjectionName(*inputLabel);

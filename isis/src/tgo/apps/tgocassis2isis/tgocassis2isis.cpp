@@ -27,26 +27,26 @@ void IsisMain() {
   try {
     ProcessImport importer;
     translateCoreInfo(xmlFileName, importer);
-    // fails 
+
     importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
     Cube *outputCube = importer.SetOutputCube("TO");
-    // fails above
+
     translateLabels(xmlFileName, outputCube);
-
+  
     FileName outputCubeFileName(ui.GetFileName("TO"));
-
+  
     OriginalXmlLabel xmlLabel;
     xmlLabel.readFromXmlFile(xmlFileName);
-
+  
     importer.StartProcess();
-
+  
     // Write out original label before closing the cube
     outputCube->write(xmlLabel);
-
+  
     importer.EndProcess();
   }
   catch (IException &e) {
-    QString msg = "Given file [" + xmlFileName.expanded() + "] does not appear to be a valid TGO CaSSIS label.";
+    QString msg = "Given file does not appear to be a valid TGO CaSSIS product.";
       throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
@@ -145,14 +145,11 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
 
   // Create the Archive Group
   FileName archiveTransFile(missionDir + "/translations/tgoCassisArchive.trn");
-  FileName subTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
   XmlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
-  XmlToPvlTranslationManager subXlater(inputLabel, subTransFile.expanded());
 
   // Pvl output label
   outputLabel = outputCube->label();
   archiveXlater.Auto(*(outputLabel));
-  subXlater.Auto(*(outputLabel));
 
   // Create YearDoy keyword in Archive group
   iTime stime(outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
@@ -238,12 +235,17 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
   outputCube->putGroup(kern);
 
   // Add an alpha cube group based on the subwindowing
-  int windowNumber = (int) archive["Window_Count"] + 1;
+  FileName alphaTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
+  XmlToPvlTranslationManager alphaXlater(inputLabel, alphaTransFile.expanded());
+  Pvl alphaPvl;
+  alphaXlater.Auto(alphaPvl);
+  PvlObject subWindow = alphaPvl.findObject("SubWindow");
+  int windowNumber = (int) subWindow["Window_Count"] + 1;
   QString windowString = "Window_" + toString(windowNumber);
-  int frameletStartSample = (int) archive[windowString + "_Start_Sample"] + 1;
-  int frameletEndSample   = (int) archive[windowString + "_End_Sample"] + 1;
-  int frameletStartLine   = (int) archive[windowString + "_Start_Line"] + 1;
-  int frameletEndLine     = (int) archive[windowString + "_End_Line"] + 1;
+  int frameletStartSample = (int) subWindow[windowString + "_Start_Sample"] + 1;
+  int frameletEndSample   = (int) subWindow[windowString + "_End_Sample"] + 1;
+  int frameletStartLine   = (int) subWindow[windowString + "_Start_Line"] + 1;
+  int frameletEndLine     = (int) subWindow[windowString + "_End_Line"] + 1;
   AlphaCube frameletArea(2048, 2048,
                          frameletEndSample - frameletStartSample + 1,
                          frameletEndLine - frameletStartLine + 1,

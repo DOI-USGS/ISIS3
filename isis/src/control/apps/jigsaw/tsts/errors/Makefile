@@ -15,7 +15,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 # TEST A: CAMSOLVE=None and SPSOLVE=None
-	echo -e "Error Test A:" >> $(OUTPUT)/error.txt;
+	echo -e "Error Test A:" > $(OUTPUT)/error.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/empty.net \
@@ -60,7 +60,7 @@ commands:
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/empty.net \
-	  onet=$(OUTPUT)/out.net \
+	  onet=$(output)/out.net \
 	  radius=yes \
 	  spsolve=positions \
 	  point_radius_sigma=500 \

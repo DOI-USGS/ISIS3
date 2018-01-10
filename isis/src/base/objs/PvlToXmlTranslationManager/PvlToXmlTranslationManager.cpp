@@ -21,7 +21,6 @@
  */
 #include "LabelTranslationManager.h"
 
-#include <QDebug>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QString>
@@ -130,7 +129,8 @@ namespace Isis {
         }
       }
     }
-    return PvlTranslationTable::Translate(transGroupName); 
+
+    return PvlTranslationTable::Translate(transGroupName);
   }
 
 
@@ -148,6 +148,10 @@ namespace Isis {
   void PvlToXmlTranslationManager::doTranslation(PvlGroup transGroup,
                                                  QDomElement &parentElement) {
 
+    if (transGroup.hasKeyword("OutputSiblings")) {
+      addSiblings(transGroup.findKeyword("OutputSiblings"), parentElement);
+    }
+
     int inst = 0;
     QString transGroupName = transGroup.name();
     PvlKeyword grp = InputGroup(transGroupName, inst);
@@ -159,15 +163,15 @@ namespace Isis {
         if (con->hasKeyword(InputKeywordName(transGroupName))) {
 
           QStringList outputName = parseSpecification(OutputName(transGroupName));
-          // Get the InputKey from the input label.
+          // get the InputKey from the input label.
           PvlKeyword inputKeyword = (*con)[InputKeywordName(transGroupName)];
-          // Translate input keyword value and set the qdomelement
+          // translate input keyword value and set the qdomelement
           // NOTE: We are assuming this is a single valued keyword since
           //       xml does not allow multiple values
           QString untranslatedValue = inputKeyword[0];
-          QString translatedValue = PvlTranslationTable::Translate(transGroupName, 
+          QString translatedValue = PvlTranslationTable::Translate(transGroupName,
                                                                    untranslatedValue);
-          QString units = inputKeyword.unit(); 
+          QString units = inputKeyword.unit();
           if (outputName.size() == 2 && outputName[0] == "att") {
             parentElement.setAttribute(outputName[1], translatedValue);
             if (transGroup.hasKeyword("OutputAttributes")) {
@@ -183,9 +187,6 @@ namespace Isis {
             }
           }
 
-          if (transGroup.hasKeyword("OutputSiblings")) {
-            addSiblings(transGroup.findKeyword("OutputSiblings"), parentElement);
-          }
           return;
 
         }
@@ -193,16 +194,13 @@ namespace Isis {
       grp = InputGroup(transGroupName, ++inst);
     }
 
-    // Look for default
+    // look for default
     QString translatedValue = PvlTranslationTable::Translate(transGroupName, "");
-    QDomElement newElement = parentElement.ownerDocument().createElement(OutputName(transGroupName));
+    QDomElement newElement = parentElement.ownerDocument().createElement(transGroupName);
     setElementValue(newElement, translatedValue);
     parentElement.appendChild(newElement);
     if (transGroup.hasKeyword("OutputAttributes")) {
       addAttributes(transGroup.findKeyword("OutputAttributes"), newElement);
-    }
-    if (transGroup.hasKeyword("OutputSiblings")) {
-      addSiblings(transGroup.findKeyword("OutputSiblings"), parentElement);
     }
 
   }
@@ -247,7 +245,7 @@ namespace Isis {
         }
         catch(IException &e) {
           if(!IsOptional(g.name())) {
-            throw;//???
+            throw;
           }
         }
       }
@@ -288,8 +286,7 @@ namespace Isis {
 
     if(anInputGroupFound) {
       QString msg = "Unable to find input keyword [" + InputKeywordName(transGroupName) +
-                     "] for output name [" + transGroupName + "] in file [" + 
-                     TranslationTable().fileName() + "]";
+                   "] for output name [" + transGroupName + "] in file [" + TranslationTable().fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
@@ -301,8 +298,8 @@ namespace Isis {
         container += InputGroup(transGroupName)[i];
       }
 
-      QString msg = "Unable to find input group [" + container + "] for output name [" + 
-                     transGroupName + "] in file [" + TranslationTable().fileName() + "]";
+      QString msg = "Unable to find input group [" + container +
+                   "] for output name [" + transGroupName + "] in file [" + TranslationTable().fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -322,6 +319,8 @@ namespace Isis {
     // by finding the input group corresponding to the output group
     const PvlContainer *con;
     int inst = 0;
+    //while ((con = GetContainer(InputGroup(transGroupName, inst++))) != NULL) {
+    //if ((con = GetContainer (InputGroup(transGroupName))) != NULL) {
 
     PvlKeyword grp;
     while((grp = InputGroup(transGroupName, inst++)).name() != "") {
@@ -448,24 +447,22 @@ namespace Isis {
    * @param outputSiblings The PvlKeyword that holds the list of siblings
    * @param parent The parent QDomElement
    *
-   * @throws IException::Programmer "Malformed OutputSibling [" + outputSiblings[i] + "]"
+   * @throws IException::Programmer "OutputSibling does not have a tag name and/or value."
    */
   void PvlToXmlTranslationManager::addSiblings(PvlKeyword outputSiblings,
                                                QDomElement &parent) {
 
     for (int i = 0; i < outputSiblings.size(); i++) {
-      QStringList parsedSibling;
-      parsedSibling.reserve(5);
-      parsedSibling = parseSpecification(outputSiblings[i]);
+      QStringList parsedSibling = parseSpecification(outputSiblings[i]);
+
       if (parsedSibling.size() != 2) {
-        // If the sibling does not have a tag name AND a tag value
-        QString msg = "Malformed OutputSibling [" + outputSiblings[i] + "]. OutputSiblings must" +
-                      " be in the form of tag|value";
+        //If the sibling does not have a tag name AND a tag value
+        QString msg = "OutputSibling does not have a tag name and/or value.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if (parent.namedItem(parsedSibling[0]).isNull()) {
-        // parsedSibling[0] is the tag name, parsedSibling[1] is the tag value
+        //parsedSibling[0] is the tag name, parsedSibling[1] is the tag value
         QDomElement childElement = parent.ownerDocument().createElement(parsedSibling[0]);
         setElementValue(childElement, parsedSibling[1]);
         parent.appendChild(childElement).toElement();;
@@ -492,7 +489,7 @@ namespace Isis {
 
       if (parsedAttribute.size() != 2) {
         QString msg = "Malformed output attribute [" + outputAttributes[i] +
-                        "]. OutputAttributes must be in the form of att@attribute_name|value";
+                        "].";
         throw IException(IException::Programmer,msg ,_FILEINFO_);
       }
       element.setAttribute(parsedAttribute[0], parsedAttribute[1]);
@@ -501,60 +498,20 @@ namespace Isis {
 
 
   /**
-   * Add a QDomElement to the given parent with the indicated 
-   * value and units. 
-   *
-   * @param parent The parent QDomElement of the new element.
-   * @param name The name of the new element.
-   * @param value The value of the new element.
-   * @param units A string containing the unit specification for 
-   *              the new element.
-   */
-  void PvlToXmlTranslationManager::addElement(QDomElement &parent,
-                                              QString name,
-                                              QString value,
-                                              QString units) {
-    QDomElement newElement = parent.ownerDocument().createElement(name);
-    setElementValue(newElement, value, units);
-    // append element to parent node???
-    parent.appendChild(newElement).toElement();;
-  }
-
-
-  /**
    * Set the QDomElement's value, and units, if units != "".
    *
-   * @param element The QDomElement whose value needs to be set.
-   * @param value The value to set.
-   * @param units A string containing the unit specification.
+   * @param element The QDomElement whose value needs to be set
+   * @param value The value to set
    */
   void PvlToXmlTranslationManager::setElementValue(QDomElement &element,
                                                    QString value,
                                                    QString units) {
     QDomText valueText = element.ownerDocument().createTextNode(value);
-    // append value to element???
     element.appendChild(valueText);
 
     if (units != "") {
-      element.setAttribute("unit", units);
+      element.setAttribute("Unit", units);
     }
   }
 
-
-  /**
-   * Reset the QDomElement's value, and units, if units != "".
-   *
-   * @param element The QDomElement whose value needs to be reset.
-   * @param value The value to set.
-   * @param units A string containing the unit specification.
-   */
-  void PvlToXmlTranslationManager::resetElementValue(QDomElement &element,
-                                                     QString value,
-                                                     QString units) {
-    element.firstChild().setNodeValue(value);
-    if (units != "") {
-      element.setAttribute("unit", units);
-    }
-  }
 } // end namespace isis
-

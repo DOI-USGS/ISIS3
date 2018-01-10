@@ -1,15 +1,15 @@
 // $Id: amicacal.cpp 6045 2015-02-07 02:06:59Z moses@GS.DOI.NET $
 #include "Isis.h"
 
-#include <algorithm>
-#include <cmath>
-#include <cstdio>
-#include <memory>
 #include <vector>
+#include <algorithm>
+#include <memory>
+#include <cstdio>
+#include <cmath>
 
 #include <QFile>
-#include <QScopedPointer>
 #include <QString>
+#include <QScopedPointer>
 #include <QTemporaryFile>
 #include <QVector>
 
@@ -21,10 +21,10 @@
 #include "iTime.h"
 #include "LineManager.h"
 #include "Pixel.h"
-#include "ProcessByBoxcar.h"
-#include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "ProcessBySample.h"
+#include "ProcessByBrick.h"
+#include "ProcessByBoxcar.h"
 #include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -37,16 +37,12 @@ using namespace Isis;
 using namespace std;
 
 // Calibration support routines
-FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix);
-void calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
+FileName DetermineFlatFieldFile(const QString &filter, const bool nullPolarPix);
+void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
 
 QString loadCalibrationVariables(const QString &config);
-
-#if 0
-// PSF correction is currently not working and has been removed as an option. 
 //void psfCorrection(vector<Buffer *>& in, vector<Buffer *>& out);
 //void psfCorrectionBoxcar(Buffer &in, double &result);
-#endif
 
 // Temporary cube file pointer deleter
 struct TemporaryCubeDeleter {
@@ -62,18 +58,18 @@ struct TemporaryCubeDeleter {
 
 
 //For subimage and binning mapping
-static AlphaCube *alpha = 0;
+static AlphaCube *alpha(0);
 
 QString g_filter = "";
 static QString g_target ="";
-static const int g_hayabusaNaifCode = -130;
+static const int g_HayabusaNaifCode = -130;
 static Pvl g_configFile;
 
 //Bias calculation variables
-static double g_b0 = 0;
-static double g_b1 = 0;
-static double g_b2 = 0;
-static double g_bias = 0;
+static double g_b0(0);
+static double g_b1(0);
+static double g_b2(0);
+static double g_bias(0);
 
 static QString g_launchTimeStr;
 static iTime g_launchTime;
@@ -81,56 +77,54 @@ static QString g_startTime;
 
 
 //Dark Current variables
-static double g_d0 = 0;
-static double g_d1 = 0;
-static double g_temperature = 0;
-static double g_darkCurrent = 0;
+static double g_d0(0);
+static double g_d1(0);
+static double g_temp(0);
+static double g_darkCurrent(0);
 
 //Smear calculation variables
-static double g_tvct = 0;         //!< Vertical charge-transfer period  ( in seconds).
-static double g_exposureTime = 1;
-static double g_timeRatio = 1.0;
+static double g_Tvct(0);       //!< Vertical charge-transfer period (in seconds).
+static double g_texp(1);       //!< Exposure time.
+static double g_timeRatio(1.0);
 
 //Linearity calculation variables
-static double g_gamma = 0;
-static double g_L0 = 0;
-static double g_L1 = 0;
+static double g_Gamma(0);
+static double g_L0(0);
+static double g_L1(0);
 
 
 // Calibration parameters
-static int nsubImages = 0;      //!< Number of sub images
-static int binning = 1;         //!< The number of samples/lines which are binned
-static bool g_nullPolarizedPixels = true;   /**< Flag which tells us if the Polarized pixels are
+static int nsubImages(0);      //!< Number of sub images
+static int binning(1);         //!< The number of samples/lines which are binned
+static bool g_nullPolarizedPixels = true;   /**< Flag which tells us if the Polarized pixels are to
                                                  to be set to ISIS::Null */
-static double g_compfactor = 1.0;  //!< Default if OutputMode = LOSS-LESS; 16.0 for LOSSY
+static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for LOSSY
 
-static QString g_iofCorrection = "IOF";  //!< Is I/F correction to be applied?
+static QString g_iofCorrection("IOF");  //!< Is I/F correction to be applied?
 
 
 //  I/F variables
-static double g_solarDist = 1.0;  /**< Distance from the Sun to the target body
-                                 (used to calculate g_calibrationScale) */
-static double g_calibrationScale = 1.0;        //!< I/F conversion value
-static double g_iofScale = 1.0;
-static double g_solarFlux = 1.0;  //!< The solar flux (used to calculate g_calibrationScale).
-static double g_radStd = 3.42E-3;//!< Base conversion for all filters (Tbl. 9)
+static double g_solarDist(1.0);  /**< Distance from the Sun to the target body
+                                 (used to calculate g_iof) */
+static double g_iof(1.0);        //!< I/F conversion value
+static double g_iofScale(1.0);
+static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
+static double g_v_standard(3.42E-3);//!< Base conversion for all filters (Tbl. 9)
 
 
 //Hot pixel vector container
 static QVector<Pixel> hotPixelVector;  //!< A pixel vector that contains the Hot Pixel locations
 
-#if 0
-// PSF correction is currently not working and has been removed as an option. 
 // PSF variables 
-//static bool g_applyPSF = false;
-//static int ns, nl, nb;     //!< Number of samples, lines, bands of the input cube
-//static int g_size = 23;   //!< The size of the Boxcar used for calculating the light diffusion model.
+//static bool g_applyPSF(false);
+//static int ns,nl,nb;     //!< Number of samples, lines, bands of the input cube
+//static int g_size(23);   //!< The size of the Boxcar used for calculating the light diffusion model.
 //static const int g_N = 6;
-//static double g_alpha = 0.0;
-//static double *g_psfFilter;
+//static double g_alpha(0.0);
+//static double * g_psfFilter;
 //static double g_sigma[g_N];
 //static double g_A[g_N];
-#endif
+
 
 void IsisMain() {
 
@@ -139,29 +133,26 @@ void IsisMain() {
   g_nullPolarizedPixels = ui.GetBoolean("NULLPOLARPIX");
   g_iofCorrection = ui.GetString("UNITS");
 
-  const QString amicacalProgram = "amicacal";
-  const QString amicacalVersion = "1.0";
-  const QString amicacalRevision = "$Revision$";
-  QString amicacalRuntime = Application::DateTime();
+  const QString amicacal_program = "amicacal";
+  const QString amicacal_version = "1.0";
+  const QString amicacal_revision = "$Revision$";
+  QString amicacal_runtime = Application::DateTime();
 
-  ProcessBySample process;
+  ProcessBySample p;
 
-  Cube *inputCube = process.SetInputCube("FROM");
-#if 0
-// PSF correction is currently not working and has been removed as an option. 
+  Cube *icube = p.SetInputCube("FROM");  
 //  g_applyPSF = ui.GetBoolean("APPLYPSF");
-#endif
+
 
   // Basic assurances...
-  if (inputCube->bandCount() != 1) {
-    throw IException(IException::User, 
-                     "AMICA images may only contain one band", 
-                     _FILEINFO_);
+  if (icube->bandCount() != 1) {
+    throw IException(IException::User,
+                     "AMICA images may only contain one band", _FILEINFO_);
   }
 
-  PvlGroup& inst = inputCube->group("Instrument");
-  PvlGroup &bandbin = inputCube->group("BandBin");
-  PvlGroup &archive = inputCube->group("Archive");
+  PvlGroup& inst = icube->group("Instrument");
+  PvlGroup &bandbin = icube->group("BandBin");
+  PvlGroup &archive = icube->group("Archive");
 
   QString filter = bandbin["Name"];
   g_filter=filter;
@@ -174,32 +165,28 @@ void IsisMain() {
 
   //Set up binning and image subarea mapping
 
-  AlphaCube myAlpha(1024, 1024, inputCube->sampleCount(), 
-                    inputCube->lineCount(), 
-                    startSample + 1, 
-                    startLine + 1, 
-                    lastSample + 1, 
-                    lastLine + 1);
+  AlphaCube myAlpha(1024,1024,icube->sampleCount(), icube->lineCount(),
+                    startSample+1,startLine+1,lastSample+1,lastLine+1);
 
-  alpha = &myAlpha;
+  alpha=&myAlpha;
 
   try {
-    g_exposureTime = inst["ExposureDuration"] ; 
+    g_texp = inst["ExposureDuration"] ; 
   }
   catch(IException &e) {
     QString msg = "Unable to read [ExposureDuration] keyword in the Instrument group "
-                  "from input file [" + inputCube->fileName() + "]";
-    throw IException(e, IException::Io, msg, _FILEINFO_);
+                  "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
 
   try {
-    g_temperature = inst["CcdTemperature"] ;
+    g_temp = inst["CcdTemperature"] ;
   }
   catch(IException &e) {
     QString msg = "Unable to read [CcdTemperature] keyword in the Instrument group "
-                  "from input file [" + inputCube->fileName() + "]";
-    throw IException(e, IException::Io, msg, _FILEINFO_);
+                  "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
 
   }
 
@@ -207,7 +194,7 @@ void IsisMain() {
 
   g_startTime = startTime;
   binning = inst["Binning"];
-  int firstLine = inst["FirstLine"];
+  int startline = inst["FirstLine"];
   int startsample = inst["FirstSample"];
   int lastline = inst["LastLine"];
   int lastsample = inst["LastSample"];
@@ -226,12 +213,12 @@ void IsisMain() {
   // Determine if we need to subsample the flat field should pixel binning
   // occurred
   QScopedPointer<Cube, TemporaryCubeDeleter> flatcube;
-  FileName flatfile = determineFlatFieldFile(g_filter, g_nullPolarizedPixels);
+  FileName flatfile= DetermineFlatFieldFile(g_filter,g_nullPolarizedPixels);
 
-  QString reducedFlat = flatfile.expanded();
+  QString reducedFlat(flatfile.expanded());
 
   // Image is not cropped
-  if (firstLine ==0 && startsample == 0){
+  if (startline ==0 && startsample == 0){
 
     if (binning > 1) {
       QString scale(toString(binning));
@@ -257,108 +244,82 @@ void IsisMain() {
 
     // Set up processing for flat field as a second input file
     CubeAttributeInput att;
-    process.SetInputCube(reducedFlat, att);
+    p.SetInputCube(reducedFlat, att);
   }
   else {
     // Image is cropped so we have to deal with it
-    FileName transFlat = FileName::createTempFile("$TEMPORARY/" 
-                                                  + flatfile.baseName() 
-                                                  + "_translated.cub");
+    FileName transFlat =
+      FileName::createTempFile("$TEMPORARY/" + flatfile.baseName() + "_translated.cub");
 
     Cube *flatOriginal = new Cube(flatfile.expanded() );
     
-    int transform[5] = {binning, startsample, firstLine, lastsample, lastline};
+    int transform[5] = {binning,startsample,startline,lastsample,lastline};
     
     // Translates and scales the flatfield image.  Scaling
     // might be necessary in the event that the raw image was also binned.
 
-    translate(flatOriginal, transform, transFlat.expanded());
+    translate(flatOriginal,transform,transFlat.expanded());
 
     QScopedPointer<Cube, TemporaryCubeDeleter> translated(new Cube(transFlat.expanded(), "r"));
     flatcube.swap(translated);
     
     CubeAttributeInput att;
-    process.SetInputCube(transFlat.expanded(), att);
+    p.SetInputCube(transFlat.expanded(),att);
   }
 
-  Cube *outputCube  = process.SetOutputCube("TO");
-  QString fname = outputCube->fileName();
+  Cube *ocube  = p.SetOutputCube("TO");
+  QString fname = ocube->fileName();
 
-#if 0
-// PSF correction is currently not working and has been removed as an option. 
-  //ns = inputCube->sampleCount();
-  //nl = inputCube->lineCount();
-  //nb = inputCube->bandCount();
-#endif
+  //ns = icube->sampleCount();
+  //nl = icube->lineCount();
+  //nb = icube->bandCount();
 
   QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
 
-  g_timeRatio = g_tvct / (g_exposureTime + g_tvct);
-  g_darkCurrent = g_d0 * exp(g_d1 * g_temperature);
+  g_timeRatio = g_Tvct/(g_texp + g_Tvct);
+
+  g_darkCurrent = g_d0*exp(g_d1*g_temp);
+
+  g_iof = 1.0;  // Units of DN
+
   QString g_units = "DN";
+  if ( "radiance" == g_iofCorrection.toLower() ) {
+    // Units of RADIANCE 
+    g_iof = g_iof * g_v_standard * g_iofScale; 
+    g_units = "W / (m**2 micrometer sr)";
+  }
 
   if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
-     throw IException(IException::Programmer, 
-                      "Cannot calculated distance to sun!", 
-                      _FILEINFO_);
+     throw IException(IException::Programmer, "Cannot calculated distance to sun!",
+                       _FILEINFO_);
   }
 
-  if ( QString::compare(g_iofCorrection, "dn", Qt::CaseInsensitive) != 0 ) {
-    /* Note - this radiance calibration scaling factor is applied to both radiance and iof
-     * 
-     * Units of RADIANCE
-     * equation:
-     *     Rad(i)=image(DN/s) * C * S(i) where
-     *         C = radStd = 3.42.10^-3 
-     *         S(i) = iofScale, 
-     *             with S(v) = 1, 
-     *             S(zs)=3.286 (factor computed by Lucille Le Corre of PSI),
-     *             and the remaining scale factors from table 9 of the Ishiguro et al. 2010 paper
-     */ 
-    g_calibrationScale = g_radStd * g_iofScale / g_exposureTime; 
-    g_units = "W / (m**2 micrometer sr)";
-
-    if ( QString::compare(g_iofCorrection, "iof", Qt::CaseInsensitive) == 0 ) {
-      /* Note: iof (i.e. reflectance) equation described below is just
-       *       Ref(i) = Rad(i) * pi * d^2 /Fv
-       *       so this if-statement is nested 
-       *
-       * Units of I/F (reflectance)
-       * equation:
-       *     Ref(v)=image(DN/s) * C * S(i) * pi * d^2/F(v) where 
-       *         C, S(i) are as described above,
-       *         d is the solar distance from the label of the v filter image,
-       *         Fv = solarflux(v) = 1861.145142 is the solar flux 
-       *             resampled to V filter bandpass with Quantum Efficiency
-       */
-      g_calibrationScale = g_calibrationScale 
-                           * Isis::PI 
-                           * (g_solarDist * g_solarDist) 
-                           / g_solarFlux;
-      g_units = "I over F";
-    }
+  if ( "iof" == g_iofCorrection.toLower() ) {
+    // Units of I/F
+    g_iof = pi_c() * (g_solarDist * g_solarDist) * 
+            (g_v_standard * g_iofScale) / g_solarFlux / g_texp;
+    g_units = "I over F";
   }
+
 
   // Calibrate!
   try {
-    process.Progress()->SetText("Calibrating Hayabusa Cube");
-    process.StartProcess(calibrate);
+    p.Progress()->SetText("Calibrating Hayabusa Cube");
+    p.StartProcess(Calibrate);
   }
   catch (IException &ie) {
-    throw IException(ie, 
-                     IException::Programmer, 
-                     "Radiometric calibration failed!", 
-                     _FILEINFO_);
+    throw IException(ie, IException::Programmer, 
+                     "Radiometric calibration failed!", _FILEINFO_);
   }
 
   // Log calibration activity performed so far
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.addKeyword(PvlKeyword("SoftwareName", amicacalProgram));
-  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", amicacalVersion));
-  calibrationLog.addKeyword(PvlKeyword("ProcessDate", amicacalRuntime));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareName", amicacal_program));
+  calibrationLog.addKeyword(PvlKeyword("SoftwareVersion", amicacal_version));
+  calibrationLog.addKeyword(PvlKeyword("ProcessDate", amicacal_runtime));
   calibrationLog.addKeyword(PvlKeyword("CalibrationFile", calfile));
   calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", flatfile.originalPath()
-                                                        + "/" + flatfile.name()));
+                                       + "/" + flatfile.name()));
   calibrationLog.addKeyword(PvlKeyword("CompressionFactor", toString(g_compfactor, 2)));
 
   // Parameters
@@ -373,77 +334,75 @@ void IsisMain() {
   key.addValue(toString(g_L0, 8));
   key.addValue(toString(g_L1, 8));
   calibrationLog.addKeyword(key);
-  calibrationLog.addKeyword(PvlKeyword("Linearity_Gamma", toString(g_gamma, 16)));
+  calibrationLog.addKeyword(PvlKeyword("Linearity_Gamma", toString(g_Gamma, 16)));
 
-  calibrationLog.addKeyword(PvlKeyword("Smear_tvct", toString(g_tvct, 16)));
+  calibrationLog.addKeyword(PvlKeyword("Smear_Tvct", toString(g_Tvct, 16)));
 
   calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
-  calibrationLog.addKeyword(PvlKeyword("RadianceStandard", toString(g_radStd, 16)));
+  calibrationLog.addKeyword(PvlKeyword("RadianceStandard", toString(g_v_standard, 16)));
   calibrationLog.addKeyword(PvlKeyword("RadianceScaleFactor", toString(g_iofScale, 16)));
   calibrationLog.addKeyword(PvlKeyword("SolarDistance", toString(g_solarDist, 16), "AU"));
   calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));
-  calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_calibrationScale, 16)));
+  calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_iof, 16)));
   calibrationLog.addKeyword(PvlKeyword("Units", g_units));
 
-#if 0 
 // PSF correction is currently not working and has been removed as an option. 
+#if 0 
   // This section will apply the PSF correction
   if ( g_applyPSF ) {
     //PSF correction
     CubeAttributeInput attInput;
     CubeAttributeOutput attOutput;
 
-    ProcessByBoxcar processDiffusionModel;
+    ProcessByBoxcar pDiffusionModel;
 
     QScopedPointer<Cube, TemporaryCubeDeleter> diffusionModel;
 
-    FileName oname(outputCube->fileName());
+    FileName oname(ocube->fileName());
     FileName psfModel = FileName::createTempFile("$TEMPORARY/" + oname.baseName() + "_psfmodel.cub");
 
 
-    processDiffusionModel.SetInputCube(outputCube);
-    processDiffusionModel.SetOutputCube(psfModel.name(), attOutput, 
-                                        outputCube->sampleCount(), 
-                                        outputCube->lineCount(), 
-                                        outputCube->bandCount());
+    pDiffusionModel.SetInputCube(ocube);
+    pDiffusionModel.SetOutputCube(psfModel.name(),attOutput,
+                                  ocube->sampleCount(),
+                                  ocube->lineCount(),
+                                  ocube->bandCount());
 
-    processDiffusionModel.SetBoxcarSize(g_size, g_size);
+    pDiffusionModel.SetBoxcarSize(g_size,g_size);
 
-    g_psfFilter = setPSFFilter(g_size, g_A, g_sigma, g_alpha, g_N, binning);
+    g_psfFilter = setPSFFilter(g_size, g_A,g_sigma, g_alpha,g_N,binning);
 
     try {
 
-         processDiffusionModel.StartProcess(psfCorrectionBoxcar);  //Determine the diffusion model.
+         pDiffusionModel.StartProcess(psfCorrectionBoxcar);  //Determine the diffusion model.
 
       }
 
       catch(IException &ie) {
-        processDiffusionModel.EndProcess();
-        outputCube->putGroup(calibrationLog);
-        process.EndProcess();
+        pDiffusionModel.EndProcess();
+        ocube->putGroup(calibrationLog);
+        p.EndProcess();
         remove( psfModel.expanded().toLatin1().data() );
-        throw IException(ie, 
-                         IException::Programmer, 
-                         "Calculating the diffusion model failed!", 
-                         _FILEINFO_);
+        throw IException(ie, IException::Programmer,
+                         "Calculating the diffusion model failed!", _FILEINFO_);
       }
 
-      processDiffusionModel.EndProcess();
+      pDiffusionModel.EndProcess();
 
      //Apply the PSF correction
-      ProcessByLine processPSFCorrection;
+      ProcessByLine pPSFCorrection;
 
       //The diffusion model
-      processPSFCorrection.SetInputCube(psfModel.name(), attInput);
+      pPSFCorrection.SetInputCube(psfModel.name(),attInput);
 
       //The original output cube.
-      processPSFCorrection.SetInputCube(outputCube);
-      processPSFCorrection.AddOutputCube(outputCube, false);
+      pPSFCorrection.SetInputCube(ocube);
+      pPSFCorrection.AddOutputCube(ocube, false);
 
 
       try {
 
-        processPSFCorrection.StartProcess(psfCorrection);
+        pPSFCorrection.StartProcess(psfCorrection);
 
         // Add PSF parameter to the calibration reporting
         key = PvlKeyword("PSF_KernelSize");
@@ -454,31 +413,25 @@ void IsisMain() {
         calibrationLog.addKeyword(PvlKeyword("PSF_Focused", toString(g_alpha, 6)));
 
         key = PvlKeyword("PSF_Sigma");
-        for (int i = 0 ; i < g_N ; i++ ) { 
-          key.addValue(toString(g_sigma[i])); 
-        }
+        for (int i = 0 ; i < g_N ; i++ ) { key.addValue(toString(g_sigma[i])); }
         calibrationLog.addKeyword(key);
 
         key = PvlKeyword("PSF_Diffuse");
-        for (int i = 0 ; i < g_N ; i++ ) { 
-          key.addValue(toString(g_A[i])); 
-        }
+        for (int i = 0 ; i < g_N ; i++ ) { key.addValue(toString(g_A[i])); }
 
       }
 
       catch(IException &ie){
-        processPSFCorrection.EndProcess();
-        outputCube->putGroup(calibrationLog);
-        process.EndProcess();
+        pPSFCorrection.EndProcess();
+        ocube->putGroup(calibrationLog);
+        p.EndProcess();
         remove( psfModel.expanded().toLatin1().data() );
-        throw IException(ie, 
-                         IException::Programmer, 
-                         "Applying the PSF correction failed!", 
-                         _FILEINFO_);
+        throw IException(ie, IException::Programmer,
+                         "Applying the PSF correction failed!", _FILEINFO_);
 
       }  
       
-      processPSFCorrection.EndProcess();
+      pPSFCorrection.EndProcess();
 
       // Remove the PSF file  
       remove( psfModel.expanded().toLatin1().data() );
@@ -486,10 +439,10 @@ void IsisMain() {
 #endif 
 
   // Write Calibration group to output file
-  outputCube->putGroup(calibrationLog);
+  ocube->putGroup(calibrationLog);
   Application::Log(calibrationLog);
   //configFile.clear();
-  process.EndProcess();
+  p.EndProcess();
 
 }
 
@@ -500,7 +453,7 @@ void IsisMain() {
  * @param filter  Name of AMICA filter
  * @return FileName Path and name of flat file file
  */
-FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix) {
+FileName DetermineFlatFieldFile(const QString &filter, const bool nullPolarPix) {
 
   QString fileName = "$hayabusa/calibration/flatfield/";
 
@@ -524,7 +477,6 @@ FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix) 
 
 
 #if 0
-// PSF correction is currently not working and has been removed as an option. 
 /**
  * @brief This function moves the PSF kernel through each pixel of the input cube and approximates
  * the amount of light diffusion produced by that pixel.
@@ -536,16 +488,16 @@ FileName determineFlatFieldFile(const QString &filter, const bool nullPolarPix) 
 void psfCorrectionBoxcar(Buffer &in, double &result) {
 
     result = 0;
-    int center = (int)((g_size * g_size - 1) / 2);
+    int center = (int)(g_size*g_size -1)/2;
 
     Statistics stats;
 
     for (int i = 0; i < in.size(); i++) {
 
-      if (!IsSpecial(in[i])) {
-        //stats.AddData(in[i] * g_psfFilter[i]);
-        stats.AddData(in[center] * g_psfFilter[i]);
-        //result += in[i] * g_psfFilter[i];
+      if(!IsSpecial(in[i])) {
+        //stats.AddData(in[i]*g_psfFilter[i]);
+        stats.AddData(in[center]*g_psfFilter[i]);
+        //result += in[i]*g_psfFilter[i];
       }
 
     }
@@ -569,7 +521,7 @@ void psfCorrection(vector<Buffer *> &in, vector<Buffer *> &out) {
   for (int i = 0; i < nopsf.size(); i++) {
     if (!IsSpecial(psfVals[i])) {
 
-      imageOut[i] = nopsf[i] - psfVals[i];
+      imageOut[i] = nopsf[i]-psfVals[i];
       //imageOut[i] = psfVals[i];
 
     }
@@ -598,50 +550,46 @@ QString loadCalibrationVariables(const QString &config)  {
   g_configFile.read(calibFile.expanded());
 
   // Load the groups
-  PvlGroup &biasGroup = g_configFile.findGroup("Bias");
-  PvlGroup &darkCurrentGroup = g_configFile.findGroup("DarkCurrent");
-  PvlGroup &smearGroup = g_configFile.findGroup("SmearRemoval");
-  PvlGroup &linearityGroup = g_configFile.findGroup("Linearity");
-  PvlGroup &hotPixelsGroup = g_configFile.findGroup("HotPixels");
-  PvlGroup &radGroup = g_configFile.findGroup("Rad");
-  PvlGroup &solarFluxGroup = g_configFile.findGroup("SolarFlux");
-
-#if 0
-// PSF correction is currently not working and has been removed as an option. 
+  PvlGroup &Bias = g_configFile.findGroup("Bias");
+  PvlGroup &DarkCurrent = g_configFile.findGroup("DarkCurrent");
+  PvlGroup &Smear = g_configFile.findGroup("SmearRemoval");
+  PvlGroup &Linearity = g_configFile.findGroup("Linearity");
+  PvlGroup &hotPixels = g_configFile.findGroup("HotPixels");
 //  PvlGroup &psfDiffuse = g_configFile.findGroup("PSFDiffuse");
 //  PvlGroup &psfFocused = g_configFile.findGroup("PSFFocused");
-#endif
+  PvlGroup &solar = g_configFile.findGroup("SOLARFLUX");
+  PvlGroup &iof = g_configFile.findGroup("RAD");
 
   // Load the hot pixels into a vector
-  for (int i = 0; i< hotPixelsGroup.keywords(); i++ ){
+  for (int i = 0; i< hotPixels.keywords(); i++ ){
 
-    int samp(hotPixelsGroup[i][0].toInt());
-    int line (hotPixelsGroup[i][1].toInt());
+    int samp(hotPixels[i][0].toInt());
+    int line (hotPixels[i][1].toInt());
 
-    hotPixelVector.append( Pixel(alpha->BetaSample(samp), alpha->BetaLine(line), 1, 0));
+    hotPixelVector.append( Pixel(alpha->BetaSample(samp),alpha->BetaLine(line),1,0));
   }
 
   // Load linearity variables
-  g_gamma = linearityGroup["Gamma"];
-  g_gamma = 1.0 - g_gamma;
+  g_Gamma = Linearity["Gamma"];
+  g_Gamma = 1.0-g_Gamma;
 
-  g_L0 = linearityGroup["L"][0].toDouble();
-  g_L1 = linearityGroup["L"][1].toDouble();
+  g_L0 = Linearity["L"][0].toDouble();
+  g_L1 = Linearity["L"][1].toDouble();
 
   // Load Smear Removal Variables
-  g_tvct = smearGroup["tvct"];
+  g_Tvct = Smear["Tvct"];
 
   // Load DarkCurrent variables
-  g_d0 = darkCurrentGroup["D"][0].toDouble();
-  g_d1 = darkCurrentGroup["D"][1].toDouble();
+  g_d0 = DarkCurrent["D"][0].toDouble();
+  g_d1 = DarkCurrent["D"][1].toDouble();
 
   // Load Bias variables
-  g_b0 = biasGroup["B"][0].toDouble();
-  g_b1 = biasGroup["B"][1].toDouble();
-  g_b2 = biasGroup["B"][2].toDouble();
+  g_b0 = Bias["B"][0].toDouble();
+  g_b1 = Bias["B"][1].toDouble();
+  g_b2 = Bias["B"][2].toDouble();
 
 
-  g_launchTimeStr=QString(biasGroup["launchTime"]);
+  g_launchTimeStr=QString(Bias["launchTime"]);
 
   //cout << g_launchTimeStr << endl;
 
@@ -657,15 +605,11 @@ QString loadCalibrationVariables(const QString &config)  {
 
   loadNaifTiming();  // Ensure the proper kernels are loaded
 
-  scs2e_c(g_hayabusaNaifCode, g_startTime.toLatin1().data(), &obsStartTime);  
+  scs2e_c(g_HayabusaNaifCode,g_startTime.toLatin1().data(), &obsStartTime);  
   tsecs = obsStartTime - g_launchTime.Et();
-  tdays = tsecs / 86400;
-  g_bias = g_b0 
-           + g_b1 * tdays 
-           + g_b2 * (tdays * tdays);
+  tdays = tsecs/86400;
+  g_bias = g_b0+g_b1*tdays+g_b2*(tdays*tdays);
 
-#if 0
-// PSF correction is not working and is temporarily removed. 
   //g_bias = 0;
   //cout << "g_bias = "  << g_bias << endl;
 
@@ -678,6 +622,7 @@ QString loadCalibrationVariables(const QString &config)  {
 
   //Commenting out this code and making it a user parameter
   //to make it easier to try out optimum values
+ #if 0
   if (psfFocused.hasKeyword("KernelSize") ) {
     g_size = psfFocused["KernelSize"];
   }
@@ -685,6 +630,10 @@ QString loadCalibrationVariables(const QString &config)  {
     g_size = 23;
   }
 
+#endif
+
+// PSF correction is not working and is temporarily removed. 
+#if 0 
   g_alpha = psfFocused[g_filter.toLower()];
 
    for (int i =0; i < g_N; i++) {
@@ -694,10 +643,13 @@ QString loadCalibrationVariables(const QString &config)  {
 #endif
 
   // Load the Solar Flux for the specific filter
-  g_solarFlux = solarFluxGroup["v"];
+  g_solarFlux=solar[g_filter.toLower()];
 
-  g_radStd = radGroup["iof_standard"];
-  g_iofScale   = radGroup[g_filter];
+  // radiance = g_v_standard * g_iofScale
+  // iof      = radiance * pi *dist_au^2
+
+  g_v_standard = iof["iof_standard"];
+  g_iofScale   = iof[g_filter];
 
   return ( calibFile.original() );
 }
@@ -709,7 +661,7 @@ QString loadCalibrationVariables(const QString &config)  {
  * @param in   Raw image and flat field
  * @param out  Radometrically corrected image
  */
-void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
+void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   Buffer& imageIn   = *in[0];
   Buffer& flatField = *in[1];
@@ -730,12 +682,12 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
 
   // Compute smear component here as its a constant for the entire sample
-  double t1 = g_timeRatio / imageIn.size();
+  double t1 = g_timeRatio/imageIn.size();
   double b = binning;
-  double c1 = 1.0;  //default if no binning
+  double c1(1.0);  //default if no binning
 
   if (binning > 1) {
-    c1 = 1.0 / (1.0 + t1 * ((b - 1.0) / (2.0 * b) ) );
+    c1 = 1.0/(1.0 + t1*((b -1.0)/(2.0*b) ) );
   }
 
   double smear = 0;
@@ -773,12 +725,12 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     }
 
     // 2) LINEARITY Correction - always done
-    imageOut[i] = pow(imageOut[i], g_gamma) + g_L0 * imageOut[i] * exp(g_L1 * imageOut[i]);
+    imageOut[i] = pow(imageOut[i],g_Gamma) + g_L0*imageOut[i]*exp(g_L1*imageOut[i]);
 
 
     // 3) DARK Current - Currently negligible and removed
 #if 0
-      imageOut[i] = imageOut[i] - g_darkCurrent;
+      imageOut[i] = imageOut[i]-g_darkCurrent;
 #endif
 
     // 4) HOT Pixel Removal
@@ -799,7 +751,7 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // 5) READOUT Smear Removal - Not needed if on-board corrected.  Binning is
     //    accounted for in computation of c1 before loop.
     if (nsubImages <= 1) {
-      imageOut[i] = c1 * (imageOut[i] - smear);
+      imageOut[i] = c1*(imageOut[i] - smear);
     }
 
     // 6) FLATFIELD correction
@@ -812,8 +764,8 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       imageOut[i] /= flatField[i];
     }
 
-    // 7) I/F or Radiance Conversion (or g_calibrationScale might = 1, in which case the output will be in DNs)
-    imageOut[i] *= g_calibrationScale;
+    // 7) I/F or Radiance Conversion (or g_iof might = 1, in which case the output will be in DNs)
+    imageOut[i] *= g_iof;
   }
   return;
 }
