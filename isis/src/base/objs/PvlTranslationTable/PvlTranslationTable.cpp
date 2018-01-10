@@ -85,19 +85,26 @@ namespace Isis {
    */
   void PvlTranslationTable::AddTable(const QString &transFile) {
     p_trnsTbl.read(FileName(transFile).expanded());
+    validateTable();
   }
 
 
   /**
    * Adds the contents of a translation table to the searchable groups/keys
-   * Also performs a verification, to ensure that the translation table
-   * is valid
    *
    * @param transStm The stream to be added.
    */
   void PvlTranslationTable::AddTable(std::istream &transStm) {
     transStm >> p_trnsTbl;
-    
+    validateTable();
+  }
+
+
+  /**
+  * Performs verification to ensure that p_trnsTbl is valid
+  *
+  */
+  void PvlTranslationTable::validateTable() {
     // pair< name, size > of acceptable keywords.
     // A size of -1 means non-zero size.
     vector< pair<QString, int> > validKeywordSizes = validKeywords();
@@ -164,12 +171,12 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   /**
    * Returns a vector of valid keyword names and their sizes.  A size of -1
    * indicates that the keyword can be any size.
-   * 
+   *
    * @return @b vector<pair<QString,int>> A vector of valid keyword names and their sizes.
    */
   vector< pair<QString, int> > PvlTranslationTable::validKeywords() const {
@@ -233,7 +240,7 @@ namespace Isis {
     while(it != tgrp.end()) {
       const PvlKeyword &key = *it;
       // compare the value from the input file to the second value of each Translation in the trans file.
-      // ignore cases for input values  
+      // ignore cases for input values
       if(QString::compare((QString) key[1], tmpFValue, Qt::CaseInsensitive) == 0) {
         return key[0];
       }
@@ -458,4 +465,3 @@ namespace Isis {
     return "";
   }
 } // end namespace isis
-

@@ -110,9 +110,12 @@ namespace Isis {
    *                          renamed later) now returns a PvlKeyword.
    *  @history 2017-11-04 Jeannie Backer - Modified Translation input value to make a case
    *                          insensitive comparison.
-   *  
-   *  
-   *  
+   *  @history 2018-01-09 Summer Stapleton - Added validateTable() method called by both
+   *                          AddTable() methods to check for validity of table being added by
+   *                          either method. Fixes #4900.
+   *
+   *
+   *
    *  @todo 2005-02-15 Stuart Sides - add coded and implementation example to
    *                       class documentation and finish documentation
    *                       for protected methods and variable
@@ -153,6 +156,9 @@ namespace Isis {
       bool IsOptional(const QString nName);
       PvlKeyword &OutputPosition(const QString nName);
       QString OutputName(const QString nName);
+
+      // Ensures that added table entries are valid
+      void validateTable();
 
     private:
       Pvl p_trnsTbl;
