@@ -11,10 +11,12 @@
 #include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSettings>
 #include <QStackedWidget>
 #include <QString>
 #include <QTabWidget>
+#include <QVBoxLayout>
 #include <QWidget>
 
 #include "QnetCubeDistanceFilter.h"
@@ -46,6 +48,9 @@
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+
+
+#include <typeinfo>
 
 using namespace std;
 
@@ -79,6 +84,8 @@ namespace Isis {
 
     createNavigationDialog(parent);
     connect(this, SIGNAL(deletedPoints()), this, SLOT(refreshList()));
+    connect(this, SIGNAL( activityUpdate(QString) ),
+            this, SLOT( updateActivityHistory(QString) ) );
   }
 
   /**
@@ -225,7 +232,7 @@ namespace Isis {
         FileName("$HOME/.Isis/" + QApplication::applicationName() + "/NavTool.config").expanded();
     QSettings settings(settingsFileName, QSettings::NativeFormat);
     m_navDialog->resize(settings.value("size").toSize());
-    
+
     // View the dialog - we need this to get the size of the dialog which we're using
     // for positioning it.
     m_navDialog->setVisible(true);
@@ -268,6 +275,10 @@ namespace Isis {
    *                           "Properties". Updated "What's This?" documentation
    *                           for Measure Properties to explain use of ignore
    *                           status and measure type filters.
+   *   @history  2018-01-10 Adam Goins - Added the Activity History tab to the window.
+   *                           This tab will keep track of edits made to control points/measures.
+   *                           More history entries can be kept track of
+   *                           by emitting the activityUpdate(QString message) signal.
    */
   void QnetNavTool::createFilters() {
     // Set up the point filters
@@ -419,8 +430,31 @@ namespace Isis {
     // Add widgets to the filter stack
     m_filterStack->addWidget(pointFilters);
     m_filterStack->addWidget(cubeFilters);
+
+
+    // Create the Activity History Tab
+    QScrollArea *scrollArea = new QScrollArea();
+
+    QWidget *historyWidget = new QWidget();
+    QWidget *innerWidget = new QWidget();
+
+    QVBoxLayout *innerLayout = new QVBoxLayout();
+    QLabel *title = new QLabel("<b>History</b>");
+    innerLayout->addWidget(title);
+    innerLayout->addWidget(scrollArea);
+
+    m_historyLayout = new QVBoxLayout(scrollArea);
+    m_historyLayout->setAlignment(Qt::AlignTop);
+
+    historyWidget->setLayout(innerLayout);
+    innerWidget->setLayout(m_historyLayout);
+    scrollArea->setWidget(innerWidget);
+    scrollArea->setWidgetResizable(true);
+
+    pointFilters->addTab(historyWidget, QString("&Activity History") );
+
   }
-  
+
 
   QList<int> &QnetNavTool::filteredImages() {
     return m_filteredImages;
@@ -430,8 +464,8 @@ namespace Isis {
   const QList<int> &QnetNavTool::filteredImages() const {
     return m_filteredImages;
   }
-  
-  
+
+
   QList<int> &QnetNavTool::filteredPoints() {
     return m_filteredPoints;
   }
@@ -441,7 +475,7 @@ namespace Isis {
     return m_filteredPoints;
   }
 
-  
+
   ControlNet *QnetNavTool::controlNet() {
     return m_qnetTool->controlNet();
   }
@@ -574,10 +608,32 @@ namespace Isis {
     else {
       m_listBox->setCurrentItem(items.at(0));
     }
+    QString activityMessage("Point selected: " + pointId);
+    emit(activityUpdate(activityMessage));
     return;
   }
 
+  /**
+  *   Slot to update the history tab with current edits.
+  *   It is deisgned not to allow duplicate history entries back to back.
+  *
+  *   @internal
+  *     @history 2018-01-10 Adam Goins - Slot was created.
+  */
+  void QnetNavTool::updateActivityHistory(QString activityMessage) {
 
+    // Check to ensure duplicate entries aren't added back to back.
+    if (m_historyLayout->count() > 0) {
+      QWidget *firstEntry = m_historyLayout->layout()->itemAt(0)->widget();
+      QLabel *firstLabel = dynamic_cast<QLabel*>(firstEntry);
+      if (firstLabel->text() == activityMessage) {
+        return;
+      }
+    }
+
+    QLabel *historyEntry = new QLabel(activityMessage);
+    m_historyLayout->insertWidget(0, historyEntry);
+  }
 
   /**
    *   Slot to refresh the listBox
@@ -628,7 +684,7 @@ namespace Isis {
           this, SLOT(load(QListWidgetItem *)));
       connect(m_listBox, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
           this, SLOT(editPoint(QListWidgetItem *)), Qt::UniqueConnection);
-          
+
       for (int i = 0; i < m_filteredPoints.size(); i++) {
         QString cNetId = (*controlNet())[m_filteredPoints[i]]->GetId();
         QString itemString = cNetId;
@@ -724,9 +780,9 @@ namespace Isis {
 
 
   /**
-   * Slot for double-clicking cube list.  Needed this slot because the signal 
-   * has a QListWidgetItem parameter.  TODO:  Clean this up by possibly combining 
-   * the two different load slots??? 
+   * Slot for double-clicking cube list.  Needed this slot because the signal
+   * has a QListWidgetItem parameter.  TODO:  Clean this up by possibly combining
+   * the two different load slots???
    *
    * @author 2010-11-04 Tracie Sucharski
    *
@@ -850,7 +906,7 @@ namespace Isis {
    * @internal
    *   @history 2008-12-29 Jeannie Walldren - Added question box to verify that
    *                          the user wants to delete the selected points.
-   *   @history 2011-07-25 Tracie Sucharski - Fixed bug in refreshing list 
+   *   @history 2011-07-25 Tracie Sucharski - Fixed bug in refreshing list
    *                          changed to delete starting at end of list so
    *                          indices stay accurate.
    *   @history 2011-10-20 Tracie Sucharski - Fixed bug with filter list not
@@ -935,21 +991,21 @@ namespace Isis {
     return;
   }
 
-  
+
   /**
    * Bring up apriori dialog
    *
-   * @author 2011-04-19 Tracie Sucharski 
-   *  
-   * @internal 
+   * @author 2011-04-19 Tracie Sucharski
+   *
+   * @internal
    *   @history 2016-11-18 Makayla Shepherd - Added a connection to disconnectAprioriDialog() which
    *                           will disconnect the dialog and delete it.
-   * 
-   * @todo  This method should be temporary until the control point editor 
+   *
+   * @todo  This method should be temporary until the control point editor
    *           comes online.  If this stick around, needs to be re-designed-
    *           put in a separate class??
-   *  
-   */ 
+   *
+   */
   void QnetNavTool::aprioriDialog() {
     // If no cubes are loaded, simply return
     if (serialNumberList() == NULL)
@@ -969,13 +1025,13 @@ namespace Isis {
     }
     m_aprioriDialog->setVisiblity();
   }
-  
-  
+
+
   /**
-   * Slot to pass points selected in Nav List Widget to Apriori Dialog 
-   *  
-   * @internal 
-   * @history 2011-05-04 Tracie Sucharski - Do not print error if no pts 
+   * Slot to pass points selected in Nav List Widget to Apriori Dialog
+   *
+   * @internal
+   * @history 2011-05-04 Tracie Sucharski - Do not print error if no pts
    *                        selected, simply return.
    */
   void QnetNavTool::setAprioriDialogPoints() {
@@ -992,12 +1048,12 @@ namespace Isis {
     m_aprioriDialog->setPoints(selected);
 
   }
-  
-  
+
+
   /**
-   * Apriori dialog has been closed and needs to be disconnected and deleted so a new dialog can 
+   * Apriori dialog has been closed and needs to be disconnected and deleted so a new dialog can
    * be brought up next time.
-   * 
+   *
    * @author 2016-11-14 Makayla Shepherd
    *
    */
@@ -1010,7 +1066,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Figures out what type of widget the filter was selected for and calls the
    * filter method for that filter class
@@ -1033,7 +1089,7 @@ namespace Isis {
    *
    */
   void QnetNavTool::filter() {
-    
+
     m_filtered = true;
     QApplication::setOverrideCursor(Qt::WaitCursor);
     m_filter->setEnabled(false);
@@ -1243,4 +1299,3 @@ namespace Isis {
   }
 #endif
 }
-
