@@ -52,9 +52,7 @@ namespace Isis {
   ControlNetVersioner::ControlNetVersioner(ControlNet *net)
       : m_ownsPoints(false) {
     // Populate the internal list of points.
-    for (int i = 0; i < net->GetNumPoints(); i++) {
-        m_points.append( net->GetPoints().at(i) );
-    }
+    m_points.append( net->GetPoints() );
 
     ControlNetHeaderV0001 header;
 
