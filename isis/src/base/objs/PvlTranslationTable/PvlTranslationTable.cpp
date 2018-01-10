@@ -85,26 +85,19 @@ namespace Isis {
    */
   void PvlTranslationTable::AddTable(const QString &transFile) {
     p_trnsTbl.read(FileName(transFile).expanded());
-    validateTable();
   }
 
 
   /**
    * Adds the contents of a translation table to the searchable groups/keys
+   * Also performs a verification, to ensure that the translation table
+   * is valid
    *
    * @param transStm The stream to be added.
    */
   void PvlTranslationTable::AddTable(std::istream &transStm) {
     transStm >> p_trnsTbl;
-    validateTable();
-  }
 
-
-  /**
-  * Performs verification to ensure that p_trnsTbl is valid
-  *
-  */
-  void PvlTranslationTable::validateTable() {
     // pair< name, size > of acceptable keywords.
     // A size of -1 means non-zero size.
     vector< pair<QString, int> > validKeywordSizes = validKeywords();
@@ -200,6 +193,7 @@ namespace Isis {
    * Translates the output name and input value.
    *
    * @param nName The output name to be used to search the translation table.
+   *
    * @param fValue The input value to be translated
    *
    * @return QString The translated QString
@@ -207,7 +201,7 @@ namespace Isis {
    * @throws iException::Programmer
    */
   QString PvlTranslationTable::Translate(const QString nName,
-                                         const QString fValue) const {
+                                        const QString fValue) const {
     if(!p_trnsTbl.hasGroup(nName)) {
       QString msg = "Unable to find translation group [" +
                    nName + "] in file [" + p_trnsTbl.fileName() + "]";
@@ -239,9 +233,7 @@ namespace Isis {
 
     while(it != tgrp.end()) {
       const PvlKeyword &key = *it;
-      // compare the value from the input file to the second value of each Translation in the trans file.
-      // ignore cases for input values
-      if(QString::compare((QString) key[1], tmpFValue, Qt::CaseInsensitive) == 0) {
+      if((QString) key[1] == tmpFValue) {
         return key[0];
       }
       else if((QString) key[1] == "*") {
@@ -362,7 +354,9 @@ namespace Isis {
     }
 
     PvlGroup tgrp = p_trnsTbl.findGroup(nName);
-    if(tgrp.hasKeyword("InputKey")) return tgrp["InputKey"];
+    if (tgrp.hasKeyword("InputKey")) {
+      return tgrp["InputKey"];
+    }
 
     return "";
   }
