@@ -56,7 +56,8 @@ namespace Isis {
     // needs changing...
 
     #ifdef Q_OS_LINUX
-    if (!XOpenDisplay(NULL)) {
+    Display *xDisplay = XOpenDisplay(NULL);
+    if (!xDisplay) {
       std::cerr << "cannot connect to X server...\n\n"
           "Do you have an X server running?\n\n"
           "If yes then...\n\n"
@@ -67,6 +68,9 @@ namespace Isis {
           "system administrator.\n\n";
 
       abort();
+    }
+    else {
+      XCloseDisplay(xDisplay);
     }
     #endif
   }
@@ -94,21 +98,21 @@ namespace Isis {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle(style);
     }
-    
-    
+
+
     if (uiPref.hasKeyword("GuiFontName")) {
       QString fontString = uiPref["GuiFontName"];
       QFont font = QFont(fontString);
-      
+
       if (uiPref.hasKeyword("GuiFontSize")) {
         int pointSize = uiPref["GuiFontSize"];
         font.setPointSize(pointSize);
       }
-      
+
       QApplication::setFont(font);
     }
-    
-    
+
+
     // Create the main window
     p_gui = new Gui(ui);
     p_gui->show();

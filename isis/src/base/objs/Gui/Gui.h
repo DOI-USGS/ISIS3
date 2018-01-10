@@ -85,6 +85,8 @@ namespace Isis {
    *                         setup. Fixes #4731.
    *  @history 2017-05-19 Marjorie Hahn - Applied font style and font size from the 
    *                         IsisPreferences file. Fixes #198.
+   *  @history 2018-01-08 Summer Stapleton - Fixed memory leak involved in the X-forwarding check.
+   *                         Fixes #4736.
    */
 
   class Gui : public QMainWindow {
