@@ -90,7 +90,7 @@ namespace Isis {
    *                           previous versions, corrected units throughout in comments and code.
    *                           Reference #4649 and #501.
    *  @history 2018-01-05 Debbie A. Cook - Added new members m_coordTypeReports and
-   *                           m_coordTypeBundle to copy constructor.  Reference #4649 and #501.
+   *                           m_coordTypeBundle to copy method.  Reference #4649 and #501.
   */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
