@@ -49,9 +49,6 @@
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 
-
-#include <typeinfo>
-
 using namespace std;
 
 namespace Isis {
