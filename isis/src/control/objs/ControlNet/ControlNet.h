@@ -209,8 +209,6 @@ namespace Isis {
    *   @history 2017-12-21 Jesse Mapel - Modified read and write methods to use the refactored
    *                           ControlNetVersioner instead of directly parsing the protobuf
    *                           objects from the LatestControlNetFile.
-   *   @history 2017-12-21 Jesse Mapel - Modified GetPoints to use QHash's values method instead
-   *                           GetPoint for every Serial Number.
    */
   class ControlNet : public QObject {
       Q_OBJECT

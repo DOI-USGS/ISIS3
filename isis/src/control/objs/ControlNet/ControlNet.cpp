@@ -1483,10 +1483,8 @@ namespace Isis {
   QList< ControlPoint * > ControlNet::GetPoints() {
     QList< ControlPoint * > pointsList;
 
-    QHash< QString, ControlPoint * >::const_iterator pointsIt = points->constBegin();
-    while(pointsIt != points->constEnd()) {
-      pointsList.append( pointsIt.value() );
-      ++pointsIt;
+    for (int i = 0; i < pointIds->size(); i++) {
+      pointsList.append(GetPoint(i));
     }
 
     return pointsList;
