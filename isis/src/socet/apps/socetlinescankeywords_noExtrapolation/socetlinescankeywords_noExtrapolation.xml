@@ -111,9 +111,6 @@
         </description>
       </parameter>
 
-<!--
-Commented this parameter out until HRSC is supported in SS
--->
       <parameter name="HRSC_NADIRCENTERTIME">
         <brief>Ephemeris time at center of HRSC nadir image 
         </brief>

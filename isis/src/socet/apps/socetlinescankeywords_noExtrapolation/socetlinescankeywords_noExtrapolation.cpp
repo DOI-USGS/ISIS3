@@ -155,43 +155,9 @@ void IsisMain() {
 
   double focal = cam->FocalLength();  // focal length returned in mm
 
-//TO DO: UNCOMMENT THESE LINES ONCE HRSC and MOC IS WORKING IN SS
+//NOTE: UNCOMMENT CODE BELOW WHEN MOC IS WORKING IN SS
 //  if (isMocWARed)
 //    focal = focal * 0.007;  // pixel to mm conversion
-//  else if (isHRSC)
-//  if (isHRSC) {
-//    switch (ikCode) {
-//      case -41219:                   //S1: fwd stereo
-//        focal = 184.80;
-//        break;
-//      case -41218:                   //IR: infra-red
-//        focal = 181.57;
-//        break;
-//      case -41217:                   //P1: fwd photo
-//        focal = 179.16;
-//        break;
-//      case -41216:                   // GREEN
-//        focal = 175.31;
-//        break;
-//      case -41215:                   // NADIR
-//        focal = 175.01;
-//        break;
-//      case -41214:                   // BLUE
-//        focal = 175.53;
-//        break;
-//      case -41213:                   // P2: aft photo
-//        focal = 179.19;
-//        break;
-//      case -41212:                   // RED
-//        focal = 181.77;
-//        break;
-//      case -41211:                   // S2: aft stereo
-//        focal = 184.88;
-//        break;
-//      default:
-//        break;
-//    }
-//  }
 
   // Get instrument summing modes
   int csum = (int) detectorMap->SampleScaleFactor();
@@ -883,8 +849,6 @@ void IsisMain() {
     etStart = cube.camera()->time().Et();
   }
 
-//  toStrm << "STARTING_EPHEMERIS_TIME " << setprecision(25) << etStart << endl;
-//  toStrm << "CENTER_EPHEMERIS_TIME " << etCenter << endl;
   toStrm << "STARTING_EPHEMERIS_TIME " << setprecision(25) << etStart + tCenter << endl;
   toStrm << "CENTER_EPHEMERIS_TIME " << etCenter + tCenter << endl;
 } // end main
