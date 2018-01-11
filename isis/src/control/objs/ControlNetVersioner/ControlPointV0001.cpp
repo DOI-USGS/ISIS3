@@ -445,7 +445,6 @@ namespace Isis {
         measure.mutable_measurement()->set_sampleresidual(value);
         group.deleteKeyword("SampleResidual");
       }
-      measure.mutable_measurement()->set_sampleresidual(sampleResidualValue);
 
       if (group.hasKeyword("LineResidual")) {
         double value = toDouble(group["LineResidual"][0]);
