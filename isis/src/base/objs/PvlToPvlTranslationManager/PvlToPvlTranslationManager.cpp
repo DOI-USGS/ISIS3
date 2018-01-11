@@ -143,43 +143,32 @@ namespace Isis {
    *
    * @return PvlKeyword
    */
-   PvlKeyword PvlToPvlTranslationManager::DoTranslation(const QString nName) {
-     const PvlContainer *con = NULL;
-     PvlKeyword key;
+  PvlKeyword PvlToPvlTranslationManager::DoTranslation(const QString nName) {
+    const PvlContainer *con = NULL;
+    PvlKeyword key;
 
-     int inst = 0;
-     PvlGroup transGroup;
-     PvlKeyword grp;
+    int inst = 0;
+    PvlKeyword grp;
 
-     while((grp = InputGroup(nName, inst++)).name() != "") {
-       if((con = GetContainer(grp)) != NULL) {
-         transGroup = TranslationTable().findGroup(nName);
-         Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputKey",
-                                           transGroup.begin(),
-                                           transGroup.end());
-         // Loop through potential InputKeys in the translation file group currently beginning
-         // translated.
-         while(it != transGroup.end()) {
-           const PvlKeyword &result = *it;
-           if(con->hasKeyword(result[0])) {
-             key.setName(OutputName(nName));
+    while((grp = InputGroup(nName, inst++)).name() != "") {
+      if((con = GetContainer(grp)) != NULL) {
+        if(con->hasKeyword(InputKeywordName(nName))) {
+          key.setName(OutputName(nName));
 
-             for(int v = 0; v < (*con)[(result[0])].size(); v++) {
-               key.addValue(PvlTranslationTable::Translate(nName,
-                            (*con)[result[0]][v]),
-                            (*con)[result[0]].unit(v));
-             }
+          for(int v = 0; v < (*con)[(InputKeywordName(nName))].size(); v++) {
+            key.addValue(PvlTranslationTable::Translate(nName,
+                         (*con)[InputKeywordName(nName)][v]),
+                         (*con)[InputKeywordName(nName)].unit(v));
+          }
 
-             return key;
-           }
-           it = transGroup.findKeyword("InputKey", it + 1, transGroup.end());
-         }
-       }
-     }
+          return key;
+        }
+      }
+    }
 
-     return PvlKeyword(OutputName(nName),
-                             PvlTranslationTable::Translate(nName, ""));
-   }
+    return PvlKeyword(OutputName(nName),
+                            PvlTranslationTable::Translate(nName, ""));
+  }
 
 
   /**
@@ -220,7 +209,7 @@ namespace Isis {
 
 
   /**
-   * Returns the ith input value associated with the output name argument.
+   * Returns the ith input value assiciated with the output name argument.
    *
    * @param nName The output name used to identify the input keyword.
    *

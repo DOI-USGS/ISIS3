@@ -31,7 +31,7 @@ void IsisMain() {
   FileName tempFileName = FileName::createTempFile("TEMPORARYlabel.pvl").name();
   QString fn(tempFileName.expanded());
   label.write(fn);
-  p.SetPdsFile(label, labelFile);
+  p.SetPdsFile(fn, labelFile, label);
   QFile::remove(fn);
 
   Cube *ocube = p.SetOutputCube("TO");

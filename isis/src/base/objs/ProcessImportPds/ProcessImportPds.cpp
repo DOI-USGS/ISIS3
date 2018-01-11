@@ -807,7 +807,8 @@ namespace Isis {
 
     // Use the name supplied by the application if it is there
     if (pdsDataFile.length() > 0) {
-      ProcessDataFilePointer(pdsXlater, false);
+      SetInputFile(pdsDataFile);
+      ProcessDataFilePointer(pdsXlater, true);
     }
     // If the data is in JPEG 2000 format, then use the name of the file
     // from the label

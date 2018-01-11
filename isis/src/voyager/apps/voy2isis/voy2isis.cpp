@@ -5,16 +5,12 @@
 #include <iostream>
 #include <iomanip>
 
-#include <QByteArray>
 #include <QFile>
-#include <QFileInfo>
 #include <QString>
-#include <QTextStream>
 
 #include <SpiceUsr.h>
 
 #include "FileName.h"
-#include "History.h"
 #include "IException.h"
 #include "IString.h"
 #include "NaifStatus.h"
@@ -22,16 +18,14 @@
 #include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "PvlKeyword.h"
 #include "PvlToPvlTranslationManager.h"
 #include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
 
-void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube);
+void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube);
 void ConvertComments(FileName file);
-QByteArray fixLabels(QString fileName, History *hist);
 
 void IsisMain() {
   // We should be processing a PDS file
@@ -46,7 +40,7 @@ void IsisMain() {
 
   // input files are compressed, use vdcomp to decompress
   QString ext = in.extension().toUpper();
-  if (ext == "IMQ") {
+  if(ext == "IMQ") {
     try {
       QString command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " + temp.expanded();
       // don't pretend vdcomp is a standard Isis program, just run it
@@ -55,63 +49,37 @@ void IsisMain() {
       ConvertComments(in);
       tempFile = true;
     }
-    catch (IException &e) {
+    catch(IException &e) {
       throw IException(IException::Io,
                        "Unable to decompress input file ["
                        + in.name() + "].", _FILEINFO_);
     }
   }
-  
+  else if (ext == "IMG") {
+    // Do nothing
+  }
+  else {
+    QString msg = "Input file [" + in.name() +
+                 "] does not appear to be a Voyager EDR";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
   // Convert the pds file to a cube
-  Pvl *pdsLabel = new Pvl();
-
-  // Preparse the IMG to fix messed up labels
-
-  History *hist = new History("IsisCube");
-  QByteArray pdsData = fixLabels(in.expanded(), hist);
-
-  QTextStream pdsTextStream(&pdsData);
-  istringstream pdsStream(pdsTextStream.readAll().toStdString());
-
-  pdsStream >> *pdsLabel;
-
-  if (pdsLabel->hasKeyword("LBL") &&
-      pdsLabel->findKeyword("LBL").isNull()) {
-    QString msg = "No label information.";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
-
-  if (pdsLabel->hasKeyword("PRODUCT_TYPE") &&
-  !pdsLabel->findKeyword("PRODUCT_TYPE").isEquivalent("DECOMPRESSED_RAW_IMAGE")) {
-    QString msg = "ISIS does not currently support images of product types other than raw.";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
-
+  Pvl pdsLabel;
   try {
-    p.SetPdsFile(*pdsLabel, in.expanded());
+    p.SetPdsFile(in.expanded(), "", pdsLabel);
   }
-  catch (IException &e) {
-    e.print();
-    QString msg = "Unable to set PDS file. Decompressed input file ["
+  catch(IException &e) {
+    QString msg = "Unable to set PDS file.  Decompressed input file ["
                  + in.name() + "] does not appear to be a PDS product";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Cube *ocube = p.SetOutputCube("TO");
   p.StartProcess();
-  try  {
-    TranslateVoyagerLabels(*pdsLabel, ocube);
-  }
-  catch (IException e) {
-    e.print();
-  }
-
-  ocube->write(*hist);
-
+  TranslateVoyagerLabels(pdsLabel, ocube);
   p.EndProcess();
-  
-  delete pdsLabel;
-  if (tempFile) QFile::remove(temp.expanded());
+
+  if(tempFile) QFile::remove(temp.expanded());
 }
 
 /**
@@ -160,26 +128,10 @@ void ConvertComments(FileName file) {
  *   @history 2009-03-11 Jeannie Walldren - Original Version
  *   @history 2015-07-22 Kristin Berry - Added NaifStatus::CheckErrors()
  */
-void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
-  Pvl inputLabel(inputLab);
-
+void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Get the directory where the Voyager translation tables are
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-  QString missionDir;
-  if (inputLabel.hasKeyword("SPACECRAFT_NAME")) {
-    missionDir = (QString) dataDir[(QString)inputLabel["SPACECRAFT_NAME"]];
-  }
-  else if (inputLabel.hasKeyword("INSTRUMENT_HOST_NAME")) {
-    if ((QString)inputLabel["INSTRUMENT_HOST_NAME"] == "VOYAGER 1") {
-      missionDir = (QString) dataDir["VOYAGER_1"];
-    }
-    else if ((QString)inputLabel["INSTRUMENT_HOST_NAME"] == "VOYAGER 2") {
-      missionDir = (QString) dataDir["VOYAGER_2"];
-    }
-    else {
-      missionDir = (QString) dataDir[(QString)inputLabel["INSTRUMENT_HOST_NAME"]];
-    }
-  }
+  QString missionDir = (QString) dataDir[(QString)inputLabel["SpacecraftName"]];
   FileName transFile(missionDir + "/translations/voyager.trn");
 
   // Get the translation manager ready
@@ -246,8 +198,8 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
       instId = "isswa";
     }
     else {
-      QString msg = "Instrument ID [" + instId + "] does not match Narrow or " +
-                    "Wide angle camera. The cube was created, but the labels were not translated.";
+      QString msg = "Instrument ID [" + instId + "] does not match Narrow or" +
+                   "Wide angle camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -264,8 +216,8 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
       instId = "isswa";
     }
     else {
-      QString msg = "Instrument ID [" + instId + "] does not match Narrow or " +
-                    "Wide angle camera. The cube was created, but the labels were not translated.";
+      QString msg = "Instrument ID [" + instId + "] does not match Narrow or" +
+                   "Wide angle camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -448,86 +400,4 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
   ocube->putGroup(res);
   NaifStatus::CheckErrors();   
 }
-
-
-/**
- * @brief   Fixes the broken tags in the IMG file. The IMG file is loaded into memory,
- *          and after the fixes are applied, the corrected labels are returned as
- *          a QByteArray.
- * @param   fileName The full path to the Voyager input IMG
- * @return  A QByteArray containing the modified Voyager labels. This is fed to
- *          a QTextStream which is then fed to a Pvl object.
- * @internal
- *   @history 2017-06-28 Marjorie Hahn - Original Version
- */
-QByteArray fixLabels(QString fileName, History *hist){
-
-  QByteArray null;
-  QFile imgFile;
-
-  imgFile.setFileName(fileName);
-
-  if (!imgFile.open(QFile::ReadOnly|QIODevice::Text))
-    return null;
-
-  // Read the IMG file into a byte array
-  QByteArray fileData = imgFile.readAll();
-  QByteArray labels;
-
-  QString labelEnd("\nEND");
-  int ix = fileData.lastIndexOf(labelEnd);
-
-  labels = fileData.left(ix + labelEnd.size());
-  PvlObject hEntry = Isis::iApp->History();
-
-  // Check if the instrument name is valid
-  if (labels.contains(QByteArray("INSTRUMENT_NAME\n"))) {
-    labels.replace("INSTRUMENT_NAME", "INSTRUMENT_NAME                  = Unknown");
-
-    PvlGroup insNameWarning("Warning");
-    PvlKeyword insNameMsg("Message", "The INSTRUMENT_NAME for [" + fileName + "] is empty."
-                              + "The InstrumentId in the output cube will instead be set to "
-                              + "[Unknown] and the labels will not translate.");
-    insNameWarning += insNameMsg;
-    Application::Log(insNameWarning);
-
-    hEntry += insNameWarning;
-  }
-
-  // Check if image id is valid
-  int imageIdIndex = labels.indexOf(QByteArray("IMAGE_ID"));
-  int i = imageIdIndex;
-  char c;
-  bool replaceImageId = false;
-  while (c != '\n' && i != -1) {
-    c = labels[i];
-
-    // If character is out of range, image id is corrupt and must be replaced
-    if (c < 0 || c > 127) {
-      replaceImageId = true;
-    }
-    i++;
-  }
-
-  QFileInfo fi(fileName);
-  QString baseName = fi.baseName();
-
-
-  if (replaceImageId == true) {
-    labels.replace(imageIdIndex,
-                   i - imageIdIndex - 1,
-                   QByteArray("IMAGE_ID                         = ").append(baseName));
-    PvlGroup insIdWarning("Warning");
-    PvlKeyword insIdMsg("Message", "The IMAGE_ID for [" + fileName + "] is corrupted. The ProductId "
-                              + "in the output cube will instead be set to [" + baseName + "].");
-    insIdWarning += insIdMsg;
-    Application::Log(insIdWarning);
-
-    hEntry += insIdWarning;
-  }
-  hist->AddEntry(hEntry);
-
-  return labels;
-}
-
 
