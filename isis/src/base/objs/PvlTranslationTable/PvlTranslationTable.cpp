@@ -241,7 +241,7 @@ namespace Isis {
       const PvlKeyword &key = *it;
       // compare the value from the input file to the second value of each Translation in the trans file.
       // ignore cases for input values
-      if(QString::compare((QString) key[1], tmpFValue, Qt::CaseInsensitive) == 0) {
+      if((QString) key[1] == tmpFValue) {
         return key[0];
       }
       else if((QString) key[1] == "*") {

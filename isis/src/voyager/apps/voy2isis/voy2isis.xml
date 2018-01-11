@@ -46,6 +46,15 @@
     <change name="Kristin Berry" date="2015-07-22">
       Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248
     </change>
+    <change name="Adam Pacquette" date="2017-06-23">
+      Added support for inputting files as decompressed LBL/IMG pairs. Fixes #4345
+    </change>
+    <change name="Marjorie Hahn" date="2017-08-09">
+      Added label preparsing to modify corrupt labels. Fixes #4421.
+    </change>
+    <change name="Christopher Combs" date="2018-01-10">
+      Made changes to allow merge of two voy2isis tickets. References #4421, #4345.
+    </change>
   </history>
 
   <category>
@@ -92,9 +101,11 @@
           Input Voyager EDR image file
         </brief>
         <description>
-          Use this parameter to select the Voyager PDS EDR file to be imported.  
-          These files are in compressed format and have the form cnnnnnnn.imq 
-          where "nnnnnnn" is the FDS count.
+          Use this parameter to select the Voyager PDS EDR file to be imported.
+          These files are in compressed format and have the form cnnnnnnn.imq
+          where "nnnnnnn" is the FDS count. When selecting input files that are
+          decompressed, set this parameter to the LBL file that points to the
+          corresponding IMG.
         </description>
         <filter>
           *.imq

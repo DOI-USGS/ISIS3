@@ -75,6 +75,8 @@ namespace Isis {
    *                          parent class, LabelTranslationManager. Fixes #4584.
    *  @history 2017-06-13 Adam Paquette - Changed PvlTranslationManager file name to
    *                          PvlToPvlTranslationManager. Fixes #4901.
+   *  @history 2018-01-10 Christopher Combs - Changed ProcessDataFilePointer call to reflect 
+   *                          reflect changes made to voy2isis. Fixes #4345, #4421.
    *  @todo 2005-02-15 Stuart Sides - add coded example and implementation example
    *                                  to class documentation, and finish
    *                                  documentation
