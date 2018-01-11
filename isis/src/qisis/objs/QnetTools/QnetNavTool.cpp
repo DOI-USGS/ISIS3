@@ -443,12 +443,12 @@ namespace Isis {
     m_historyLayout = new QVBoxLayout(scrollArea);
     m_historyLayout->setAlignment(Qt::AlignTop);
 
-    historyWidget->setLayout(innerLayout);
-    innerWidget->setLayout(m_historyLayout);
-    scrollArea->setWidget(innerWidget);
+    innerWidget->setLayout(innerLayout);
+    historyWidget->setLayout(m_historyLayout);
+    scrollArea->setWidget(historyWidget);
     scrollArea->setWidgetResizable(true);
 
-    pointFilters->addTab(historyWidget, QString("&Activity History") );
+    pointFilters->addTab(innerWidget, QString("&Activity History") );
 
   }
 
