@@ -1946,10 +1946,8 @@ namespace Isis {
 
           ControlPointFileEntryV0002_Measure_MeasureLogData logData;
 
-          if ( ((int) log.GetDataType()) ) {
+          if ( log.IsValid() ) {
             logData.set_doubledatatype( (int) log.GetDataType() );
-          }
-          if ( log.GetNumericalValue() ) {
             logData.set_doubledatavalue( log.GetNumericalValue() );
           }
 
