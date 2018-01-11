@@ -426,6 +426,9 @@ namespace Isis {
         measure.mutable_measurement()->set_line(value);
         group.deleteKeyword("Line");
       }
+
+      // Some old networks use ErrorSample and ErrorLine,
+      // others use SampleResidual and LineResidual so check for both
       if (group.hasKeyword("ErrorSample")) {
         double value = toDouble(group["ErrorSample"][0]);
         measure.mutable_measurement()->set_sampleresidual(value);
@@ -435,6 +438,19 @@ namespace Isis {
         double value = toDouble(group["ErrorLine"][0]);
         measure.mutable_measurement()->set_lineresidual(value);
         group.deleteKeyword("ErrorLine");
+      }
+
+      if (group.hasKeyword("SampleResidual")) {
+        double value = toDouble(group["SampleResidual"][0]);
+        measure.mutable_measurement()->set_sampleresidual(value);
+        group.deleteKeyword("SampleResidual");
+      }
+      measure.mutable_measurement()->set_sampleresidual(sampleResidualValue);
+
+      if (group.hasKeyword("LineResidual")) {
+        double value = toDouble(group["LineResidual"][0]);
+        measure.mutable_measurement()->set_lineresidual(value);
+        group.deleteKeyword("LineResidual");
       }
 
       if (group.hasKeyword("Reference")) {
