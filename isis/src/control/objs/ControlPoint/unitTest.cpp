@@ -273,6 +273,22 @@ void printPoint(Isis::ControlPoint &p) {
   p.SetDateTime("2005-05-03T00:00:00");
   p.SetEditLock(wasLocked);
 
+  std::cout << "Testing point has ChooserName: ";
+  if ( p.HasChooserName() ) {
+    std::cout << "TRUE" << std::endl;
+  }
+  else {
+    std::cout << "FALSE" << std::endl;
+  }
+
+  std::cout << "Testing point has DateTime:    ";
+  if ( p.HasDateTime() ) {
+    std::cout << "TRUE" << std::endl;
+  }
+  else {
+    std::cout << "FALSE" << std::endl;
+  }
+  std::cout << std::endl;
   ControlNet net;
 
   ControlPoint *copyPoint = new ControlPoint(p);
