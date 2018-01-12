@@ -1377,10 +1377,6 @@ namespace Isis {
         // note: setting lat/lon/rad constrained happens when we call SetAprioriSurfacePoint()
       }
 
-      if ( equatorialRadius.isValid() && polarRadius.isValid() ) {
-        aprioriSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-      }
-
       controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
     }
 
@@ -1406,10 +1402,16 @@ namespace Isis {
         adjustedSurfacePoint.SetRectangularMatrix(adjustedCovarianceMatrix);
       }
 
-      if ( equatorialRadius.isValid() && polarRadius.isValid() ) {
-        adjustedSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-      }
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
+    }
+
+    if ( equatorialRadius.isValid() && polarRadius.isValid() ) {
+      SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
+      SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
+      aprioriSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+      adjustedSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+      controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
+      controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
     }
 
     // adding measure information
