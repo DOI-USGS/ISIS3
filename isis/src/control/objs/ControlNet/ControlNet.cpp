@@ -252,8 +252,18 @@ namespace Isis {
     p_description = versionedReader.description();
 
     int numPoints = versionedReader.numPoints();
+
+    if (progress) {
+      progress->SetText("Adding Control Points to Network...");
+      progress->SetMaximumSteps(numPoints);
+      progress->CheckStatus();
+    }
+
     for (int i = 0; i < numPoints; i++) {
       AddPoint( versionedReader.takeFirstPoint() );
+      if (progress) {
+        progress->CheckStatus();
+      }
     }
   }
 
