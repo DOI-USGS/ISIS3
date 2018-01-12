@@ -196,6 +196,8 @@ namespace Isis {
    *   @history 2018-01-03 Jesse Mapel - Updated class documentation.
    *   @history 2018-01-04 Adam Goins - Updated read/write methods to read/write protobuf messages
    *                           correctly.
+   *   @history 2018-01-12 Adam Goins - Added the ControlPoint radii to the header to avoid
+   *                           Target::GetRadii calls to speed up createPoint().
    */
   class ControlNetVersioner {
 
