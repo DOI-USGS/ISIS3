@@ -233,6 +233,8 @@ namespace Isis {
         QString lastModified;
         QString description;
         QString userName;
+        Distance equatorialRadius;
+        Distance polarRadius;
       };
       typedef ControlNetHeaderV0001 ControlNetHeaderV0002;
       typedef ControlNetHeaderV0001 ControlNetHeaderV0003;

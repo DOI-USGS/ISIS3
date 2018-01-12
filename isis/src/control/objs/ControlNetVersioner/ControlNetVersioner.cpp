@@ -1261,21 +1261,6 @@ namespace Isis {
     }
     controlPoint->SetType(pointType);
 
-    // get radius values for surface points
-    Distance equatorialRadius;
-    Distance polarRadius;
-    if ( !m_header.targetName.isEmpty() ) {
-      try {
-        // attempt to get target radii values...
-        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
-        equatorialRadius.setMeters(pvlRadii["EquatorialRadius"]);
-        polarRadius.setMeters(pvlRadii["PolarRadius"]);
-       }
-       catch (IException &e) {
-         // do nothing
-       }
-    }
-
     if ( protoPoint.has_ignore() ) {
       controlPoint->SetIgnored(protoPoint.ignore());
     }
@@ -1405,11 +1390,11 @@ namespace Isis {
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
     }
 
-    if ( equatorialRadius.isValid() && polarRadius.isValid() ) {
+    if ( m_header.equatorialRadius.isValid() && m_header.polarRadius.isValid() ) {
       SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
       SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
-      aprioriSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-      adjustedSurfacePoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
+      aprioriSurfacePoint.SetRadii(m_header.equatorialRadius, m_header.equatorialRadius, m_header.polarRadius);
+      adjustedSurfacePoint.SetRadii(m_header.equatorialRadius, m_header.equatorialRadius, m_header.polarRadius);
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
       controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
     }
@@ -1546,6 +1531,18 @@ namespace Isis {
 
     if ( m_header.targetName.startsWith("MRO/") ) {
       m_header.targetName = "Mars";
+    }
+
+    if ( !m_header.targetName.isEmpty() ) {
+      try {
+        // attempt to get target radii values...
+        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
+        m_header.equatorialRadius.setMeters(pvlRadii["EquatorialRadius"]);
+        m_header.polarRadius.setMeters(pvlRadii["PolarRadius"]);
+       }
+       catch (IException &e) {
+         // do nothing
+       }
     }
   }
 
