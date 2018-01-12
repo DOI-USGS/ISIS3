@@ -198,12 +198,13 @@ namespace Isis {
    *                           correctly.
    *   @history 2018-01-12 Adam Goins - Added the ControlPoint radii to the header to avoid
    *                           Target::GetRadii calls to speed up createPoint().
+   *   @history 2018-01-12 Adam Goins - Added Progress during reads.
    */
   class ControlNetVersioner {
 
     public:
       ControlNetVersioner(ControlNet *net);
-      ControlNetVersioner(const FileName netFile);
+      ControlNetVersioner(const FileName netFile, Progress *progress);
       ~ControlNetVersioner();
 
       QString netId() const;
@@ -246,19 +247,19 @@ namespace Isis {
       typedef ControlPointV0003 ControlPointV0004;
       typedef ControlPointV0003 ControlPointV0005;
 
-      void read(const FileName netFile);
+      void read(const FileName netFile, Progress *progress);
 
-      void readPvl(const Pvl &network);
-      void readPvlV0001(const PvlObject &network);
-      void readPvlV0002(const PvlObject &network);
-      void readPvlV0003(const PvlObject &network);
-      void readPvlV0004(const PvlObject &network);
-      void readPvlV0005(const PvlObject &network);
+      void readPvl(const Pvl &network, Progress *progress);
+      void readPvlV0001(const PvlObject &network, Progress *progress);
+      void readPvlV0002(const PvlObject &network, Progress *progress);
+      void readPvlV0003(const PvlObject &network, Progress *progress);
+      void readPvlV0004(const PvlObject &network, Progress *progress);
+      void readPvlV0005(const PvlObject &network, Progress *progress);
 
-      void readProtobuf(const Pvl &header, const FileName netFile);
-      void readProtobufV0001(const Pvl &header, const FileName netFile);
-      void readProtobufV0002(const Pvl &header, const FileName netFile);
-      void readProtobufV0005(const Pvl &header, const FileName netFile);
+      void readProtobuf(const Pvl &header, const FileName netFile, Progress *progress);
+      void readProtobufV0001(const Pvl &header, const FileName netFile, Progress *progress);
+      void readProtobufV0002(const Pvl &header, const FileName netFile, Progress *progress);
+      void readProtobufV0005(const Pvl &header, const FileName netFile, Progress *progress);
 
       ControlPoint *createPoint(ControlPointV0001 &point);
       ControlPoint *createPoint(ControlPointV0002 &point);

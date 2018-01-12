@@ -242,7 +242,7 @@ namespace Isis {
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
 
     FileName cnetFileName(filename);
-    ControlNetVersioner versionedReader(cnetFileName);
+    ControlNetVersioner versionedReader(cnetFileName, progress);
 
     SetTarget( versionedReader.targetName() );
     p_networkId   = versionedReader.netId();
