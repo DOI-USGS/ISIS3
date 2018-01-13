@@ -153,13 +153,8 @@ namespace Isis {
         throw IException(IException::Unknown, p_response->value("Error").toString(), _FILEINFO_);
       }
 
-      QFile finalOutput("output.txt");
-      finalOutput.open(QIODevice::WriteOnly);
-      finalOutput.write( doc.toJson() );
-      finalOutput.close();
-
       // Make sure we can get the log out of it before continuing
-      // applicationLog();
+      applicationLog();
     }
     catch(IException &) {
       p_error = new QString();
@@ -516,12 +511,14 @@ namespace Isis {
     QString value = p_response->value(jsonName).toString();
     QByteArray decoded = QByteArray::fromHex(value.toUtf8().constData());
 
-    QFile finalOutput(tableName + ".txt");
-    finalOutput.open(QIODevice::WriteOnly);
-    finalOutput.write(decoded);
-    finalOutput.close();
+    QFile tableOutput(tableName + ".txt");
+    tableOutput.open(QIODevice::WriteOnly);
+    tableOutput.write(decoded);
+    tableOutput.close();
 
     Table *table = new Table(tableName,tableName + ".txt");
+    
+    tableOutput.remove();
 
     return table;
   }

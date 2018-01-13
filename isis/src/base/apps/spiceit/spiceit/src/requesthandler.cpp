@@ -51,7 +51,6 @@ double g_endPad = 0.0;
 QString g_shapeKernelStr;
 
 
-
 RequestHandler::RequestHandler(QObject* parent)
     :HttpRequestHandler(parent)
 {
@@ -81,8 +80,6 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
     //! Read the spiceinit parameters
     void parseParameters(QJsonObject jsonObject);
 
-    //! Convert a table into an xml tag
-    QString tableToXml(QString tableName, QString file);
     QByteArray spiceResponse;
     QByteArray path=request.getPath();
     qDebug("Conroller: path=%s",path.data());
@@ -111,19 +108,12 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         QString otherVersion;
 
         if ( !hexCode.isEmpty() ) {
-
-
           // Parse the Json with Qt's JSON parser
           QJsonDocument document;
           QString error;
 
           document = QJsonDocument::fromJson(hexCode);
           QJsonObject jsonObject = document.object();
-
-          QFile finalOutput("output.txt");
-          finalOutput.open(QIODevice::WriteOnly);
-          finalOutput.write( document.toJson() );
-          finalOutput.close();
 
           parseParameters(jsonObject);
 
@@ -147,10 +137,10 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         // Get the directory where the system missions translation table is.
         QString transFile = p.MissionData("base", "translations/MissionName2DataDir.trn");
 
-
         // Get the mission translation manager ready
         PvlToPvlTranslationManager missionXlater(label, transFile);
-        //label.write("label_after_PvlToPvlTranslationManager.txt");
+        label.write("label_after_PvlToPvlTranslationManager.txt");
+
         // Get the mission name so we can search the correct DB's for kernels
         QString mission = missionXlater.Translate("MissionName");
 
@@ -185,10 +175,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         ck        = ckKernels.spacecraftPointing(label);
         spk       = spkKernels.spacecraftPosition(label);
 
-
         if (g_ckNadir) {
-
-
           // Only add nadir if no spacecraft pointing found
           QStringList nadirCk;
           nadirCk.push_back("Nadir");
@@ -198,7 +185,6 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           }
           // if no queue exists, create a nadir queue
           else {
-
             priority_queue<Kernel> nadirQueue;
             nadirQueue.push( Kernel( (Kernel::Type)0, nadirCk ) );
             ck.push_back(nadirQueue);
@@ -207,12 +193,8 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
 
         // Get shape kernel
         if (g_shapeKernelStr == "system") {
-
           dem = baseKernels.dem(label);
-
-
         }
-
 
         else if (g_shapeKernelStr != "ellipsoid") {
           stringstream demPvlKeyStream;
@@ -220,25 +202,20 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
           PvlKeyword key;
           demPvlKeyStream >> key;
 
-
           for (int value = 0; value < key.size(); value++) {
             dem.push_back(key[value]);
           }
-
         }
-
 
         bool kernelSuccess = false;
 
         if (ck.size() == 0 || ck.at(0).size() == 0) {
-//          throw IException(IException::Unknown,
-//                           "No Camera Kernel found for the image [" +
-//                            ui.GetFileName("FROM") + "]",
-//                           _FILEINFO_);
+         throw IException(IException::Unknown,
+                          "No Camera Kernel found for the image.",
+                          _FILEINFO_);
         }
 
         FileName inputLabels;
-
 
         while (ck.at(0).size() != 0 && !kernelSuccess) {
           // create an empty kernel
@@ -298,31 +275,17 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         else {
           spiceResponse = packageKernels("kernels" );
         }
-//        remove( inputLabels.expanded().toLatin1() ); //clean up
+        
+        // Clean up
+        remove( inputLabels.expanded().toLatin1() );
+        remove("kernels.pointing");
+        remove("kernels.position");
+        remove("kernels.bodyrot");
+        remove("kernels.sun");
+        remove("label_after_PvlToPvlTranslationManager.txt");
+        remove("lab.txt");
+        
         p.EndProcess();
-      }
-      catch (IException &e) {
-
-        // We failed at something, delete the temp files...
-
-        QFile pointingFile("kernels.pointing");
-        if ( pointingFile.exists() ) pointingFile.remove();
-
-        QFile positionFile("kernels.position");
-        if ( positionFile.exists() ) positionFile.remove();
-
-        QFile bodyRotFile("kernels.bodyrot");
-        if ( bodyRotFile.exists() ) bodyRotFile.remove();
-
-        QFile sunFile("kernels.sun");
-        if ( sunFile.exists() ) sunFile.remove();
-
-        QJsonObject errorData;
-        errorData.insert("Error", e.what());
-
-        QJsonDocument doc(errorData);
-        spiceResponse.clear();
-        QByteArray spiceResponse = QByteArray( doc.toJson() );
       }
       catch (...) {
 
@@ -340,12 +303,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
         QFile sunFile("kernels.sun");
         if ( sunFile.exists() ) sunFile.remove();
 
-        QJsonObject errorData;
-        errorData.insert("Error", "Unknown error occurred");
-
-        QJsonDocument doc(errorData);
-        spiceResponse.clear();
-        QByteArray spiceResponse = QByteArray( doc.toJson() );
+        throw;
       }
 
     // Return a simple HTML document
@@ -359,6 +317,7 @@ void RequestHandler::service(HttpRequest& request, HttpResponse& response)
        logger->clear();
     }
 }
+
 
 bool tryKernels(Cube &cube, Pvl &lab, Process &p,
                 Kernel lk, Kernel pck,
@@ -461,14 +420,12 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   if ( currentKernels.hasKeyword("EndPadding") )
     currentKernels.deleteKeyword("EndPadding");
 
-
   // Add any time padding the user specified to the spice group
   if (g_startPad > DBL_EPSILON)
     currentKernels.addKeyword( PvlKeyword("StartPadding", toString(g_startPad), "seconds") );
 
   if (g_endPad > DBL_EPSILON)
     currentKernels.addKeyword( PvlKeyword("EndPadding", toString(g_endPad), "seconds") );
-
 
   currentKernels.addKeyword(
       PvlKeyword( "CameraVersion", toString( CameraFactory::CameraVersion(cube) ) ), Pvl::Replace);
@@ -620,17 +577,6 @@ QByteArray packageKernels(QString toFile) {
   QJsonDocument doc(spiceData);
 
   QByteArray jsonHexedTables( doc.toJson() );
-
-  QFile finalOutput("finalOutput.txt");
-  finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write(jsonHexedTables.constData());
-  finalOutput.close();
-
-  //QFile finalsOutput("toFile.txt");
-  //finalsOutput.open(QIODevice::WriteOnly);
-  //QString raw(doc.rawData(sizeOfData));
-  //finalsOutput.write(raw.);
-  //finalsOutput.close();
 
   return jsonHexedTables;
 }
