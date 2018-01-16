@@ -44,6 +44,11 @@ namespace Isis {
   *   @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
   *                          this->show() so that it hides the unselected columns appropriately.
   *                          Fixes #5141.
+  *   @history 2017-11-13 Adam Goins - modified createTable() to set the resize property of the
+  *                          columns to resize automatically based on the content inside of the
+  *                          column. Added resizeColumn() slot and readColumnSettings().
+  *                          modifie writeSettings() to write updated settings on destroy.
+  *                          Added Fixes #5142.
   */
   class TableMainWindow : public MainWindow {
       Q_OBJECT
@@ -129,6 +134,7 @@ namespace Isis {
       bool trackListItems();
       void loadTable();
       void writeSettings() const;
+      void resizeColumn(int columnIndex);
 
     signals:
       /**
@@ -142,6 +148,8 @@ namespace Isis {
       void createTable();
       void readItemSettings(QString heading, QListWidgetItem *item,
                             bool defaultChecked);
+
+      void readColumnSettings();
 
     private:
       std::string p_appName; //!< The application name
