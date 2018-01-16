@@ -44,11 +44,13 @@ namespace Isis {
   *   @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
   *                          this->show() so that it hides the unselected columns appropriately.
   *                          Fixes #5141.
-  *   @history 2017-11-13 Adam Goins - modified createTable() to set the resize property of the
-  *                          columns to resize automatically based on the content inside of the
-  *                          column. Added resizeColumn() slot and readColumnSettings().
-  *                          modifie writeSettings() to write updated settings on destroy.
-  *                          Added Fixes #5142.
+  *   @history 2017-11-13 Adam Goins - Afforded TableMainWindow the ability to toggle between auto
+  *                          resizing columns or setting a specific column size for each column.
+  *                          modified createTable() to set the resize property of the columns to
+  *                          resize automatically based on the content inside of the column.
+  *                          Added resizeColumn() slot and readColumnSettings().
+  *                          modified writeSettings() to write updated settings on destroy.
+  *                          Fixes #5142.
   */
   class TableMainWindow : public MainWindow {
       Q_OBJECT

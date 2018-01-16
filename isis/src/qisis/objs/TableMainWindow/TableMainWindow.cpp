@@ -580,12 +580,10 @@ namespace Isis {
    * to the appropriate size, or the size to auto based on what they were
    * stored as.
    *
-   * @param heading
-   * @param item
    */
   void TableMainWindow::readColumnSettings() {
 
-    QHeaderView* header = p_table->horizontalHeader();
+    QHeaderView *header = p_table->horizontalHeader();
     QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
     for(int columnIndex = 0; columnIndex < p_table->model()->columnCount(); columnIndex++)
@@ -616,6 +614,11 @@ namespace Isis {
    * is closed or hidden to write the size and location settings
    * (and dock widget settings) to a config file in the user's
    * home directory.
+   *
+   *  @internal
+   *    @history 2017-11-13 Adam Goins - Added the behavior of columns sizes to be written
+   *                            to the settings file so that they can be persistent through
+   *                            new instances of qview.
    *
    */
   void TableMainWindow::writeSettings() const {
