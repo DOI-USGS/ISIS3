@@ -195,11 +195,14 @@ namespace Isis {
    *                           classes. Fixes #5117.
    *   @history 2017-11-09 Tyler Wilson - Made changes to updateRecentProjects() to handle deleting
    *                           the OpenRecentProjectWorkOrder.  Fixes #5220.
-   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
-   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
    *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
    *                           Fixes #5224
+   *   @history 2017-12-01 Adam Goins Modified updateRecentProjects() to update the recent projects
+   *                           menu it display a chronologically ordered list of recently loaded 
+   *                           projects. Fixes #5216.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -318,7 +321,7 @@ namespace Isis {
 
       void cnetModified();
       void redrawMeasures();
-      
+
       void cleanProject(bool);
 
     public slots:

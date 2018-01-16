@@ -129,9 +129,9 @@ namespace Isis {
     //connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
              //this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
 
-//     connect( m_project, SIGNAL(projectLoaded(Project *) ),
-//              this, SLOT(updateRecentProjects(Project *) ) );
-//
+     connect( m_project, SIGNAL(projectLoaded(Project *) ),
+              this, SLOT(updateRecentProjects(Project *) ) );
+
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
 
@@ -164,7 +164,7 @@ namespace Isis {
       m_importTemplateWorkOrder = createWorkOrder<ImportTemplateWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
-      m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();      
+      m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
       m_runJigsawWorkOrder = createWorkOrder<JigsawWorkOrder>();
       m_closeProjectWorkOrder = createWorkOrder<CloseProjectWorkOrder>();
       m_renameProjectWorkOrder = createWorkOrder<RenameProjectWorkOrder>();
@@ -188,7 +188,7 @@ namespace Isis {
 
     m_workOrders.clear();
 
-    if (m_project) {     
+    if (m_project) {
       m_project ->deleteLater();
       m_project = NULL;
     }
@@ -304,43 +304,86 @@ namespace Isis {
    * @internal
    *   @history Tyler Wilson 2017-10-17 - This function updates the Recent Projects File
    *                                      menu.  References #4492.
+   *   @history Adam Goins 2017-11-27 - Updated this function to add the most recent
+   *                project to the recent projects menu. References #5216.
    */
   void Directory::updateRecentProjects(){
 
     if (m_recentProjectsLoaded)  {
-      return;      
-  }
-    else {
+      QMenu *recentProjectsMenu = new QMenu("&Recent Projects");
 
-    QMenu *fileMenu = new QMenu();
+      foreach (QAction *action, m_fileMenuActions) {
 
-    QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
-    int nRecentProjects = m_recentProjects.size();
+        QString actionText(action->text());
+        if (actionText == "&Recent Projects") {
+          // Grab the pointer to the actual ""&Recent Projects" menu in IPCE
+          recentProjectsMenu = qobject_cast<QMenu*>(action->parentWidget());
+          break;
+        }
+      }
 
-    for (int i = 0; i < nRecentProjects; i++) {
-      FileName projectFileName = m_recentProjects.at(i);
-
-      if (!projectFileName.fileExists() )
-        continue;
+      QString projName = m_recentProjects.at(0).split("/").last();
 
       QAction *openRecentProjectAction = m_openProjectWorkOrder->clone();
+      openRecentProjectAction->setText(projName);
+      openRecentProjectAction->setToolTip(m_recentProjects.at(0));
 
-      if ( !( (OpenProjectWorkOrder*)openRecentProjectAction )
-           ->isExecutable(m_recentProjects.at(i),true ) )
-        continue;
-
-
-      QString projName = m_recentProjects.at(i).split("/").last();      
-      openRecentProjectAction->setText(m_recentProjects.at(i).split("/").last() );
-      openRecentProjectAction->setToolTip(m_recentProjects.at(i));
-      recentProjectsMenu->addAction(openRecentProjectAction);
+      if (recentProjectsMenu->isEmpty())
+      {
+        recentProjectsMenu->addAction(openRecentProjectAction);
+        return;
       }
-      fileMenu->addSeparator();
-      m_fileMenuActions.append( fileMenu->actions() );
-      m_recentProjectsLoaded = true;
 
+      QAction *firstAction = recentProjectsMenu->actions().at(0);
+
+      // If the opened project is already the most recent project, return.
+      if (firstAction->text() == projName) {
+        return;
+      }
+
+      // If the action we're placing at the first index already exists,
+      // Then point to that action.
+      foreach (QAction *action, recentProjectsMenu->actions()) {
+        if (action->text() == projName) {
+          openRecentProjectAction = action;
+          break;
+        }
+      }
+
+      recentProjectsMenu->insertAction(firstAction, openRecentProjectAction);
+      if (recentProjectsMenu->actions().length() > Project::maxRecentProjects())
+      {
+        recentProjectsMenu->removeAction(recentProjectsMenu->actions().last());
+      }
     }
+    else {
 
+      QMenu *fileMenu = new QMenu();
+      QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
+      int nRecentProjects = m_recentProjects.size();
+
+      for (int i = 0; i < nRecentProjects; i++) {
+        FileName projectFileName = m_recentProjects.at(i);
+
+        if (!projectFileName.fileExists() )
+          continue;
+
+        QAction *openRecentProjectAction = m_openProjectWorkOrder->clone();
+
+        if ( !( (OpenProjectWorkOrder*)openRecentProjectAction )
+             ->isExecutable(m_recentProjects.at(i),true ) )
+          continue;
+
+
+        QString projName = m_recentProjects.at(i).split("/").last();
+        openRecentProjectAction->setText(m_recentProjects.at(i).split("/").last() );
+        openRecentProjectAction->setToolTip(m_recentProjects.at(i));
+        recentProjectsMenu->addAction(openRecentProjectAction);
+        }
+        fileMenu->addSeparator();
+        m_fileMenuActions.append( fileMenu->actions() );
+        m_recentProjectsLoaded = true;
+      }
   }
 
   /**
@@ -636,10 +679,10 @@ namespace Isis {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // IMPORTANT TODO::  The following connections seem recursive
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // 
+    //
     // Connection between cneteditor view & other views
     connect(mainWidget, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
-    
+
     // ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
     // deleted or saved
     connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
@@ -923,9 +966,9 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
-   
+
     //  The model emits this signal when the user double-clicks on the project name, the parent
-    //  node located on the ProjectTreeView. 
+    //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
 
@@ -933,11 +976,11 @@ namespace Isis {
   }
 
 
-/** 
- * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
- * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
+/**
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A
  * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
- *  
+ *
  * @param QString projectName New project name
  */
   void Directory::initiateRenameProjectWorkOrder(QString projectName) {
@@ -947,7 +990,7 @@ namespace Isis {
     RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
     project()->addToProject(workOrder);
   }
-  
+
 
   /**
    * @brief Gets the ProjectItemModel for this directory.
@@ -1108,8 +1151,7 @@ namespace Isis {
    * @param project A pointer to the Project to add.
    */
   void Directory::updateRecentProjects(Project *project) {
-    if ( !m_recentProjects.contains( project->projectRoot() ) )
-      m_recentProjects.insert( 0, project->projectRoot() );
+    m_recentProjects.insert( 0, project->projectRoot() );
   }
 
 
@@ -1608,13 +1650,13 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a left mouse button operation on views 
-   *  
+   * Slot that is connected from a left mouse button operation on views
+   *
    * @param controlPoint (ControlPoint *) The control point selected from view for editing
-   * @param serialNumber (QString) The serial number of Cube that was used to select control point 
+   * @param serialNumber (QString) The serial number of Cube that was used to select control point
    *                     from the CubeDnView.  This parameter will be empty if control point was
    *                     selected from Footprint2DView.
-   *  
+   *
    */
   void Directory::modifyControlPoint(ControlPoint *controlPoint, QString serialNumber) {
 
@@ -1633,10 +1675,10 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a middle mouse button operation on views 
-   *  
+   * Slot that is connected from a middle mouse button operation on views
+   *
    * @param controlPoint (ControlPoint *) The control point selected from view for editing
-   *  
+   *
    */
   void Directory::deleteControlPoint(ControlPoint *controlPoint) {
 
@@ -1647,7 +1689,7 @@ namespace Isis {
         }
       }
       m_editPointId = controlPoint->GetId();
- 
+
       //  Update views with point to be deleted shown as current edit point
       emit redrawMeasures();
 
@@ -1657,17 +1699,17 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a right mouse button operation on views 
-   *  
+   * Slot that is connected from a right mouse button operation on views
+   *
    * @param latitude (double) Latitude location where the control point was created
    * @param longitude (double) Longitude location where the control point was created
-   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control 
+   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control
    *                     point.  This parameter will be empty if control point was selected from
    *                     Footprint2DView.
    * @param isGroundSource (bool) Indicates whether the Cube in the CubeDnView that was used to select
    *                     location for new control point is a ground source.  This parameter will be
    *                     empty if control point was selected from Footprint2DView.
-   *  
+   *
    */
   void Directory::createControlPoint(double latitude, double longitude, Cube *cube,
                                      bool isGroundSource) {
@@ -1685,9 +1727,9 @@ namespace Isis {
 
 
   /**
-   * Autosave for control net.  The control net is auto saved to the same directory as the input 
-   * net.  It is saved to controlNetFilename.net.bak. 
-   * 
+   * Autosave for control net.  The control net is auto saved to the same directory as the input
+   * net.  It is saved to controlNetFilename.net.bak.
+   *
    */
   void Directory::makeBackupActiveControl() {
 
@@ -1697,7 +1739,7 @@ namespace Isis {
 
   /**
    * Return the current control point id loaded in the ControlPointEditWidget
-   * 
+   *
    * @return @b QString Id of the control point loaded in the ControlPointEditWidget
    */
   QString Directory::editPointId() {
