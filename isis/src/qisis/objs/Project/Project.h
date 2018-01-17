@@ -205,7 +205,7 @@ namespace Isis {
    *                           a temporary fix until the project and model/view is improved.
    *                           Corrected the setting of the project root when pening a project from
    *                           the command line. Removed m_projectPath, it is no longer needed since
-   *                           m_projectRoot contains the correct path.
+   *                           m_projectRoot contains the correct path. References #5104.
    */
   class Project : public QObject {
     Q_OBJECT
