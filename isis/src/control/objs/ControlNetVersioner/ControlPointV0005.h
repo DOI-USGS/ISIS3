@@ -73,6 +73,10 @@ namespace Isis {
       void copy(PvlContainer &container,
                 QString keyName,
                 ControlPointFileEntryV0005_Measure &measure,
+                void (ControlPointFileEntryV0005_Measure::*setter)(int));
+      void copy(PvlContainer &container,
+                QString keyName,
+                ControlPointFileEntryV0005_Measure &measure,
                 void (ControlPointFileEntryV0005_Measure::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,

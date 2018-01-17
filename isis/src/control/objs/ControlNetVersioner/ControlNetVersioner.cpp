@@ -56,7 +56,7 @@ namespace Isis {
     }
 
 
-    ControlNetHeaderV0001 header;
+    ControlNetHeaderV0005 header;
 
     header.networkID = net->GetNetworkId();
     header.targetName = net->GetTarget();
@@ -1095,7 +1095,7 @@ namespace Isis {
       header.userName = protoHeader.username().c_str();
       header.serialNumbers.clear();
       for (int i = 0; i < protoHeader.serialnumbers_size(); i++) {
-        header.serialNumbers.append( QString(protoHeader.serialnumbers(i)) );
+        header.serialNumbers.append( QString::fromStdString(protoHeader.serialnumbers(i)) );
       }
       createHeader(header);
     }
@@ -1513,7 +1513,7 @@ namespace Isis {
     newHeader.userName = header.userName;
     newHeader.serialNumbers.clear();
 
-    createHeader(newHeader)
+    createHeader(newHeader);
   }
 
 

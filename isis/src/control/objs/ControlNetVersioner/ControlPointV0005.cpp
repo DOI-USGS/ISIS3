@@ -14,7 +14,7 @@ using namespace std;
 namespace Isis {
 
   /**
-   * Create a ControlPointV0005 object from a protobuf version 2 control point message.
+   * Create a ControlPointV0005 object from a protobuf version 5 control point message.
    *
    * @param pointData The protobuf message from a control net file.
    */
@@ -274,13 +274,8 @@ namespace Isis {
                                        QList<QString> &serialNumbers)
    : m_pointData(new ControlPointFileEntryV0005) {
     ControlPointFileEntryV0002 oldPointData = oldPoint.pointData();
-    if (!oldPointData) {
-      QString msg = "Version 2 control point is missing point data.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    QSharedPointer<ControlNetLogDataProtoV0001_Point> oldLogData = oldPoint.logData();
-    if (!oldLogData) {
-      QString msg = "Version 2 control point is missing measure log data.";
+    if ( !oldPointData.IsInitialized() ) {
+      QString msg = "version 2 control point is not fully initialized.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -347,7 +342,7 @@ namespace Isis {
     // Later check if the point is constrained.
     if ( oldPointData.has_type() ) {
       ControlPointFileEntryV0002_PointType pointType = oldPointData.type();
-      switch (poointType) {
+      switch (pointType) {
         case ControlPointFileEntryV0002_PointType_obsolete_Tie:
         case ControlPointFileEntryV0002_PointType_Free:
           m_pointData->set_type(ControlPointFileEntryV0005_PointType_Free);
@@ -396,7 +391,7 @@ namespace Isis {
     }
 
     if ( oldPointData.has_aprioriradiussource() ) {
-      ControlNetFileProtoV0001_PBControlPoint_AprioriSource radiusSource;
+      ControlPointFileEntryV0002_AprioriSource radiusSource;
       radiusSource = oldPointData.aprioriradiussource();
       switch (radiusSource) {
         case ControlPointFileEntryV0002_AprioriSource_None:
@@ -455,11 +450,12 @@ namespace Isis {
       // If the serial number is not in the list, append it.
       if ( oldMeasure.has_serialnumber() ) {
         // TODO this may be slow, QList::indexOf is a linear search through the list
-        int serialNumberIndex = serialNumbers.indexOf( oldMeasure.serialnumber() );
+        int serialNumberIndex = serialNumbers.indexOf(
+                                    QString::fromStdString(oldMeasure.serialnumber()) );
         // If !serialNumbers.contains(oldMeasure.serialnumber()), then serialNumberIndex = -1
         if ( serialNumberIndex < 0 ) {
-          serialNumbers.append( oldMeasure.serialnumber() );
-          serialNumberIndex = serialNumber.size() - 1;
+          serialNumbers.append( QString::fromStdString( oldMeasure.serialnumber() ) );
+          serialNumberIndex = serialNumbers.size() - 1;
         }
         newMeasure->set_serialnumberindex(serialNumberIndex);
       }
@@ -495,16 +491,16 @@ namespace Isis {
         newMeasure->set_linesigma( oldMeasure.linesigma() );
       }
       if ( oldMeasure.has_sample() ) {
-        newMeasure->set_sample( oldMeasurement.sample() );
+        newMeasure->set_sample( oldMeasure.sample() );
       }
       if ( oldMeasure.has_line() ) {
-        newMeasure->set_line( oldMeasurement.line() );
+        newMeasure->set_line( oldMeasure.line() );
       }
       if ( oldMeasure.has_sampleresidual() ) {
-        newMeasure->set_sampleresidual( oldMeasurement.sampleresidual() );
+        newMeasure->set_sampleresidual( oldMeasure.sampleresidual() );
       }
       if ( oldMeasure.has_lineresidual() ) {
-        newMeasure->set_lineresidual( oldMeasurement.lineresidual() );
+        newMeasure->set_lineresidual( oldMeasure.lineresidual() );
       }
 
       // Copy over the enumerated values
@@ -532,7 +528,7 @@ namespace Isis {
 
         // Copy over any log data
         for (int j = 0; j < oldMeasure.log_size(); j++) {
-          ControlPointFileEntryV0005_Measure_MeasureLogData newLogData
+          ControlPointFileEntryV0005_Measure_MeasureLogData newLogData;
           ControlPointFileEntryV0002_Measure_MeasureLogData oldLogData = oldMeasure.log(j);
 
           if ( oldLogData.has_doubledatatype() ) {
@@ -587,7 +583,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 5
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -595,7 +591,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 5 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -618,7 +614,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a double value from a PvlKeyword and copies it into a version 5
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -626,7 +622,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 5 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -646,7 +642,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a string value from a PvlKeyword and copies it into a version 5
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -654,7 +650,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param point[out] The version 5 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -674,7 +670,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 5
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -682,7 +678,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 5 protobuf representation of the control measure that the
    *                     value will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -705,7 +701,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes an int value from a PvlKeyword and copies it into a version 5
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -713,7 +709,35 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 5 protobuf representation of the control measure that the
+   *                     value will be copied into.
+   * @param setter The protobuf mutator method that sets the value of the field in the protobuf
+   *               representation.
+   */
+  void ControlPointV0005::copy(PvlContainer &container,
+                               QString keyName,
+                               ControlPointFileEntryV0005_Measure &measure,
+                               void (ControlPointFileEntryV0005_Measure::*setter)(int)) {
+
+    if (!container.hasKeyword(keyName))
+      return;
+
+    int value = toInt(container[keyName][0]);
+    container.deleteKeyword(keyName);
+    (measure.*setter)(value);
+  }
+
+
+  /**
+   * This convenience method takes a double value from a PvlKeyword and copies it into a version 5
+   * protobuf field.
+   *
+   * If the keyword doesn't exist, this does nothing.
+   *
+   * @param container The PvlContainer representation of the control measure that contains the
+   *                  PvlKeyword.
+   * @param keyName The name of the keyword to be copied.
+   * @param[out] measure The version 5 protobuf representation of the control measure that the
    *                     value will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -733,7 +757,7 @@ namespace Isis {
 
 
   /**
-   * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
+   * This convenience method takes a string value from a PvlKeyword and copies it into a version 5
    * protobuf field.
    *
    * If the keyword doesn't exist, this does nothing.
@@ -741,7 +765,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control measure that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param[out] measure The version 2 protobuf representation of the control measure that the
+   * @param[out] measure The version 5 protobuf representation of the control measure that the
    *                     value will be into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.

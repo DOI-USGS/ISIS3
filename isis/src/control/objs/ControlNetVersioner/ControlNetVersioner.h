@@ -33,6 +33,7 @@
 #include "ControlPointV0001.h"
 #include "ControlPointV0002.h"
 #include "ControlPointV0003.h"
+#include "ControlPointV0005.h"
 
 class QString;
 
@@ -42,10 +43,6 @@ namespace Isis {
   class Pvl;
   class PvlContainer;
   class PvlObject;
-  class ControlPointV0001;
-  class ControlPointV0002;
-  class ControlPointV0003;
-  class ControlPointV0005;
 
   /**
    * @brief Handle various control network file format versions.
@@ -269,7 +266,7 @@ namespace Isis {
       ControlPoint *createPoint(ControlPointV0003 &point);
       ControlPoint *createPoint(ControlPointV0005 &point);
 
-      ControlMeasure *createMeasure(const ControlPointFileEntryV0002_Measure&);
+      ControlMeasure *createMeasure(const ControlPointFileEntryV0005_Measure&);
 
       void createHeader(const ControlNetHeaderV0001 header);
       void createHeader(const ControlNetHeaderV0005 header);
