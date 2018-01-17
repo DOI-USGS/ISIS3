@@ -653,22 +653,25 @@ namespace Isis {
 
     controlDetailsWriter.writeStartElement("controls");
 
-    QFuture<void *> future = QtConcurrent::mapped(*this,
-                                                  CopyControlDataFunctor(project, newProjectRoot));
-    for (int i = 0; i < count(); i++) {
-      int newProgressValue = progressDialog.value() + 1;
-      progressLabel->setText(
-          tr("Saving Control Information for [%1] - %L2/%L3 done")
-            .arg(m_name)
-            .arg(newProgressValue, countWidth, 10, paddingChar)
-            .arg(count()));
-      progressDialog.setValue(newProgressValue);
-      future.resultAt(i);
-    }
+    // Only copy controls if saving to new location
+    if (project->newProjectRoot() != project->projectRoot()) {
+      QFuture<void *> future = QtConcurrent::mapped(*this, 
+                                                    CopyControlDataFunctor(project, newProjectRoot));
+      for (int i = 0; i < count(); i++) {
+        int newProgressValue = progressDialog.value() + 1;
+        progressLabel->setText(
+            tr("Saving Control Information for [%1] - %L2/%L3 done")
+              .arg(m_name)
+              .arg(newProgressValue, countWidth, 10, paddingChar)
+              .arg(count()));
+        progressDialog.setValue(newProgressValue);
+        future.resultAt(i);
+      }
 
-    progressLabel->setText(tr("Finalizing..."));
-    progressDialog.setRange(0, 0);
-    progressDialog.setValue(0);
+      progressLabel->setText(tr("Finalizing..."));
+      progressDialog.setRange(0, 0);
+      progressDialog.setValue(0);
+    }
 
     foreach (Control *control, *this) {
       control->save(controlDetailsWriter, project, newProjectRoot);

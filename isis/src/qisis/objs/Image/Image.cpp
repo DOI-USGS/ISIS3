@@ -2,6 +2,7 @@
 
 #include <QBuffer>
 #include <QDataStream>
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QMutexLocker>
@@ -488,27 +489,43 @@ namespace Isis {
     if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
       Cube origImage(m_fileName);
 
+      // The imageDataRoot will either be PROJECTROOT/images or PROJECTROOT/results/bundle/timestamp/images,
+      // depending on how the newProjectRoot points to.
       FileName newExternalLabelFileName(Project::imageDataRoot(newProjectRoot.toString()) + "/" +
           FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name());
 
-      QScopedPointer<Cube> newExternalLabel(
-          origImage.copy(newExternalLabelFileName, CubeAttributeOutput("+External")));
+      if (m_fileName != newExternalLabelFileName.toString()) {
+        // This cube copy creates a filename w/ecub extension in the new project root, but looks to
+        // be a cube(internal vs external). It changes the DnFile pointer to the old ecub, 
+        // /tmp/tsucharski_ipce/tmpProject/images/import1/AS15-.ecub, but doing a less on file 
+        // immediately after the following call indicates it is a binary file.
+        QScopedPointer<Cube> newExternalLabel(
+            origImage.copy(newExternalLabelFileName, CubeAttributeOutput("+External")));
 
-      // If this is an ecub (it should be) and is pointing to a relative file name,
-      //   then we want to copy the DN cube also.
-      if (!origImage.storesDnData() ) {
-        if (origImage.externalCubeFileName().path() == ".") {
-          Cube dnFile(
-              FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
-
-          FileName newDnFileName = newExternalLabelFileName.setExtension("cub");
-
-          QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
-          newDnFile->close();
-          newExternalLabel->relocateDnData(newDnFileName.name());
-        }
-        else {
-          newExternalLabel->relocateDnData(origImage.externalCubeFileName());
+        // If this is an ecub (it should be) and is pointing to a relative file name,
+        //   then we want to copy the DN cube also.
+        if (!origImage.storesDnData() ) {
+          if (origImage.externalCubeFileName().path() == ".") {
+            Cube dnFile(
+                FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
+            FileName newDnFileName = newExternalLabelFileName.setExtension("cub");
+            QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
+            newDnFile->close();
+            // Changes the ecube's DnFile pointer in the labels.
+            newExternalLabel->relocateDnData(newDnFileName.name());
+          }
+          else {
+            //  If the the ecub's external cube is pointing to the old project root, update to new
+            //  project root.
+            if (origImage.externalCubeFileName().toString().contains(project->projectRoot())) {
+              QString newExternalCubeFileName = origImage.externalCubeFileName().toString();
+              newExternalCubeFileName.replace(project->projectRoot(), project->newProjectRoot());
+              newExternalLabel->relocateDnData(newExternalCubeFileName); 
+            }
+            else {
+              newExternalLabel->relocateDnData(origImage.externalCubeFileName()); 
+            }
+          }
         }
       }
     }

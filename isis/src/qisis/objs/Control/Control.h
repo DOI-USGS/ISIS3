@@ -63,6 +63,8 @@ namespace Isis {
    *                           control net is copied to it's new location like a binary file,
    *                           instead of being recreated from scratch by calling it's write method.
    *                           Fixes #5212.
+   *   @history 2017-12-20 Tracie Sucharski - In ::copyToNewProjectRoot use string comparison
+   *                           to compare project roots. References #4804, #4849.
    */
   class Control : public QObject {
     Q_OBJECT

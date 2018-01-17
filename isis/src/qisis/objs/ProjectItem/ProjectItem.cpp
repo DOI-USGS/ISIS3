@@ -146,7 +146,7 @@ namespace Isis {
     appendRow( new ProjectItem(control) );
 
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
-    appendRow( new ProjectItem( bundleSolutionInfo->imageList() ) );
+    appendRow( new ProjectItem( bundleSolutionInfo->adjustedImages() ) );
   }
 
 

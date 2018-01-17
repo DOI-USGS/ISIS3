@@ -116,6 +116,8 @@ namespace Isis {
    *                           Also switched the order in which a project is saved.  A project is
    *                           cleared after it is saved, and not before (which had been the previous
    *                           behavior.  Fixes #5175.
+   *   @history 2017-12-08 Tracie Sucharski - Removed project path.  Project root has been
+   *                           fixed to correctly show the path.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

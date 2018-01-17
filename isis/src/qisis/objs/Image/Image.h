@@ -87,7 +87,10 @@ namespace Isis {
    *                           Fixes #3950.
    *   @history 2017-10-11 Summer Stapleton - Removed path to instrumentId and spacecraftName in
    *                           the startElement method. Fixes #5179.
-   *
+   *   @history 2017-11-01 Tracie Sucharski - Changed copyToNewProjectRoot to handle Images that are
+   *                           located outside of the import image directories such as the updated
+   *                           Images from a bundle run.  To improve efficiency, return from method
+   *                           if the project root has not changed. Fixes #4849.
    */
 
   class Image : public QObject {

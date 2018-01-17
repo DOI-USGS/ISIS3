@@ -30,6 +30,8 @@ namespace Isis {
    *                           metatype for use with QVariant.
    *   @history 2016-06-06 Ian Humphrey - Updated documentation and coding standards. Fixes #3959.
    *   @history 2017-05-05 Tracie Sucharski - Removed Workorder.h, never used.
+   *   @history 2017-12-08 Tracie Sucharski - When saving project only copy the control if project
+   *                           is being saved to a new location.
    */
   class ControlList : public QObject, public QList<Control *> {
     Q_OBJECT

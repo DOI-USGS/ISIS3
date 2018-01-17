@@ -157,6 +157,11 @@ namespace Isis {
    *   @history 2017-06-08 Chris Combs - Made "Failed to create" error messages more descriptive.
    *                           Fixes #833.
    *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
+   *   @history 2018-01-04 Tracie Sucharski - Allow relative paths that are not "." in the DnFile
+   *                           keyword for ecubs. Changes to ::open to set m_dataFileName for ecubs,
+   *                           and changed ::realDataFileName() to return the absolute path if it is
+   *                           relative. Changed ::realDataFileLabel to call realDataFileName to
+   *                           make sure we get absolute path.  Fixes #5276.
    */
   class Cube {
     public:

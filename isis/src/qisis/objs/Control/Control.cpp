@@ -224,14 +224,13 @@ namespace Isis {
    *                       will be copied.
    */
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
-    if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
+    if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
 
       QString newNetworkPath =  project->cnetRoot(newProjectRoot.toString()) + "/" +
                   FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
 
       QString oldNetworkPath = project->cnetRoot(project->projectRoot()) + "/" +
                   FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
-
       if (!QFile::copy(oldNetworkPath,newNetworkPath) ) {
         throw IException(IException::Io, "Error saving control net.", _FILEINFO_);
       }

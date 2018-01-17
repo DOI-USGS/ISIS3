@@ -132,6 +132,8 @@ namespace Isis {
    *                             imported templates to show on the project tree. Fixes #5086.
    *     @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open
    *                             source images. Fixes #5105.
+   *     @history 2017-11-01 Ian Humphrey - Changed imageList to adjustedImages in the constructor
+   *                             taking a BundleSolutionInfo.  Fixes #4849.
    *     @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                             classes. Fixes #5117.
    *

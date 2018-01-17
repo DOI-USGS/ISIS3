@@ -180,6 +180,11 @@ namespace Isis {
    *   @history 2017-10-16 Ian Humphrey - Modified activeControl() to check if any images have been
    *                           imported into the project before trying to set an active control
    *                           when there is only one control in the project. Fixes #5160.
+   *   @history 2017-11-01 Tracie Sucharski - Added new member variable for the
+   *                           new project root when a Save As is being executed.  Both the old and
+   *                           new project roots are needed for copying files into the new project
+   *                           folders. Also updated the project name based on the new project.
+   *                           Fixes #4849.
    *   @history 2017-11-02 Tyler Wilson - Added support for opening Recent Projects from the
    *                           File Menu.  Fixes #4492.
    *   @history 2017-11-08 Ian Humphrey - Changed save() from a void to a bool return value. This
@@ -193,6 +198,14 @@ namespace Isis {
    *   @history 2017-11-15 Cole Neubauer - Added a check if there was an arg for the command line
    *                           to avoid creation of new temp project if a user is opening one from
    *                           the command line #5222
+   *   @history 2017-12-08 Tracie Sucharski - Added public method to add an Image to the
+   *                           idToImageMap.  This was needed to add Images from the results item.
+   *                           We need to access the map when opening saved projects that contain
+   *                           images from groups other than the main project data area.  This is
+   *                           a temporary fix until the project and model/view is improved.
+   *                           Corrected the setting of the project root when pening a project from
+   *                           the command line. Removed m_projectPath, it is no longer needed since
+   *                           m_projectRoot contains the correct path.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -211,6 +224,7 @@ namespace Isis {
       QDir addImageFolder(QString prefix);
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
+      void addImagesToIdMap(ImageList images);
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
@@ -236,7 +250,7 @@ namespace Isis {
       QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
-      QString projectPath() const;
+      QString newProjectRoot() const;
 
       void setName(QString newName);
       QUndoStack *undoStack();
@@ -423,8 +437,6 @@ namespace Isis {
 
       void templatesAdded(TemplateList *newTemplates);
 
-
-
     public slots:
       void open(QString);
       void setClean(bool value);
@@ -498,6 +510,7 @@ namespace Isis {
 
       static const int m_maxRecentProjects = 5;
       QDir *m_projectRoot;
+      QString m_newProjectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
       QPointer<Directory> m_directory;
@@ -532,7 +545,6 @@ namespace Isis {
       QMap<QString, GuiCamera *> *m_idToGuiCameraMap;
 
       QString m_name;
-      QString m_projectPath;
       QStringList *m_warnings;
       QList< QPointer<WorkOrder> > *m_workOrderHistory;
 

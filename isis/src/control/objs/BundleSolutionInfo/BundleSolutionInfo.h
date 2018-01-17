@@ -106,6 +106,16 @@ namespace Isis {
    *                           Fixes #4804, #4837.
    *   @history 2017-07-11 Makayla Shepherd - Added bundle naming capabilities. Fixes #4855.
    *   @history 2017-07-28 Makayla Shepherd - Fixed the default naming tag. Fixes #5069.
+   *   @history 2017-08-09 Ian Humphrey - Added m_adjustedImages with setters and getters so the
+   *                           BundleSolutionInfo can know which images have been adjusted (Updated
+   *                           labels). References #4849.
+   *   @history 2017-10-30 Tracie Sucharski - In ::save method, if the newProjectRoot is different
+   *                           from the current projectRoot, save the cnet and csv files and
+   *                           create the directory structure.
+   *   @history 2017-12-20 Tracie Sucharski - Fixed bug which was saving the bundle adjust input
+   *                           control net rather than the output control net.  References #4804.
+   *   @history 2017-01-03 Tracie Sucharski - Changed serialization to use relative paths.
+   *                           Fixes #5104.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -126,10 +136,12 @@ namespace Isis {
       QString savedPointsFilename();
       QString savedResidualsFilename();
 
+      void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
       void setRunTime(QString runTime);
       void setName(QString name);
 
+      QList<ImageList *> adjustedImages() const;
       QString id() const;
       QString controlNetworkFileName() const;
       BundleSettingsQsp bundleSettings();
@@ -193,7 +205,8 @@ namespace Isis {
       FileName           *m_controlNetworkFileName; //!< The name of the control network
       BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust
       BundleResults      *m_statisticsResults; //!< The results of the bundle adjust
-      QList<ImageList *> *m_images; //!< The list of images that were adjusted
+      QList<ImageList *> *m_images; //!< The list of images as input to the bundle
+      QList<ImageList *> *m_adjustedImages; //!< The list of images that were adjsuted
 
       // In theory the path in the BundlesSettings can change while running.  So we save the
       // filenames actually used when the most recent save of the file was done.

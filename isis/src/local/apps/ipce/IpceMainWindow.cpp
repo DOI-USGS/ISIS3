@@ -658,15 +658,16 @@ namespace Isis {
 
       //If the currently open project is a project that has been saved and is not within the current
       //list of recently open projects, then remove the oldest project from the list.
-      if (!project->projectPath().contains("tmpProject") && !projectPaths.contains(project->projectPath()) ) {
+      if (!project->projectRoot().contains("tmpProject") &&
+          !projectPaths.contains(project->projectRoot()) ) {
         QString s=keys.first();
         recentProjects.remove( s );
       }
 
       //If the currently open project is already contained within the list,
       //then remove the earlier reference.
-      if (projectPaths.contains(project->projectPath())) {
-        QString key = recentProjects.key(project->projectPath());
+      if (projectPaths.contains(project->projectRoot())) {
+        QString key = recentProjects.key(project->projectRoot());
         recentProjects.remove(key);
 
       }
@@ -685,8 +686,8 @@ namespace Isis {
       QString t0String=QString::number(t0);
 
       //Save the project location
-      if (!project->projectPath().contains("tmpProject") ) {
-              globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());
+      if (!project->projectRoot().contains("tmpProject") ) {
+              globalSettings.setValue(t0String+"%%%%%"+projName,project->projectRoot());
       }
     }
 
@@ -697,8 +698,9 @@ namespace Isis {
       QString projName = project->name();
       QString t0String=QString::number(t0);
 
-      if (!project->projectPath().contains("tmpProject") && !projectPaths.contains( project->projectPath() ) ) {
-        globalSettings.setValue(t0String+"%%%%%"+projName,project->projectPath());
+      if (!project->projectRoot().contains("tmpProject") &&
+          !projectPaths.contains( project->projectRoot())) {
+        globalSettings.setValue(t0String+"%%%%%"+projName,project->projectRoot());
       }
     }
     globalSettings.endGroup();

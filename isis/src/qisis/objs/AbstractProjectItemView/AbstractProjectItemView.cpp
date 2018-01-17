@@ -301,7 +301,6 @@ namespace Isis {
   void AbstractProjectItemView::removeItem(ProjectItem *item) {
     if (ProjectItemProxyModel *proxyModel = 
             qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
-//    qDebug()<<"AbstractProjectItemView::removeItem";
       proxyModel->removeItem(item);
     }
   }
