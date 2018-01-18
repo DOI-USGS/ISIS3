@@ -1239,7 +1239,6 @@ namespace Isis {
           numberOfPoints = networkInfo["NumberOfPoints"];
         }
         catch (...) {
-          std::cout << "Number of points not found." << std::endl;
           numberOfPoints = 0;
         }
       }
