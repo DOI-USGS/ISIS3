@@ -19,8 +19,6 @@ namespace Isis {
    *                           between all viewports now. Fixes #195.
    *   @history 2017-07-19 Marjorie Hahn and Tracie Sucharski - Implemented new
    *                           viewport tiling scheme.
-   *   @history 2018-01-09 Cole Neubauer - Returns windows to normal state before they are tiled to
-   *                           fix fullscreen tiling issue Fixes #5262
    */
   class WindowTool : public Tool {
       Q_OBJECT
@@ -31,7 +29,7 @@ namespace Isis {
       void addTo(Workspace *ws);
       void addToPermanent(QToolBar *toolbar);
 
-      /**
+      /** 
        * @return the menu name
        */
       QString menuName() const {
@@ -71,3 +69,4 @@ namespace Isis {
 };
 
 #endif
+
