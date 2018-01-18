@@ -449,9 +449,12 @@ namespace Isis {
       // Convert the serial number to an index into the serial number list.
       // If the serial number is not in the list, append it.
       if ( oldMeasure.has_serialnumber() ) {
-        // TODO this may be slow, QList::indexOf is a linear search through the list
+        // This is known to be incredibly slow but it was decided that it was acceptable
+        // For the update routines to be slow as long as the standard routines are fast.
         int serialNumberIndex = serialNumbers.indexOf(
                                     QString::fromStdString(oldMeasure.serialnumber()) );
+
+
         // If !serialNumbers.contains(oldMeasure.serialnumber()), then serialNumberIndex = -1
         if ( serialNumberIndex < 0 ) {
           serialNumbers.append( QString::fromStdString( oldMeasure.serialnumber() ) );

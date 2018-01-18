@@ -1,5 +1,7 @@
 #include "ControlNetVersioner.h"
 
+#include <algorithm>
+
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
@@ -64,6 +66,7 @@ namespace Isis {
     header.userName = net->GetUserName();
     header.serialNumbers = net->GetCubeSerials();
     createHeader(header);
+
   }
 
 
@@ -190,7 +193,11 @@ namespace Isis {
    *
    * @return Pvl& The Pvl version of the network
    */
-  Pvl ControlNetVersioner::toPvl(){
+  Pvl ControlNetVersioner::toPvl() {
+
+    // sort the lookup table to allow for logarithmic search complexity.
+    std::sort( m_header.serialNumbers.begin(), m_header.serialNumbers.end() );
+
     Pvl pvl;
     pvl.addObject(PvlObject("ControlNetwork"));
     PvlObject &network = pvl.findObject("ControlNetwork");
@@ -465,13 +472,12 @@ namespace Isis {
         const ControlMeasure &
             controlMeasure = *controlPoint->GetMeasure(j);
 
-        QString serialNumber(controlMeasure.GetCubeSerialNumber());
-        int index = m_header.serialNumbers.indexOf(serialNumber);
-        if (index < 0) {
-          m_header.serialNumbers.append(serialNumber);
-          network["SerialNumbers"] += serialNumber;
-          index = m_header.serialNumbers.size() - 1;
-        }
+        QList<QString>::Iterator serialNumberIterator = std::lower_bound( m_header.serialNumbers.begin(),
+                                                                          m_header.serialNumbers.end(),
+                                                                          controlMeasure.GetCubeSerialNumber() );
+
+        int index = std::distance( m_header.serialNumbers.begin(), serialNumberIterator );
+
         pvlMeasure += PvlKeyword("SerialNumberIndex", toString(index));
 
         switch ( controlMeasure.GetType() ) {
@@ -1112,6 +1118,7 @@ namespace Isis {
       header.lastModified = protoHeader.lastmodified().c_str();
       header.description = protoHeader.description().c_str();
       header.userName = protoHeader.username().c_str();
+
       createHeader(header);
     }
     catch (IException &e) {
@@ -1741,6 +1748,8 @@ namespace Isis {
    */
   void ControlNetVersioner::write(FileName netFile) {
     try {
+      // sort the lookup table to allow for logarithmic search complexity.
+      std::sort( m_header.serialNumbers.begin(), m_header.serialNumbers.end() );
 
       const int labelBytes = 65536;
       fstream output(netFile.expanded().toLatin1().data(), ios::out | ios::trunc | ios::binary);
@@ -2035,12 +2044,12 @@ namespace Isis {
 //??? moved             protoPoint.set_referenceindex(j);
 //??? moved        }
 
-        int index = m_header.serialNumbers.indexOf( controlMeasure.GetCubeSerialNumber() );
-        if (index < 0) {
-          QString msg = "Index for serial number [" + controlMeasure.GetCubeSerialNumber()
-                        + "] not found";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
+        QList<QString>::Iterator serialNumberIterator = std::lower_bound( m_header.serialNumbers.begin(),
+                                                                          m_header.serialNumbers.end(),
+                                                                          controlMeasure.GetCubeSerialNumber() );
+
+        int index = std::distance( m_header.serialNumbers.begin(), serialNumberIterator );
+
         protoMeasure.set_serialnumberindex(index);
 
         switch ( controlMeasure.GetType() ) {
