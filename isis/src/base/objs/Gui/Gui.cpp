@@ -68,6 +68,9 @@ namespace Isis {
 
       abort();
     }
+    else {
+      XCloseDisplay(NULL);
+    }
     #endif
   }
 
@@ -94,21 +97,21 @@ namespace Isis {
       QString style = uiPref["GuiStyle"];
       QApplication::setStyle(style);
     }
-    
-    
+
+
     if (uiPref.hasKeyword("GuiFontName")) {
       QString fontString = uiPref["GuiFontName"];
       QFont font = QFont(fontString);
-      
+
       if (uiPref.hasKeyword("GuiFontSize")) {
         int pointSize = uiPref["GuiFontSize"];
         font.setPointSize(pointSize);
       }
-      
+
       QApplication::setFont(font);
     }
-    
-    
+
+
     // Create the main window
     p_gui = new Gui(ui);
     p_gui->show();
