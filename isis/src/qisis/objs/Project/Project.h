@@ -192,12 +192,14 @@ namespace Isis {
    *                           saved (i.e. not cancelled). Fixes #5205.
    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                           classes. Fixes #5117.
-   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
-   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
    *   @history 2017-11-15 Cole Neubauer - Added a check if there was an arg for the command line
    *                           to avoid creation of new temp project if a user is opening one from
    *                           the command line #5222
+   *   @history 2017-12-01 Adam Goins - Added the maxRecentProjects() function to return the max
+   *                           number of recent projects to be displayed. Fixes #5216.
    *   @history 2017-12-08 Tracie Sucharski - Added public method to add an Image to the
    *                           idToImageMap.  This was needed to add Images from the results item.
    *                           We need to access the map when opening saved projects that contain
@@ -300,6 +302,12 @@ namespace Isis {
        * @return BundleSettings
        */
       BundleSettings *bundleSettings() {return m_bundleSettings;}
+
+      /**
+       * Return max number of recent projects to be displayed.
+       * @return Max number of recent Projects
+       */
+      static int maxRecentProjects() { return m_maxRecentProjects; }
 
       QProgressBar *progress();
 
@@ -465,7 +473,7 @@ namespace Isis {
       ControlList *createOrRetrieveControlList(QString name, QString path = "");
       ImageList *createOrRetrieveImageList(QString name, QString path = "");
       ShapeList *createOrRetrieveShapeList(QString name, QString path = "");
-      
+
       void writeSettings();
 
 
