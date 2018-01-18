@@ -223,8 +223,6 @@ namespace Isis {
    *                          the default projection offsets and multipliers. Fixes #4887.
    *   @history 2017-12-20 Summer Stapleton - Modified error message in
    *                          ProcessImportPds::ProcessLabel() to be more discriptive. Fixes #4883.
-   *   @history 2018-01-10 Christopher Combs - Changed ProcessDataFilePointer call to reflect 
-   *                          reflect changes made to voy2isis. Fixes #4345, #4421.
    *
    */
   class ProcessImportPds : public ProcessImport {
