@@ -271,7 +271,7 @@ namespace Isis {
       void createHeader(const ControlNetHeaderV0001 header);
       void createHeader(const ControlNetHeaderV0005 header);
 
-      void writeHeader(std::fstream *output);
+      uint32_t writeHeader(std::fstream *output);
       int writeFirstPoint(std::fstream *output);
 
       ControlNetHeaderV0005 m_header; /**< Header containing information about
