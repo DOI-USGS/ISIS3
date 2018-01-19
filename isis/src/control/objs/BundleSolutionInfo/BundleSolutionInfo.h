@@ -114,8 +114,11 @@ namespace Isis {
    *                           create the directory structure.
    *   @history 2017-12-20 Tracie Sucharski - Fixed bug which was saving the bundle adjust input
    *                           control net rather than the output control net.  References #4804.
-   *   @history 2017-01-03 Tracie Sucharski - Changed serialization to use relative paths.
+   *   @history 2018-01-03 Tracie Sucharski - Changed serialization to use relative paths.
    *                           Fixes #5104.
+   *   @history 2018-01-17 Tracie Sucharski - Added conditional code to check for null project in
+   *                           xml serialization to allow the unitTest to use xml serialization
+   *                           without having a project. References #5104.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

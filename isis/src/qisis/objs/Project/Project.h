@@ -177,6 +177,16 @@ namespace Isis {
    *                           addTemplateFolder(), templateRoot(), and m_templates as well as
    *                           serialization and structure for importing template filenames
    *                           Fixes #5086.
+   *   @history 2017-09-13 Tracie Sucharski - Fixed problems with cleanup on temporary projects.
+   *                           Remove shapes, controls, and results.
+   *   @history 2017-09-26 Tracie Sucharski - Close Image cube in
+   *                           ::addTargetsFromImportedImagesToProject and
+   *                           ::addCamerasFromImportedImagesToProject.  Fixes #4955.
+   *   @history 2017-10-04 Tracie Sucharski - Comment out connections for
+   *                           addTargetsFromImportedImagesToProject and
+   *                           addCamerasFromImportedImagesToProject.  This functionality needs to
+   *                           be put into the asynchronous process of importing images for speed
+   *                           and memory efficiency.  See ticket #5181.  Fixes #4955.
    *   @history 2017-10-16 Ian Humphrey - Modified activeControl() to check if any images have been
    *                           imported into the project before trying to set an active control
    *                           when there is only one control in the project. Fixes #5160.
@@ -200,6 +210,9 @@ namespace Isis {
    *                           the command line #5222
    *   @history 2017-12-01 Adam Goins - Added the maxRecentProjects() function to return the max
    *                           number of recent projects to be displayed. Fixes #5216.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168. Also fixed issue with saving
+   *                           a project before save as where isOpen was not set to true.
    *   @history 2017-12-08 Tracie Sucharski - Added public method to add an Image to the
    *                           idToImageMap.  This was needed to add Images from the results item.
    *                           We need to access the map when opening saved projects that contain
@@ -208,9 +221,6 @@ namespace Isis {
    *                           Corrected the setting of the project root when pening a project from
    *                           the command line. Removed m_projectPath, it is no longer needed since
    *                           m_projectRoot contains the correct path. References #5104.
-   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
-   *                           TemplateEditViewWorkOrder. Fixes #5168. Also fixed issue with saving
-   *                           a project before save as where isOpen was not set to true.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -223,6 +233,7 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+
       QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
       void addControl(Control *control);
@@ -236,6 +247,9 @@ namespace Isis {
       void addTemplates(TemplateList *templateFiles);
       QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void addTarget(Target *target);
+      void addCamera(Camera *camera);
+
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void clear();
       bool clearing(); //! Accessor for if the project is clearing or not
@@ -317,7 +331,7 @@ namespace Isis {
       void removeImages(ImageList &imageList);
 
       bool save();
-      void save(FileName newPath, bool verifyPathDoesntExist = true);
+      void save(FileName projectPath, bool verifyPathDoesntExist = true);
 
       void addToProject(WorkOrder *);
 
@@ -456,8 +470,6 @@ namespace Isis {
       void controlClosed(QObject *control);
       void controlListDeleted(QObject *controlList);
       void imagesReady(ImageList);
-      void addTargetsFromImportedImagesToProject(ImageList *imageList);
-      void addCamerasFromImportedImagesToProject(ImageList *imageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
       void bundleSolutionInfoClosed(QObject *bundleSolutionInfo);

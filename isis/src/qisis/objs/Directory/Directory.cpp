@@ -356,8 +356,7 @@ namespace Isis {
       }
 
       recentProjectsMenu->insertAction(firstAction, openRecentProjectAction);
-      if (recentProjectsMenu->actions().length() > Project::maxRecentProjects())
-      {
+      if (recentProjectsMenu->actions().length() > Project::maxRecentProjects()) {
         recentProjectsMenu->removeAction(recentProjectsMenu->actions().last());
       }
     }

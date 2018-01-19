@@ -65,6 +65,8 @@ namespace Isis {
    *                           Fixes #5212.
    *   @history 2017-12-20 Tracie Sucharski - In ::copyToNewProjectRoot use string comparison
    *                           to compare project roots. References #4804, #4849.
+   *   @history 2018-01-19 Tracie Sucharski - Do not copy control unless the project root has
+   *                           changed. References #5212.
    */
   class Control : public QObject {
     Q_OBJECT

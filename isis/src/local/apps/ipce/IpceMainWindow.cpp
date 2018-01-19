@@ -139,17 +139,17 @@ namespace Isis {
     m_directory->setHistoryContainer(historyDock);
     tabifyDockWidget(m_warningsDock, historyDock);
 
-    QDockWidget *progressDock = new QDockWidget("Progress", this, Qt::SubWindow);
-    progressDock->setObjectName("progressDock");
-    progressDock->setFeatures(QDockWidget::DockWidgetClosable |
-                         QDockWidget::DockWidgetMovable |
-                         QDockWidget::DockWidgetFloatable);
-    progressDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    //m_directory->setProgressContainer(progressDock);
-    addDockWidget(Qt::BottomDockWidgetArea, progressDock);
-    tabifyDockWidget(historyDock, progressDock);
+//  QDockWidget *progressDock = new QDockWidget("Progress", this, Qt::SubWindow);
+//  progressDock->setObjectName("progressDock");
+//  progressDock->setFeatures(QDockWidget::DockWidgetClosable |
+//                       QDockWidget::DockWidgetMovable |
+//                       QDockWidget::DockWidgetFloatable);
+//  progressDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+//  //m_directory->setProgressContainer(progressDock);
+//  addDockWidget(Qt::BottomDockWidgetArea, progressDock);
+//  tabifyDockWidget(historyDock, progressDock);
 
-    m_warningsDock->raise();
+    historyDock->raise();
 
 
     setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);

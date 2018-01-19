@@ -197,12 +197,6 @@ namespace Isis {
     connect( m_imageReader, SIGNAL( imagesReady(ImageList) ),
              this, SLOT( imagesReady(ImageList) ) );
 
-    connect( this, SIGNAL(imagesAdded(ImageList *) ),
-             this, SLOT(addTargetsFromImportedImagesToProject(ImageList *) ) );
-
-    connect( this, SIGNAL(imagesAdded(ImageList *) ),
-             this, SLOT(addCamerasFromImportedImagesToProject(ImageList *) ) );
-
     // Project will be listening for when both cnets and images have been added.
     // It will emit a signal, controlsAndImagesAvailable, when this occurs.
     // Directory sets up a listener on the JigsawWorkOrder clone to enable itself
@@ -685,7 +679,28 @@ namespace Isis {
       stream.writeEndElement();
     }
 
-    //  Write general look of gui, including docked widges
+    // TODO:  Finish implementing serialization of TargetBody & GuiCameras
+//  if (!m_targets->isEmpty()) {
+//    stream.writeStartElement("targets");
+//
+//    for (int i = 0; i < m_targets->count(); i++) {
+//      m_targets->at(i)->save(stream, this, newProjectRoot);
+//    }
+//
+//    stream.writeEndElement();
+//  }
+//
+//  if (!m_guiCameras->isEmpty()) {
+//    stream.writeStartElement("cameras");
+//
+//    for (int i = 0; i < m_guiCameras->count(); i++) {
+//      m_guiCameras->at(i)->save(stream, this, newProjectRoot);
+//    }
+//
+//    stream.writeEndElement();
+//  }
+
+//  Write general look of gui, including docked widges
 //  QVariant geo_data = saveGeometry();
 //  QVariant layout_data = saveState();
 //
@@ -932,6 +947,10 @@ namespace Isis {
    */
   void Project::addImages(ImageList newImages) {
     imagesReady(newImages);
+
+    //  The each 
+    emit guiCamerasAdded(m_guiCameras);
+    emit targetsAdded(m_targets);
   }
 
 
@@ -1265,15 +1284,16 @@ namespace Isis {
     m_isTemporaryProject = false;
 
     XmlHandler handler(this);
+
     XmlStackedHandlerReader reader;
     reader.pushContentHandler(&handler);
     reader.setErrorHandler(&handler);
 
     QDir oldProjectRoot(*m_projectRoot);
-    QDir oldProjectRoot(*m_projectRoot);
     *m_projectRoot =  QDir(projectAbsolutePathStr);
 
     QXmlInputSource xmlInputSource(&file);
+
     //This prevents the project from not loading if everything
     //can't be loaded, and outputs the warnings/errors to the
     //Warnings Tab
@@ -1290,8 +1310,10 @@ namespace Isis {
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
+
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
+
     try {
         reader.parse(xmlHistoryInputSource);
         }
@@ -1306,15 +1328,19 @@ namespace Isis {
                                 .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
+
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
+
     if (!reader.parse(xmlWarningsInputSource)) {
       warn(tr("Failed to read warnings from project [%1]").arg(projectAbsolutePathStr));
     }
+
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
+
     try {
       reader.parse(xmlDirectoryInputSource);
          }
@@ -1329,6 +1355,7 @@ namespace Isis {
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
+
     QDir bundleRoot(bundleSolutionInfoRoot());
     if (bundleRoot.exists()) {
       // get QFileInfo for each directory in the bundle root
@@ -2030,6 +2057,12 @@ namespace Isis {
    * Delete all of the files, that this project stores, from disk.
    */
   void Project::deleteAllProjectFiles() {
+
+    // Currently the deleteFromDisk methods for Image and Shape delete the Cube if it exists, the
+    //  other objects deleteFromDisk methods simply remove files.  This could be achieved easier
+    //  in this method by simply calling QDir::removeRecursively(), but for future functionality
+    //  call each objects deleteFromDisk.  Currently there are no cleanup methods for Bundle results
+    //  or templates, so simply remove directory recursively.
     foreach (ImageList *imagesInAFolder, *m_images) {
       imagesInAFolder->deleteFromDisk(this);
     }
@@ -2038,9 +2071,17 @@ namespace Isis {
       warn( tr("Did not properly clean up images folder [%1] in project").arg( imageDataRoot() ) );
     }
 
+    foreach (ShapeList *shapesInAFolder, *m_shapes) {
+      shapesInAFolder->deleteFromDisk(this);
+    }
+
     if ( !m_projectRoot->rmdir( shapeDataRoot() ) ) {
       warn( tr("Did not properly clean up shapes folder [%1] in project").
             arg( shapeDataRoot() ) );
+    }
+
+    foreach (ControlList *controlsInAFolder, *m_controls) {
+      controlsInAFolder->deleteFromDisk(this);
     }
 
     if ( !m_projectRoot->rmdir( cnetRoot() ) ) {
@@ -2048,12 +2089,12 @@ namespace Isis {
              .arg( cnetRoot() ) );
     }
 
-    if ( !m_projectRoot->rmdir( resultsRoot() ) ) {
+    if ( !(QDir(resultsRoot()).removeRecursively()) ) {
       warn( tr("Did not properly clean up results folder [%1] in project")
              .arg( resultsRoot() ) );
     }
 
-    if ( !m_projectRoot->rmdir( templateRoot() ) ) {
+    if ( !(QDir(templateRoot()).removeRecursively()) ) {
       warn( tr("Did not properly clean up templates folder [%1] in project")
              .arg( templateRoot() ) );
     }
@@ -2070,7 +2111,6 @@ namespace Isis {
    * @param newProjectRoot The new root directory for the project.
    */
   void Project::relocateProjectRoot(QString newProjectRoot) {
-    qDebug()<<"Project::relocateProjectRoot";
     *m_projectRoot = newProjectRoot;
     emit projectRelocated(this);
   }
@@ -2124,7 +2164,7 @@ namespace Isis {
 
   /**
    * @brief Project::save  Saves the project state out to an XML file
-   * @param newPath  The path to the project directory.
+   * @param projectPath  The path to the project directory.
    * @param verifyPathDoesntExist A boolean variable which is set to true
    * if we wish to check that we are not overwriting a pre-existing save.
    *
@@ -2455,6 +2495,68 @@ namespace Isis {
   }
 
 
+  void Project::addTarget(Target *target) {
+
+    bool found = false;
+
+    // construct TargetBody QSharedPointer from this images cameras Target
+    TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
+
+    foreach (TargetBodyQsp tb, *m_targets) {
+      if (*tb == *targetBody) {
+        found = true;
+        break;
+      }
+    }
+
+    // if this TargetBody is not already in the project, add it
+    // below is how it probably should work, would have to I think
+    // override the ::contains() method in the TargetBodyList class
+//      if (!m_targets->contains(targetBody))
+//        m_targets->append(targetBody);
+    if (!found) {
+      m_targets->append(targetBody);
+      connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
+               this, SLOT( targetBodyClosed(QObject *) ) );
+//      connect( this, SIGNAL( projectRelocated(Project *) ),
+//               targetBody.data(), SLOT( updateFileName(Project *) ) );
+
+      (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
+    }
+  }
+
+
+  void Project::addCamera(Camera *camera) {
+    bool found = false;
+
+    // construct guiCamera QSharedPointer from this images cameras Target
+    GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
+
+    foreach (GuiCameraQsp gc, *m_guiCameras) {
+      if (*gc == *guiCamera) {
+        found = true;
+        break;
+      }
+    }
+
+    // if this guiCamera is not already in the project, add it
+    // below is how it probably should work, would have to I think
+    // override the ::contains() method in the GuiCameraList class
+//      if (!m_guiCameras->contains(guiCamera))
+//        m_guiCameras->append(guiCamera);
+
+    if (!found) {
+      m_guiCameras->append(guiCamera);
+//      connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
+//               this, SLOT( guiCameraClosed(QObject *) ) );
+//      connect( this, SIGNAL( projectRelocated(Project *) ),
+//               guiCamera.data(), SLOT( updateFileName(Project *) ) );
+
+      (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
+    }
+  }
+
+
   /**
    * Add images to the id map which are not under the projects main data area, the Images node on 
    * the project tree, such as the images under bundle results.  This is an interim solution since 
@@ -2468,85 +2570,6 @@ namespace Isis {
     foreach (Image *image, images) {
       (*m_idToImageMap)[image->id()] = image;
     }
-  }
-
-
-  void Project::addTargetsFromImportedImagesToProject(ImageList *imageList) {
-
-    bool found = false;
-    foreach (Image *image, *imageList) {
-
-      // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
-      //   2016-07-25  TLS The cube is created if it doesn't exist (or isn't open)
-      Target *target = image->cube()->camera()->target();
-
-      // construct TargetBody QSharedPointer from this images cameras Target
-      TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
-
-      foreach (TargetBodyQsp tb, *m_targets) {
-        if (*tb == *targetBody) {
-          found = true;
-          break;
-        }
-      }
-
-      // if this TargetBody is not already in the project, add it
-      // below is how it probably should work, would have to I think
-      // override the ::contains() method in the TargetBodyList class
-//      if (!m_targets->contains(targetBody))
-//        m_targets->append(targetBody);
-
-      if (!found) {
-        m_targets->append(targetBody);
-        connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
-                 this, SLOT( targetBodyClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               targetBody.data(), SLOT( updateFileName(Project *) ) );
-
-        (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
-      }
-    }
-
-    emit targetsAdded(m_targets);
-  }
-
-
-
-  void Project::addCamerasFromImportedImagesToProject(ImageList *imageList) {
-    bool found = false;
-    foreach (Image *image, *imageList) {
-
-      // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
-      Camera *camera = image->cube()->camera();
-
-      // construct guiCamera QSharedPointer from this images cameras Target
-      GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
-
-      foreach (GuiCameraQsp gc, *m_guiCameras) {
-        if (*gc == *guiCamera) {
-          found = true;
-          break;
-        }
-      }
-
-      // if this guiCamera is not already in the project, add it
-      // below is how it probably should work, would have to I think
-      // override the ::contains() method in the GuiCameraList class
-//      if (!m_guiCameras->contains(guiCamera))
-//        m_guiCameras->append(guiCamera);
-
-      if (!found) {
-        m_guiCameras->append(guiCamera);
-//      connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
-//               this, SLOT( guiCameraClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               guiCamera.data(), SLOT( updateFileName(Project *) ) );
-
-        (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
-      }
-    }
-
-    emit guiCamerasAdded(m_guiCameras);
   }
 
 

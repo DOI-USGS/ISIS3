@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QtConcurrentMap>
 
+#include "Camera.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
@@ -34,6 +35,7 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "SaveProjectWorkOrder.h"
+#include "Target.h"
 #include "TextFile.h"
 
 namespace Isis {
@@ -173,7 +175,8 @@ namespace Isis {
                    tr("Save Project Before Importing Images"),
                    tr("Would you like to save your project <b>before</b> importing images? It can be "
                       "slow to save your project after these images have been loaded if you do not "
-                      "save now."),
+                      "save now. <br><br>IMPORTANT: WHEN IMPORTING LARGE DATA SETS, SAVING YOUR "
+                      "PROJECT BEFORE IMPORTING IS HIGHLY RECOMMENDED."),
                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                    QMessageBox::Yes);
         }
@@ -409,19 +412,22 @@ namespace Isis {
           projectImage->relocateDnData(FileName(destination).name());
         }
 
+        //  Set new ecub to readOnly
+        projectImage->reopen();
+
         delete input;
 
         result = projectImage;
       }
       // When we encounter an exception, update the m_errors and m_numErrors to with the exception
       // that occurred.
-      catch (...) {
-      //  m_errorsLock.lock();
+      catch (IException &e) {
+        m_errorsLock.lock();
 
-      //  m_errors->append(e);
-      //  (*m_numErrors)++;
+        m_errors->append(e);
+        (*m_numErrors)++;
 
-        //m_errorsLock.unlock();
+        m_errorsLock.unlock();
       }
     }
 
@@ -522,8 +528,17 @@ namespace Isis {
           Cube *cube = future.resultAt(i);
 
           if (cube) {
+
+            Camera *camera = cube->camera();
+            project()->addCamera(camera);
+            Target *target = camera->target();
+            project()->addTarget(target);
+
             // Create a new image from the result in the thread spawned in WorkOrder::redo().
-            Image *newImage = new Image(future.resultAt(i));
+            Image *newImage = new Image(cube);
+            newImage->closeCube();
+            // Memory for cube is deleted in Image::closeCube()
+            cube = NULL;
 
             // Either use a unique id that was already provided or create one for the new image.
             if (confirmedImagesIds[i].isEmpty()) {
@@ -546,8 +561,6 @@ namespace Isis {
             // (was created) in the GUI thread.
             newImage->moveToThread(thread());
             newImage->displayProperties()->moveToThread(thread());
-
-            newImage->closeCube();
           }
         }
         // Since we temporarily increased the max thread count (by releasing a thread), make sure

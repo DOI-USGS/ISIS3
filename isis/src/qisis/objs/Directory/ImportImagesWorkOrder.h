@@ -88,6 +88,17 @@ namespace Isis {
    *
    *   @history 2017-11-13 Cole Neubauer - Fixed apsolute paths not being read correctly in cubelis
    *                           Fixes #4956
+   *   @history 2017-09-26 Tracie Sucharski - In ::importConfirmedImages, pass in the cube pointer
+   *                           to Image constructor rather than the future result.  Null out the
+   *                           cube pointer after it is closed in the Image.  After output ecub is
+   *                           created reopen created ecub as readOnly.  When closing cube, the
+   *                           labels were being re-written because the cube was read/write. This
+   *                           caused a segfault when imported large number of images because of a
+   *                           label template file being opened too many times.  Uncommented error
+   *                           checking in functor operator method. Fixes #4955.
+   *   @history 2018-01-18 Tracie Sucharski - Add the targets and gui cameras to the project.
+   *                           Fixes #5181.
+   *            
    */
   class ImportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

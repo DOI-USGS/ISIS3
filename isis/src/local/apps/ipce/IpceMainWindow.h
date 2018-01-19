@@ -117,7 +117,10 @@ namespace Isis {
    *                           cleared after it is saved, and not before (which had been the previous
    *                           behavior.  Fixes #5175.
    *   @history 2017-12-08 Tracie Sucharski - Removed project path.  Project root has been
-   *                           fixed to correctly show the path.
+   *                           fixed to correctly show the path. References #5276, #5289.
+   *   @history 2018-01-18 Tracie Sucharski - Commented out progressDock until we decide if it's
+   *                           needed.  Currently, it is not being used, the progress bar appears in
+   *                           the history dock. Fixes #5151.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

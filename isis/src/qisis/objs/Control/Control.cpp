@@ -226,10 +226,8 @@ namespace Isis {
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
     if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
 
-      FileName newCnetFileName(project->cnetRoot(newProjectRoot.toString()) + "/" +
-          FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name());
-      controlNet()->Write(newCnetFileName.toString());
-    }
+      QString newNetworkPath =  project->cnetRoot(newProjectRoot.toString()) + "/" +
+                  FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
 
       QString oldNetworkPath = project->cnetRoot(project->projectRoot()) + "/" +
                   FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();

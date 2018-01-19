@@ -75,7 +75,7 @@ namespace Isis {
    * Destructor.
    */
   TemplateList::~TemplateList() {
-    // emit deletingList(this);
+    // At the moment, this only occurs during an ImportTemplateWorkOrder undo, where it is handled
   }
 
 
@@ -189,7 +189,6 @@ namespace Isis {
     stream.writeAttribute("name", m_name);
     stream.writeAttribute("type", m_type);
     stream.writeAttribute("path", m_path);
-
 
     FileName settingsFileName(
       Project::templateRoot(newProjectRoot.toString()) + "/" + m_type + "/" + m_name + "/templates.xml");
