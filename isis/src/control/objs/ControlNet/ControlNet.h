@@ -247,6 +247,7 @@ namespace Isis {
       int getEdgeCount() const;
       QString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
+      QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
                                                   double min,double max);
       void DeleteMeasuresWithId(QString serialNumber);
