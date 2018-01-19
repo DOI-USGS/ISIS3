@@ -39,6 +39,10 @@
     * another, saved to disk, or deleted from disk. Adapted from ControlList.
     *
     * @author 2017-11-01 Christopher Combs
+    * @internal
+    *   @history 2017-11-01 Christopher Combs - Original version. Fixes #5117
+    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+    *                           TemplateEditViewWorkOrder. Fixes #5168.
     */
    class TemplateList : public QObject, public QList<Template *> {
      Q_OBJECT

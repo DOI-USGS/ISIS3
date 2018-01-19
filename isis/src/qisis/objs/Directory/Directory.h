@@ -67,6 +67,7 @@ namespace Isis {
   class SensorInfoWidget;
   class TargetBody;
   class TargetInfoWidget;
+  class TemplateEditorWidget;
   class WarningTreeWidget;
   class WorkOrder;
   class Workspace;
@@ -203,6 +204,8 @@ namespace Isis {
    *   @history 2017-12-01 Adam Goins Modified updateRecentProjects() to update the recent projects
    *                           menu it display a chronologically ordered list of recently loaded 
    *                           projects. Fixes #5216.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -222,6 +225,7 @@ namespace Isis {
       Footprint2DView *addFootprint2DView();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
+      TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
       ImageFileListWidget *addImageFileListView();
       ControlPointEditView *addControlPointEditView();
@@ -251,6 +255,7 @@ namespace Isis {
       QList<MatrixSceneWidget *> matrixViews();
       QList<SensorInfoWidget *> sensorInfoViews();
       QList<TargetInfoWidget *> targetInfoViews();
+      QList<TemplateEditorWidget *> templateEditorViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
       ControlPointEditView *controlPointEditView();
@@ -334,6 +339,7 @@ namespace Isis {
       void cleanupMatrixViewWidgets(QObject *);
       void cleanupSensorInfoWidgets(QObject *);
       void cleanupTargetInfoWidgets(QObject *);
+      void cleanupTemplateEditorWidgets(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
@@ -418,6 +424,7 @@ namespace Isis {
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
       QList< QPointer<SensorInfoWidget> > m_sensorInfoWidgets; //!< List of SensorInfoWidgets
       QList< QPointer<TargetInfoWidget> > m_targetInfoWidgets; //!< List of TargetInfoWidgets
+      QList< QPointer<TemplateEditorWidget> > m_templateEditorWidgets; //!< List of TemplateEditorWidgets
 
       QList< QPointer<WorkOrder> > m_workOrders; //!< List of WorkOrders
 

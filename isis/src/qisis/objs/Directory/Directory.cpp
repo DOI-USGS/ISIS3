@@ -92,6 +92,8 @@
 #include "TableViewContent.h"
 #include "TargetInfoWidget.h"
 #include "TargetGetInfoWorkOrder.h"
+#include "TemplateEditorWidget.h"
+#include "TemplateEditViewWorkOrder.h"
 #include "ToolPad.h"
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
@@ -154,6 +156,7 @@ namespace Isis {
       //createWorkOrder<RemoveImagesWorkOrder>();
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<BundleObservationViewWorkOrder>();
+      createWorkOrder<TemplateEditViewWorkOrder>();
 
       //  Main menu actions
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
@@ -294,6 +297,8 @@ namespace Isis {
     m_matrixViewWidgets.clear();
     m_sensorInfoWidgets.clear();
     m_targetInfoWidgets.clear();
+    m_templateEditorWidgets.clear();
+
     m_projectItemModel->clean();
     emit directoryCleaned();
   }
@@ -919,6 +924,27 @@ namespace Isis {
 
 
   /**
+   * @brief Add template editor view widget to the window.
+   * @return (TemplateEditorWidget*) The widget to view.
+   */
+  TemplateEditorWidget *Directory::addTemplateEditorView(Template *currentTemplate) {
+    TemplateEditorWidget *result = new TemplateEditorWidget(currentTemplate, this);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
+
+    m_templateEditorWidgets.append(result);
+
+    result->setWindowTitle( tr("%1").arg( FileName(currentTemplate->fileName()).name() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result);
+
+    return result;
+  }
+
+
+  /**
    * @brief Add sensor data view widget to the window.
    * @return @b (SensorInfoWidget*) The widget to view.
    */
@@ -1146,6 +1172,20 @@ namespace Isis {
 
 
   /**
+   * @brief Removes pointers to deleted TemplateEditorWidget objects.
+   */
+  void Directory::cleanupTemplateEditorWidgets(QObject *obj) {
+
+    TemplateEditorWidget *templateEditorWidget = static_cast<TemplateEditorWidget *>(obj);
+    if (!templateEditorWidget) {
+      return;
+    }
+    m_templateEditorWidgets.removeAll(templateEditorWidget);
+    m_project->setClean(false);
+  }
+
+
+  /**
    * @brief  Adds a new Project object to the list of recent projects if it has not
    * already been added.
    * @param project A pointer to the Project to add.
@@ -1232,6 +1272,21 @@ namespace Isis {
     QList<TargetInfoWidget *> results;
 
     foreach (TargetInfoWidget *widget, m_targetInfoWidgets) {
+      results.append(widget);
+    }
+
+    return results;
+  }
+
+
+  /**
+   * @brief Accessor for the list of TemplateEditorWidgets currently available.
+   * @return @b QList<TemplateEditorWidget *> The list of TemplateEditorWidget objects.
+   */
+  QList<TemplateEditorWidget *> Directory::templateEditorViews() {
+    QList<TemplateEditorWidget *> results;
+
+    foreach (TemplateEditorWidget *widget, m_templateEditorWidgets) {
       results.append(widget);
     }
 

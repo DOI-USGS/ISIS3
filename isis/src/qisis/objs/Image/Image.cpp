@@ -247,7 +247,7 @@ namespace Isis {
 
 
   /**
-   * @brief Get the Cube pointer associated with this display property. 
+   * @brief Get the Cube pointer associated with this display property.
    *
    * This will allocate the Cube pointer if one is not already present.
    * @throws IException::Programmer "Cube cannot be created"
@@ -256,7 +256,7 @@ namespace Isis {
   Cube *Image::cube() {
     if (!m_cube) {
       try {
-        m_cube = new Cube(m_fileName); 
+        m_cube = new Cube(m_fileName);
       }
       catch (IException &e) {
         throw IException(e, IException::Programmer, "Cube cannot be created", _FILEINFO_);
@@ -268,7 +268,7 @@ namespace Isis {
 
 
   /**
-   * @brief Cleans up the Cube pointer. 
+   * @brief Cleans up the Cube pointer.
    *
    * You want to call this once you are sure you are done
    * with the Cube because the OS will limit how many of these we have open.
@@ -350,9 +350,9 @@ namespace Isis {
 
 
   /**
-   * @brief Calculate a footprint for this image. 
+   * @brief Calculate a footprint for this image.
    *
-   * If the footprint is already stored inside the cube, that will be used instead. 
+   * If the footprint is already stored inside the cube, that will be used instead.
    * If no footprint can be found, this throws an exception.
    * @param cameraMutex A pointer to the camera mutex to lock the camera resource while a footprint
    * is created.
@@ -932,5 +932,3 @@ namespace Isis {
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }
-
-

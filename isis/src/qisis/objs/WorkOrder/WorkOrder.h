@@ -49,6 +49,7 @@ namespace Isis {
   class Project;
   class ProjectItem;
   class ShapeList;
+  class Template;
   class XmlStackedHandlerReader;
 
   /**
@@ -311,6 +312,8 @@ namespace Isis {
    *                           of these accessors should be used in the workorder template #5113
    *   @history 2017-11-02 Tyler Wilson - Added a virtual setData method for a QString, and
    *                           a private QString object called m_data.  References #4492.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -356,9 +359,10 @@ namespace Isis {
       virtual bool isExecutable(ControlList *controls);
       virtual bool isExecutable(CorrelationMatrix);
       virtual bool isExecutable(TargetBodyQsp targetBody);
+      virtual bool isExecutable(Template *currentTemplate);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
       virtual bool isExecutable(FileItemQsp fileItem);
-      virtual bool isExecutable(ProjectItem *item);      
+      virtual bool isExecutable(ProjectItem *item);
 
       void read(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream) const;
@@ -368,6 +372,7 @@ namespace Isis {
       virtual void setData(ImageList *images);
       virtual void setData(ShapeList *shapes);
       virtual void setData(ControlList *controls);
+      virtual void setData(Template *currentTemplate);
       virtual void setData(CorrelationMatrix);
       virtual void setData(TargetBodyQsp targetBody);
       virtual void setData(GuiCameraQsp guiCamera);
@@ -432,6 +437,8 @@ namespace Isis {
 
       QPointer<ControlList> controlList();
 
+      Template *getTemplate();
+
       TargetBodyQsp targetBody();
 
       GuiCameraQsp guiCamera();
@@ -465,7 +472,7 @@ namespace Isis {
       bool isInStableState() const;
       void listenForImageDestruction();
       void listenForShapeDestruction();
-      void resetProgressBar();   
+      void resetProgressBar();
       void setProgressToFinalText();
 
     private slots:
@@ -582,6 +589,13 @@ namespace Isis {
        * framework
        */
       GuiCameraQsp m_guiCamera;
+
+
+      /**
+       * A QSharedPointer to the Template (A Template object but encapsulated within a Gui
+       * framework.
+       */
+      Template *m_template;
 
 
       /**

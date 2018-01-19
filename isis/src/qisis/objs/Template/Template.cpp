@@ -35,12 +35,18 @@ namespace Isis{
     xmlReader->pushContentHandler(new XmlHandler(this, templateFolder));
   }
 
-
-  /**
-   * Destroys Template object.
-   */
-  Template::~Template() {
-  }
+  //
+  // /**
+  //  * Copy constructor.
+  //  *
+  //  * @param other The Template to copy.
+  //  */
+  // Template::Template(const Template &other) :
+  //     QObject(parent) {
+  //   m_fileName = other.m_fileName;
+  //   m_templateType = other.m_templateType;
+  //   m_importName = other.m_importName;
+  // }
 
 
   /**
@@ -78,6 +84,10 @@ namespace Isis{
   void Template::updateFileName(Project *project) {
     m_fileName = project->templateRoot() + "/" + m_templateType + "/" + m_importName +"/" + FileName(m_fileName).name();
   }
+  //
+  // void Template::updateFileName(Project *project) {
+  //   updateFileName(project)
+  // }
 
 
   /**
@@ -147,7 +157,16 @@ namespace Isis{
         QString importName = atts.value("importName");
 
         if (!fileName.isEmpty()) {
-          m_xmlHandlerTemplate->m_fileName = fileName;
+          m_xmlHandlerTemplate->m_fileName =
+            m_xmlHandlerTemplateFolderName.expanded() + "/" + templateType + "/" + importName + "/" +fileName;
+        }
+
+        if (!templateType.isEmpty()) {
+          m_xmlHandlerTemplate->m_templateType = templateType;
+        }
+
+        if (!importName.isEmpty()) {
+          m_xmlHandlerTemplate->m_importName = importName;
         }
       }
     }

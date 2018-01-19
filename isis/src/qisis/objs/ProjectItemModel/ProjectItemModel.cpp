@@ -420,11 +420,9 @@ namespace Isis {
    */
   void ProjectItemModel::onTemplatesAdded(TemplateList *templateList) {
     Project *project = qobject_cast<Project *>( sender() );
+    if (!project) { return; }
 
-    if (!project) {
-      return;
-    }
-
+    // Start at our project's node
     // Start at our project's node
     for (int i = 0; i<rowCount(); i++) {
       ProjectItem *projectItem = item(i);
@@ -847,7 +845,6 @@ namespace Isis {
    * Used to clean the ProjectItemModel of everything but the headers
    */
    void ProjectItemModel::clean() {
-
      for (int i=0; i<rowCount(); i++) {
        ProjectItem *projectItem = item(i);
        if (projectItem->project()) {
@@ -856,19 +853,19 @@ namespace Isis {
              ProjectItem *subProjectItem = projectItem->child(j);
 
              // The header "Templates" has two subheaders that we want to keep
-             if (subProjectItem->text() == "Templates"){
+             if (subProjectItem->text() == "Templates") {
                if (subProjectItem->hasChildren()) {
                  for (int k=0; k < subProjectItem->rowCount(); k++) {
                    ProjectItem *tempProjectItem = subProjectItem->child(k);
                    while (tempProjectItem->hasChildren()) {
-                     removeItem(tempProjectItem->child(0));
+                       removeItem(tempProjectItem->child(0));
                    }
                  }
                }
              }
              else {
                while (subProjectItem->hasChildren()) {
-                 removeItem(subProjectItem->child(0));
+                   removeItem(subProjectItem->child(0));
                }
              }
            }

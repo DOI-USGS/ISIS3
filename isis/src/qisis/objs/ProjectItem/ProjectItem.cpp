@@ -27,6 +27,7 @@
 #include <QIcon>
 #include <QStandardItem>
 #include <QVariant>
+#include <QDebug>
 
 #include "BundleResults.h"
 #include "BundleSolutionInfo.h"
@@ -312,7 +313,7 @@ namespace Isis {
     setEditable(false);
     setTemplateList(templateList);
     foreach (Template *currentTemplate, *templateList) {
-      appendRow( new ProjectItem(currentTemplate));
+      appendRow(new ProjectItem(currentTemplate));
     }
   }
 
@@ -600,7 +601,7 @@ namespace Isis {
 
 
   bool ProjectItem::isTemplate() const {
-    return data().canConvert<QString>();
+    return data().canConvert<Template *>();
   }
 
 
@@ -957,6 +958,7 @@ namespace Isis {
                            .expanded()));
     mapsItem->setData( QVariant() );
     appendRow(mapsItem);
+
 
     ProjectItem *registrationsItem = new ProjectItem();
     registrationsItem->setText("Registrations");

@@ -122,12 +122,8 @@ namespace Isis {
     else {
       itemType = internalData().at(0);
 
-      if (itemType == "Maps") {
-        filterText = "Maps (*.def *.map *.pvl)";
-      }
-      else if (itemType == "Registrations") {
-        filterText = "Registrations (*.def *.pvl)";
-      }
+      if (itemType == "Maps") { filterText = "Maps (*.def *.map *.pvl)"; }
+      else if (itemType == "Registrations") { filterText = "Registrations (*.def *.pvl)"; }
 
       internalData().clear();
     }
@@ -143,7 +139,7 @@ namespace Isis {
         &selectedFilter);
 
     if (!templateFileNames.isEmpty() && !selectedFilter.isEmpty()) {
-      QUndoCommand::setText(tr("Import %1 Templates").arg(templateFileNames.count()));
+      QUndoCommand::setText(tr("Import %1 Template(s)").arg(templateFileNames.count()));
     }
     else {
       return false;
@@ -169,13 +165,11 @@ namespace Isis {
     QDir templateFolder = project()->addTemplateFolder(m_fileType + "/import");
     QStringList templateFileNames = internalData();
 
-    m_list = new TemplateList(
-      templateFolder.dirName(), m_fileType, m_fileType + "/" +templateFolder.dirName() );
+    m_list = new TemplateList(templateFolder.dirName(), m_fileType, m_fileType + "/" +templateFolder.dirName() );
 
     foreach (FileName filename, templateFileNames) {
       QFile::copy(filename.expanded(), templateFolder.path() + "/" + filename.name());
-      m_list->append(new Template(
-        templateFolder.path() + "/" + filename.name(), m_fileType, templateFolder.dirName()));
+      m_list->append(new Template(templateFolder.path() + "/" + filename.name(), m_fileType, templateFolder.dirName()));
     }
 
     if (!m_list->isEmpty()) {

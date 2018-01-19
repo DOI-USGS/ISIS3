@@ -575,6 +575,7 @@ namespace Isis {
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
     m_workOrderHistory->clear();
+
     directory()->clean();
     setClean(true);
   }
@@ -1264,17 +1265,15 @@ namespace Isis {
     m_isTemporaryProject = false;
 
     XmlHandler handler(this);
-
     XmlStackedHandlerReader reader;
     reader.pushContentHandler(&handler);
     reader.setErrorHandler(&handler);
 
-
+    QDir oldProjectRoot(*m_projectRoot);
     QDir oldProjectRoot(*m_projectRoot);
     *m_projectRoot =  QDir(projectAbsolutePathStr);
 
     QXmlInputSource xmlInputSource(&file);
-
     //This prevents the project from not loading if everything
     //can't be loaded, and outputs the warnings/errors to the
     //Warnings Tab
@@ -1291,10 +1290,8 @@ namespace Isis {
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
-
     reader.pushContentHandler(&handler);
     QXmlInputSource xmlHistoryInputSource(&historyFile);
-
     try {
         reader.parse(xmlHistoryInputSource);
         }
@@ -1309,18 +1306,15 @@ namespace Isis {
                                 .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
-
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
     if (!reader.parse(xmlWarningsInputSource)) {
       warn(tr("Failed to read warnings from project [%1]").arg(projectAbsolutePathStr));
     }
-
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlDirectoryInputSource(&directoryFile);
-
     try {
       reader.parse(xmlDirectoryInputSource);
          }
@@ -1335,14 +1329,15 @@ namespace Isis {
                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
-
     QDir bundleRoot(bundleSolutionInfoRoot());
     if (bundleRoot.exists()) {
       // get QFileInfo for each directory in the bundle root
       bundleRoot.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks); // sym links ok???
 
       QFileInfoList bundleDirs = bundleRoot.entryInfoList();
+
       for (int dirListIndex = 0; dirListIndex < bundleDirs.size(); dirListIndex++) {
+
         // get QFileInfo for each file in this directory
         QDir bundleSolutionDir(bundleDirs[dirListIndex].absoluteFilePath());
         bundleSolutionDir.setFilter(QDir::Files | QDir::NoSymLinks); // sym links ok???
@@ -1387,11 +1382,11 @@ namespace Isis {
    */
   ImageList *Project::imageList(QString name) {
     QListIterator<ImageList *> it(*m_images);
-    
+
     ImageList *result = NULL;
     while (it.hasNext() && !result) {
       ImageList *list = it.next();
-      
+
       if (list->name() == name) result = list;
     }
 
@@ -2118,6 +2113,7 @@ namespace Isis {
     }
     else {
       save(m_projectRoot->absolutePath(), false);
+      // if (newDestination != )
     }
 
     return saveDialogCompleted;
@@ -2328,6 +2324,7 @@ namespace Isis {
     m_directory->save(directoryStateWriter, newPath);
 
     directoryStateWriter.writeEndDocument();
+    m_isOpen = true;
   }
 
 
@@ -2778,7 +2775,7 @@ namespace Isis {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
       else if (localName == "templateList") {
-        m_templates.append(new TemplateList(m_project, reader()));
+        m_templates.append( new TemplateList(m_project, reader()));
       }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {

@@ -208,6 +208,9 @@ namespace Isis {
    *                           Corrected the setting of the project root when pening a project from
    *                           the command line. Removed m_projectPath, it is no longer needed since
    *                           m_projectRoot contains the correct path. References #5104.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168. Also fixed issue with saving
+   *                           a project before save as where isOpen was not set to true.
    */
   class Project : public QObject {
     Q_OBJECT

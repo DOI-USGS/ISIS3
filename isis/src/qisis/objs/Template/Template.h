@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+
  #include <QObject>
  #include <QString>
  #include <QXmlStreamWriter>
@@ -39,6 +40,11 @@
     * This encapsulates ideas about a template such as it's filename and import name.
     *
     * @author 2017-11-01 Christopher Combs
+    *
+    * @internal
+    *   @history 2017-11-01 Christopher Combs - Original version. Fixes #5117
+    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+    *                           TemplateEditViewWorkOrder. Fixes #5168.
     */
    class Template : public QObject {
      Q_OBJECT
@@ -46,7 +52,6 @@
    public:
      explicit Template(QString fileName, QString templateType, QString importName, QObject *parent = 0);
      Template(FileName templateFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
-     ~Template();
 
      QString importName() const;
      QString fileName() const;

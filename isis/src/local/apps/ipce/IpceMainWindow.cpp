@@ -54,6 +54,7 @@
 #include "OpenProjectWorkOrder.h"
 #include "SensorInfoWidget.h"
 #include "TargetInfoWidget.h"
+#include "TemplateEditorWidget.h"
 #include "ViewSubWindow.h"
 
 namespace Isis {
@@ -213,7 +214,8 @@ namespace Isis {
    */
   void IpceMainWindow::addView(QWidget *newWidget) {
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
-         qobject_cast<TargetInfoWidget *>(newWidget) ) {
+         qobject_cast<TargetInfoWidget *>(newWidget) ||
+         qobject_cast<TemplateEditorWidget *>(newWidget)) {
       QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
       dock->setAttribute(Qt::WA_DeleteOnClose, true);
       dock->setWidget(newWidget);
@@ -720,8 +722,8 @@ namespace Isis {
    * @internal
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
-   *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it 
-   *                                      was messing with the positions of widgets after a 
+   *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it
+   *                                      was messing with the positions of widgets after a
    *                                      project was loaded.  Fixes #5075.
    */
   void IpceMainWindow::readSettings(Project *project) {
