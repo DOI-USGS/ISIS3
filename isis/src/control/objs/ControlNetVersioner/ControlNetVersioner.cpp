@@ -241,12 +241,10 @@ namespace Isis {
       else {
         pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
       }
-      if ( controlPoint->HasChooserName()
-           && QString::compare(controlPoint->GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+      if ( QString::compare(controlPoint->GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
         pvlPoint += PvlKeyword("ChooserName", controlPoint->GetChooserName());
       }
-      if ( controlPoint->HasDateTime()
-           && QString::compare(controlPoint->GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+      if ( QString::compare(controlPoint->GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
         pvlPoint += PvlKeyword("DateTime", controlPoint->GetDateTime());
       }
       if ( controlPoint->IsEditLocked() ) {
@@ -474,12 +472,10 @@ namespace Isis {
             break;
         }
 
-        if ( controlMeasure.HasChooserName()
-             && QString::compare(controlMeasure.GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+        if ( QString::compare(controlMeasure.GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
           pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName());
         }
-        if ( controlMeasure.HasDateTime()
-             && QString::compare(controlMeasure.GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+        if ( QString::compare(controlMeasure.GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
           pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
         }
         if ( controlMeasure.IsEditLocked() ) {
@@ -1800,12 +1796,10 @@ namespace Isis {
         protoPoint.set_id(controlPoint->GetId().toLatin1().data());
       }
 
-      if ( controlPoint->HasChooserName()
-           && QString::compare(controlPoint->GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+      if ( QString::compare(controlPoint->GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
         protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
       }
-      if ( controlPoint->HasDateTime()
-           && QString::compare(controlPoint->GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+      if ( QString::compare(controlPoint->GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
         protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
       }
       if ( controlPoint->IsEditLocked() ) {
@@ -1988,13 +1982,11 @@ namespace Isis {
                 break;
         }
 
-        if ( controlMeasure.HasChooserName()
-             && QString::compare(controlMeasure.GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+        if ( QString::compare(controlMeasure.GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
           protoMeasure.set_choosername(controlMeasure.GetChooserName().toLatin1().data());
         }
 
-        if ( controlMeasure.HasDateTime()
-             && QString::compare(controlMeasure.GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+        if ( QString::compare(controlMeasure.GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
           protoMeasure.set_datetime(controlMeasure.GetDateTime().toLatin1().data());
         }
 
