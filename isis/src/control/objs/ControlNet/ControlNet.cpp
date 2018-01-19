@@ -41,9 +41,9 @@ using namespace boost::numeric::ublas;
 
 
 namespace Isis {
-  
+
   void ControlNet::nullify() {
-    
+
     points = NULL;
     cubeGraphNodes = NULL;
     pointIds = NULL;
@@ -52,21 +52,21 @@ namespace Isis {
 
   //!Creates an empty ControlNet object
   ControlNet::ControlNet() {
-    
+
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
-    m_ownPoints = true; 
+    m_ownPoints = true;
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
   }
 
 
   ControlNet::ControlNet(const ControlNet &other) {
-    
+
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -78,7 +78,7 @@ namespace Isis {
       AddPoint(newPoint);
     }
 
-    m_ownPoints = true; 
+    m_ownPoints = true;
 
     p_targetName = other.p_targetName;
     p_targetRadii = other.p_targetRadii;
@@ -99,7 +99,7 @@ namespace Isis {
    * @param progress A pointer to the progress of reading in the control points
    */
   ControlNet::ControlNet(const QString &ptfile, Progress *progress) {
-    
+
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -107,7 +107,7 @@ namespace Isis {
     pointIds = new QStringList;
 
     m_ownPoints = true;
-    
+
     try {
       ReadControl(ptfile, progress);
     }
@@ -120,36 +120,36 @@ namespace Isis {
 
  /**
   *  @brief Destructor removes allocated memory
-  * 
-  * @author Kris Becker 
+  *
+  * @author Kris Becker
   */
   ControlNet::~ControlNet() {
-    
+
     clear();
 
     delete points;
     delete cubeGraphNodes;
     delete pointIds;
 
-    nullify(); 
+    nullify();
   }
- 
+
 
  /**
   *  @brief Clear the contents of this object
-  * 
+  *
   *  The contents of the ControlNet object are deleted. The internal variables
   *  that hold the contents are not. See the destructor.
-  * 
+  *
   * @author Kris Becker
   */
   void ControlNet::clear() {
 
-    // Now must also own points to delete them. 
+    // Now must also own points to delete them.
     if (points) {
       if (GetNumPoints() > 0) {
         if (m_ownPoints) {
-          QHashIterator<QString, ControlPoint*> i(*points); 
+          QHashIterator<QString, ControlPoint*> i(*points);
           while (i.hasNext()) {
             i.next();
             delete(*points)[i.key()];
@@ -173,31 +173,31 @@ namespace Isis {
     if (pointIds) {
       pointIds->clear();
     }
- 
+
     return;
   }
 
 
   /**
-   * @brief Transfer ownership of all points to caller 
-   *  
-   * This method is used to transfer ownership to the caller. This method is not 
-   * reintrant in the sense that if someone else has already made this call, it is 
-   * an error to attempt to take ownership again. 
-   *  
-   * Note that it now becomes the responsibility of the caller to delete all the 
-   * pointers to ControlPoints that are returned in the list. 
-   *  
-   * WARNING!!! This call alone can create a situation where the owner could 
+   * @brief Transfer ownership of all points to caller
+   *
+   * This method is used to transfer ownership to the caller. This method is not
+   * reintrant in the sense that if someone else has already made this call, it is
+   * an error to attempt to take ownership again.
+   *
+   * Note that it now becomes the responsibility of the caller to delete all the
+   * pointers to ControlPoints that are returned in the list.
+   *
+   * WARNING!!! This call alone can create a situation where the owner could
    * delete point memory after the point list is exported from this class creating
    * a problem. For this reason, the clear() method be called!!!
-   * 
-   * @author Kris Becker 
-   * 
+   *
+   * @author Kris Becker
+   *
    * @return QList<ControlPoint*> Returns the list of all control points to caller
    */
     QList< ControlPoint * > ControlNet::take() {
-      
+
       // First check to see if someone else has taken ownership
       if (!m_ownPoints) {
         throw IException(IException::Programmer, "Ownership has already been taken",
@@ -239,7 +239,7 @@ namespace Isis {
    *
    */
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
-    
+
     LatestControlNetFile *fileData = ControlNetVersioner::Read(filename);
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
@@ -366,9 +366,9 @@ namespace Isis {
    * this measure as its first.
    *
    * @param measure The measure added to the network.
-   * 
+   *
    * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
-   * @throws IException::Programmer "Control measure with NULL parent passed to 
+   * @throws IException::Programmer "Control measure with NULL parent passed to
    *     ControlNet::AddControlCubeGraphNode!"
    * @throws IException::Programmer "ControlNet does not contain the point."
    */
@@ -429,9 +429,9 @@ namespace Isis {
    * measure's serial number to reflect the unignoration.
    *
    * @param measure The measure unignored from the network.
-   * 
+   *
    * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
-   * @throws IException::Programmer "Control measure with NULL parent passed to 
+   * @throws IException::Programmer "Control measure with NULL parent passed to
    *     ControlNet::AddControlCubeGraphNode!"
    * @throws IException::Programmer "ControlNet does not contain the point."
    * @throws IException::Programmer "Node does not exist for the cube serial number."
@@ -532,7 +532,7 @@ namespace Isis {
     }
   }
 
-  
+
   void ControlNet::measureIgnored(ControlMeasure *measure) {
     if (!measure) {
       IString msg = "NULL measure passed to "
@@ -649,7 +649,7 @@ namespace Isis {
    *          second element is the number of critical edges.
    */
   QPair< int, int > ControlNet::CalcBWAndCE(QList< QString > serials) const {
-    
+
     for (int i = 0; i < serials.size(); i++)
       ASSERT(cubeGraphNodes->contains(serials[i]));
 
@@ -704,7 +704,7 @@ namespace Isis {
    * Delete a ControlPoint from the network using the point's Id.
    *
    * @param pointId The Point Id of the ControlPoint to be deleted.
-   * 
+   *
    * @throw IException::User "the point Id does not exist in the network"
    */
   int ControlNet::DeletePoint(QString pointId) {
@@ -861,7 +861,7 @@ namespace Isis {
    * @param island The list of graph nodes forming the island to be minimized
    * @param lessThan A comparison function telling us if one measure is better
    *                 than another
-   * 
+   *
    * @return The set of all measures (edges) in the minimum spanning tree
    */
   QSet< ControlMeasure * > ControlNet::MinimumSpanningTree(
@@ -1065,13 +1065,24 @@ namespace Isis {
 
 
   /**
+   * Get all the valid measures pertaining to a given cube serial number
+   *
+   * @returns A list of all valid measures which are in a given cube
+   */
+  QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
+    ValidateSerialNumber(serialNumber);
+    return (*cubeGraphNodes)[serialNumber]->getValidMeasures();
+  }
+
+
+  /**
    * Copies the content of the a ControlMeasureLessThanFunctor
    *
    * @param other, reference to the other ControlMeasureLessThanFunctor
    */
-  ControlNet::ControlMeasureLessThanFunctor & 
+  ControlNet::ControlMeasureLessThanFunctor &
     ControlNet::ControlMeasureLessThanFunctor::operator=(ControlMeasureLessThanFunctor const &other) {
-    
+
     if (this != &other) {
       this->m_accessor = other.m_accessor;
     }
@@ -1082,18 +1093,18 @@ namespace Isis {
 
   /**
    * The () operator for the Control Measure less than functor
-   * 
+   *
    * @param a, ControlMeasure* pointer to the first control measure
    * @param b, ControlMeasure* pointer to the sencond control measure
    */
   bool ControlNet::ControlMeasureLessThanFunctor::operator()
     (ControlMeasure* const &a, ControlMeasure* const &b) {
-    
+
     return (a->*this->m_accessor)() < (b->*this->m_accessor)();
 
   }
 
-  
+
   /**
    * Get a sorted list of all the measures that have values in a given ragen
    *
@@ -1377,10 +1388,10 @@ namespace Isis {
   /**
    * Return the number of measures in image specified by serialNumber
    *
-   * @return Number of valid measures in image 
-   *  
-   * @history 2013-12-18 Tracie Sucharski - Renamed from GetNumberOfMeasuresInImage, it is 
-   *                         returning a count of only valid measures (Ignore=False). 
+   * @return Number of valid measures in image
+   *
+   * @history 2013-12-18 Tracie Sucharski - Renamed from GetNumberOfMeasuresInImage, it is
+   *                         returning a count of only valid measures (Ignore=False).
    */
   int ControlNet::GetNumberOfValidMeasuresInImage(const QString &serialNumber) {
     return p_cameraValidMeasuresMap[serialNumber];
@@ -1635,10 +1646,10 @@ namespace Isis {
 
   /**
    * Set mutex to lock for making Naif calls
-   * 
+   *
    * @author 2012-09-11 Tracie Sucharski
-   * 
-   * @param mutex 
+   *
+   * @param mutex
    */
   void ControlNet::SetMutex(QMutex *mutex) {
     m_mutex = mutex;
@@ -1656,14 +1667,14 @@ namespace Isis {
 
 
   /**
-   * Sets the target name and target radii, if available. 
-   *  
-   * Note: The target radii are found using NAIF target codes. If the given 
-   * target name is not recognized, the target radii vector will be filled with 
-   * Isis::Null values. 
+   * Sets the target name and target radii, if available.
    *
-   * @see Target::radiiGroup(QString) 
-   *  
+   * Note: The target radii are found using NAIF target codes. If the given
+   * target name is not recognized, the target radii vector will be filled with
+   * Isis::Null values.
+   *
+   * @see Target::radiiGroup(QString)
+   *
    * @param target The name of the target of this Control Network
    */
   void ControlNet::SetTarget(const QString &target) {
@@ -1696,10 +1707,10 @@ namespace Isis {
 
 
   /**
-   * Sets the target name and radii using values found in the mapping group of 
+   * Sets the target name and radii using values found in the mapping group of
    * the given label, if available. If this fails, calls SetTarget(QString).
-   *  
-   * @param label A PVL Containing Target information (usually in a Mapping 
+   *
+   * @param label A PVL Containing Target information (usually in a Mapping
    *              group or NaifKeywords object).
    */
   void ControlNet::SetTarget(Pvl label) {
@@ -1720,16 +1731,16 @@ namespace Isis {
       // or if they are set to null,
       // try to get target radii using the TargetName or NaifKeywords object values
       Distance equatorialRadius, polarRadius;
-      if (!mapping.hasKeyword("EquatorialRadius") 
+      if (!mapping.hasKeyword("EquatorialRadius")
           || !mapping.hasKeyword("PolarRadius")) {
-      
+
         mapping = Target::radiiGroup(label, mapping);
-      
+
       }
 
       equatorialRadius = Distance(mapping["EquatorialRadius"], Distance::Meters);
       polarRadius      = Distance(mapping["PolarRadius"],      Distance::Meters);
-      
+
       p_targetRadii.push_back(equatorialRadius);
       p_targetRadii.push_back(equatorialRadius);
       p_targetRadii.push_back(polarRadius);
@@ -1751,15 +1762,15 @@ namespace Isis {
 
 
   /**
-   * Directly sets the target name and radii using the given information. 
-   *  
-   * @see Target::radiiGroup(Pvl, PvlGroup) 
-   *  
+   * Directly sets the target name and radii using the given information.
+   *
+   * @see Target::radiiGroup(Pvl, PvlGroup)
+   *
    * @param target The name of the target for this Control Network
    * @param target A 3-dimensional vector containing the A (equatorial major), B
    *               (equatorial minor), and C (polar) triaxial radii values of
    *               the target for this Control Network
-   *  
+   *
    */
   void ControlNet::SetTarget(const QString &target,
                              const QVector<Distance> &radii) {
