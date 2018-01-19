@@ -1,4 +1,4 @@
-APPNAME = socetlinescankeywords_noExtrapolation
+APPNAME = socetlinescankeywords
 
 include $(ISISROOT)/make/isismake.tsts
 

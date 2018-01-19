@@ -25,7 +25,7 @@
  */                                                                       
 
 
-#include "ApolloPanIO.h"
+//#include "ApolloPanIO.h"
 #include "LineScanCameraDetectorMap.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -43,7 +43,6 @@ namespace Isis {
      * @internal                                                              
      *   @history 2011-11-21 Orrin Thomas - Original version
      *   @history 2012-07-10 Orrin Thomas - Updated to current coding standards
-     *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
      */        
     class ApolloPanoramicDetectorMap : public CameraDetectorMap {
     public:
@@ -66,7 +65,7 @@ namespace Isis {
       }
 
       //! Destroys ApolloPanoramicDetectorMap object
-      virtual ~ApolloPanoramicDetectorMap() {};
+//      virtual ~ApolloPanoramicDetectorMap() {};
 
       virtual bool SetParent(const double sample, const double line);
 
@@ -79,52 +78,37 @@ namespace Isis {
        *
        * @param lineRate the time in seconds between lines
        *
-       * @return void
        */
       void SetLineRate(const double lineRate) {
         m_lineRate = lineRate;
       };
 
-      /**
-       * Return the time in seconds between scan lines
-       * 
-       * @return double Time in seconds between scan lines
-       */
+      //! Return the time in seconds between scan lines
       double LineRate() const {
         return m_lineRate;
       };
 
-      /**
-       * Mean (average) of interior orientation residual vector lengths, accesor
-       * 
-       * @return double Mean of interior orientation residual vector lengths
-       */
-      double  meanResidual() { return p_intOri.meanResiduals(); };
+      //! Mean (average) of interior orientation residual vector lengths, accesor
+//      double  meanResidual() { return p_intOri.meanResiduals(); };
 
-      /**
-       * Max interior orientation residual vector length, accesor
-       * 
-       * @return double Max interior orientation residual vector length
-       */
-      double   maxResidual() { return p_intOri.maxResiduals(); };
+      //! Max interior orientation residual vector length, accesor
+//      double   maxResidual() { return p_intOri.maxResiduals(); };
 
-      /**
-       * Standard deviation of interior orientation residual vector lengths, accesor
-       * 
-       * @return double Standard deviation of interior orientation residual vector lengths
-       */
-      double stdevResidual() { return p_intOri.stdevResiduals(); };
+      //! Standard deviation of interior orientation residual vector lengths, accesor
+//      double stdevResidual() { return p_intOri.stdevResiduals(); };
 
       private:
-        
-        double m_etMiddle; //!< Ephemeris time at the middle line 
-        double m_lineRate; //!< line exposure duration
-        Pvl *m_lab;        //!< Image label used to construct camera object
+        //! Ephemeris time at the middle line
+        double m_etMiddle;  
 
-        /**
-         * Class to preform transformations from cube coordiantes to image coordinates
-         */
-        ApolloPanIO p_intOri;
+        //!line exposure duration
+        double m_lineRate;
+
+        //! Image label used to construct camera object    
+        Pvl *m_lab;
+
+        //! Class to preform transformations from cube coordiantes to image coordinates
+//        ApolloPanIO p_intOri;
 
         int initializeInteriorOrientation();
     };

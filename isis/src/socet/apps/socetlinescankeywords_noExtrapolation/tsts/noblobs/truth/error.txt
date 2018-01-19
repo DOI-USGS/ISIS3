@@ -1,0 +1,1 @@
+**USER ERROR** Input image does not contain needed SPICE blobs...run spiceinit with attach=yes.

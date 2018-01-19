@@ -159,7 +159,6 @@ namespace Isis {
   bool CameraFocalPlaneMap::SetFocalPlane(const double dx, const double dy) {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
-
     p_centeredDetectorSample = p_itranss[0] + (p_itranss[1] * dx) + (p_itranss[2] * dy);
     p_centeredDetectorLine   = p_itransl[0] + (p_itransl[1] * dx) + (p_itransl[2] * dy);
     ComputeUncentered();
@@ -167,7 +166,7 @@ namespace Isis {
   }
 
 
-  /** Compute distorted focal plane coordinate from detector position (sampel,line)
+  /** Compute distorted focal plane coordinate from detector position (sample,line)
    *
    * This method will compute both the distorted focal plane x/y and centered
    * detector position given a detector position
@@ -249,49 +248,37 @@ namespace Isis {
   }
 
 
-  /**
-   * @returns The distorted focal plane x
-   */
+  //! Return distorted focal plane x
   double CameraFocalPlaneMap::FocalPlaneX() const {
     return p_focalPlaneX;
   }
 
 
-  /**
-   * @returns The distorted focal plane y
-   */
+  //! Return distorted focal plane y
   double CameraFocalPlaneMap::FocalPlaneY() const {
     return p_focalPlaneY;
   }
 
 
-  /**
-   * @returns The detector sample
-   */
+  //! Return detector sample
   double CameraFocalPlaneMap::DetectorSample() const {
     return p_detectorSample;
   }
 
 
-  /**
-   * @returns The detector line
-   */
+  //! Return detector line
   double CameraFocalPlaneMap::DetectorLine() const {
     return p_detectorLine;
   }
 
 
-  /**
-   * @returns The centered detector sample
-   */
+  //! Return centered detector sample
   double CameraFocalPlaneMap::CenteredDetectorSample() const {
     return p_centeredDetectorSample;
   }
 
 
-  /**
-   * @returns The centered detector line
-   */
+  //! Return centered detector line
   double CameraFocalPlaneMap::CenteredDetectorLine() const {
     return p_centeredDetectorLine;
   }
@@ -312,17 +299,13 @@ namespace Isis {
   }
 
 
-  /**
-   * @returns The detector line origin
-   */
+  //! Return detector line origin
   double CameraFocalPlaneMap::DetectorLineOrigin() const {
     return p_detectorLineOrigin;
   }
 
 
-  /**
-   * @returns The detector sample origin
-   */
+  //! Return detector sample origin
   double CameraFocalPlaneMap::DetectorSampleOrigin() const {
     return p_detectorSampleOrigin;
   }
@@ -344,27 +327,19 @@ namespace Isis {
   }
 
 
-  /**
-   * @returns The detector line offset
-   */
+  //! Return detector line offset
   double CameraFocalPlaneMap::DetectorLineOffset() const {
     return p_detectorLineOffset;
   }
 
 
-  /**
-   * @returns The detector sample offset
-   */
+  //! Return detector sample offset
   double CameraFocalPlaneMap::DetectorSampleOffset() const {
     return p_detectorSampleOffset;
   }
 
 
-  /**
-   * Set the affine coefficients for converting destorted (x,y) to a detector Line
-   * 
-   * @param transL Vector of the affine coefficients
-   */
+  //! Set the affine coefficients for converting destorted (x,y) to a detector Line
   void CameraFocalPlaneMap::SetTransL(const QVector<double> transL) {
    for (int i=0; i<3; ++i) {
      p_itransl[i] = transL[i];
@@ -372,11 +347,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Set the affine coefficients for converting destorted (x,y) to a detector Sample
-   * 
-   * @param transS Vector of the affine coefficients
-   */
+  //! Set the affine coefficients for converting destorted (x,y) to a detector Sample
   void CameraFocalPlaneMap::SetTransS(const QVector<double> transS) {
    for (int i=0; i<3; ++i) {
      p_itranss[i] = transS[i];
@@ -384,11 +355,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Set the affine coefficients for converting detector (sample,line) to a distorted X
-   * 
-   * @param transX Vector of the affine coefficients
-   */
+  //! Set the affine coefficients for converting detector (sample,line) to a distorted X
   void CameraFocalPlaneMap::SetTransX(const QVector<double> transX) {
    for (int i=0; i<3; ++i) {
      p_transx[i] = transX[i];
@@ -396,11 +363,7 @@ namespace Isis {
   }
 
 
-  /**
-   * Set the affine coefficients for converting detector (sample,line) to a distorted Y
-   * 
-   * @param transY Vector of the affine coefficients
-   */
+  //! Set the affine coefficients for converting detector (sample,line) to a distorted Y
   void CameraFocalPlaneMap::SetTransY(const QVector<double> transY) {
    for (int i=0; i<3; ++i) {
      p_transy[i] = transY[i];
@@ -408,33 +371,25 @@ namespace Isis {
   }
 
 
-  /**
-   * @return The affine coefficients for converting detector (sample,line) to a distorted X
-   */
+  //! Return the affine coefficients for converting detector (sample,line) to a distorted X
   const double *CameraFocalPlaneMap::TransX() const{
     return p_transx;
   }
 
 
-  /**
-   * @returns The affine coefficients for converting detector (sample,line) to distorted Y
-   */
+  //! Return the affine coefficients for converting detector (sample,line) to distorted Y
   const double *CameraFocalPlaneMap::TransY() const{
     return p_transy;
   }
 
 
-  /**
-   * @returns The affine coefficients for converting distorted (x,y) to a detector Sample
-   */
+  //! Return the affine coefficients for converting distorted (x,y) to a detector Sample
   const double *CameraFocalPlaneMap::TransS() const{
     return p_itranss;
   }
 
 
-  /**
-   * @returns The affine coefficients for converting distorted (x,y) to a detector Line
-   */
+  //! Return the affine coefficients for converting distorted (x,y) to a detector Line
   const double *CameraFocalPlaneMap::TransL() const{
     return p_itransl;
   }

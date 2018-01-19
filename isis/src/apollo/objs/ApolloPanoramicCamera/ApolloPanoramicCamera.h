@@ -24,7 +24,8 @@
  *   http://www.usgs.gov/privacy.html.                                    
  */                                                                       
 
-#include "LineScanCamera.h"
+#include "SampleScanCamera.h"
+#include "VariableSampleScanCameraDetectorMap.h"
 
 namespace Isis {
   class PvlGroup;
@@ -48,9 +49,9 @@ namespace Isis {
      *                           members and methods and removed implementation of these methods
      *                           since Camera now handles this. References #2335. Fixed 
      *                           indentation.
-     *   @history 2017-06-28 Makayla Shepherd - Updated documentation. References #4807.
-     */        
-    class ApolloPanoramicCamera : public LineScanCamera {
+     *   @history 2016-09-12 Ken Edmundson - Major changes, deriving now from SampleScanCamera.
+     */
+    class ApolloPanoramicCamera : public SampleScanCamera {
     public:
       ApolloPanoramicCamera(Cube &lab);
 
@@ -64,7 +65,7 @@ namespace Isis {
       *         Kernel Frame ID
       */
       //this sensor was used on multiple missions so it is necessary to check which Apollo 
-      virtual int CkFrameId() const {return m_CkFrameId; }  
+      virtual int CkFrameId() const {return m_ckFrameId; }
 
       /** 
       * CK Reference ID - J2000
@@ -82,46 +83,13 @@ namespace Isis {
       */
       virtual int SpkReferenceId() const { return (1); }
 
-      /** 
-       * Returns residual summary statistics from interior orientation as a PvlGroup
-       * 
-       * @return PvlGroup Residuals report.
-       */
-      PvlGroup intOriResidualsReport();
-
-      /**
-       * Max interior orientation residual vector length, accesor
-       * 
-       * @return double Residual max
-       */
-      double intOriResidualMax()   const { return m_residualMax; }
-
-      /**
-       * Mean (average) of interior orientation residual vector length, accesor
-       * 
-       * @return double Residual mean
-       */
-      double intOriResidualMean()  const { return m_residualMean; }
-
-      /**
-       * Standard deviation of interior orientation residual vector length, accesor
-       * 
-       * @return double Residual standard deviation
-       */
-      double intOriResidualStdev() const { return m_residualStdev; }
-
     private:
-      //! Max interior orientation residual vector length
-      double m_residualMean;
+      void ReadSampleRates(QString filename);
 
-      //! Mean (average) of interior orientation residual vector length
-      double m_residualMax;
-
-      //! Standard deviation of interior orientation residual vector length
-      double m_residualStdev;
+      std::vector<SampleRateChange> p_sampleRates;
 
       //! CK "Camera Matrix" kernel frame ID
-      int m_CkFrameId;
+      int m_ckFrameId;
     };
 };
 

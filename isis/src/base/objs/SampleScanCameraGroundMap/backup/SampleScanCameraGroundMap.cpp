@@ -21,7 +21,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "LineScanCameraGroundMap.h"
+#include "SampleScanCameraGroundMap.h"
 
 #include <iostream>
 #include <iomanip>
@@ -37,7 +37,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "Distance.h"
-#include "LineScanCameraDetectorMap.h"
+#include "SampleScanCameraDetectorMap.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -49,33 +49,33 @@
 using namespace std;
 using namespace Isis;
 
-bool ptXLessThan(const QList<double> l1, const QList<double> l2);
+//bool ptXLessThan(const QList<double> l1, const QList<double> l2);
 
 /**
  * @author 2012-05-09 Orrin Thomas
  *
  * @internal
  */
-class LineOffsetFunctor : 
+class SampleOffsetFunctor :
   public std::unary_function<double, double > {
   public:
 
-    LineOffsetFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
+    SampleOffsetFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
       m_camera = camera;
       surfacePoint = surPt;
     }
 
 
-    ~LineOffsetFunctor() {}
+    ~SampleOffsetFunctor() {}
 
 
-    /** Compute the number of lines between the current line (i.e., the line imaged at the et as set
-     *  in the camera model) and the line number where the argument et would hit the focal
+    /** Compute the number of samples between the current sample (i.e., the sample imaged at the et
+     *  as set in the camera model) and the sample number where the argument et would hit the focal
      *  plane.
      *  
      * @param et The et at the new postion
      *
-     * @return Line off (see description)
+     * @return Sample off (see description)
      */
     double operator()(double et) {
       double lookC[3] = {0.0, 0.0, 0.0};
@@ -88,7 +88,7 @@ class LineOffsetFunctor :
       double startTime = m_camera->cacheStartTime().Et();
       double endTime = m_camera->cacheEndTime().Et();
       if (et < startTime || et > endTime) {
-        IString msg = "Ephemeris time passed to LineOffsetFunctor is not within the image "
+        IString msg = "Ephemeris time passed to SampleOffsetFunctor is not within the image "
                       "cache bounds";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -97,33 +97,71 @@ class LineOffsetFunctor :
  
       // Set ground
       if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
-        IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
-                      " LineOffsetFunctor";
+        IString msg = "Sensor::SetGround failed for surface point in SampleScanCameraGroundMap.cpp"
+                      " SampleOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
    
       // Calculate the undistorted focal plane coordinates
+
       m_camera->Sensor::LookDirection(lookC);
       ux = m_camera->FocalLength() * lookC[0] / lookC[2];
       uy = m_camera->FocalLength() * lookC[1] / lookC[2];
 
-
-      // This was replaced with the code below to get Chandrayaan M3 to work.
-      // SetUndistortedFocalPlane was failing a majority of the time, causing most SetGround calls
-      // to fail. Even when it did succeed, it was producing non-continous return values.
-        // Set the undistorted focal plane coordinates
-//        if (!m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
-//          IString msg = "DistortionMap::SetUndistoredFocalPlane failed for surface point in "
-//                        "LineScanCameraGroundMap.cpp LineOffsetFunctor";
-//          throw IException(IException::Programmer, msg, _FILEINFO_);
-//        }
-
+      // Try to use SetUndistortedFocalPlane, if that does not work use the distorted x,y
+      // under the assumption (bad|good) that extrapolating the distortion
+      // is causing the distorted x to be way off the sensor, and thus not very good anyway.
+      if (m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
         // Get the natural (distorted focal plane coordinates)
-//        dx = m_camera->DistortionMap()->FocalPlaneX();
-//        dy = m_camera->DistortionMap()->FocalPlaneY();
-//        std::cout << "use dist" << std::endl;
+        dx = m_camera->DistortionMap()->FocalPlaneX();
+        dy = m_camera->DistortionMap()->FocalPlaneY();
+      }
+      else {
+        dx = ux;
+        dy = uy;
+      }
+
+//      if (!m_camera->FocalPlaneMap()->SetFocalPlane(dx, dy)) {
+//        IString msg = "FocalPlaneMap::SetFocalPlane failed for surface point in "
+//                      "SampleScanCameraGroundMap.cpp SampleOffsetFunctor";
+//        throw IException(IException::Programmer, msg, _FILEINFO_);
 //      }
 
+      // return sample offset in pixels
+      return (dx/0.005);
+    }
+
+/*
+    double operator()(double et) {
+      double lookC[3] = {0.0, 0.0, 0.0};
+      double ux = 0.0;
+      double uy = 0.0;
+      double dx = 0.0;
+      double dy = 0.0;
+
+      // Verify the time is with the cache bounds
+      double startTime = m_camera->cacheStartTime().Et();
+      double endTime = m_camera->cacheEndTime().Et();
+      if (et < startTime || et > endTime) {
+        IString msg = "Ephemeris time passed to SampleOffsetFunctor is not within the image "
+                      "cache bounds";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      m_camera->Sensor::setTime(et);
+
+      // Set ground
+      if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
+        IString msg = "Sensor::SetGround failed for surface point in SampleScanCameraGroundMap.cpp"
+                      " SampleOffsetFunctor";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      // Calculate the undistorted focal plane coordinates
+
+      m_camera->Sensor::LookDirection(lookC);
+      ux = m_camera->FocalLength() * lookC[0] / lookC[2];
+      uy = m_camera->FocalLength() * lookC[1] / lookC[2];
 
       // Try to use SetUndistortedFocalPlane, if that does not work use the distorted x,y
       // under the assumption (bad|good) that extrapolating the distortion
@@ -140,16 +178,17 @@ class LineOffsetFunctor :
 
       if (!m_camera->FocalPlaneMap()->SetFocalPlane(dx, dy)) {
         IString msg = "FocalPlaneMap::SetFocalPlane failed for surface point in "
-                      "LineScanCameraGroundMap.cpp LineOffsetFunctor";
+                      "SampleScanCameraGroundMap.cpp SampleOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
-      }     
+      }
 
       // Return the offset
-      return (m_camera->FocalPlaneMap()->DetectorLineOffset() - 
-              m_camera->FocalPlaneMap()->DetectorLine());
+//      return (m_camera->FocalPlaneMap()->DetectorSampleOffset() -
+//              m_camera->FocalPlaneMap()->DetectorSample());
+      return (m_camera->FocalPlaneMap()->DetectorSampleOffset() -
+              m_camera->FocalPlaneMap()->DetectorSample());
     }
-
-
+*/
   private:
     SurfacePoint surfacePoint;
     Camera* m_camera;
@@ -188,7 +227,7 @@ class SensorSurfacePointDistanceFunctor :
       }
       m_camera->Sensor::setTime(et);
       if(!m_camera->Sensor::SetGround(surfacePoint, false)) {
-         IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
+         IString msg = "Sensor::SetGround failed for surface point in SampleScanCameraGroundMap.cpp"
                        "SensorSurfacePointDistanceFunctor";
       }
       m_camera->instrumentPosition(s);
@@ -210,13 +249,13 @@ namespace Isis {
    *
    * @param cam pointer to camera model
    */
-  LineScanCameraGroundMap::LineScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {}
+  SampleScanCameraGroundMap::SampleScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {}
 
 
   /** Destructor
    *
    */
-  LineScanCameraGroundMap::~LineScanCameraGroundMap() {}
+  SampleScanCameraGroundMap::~SampleScanCameraGroundMap() {}
 
   /** Compute undistorted focal plane coordinate from ground position
    *
@@ -225,7 +264,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
+  bool SampleScanCameraGroundMap::SetGround(const Latitude &lat,
       const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
 
@@ -246,10 +285,12 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint, const int &approxLine) {
-    FindFocalPlaneStatus status = FindFocalPlane(approxLine, surfacePoint);
-    if (status == Success) return true;
-    //if(status == Failure) return false;
+  bool SampleScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint,
+                                            const int &approxSample) {
+    FindFocalPlaneStatus status = FindFocalPlane(approxSample, surfacePoint);
+    if (status == Success)
+      return true;
+
     return false;
   }
   
@@ -260,20 +301,21 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
+  bool SampleScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
     FindFocalPlaneStatus status = FindFocalPlane(-1, surfacePoint);
 
-    if (status == Success) return true;
+    if (status == Success)
+      return true;
 
     return false;
   }
 
 
-  double LineScanCameraGroundMap::FindSpacecraftDistance(int line,
+  double SampleScanCameraGroundMap::FindSpacecraftDistance(int sample,
       const SurfacePoint &surfacePoint) {
 
     CameraDetectorMap *detectorMap = p_camera->DetectorMap();
-    detectorMap->SetParent(p_camera->ParentSamples() / 2, line);
+    detectorMap->SetParent(sample, p_camera->ParentLines() / 2);
     if (!p_camera->Sensor::SetGround(surfacePoint, false)) {
       return DBL_MAX;
     }
@@ -282,39 +324,36 @@ namespace Isis {
   }
 
 
-  LineScanCameraGroundMap::FindFocalPlaneStatus
-      LineScanCameraGroundMap::FindFocalPlane(const int &approxLine,
-                                              const SurfacePoint &surfacePoint) {
-
-    //CameraDistortionMap *distortionMap = p_camera->DistortionMap();
-    //CameraFocalPlaneMap *focalMap = p_camera->FocalPlaneMap();
+  SampleScanCameraGroundMap::FindFocalPlaneStatus
+      SampleScanCameraGroundMap::FindFocalPlane(const int &approxSample,
+                                                const SurfacePoint &surfacePoint) {
 
     double approxTime=0;
     double approxOffset=0;
     double lookC[3] = {0.0, 0.0, 0.0};
     double ux = 0.0;
     double uy = 0.0;
-    //double dx = 0.0, dy = 0.0;
-    //double s[3], p[3];
     const double cacheStart = p_camera->Spice::cacheStartTime().Et();
     const double cacheEnd = p_camera->Spice::cacheEndTime().Et();
 
-    double lineRate = ((LineScanCameraDetectorMap *)p_camera->DetectorMap())->LineRate(); //line rate
+    double sampleRate = ((SampleScanCameraDetectorMap *)p_camera->DetectorMap())->SampleRate();
 
-    if (lineRate == 0.0) return Failure;
+    if (sampleRate == 0.0)
+      return Failure;
 
-    LineOffsetFunctor offsetFunc(p_camera,surfacePoint);
+    SampleOffsetFunctor offsetFunc(p_camera,surfacePoint);
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
-    /*********************************************************************************************
-    if an approximate point is given use that as a start point for the secant method root search
-    *********************************************************************************************/
-    if (approxLine > 0) {
-      //convert the approxLine to an approximate time and offset
-      p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2, p_camera->ParentLines());
-//    p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2, approxLine);
+    // #1 try use secant method using midsample as start point
+
+    // if an approximate point is given use that as a start point for the secant method root search
+    //if (approxSample > 0) {
+      //convert the approxSample to an approximate time and offset
+      double midSample = p_camera->ParentSamples()/2.0;
+      double midLine = p_camera->ParentLines()/2.0;
+      p_camera->DetectorMap()->SetParent(midSample, midLine);
       approxTime = p_camera->time().Et();
-  
+
       approxOffset = offsetFunc(approxTime);
 
       if (fabs(approxOffset) < 1e-2) { //no need to iteratively improve this root, it's good enough
@@ -322,11 +361,11 @@ namespace Isis {
         //check to make sure the point isn't behind the planet
         if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
           return Failure;
-        } 
+        }
         p_camera->Sensor::LookDirection(lookC);
         ux = p_camera->FocalLength() * lookC[0] / lookC[2];
         uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-     
+
         p_focalPlaneX = ux;
         p_focalPlaneY = uy;
 
@@ -337,32 +376,68 @@ namespace Isis {
 
       //starting times for the secant method, kept within the domain of the cache
       xh = approxTime;
-      if (xh + lineRate < cacheEnd) {
-        xl = xh + lineRate;
+      if (xh + sampleRate < cacheEnd) {
+        xl = xh + sampleRate;
       }
       else {
-        xl = xh - lineRate;
+        xl = xh - sampleRate;
       }
-
+double etGuess;
       //starting offsets
       fh = approxOffset;  //the first is already calculated
       fl = offsetFunc(xl);
+      double fprevious = approxOffset;
 
       // Iterate to refine the given approximate time that the instrument imaged the ground point
       for (int j=0; j < 10; j++) {
-        if (fl-fh == 0.0) {
-          return Failure;
-        }
-        double etGuess = xl + (xh - xl) * fl / (fl - fh);
+        if (fl-fh == 0.0)
+          break;
 
-        if (etGuess < cacheStart) etGuess = cacheStart;
-        if (etGuess > cacheEnd) etGuess = cacheEnd;
+        etGuess = xl + (xh - xl) * fl / (fl - fh);
+
+        if (etGuess < cacheStart)
+          etGuess = cacheStart;
+
+        if (etGuess > cacheEnd)
+          etGuess = cacheEnd;
 
         double f = offsetFunc(etGuess);
 
+        // if f is not changing anymore, we stop iterating
+        double convergedcheck;
+        if (f != 0.0)
+          convergedcheck = fabs(f-fprevious)/fabs(f);
+        else
+          convergedcheck = fabs(f-fprevious);
+//      if (fabs(convergedcheck) < 1e-5) {
+        if (fabs(convergedcheck) < 1e-3) {
+          // now, if f is less than our tolerance, we're done
+          // if f is not less than our tolerance, we jump down to the next step, determining the
+          // coefficients of a quadratic with a "reasonable" interval, which we have hopefully
+          // narrowed down in the secant method
+//        if (fabs(f) < 1e-2) {
+          if (fabs(f) < 1.0) {
+            p_camera->Sensor::setTime(etGuess);
 
-        //elliminate the node farthest away from the current best guess
-        if (fabs( xl- etGuess) > fabs( xh - etGuess)) {  
+            // check to make sure the point isn't behind the planet
+            if (!p_camera->Sensor::SetGround(surfacePoint, true))
+              break;
+
+            p_camera->Sensor::LookDirection(lookC);
+            ux = p_camera->FocalLength() * lookC[0] / lookC[2];
+            uy = p_camera->FocalLength() * lookC[1] / lookC[2];
+
+            p_focalPlaneX = ux;
+            p_focalPlaneY = uy;
+
+            return Success;
+          }
+          else
+            break;
+        }
+
+        // eliminate node farthest away from current best guess and continue
+        if (fabs( xl- etGuess) > fabs( xh - etGuess)) {
           xl = etGuess;
           fl = f;
         }
@@ -370,32 +445,18 @@ namespace Isis {
           xh = etGuess;
           fh = f;
         }
-
-        //See if we converged on the point so set up the undistorted
-        //  focal plane values and return
-        if (fabs(f) < 1e-2) {
-          p_camera->Sensor::setTime(etGuess);
-          //check to make sure the point isn't behind the planet
-          if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-            return Failure;
-          } 
-          p_camera->Sensor::LookDirection(lookC);
-          ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-          uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-      
-          p_focalPlaneX = ux;
-          p_focalPlaneY = uy;
-
-          return Success;       
-        }
+        fprevious = f;
       }
+
       return Failure;
-    }
+  }
 
 
-    /**********************************************************************************************
-    no estimate given for the approximate line--quadratic approximation root finding
-    **********************************************************************************************/
+  /* KLE 2016-09-12 below is the rest of the code from LineScanCameraGroundMap, hoping secant method
+ * is initially good enough for pan
+    //
+    // no estimate given for the approximate line--quadratic approximation root finding
+    //
     // The offsets are typically quadratic, so three points will be used to approximate a quadratic
     // as a first order attempt to find the root location(s)
 
@@ -534,10 +595,10 @@ namespace Isis {
       return Success;
     }
 
-    /**********************************************************************************************
-    no estimate given for the approximate line, quadratic approximation insufficient, use Brent's
-    method
-    **********************************************************************************************/
+    //
+    // no estimate given for the approximate line, quadratic approximation insufficient, use Brent's
+    // method
+    //
     // The offsets are typically quadratic, so three points will be used to approximate a quadratic
     // as a first order attempt to find the root location(s)
 
@@ -622,10 +683,11 @@ namespace Isis {
        
     return Success;
   }
+*/
 }
 
 
-bool ptXLessThan(const QList<double> l1, const QList<double> l2) {
-  return l1[0] < l2[0];
-}
+//bool ptXLessThan(const QList<double> l1, const QList<double> l2) {
+//  return l1[0] < l2[0];
+//}
 

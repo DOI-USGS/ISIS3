@@ -365,6 +365,7 @@ namespace Isis {
       enum CameraType {
         Framing,    //!< Framing Camera
         PushFrame,  //!< Push Frame Camera
+        SampleScan, //!< Sample Scan Camera
         LineScan,   //!< Line Scan Camera
         Radar,      //!< Radar Camera
         Point       //!< Point Camera
