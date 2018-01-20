@@ -339,7 +339,7 @@
         <description>
           This parameter is used to specify the amount of offset (in seconds) to apply to the 
           StartTime value for each kernel that is used to populate the db file. This value will be
-          subtracted the value found in the kernel. If left as 0.0, no offset will be applied, and 
+          subtracted from the value found in the kernel. If left as 0.0, no offset will be applied, and 
           the Time will be copied over as written in the kernel.
         </description>
         <default>
