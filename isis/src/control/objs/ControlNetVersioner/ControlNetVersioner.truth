@@ -20,12 +20,16 @@ Object = ControlNetwork
   Version      = 5
 
   Object = ControlPoint
-    PointType = Free
-    PointId   = 1
+    PointType   = Free
+    PointId     = 1
+    ChooserName = Unknown
+    DateTime    = 2018-01-09
 
     Group = ControlMeasure
       SerialNumber = M0
       MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-01-09
       Ignore       = True
       Sample       = 0.0
       Line         = 0.0
@@ -34,6 +38,8 @@ Object = ControlNetwork
     Group = ControlMeasure
       SerialNumber = M1
       MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-01-09
       Sample       = 1.0
       Line         = 1.0
     End_Group
@@ -41,6 +47,8 @@ Object = ControlNetwork
     Group = ControlMeasure
       SerialNumber = M2
       MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-01-09
       Sample       = 1.0
       Line         = 1.0
     End_Group
@@ -66,12 +74,16 @@ Object = ControlNetwork
   Version      = 5
 
   Object = ControlPoint
-    PointType = Fixed
-    PointId   = 1001
+    PointType   = Fixed
+    PointId     = 1001
+    ChooserName = Unknown
+    DateTime    = 2018-01-19
 
     Group = ControlMeasure
       SerialNumber = Cassini-Huygens/ISSNA/1/1467436709.122
       MeasureType  = RegisteredPixel
+      ChooserName  = Unknown
+      DateTime     = 2018-01-19
       Sample       = 893.0
       Line         = 616.0
     End_Group
@@ -79,6 +91,8 @@ Object = ControlNetwork
     Group = ControlMeasure
       SerialNumber = Cassini-Huygens/ISSNA/1/1467443189.122
       MeasureType  = RegisteredPixel
+      ChooserName  = Unknown
+      DateTime     = 2018-01-19
       Sample       = 799.25
       Line         = 701.21
       Reference    = True
@@ -87,6 +101,8 @@ Object = ControlNetwork
     Group = ControlMeasure
       SerialNumber = Cassini-Huygens/ISSNA/1/1467454012.125
       MeasureType  = RegisteredPixel
+      ChooserName  = Unknown
+      DateTime     = 2018-01-19
       Sample       = 569.01
       Line         = 807.23
     End_Group
