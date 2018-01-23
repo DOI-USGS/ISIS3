@@ -43,11 +43,11 @@ namespace Isis {
   class Latitude;
   class Longitude;
   /**
-   * This class holds all static methods to perform linear algebra 
-   * operations on vectors and matrices. 
-   *  
-   * This class has 4 representations of a 3 dimensional rotation 
-   * <ul> 
+   * This class holds all static methods to perform linear algebra
+   * operations on vectors and matrices.
+   *
+   * This class has 4 representations of a 3 dimensional rotation
+   * <ul>
    *   <li> A 3 X 3 rotation matrix </li>
    *   <li> An angle/axis pair - This pair is made up of a vector (axis)
    *   and angle of rotation about that axis.</li>
@@ -59,7 +59,7 @@ namespace Isis {
    *   their corresponding axis of rotation. In this case, each axis
    *   must be one of the x, y, or z axes for the coordinate system.</li>
    * </ul>
-   *  
+   *
    * @author 2013-06-01 Jeannie Backer
    *
    * @internal
@@ -71,31 +71,31 @@ namespace Isis {
    *                           prevent Boost from outputing debug information to standard out
    *                           when throwing exceptions.  Fixes #2302.
    *   @history 2017-12-12 Jeannie Backer - Added SymmetricMatrix typedef.
-   *  
-   *  
+   *
+   *
    *   @todo document methods (a) add naif routine names to documentation where appropriate,
    *                          (b) clean up comments within methods,
    *                          (3) use naif documentation where appropriate
    *   @todo add links to naif documentation web pages???
    *   @todo add proper scopes
    *   @todo implement norm2 (L2 norm)?
-   *   @todo implement trace? 
-   *   @todo common validate errors - vector size match, 3x3 matrix, 3D vector 
+   *   @todo implement trace?
+   *   @todo common validate errors - vector size match, 3x3 matrix, 3D vector
    *   @todo what is more expensive - unitize vector and compare to 1 or isOrthogonal?
    *   @todo rename local variables m2q and q2m
    *   @todo implement qdq2av (Quaternion and quaternion derivative to angular velocity)?
    *   @todo implement qxq (Quaternion times quaternion)?
    *   @todo implement qderiv (Quadratic derivative)?
-   *   @todo When converting quaternion, axis-angle, Euler angle to rot 
+   *   @todo When converting quaternion, axis-angle, Euler angle to rot
    *         matrix, should we verify that the matrix is valid (is a rotation matrix)???
-   *   @todo isQuaternion??? 
+   *   @todo isQuaternion???
    *   @todo should we throw error in q2m if q = 0???
    *   @todo q2m - why check if sharpen when q is not unit if it is required
    *         to be a unit? throw an error?
-   *   @todo axisar - throw error if axis is origin? If we rotate about 
+   *   @todo axisar - throw error if axis is origin? If we rotate about
    *         about origin, then we get a zero matrix - not a rotation...
    *         except maybe trivially... (or do we get identity??? indicating no rotation)
-   *   @todo double check all indexing on code copied from NAIF - indices 
+   *   @todo double check all indexing on code copied from NAIF - indices
    *         should reverse col/row order and subtract 1
    */
 
@@ -104,48 +104,48 @@ namespace Isis {
   class LinearAlgebra {
     public:
       /**
-       * Definition for an Isis::LinearAlgebra::Matrix of doubles. This is a 
-       * typedef for a boost matrix. 
-       *  
-       * Note: This typedef is used so that we can add functionality to an 
+       * Definition for an Isis::LinearAlgebra::Matrix of doubles. This is a
+       * typedef for a boost matrix.
+       *
+       * Note: This typedef is used so that we can add functionality to an
        * existing matrix type and/or change which third party library's matrix
        * we are using without changing all references to this type in the ISIS
-       * API. 
+       * API.
        */
       typedef boost::numeric::ublas::matrix<double> Matrix;
       /**
        * Definition for an Isis::LinearAlgebra::SymmetrixMatrix of doubles with
-       * an upper configuration. This is a typedef for a boost symmetric_matrix. 
-       *  
-       * Note: This typedef is used so that we can add functionality to an 
+       * an upper configuration. This is a typedef for a boost symmetric_matrix.
+       *
+       * Note: This typedef is used so that we can add functionality to an
        * existing matrix type and/or change which third party library's matrix
        * we are using without changing all references to this type in the ISIS
-       * API. 
+       * API.
        */
-      typedef boost::numeric::ublas::symmetric_matrix<double, upper> SymmetricMatrix;
+      typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> SymmetricMatrix;
       /**
-       * Definition for an Isis::LinearAlgebra::Vector of doubles. This is a 
-       * typedef for a boost vector. 
-       *  
-       * Note: This typedef is used so that we can add functionality to an 
+       * Definition for an Isis::LinearAlgebra::Vector of doubles. This is a
+       * typedef for a boost vector.
+       *
+       * Note: This typedef is used so that we can add functionality to an
        * existing vector type and/or change which third party library's vector
        * we are using without changing all references to this type in the ISIS
-       * API. 
+       * API.
        */
       typedef boost::numeric::ublas::vector<double> Vector;
 
       // define AxisAngle and EulerAngle
       /**
        * Definition for an Axis-Angle pair. This is a three dimensional rotation
-       * represented as an axis of rotation and a corresponding rotation angle. 
-       * AxisAngle is a typedef for a QPair of an Isis::LinearAlgebra::Vector 
-       * and an Isis::Angle. 
+       * represented as an axis of rotation and a corresponding rotation angle.
+       * AxisAngle is a typedef for a QPair of an Isis::LinearAlgebra::Vector
+       * and an Isis::Angle.
        */
       typedef QPair<Vector, Angle> AxisAngle;
       /**
        * Definition for an EulerAngle pair. This is a three dimensional rotation
-       * represented as an Euler angle and the number corresponding to its 
-       * rotation axis. EulerAngle is a typedef for a QPair of an Isis::Angle 
+       * represented as an Euler angle and the number corresponding to its
+       * rotation axis. EulerAngle is a typedef for a QPair of an Isis::Angle
        * and an integer (1, 2, or 3).
        */
       typedef QPair<Angle, int> EulerAngle;
@@ -166,7 +166,7 @@ namespace Isis {
       static Matrix zeroMatrix(int rows, int columns);
       static Vector zeroVector(int size);
 
-      // 
+      //
       static double determinant(const Matrix &matrix);
 
       // magnitude/norm based calculations
@@ -193,9 +193,9 @@ namespace Isis {
       static Vector project(const Vector &vector1, const Vector &vector2);
       static Vector rotate(const Vector &vector, const Vector &axis, Angle angle);
 
-      // 
+      //
       static Vector perpendicular(const Vector &vector1, const Vector &vector2);
-       
+
       // converters
       static AxisAngle toAxisAngle(const Matrix &rotationMatrix);//raxisa
       static Matrix toMatrix(const AxisAngle &axisAngle); // axisar
@@ -225,7 +225,7 @@ namespace Isis {
       // done in boost/numeric/ublas/io.hpp, which is included above
       // The print format for a size 3 vector is
       // [3] (1, 2, 3)
-      // 
+      //
       // friend ostream &operator<<(ostream &os, LinearAlgebra::Vector &vector);
 
     protected:
@@ -243,4 +243,3 @@ namespace Isis {
 };
 
 #endif
-

@@ -36,7 +36,7 @@ namespace Isis {
    * Create a ControlPointV0001 object from a version 1 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
-   * @param targetName The name of the taret used to get the body radii when converting from
+   * @param targetName The name of the target used to get the body radii when converting from
    *                   lat/lon to x/y/z.
    */
   ControlPointV0001::ControlPointV0001(PvlObject &pointObject, const QString targetName)
@@ -587,7 +587,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -618,7 +618,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -646,7 +646,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -674,7 +674,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -705,7 +705,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -739,7 +739,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *

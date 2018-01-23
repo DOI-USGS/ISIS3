@@ -27,11 +27,9 @@
 #include <QMetaType>
 #include <QObject> // parent class
 #include <QSharedPointer>
-
-#include <map>
-#include <vector>
-
 #include <QString>
+#include <QMap>
+#include <QVector>
 
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
@@ -39,7 +37,6 @@ template< typename A, typename B > struct QPair;
 template< typename T > class QSet;
 class QMutex;
 class QString;
-
 
 namespace Isis {
   class Camera;
@@ -205,6 +202,8 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added throw to caught exception for bad control net
    *                           import in constructor. Also removed p_invalid as it was no longer
    *                           being used anywhere. Fixes #5068.
+   *   @history 2017-12-12 Kristin Berry - Updated to use QMap and QVector rather than std::map
+   *                            and std::vector. Fixes #5259.
    *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258.
    *   @history 2017-12-21 Jesse Mapel - Modified read and write methods to use the refactored
    *                           ControlNetVersioner instead of directly parsing the protobuf
@@ -439,12 +438,12 @@ namespace Isis {
       QString p_modified;              //!< Date Last Modified
       QString p_description;           //!< Textual Description of network
       QString p_userName;              //!< The user who created the network
-      std::map<QString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
-      std::map<QString, int> p_cameraValidMeasuresMap; //!< A map from serialnumber to #measures
-      std::map<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
+      QMap<QString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
+      QMap<QString, int> p_cameraValidMeasuresMap; //!< A map from serialnumber to #measures
+      QMap<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
       //!  #rejected measures
-      std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
-      std::vector<Distance> p_targetRadii;        //!< Radii of target body
+      QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
+      QVector<Distance> p_targetRadii;        //!< Radii of target body
 
       bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
   };
