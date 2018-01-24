@@ -1354,14 +1354,14 @@ namespace Isis {
     switch ( protoPoint.type() ) {
       case ControlPointFileEntryV0002_PointType_obsolete_Tie:
       case ControlPointFileEntryV0002_PointType_Free:
-        pointType = ControlPoint::PointType::Free;
+        pointType = ControlPoint::Free;
         break;
       case ControlPointFileEntryV0002_PointType_Constrained:
-        pointType = ControlPoint::PointType::Constrained;
+        pointType = ControlPoint::Constrained;
         break;
       case ControlPointFileEntryV0002_PointType_obsolete_Ground:
       case ControlPointFileEntryV0002_PointType_Fixed:
-        pointType = ControlPoint::PointType::Fixed;
+        pointType = ControlPoint::Fixed;
         break;
       default:
         QString msg = "Unable to create ControlPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
@@ -1808,13 +1808,13 @@ namespace Isis {
 
       ControlPointFileEntryV0002_PointType pointType;
       switch ( controlPoint->GetType() ) {
-        case ControlPoint::PointType::Free:
+        case ControlPoint::Free:
           pointType = ControlPointFileEntryV0002_PointType_Free;
           break;
-        case ControlPoint::PointType::Constrained:
+        case ControlPoint::Constrained:
           pointType = ControlPointFileEntryV0002_PointType_Constrained;
           break;
-        case ControlPoint::PointType::Fixed:
+        case ControlPoint::Fixed:
           pointType = ControlPointFileEntryV0002_PointType_Fixed;
           break;
         default:
@@ -1965,11 +1965,11 @@ namespace Isis {
         protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber().toLatin1().data());
 
         switch ( controlMeasure.GetType() ) {
-            case (ControlMeasure::MeasureType::Candidate):
+            case (ControlMeasure::Candidate):
                 protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Candidate);
                 break;
 
-            case (ControlMeasure::MeasureType::Manual):
+            case (ControlMeasure::Manual):
                 protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Manual);
                 break;
 
