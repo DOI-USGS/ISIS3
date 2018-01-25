@@ -74,7 +74,8 @@ namespace Isis {
    *  @history 2015-06-04 Kristin Berry - Now throws an error when unable to open an output file or
    *                           finish writing to an output file.
    *                           Fixes #996.
-   *  @history 2017-12-12 Kristin Berry - Updated std::map to QMap and std::vector to QVector. 
+   *  @history 2017-12-12 Kristin Berry - Updated std::map to QMap and std::vector to QVector. Fixes
+   *                           #5259.
    *  
    */
   class ControlNetStatistics {

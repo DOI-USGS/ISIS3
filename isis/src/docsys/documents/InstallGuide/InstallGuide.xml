@@ -75,7 +75,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <h3>Recommended Installation Process</h3>
         <p>
           ISIS 3 now features a downloadable Java-based installer.  The installer provides user options for choosing which mission
-          packages and target DEMs (e.g. Mars, Moon) to download. It also includes the sizes of the packages.   During the installation process,
+          packages and target DEMs (e.g. Mars, Moon) to download. It also includes the sizes of the packages.   During the installation process, 
 	  you can choose to use the ISIS SPICE Web service which will eliminate the need to download most of theSPICE data for a mission.
         </p>
         <p>
@@ -212,7 +212,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
              <h3>I just can not get ISIS installed.  What can I do?</h3>
              <p>
                If you encounter problems, we monitor our discussion
-               board daily and will respond to any questions as soon as we can.  But, first, please check the discussion board
+               board daily and will respond to any questions as soon as we can.  But, first, please check the discussion board 
 	       as others may have posted the problem with similar issues to you.
              </p>
              <p>
@@ -374,7 +374,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
   via the internet. To use this service instead of your local SPICE data, click the WEB check box in
   the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE Web
   Service will significantly reduce the size of the downloads from our data area.
-
+  
   If you want to use this new service, without having to download all the SPICE data, add the
   following argument to the mission-specific rsync command:
  </p>
@@ -386,11 +386,12 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         </p>
 
         <span style="font-size:120%; color:red; font-weight:bold">
-          WARNING: Some instruments require mission data to be present for calibration, which may
-          not be supported by the SPICE Web Server exclusively, and some programs that are designed
-          to run an image from ingestion through the mapping phase do not have an option to use the
-          SPICE Web Service. For information specific to an instrument, see the documentation for
-          radiometric callobration programs.
+          WARNING: Some missions do not currently support calibration when using the SPICE Web
+          Service exclusively: these include LRO, MRO, Viking, MGS, and MER. These calibration
+          programs are lronaccal, lrowaccal, mical, moccal, ctxcal, hical, vikcal, mocevenodd, and
+          mocnoise50. Some programs designed to run an image from ingestion through the mapping
+          phase do not have an option to use the SPICE Web Service. Known programs are thmproc,
+          mocproc, hicalproc, and mdisproc.
         </span>
 
           <A NAME="ApolloMission"> </A>
@@ -409,10 +410,10 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </pre>
 <p>
-  Chandrayaan Mission (kernels can be excluded):
+  Chan1 Mission (kernels can be excluded):
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chan1 data/
         </pre>
 <p>
   Clementine Mission (kernels can be excluded):
@@ -426,42 +427,17 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn data/
         </pre>
-<p>
-  ExoMars Trace Gas Orbiter Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/tgo data/
-        </pre>
-<p>
+ <p>
   Galileo Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo data/
         </pre>
 <p>
-  Hayabusa Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa data/
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa2 data/
-        </pre>
-<p>
   Ideal Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ideal data/
-        </pre>
-<p>
-  Juno Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/juno data/
-        </pre>
-<p>
-  Kaguya Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/kaguya data/
         </pre>
 <p>
   Lunar Orbiter Mission (kernels can be excluded):
@@ -518,34 +494,16 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
         </pre>
 <p>
-  Near Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/near data/
-        </pre>
-<p>
   New Horizons Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons data/
         </pre>
 <p>
-  Odyssey Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
-        </pre>
-<p>
   Rolo Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo data/
-        </pre>
-<p>
-  Rosetta Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rosetta data/
         </pre>
 <p>
   Smart1 Mission (kernels can be excluded):
@@ -619,7 +577,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <p>
             Run the startup script for ISIS. This script assumes you installed
             the ISIS 3 data area in the same directory you installed the ISIS 3
-            package. If you did not do this, you will need to modify the script to
+            package. If you did not do this, you will need to modify the script to 
 	    indicatethe proper location.
         </p>
 
@@ -681,7 +639,6 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <change name="Ian Humphrey" date="2016-02-26">Updated for latest Fedora version (Fedora21).</change>
     <change name="Adam Paquette" date="2016-06-24">Updated links to the support center.</change>
     <change name="Ian Humphrey" date="2017-01-25">Updated instructions for new supported systems.</change>
-    <change name="Summer Stapleton" date="2017-12-29">Updated SPICE Web Service mission information to include newer missions.</change>
   </history>
 
   <bibliography>

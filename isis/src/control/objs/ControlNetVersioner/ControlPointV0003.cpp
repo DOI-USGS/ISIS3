@@ -25,7 +25,7 @@ namespace Isis {
 
 
   /**
-   * Create a ControlPointV0003 object from a version 4 control point Pvl object
+   * Create a ControlPointV0003 object from a version 3 or 4 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
    */
@@ -262,12 +262,12 @@ namespace Isis {
 
 
   /**
-   * Create a ControlPointV0003 object from a PvlControlPointV0002 object
+   * Create a ControlPointV0003 object from a ControlPointV0002 object
    *
    * @param oldPoint The PvlControlPointV0002 that will be upgraded to V0003.
    */
   ControlPointV0003::ControlPointV0003(ControlPointV0002 &oldPoint)
-   : m_pointData(new ControlPointFileEntryV0002) {
+      : m_pointData(new ControlPointFileEntryV0002) {
     QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> oldPointData = oldPoint.pointData();
     if (!oldPointData) {
       QString msg = "Version 2 control point is missing point data.";
@@ -513,11 +513,15 @@ namespace Isis {
         // Copy over any log data
         ControlNetLogDataProtoV0001_Point_Measure measureLogData = oldLogData->measures(i);
         for (int j = 0; j < measureLogData.loggedmeasuredata_size(); j++) {
+
           ControlNetLogDataProtoV0001_Point_Measure_DataEntry oldData =
-                measureLogData.loggedmeasuredata(j);
+              measureLogData.loggedmeasuredata(j);
+
           ControlPointFileEntryV0002_Measure_MeasureLogData newData;
+
           newData.set_doubledatatype( oldData.datatype() );
           newData.set_doubledatavalue( oldData.datavalue() );
+
           *newMeasure->add_log() = newData;
         }
 
@@ -530,7 +534,7 @@ namespace Isis {
       }
     }
 
-    // Check that all fo the required fields in the point are filled
+    // Check that all of the required fields in the point are filled
     if ( !m_pointData->IsInitialized() ) {
       QString msg = "Control point file entry is missing required fields.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -558,7 +562,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -590,7 +594,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -619,7 +623,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -647,7 +651,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -678,7 +682,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -706,7 +710,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *

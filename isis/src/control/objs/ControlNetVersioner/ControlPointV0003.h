@@ -33,13 +33,29 @@ namespace Isis {
   class PvlContainer;
 
   /**
-  * @internal
-  *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to not used
-  *                           the deprecated "ToProtocolBuffer()" call from
-  *                           ControlMeasureLogData.
-  **/
-
-  //TODO document this
+   * @breif A container for the information stored in a version 3 and 4 ControlPoint.
+   *
+   * A wrapper around the version 3 and 4 protobuf serialization of a ControlPoint. It allows for
+   * reading ControlPoints serialized as both PvlObjects and protobuf messages. It also allows
+   * for upgrading version 2 ControlPoints to version 3 and 4 ControlPoints.
+   *
+   * The version 3 and 4 binary serialization of ControlPoint use the same protobuf message, so
+   * this class works with both versions. The differences between the version 3 and 4 Pvl
+   * serialization is small enough that it is handled in the PvlObject constructor.
+   *
+   * @ingroup ControlNetwork
+   *
+   * @author 2017-12-14 Jesse Mapel
+   *
+   * @internal
+   *   @history 2017-12-14 Jesse Mapel - Original version.
+   *   @history 2017-12-21 Jesse Mapel - Added support for measure log data.
+   *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to take PvlObject.
+   *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to not used
+   *                           the deprecated "ToProtocolBuffer()" call from
+   *                           ControlMeasureLogData.
+   *   @history 2018-01-03 Jesse Mapel - Improved documentation.
+   */
   class ControlPointV0003 {
     public:
       ControlPointV0003(PvlObject &pointObject);
