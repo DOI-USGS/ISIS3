@@ -18,6 +18,8 @@ moc_*
 *.pb.*
 *.lbl
 *.img
+# ignore all files created by squish coco
+*csmes
 
 !TestPreferences
 
@@ -41,4 +43,3 @@ ui_*.h
 */tsts/*/input/*
 */tsts/*/truth/*
 */tsts/*/output/*
-
