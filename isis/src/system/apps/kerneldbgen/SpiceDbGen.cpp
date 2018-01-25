@@ -71,7 +71,7 @@ SpiceDbGen::SpiceDbGen(QString type) {
  * @throws Isis::iException::Message
 */
 PvlObject SpiceDbGen::Direct(QString quality, QString location,
-                             std::vector<QString> &filter) {
+                             std::vector<QString> &filter, double startOffset, double endOffset) {
   PvlObject result;
   QString type = "none";
 
@@ -90,7 +90,7 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
 
     for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
       FileName currFile((QString) location + "/" + files[fileNum]);
-      PvlGroup selection = AddSelection(currFile);
+      PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
       selection += PvlKeyword("Type", quality);
       result.addGroup(selection);
     }
@@ -164,7 +164,7 @@ QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
   *
   * @throws Isis::iException::Message
   */
-PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
+PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double endOffset) {
   NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
@@ -220,7 +220,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 
         NaifStatus::CheckErrors();
 
-        result = FormatIntervals(cover, currFile);
+        result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
       else if (currFile == "CK") {
         //  200,000 is the max coverage window size for a CK kernel
@@ -231,7 +231,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 
         NaifStatus::CheckErrors();
 
-        result = FormatIntervals(cover, currFile);
+        result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
     }
   }
@@ -248,7 +248,8 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 }
 
 
-PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
+PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
+                                     double startOffset, double endOffset) {
   NaifStatus::CheckErrors();
 
   PvlGroup result(type);
@@ -261,8 +262,11 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
     //Get the endpoints of the jth interval.
     wnfetd_c(&coverage, j, &begin, &end);
     //Convert the endpoints to TDB calendar
+    begin -= startOffset;
+    end += endOffset;
     timout_c(begin, calForm, 35, begStr);
     timout_c(end, calForm, 35, endStr);
+    
     result += PvlKeyword("Time", "(\"" + (QString)begStr +
                          "\", \"" + (QString)endStr + "\")");
   }

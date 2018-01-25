@@ -2347,13 +2347,13 @@ namespace Isis {
    *
    * @param *map Pointer to a CameraDistortionMap object
    */
-  void Camera::SetDistortionMap(CameraDistortionMap *map) {
-    if (p_distortionMap) {
-      delete p_distortionMap;
-    }
+ void Camera::SetDistortionMap(CameraDistortionMap *map, bool deleteExisting) {
+   if (deleteExisting && p_distortionMap) {
+     delete p_distortionMap;
+   }
 
-    p_distortionMap = map;
-  }
+   p_distortionMap = map;
+ }
 
 
   /**

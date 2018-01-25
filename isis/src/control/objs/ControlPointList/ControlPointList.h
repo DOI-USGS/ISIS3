@@ -47,7 +47,7 @@ namespace Isis {
    *   @history 2009-10-04 Steven Lambright Constructor now takes a FileName
    *            instead of a string.
    *   @history 2017-12-12 Kristin Berry Updated to use QVector and QString instead of std::vector
-   *            and std::string.
+   *            and std::string. Fixes #5259.
    */
   class ControlPointList {
     public:

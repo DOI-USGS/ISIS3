@@ -15,21 +15,24 @@ namespace Isis {
    * Create a ControlPointV0002 object from a protobuf version 1 control point message.
    *
    * @param pointData The protobuf message from a control net file.
+   * @param logData The accompanying protobuf control measure log data for the point.
    */
   ControlPointV0002::ControlPointV0002(
-          QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData)
-   : m_pointData(pointData) {
+          QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData,
+          QSharedPointer<ControlNetLogDataProtoV0001_Point> logData)
+   : m_pointData(pointData), m_logData(logData) {
 
    }
 
 
   /**
-   * Create a ControlPointV0002 object from a version 2 control point Pvl object
+   * Create a ControlPointV0002 object from a version 2 control point Pvl object.
    *
-   * @param pointObject The control point and its measures in a Pvl object
+   * @param pointObject The control point and its measures in a Pvl object.
    */
   ControlPointV0002::ControlPointV0002(PvlObject &pointObject)
-   : m_pointData(new ControlNetFileProtoV0001_PBControlPoint) {
+   : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
+     m_logData(new ControlNetLogDataProtoV0001_Point) {
 
     // Copy over strings, doubles, and bools
     copy(pointObject, "PointId",
@@ -69,11 +72,6 @@ namespace Isis {
 
     // Copy enumerated values
 
-    // The control point type names were changed between version 3 and version 4.
-    // In version 3, the types are ground, tie, and constrained
-    // In version 4, these were changed to fixed, free, and constrained respectively.
-    // The protobuf file version was not changed, fixed and free were simply added to the
-    // enumeration and the old names were flagged as obsolete.
     if (pointObject["PointType"][0] == "Ground") {
       m_pointData->set_type(ControlNetFileProtoV0001_PBControlPoint::Ground);
     }
@@ -238,7 +236,71 @@ namespace Isis {
       }
       group.deleteKeyword("MeasureType");
 
+      // Clean up the remaining keywords
+      // This also removes obsolete log data entries
+      for (int cmKeyIndex = 0; cmKeyIndex < group.keywords(); cmKeyIndex ++) {
+        if (group[cmKeyIndex][0] == ""
+            || group[cmKeyIndex].name() == "ZScore"
+            || group[cmKeyIndex].name() == "ErrorMagnitude") {
+          group.deleteKeyword(cmKeyIndex);
+        }
+      }
+
+      // Create the log data for the measure
+      ControlNetLogDataProtoV0001_Point_Measure measureLogData;
+
+      for (int keyIndex = 0; keyIndex < group.keywords(); keyIndex++) {
+        PvlKeyword dataKeyword = group[keyIndex];
+        QString name = dataKeyword.name();
+        int dataType = 0;
+        double value = 0.0;
+
+        if (name == "Obsolete_Eccentricity") {
+          dataType = 1;
+        }
+        else if (name == "GoodnessOfFit") {
+          dataType = 2;
+        }
+        else if (name ==  "MinimumPixelZScore") {
+          dataType = 3;
+        }
+        else if (name ==  "MaximumPixelZScore") {
+          dataType = 4;
+        }
+        else if (name == "PixelShift") {
+          dataType = 5;
+        }
+        else if (name == "WholePixelCorrelation") {
+          dataType = 6;
+        }
+        else if (name == "SubPixelCorrelation") {
+          dataType = 7;
+        }
+        else if (name == "Obsolete_AverageResidual") {
+          dataType = 8;
+        }
+        else {
+          QString msg = "Invalid control measure log data name [" + name + "]";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+
+        try {
+          value = toDouble(dataKeyword[0]);
+        }
+        catch (IException e) {
+          QString msg = "Invalid control measure log data value [" + dataKeyword[0] + "]";
+          throw IException(e, IException::Io, msg, _FILEINFO_);
+        }
+
+        ControlNetLogDataProtoV0001_Point_Measure_DataEntry logEntry;
+        logEntry.set_datatype(dataType);
+        logEntry.set_datavalue(value);
+        *measureLogData.add_loggedmeasuredata() = logEntry;
+      }
+
+      // Store the measure and its log data
       *m_pointData->add_measures() = measure;
+      *m_logData->add_measures() = measureLogData;
     }
 
     if (!m_pointData->IsInitialized()) {
@@ -250,39 +312,46 @@ namespace Isis {
 
 
   /**
-   * Create a version 2 control point from a version 1 control point. The two versions actually
-   * store the same values, so all this does is copy the internal protobuf object.
+   * Create a version 2 control point from a version 1 control point. The two versions internally
+   * store the same protobuf message, so all this does is copy the pointer to the internal protobuf
+   * object.
+   *
+   * @note Because the two points share the same container, modifications to one will affect the
+   *       other.
    *
    * @param oldPoint The old version 1 control point.
    */
   ControlPointV0002::ControlPointV0002(ControlPointV0001 &oldPoint)
-   : m_pointData(oldPoint.pointData()) {
+   : m_pointData(oldPoint.pointData()), m_logData(oldPoint.logData()) {
 
   }
 
 
   /**
-   * Access the protobuf control point data. If there is not internal point data then
-   * default point data is returned. Note that default point data may be missing required
-   * fields.
+   * Access the protobuf control point data.
    *
-   * @return @b const ControlNetFileProtoV0001_PBControlPoint& A constant reference to the internal
-   *                                                           control point data. There is no
-   *                                                           guarantee that the point data is
-   *                                                           fully initialized.
+   * @return @b QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> A pointer to the internal
+   *                                                                    point data.
    */
-  const ControlNetFileProtoV0001_PBControlPoint &ControlPointV0002::pointData() {
-      if (!m_pointData) {
-        m_pointData.reset(new ControlNetFileProtoV0001_PBControlPoint);
-      }
+  QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0002::pointData() {
+      return m_pointData;
+  }
 
-      return *m_pointData;
+
+  /**
+   * Access the protobuf log data for the control measures in the point.
+   *
+   * @return @b QSharedPointer<ControlNetLogDataProtoV0001_Point> A pointer to the internal
+   *                                                              measure log data.
+   */
+  QSharedPointer<ControlNetLogDataProtoV0001_Point> ControlPointV0002::logData() {
+      return m_logData;
   }
 
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -313,7 +382,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -341,7 +410,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -369,7 +438,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -400,7 +469,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -428,7 +497,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 1
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
