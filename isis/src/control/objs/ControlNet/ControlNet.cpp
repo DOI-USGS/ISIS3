@@ -23,11 +23,11 @@
 #include "Application.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
-#include "ControlNetFile.h"
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
 #include "Distance.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
@@ -236,48 +236,35 @@ namespace Isis {
    *                           they are read into memory instead of setting
    *                           parent prematurely to be able to set the radii
    *                           in ControlPoint.
+   * @history 2017-12-21 Jesse Mapel - Modified to use the ControlNetVersioner.
    *
    */
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
 
-    LatestControlNetFile *fileData = ControlNetVersioner::Read(filename);
+    FileName cnetFileName(filename);
+    ControlNetVersioner versionedReader(cnetFileName, progress);
 
-    ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
-    p_networkId     = header.networkid().c_str();
-    if (header.has_targetname()) {
-      SetTarget(header.targetname().c_str());
+    SetTarget( versionedReader.targetName() );
+    p_networkId   = versionedReader.netId();
+    p_userName    = versionedReader.userName();
+    p_created     = versionedReader.creationDate();
+    p_modified    = versionedReader.lastModificationDate();
+    p_description = versionedReader.description();
+
+    int numPoints = versionedReader.numPoints();
+
+    if (progress) {
+      progress->SetText("Adding Control Points to Network...");
+      progress->SetMaximumSteps(numPoints);
+      progress->CheckStatus();
     }
-    else {
-      SetTarget("");
-    }
 
-    p_userName      = header.username().c_str();
-    p_created       = header.created().c_str();
-    p_modified      = header.lastmodified().c_str();
-    p_description   = header.description().c_str();
-
-    QList< ControlPointFileEntryV0002 > &fileDataPoints =
-      fileData->GetNetworkPoints();
-
-    if (fileDataPoints.size() > 0) {
-      if (progress != NULL) {
-        progress->SetText("Loading Control Points...");
-        progress->SetMaximumSteps(fileDataPoints.size());
+    for (int i = 0; i < numPoints; i++) {
+      AddPoint( versionedReader.takeFirstPoint() );
+      if (progress) {
         progress->CheckStatus();
       }
-
-      ControlPointFileEntryV0002 fileDataPoint;
-      foreach(fileDataPoint, fileDataPoints) {
-        AddPoint(new ControlPoint(fileDataPoint,
-                 p_targetRadii[0], p_targetRadii[1], p_targetRadii[2]));
-
-        if (progress != NULL)
-          progress->CheckStatus();
-      }
     }
-
-    delete fileData;
-    fileData = NULL;
   }
 
 
@@ -288,41 +275,41 @@ namespace Isis {
    * @param pvl    Boolean indicating whether to write in pvl format
    *               (Default=false)
    *
-   * @throws Isis::iException::Programmer - "Invalid Net
-   *             Enumeration"
-   * @throws Isis::iException::Io - "Unable to write PVL
-   *             infomation to file"
-   *
    * @history 2010-10-05 Tracie Sucharski - Renamed old WRite method to WritePvl
    *                     and created this new method to determine format to
    *                     be written.
+   * @history 2017-12-21 Jesse Mapel - Modified to use new ControlNetVersioner.
    */
   void ControlNet::Write(const QString &ptfile, bool pvl) {
-    LatestControlNetFile *fileData = new LatestControlNetFile();
+    ControlNetVersioner versionedWriter(this);
 
-    ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
+    if (pvl) {
+      Pvl network;
+      try {
+        network = versionedWriter.toPvl();
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert control network to Pvl format.";
+        throw IException(e, IException::Programmer, msg, _FILEINFO_);
+      }
 
-    header.set_networkid(p_networkId.toLatin1().data());
-    header.set_targetname(p_targetName.toLatin1().data());
-    header.set_username(p_userName.toLatin1().data());
-    header.set_created(p_created.toLatin1().data());
-    header.set_lastmodified(p_modified.toLatin1().data());
-    header.set_description(p_description.toLatin1().data());
-
-    QList< ControlPointFileEntryV0002 > &fileDataPoints =
-      fileData->GetNetworkPoints();
-
-    for (int i = 0; i < pointIds->size(); i++) {
-      ControlPoint *point = points->value(pointIds->at(i));
-
-      ControlPointFileEntryV0002 pointFileEntry = point->ToFileEntry();
-      fileDataPoints.append(pointFileEntry);
+      try {
+        network.write(ptfile);
+      }
+      catch (IException &e) {
+        QString msg = "Failed writing control network to file [" + ptfile + "]";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
     }
-
-    ControlNetVersioner::Write(ptfile, *fileData, pvl);
-
-    delete fileData;
-    fileData = NULL;
+    else {
+      try {
+        versionedWriter.write(FileName(ptfile));
+      }
+      catch (IException &e) {
+        QString msg = "Failed writing control network to file [" + ptfile + "]";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
   }
 
 
@@ -1237,7 +1224,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (10/6/2010)
    *
-   * @return std::string
+   * @return QString
    */
   QString ControlNet::CreatedDate() const {
     return p_created;
@@ -1507,16 +1494,21 @@ namespace Isis {
     return p_userName;
   }
 
+  //! Return the last modified date
+  QString ControlNet::GetLastModified() const {
+    return p_modified;
+  }
 
-  //! Return QList of ControlPoints ordered by point ID
+
+  //! Return QList of all the ControlPoints in the network
   QList< ControlPoint * > ControlNet::GetPoints() {
-    QList< ControlPoint * > orderedPoints;
+    QList< ControlPoint * > pointsList;
 
     for (int i = 0; i < pointIds->size(); i++) {
-      orderedPoints.append(GetPoint(i));
+      pointsList.append(GetPoint(i));
     }
 
-    return orderedPoints;
+    return pointsList;
   }
 
 
@@ -1787,7 +1779,7 @@ namespace Isis {
     }
 
     p_targetName = target;
-    p_targetRadii = radii.toStdVector();
+    p_targetRadii = radii;
 
   }
 
@@ -1936,7 +1928,7 @@ namespace Isis {
    * @returns the radii of the target body
    */
   std::vector<Distance> ControlNet::GetTargetRadii() {
-    return p_targetRadii;
+    return p_targetRadii.toStdVector();
   }
 
 

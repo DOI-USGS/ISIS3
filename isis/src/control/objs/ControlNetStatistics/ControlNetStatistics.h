@@ -2,7 +2,7 @@
 #define _CONTROLNETSTATISTICS_H_
 
 #include <QMap>
-#include <QVector>
+#include <QVector> 
 
 #include "Progress.h"
 #include "PvlGroup.h"
@@ -75,7 +75,6 @@ namespace Isis {
    *                           Fixes #996.
    *  @history 2017-12-12 Kristin Berry - Updated std::map to QMap and std::vector to QVector. Fixes
    *                           #5259.
-   *
    */
   class ControlNetStatistics {
     public:

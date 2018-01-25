@@ -206,6 +206,9 @@ namespace Isis {
    *                           constants for a PCK type. 
    *   @history 2016-06-28 Ian Humphrey - Updated documentation and coding standards. Added new
    *                           tests to unit test. Fixes #3972.
+   *   @history 2017-12-13 Ken Edmundson - Added "case DYN:" to methods ToReferencePartial and toJ2000Partial. Fixes #5251.
+   *                           This problem was found when trying to bundle M3 images that had been spiceinited with nadir
+   *                           pointing. The nadir frame is defined as a Dynamic Frame by Naif.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or 

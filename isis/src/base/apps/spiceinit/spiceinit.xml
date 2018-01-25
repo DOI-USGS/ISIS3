@@ -286,6 +286,10 @@
       Updated spiceinit to remove code dealing with the CubeSupported Pvl Keyword, from the ShapeModel group in the IsisPreferences file, 
       which has been removed.
     </change>
+    <change name="Christopher Combs" date="2018-01-11">
+      Made change to camera construction error throw for better reporting on uninstantiated cameras.
+      Fixes #5163.
+    </change>
   </history>
 
   <oldName>

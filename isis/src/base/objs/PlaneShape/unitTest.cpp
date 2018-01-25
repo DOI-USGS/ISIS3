@@ -57,7 +57,7 @@ int main() {
   try {
     Preference::Preferences(true);
     //string inputFile = "$mgs/testData/ab102401.cub";
-    QString inputFile = "W1591510834_1_cal.cub";
+    QString inputFile = "$base/testData/PlaneShape/W1591510834_1_cal.cub";
     Cube cube;
     cube.open(inputFile);
     Camera *c = cube.camera();

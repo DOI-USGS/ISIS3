@@ -27,8 +27,6 @@ class QString;
 class QVariant;
 
 namespace Isis {
-  class ControlNetLogDataProtoV0001_Point_Measure_DataEntry;
-  class ControlPointFileEntryV0002_Measure_MeasureLogData;
   class PvlKeyword;
 
   /**
@@ -47,6 +45,8 @@ namespace Isis {
    *   @history 2011-04-04 Steven Lambright - Added error checking to the
    *                         conversion to protocol buffer
    *   @history 2011-04-11 Steven Lambright - Added GetValue method
+   *   @history 2017-12-21 Adam Goins - Removed protobuf references.
+   *   @history 2018-01-04 Adam Goins - Added variable names to method declarations.
    */
   class ControlMeasureLogData {
     public:
@@ -118,26 +118,22 @@ namespace Isis {
          */
         Obsolete_AverageResidual           = 8
       };
+
       /**
        * This value must be > the largest enumerated value in this type or
        * convertions to and from Pvl will not work.
        */
       static const int MaximumNumericLogDataType = 9;
 
-
       ControlMeasureLogData();
-      ControlMeasureLogData(NumericLogDataType);
-      ControlMeasureLogData(PvlKeyword);
-      ControlMeasureLogData(NumericLogDataType, double value);
-      ControlMeasureLogData(
-          const ControlNetLogDataProtoV0001_Point_Measure_DataEntry &);
-      ControlMeasureLogData(
-          const ControlPointFileEntryV0002_Measure_MeasureLogData &);
+      ControlMeasureLogData(NumericLogDataType dataType);
+      ControlMeasureLogData(PvlKeyword keywordRep);
+      ControlMeasureLogData(NumericLogDataType dataType, double value);
       ControlMeasureLogData(const ControlMeasureLogData & other);
       ~ControlMeasureLogData();
 
-      void SetNumericalValue(double);
-      void SetDataType(NumericLogDataType);
+      void SetNumericalValue(double value);
+      void SetDataType(NumericLogDataType newDataType);
 
       double GetNumericalValue() const;
       NumericLogDataType GetDataType() const;
@@ -145,11 +141,8 @@ namespace Isis {
       bool IsValid() const;
       PvlKeyword ToKeyword() const;
 
-      ControlPointFileEntryV0002_Measure_MeasureLogData
-          ToProtocolBuffer() const;
-
       NumericLogDataType NameToDataType(QString name) const;
-      QString DataTypeToName(NumericLogDataType) const;
+      QString DataTypeToName(NumericLogDataType type) const;
 
     private:
       void Init();
