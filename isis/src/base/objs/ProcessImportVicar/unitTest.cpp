@@ -17,7 +17,7 @@ void IsisMain() {
 
   ProcessImportVicar p;
   Pvl vlab;
-  p.SetVicarFile(FileName("$base/testData/ProcessImportVicar/unitTest.img").expanded(), vlab);
+  p.SetVicarFile(FileName("$ISIS3TESTDATA/isis/src/base/objs/ProcessImportVicar/unitTest.img").expanded(), vlab);
   p.SetOutputCube("TO");
   p.StartProcess();
   p.EndProcess();
