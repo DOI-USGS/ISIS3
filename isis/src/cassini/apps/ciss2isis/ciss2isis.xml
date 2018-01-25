@@ -105,6 +105,12 @@
           Use this parameter to select the Cassini PDS Image Label. The file must
           contain PDS labels for Cassini ISS data.  This can be a detached label file with
           pointer to the cube data.
+          
+          <strong>NOTE:</strong> While we support most Cassini ISS Targets for ingestion, some of 
+          these targets do not currently have support for being spiced. The current list is : ANTHE, 
+          AEGAEON, BERGELMIR, BESTLA, ERRIAPO, ERRIAPUS, FORNJOT, GREIP, HATI, HYROKKIN, IJIRAQ, 
+          JARNSAXA, K07S4, KARI, KIVIUQ, LOGE, MUNDILFARI, NARVI, PAALIAQ, SIARNAQ, SKADI, SKATHI,
+          SKOLL, SURTUR, SUTTUNG, SUTTUNGR, TARVOS, TARQEQ, THRYM, THRYMR, YMIR. 
         </description>
         <filter>
           *.lbl *.LBL
@@ -119,6 +125,9 @@
          </brief>
          <description>
            Use this parameter to select the output filename
+           
+           <strong>NOTE:</strong> The following TARGET_NAMEs will be translated to 'Sky' in the
+           output cube's PVL: SKY, DARK SKY, S8_2004, S12_2004, S13_2004, S14_2004, S18_2004.
          </description>
          <filter>
            *.cub
