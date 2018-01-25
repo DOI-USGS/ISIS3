@@ -7,8 +7,9 @@
 
   <description>
     <p>
-      This program converts an Isis3 control network file from binary into an 
-    ascii pvl formatted file.
+      This program converts an Isis3 control network file from binary into a
+      utf pvl formatted file. The output pvl will be written as the latest Pvl version.
+      A link to the most recent Pvl template can be found <a href="#ControlNetPVLV0005Template"> here</a>
     </p>
   </description>
 
@@ -25,6 +26,11 @@
     </change>
     <change name="Steven Lambright" date="2011-04-05">
       Added a basic progress
+    </change>
+    <change name="Adam Goins" date="2018-01-24">
+      Updated Description to reflect utf file format.
+      Added link to current Pvl template.
+      Added user example.
     </change>
   </history>
 
@@ -57,6 +63,51 @@
               *.cnet *.pvl
       </filter>
     </parameter>
-    </group>    
+    </group>
   </groups>
+  <examples>
+    <example>
+      <brief>Cnverting a binary ControlNet to a PVL network.</brief>
+      <description>A binary V0001 ControlNetwork converted to the latest PVL network.</description>
+      <terminalInterface>
+        <commandLine>
+          from=/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net to=PvlNetwork.pvl
+        </commandLine>
+        <description>
+          In this example we are converting a Binary V0001 network from the test data area to a Pvl network.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/peaks.1.jpg" width="500" height="500">
+          <brief>Input image for crop</brief>
+          <description>
+            This is the input image for the 200x300 example of crop. The area to be "cropped" is shown in red.
+          </description>
+          <thumbnail caption=" Input image" src="assets/thumb/peaks.1.jpg" width="200" height="200"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/peaks.crop.jpg" width="200" height="300">
+          <brief>Output image for crop</brief>
+          <description>
+            This is the output image for the 200x300 example of crop
+          </description>
+          <thumbnail caption="Output image showing results of the crop application with 200 by 300 input." src="assets/thumb/peaks.crop.jpg" width="133" height="200"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="472" height="388" src="assets/image/cropgui.jpg">
+            <brief>Example Gui</brief>
+            <description>
+              Screenshot of GUI with parameters filled in to perform a 200 pixel by 300 pixel crop of the input image.
+            </description>
+            <thumbnail width="200" height="165" caption="Crop Gui" src="assets/thumb/cropgui.jpg"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
 </application>
