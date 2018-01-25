@@ -148,6 +148,10 @@
       Added three additional decimal places to the output of the TIME keyword in output
       kernel database file.  Fixes #2236.
     </change>
+    <change name="Christopher Combs" date="2018-01-11">
+      Added STARTOFFSET and ENDOFFSET parameters to allow for slight editing to start and end times.
+      Fixes #5272.
+    </change>
   </history>
 
   <groups>
@@ -325,7 +329,6 @@
         </default>
       </parameter>
     </group>
-<<<<<<< HEAD
     <group name="Offset">
       <parameter name="STARTOFFSET">
         <type>double</type>
@@ -360,8 +363,6 @@
         </default>
       </parameter>
     </group>
-=======
->>>>>>> d52173579efb95b60629a85b407d372b767fd706
     <!-- Removed because NADIR kerels are not specifed by files, instead NADIR pointing is caluculated as normal to the surface from the current spacecraft position
     <group name="Nadir">
       <parameter name="NADIRDIR">
