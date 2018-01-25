@@ -1,19 +1,24 @@
 #include "ControlNetVersioner.h"
 
-#include <string>
+#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 #include <QDebug>
+#include <QString>
 
-#include "ControlNetFile.h"
-#include "ControlNetFileV0001.h"
-#include "ControlNetFileV0002.h"
-#include "ControlNetFileV0002.pb.h"
+#include "ControlNetFileHeaderV0002.pb.h"
+#include "ControlNetFileHeaderV0005.pb.h"
+#include "ControlNetLogDataProtoV0001.pb.h"
+#include "ControlPointFileEntryV0002.pb.h"
+
+#include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlMeasureLogData.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
-#include "IString.h"
 #include "Latitude.h"
+#include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Progress.h"
@@ -21,930 +26,2062 @@
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
+#include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
 
+
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/coded_stream.h>
+
+using boost::numeric::ublas::symmetric_matrix;
+using boost::numeric::ublas::upper;
+using namespace google::protobuf::io;
 using namespace std;
 
 namespace Isis {
-  
-  /**
-   * Read the control network from disk. This will always return the network in
-   *   its "latest version" binary form. Generally this will only be called by
-   *   ControlNet but a conversion from binary to pvl can make use out of this
-   *   also.
-   *
-   * @param networkFileName The filename of the cnet to be read
-   *
-   */
-  LatestControlNetFile *ControlNetVersioner::Read(const FileName &networkFileName) {
-    
-    try {
-      Pvl network(networkFileName.expanded());
 
-      if (network.hasObject("ProtoBuffer")) {
-        return ReadBinaryNetwork(network, networkFileName);
+  /**
+   * Construct a ControlNetVersioner from a control network. This versioner can only be used to
+   * write out the control points in the control network. It is expected that the control points
+   * in the control network will not be deleted while the control net versioner persists.
+   *
+   * @param net A pointer to the network that will be written out.
+   */
+  ControlNetVersioner::ControlNetVersioner(ControlNet *net)
+      : m_ownsPoints(false) {
+    // Populate the internal list of points.
+    m_points.append( net->GetPoints() );
+
+    ControlNetHeaderV0001 header;
+
+    header.networkID = net->GetNetworkId();
+    header.targetName = net->GetTarget();
+    header.created = net->CreatedDate();
+    header.lastModified = net->GetLastModified();
+    header.description = net->Description();
+    header.userName = net->GetUserName();
+    createHeader(header);
+  }
+
+
+  /**
+   * Construct a ControlNetVersioner from a file. The file will be read in and converted into
+   * a header object that contains general information about the network and a list of
+   * ControlPoints.
+   *
+   * @param netFile The control network file to read in.
+   * @param progress The progress object to track reading points.
+   *
+   * @see ControlNetVersioner::Read
+   */
+  ControlNetVersioner::ControlNetVersioner(const FileName netFile, Progress *progress)
+      : m_ownsPoints(true) {
+    read(netFile, progress);
+  }
+
+
+  /**
+   * Destroy a ControlNetVersioner. If the versioner owns the control points stored in it,
+   * they will also be deleted.
+   */
+  ControlNetVersioner::~ControlNetVersioner() {
+    if ( m_ownsPoints ) {
+      while ( !m_points.isEmpty() ) {
+        ControlPoint *unusedPoint = m_points.takeFirst();
+        delete unusedPoint;
+        unusedPoint = NULL;
       }
-      else if (network.hasObject("ControlNetwork")) {
-        return ReadPvlNetwork(network);
+    }
+  }
+
+
+  /**
+   * Returns the ID for the network.
+   *
+   * @return @b QString The network ID as a string
+   */
+  QString ControlNetVersioner::netId() const {
+    return m_header.networkID;
+  }
+
+
+  /**
+   * Returns the target for the network.
+   *
+   * @return @b QString The target name as a string
+   */
+  QString ControlNetVersioner::targetName() const {
+    return m_header.targetName;
+  }
+
+
+  /**
+   * Returns the date and time that the network was created
+   *
+   * @return @b QString The date and time the network was created as a string
+   */
+  QString ControlNetVersioner::creationDate() const {
+    return m_header.created;
+  }
+
+
+  /**
+   * Returns the date and time of the last modification to the network.
+   *
+   * @return @b QString The date and time of the last modfication as a string
+   */
+  QString ControlNetVersioner::lastModificationDate() const {
+    return m_header.lastModified;
+  }
+
+
+  /**
+   * Returns the network's description.
+   *
+   * @return @b QString A description of the network.
+   */
+  QString ControlNetVersioner::description() const {
+    return m_header.description;
+  }
+
+
+  /**
+   * Returns the name of the last person or program to modify the network.
+   *
+   * @retrun @b QString The name of the last person or program to modify the network.
+   */
+  QString ControlNetVersioner::userName() const {
+    return m_header.userName;
+  }
+
+
+  /**
+   * Returns the number of points that have been read in or are ready to write out.
+   *
+   * @return @b int The number of control points stored internally.
+   */
+  int ControlNetVersioner::numPoints() const {
+    return m_points.size();
+  }
+
+
+  /**
+   * Returns the first point stored in the versioner's internal list. This method passes ownership
+   * of the point to the caller who is expected to delete it when done with it.
+   *
+   * @return @b ControlPoint* A pointer to the control point. The caller assumes ownership of the
+   *                          ControlPoint and is expected to delete it when done.
+   */
+  ControlPoint *ControlNetVersioner::takeFirstPoint() {
+    ControlPoint *point = NULL;
+    if ( !m_points.isEmpty() ) {
+      point = m_points.takeFirst();
+    }
+
+    return point;
+  }
+
+
+  /**
+   * Generates a Pvl file from the currently stored control points and header.
+   *
+   * @return Pvl& The Pvl version of the network
+   */
+  Pvl ControlNetVersioner::toPvl(){
+    Pvl pvl;
+    pvl.addObject(PvlObject("ControlNetwork"));
+    PvlObject &network = pvl.findObject("ControlNetwork");
+
+    network += PvlKeyword("NetworkId", m_header.networkID);
+    network += PvlKeyword("TargetName", m_header.targetName);
+    network += PvlKeyword("UserName", m_header.userName);
+    network += PvlKeyword("Created", m_header.created);
+    network += PvlKeyword("LastModified", m_header.lastModified);
+    network += PvlKeyword("Description", m_header.description);
+    // optionally add username to output?
+
+    // This is the Pvl version we're converting to
+    network += PvlKeyword("Version", "5");
+
+    //  Get Target Radii from naif kernel
+    PvlGroup pvlRadii;
+    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
+    if ( target != "" ) {
+      try {
+        NaifStatus::CheckErrors();
+        pvlRadii = Target::radiiGroup(target);
+      }
+      catch (IException) {
+        // leave pvlRadii empty if target is not recognized by NAIF
+      }
+    }
+
+    foreach (ControlPoint *controlPoint, m_points) {
+      PvlObject pvlPoint("ControlPoint");
+
+      if ( controlPoint->GetType() == ControlPoint::Fixed ) {
+        pvlPoint += PvlKeyword("PointType", "Fixed");
+      }
+
+      else if ( controlPoint->GetType() == ControlPoint::Constrained ) {
+        pvlPoint += PvlKeyword("PointType", "Constrained");
+      }
+
+      else {
+        pvlPoint += PvlKeyword("PointType", "Free");
+      }
+
+      if ( controlPoint->GetId().isEmpty() ) {
+        QString msg = "Unbable to write control net to PVL file. "
+                      "Invalid control point has no point ID value.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
-        IString msg = "Could not determine the control network file type";
+        pvlPoint += PvlKeyword("PointId", controlPoint->GetId());
+      }
+      if ( QString::compare(controlPoint->GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+        pvlPoint += PvlKeyword("ChooserName", controlPoint->GetChooserName());
+      }
+      if ( QString::compare(controlPoint->GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+        pvlPoint += PvlKeyword("DateTime", controlPoint->GetDateTime());
+      }
+      if ( controlPoint->IsEditLocked() ) {
+        pvlPoint += PvlKeyword("EditLock", "True");
+      }
+      if ( controlPoint->IsIgnored() ) {
+        pvlPoint += PvlKeyword("Ignore", "True");
+      }
+
+      switch ( controlPoint->GetAprioriSurfacePointSource() ) {
+        case ControlPoint::SurfacePointSource::None:
+          break;
+        case ControlPoint::SurfacePointSource::User:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "User");
+          break;
+        case ControlPoint::SurfacePointSource::AverageOfMeasures:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "AverageOfMeasures");
+          break;
+        case ControlPoint::SurfacePointSource::Reference:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "Reference");
+          break;
+        case ControlPoint::SurfacePointSource::Basemap:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "Basemap");
+          break;
+        case ControlPoint::SurfacePointSource::BundleSolution:
+          pvlPoint += PvlKeyword("AprioriXYZSource", "BundleSolution");
+          break;
+      }
+
+      if ( controlPoint->HasAprioriSurfacePointSourceFile() ) {
+        pvlPoint += PvlKeyword("AprioriXYZSourceFile",
+                        controlPoint->GetAprioriSurfacePointSourceFile());
+      }
+
+      switch ( controlPoint->GetAprioriRadiusSource() ) {
+        case ControlPoint::RadiusSource::None:
+          break;
+        case ControlPoint::RadiusSource::User:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "User");
+          break;
+        case ControlPoint::RadiusSource::AverageOfMeasures:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "AverageOfMeasures");
+          break;
+        case ControlPoint::RadiusSource::BundleSolution:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "BundleSolution");
+          break;
+        case ControlPoint::RadiusSource::Ellipsoid:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "Ellipsoid");
+          break;
+        case ControlPoint::RadiusSource::DEM:
+          pvlPoint += PvlKeyword("AprioriRadiusSource", "DEM");
+          break;
+      }
+
+      if ( controlPoint->HasAprioriRadiusSourceFile() ) {
+        pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
+                        controlPoint->GetAprioriRadiusSourceFile());
+        }
+
+      // add surface point x/y/z, convert to lat,lon,radius and output as comment
+      SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
+      if ( aprioriSurfacePoint.Valid() ) {
+        PvlKeyword aprioriX("AprioriX", toString(aprioriSurfacePoint.GetX().meters()), "meters");
+        PvlKeyword aprioriY("AprioriY", toString(aprioriSurfacePoint.GetY().meters()), "meters");
+        PvlKeyword aprioriZ("AprioriZ", toString(aprioriSurfacePoint.GetZ().meters()), "meters");
+
+        aprioriX.addComment("AprioriLatitude = "
+                            + toString(aprioriSurfacePoint.GetLatitude().degrees())
+                            + " <degrees>");
+        aprioriY.addComment("AprioriLongitude = "
+                            + toString(aprioriSurfacePoint.GetLongitude().degrees())
+                            + " <degrees>");
+
+        aprioriZ.addComment("AprioriRadius = "
+                            + toString(aprioriSurfacePoint.GetLocalRadius().meters())
+                            + " <meters>");
+
+        pvlPoint += aprioriX;
+        pvlPoint += aprioriY;
+        pvlPoint += aprioriZ;
+
+        symmetric_matrix<double, upper> aprioriCovarianceMatrix = aprioriSurfacePoint.GetRectangularMatrix();
+
+        if ( aprioriCovarianceMatrix.size1() > 0 ) {
+
+          PvlKeyword matrix("AprioriCovarianceMatrix");
+          matrix += toString(aprioriCovarianceMatrix(0, 0));
+          matrix += toString(aprioriCovarianceMatrix(0, 1));
+          matrix += toString(aprioriCovarianceMatrix(0, 2));
+          matrix += toString(aprioriCovarianceMatrix(1, 1));
+          matrix += toString(aprioriCovarianceMatrix(1, 2));
+          matrix += toString(aprioriCovarianceMatrix(2, 2));
+
+          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+
+            aprioriSurfacePoint.SetRadii( Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
+                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
+                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
+
+            if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
+                 && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
+                 && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
+
+              QString sigmas = "AprioriLatitudeSigma = "
+              + toString(aprioriSurfacePoint.GetLatSigmaDistance().meters())
+              + " <meters>  AprioriLongitudeSigma = "
+              + toString(aprioriSurfacePoint.GetLonSigmaDistance().meters())
+              + " <meters>  AprioriRadiusSigma = "
+              + toString(aprioriSurfacePoint.GetLocalRadiusSigma().meters())
+              + " <meters>";
+              matrix.addComment(sigmas);
+            }
+          }
+
+          // If the covariance matrix has a value, add it to the PVL point.
+          if ( aprioriCovarianceMatrix(0, 0) != 0.0
+               || aprioriCovarianceMatrix(0, 1) != 0.0
+               || aprioriCovarianceMatrix(0, 2) != 0.0
+               || aprioriCovarianceMatrix(1, 1) != 0.0
+               || aprioriCovarianceMatrix(1, 2) != 0.0
+               || aprioriCovarianceMatrix(2, 2) != 0.0 ) {
+
+                 pvlPoint += matrix;
+            }
+        }
+      }
+
+      if ( controlPoint->IsLatitudeConstrained() ) {
+        pvlPoint += PvlKeyword("LatitudeConstrained", "True");
+      }
+
+      if ( controlPoint->IsLongitudeConstrained() ) {
+        pvlPoint += PvlKeyword("LongitudeConstrained", "True");
+      }
+
+      if ( controlPoint->IsRadiusConstrained() ) {
+        pvlPoint += PvlKeyword("RadiusConstrained", "True");
+      }
+
+      // adj surface point, convert to lat,lon,radius and output as comment
+      SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
+      if ( adjustedSurfacePoint.Valid() ) {
+        PvlKeyword adjustedX("AdjustedX", toString(adjustedSurfacePoint.GetX().meters()), "meters");
+        PvlKeyword adjustedY("AdjustedY", toString(adjustedSurfacePoint.GetY().meters()), "meters");
+        PvlKeyword adjustedZ("AdjustedZ", toString(adjustedSurfacePoint.GetZ().meters()), "meters");
+
+        adjustedX.addComment("AdjustedLatitude = "
+                             + toString(adjustedSurfacePoint.GetLatitude().degrees())
+                             + " <degrees>");
+        adjustedY.addComment("AdjustedLongitude = "
+                             + toString(adjustedSurfacePoint.GetLongitude().degrees())
+                             + " <degrees>");
+        adjustedZ.addComment("AdjustedRadius = "
+                             + toString(adjustedSurfacePoint.GetLocalRadius().meters())
+                             + " <meters>");
+
+        pvlPoint += adjustedX;
+        pvlPoint += adjustedY;
+        pvlPoint += adjustedZ;
+
+        symmetric_matrix<double, upper> adjustedCovarianceMatrix = adjustedSurfacePoint.GetRectangularMatrix();
+
+        if ( adjustedCovarianceMatrix.size1() > 0 ) {
+
+          PvlKeyword matrix("AdjustedCovarianceMatrix");
+          matrix += toString(adjustedCovarianceMatrix(0, 0));
+          matrix += toString(adjustedCovarianceMatrix(0, 1));
+          matrix += toString(adjustedCovarianceMatrix(0, 2));
+          matrix += toString(adjustedCovarianceMatrix(1, 1));
+          matrix += toString(adjustedCovarianceMatrix(1, 2));
+          matrix += toString(adjustedCovarianceMatrix(2, 2));
+
+          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+
+            adjustedSurfacePoint.SetRadii( Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
+                                           Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
+                                           Distance(pvlRadii["PolarRadius"], Distance::Meters) );
+
+            if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
+                 && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
+                 && adjustedSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
+
+            QString sigmas = "AdjustedLatitudeSigma = "
+                             + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
+                             + " <meters>  AdjustedLongitudeSigma = "
+                             + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
+                             + " <meters>  AdjustedRadiusSigma = "
+                             + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
+                             + " <meters>";
+
+            matrix.addComment(sigmas);
+            }
+          }
+          // If the covariance matrix has a value, add it to the PVL point.
+          if ( adjustedCovarianceMatrix(0, 0) != 0.0
+               || adjustedCovarianceMatrix(0, 1) != 0.0
+               || adjustedCovarianceMatrix(0, 2) != 0.0
+               || adjustedCovarianceMatrix(1, 1) != 0.0
+               || adjustedCovarianceMatrix(1, 2) != 0.0
+               || adjustedCovarianceMatrix(2, 2) != 0.0 ) {
+
+                 pvlPoint += matrix;
+          }
+        }
+      }
+
+      for (int j = 0; j < controlPoint->GetNumMeasures(); j++) {
+        PvlGroup pvlMeasure("ControlMeasure");
+        const ControlMeasure &
+            controlMeasure = *controlPoint->GetMeasure(j);
+        pvlMeasure += PvlKeyword("SerialNumber", controlMeasure.GetCubeSerialNumber());
+
+        switch ( controlMeasure.GetType() ) {
+          case ControlMeasure::Candidate:
+            pvlMeasure += PvlKeyword("MeasureType", "Candidate");
+            break;
+          case ControlMeasure::Manual:
+            pvlMeasure += PvlKeyword("MeasureType", "Manual");
+            break;
+          case ControlMeasure::RegisteredPixel:
+            pvlMeasure += PvlKeyword("MeasureType", "RegisteredPixel");
+            break;
+          case ControlMeasure::RegisteredSubPixel:
+            pvlMeasure += PvlKeyword("MeasureType", "RegisteredSubPixel");
+            break;
+        }
+
+        if ( QString::compare(controlMeasure.GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+          pvlMeasure += PvlKeyword("ChooserName", controlMeasure.GetChooserName());
+        }
+        if ( QString::compare(controlMeasure.GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+          pvlMeasure += PvlKeyword("DateTime", controlMeasure.GetDateTime());
+        }
+        if ( controlMeasure.IsEditLocked() ) {
+          pvlMeasure += PvlKeyword("EditLock", "True");
+        }
+
+        if ( controlMeasure.IsIgnored() ) {
+          pvlMeasure += PvlKeyword("Ignore", "True");
+        }
+
+        if ( controlMeasure.GetSample() != Isis::Null) {
+          pvlMeasure += PvlKeyword("Sample", toString(controlMeasure.GetSample()));
+
+        }
+
+        if ( controlMeasure.GetLine() != Isis::Null ) {
+          pvlMeasure += PvlKeyword("Line", toString(controlMeasure.GetLine()));
+        }
+
+        if ( controlMeasure.GetDiameter() != Isis::Null
+             && controlMeasure.GetDiameter() != 0. ) {
+          pvlMeasure += PvlKeyword("Diameter", toString(controlMeasure.GetDiameter()));
+        }
+
+        if ( controlMeasure.GetAprioriSample() != Isis::Null ) {
+          pvlMeasure += PvlKeyword("AprioriSample", toString(controlMeasure.GetAprioriSample()));
+        }
+
+        if ( controlMeasure.GetAprioriLine() != Isis::Null ) {
+          pvlMeasure += PvlKeyword("AprioriLine", toString(controlMeasure.GetAprioriLine()));
+        }
+
+        if ( controlMeasure.GetSampleSigma() != Isis::Null ) {
+          pvlMeasure += PvlKeyword("SampleSigma", toString(controlMeasure.GetSampleSigma()),
+                                   "pixels");
+        }
+
+        if ( controlMeasure.GetLineSigma() != Isis::Null ) {
+          pvlMeasure += PvlKeyword("LineSigma", toString(controlMeasure.GetLineSigma()),
+                                   "pixels");
+        }
+
+        if ( controlMeasure.GetSampleResidual() != Isis::Null
+             && controlMeasure.GetSampleResidual() != 0. ) {
+          pvlMeasure += PvlKeyword("SampleResidual", toString(controlMeasure.GetSampleResidual()),
+                                   "pixels");
+        }
+
+        if ( controlMeasure.GetLineResidual() != Isis::Null
+             && controlMeasure.GetLineResidual() != 0. ) {
+          pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
+                                   "pixels");
+        }
+
+        if ( controlMeasure.IsRejected() ) {
+          pvlMeasure += PvlKeyword("JigsawRejected", toString(controlMeasure.IsRejected()));
+        }
+
+        foreach (ControlMeasureLogData log, controlMeasure.GetLogDataEntries()) {
+          pvlMeasure += log.ToKeyword();
+        }
+
+        if ( controlPoint->HasRefMeasure() &&
+           controlPoint->IndexOfRefMeasure() == j &&
+           controlPoint->IsReferenceExplicit() ) {
+          pvlMeasure += PvlKeyword("Reference", "True");
+        }
+        pvlPoint.addGroup(pvlMeasure);
+      }
+      network.addObject(pvlPoint);
+    }
+    return pvl;
+  }
+
+
+  /**
+   * Read a control network file and prepare the data to be converted into
+   * a control network.
+   *
+   * @param netFile The control network file to read.
+   * @param progress The progress object to track reading points.
+   */
+  void ControlNetVersioner::read(const FileName netFile, Progress *progress) {
+    try {
+
+      const Pvl &network(netFile.expanded());
+
+      if ( network.hasObject("ProtoBuffer") ) {
+        readProtobuf(network, netFile, progress);
+      }
+      else if ( network.hasObject("ControlNetwork") ) {
+        readPvl(network, progress);
+      }
+      else {
+        QString msg = "Could not determine the control network file type";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
     catch (IException &e) {
-      IString msg = "Reading the control network [" + networkFileName.name()
-          + "] failed";
+      QString msg = "Reading the control network [" + netFile.name()
+                    + "] failed";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
   }
 
-  
+
   /**
-   * This will write a control net file object to disk.
+   * Read a Pvl control network and prepare the data to be converted into a
+   * control network.
    *
-   * @param file file The output filename that will be written to
-   * @param fileData The ControlNetFile representation to write
-   * @param pvl True if the output format should be Pvl, false if not
-   *
+   * @param network The Pvl network data
+   * @param progress The progress object to track reading points.
    */
-  void ControlNetVersioner::Write(const FileName &file,
-      const LatestControlNetFile &fileData, bool pvl) {
-    
-    if (pvl) {
-      fileData.toPvl().write(file.expanded());
+  void ControlNetVersioner::readPvl(const Pvl &network, Progress *progress) {
+    const PvlObject &controlNetwork = network.findObject("ControlNetwork");
+
+    int version = 1;
+
+    if ( controlNetwork.hasKeyword("Version") ) {
+      version = toInt(controlNetwork["Version"][0]);
     }
-    else {
-      fileData.Write(file);
+
+    switch ( version ) {
+      case 1:
+        readPvlV0001(controlNetwork, progress);
+        break;
+      case 2:
+        readPvlV0002(controlNetwork, progress);
+        break;
+      case 3:
+        readPvlV0003(controlNetwork, progress);
+        break;
+      case 4:
+        readPvlV0004(controlNetwork, progress);
+        break;
+      case 5:
+        readPvlV0005(controlNetwork, progress);
+        break;
+      default:
+        QString msg = "The Pvl file version [" + toString(version)
+                      + "] is not supported";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
 
   /**
-   * This interprets a Pvl network of any version. Since we already have the
-   *   Pvl in memory (we need it to figure out if it is a Pvl network) it
-   *   does not actually call Pvl::Read.
+   * read a version 1 Pvl control network and convert the data into control points.
    *
-   * The update cycle is contained in this method. Old versions of Pvl will be
-   *   updated until they reach the latest version and then LatestPvlToBinary
-   *   will be called to convert it back to a LatestControlNetFile.
-   *
-   * To add a new version, you only need to add a case to the switch that
-   *   calls a method (ConvertVersionAToVersionB). No other code should be
-   *   necessary. ConvertVersionAToVersionB is expected to update the Pvl's
-   *   version number.
-   *
-   * @param pvl The pvl network obtained from Pvl::Read on the input filename
+   * @param network The control network PvlObject.
+   * @param progress The progress object to track reading points.
    */
-  LatestControlNetFile *ControlNetVersioner::ReadPvlNetwork(Pvl pvl) {
-    
-    PvlObject &network = pvl.findObject("ControlNetwork");
+  void ControlNetVersioner::readPvlV0001(const PvlObject &network, Progress *progress) {
+    // initialize the header
+    ControlNetHeaderV0001 header;
 
-    if (!network.hasKeyword("Version"))
-      network += PvlKeyword("Version", "1");
-
-    int version = toInt(network["Version"][0]);
-
-    while (version != LATEST_PVL_VERSION) {
-      int previousVersion = version;
-
-      switch (version) {
-        case 1:
-          ConvertVersion1ToVersion2(network);
-          break;
-
-        case 2:
-          ConvertVersion2ToVersion3(network);
-          break;
-
-        case 3:
-          ConvertVersion3ToVersion4(network);
-          break;
-
-        default:
-          IString msg = "The Pvl file version [" + IString(version) + "] is not"
-              " supported";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-      }
-
-      version = toInt(network["Version"][0]);
-
-      if (version == previousVersion) {
-        IString msg = "Cannot update from version [" + IString(version) + "] "
-            "to any other version";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
+    try {
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
-    return LatestPvlToBinary(network);
-  }
-
-
-  /**
-   * Convert a pvl (in the latest version) back to binary (LatestControlNetFile)
-   *
-   * This does exactly what you think it would do - it copies PvlKeywords into
-   *   protocol buffer objects. Helper methods Copy(...) do most of the work.
-   *   Any unexpected keywords in the Pvl will cause an exception to be thrown.
-   *   Not enough keywords in the Pvl will cause an exception to be thrown.
-   *   The returned LatestControlNetFile is guaranteed to have all required
-   *   fields.
-   *
-   * @param network The input PVL Control Network to convert
-   */
-  LatestControlNetFile *ControlNetVersioner::LatestPvlToBinary(PvlObject &network) {
-    
-    LatestControlNetFile *latest = new LatestControlNetFile;
-
-    ControlNetFileHeaderV0002 &header = latest->GetNetworkHeader();
-
-    header.set_networkid(network.findKeyword("NetworkId")[0].toLatin1().data());
-    header.set_targetname(network.findKeyword("TargetName")[0].toLatin1().data());
-    header.set_created(network.findKeyword("Created")[0].toLatin1().data());
-    header.set_lastmodified(network.findKeyword("LastModified")[0].toLatin1().data());
-    header.set_description(network.findKeyword("Description")[0].toLatin1().data());
-    header.set_username(network.findKeyword("UserName")[0].toLatin1().data());
-    header.add_pointmessagesizes(0); // Just to pass the "IsInitialized" test
-
-    if (!header.IsInitialized()) {
-      IString msg = "There is missing required information in the network "
-          "header";
-      throw IException(IException::Io, msg, _FILEINFO_);
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(network.objects());
+      progress->CheckStatus();
     }
 
-    QList<ControlPointFileEntryV0002> &points = latest->GetNetworkPoints();
-
+    // initialize the control points
     for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
-      ControlPointFileEntryV0002 point;
-      PvlObject &object = network.object(objectIndex);
+      try {
 
-      Copy(object, "PointId",
-           point, &ControlPointFileEntryV0002::set_id);
-      Copy(object, "ChooserName",
-           point, &ControlPointFileEntryV0002::set_choosername);
-      Copy(object, "DateTime",
-           point, &ControlPointFileEntryV0002::set_datetime);
-      Copy(object, "AprioriXYZSourceFile",
-           point, &ControlPointFileEntryV0002::set_apriorisurfpointsourcefile);
-      Copy(object, "AprioriRadiusSourceFile",
-           point, &ControlPointFileEntryV0002::set_aprioriradiussourcefile);
-      Copy(object, "JigsawRejected",
-           point, &ControlPointFileEntryV0002::set_jigsawrejected);
-      Copy(object, "EditLock",
-           point, &ControlPointFileEntryV0002::set_editlock);
-      Copy(object, "Ignore",
-           point, &ControlPointFileEntryV0002::set_ignore);
-      Copy(object, "AprioriX",
-           point, &ControlPointFileEntryV0002::set_apriorix);
-      Copy(object, "AprioriY",
-           point, &ControlPointFileEntryV0002::set_aprioriy);
-      Copy(object, "AprioriZ",
-           point, &ControlPointFileEntryV0002::set_aprioriz);
-      Copy(object, "AdjustedX",
-           point, &ControlPointFileEntryV0002::set_adjustedx);
-      Copy(object, "AdjustedY",
-           point, &ControlPointFileEntryV0002::set_adjustedy);
-      Copy(object, "AdjustedZ",
-           point, &ControlPointFileEntryV0002::set_adjustedz);
-      Copy(object, "LatitudeConstrained",
-           point, &ControlPointFileEntryV0002::set_latitudeconstrained);
-      Copy(object, "LongitudeConstrained",
-           point, &ControlPointFileEntryV0002::set_longitudeconstrained);
-      Copy(object, "RadiusConstrained",
-           point, &ControlPointFileEntryV0002::set_radiusconstrained);
+        PvlObject pointObject = network.object(objectIndex);
+        ControlPointV0001 point(pointObject, m_header.targetName);
 
-      if (object["PointType"][0] == "Fixed")
-        point.set_type(ControlPointFileEntryV0002::Fixed);
-      else if (object["PointType"][0] == "Constrained")
-        point.set_type(ControlPointFileEntryV0002::Constrained);
-      else
-        point.set_type(ControlPointFileEntryV0002::Free);
+        m_points.append( createPoint(point) );
 
-      if (object.hasKeyword("AprioriXYZSource")) {
-        IString source = object["AprioriXYZSource"][0];
+        if (progress) {
+          progress->CheckStatus();
+        }
 
-        if (source == "None") {
-          point.set_apriorisurfpointsource(ControlPointFileEntryV0002::None);
-        }
-        else if (source == "User") {
-          point.set_apriorisurfpointsource(ControlPointFileEntryV0002::User);
-        }
-        else if (source == "AverageOfMeasures") {
-          point.set_apriorisurfpointsource(
-              ControlPointFileEntryV0002::AverageOfMeasures);
-        }
-        else if (source == "Reference") {
-          point.set_apriorisurfpointsource(
-              ControlPointFileEntryV0002::Reference);
-        }
-        else if (source == "Basemap") {
-          point.set_apriorisurfpointsource(
-              ControlPointFileEntryV0002::Basemap);
-        }
-        else if (source == "BundleSolution") {
-          point.set_apriorisurfpointsource(
-              ControlPointFileEntryV0002::BundleSolution);
-        }
-        else {
-          IString msg = "Invalid AprioriXYZSource [" + source + "]";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
       }
-
-      if (object.hasKeyword("AprioriRadiusSource")) {
-        IString source = object["AprioriRadiusSource"][0];
-
-        if (source == "None") {
-          point.set_aprioriradiussource(ControlPointFileEntryV0002::None);
-        }
-        else if (source == "User") {
-          point.set_aprioriradiussource(ControlPointFileEntryV0002::User);
-        }
-        else if (source == "AverageOfMeasures") {
-          point.set_aprioriradiussource(ControlPointFileEntryV0002::AverageOfMeasures);
-        }
-        else if (source == "Ellipsoid") {
-          point.set_aprioriradiussource(ControlPointFileEntryV0002::Ellipsoid);
-        }
-        else if (source == "DEM") {
-          point.set_aprioriradiussource(ControlPointFileEntryV0002::DEM);
-        }
-        else if (source == "BundleSolution") {
-          point.set_aprioriradiussource(ControlPointFileEntryV0002::BundleSolution);
-        }
-        else {
-          std::string msg = "Invalid AprioriRadiusSource, [" + source + "]";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
       }
-
-      if (object.hasKeyword("AprioriCovarianceMatrix")) {
-        PvlKeyword &matrix = object["AprioriCovarianceMatrix"];
-
-        point.add_aprioricovar(toDouble(matrix[0]));
-        point.add_aprioricovar(toDouble(matrix[1]));
-        point.add_aprioricovar(toDouble(matrix[2]));
-        point.add_aprioricovar(toDouble(matrix[3]));
-        point.add_aprioricovar(toDouble(matrix[4]));
-        point.add_aprioricovar(toDouble(matrix[5]));
-      }
-
-      if (object.hasKeyword("AdjustedCovarianceMatrix")) {
-        PvlKeyword &matrix = object["AdjustedCovarianceMatrix"];
-
-        point.add_adjustedcovar(toDouble(matrix[0]));
-        point.add_adjustedcovar(toDouble(matrix[1]));
-        point.add_adjustedcovar(toDouble(matrix[2]));
-        point.add_adjustedcovar(toDouble(matrix[3]));
-        point.add_adjustedcovar(toDouble(matrix[4]));
-        point.add_adjustedcovar(toDouble(matrix[5]));
-      }
-
-      //  Process Measures
-      for (int groupIndex = 0; groupIndex < object.groups(); groupIndex ++) {
-        PvlGroup &group = object.group(groupIndex);
-        ControlPointFileEntryV0002::Measure measure;
-
-        Copy(group, "SerialNumber",
-             measure, &ControlPointFileEntryV0002::Measure::set_serialnumber);
-        Copy(group, "ChooserName",
-             measure, &ControlPointFileEntryV0002::Measure::set_choosername);
-        Copy(group, "Sample",
-             measure, &ControlPointFileEntryV0002::Measure::set_sample);
-        Copy(group, "Line",
-             measure, &ControlPointFileEntryV0002::Measure::set_line);
-        Copy(group, "SampleResidual",
-             measure, &ControlPointFileEntryV0002::Measure::set_sampleresidual);
-        Copy(group, "LineResidual",
-             measure, &ControlPointFileEntryV0002::Measure::set_lineresidual);
-        Copy(group, "DateTime",
-             measure, &ControlPointFileEntryV0002::Measure::set_datetime);
-        Copy(group, "Diameter",
-             measure, &ControlPointFileEntryV0002::Measure::set_diameter);
-        Copy(group, "EditLock",
-             measure, &ControlPointFileEntryV0002::Measure::set_editlock);
-        Copy(group, "Ignore",
-             measure, &ControlPointFileEntryV0002::Measure::set_ignore);
-        Copy(group, "JigsawRejected",
-             measure, &ControlPointFileEntryV0002::Measure::set_jigsawrejected);
-        Copy(group, "AprioriSample",
-             measure, &ControlPointFileEntryV0002::Measure::set_apriorisample);
-        Copy(group, "AprioriLine",
-             measure, &ControlPointFileEntryV0002::Measure::set_aprioriline);
-        Copy(group, "SampleSigma",
-             measure, &ControlPointFileEntryV0002::Measure::set_samplesigma);
-        Copy(group, "LineSigma",
-             measure, &ControlPointFileEntryV0002::Measure::set_linesigma);
-
-        if (group.hasKeyword("Reference")) {
-          if (group["Reference"][0].toLower() == "true")
-            point.set_referenceindex(groupIndex);
-
-          group.deleteKeyword("Reference");
-        }
-
-        QString type = group["MeasureType"][0].toLower();
-        if (type == "candidate")
-          measure.set_type(ControlPointFileEntryV0002::Measure::Candidate);
-        else if (type == "manual")
-          measure.set_type(ControlPointFileEntryV0002::Measure::Manual);
-        else if (type == "registeredpixel")
-          measure.set_type(ControlPointFileEntryV0002::Measure::RegisteredPixel);
-        else if (type == "registeredsubpixel")
-          measure.set_type(ControlPointFileEntryV0002::Measure::RegisteredSubPixel);
-        else
-          throw IException(IException::Io,
-                           "Unknown measure type [" + type + "]",
-                           _FILEINFO_);
-        group.deleteKeyword("MeasureType");
-
-        for (int key = 0; key < group.keywords(); key++) {
-          ControlMeasureLogData interpreter(group[key]);
-          if (!interpreter.IsValid()) {
-            IString msg = "Unhandled or duplicate keywords in control measure ["
-                + group[key].name() + "]";
-            throw IException(IException::Programmer, msg, _FILEINFO_);
-          }
-          else {
-            *measure.add_log() = interpreter.ToProtocolBuffer();
-          }
-        }
-
-        *point.add_measures() = measure;
-      }
-
-      if (!point.IsInitialized()) {
-        IString msg = "There is missing required information in the control "
-            "points or measures";
-        throw IException(IException::Io, msg, _FILEINFO_);
-      }
-
-      points.append(point);
     }
-
-    return latest;
   }
 
 
   /**
-   * This method is designed to read any and all binary networks. Old versions
-   *   will be sent to ReadPvlNetwork.
+   * read a version 2 Pvl control network and convert the data into control points.
    *
-   * @param header The Pvl at the top of the binary file
-   * @param filename The file that contains the binary network
-   * @return In-memory representation of the network
+   * @param network The control network PvlObject.
+   * @param progress The progress object to track reading points.
    */
-  LatestControlNetFile *ControlNetVersioner::ReadBinaryNetwork(const Pvl &header,
-                                                               const FileName &filename) {
-    
-    // Find the binary cnet version by any means necessary
+  void ControlNetVersioner::readPvlV0002(const PvlObject &network, Progress *progress) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0002 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(network.objects());
+      progress->CheckStatus();
+    }
+
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject pointObject = network.object(objectIndex);
+        ControlPointV0002 point(pointObject);
+        m_points.append( createPoint(point) );
+
+        if (progress) {
+          progress->CheckStatus();
+        }
+
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
+  }
+
+
+  /**
+   * read a version 3 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   * @param progress The progress object to track reading points.
+   */
+  void ControlNetVersioner::readPvlV0003(const PvlObject &network, Progress *progress) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0003 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(network.objects());
+      progress->CheckStatus();
+    }
+
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject pointObject = network.object(objectIndex);
+        ControlPointV0003 point(pointObject);
+        m_points.append( createPoint(point) );
+
+        if (progress) {
+          progress->CheckStatus();
+        }
+
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
+  }
+
+
+  /**
+   * read a version 4 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   * @param progress The progress object to track reading points.
+   */
+  void ControlNetVersioner::readPvlV0004(const PvlObject &network, Progress *progress) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0004 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(network.objects());
+      progress->CheckStatus();
+    }
+
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject pointObject = network.object(objectIndex);
+        ControlPointV0004 point(pointObject);
+        m_points.append( createPoint(point) );
+
+        if (progress) {
+          progress->CheckStatus();
+        }
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
+  }
+
+
+  /**
+   * read a version 5 Pvl control network and convert the data into control points.
+   *
+   * @param network The control network PvlObject.
+   * @param progress The progress object to track reading points.
+   */
+  void ControlNetVersioner::readPvlV0005(const PvlObject &network, Progress *progress) {
+    // initialize the header
+    try {
+      ControlNetHeaderV0005 header;
+      header.networkID = network.findKeyword("NetworkId")[0];
+      header.targetName = network.findKeyword("TargetName")[0];
+      header.created = network.findKeyword("Created")[0];
+      header.lastModified = network.findKeyword("LastModified")[0];
+      header.description = network.findKeyword("Description")[0];
+      header.userName = network.findKeyword("UserName")[0];
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(network.objects());
+      progress->CheckStatus();
+    }
+
+    // initialize the control points
+    for (int objectIndex = 0; objectIndex < network.objects(); objectIndex ++) {
+      try {
+        PvlObject pointObject = network.object(objectIndex);
+        ControlPointV0005 point(pointObject);
+        m_points.append( createPoint(point) );
+
+        if (progress) {
+          progress->CheckStatus();
+        }
+      }
+      catch (IException &e) {
+        QString msg = "Failed to initialize control point at index ["
+                      + toString(objectIndex) + "].";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
+    }
+  }
+
+
+  /**
+   * Read a protobuf control network and prepare the data to be converted into a
+   * control network.
+   *
+   * @param header The Pvl network header that contains the version number.
+   * @param netFile The filename of the control network file.
+   * @param progress The progress object to track reading points.
+   */
+  void ControlNetVersioner::readProtobuf(const Pvl &header, const FileName netFile, Progress *progress) {
     int version = 1;
 
     const PvlObject &protoBuf = header.findObject("ProtoBuffer");
     const PvlGroup &netInfo = protoBuf.findGroup("ControlNetworkInfo");
 
-    if (netInfo.hasKeyword("Version"))
+    if ( netInfo.hasKeyword("Version") ) {
       version = toInt(netInfo["Version"][0]);
-
-    // Okay, let's instantiate the correct ControlNetFile for this version
-    ControlNetFile *cnetFile;
-    switch (version) {
+    }
+    switch ( version ) {
       case 1:
-        cnetFile = new ControlNetFileV0001;
+        readProtobufV0001(header, netFile, progress);
         break;
-
       case 2:
-        cnetFile = new ControlNetFileV0002;
+        readProtobufV0002(header, netFile, progress);
         break;
-
+      case 5:
+        readProtobufV0005(header, netFile, progress);
+        break;
       default:
-        IString msg = "The binary file version [" + IString(version) + "] is "
-            "not supported";
+        QString msg = "The Protobuf file version [" + toString(version)
+                      + "] is not supported";
         throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    // Now read and update as necessary
-    cnetFile->Read(header, filename);
-
-    if (version != LATEST_BINARY_VERSION) {
-      Pvl pvl(cnetFile->toPvl());
-
-      delete cnetFile;
-      cnetFile = NULL;
-
-      return ReadPvlNetwork(pvl);
-    }
-    else {
-      return (LatestControlNetFile *)cnetFile;
     }
   }
 
 
   /**
-   * This converts pvl networks from their implied version 1 to version 2.
+   * Read a protobuf version 1 control network and prepare the data to be
+   *  converted into a control network.
    *
-   * We're trying to handle all cases of old keywords from over a very long
-   *   time in this method, and end up with a consistent set of keywords so
-   *   there is no more duplication or confusion about what will be in the Pvl.
-   *
-   * Future conversions will have similar operations in them but will probably
-   *   be smaller/less work.
-   *
-   * Modify in place to prevent unnecessary memory usage.
-   *
-   * Version 2 is the first version made inside this versioner. It is the
-   *   first time keyword names and values cannot vary.
-   *
-   * @param network Input is Version 1, must be modified to conform to Version 2
+   * @param netFile The filename of the control network file.
+   * @param progress The progress object to track reading points.
    */
-  void ControlNetVersioner::ConvertVersion1ToVersion2(PvlObject &network) {
-    
-    network["Version"] = "2";
+  void ControlNetVersioner::readProtobufV0001(const Pvl &header, const FileName netFile, Progress *progress) {
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
 
-    // Really... Projection::TargetRadii should be making this call
-    NaifStatus::CheckErrors();
+    BigInt coreStartPos = protoBufferCore["StartByte"];
+    BigInt coreLength = protoBufferCore["Bytes"];
 
-    if (QString(network["TargetName"]).startsWith("MRO/")) {
-      network["TargetName"] = "Mars";
+    fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    if ( !input.is_open() ) {
+      QString msg = "Failed to open protobuf file [" + netFile.name() + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    PvlGroup radii;
+    input.seekg(coreStartPos, ios::beg);
+    IstreamInputStream inStream(&input);
+    CodedInputStream codedInStream(&inStream);
+    codedInStream.PushLimit(coreLength);
+    // max 512MB, warn at 400MB
+    codedInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+
+    // Now stream the rest of the input into the google protocol buffer.
+    ControlNetFileProtoV0001 protoNet;
     try {
-      radii = Target::radiiGroup(network["TargetName"][0]);
+      if ( !protoNet.ParseFromCodedStream(&codedInStream) ) {
+        QString msg = "Failed to read input PB file [" + netFile.name() + "].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
     }
     catch (IException &e) {
-      try {
-        NaifStatus::CheckErrors();
-      }
-      catch (IException &) {
-      }
+      QString msg = "Cannot parse binary protobuf file";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+    catch (...) {
+      QString msg = "Cannot parse binary PB file";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
-      QString msg = "Unable to get convert ControlNet Version 1 to Version 2.";
+    const PvlObject &logDataInfo = protoBufferInfo.findObject("LogData");
+    BigInt logStartPos = logDataInfo["StartByte"];
+    BigInt logLength = logDataInfo["Bytes"];
+
+    input.clear();
+    input.seekg(logStartPos, ios::beg);
+    IstreamInputStream logInStream(&input);
+    CodedInputStream codedLogInStream(&logInStream);
+    codedLogInStream.PushLimit(logLength);
+    // max 512MB, warn at 400MB
+    codedLogInStream.SetTotalBytesLimit(1024 * 1024 * 512, 1024 * 1024 * 400);
+
+    // Now stream the rest of the input into the google protocol buffer.
+    ControlNetLogDataProtoV0001 protoLogData;
+    try {
+      if ( !protoLogData.ParseFromCodedStream(&codedLogInStream) ) {
+        QString msg = "Failed to read log data in protobuf file [" + netFile.name() + "].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+    catch (...) {
+      QString msg = "Cannot parse binary protobuf file's log data";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // Create the header
+    try {
+      ControlNetHeaderV0002 header;
+      header.networkID = protoNet.networkid().c_str();
+      if ( protoNet.has_targetname() ) {
+        header.targetName = protoNet.targetname().c_str();
+      }
+      else {
+        header.targetName = "";
+      }
+      header.created = protoNet.created().c_str();
+      header.lastModified = protoNet.lastmodified().c_str();
+      header.description = protoNet.description().c_str();
+      header.userName = protoNet.username().c_str();
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to parse the header from the protobuf control network file.";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps( protoNet.points_size() );
+      progress->CheckStatus();
+    }
+
+    // Create the control points
+    for (int i = 0; i < protoNet.points_size(); i++) {
+      try {
+        QSharedPointer<ControlNetFileProtoV0001_PBControlPoint>
+              protoPoint(new ControlNetFileProtoV0001_PBControlPoint(protoNet.points(i)));
+        QSharedPointer<ControlNetLogDataProtoV0001_Point>
+              protoPointLogData(new ControlNetLogDataProtoV0001_Point(protoLogData.points(i)));
+        ControlPointV0002 point(protoPoint, protoPointLogData);
+        m_points.append( createPoint(point) );
+
+        if (progress) {
+          progress->CheckStatus();
+        }
+
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert version 1 protobuf control point at index ["
+                      + toString(i) + "] into a ControlPoint.";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+  }
+
+
+  /**
+   * Read a protobuf version 2 control network and prepare the data to be
+   *  converted into a control network.
+   *
+   * @param netFile The filename of the control network file.
+   * @param progress The progress object to track reading points.
+   */
+  void ControlNetVersioner::readProtobufV0002(const Pvl &header, const FileName netFile, Progress *progress) {
+    // read the header protobuf object
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
+
+    BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
+    BigInt headerLength = protoBufferCore["HeaderBytes"];
+
+    fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    if ( !input.is_open() ) {
+      QString msg = "Failed to open control network file" + netFile.name();
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    input.seekg(headerStartPos, ios::beg);
+    streampos filePos = input.tellg();
+
+    ControlNetFileHeaderV0002 protoHeader;
+    try {
+      IstreamInputStream headerInStream(&input);
+      CodedInputStream headerCodedInStream(&headerInStream);
+      // max 512MB, warn at 400MB
+      headerCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                             1024 * 1024 * 400);
+      CodedInputStream::Limit oldLimit = headerCodedInStream.PushLimit(headerLength);
+      if ( !protoHeader.ParseFromCodedStream(&headerCodedInStream) ) {
+        QString msg = "Failed to parse protobuf header from input control net file ["
+                      + netFile.name() + "]";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      headerCodedInStream.PopLimit(oldLimit);
+      filePos += headerLength;
+    }
+    catch (...) {
+      QString msg = "An error occured while reading the protobuf control network header.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
+    // initialize the header from the protobuf header
+    try {
+      ControlNetHeaderV0004 header;
+      header.networkID = protoHeader.networkid().c_str();
+      if ( protoHeader.has_targetname() ) {
+        header.targetName = protoHeader.targetname().c_str();
+      }
+      else {
+        header.targetName = "";
+      }
+      header.created = protoHeader.created().c_str();
+      header.lastModified = protoHeader.lastmodified().c_str();
+      header.description = protoHeader.description().c_str();
+      header.userName = protoHeader.username().c_str();
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
-    Distance equatorialRadius(radii["EquatorialRadius"], Distance::Meters);
-    Distance polarRadius(radii["PolarRadius"], Distance::Meters);
+    // read each protobuf control point and then initialize it
+    // For some reason, reading the header causes the input stream to fail so reopen the file
+    input.close();
+    input.open(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    input.seekg(filePos, ios::beg);
+    IstreamInputStream pointInStream(&input);
+    int numPoints = protoHeader.pointmessagesizes_size();
 
-    for (int cpIndex = 0; cpIndex < network.objects(); cpIndex ++) {
-      PvlObject &cp = network.object(cpIndex);
+    if (progress) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(numPoints);
+      progress->CheckStatus();
+    }
 
-      if (cp.hasKeyword("Held") && cp["Held"][0] == "True")
-        cp["PointType"] = "Ground";
+    for (int pointIndex = 0; pointIndex < numPoints; pointIndex ++) {
+      QSharedPointer<ControlPointFileEntryV0002> newPoint(new ControlPointFileEntryV0002);
 
-      if (cp.hasKeyword("AprioriLatLonSource"))
-        cp["AprioriLatLonSource"].setName("AprioriXYZSource");
-
-      if (cp.hasKeyword("AprioriLatLonSourceFile"))
-        cp["AprioriLatLonSourceFile"].setName("AprioriXYZSourceFile");
-
-      if (cp.hasKeyword("AprioriLatitude")) {
-        SurfacePoint apriori(
-            Latitude(toDouble(cp["AprioriLatitude"][0]), Angle::Degrees),
-            Longitude(toDouble(cp["AprioriLongitude"][0]), Angle::Degrees),
-            Distance(toDouble(cp["AprioriRadius"][0]), Distance::Meters));
-
-        cp += PvlKeyword("AprioriX", toString(apriori.GetX().meters()), "meters");
-        cp += PvlKeyword("AprioriY", toString(apriori.GetY().meters()), "meters");
-        cp += PvlKeyword("AprioriZ", toString(apriori.GetZ().meters()), "meters");
+      try {
+        CodedInputStream pointCodedInStream(&pointInStream);
+        pointCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                              1024 * 1024 * 400);
+        int pointSize = protoHeader.pointmessagesizes(pointIndex);
+        CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(pointSize);
+        newPoint->ParseFromCodedStream(&pointCodedInStream);
+        pointCodedInStream.PopLimit(oldPointLimit);
+      }
+      catch (...) {
+        QString msg = "Failed to read protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "].";
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
-      if (cp.hasKeyword("Latitude")) {
-        SurfacePoint adjusted(
-            Latitude(toDouble(cp["Latitude"][0]), Angle::Degrees),
-            Longitude(toDouble(cp["Longitude"][0]), Angle::Degrees),
-            Distance(toDouble(cp["Radius"][0]), Distance::Meters));
+      try {
+        ControlPointV0004 point(newPoint);
+        m_points.append( createPoint(point) );
 
-        cp += PvlKeyword("AdjustedX", toString(adjusted.GetX().meters()), "meters");
-        cp += PvlKeyword("AdjustedY", toString(adjusted.GetY().meters()), "meters");
-        cp += PvlKeyword("AdjustedZ", toString(adjusted.GetZ().meters()), "meters");
-
-        if (!cp.hasKeyword("AprioriLatitude")) {
-          cp += PvlKeyword("AprioriX", toString(adjusted.GetX().meters()), "meters");
-          cp += PvlKeyword("AprioriY", toString(adjusted.GetY().meters()), "meters");
-          cp += PvlKeyword("AprioriZ", toString(adjusted.GetZ().meters()), "meters");
+        if (progress) {
+          progress->CheckStatus();
         }
+
       }
-
-      if (cp.hasKeyword("X"))
-        cp["X"].setName("AdjustedX");
-
-      if (cp.hasKeyword("Y"))
-        cp["Y"].setName("AdjustedY");
-
-      if (cp.hasKeyword("Z"))
-        cp["Z"].setName("AdjustedZ");
-
-      if (cp.hasKeyword("AprioriSigmaLatitude") ||
-         cp.hasKeyword("AprioriSigmaLongitude") ||
-         cp.hasKeyword("AprioriSigmaRadius")) {
-        double sigmaLat = 10000.0;
-        double sigmaLon = 10000.0;
-        double sigmaRad = 10000.0;
-
-        if (cp.hasKeyword("AprioriSigmaLatitude")) {
-          if (toDouble(cp["AprioriSigmaLatitude"][0]) > 0 &&
-              toDouble(cp["AprioriSigmaLatitude"][0]) < sigmaLat)
-            sigmaLat = cp["AprioriSigmaLatitude"];
-
-          cp += PvlKeyword("LatitudeConstrained", "True");
-        }
-
-        if (cp.hasKeyword("AprioriSigmaLongitude")) {
-          if (toDouble(cp["AprioriSigmaLongitude"][0]) > 0 &&
-              toDouble(cp["AprioriSigmaLongitude"][0]) < sigmaLon)
-            sigmaLon = cp["AprioriSigmaLongitude"];
-
-          cp += PvlKeyword("LongitudeConstrained", "True");
-        }
-
-        if (cp.hasKeyword("AprioriSigmaRadius")) {
-          if (toDouble(cp["AprioriSigmaRadius"][0]) > 0 &&
-              toDouble(cp["AprioriSigmaRadius"][0]) < sigmaRad)
-            sigmaRad = cp["AprioriSigmaRadius"];
-
-          cp += PvlKeyword("RadiusConstrained", "True");
-        }
-
-        SurfacePoint tmp;
-        tmp.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-        tmp.SetRectangular(
-            Displacement(cp["AprioriX"], Displacement::Meters),
-            Displacement(cp["AprioriY"], Displacement::Meters),
-            Displacement(cp["AprioriZ"], Displacement::Meters));
-        tmp.SetSphericalSigmasDistance(
-          Distance(sigmaLat, Distance::Meters),
-          Distance(sigmaLon, Distance::Meters),
-          Distance(sigmaRad, Distance::Meters));
-
-        PvlKeyword aprioriCovarMatrix("AprioriCovarianceMatrix");
-        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 0));
-        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 1));
-        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 2));
-        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 1));
-        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 2));
-        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(2, 2));
-
-        cp += aprioriCovarMatrix;
-      }
-
-      if (cp.hasKeyword("AdjustedSigmaLatitude") ||
-          cp.hasKeyword("AdjustedSigmaLongitude") ||
-          cp.hasKeyword("AdjustedSigmaRadius")) {
-        double sigmaLat = 10000.0;
-        double sigmaLon = 10000.0;
-        double sigmaRad = 10000.0;
-
-        if (cp.hasKeyword("AdjustedSigmaLatitude")) {
-          if (toDouble(cp["AdjustedSigmaLatitude"][0]) > 0 &&
-              toDouble(cp["AdjustedSigmaLatitude"][0]) < sigmaLat)
-            sigmaLat = cp["AdjustedSigmaLatitude"];
-        }
-
-        if (cp.hasKeyword("AdjustedSigmaLongitude")) {
-          if (toDouble(cp["AdjustedSigmaLongitude"][0]) > 0 &&
-              toDouble(cp["AdjustedSigmaLongitude"][0]) < sigmaLon)
-            sigmaLon = cp["AdjustedSigmaLongitude"];
-        }
-
-        if (cp.hasKeyword("AdjustedSigmaRadius")) {
-          if (toDouble(cp["AdjustedSigmaRadius"][0]) > 0 &&
-              toDouble(cp["AdjustedSigmaRadius"][0]) < sigmaRad)
-            sigmaRad = cp["AdjustedSigmaRadius"];
-        }
-
-        SurfacePoint tmp;
-        tmp.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
-        tmp.SetRectangular(Displacement(cp["AdjustedX"], Displacement::Meters),
-                           Displacement(cp["AdjustedY"], Displacement::Meters),
-                           Displacement(cp["AdjustedZ"], Displacement::Meters));
-        tmp.SetSphericalSigmasDistance(Distance(sigmaLat, Distance::Meters),
-                                       Distance(sigmaLon, Distance::Meters),
-                                       Distance(sigmaRad, Distance::Meters));
-
-        PvlKeyword adjustedCovarMatrix("AdjustedCovarianceMatrix");
-        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 0));
-        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 1));
-        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 2));
-        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 1));
-        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 2));
-        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(2, 2));
-
-        cp += adjustedCovarMatrix;
-      }
-
-      if (cp.hasKeyword("ApostCovarianceMatrix"))
-        cp["ApostCovarianceMatrix"].setName("AdjustedCovarianceMatrix");
-
-      if (!cp.hasKeyword("LatitudeConstrained")) {
-        if (cp.hasKeyword("AprioriCovarianceMatrix"))
-          cp += PvlKeyword("LatitudeConstrained", "True");
-        else
-          cp += PvlKeyword("LatitudeConstrained", "False");
-      }
-
-      if (!cp.hasKeyword("LongitudeConstrained")) {
-        if (cp.hasKeyword("AprioriCovarianceMatrix"))
-          cp += PvlKeyword("LongitudeConstrained", "True");
-        else
-          cp += PvlKeyword("LongitudeConstrained", "False");
-      }
-
-      if (!cp.hasKeyword("RadiusConstrained")) {
-        if (cp.hasKeyword("AprioriCovarianceMatrix"))
-          cp += PvlKeyword("RadiusConstrained", "True");
-        else
-          cp += PvlKeyword("RadiusConstrained", "False");
-      }
-
-      // Delete anything that has no value...
-      for (int cpKeyIndex = 0; cpKeyIndex < cp.keywords(); cpKeyIndex ++) {
-        if (cp[cpKeyIndex][0] == "") {
-          cp.deleteKeyword(cpKeyIndex);
-        }
-      }
-
-      for (int cmIndex = 0; cmIndex < cp.groups(); cmIndex ++) {
-        PvlGroup &cm = cp.group(cmIndex);
-
-        // Estimated => Candidate
-        if (cm.hasKeyword("MeasureType")) {
-          QString type = cm["MeasureType"][0].toLower();
-
-          if (type == "estimated" || type == "unmeasured") {
-            if (type == "unmeasured") {
-              bool hasSampleLine = false;
-
-              try {
-                toDouble(cm["Sample"][0]);
-                toDouble(cm["Line"][0]);
-                hasSampleLine = true;
-              }
-              catch (...) {
-              }
-
-              if (!hasSampleLine) {
-                cm.addKeyword(PvlKeyword("Sample", "0.0"), PvlContainer::Replace);
-                cm.addKeyword(PvlKeyword("Line", "0.0"), PvlContainer::Replace);
-                cm.addKeyword(PvlKeyword("Ignore", toString(true)), PvlContainer::Replace);
-              }
-            }
-
-            cm["MeasureType"] = "Candidate";
-          }
-          else if (type == "automatic" || 
-                   type == "validatedmanual" ||
-                   type == "automaticpixel") {
-            cm["MeasureType"] = "RegisteredPixel";
-          }
-          else if (type == "validatedautomatic" || type == "automaticsubpixel") {
-            cm["MeasureType"] = "RegisteredSubPixel";
-          }
-        }
-
-        if (cm.hasKeyword("ErrorSample"))
-          cm["ErrorSample"].setName("SampleResidual");
-
-        if (cm.hasKeyword("ErrorLine"))
-          cm["ErrorLine"].setName("LineResidual");
-
-        // Delete some extraneous values we once printed
-        if (cm.hasKeyword("SampleResidual") &&
-            toDouble(cm["SampleResidual"][0]) == 0.0)
-          cm.deleteKeyword("SampleResidual");
-
-        if (cm.hasKeyword("LineResidual") &&
-            toDouble(cm["LineResidual"][0]) == 0.0)
-          cm.deleteKeyword("LineResidual");
-
-        if (cm.hasKeyword("Diameter") &&
-            toDouble(cm["Diameter"][0]) == 0.0)
-          cm.deleteKeyword("Diameter");
-
-        if (cm.hasKeyword("ErrorMagnitude"))
-          cm.deleteKeyword("ErrorMagnitude");
-
-        if (cm.hasKeyword("ZScore"))
-          cm.deleteKeyword("ZScore");
-
-        // Delete anything that has no value...
-        for (int cmKeyIndex = 0; cmKeyIndex < cm.keywords(); cmKeyIndex ++) {
-          if (cm[cmKeyIndex][0] == "") {
-            cm.deleteKeyword(cmKeyIndex);
-          }
-        }
+      catch (IException &e) {
+        QString msg = "Failed to convert protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "] into a ControlPoint.";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
       }
     }
   }
 
 
   /**
-   * This converts pvl networks from their version 2 to version 3.
+   * Read a protobuf version 5 control network and prepare the data to be
+   *  converted into a control network.
    *
-   * Modify in place to prevent unnecessary memory usage.
-   *
-   * @param network Input is Version 2, must be modified to conform to Version 3
+   * @param netFile The filename of the control network file.
+   * @param progress The progress object to track reading points.
    */
-  void ControlNetVersioner::ConvertVersion2ToVersion3(PvlObject &network) {
-    
-    network["Version"] = "3";
+  void ControlNetVersioner::readProtobufV0005(const Pvl &header, const FileName netFile, Progress *progress) {
+    // read the header protobuf object
+    const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
+    const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
 
-    for (int cpIndex = 0; cpIndex < network.objects(); cpIndex ++) {
-      PvlObject &cp = network.object(cpIndex);
+    BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
+    BigInt headerLength = protoBufferCore["HeaderBytes"];
+    BigInt pointsLength = protoBufferCore["PointsBytes"];
 
-     if (cp.hasKeyword("AprioriCovarianceMatrix") ||
-         cp.hasKeyword("AdjustedCovarianceMatrix"))
-       cp["PointType"] = "Constrained";
+    fstream input(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    if ( !input.is_open() ) {
+      QString msg = "Failed to open control network file" + netFile.name();
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    input.seekg(headerStartPos, ios::beg);
+
+    streampos filePos = input.tellg();
+
+    ControlNetFileHeaderV0005 protoHeader;
+    try {
+
+      IstreamInputStream headerInStream(&input);
+      CodedInputStream headerCodedInStream(&headerInStream);
+
+      // max 512MB, warn at 400MB
+      headerCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                             1024 * 1024 * 400);
+
+      CodedInputStream::Limit oldLimit = headerCodedInStream.PushLimit(headerLength);
+
+      if ( !protoHeader.ParseFromCodedStream(&headerCodedInStream) ) {
+        QString msg = "Failed to parse protobuf header from input control net file ["
+                      + netFile.name() + "]";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      headerCodedInStream.PopLimit(oldLimit);
+
+      filePos += headerLength;
+    }
+    catch (...) {
+      QString msg = "An error occured while reading the protobuf control network header.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+    // initialize the header from the protobuf header
+    try {
+      ControlNetHeaderV0005 header;
+      header.networkID = protoHeader.networkid().c_str();
+      if ( protoHeader.has_targetname() ) {
+        header.targetName = protoHeader.targetname().c_str();
+      }
+      else {
+        header.targetName = "";
+      }
+      header.created = protoHeader.created().c_str();
+      header.lastModified = protoHeader.lastmodified().c_str();
+      header.description = protoHeader.description().c_str();
+      header.userName = protoHeader.username().c_str();
+      createHeader(header);
+    }
+    catch (IException &e) {
+      QString msg = "Missing required header information.";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    // read each protobuf control point and then initialize it
+    // For some reason, reading the header causes the input stream to fail so reopen the file
+    input.close();
+    input.open(netFile.expanded().toLatin1().data(), ios::in | ios::binary);
+    input.seekg(filePos, ios::beg);
+
+    IstreamInputStream pointInStream(&input);
+
+    BigInt numberOfPoints = 0;
+
+    if ( header.hasGroup("ControlNetworkInfo") ) {
+      const PvlGroup &networkInfo = header.findGroup("ControlNetworkInfo");
+
+      if ( networkInfo.hasKeyword("NumberOfPoints") ) {
+        try {
+          numberOfPoints = networkInfo["NumberOfPoints"];
+        }
+        catch (...) {
+          numberOfPoints = 0;
+        }
+      }
+    }
+
+    if (progress && numberOfPoints != 0) {
+      progress->SetText("Reading Control Points...");
+      progress->SetMaximumSteps(numberOfPoints);
+      progress->CheckStatus();
+    }
+
+    int pointIndex = -1;
+    while (pointInStream.ByteCount() < pointsLength) {
+      pointIndex += 1;
+      QSharedPointer<ControlPointFileEntryV0002> newPoint(new ControlPointFileEntryV0002);
+
+      try {
+
+        CodedInputStream pointCodedInStream(&pointInStream);
+        pointCodedInStream.SetTotalBytesLimit(1024 * 1024 * 512,
+                                              1024 * 1024 * 400);
+
+        uint32_t size;
+        pointCodedInStream.ReadRaw(reinterpret_cast<char *>(&size), sizeof(size));
+
+        CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
+        newPoint->ParseFromCodedStream(&pointCodedInStream);
+        pointCodedInStream.PopLimit(oldPointLimit);
+      }
+      catch (...) {
+        QString msg = "Failed to read protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "].";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      try {
+        ControlPointV0005 point(newPoint);
+        m_points.append( createPoint(point) );
+
+        if (progress && numberOfPoints != 0) {
+          progress->CheckStatus();
+        }
+
+      }
+      catch (IException &e) {
+        QString msg = "Failed to convert protobuf version 2 control point at index ["
+                      + toString(pointIndex) + "] into a ControlPoint.";
+        throw IException(e, IException::Io, msg, _FILEINFO_);
+      }
     }
   }
 
 
   /**
-   * This converts pvl networks from their version 3 to version 4.
+   * Create a pointer to a latest version ControlPoint from an
+   * object in a V0001 control net file. This method converts a
+   * ControlPointV0001 to the latest ControlPontV#### version
+   * and uses the latest versioned point to construct and fill an
+   * Isis::ControlPoint.
    *
-   * Modify in place to prevent unnecessary memory usage.
+   * @param point The versioned control point to be updated.
    *
-   * @param network Input is Version 3, must be modified to conform to Version 4
+   * @return The latest version ControlPoint constructed from the
+   *         given point.
    */
-  void ControlNetVersioner::ConvertVersion3ToVersion4(PvlObject &network) {
-    
-    network["Version"] = "4";
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0001 &point) {
+    ControlPointV0002 newPoint(point);
+    return createPoint(newPoint);
+  }
 
-    for (int cpIndex = 0; cpIndex < network.objects(); cpIndex ++) {
-      PvlObject &cp = network.object(cpIndex);
 
-     if (cp["PointType"][0] == "Ground") cp["PointType"] = "Fixed";
-     if (cp["PointType"][0] == "Tie") cp["PointType"] = "Free";
+  /**
+   * Create a pointer to a latest version ControlPoint from an
+   * object in a V0002 control net file. This method converts a
+   * ControlPointV0002 to the latest ControlPontV#### version
+   * and uses the latest versioned point to construct and fill an
+   * Isis::ControlPoint.
+   *
+   * @param point The versioned control point to be updated.
+   *
+   * @return The latest version ControlPoint constructed from the
+   *         given point.
+   */
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0002 &point) {
+
+    ControlPointV0003 newPoint(point);
+    return createPoint(newPoint);
+
+  }
+
+
+  /**
+   * Create a pointer to a latest version ControlPoint from an
+   * object in a V0003 control net file. This method converts a
+   * ControlPointV0003 to the latest ControlPontV#### version
+   * and uses the latest versioned point to construct and fill an
+   * Isis::ControlPoint.
+   *
+   * @param point The versioned control point to be updated.
+   *
+   * @return The latest version ControlPoint constructed from the
+   *         given point.
+   */
+  ControlPoint *ControlNetVersioner::createPoint(ControlPointV0003 &point) {
+    ControlPointFileEntryV0002 protoPoint = point.pointData();
+    ControlPoint *controlPoint = new ControlPoint;
+
+    // ID is required, no need for if-statement here
+    controlPoint->SetId(QString(protoPoint.id().c_str()));
+
+    if ( protoPoint.has_choosername() ) {
+      controlPoint->SetChooserName(protoPoint.choosername().c_str());
+    }
+
+    // point type is required, no need for if statement here
+    ControlPoint::PointType pointType;
+    switch ( protoPoint.type() ) {
+      case ControlPointFileEntryV0002_PointType_obsolete_Tie:
+      case ControlPointFileEntryV0002_PointType_Free:
+        pointType = ControlPoint::PointType::Free;
+        break;
+      case ControlPointFileEntryV0002_PointType_Constrained:
+        pointType = ControlPoint::PointType::Constrained;
+        break;
+      case ControlPointFileEntryV0002_PointType_obsolete_Ground:
+      case ControlPointFileEntryV0002_PointType_Fixed:
+        pointType = ControlPoint::PointType::Fixed;
+        break;
+      default:
+        QString msg = "Unable to create ControlPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
+                      "Type enumeration [" + toString((int)(protoPoint.type())) + "] is invalid.";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+        break;
+    }
+    controlPoint->SetType(pointType);
+
+    if ( protoPoint.has_ignore() ) {
+      controlPoint->SetIgnored(protoPoint.ignore());
+    }
+    if ( protoPoint.has_jigsawrejected() ) {
+      controlPoint->SetRejected(protoPoint.jigsawrejected());
+    }
+
+    // setting apriori radius information
+    if ( protoPoint.has_aprioriradiussource() ) {
+
+      switch ( protoPoint.aprioriradiussource() ) {
+        case ControlPointFileEntryV0002_AprioriSource_None:
+          controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::None);
+          break;
+        case ControlPointFileEntryV0002_AprioriSource_User:
+          controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::User);
+          break;
+        case ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures:
+          controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::AverageOfMeasures);
+          break;
+        case ControlPointFileEntryV0002_AprioriSource_Ellipsoid:
+          controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::Ellipsoid);
+          break;
+        case ControlPointFileEntryV0002_AprioriSource_DEM:
+          controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::DEM);
+          break;
+        case ControlPointFileEntryV0002_AprioriSource_BundleSolution:
+          controlPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::BundleSolution);
+          break;
+
+        default:
+          QString msg = "Unknown control point apriori radius source.";
+          throw IException(IException::User, msg, _FILEINFO_);
+          break;
+      }
+    }
+
+    if ( protoPoint.has_aprioriradiussourcefile() ) {
+      controlPoint->SetAprioriRadiusSourceFile(protoPoint.aprioriradiussourcefile().c_str());
+    }
+
+    // setting apriori surf pt information
+    if ( protoPoint.has_apriorisurfpointsource() ) {
+      switch ( protoPoint.apriorisurfpointsource() ) {
+        case ControlPointFileEntryV0002_AprioriSource_None:
+          controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::None);
+         break;
+
+        case ControlPointFileEntryV0002_AprioriSource_User:
+          controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::User);
+          break;
+
+        case ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures:
+          controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::AverageOfMeasures);
+          break;
+
+        case ControlPointFileEntryV0002_AprioriSource_Reference:
+          controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Reference);
+          break;
+
+        case ControlPointFileEntryV0002_AprioriSource_Basemap:
+          controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
+          break;
+
+        case ControlPointFileEntryV0002_AprioriSource_BundleSolution:
+          controlPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::BundleSolution);
+          break;
+
+        default:
+          QString msg = "Unknown control point aprioir surface point source.";
+          throw IException(IException::User, msg, _FILEINFO_);
+          break;
+      }
+    }
+
+    if ( protoPoint.has_apriorisurfpointsourcefile() ) {
+      controlPoint->SetAprioriSurfacePointSourceFile(protoPoint.apriorisurfpointsourcefile().c_str());
+    }
+
+    if ( protoPoint.has_apriorix()
+        && protoPoint.has_aprioriy()
+        && protoPoint.has_aprioriz() ) {
+
+      SurfacePoint aprioriSurfacePoint(Displacement(protoPoint.apriorix(), Displacement::Meters),
+                                       Displacement(protoPoint.aprioriy(), Displacement::Meters),
+                                       Displacement(protoPoint.aprioriz(), Displacement::Meters));
+
+      if ( protoPoint.aprioricovar_size() > 0 ) {
+        symmetric_matrix<double, upper> aprioriCovarianceMatrix;
+        aprioriCovarianceMatrix.resize(3);
+        aprioriCovarianceMatrix.clear();
+        aprioriCovarianceMatrix(0, 0) = protoPoint.aprioricovar(0);
+        aprioriCovarianceMatrix(0, 1) = protoPoint.aprioricovar(1);
+        aprioriCovarianceMatrix(0, 2) = protoPoint.aprioricovar(2);
+        aprioriCovarianceMatrix(1, 1) = protoPoint.aprioricovar(3);
+        aprioriCovarianceMatrix(1, 2) = protoPoint.aprioricovar(4);
+        aprioriCovarianceMatrix(2, 2) = protoPoint.aprioricovar(5);
+        aprioriSurfacePoint.SetRectangularMatrix(aprioriCovarianceMatrix);
+        // note: setting lat/lon/rad constrained happens when we call SetAprioriSurfacePoint()
+      }
+
+      controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
+    }
+
+    // setting adj surf pt information
+    if ( protoPoint.has_adjustedx()
+        && protoPoint.has_adjustedy()
+        && protoPoint.has_adjustedz() ) {
+
+      SurfacePoint adjustedSurfacePoint(Displacement(protoPoint.adjustedx(), Displacement::Meters),
+                                        Displacement(protoPoint.adjustedy(), Displacement::Meters),
+                                        Displacement(protoPoint.adjustedz(), Displacement::Meters));
+
+      if ( protoPoint.adjustedcovar_size() > 0 ) {
+        symmetric_matrix<double, upper> adjustedCovarianceMatrix;
+        adjustedCovarianceMatrix.resize(3);
+        adjustedCovarianceMatrix.clear();
+        adjustedCovarianceMatrix(0, 0) = protoPoint.adjustedcovar(0);
+        adjustedCovarianceMatrix(0, 1) = protoPoint.adjustedcovar(1);
+        adjustedCovarianceMatrix(0, 2) = protoPoint.adjustedcovar(2);
+        adjustedCovarianceMatrix(1, 1) = protoPoint.adjustedcovar(3);
+        adjustedCovarianceMatrix(1, 2) = protoPoint.adjustedcovar(4);
+        adjustedCovarianceMatrix(2, 2) = protoPoint.adjustedcovar(5);
+        adjustedSurfacePoint.SetRectangularMatrix(adjustedCovarianceMatrix);
+      }
+
+      controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
+    }
+
+    if ( m_header.equatorialRadius.isValid() && m_header.polarRadius.isValid() ) {
+      SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
+      SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
+      aprioriSurfacePoint.SetRadii(m_header.equatorialRadius, m_header.equatorialRadius, m_header.polarRadius);
+      adjustedSurfacePoint.SetRadii(m_header.equatorialRadius, m_header.equatorialRadius, m_header.polarRadius);
+      controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
+      controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
+    }
+
+    // adding measure information
+    for (int m = 0 ; m < protoPoint.measures_size(); m++) {
+      controlPoint->Add( createMeasure( protoPoint.measures(m) ) );
+    }
+
+    if ( protoPoint.has_referenceindex() ) {
+      controlPoint->SetRefMeasure(protoPoint.referenceindex());
+    }
+
+    // Set DateTime after calling all setters that clear DateTime value
+    if ( protoPoint.has_datetime() ) {
+      controlPoint->SetDateTime(protoPoint.datetime().c_str());
+    }
+    // Set edit lock last
+    if ( protoPoint.has_editlock() ) {
+      controlPoint->SetEditLock(protoPoint.editlock());
+    }
+
+    return controlPoint;
+
+  }
+
+
+  /**
+   * Create a pointer to a ControlMeasure from a V0006 file.
+   *
+   * @param measure The versioned control measure to be created.
+   *
+   * @return The ControlMeasure constructed from the V0006 version
+   *         file.
+   */
+  ControlMeasure *ControlNetVersioner::createMeasure(const ControlPointFileEntryV0002_Measure &measure) {
+
+    ControlMeasure *newMeasure = new ControlMeasure;
+
+    // serial number is required, no need for if-statement
+    newMeasure->SetCubeSerialNumber(QString(measure.serialnumber().c_str()));
+
+    // measure type is required, no need for if-statement
+    ControlMeasure::MeasureType measureType;
+    switch ( measure.type() ) {
+      case ControlPointFileEntryV0002_Measure::Candidate:
+        measureType = ControlMeasure::Candidate;
+        break;
+      case ControlPointFileEntryV0002_Measure::Manual:
+        measureType = ControlMeasure::Manual;
+        break;
+      case ControlPointFileEntryV0002_Measure::RegisteredPixel:
+        measureType = ControlMeasure::RegisteredPixel;
+        break;
+      case ControlPointFileEntryV0002_Measure::RegisteredSubPixel:
+        measureType = ControlMeasure::RegisteredSubPixel;
+        break;
+      default:
+        QString msg = "Unknown control measure type.";
+        throw IException(IException::User, msg, _FILEINFO_);
+        break;
+    }
+    newMeasure->SetType(measureType);
+
+    if ( measure.has_jigsawrejected() ) {
+      newMeasure->SetRejected(measure.jigsawrejected());
+    }
+    if ( measure.has_ignore() ) {
+      newMeasure->SetIgnored(measure.ignore());
+    }
+    if ( measure.has_line() ) {
+      newMeasure->SetCoordinate(measure.sample(), measure.line());
+    }
+    if ( measure.has_diameter() ) {
+      newMeasure->SetDiameter(measure.diameter());
+    }
+    if ( measure.has_apriorisample() ) {
+      newMeasure->SetAprioriSample(measure.apriorisample());
+    }
+    if ( measure.has_aprioriline() ) {
+      newMeasure->SetAprioriLine(measure.aprioriline());
+    }
+    if ( measure.has_samplesigma() ) {
+      newMeasure->SetSampleSigma(measure.samplesigma());
+    }
+    if ( measure.has_linesigma() ) {
+      newMeasure->SetLineSigma(measure.linesigma());
+    }
+    if ( measure.has_sampleresidual()
+        && measure.has_lineresidual() ) {
+      newMeasure->SetResidual(measure.sampleresidual(), measure.lineresidual());
+    }
+
+    for (int i = 0; i < measure.log_size(); i++) {
+
+      const ControlPointFileEntryV0002_Measure_MeasureLogData &protoLog = measure.log(i);
+      ControlMeasureLogData logEntry;
+      if ( protoLog.has_doubledatatype() ) {
+        logEntry.SetDataType((ControlMeasureLogData::NumericLogDataType)protoLog.doubledatatype());
+      }
+      if ( protoLog.has_doubledatavalue() ) {
+        logEntry.SetNumericalValue( protoLog.doubledatavalue() );
+      }
+      newMeasure->SetLogData(logEntry);
+    }
+
+    if ( measure.has_choosername() ) {
+      newMeasure->SetChooserName(QString(measure.choosername().c_str()));
+    }
+
+    if ( measure.has_datetime() ) {
+      newMeasure->SetDateTime(QString(measure.datetime().c_str()));
+    }
+
+    // It is VERY important that the edit lock flag is set last because it prevents
+    // all of the other mutators from working if true.
+    if ( measure.has_editlock() ) {
+      newMeasure->SetEditLock(measure.editlock());
+    }
+    return newMeasure;
+  }
+
+
+  /**
+   * Create the internal header from a V0001 header.
+   *
+   * The latest version is V0001, so this will check for an old issue with
+   * Mars target names and then internalize the header.
+   *
+   * @param header The V0001 header
+   */
+  void ControlNetVersioner::createHeader(const ControlNetHeaderV0001 header) {
+    m_header = header;
+
+    if ( m_header.targetName.startsWith("MRO/") ) {
+      m_header.targetName = "Mars";
+    }
+
+    if ( !m_header.targetName.isEmpty() ) {
+      try {
+        // attempt to get target radii values...
+        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
+        m_header.equatorialRadius.setMeters(pvlRadii["EquatorialRadius"]);
+        m_header.polarRadius.setMeters(pvlRadii["PolarRadius"]);
+       }
+       catch (IException &e) {
+         // do nothing
+       }
     }
   }
 
 
   /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002 for booleans. This operation is
-   *   only necessary for the latest version of the binary so this method needs
-   *   to be updated or removed when V0003 comes around.
+   * This will write a control net file object to disk.
    *
-   * If the keyword doesn't exist, this does nothing.
+   * @param netFile The output filename that will be written to
    *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param point The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container,
-                                 QString keyName, 
-                                 ControlPointFileEntryV0002 &point,
-                                 void (ControlPointFileEntryV0002::*setter)(bool)) {
-    
-    if (!container.hasKeyword(keyName))
-      return;
+  void ControlNetVersioner::write(FileName netFile) {
+    try {
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    value = value.toLower();
-    
-    if (value == "true" || value == "yes")
-      (point.*setter)(true);
+      const int labelBytes = 65536;
+      fstream output(netFile.expanded().toLatin1().data(), ios::out | ios::trunc | ios::binary);
+      char *blankLabel = new char[labelBytes];
+      memset(blankLabel, 0, labelBytes);
+      output.write(blankLabel, labelBytes);
+      delete [] blankLabel;
+
+      int numMeasures = 0;
+      int numPoints = 0;
+      foreach (ControlPoint *point, m_points) {
+        numMeasures += point->GetNumMeasures();
+        numPoints += 1;
+      }
+
+      streampos startCoreHeaderPos = output.tellp();
+
+      writeHeader(&output);
+
+      BigInt pointByteTotal = 0;
+      while ( !m_points.isEmpty() ) {
+         pointByteTotal += writeFirstPoint(&output);
+      }
+
+      // // Insert header at the beginning of the file once writing is done.
+      ControlNetFileHeaderV0005 protobufHeader;
+
+      protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
+      protobufHeader.set_targetname(m_header.targetName.toLatin1().data());
+      protobufHeader.set_created(m_header.created.toLatin1().data());
+      protobufHeader.set_lastmodified(m_header.lastModified.toLatin1().data());
+      protobufHeader.set_description(m_header.description.toLatin1().data());
+      protobufHeader.set_username(m_header.userName.toLatin1().data());
+
+      streampos coreHeaderSize = protobufHeader.ByteSize();
+
+      Pvl p;
+
+      PvlObject protoObj("ProtoBuffer");
+
+      PvlObject protoCore("Core");
+      protoCore.addKeyword(PvlKeyword("HeaderStartByte",
+                           toString((BigInt) startCoreHeaderPos)));
+      protoCore.addKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
+
+      BigInt pointsStartByte = (BigInt) (startCoreHeaderPos + coreHeaderSize);
+
+      protoCore.addKeyword(PvlKeyword("PointsStartByte", toString(pointsStartByte)));
+
+      protoCore.addKeyword(PvlKeyword("PointsBytes",
+                           toString(pointByteTotal)));
+      protoObj.addObject(protoCore);
+
+      PvlGroup netInfo("ControlNetworkInfo");
+      netInfo.addComment("This group is for informational purposes only");
+      netInfo += PvlKeyword("NetworkId", protobufHeader.networkid().c_str());
+      netInfo += PvlKeyword("TargetName", protobufHeader.targetname().c_str());
+      netInfo += PvlKeyword("UserName", protobufHeader.username().c_str());
+      netInfo += PvlKeyword("Created", protobufHeader.created().c_str());
+      netInfo += PvlKeyword("LastModified", protobufHeader.lastmodified().c_str());
+      netInfo += PvlKeyword("Description", protobufHeader.description().c_str());
+      netInfo += PvlKeyword("NumberOfPoints", toString(numPoints));
+
+      netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
+      netInfo += PvlKeyword("Version", "5");
+      protoObj.addGroup(netInfo);
+
+      p.addObject(protoObj);
+
+      output.seekp(0, ios::beg);
+      output << p;
+      output << '\n';
+      output.close();
+
+    }
+    catch (...) {
+      QString msg = "Can't write control net file";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+  }
+
+ /**
+  * This will read the binary protobuffer control network header to an fstream
+  *
+  * @param output The fstream we're writing out to.
+  */
+  void ControlNetVersioner::writeHeader(fstream *output) {
+
+    // Create the protobuf header using our struct
+    ControlNetFileHeaderV0005 protobufHeader;
+
+    protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
+    protobufHeader.set_targetname(m_header.targetName.toLatin1().data());
+    protobufHeader.set_created(m_header.created.toLatin1().data());
+    protobufHeader.set_lastmodified(m_header.lastModified.toLatin1().data());
+    protobufHeader.set_description(m_header.description.toLatin1().data());
+    protobufHeader.set_username(m_header.userName.toLatin1().data());
+
+    // Write out the header
+    if ( !protobufHeader.SerializeToOstream(output) ) {
+      QString msg = "Failed to write output control network file.";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
   }
 
 
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002 for doubles. This operation is
-   *   only necessary for the latest version of the binary so this method needs
-   *   to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param point The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::Copy(PvlContainer &container,
-                                 QString keyName, 
-                                 ControlPointFileEntryV0002 &point,
-                                 void (ControlPointFileEntryV0002::*setter)(double)) {
-    
-    if (!container.hasKeyword(keyName))
-      return;
+ /**
+  * This will write the first control point to a ZeroCopyOutputStream.
+  * The written point will be removed from the versioner and deleted if the versioner
+  * has ownership of it.
+  *
+  * @param fileStream A pointer to the fileStream that we are writing the point to.
+  *
+  * @return @b int The number of bytes written to the filestream.
+  */
+  int ControlNetVersioner::writeFirstPoint(fstream *output) {
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
-    (point.*setter)(value);
-  }
+      BigInt startPos = output->tellp();
 
+      ControlPointFileEntryV0002 protoPoint;
+      ControlPoint *controlPoint = m_points.takeFirst();
 
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002 for strings. This operation is
-   *   only necessary for the latest version of the binary so this method needs
-   *   to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param point The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::Copy(PvlContainer &container,
-                                 QString keyName, 
-                                 ControlPointFileEntryV0002 &point,
-                                 void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
-    
-    if (!container.hasKeyword(keyName))
-      return;
+      if ( controlPoint->GetId().isEmpty() ) {
+        QString msg = "Unbable to write first point of control net. "
+                      "Invalid control point has no point ID value.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      else {
+        protoPoint.set_id(controlPoint->GetId().toLatin1().data());
+      }
 
-    IString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    (point.*setter)(value);
-  }
+      if ( QString::compare(controlPoint->GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+        protoPoint.set_choosername(controlPoint->GetChooserName().toLatin1().data());
+      }
+      if ( QString::compare(controlPoint->GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+        protoPoint.set_datetime(controlPoint->GetDateTime().toLatin1().data());
+      }
+      if ( controlPoint->IsEditLocked() ) {
+        protoPoint.set_editlock(true);
+      }
 
+      ControlPointFileEntryV0002_PointType pointType;
+      switch ( controlPoint->GetType() ) {
+        case ControlPoint::PointType::Free:
+          pointType = ControlPointFileEntryV0002_PointType_Free;
+          break;
+        case ControlPoint::PointType::Constrained:
+          pointType = ControlPointFileEntryV0002_PointType_Constrained;
+          break;
+        case ControlPoint::PointType::Fixed:
+          pointType = ControlPointFileEntryV0002_PointType_Fixed;
+          break;
+        default:
+          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
+                        "Type enumeration [" + toString((int)(controlPoint->GetType())) + "] is invalid.";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+          break;
+      }
+      protoPoint.set_type(pointType);
 
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002::Measure for booleans. This
-   *   operation is only necessary for the latest version of the binary so
-   *   this method needs to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param measure The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::Copy(PvlContainer &container, 
-                                 QString keyName,
-                                 ControlPointFileEntryV0002::Measure &measure,
-                                 void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
-    
-    if (!container.hasKeyword(keyName))
-      return;
+      if ( controlPoint->IsIgnored() ) {
+        protoPoint.set_ignore(true);
+      }
 
-    QString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    value = value.toLower();
-    
-    if (value == "true" || value == "yes")
-      (measure.*setter)(true);
-  }
+      if ( controlPoint->IsRejected() ) {
+        protoPoint.set_jigsawrejected(true);
+      }
 
+      if ( controlPoint->HasRefMeasure() && controlPoint->IsReferenceExplicit() ) {
+        protoPoint.set_referenceindex(controlPoint->IndexOfRefMeasure());
+      }
 
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002::Measure for doubles. This
-   *   operation is only necessary for the latest version of the binary so
-   *   this method needs to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param measure The protocol buffer point instance to set the value in
-   * @param setter The protocol buffer setter method
-   */
-  void ControlNetVersioner::Copy(PvlContainer &container, 
-                                 QString keyName,
-                                 ControlPointFileEntryV0002::Measure &measure,
-                                 void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
-    
-    if (!container.hasKeyword(keyName))
-      return;
+      if ( controlPoint->HasAprioriSurfacePointSourceFile() ) {
+        protoPoint.set_apriorisurfpointsourcefile(
+                   controlPoint->GetAprioriSurfacePointSourceFile().toLatin1().data());
+      }
 
-    double value = toDouble(container[keyName][0]);
-    container.deleteKeyword(keyName);
-    (measure.*setter)(value);
-  }
+      // Apriori Surf Point Source ENUM settting
+      switch ( controlPoint->GetAprioriSurfacePointSource() ) {
+        case ControlPoint::SurfacePointSource::None:
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_None);
+          break;
+        case ControlPoint::SurfacePointSource::User:
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_User);
+          break;
+        case ControlPoint::SurfacePointSource::AverageOfMeasures:
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures);
+          break;
+        case ControlPoint::SurfacePointSource::Reference:
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_Reference);
+          break;
+        case ControlPoint::SurfacePointSource::Basemap:
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_Basemap);
+          break;
+        case ControlPoint::SurfacePointSource::BundleSolution:
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
+          break;
+        default:
+          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
+                        "Type enumeration [" + toString((int)(controlPoint->GetAprioriSurfacePointSource())) + "] is invalid.";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+          break;
+      }
 
+      // Apriori Radius Point Source ENUM setting
+      switch ( controlPoint->GetAprioriRadiusSource() ) {
+        case ControlPoint::RadiusSource::None:
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_None);
+          break;
+        case ControlPoint::RadiusSource::User:
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_User);
+          break;
+        case ControlPoint::RadiusSource::AverageOfMeasures:
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures);
+          break;
+        case ControlPoint::RadiusSource::BundleSolution:
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
+          break;
+        case ControlPoint::RadiusSource::Ellipsoid:
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_Ellipsoid);
+          break;
+        case ControlPoint::RadiusSource::DEM:
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_DEM);
+          break;
+        default:
+          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str()) + "] from file. "
+                        "Type enumeration [" + toString((int)(controlPoint->GetAprioriRadiusSource())) + "] is invalid.";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+          break;
+      }
 
-  /**
-   * This is a convenience method for copying keywords out of the container
-   *   and into the ControlPointFileEntryV0002::Measure for strings. This
-   *   operation is only necessary for the latest version of the binary so
-   *   this method needs to be updated or removed when V0003 comes around.
-   *
-   * If the keyword doesn't exist, this does nothing.
-   *
-   * @param container The PvlObject that represents a control point
-   * @param keyName The keyword name inside the PvlObject
-   * @param measure The protocol buffer point instance to set the value in
-   * @param set The protocol buffer setter method
-   */
-  void ControlNetVersioner::Copy(PvlContainer &container, 
-                                 QString keyName,
-                                 ControlPointFileEntryV0002::Measure &measure,
-                                 void (ControlPointFileEntryV0002::Measure::*set)
-                                      (const std::string &)) {
-    
-    if (!container.hasKeyword(keyName))
-      return;
+      if ( controlPoint->HasAprioriRadiusSourceFile() ) {
+        protoPoint.set_aprioriradiussourcefile(
+                   controlPoint->GetAprioriRadiusSourceFile().toLatin1().data());
+      }
 
-    IString value = container[keyName][0];
-    container.deleteKeyword(keyName);
-    (measure.*set)(value);
+      SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
+      if ( aprioriSurfacePoint.Valid() ) {
+        protoPoint.set_apriorix(aprioriSurfacePoint.GetX().meters());
+        protoPoint.set_aprioriy(aprioriSurfacePoint.GetY().meters());
+        protoPoint.set_aprioriz(aprioriSurfacePoint.GetZ().meters());
+
+        symmetric_matrix<double, upper> aprioriCovarianceMatrix = aprioriSurfacePoint.GetRectangularMatrix();
+        if ( aprioriCovarianceMatrix.size1() > 0 &&
+             aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null &&
+             aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null &&
+             aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
+
+          protoPoint.add_aprioricovar(aprioriCovarianceMatrix(0, 0));
+          protoPoint.add_aprioricovar(aprioriCovarianceMatrix(0, 1));
+          protoPoint.add_aprioricovar(aprioriCovarianceMatrix(0, 2));
+          protoPoint.add_aprioricovar(aprioriCovarianceMatrix(1, 1));
+          protoPoint.add_aprioricovar(aprioriCovarianceMatrix(1, 2));
+          protoPoint.add_aprioricovar(aprioriCovarianceMatrix(2, 2));
+        }
+      }
+      // this might be redundant... determined by covariance matrix???
+      if ( controlPoint->IsLatitudeConstrained() ) {
+        protoPoint.set_latitudeconstrained(controlPoint->IsLatitudeConstrained());
+      }
+      if ( controlPoint->IsLongitudeConstrained() ) {
+        protoPoint.set_longitudeconstrained(controlPoint->IsLongitudeConstrained());
+      }
+      if ( controlPoint->IsRadiusConstrained() ) {
+        protoPoint.set_radiusconstrained(controlPoint->IsRadiusConstrained());
+      }
+
+      SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
+      if ( adjustedSurfacePoint.Valid() ) {
+
+        protoPoint.set_adjustedx(adjustedSurfacePoint.GetX().meters());
+        protoPoint.set_adjustedy(adjustedSurfacePoint.GetY().meters());
+        protoPoint.set_adjustedz(adjustedSurfacePoint.GetZ().meters());
+
+        symmetric_matrix<double, upper> adjustedCovarianceMatrix = adjustedSurfacePoint.GetRectangularMatrix();
+        if ( adjustedCovarianceMatrix.size1() > 0 ) {
+          protoPoint.add_adjustedcovar(adjustedCovarianceMatrix(0, 0));
+          protoPoint.add_adjustedcovar(adjustedCovarianceMatrix(0, 1));
+          protoPoint.add_adjustedcovar(adjustedCovarianceMatrix(0, 2));
+          protoPoint.add_adjustedcovar(adjustedCovarianceMatrix(1, 1));
+          protoPoint.add_adjustedcovar(adjustedCovarianceMatrix(1, 2));
+          protoPoint.add_adjustedcovar(adjustedCovarianceMatrix(2, 2));
+        }
+      }
+
+      // Converting Measures
+      for (int j = 0; j < controlPoint->GetNumMeasures(); j++) {
+
+        const ControlMeasure &
+            controlMeasure = *controlPoint->GetMeasure(j);
+
+        ControlPointFileEntryV0002_Measure protoMeasure;
+
+//??? moved        if ( controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j ) {
+//??? moved             protoPoint.set_referenceindex(j);
+//??? moved        }
+
+        protoMeasure.set_serialnumber(controlMeasure.GetCubeSerialNumber().toLatin1().data());
+
+        switch ( controlMeasure.GetType() ) {
+            case (ControlMeasure::MeasureType::Candidate):
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Candidate);
+                break;
+
+            case (ControlMeasure::MeasureType::Manual):
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_Manual);
+                break;
+
+            case (ControlMeasure::RegisteredPixel):
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredPixel);
+                break;
+
+            case (ControlMeasure::RegisteredSubPixel):
+                protoMeasure.set_type(ControlPointFileEntryV0002_Measure_MeasureType_RegisteredSubPixel);
+                break;
+        }
+
+        if ( QString::compare(controlMeasure.GetChooserName(), "Null", Qt::CaseInsensitive) != 0 ) {
+          protoMeasure.set_choosername(controlMeasure.GetChooserName().toLatin1().data());
+        }
+
+        if ( QString::compare(controlMeasure.GetDateTime(), "Null", Qt::CaseInsensitive) != 0 ) {
+          protoMeasure.set_datetime(controlMeasure.GetDateTime().toLatin1().data());
+        }
+
+        if ( controlMeasure.IsEditLocked() ) {
+          protoMeasure.set_editlock(true);
+        }
+
+        if ( controlMeasure.IsIgnored() ) {
+          protoMeasure.set_ignore(true);
+        }
+
+        if ( controlMeasure.IsRejected() ) {
+          protoMeasure.set_jigsawrejected(true);
+        }
+
+        if ( controlMeasure.GetSample() != Isis::Null ) {
+          protoMeasure.set_sample(controlMeasure.GetSample());
+        }
+
+        if ( controlMeasure.GetLine() != Isis::Null ) {
+          protoMeasure.set_line(controlMeasure.GetLine());
+        }
+
+        if ( controlMeasure.GetDiameter() != Isis::Null ) {
+          protoMeasure.set_diameter(controlMeasure.GetDiameter());
+        }
+
+        if ( controlMeasure.GetAprioriSample() != Isis::Null ) {
+          protoMeasure.set_apriorisample(controlMeasure.GetAprioriSample());
+        }
+
+        if ( controlMeasure.GetAprioriLine() != Isis::Null ) {
+          protoMeasure.set_aprioriline(controlMeasure.GetAprioriLine());
+        }
+
+        if ( controlMeasure.GetSampleSigma() != Isis::Null ) {
+          protoMeasure.set_samplesigma(controlMeasure.GetSampleSigma());
+        }
+
+        if ( controlMeasure.GetLineSigma() != Isis::Null ) {
+          protoMeasure.set_linesigma(controlMeasure.GetLineSigma());
+        }
+
+        if ( controlMeasure.GetSampleResidual() != Isis::Null ) {
+          protoMeasure.set_sampleresidual(controlMeasure.GetSampleResidual());
+        }
+
+        if ( controlMeasure.GetLineResidual() != Isis::Null ) {
+          protoMeasure.set_lineresidual(controlMeasure.GetLineResidual());
+        }
+
+        if ( controlMeasure.IsRejected() ) {
+          protoMeasure.set_jigsawrejected(true);
+        }
+
+        QVector<ControlMeasureLogData> measureLogs = controlMeasure.GetLogDataEntries();
+        for (int logEntry = 0;
+            logEntry < measureLogs.size(); // DNE?
+            logEntry ++) {
+
+          const ControlMeasureLogData &log = measureLogs[logEntry];
+
+          ControlPointFileEntryV0002_Measure_MeasureLogData logData;
+
+          if ( log.IsValid() ) {
+            logData.set_doubledatatype( (int) log.GetDataType() );
+            logData.set_doubledatavalue( log.GetNumericalValue() );
+          }
+
+          *protoMeasure.add_log() = logData;
+        }
+
+//???        if ( controlPoint->HasRefMeasure() && controlPoint->IndexOfRefMeasure() == j ) {
+//???             protoPoint.set_referenceindex(j);
+//???        }
+        *protoPoint.add_measures() = protoMeasure;
+      }
+
+      uint32_t byteSize = protoPoint.ByteSize();
+      output->write(reinterpret_cast<char *>(&byteSize), sizeof(byteSize));
+
+      if ( !protoPoint.SerializeToOstream(output) ) {
+        QString err = "Error writing to coded protobuf stream";
+        throw IException(IException::Programmer, err, _FILEINFO_);
+      }
+
+      // Make sure that if the versioner owns the ControlPoint it is properly cleaned up.
+      if ( m_ownsPoints ) {
+        delete controlPoint;
+        controlPoint = NULL;
+      }
+      BigInt currentPos = output->tellp();
+      BigInt byteCount = currentPos - startPos;
+
+      // return size of message
+      return byteCount;
   }
 }

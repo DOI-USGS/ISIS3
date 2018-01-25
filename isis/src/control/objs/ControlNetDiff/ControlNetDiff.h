@@ -60,6 +60,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-26 Travis Addair - Added documentation.
+   *   @history 2018-01-02 Kristin Berry - Modified to use ControlNetVersioner instead of
+   *                           LatestControlNetFile.
    *
    */
   class ControlNetDiff {

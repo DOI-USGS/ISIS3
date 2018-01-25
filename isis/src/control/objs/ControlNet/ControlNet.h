@@ -27,9 +27,6 @@
 #include <QMetaType>
 #include <QObject> // parent class
 #include <QSharedPointer>
-
-#include "ControlNetFile.h"
-
 #include <QString>
 #include <QMap>
 #include <QVector>
@@ -48,6 +45,7 @@ namespace Isis {
   class ControlCubeGraphNode;
   class Distance;
   class Progress;
+  class Pvl;
   class SerialNumberList;
 
   /**
@@ -206,6 +204,11 @@ namespace Isis {
    *                           being used anywhere. Fixes #5068.
    *   @history 2017-12-12 Kristin Berry - Updated to use QMap and QVector rather than std::map
    *                           and std::vector. Fixes #5259.
+   *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258.
+   *   @history 2017-12-21 Jesse Mapel - Modified read and write methods to use the refactored
+   *                           ControlNetVersioner instead of directly parsing the protobuf
+   *                           objects from the LatestControlNetFile.
+   *   @history 2018-01-12 Adam Goins - Added Progress support back to Read methods.
    *   @history 2017-01-19 Jesse Mapel - Added a method to get all of the valid measures in an
    *                           image. Previously, this had to be done throug the graph.
    */
@@ -283,6 +286,7 @@ namespace Isis {
       int GetNumValidPoints();
       QString GetTarget() const;
       QString GetUserName() const;
+      QString GetLastModified() const;
       QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();

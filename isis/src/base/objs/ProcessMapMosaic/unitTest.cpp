@@ -6,6 +6,7 @@
 #include "Application.h"
 #include "CubeAttribute.h"
 #include "FileList.h"
+#include "FileName.h"
 #include "ProcessMosaic.h"
 #include "LineManager.h"
 
@@ -91,7 +92,7 @@ void IsisMain() {
 
   cout << endl << "Testing Mosaic where the input (x, y) is negative,"
           " according to the output cube." << endl;
-  QString inputFile = "./unitTest1.cub";
+  QString inputFile = FileName("$base/testData/ProcessMapMosaic/unitTest1.cub").expanded();
   Cube inCube;
   inCube.open(inputFile);
   PvlGroup mapGroup = inCube.label()->findGroup("Mapping", Pvl::Traverse);

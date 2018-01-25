@@ -4,10 +4,10 @@ unittest: Initializing mosaic
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 unittest: Mosaicking unitTest1.cub
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-./unitTest1.cub is inside the mosaic
+/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest1.cub is inside the mosaic
 unittest: Mosaicking unitTest2.cub
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-./unitTest2.cub is inside the mosaic
+/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest2.cub is inside the mosaic
 Mosaic label: 
 Object = IsisCube
   Object = Core
@@ -58,10 +58,10 @@ unittest: Initializing mosaic
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 unittest: Mosaicking unitTest1.cub
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-./unitTest1.cub is inside the mosaic
+/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest1.cub is inside the mosaic
 unittest: Mosaicking unitTest2.cub
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-./unitTest2.cub is inside the mosaic
+/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest2.cub is inside the mosaic
 Mosaic label: 
 Object = IsisCube
   Object = Core
@@ -558,10 +558,10 @@ unittest: Initializing mosaic
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 unittest: Mosaicking unitTest_crop.cub
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-./unitTest_crop.cub is inside the mosaic
+/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest_crop.cub is inside the mosaic
 unittest: Mosaicking unitTest_nocrop.cub
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-./unitTest_nocrop.cub is inside the mosaic
+/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest_nocrop.cub is inside the mosaic
 Mosaic label: 
 Object = IsisCube
   Object = Core

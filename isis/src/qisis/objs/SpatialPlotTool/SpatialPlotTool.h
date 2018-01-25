@@ -46,14 +46,16 @@ namespace Isis {
    *   @history 2013-01-24 Steven Lambright - Fixed positioning of portal/interpolator used
    *                           when reading DN data to create a plot. Fixes #997.
    *   @history 2014-04-15 Tracie Sucharski - Reset defaults for plots to the following:
-   *                         SolidLine, Width=1, NoSymbols.  This is a temporary fix until
-   *                         the defaults can be saved on a user basis.  Fixes #2062.
+   *                           SolidLine, Width=1, NoSymbols.  This is a temporary fix until
+   *                           the defaults can be saved on a user basis.  Fixes #2062.
    *   @history 2014-06-20 Janet Barrett - Fixed SpatialPlotTool::getSpatialStatistics to
-   *                         check for length of line used to draw profile to make sure it
-   *                         is greater than zero to avoid divide by zero error. Fixes #1921
-   *                         and #1950.
+   *                           check for length of line used to draw profile to make sure it
+   *                           is greater than zero to avoid divide by zero error. Fixes #1921
+   *                           and #1950.
    *   @history 2014-07-31 Ian Humphrey - Added What's This help for SpatialPlotTool.
    *                           References #2089.
+   *   @history 2018-01-12 Summer Stapleton - Prevented lengths of zero for the rotated rectangle 
+   *                           selection to address segfault. Fixes #4953.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT
