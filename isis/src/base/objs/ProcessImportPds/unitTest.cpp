@@ -113,7 +113,8 @@ void IsisMain() {
     cout << "Testing PDS file containing an ^IMAGE pointer and ^TABLE pointer" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("data/pdsImageWithTables.lbl", "$base/testData/ProcessImportPds/pdsImageWithTables.img", plab);
+    p.SetPdsFile("data/pdsImageWithTables.lbl",
+                 "$ISIS3TESTDATA/isis/src/base/objs/ProcessImportPds/pdsImageWithTables.img", plab);
     p.SetOutputCube("TO");
     p.ImportTable("SUN_POSITION_TABLE");
     p.StartProcess();
