@@ -5,6 +5,7 @@
 #include "ProcessImportVicar.h"
 #include "Application.h"
 #include "Cube.h"
+#include "FileName.h"
 #include "Statistics.h"
 
 using namespace Isis;
@@ -16,7 +17,7 @@ void IsisMain() {
 
   ProcessImportVicar p;
   Pvl vlab;
-  p.SetVicarFile("unitTest.img", vlab);
+  p.SetVicarFile(FileName("$base/testData/ProcessImportVicar/unitTest.img").expanded(), vlab);
   p.SetOutputCube("TO");
   p.StartProcess();
   p.EndProcess();
