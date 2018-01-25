@@ -71,6 +71,9 @@ namespace Isis {
    *   @history 2017-09-15 Jesse Mapel - Removed setting the detector start line
    *                           because it is now being handled by the alpha
    *                           cube group. Fixes #5156.
+   *   @history 2018-01-11 Christopher Combs - Added try/catch around creation of
+   *                           cameras distortion map to prevent segfault when 
+   *                           destructing. Fixes #5163.
    */
   class TgoCassisCamera : public FramingCamera {
     public:

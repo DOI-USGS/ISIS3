@@ -242,7 +242,7 @@ namespace Isis {
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
 
     FileName cnetFileName(filename);
-    ControlNetVersioner versionedReader(cnetFileName);
+    ControlNetVersioner versionedReader(cnetFileName, progress);
 
     SetTarget( versionedReader.targetName() );
     p_networkId   = versionedReader.netId();
@@ -252,8 +252,18 @@ namespace Isis {
     p_description = versionedReader.description();
 
     int numPoints = versionedReader.numPoints();
+
+    if (progress) {
+      progress->SetText("Adding Control Points to Network...");
+      progress->SetMaximumSteps(numPoints);
+      progress->CheckStatus();
+    }
+
     for (int i = 0; i < numPoints; i++) {
       AddPoint( versionedReader.takeFirstPoint() );
+      if (progress) {
+        progress->CheckStatus();
+      }
     }
   }
 

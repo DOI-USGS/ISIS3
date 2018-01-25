@@ -83,7 +83,7 @@ namespace Isis {
    *                         instantiated. Fixes #3908.
    *  @history 2017-05-16 Cole Neubauer - Fixed Title not showing in Putty/Xming
    *                         setup. Fixes #4731.
-   *  @history 2017-05-19 Marjorie Hahn - Applied font style and font size from the 
+   *  @history 2017-05-19 Marjorie Hahn - Applied font style and font size from the
    *                         IsisPreferences file. Fixes #198.
    *  @history 2018-01-08 Summer Stapleton - Fixed memory leak involved in the X-forwarding check.
    *                         Fixes #4736.

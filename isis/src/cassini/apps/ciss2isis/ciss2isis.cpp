@@ -229,17 +229,12 @@ void CreateStretchPairs() {
   return;
 }
 
-/**
-* The input buffer has a raw 16 bit buffer but the values are still 0 to 255.
-* We know that 255 (stretched to 4095 if Table converted) is saturated.
-* Sky pixels could have valid DN of 0, but missing pixels are also saved as 0,
-* so it is impossible to distinguish between them.
-* This method is used by ConvertLinePrefixPixels() and IsisMain() for ProcessByLine p2.
-* author Jeannie Walldren 2008-08-21
-*
-* @history 2017-11-22 Summer Stapleton - Changed returned max value from HRS to HIS.
-*                        Fixes #5106.
-*/
+// The input buffer has a raw 16 bit buffer but the values are still 0 to 255.
+// We know that 255 (stretched to 4095 if Table converted) is saturated.
+// Sky pixels could have valid DN of 0, but missing pixels are also saved as 0,
+// so it is impossible to distinguish between them.
+// This method is used by ConvertLinePrefixPixels() and IsisMain() for ProcessByLine p2.
+// author Jeannie Walldren 2008-08-21
 void FixDns(Buffer &buf) {
   for(int i = 0; i < buf.size(); i++) {
     // zeros and negatives are valid DN values, according to scientists,
@@ -251,9 +246,9 @@ void FixDns(Buffer &buf) {
     else if(dataConversionType == "Table") {
       buf[i] = stretch.Map((int)buf[i]);
     }
-    // save max values (4095 for table-converted images and 255 for others) as HIS
+    // save max values (4095 for table-converted images and 255 for others) as HRS
     if(buf[i] == validMax) {
-      buf[i] = His;
+      buf[i] = Hrs;
     }
   }
 }
@@ -457,3 +452,4 @@ double ComputeOverclockAvg(vector <double> pixel) {
 //        IDL cisscal application files: cassimg_subtractdark.pro and linetime.pro
 // -Jeannie Walldren 08/06/2008
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
