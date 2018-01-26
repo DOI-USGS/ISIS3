@@ -418,7 +418,7 @@ bool tryKernels(Cube *icube, Process &p,
 
       Application::Log(currentKernels);
       icube->putGroup(originalKernels);
-      throw;
+      throw IException(e);
     }
 
     if (ui.GetBoolean("ATTACH")) {

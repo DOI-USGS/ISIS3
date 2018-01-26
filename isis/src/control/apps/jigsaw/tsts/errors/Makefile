@@ -15,14 +15,14 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 # TEST A: CAMSOLVE=None and SPSOLVE=None
-	echo -e "Error Test A:" >> $(OUTPUT)/error.txt;
+	echo -e "Error Test A:" > $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  camsolve=None \
 	  spsolve=None \
-	  2>> $(OUTPUT)/error.txt \
+	  2>> $(OUTPUT)/error_temp.txt \
 	  > /dev/null` ]]; \
 	then \
 	  true; \
@@ -30,46 +30,47 @@ commands:
 # TEST B: exception occurs when performing bundle adjust
 #         TODO: This still needs to be tested.
 # TEST C: SOLVETARGETBODY=yes and TBPARAMETERS file missing Target object
-	echo -e "Error Test C:" >> $(OUTPUT)/error.txt;
+	echo -e "Error Test C:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  solvetargetbody=yes \
 	  tbparameters=$(INPUT)/invalidTargetParameters.pvl \
-	  2>> $(OUTPUT)/error.txt \
+	  2>> $(OUTPUT)/error_temp.txt \
 	  > /dev/null` ]]; \
 	then \
 	  true; \
 	fi;
 # TEST D: SOLVETARGETBODY=yes and # of parameters to solve is 0
-	echo -e "Error Test D:" >> $(OUTPUT)/error.txt;
+	echo -e "Error Test D:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/empty.net \
 	  onet=$(OUTPUT)/out.net \
 	  solvetargetbody=yes \
 	  tbparameters=$(INPUT)/zeroTargetParameters.pvl \
-	  2>> $(OUTPUT)/error.txt \
+	  2>> $(OUTPUT)/error_temp.txt \
 	  > /dev/null` ]]; \
 	then \
 	  true; \
 	fi;
 # TEST F: CNET=[invalid control net file]
-	echo -e "Error Test F:" >> $(OUTPUT)/error.txt;
+	echo -e "Error Test F:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/notacnet.net \
-	  onet=$(OUTPUT)/out.net \
+	  onet=$(output)/out.net \
 	  radius=yes \
 	  spsolve=positions \
 	  point_radius_sigma=500 \
 	  spacecraft_position_sigma=500 \
 	  camera_angles_sigma=2 \
-	  2>> $(OUTPUT)/error.txt \
+	  2>> $(OUTPUT)/error_temp.txt \
 	  > /dev/null` ]]; \
 	then \
 	  true; \
 	fi;
-
-	sed -i 's_$(INPUT)/__g' $(OUTPUT)/error.txt
+# Remove paths from errors file
+	$(SED) 's/\(\[\)\/.*\(input\)/\1\2/g' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
+	$(RM) $(OUTPUT)/error_temp.txt;

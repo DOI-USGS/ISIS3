@@ -148,6 +148,10 @@
       Added three additional decimal places to the output of the TIME keyword in output
       kernel database file.  Fixes #2236.
     </change>
+    <change name="Christopher Combs" date="2018-01-11">
+      Added STARTOFFSET and ENDOFFSET parameters to allow for slight editing to start and end times.
+      Fixes #5272.
+    </change>
   </history>
 
   <groups>
@@ -322,6 +326,40 @@
         </description>
         <default>
           <item>none</item>
+        </default>
+      </parameter>
+    </group>
+    <group name="Offset">
+      <parameter name="STARTOFFSET">
+        <type>double</type>
+        <brief>
+          Seconds to subtract from each start time in the kernel.
+        </brief>
+        <minimum inclusive="yes">0.0</minimum>
+        <description>
+          This parameter is used to specify the amount of offset (in seconds) to apply to the 
+          StartTime value for each kernel that is used to populate the db file. This value will be
+          subtracted from the value found in the kernel. If left as 0.0, no offset will be applied, and 
+          the Time will be copied over as written in the kernel.
+        </description>
+        <default>
+          <item>0.0</item>
+        </default>
+      </parameter>
+      <parameter name="ENDOFFSET">
+        <type>double</type>
+        <brief>
+           Seconds to add to each end time in the kernel.
+        </brief>
+        <minimum inclusive="yes">0.0</minimum>
+        <description>
+          This parameter is used to specify the amount of offset (in seconds) to apply to the 
+          EndTime value for each kernel that is used to populate the db file. This value will be
+          added to the value found in the kernel. If left as 0.0, no offset will be applied, and the
+          Time will be copied over as written in the kernel.
+        </description>
+        <default>
+          <item>0.0</item>
         </default>
       </parameter>
     </group>

@@ -22,7 +22,7 @@
 #include "Longitude.h"
 
 namespace Isis {
-  
+
   /**
    * Instantiate a feature nomenclature. This prepares to make network requests.
    */
@@ -37,7 +37,7 @@ namespace Isis {
 
     m_request = new QNetworkRequest;
     m_request->setUrl(
-        QUrl("http://planetarynames.wr.usgs.gov/nomenclature/SearchResults"));
+        QUrl("https://planetarynames.wr.usgs.gov/nomenclature/SearchResults"));
     m_request->setRawHeader("User-Agent",
                             "Mozilla/5.0 (X11; Linux i686; rv:6.0) "
                             "Gecko/20100101 Firefox/6.0");
@@ -85,7 +85,7 @@ namespace Isis {
     m_features = NULL;
   }
 
-  
+
    /**
    * Makes sure the longitudinal ranges are correct. If the range intersects with the 0 line the
    *   range is split into two ranges, the minimum to 360 and 0 to the maximum. Then it runs a
@@ -100,19 +100,19 @@ namespace Isis {
   void FeatureNomenclature::queryFeatures(QString target,
                                           Latitude startLat, Longitude startLon,
                                           Latitude endLat, Longitude endLon) {
-    
+
     QList< QPair<Longitude, Longitude> > range = Longitude::to360Range(startLon, endLon);
 
     if (!range.isEmpty()) {
       startLon = range[0].first;
       endLon = range[0].second;
     }
-      
+
     if (range.size() > 1) {
 
       Longitude startLon2 = range[1].first;
       Longitude endLon2 = range[1].second;
-      
+
       runQuery(target, startLat, startLon, endLat, endLon);
       runQuery(target, startLat, startLon2, endLat, endLon2);
 
@@ -120,7 +120,7 @@ namespace Isis {
     }
     else {
       runQuery(target, startLat, startLon, endLat, endLon);
-      
+
       m_lastQuery = true;
     }
   }
@@ -454,7 +454,7 @@ namespace Isis {
 
     if (nameString != cleanNameString)
       displayNameString = nameString + " (" + cleanNameString + ")";
-    
+
     return displayNameString;
   }
 
@@ -741,7 +741,7 @@ namespace Isis {
     return m_approvalStatus;
   }
 
-  
+
   /**
    * Swap the member data of this feature with another feature.
    *
@@ -750,7 +750,7 @@ namespace Isis {
   void FeatureNomenclature::Feature::swap(Feature &other) {
     std::swap(m_xmlRepresenation, other.m_xmlRepresenation);
     std::swap(m_approvalStatus, other.m_approvalStatus);
-    
+
   }
 
 
@@ -786,7 +786,7 @@ namespace Isis {
       if (nodes.count())
         text = nodes.at(0).toElement().text().trimmed();
     }
-    
+
     return text;
   }
 
@@ -816,6 +816,12 @@ namespace Isis {
             readSearchResults(element);
           }
         }
+      }
+      else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 301) {
+        IString msg = "The URL has been permanently moved to " +
+                      reply->attribute(QNetworkRequest::RedirectionTargetAttribute)
+                      .toUrl().toString();
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       else {
       QMessageBox::warning(NULL, "Failed to read nomenclature database result",
@@ -853,7 +859,7 @@ namespace Isis {
    */
   void FeatureNomenclature::readSearchResults(QDomElement xmlSearchResults) {
     ASSERT(xmlSearchResults.tagName() == "searchresults");
-    
+
     if (!m_features)
       m_features = new QList<Feature>;
 
@@ -864,7 +870,7 @@ namespace Isis {
       QString approvalID = element.childNodes().item(15).toElement().attribute("id");
 
       if (element.tagName() == "feature") {
-        
+
         if(approvalID == "5") {
            m_statusApproval = Approved;
         }
@@ -883,7 +889,7 @@ namespace Isis {
     }
   }
 
-  
+
    /**
    * Query the nomenclature database for features inside the given range on the
    *   target. When the last query for the cube is done, featuresIdentified()
@@ -957,6 +963,6 @@ namespace Isis {
     formQuery.addQueryItem("southernLatitude",
                                  QString::number(startLat.degrees()));
 
-    m_networkMgr->post(*m_request, formQuery.query(QUrl::FullyEncoded).toUtf8()); 
+    m_networkMgr->post(*m_request, formQuery.query(QUrl::FullyEncoded).toUtf8());
   }
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <float.h>
 
+#include <QDebug>
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -26,13 +27,14 @@ int main() {
    * @history 2010-08-12  Tracie Sucharski,  Keywords changed AGAIN..
    * @history 2010-10-18  Tracie Sucharski,  Set EditLock to false before
    *                         Test 5 so type can be updatem.
-   * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData() 
-   * @history 2012-07-26  Tracie Sucharski,  Added test for == and != operators. 
+   * @history 2010-11-03  Mackenzie Boyd,  Added test for PrintableClassData()
+   * @history 2012-07-26  Tracie Sucharski,  Added test for == and != operators.
+   * @history 2017-12-21  Kristin Berry - Added tests for accessor methods.
    *
   */
   Preference::Preferences(true);
   ControlMeasure m;
-  cout << "Test 1 Default values" << endl;
+  qDebug() << "Test 1 Default values";
   m.SetChooserName("ManuallySet");
   m.SetDateTime("2001-01-01T00:00:00");
   outit(m);
@@ -49,55 +51,54 @@ int main() {
   m.SetLineSigma(.21);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  cout << "Test 2" << endl;
+  qDebug() << "Test 2";
   outit(m);
 
   m.SetType(ControlMeasure::Candidate);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  cout << "Test 3" << endl;
+  qDebug() << "Test 3";
   outit(m);
 
   m.SetType(ControlMeasure::Manual);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   m.SetEditLock(true);
-  cout << "Test 4" << endl;
+  qDebug() << "Test 4";
   outit(m);
 
   m.SetType(ControlMeasure::RegisteredPixel);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   m.SetEditLock(false);
-  cout << "Test 5" << endl;
+  qDebug() << "Test 5";
   outit(m);
 
   m.SetType(ControlMeasure::RegisteredSubPixel);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
-  cout << "Test 6" << endl;
+  qDebug() << "Test 6";
   outit(m);
 
-  m.SetLogData(
-    ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0)
-  );
+  m.SetLogData(ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0));
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
 
   // Dump of all variables
-  cout << "Test 7" << endl;
+  qDebug() << "Test 7";
   QList< QStringList > printableMeasureData = m.PrintableClassData();
   QStringList nameValuePair;
   foreach(nameValuePair, printableMeasureData) {
-    cout << nameValuePair.at(0).toStdString() << "=" <<
-        nameValuePair.at(1).toStdString() << endl;
+    // qDebug adds uneccessary spacing after each << so we use cout to display this data.
+    std::cout << nameValuePair.at(0).toLatin1().data() << "=" <<
+        nameValuePair.at(1).toLatin1().data() <<std::endl;
   }
 
-  cout << "Test 8" << endl;
-  cout << m.GetLogData(ControlMeasureLogData::GoodnessOfFit).
-      GetNumericalValue() << endl;
-  cout << m.GetLogValue(ControlMeasureLogData::GoodnessOfFit).
-      toDouble() << endl;
+  qDebug() << "Test 8";
+  qDebug() << m.GetLogData(ControlMeasureLogData::GoodnessOfFit).
+      GetNumericalValue();
+  qDebug() << m.GetLogValue(ControlMeasureLogData::GoodnessOfFit).
+      toDouble();
 
   // Test parent editLock on reference measure
   ControlPoint *cp = new ControlPoint("Parent1");
@@ -112,53 +113,57 @@ int main() {
   cp->Add(&m2);
   cp->SetRefMeasure(&m2);
   cp->SetEditLock(true);
-  cout << endl << "Test 9" << endl;
-  cout << "Testing point editLock on reference measure" << endl;
+  qDebug() << "";
+  qDebug() << "Test 9";
+  qDebug() << "Testing point editLock on reference measure";
   if (m2.IsEditLocked())
-    cout << "Reference point ok" << endl;
+    qDebug() << "Reference point ok";
   else
-    cout << "Reference point failed" << endl;
+    qDebug() << "Reference point failed";
   if (m.IsEditLocked())
-    cout << "Nonreference point failed" << endl;
+    qDebug() << "Nonreference point failed";
   else
-    cout << "Nonreference point ok" << endl;
+    qDebug() << "Nonreference point ok";
 
-  cout << endl << "Test 10" << endl;
-  cout << "Testing == operator on the same measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 10";
+  qDebug() << "Testing == operator on the same measures";
   if (m == m) {
-    cout << "Measure1 == Measure1   TRUE" << endl;
+    qDebug() << "Measure1 == Measure1   TRUE";
   }
   else {
-    cout << "Measure1 == Measure1   FALSE" << endl;
+    qDebug() << "Measure1 == Measure1   FALSE";
   }
 
-  cout << endl << "Test 11" << endl;
-  cout << "Testing == operator on two different measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 11";
+  qDebug() << "Testing == operator on two different measures";
   if (m == m2) {
-    cout << "Measure1 == Measure2   TRUE" << endl;
+    qDebug() << "Measure1 == Measure2   TRUE";
   }
   else {
-    cout << "Measure1 == Measure2   FALSE" << endl;
+    qDebug() << "Measure1 == Measure2   FALSE";
   }
 
-  cout << endl << "Test 12" << endl;
-  cout << "Testing != operator on the same measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 12";
+  qDebug() << "Testing != operator on the same measures";
   if (m != m) {
-    cout << "Measure1 != Measure1   TRUE" << endl;
+    qDebug() << "Measure1 != Measure1   TRUE";
   }
   else {
-    cout << "Measure1 != Measure1   FALSE" << endl;
+    qDebug() << "Measure1 != Measure1   FALSE";
   }
 
-  cout << endl << "Test 13" << endl;
-  cout << "Testing != operator on two different measures" << endl;
+  qDebug() << "";
+  qDebug() << "Test 13";
+  qDebug() << "Testing != operator on two different measures";
   if (m != m2) {
-    cout << "Measure1 != Measure2   TRUE" << endl;
+    qDebug() << "Measure1 != Measure2   TRUE";
   }
   else {
-    cout << "Measure1 != Measure2   FALSE" << endl;
+    qDebug() << "Measure1 != Measure2   FALSE";
   }
-
 
   try {
     m.SetLogData(ControlMeasureLogData());
@@ -166,6 +171,18 @@ int main() {
   catch (IException &e) {
     e.print();
   }
+
+  qDebug() << "";
+  qDebug() << "Test 14: Testing accessor methods";
+
+  if (m.IsRejected()) {
+      qDebug() << "Measure was rejected.";
+  }
+  else {
+      qDebug() << "Measure was not rejected.";
+  }
+  qDebug() << "Measure HasChooserName(): " << m.HasChooserName();
+  qDebug() << "Measure HasDateTime(): " << m.HasDateTime();
 }
 
 void outit(ControlMeasure &m) {
@@ -181,7 +198,6 @@ void outit(ControlMeasure &m) {
   net.SetModifiedDate("Yesterday");
   net.Write("./tmp.net", true);
   Pvl tmp("./tmp.net");
-  cout << "Printing measure:\n" << tmp << "\nDone printing measure." << endl
-       << endl;
+  std::cout << "Printing measure:\n" << tmp << "\nDone printing measure.\n" << std::endl;
   remove("./tmp.net");
 }
