@@ -67,16 +67,16 @@ namespace Isis {
 
   ProcessImportPds::~ProcessImportPds() {
   }
-  
-  
+
+
   /**
-  * @deprecated. Please use Finalize. 
+  * @deprecated. Please use Finalize.
   */
   void ProcessImportPds::EndProcess() {
     ProcessImportPds::Finalize();
   }
-  
-  
+
+
   /**
    * Extract all possible PDS projection parameters from the PDS label
    *
@@ -315,15 +315,15 @@ namespace Isis {
     p_projectionOffsetGroup.addKeyword(PvlKeyword("xOffset", QString::number(xoff)));
     p_projectionOffsetGroup.addKeyword(PvlKeyword("yOffset", QString::number(yoff)));
     p_projectionOffsetGroup.addKeyword(PvlKeyword("xMultiplier", QString::number(xmult)));
-    p_projectionOffsetGroup.addKeyword(PvlKeyword("yMultiplier", QString::number(ymult))); 
+    p_projectionOffsetGroup.addKeyword(PvlKeyword("yMultiplier", QString::number(ymult)));
 
   }
-  
-  
+
+
   /**
   * End the processing sequence and cleans up by closing cubes,
   * freeing memory, etc. Adds the OriginalLabel data to the end of
-  * the cube file, unless OmitOriginalLabel() has been called. 
+  * the cube file, unless OmitOriginalLabel() has been called.
   */
   void ProcessImportPds::Finalize() {
     if (p_keepOriginalLabel) {
@@ -334,24 +334,24 @@ namespace Isis {
     }
     Process::Finalize();
   }
-  
-  
+
+
   /**
    * Return whether the projection offsets have changed.
    */
   bool ProcessImportPds::GetProjectionOffsetChange() {
     return p_projectionOffsetChange;
   }
-  
-  
+
+
   /**
    * Return the projection offsets. This will allow an app to log offset data.
    */
   PvlGroup ProcessImportPds::GetProjectionOffsetGroup() {
     return p_projectionOffsetGroup;
   }
-  
-  
+
+
   /**
    * Read mults and offsets from a def file in order to calculate the upper
    * left x/y.
@@ -396,8 +396,8 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   /**
   * Identify the source of this file PDS or ISIS2.
   *
@@ -432,8 +432,8 @@ namespace Isis {
     }
 
   }
-  
-  
+
+
   /**
    * This method will import the PDS table with the given name into an Isis
    * Table object. The table will be added to the cube file in the call to
@@ -458,8 +458,8 @@ namespace Isis {
 
     return p_tables.at(p_tables.size() - 1);
   }
-  
-  
+
+
   /**
    * Return true if ISIS2 cube, else return false
    *
@@ -479,8 +479,8 @@ namespace Isis {
     }
 
   }
-  
-  
+
+
   /**
    * Prevents the Original Label blob from being written out to
    * the end of the cube.
@@ -488,8 +488,8 @@ namespace Isis {
   void ProcessImportPds::OmitOriginalLabel() {
     p_keepOriginalLabel = false;
   }
-  
-  
+
+
 /**
    * Handles the DataFilePointer keyword, aka ^QUBE or ^IMAGE.
    * There are two side effects of this method, those are
@@ -590,9 +590,9 @@ namespace Isis {
       QString recSize = pdsXlater.Translate("DataFileRecordBytes");
       SetFileHeaderBytes((offset - 1) * toInt(recSize));
     }
-  }  
-  
-  
+  }
+
+
 /**
    * Load the PDS labels after determining what type of data file was provided.
    * This code used to be part of the SetPdsFile method, but had to be moved to
@@ -749,19 +749,20 @@ namespace Isis {
       ProcessPdsCombinedSpectrumLabel(pdsDataFile);
     }
     else {
-      QString msg = "Unknown label type in [" + p_labelFile + "]";
+      QString msg = "Unknown label type in [" + p_labelFile + "]. It is possible the label file "
++                    "does not describe an image product (IMAGE, CUBE, or SPECTRALCUBE).";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-    
+
 
     // Find out if this is a PDS file or an ISIS2 file
     IdentifySource(p_pdsLabel);
 
-    
+
     return;
   }
-  
-  
+
+
   /**
    * Process the PDS label of type CombinedSpectrum.
    *
@@ -787,7 +788,7 @@ namespace Isis {
 
     ProcessPixelBitandType(pdsXlater);
 
-    str = pdsXlater.Translate("CoreByteOrder");    
+    str = pdsXlater.Translate("CoreByteOrder");
     SetByteOrder(Isis::ByteOrderEnumeration(str));
 
     str = pdsXlater.Translate("CoreSamples");
@@ -850,8 +851,8 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
-  
-  
+
+
   /**
    * Process the PDS label of type QUBE or SPECTRALQUBE.
    *
@@ -949,12 +950,12 @@ namespace Isis {
       str = pdsXlater.Translate("CoreSamples", samplePos);
       trailer *= toInt(str);
       trailer += suffix;
-      SetDataTrailerBytes(trailer); 
+      SetDataTrailerBytes(trailer);
     }
 
     // Save the Data Trailer if it exists
     if (DataTrailerBytes() != 0) {
-      SaveDataTrailer(); 
+      SaveDataTrailer();
     }
 
     ProcessPixelBitandType(pdsXlater);
@@ -1034,8 +1035,8 @@ namespace Isis {
       SetMultiplier(toDouble(str));
     }
   }
-  
-  
+
+
   /**
    * Process the PDS label of type IMAGE.
    *
@@ -1061,7 +1062,7 @@ namespace Isis {
 
     ProcessPixelBitandType(pdsXlater);
 
-    str = pdsXlater.Translate("CoreByteOrder");    
+    str = pdsXlater.Translate("CoreByteOrder");
     SetByteOrder(Isis::ByteOrderEnumeration(str));
 
     str = pdsXlater.Translate("CoreSamples");
@@ -1127,8 +1128,8 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
-  
-  
+
+
   /**
    * Handles PixelType and BitsPerPixel
    * Calls SetPixelType with the correct values
@@ -1167,15 +1168,15 @@ namespace Isis {
     else if ((str == "Natural") && (bitsPerPixel == 32)) {
       SetPixelType(Isis::UnsignedInteger);
     }
-    
+
     else {
       QString msg = "Invalid PixelType and BitsPerPixel combination [" + str +
                    ", " + toString(bitsPerPixel) + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
-  
-  
+
+
   /**
    * Process Chandrayaan M3 PDS label
    *
@@ -1284,8 +1285,8 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
-  
-  
+
+
   /**
    * Handles all special pixel setting, ultimately, calls SetSpecialValues.
    */
@@ -1364,8 +1365,8 @@ namespace Isis {
 
     SetSpecialValues(pdsNull, pdsLrs, pdsLis, pdsHrs, pdsHis);
   }
-  
-  
+
+
   /**
    * Set the input label PVL and data file and initialize a Pvl with the PDS labels.
    * This method was written to allow the calling application to intercept the PDS
@@ -1373,7 +1374,7 @@ namespace Isis {
    * keywords like TARGET_NAME) before this class loads them. See the kaguyatc2isis
    * program for an example.
    *
-   * @param pdsLabelPvl The PVL containing the PDS label. 
+   * @param pdsLabelPvl The PVL containing the PDS label.
    *
    * @param pdsDataFile The name of the PDS data file where the actual image/cube
    *                    data is stored. This parameter cannot be empty.
@@ -1429,8 +1430,8 @@ namespace Isis {
     p_labelFile = pdsLabelFile;
     ProcessLabel(pdsDataFile, allowedTypes);
   }
-  
-  
+
+
   /**
    * This method will write the cube and table data to the output cube.
    */
@@ -1444,8 +1445,8 @@ namespace Isis {
 
 
   /**
-   * Process the input file and send data to a method for specialized processing. The method is 
-   * expected to write the data after it has processed it if necessary. 
+   * Process the input file and send data to a method for specialized processing. The method is
+   * expected to write the data after it has processed it if necessary.
    *
    * @param funct Method that accepts Isis::Buffer as an input
    *              parameter, processes the image, and has no
@@ -1458,8 +1459,8 @@ namespace Isis {
     return;
   }
 
-  
-  
+
+
   /**
    * Fill as many of the Isis3 BandBin labels as possible
    *
@@ -1477,8 +1478,8 @@ namespace Isis {
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
   }
-  
-  
+
+
   /**
    * Fill as many of the Isis3 instrument labels as possible
    *
@@ -1505,8 +1506,8 @@ namespace Isis {
       stkey = stime;
     }
   }
-  
-  
+
+
   /**
    * Translate as many of the ISIS2 labels as possible
    *
@@ -1518,8 +1519,8 @@ namespace Isis {
     TranslateIsis2BandBin(lab);
     TranslateIsis2Instrument(lab);
   }
-  
-  
+
+
   /**
    * Fill as many of the Isis3 BandBin labels as possible
    *
@@ -1534,8 +1535,8 @@ namespace Isis {
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
   }
-  
-  
+
+
   /**
    * Fill as many of the Isis3 BandBin labels as possible
    *
@@ -1550,8 +1551,8 @@ namespace Isis {
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
   }
-  
-  
+
+
   /**
    * Translate as many of the PDS labels as possible
    *

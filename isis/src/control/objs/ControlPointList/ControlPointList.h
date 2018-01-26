@@ -23,9 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include <vector>
 #include <QStringList>
+#include <QVector>
 
 #include "Pvl.h"
 
@@ -46,7 +45,9 @@ namespace Isis {
    *
    *   @history 2009-08-11 Sharmila Prasad Original Version
    *   @history 2009-10-04 Steven Lambright Constructor now takes a FileName
-   *     instead of a string.
+   *            instead of a string.
+   *   @history 2017-12-12 Kristin Berry Updated to use QVector and QString instead of std::vector
+   *            and std::string. Fixes #5259.
    */
   class ControlPointList {
     public:
@@ -67,7 +68,7 @@ namespace Isis {
 
       //! holds one to one correspondence with "mqCpList" on
       //! whether the point was valid
-      std::vector<bool> mbFound; 
+      QVector<bool> mbFound; 
   };
 };
 

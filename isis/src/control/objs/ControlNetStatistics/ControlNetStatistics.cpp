@@ -25,9 +25,6 @@
 #include "SpecialPixel.h"
 #include "Statistics.h"
 
-
-using namespace std;
-
 namespace Isis {
 
   //! String names for Point Type
@@ -232,7 +229,7 @@ namespace Isis {
           new geos::geom::CoordinateArraySequence();
 
       // setup vector for number of image properties and init to 0
-      vector<double> imgStats(numImageStats, 0);
+      QVector<double> imgStats(numImageStats, 0);
 
       // Open the cube to get the dimensions
       QString sn = node->getSerialNumber();
@@ -335,25 +332,25 @@ namespace Isis {
      }
 
     //map< QString, vector<double> >::iterator it;
-    map<QString, bool>::iterator it;
     // imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
-
+    QMap<QString, bool>::iterator it;
     // Log into the output file
     ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free, ConvexHullRatio" <<  endl;
     //for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
+
     for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
-        ostm << mSerialNumList.fileName((*it).first) << ", " << (*it).first << ", ";
-        bool serialNumExists = (*it).second ;
-        if (serialNumExists) {
-          vector<double>imgStats = mImageMap[(*it).first] ;
-          ostm << imgStats[imgTotalPoints]<< ", " << imgStats[imgIgnoredPoints] << ", " ;
-          ostm << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", " ;
-          ostm << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", ";
-          ostm << imgStats[ imgConvexHullRatio] << endl;
-        }
-        else {
-          ostm << "0, 0, 0, 0, 0, 0, 0" << endl;
-        }
+      ostm << mSerialNumList.fileName(it.key()) << ", " << it.key() << ", ";
+      bool serialNumExists = it.value();
+      if (serialNumExists) {
+        QVector<double> imgStats = mImageMap[(it).key()] ;
+        ostm << imgStats[imgTotalPoints]<< ", " << imgStats[imgIgnoredPoints] << ", " ;
+        ostm << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", " ;
+        ostm << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", ";
+        ostm << imgStats[imgConvexHullRatio] << endl;
+      }
+      else {
+        ostm << "0, 0, 0, 0, 0, 0, 0" << endl;
+      }
     }
 
     if (!ostm) {
@@ -371,10 +368,10 @@ namespace Isis {
    *
    * @param psSerialNum - Image serialNum
    *
-   * @return const vector<double>
+   * @return const QVector<double>
    */
-  vector<double> ControlNetStatistics::GetImageStatsBySerialNum(QString psSerialNum) const {
-    return (*mImageMap.find(psSerialNum)).second;
+  QVector<double> ControlNetStatistics::GetImageStatsBySerialNum(QString psSerialNum) const {
+    return (mImageMap.find(psSerialNum)).value();
   }
 
 

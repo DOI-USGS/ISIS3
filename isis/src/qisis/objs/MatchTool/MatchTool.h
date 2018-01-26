@@ -209,6 +209,9 @@ namespace Isis {
    *                         in clang. Part of porting to OS X 10.11
    * @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
    *                           SerialNumberList.remove()
+   * @history 2017-11-22 Adam Goins - Set the MatchTool window title and
+   *                          the CNet file name label to the newly saved file.
+   *                          Fixes #3922.
    */
   class MatchTool : public Tool {
     Q_OBJECT
