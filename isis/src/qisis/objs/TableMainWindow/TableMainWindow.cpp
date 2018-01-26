@@ -3,12 +3,13 @@
 #include <iostream>
 
 #include <QAction>
-#include <QStatusBar>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QHeaderView>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
+#include <QStatusBar>
 #include <QTableWidget>
 #include <QToolBar>
 
@@ -28,14 +29,15 @@ namespace Isis {
     p_visibleColumns = -1;
     p_currentRow = 0;
     p_currentIndex = 0;
-    createTable();
-
     setObjectName(title);
+    createTable();
     readSettings(QSize(500, 300));
+    readColumnSettings();
   }
 
 
   TableMainWindow::~TableMainWindow() {
+    writeSettings();
   }
 
 
@@ -57,6 +59,23 @@ namespace Isis {
     return result;
   }
 
+  void TableMainWindow::resizeColumn(int columnIndex) {
+    QHeaderView* header = p_table->horizontalHeader();
+
+    QString columnName(p_table->model()->headerData(columnIndex, Qt::Horizontal).toString());
+
+    if (columnName.isEmpty())
+    {
+      return;
+    }
+
+    if (header->sectionResizeMode(columnIndex) == QHeaderView:: ResizeToContents) {
+      header->setSectionResizeMode(columnIndex, QHeaderView::Interactive);
+    }
+    else {
+      header->setSectionResizeMode(columnIndex, QHeaderView::ResizeToContents);
+    }
+  }
 
   /**
    * This creates the table main window.  The table and docking
@@ -77,6 +96,12 @@ namespace Isis {
     // Create the table widget
     p_table = new QTableWidget(this);
     p_table->setAlternatingRowColors(true);
+    //
+    QHeaderView* columnHeader = p_table->horizontalHeader();
+    columnHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+    connect ( columnHeader, SIGNAL( sectionPressed(int) ),
+              this, SLOT( resizeColumn(int) ) );
+
     setCentralWidget(p_table);
 
     // Create the dock area
@@ -151,7 +176,6 @@ namespace Isis {
     cols->setText("Columns");
     connect(cols, SIGNAL(triggered()), p_dock, SLOT(show()));
     viewMenu->addAction(cols);
-
     this->setMenuBar(menuBar);
     installEventFilter(this);
   }
@@ -198,7 +222,7 @@ namespace Isis {
         destinationColumn = startCol + i;
         p_table->insertColumn(startCol + i);
       }
-      
+
       QTableWidgetItem *header = new QTableWidgetItem(htext);
       if (insertAt >= 0) {
 
@@ -255,6 +279,7 @@ namespace Isis {
 
       readItemSettings(heading, item, setOn);
     }
+    readColumnSettings();
   }
 
 
@@ -345,7 +370,7 @@ namespace Isis {
   /**
    * This method checks to see if the table has been created. If
    * not it calls the createTable method before calling show.
-   * 
+   *
    * @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
    *                        this->show() so that it hides the unselected columns appropriately.
    *                        Fixes #5141.
@@ -550,12 +575,46 @@ namespace Isis {
     item->setCheckState(state);
   }
 
+  /**
+   * This method reads the columns in the table and sets their size
+   * to the appropriate size, or the size to auto based on what they were
+   * stored as.
+   *
+   */
+  void TableMainWindow::readColumnSettings() {
+
+    QHeaderView *header = p_table->horizontalHeader();
+    QSettings settings(settingsFileName(), QSettings::NativeFormat);
+
+    for (int columnIndex = 0; columnIndex < p_table->model()->columnCount(); columnIndex++) {
+
+       QString headerName = p_table->model()->headerData(columnIndex, Qt::Horizontal).toString();
+       QString settingName = "column-" + headerName;
+       QString value = settings.value(settingName, "auto").toString();
+
+       if (value == "auto" || value == "0") {
+          header->setSectionResizeMode(columnIndex, QHeaderView::ResizeToContents);
+       }
+       else {
+         int width = value.toInt();
+
+         header->setSectionResizeMode(columnIndex, QHeaderView::Interactive);
+         p_table->setColumnWidth(columnIndex, width);
+       }
+    }
+  }
+
 
   /**
    * This overriden method is called when the Tablemainwindow
    * is closed or hidden to write the size and location settings
    * (and dock widget settings) to a config file in the user's
    * home directory.
+   *
+   *  @internal
+   *    @history 2017-11-13 Adam Goins - Added the behavior of columns sizes to be written
+   *                            to the settings file so that they can be persistent through
+   *                            new instances of qview.
    *
    */
   void TableMainWindow::writeSettings() const {
@@ -565,6 +624,22 @@ namespace Isis {
       foreach (QListWidgetItem *item, itemList()) {
         QString itemTitle = "item-" + item->text();
         settings.setValue(itemTitle, item->checkState());
+      }
+
+      QHeaderView *header = p_table->horizontalHeader();
+      for(int columnIndex = 0; columnIndex < p_table->model()->columnCount(); columnIndex++)
+      {
+         QString headerName = p_table->model()->headerData(columnIndex, Qt::Horizontal).toString();
+         QString settingName = "column-" + headerName;
+
+         if (header->sectionResizeMode(columnIndex) == QHeaderView::ResizeToContents)
+         {
+           settings.setValue(settingName, "auto");
+         }
+         else
+         {
+           settings.setValue( settingName, header->sectionSize(columnIndex) );
+         }
       }
     }
   }

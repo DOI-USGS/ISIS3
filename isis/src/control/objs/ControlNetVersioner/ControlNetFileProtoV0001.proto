@@ -1,4 +1,6 @@
 // Protocol buffer descriptor for ISIS3 ControlNet class hierarchy
+//
+// 2017-12-11 Kristin Berry - Separated top-level messages into different files
 
 package Isis;
 
@@ -131,19 +133,3 @@ message ControlNetFileProtoV0001 {
   optional PBNetCubes netcubes = 9;
 }
 
-message ControlNetLogDataProtoV0001 {
-  message Point {
-    message Measure {
-      message DataEntry {
-        required int32 dataType = 2;
-        required double dataValue = 3;
-      }
-
-      repeated DataEntry loggedMeasureData = 2;
-    }
-
-    repeated Measure measures = 2;
-  }
-
-  repeated Point points = 1;
-}

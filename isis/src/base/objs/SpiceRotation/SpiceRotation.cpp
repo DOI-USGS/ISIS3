@@ -1447,6 +1447,7 @@ namespace Isis {
     QString msg;
     switch (m_frameType) {
      case CK:
+     case DYN:
        dpoly = DPolynomial(coeffIndex);
        break;
      case PCK:
@@ -2035,7 +2036,7 @@ namespace Isis {
    * @param[in]  partialVar  Variable derivative is to be with respect to
    * @param[in]  coeffIndex  Coefficient index in the polynomial fit to the variable (angle)
    *
-   * @throws IException::Programmer "Only CK and PCK partials can be calculated"
+   * @throws IException::Programmer "Only CK, DYN, and PCK partials can be calculated"
    *
    * @return @b vector<double> Vector rotated by derivative of J2000 to reference rotation.
    */
@@ -2062,13 +2063,14 @@ namespace Isis {
     switch (m_frameType) {
      case UNKNOWN:  // For now let everything go through for backward compatability
      case CK:
-       dpoly = DPolynomial(coeffIndex);
+     case DYN:
+      dpoly = DPolynomial(coeffIndex);
        break;
      case PCK:
        dpoly = DPckPolynomial(partialVar, coeffIndex);
        break;
      default:
-      QString msg = "Only CK and PCK partials can be calculated";
+      QString msg = "Only CK, DYN, and PCK partials can be calculated";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

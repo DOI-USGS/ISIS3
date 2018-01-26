@@ -1,5 +1,9 @@
 ControlPoint unitTest
 Adding ControlMeasure with cube serial number [Test1]
+
+Testing point has ChooserName: TRUE
+Testing point has DateTime:    TRUE
+
 Printing point:
 Object = ControlNetwork
   NetworkId    = Identifier
@@ -8,7 +12,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Fixed
@@ -70,6 +74,10 @@ Done printing point.
 Adding ControlMeasure with cube serial number [Test2]
 Testing Edit Locking... ok!
 
+
+Testing point has ChooserName: TRUE
+Testing point has DateTime:    TRUE
+
 Printing point:
 Object = ControlNetwork
   NetworkId    = Identifier
@@ -78,7 +86,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Fixed
@@ -159,6 +167,10 @@ Testing copy constructor...
 	 Also testing == operator
 		 original == its self (yes)? 1
 		 original == copy (no)? 0
+
+Testing point has ChooserName: TRUE
+Testing point has DateTime:    TRUE
+
 Printing point:
 Object = ControlNetwork
   NetworkId    = Identifier
@@ -167,7 +179,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Fixed
@@ -245,6 +257,10 @@ End
 Done printing point.
 
 Testing assignment operator...
+
+Testing point has ChooserName: TRUE
+Testing point has DateTime:    TRUE
+
 Printing point:
 Object = ControlNetwork
   NetworkId    = Identifier
@@ -253,7 +269,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Fixed
@@ -330,6 +346,10 @@ Done printing point.
 
 Deleting ControlMeasure with cube serial number [Test1]
 Measure type: Candidate
+
+Testing point has ChooserName: TRUE
+Testing point has DateTime:    TRUE
+
 Printing point:
 Object = ControlNetwork
   NetworkId    = Identifier
@@ -338,7 +358,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType                = Fixed

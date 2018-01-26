@@ -1,0 +1,14 @@
+// Protocol buffer header descriptor for Isis3 Control Networks
+package Isis;
+
+message ControlNetFileHeaderV0005 {
+//  Some fields of ControlNet
+  required string networkId    = 1;
+  required string targetName   = 2;
+  optional string created      = 3;
+  optional string lastModified = 4;
+  optional string description  = 5;
+  optional string userName     = 6;
+  optional int32  numPoints    = 7; 
+}
+
