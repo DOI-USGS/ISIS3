@@ -94,7 +94,6 @@ void IsisMain() {
     p.SetPdsFile(*pdsLabel, in.expanded());
   }
   catch (IException &e) {
-    e.print();
     QString msg = "Unable to set PDS file. Decompressed input file ["
                  + in.name() + "] does not appear to be a PDS product";
     throw IException(IException::User, msg, _FILEINFO_);
