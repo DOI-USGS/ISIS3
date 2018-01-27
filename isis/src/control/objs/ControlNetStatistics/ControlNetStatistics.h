@@ -2,7 +2,7 @@
 #define _CONTROLNETSTATISTICS_H_
 
 #include <QMap>
-#include <QVector> 
+#include <QVector>
 
 #include "Progress.h"
 #include "PvlGroup.h"
