@@ -1391,8 +1391,13 @@ namespace Isis {
 
   /**
    * Signal to save the control net.
+   *
+   * @internal
+   * @history 2017-11-22 Adam Goins - Set the MatchTool window title and
+   *                         the CNet file name label to the newly saved file.
+   *                         Fixes #3922.
    */
-  void MatchTool::saveAsNet () {
+  void MatchTool::saveAsNet() {
 
     QString fn = QFileDialog::getSaveFileName(m_matchTool,
                  "Choose filename to save under",
@@ -1410,6 +1415,8 @@ namespace Isis {
         return;
       }
       m_cnetFileName = fn;
+      m_matchTool->setWindowTitle("Match Tool - Control Network File: " + m_cnetFileName);
+      m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
     }
     //The user cancelled, or the filename is empty
     else {

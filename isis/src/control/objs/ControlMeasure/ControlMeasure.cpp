@@ -33,8 +33,9 @@
 #include "ControlCubeGraphNode.h"
 #include "IString.h"
 #include "iTime.h"
-#include "ControlNetFileV0002.pb.h"
 #include "SpecialPixel.h"
+
+using namespace std;
 
 namespace Isis {
   /**
@@ -52,75 +53,6 @@ namespace Isis {
     p_jigsawRejected = false;
     p_ignore = false;
 
-    p_sample = 0.0;
-    p_line = 0.0;
-  }
-
-
-  /**
-   * Converts the protocol buffer version of the measure into a real
-   *   ControlMeasure
-   *
-   * @param other The control measure to copy all of the values from
-   */
-  ControlMeasure::ControlMeasure(
-      const ControlPointFileEntryV0002_Measure &protoBuf) {
-    InitializeToNull();
-
-    p_serialNumber = new QString(protoBuf.serialnumber().c_str());
-    p_chooserName = new QString(protoBuf.choosername().c_str());
-    p_dateTime = new QString(protoBuf.datetime().c_str());
-    p_loggedData = new QVector<ControlMeasureLogData>();
-
-    switch (protoBuf.type()) {
-      case ControlPointFileEntryV0002_Measure::Candidate:
-        p_measureType = ControlMeasure::Candidate;
-        break;
-      case ControlPointFileEntryV0002_Measure::Manual:
-        p_measureType = ControlMeasure::Manual;
-        break;
-      case ControlPointFileEntryV0002_Measure::RegisteredPixel:
-        p_measureType = ControlMeasure::RegisteredPixel;
-        break;
-      case ControlPointFileEntryV0002_Measure::RegisteredSubPixel:
-        p_measureType = ControlMeasure::RegisteredSubPixel;
-        break;
-    }
-
-    p_editLock = protoBuf.editlock();
-    p_jigsawRejected = protoBuf.jigsawrejected();
-    p_ignore = protoBuf.ignore();
-    p_sample = protoBuf.sample();
-    p_line = protoBuf.line();
-//    ground = protoBuf.???
-
-    if (protoBuf.has_diameter())
-      p_diameter = protoBuf.diameter();
-
-    if (protoBuf.has_apriorisample())
-      p_aprioriSample = protoBuf.apriorisample();
-
-    if (protoBuf.has_aprioriline())
-      p_aprioriLine = protoBuf.aprioriline();
-
-    if (protoBuf.has_samplesigma())
-      p_sampleSigma = protoBuf.samplesigma();
-
-    if (protoBuf.has_linesigma())
-      p_lineSigma = protoBuf.linesigma();
-
-    if (protoBuf.has_sampleresidual())
-      p_sampleResidual = protoBuf.sampleresidual();
-
-    if (protoBuf.has_lineresidual())
-      p_lineResidual = protoBuf.lineresidual();
-
-    for (int dataEntry = 0;
-        dataEntry < protoBuf.log_size();
-        dataEntry ++) {
-      ControlMeasureLogData logEntry(protoBuf.log(dataEntry));
-      p_loggedData->push_back(logEntry);
-    }
   }
 
 
@@ -158,6 +90,11 @@ namespace Isis {
 
   //! initialize pointers and other data to NULL
   void ControlMeasure::InitializeToNull() {
+
+    // Previously these were initialized to 0.0 in the constructor.
+    p_sample = Null;
+    p_line = Null;
+
     p_serialNumber = NULL;
     p_chooserName = NULL;
     p_dateTime = NULL;
@@ -469,6 +406,7 @@ namespace Isis {
    */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
       double lineResidual) {
+        
     MeasureModified();
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
@@ -502,8 +440,8 @@ namespace Isis {
    */
   void ControlMeasure::SetLogData(ControlMeasureLogData data) {
     if (!data.IsValid()) {
-      IString msg = "Cannot set log data with invalid information stored in "
-          "the ControlMeasureLogData";
+      QString msg = "Cannot set log data with invalid information stored in "
+                    "the ControlMeasureLogData";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -582,10 +520,10 @@ namespace Isis {
     }
 
     if (!updated) {
-      IString msg = "Unable to update the log data for [" +
-          newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
-          " control measure does not have log data for this value. Please use "
-          "SetLogData instead";
+      QString msg = "Unable to update the log data for ["
+                    + newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
+                    " control measure does not have log data for this value. Please use "
+                    "SetLogData instead";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -616,6 +554,10 @@ namespace Isis {
     }
   }
 
+  //! Returns true if the choosername is not empty.
+  bool ControlMeasure::HasChooserName() const {
+    return !p_chooserName->isEmpty();
+  }
 
   //! Return the serial number of the cube containing the coordinate
   QString ControlMeasure::GetCubeSerialNumber() const {
@@ -632,6 +574,12 @@ namespace Isis {
       return Application::DateTime();
     }
   }
+
+  //! Returns true if the datetime is not empty.
+  bool ControlMeasure::HasDateTime() const {
+    return !p_dateTime->isEmpty();
+  }
+
 
 
   //! Return the diameter of the crater in pixels (0 implies no crater)
@@ -736,8 +684,8 @@ namespace Isis {
     }
 
     if (!validField) {
-      IString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
-          + IString(field) + "]";
+      QString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
+                    + QString(field) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -764,7 +712,7 @@ namespace Isis {
    * Return Residual magnitude. Returns Isis:Null when p_lineResidual or p_sampleResidual not
    * specifically set after call to constructor. (This calculation is normally done within the
    * jigsaw app)
-   * 
+   *
    * @returns (double) The residual magnitude
    */
   double ControlMeasure::GetResidualMagnitude() const {
@@ -800,7 +748,7 @@ namespace Isis {
 
   QString ControlMeasure::GetPointId() const {
     if (parentPoint == NULL) {
-      IString msg = "Measure has no containing point";
+      QString msg = "Measure has no containing point";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -846,22 +794,42 @@ namespace Isis {
   }
 
 
+  /**
+   * Return all of the log data for the measure.
+   *
+   * @return @b QVector<ControlMeasureLogData> All of the log data for the measure.
+   */
+  QVector<ControlMeasureLogData> ControlMeasure::GetLogDataEntries() const {
+    QVector<ControlMeasureLogData> logs;
+    if (p_loggedData) {
+      logs = *p_loggedData;
+    }
+    return logs;
+  }
+
+
   //! One Getter to rule them all
   double ControlMeasure::GetMeasureData(QString data) const {
-    if (data == "SampleResidual")
+    if (data == "SampleResidual") {
       return p_sampleResidual;
-    else if (data == "LineResidual")
+    }
+    else if (data == "LineResidual") {
       return p_lineResidual;
-    else if (data == "Type")
+    }
+    else if (data == "Type") {
       return p_measureType;
-    else if (data == "IsMeasured")
+    }
+    else if (data == "IsMeasured") {
       return IsMeasured();
-    else if (data == "IsRegistered")
+    }
+    else if (data == "IsRegistered") {
       return IsRegistered();
-    else if (data == "Ignore")
+    }
+    else if (data == "Ignore") {
       return p_ignore;
+    }
     else {
-      IString msg = data + " passed to GetMeasureData but is invalid";
+      QString msg = data + " passed to GetMeasureData but is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -956,8 +924,7 @@ namespace Isis {
    */
   ControlMeasure::MeasureType ControlMeasure::StringToMeasureType(QString str) {
 
-    IString err = "String [";
-    err += IString(str) + "] can not be converted to a MeasureType";
+    QString err = "String [" + str + "] can not be converted to a MeasureType";
 
     str = str.toLower();
     MeasureType measureType;
@@ -1016,62 +983,7 @@ namespace Isis {
 
     return sPrintable;
   }
-  
-  bool HasChooserName() {
-    return !p_chooserName->isEmpty();
-  }
 
-  bool HasDataTime() {
-    return !p_dateTime->isEmpty();   
-  }
-  
-  bool HasSample() {
-    return p_sample ? true : false;   
-  }
-    
-  bool HasLine() {
-    return p_line ? true : false;    
-  }
-  
-  bool HasDiameter() {
-    return p_diameter ? true : false;   
-  }
-  
-  bool hasAprioriSample() {
-    return p_aprioriSample ? true : false;
-  }
-  
-  bool hasAprioriLine() {
-    return p_aprioriLine ? true : false;
-  }
-  
-  bool HasSampleSigma() {
-    return p_sampleSigma ? true : false;
-  }
-  
-  bool HasLineSigma() {
-    return p_lineSigma ? true : false;
-  }
-  
-  bool HasSampleResidual() {
-    return p_sampleResidual ? true : false;
-  }
-  
-  bool HasLineResidual() {
-    return p_lineResidual ? true : false;
-  }
-  
-  bool HasJigsawRejected() {
-    return p_jigsawRejected != NULL ? true : false; 
-  }
-  
-  bool JigsawRejected() {
-    return p_jigsawRejected ? true : false;
-  }
- 
-  int LogSize(){
-    return p_loggedData->size();
-  }
 
   /**
    * Obtain a string representation of the MeasureType
@@ -1168,12 +1080,12 @@ namespace Isis {
    *
    * @author sprasad (4/20/2010)
    *
-   * @internal 
+   * @internal
    *   @history 2010-06-24 Tracie Sucharski, Added new keywords
    *   @history 2012-07-26 Tracie Sucharski, Fixed bug in comparison of chooserName and dateTime,
    *                          comparison was between the pointers instead of the data and added
    *                          comparisons for missing member data.
-   *             
+   *
    *
    * @param pMeasure - Control Measure to be compared against
    *
@@ -1203,77 +1115,6 @@ namespace Isis {
         pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY &&
         pMeasure.p_measuredEphemerisTime == p_measuredEphemerisTime;
   }
-
-
-  ControlPointFileEntryV0002_Measure ControlMeasure::ToProtocolBuffer() const {
-    ControlPointFileEntryV0002_Measure protoBufMeasure;
-
-    protoBufMeasure.set_serialnumber(GetCubeSerialNumber().toLatin1().data());
-    switch (GetType()) {
-      case ControlMeasure::Candidate:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
-        break;
-      case ControlMeasure::Manual:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::Manual);
-        break;
-      case ControlMeasure::RegisteredPixel:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::RegisteredPixel);
-        break;
-      case ControlMeasure::RegisteredSubPixel:
-        protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::RegisteredSubPixel);
-        break;
-    }
-
-    if (GetChooserName() != "") {
-      protoBufMeasure.set_choosername(GetChooserName().toLatin1().data());
-    }
-    if (GetDateTime() != "") {
-      protoBufMeasure.set_datetime(GetDateTime().toLatin1().data());
-    }
-    if (IsEditLocked())
-      protoBufMeasure.set_editlock(true);
-
-    if (IsIgnored())
-      protoBufMeasure.set_ignore(true);
-
-    if (IsRejected())
-      protoBufMeasure.set_jigsawrejected(true);
-
-    if (GetSample() != 0.)
-      protoBufMeasure.set_sample(GetSample());
-
-    if(GetLine() != 0.)
-      protoBufMeasure.set_line(GetLine());
-
-    if (GetSampleResidual() != Isis::Null)
-      protoBufMeasure.set_sampleresidual(GetSampleResidual());
-
-    if (GetLineResidual() != Isis::Null)
-      protoBufMeasure.set_lineresidual(GetLineResidual());
-
-    if (GetDiameter() != Isis::Null)
-      protoBufMeasure.set_diameter(GetDiameter());
-
-    if (GetAprioriSample() != Isis::Null)
-      protoBufMeasure.set_apriorisample(GetAprioriSample());
-
-    if (GetAprioriLine() != Isis::Null)
-      protoBufMeasure.set_aprioriline(GetAprioriLine());
-
-    if (GetSampleSigma() != Isis::Null)
-      protoBufMeasure.set_samplesigma(GetSampleSigma());
-
-    if (GetLineSigma() != Isis::Null)
-      protoBufMeasure.set_linesigma(GetLineSigma());
-
-    ControlMeasureLogData logEntry;
-    foreach(logEntry, *p_loggedData) {
-      *protoBufMeasure.add_log() = logEntry.ToProtocolBuffer();
-    }
-
-    return protoBufMeasure;
-  }
-
 
   void ControlMeasure::MeasureModified() {
     *p_dateTime = "";

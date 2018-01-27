@@ -23,28 +23,52 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
- #include <QSharedPointer>
+#include <QSharedPointer>
 
- #include "ControlPointFileEntryV0002.pb.h"
+#include "ControlPointFileEntryV0002.pb.h"
 
 namespace Isis {
   class ControlPointV0002;
   class PvlObject;
+  class PvlContainer;
 
-  //TODO document this
+  /**
+   * @breif A container for the information stored in a version 3 and 4 ControlPoint.
+   *
+   * A wrapper around the version 3 and 4 protobuf serialization of a ControlPoint. It allows for
+   * reading ControlPoints serialized as both PvlObjects and protobuf messages. It also allows
+   * for upgrading version 2 ControlPoints to version 3 and 4 ControlPoints.
+   *
+   * The version 3 and 4 binary serialization of ControlPoint use the same protobuf message, so
+   * this class works with both versions. The differences between the version 3 and 4 Pvl
+   * serialization is small enough that it is handled in the PvlObject constructor.
+   *
+   * @ingroup ControlNetwork
+   *
+   * @author 2017-12-14 Jesse Mapel
+   *
+   * @internal
+   *   @history 2017-12-14 Jesse Mapel - Original version.
+   *   @history 2017-12-21 Jesse Mapel - Added support for measure log data.
+   *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to take PvlObject.
+   *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to not used
+   *                           the deprecated "ToProtocolBuffer()" call from
+   *                           ControlMeasureLogData.
+   *   @history 2018-01-03 Jesse Mapel - Improved documentation.
+   */
   class ControlPointV0003 {
     public:
-      ControlPointV0003(const PvlObject &pointObject);
-      ControlPointV0003(const ControlPointFileEntryV0002 &pointData);
+      ControlPointV0003(PvlObject &pointObject);
+      ControlPointV0003(QSharedPointer<ControlPointFileEntryV0002> pointData);
       ControlPointV0003(ControlPointV0002 &oldPoint);
 
-      const ControlPointFileEntryV0002 &pointData() const;
+      const ControlPointFileEntryV0002 &pointData();
 
     private:
       // These are intentionally not implemented
       ControlPointV0003();
-      ControlPointV0003(const &ControlPointV0003 other);
-      ControlPointV0003 &operator=(const &ControlPointV0003 other);
+      ControlPointV0003(const ControlPointV0003 &other);
+      ControlPointV0003 &operator=(const ControlPointV0003 &other);
 
       // methods for converting from Pvl to protobuf
       void copy(PvlContainer &container,
@@ -53,24 +77,24 @@ namespace Isis {
                 void (ControlPointFileEntryV0002::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                QSharedPointer<ControlPointFileEntryV0002> &point,
+                QSharedPointer<ControlPointFileEntryV0002> point,
                 void (ControlPointFileEntryV0002::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                QSharedPointer<ControlPointFileEntryV0002> &point,
+                QSharedPointer<ControlPointFileEntryV0002> point,
                 void (ControlPointFileEntryV0002::*setter)(const std::string&));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(bool));
+                ControlPointFileEntryV0002_Measure &measure,
+                void (ControlPointFileEntryV0002_Measure::*setter)(bool));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(double));
+                ControlPointFileEntryV0002_Measure &measure,
+                void (ControlPointFileEntryV0002_Measure::*setter)(double));
       void copy(PvlContainer &container,
                 QString keyName,
-                ControlPointFileEntryV0002::Measure &measure,
-                void (ControlPointFileEntryV0002::Measure::*setter)(const std::string &));
+                ControlPointFileEntryV0002_Measure &measure,
+                void (ControlPointFileEntryV0002_Measure::*setter)(const std::string &));
 
       QSharedPointer<ControlPointFileEntryV0002> m_pointData; /**< protobuf container that holds
                                                                    information used to create a

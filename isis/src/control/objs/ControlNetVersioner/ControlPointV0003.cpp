@@ -2,8 +2,12 @@
 
 #include <QString>
 
+#include "ControlMeasureLogData.h"
+#include "ControlPointFileEntryV0002.pb.h"
 #include "ControlPointV0002.h"
-#include "Pvl.h"
+#include "IException.h"
+#include "PvlObject.h"
+#include "PvlContainer.h"
 
 using namespace std;
 
@@ -21,11 +25,11 @@ namespace Isis {
 
 
   /**
-   * Create a ControlPointV0003 object from a version 4 control point Pvl object
+   * Create a ControlPointV0003 object from a version 3 or 4 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
    */
-  ControlPointV0003::ControlPointV0003(const PvlObject &pointObject)
+  ControlPointV0003::ControlPointV0003(PvlObject &pointObject)
    : m_pointData(new ControlPointFileEntryV0002) {
 
     // Copy over strings, doubles, and bools
@@ -167,39 +171,39 @@ namespace Isis {
     //  Process Measures
     for (int groupIndex = 0; groupIndex < pointObject.groups(); groupIndex ++) {
       PvlGroup &group = pointObject.group(groupIndex);
-      ControlPointFileEntryV0002::Measure measure;
+      ControlPointFileEntryV0002_Measure measure;
 
       // Copy strings, booleans, and doubles
       copy(group, "SerialNumber",
-           measure, &ControlPointFileEntryV0002::Measure::set_serialnumber);
+           measure, &ControlPointFileEntryV0002_Measure::set_serialnumber);
       copy(group, "ChooserName",
-           measure, &ControlPointFileEntryV0002::Measure::set_choosername);
+           measure, &ControlPointFileEntryV0002_Measure::set_choosername);
       copy(group, "Sample",
-           measure, &ControlPointFileEntryV0002::Measure::set_sample);
+           measure, &ControlPointFileEntryV0002_Measure::set_sample);
       copy(group, "Line",
-           measure, &ControlPointFileEntryV0002::Measure::set_line);
+           measure, &ControlPointFileEntryV0002_Measure::set_line);
       copy(group, "SampleResidual",
-           measure, &ControlPointFileEntryV0002::Measure::set_sampleresidual);
+           measure, &ControlPointFileEntryV0002_Measure::set_sampleresidual);
       copy(group, "LineResidual",
-           measure, &ControlPointFileEntryV0002::Measure::set_lineresidual);
+           measure, &ControlPointFileEntryV0002_Measure::set_lineresidual);
       copy(group, "DateTime",
-           measure, &ControlPointFileEntryV0002::Measure::set_datetime);
+           measure, &ControlPointFileEntryV0002_Measure::set_datetime);
       copy(group, "Diameter",
-           measure, &ControlPointFileEntryV0002::Measure::set_diameter);
+           measure, &ControlPointFileEntryV0002_Measure::set_diameter);
       copy(group, "EditLock",
-           measure, &ControlPointFileEntryV0002::Measure::set_editlock);
+           measure, &ControlPointFileEntryV0002_Measure::set_editlock);
       copy(group, "Ignore",
-           measure, &ControlPointFileEntryV0002::Measure::set_ignore);
+           measure, &ControlPointFileEntryV0002_Measure::set_ignore);
       copy(group, "JigsawRejected",
-           measure, &ControlPointFileEntryV0002::Measure::set_jigsawrejected);
+           measure, &ControlPointFileEntryV0002_Measure::set_jigsawrejected);
       copy(group, "AprioriSample",
-           measure, &ControlPointFileEntryV0002::Measure::set_apriorisample);
+           measure, &ControlPointFileEntryV0002_Measure::set_apriorisample);
       copy(group, "AprioriLine",
-           measure, &ControlPointFileEntryV0002::Measure::set_aprioriline);
+           measure, &ControlPointFileEntryV0002_Measure::set_aprioriline);
       copy(group, "SampleSigma",
-           measure, &ControlPointFileEntryV0002::Measure::set_samplesigma);
+           measure, &ControlPointFileEntryV0002_Measure::set_samplesigma);
       copy(group, "LineSigma",
-           measure, &ControlPointFileEntryV0002::Measure::set_linesigma);
+           measure, &ControlPointFileEntryV0002_Measure::set_linesigma);
 
       if (group.hasKeyword("Reference")) {
         if (group["Reference"][0].toLower() == "true") {
@@ -210,16 +214,16 @@ namespace Isis {
 
       QString type = group["MeasureType"][0].toLower();
       if (type == "candidate") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::Candidate);
+        measure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
       }
       else if (type == "manual") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::Manual);
+        measure.set_type(ControlPointFileEntryV0002_Measure::Manual);
       }
       else if (type == "registeredpixel") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::RegisteredPixel);
+        measure.set_type(ControlPointFileEntryV0002_Measure::RegisteredPixel);
       }
       else if (type == "registeredsubpixel") {
-        measure.set_type(ControlPointFileEntryV0002::Measure::RegisteredSubPixel);
+        measure.set_type(ControlPointFileEntryV0002_Measure::RegisteredSubPixel);
       }
       else {
         throw IException(IException::Io,
@@ -236,7 +240,13 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
-          *measure.add_log() = interpreter.ToProtocolBuffer();
+
+          ControlPointFileEntryV0002_Measure_MeasureLogData protoBufDataEntry;
+
+          protoBufDataEntry.set_doubledatatype(interpreter.GetDataType());
+          protoBufDataEntry.set_doubledatavalue(interpreter.GetNumericalValue());
+
+          *measure.add_log() = protoBufDataEntry;
         }
       }
 
@@ -252,13 +262,22 @@ namespace Isis {
 
 
   /**
-   * Create a ControlPointV0003 object from a PvlControlPointV0002 object
+   * Create a ControlPointV0003 object from a ControlPointV0002 object
    *
    * @param oldPoint The PvlControlPointV0002 that will be upgraded to V0003.
    */
   ControlPointV0003::ControlPointV0003(ControlPointV0002 &oldPoint)
-   : m_pointData(new ControlPointFileEntryV0002) {
+      : m_pointData(new ControlPointFileEntryV0002) {
     QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> oldPointData = oldPoint.pointData();
+    if (!oldPointData) {
+      QString msg = "Version 2 control point is missing point data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    QSharedPointer<ControlNetLogDataProtoV0001_Point> oldLogData = oldPoint.logData();
+    if (!oldLogData) {
+      QString msg = "Version 2 control point is missing measure log data.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
 
     // Copy over POD values
     if ( oldPointData->has_id() ) {
@@ -311,6 +330,9 @@ namespace Isis {
     }
     if ( oldPointData->has_radiusconstrained() ) {
       m_pointData->set_radiusconstrained( oldPointData->radiusconstrained() );
+    }
+    if ( oldPointData->has_referenceindex() ) {
+      m_pointData->set_referenceindex( oldPointData->referenceindex() );
     }
 
     // Copy over enumerated values
@@ -377,11 +399,11 @@ namespace Isis {
       else if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::DEM) {
         m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::DEM);
       }
-      else if (surfacePointSource == ControlNetFileProtoV0001_PBControlPoint::BundleSolution) {
+      else if (radiusSource == ControlNetFileProtoV0001_PBControlPoint::BundleSolution) {
         m_pointData->set_aprioriradiussource(ControlPointFileEntryV0002::BundleSolution);
       }
       else {
-        QString msg = "Invalid AprioriRadiusSource, [" + source + "]";
+        QString msg = "Invalid AprioriRadiusSource.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -488,6 +510,21 @@ namespace Isis {
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
+        // Copy over any log data
+        ControlNetLogDataProtoV0001_Point_Measure measureLogData = oldLogData->measures(i);
+        for (int j = 0; j < measureLogData.loggedmeasuredata_size(); j++) {
+
+          ControlNetLogDataProtoV0001_Point_Measure_DataEntry oldData =
+              measureLogData.loggedmeasuredata(j);
+
+          ControlPointFileEntryV0002_Measure_MeasureLogData newData;
+
+          newData.set_doubledatatype( oldData.datatype() );
+          newData.set_doubledatavalue( oldData.datavalue() );
+
+          *newMeasure->add_log() = newData;
+        }
+
         // Check that all the required fields in the measure are filled
         if ( !newMeasure->IsInitialized() ) {
           QString msg = "Measure file entry at index [" + toString(i)
@@ -497,7 +534,7 @@ namespace Isis {
       }
     }
 
-    // Check that all fo the required fields in the point are filled
+    // Check that all of the required fields in the point are filled
     if ( !m_pointData->IsInitialized() ) {
       QString msg = "Control point file entry is missing required fields.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -514,7 +551,7 @@ namespace Isis {
    *                                              point data. There is no guarantee that the point
    *                                              data is fully initialized.
    */
-  const ControlPointFileEntryV0002 &ControlPointV0003::pointData() const {
+  const ControlPointFileEntryV0002 &ControlPointV0003::pointData() {
     if (!m_pointData) {
       m_pointData.reset(new ControlPointFileEntryV0002);
     }
@@ -525,7 +562,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -542,21 +579,22 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
     if (value == "true" || value == "yes")
-      (point->*setter)(true);
+      (point.data()->*setter)(true);
   }
 
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -570,21 +608,22 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               QSharedPointer<ControlPointFileEntryV0002> &point,
+                               QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
-    (point->*setter)(value);
+    (point.data()->*setter)(value);
   }
 
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -598,7 +637,7 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               QSharedPointer<ControlPointFileEntryV0002> &point,
+                               QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
 
     if (!container.hasKeyword(keyName))
@@ -606,13 +645,13 @@ namespace Isis {
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
-    (point->*setter)(value);
+    (point.data()->*setter)(value.toLatin1().data());
   }
 
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -626,8 +665,8 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               ControlPointFileEntryV0002::Measure &measure,
-                               void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
+                               ControlPointFileEntryV0002_Measure &measure,
+                               void (ControlPointFileEntryV0002_Measure::*setter)(bool)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -643,7 +682,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -657,8 +696,8 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               ControlPointFileEntryV0002::Measure &measure,
-                               void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
+                               ControlPointFileEntryV0002_Measure &measure,
+                               void (ControlPointFileEntryV0002_Measure::*setter)(double)) {
 
     if (!container.hasKeyword(keyName))
       return;
@@ -671,7 +710,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -685,15 +724,16 @@ namespace Isis {
    */
   void ControlPointV0003::copy(PvlContainer &container,
                                QString keyName,
-                               ControlPointFileEntryV0002::Measure &measure,
-                               void (ControlPointFileEntryV0002::Measure::*setter)
+                               ControlPointFileEntryV0002_Measure &measure,
+                               void (ControlPointFileEntryV0002_Measure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
-    (measure.*set)(value);
+    (measure.*setter)(value.toLatin1().data());
   }
 }

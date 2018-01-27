@@ -29,7 +29,6 @@
 #include <QString>
 #include <QStringList>
 
-#include "ControlNetFile.h"
 #include "ProgressBar.h"
 
 template<typename A> class QAtomicPointer;
@@ -48,11 +47,11 @@ namespace Isis {
    * This class provides progress for reading a ControlNet.  Reading is done
    * in separate threads using QtConcurrent.  When reading large Pvl networks
    * the progress will hang at zero percent for a while.
-   * 
+   *
    * @author 2012-06-11 Ken Edmundson, Steven Lambright
    *
    * @internal
-   *   @history 2017-08-09 Summer Stapleton - Added a try-catch block to handle invalid control 
+   *   @history 2017-08-09 Summer Stapleton - Added a try-catch block to handle invalid control
    *                         networks. Fixes #5068.
    */
   class ConcurrentControlNetReader : public QObject {

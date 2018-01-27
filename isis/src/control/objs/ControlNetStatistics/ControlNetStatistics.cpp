@@ -337,16 +337,16 @@ namespace Isis {
     // Log into the output file
     ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free, ConvexHullRatio" <<  endl;
     //for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
-//    for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
+
     for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
       ostm << mSerialNumList.fileName(it.key()) << ", " << it.key() << ", ";
-      bool serialNumExists = it.value() ;
+      bool serialNumExists = it.value();
       if (serialNumExists) {
         QVector<double> imgStats = mImageMap[(it).key()] ;
         ostm << imgStats[imgTotalPoints]<< ", " << imgStats[imgIgnoredPoints] << ", " ;
         ostm << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", " ;
         ostm << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", ";
-        ostm << imgStats[ imgConvexHullRatio] << endl;
+        ostm << imgStats[imgConvexHullRatio] << endl;
       }
       else {
         ostm << "0, 0, 0, 0, 0, 0, 0" << endl;
