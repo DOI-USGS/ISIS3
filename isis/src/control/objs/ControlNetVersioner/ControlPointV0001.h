@@ -36,9 +36,25 @@ namespace Isis {
    * @breif A container for the information stored in a version 1 ControlPoint.
    *
    * A wrapper around the version 1 protobuf serialization of a ControlPoint. It allows for reading
-   * ControlPoints serialized as both PvlObjects and protobuf messages. In order to simplify the
-   * upgrade process from version 1 to version 2, the data is always stored in a protobuf message
-   * after being read.
+   * ControlPoints serialized as both PvlObjects and protobuf messages.
+   *
+   * This class is designed to be compatible with all Pvl formats created prior
+   * to the use of versioning. So, the PvlObject constructor has to work with
+   * several different formats. Hence, several different keywords are checked
+   * for the same value.
+   *
+   * Because this version supports several different formats, there is no
+   * standardized set of keywords, but all version 1 Pvl control networks
+   * have the same high level structure. Control points are represented by
+   * objects contained in the ControlNetwork object. Control measures are
+   * represented by groups contained in the control point objects.
+   *
+   * Once read in, the data is always stored in a protobuf message regardless
+   * of the source. This is done to optimize reading binary control network
+   * files. Because the protobuf format for version 1 control points is
+   * identical to the version 2 format, control points read from a version 1
+   * file are automatically "converted" to version 2. This also makes the
+   * version 1 to 2 upgrade process as simple as passing a pointer.
    *
    * @ingroup ControlNetwork
    *
@@ -48,6 +64,7 @@ namespace Isis {
    *   @history 2017-12-18 Jesse Mapel - Original version.
    *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to take PvlObject.
    *   @history 2017-12-21 Jesse Mapel - Improved documentation.
+   *   @history 2017-01-27 Jesse Mapel - More documentation improvements.
    */
   class ControlPointV0001 {
     public:
