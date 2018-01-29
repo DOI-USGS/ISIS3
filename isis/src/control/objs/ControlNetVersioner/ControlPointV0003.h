@@ -33,7 +33,7 @@ namespace Isis {
   class PvlContainer;
 
   /**
-   * @breif A container for the information stored in a version 3 and 4 ControlPoint.
+   * @brief A container for the information stored in a version 3 and 4 ControlPoint.
    *
    * A wrapper around the version 3 and 4 protobuf serialization of a ControlPoint. It allows for
    * reading ControlPoints serialized as both PvlObjects and protobuf messages. It also allows
