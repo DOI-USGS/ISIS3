@@ -40,8 +40,122 @@ namespace Isis {
    * for upgrading version 2 ControlPoints to version 3 and 4 ControlPoints.
    *
    * The version 3 and 4 binary serialization of ControlPoint use the same protobuf message, so
-   * this class works with both versions. The differences between the version 3 and 4 Pvl
-   * serialization is small enough that it is handled in the PvlObject constructor.
+   * this class works with both versions. The difference between the version 3 and 4 Pvl
+   * serializations is Ground and Tie points were renamed to Fixed and Free respectively.
+   * This is sufficiently minor that it is handled in the pvl constructor.
+   *
+   * In the Pvl format, control points are represented by objects contained in the
+   * ControlNetwork object. Control measures are represented by groups
+   * contained in the control point objects.
+   *
+   * <b>Valid Control Point Keywords</b>
+   *
+   * <ul>
+   *   <li><em>PointId:</em> The point ID string</li>
+   *   <li><em>ChooserName:</em> The name of the application or user that last
+   *       modified the point</li>
+   *   <li><em>DateTime:</em> The date and time of the last modification to the
+   *       point</li>
+   *   <li><em>AprioriXYZSource:</em> What type of source the apriori ground
+   *       point was calculated from. Options:
+   *       <ul>
+   *           <li>None</li>
+   *           <li>User</li>
+   *           <li>AverageOfMeasures</li>
+   *           <li>Reference</li>
+   *           <li>Basemap</li>
+   *           <li>BundleSolution</li>
+   *       </ul></li>
+   *   <li><em>AprioriXYZSourceFile:</em> The name of the file that the apriori
+   *       ground point was calculated from</li>
+   *   <li><em>AprioriRadiusSource:</em> What type of source the apriori point
+   *       radius was calculated from. Options:
+   *       <ul>
+   *           <li>None</li>
+   *           <li>User</li>
+   *           <li>AverageOfMeasures</li>
+   *           <li>Ellipsoid</li>
+   *           <li>DEM</li>
+   *           <li>BundleSolution</li>
+   *       </ul></li>
+   *   <li><em>AprioriRadiusSourceFile:</em> The name of the file that the
+   *       apriori point radius was calculated from</li>
+   *   <li><em>JigsawRejected:</em> If the point was rejected by a bundle
+   *       adjustment</li>
+   *   <li><em>EditLock:</em> If the point is locked out of editing</li>
+   *   <li><em>Ignore:</em> If the point will be ignored</li>
+   *   <li><em>AprioriX:</em> The body fixed X coordinate of the a priori
+   *       ground point in meters</li>
+   *   <li><em>AprioriY:</em> The body fixed Y coordinate of the a priori
+   *       ground point in meters</li>
+   *   <li><em>AprioriZ:</em> The body fixed Z coordinate of the a priori
+   *       ground point in meters</li>
+   *   <li><em>AdjustedX:</em> The body fixed X coordinate of the adjusted
+   *       ground point in meters</li>
+   *   <li><em>AdjustedY:</em> The body fixed Y coordinate of the adjusted
+   *       ground point in meters</li>
+   *   <li><em>AdjustedZ:</em> The body fixed Z coordinate of the adjusted
+   *       ground point in meters</li>
+   *   <li><em>LatitudeConstrained:</em> If the latitude of the ground point
+   *       is constrained</li>
+   *   <li><em>LongitudeConstrained:</em> If the longitude of the ground point
+   *       is constrained</li>
+   *   <li><em>RadiusConstrained:</em> If the radius of the ground point
+   *       is constrained</li>
+   *   <li><em>PointType:</em> What type of point it is. Options:
+   *       <ul>
+   *           <li>Fixed</li>
+   *           <li>Ground</li>
+   *           <li>Constrained</li>
+   *           <li>Free</li>
+   *           <li>Tie</li>
+   *       </ul></li>
+   *   <li><em>AprioriCovarianceMatrix:</em> A six element vector corresponding
+   *       to the upper triangle; elements (0,0), (0,1), (0,2), (1,1), (1,2),
+   *       and (2,2); of the 3x3, symmetric covariance matrix for
+   *       the rectangular, a priori ground point.</li>
+   *   <li><em>AdjustedCovarianceMatrix:</em> A six element vector corresponding
+   *       to the upper triangle; elements (0,0), (0,1), (0,2), (1,1), (1,2),
+   *       and (2,2); of the 3x3, symmetric covariance matrix for
+   *       the rectangular, adjusted ground point.</li>
+   * </ul>
+   *
+   * <b>Valid Control Measure Keywords</b>
+   *
+   * <ul>
+   *   <li><em>SerialNumber:</em> The serial number of the cube the measure
+   *       is from</li>
+   *   <li><em>ChooserName:</em> The name of the application or user who last
+   *       modified the measure</li>
+   *   <li><em>DateTime:</em> The date and time of the last modification</li>
+   *   <li><em>Diameter:</em> If the measure was selected from a crater, this
+   *       is the diameter of the crater in meters</li>
+   *   <li><em>EditLock:</em> If the measure is locked out of editing</li>
+   *   <li><em>Ignore:</em> If the measure will be ignored</li>
+   *   <li><em>JigsawRejected:</em> If the measure was rejected during a
+   *       bundle adjustment</li>
+   *   <li><em>AprioriSample:</em> The a priori sample</li>
+   *   <li><em>AprioriLine:</em> The a priori line</li>
+   *   <li><em>SampleSigma:</em> The standard deviation of the sample
+   *       measurement</li>
+   *   <li><em>LineSigma:</em> The standard deviation of the line
+   *       measurement</li>
+   *   <li><em>Sample:</em> The adjusted sample</li>
+   *   <li><em>Line:</em> The adjusted line</li>
+   *   <li><em>SampleResidual:</em> The difference between the a priori and
+   *       adjusted sample</li>
+   *   <li><em>LineResidual:</em> The difference between the a priori and
+   *       adjusted line</li>
+   *   <li><em>Reference:</em> If the measure is the reference measure for
+   *       its point</li>
+   *   <li><em>MeasureType:</em> What type of measure it is. Options:
+   *       <ul>
+   *           <li>candidate</li>
+   *           <li>manual</li>
+   *           <li>registeredpixel</li>
+   *           <li>registeredsubpixel</li>
+   *       </ul></li>
+   * </ul>
    *
    * @ingroup ControlNetwork
    *
@@ -55,6 +169,7 @@ namespace Isis {
    *                           the deprecated "ToProtocolBuffer()" call from
    *                           ControlMeasureLogData.
    *   @history 2018-01-03 Jesse Mapel - Improved documentation.
+   *   @history 2017-01-27 Jesse Mapel - More documentation improvements.
    */
   class ControlPointV0003 {
     public:
