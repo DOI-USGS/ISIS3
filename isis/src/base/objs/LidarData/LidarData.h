@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QList>
 #include <QPointer>
+#include <QString>
 
 namespace Isis {
 
