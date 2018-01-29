@@ -7,7 +7,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType   = Free
@@ -35,7 +35,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType   = Free
@@ -73,7 +73,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType   = Free
@@ -111,7 +111,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType   = Free
@@ -150,7 +150,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType   = Free
@@ -188,7 +188,7 @@ Object = ControlNetwork
   Created      = Yesterday
   LastModified = Yesterday
   Description  = Null
-  Version      = 3
+  Version      = 5
 
   Object = ControlPoint
     PointType   = Free
@@ -256,3 +256,8 @@ Test 13
 Testing != operator on two different measures
 Measure1 != Measure2   TRUE
 **PROGRAMMER ERROR** Cannot set log data with invalid information stored in the ControlMeasureLogData.
+
+Test 14: Testing accessor methods
+Measure was not rejected.
+Measure HasChooserName():  true
+Measure HasDateTime():  true

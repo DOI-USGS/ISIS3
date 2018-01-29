@@ -56,7 +56,8 @@ namespace Isis {
   /**
    * Destructor for a LinearAlgebra object.
    */
-  LinearAlgebra::~LinearAlgebra() {}
+  LinearAlgebra::~LinearAlgebra() {
+  }
 
 
   /** 

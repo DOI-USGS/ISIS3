@@ -556,7 +556,6 @@ namespace Isis {
 
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
-
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
       int numImages = m_bundleObservations.at(i)->size();

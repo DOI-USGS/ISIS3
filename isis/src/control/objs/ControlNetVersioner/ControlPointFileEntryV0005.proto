@@ -1,0 +1,111 @@
+// Protocol buffer control point descriptor for Isis3 Control Networks
+package Isis;
+
+message ControlPointFileEntryV0005 {
+  enum PointType {
+    Free                 = 2; //  Image to Image
+    Constrained          = 3; //  Image to Ground
+    Fixed                = 4; //  Image to Ground
+    obsolete_Tie         = 0; //  Image to Image
+    obsolete_Ground      = 1; //  Image to Ground
+  }
+
+  enum AprioriSource {
+    None              = 0;
+    User              = 1;
+    AverageOfMeasures = 2;
+    Reference         = 3;
+    Ellipsoid         = 4;
+    DEM               = 5;
+    Basemap           = 6;
+    BundleSolution    = 7;
+  }
+
+  required string         id   = 1;
+  required PointType      type = 2;
+  optional string         chooserName = 3;
+  optional string         datetime = 4;
+  optional bool           editLock = 5;
+  optional bool           ignore   = 6;
+  optional bool           jigsawRejected = 7;
+  optional int32          referenceIndex = 8;
+
+  optional AprioriSource        aprioriSurfPointSource = 9;
+  optional string               aprioriSurfPointSourceFile = 10;
+  optional AprioriSource        aprioriRadiusSource = 11;
+  optional string               aprioriRadiusSourceFile = 12;
+  optional bool                 latitudeConstrained = 13;
+  optional bool                 longitudeConstrained = 14;
+  optional bool                 radiusConstrained = 15;
+  optional double               aprioriX = 16; // <meters>
+  optional double               aprioriY = 17; // <meters>
+  optional double               aprioriZ = 18; // <meters>
+
+  //  Accuracy of apriori coordinates from basemap, user or mission SPICE,
+  //    jigsaw weights based on these values. The sigmas are stored as a
+  //    3 x 3 variance-covariance matrix.
+  repeated double aprioriCovar = 19 [packed = true];
+
+  optional double adjustedX = 20;
+  optional double adjustedY = 21;
+  optional double adjustedZ = 22;
+
+  //  Set in jigsaw.  Accuracy of adjusted lat/lon from basemap, user or
+  //  mission SPICE stored as a 3 x 3 variance-covariance matrix.
+  repeated double adjustedCovar = 23 [packed = true];
+
+  message PointLogData {
+    optional int32   doubleDataType  = 1;
+    optional double  doubleDataValue = 2;
+    optional int32   boolDataType    = 3;
+    optional bool    boolDataValue   = 4;
+  }
+
+  repeated PointLogData log = 24;
+
+// Start of ControlMeasure definition
+  message Measure {
+    enum MeasureType {
+      // predicted, unmeasured, unverified
+      Candidate           = 0;
+      // Hand Measured (e.g., qnet)
+      Manual              = 1;
+      // Automatically registered to whole pixel (e.g.,pointreg/qnet)
+      RegisteredPixel     = 2;
+      // Automatically registered to sub-pixel (e.g., pointreg/qnet)
+      RegisteredSubPixel  = 3;
+    }
+
+    message MeasureLogData {
+      optional int32   doubleDataType  = 1;
+      optional double  doubleDataValue = 2;
+      optional int32   boolDataType    = 3;
+      optional bool    boolDataValue   = 4;
+    }
+
+    required string       serialnumber   = 1;
+    required MeasureType  type           = 2;
+    optional double       sample         = 3;
+    optional double       line           = 4;
+    // Jigsaw info-solution error <pixels>
+    optional double       sampleResidual = 5;
+    optional double       lineResidual   = 6;
+    optional string       choosername    = 7;
+    optional string       datetime       = 8;
+    optional bool         editLock       = 9;
+    optional bool         ignore         = 10;
+    optional bool         jigsawRejected = 11;
+    optional double       diameter       = 12;
+    // The first identified location of measure
+    optional double       apriorisample  = 13;
+    optional double       aprioriline    = 14;
+
+    // Uncertainty/Sigma of current samp/line <pixels>
+    optional double       samplesigma    = 15;
+    optional double       linesigma      = 16;
+    repeated MeasureLogData log          = 17;
+  }
+
+  //  Actual declaration of variable number of ControlMeasures
+  repeated Measure measures = 25;
+}

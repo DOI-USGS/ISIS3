@@ -21,11 +21,11 @@ int main() {
   // this is because the directory it is run from may change
   // under normal usage FileName is always included
 
-  cpi.SetCube("unitTest1.cub");
+  cpi.SetCube("$base/testData/CameraPointInfo/unitTest1.cub");
   PvlGroup *grp = cpi.SetImage(1, 1);
   PrintResults(*grp);
 
-  cpi.SetCube("unitTest1.cub");
+  cpi.SetCube("$base/testData/CameraPointInfo/unitTest1.cub");
   PvlGroup *too = cpi.SetGround(-84.5, 15.0);
   PrintResults(*too);
 

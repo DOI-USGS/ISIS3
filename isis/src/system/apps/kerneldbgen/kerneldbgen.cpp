@@ -52,6 +52,9 @@ void IsisMain() {
   //  PvlObject::PvlGroupIterator grp = result.beginGroup();
   //  while(grp != result.endGroup()){ selections.addGroup(*grp);grp++;}
   //}
+  double startOffset = ui.GetDouble("STARTOFFSET");
+  double endOffset = ui.GetDouble("ENDOFFSET");
+  
   if (ui.GetString("PREDICTFILTER") != "none" &&
       ui.GetString("PREDICTDIR") != "none") {
     QString location = "";
@@ -59,7 +62,7 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("PREDICTFILTER", filter);
-    PvlObject result = sdg.Direct("Predicted", location, filter);
+    PvlObject result = sdg.Direct("Predicted", location, filter, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -74,7 +77,7 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("RECONFILTER", filter);
-    PvlObject result = sdg.Direct("Reconstructed", location, filter);
+    PvlObject result = sdg.Direct("Reconstructed", location, filter, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -89,7 +92,7 @@ void IsisMain() {
     location.remove("\\");
     std::vector<QString> filter;
     ui.GetString("SMITHEDFILTER", filter);
-    PvlObject result = sdg.Direct("Smithed", location, filter);
+    PvlObject result = sdg.Direct("Smithed", location, filter, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
