@@ -228,23 +228,53 @@ namespace Isis {
       ControlNetVersioner &operator=(const ControlNetVersioner &other);
 
       // Private ControlNetHeader structs for versioning
-      // TODO Document these for doxygen. JAM
+      /**
+       * Versioned container for general information about a control network.
+       *
+       * @ingroup ControlNetwork
+       *
+       * @author 2017-12-27 Jesse Mapel
+       *
+       * @internal
+       *   @history 2017-12-27 Jesse Mapel - Original Version
+       */
       struct ControlNetHeaderV0001 {
+	//! The ID/Name of the control network
         QString networkID;
+	//! The NAIF name of the target body
         QString targetName;
+	//! The date and time of the control network's creation
         QString created;
+	//! The date and time of the control network's last modification
         QString lastModified;
+	//! The text description of the control network
         QString description;
+	//! The name of the user or program that last modified the control network
         QString userName;
+	/**
+	 * The equatorial radius of the target body
+	 * used to convert from spherical to rectangular coordinates
+	 */
         Distance equatorialRadius;
+	/**
+	 * The equatorial radius of the target body
+	 * used to convert from spherical to rectangular coordinates
+	 */
         Distance polarRadius;
       };
+
+      //! Typedef for consistent naming of containers for version 2
       typedef ControlNetHeaderV0001 ControlNetHeaderV0002;
+      //! Typedef for consistent naming of containers for version 3
       typedef ControlNetHeaderV0001 ControlNetHeaderV0003;
+      //! Typedef for consistent naming of containers for version 4
       typedef ControlNetHeaderV0001 ControlNetHeaderV0004;
+      //! Typedef for consistent naming of containers for version 5
       typedef ControlNetHeaderV0001 ControlNetHeaderV0005;
 
+      //! Typedef for consistent naming of containers for version 4
       typedef ControlPointV0003 ControlPointV0004;
+      //! Typedef for consistent naming of containers for version 5
       typedef ControlPointV0003 ControlPointV0005;
 
       void read(const FileName netFile, Progress *progress=NULL);
