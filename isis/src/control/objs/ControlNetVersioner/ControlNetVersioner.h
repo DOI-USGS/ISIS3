@@ -189,7 +189,7 @@ namespace Isis {
    *   @history 2017-12-18 Adam Goins and Kristin Berry - Added new write() method.
    *   @history 2017-12-19 Kristin Berry - Corrected method names and general cleanup in toPvl and
    *                           write for refactor.
-   *   @histroy 2017-12-20 Jesse Mapel - Made read and createPoint methods match new
+   *   @history 2017-12-20 Jesse Mapel - Made read and createPoint methods match new
    *                           ControlPointV#### classes.
    *   @history 2017-12-20 Jeannie Backer - Updated toPvl and write methods to get surface point
    *                           information from the ControlPoint.
@@ -223,28 +223,71 @@ namespace Isis {
     private:
       // These three methods are private for safety reasons.
       // TODO write a better reason. JAM
+      //! Default constructor. Intentially un-implemented.
       ControlNetVersioner();
+      /**
+       * Copy constructor. Intentially un-implemented.
+       *
+       * @param other The other ControlNetVersioner to create a copy of.
+       */
       ControlNetVersioner(const ControlNetVersioner &other);
+      /**
+       * Asssignment operator. Intentially un-implemented.
+       *
+       * @param other The other ControlNetVersione to assign from.
+       *
+       * @return @b ControlNetVersioner& A reference to this after assignment.
+       */
       ControlNetVersioner &operator=(const ControlNetVersioner &other);
 
       // Private ControlNetHeader structs for versioning
-      // TODO Document these for doxygen. JAM
+      /**
+       * Versioned container for general information about a control network.
+       *
+       * @ingroup ControlNetwork
+       *
+       * @author 2017-12-27 Jesse Mapel
+       *
+       * @internal
+       *   @history 2017-12-27 Jesse Mapel - Original Version
+       */
       struct ControlNetHeaderV0001 {
+	//! The ID/Name of the control network
         QString networkID;
+	//! The NAIF name of the target body
         QString targetName;
+	//! The date and time of the control network's creation
         QString created;
+	//! The date and time of the control network's last modification
         QString lastModified;
+	//! The text description of the control network
         QString description;
+	//! The name of the user or program that last modified the control network
         QString userName;
+	/**
+	 * The equatorial radius of the target body
+	 * used to convert from spherical to rectangular coordinates
+	 */
         Distance equatorialRadius;
+	/**
+	 * The equatorial radius of the target body
+	 * used to convert from spherical to rectangular coordinates
+	 */
         Distance polarRadius;
       };
+
+      //! Typedef for consistent naming of containers for version 2
       typedef ControlNetHeaderV0001 ControlNetHeaderV0002;
+      //! Typedef for consistent naming of containers for version 3
       typedef ControlNetHeaderV0001 ControlNetHeaderV0003;
+      //! Typedef for consistent naming of containers for version 4
       typedef ControlNetHeaderV0001 ControlNetHeaderV0004;
+      //! Typedef for consistent naming of containers for version 5
       typedef ControlNetHeaderV0001 ControlNetHeaderV0005;
 
+      //! Typedef for consistent naming of containers for version 4
       typedef ControlPointV0003 ControlPointV0004;
+      //! Typedef for consistent naming of containers for version 5
       typedef ControlPointV0003 ControlPointV0005;
 
       void read(const FileName netFile, Progress *progress=NULL);

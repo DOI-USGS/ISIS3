@@ -150,7 +150,7 @@ namespace Isis {
   /**
    * Returns the name of the last person or program to modify the network.
    *
-   * @retrun @b QString The name of the last person or program to modify the network.
+   * @return @b QString The name of the last person or program to modify the network.
    */
   QString ControlNetVersioner::userName() const {
     return m_header.userName;
@@ -912,6 +912,7 @@ namespace Isis {
    * Read a protobuf version 1 control network and prepare the data to be
    *  converted into a control network.
    *
+   * @param header The Pvl file header that contains byte offsets for the protobuf messages
    * @param netFile The filename of the control network file.
    * @param progress The progress object to track reading points.
    */
@@ -1032,6 +1033,7 @@ namespace Isis {
    * Read a protobuf version 2 control network and prepare the data to be
    *  converted into a control network.
    *
+   * @param header The Pvl file header that contains byte offsets for the protobuf messages
    * @param netFile The filename of the control network file.
    * @param progress The progress object to track reading points.
    */
@@ -1148,6 +1150,7 @@ namespace Isis {
    * Read a protobuf version 5 control network and prepare the data to be
    *  converted into a control network.
    *
+   * @param header The Pvl file header that contains byte offsets for the protobuf messages
    * @param netFile The filename of the control network file.
    * @param progress The progress object to track reading points.
    */
@@ -1776,7 +1779,7 @@ namespace Isis {
   * The written point will be removed from the versioner and deleted if the versioner
   * has ownership of it.
   *
-  * @param fileStream A pointer to the fileStream that we are writing the point to.
+  * @param output A pointer to the fileStream that we are writing the point to.
   *
   * @return @b int The number of bytes written to the filestream.
   */

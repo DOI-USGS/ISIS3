@@ -33,7 +33,7 @@ namespace Isis {
   class PvlContainer;
 
   /**
-   * @breif A container for the information stored in a version 3 and 4 ControlPoint.
+   * @brief A container for the information stored in a version 3 and 4 ControlPoint.
    *
    * A wrapper around the version 3 and 4 protobuf serialization of a ControlPoint. It allows for
    * reading ControlPoints serialized as both PvlObjects and protobuf messages. It also allows
@@ -65,9 +65,23 @@ namespace Isis {
       const ControlPointFileEntryV0002 &pointData();
 
     private:
-      // These are intentionally not implemented
+      /**
+       * Default constructor. Intentionally un-implemented.
+       */
       ControlPointV0003();
+      /**
+       * Copy constructor. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0003 to copy from.
+       */
       ControlPointV0003(const ControlPointV0003 &other);
+      /**
+       * Assignment operator. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0003 to assign from.
+       *
+       * @return @b ControlPointV0003& A reference to this after assignment.
+       */
       ControlPointV0003 &operator=(const ControlPointV0003 &other);
 
       // methods for converting from Pvl to protobuf

@@ -569,7 +569,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -601,7 +601,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -630,7 +630,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.

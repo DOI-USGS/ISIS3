@@ -33,7 +33,7 @@ namespace Isis {
   class PvlContainer;
 
   /**
-   * @breif A container for the information stored in a version 1 ControlPoint.
+   * @brief A container for the information stored in a version 1 ControlPoint.
    *
    * A wrapper around the version 1 protobuf serialization of a ControlPoint. It allows for reading
    * ControlPoints serialized as both PvlObjects and protobuf messages. In order to simplify the
@@ -59,9 +59,23 @@ namespace Isis {
       QSharedPointer<ControlNetLogDataProtoV0001_Point> logData();
 
     private:
-      // These are intentionally not implemented
+      /**
+       * Default constructor. Intentionally un-implemented.
+       */
       ControlPointV0001();
+      /**
+       * Copy constructor. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0001 to copy from.
+       */
       ControlPointV0001(const ControlPointV0001 &other);
+      /**
+       * Assignment operator. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0001 to assign from.
+       *
+       * @return @b ControlPointV0001& A reference to this after assignment.
+       */
       ControlPointV0001 &operator=(const ControlPointV0001 &other);
 
       // methods for converting from Pvl to protobuf
