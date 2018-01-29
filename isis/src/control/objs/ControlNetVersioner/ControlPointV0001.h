@@ -76,9 +76,23 @@ namespace Isis {
       QSharedPointer<ControlNetLogDataProtoV0001_Point> logData();
 
     private:
-      // These are intentionally not implemented
+      /**
+       * Default constructor. Intentionally un-implemented.
+       */
       ControlPointV0001();
+      /**
+       * Copy constructor. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0001 to copy from.
+       */
       ControlPointV0001(const ControlPointV0001 &other);
+      /**
+       * Assignment operator. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0001 to assign from.
+       *
+       * @return @b ControlPointV0001& A reference to this after assignment.
+       */
       ControlPointV0001 &operator=(const ControlPointV0001 &other);
 
       // methods for converting from Pvl to protobuf

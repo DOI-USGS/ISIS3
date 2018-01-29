@@ -180,9 +180,23 @@ namespace Isis {
       const ControlPointFileEntryV0002 &pointData();
 
     private:
-      // These are intentionally not implemented
+      /**
+       * Default constructor. Intentionally un-implemented.
+       */
       ControlPointV0003();
+      /**
+       * Copy constructor. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0003 to copy from.
+       */
       ControlPointV0003(const ControlPointV0003 &other);
+      /**
+       * Assignment operator. Intentionally un-implemented.
+       *
+       * @param other The other ControlPointV0003 to assign from.
+       *
+       * @return @b ControlPointV0003& A reference to this after assignment.
+       */
       ControlPointV0003 &operator=(const ControlPointV0003 &other);
 
       // methods for converting from Pvl to protobuf
