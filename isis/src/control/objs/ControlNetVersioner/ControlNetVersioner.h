@@ -388,7 +388,7 @@ namespace Isis {
    *   @history 2017-12-18 Adam Goins and Kristin Berry - Added new write() method.
    *   @history 2017-12-19 Kristin Berry - Corrected method names and general cleanup in toPvl and
    *                           write for refactor.
-   *   @histroy 2017-12-20 Jesse Mapel - Made read and createPoint methods match new
+   *   @history 2017-12-20 Jesse Mapel - Made read and createPoint methods match new
    *                           ControlPointV#### classes.
    *   @history 2017-12-20 Jeannie Backer - Updated toPvl and write methods to get surface point
    *                           information from the ControlPoint.
@@ -424,8 +424,21 @@ namespace Isis {
     private:
       // These three methods are private for safety reasons.
       // TODO write a better reason. JAM
+      //! Default constructor. Intentially un-implemented.
       ControlNetVersioner();
+      /**
+       * Copy constructor. Intentially un-implemented.
+       *
+       * @param other The other ControlNetVersioner to create a copy of.
+       */
       ControlNetVersioner(const ControlNetVersioner &other);
+      /**
+       * Asssignment operator. Intentially un-implemented.
+       *
+       * @param other The other ControlNetVersione to assign from.
+       *
+       * @return @b ControlNetVersioner& A reference to this after assignment.
+       */
       ControlNetVersioner &operator=(const ControlNetVersioner &other);
 
       // Private ControlNetHeader structs for versioning
