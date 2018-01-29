@@ -3,6 +3,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Cube.h"
+#include "IException.h"
 
 using namespace std;
 
@@ -32,16 +33,16 @@ namespace Isis {
   }
   
   
-  /**
-   * Copy the given LidarControlPoint
-   * 
-   * @param other The LidarControlPoint to copy
-   */
-  LidarControlPoint::LidarControlPoint(const LidarControlPoint &other) {
-    m_time = other.time();
-    m_range = other.range();
-    m_sigmaRange = other.sigmaRange();
-  }
+//   /**
+//    * Copy the given LidarControlPoint
+//    * 
+//    * @param other The LidarControlPoint to copy
+//    */
+//   LidarControlPoint::LidarControlPoint(const LidarControlPoint &other) {
+//     m_time = other.time();
+//     m_range = other.range();
+//     m_sigmaRange = other.sigmaRange();
+//   }
   
   
   /**
@@ -115,6 +116,7 @@ namespace Isis {
    * Returns the sigma range of the point
    * 
    * @return double The sigma range
+   */
   double LidarControlPoint::sigmaRange() {
     return m_sigmaRange;
   }

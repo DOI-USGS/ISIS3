@@ -44,8 +44,8 @@ namespace Isis {
   public:
     
     LidarControlPoint();
-    LidarControlPoint(double time, double range, double time);
-    LidarControlPoint(const LidarControlPoint &);
+    LidarControlPoint(double time, double range, double sigmaRange);
+//     LidarControlPoint(const LidarControlPoint &);
     
     ~LidarControlPoint();
     
@@ -63,4 +63,9 @@ namespace Isis {
     double m_range;
     double m_sigmaRange;
     double m_time;
+    
+  };
+}
+
+#endif
     
