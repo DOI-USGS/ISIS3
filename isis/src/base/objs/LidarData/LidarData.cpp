@@ -34,11 +34,7 @@ namespace Isis {
    */
   QList<QSharedPointer <LidarControlPoint> > LidarData::points() const {
     // Placeholder code follows
-    QSharedPointer<LidarControlPoint> placeHolder =
-        QSharedPointer<LidarControlPoint>(new LidarControlPoint);
-    QList<QSharedPointer< LidarControlPoint> > returnList;
-    returnList.append(placeHolder);
-    return returnList;
+    return m_points.values();
   }
 
 
