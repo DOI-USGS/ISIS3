@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lrolola2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Imports LIDAR data from LRO LOLA instrument.
+  </brief>
+
+  <description>
+    <p>
+
+    Descriptive text about how to use this application goes here.
+
+    <p>
+    See Also:
+    <ul>
+        <li>
+        <a href="http://pdsimage.wr.usgs.gov/Missions/Galileo/NIMS/go_1001/document/nimsinst/instpub.asc">
+        The Near Infrared Mapping Spectrometer Experiment on Galileo</a>
+        </li>
+        <p>
+        A detailed description of the Galileo NIMS instrument.
+        </p>
+        <li>
+        <a href="https://pds.nasa.gov/documents/psdd/PSDDmain_1r71.pdf">
+        Planetary Science Data Dictionary Document</a>
+        <p>
+        A standard reference for data product descriptions contained in Planetary Data System (PDS)
+        data catalogs.
+        </p>
+        </li>
+    </ul>
+
+    </p>
+   </p>
+  </description>
+
+  <history>
+    <change name="Tyler Wilson" date="2017-01-29">
+      Original version
+    </change>
+
+
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input PDS Galileo NIMS cube
+        </brief>
+        <description>
+          Use this parameter to select the path to the NIMS cube.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+
+      <parameter name="CUBES">
+         <type>filename</type>
+         <fileMode>input</fileMode>
+         <brief>
+           Output ISIS core data for a Galileo NIMS cube.
+         </brief>
+         <description>
+           Use this parameter to select the output core data filename.
+         </description>
+         <filter>
+           *.lis
+         </filter>
+       </parameter>
+       <parameter name="TO">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+            Output topographic data from LOLA
+          </brief>
+          <description>
+            Use this parameter to select the output cube for the ISIS backplane data.
+          </description>
+          <filter>
+            *.txt
+          </filter>
+        </parameter>
+    </group>
+  </groups>
+
+
+  <examples>
+    <example>
+      <brief>Importing LOLA topographic data</brief>
+      <description>
+        This example shows how to import LOLA topographic data
+      </description>
+      <terminalInterface>
+        <commandLine>         
+        </commandLine>
+        <description>
+          Run the lrolola2isis application
+        </description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="804" height="1057" src="assets/images/gllnims2isisGUI.png">
+            <brief>
+              Example GUI
+            </brief>
+            <description>
+              Screenshot of the GUI with parameters filled in to execute the
+              gllnims2isis application.  Output cubes for core and suffix data are always
+              required.
+            </description>
+            <thumbnail width="257" height="338" caption="gllnims2isis GUI."
+            src="assets/thumbs/gllnims2isisGUIThumb.png"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <outputImages>
+        <image width="538" height="583" src="assets/images/gllnims2isisCORE.png">
+          <brief>
+            Output image of core data.
+          </brief>
+          <description>
+            Output image of core data after gllnims2isis has imported it to ISIS3.
+          </description>
+          <thumbnail width="172" height="187" caption="Output core data cube."
+          src="assets/thumbs/gllnims2isisCOREThumb.png" />
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+
+        <image width="538" height="581" src="assets/images/gllnims2isisSUFFIX.png">
+          <brief>
+            Output image of suffix data.
+          </brief>
+          <description>
+            Output image of suffix (backplane) data after gllnims2isis has imported it to ISIS3.
+          </description>
+          <thumbnail width="172" height="186" caption="Output suffix data cube."
+          src="assets/thumbs/gllnims2isisSUFFIXThumb.png" />
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example>
+  </examples>
+
+
+</application>
