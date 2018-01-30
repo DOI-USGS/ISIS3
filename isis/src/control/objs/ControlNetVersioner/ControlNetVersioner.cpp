@@ -1250,6 +1250,7 @@ namespace Isis {
       progress->CheckStatus();
     }
 
+    Isis::EndianSwapper lsb("LSB");
     int pointIndex = -1;
     while (pointInStream.ByteCount() < pointsLength) {
       pointIndex += 1;
@@ -1263,8 +1264,7 @@ namespace Isis {
 
         uint32_t size;
         pointCodedInStream.ReadRaw(reinterpret_cast<char *>(&size), sizeof(size));
-
-        Isis::EndianSwapper lsb("LSB");
+        
         size = lsb.Uint32_t(&size);
 
         CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
