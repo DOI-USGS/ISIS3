@@ -29,7 +29,7 @@
 #include "Cube.h"
 #include "iTime.h"
 
-namespace Isis {e
+namespace Isis {
   /**
    * @brief A lidar control ControlPoint
    * 

@@ -107,7 +107,7 @@ namespace Isis {
    * @param time The time to set
    */
   void LidarControlPoint::setTime(QString time) {
-    if (time < 0.0) {
+    if (time.toDouble() < 0.0) {
       QString msg = "The time must be greater then 0.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
       return;
