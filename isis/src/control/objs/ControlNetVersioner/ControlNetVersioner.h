@@ -114,7 +114,7 @@ namespace Isis {
    *   </ol>
    *   </li>
    *   <li>Write a Pvl header into the original blank header at the start of the
-   *        file. This header contains a flag indicating the network is a
+   *        file. This header contains: a flag indicating the network is a
    *        protobuf formatted network, the version of the format, the byte
    *        offset and size of the protobuf header, the byte offset and
    *        size of the block of protobuf control points, and general
@@ -186,7 +186,7 @@ namespace Isis {
    *
    * <h3>Control Network File Format History</h3>
    *
-   * Prior to the creation of this versioning class, which was release with
+   * Prior to the creation of this versioning class, which was released with
    *   ISIS 3.2.2, all control network files were Pvl formatted text files.
    *   Reading and writing these files was handled by the ControlNet, ControlPoint,
    *   and ControlMeasure classes. As the file format was changed, those
@@ -243,18 +243,18 @@ namespace Isis {
    *   <ol>
    *     <li>
    *     <em>Pvl File Header:</em> The file starts with a Pvl formatted header
-   *     that contains offsets to the binary components of the file. This
-   *     header may also contain general information about the control network.
-   *     This information is only for user reference is not used when reading
-   *     the file.
+   *     that contains offsets to the binary components of the file and the
+   *     version number of the file. This header may also contain general
+   *     information about the control network that is only for user reference
+   *     is not used when reading the file.
    *     </li>
    *     <li>
    *     <em>Protobuf Core:</em> After the Pvl header is the protobuf core that
    *     contains the majority of the network data. This is a hierarchical
    *     structure with general network information such as the network
    *     description at the top level. Below that is the control point
-   *     information. Lastly, is the control measure information. This
-   *     structure is defined by <em>ControlNetFileProtoV0001.proto</em>.
+   *     information. The lowest level contains the control measure information.
+   *     This structure is defined by <em>ControlNetFileProtoV0001.proto</em>.
    *     </li>
    *     <li>
    *     <em>Protobuf Log Data:</em> The final component of the file contains
@@ -301,7 +301,7 @@ namespace Isis {
    *     the Protobuf Core which contains all of the control point and control
    *     measure information. This is structured as consecutive protobuf
    *     messages where each message contains all of the information for a
-   *     control point and its control measures. Because, protobuf messages
+   *     control point and its control measures. Because protobuf messages
    *     are not self-delimiting, the size of each message must be known prior
    *     to parsing the Protobuf Core. The control point messages are defined
    *     by <em>ControlPointFileEntryV0002.proto</em>.

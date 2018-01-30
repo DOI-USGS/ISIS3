@@ -95,11 +95,11 @@ namespace Isis {
    *       ground point in meters</li>
    *   <li><em>AdjustedZ:</em> The body fixed Z coordinate of the adjusted
    *       ground point in meters</li>
-   *   <li><em>LatitudeConstrained:</em> If the latitude of the grount point
+   *   <li><em>LatitudeConstrained:</em> If the latitude of the ground point
    *       is constrained</li>
-   *   <li><em>LongitudeConstrained:</em> If the longitude of the grount point
+   *   <li><em>LongitudeConstrained:</em> If the longitude of the ground point
    *       is constrained</li>
-   *   <li><em>RadiusConstrained:</em> If the radius of the grount point
+   *   <li><em>RadiusConstrained:</em> If the radius of the ground point
    *       is constrained</li>
    *   <li><em>PointType:</em> What type of point it is. Options:
    *       <ul>
