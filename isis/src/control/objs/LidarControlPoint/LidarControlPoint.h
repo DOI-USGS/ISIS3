@@ -64,9 +64,9 @@ namespace Isis {
     ControlMeasure backProject(Cube cube);
     
   private:
-    double m_range;
-    double m_sigmaRange;
-    iTime m_time;
+    double m_range;       //!< The range
+    double m_sigmaRange;  //!< The sigma range
+    iTime m_time;         //!< The time the lidar point was taken
     
   };
 }
