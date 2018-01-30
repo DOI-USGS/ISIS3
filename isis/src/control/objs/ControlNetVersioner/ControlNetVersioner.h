@@ -400,6 +400,8 @@ namespace Isis {
    *   @history 2018-01-12 Adam Goins - Added Progress during reads.
    *   @history 2018-01-27 Jesse Mapel - Fixed some documentation formatting. Added a section
    *                           describing the different file format versions.
+   *   @history 2018-01-30 Adam Goins - Ensured point sizes are written/read as lsb by using
+   *                           EndianSwapper.
    */
   class ControlNetVersioner {
 
