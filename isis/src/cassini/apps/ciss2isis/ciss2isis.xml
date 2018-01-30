@@ -107,10 +107,12 @@
           pointer to the cube data.
           
           <strong>NOTE:</strong> While we support most Cassini ISS Targets for ingestion, some of 
-          these targets do not currently have support for being spiced. The current list is : ANTHE, 
-          AEGAEON, BERGELMIR, BESTLA, ERRIAPO, ERRIAPUS, FORNJOT, GREIP, HATI, HYROKKIN, IJIRAQ, 
-          JARNSAXA, K07S4, KARI, KIVIUQ, LOGE, MUNDILFARI, NARVI, PAALIAQ, SIARNAQ, SKADI, SKATHI,
-          SKOLL, SURTUR, SUTTUNG, SUTTUNGR, TARVOS, TARQEQ, THRYM, THRYMR, YMIR. 
+          the smaller bodies do not currently have support for parameters such as their body radii. 
+          Therefore, spiceinit will fail when run on cubes created with these targets. The current 
+          list of these target bodies is : ANTHE, AEGAEON, BERGELMIR, BESTLA, ERRIAPO, ERRIAPUS,
+          FORNJOT, GREIP, HATI, HYROKKIN, IJIRAQ, JARNSAXA, K07S4, KARI, KIVIUQ, LOGE, MUNDILFARI,
+          NARVI, PAALIAQ, SIARNAQ, SKADI, SKATHI, SKOLL, SURTUR, SUTTUNG, SUTTUNGR, TARVOS, TARQEQ,
+          THRYM, THRYMR, YMIR. 
         </description>
         <filter>
           *.lbl *.LBL
