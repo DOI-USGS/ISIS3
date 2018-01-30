@@ -295,138 +295,260 @@ If any a priori coordinate is present without a corresponding a priori sigma, it
       </td>
 <!-- For control nets with AprioriX, AprioriY, and AprioriZ, the default is false.  Even it a point has both the coordinates and covariance matrix, the  a priori information will not be applied for any of the coordinates unless the appropriate constraint flags are present.  For old and transitional nets, the default will depend on the presence a valid value for the coordinate and its corresponding sigma.-->
   </tr>
-</table>
+  <tr><td> LongitudeConstrained</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td> False</td>
+      <td> tbd
+      </td>
+  </tr>
+  <tr><td> RadiusConstrained</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td> False</td>
+      <td> tbd
+      </td>
+  </tr>
+  <tr><td> XConstrained</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  False</td>
+      <td> tbd
+      </td>
+  </tr>
+  <tr><td> YConstrained</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  False</td>
+      <td> tbd
+      </td>
+  </tr>
+  <tr><td> ZConstrained</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  False</td>
+      <td> 
+      </td>
 <!--
-===LongitudeConstrained===
-===RadiusConstrained===
-===XConstrained===
-===YConstrained===
-===ZConstrained===
-(Default:  FALSE)
-
-For control nets with AprioriX, AprioriY, and AprioriZ, the default is false.  Even it a point has both the coordinates and covariance matrix, the  a priori information will not be applied for any of the coordinates unless the appropriate constraint flags are present.  For old and transitional nets, the default will depend on the presence a valid value for the coordinate and its corresponding sigma.
-
-===X===
-(Default:  NONE)
-
-Adjusted X coordinate of the Control Point location. Units are decimal meters.
-
-'''Note:''' The adjusted coordinates stored in the binary control network will always be (X,Y,Z) <meters>. When this information is presented on a terminal window, graphical display, or log file, these will be converted to a user chosen coordinate system. That system may be controlled by the application, user's preference or something else.
-
-===Y===
-(Default:  NONE)
-
-Adjusted Y coordinate of the Control Point location. Units are decimal meters.
-
-===Z===
-(Default:  NONE)
-
-Adjusted Z coordinate of the Control Point location. Units are decimal meters.
-
-===AdjustedSigmaX===
-
-===AdjustedSigmaY===
-===AdjustedSigmaZ===
-
-Note:  CORRECTION
-
+For control nets with AprioriX, AprioriY, and AprioriZ, the default is false.  Even it a point has both the coordinates and covariance matrix, the  a priori information will not be applied for any of the coordinates unless the appropriate constraint flags are present.  For old and transitional nets, the default will depend on the presence a valid value for the coordinate and its corresponding sigma.-->
+  </tr>
+  <tr><td> X</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  None</td>
+      <td> Adjusted X coordinate of the Control Point location. Units are decimal meters.
+      </td>
+<!--'''Note:''' The adjusted coordinates stored in the binary control network will always be (X,Y,Z) <meters>. When this information is presented on a terminal window, graphical display, or log file, these will be converted to a user chosen coordinate system. That system may be controlled by the application, user's preference or something else.-->
+  </tr>
+<tr><td> Y</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  None</td>
+      <td> Adjusted Y coordinate of the Control Point location. Units are decimal meters.
+      </td>
+  </tr>
+<tr><td> Z</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  None</td>
+      <td> Adjusted Z coordinate of the Control Point location. Units are decimal meters.
+      </td>
+  </tr>
+<tr><td> AdjustedSigmaX</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  None</td>
+      <td> Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
+      </td>
+  </tr>
+<tr><td> AdjustedSigmaY</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  None</td>
+      <td> Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
+      </td>
+  </tr>
+<tr><td> AdjustedSigmaZ</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  None</td>
+      <td> Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
+      </td>
+  <!--Note:  CORRECTION
 The Sigmas are stored in the binary control net as an 6 element upper triangular covariance matrix for accuracy.  The keyword is ApostCovarianceMatrix.
+If an input control net has a point with latitude, longitude, and radius (such as an old pvl net) or X, Y, and Z (such as a transitional net) and no sigmas or covariance matrix, the point coordinates will be ignored in the bundle adjustment applications and a priori coodinates will be recomputed.  If a priori sigmas are present along with the coordinate (X,Y, and Z or latitude, longitude, and radius), the coordinates will be used to set the a priori (initial) coordinates in bundle adjustment applications.  Also if an old net has both the a priori point coordinates (latitude, longitude, and radius) and the sigmas, bundle adjustment applications will use these values as the a priori (initial) coordinates and sigmas and not recompute them.  The constraint flags will be set as well.-->
+  </tr>
+</table>
 
-Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
+<h2>Control Measure</h2>
+<p>A logical grouping of all information concerning a control measurement.</p>
 
-If an input control net has a point with latitude, longitude, and radius (such as an old pvl net) or X, Y, and Z (such as a transitional net) and no sigmas or covariance matrix, the point coordinates will be ignored in the bundle adjustment applications and a priori coodinates will be recomputed.  If a priori sigmas are present along with the coordinate (X,Y, and Z or latitude, longitude, and radius), the coordinates will be used to set the a priori (initial) coordinates in bundle adjustment applications.  Also if an old net has both the a priori point coordinates (latitude, longitude, and radius) and the sigmas, bundle adjustment applications will use these values as the a priori (initial) coordinates and sigmas and not recompute them.  The constraint flags will be set as well.
+<pre style="padding-left:4em;">
+    Group = ControlMeasure
+      SerialNumber*      = Example/Measure/111.000
+      MeasureType        = "Candidate   # (Candidate, Manual, RegisteredPixel, RegisteredSubPixel)"
+      ChooserName        = aexample
+      DateTime           = 2012-01-04T17:01:32
+      EditLock           = True
+      Ignore             = True
+      Sample             = 180.0
+      Line               = 270.0
+      Diameter           = 10.0
+      AprioriSample      = 50
+      AprioriLine        = 50
+      SampleSigma        = 10 &lt;pixels&gt;
+      LineSigma          = 10 &lt;pixels&gt;
+      SampleResidual     = 10 &lt;pixels&gt;
+      LineResidual       = -10 &lt;pixels&gt;
+      JigsawRejected     = Yes
+      MinimumPixelZScore = -6.9339878963865
+      MaximumPixelZScore = 7.8509687345151
+      GoodnessOfFit      = 0.7774975693515
+      Reference          = True
+      End_Group
+    End_Object
+  End_Object
+</pre>
 
-==Control Measure==
-A logical grouping of all information concerning a control measurement.
-
-===SerialNumber===
-(No Default)
-
-A serial number is a unique identifier for a cube. This value is usually comprised of a spacecraft name, instrument name, start time, and if needed, other identifying label values from the cube. Serial numbers are used within control networks in conjunction with a cube list to associate cubes and control measures.
-
-===MeasureType===
-(Default:  Candidate)
-
-*Reference - This Control Measurement is the reference for the Control Point it is contained in
+<table class="tableFormattedInformation" align="center">
+  <tr><th>Keyword</th>
+      <th>Type</th>
+      <th> Required </th>
+      <th> Default </th>
+      <th>Description</th>
+  </tr>
+  <tr><td> SerialNumber</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  No Default </td>
+      <td> A serial number is a unique identifier for a cube. This value is usually comprised of a spacecraft name, instrument name, start time, and if needed, other identifying label values from the cube. Serial numbers are used within control networks in conjunction with a cube list to associate cubes and control measures.
+      </td>
+  </tr>
+  <tr><td> MeasureType</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  Candidate</td>
+      <td> *Reference - This Control Measurement is the reference for the Control Point it is contained in
 *Candidate - This Control Measurement is considered a candidate (i.e., the location is preliminary or not well know). Application such as Autoseed, cnetref should use this setting
 *Manual - This Control Measurement was hand measured (eg. qnet).
 *RegisteredPixel - Automatically registered to whole pixel (eg. pointreg).
 *RegisteredSubPixel - Automatically registered to sub-pixel (eg. pointreg, qnet).
+      </td>
+  </tr>
+  <tr><td> EditLock</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  No Default </td>
+      <td> This measure is not to be edited.  This includes the Ignore and Reference flag for any measure. If the reference measure EditLock=False and the Point-EditLock=TRUE, then the reference measure is implicitly Editlock=TRUE.
+      </td>
+      <!--If the reference measure EditLock=False and the Point-EditLock=TRUE, then the reference measure is implicitly Editlock=TRUE.
 
-===EditLock===
-This measure is not to be edited.  This includes the Ignore and Reference flag for any measure. 
-
-If the reference measure EditLock=False and the Point-EditLock=TRUE, then the reference measure is implicitly Editlock=TRUE.
-
-If any non-reference measure is EditLock=True and the Reference measure EditLock=False, this is an ERROR and the application needs to report to the user.  There can be more than one measure with EditLock=True (reference + any other measures).
-
-===Ignore===
-(Default: False)
-
-Flag (True/False) to indicate whether this Control Measure should be Ignored. When a measurement is ignored it should not be used by a program unless the program is explicitly working with ignored measurements.
-
-===ChooserName===
-(Default:  "")
-
-Indicates the chooser name of an application that last changed this Control Measure's coordinate.
-
-''''''Note:'''''' For qnet use the user name instead of "qnet"
-
-===DateTime===
-(Default:  "")
-
-Indicates the date/time the Control Measure's line/sample coordinate was last changed
-
-'''AI''' Add updating this automatically to control measure class if possible
-
-===Sample===
-Sample coordinate of the Control Measure within the cube. The value of the keyword is a floating point number.
-
-===Line===
-Line coordinate of the Control Measure within the cube. The value of the keyword is a floating point number.
-
-===SampleResidual===
+If any non-reference measure is EditLock=True and the Reference measure EditLock=False, this is an ERROR and the application needs to report to the user.  There can be more than one measure with EditLock=True (reference + any other measures).-->
+  </tr>
+  <tr><td> Ignore</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  False</td>
+      <td> Flag (True/False) to indicate whether this Control Measure should be Ignored. When a measurement is ignored it should not be used by a program unless the program is explicitly working with ignored measurements.
+      </td>
+  </tr>
+  <tr><td> ChooserName</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  "" (or omitted?) </td>
+      <td>Indicates the chooser name of an application that last changed this Control Measure's coordinate.
+      </td>
+  <!--''''''Note:'''''' For qnet use the user name instead of "qnet"-->
+  </tr>
+  <tr><td> DateTime</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  "" (or omitted?) </td>
+      <td> Indicates the date/time the Control Measure's line/sample coordinate was last changed
+      </td>
+  <!-- '''AI''' Add updating this automatically to control measure class if possible -->
+  </tr>
+  <tr><td> Sample</td>
+      <td>  String</td>
+      <td>  No </td>
+      <td>  0.0?</td> 
+      <td> Sample coordinate of the Control Measure within the cube. The value of the keyword is a floating point number.
+      </td>
+  </tr>
+ <tr><td> Line</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> Line coordinate of the Control Measure within the cube. The value of the keyword is a floating point number.
+      </td>
+  </tr>
+ <tr><td> SampleResidual</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> 
 The difference between the ''estimated'' sample measurement (as determined at the end of each iteration of the bundle adjustment) and the original sample measurement. Used in the determination of outliers throughout the bundle. Measurement residuals are used upon convergence to compute the reference variance (σ<SUB>0</SUB><SUP>2</SUP>) which in turn is used to scale the inverse of the normal equations matrix for error propagation. Units are pixels.
-
-''''''Note:'''''' Make sure warp, translate, coreg type apps output a cnet and set these
-
-===LineResidual===
+      </td>
+<!--''''''Note:'''''' Make sure warp, translate, coreg type apps output a cnet and set these-->
+  </tr>
+ <tr><td> LineResidual</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> 
 The difference between the ''estimated'' line measurement (as determined at the end of each iteration of the bundle adjustment) and the original sample measurement. Used in the determination of outliers throughout the bundle. Measurement residuals are used upon convergence to compute the reference variance (σ<SUB>0</SUB><SUP>2</SUP>) which in turn is used to scale the inverse of the normal equations matrix for error propagation. Units are pixels.
-
-''''''Note:'''''' See Sample Residual
-
-===Diameter===
-(Default:  0.0)
-
-The diameter of the crater in meters
-
-'''AI''' Check qnet to see if this is being set and used as need by users.
-
-===AprioriSample===
-The first identified location of the measure by any application. In this initial state the a priori keyword values are the same as line/sample keyword values.
-
-autoseed, cnetadd, qnet (for manual movement), cnetref (with interest),mat2cnet - set this to the new value.
-
-pointreg, qnet (with sub-pixel), hijitreg, ALL autoreg apps - leave this alone. They will use it to calculate the pixelshift in the log file
-
-===AprioriLine===
-See AprioriSample keyword
-
-===SampleSigma===
+      </td>
+ <!--''''''Note:'''''' See Sample Residual-->
+  </tr>
+ <tr><td> Diameter</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  0.0</td> 
+      <td> The diameter of the crater in meters
+      </td>
+ <!-- '''AI''' Check qnet to see if this is being set and used as need by users. -->
+  </tr>
+ <tr><td> AprioriSample</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> The first identified location of the measure by any application. In this initial state the a priori keyword values are the same as line/sample keyword values.
+      </td>
+  <!--autoseed, cnetadd, qnet (for manual movement), cnetref (with interest),mat2cnet - set this to the new value.
+  pointreg, qnet (with sub-pixel), hijitreg, ALL autoreg apps - leave this alone. They will use it to calculate the pixelshift in the log file -->
+  </tr>
+ <tr><td> AprioriLine</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> See AprioriSample keyword
+      </td>
+  </tr>
+ <tr><td> SampleSigma</td>
+      <td>  String</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> 
 Standard deviation of sample measurement. An indicator of precision used in the weighting of measurements in the bundle adjustment (i.e. Jigsaw). May be determined from experience (e.g., manual point measurement) or perhaps estimated within an automated point measurement technique (e.g., ellipse fitting of crater edges, or through the use of an interest operator). Units are pixels.
-
-* Note that the computation of this value by ISIS automated point measurement methods is yet to be determined.
-
-'''''NOTE:''''' See LINESIGMA
-
-===LineSigma===
-Standard deviation of line measurement. An indicator of precision used in the weighting of measurements in the bundle adjustment (i.e. Jigsaw). May be determined from experience (e.g., manual point measurement) or perhaps estimated within an automated point measurement technique (e.g., ellipse fitting of crater edges, or through the use of an interest operator). Units are pixels.
-
+      </td>
+ <!--* Note that the computation of this value by ISIS automated point measurement methods is yet to be determined. 
+'''''NOTE:''''' See LINESIGMA-->
+  </tr>
+  <tr><td> LineSigma</td>
+       <td>  String</td>
+       <td>  No</td>
+       <td>  None</td> 
+       <td>Standard deviation of line measurement. An indicator of precision used in the weighting of measurements in the bundle adjustment (i.e. Jigsaw). May be determined from experience (e.g., manual point measurement) or perhaps estimated within an automated point measurement technique (e.g., ellipse fitting of crater edges, or through the use of an interest operator). Units are pixels.
+       </td>
+<!--
 ''''''Note:'''''' The computation of this value by ISIS automated point measurement methods is yet to be determined. Eventually this should be defined before jigsaw runs such as pointreg setting it based on how well the measurement coregistered.
 
 '''AI''' Can Ken E. look at autoreg output stats to determine an accurate sigma from those stats.
 
 '''''Note:''''' Consider adding this as input to warp/coreg/translate-->
+   </tr>
+</table>
+
       </body>
 
       <type>HTML</type>
