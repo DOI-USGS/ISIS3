@@ -43,19 +43,14 @@ namespace Isis {
   class LidarControlPoint : public ControlPoint {
     
   public:
-    
-    LidarControlPoint();
-    LidarControlPoint(double time, double range, double sigmaRange);
+
     LidarControlPoint(iTime time, double range, double sigmaRange);
-    LidarControlPoint(QString time, double range, double sigmaRange);
     
     ~LidarControlPoint();
     
     void setRange(double range);
     void setSigmaRange(double sigmaRange);
-    void setTime(double time);
     void setTime(iTime time);
-    void setTime(QString time);
     
     double range();
     double sigmaRange();
