@@ -15,6 +15,7 @@
 #include "ControlNet.h"
 #include "ControlMeasureLogData.h"
 #include "Distance.h"
+#include "EndianSwapper.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
@@ -1263,6 +1264,9 @@ namespace Isis {
         uint32_t size;
         pointCodedInStream.ReadRaw(reinterpret_cast<char *>(&size), sizeof(size));
 
+        Isis::EndianSwapper lsb("LSB");
+        size = lsb.Uint32_t(&size);
+
         CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
         newPoint->ParseFromCodedStream(&pointCodedInStream);
         pointCodedInStream.PopLimit(oldPointLimit);
@@ -2069,6 +2073,10 @@ namespace Isis {
       }
 
       uint32_t byteSize = protoPoint.ByteSize();
+
+      Isis::EndianSwapper lsb("LSB");
+      byteSize = lsb.Uint32_t(&byteSize);
+
       output->write(reinterpret_cast<char *>(&byteSize), sizeof(byteSize));
 
       if ( !protoPoint.SerializeToOstream(output) ) {
