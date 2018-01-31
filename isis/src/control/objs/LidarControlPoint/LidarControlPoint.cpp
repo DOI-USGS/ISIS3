@@ -1,24 +1,18 @@
 #include "LidarControlPoint.h"
 
+#include <QString>
+
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "IException.h"
+#include "iTime.h"
 
 using namespace std;
 
 namespace Isis {
   
-  /**
-   * Empty LidarControlPoint constructor
-   */
-  LidarControlPoint::LidarControlPoint() {
-    m_time = -1;
-    m_range = -1;
-    m_sigmaRange = -1;
-  }
-  
-  
+
   /**
    * Constructs a LidarControlPoint with the given time, range, and sigma range.
    * 
@@ -26,23 +20,11 @@ namespace Isis {
    * @param range The range of the point.
    * @param sigmaRange The sigmas od the range.
    */
-  LidarControlPoint::LidarControlPoint(double time, double range, double sigmaRange) {
+  LidarControlPoint::LidarControlPoint(iTime time, double range, double sigmaRange) {
     m_time = time;
     m_range = range;
     m_sigmaRange = sigmaRange;
   }
-  
-  
-//   /**
-//    * Copy the given LidarControlPoint
-//    * 
-//    * @param other The LidarControlPoint to copy
-//    */
-//   LidarControlPoint::LidarControlPoint(const LidarControlPoint &other) {
-//     m_time = other.time();
-//     m_range = other.range();
-//     m_sigmaRange = other.sigmaRange();
-//   }
   
   
   /**
@@ -57,7 +39,7 @@ namespace Isis {
    * 
    * @param time The time to set
    */
-  void LidarControlPoint::setTime(double time) {
+  void LidarControlPoint::setTime(iTime time) {
     if (time < 0.0) {
       QString msg = "The time must be greater then 0.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -65,7 +47,7 @@ namespace Isis {
     }
     m_time = time;
   }
-  
+
   
   /**
    * Set the range of the LidarControlPoint
@@ -107,7 +89,7 @@ namespace Isis {
    * 
    * @return double The time
    */
-  double LidarControlPoint::time() {
+  iTime LidarControlPoint::time() {
     return m_time;
   }
   
