@@ -23,17 +23,17 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 </div>
 -->
 
-        <h2>Introduction</h2>
+	  <h2>Introduction</h2>
 
         <h3>Control Network</h3>
-        <p>A Control Network in ISIS3 is a structure which holds common </p>
+        <p>A Control Network in ISIS3 is a structure which holds a network of image correspondances, also known as tie points or control points, which identify common ground points across multiple images of the same body. A Control Network is made up of Control Points (the common tie point) and a Control Point has one or more Control Measures (measurements in image space of the common point in a particular image.) There are two file formats for Control Networks in ISIS3 -- a binary google protocol buffer format and a human-readable pvl format. Both contain the same contents and information. This document describes the keywords present in the PVL format for convenience.</p>
 
 	<h2>Control Network</h2>
-        <p>This section contains keywords associated with the main Control Network object.</p>
+        <p>This section describes the keywords associated with the main Control Network object.</p>
  
 <pre style="padding-left:4em;">
   Object = ControlNetwork
-  NetworkId*   = ExampleNetwork1
+  NetworkId   = ExampleNetwork1
   TargetName   = Template
   UserName     = aexample
   Created      = 2012-01-04T12:09:57
@@ -44,66 +44,64 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 <table class="tableFormattedInformation" align="center">
   <tr><th>Keyword</th>
-      <th>Type</th>
       <th> Required </th>
       <th> Default </th>
       <th>Description</th>
   </tr>
   <tr><td> NetworkId</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  No Default </td>
+      <td>  Yes</td>
+      <td>  No Default</td>
       <td> A user defined single word identifier assigned to the control network file. </td>
       <!--Most programs should copy this from the input cnet with an option to change it if it is entered by the user. If more than one input cnet use the first cnet entered (i.e., cnetmerge) -->
   </tr>
   <tr><td>  TargetName</td>
-      <td>  String</td>
-      <td>  No Default </td>
-      <td>  Yes </td>
-      <td>  The planetary body to which the control network file applies. This Target Name should appear in all cubes used in the control network. Possible values are Moon, or Mars.</td>
+      <td>  Yes</td>
+      <td>  ""</td>
+      <td>  The planetary body to which the control network file applies. This Target Name should appear in all cubes used in the control network. Possible example values are Moon, or Mars.</td>
 <!--Use Cases:
 *cnetmerge should use this to verify the control networks share the same target.
 *cnetadd should use this to verify the control network and images share the same target.
 -->
       </tr>
   <tr><td>  UserName</td>
-      <td>  String</td>
-      <td>  No Default </td>
-      <td> No </td>
-      <td> Name of the user that created the control network file. </td>
+      <td>  No</td>
+      <td> No Default</td>
+      <td> Name of the user that created the control network file.</td>
   </tr>
   <tr><td>  Created</td>
-      <td>  String</td>
-      <td>  No Default </td>
-      <td> No </td>
+      <td>  No</td>
+      <td> Set automatically</td>
       <td> Initial creation date and time of control net file. Once this is set it should not be modified. </td>
 <!--
 ''''''Note:'''''' For cnetmerge retain the earliest of the input cnets.
 ''''''Note:'''''' Report all input creation dates to the log file. --> 
   </tr>
   <tr><td>  LastModified</td>
-      <td>  String</td>
-      <td>  ? </td>
-      <td> ? </td>
+      <td>  No</td>
+      <td> None</td>
       <td> Date and time on which the control net file was last modified. All programs which modify the contents of this network must set this keyword.</td>
   </tr>
 <!--(Default:  CurrentLocalTime()) QUESTION: Is there truly a default? -->
   <tr><td>  Description</td>
-      <td>  String</td>
-      <td> None </td>
       <td> No </td>
+      <td> None </td>
       <td>Brief description of the control network file. This is free-form text normally supplied by the person running the application.</td>
+  </tr>
+  <tr><td>  Version</td>
+      <td> No</td>
+      <td> Set to current version on output.</td>
+      <td> The Version of the Control Network file. The most recent version is 5.</td>
   </tr>
   </table>
 
 
 <h2>Control Point</h2>
-<p>A logical grouping of all information concerning a control point.</p>
+<p>   A control point is one or more measurements that identify the same feature or location in different images.This section contains the information describing a Control Point.</p>
 
 <pre style="padding-left:4em;">
   Object = ControlPoint
     PointType                = "Fixed    # (Fixed, Constrained, Free)"
-    PointId*                 = I00826010RDR_ex_1_ID
+    PointId                 = I00826010RDR_ex_1_ID
     ChooserName              = aexample
     DateTime                 = 2012-01-04T17:01:32
     EditLock                 = True
@@ -139,30 +137,32 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 <table class="tableFormattedInformation" align="center">
   <tr><th>Keyword</th>
-      <th>Type</th>
       <th> Required </th>
       <th> Default </th>
       <th>Description</th>
   </tr>
   <tr><td> PointType</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  No Default </td>
-      <td>  Fixed, Constrained, Free </td>
+      <td>  No</td>
+      <td>  No Default?</td>
+      <td>  <ul>
+		<li>Fixed - A Fixed point is a Control Point whose lat/lon is well established and should not be changed. Some people will refer to this as a truth (i.e., ground truth).  <!--A fixed point can be identifed in one or
+          * more cubes.  Historically this point was called a "Ground" point.--></li>
+		<li> Constrained - A Constrained point is a Control Point whose lat/lon/radius is somewhat established and should not be changed. </li>
+		<li>Free - A Free point is a Control Point that identifies common measurements between two or more cubes. While it could have a lat/lon, it is not necessarily correct and is subject to change.  This is the most common type of control point.  This point type floats freely in a bundle adjustment.</li>
+		</ul>
 <!--
 This type of control point is measured image to image. Each measurement associated with this point has a line and sample coordinate indicating the location of this point on that image.
 
 The coordinates of this type of control point are assumed to have a known accuracy. The bundle adjustment will constrain"Ground" points accordingly.
 -->
+      </td>
   </tr>
   <tr><td> PointId</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  No Default </td>
       <td>   String to identify an individual Control Point. This is a required keyword for all points and must be unique within a single Control Network. This keyword is often generated automatically by applications which create Control Points.</td>
   </tr>
   <tr><td> ChooserName</td>
-      <td>  String</td>
       <td>  No Default</td>
       <td> No</td>
       <td> The name of the user who manually created a point or the name of the application which automatically created a point.</td>
@@ -171,13 +171,11 @@ The coordinates of this type of control point are assumed to have a known accura
 *When autoseed creates points it should set this to "autoseed".-->
   </tr>
   <tr><td> DateTime</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  No Default </td>
       <td> Indicates the date/time a ground Control Point's coordinate was last changed</td>
   </tr>
   <tr><td> EditLock</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  False </td>
       <td> Indicator to applications that edit the contents of Control Points that all information about this point (e.g. Latitude, Longitude, Radius) should not be modified. This does not include adding or removing measurements or the contents of existing measurements, as long as those measures are not locked.
@@ -190,14 +188,12 @@ Question: Should Reference measures have EditLock set to True by default when th
 
 For applications such as 'cnetadd', when the control Point-EditLock=TRUE, new measures can be still added to the network..BUT, if the AprioriXYZSource=AverageOfMeasures; the a priori xyz values will remain UNchanged because the Point-EditLock=TRUE (most likely not the responsibilty to a measure app like cnetadd anyway).  There might need to be a new app that updates 'ControlPoint' Level information allowing the user to "unlock" points and update a priori xyz values based on current state of measures. -->
   <tr><td> Ignore</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  False </td>
       <td> Flag (True/False) to indicate whether this Control Point should be Ignored. When a point is ignored, no data within the point should be used by a program unless the program is explicitly working with ignored points.
       </td>
   </tr>
   <tr><td> AprioriXYZSource</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  None </td>
       <td>  
@@ -210,7 +206,6 @@ Set to one of the values below:
       </td>
   </tr>
   <tr><td> AprioriXYZSourceFile</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  "" </td>
       <td> A string containing the file name of the AprioriLatitude and AprioriLongitude source.   This keyword will only be used if AprioriLatLonSource == Basemap.
@@ -219,9 +214,8 @@ Set to one of the values below:
 '''Note:''' If the AprioriCoordinateSourceFile is set to the serial number of the reference measurement and the reference measurement is modified then all a  priori information should be updated.-->
   </tr>
   <tr><td> AprioriRadiusSource</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  Doesn't exist in net </td>
+      <td>  No</td>
+      <td>  Doesn't exist in net</td>
       <td> Set to one of the values below:
 *User - The a priori radius was hand entered by the user.
 *AverageOfMeasures - The a priori radius was calculated as the average radius for all measures.
@@ -231,9 +225,8 @@ Set to one of the values below:
       </td>
   </tr>
   <tr><td> AprioriRadiusSourceFile</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  NONE </td>
+      <td>  No</td>
+      <td>  NONE</td>
       <td> A string containing the file name of the AprioriRadius source.
 :  If AprioriiRadiusSource = Ellipsoid, this keyword will be set to the Naif PCK file.
 :  If AprioriRadiusSource = DEM, this keyword will be set to the file name of the DEM.
@@ -241,21 +234,18 @@ The default value is the empty string ("").
       </td>
   </tr>
   <tr><td> AprioriX</td>
-      <td>  String</td>
-      <td>  No </td>
+      <td>  No</td>
       <td>  False </td>
       <td> Internal storage of the '''initial''' position of the point on the target. Always stored in body fixed x,y,z coordinates.
       </td>
   </tr>
   <tr><td> AprioriY</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  False </td>
+      <td>  No</td>
+      <td>  False</td>
       <td> Internal storage of the '''initial''' position of the point on the target. Always stored in body fixed x,y,z coordinates.
       </td>
   </tr>
   <tr><td> AprioriZ</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  False </td>
       <td> Internal storage of the '''initial''' position of the point on the target. Always stored in body fixed x,y,z coordinates.
@@ -266,21 +256,18 @@ If any a priori coordinate is present without a corresponding a priori sigma, it
 -->
   </tr>
   <tr><td> AprioriSigmaX</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  None </td>
       <td> Pre-adjustment standard deviation of XXXXXXX. An indicator of accuracy that may be used in the weighting of the XXXXXX point coordinate in the bundle adjustment. May originate from a variety of sources; for example a base-map, a previous bundle adjustment, or from the assumed or estimated quality of a sensor measurement such as GPS (in the case of terrestrial mapping) or lidar. Or for other planets accuracy of the MOLA solution. Units are meters.
       </td>
   </tr>
   <tr><td> AprioriSigmaY</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  None </td>
       <td> Pre-adjustment standard deviation of XXXXXXX. An indicator of accuracy that may be used in the weighting of the XXXXXX point coordinate in the bundle adjustment. May originate from a variety of sources; for example a base-map, a previous bundle adjustment, or from the assumed or estimated quality of a sensor measurement such as GPS (in the case of terrestrial mapping) or lidar. Or for other planets accuracy of the MOLA solution. Units are meters.
       </td>
   </tr>
   <tr><td> AprioriSigmaZ</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  None </td>
       <td> Pre-adjustment standard deviation of XXXXXXX. An indicator of accuracy that may be used in the weighting of the XXXXXX point coordinate in the bundle adjustment. May originate from a variety of sources; for example a base-map, a previous bundle adjustment, or from the assumed or estimated quality of a sensor measurement such as GPS (in the case of terrestrial mapping) or lidar. Or for other planets accuracy of the MOLA solution. Units are meters.
@@ -288,7 +275,6 @@ If any a priori coordinate is present without a corresponding a priori sigma, it
 <!-- The Sigmas are stored in the binary control net as an 6 element upper triangular covariance matrix for accuracy.  The keyword is AprioriCovarianceMatrix.  See the description under AprioriX, AprioriY, and AprioriZ. -->
   </tr>
   <tr><td> LatitudeConstrained</td>
-      <td>  String</td>
       <td>  No </td>
       <td>  False </td>
       <td> If the Latitude is constrained. 
@@ -296,96 +282,46 @@ If any a priori coordinate is present without a corresponding a priori sigma, it
 <!-- For control nets with AprioriX, AprioriY, and AprioriZ, the default is false.  Even it a point has both the coordinates and covariance matrix, the  a priori information will not be applied for any of the coordinates unless the appropriate constraint flags are present.  For old and transitional nets, the default will depend on the presence a valid value for the coordinate and its corresponding sigma.-->
   </tr>
   <tr><td> LongitudeConstrained</td>
-      <td>  String</td>
       <td>  No </td>
       <td> False</td>
-      <td> tbd
+      <td> True if the latitude is constrained.
       </td>
   </tr>
   <tr><td> RadiusConstrained</td>
-      <td>  String</td>
       <td>  No</td>
       <td> False</td>
-      <td> tbd
+      <td> Flag that indicates if the radius is constrained.
       </td>
   </tr>
-  <tr><td> XConstrained</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  False</td>
-      <td> tbd
-      </td>
-  </tr>
-  <tr><td> YConstrained</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  False</td>
-      <td> tbd
-      </td>
-  </tr>
-  <tr><td> ZConstrained</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  False</td>
-      <td> 
-      </td>
-<!--
-For control nets with AprioriX, AprioriY, and AprioriZ, the default is false.  Even it a point has both the coordinates and covariance matrix, the  a priori information will not be applied for any of the coordinates unless the appropriate constraint flags are present.  For old and transitional nets, the default will depend on the presence a valid value for the coordinate and its corresponding sigma.-->
-  </tr>
-  <tr><td> X</td>
-      <td>  String</td>
+  <tr><td> AdjustedX</td>
       <td>  No </td>
       <td>  None</td>
       <td> Adjusted X coordinate of the Control Point location. Units are decimal meters.
       </td>
 <!--'''Note:''' The adjusted coordinates stored in the binary control network will always be (X,Y,Z) <meters>. When this information is presented on a terminal window, graphical display, or log file, these will be converted to a user chosen coordinate system. That system may be controlled by the application, user's preference or something else.-->
   </tr>
-<tr><td> Y</td>
-      <td>  String</td>
+<tr><td> AdjustedY</td>
       <td>  No </td>
       <td>  None</td>
       <td> Adjusted Y coordinate of the Control Point location. Units are decimal meters.
       </td>
   </tr>
-<tr><td> Z</td>
-      <td>  String</td>
+<tr><td> AdjustedZ</td>
       <td>  No </td>
       <td>  None</td>
       <td> Adjusted Z coordinate of the Control Point location. Units are decimal meters.
       </td>
   </tr>
-<tr><td> AdjustedSigmaX</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  None</td>
-      <td> Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
-      </td>
-  </tr>
-<tr><td> AdjustedSigmaY</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  None</td>
-      <td> Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
-      </td>
-  </tr>
-<tr><td> AdjustedSigmaZ</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  None</td>
-      <td> Estimated standard deviation of the X,Y, or Z point coordinate computed upon convergence of the bundle adjustment (i.e. Jigsaw). An indicator of precision. Computed by Jigsaw as the square-root of the pertinent diagonal element of the variance-covariance matrix. Units are meters.
-      </td>
-  <!--Note:  CORRECTION
-The Sigmas are stored in the binary control net as an 6 element upper triangular covariance matrix for accuracy.  The keyword is ApostCovarianceMatrix.
-If an input control net has a point with latitude, longitude, and radius (such as an old pvl net) or X, Y, and Z (such as a transitional net) and no sigmas or covariance matrix, the point coordinates will be ignored in the bundle adjustment applications and a priori coodinates will be recomputed.  If a priori sigmas are present along with the coordinate (X,Y, and Z or latitude, longitude, and radius), the coordinates will be used to set the a priori (initial) coordinates in bundle adjustment applications.  Also if an old net has both the a priori point coordinates (latitude, longitude, and radius) and the sigmas, bundle adjustment applications will use these values as the a priori (initial) coordinates and sigmas and not recompute them.  The constraint flags will be set as well.-->
-  </tr>
 </table>
 
 <h2>Control Measure</h2>
-<p>A logical grouping of all information concerning a control measurement.</p>
+<p>A Control Measure is a measurement in image space (sample and line coordinates) of a point in one cube that has been associated with a Control Point and other overlapping image cubes.
+
+Each ControlMeasure group in a PVL-formatted Control Network contains all information concerning a control measurement. An example follows:</p>
 
 <pre style="padding-left:4em;">
     Group = ControlMeasure
-      SerialNumber*      = Example/Measure/111.000
+      SerialNumber      = Example/Measure/111.000
       MeasureType        = "Candidate   # (Candidate, Manual, RegisteredPixel, RegisteredSubPixel)"
       ChooserName        = aexample
       DateTime           = 2012-01-04T17:01:32
@@ -412,120 +348,91 @@ If an input control net has a point with latitude, longitude, and radius (such a
 
 <table class="tableFormattedInformation" align="center">
   <tr><th>Keyword</th>
-      <th>Type</th>
       <th> Required </th>
       <th> Default </th>
       <th>Description</th>
   </tr>
   <tr><td> SerialNumber</td>
-      <td>  String</td>
-      <td>  No </td>
+      <td>  Yes </td>
       <td>  No Default </td>
       <td> A serial number is a unique identifier for a cube. This value is usually comprised of a spacecraft name, instrument name, start time, and if needed, other identifying label values from the cube. Serial numbers are used within control networks in conjunction with a cube list to associate cubes and control measures.
       </td>
   </tr>
   <tr><td> MeasureType</td>
-      <td>  String</td>
-      <td>  No </td>
+      <td>  No</td>
       <td>  Candidate</td>
-      <td> *Reference - This Control Measurement is the reference for the Control Point it is contained in
-*Candidate - This Control Measurement is considered a candidate (i.e., the location is preliminary or not well know). Application such as Autoseed, cnetref should use this setting
-*Manual - This Control Measurement was hand measured (eg. qnet).
-*RegisteredPixel - Automatically registered to whole pixel (eg. pointreg).
-*RegisteredSubPixel - Automatically registered to sub-pixel (eg. pointreg, qnet).
+      <td> 
+	  <ul>
+            <li>Candidate - This Control Measurement is considered a candidate (i.e., the location is preliminary or not well know). <!--Application such as Autoseed, cnetref should use this setting--></li>
+            <li>Manual - This Control Measurement was hand measured (eg. qnet).</li>
+            <li>RegisteredPixel - Automatically registered to whole pixel (eg. pointreg).</li>
+            <li>RegisteredSubPixel - Automatically registered to sub-pixel (eg. pointreg, qnet).</li>
+	  </ul>
       </td>
   </tr>
-  <tr><td> EditLock</td>
-      <td>  String</td>
+ <tr><td> ChooserName</td>
       <td>  No </td>
-      <td>  No Default </td>
-      <td> This measure is not to be edited.  This includes the Ignore and Reference flag for any measure. If the reference measure EditLock=False and the Point-EditLock=TRUE, then the reference measure is implicitly Editlock=TRUE.
+      <td>  Omitted if not set</td>
+      <td>Indicates the name of the user or application that last changed this Control Measure's coordinate.
+      </td>
+  <!--''''''Note:'''''' For qnet use the user name instead of "qnet"-->
+  </tr>
+  <tr><td> DateTime</td>
+      <td>  No </td>
+      <td>  "" (or omitted?)</td>
+      <td> Indicates the date/time the Control Measure's line/sample coordinate was last changed.
+      </td>
+  <!-- '''AI''' Add updating this automatically to control measure class if possible -->
+  </tr>
+  <tr><td> EditLock</td>
+      <td>  No</td>
+      <td>  False</td>
+      <td> This measure is not to be edited.  This includes the Ignore and Reference flag for any measure.
       </td>
       <!--If the reference measure EditLock=False and the Point-EditLock=TRUE, then the reference measure is implicitly Editlock=TRUE.
 
 If any non-reference measure is EditLock=True and the Reference measure EditLock=False, this is an ERROR and the application needs to report to the user.  There can be more than one measure with EditLock=True (reference + any other measures).-->
   </tr>
   <tr><td> Ignore</td>
-      <td>  String</td>
-      <td>  No </td>
+      <td>  No</td>
       <td>  False</td>
       <td> Flag (True/False) to indicate whether this Control Measure should be Ignored. When a measurement is ignored it should not be used by a program unless the program is explicitly working with ignored measurements.
       </td>
   </tr>
-  <tr><td> ChooserName</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  "" (or omitted?) </td>
-      <td>Indicates the chooser name of an application that last changed this Control Measure's coordinate.
-      </td>
-  <!--''''''Note:'''''' For qnet use the user name instead of "qnet"-->
-  </tr>
-  <tr><td> DateTime</td>
-      <td>  String</td>
-      <td>  No </td>
-      <td>  "" (or omitted?) </td>
-      <td> Indicates the date/time the Control Measure's line/sample coordinate was last changed
-      </td>
-  <!-- '''AI''' Add updating this automatically to control measure class if possible -->
-  </tr>
   <tr><td> Sample</td>
-      <td>  String</td>
-      <td>  No </td>
+      <td>  No</td>
       <td>  0.0?</td> 
       <td> Sample coordinate of the Control Measure within the cube. The value of the keyword is a floating point number.
       </td>
   </tr>
  <tr><td> Line</td>
-      <td>  String</td>
       <td>  No</td>
-      <td>  None</td> 
+      <td>  0.0?</td> 
       <td> Line coordinate of the Control Measure within the cube. The value of the keyword is a floating point number.
       </td>
   </tr>
- <tr><td> SampleResidual</td>
-      <td>  String</td>
-      <td>  No</td>
-      <td>  None</td> 
-      <td> 
-The difference between the ''estimated'' sample measurement (as determined at the end of each iteration of the bundle adjustment) and the original sample measurement. Used in the determination of outliers throughout the bundle. Measurement residuals are used upon convergence to compute the reference variance (σ<SUB>0</SUB><SUP>2</SUP>) which in turn is used to scale the inverse of the normal equations matrix for error propagation. Units are pixels.
-      </td>
-<!--''''''Note:'''''' Make sure warp, translate, coreg type apps output a cnet and set these-->
-  </tr>
- <tr><td> LineResidual</td>
-      <td>  String</td>
-      <td>  No</td>
-      <td>  None</td> 
-      <td> 
-The difference between the ''estimated'' line measurement (as determined at the end of each iteration of the bundle adjustment) and the original sample measurement. Used in the determination of outliers throughout the bundle. Measurement residuals are used upon convergence to compute the reference variance (σ<SUB>0</SUB><SUP>2</SUP>) which in turn is used to scale the inverse of the normal equations matrix for error propagation. Units are pixels.
-      </td>
- <!--''''''Note:'''''' See Sample Residual-->
-  </tr>
  <tr><td> Diameter</td>
-      <td>  String</td>
       <td>  No</td>
       <td>  0.0</td> 
-      <td> The diameter of the crater in meters
+      <td> The diameter of the crater in meters, if the control measure is associated with a crater. 
       </td>
  <!-- '''AI''' Check qnet to see if this is being set and used as need by users. -->
   </tr>
  <tr><td> AprioriSample</td>
-      <td>  String</td>
       <td>  No</td>
       <td>  None</td> 
-      <td> The first identified location of the measure by any application. In this initial state the a priori keyword values are the same as line/sample keyword values.
+      <td> The first identified sample coordinate of the measure by any application. In this initial state the a priori keyword values are the same as line/sample keyword values.
       </td>
   <!--autoseed, cnetadd, qnet (for manual movement), cnetref (with interest),mat2cnet - set this to the new value.
   pointreg, qnet (with sub-pixel), hijitreg, ALL autoreg apps - leave this alone. They will use it to calculate the pixelshift in the log file -->
   </tr>
  <tr><td> AprioriLine</td>
-      <td>  String</td>
       <td>  No</td>
       <td>  None</td> 
-      <td> See AprioriSample keyword
+      <td> The first identified line coordinate of the measure by any application. In this initial state the a priori keyword values are the same as line/sample keyword values.
       </td>
   </tr>
  <tr><td> SampleSigma</td>
-      <td>  String</td>
       <td>  No</td>
       <td>  None</td> 
       <td> 
@@ -535,11 +442,56 @@ Standard deviation of sample measurement. An indicator of precision used in the 
 '''''NOTE:''''' See LINESIGMA-->
   </tr>
   <tr><td> LineSigma</td>
-       <td>  String</td>
        <td>  No</td>
        <td>  None</td> 
        <td>Standard deviation of line measurement. An indicator of precision used in the weighting of measurements in the bundle adjustment (i.e. Jigsaw). May be determined from experience (e.g., manual point measurement) or perhaps estimated within an automated point measurement technique (e.g., ellipse fitting of crater edges, or through the use of an interest operator). Units are pixels.
        </td>
+ <tr><td> SampleResidual</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> 
+The difference between the 'estimated' sample measurement (as determined at the end of each iteration of the bundle adjustment) and the original sample measurement. Used in the determination of outliers throughout the bundle. Measurement residuals are used upon convergence to compute the reference variance (σ<SUB>0</SUB><SUP>2</SUP>) which in turn is used to scale the inverse of the normal equations matrix for error propagation. Units are pixels.
+      </td>
+<!--''''''Note:'''''' Make sure warp, translate, coreg type apps output a cnet and set these-->
+  </tr>
+ <tr><td> LineResidual</td>
+      <td>  No</td>
+      <td>  None</td> 
+      <td> 
+The difference between the ''estimated'' line measurement (as determined at the end of each iteration of the bundle adjustment) and the original sample measurement. Used in the determination of outliers throughout the bundle. Measurement residuals are used upon convergence to compute the reference variance (σ<SUB>0</SUB><SUP>2</SUP>) which in turn is used to scale the inverse of the normal equations matrix for error propagation. Units are pixels.
+      </td>
+ <!--''''''Note:'''''' See Sample Residual-->
+  </tr>
+  <tr><td> JigsawRejected</td>
+       <td>  No</td>
+       <td>  False</td> 
+       <td> A flag indicating if this measure has been rejected by jigsaw.
+       </td>
+   </tr>
+  <tr><td> MinimumPixelZScore</td>
+       <td>  No</td>
+       <td>  None</td> 
+       <td> Control measures store z-scores in pairs. A pair contains the z-scores of the minimum and maximum pixels in the pattern chip generated for the given measure during point registration. Each z-score indicates how many standard deviations the given pixel value is above or below the mean DN. This is used when using area-based-matching in ISIS3. 
+       </td>
+   </tr>
+  <tr><td> MaximumPixelZScore</td>
+       <td>  No</td>
+       <td>  None</td> 
+       <td> Control measures store z-scores in pairs. A pair contains the z-scores of the minimum and maximum pixels in the pattern chip generated for the given measure during point registration. Each z-score indicates how many standard deviations the given pixel value is above or below the mean DN. This is used when using area-based-matching in ISIS3. 
+       </td>
+   </tr>
+  <tr><td> GoodnessOfFit</td>
+       <td>  No</td>
+       <td>  None</td> 
+       <td> This measures how well the computed fit area matches the pattern area when using applications like pointreg.
+       </td>
+   </tr>
+  <tr><td> Reference</td>
+       <td>  No</td>
+       <td>  False(?)</td> 
+       <td> A flag indicating if this measure is the reference measure for its parent Control Point. 
+       </td>
+   </tr>
 <!--
 ''''''Note:'''''' The computation of this value by ISIS automated point measurement methods is yet to be determined. Eventually this should be defined before jigsaw runs such as pointreg setting it based on how well the measurement coregistered.
 
@@ -568,7 +520,7 @@ Standard deviation of sample measurement. An indicator of precision used in the 
   </audience>
 
   <history>
-    <change name="Kristin Berry" date="2018-01-26">Original Version. Migrated information from internal wiki, ControlNetVersioner.h, and the pvl template file, so actual original authors include most of the team.</change>
+    <change name="Kristin Berry" date="2018-01-26">Original Version. Migrated information from internal wiki, ControlNetVersioner.h, the pvl template file, and many other header files. Actual original authors include most of the ISIS3 team.</change>
   </history>
 
   <bibliography>
