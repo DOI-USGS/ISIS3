@@ -39,13 +39,12 @@ namespace Isis {
    * 
    * @param time The time to set
    */
-  void LidarControlPoint::setTime(iTime time) {
-    if (time < 0.0) {
-      QString msg = "The time must be greater then 0.";
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-      return;
+  ControlPoint::Status LidarControlPoint::setTime(iTime time) {
+    if (IsEditLocked()()) {
+      return ControlPoint::Status::PointLocked;
     }
     m_time = time;
+    return ControlPoint::Status::Success;
   }
 
   
@@ -54,13 +53,12 @@ namespace Isis {
    * 
    * @param range The range to set
    */
-  void LidarControlPoint::setRange(double range) {
-    if (range < 0.0) {
-      QString msg = "The range must be greater then 0.";
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-      return;
+  ControlPoint::Status LidarControlPoint::setRange(double range) {
+    if (IsEditLocked()()) {
+      return ControlPoint::Status::PointLocked;
     }
     m_range = range;
+    return ControlPoint::Status::Success;
   }
   
   
@@ -69,8 +67,12 @@ namespace Isis {
    * 
    * @param sigmaRange The sigma range to set
    */
-  void LidarControlPoint::setSigmaRange(double sigmaRange) {
+  ControlPoint::Status LidarControlPoint::setSigmaRange(double sigmaRange) {
+    if (IsEditLocked()()) {
+      return ControlPoint::Status::PointLocked;
+    }
     m_sigmaRange = sigmaRange;
+    return ControlPoint::Status::Success;
   }
   
   
