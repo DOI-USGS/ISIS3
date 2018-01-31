@@ -9,7 +9,7 @@
   <description>
     <p>
       This program, mdis2isis, converts PDS-labelled Mercury Dual Imaging (MDIS)
-      Experiment Data Record (EDRs) or Reduced Data Records (RDR) to ISIS labels.
+      Experiment Data Records (EDRs) or Reduced Data Records (RDR) to ISIS labels.
       MDIS has a narrow angle camera (NAC) and a wide angle camera (WAC)
       with twelve filters. These observations, using mdis2isis, are converted to
       ISIS format, and the resulting ISIS cubes are ready for SPICE initialization and projection.
