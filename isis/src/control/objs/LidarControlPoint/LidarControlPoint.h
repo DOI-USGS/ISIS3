@@ -27,6 +27,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Cube.h"
+#include "iTime.h"
 
 namespace Isis {
   /**
@@ -42,27 +43,25 @@ namespace Isis {
   class LidarControlPoint : public ControlPoint {
     
   public:
-    
-    LidarControlPoint();
-    LidarControlPoint(double time, double range, double sigmaRange);
-//     LidarControlPoint(const LidarControlPoint &);
+
+    LidarControlPoint(iTime time, double range, double sigmaRange);
     
     ~LidarControlPoint();
     
     void setRange(double range);
     void setSigmaRange(double sigmaRange);
-    void setTime(double time);
+    void setTime(iTime time);
     
     double range();
     double sigmaRange();
-    double time();
+    iTime time();
     
     ControlMeasure backProject(Cube cube);
     
   private:
-    double m_range;
-    double m_sigmaRange;
-    double m_time;
+    double m_range;       //!< The range
+    double m_sigmaRange;  //!< The sigma range
+    iTime m_time;         //!< The time the lidar point was taken
     
   };
 }
