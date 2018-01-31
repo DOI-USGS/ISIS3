@@ -1,4 +1,4 @@
-#include "LIDARData.h"
+#include "LidarData.h"
 
 #include "FileName.h"
 #include "Preference.h"
@@ -15,4 +15,9 @@ using namespace Isis;
 int main(int argc, char *argv[]) {
   // Set up our unit test preferences
   Preference::Preferences(true);
+
+  LidarData data;
+  FileName csvFile("RDR_98E100E_60N62NPointPerRow_csv_table-original.csv");
+  data.read(csvFile);
+
 }

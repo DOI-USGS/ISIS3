@@ -18,9 +18,11 @@ namespace Isis {
    *
    * @internal 
    *   @history 2018-01-29 Ian Humphrey - original version.
+   *   @history 2018-01-31 Tyler Wilson - Implemented Lidar::read(Filename &).
    */
   class LidarData {
 
+  public:
     LidarData();
     LidarData(FileName);
 
