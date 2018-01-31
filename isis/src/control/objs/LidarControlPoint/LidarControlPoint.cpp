@@ -40,7 +40,7 @@ namespace Isis {
    * @param time The time to set
    */
   ControlPoint::Status LidarControlPoint::setTime(iTime time) {
-    if (IsEditLocked()()) {
+    if (IsEditLocked()) {
       return ControlPoint::Status::PointLocked;
     }
     m_time = time;
@@ -54,7 +54,7 @@ namespace Isis {
    * @param range The range to set
    */
   ControlPoint::Status LidarControlPoint::setRange(double range) {
-    if (IsEditLocked()()) {
+    if (IsEditLocked()) {
       return ControlPoint::Status::PointLocked;
     }
     m_range = range;
@@ -68,7 +68,7 @@ namespace Isis {
    * @param sigmaRange The sigma range to set
    */
   ControlPoint::Status LidarControlPoint::setSigmaRange(double sigmaRange) {
-    if (IsEditLocked()()) {
+    if (IsEditLocked()) {
       return ControlPoint::Status::PointLocked;
     }
     m_sigmaRange = sigmaRange;
