@@ -219,7 +219,8 @@ namespace Isis {
       void copy(PvlContainer &container,
                 QString keyName,
                 ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
-                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(const std::string &));
+                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(
+                            const std::string &));
 
       QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> m_pointData;
       /**< protobuf container that holds information used to create a control point.*/

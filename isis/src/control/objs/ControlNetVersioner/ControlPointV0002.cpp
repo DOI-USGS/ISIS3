@@ -20,9 +20,9 @@ namespace Isis {
   ControlPointV0002::ControlPointV0002(
           QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData,
           QSharedPointer<ControlNetLogDataProtoV0001_Point> logData)
-   : m_pointData(pointData), m_logData(logData) {
+      : m_pointData(pointData), m_logData(logData) {
 
-   }
+  }
 
 
   /**
@@ -31,8 +31,8 @@ namespace Isis {
    * @param pointObject The control point and its measures in a Pvl object.
    */
   ControlPointV0002::ControlPointV0002(PvlObject &pointObject)
-   : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
-     m_logData(new ControlNetLogDataProtoV0001_Point) {
+      : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
+        m_logData(new ControlNetLogDataProtoV0001_Point) {
 
     // Copy over strings, doubles, and bools
     copy(pointObject, "PointId",
@@ -93,16 +93,19 @@ namespace Isis {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::User);
       }
       else if (source == "AverageOfMeasures") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
       }
       else if (source == "Reference") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::Reference);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::Reference);
       }
       else if (source == "Basemap") {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::Basemap);
       }
       else if (source == "BundleSolution") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
         QString msg = "Invalid AprioriXYZSource [" + source + "]";
@@ -120,7 +123,8 @@ namespace Isis {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::User);
       }
       else if (source == "AverageOfMeasures") {
-        m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
+        m_pointData->set_aprioriradiussource(
+                           ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
       }
       else if (source == "Ellipsoid") {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::Ellipsoid);
@@ -129,7 +133,8 @@ namespace Isis {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::DEM);
       }
       else if (source == "BundleSolution") {
-        m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
+        m_pointData->set_aprioriradiussource(
+                           ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
         QString msg = "Invalid AprioriRadiusSource, [" + source + "]";
@@ -224,10 +229,12 @@ namespace Isis {
         measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::Manual);
       }
       else if (type == "registeredpixel") {
-        measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::RegisteredPixel);
+        measure.set_type(
+              ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::RegisteredPixel);
       }
       else if (type == "registeredsubpixel") {
-        measure.set_type(ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
+        measure.set_type(
+              ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::RegisteredSubPixel);
       }
       else {
         throw IException(IException::Io,
@@ -322,7 +329,7 @@ namespace Isis {
    * @param oldPoint The old version 1 control point.
    */
   ControlPointV0002::ControlPointV0002(ControlPointV0001 &oldPoint)
-   : m_pointData(oldPoint.pointData()), m_logData(oldPoint.logData()) {
+      : m_pointData(oldPoint.pointData()), m_logData(oldPoint.logData()) {
 
   }
 
@@ -334,7 +341,7 @@ namespace Isis {
    *                                                                    point data.
    */
   QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0002::pointData() {
-      return m_pointData;
+    return m_pointData;
   }
 
 
@@ -345,7 +352,7 @@ namespace Isis {
    *                                                              measure log data.
    */
   QSharedPointer<ControlNetLogDataProtoV0001_Point> ControlPointV0002::logData() {
-      return m_logData;
+    return m_logData;
   }
 
 
@@ -368,15 +375,17 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (point.data()->*setter)(true);
+    }
   }
 
 
@@ -399,8 +408,9 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
@@ -427,8 +437,9 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
@@ -455,15 +466,17 @@ namespace Isis {
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (measure.*setter)(true);
+    }
   }
 
 
@@ -486,8 +499,9 @@ namespace Isis {
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
@@ -515,8 +529,9 @@ namespace Isis {
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
