@@ -424,8 +424,7 @@ namespace Isis {
       Pvl toPvl();
 
     private:
-      // These three methods are private for safety reasons.
-      // TODO write a better reason. JAM
+      // These three methods are private to ensure proper memory management
       //! Default constructor. Intentially un-implemented.
       ControlNetVersioner();
       /**
@@ -455,27 +454,27 @@ namespace Isis {
        *   @history 2017-12-27 Jesse Mapel - Original Version
        */
       struct ControlNetHeaderV0001 {
-	//! The ID/Name of the control network
+        //! The ID/Name of the control network
         QString networkID;
-	//! The NAIF name of the target body
+        //! The NAIF name of the target body
         QString targetName;
-	//! The date and time of the control network's creation
+        //! The date and time of the control network's creation
         QString created;
-	//! The date and time of the control network's last modification
+        //! The date and time of the control network's last modification
         QString lastModified;
-	//! The text description of the control network
+        //! The text description of the control network
         QString description;
-	//! The name of the user or program that last modified the control network
+        //! The name of the user or program that last modified the control network
         QString userName;
-	/**
-	 * The equatorial radius of the target body
-	 * used to convert from spherical to rectangular coordinates
-	 */
+        /**
+         * The equatorial radius of the target body
+         * used to convert from spherical to rectangular coordinates
+         */
         Distance equatorialRadius;
-	/**
-	 * The equatorial radius of the target body
-	 * used to convert from spherical to rectangular coordinates
-	 */
+        /**
+         * The equatorial radius of the target body
+         * used to convert from spherical to rectangular coordinates
+         */
         Distance polarRadius;
       };
 
