@@ -48,15 +48,15 @@ namespace Isis {
     
     ~LidarControlPoint();
     
-    void setRange(double range);
-    void setSigmaRange(double sigmaRange);
-    void setTime(iTime time);
+    ControlPoint::Status setRange(double range);
+    ControlPoint::Status setSigmaRange(double sigmaRange);
+    ControlPoint::Status setTime(iTime time);
     
     double range();
     double sigmaRange();
     iTime time();
     
-    ControlMeasure backProject(Cube cube);
+    //ControlMeasure backProject(Cube cube);
     
   private:
     double m_range;       //!< The range
