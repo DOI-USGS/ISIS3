@@ -11,7 +11,6 @@ find_path(BOOST_INCLUDE_DIR
 
 message("BOOST_INCLUDE_DIR = ${BOOST_INCLUDE_DIR}")
 
-
 get_filename_component(BOOST_ROOT_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" DIRECTORY)
 
 find_library(BOOST_ATOMIC_MT_LIBRARY
@@ -120,19 +119,3 @@ find_library(PYTHON_LIBRARY
 find_library(C_LIBRARY
   NAMES c
 )
-
-#tjw
-#if(APPLE)
-#  file(READ "${BOOST_INCLUDE_DIR}/version.hpp" EXTRACT LIMIT 4 OFFSET 1103)
-#  string(SUBSTRING ${EXTRACT} 0 1 VERSION_MAJOR)
-#  string(SUBSTRING ${EXTRACT} 2 2 VERSION_MINOR)
-#  string(CONCAT VERSION_NUM ${VERSION_MAJOR} "." ${VERSION_MINOR})
-#else(APPLE)
-#  get_version(${BOOST_ATOMIC_MT_LIBRARY} VERSION_NUM)
-#endif(APPLE)
-
-#message("BOOST FOUND VERSION = ${VERSION_NUM}")
-
-#if(VERSION_NUM VERSION_LESS Boost_FIND_VERSION)
-#  message(FATAL_ERROR "Boost version is too old (${VERSION_NUM}). Use ${Boost_FIND_VERSION} or higher.")
-#endif(VERSION_NUM VERSION_LESS Boost_FIND_VERSION)
