@@ -42,8 +42,7 @@ namespace Isis {
    *
    * @return @b QList<QSharedPointer<LidarControlPoint>> Returns list of Lidar control points.
    */
-  QList<QSharedPointer <LidarControlPoint> > LidarData::points() const {
-    // Placeholder code follows
+  QList< QSharedPointer<LidarControlPoint> > LidarData::points() const {
     return m_points.values();
   }
 

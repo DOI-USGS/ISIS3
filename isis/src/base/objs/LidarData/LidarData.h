@@ -36,7 +36,7 @@ namespace Isis {
 
     private:
       /** Hash of the LidarControlPoints this class contains. */
-      QHash<QString, QSharedPointer <LidarControlPoint> > m_points;
+      QHash< QString, QSharedPointer<LidarControlPoint> > m_points;
 
   };
 
