@@ -64,6 +64,10 @@
     <change name="Tracie Sucharski" date="2012-05-04">
       Added error message when input image does not contain Pds labels.
     </change>
+    <change name="Christopher Combs" date="2018-01-30">
+      Changed documentation to reflect newly added and unsupported target names
+      in translation files. Fixes #4970.
+    </change>
   </history>
   <liens>
     <item> 
