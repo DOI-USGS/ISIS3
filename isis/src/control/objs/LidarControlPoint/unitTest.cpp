@@ -1,6 +1,7 @@
 #include "ControlPoint.h"
 #include "iTime.h"
 #include "LidarControlPoint.h"
+#include "Preference.h"
 
 using namespace std;
 using namespace Isis;
@@ -20,7 +21,7 @@ int main() {
     cout << "Edit locked" << endl;
   }
   else {
-    cout << "Not edit locked" << endl;
+    cout << "Error: Not edit locked" << endl;
   }
   
   if (lcp.setRange(12.0) == ControlPoint::Status::PointLocked) {
@@ -30,13 +31,13 @@ int main() {
     cout << "Error: The point was not properly edit locked. Was able to set the range." << endl;
   }
   if (lcp.setSigmaRange(100.0) == ControlPoint::Status::PointLocked) {
-    cout << "Cannot set range because the point is edit locked" << endl;
+    cout << "Cannot set sigma range because the point is edit locked" << endl;
   }
   else {
     cout << "Error: The point was not properly edit locked. Was able to set the sigma range." << endl;
   }
   if (lcp.setTime(iTime(42.0)) == ControlPoint::Status::PointLocked) {
-    cout << "Cannot set range because the point is edit locked" << endl;
+    cout << "Cannot set time because the point is edit locked" << endl;
   }
   else {
     cout << "Error: The point was not properly edit locked. Was able to set the time." << endl;
@@ -60,7 +61,7 @@ int main() {
     cout << "Set the sigma range" << endl;
     
     if (lcp.sigmaRange() != 100.0) {
-      cout << "Incorrect sigma range!" << endl;
+      cout << "Error: Incorrect sigma range!" << endl;
     }
   }
   else {
@@ -70,9 +71,10 @@ int main() {
     cout << "Set the time" << endl;
     
     if (lcp.time() != iTime(42.0)) {
-      cout << "Incorrect time!" << endl;
+      cout << "Error: Incorrect time!" << endl;
     }
   }
   else {
     cout << "Error: Could not set the time." << endl;
   }
+}
