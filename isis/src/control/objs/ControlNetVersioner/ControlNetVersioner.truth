@@ -549,3 +549,20 @@ Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 Check conversions between the binary format and the pvl format.
 The conversion methods for pvl->bin and bin->pvl are correct.
+
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl...
+
+Read network...
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Test writing from ControlNet objects
+
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Adding Control Points to Network...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
+Test writing with invalid target
+

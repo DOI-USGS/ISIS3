@@ -8,6 +8,7 @@
 #include "IException.h"
 #include "IString.h"
 #include "Preference.h"
+#include "Progress.h"
 #include "Pvl.h"
 
 using namespace std;
@@ -26,6 +27,31 @@ int main(int argc, char *argv[]) {
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net");    // Corrupted (based off of oldNetwork2.net)
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", false);  // Binary V2
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", true, true); // Network with rejected jigsaw points
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl", false, false); // Network full of weird test cases (based on PvlNetwork4)
+
+  std::cout << std::endl << "Test writing from ControlNet objects" << std::endl << std::endl;
+  Progress *testProgress = new Progress();
+  ControlNet *binaryV2Net = new ControlNet("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net",
+                                           testProgress);
+  ControlNetVersioner *binV2Versioner = new ControlNetVersioner(binaryV2Net);
+  binV2Versioner->write("./binaryV2tmp.net");
+  remove("./binaryV2tmp.net");
+  delete binV2Versioner;
+  delete testProgress;
+
+  std::cout << std::endl << "Test writing with invalid target" << std::endl << std::endl;
+  try {
+    binaryV2Net->SetTarget("INVALID_TARGET_NAME");
+    binV2Versioner = new ControlNetVersioner(binaryV2Net);
+  }
+  catch (IException &e) {
+    e.print();
+    if (binV2Versioner) {
+      delete binV2Versioner;
+    }
+  }
+
+  delete binaryV2Net;
 }
 
 void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
