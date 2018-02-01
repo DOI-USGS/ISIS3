@@ -5,7 +5,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) FROM=$(INPUT)/peaks.cub \
 		TO=$(OUTPUT)/peaks.pvl FILE=FALSE OBSERVATION=TRUE SN=FALSE \
-			APPEND=false; >& $(OUTPUT)/peaks.txt;
+			APPEND=false;
 	$(APPNAME) FROM=$(INPUT)/peaks.cub \
 		TO=$(OUTPUT)/peaks.pvl FILE=TRUE OBSERVATION=FALSE SN=TRUE \
 			APPEND=TRUE;
