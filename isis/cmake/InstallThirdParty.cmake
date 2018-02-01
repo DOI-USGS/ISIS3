@@ -9,6 +9,7 @@ function(install_third_party_libs)
 
   # Where all the library files will go
   set(installLibFolder "${CMAKE_INSTALL_PREFIX}/3rdParty/lib")
+  execute_process(COMMAND mkdir -p ${installLibFolder})
 
   # TEMPORARY CODE TO INSTALL ALL FILES FROM V007/lib into 3rdParty/lib
   if(APPLE)
@@ -30,40 +31,9 @@ function(install_third_party_libs)
       file(RELATIVE_PATH relPath "${thirdPartyDir}/lib" ${library})
 
       # Check if the file is a symlink
-      execute_process(COMMAND readlink ${library} OUTPUT_VARIABLE link)
-
+      #execute_process(COMMAND readlink ${library} OUTPUT_VARIABLE link)
       message(STATUS "${library}")
-      if ("${link}" STREQUAL "")
-        # Copy original files and framework folders
-        if(IS_DIRECTORY ${library})
-          install(DIRECTORY ${library} DESTINATION ${installLibFolder})
-        else()
-          install(PROGRAMS ${library} DESTINATION ${installLibFolder})
-        endif()
-
-      else()
-        # Loop through possible chains of namelinks (i.e. lib.so -> lib.so.3.5 -> lib.so.3.5.1)
-        while (NOT "${link}" STREQUAL "")
-          # Recreate symlinks
-          string(REGEX REPLACE "\n$" "" link "${link}") # Strip trailing newline
-          #There are a few cases where directory information is contained inside the link variable.
-          #The line below handles those cases (ie. /usr/lib64/libblas.so.3)
-          execute_process(COMMAND basename ${link} OUTPUT_VARIABLE baselink)
-
-          #install(CODE "EXECUTE_PROCESS(COMMAND ln -fs ${baselink} ${installLibFolder}/${relPath})")
-          install(CODE "EXECUTE_PROCESS(COMMAND ln -fs ${librarypath}/${baselink} ${installLibFolder}/${baselink} )")
-          #message("librarypath= ${librarypath}")
-          #message ("baselink=${baselink}")
-          #message("installlibFolder/relPath = ${installLibFolder} / ${relPath}")
-          if (EXISTS "${librarypath}/${baselink}")
-            install(PROGRAMS "${librarypath}/${baselink}" DESTINATION ${installLibFolder})
-          endif()
-          # Set next iteration of possible symlinks
-          set(library "${librarypath}/${baselink}")
-          file(RELATIVE_PATH relPath "${thirdPartyDir}/lib" ${library})
-          execute_process(COMMAND readlink ${library} OUTPUT_VARIABLE link)
-        endwhile()
-      endif()
+      execute_process(COMMAND cp -L ${library} ${installLibFolder})
     endif()
   endforeach()
 
