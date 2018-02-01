@@ -398,6 +398,7 @@ namespace Isis {
    *   @history 2018-01-12 Adam Goins - Added the ControlPoint radii to the header to avoid
    *                           Target::GetRadii calls to speed up createPoint().
    *   @history 2018-01-12 Adam Goins - Added Progress during reads.
+   *   @history 2018-01-24 Jesse Mapel - Fixed c++11 build warnings.
    *   @history 2018-01-27 Jesse Mapel - Fixed some documentation formatting. Added a section
    *                           describing the different file format versions.
    *   @history 2018-01-30 Adam Goins - Ensured point sizes are written/read as lsb by using
