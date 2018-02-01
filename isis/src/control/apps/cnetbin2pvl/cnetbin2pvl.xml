@@ -7,8 +7,8 @@
 
   <description>
     <p>
-      This program converts an Isis3 control network file from binary into a
-      utf pvl formatted file. The output pvl will be written as the latest Pvl version.
+      This program converts an Isis3 control network file from binary into a human readable
+      utf8 pvl formatted file. The output pvl will be written as the latest Pvl version.
       The most recent Pvl template can be found in the Control data directory under templates/controlnetworks.
     </p>
   </description>

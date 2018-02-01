@@ -8,7 +8,6 @@
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
-#include "ControlCubeGraphNode.h"
 #include "ControlPoint.h"
 #include "FileName.h"
 #include "IString.h"
@@ -99,9 +98,7 @@ namespace Isis {
    * @param serialNum - Serial Number
    */
   void ControlNetFilter::FilterOutMeasuresBySerialNum(QString serialNum){
-    QString sn(serialNum);
-    const ControlCubeGraphNode *csn = mCNet->getGraphNode(sn);
-    QList< ControlMeasure * > measures = csn->getMeasures();
+    QList< ControlMeasure * > measures = mCNet->GetMeasuresInCube(serialNum);
 
     foreach(ControlMeasure * measure, measures) {
       bool pointEditFlag = false;
@@ -111,7 +108,7 @@ namespace Isis {
         point->SetEditLock(false);
         pointEditFlag = true;
       }
-      ControlMeasure *msr = point->GetMeasure(sn);
+      ControlMeasure *msr = point->GetMeasure(serialNum);
       msr->SetEditLock(false);
       point->Delete(serialNum);
       if (pointEditFlag) {
