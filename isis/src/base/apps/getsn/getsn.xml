@@ -44,7 +44,7 @@
     </change>
     <change name="Kaitlyn Lee" date="2018-01-17">
       Removed unreachable else clause that assumed more than two options are
-      allowed to be entered for the parameter FORMAT. Added test to default case
+      allowed to be entered in for the parameter FORMAT. Added test to default case
       to increase code coverage.
     </change>
   </history>
