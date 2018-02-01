@@ -1245,8 +1245,8 @@ namespace Isis {
 
     BigInt numberOfPoints = 0;
 
-    if ( header.hasGroup("ControlNetworkInfo") ) {
-      const PvlGroup &networkInfo = header.findGroup("ControlNetworkInfo");
+    if ( protoBufferInfo.hasGroup("ControlNetworkInfo") ) {
+      const PvlGroup &networkInfo = protoBufferInfo.findGroup("ControlNetworkInfo");
 
       if ( networkInfo.hasKeyword("NumberOfPoints") ) {
         try {
