@@ -56,8 +56,6 @@ namespace Isis {
     double sigmaRange();
     iTime time();
     
-    //ControlMeasure backProject(Cube cube);
-    
   private:
     double m_range;       //!< The range
     double m_sigmaRange;  //!< The sigma range
