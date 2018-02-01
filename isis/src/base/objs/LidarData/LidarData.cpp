@@ -28,6 +28,16 @@ namespace Isis {
 
 
   /**
+   * Adds a LidarControlPoint to the LidarData.
+   *
+   * @param QSharedPointer<LidarControlPoint> point LidarControlPoint to add.
+   */
+  void LidarData::insert(QSharedPointer<LidarControlPoint> point) {
+    m_points.insert(point->GetId(), point);
+  }
+
+
+  /**
    * Gets the list of Lidar data points.
    *
    * @return @b QList<QSharedPointer<LidarControlPoint>> Returns list of Lidar control points.
@@ -56,6 +66,4 @@ namespace Isis {
   void LidarData::write(FileName outputFile) {
 
   }
-
-
 }
