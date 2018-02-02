@@ -15,6 +15,8 @@ using namespace Isis;
  * @internal
  *   @history 2012-05-08 Tracie Sucharski - Moved test data to /usgs/cpks/mer/testData and
  *                         /usgs/cpkgs/clementine1/testData.  Added test for invalid label.z
+ *   @history 2018-01-25 Ian Humphrey - Moved .img file out of ISIS tree (since we are not
+ *                           storing .img's on GitHub).
  */
 void IsisMain() {
 
@@ -111,7 +113,8 @@ void IsisMain() {
     cout << "Testing PDS file containing an ^IMAGE pointer and ^TABLE pointer" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("data/pdsImageWithTables.lbl", "data/pdsImageWithTables.img", plab);
+    p.SetPdsFile("data/pdsImageWithTables.lbl",
+                 "$ISIS3TESTDATA/isis/src/base/objs/ProcessImportPds/pdsImageWithTables.img", plab);
     p.SetOutputCube("TO");
     p.ImportTable("SUN_POSITION_TABLE");
     p.StartProcess();
