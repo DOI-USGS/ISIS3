@@ -1,5 +1,6 @@
 #include "LidarData.h"
 
+#include <QDebug>
 #include <QString>
 
 #include "Angle.h"
@@ -15,6 +16,8 @@
 
 using namespace std;
 using namespace Isis;
+
+void print(const LidarData &lidarData);
 
 /**
  * Unit test for the LIDARData class.
@@ -50,10 +53,6 @@ int main(int argc, char *argv[]) {
   cout << "\tname of point:    " << defaultData.points().first()->GetId() << endl;
   cout << endl;
 
-  // Test read()
-  cout << "Testing read(FileName)... " << endl;
-  cout << endl;
-
   // Test write()
   cout << "Testing write(FileName)... " << endl;
   LidarData mockData;
@@ -72,20 +71,53 @@ int main(int argc, char *argv[]) {
                     Longitude(lon, Angle::Units::Degrees),
                     Distance(rad, Distance::Units::Kilometers));
     lcp->SetAprioriSurfacePoint(sp);
-    double line, sample;
-    line = 1.0;
-    sample = 1.0;
     for (int j = 0; j < 2; j++) {
       ControlMeasure *measure = new ControlMeasure();
-      sample += 1.0;
-      line += 1.0;
-      measure->SetCoordinate(sample, line);
+      measure->SetCoordinate((double) i, (double) j);
       measure->SetCubeSerialNumber("SN_" + QString::number(i) + "-" + QString::number(j));
       lcp->Add(measure);
     }
     mockData.insert(lcp);
   }
-  FileName outFile("./test.json");
+  FileName outFile("./test.dat");
   mockData.write(outFile);
   cout << endl;
+
+  // Test read()
+  cout << "Testing read(FileName)... " << endl;
+  LidarData readData;
+  readData.read(outFile);
+  print(readData);
+  cout << endl;
+}
+
+
+void print(const LidarData &lidarData) {
+  QList< QSharedPointer<LidarControlPoint> > points = lidarData.points();
+  std::cout << "LidarData:" << std::endl;
+  foreach (QSharedPointer<LidarControlPoint> point, points) {
+    std::cout << "\tLidarControlPoint:" << std::endl;
+    std::cout << "\t\tid: " << point->GetId() << std::endl;;
+    SurfacePoint sp = point->GetAprioriSurfacePoint();
+    double lat, lon, rad;
+    lat = sp.GetLatitude().planetocentric(Angle::Units::Degrees);
+    lon = sp.GetLongitude().positiveEast(Angle::Units::Degrees);
+    rad = sp.GetLocalRadius().kilometers();
+    std::cout << "\t\tlatitude:  " << lat << std::endl;
+    std::cout << "\t\tlongitude: " << lon << std::endl;
+    std::cout << "\t\tradius:    " << rad << std::endl;
+    std::cout << "\t\trange:     " << point->range() << std::endl;
+    std::cout << "\t\tsigmaRange:" << point->sigmaRange() << std::endl;
+    std::cout << "\t\ttime:      " << point->time().Et() << std::endl;
+    QList<ControlMeasure *> measures = point->getMeasures();
+    foreach (ControlMeasure *measure, measures) {
+      std::cout << "\t\tControlMeasure: " << std::endl;
+      std::cout << "\t\t\tline:   " << measure->GetLine() << std::endl;
+      std::cout << "\t\t\tsample: " << measure->GetSample() << std::endl;
+      std::cout << "\t\t\tSN:     " << measure->GetCubeSerialNumber() << std::endl;
+      std::cout << "\t\t#END_ControlMeasure." << std::endl;
+    }
+    std::cout << "\t#END_LidarControlPoint." << std::endl << std::endl;
+  }
+  std::cout << std::endl;
 }

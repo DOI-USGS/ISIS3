@@ -64,7 +64,102 @@ namespace Isis {
    * @param FileName lidarFile Name of the Lidar CSV file to read.
    */
   void LidarData::read(FileName lidarFile) {
+    // Set up the input file
+    QFile loadFile(lidarFile.expanded());
 
+    if (!loadFile.open(QIODevice::ReadOnly)) {
+      QString msg("Could not open " + loadFile.fileName());
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // Load file
+    QByteArray saveData = loadFile.readAll();
+
+    QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+
+    // Unserialize LidarData
+    QJsonObject lidarDataObject = loadDoc.object();
+    if (lidarDataObject.contains("points") && lidarDataObject["points"].isArray()) {
+      // Unserialize LidarControlPoints
+      QJsonArray pointArray = lidarDataObject["points"].toArray();
+      for (int pointIndex = 0; pointIndex < pointArray.size(); pointIndex++) {
+        // Unserialize LidarControlPoint
+        QJsonObject pointObject = pointArray[pointIndex].toObject();
+
+        QString id;
+        if (pointObject.contains("id") && pointObject["id"].isString()) {
+          id = pointObject["id"].toString();
+        }
+
+        double range = 0.0;
+        if (pointObject.contains("range") && pointObject["range"].isDouble()) {
+          range = pointObject["range"].toDouble();
+        }
+
+        double sigmaRange = 0.0;
+        if (pointObject.contains("sigmaRange") && pointObject["sigmaRange"].isDouble()) {
+          sigmaRange = pointObject["sigmaRange"].toDouble();
+        }
+
+        double time = 0.0;
+        if (pointObject.contains("time") && pointObject["time"].isDouble()) {
+          time = pointObject["time"].toDouble();
+        }
+
+        double latitude = 0.0;
+        if (pointObject.contains("latitude") && pointObject["latitude"].isDouble()) {
+          latitude = pointObject["latitude"].toDouble();
+        }
+
+        double longitude = 0.0;
+        if (pointObject.contains("longitude") && pointObject["longitude"].isDouble()) {
+          longitude = pointObject["longitude"].toDouble();
+        }
+
+        double radius = 0.0;
+        if (pointObject.contains("radius") && pointObject["radius"].isDouble()) {
+          radius = pointObject["radius"].toDouble();
+        }
+
+        QSharedPointer<LidarControlPoint> lcp =
+            QSharedPointer<LidarControlPoint>(new LidarControlPoint(iTime(time), range, sigmaRange));
+        lcp->SetId(id);
+        lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
+                                                 Longitude(longitude, Angle::Units::Degrees),
+                                                 Distance(radius, Distance::Units::Kilometers)));
+
+        // Unserialize ControlMeasures
+        if (pointObject.contains("measures") && pointObject["measures"].isArray()) {
+          QJsonArray measureArray = pointObject["measures"].toArray();
+          for (int measureIndex = 0; measureIndex < measureArray.size(); measureIndex++) {
+            // Unserialize ControlMeasure
+            QJsonObject measureObject = measureArray[measureIndex].toObject();
+
+            double line = 0.0;
+            if (measureObject.contains("line") && measureObject["line"].toDouble()) {
+              line = measureObject["line"].toDouble();
+            }
+
+            double sample = 0.0;
+            if (measureObject.contains("sample") && measureObject["sample"].toDouble()) {
+              sample = measureObject["sample"].toDouble();
+            }
+
+            QString serialNumber;
+            if (measureObject.contains("serialNumber") && measureObject["serialNumber"].isString()) {
+              serialNumber = measureObject["serialNumber"].toString();
+            }
+
+            ControlMeasure *measure = new ControlMeasure();
+            measure->SetCoordinate(sample, line);
+            measure->SetCubeSerialNumber(serialNumber);
+            lcp->Add(measure);
+          }
+        }
+
+        insert(lcp);
+      }
+    }
   }
 
 
