@@ -44,7 +44,7 @@ namespace Isis {
     
   public:
 
-    LidarControlPoint(iTime time, double range, double sigmaRange);
+    LidarControlPoint();
     
     ~LidarControlPoint();
     

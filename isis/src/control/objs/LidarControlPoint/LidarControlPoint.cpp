@@ -20,10 +20,10 @@ namespace Isis {
    * @param range The range of the point.
    * @param sigmaRange The sigmas od the range.
    */
-  LidarControlPoint::LidarControlPoint(iTime time, double range, double sigmaRange) {
-    m_time = time;
-    m_range = range;
-    m_sigmaRange = sigmaRange;
+  LidarControlPoint::LidarControlPoint() {
+    m_time = iTime();
+    m_range = NULL;
+    m_sigmaRange = NULL;
   }
   
   
