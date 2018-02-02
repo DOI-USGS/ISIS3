@@ -157,6 +157,8 @@ namespace Isis {
    *   @history 2017-06-08 Chris Combs - Made "Failed to create" error messages more descriptive.
    *                           Fixes #833.
    *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
+   *   @history 2018-01-18 Summer Stapleton - Updated error message in ::create() to address when
+   *                           an IsisPreference file cannot be found. Fixes #5145.
    */
   class Cube {
     public:
