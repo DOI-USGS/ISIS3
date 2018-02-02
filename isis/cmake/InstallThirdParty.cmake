@@ -90,7 +90,6 @@ function(install_third_party)
   install_third_party_license()
 
   # Finish miscellaneous file installation
-  install(FILES "${CMAKE_SOURCE_DIR}/3rdParty/lib/README"
-          DESTINATION ${CMAKE_INSTALL_PREFIX}/3rdParty/lib)
+  file(WRITE "${CMAKE_INSTALL_PREFIX}/3rdParty/lib/README" "This directory contains O/S and hardware specific shared libraries needed\nto execute ISIS applications")
 
 endfunction()
