@@ -34,7 +34,7 @@ namespace Isis {
    * @param FileName lidarFile Name of the Lidar CSV file to use.
    */
   LidarData::LidarData(FileName lidarFile) {
-
+    read(lidarFile);
   }
 
 
@@ -65,6 +65,7 @@ namespace Isis {
    */
   void LidarData::read(FileName lidarFile) {
     // Set up the input file
+
     QFile loadFile(lidarFile.expanded());
 
     if (!loadFile.open(QIODevice::ReadOnly)) {
@@ -76,6 +77,9 @@ namespace Isis {
     QByteArray saveData = loadFile.readAll();
 
     QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+    if (loadDoc.isNull()) {
+      loadDoc = QJsonDocument::fromBinaryData(saveData);
+    }
 
     // Unserialize LidarData
     QJsonObject lidarDataObject = loadDoc.object();
@@ -168,8 +172,14 @@ namespace Isis {
    *
    * @param FileName outputFile Name of the file to write to.
    */
-  void LidarData::write(FileName outputFile) {
+  void LidarData::write(FileName outputFile, LidarData::Format format) {
     // Set up the output file
+    if (format == Json) {
+      outputFile = outputFile.setExtension(".json");
+    }
+    else {
+      outputFile = outputFile.setExtension(".dat");
+    }
     QFile saveFile(outputFile.expanded());
 
     if (!saveFile.open(QIODevice::WriteOnly)) {
@@ -216,6 +226,11 @@ namespace Isis {
 
     // Write the JSON to the file
     QJsonDocument lidarDataDoc(lidarDataObject);
-    saveFile.write(lidarDataDoc.toJson());
+    if (format == Json) {
+      saveFile.write(lidarDataDoc.toJson());
+    }
+    else {
+      saveFile.write(lidarDataDoc.toBinaryData());
+    }
   }
 }

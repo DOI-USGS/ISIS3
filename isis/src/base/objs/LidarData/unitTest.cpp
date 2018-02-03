@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   cout << "\tname of point:    " << defaultData.points().first()->GetId() << endl;
   cout << endl;
 
-  // Test write()
+  // Test write() JSON format
   cout << "Testing write(FileName)... " << endl;
   LidarData mockData;
   double lat, lon, rad;
@@ -79,15 +79,35 @@ int main(int argc, char *argv[]) {
     }
     mockData.insert(lcp);
   }
-  FileName outFile("./test.dat");
-  mockData.write(outFile);
+  FileName outputFile("./test.json");
+  cout << outputFile.extension() << endl;
+  mockData.write(outputFile, LidarData::Json);
+  cout << endl;
+
+  // Test write() with no data
+
+  // Test read() with no data
+
+  // Test write() binary format
+  cout << outputFile.extension() << endl;
+  outputFile = outputFile.setExtension("dat");
+  cout << outputFile.extension() << endl;
+  cout << outputFile.expanded().toStdString() << endl;
+  mockData.write(outputFile, LidarData::Binary);
+
+  // Test read() binary format
+  cout << "Testing read(FileName) from binary data... " << endl;
+  LidarData fromBinary;
+  fromBinary.read(outputFile);
+  print(fromBinary);
   cout << endl;
 
   // Test read()
-  cout << "Testing read(FileName)... " << endl;
-  LidarData readData;
-  readData.read(outFile);
-  print(readData);
+  cout << "Testing read(FileName) from JSON data... " << endl;
+  LidarData fromJson;
+  outputFile = outputFile.setExtension(".json");
+  fromJson.read(outputFile);
+  print(fromJson);
   cout << endl;
 }
 

@@ -6,6 +6,8 @@
 #include <QPointer>
 #include <QString>
 
+class QJsonObject;
+
 namespace Isis {
 
   class FileName;
@@ -24,6 +26,11 @@ namespace Isis {
   class LidarData {
 
     public:
+      enum Format {
+        Binary,
+        Json
+      };
+
       LidarData();
       LidarData(FileName);
 
@@ -32,11 +39,11 @@ namespace Isis {
       QList< QSharedPointer<LidarControlPoint> > points() const;
 
       void read(FileName);
-      void write(FileName);
+      void write(FileName, Format);
 
     private:
       /** Hash of the LidarControlPoints this class contains. */
-      QHash< QString, QSharedPointer<LidarControlPoint> > m_points;
+      QHash<QString, QSharedPointer <LidarControlPoint> > m_points;
 
   };
 
