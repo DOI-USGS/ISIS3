@@ -19,6 +19,10 @@ int main(int argc, char *argv[]) {
   // Set up our unit test preferences
   Preference::Preferences(true);
 
+  LidarData data;
+  FileName csvFile("RDR_98E100E_60N62NPointPerRow_csv_table-original.csv");
+  data.read(csvFile);
+
   // Test LidarData()
   cout << "Testing default constructor... " << endl;
   LidarData defaultData;
@@ -49,4 +53,5 @@ int main(int argc, char *argv[]) {
   // Test write()
   cout << "Testing write(FileName)... " << endl;
   cout << endl;
+
 }
