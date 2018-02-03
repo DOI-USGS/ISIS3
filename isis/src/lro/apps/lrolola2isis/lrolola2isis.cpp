@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "CSVReader.h"
 #include "Cube.h"
+#include "CubeManager.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -14,6 +15,7 @@
 #include "LidarControlPoint.h"
 #include "LidarData.h"
 #include "Longitude.h"
+#include "SerialNumberList.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -25,7 +27,7 @@ struct LidarCube {
   QString sn;
   iTime startTime;
   iTime endTime;
-}
+};
 
 
 void IsisMain() {
@@ -37,7 +39,7 @@ void IsisMain() {
 
   QList<LidarCube> images;
   
-  for (i = 0; i < cubeList.size(); i++) {
+  for (int i = 0; i < cubeList.size(); i++) {
     LidarCube lidarCube;
     QString serialNumber = cubeList.serialNumber(i);
     FileName fileName = FileName(cubeList.fileName(serialNumber));
@@ -45,17 +47,18 @@ void IsisMain() {
     
     lidarCube.name = fileName;
     lidarCube.sn = serialNumber;
-    std::pair< double, double> startEndTime = cube.camera().StartEndEphemerisTimes();
+    std::pair< double, double> startEndTime = cube.camera()->StartEndEphemerisTimes();
     lidarCube.startTime = iTime(startEndTime.first);
     lidarCube.endTime = iTime(startEndTime.second);
     
     images.append(lidarCube);
   }
   
-  CSVReader lidarData(dataFile.expanded(), true, 1);
-  LidarData lidarData();
+  CSVReader lidarDataFile(dataFile.expanded(), true, 1);
+  LidarData lidarDataSet();
+  CubeManager cubeMgr;
   
-  for (i = 0; i < lidarDataFile.size(); i++) {
+  for (int i = 0; i < lidarDataFile.size(); i++) {
     CSVReader::CSVAxis row = lidarDataFile.getRow(i);
     
     iTime time(row[0].toDouble());
@@ -67,44 +70,29 @@ void IsisMain() {
     double sigma = 0; //TODO figure out how/where to calculate this
 //     QString quality = row[]; //TODO figure out how/where to find this value
     
-    LidarControlPoint lidarPoint();
+    LidarControlPoint lidarPoint;
     lidarPoint.SetId(id);
     lidarPoint.setTime(time);
     lidarPoint.setRange(range);
-    lidarPoint.setSigmaRadius(sigma);
+    lidarPoint.setSigmaRange(sigma);
     lidarPoint.SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
     
-    for (j = 0; j < images.size(); j++) {
+    for (int j = 0; j < images.size(); j++) {
       if (images[j].startTime <= time || time <= images[j].endTime) {
-        Cube cube(images[j].name);
-        Camera camera = cube.camera();
-        camera.SetGround(lat, lon);
+        Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
+        Camera *camera = cube->camera();
+        camera->SetGround(lat, lon);
         
-        ControlMeasure measure();
-        measure.SetCoordinate(camera.Line(), camera.Sample()); 
-        measure.SetCubeSerialNumber(images[j].sn);
+        ControlMeasure *measure;
+        measure->SetCoordinate(camera->Line(), camera->Sample()); 
+        measure->SetCubeSerialNumber(images[j].sn);
         
         lidarPoint.Add(measure);
       }
     }
     
-    lidarData.insert(lidarPoint);
+    lidarDataSet.insert(lidarPoint);
   }
 
   return;
 }
-
-
-void fetchCSVData(FileName &csvFile) {
-
-  QFile data(csvFile.expanded());
-
-  if (data.open(QIODevice::ReadOnly)) {
-    qDebug() << "Could not open:  " << csvFile.expanded();
-  }
-
-
-  return;
-}
-
-
