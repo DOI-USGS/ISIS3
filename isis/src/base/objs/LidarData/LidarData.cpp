@@ -114,17 +114,18 @@ namespace Isis {
 
 
   /**
-   * @brief Reads in a Lidar CSV file.
+   * @brief Unserialize LidarData.
    *
-   * @param FileName lidarFile Name of the Lidar CSV file to read.
-   * @throws If the header for the file does not contain the correct info,
-   *         an IException will be thrown.
+   * This method unserializes LidarData from a JSON or binary (QByteArray) file. It will
+   * automatically determine if it is JSON or binary formatted date.
+   *
+   * @param FileName lidarFile Name of the serialized LidarData file to read.
+   * @throws IException::User Throws User exception if it cannot open the file passed.
    */
-  void LidarData::read(FileName lidarFile) {
+  void LidarData::read(FileName lidarDataFile) {
     // Set up the input file
-
-    QFile loadFile(lidarFile.expanded());
-
+    QFile loadFile(lidarDataFile.expanded());
+    // Make sure we can open the file successfully
     if (!loadFile.open(QIODevice::ReadOnly)) {
       QString msg("Could not open " + loadFile.fileName());
       throw IException(IException::User, msg, _FILEINFO_);
@@ -132,7 +133,7 @@ namespace Isis {
 
     // Load file
     QByteArray saveData = loadFile.readAll();
-
+    // Try to load from JSON (ASCII); if it can not, load as binary.
     QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
     if (loadDoc.isNull()) {
       loadDoc = QJsonDocument::fromBinaryData(saveData);
@@ -225,9 +226,15 @@ namespace Isis {
 
 
   /**
-   * Writes out the Lidar data to a CSV file.
+   * @brief Serializes LidarData.
    *
-   * @param FileName outputFile Name of the file to write to.
+   * This method serializes the LidarData to either a JSON or binary (QByteArray) file. If JSON,
+   * the file extension will be .json; otherwise (if binary), the file extension will be .dat.
+   *
+   * @param FileName outputFile Name of the file to serialize to.
+   * @param LidarData::Format format Format of the serialized file (Json or Binary).
+   *
+   * @throws IException::User Throws User exception if it cannot open the file for writing.
    */
   void LidarData::write(FileName outputFile, LidarData::Format format) {
     // Set up the output file
