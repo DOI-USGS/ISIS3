@@ -9,8 +9,8 @@
 #include <QList>
 #include <QRegExp>
 #include <QSharedPointer>
-#include <QTextStream>
 #include <QStringList>
+#include <QTextStream>
 
 #include "Angle.h"
 #include "Distance.h"
