@@ -16,6 +16,7 @@
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
+#include "iTime.h"
 #include "Latitude.h"
 #include "LidarControlPoint.h"
 #include "Longitude.h"
