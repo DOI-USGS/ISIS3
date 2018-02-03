@@ -1,5 +1,6 @@
 #include "Isis.h"
 
+#include <QSharedPointer>
 #include <QString>
 
 #include "Angle.h"
@@ -55,7 +56,7 @@ void IsisMain() {
   }
   
   CSVReader lidarDataFile(dataFile.expanded(), true, 1);
-  LidarData lidarDataSet();
+  LidarData lidarDataSet;
   CubeManager cubeMgr;
   
   for (int i = 0; i < lidarDataFile.size(); i++) {
@@ -70,12 +71,12 @@ void IsisMain() {
     double sigma = 0; //TODO figure out how/where to calculate this
 //     QString quality = row[]; //TODO figure out how/where to find this value
     
-    LidarControlPoint lidarPoint;
-    lidarPoint.SetId(id);
-    lidarPoint.setTime(time);
-    lidarPoint.setRange(range);
-    lidarPoint.setSigmaRange(sigma);
-    lidarPoint.SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
+    LidarControlPoint *lidarPoint = new LidarControlPoint;
+    lidarPoint->SetId(id);
+    lidarPoint->setTime(time);
+    lidarPoint->setRange(range);
+    lidarPoint->setSigmaRange(sigma);
+    lidarPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
     
     for (int j = 0; j < images.size(); j++) {
       if (images[j].startTime <= time || time <= images[j].endTime) {
@@ -83,15 +84,16 @@ void IsisMain() {
         Camera *camera = cube->camera();
         camera->SetGround(lat, lon);
         
-        ControlMeasure *measure;
+        ControlMeasure *measure = new ControlMeasure;
         measure->SetCoordinate(camera->Line(), camera->Sample()); 
         measure->SetCubeSerialNumber(images[j].sn);
         
-        lidarPoint.Add(measure);
+        lidarPoint->Add(measure);
+        
       }
     }
     
-    lidarDataSet.insert(lidarPoint);
+    lidarDataSet.insert(QSharedPointer<LidarControlPoint>(lidarPoint));
   }
 
   return;
