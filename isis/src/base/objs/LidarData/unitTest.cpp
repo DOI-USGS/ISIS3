@@ -30,6 +30,10 @@ int main(int argc, char *argv[]) {
   // Set up our unit test preferences
   Preference::Preferences(true);
 
+  LidarData data;
+  FileName csvFile("RDR_98E100E_60N62NPointPerRow_csv_table-original.csv");
+  data.readCsv(csvFile);
+
   // Test LidarData()
   cout << "Testing default constructor... " << endl;
   LidarData defaultData;
@@ -105,10 +109,11 @@ int main(int argc, char *argv[]) {
   // Test read()
   cout << "Testing read(FileName) from JSON data... " << endl;
   LidarData fromJson;
-  outputFile = outputFile.setExtension(".json");
+  outputFile = outputFile.setExtension("json");
   fromJson.read(outputFile);
   print(fromJson);
   cout << endl;
+
 }
 
 

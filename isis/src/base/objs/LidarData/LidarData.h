@@ -20,6 +20,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2018-01-29 Ian Humphrey - original version.
+   *   @history 2018-01-31 Tyler Wilson - Implemented Lidar::read(Filename &).
    *   @history 2018-01-31 Ian Humphrey - Added insert method to insert a LidarControlPoint into
    *                           the LidarData. Added documentation for m_points.
    */
@@ -34,8 +35,9 @@ namespace Isis {
       LidarData();
       LidarData(FileName);
 
-      void insert(QSharedPointer<LidarControlPoint> point);
+      void readCsv(FileName);
 
+      void insert(QSharedPointer<LidarControlPoint> point);
       QList< QSharedPointer<LidarControlPoint> > points() const;
 
       void read(FileName);
