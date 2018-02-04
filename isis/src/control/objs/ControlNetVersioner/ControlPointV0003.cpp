@@ -19,9 +19,9 @@ namespace Isis {
    * @param pointData The protobuf message from a control net file.
    */
   ControlPointV0003::ControlPointV0003(QSharedPointer<ControlPointFileEntryV0002> pointData)
-   : m_pointData(pointData) {
+      : m_pointData(pointData) {
 
-   }
+  }
 
 
   /**
@@ -30,7 +30,7 @@ namespace Isis {
    * @param pointObject The control point and its measures in a Pvl object
    */
   ControlPointV0003::ControlPointV0003(PvlObject &pointObject)
-   : m_pointData(new ControlPointFileEntryV0002) {
+      : m_pointData(new ControlPointFileEntryV0002) {
 
     // Copy over strings, doubles, and bools
     copy(pointObject, "PointId",
@@ -75,15 +75,15 @@ namespace Isis {
     // In version 4, these were changed to fixed, free, and constrained respectively.
     // The protobuf file version was not changed, fixed and free were simply added to the
     // enumeration and the old names were flagged as obsolete.
-    if (pointObject["PointType"][0] == "Fixed" ||
-        pointObject["PointType"][0] == "Ground") {
+    if (pointObject["PointType"][0] == "Fixed"
+        || pointObject["PointType"][0] == "Ground") {
       m_pointData->set_type(ControlPointFileEntryV0002::Fixed);
     }
     else if (pointObject["PointType"][0] == "Constrained") {
       m_pointData->set_type(ControlPointFileEntryV0002::Constrained);
     }
-    else if (pointObject["PointType"][0] == "Free" ||
-             pointObject["PointType"][0] == "Tie") {
+    else if (pointObject["PointType"][0] == "Free"
+             || pointObject["PointType"][0] == "Tie") {
       m_pointData->set_type(ControlPointFileEntryV0002::Free);
     }
     else {
@@ -240,7 +240,6 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
-
           ControlPointFileEntryV0002_Measure_MeasureLogData protoBufDataEntry;
 
           protoBufDataEntry.set_doubledatatype(interpreter.GetDataType());
@@ -569,7 +568,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -587,8 +586,9 @@ namespace Isis {
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (point.data()->*setter)(true);
+    }
   }
 
 
@@ -601,7 +601,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -630,7 +630,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -640,8 +640,9 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
@@ -668,15 +669,17 @@ namespace Isis {
                                ControlPointFileEntryV0002_Measure &measure,
                                void (ControlPointFileEntryV0002_Measure::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (measure.*setter)(true);
+    }
   }
 
 
@@ -699,8 +702,9 @@ namespace Isis {
                                ControlPointFileEntryV0002_Measure &measure,
                                void (ControlPointFileEntryV0002_Measure::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
