@@ -27,6 +27,8 @@ namespace Isis {
    *   @history 2018-02-03 Ian Humphrey - Renamed read to readCsv. read() and write()
    *                           methods support JSON or binary serialization. Added
    *                           documentation to new Format enumeration.
+   *   @history 2018-02-03 Tyler Wilson - Fixed round-off errors happening in readCsv during
+   *                           QString -> double conversion.
    */
   class LidarData {
 
@@ -45,9 +47,12 @@ namespace Isis {
       void insert(QSharedPointer<LidarControlPoint> point);
       QList< QSharedPointer<LidarControlPoint> > points() const;
 
+
       // Serialization methods or LidarData
       void read(FileName);
       void write(FileName, Format);
+
+
 
     private:
       /** Hash of the LidarControlPoints this class contains. */
