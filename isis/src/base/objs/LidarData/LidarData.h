@@ -38,7 +38,6 @@ namespace Isis {
       };
 
       LidarData();
-      LidarData(FileName);
 
       void insert(QSharedPointer<LidarControlPoint> point);
       QList< QSharedPointer<LidarControlPoint> > points() const;
