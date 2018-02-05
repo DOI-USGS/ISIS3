@@ -10,6 +10,7 @@
 #include "CubeManager.h"
 #include "Distance.h"
 #include "FileName.h"
+#include "ID.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -59,6 +60,9 @@ void IsisMain() {
   LidarData lidarDataSet;
   CubeManager cubeMgr;
   
+  // Set up an automatic id generator for the point ids
+  ID pointId = ID(ui.GetString("POINTID"));
+  
   //Start at 1 because there is a header. TODO actually set a header in lidarDataFile
   for (int i = 1; i < lidarDataFile.rows(); i++) {
     CSVReader::CSVAxis row = lidarDataFile.getRow(i);
@@ -68,12 +72,11 @@ void IsisMain() {
     Longitude lon(row[1].toDouble(), Angle::Units::Degrees);
     Distance radius(row[3].toDouble(), Distance::Units::Kilometers);
     double range = row[4].toDouble();
-    QString id = "POINT" + QString::number(i);
     double sigma = 0; //TODO figure out how/where to calculate this
 //     QString quality = row[]; //TODO figure out how/where to find this value
     
     LidarControlPoint *lidarPoint = new LidarControlPoint;
-    lidarPoint->SetId(id);
+    lidarPoint->SetId(pointId.Next());
     lidarPoint->setTime(time);
     lidarPoint->setRange(range);
     lidarPoint->setSigmaRange(sigma);

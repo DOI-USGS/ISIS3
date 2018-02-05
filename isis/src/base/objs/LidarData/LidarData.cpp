@@ -36,15 +36,6 @@ namespace Isis {
 
 
   /**
-   * Default constructor 
-   *
-   */
-  LidarData::LidarData() {
-
-  }
-
-
-  /**
    * Adds a LidarControlPoint to the LidarData.
    *
    * @param QSharedPointer<LidarControlPoint> point LidarControlPoint to add.
