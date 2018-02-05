@@ -207,7 +207,7 @@ namespace Isis {
    *
    * param &c SpiceDouble reference to be set
    */
-  void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
+  void ShapeModel::setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
     // get target radii
     std::vector<Distance> radii = targetRadii();
     a = radii[0].kilometers();
@@ -224,16 +224,6 @@ namespace Isis {
   bool ShapeModel::hasEllipsoidIntersection() {
     return m_hasEllipsoidIntersection;
   }
-
-
-  // /**
-  //  * Used to set the private member variable m_hasEllipsoidIntersection
-  //  *
-  //  * @param status boolean value to set the m_hasEllipsoidIntersection variable to
-  //  */
-  // void setHasEllipsoidIntersection(bool status) {
-  //   m_hasEllipsoidIntersection = status;
-  // }
 
 
   /**

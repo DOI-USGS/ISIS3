@@ -425,7 +425,7 @@ namespace Isis {
    *
    * param &c SpiceDouble reference to be set
    */
-  virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
+  void EquatorialCylindricalShape::setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
     a = m_maxRadius->kilometers();
     b = m_maxRadius->kilometers();
     c = m_maxRadius->kilometers();

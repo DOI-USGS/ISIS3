@@ -47,8 +47,8 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
-   *   @history 2017-11-22 Jeff Anderson - Added the intersectEllipsoid virtual method so that the DTM
-   *                           intersect method can use a the MaximumRadius found in the
+   *   @history 2018-02-05 Cole Neubauer - Added the setTargetRadii virtual method so that the 
+   *                           intersectEllipsoid method can use a the MaximumRadius found in the
    *                           ShapeModelStatistics group of the labels (often written during a run of
    *                           demprep) as a starting radius for the ellipsoid  as opposed to the
    *                           default radius of the target.
