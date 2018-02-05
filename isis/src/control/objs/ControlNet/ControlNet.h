@@ -203,12 +203,14 @@ namespace Isis {
    *                           import in constructor. Also removed p_invalid as it was no longer
    *                           being used anywhere. Fixes #5068.
    *   @history 2017-12-12 Kristin Berry - Updated to use QMap and QVector rather than std::map
-   *                            and std::vector. Fixes #5259.
+   *                           and std::vector. Fixes #5259.
    *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258.
    *   @history 2017-12-21 Jesse Mapel - Modified read and write methods to use the refactored
    *                           ControlNetVersioner instead of directly parsing the protobuf
    *                           objects from the LatestControlNetFile.
    *   @history 2018-01-12 Adam Goins - Added Progress support back to Read methods.
+   *   @history 2017-01-19 Jesse Mapel - Added a method to get all of the valid measures in an
+   *                           image. Previously, this had to be done throug the graph.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -245,6 +247,7 @@ namespace Isis {
       int getEdgeCount() const;
       QString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
+      QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
                                                   double min,double max);
       void DeleteMeasuresWithId(QString serialNumber);

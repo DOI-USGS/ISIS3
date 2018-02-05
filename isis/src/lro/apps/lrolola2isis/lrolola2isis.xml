@@ -90,6 +90,20 @@
             *.txt
           </filter>
         </parameter>
+        <parameter name="OUTPUTTYPE">
+          <type>string</type>
+          <description>
+            The output type, either binary or json.
+          </description>
+          <list>
+            <option value="BINARY">
+              <brief> Binary output file (.dat)</brief>
+            </option>
+            <option value="JSON">
+              <brief> JSON output file (.json)</brief>
+            </option>
+          </list>
+        </parameter>
     </group>
   </groups>
 
