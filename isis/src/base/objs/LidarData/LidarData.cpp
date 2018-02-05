@@ -22,6 +22,9 @@
 #include "Longitude.h"
 #include "SurfacePoint.h"
 
+
+#include <stdlib.h>  /* atof */
+#include <stdio.h>
 namespace Isis {
 
 
@@ -100,7 +103,26 @@ namespace Isis {
       int shotIx = headerCells.indexOf(shot);
       int frameIx = headerCells.indexOf(frame);
       if ( longIx < 0 || latIx < 0 || utcIx < 0 || rangeIx < 0 ||shotIx < 0 || frameIx < 0) {
-        QString msg = "Header line in "+lidarFile.expanded() + " is missing expected information.";
+        QString msg;
+        if (longIx < 0) {
+          msg = "Header line in "+lidarFile.expanded() + " is missing Pt_Longitude column.";
+        }
+        if (latIx < 0) {
+          msg = "Header line in "+lidarFile.expanded() + " is missing Pt_Latitude column.";
+        }
+        if (utcIx < 0) {
+          msg = "Header line in "+lidarFile.expanded() + " is missing Coordinated_Universal_Time column.";
+        }
+        if (rangeIx < 0) {
+          msg = "Header line in "+lidarFile.expanded() + " is missing Pt_Range column.";
+        }
+        if (shotIx < 0) {
+          msg = "Header line in "+lidarFile.expanded() + " is missing shot (S) column.";
+        }
+        if (frameIx < 0) {
+          msg = "Header line in "+lidarFile.expanded() + " is missing frame (Frm) column.";
+        }
+
           throw IException(IException::Io,msg, _FILEINFO_);
         }
 
@@ -111,9 +133,17 @@ namespace Isis {
         iTime time(cells[utcIx]);
         QString shot(cells[shotIx]);
         QString frame(cells[frameIx]);
+
         key = "lrolola"+time.EtString()+"_"+frame+"_"+shot;
+
+        QString rangeString(cells[rangeIx]);
+        QByteArray rangeBytes = rangeString.toUtf8();
+        const char * c_rangeBytes = rangeBytes.data();
+        double rangeDouble = atof(c_rangeBytes);
+
         QSharedPointer<LidarControlPoint> pt = QSharedPointer<LidarControlPoint>
-            (new LidarControlPoint(time,cells[rangeIx].toDouble(),0.0));
+            (new LidarControlPoint(time,rangeDouble,0.0));
+            //printf("%s : %0.6f : %0.6f\n",pt->time().UTC().toStdString().c_str(),pt->range(),pt->sigmaRange());
 
         m_points.insert(key,pt);
       }

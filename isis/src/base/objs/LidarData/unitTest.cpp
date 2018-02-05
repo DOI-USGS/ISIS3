@@ -1,3 +1,4 @@
+#include "LidarControlPoint.h"
 #include "LidarData.h"
 
 #include <QDebug>
@@ -8,11 +9,20 @@
 #include "Distance.h"
 #include "FileName.h"
 #include "iTime.h"
+
 #include "Latitude.h"
 #include "LidarControlPoint.h"
 #include "Longitude.h"
 #include "Preference.h"
 #include "SurfacePoint.h"
+
+
+
+#include <QDebug>
+#include <QList>
+#include <QString>
+
+#include <stdlib.h>
 
 using namespace std;
 using namespace Isis;
@@ -144,5 +154,9 @@ void print(const LidarData &lidarData) {
     }
     std::cout << "\t#END_LidarControlPoint." << std::endl << std::endl;
   }
-  std::cout << std::endl;
+
+
+
+
+
 }

@@ -28,8 +28,11 @@ object_script.*.Debug
 *.moc
 ui_*.h
 
-print.prt
 
+# ignore all files created by squish coco
+*csmes
+
+print.prt
 */3rdParty/*
 */inc/*
 */bin/*
@@ -37,4 +40,3 @@ print.prt
 */tsts/*/input/*
 */tsts/*/truth/*
 */tsts/*/output/*
-
