@@ -66,9 +66,8 @@ namespace Isis {
                             std::vector<double> lookDirection);
 
     protected:
-      virtual bool intersectEllipsoid(
-                      const std::vector<double> observerPosRelativeToTarget,
-                      const std::vector<double> &observerLookVectorToTarget);
+      virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c);
+
 
     private:
       Distance *m_minRadius;  //!< Minimum radius value in DEM file

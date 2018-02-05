@@ -417,59 +417,17 @@ namespace Isis {
 
 
   /**
-   * Finds the intersection point on the ellipsoid model using the given
-   * position of the observer (spacecraft) and direction vector from the
-   * observer to the target (body).
+   * Override of virtual function for intersectEllipsoid
    *
-   * @param observerBodyFixedPosition  Three dimensional position of the observer,
-   *                                   in the coordinate system of the target body.
-   * @param observerLookVectorToTarget Three dimensional direction vector from
-   *                                   the observer to the target.
+   * param &a SpiceDouble reference to be set
    *
-   * @return @b bool Indicates whether this shape model found a valid ellipsoid intersection.
+   * param &b SpiceDouble reference to be set
+   *
+   * param &c SpiceDouble reference to be set
    */
-  bool EquatorialCylindricalShape::intersectEllipsoid(
-                                      const std::vector<double> observerBodyFixedPosition,
-                                      const std::vector<double> &observerLookVectorToTarget) {
-
-    // Clear out previous surface point and normal
-    clearSurfacePoint();
-
-    SpiceDouble lookB[3];
-
-    // This memcpy does:
-    // lookB[0] = observerLookVectorToTarget[0];
-    // lookB[1] = observerLookVectorToTarget[1];
-    // lookB[2] = observerLookVectorToTarget[2];
-    memcpy(lookB,&observerLookVectorToTarget[0], 3*sizeof(double));
-
-    // get target radii
-    // std::vector<Distance> radii = targetRadii();
-    // SpiceDouble a = radii[0].kilometers();
-    // SpiceDouble b = radii[1].kilometers();
-    // SpiceDouble c = radii[2].kilometers();
-    SpiceDouble a = m_maxRadius->kilometers();
-    SpiceDouble b = m_maxRadius->kilometers();
-    SpiceDouble c = m_maxRadius->kilometers();
-
-    // check if observer look vector intersects the target
-    SpiceDouble intersectionPoint[3];
-    SpiceBoolean intersected = false;
-
-    NaifStatus::CheckErrors();
-    surfpt_c((SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
-             intersectionPoint, &intersected);
-    NaifStatus::CheckErrors();
-
-    if (intersected) {
-      SurfacePoint p;
-      p.FromNaifArray(intersectionPoint);
-      setSurfacePoint(p);
-    }
-
-    setHasIntersection(intersected);
-    setHasEllipsoidIntersection(intersected);
-    return intersected;
+  virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
+    a = m_maxRadius->kilometers();
+    b = m_maxRadius->kilometers();
+    c = m_maxRadius->kilometers();
   }
-
 }

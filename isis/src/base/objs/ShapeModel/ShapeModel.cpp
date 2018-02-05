@@ -198,6 +198,23 @@ namespace Isis {
     return acos(angle) * RAD2DEG;
   }
 
+  /**
+   * Sets the parameters to the Target radii
+   *
+   * param &a SpiceDouble reference to be set
+   *
+   * param &b SpiceDouble reference to be set
+   *
+   * param &c SpiceDouble reference to be set
+   */
+  virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
+    // get target radii
+    std::vector<Distance> radii = targetRadii();
+    a = radii[0].kilometers();
+    b = radii[1].kilometers();
+    c = radii[2].kilometers();
+  }
+
 
   /**
    * Returns the status of the ellipsoid model intersection.
@@ -283,10 +300,10 @@ namespace Isis {
     memcpy(lookB,&observerLookVectorToTarget[0], 3*sizeof(double));
 
     // get target radii
-    std::vector<Distance> radii = targetRadii();
-    SpiceDouble a = radii[0].kilometers();
-    SpiceDouble b = radii[1].kilometers();
-    SpiceDouble c = radii[2].kilometers();
+    SpiceDouble a;
+    SpiceDouble b;
+    SpiceDouble c;
+    setTargetRadii(&a, &b, &c);
 
     // check if observer look vector intersects the target
     SpiceDouble intersectionPoint[3];

@@ -166,6 +166,9 @@ namespace Isis {
                                  const std::vector<double> lookDirection);
 
     protected:
+      // Virtual function to be called in intersectEllipsoid to avoid redundant code
+      virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c);
+
 
       // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
@@ -174,14 +177,14 @@ namespace Isis {
       // accessor and setter for m_hasEllipsoidIntersection
       bool hasEllipsoidIntersection();
       void setHasEllipsoidIntersection(bool status);
-      
+
       // Set shape name
       void setName(QString name);
 
       void calculateEllipsoidalSurfaceNormal();
 
       // Intersect ellipse
-      virtual bool intersectEllipsoid(
+      bool intersectEllipsoid(
                       const std::vector<double> observerPosRelativeToTarget,
                       const std::vector<double> &observerLookVectorToTarget);
 
