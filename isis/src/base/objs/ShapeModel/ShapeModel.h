@@ -95,15 +95,15 @@ namespace Isis {
                                     std::vector<double> lookDirection)=0;
 
       // These two methods are for optional testing of occlusions when checking
-      // specific locations on the body from the observer. The first uses 
-      // localRadius() by default and so may be OK as is. 
+      // specific locations on the body from the observer. The first uses
+      // localRadius() by default and so may be OK as is.
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
-      virtual bool intersectSurface(const SurfacePoint &surfpt, 
+      virtual bool intersectSurface(const SurfacePoint &surfpt,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
-                                 
+
 
 
       // Return the surface intersection
@@ -171,24 +171,27 @@ namespace Isis {
       void setNormal(const std::vector<double>);
       void setNormal(const double a, const double b, const double c);
 
+      // accessor and setter for m_hasEllipsoidIntersection
+      bool hasEllipsoidIntersection();
+      void setHasEllipsoidIntersection(bool status);
+      
       // Set shape name
       void setName(QString name);
 
       void calculateEllipsoidalSurfaceNormal();
-      bool hasEllipsoidIntersection();
 
       // Intersect ellipse
       virtual bool intersectEllipsoid(
                       const std::vector<double> observerPosRelativeToTarget,
                       const std::vector<double> &observerLookVectorToTarget);
-    
-      bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
+
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
       double resolution();
 
     private:
+      bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
       bool m_hasIntersection;          //!< indicates good intersection exists
       bool m_hasNormal;                //!< indicates normal has been computed
       std::vector<double> m_normal;    //!< Local normal of current intersection point

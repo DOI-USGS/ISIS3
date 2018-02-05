@@ -44,7 +44,7 @@ namespace Isis {
    * empty string, surface point to an empty surface point, has intersection to
    * FALSE, has normal to FALSE, has ellipsoid intersection to FALSE, normal
    * vector size to 3, and  target to the given target.
-   *  
+   *
    * @param target A pointer to a valid ISIS target.
    */
   ShapeModel::ShapeModel(Target *target) {
@@ -78,20 +78,20 @@ namespace Isis {
 
 
 /**
- * @brief Compute surface intersection with optional occlusion check 
- *  
- * This method sets the surface point at the given latitude, longitude. The 
- * derived model is called to get the radius at that location to complete the 
- * accuracy of the surface point, them the derived method is called to complete 
- * the intersection. 
- * 
+ * @brief Compute surface intersection with optional occlusion check
+ *
+ * This method sets the surface point at the given latitude, longitude. The
+ * derived model is called to get the radius at that location to complete the
+ * accuracy of the surface point, them the derived method is called to complete
+ * the intersection.
+ *
  * @author 2017-03-23 Kris Becker
- * 
+ *
  * @param lat          Latitude of the surface point
  * @param lon          Longitude of the surface point
  * @param observerPos  Position of the observer
  * @param backCheck    Flag to indicate occlusion check
- * 
+ *
  * @return bool        True if the intersection point is valid (visable)
  */
   bool ShapeModel::intersectSurface(const Latitude &lat, const Longitude &lon,
@@ -103,22 +103,22 @@ namespace Isis {
 
 
 /**
- * @brief Compute surface intersection with optional occlusion check 
- *  
- * This method sets the surface point at the given latitude, longitude. The 
- * derived model is called to get the radius at that location to complete the 
- * accuracy of the surface point, them the derived method is called to complete 
- * the intersection. 
- * 
+ * @brief Compute surface intersection with optional occlusion check
+ *
+ * This method sets the surface point at the given latitude, longitude. The
+ * derived model is called to get the radius at that location to complete the
+ * accuracy of the surface point, them the derived method is called to complete
+ * the intersection.
+ *
  * @author 2017-03-23 Kris Becker
- * 
+ *
  * @param surfpt        Absolute point on the surface to check
  * @param observerPos  Position of the observer
  * @param backCheck    Flag to indicate occlusion check
- * 
+ *
  * @return bool        True if the intersection point is valid (visable)
  */
-  bool ShapeModel::intersectSurface(const SurfacePoint &surfpt, 
+  bool ShapeModel::intersectSurface(const SurfacePoint &surfpt,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck) {
 
@@ -206,6 +206,16 @@ namespace Isis {
    */
   bool ShapeModel::hasEllipsoidIntersection() {
     return m_hasEllipsoidIntersection;
+  }
+
+
+  /**
+   * Used to set the private member variable m_hasEllipsoidIntersection
+   *
+   * @param status boolean value to set the m_hasEllipsoidIntersection variable to
+   */
+  void setHasEllipsoidIntersection(bool status) {
+    m_hasEllipsoidIntersection = status;
   }
 
 
@@ -404,22 +414,22 @@ namespace Isis {
   }
 
 /**
- * @brief Default occulsion implementation 
- *  
+ * @brief Default occulsion implementation
+ *
  *  This method is originally copied from Sensor::SetLocalGround(bool
  *  backCheck). This version checks for the emission angle from the observer to
  *  be less than or equal to 90 degrees.
- *  
+ *
  *  It is recommended that models derived from this base class reimplement this
  *  method if a more robust, efficent test can be made.
- *  
+ *
  *  Note this implementation does not handle occlusion!
- * 
- * @author 2017-03-17 Kris Becker 
- * 
+ *
+ * @author 2017-03-17 Kris Becker
+ *
  * @param observerPos   Position of the observer in body fixed coordinates
  * @param lookDirection Look direction from the observer
- * 
+ *
  * @return bool True if the point is not visable, false if it can be seen
  */
   bool ShapeModel::isVisibleFrom(const std::vector<double> observerPos,

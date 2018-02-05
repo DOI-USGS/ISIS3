@@ -28,13 +28,16 @@ using namespace std;
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
+
 namespace Isis {
+
+
   /**
    * Initialize the Isis3 Equatorial Cylindrical shape model.
    *
    * @param pvl Valid Isis3 cube label.
    */
-  EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) : 
+  EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) :
       DemShape(target, pvl) {
     setName("EquatorialCylindricalShape");
 
@@ -63,11 +66,11 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Destructor for Isis3 Equatorial Cylindrical shape model
    */
   EquatorialCylindricalShape::~EquatorialCylindricalShape() {
-    
+
     delete m_minRadius;
     m_minRadius = NULL;
 
@@ -76,14 +79,14 @@ namespace Isis {
    }
 
 
-  /** 
+  /**
    * Finds the surface intersection point.
-   *  
-   * @param observerBodyFixedPosition  Three dimensional position of the observer, 
+   *
+   * @param observerBodyFixedPosition  Three dimensional position of the observer,
    *                                   in the coordinate system of the target body.
-   * @param observerLookVectorToTarget Three dimensional direction vector from 
+   * @param observerLookVectorToTarget Three dimensional direction vector from
    *                                   the observer to the target.
-   *  
+   *
    * @return @b bool Indicates whether this shape model found a valid surface intersection.
    */
   bool EquatorialCylindricalShape::intersectSurface(vector<double> observerBodyFixedPos,
@@ -91,7 +94,7 @@ namespace Isis {
 
     // try to intersect the surface using the DemShape method
     // if this is successful, return
-    // 
+    //
     // otherwise, (i.e. DemShape::intersectSurface() fails) we will attempt to
     // intersect using the following iterative method...
     if (!DemShape::intersectSurface(observerBodyFixedPos, observerLookVectorToTarget)) {
@@ -142,7 +145,7 @@ namespace Isis {
       // JWB - The commented code here is an alternate way of doing this...
       //       which method has less expensive computing???
       //       I believe the alternate one may be (no need for cosine after naif routines)
-      // 
+      //
       //
       // find the vector to the point found by orthogonally projecting the observer position vector
       // onto the line containing the look direction vector
@@ -190,7 +193,7 @@ namespace Isis {
         return hasIntersection();
       }
 
-      double d0 = observerdist * cospsi0 - radiusDiff; 
+      double d0 = observerdist * cospsi0 - radiusDiff;
       double dm = observerdist * cospsi0 + radiusDiff;
 
       // Set the properties at the first test observation point
@@ -391,7 +394,7 @@ namespace Isis {
       SpiceBoolean found;
 
       NaifStatus::CheckErrors();
-      surfpt_c(&observerBodyFixedPos[0], &observerLookVectorToTarget[0], plen, plen, plen, 
+      surfpt_c(&observerBodyFixedPos[0], &observerLookVectorToTarget[0], plen, plen, plen,
                intersectionPoint, &found);
       NaifStatus::CheckErrors();
 
@@ -407,10 +410,11 @@ namespace Isis {
 
     }
 
+    // Do nothing since the DEM intersection was already successful
     setHasIntersection(true);
     return hasIntersection();
   }
-  // Do nothing since the DEM intersection was already successful
+
 
   /**
    * Finds the intersection point on the ellipsoid model using the given
@@ -464,9 +468,8 @@ namespace Isis {
     }
 
     setHasIntersection(intersected);
-    m_hasEllipsoidIntersection = intersected;
+    setHasEllipsoidIntersection(intersected);
     return intersected;
   }
 
 }
-
