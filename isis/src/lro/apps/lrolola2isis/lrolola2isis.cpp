@@ -35,7 +35,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   FileName dataFile = ui.GetFileName("FROM");
-  SerialNumberList cubeList = SerialNumberList(ui.GetFileName("FROM2"));
+  SerialNumberList cubeList = SerialNumberList(ui.GetFileName("CUBES"));
   FileName output = ui.GetFileName("TO");
 
   QList<LidarCube> images;
@@ -55,11 +55,13 @@ void IsisMain() {
     images.append(lidarCube);
   }
   
-  CSVReader lidarDataFile(dataFile.expanded(), true, 1);
+  CSVReader lidarDataFile;
+  lidarDataFile.read(dataFile.expanded());
   LidarData lidarDataSet;
   CubeManager cubeMgr;
   
-  for (int i = 0; i < lidarDataFile.size(); i++) {
+  //Start at 1 because there is a header. TODO actually set a header in lidarDataFile
+  for (int i = 1; i < lidarDataFile.rows(); i++) {
     CSVReader::CSVAxis row = lidarDataFile.getRow(i);
     
     iTime time(row[0].toDouble());
@@ -81,14 +83,29 @@ void IsisMain() {
     for (int j = 0; j < images.size(); j++) {
       if (images[j].startTime <= time || time <= images[j].endTime) {
         Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
-        Camera *camera = cube->camera();
-        camera->SetGround(lat, lon);
         
-        ControlMeasure *measure = new ControlMeasure;
-        measure->SetCoordinate(camera->Line(), camera->Sample()); 
-        measure->SetCubeSerialNumber(images[j].sn);
+        if (cube != NULL) {
+          
+          Camera *camera = cube->camera();
+          
+          if (camera != NULL) {
+            camera->SetGround(lat, lon);
         
-        lidarPoint->Add(measure);
+            ControlMeasure *measure = new ControlMeasure;
+            measure->SetCoordinate(camera->Line(), camera->Sample()); 
+            measure->SetCubeSerialNumber(images[j].sn);
+        
+            lidarPoint->Add(measure);
+          }
+          else {
+            QString msg = "Unable to create a camera from " + images[j].name.expanded();
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+        }
+        else {
+          QString msg = "Unable to open a cube from " + images[j].name.expanded();
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
         
       }
     }
