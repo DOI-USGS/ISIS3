@@ -36,14 +36,10 @@ namespace Isis {
 
 
   /**
-   * Constructor that takes a Lidar CSV file to create LidarControlPoints.
+   * Default constructor 
    *
-   * This constructor uses the input CSV file to add internal LidarControlPoints from the CSV data.
-   * This is NOT for unserializing LidarData from a file - use the read() method.
-   *
-   * @param FileName lidarFile Name of the Lidar CSV file to use.
    */
-  LidarData::LidarData(FileName lidarFile) {
+  LidarData::LidarData() {
 
   }
 
