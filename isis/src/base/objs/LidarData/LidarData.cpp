@@ -24,9 +24,6 @@
 #include "SurfacePoint.h"
 
 
-
-#include <QDebug>
-
 namespace Isis {
 
 
