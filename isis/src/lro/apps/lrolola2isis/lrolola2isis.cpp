@@ -36,7 +36,6 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName dataFile = ui.GetFileName("FROM");
   SerialNumberList cubeList = SerialNumberList(ui.GetFileName("CUBES"));
-  FileName output = ui.GetFileName("TO");
 
   QList<LidarCube> images;
   
@@ -63,10 +62,10 @@ void IsisMain() {
   //Start at 1 because there is a header. TODO actually set a header in lidarDataFile
   for (int i = 1; i < lidarDataFile.rows(); i++) {
     CSVReader::CSVAxis row = lidarDataFile.getRow(i);
-    
-    iTime time(row[0].toDouble());
-    Latitude lat(row[1].toDouble(), Angle::Units::Degrees);
-    Longitude lon(row[2].toDouble(), Angle::Units::Degrees);
+
+    iTime time(row[0]);
+    Latitude lat(row[2].toDouble(), Angle::Units::Degrees);
+    Longitude lon(row[1].toDouble(), Angle::Units::Degrees);
     Distance radius(row[3].toDouble(), Distance::Units::Kilometers);
     double range = row[4].toDouble();
     QString id = "POINT" + QString::number(i);
@@ -89,13 +88,14 @@ void IsisMain() {
           Camera *camera = cube->camera();
           
           if (camera != NULL) {
-            camera->SetGround(lat, lon);
+            if (camera->SetGround(lat, lon)) {
         
-            ControlMeasure *measure = new ControlMeasure;
-            measure->SetCoordinate(camera->Line(), camera->Sample()); 
-            measure->SetCubeSerialNumber(images[j].sn);
-        
-            lidarPoint->Add(measure);
+              ControlMeasure *measure = new ControlMeasure;
+              measure->SetCoordinate(camera->Line(), camera->Sample()); 
+              measure->SetCubeSerialNumber(images[j].sn);
+          
+              lidarPoint->Add(measure);
+            }
           }
           else {
             QString msg = "Unable to create a camera from " + images[j].name.expanded();
@@ -113,5 +113,11 @@ void IsisMain() {
     lidarDataSet.insert(QSharedPointer<LidarControlPoint>(lidarPoint));
   }
 
-  return;
+  
+  if (ui.GetString("OUTPUTTYPE") == "JSON") {
+    lidarDataSet.write(ui.GetFileName("TO"), LidarData::Format::Json);
+  }
+  else {
+    lidarDataSet.write(ui.GetFileName("TO"), LidarData::Format::Binary);
+  }
 }
