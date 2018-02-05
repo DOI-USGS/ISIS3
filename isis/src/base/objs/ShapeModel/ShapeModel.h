@@ -178,7 +178,7 @@ namespace Isis {
 
       // accessor and setter for m_hasEllipsoidIntersection
       bool hasEllipsoidIntersection();
-      void setHasEllipsoidIntersection(bool status);
+      // void setHasEllipsoidIntersection(bool status);
 
       // Set shape name
       void setName(QString name);

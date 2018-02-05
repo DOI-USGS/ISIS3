@@ -226,14 +226,14 @@ namespace Isis {
   }
 
 
-  /**
-   * Used to set the private member variable m_hasEllipsoidIntersection
-   *
-   * @param status boolean value to set the m_hasEllipsoidIntersection variable to
-   */
-  void setHasEllipsoidIntersection(bool status) {
-    m_hasEllipsoidIntersection = status;
-  }
+  // /**
+  //  * Used to set the private member variable m_hasEllipsoidIntersection
+  //  *
+  //  * @param status boolean value to set the m_hasEllipsoidIntersection variable to
+  //  */
+  // void setHasEllipsoidIntersection(bool status) {
+  //   m_hasEllipsoidIntersection = status;
+  // }
 
 
   /**
