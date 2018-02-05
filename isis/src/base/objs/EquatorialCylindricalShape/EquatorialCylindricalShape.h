@@ -47,9 +47,9 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
-   *   @history 2018-11-01 Cole Neubauer - Made Jeff Anderson's recommended change to put the
-   *                           dalpha calculation into pixels per degree instead of radians per
-   *                           degree Fixes #5245
+   *   @history 2018-01-05 Cole Neubauer - Fixed units conversion in intersectSurface so that the
+   *                           loop is stepping by radians per pixel, as recommended by Jeff
+   *                           Anderson (LROC team). Fixes #5245
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
