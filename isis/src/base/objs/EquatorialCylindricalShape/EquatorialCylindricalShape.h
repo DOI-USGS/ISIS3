@@ -47,6 +47,10 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
+   *   @history 2017-11-22 Jeff Anderson - Added the intersectEllipsoid virtual method so that
+   *                           the DTM intersect method can use a starting radius for the
+   *                           ellipsoid that is written to the labels during demprep as opposed 
+   *                           to the default radius of the target.
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
@@ -59,6 +63,11 @@ namespace Isis {
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
+
+    protected:
+      virtual bool intersectEllipsoid(
+                      const std::vector<double> observerPosRelativeToTarget,
+                      const std::vector<double> &observerLookVectorToTarget);
 
     private:
       Distance *m_minRadius;  //!< Minimum radius value in DEM file

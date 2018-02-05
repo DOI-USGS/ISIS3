@@ -67,6 +67,8 @@ namespace Isis {
    *   @history 2017-05-19 Tyler Wilson - Removed the calculateEllipsoidalSurfaceNormal() function,
    *                           as this is now being handled in the EllipsoidShape class.
    *                           References #1028.
+   *   @history 2017-11-22 Jeff Anderson - made intersectEllipsoid method virtual so it can be
+   *                           overridden in the EquatorialCylindricalShape class
    *   @history 2017-03-23 Kris Becker - added isVisibleFrom() and two
    *                            intersectSurface() methods to address real
    *                            occlusions. It is recommended that derived
@@ -176,15 +178,17 @@ namespace Isis {
       bool hasEllipsoidIntersection();
 
       // Intersect ellipse
-      bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
-                              const std::vector<double> &observerLookVectorToTarget);
+      virtual bool intersectEllipsoid(
+                      const std::vector<double> observerPosRelativeToTarget,
+                      const std::vector<double> &observerLookVectorToTarget);
+    
+      bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
       double resolution();
 
     private:
-      bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected
       bool m_hasIntersection;          //!< indicates good intersection exists
       bool m_hasNormal;                //!< indicates normal has been computed
       std::vector<double> m_normal;    //!< Local normal of current intersection point
