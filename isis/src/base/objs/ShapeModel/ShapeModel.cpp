@@ -207,7 +207,7 @@ namespace Isis {
    *
    * param &c SpiceDouble reference to be set
    */
-  virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
+  void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
     // get target radii
     std::vector<Distance> radii = targetRadii();
     a = radii[0].kilometers();
@@ -303,7 +303,7 @@ namespace Isis {
     SpiceDouble a;
     SpiceDouble b;
     SpiceDouble c;
-    setTargetRadii(&a, &b, &c);
+    setTargetRadii(a, b, c);
 
     // check if observer look vector intersects the target
     SpiceDouble intersectionPoint[3];

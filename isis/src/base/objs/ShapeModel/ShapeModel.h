@@ -23,6 +23,8 @@
  */
 
 #include <vector>
+#include "Spice.h"
+
 
 template<class T> class QVector;
 
