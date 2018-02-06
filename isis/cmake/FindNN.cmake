@@ -9,4 +9,8 @@ find_path(NN_INCLUDE_DIR
     PATH_SUFFIXES nn
 )
 
+find_library(NN_LIBRARY
+  NAMES nn
+)
+
 get_filename_component(NN_ROOT_INCLUDE_DIR "${NN_INCLUDE_DIR}" DIRECTORY)
