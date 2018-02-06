@@ -570,6 +570,22 @@ Write the network and re-read it...
 After reading and writing to a binary form does Pvl match?
 Reading/Writing control network is consistent
 
+Reading: $control/testData/PvlNet_TestNetwork1_V2.net...
+
+Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed**I/O ERROR** Reading the control network [PvlNet_TestNetwork1_V2.net] failed.
+**I/O ERROR** Failed to initialize control point at index [7].
+
+Reading: $control/testData/PvlNet_TestNetwork2_V3.net...
+
+Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
 
 Read network...
