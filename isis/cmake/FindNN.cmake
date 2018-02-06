@@ -10,6 +10,3 @@ find_path(NN_INCLUDE_DIR
 )
 
 get_filename_component(NN_ROOT_INCLUDE_DIR "${NN_INCLUDE_DIR}" DIRECTORY)
-
-find_library(NN_LIBRARY  NAMES nn)
-message("NN FOUND VERSION = UNABLE TO VERSION")

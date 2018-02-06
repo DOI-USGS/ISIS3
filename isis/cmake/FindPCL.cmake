@@ -20,4 +20,3 @@ find_library(PCL_OCTREE_LIBRARY NAMES pcl_octree)
 find_library(PCL_IO_LIBRARY     NAMES pcl_io)
 
 get_filename_component(PCL_ROOT_INCLUDE_DIR "${PCL_INCLUDE_DIR}" DIRECTORY)
-message("PCL FOUND VERSION = ${VERSION_NUM}")
