@@ -8,7 +8,6 @@
 #include <QString>
 #include <QTextStream>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlNetValidMeasure.h"
@@ -137,7 +136,7 @@ void IsisMain() {
     QString msg = "The control network [" + cnetInput.expanded() + "] entered for CNET does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
   ControlNet cnet(ui.GetFileName("CNET"));
@@ -878,15 +877,13 @@ void lockMeasures(ControlNet &cnet,
 void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
   SerialNumberList serialNumbers(cubeList);
 
-  QList<ControlCubeGraphNode *> graphNodes = cnet.GetCubeGraphNodes();
+  QList<QString> cnetSerials = cnet.GetCubeSerials();
   Progress progress;
   progress.SetText("Checking Measure Validity");
-  progress.SetMaximumSteps(graphNodes.size());
+  progress.SetMaximumSteps(cnetSerials.size());
   progress.CheckStatus();
 
-  for (int sn = 0; sn < graphNodes.size(); sn++) {
-    ControlCubeGraphNode *graphNode = graphNodes[sn];
-    QString serialNumber = graphNode->getSerialNumber();
+  foreach (QString serialNumber, cnetSerials) {
 
     Cube *cube = NULL;
     Camera *camera = NULL;
@@ -911,7 +908,7 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
       }
     }
 
-    QList<ControlMeasure *> measures = graphNode->getMeasures();
+    QList<ControlMeasure *> measures = cnet.GetMeasuresInCube(serialNumber);
     for (int cm = 0; cm < measures.size(); cm++) {
       ControlMeasure *measure = measures[cm];
       ControlPoint *point = measure->Parent();
@@ -1076,5 +1073,3 @@ void EditDefFile(void) {
 
   GuiEditFile::EditFile(ui, sDefFile);
 }
-
-

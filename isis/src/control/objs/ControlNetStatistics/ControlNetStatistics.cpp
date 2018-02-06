@@ -15,7 +15,6 @@
 #include "ControlPoint.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
-#include "ControlCubeGraphNode.h"
 #include "Cube.h"
 #include "CubeManager.h"
 #include "FileName.h"
@@ -216,15 +215,15 @@ namespace Isis {
     CubeManager cubeMgr;
     cubeMgr.SetNumOpenCubes(50);
 
-    mCubeGraphNodes = mCNet->GetCubeGraphNodes();
+    QList<QString> cnetSerials = mCNet->GetCubeSerials();
 
     if (mProgress != NULL) {
       mProgress->SetText("Generating Image Stats.....");
-      mProgress->SetMaximumSteps(mCubeGraphNodes.size());
+      mProgress->SetMaximumSteps(cnetSerials.size());
       mProgress->CheckStatus();
     }
 
-    foreach (ControlCubeGraphNode * node, mCubeGraphNodes) {
+    foreach (QString sn, cnetSerials) {
       geos::geom::CoordinateSequence * ptCoordinates =
           new geos::geom::CoordinateArraySequence();
 
@@ -232,7 +231,6 @@ namespace Isis {
       QVector<double> imgStats(numImageStats, 0);
 
       // Open the cube to get the dimensions
-      QString sn = node->getSerialNumber();
       Cube *cube = cubeMgr.OpenCube(mSerialNumList.fileName(sn));
 
       mSerialNumMap[sn] = true;
@@ -242,7 +240,7 @@ namespace Isis {
       imgStats[imgLines]   = cube->lineCount();
       double cubeArea      = imgStats[imgSamples] * imgStats[imgLines];
 
-      QList< ControlMeasure * > measures = node->getMeasures();
+      QList< ControlMeasure * > measures = mCNet->GetMeasuresInCube(sn);
 
       // Populate pts with a list of control points
       if (!measures.isEmpty()) {
@@ -357,7 +355,7 @@ namespace Isis {
       QString msg = QObject::tr("Error writing to file: [%1]").arg(psImageFile);
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-    ostm.close(); 
+    ostm.close();
   }
 
 
@@ -610,4 +608,3 @@ namespace Isis {
     }
   }
 }
-

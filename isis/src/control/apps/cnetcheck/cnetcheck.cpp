@@ -22,7 +22,6 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -48,15 +47,12 @@ QVector< set<QString> > findIslands(
   set<QString> &index,
   QMap< QString, set<QString> > adjCubes);
 
-QList< ControlCubeGraphNode * > checkSerialList(
-    SerialNumberList *serialNumbers, ControlNet * controlNet);
-
 void writeOutput(SerialNumberList num2cube,
                  QString filename,
                  set<QString> sns,
                  QMap< QString, set<QString> > cps);
 
-double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube);
+double getControlFitness(ControlNet &cnet, QString sn, double tolerance, Cube * cube);
 void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     bool ignore, SerialNumberList &num2cube,
     set<QString> &noLatLonSerialNumbers,
@@ -178,16 +174,16 @@ void IsisMain() {
 
         // Records if the currentsnum is not in the input cube list
         bool contains = false;
-        for (int sn = 0; 
-             sn < (int)listedSerialNumbers.size()  &&  !contains; 
+        for (int sn = 0;
+             sn < (int)listedSerialNumbers.size()  &&  !contains;
              sn++) {
           if (currentsn == listedSerialNumbers[sn]) {
             contains = true;
           }
         }
         // Check if already added
-        for (int sn = 0; 
-             sn < (int)nonListedSerialNumbers.size()  &&  !contains; 
+        for (int sn = 0;
+             sn < (int)nonListedSerialNumbers.size()  &&  !contains;
              sn++) {
           if (currentsn == nonListedSerialNumbers[sn]) {
             contains = true;
@@ -220,7 +216,7 @@ void IsisMain() {
 
     bool hasList = false;
     for (set<QString>::iterator island = islands[i].begin();
-         island != islands[i].end(); 
+         island != islands[i].end();
          island++) {
       if (num2cube.hasSerialNumber(*island)) {
         outputRow(out_stream, buildRow(num2cube, *island));
@@ -295,22 +291,21 @@ void IsisMain() {
   QString coverageOp = "LowCoverage";
   int failedCoverageCheck = 0;
   if (ui.GetBoolean(QString(coverageOp).toUpper())) {
-    QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
+    QList< QString > netSerials = innet.GetCubeSerials();
 
-    if (nodes.size() > 0) {
+    if (netSerials.size() > 0) {
       QString name(FileName(prefix + coverageOp + ".txt").expanded());
       ofstream out_stream;
       out_stream.open(name.toLatin1().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
 
       double tolerance = ui.GetDouble("TOLERANCE");
-      foreach (ControlCubeGraphNode * node, nodes) {
-        QString sn = node->getSerialNumber();
+      foreach (QString sn, netSerials) {
 
         if (num2cube.hasSerialNumber(sn)) {
           // Create a convex hull
           Cube *cube = cbman.OpenCube(num2cube.fileName(sn));
-          double controlFitness = getControlFitness(node, tolerance, cube);
+          double controlFitness = getControlFitness(innet, sn, tolerance, cube);
 
           if (controlFitness < tolerance) {
             outputRow(out_stream, buildRow(num2cube, sn, controlFitness));
@@ -375,8 +370,7 @@ void IsisMain() {
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for (int sn = 0; sn < (int)nonListedSerialNumbers.size(); sn++) {
-      int validMeasureCount = innet.getGraphNode(
-          nonListedSerialNumbers[sn])->getValidMeasures().size();
+      int validMeasureCount = innet.GetValidMeasuresInCube(nonListedSerialNumbers[sn]).size();
       QString rowText = nonListedSerialNumbers[sn] + " (Valid Measures: " +
           toString(validMeasureCount) + ")";
       outputRow(out_stream, rowText);
@@ -504,8 +498,8 @@ QVector< set<QString> > findIslands(set<QString> & index,
       // Find the first connected unvisited node
       QString nextNode = "";
       set<QString> neighbors = adjCubes[str_stack.top()];
-      for (set<QString>::iterator i = neighbors.begin(); 
-           i != neighbors.end(); 
+      for (set<QString>::iterator i = neighbors.begin();
+           i != neighbors.end();
            i++) {
         if (index.count(*i) == 1) {
           nextNode = *i;
@@ -542,7 +536,7 @@ void writeOutput(SerialNumberList num2cube, QString filename,
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
   for (set<QString>::iterator sn = sns.begin();
-       sn != sns.end(); 
+       sn != sns.end();
        sn++) {
     outputRow(out_stream, buildRow(num2cube, *sn, cps[*sn]));
   }
@@ -551,12 +545,12 @@ void writeOutput(SerialNumberList num2cube, QString filename,
 }
 
 
-double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube) {
+double getControlFitness(ControlNet &cnet, QString sn, double tolerance, Cube * cube) {
   double controlFitness = 0;
 
   static  geos::geom::GeometryFactory geosFactory;
   geos::geom::CoordinateSequence * pts = new geos::geom::CoordinateArraySequence();
-  QList< ControlMeasure * > measures = node->getMeasures();
+  QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(sn);
 
   // Populate pts with a list of control points
   foreach (ControlMeasure * measure, measures) {
@@ -572,7 +566,6 @@ double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cu
 
     // Calculate the area of the convex hull
     double convexArea = convexHull->getArea();
-    QString sn = node->getSerialNumber();
     double cubeArea = cube->sampleCount() * cube->lineCount();
 
     controlFitness = convexArea / cubeArea;
@@ -594,16 +587,14 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     QMap< QString, set<QString> > &noLatLonControlPoints) {
 
   // Set calculating progress
-  QList<ControlCubeGraphNode *> graphNodes = cnet.GetCubeGraphNodes();
-  if (graphNodes.size() > 0) {
+  QList< QString > netSerials = cnet.GetCubeSerials();
+  if (netSerials.size() > 0) {
     progress.SetText("Checking for No Lat/Lon");
-    progress.SetMaximumSteps(graphNodes.size());
+    progress.SetMaximumSteps(netSerials.size());
     progress.CheckStatus();
   }
 
-  for (int sn = 0; sn < graphNodes.size(); sn++) {
-    ControlCubeGraphNode *graphNode = graphNodes[sn];
-    QString serialNumber = graphNode->getSerialNumber();
+  foreach (QString serialNumber, netSerials) {
 
     if (num2cube.hasSerialNumber(serialNumber)) {
       Cube *cube = manager.OpenCube(num2cube.fileName(serialNumber));
@@ -618,7 +609,7 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
         createdCamera = false;
       }
 
-      QList< ControlMeasure * > measures = graphNode->getMeasures();
+      QList< ControlMeasure * > measures = cnet.GetMeasuresInCube(serialNumber);
       for (int cm = 0; cm < measures.size(); cm++) {
         ControlMeasure *measure = measures[cm];
         ControlPoint *point = measure->Parent();
@@ -671,4 +662,3 @@ QString buildRow(SerialNumberList &serials, QString sn, double value) {
 void outputRow(ofstream &outStream, QString rowText) {
   outStream << rowText << "\n";
 }
-
