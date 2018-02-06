@@ -9,39 +9,15 @@
 
   <description>
     <p>
-
-    Descriptive text about how to use this application goes here.
-
-    <p>
-    See Also:
-    <ul>
-        <li>
-        <a href="http://pdsimage.wr.usgs.gov/Missions/Galileo/NIMS/go_1001/document/nimsinst/instpub.asc">
-        The Near Infrared Mapping Spectrometer Experiment on Galileo</a>
-        </li>
-        <p>
-        A detailed description of the Galileo NIMS instrument.
-        </p>
-        <li>
-        <a href="https://pds.nasa.gov/documents/psdd/PSDDmain_1r71.pdf">
-        Planetary Science Data Dictionary Document</a>
-        <p>
-        A standard reference for data product descriptions contained in Planetary Data System (PDS)
-        data catalogs.
-        </p>
-        </li>
-    </ul>
-
+      Imports LIDAR data from LRO LOLA instrument.
     </p>
-   </p>
+
   </description>
 
   <history>
-    <change name="Tyler Wilson" date="2017-01-29">
+    <change name="Makayla Shepherd and Tyler Wilson" date="2017-01-29">
       Original version
     </change>
-
-
   </history>
 
   <category>
@@ -54,10 +30,10 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input PDS Galileo NIMS cube
+          Input LOLA Lidar CSV
         </brief>
         <description>
-          Use this parameter to select the path to the NIMS cube.
+          This file is a complied CSV with data from LOLA.
         </description>
         <filter>
           *.csv
@@ -68,11 +44,8 @@
          <type>filename</type>
          <fileMode>input</fileMode>
          <brief>
-           Output ISIS core data for a Galileo NIMS cube.
+           List with cubes to add as measures to the lidar points.
          </brief>
-         <description>
-           Use this parameter to select the output core data filename.
-         </description>
          <filter>
            *.lis
          </filter>
@@ -81,20 +54,15 @@
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-            Output topographic data from LOLA
+            Output lidar point data 
           </brief>
-          <description>
-            Use this parameter to select the output cube for the ISIS backplane data.
-          </description>
-          <filter>
-            *.txt
-          </filter>
         </parameter>
         <parameter name="OUTPUTTYPE">
           <type>string</type>
           <description>
             The output type, either binary or json.
           </description>
+          <default><item>BINARY</item></default>
           <list>
             <option value="BINARY">
               <brief> Binary output file (.dat)</brief>
@@ -104,70 +72,43 @@
             </option>
           </list>
         </parameter>
+        <parameter name="POINTID">
+          <type>string</type>
+          <brief>
+            The pattern to be used to create point ids.
+          </brief>
+          <description>
+            <p>
+              This string will be used to create unique IDs for each control
+              point created by this program. The string must contain a
+              single series
+              of question marks ("?"). For example: "VallesMarineris????"
+            </p>
+            <p>
+              The question marks will be replaced
+              with a number beginning with zero and incremented by one each time
+              a new control point is created. The example above would cause the
+              first control point to have an ID of "VallesMarineris0000", the
+              second ID would be "VallesMarineris0001" and so on.
+              The maximum number of new control points for this example would be
+              10000 with the final ID being "VallesMarineris9999".
+            </p>
+            <p>
+              Note: Make sure there are enough "?"s for all the control
+              points that might be created during this run. If all the possible
+              point IDs are exhausted the program will exit with an error, and 
+              will not produce an output control network file. 
+            </p>
+            <p>
+              Examples of POINTID:
+            </p>
+            <ul>
+              <li>POINTID="JohnDoe?????"</li>
+              <li>POINTID="Quad1_????></li>
+              <li>POINTID="JD_???_test1"</li>
+            </ul>
+          </description>
+        </parameter>
     </group>
   </groups>
-
-
-  <examples>
-    <example>
-      <brief>Importing LOLA topographic data</brief>
-      <description>
-        This example shows how to import LOLA topographic data
-      </description>
-      <terminalInterface>
-        <commandLine>         
-        </commandLine>
-        <description>
-          Run the lrolola2isis application
-        </description>
-      </terminalInterface>
-      <guiInterfaces>
-        <guiInterface>
-          <image width="804" height="1057" src="assets/images/gllnims2isisGUI.png">
-            <brief>
-              Example GUI
-            </brief>
-            <description>
-              Screenshot of the GUI with parameters filled in to execute the
-              gllnims2isis application.  Output cubes for core and suffix data are always
-              required.
-            </description>
-            <thumbnail width="257" height="338" caption="gllnims2isis GUI."
-            src="assets/thumbs/gllnims2isisGUIThumb.png"/>
-          </image>
-        </guiInterface>
-      </guiInterfaces>
-      <outputImages>
-        <image width="538" height="583" src="assets/images/gllnims2isisCORE.png">
-          <brief>
-            Output image of core data.
-          </brief>
-          <description>
-            Output image of core data after gllnims2isis has imported it to ISIS3.
-          </description>
-          <thumbnail width="172" height="187" caption="Output core data cube."
-          src="assets/thumbs/gllnims2isisCOREThumb.png" />
-          <parameterName>
-            TO
-          </parameterName>
-        </image>
-
-        <image width="538" height="581" src="assets/images/gllnims2isisSUFFIX.png">
-          <brief>
-            Output image of suffix data.
-          </brief>
-          <description>
-            Output image of suffix (backplane) data after gllnims2isis has imported it to ISIS3.
-          </description>
-          <thumbnail width="172" height="186" caption="Output suffix data cube."
-          src="assets/thumbs/gllnims2isisSUFFIXThumb.png" />
-          <parameterName>
-            TO
-          </parameterName>
-        </image>
-      </outputImages>
-    </example>
-  </examples>
-
-
 </application>
