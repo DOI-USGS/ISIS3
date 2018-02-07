@@ -56,38 +56,21 @@ commands:
 	  true; \
 	fi;
 # TEST F: CNET=[invalid control net file]
-<<<<<<< HEAD
-	echo -e "Error Test F:" >> $(OUTPUT)/error.txt;
-	if [[ `$(APPNAME) \
-	  fromlist=$(INPUT)/empty.lis \
-	  cnet=$(INPUT)/empty.net \
-=======
 	echo -e "Error Test F:" >> $(OUTPUT)/error_temp.txt;
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/notacnet.net \
->>>>>>> dev
 	  onet=$(output)/out.net \
 	  radius=yes \
 	  spsolve=positions \
 	  point_radius_sigma=500 \
 	  spacecraft_position_sigma=500 \
 	  camera_angles_sigma=2 \
-<<<<<<< HEAD
-	  2>> $(OUTPUT)/error.txt \
-=======
 	  2>> $(OUTPUT)/error_temp.txt \
->>>>>>> dev
 	  > /dev/null` ]]; \
 	then \
 	  true; \
 	fi;
-<<<<<<< HEAD
-# Remove full paths from the errors file
-	sed -i "s/$(INPUT)\///" $(OUTPUT)/error.txt;
-	sed -i "s/$(OUTPUT)\///" $(OUTPUT)/error.txt;
-=======
 # Remove paths from errors file
 	$(SED) 's/\(\[\)\/.*\(input\)/\1\2/g' $(OUTPUT)/error_temp.txt > $(OUTPUT)/error.txt;
 	$(RM) $(OUTPUT)/error_temp.txt;
->>>>>>> dev
