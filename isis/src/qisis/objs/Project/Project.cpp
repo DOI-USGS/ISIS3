@@ -27,7 +27,9 @@
 #include <unistd.h>
 
 #include <QApplication>
+#include <QDateTime>
 #include <QDir>
+#include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 #include <QFuture>
@@ -36,13 +38,16 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QProgressBar>
+#include <QRegExp>
+#include <QSettings>
 #include <QStringList>
 #include <QtDebug>
 #include <QTextStream>
+#include <QWidget>
 #include <QXmlStreamWriter>
 
-#include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
+#include "BundleSolutionInfo.h"
 #include "Camera.h"
 #include "Control.h"
 #include "ControlList.h"
@@ -54,9 +59,9 @@
 #include "FileName.h"
 #include "GuiCamera.h"
 #include "GuiCameraList.h"
-#include "IException.h"
 #include "ImageList.h"
 #include "ImageReader.h"
+#include "IException.h"
 #include "ProgressBar.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -66,18 +71,21 @@
 #include "ShapeReader.h"
 #include "Target.h"
 #include "TargetBodyList.h"
+#include "Template.h"
+#include "TemplateList.h"
 #include "WorkOrder.h"
 #include "WorkOrderFactory.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
 
+
+
   /**
    * Create a new Project. This creates a project on disk at /tmp/username_appname_pid.
    */
   Project::Project(Directory &directory, QObject *parent) :
       QObject(parent) {
-    //qDebug()<<"Project::Project";
     m_bundleSettings = NULL;
     m_clearing = false;
     m_directory = &directory;
@@ -92,6 +100,7 @@ namespace Isis {
     m_imageReader = NULL;
     m_shapeReader = NULL;
     m_shapes = NULL;
+    m_templates = NULL;
     m_warnings = NULL;
     m_workOrderHistory = NULL;
     m_isTemporaryProject = true;
@@ -99,6 +108,7 @@ namespace Isis {
     m_isClean = true;
     m_activeControl = NULL;
     m_activeImageList = NULL;
+
 
     m_numImagesCurrentlyReading = 0;
 
@@ -118,6 +128,7 @@ namespace Isis {
     m_idToBundleSolutionInfoMap = new QMap<QString, BundleSolutionInfo *>;
 
     m_name = "Project";
+
 
     // Look for old projects
     QDir tempDir = QDir::temp();
@@ -155,6 +166,7 @@ namespace Isis {
                                          arg( QApplication::applicationName() ) );
     }
 
+    QCoreApplication* ipce_app = static_cast<QCoreApplication *>(directory.parent());
 
     try {
       QString tmpFolder = QDir::temp().absolutePath() + "/"
@@ -162,8 +174,10 @@ namespace Isis {
             + QApplication::applicationName() + "_" + QString::number( getpid() );
       QDir temp(tmpFolder + "/tmpProject");
       m_projectRoot = new QDir(temp);
-      //qDebug()<<"          Create temp project";
-      createFolders();
+
+      if (ipce_app->arguments().count() == 1) {
+        createFolders();
+      }
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer, "Error creating project folders.", _FILEINFO_);
@@ -183,12 +197,6 @@ namespace Isis {
     connect( m_imageReader, SIGNAL( imagesReady(ImageList) ),
              this, SLOT( imagesReady(ImageList) ) );
 
-    connect( this, SIGNAL(imagesAdded(ImageList *) ),
-             this, SLOT(addTargetsFromImportedImagesToProject(ImageList *) ) );
-
-    connect( this, SIGNAL(imagesAdded(ImageList *) ),
-             this, SLOT(addCamerasFromImportedImagesToProject(ImageList *) ) );
-
     // Project will be listening for when both cnets and images have been added.
     // It will emit a signal, controlsAndImagesAvailable, when this occurs.
     // Directory sets up a listener on the JigsawWorkOrder clone to enable itself
@@ -197,6 +205,8 @@ namespace Isis {
             this, SLOT(checkControlsAndImagesAvailable()));
     connect(this, SIGNAL(controlListAdded(ControlList *)),
             this, SLOT(checkControlsAndImagesAvailable()));
+    connect(m_directory, SIGNAL(cleanProject(bool)),
+            this, SLOT(setClean(bool)));
 
     m_images = new QList<ImageList *>;
 
@@ -213,6 +223,8 @@ namespace Isis {
     m_controls = new QList<ControlList *>;
 
     m_targets = new TargetBodyList;
+
+    m_templates = new QList<TemplateList *>;
 
     m_guiCameras = new GuiCameraList;
 
@@ -242,6 +254,7 @@ namespace Isis {
    */
   Project::~Project() {
 
+
     if (m_images) {
       foreach (ImageList *imageList, *m_images) {
         foreach (Image *image, *imageList) {
@@ -267,6 +280,7 @@ namespace Isis {
       delete m_shapes;
       m_shapes = NULL;
     }
+
 
     if (m_controls) {
       foreach (ControlList *controlList, *m_controls) {
@@ -324,7 +338,7 @@ namespace Isis {
     delete m_warnings;
     m_warnings = NULL;
 
-    delete m_workOrderHistory;
+    m_workOrderHistory->removeAll(NULL);
     m_workOrderHistory = NULL;
 
     delete m_bundleSettings;
@@ -359,7 +373,7 @@ namespace Isis {
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-//      qDebug()<<"shape directory = "<<shapeDataRoot();
+
       if ( !dir.mkdir( shapeDataRoot() ) ) {
         QString msg = QString("Unable to create folder [%1] when trying to initialize project")
                         .arg( shapeDataRoot() );
@@ -376,6 +390,24 @@ namespace Isis {
       if ( !dir.mkdir( bundleSolutionInfoRoot() ) ) {
         QString msg = QString("Unable to create folder [%1] when trying to initialize project")
                         .arg( bundleSolutionInfoRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      if ( !dir.mkdir( templateRoot() ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( templateRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      if ( !dir.mkdir( templateRoot() + "/maps" ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( templateRoot() );
+        warn(msg);
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+      if ( !dir.mkdir( templateRoot() + "/registrations" ) ) {
+        QString msg = QString("Unable to create folder [%1] when trying to initialize project")
+                        .arg( templateRoot() );
         warn(msg);
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -532,12 +564,13 @@ namespace Isis {
     m_images->clear();
     m_shapes->clear();
     m_controls->clear();
+    m_templates->clear();
     m_targets->clear();
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
     m_workOrderHistory->clear();
+
     directory()->clean();
-    setName("Project");
     setClean(true);
   }
 
@@ -547,13 +580,18 @@ namespace Isis {
   }
 
 
-  ImageList *Project::createOrRetrieveImageList(QString name) {
+  ImageList *Project::createOrRetrieveImageList(QString name, QString path) {
     ImageList *result = imageList(name);
     if (!result) {
       result = new ImageList;
 
       result->setName(name);
-      result->setPath(name);
+      if (path == "") {
+        result->setPath(name);
+      }
+      else {
+        result->setPath(path);
+      }
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( imageListDeleted(QObject *) ) );
@@ -563,13 +601,18 @@ namespace Isis {
   }
 
 
-  ShapeList *Project::createOrRetrieveShapeList(QString name) {
+  ShapeList *Project::createOrRetrieveShapeList(QString name, QString path) {
     ShapeList *result = shapeList(name);
     if (!result) {
       result = new ShapeList;
 
       result->setName(name);
-      result->setPath(name);
+      if (path == "") {
+        result->setPath(name);
+      }
+      else {
+        result->setPath(path);
+      }
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( shapeListDeleted(QObject *) ) );
@@ -626,19 +669,38 @@ namespace Isis {
       stream.writeEndElement();
     }
 
-    if ( !m_templates.isEmpty() ) {
-      stream.writeStartElement("templates");
+    if ( !m_templates->isEmpty() ) {
+      stream.writeStartElement("templateLists");
 
-      for (int i = 0; i < m_templates.count(); i++) {
-        stream.writeStartElement("template");
-        stream.writeAttribute("fileName", m_templates.at(i).dir().dirName() + "/" + m_templates.at(i).name());
-        stream.writeEndElement();
+      for (int i = 0; i < m_templates->count(); i++) {
+        m_templates->at(i)->save(stream, this, newProjectRoot);
       }
 
       stream.writeEndElement();
     }
 
-    //  Write general look of gui, including docked widges
+    // TODO:  Finish implementing serialization of TargetBody & GuiCameras
+//  if (!m_targets->isEmpty()) {
+//    stream.writeStartElement("targets");
+//
+//    for (int i = 0; i < m_targets->count(); i++) {
+//      m_targets->at(i)->save(stream, this, newProjectRoot);
+//    }
+//
+//    stream.writeEndElement();
+//  }
+//
+//  if (!m_guiCameras->isEmpty()) {
+//    stream.writeStartElement("cameras");
+//
+//    for (int i = 0; i < m_guiCameras->count(); i++) {
+//      m_guiCameras->at(i)->save(stream, this, newProjectRoot);
+//    }
+//
+//    stream.writeEndElement();
+//  }
+
+//  Write general look of gui, including docked widges
 //  QVariant geo_data = saveGeometry();
 //  QVariant layout_data = saveState();
 //
@@ -802,7 +864,7 @@ namespace Isis {
     connect( this, SIGNAL( projectRelocated(Project *) ),
              control, SLOT( updateFileName(Project *) ) );
 
-    createOrRetrieveControlList( FileName( control->fileName() ).dir().dirName() )->append(control);
+    createOrRetrieveControlList( FileName( control->fileName() ).dir().dirName(), "" )->append(control);
 
     (*m_idToControlMap)[control->id()] = control;
 
@@ -810,14 +872,19 @@ namespace Isis {
   }
 
 
-  ControlList *Project::createOrRetrieveControlList(QString name) {
+  ControlList *Project::createOrRetrieveControlList(QString name, QString path) {
     ControlList *result = controlList(name);
 
     if (!result) {
       result = new ControlList;
 
       result->setName(name);
-      result->setPath(name);
+      if (path == "") {
+        result->setPath(name);
+      }
+      else {
+        result->setPath(path);
+      }
 
       connect( result, SIGNAL( destroyed(QObject *) ),
                this, SLOT( controlListDeleted(QObject *) ) );
@@ -865,7 +932,6 @@ namespace Isis {
    * @param QStringList names of imageFiles
    */
   void Project::addImages(QStringList imageFiles) {
-//  qDebug()<<"Project::addImages(QStringList imageFiles)";
     if (m_numImagesCurrentlyReading == 0) {
       m_imageReadingMutex->lock();
     }
@@ -881,6 +947,10 @@ namespace Isis {
    */
   void Project::addImages(ImageList newImages) {
     imagesReady(newImages);
+
+    //  The each 
+    emit guiCamerasAdded(m_guiCameras);
+    emit targetsAdded(m_targets);
   }
 
 
@@ -942,21 +1012,14 @@ namespace Isis {
    *
    * @param newFileList QList of FileNames for each new imported template
    */
-  void Project::addTemplates(QList<FileName> newFileList) {
-    m_templates.append(newFileList);
-    emit templatesAdded(newFileList);
+  void Project::addTemplates(TemplateList *templateList) {
+    foreach (Template *templateFile, *templateList) {
+      connect( this, SIGNAL( projectRelocated(Project *) ),
+               templateFile, SLOT( updateFileName(Project *) ) );
+    }
+    m_templates->append(templateList);
+    emit templatesAdded(templateList);
   }
-
-
-  /**
-   * Remove a FileName from m_templates
-   *
-   * @param file FileName to be removed
-   */
-  void Project::removeTemplate(FileName file) {
-    m_templates.removeOne(file);
-  }
-
 
   /**
    * Create and navigate to the appropriate template type folder in the project directory.
@@ -964,14 +1027,26 @@ namespace Isis {
    * @param prefix The name of the director under templates/ to store the template file.
    */
   QDir Project::addTemplateFolder(QString prefix) {
-    QDir templateFolder = templateRoot();
 
-    if ( !templateFolder.mkpath(prefix) ) {
+    QDir templateFolder = templateRoot();
+    prefix += "%1";
+    int prefixCounter = 0;
+    QString numberedPrefix;
+
+    do {
+      prefixCounter++;
+      numberedPrefix = prefix.arg( QString::number(prefixCounter) );
+    }
+    while ( templateFolder.exists(numberedPrefix) );
+
+    if ( !templateFolder.mkpath(numberedPrefix) ) {
       throw IException(IException::Io,
           tr("Could not create template directory [%1] in [%2].")
-            .arg(prefix).arg( templateFolder.absolutePath() ),
+            .arg(numberedPrefix).arg( templateFolder.absolutePath() ),
           _FILEINFO_);
     }
+
+    templateFolder.cd(numberedPrefix);
 
     return templateFolder;
   }
@@ -1047,6 +1122,105 @@ namespace Isis {
   }
 
 
+  void Project::writeSettings() {
+
+    QString appName = QApplication::applicationName();
+
+
+    QSettings globalSettings(
+        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
+          .expanded(),
+        QSettings::NativeFormat);
+
+    globalSettings.beginGroup("recent_projects");
+    QStringList keys = globalSettings.allKeys();
+    QMap<QString,QString> recentProjects;
+
+    foreach (QString key,keys) {
+
+      recentProjects[key]=globalSettings.value(key).toString();
+
+    }
+
+    QList<QString> projectPaths = recentProjects.values();
+
+    if (keys.count() >= m_maxRecentProjects) {
+
+      //Clear out the recent projects before repopulating this group
+      globalSettings.remove("");
+
+
+
+      //If the currently open project is a project that has been saved and is not within the current
+      //list of recently open projects, then remove the oldest project from the list.
+      if (!this->projectRoot().contains("tmpProject") && !projectPaths.contains(this->projectRoot()) ) {
+        QString s=keys.first();
+        recentProjects.remove( s );
+      }
+
+      //If the currently open project is already contained within the list,
+      //then remove the earlier reference.
+
+      if (projectPaths.contains(this->projectRoot())) {
+        QString key = recentProjects.key(this->projectRoot());
+        recentProjects.remove(key);
+      }
+
+      QMap<QString,QString>::iterator i;
+
+      //Iterate through the recentProjects QMap and set the <key,val> pairs.
+      for (i=recentProjects.begin();i!=recentProjects.end();i++) {
+
+          globalSettings.setValue(i.key(),i.value());
+
+      }
+
+      //Get a unique time value for generating a key
+      long t0 = QDateTime::currentMSecsSinceEpoch();
+      QString projName = this->name();
+
+      QString t0String=QString::number(t0);
+
+      //Save the project location
+      if (!this->projectRoot().contains("tmpProject") ) {
+              globalSettings.setValue(t0String+"%%%%%"+projName,this->projectRoot());
+
+      }
+
+    }
+
+    //The numer of recent open projects is less than m_maxRecentProjects
+    else {
+
+      //Clear out the recent projects before repopulating this group
+      globalSettings.remove("");
+      if (projectPaths.contains(this->projectRoot())) {
+        QString key = recentProjects.key(this->projectRoot());
+        recentProjects.remove(key);
+      }
+      QMap<QString,QString>::iterator i;
+
+      //Iterate through the recentProjects QMap and set the <key,val> pairs.
+      for ( i=recentProjects.begin(); i!=recentProjects.end(); i++ ) {
+          globalSettings.setValue(i.key(),i.value());
+      }
+
+      long t0 = QDateTime::currentMSecsSinceEpoch();
+      QString projName = this->name();
+      QString t0String=QString::number(t0);
+
+      //if (!this->projectRoot().contains("tmpProject") && !projectPaths.contains( this->projectRoot() ) ) {
+      if (!this->projectRoot().contains("tmpProject") ) {
+        globalSettings.setValue(t0String+"%%%%%"+projName,this->projectRoot());
+      }
+
+    }
+
+
+    globalSettings.endGroup();
+  }
+
+
   /**
    * Open the project at the given path.
    * @param The path to the project folder
@@ -1060,8 +1234,10 @@ namespace Isis {
    *                  directory is chosen Fixes #4969
    * */
   void Project::open(QString projectPathStr) {
-    FileName projectPath(projectPathStr);
-    QString projectXmlPath = projectPath.toString() + "/project.xml";
+    // Expand projectPathStr to contain absolute path
+    QString projectAbsolutePathStr = QDir(projectPathStr).absolutePath();
+
+    QString projectXmlPath = projectAbsolutePathStr + "/project.xml";
     QFile file(projectXmlPath);
 
     if ( !file.open(QFile::ReadOnly) ) {
@@ -1071,7 +1247,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    QString projectXmlHistoryPath = projectPath.toString() + "/history.xml";
+    QString projectXmlHistoryPath = projectAbsolutePathStr + "/history.xml";
     QFile historyFile(projectXmlHistoryPath);
 
     if ( !historyFile.open(QFile::ReadOnly) ) {
@@ -1081,7 +1257,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    QString projectXmlWarningsPath = projectPath.toString() + "/warnings.xml";
+    QString projectXmlWarningsPath = projectAbsolutePathStr + "/warnings.xml";
     QFile warningsFile(projectXmlWarningsPath);
 
     if (!warningsFile.open(QFile::ReadOnly)) {
@@ -1091,7 +1267,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    QString directoryXmlPath = projectPath.toString() + "/directory.xml";
+    QString directoryXmlPath = projectAbsolutePathStr + "/directory.xml";
     QFile directoryFile(directoryXmlPath);
 
     if (!directoryFile.open(QFile::ReadOnly)) {
@@ -1113,10 +1289,8 @@ namespace Isis {
     reader.pushContentHandler(&handler);
     reader.setErrorHandler(&handler);
 
-
-
     QDir oldProjectRoot(*m_projectRoot);
-    *m_projectRoot = projectPath.expanded();
+    *m_projectRoot =  QDir(projectAbsolutePathStr);
 
     QXmlInputSource xmlInputSource(&file);
 
@@ -1128,12 +1302,12 @@ namespace Isis {
         }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to open project completely [%1]")
-                               .arg(projectPath.original()));
+                               .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
       }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to open project completely[%1]")
-                               .arg(projectPath.original()));
+                               .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
 
@@ -1146,20 +1320,21 @@ namespace Isis {
 
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read history from project[%1]")
-                               .arg(projectPath.original()));
+                               .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
       }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to read history from project[%1]")
-                                .arg(projectPath.original()));
+                                .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
 
     reader.pushContentHandler(&handler);
 
     QXmlInputSource xmlWarningsInputSource(&warningsFile);
+
     if (!reader.parse(xmlWarningsInputSource)) {
-      warn(tr("Failed to read warnings from project [%1]").arg(projectPath.original()));
+      warn(tr("Failed to read warnings from project [%1]").arg(projectAbsolutePathStr));
     }
 
     reader.pushContentHandler(&handler);
@@ -1171,13 +1346,13 @@ namespace Isis {
          }
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read GUI state from project[%1]")
-                               .arg(projectPath.original()));
+                               .arg(projectAbsolutePathStr));
       directory()->showWarning(e.toString());
 
       }
     catch (std::exception &e) {
       directory()->showWarning(QString("Failed to read GUI state from project[%1]")
-                               .arg(projectPath.original()));
+                               .arg(projectAbsolutePathStr));
       directory()->showWarning(e.what());
     }
 
@@ -1187,7 +1362,9 @@ namespace Isis {
       bundleRoot.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks); // sym links ok???
 
       QFileInfoList bundleDirs = bundleRoot.entryInfoList();
+
       for (int dirListIndex = 0; dirListIndex < bundleDirs.size(); dirListIndex++) {
+
         // get QFileInfo for each file in this directory
         QDir bundleSolutionDir(bundleDirs[dirListIndex].absoluteFilePath());
         bundleSolutionDir.setFilter(QDir::Files | QDir::NoSymLinks); // sym links ok???
@@ -1204,6 +1381,7 @@ namespace Isis {
       }
     }
     m_isOpen = true;
+    writeSettings();
     emit projectLoaded(this);
   }
 
@@ -1219,6 +1397,7 @@ namespace Isis {
    * @return Image matching id
    */
   Image *Project::image(QString id) {
+
     return (*m_idToImageMap)[id];
   }
 
@@ -1376,6 +1555,15 @@ namespace Isis {
    */
   QString Project::projectRoot() const {
     return m_projectRoot->path();
+  }
+
+
+  /**
+   * Get the top-level folder of the new project. This is where the project is opened from/saved to. 
+   * This is set when a Save As operation is in progress. 
+   */
+  QString Project::newProjectRoot() const {
+    return m_newProjectRoot;
   }
 
 
@@ -1557,11 +1745,14 @@ namespace Isis {
    *   @history 2016-06-23 Tracie Sucharski - Original version.
    *   @history 2017-05-17 Tracie Sucharski - If no active control set & there is only one control
    *                          in the project, default to that control.
+   *   @history 2017-10-16 Ian Humphrey - Check to make sure we have imported images before trying
+   *                           to set an active control when there is only one control in the
+   *                           project. Fixes #5160.
    */
   Control *Project::activeControl() {
 
     if (!m_activeControl && m_controls->count() == 1) {
-      if (m_controls->at(0)->count() == 1) {
+      if (m_controls->at(0)->count() == 1 && m_images->count() > 1) {
         QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
         setActiveControl(controlName);
       }
@@ -1780,8 +1971,8 @@ namespace Isis {
    *
    * @return QList of FileName
    */
-  QList<FileName> Project::templates() {
-    return m_templates;
+  QList<TemplateList *> Project::templates() {
+    return *m_templates;
   }
 
 
@@ -1866,6 +2057,12 @@ namespace Isis {
    * Delete all of the files, that this project stores, from disk.
    */
   void Project::deleteAllProjectFiles() {
+
+    // Currently the deleteFromDisk methods for Image and Shape delete the Cube if it exists, the
+    //  other objects deleteFromDisk methods simply remove files.  This could be achieved easier
+    //  in this method by simply calling QDir::removeRecursively(), but for future functionality
+    //  call each objects deleteFromDisk.  Currently there are no cleanup methods for Bundle results
+    //  or templates, so simply remove directory recursively.
     foreach (ImageList *imagesInAFolder, *m_images) {
       imagesInAFolder->deleteFromDisk(this);
     }
@@ -1874,9 +2071,17 @@ namespace Isis {
       warn( tr("Did not properly clean up images folder [%1] in project").arg( imageDataRoot() ) );
     }
 
+    foreach (ShapeList *shapesInAFolder, *m_shapes) {
+      shapesInAFolder->deleteFromDisk(this);
+    }
+
     if ( !m_projectRoot->rmdir( shapeDataRoot() ) ) {
       warn( tr("Did not properly clean up shapes folder [%1] in project").
             arg( shapeDataRoot() ) );
+    }
+
+    foreach (ControlList *controlsInAFolder, *m_controls) {
+      controlsInAFolder->deleteFromDisk(this);
     }
 
     if ( !m_projectRoot->rmdir( cnetRoot() ) ) {
@@ -1884,12 +2089,12 @@ namespace Isis {
              .arg( cnetRoot() ) );
     }
 
-    if ( !m_projectRoot->rmdir( resultsRoot() ) ) {
+    if ( !(QDir(resultsRoot()).removeRecursively()) ) {
       warn( tr("Did not properly clean up results folder [%1] in project")
              .arg( resultsRoot() ) );
     }
 
-    if ( !m_projectRoot->rmdir( templateRoot() ) ) {
+    if ( !(QDir(templateRoot()).removeRecursively()) ) {
       warn( tr("Did not properly clean up templates folder [%1] in project")
              .arg( templateRoot() ) );
     }
@@ -1906,25 +2111,28 @@ namespace Isis {
    * @param newProjectRoot The new root directory for the project.
    */
   void Project::relocateProjectRoot(QString newProjectRoot) {
-    QString oldRoot = templateRoot();
     *m_projectRoot = newProjectRoot;
-
     emit projectRelocated(this);
-
-    addTemplateFolder("maps");
-    addTemplateFolder("registrations");
-
-    // This is a temporary fix until we create an object for Templates
-    foreach (FileName templateFile, templates()) {
-      QFile::copy(oldRoot + "/" + templateFile.toString(), templateRoot() + "/" + templateFile.toString());
-      ProjectItem *currentItem =
-          directory()->model()->findItemData(QVariant::fromValue(templateFile.toString()));
-      currentItem->setData(QVariant(templateFile.toString()));
-    }
   }
 
 
-  void Project::save() {
+  /**
+   * Generic save method to save the state of the project.
+   *
+   * This method is used to save the state of the project. If the project is currently a temporary
+   * project, this method will create a file dialog to prompt the user for a place/name to save
+   * the project as. Otherwise, the existing project state will be saved. This method also informs
+   * the caller whether or not the save occurred. It is possible for a save to NOT occur if the
+   * project is a temporary project and the user cancels/closes the dialog prompt.
+   *
+   * @return @b bool Returns true if the save completed. The save is considered incomplete if the
+   * project is a temporary project and the user either cancels or closes the file dialog prompt
+   * that is created.
+   */
+  bool Project::save() {
+    // Let caller know if the save dialog was cancelled
+    bool saveDialogCompleted = true;
+
     if (m_isTemporaryProject) {
       QString newDestination = QFileDialog::getSaveFileName(NULL,
                                                             QString("Project Location"),
@@ -1938,10 +2146,17 @@ namespace Isis {
         relocateProjectRoot(newDestination);
         m_isTemporaryProject = false;
       }
+      // Dialog was cancelled
+      else {
+        saveDialogCompleted = false;
+      }
     }
     else {
       save(m_projectRoot->absolutePath(), false);
+      // if (newDestination != )
     }
+
+    return saveDialogCompleted;
   }
 
 
@@ -1949,7 +2164,7 @@ namespace Isis {
 
   /**
    * @brief Project::save  Saves the project state out to an XML file
-   * @param newPath  The path to the project directory.
+   * @param projectPath  The path to the project directory.
    * @param verifyPathDoesntExist A boolean variable which is set to true
    * if we wish to check that we are not overwriting a pre-existing save.
    *
@@ -2064,10 +2279,16 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    //  If current project is temporary set project name to path name as a default
-    if (m_isTemporaryProject) {
-      setName(newPath.name());
-    }
+    //  TODO Set newpath member variable.  This is used for some of the data copy methods and is not
+    //  the ideal way to handle this.  Maybe change the data copy methods to either take the new
+    //  project root in addition to the data root or put the data root in the dataList (ImageList,
+    //  etc.).
+    m_newProjectRoot = newPath.toString();
+
+    //  For now set the member variable rather than calling setName which emits signal and updates
+    //  ProjectItemModel & the project name on the tree.  This will be updated when the new project
+    //  is opened.  
+    m_name = newPath.name();
 
     QFile projectSettingsFile(newPath.toString() + "/project.xml");
     if (!projectSettingsFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
@@ -2134,15 +2355,16 @@ namespace Isis {
     directoryStateWriter.setAutoFormatting(true);
 
     directoryStateWriter.writeStartDocument();
-    //qDebug()<<"Project::save Before save Directory";
+
     /*
      * TODO: Does Project need to know about Directory?
      * This is the only place that project uses m_directory. This makes me wonder if it is
      * necessary for project to have a Directory member variable.
      */
     m_directory->save(directoryStateWriter, newPath);
-    //qDebug()<<"Project::save After save Directory";
+
     directoryStateWriter.writeEndDocument();
+    m_isOpen = true;
   }
 
 
@@ -2242,10 +2464,10 @@ namespace Isis {
 
       (*m_idToImageMap)[image->id()] = image;
       if (images.name() != "") {
-        createOrRetrieveImageList(images.name())->append(image);
+        createOrRetrieveImageList(images.name(), images.path())->append(image);
       }
       else {
-        createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName())->append(image);
+        createOrRetrieveImageList(FileName(images[0]->fileName()).dir().dirName(), "")->append(image);
       }
     }
 
@@ -2273,82 +2495,81 @@ namespace Isis {
   }
 
 
-  void Project::addTargetsFromImportedImagesToProject(ImageList *imageList) {
+  void Project::addTarget(Target *target) {
 
     bool found = false;
-    foreach (Image *image, *imageList) {
 
-      // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
-      //   2016-07-25  TLS The cube is created if it doesn't exist (or isn't open)
-      Target *target = image->cube()->camera()->target();
+    // construct TargetBody QSharedPointer from this images cameras Target
+    TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
 
-      // construct TargetBody QSharedPointer from this images cameras Target
-      TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
-
-      foreach (TargetBodyQsp tb, *m_targets) {
-        if (*tb == *targetBody) {
-          found = true;
-          break;
-        }
-      }
-
-      // if this TargetBody is not already in the project, add it
-      // below is how it probably should work, would have to I think
-      // override the ::contains() method in the TargetBodyList class
-//      if (!m_targets->contains(targetBody))
-//        m_targets->append(targetBody);
-
-      if (!found) {
-        m_targets->append(targetBody);
-        connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
-                 this, SLOT( targetBodyClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               targetBody.data(), SLOT( updateFileName(Project *) ) );
-
-        (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
+    foreach (TargetBodyQsp tb, *m_targets) {
+      if (*tb == *targetBody) {
+        found = true;
+        break;
       }
     }
 
-    emit targetsAdded(m_targets);
+    // if this TargetBody is not already in the project, add it
+    // below is how it probably should work, would have to I think
+    // override the ::contains() method in the TargetBodyList class
+//      if (!m_targets->contains(targetBody))
+//        m_targets->append(targetBody);
+    if (!found) {
+      m_targets->append(targetBody);
+      connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
+               this, SLOT( targetBodyClosed(QObject *) ) );
+//      connect( this, SIGNAL( projectRelocated(Project *) ),
+//               targetBody.data(), SLOT( updateFileName(Project *) ) );
+
+      (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
+    }
   }
 
 
-
-  void Project::addCamerasFromImportedImagesToProject(ImageList *imageList) {
+  void Project::addCamera(Camera *camera) {
     bool found = false;
-    foreach (Image *image, *imageList) {
 
-      // TODO - I'm a bit worried about being sure the cube is still open at this point (Ken)
-      Camera *camera = image->cube()->camera();
+    // construct guiCamera QSharedPointer from this images cameras Target
+    GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
 
-      // construct guiCamera QSharedPointer from this images cameras Target
-      GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
-
-      foreach (GuiCameraQsp gc, *m_guiCameras) {
-        if (*gc == *guiCamera) {
-          found = true;
-          break;
-        }
+    foreach (GuiCameraQsp gc, *m_guiCameras) {
+      if (*gc == *guiCamera) {
+        found = true;
+        break;
       }
+    }
 
-      // if this guiCamera is not already in the project, add it
-      // below is how it probably should work, would have to I think
-      // override the ::contains() method in the GuiCameraList class
+    // if this guiCamera is not already in the project, add it
+    // below is how it probably should work, would have to I think
+    // override the ::contains() method in the GuiCameraList class
 //      if (!m_guiCameras->contains(guiCamera))
 //        m_guiCameras->append(guiCamera);
 
-      if (!found) {
-        m_guiCameras->append(guiCamera);
+    if (!found) {
+      m_guiCameras->append(guiCamera);
 //      connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
 //               this, SLOT( guiCameraClosed(QObject *) ) );
 //      connect( this, SIGNAL( projectRelocated(Project *) ),
 //               guiCamera.data(), SLOT( updateFileName(Project *) ) );
 
-        (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
-      }
+      (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
     }
+  }
 
-    emit guiCamerasAdded(m_guiCameras);
+
+  /**
+   * Add images to the id map which are not under the projects main data area, the Images node on 
+   * the project tree, such as the images under bundle results.  This is an interim solution since 
+   * the Project and model/view does not seem to be properly handling data which is not on the main 
+   * data part of the project tree. 
+   *  
+   * @param ImagesList of images 
+   */
+  void Project::addImagesToIdMap(ImageList images) {
+
+    foreach (Image *image, images) {
+      (*m_idToImageMap)[image->id()] = image;
+    }
   }
 
 
@@ -2491,10 +2712,10 @@ namespace Isis {
 
       (*m_idToShapeMap)[shape->id()] = shape;
       if (shapes.name() != "") {
-        createOrRetrieveShapeList(shapes.name())->append(shape);
+        createOrRetrieveShapeList(shapes.name(), shapes.path())->append(shape);
       }
       else {
-        createOrRetrieveShapeList(FileName(shapes[0]->fileName()).dir().dirName())->append(shape);
+        createOrRetrieveShapeList(FileName(shapes[0]->fileName()).dir().dirName(), "")->append(shape);
       }
 
     }
@@ -2563,7 +2784,6 @@ namespace Isis {
 
       if (localName == "project") {
         QString name = atts.value("name");
-
         if (!name.isEmpty()) {
           m_project->setName(name);
         }
@@ -2577,8 +2797,8 @@ namespace Isis {
       else if (localName == "shapeLists") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
-      else if (localName == "template") {
-        m_templates.append(FileName(m_project->templateRoot() + "/" + atts.value("fileName")));
+      else if (localName == "templateList") {
+        m_templates.append( new TemplateList(m_project, reader()));
       }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
@@ -2665,10 +2885,18 @@ namespace Isis {
     else if (localName == "results") {
       foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
         m_project->addBundleSolutionInfo(bundleInfo);
+        // If BundleSolutionInfo contains adjusted images, add to the project id map.
+        if (bundleInfo->adjustedImages().count()) {
+          foreach (ImageList *adjustedImageList, bundleInfo->adjustedImages()) {
+            m_project->addImagesToIdMap(*adjustedImageList);
+          }
+        }
       }
     }
-    else if (localName == "templates") {
-      m_project->addTemplates(m_templates);
+    else if (localName == "templateLists") {
+      foreach (TemplateList *list, m_templates) {
+        m_project->addTemplates(list);
+      }
     }
 
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);

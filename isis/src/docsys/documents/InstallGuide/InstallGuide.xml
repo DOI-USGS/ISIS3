@@ -412,7 +412,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
   Chandrayaan Mission (kernels can be excluded):
 </p>
         <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chan1 data/
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 data/
         </pre>
 <p>
   Clementine Mission (kernels can be excluded):

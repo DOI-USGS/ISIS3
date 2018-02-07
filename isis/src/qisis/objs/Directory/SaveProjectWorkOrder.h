@@ -40,6 +40,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-11-08 Ian Humphrey - Modified setupExecution() to check to see if the 
+   *                           project::save()'s dialog was cancelled or not to properly
+   *                           trigger the clean state of the project. Fixes #5205.
    */
   class SaveProjectWorkOrder : public WorkOrder {
       Q_OBJECT

@@ -63,10 +63,11 @@ namespace Isis {
 
   bool CnetEditorViewWorkOrder::isExecutable(ControlList * controls) {
 
-    if (controls->count() >= 1)
-      return true;
-    else
-      return false;
+
+    if (controls) {
+      return (controls->count() >= 1);
+    }
+    return false;
   }
 
 
