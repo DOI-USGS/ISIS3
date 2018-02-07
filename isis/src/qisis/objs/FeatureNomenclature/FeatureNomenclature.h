@@ -44,6 +44,9 @@ namespace Isis {
    *                           1) queryFeatures(), which makes sure the longitude range is between
    *                           0 and 360 and that it is in the 360 domain, and calls the request
    *                           method, and 2) runQuery(), which makes the request. Fixes #958.
+   *   @history 2018-01-05 Cole Neubauer - The URL for request was moved. Updated the URL to the
+   *                           new URL and added an error to be thrown if it is moved again
+   *                           Fixes #4963.
    */
   class FeatureNomenclature : public QObject {
       Q_OBJECT
@@ -56,7 +59,7 @@ namespace Isis {
          * When this status is assigned to a feature, there will be no status displayed and
          * the feature will not be shown if the IAU approved only checkbox is checked.
          */
-        NoStatus, 
+        NoStatus,
         /**
          * When this status is assigned to a feature, the displayed status will be "Adopted
          * by the IAU" and the feature will always be shown.
@@ -74,11 +77,11 @@ namespace Isis {
          * checkbox checked.
          */
         Unapproved };
-      
+
       FeatureNomenclature();
       FeatureNomenclature(const FeatureNomenclature &other);
       ~FeatureNomenclature();
-      
+
       void queryFeatures(QString target,
                          Latitude startLat, Longitude startLon,
                          Latitude endLat, Longitude endLon);
@@ -112,7 +115,7 @@ namespace Isis {
        *                           to find the features for the feature nomenclature tool (Qt5).
        */
       class Feature {
-      public:          
+      public:
           Feature();
           Feature(QDomElement searchResultFeature, IAUStatus status);
           Feature(const Feature &other);

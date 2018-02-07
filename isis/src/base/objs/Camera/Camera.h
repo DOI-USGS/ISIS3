@@ -239,6 +239,8 @@ namespace Isis {
    *                           an error in the original formula, and updated the documention for this
    *                           function.  Fixes #4614.
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to 
+   *                           prevent a segfault when the distortion map is incomplete. Fixes $5163.
    */
 
   class Camera : public Sensor {
@@ -332,7 +334,7 @@ namespace Isis {
       QString spacecraftNameLong() const;
       QString spacecraftNameShort() const;
 
-      void SetDistortionMap(CameraDistortionMap *map);
+      void SetDistortionMap(CameraDistortionMap *map, bool deleteExisting = true);
       void SetFocalPlaneMap(CameraFocalPlaneMap *map);
       void SetDetectorMap(CameraDetectorMap *map);
       void SetGroundMap(CameraGroundMap *map);

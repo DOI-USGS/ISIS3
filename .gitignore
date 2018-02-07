@@ -7,7 +7,14 @@
 # Unignore all dirs
 !*/
 
+<<<<<<< HEAD
 !Makefile
+=======
+# Unignore Makefiles, and TestPreferences
+!Makefile
+!TestPreferences
+!*/3rdParty/Makefile
+>>>>>>> dev
 
 *.cub
 *.o
@@ -18,17 +25,22 @@ moc_*
 *.pb.*
 *.lbl
 *.img
+<<<<<<< HEAD
 
 !TestPreferences
 
 print.prt
 
+=======
+*.kate-swp
+>>>>>>> dev
 object_script.*.Release
 object_script.*.Debug
 *_plugin_import.cpp
 *.moc
 ui_*.h
 
+<<<<<<< HEAD
 */3rdParty/*
 !*/3rdParty/Makefile
 
@@ -42,3 +54,17 @@ ui_*.h
 */tsts/*/truth/*
 */tsts/*/output/*
 
+=======
+# ignore all files created by squish coco
+*csmes
+
+print.prt
+
+*/3rdParty/*
+*/inc/*
+*/bin/*
+*/lib/*
+*/tsts/*/input/*
+*/tsts/*/truth/*
+*/tsts/*/output/*
+>>>>>>> dev

@@ -8,8 +8,6 @@
 #include "SpecialPixel.h"
 #include "UniversalGroundMap.h"
 
-using namespace std;
-
 namespace Isis {
 
   /**

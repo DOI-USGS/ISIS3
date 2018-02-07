@@ -522,16 +522,24 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     </change>
     <change name="Kristin Berry" date="2017-02-07">
        Removed the "APPLYSMEAR" option as a user-specifiable parameter. The smear correction
-       will still be applied automatically when an image is being processed for which on-board smear 
-       correction was not applied (NSUB &lt;= 1). Also updated application code for conformity with ISIS3
-       Coding Standards. Backward Compatibility Issue: The APPLYSMEAR parameter was removed. The smear
-       correction will automatically be applied to images with 1 sub-image. 
+       will still be applied automatically when an image is being processed for which on-board 
+       smear correction was not applied (NSUB &lt;= 1). Also updated application code for 
+       conformity with ISIS3 Coding Standards. Backward Compatibility Issue: The APPLYSMEAR
+       parameter was removed. The smear correction will automatically be applied to images with
+       1 sub-image. 
     </change>
     <change name="Kristin Berry" date="2017-02-08">
-       Removed the "PSF" correction option, since the PSF correction is not yet working. Related code has been commented-
-       out rather than removed entirely so that this work can potentially be resumed at a later date. 
-       Backward Compatibility Issue: The PSF parameter was removed, since it is not yet working. 
-       amicacal cannot apply a PSF correction anymore.
+       Removed the "PSF" correction option, since the PSF correction is not yet working. Related 
+       code has been commented out rather than removed entirely so that this work can potentially
+       be resumed at a later date. Backward Compatibility Issue: The PSF parameter was removed
+       since it is not yet working. The amicacal program cannot apply a PSF correction anymore.
+    </change>
+    <change name="Jeannie Backer" date="2017-11-28 ">
+       Updated radiance calibration to divide by exposure duration, as done with reflectance. 
+       Updated amicaCalibration????.trn file with latest radiance scale factor for sz 
+       (value provided by L. LeCorre, PSI).
+       Updated to use filter V solar flux on all calculations. 
+       Brought code closer to ISIS3 coding standards. Fixes #5243
     </change>
   </history>
 

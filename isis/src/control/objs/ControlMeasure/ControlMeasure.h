@@ -36,7 +36,6 @@ namespace Isis {
   class Camera;
   class ControlMeasureLogData;
   class ControlPoint;
-  class ControlPointFileEntryV0002_Measure;
   class ControlCubeGraphNode;
   class PvlGroup;
   class PvlKeyword;
@@ -152,13 +151,13 @@ namespace Isis {
    *                              does math on special pixels.
    *   @history 2011-04-11 Steven Lambright - Added GetLogValue for convenience
    *   @history 2011-07-05 Debbie A. Cook - Removed editLock checks from methods
-   *                              SetCamera, SetRejected, and SetResidual and 
+   *                              SetCamera, SetRejected, and SetResidual and
    *                              changed all other editLock tests to use
    *                              IsEditLocked method instead of the private
    *                              member, p_editLock, directly.  Also added
    *                              a check for an implicit lock if the measure is
    *                              the reference measure of the parent point in
-   *                              the IsEditLocked method.  
+   *                              the IsEditLocked method.
    *   @history 2011-07-29 Jai Rideout, Steven Lambright, and Eric Hyer - Made
    *                           this inherit from QObject to get destroyed()
    *                           signal
@@ -167,6 +166,15 @@ namespace Isis {
    *                           data and added comparisons for missing member data.
    *   @history 2012-08-11 Tracie Sucharski, Add computed and measured ephemeris time set to Null
    *                           in InitializeToNull.
+   *   @history 2017-12-19 Adam Goins - Added "HasX()" accessors to ControlMeasure.
+   *   @history 2017-12-20 Jesse Mapel - Implemented GetLogDataEntries method for use in
+   *                           ControlNetVersioner refactor.
+   *   @history 2017-12-21 Adam Goins - Removed protobuf references.
+   *   @history 2018-01-04 Adam Goins - Moved sample/line initialization from the constructor
+   *                           to the InitToNull() method.
+   *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
+   *                           to allow the value of these variables to be read without being
+   *                           overriden if they're empty. (Getters override if they're empty).
    */
   class ControlMeasure : public QObject {
 
@@ -237,7 +245,6 @@ namespace Isis {
       };
 
       ControlMeasure();
-      ControlMeasure(const ControlPointFileEntryV0002_Measure &);
       ControlMeasure(const ControlMeasure &other);
       ~ControlMeasure();
 
@@ -275,8 +282,10 @@ namespace Isis {
       double GetAprioriSample() const;
       Isis::Camera *Camera() const;
       QString GetChooserName() const;
+      bool HasChooserName() const;
       QString GetCubeSerialNumber() const;
       QString GetDateTime() const;
+      bool HasDateTime() const;
       double GetDiameter() const;
       ControlMeasureLogData GetLogData(long dataType) const;
       bool IsEditLocked() const;
@@ -317,8 +326,6 @@ namespace Isis {
       const ControlMeasure &operator=(const ControlMeasure &other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
       bool operator == (const Isis::ControlMeasure &pMeasure) const;
-
-      ControlPointFileEntryV0002_Measure ToProtocolBuffer() const;
 
     private: // methods
       void InitializeToNull();
