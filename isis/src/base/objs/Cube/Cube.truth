@@ -283,7 +283,7 @@ Testing errors ...
 **PROGRAMMER ERROR** Tried to write to a cube before opening/creating it.
 **PROGRAMMER ERROR** Number of samples [0], lines [0], or bands [0] cannot be less than 1.
 **I/O ERROR** Label space is full in [IsisCube_04.cub] unable to write labels.
-**USER ERROR** The cube you are attempting to create [IsisCube_05] is [33527GB]. This is larger than the current allowed size of [12GB]. The cube dimensions were (S,L,B) [1000000, 1000000, 9] with [4] bytes per pixel. If you still wish to create this cube, the maximum value can be changed in the file [~/.Isis/IsisPreferences] within the group CubeCustomization, keyword MaximumSize.
+**USER ERROR** The cube you are attempting to create [IsisCube_05] is [33527GB]. This is larger than the current allowed size of [12GB]. The cube dimensions were (S,L,B) [1000000, 1000000, 9] with [4] bytes per pixel. If you still wish to create this cube, the maximum value can be changed in your personal preference file located in [~/.Isis/IsisPreferences] within the group CubeCustomization, keyword MaximumSize. If you do not have an ISISPreference file, please refer to the documentation "Environment and Preference Setup". Error.
 **PROGRAMMER ERROR** Unknown value for access [a]. Expected 'r'  or 'rw'.
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
