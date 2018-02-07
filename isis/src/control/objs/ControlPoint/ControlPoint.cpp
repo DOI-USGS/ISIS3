@@ -17,9 +17,6 @@
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
-#include "ControlNetFile.h"
-#include "ControlNetFile.h"
-#include "ControlNetFileV0002.pb.h"
 #include "Cube.h"
 #include "IString.h"
 #include "Latitude.h"
@@ -86,8 +83,9 @@ namespace Isis {
       ControlMeasure *newMeasure = new ControlMeasure(*otherCm);
       AddMeasure(newMeasure);
 
-      if (other.referenceMeasure == otherCm)
+      if (other.referenceMeasure == otherCm) {
         SetRefMeasure(newMeasure);
+      }
     }
 
     id = other.id;
@@ -109,209 +107,6 @@ namespace Isis {
     constraintStatus = other.constraintStatus;
   }
 
-
-  /**
-   * This is used when reading from a protocol buffer. Given a file
-   *   representation (protocol buffer), and log data,
-   *   construct the control point.
-   *
-   * @history 2008-06-18  Debbie A. Cook, Swapped Init with SetRadii
-   *          calls to avoid resetting the surface points with no radii
-   * @history 2015-11-03  Kris Becker - invalid flag was not being initialized
-   */
-  ControlPoint::ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
-      const Distance &majorRad, const Distance &minorRad,
-      const Distance &polarRad) : invalid(false)  {
-    measures = NULL;
-    cubeSerials = NULL;
-    referenceMeasure = NULL;
-    numberOfRejectedMeasures = 0;
-    measures = new QHash< QString, ControlMeasure * >;
-    cubeSerials = new QStringList;
-
-    id = fileEntry.id().c_str();
-    dateTime = "";
-    aprioriSurfacePointSource = SurfacePointSource::None;
-    aprioriRadiusSource = RadiusSource::None;
-
-    chooserName = fileEntry.choosername().c_str();
-    dateTime = fileEntry.datetime().c_str();
-    editLock = false;
-
-    parentNetwork = NULL;
-
-    switch (fileEntry.type()) {
-      case ControlPointFileEntryV0002_PointType_obsolete_Tie:
-      case ControlPointFileEntryV0002_PointType_Free:
-        type = Free;
-        break;
-      case ControlPointFileEntryV0002_PointType_Constrained:
-        type = Constrained;
-        break;
-      case ControlPointFileEntryV0002_PointType_obsolete_Ground:
-      case ControlPointFileEntryV0002_PointType_Fixed:
-        type = Fixed;
-        break;
-      default:
-        QString msg = "Point type is invalid.";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    ignore = fileEntry.ignore();
-    jigsawRejected = fileEntry.jigsawrejected();
-
-    // Read apriori keywords
-    if (fileEntry.has_apriorisurfpointsource()) {
-      switch (fileEntry.apriorisurfpointsource()) {
-        case ControlPointFileEntryV0002_AprioriSource_None:
-          aprioriSurfacePointSource = SurfacePointSource::None;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_User:
-          aprioriSurfacePointSource = SurfacePointSource::User;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures:
-          aprioriSurfacePointSource = SurfacePointSource::AverageOfMeasures;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_Reference:
-          aprioriSurfacePointSource = SurfacePointSource::Reference;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_Basemap:
-          aprioriSurfacePointSource = SurfacePointSource::Basemap;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_BundleSolution:
-          aprioriSurfacePointSource = SurfacePointSource::BundleSolution;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_Ellipsoid:
-        case ControlPointFileEntryV0002_AprioriSource_DEM:
-          break;
-      }
-    }
-
-    if (fileEntry.has_apriorisurfpointsourcefile()) {
-      aprioriSurfacePointSourceFile = fileEntry.apriorisurfpointsourcefile().c_str();
-    }
-
-    if (fileEntry.has_aprioriradiussource()) {
-      switch (fileEntry.aprioriradiussource()) {
-        case ControlPointFileEntryV0002_AprioriSource_None:
-          aprioriRadiusSource = RadiusSource::None;
-          break;
-        case ControlPointFileEntryV0002_AprioriSource_User:
-          aprioriRadiusSource = RadiusSource::User;
-          break;
-        case ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures:
-          aprioriRadiusSource = RadiusSource::AverageOfMeasures;
-          break;
-        case ControlPointFileEntryV0002_AprioriSource_Ellipsoid:
-          aprioriRadiusSource = RadiusSource::Ellipsoid;
-          break;
-        case ControlPointFileEntryV0002_AprioriSource_DEM:
-          aprioriRadiusSource = RadiusSource::DEM;
-          break;
-        case ControlPointFileEntryV0002_AprioriSource_BundleSolution:
-          aprioriRadiusSource = RadiusSource::BundleSolution;
-          break;
-
-        case ControlPointFileEntryV0002_AprioriSource_Reference:
-        case ControlPointFileEntryV0002_AprioriSource_Basemap:
-          break;
-      }
-    }
-
-    if (fileEntry.has_aprioriradiussourcefile()) {
-      aprioriRadiusSourceFile = fileEntry.aprioriradiussourcefile().c_str();
-    }
-
-    constraintStatus.reset();
-
-    if (fileEntry.has_apriorix() && fileEntry.has_aprioriy() &&
-        fileEntry.has_aprioriz()) {
-      SurfacePoint apriori(
-        Displacement(fileEntry.apriorix(), Displacement::Meters),
-        Displacement(fileEntry.aprioriy(), Displacement::Meters),
-        Displacement(fileEntry.aprioriz(), Displacement::Meters));
-
-      if (fileEntry.aprioricovar_size() > 0) {
-        symmetric_matrix<double, upper> covar;
-        covar.resize(3);
-        covar.clear();
-        covar(0, 0) = fileEntry.aprioricovar(0);
-        covar(0, 1) = fileEntry.aprioricovar(1);
-        covar(0, 2) = fileEntry.aprioricovar(2);
-        covar(1, 1) = fileEntry.aprioricovar(3);
-        covar(1, 2) = fileEntry.aprioricovar(4);
-        covar(2, 2) = fileEntry.aprioricovar(5);
-        apriori.SetRectangularMatrix(covar);
-
-        if (Displacement(covar(0, 0), Displacement::Meters).isValid() ||
-            Displacement(covar(1, 1), Displacement::Meters).isValid()) {
-          if (fileEntry.latitudeconstrained())
-            constraintStatus.set(LatitudeConstrained);
-          if (fileEntry.longitudeconstrained())
-            constraintStatus.set(LongitudeConstrained);
-          if (fileEntry.radiusconstrained())
-            constraintStatus.set(RadiusConstrained);
-        }
-        else if (Displacement(covar(2, 2), Displacement::Meters).isValid()) {
-          if (fileEntry.latitudeconstrained())
-            constraintStatus.set(LatitudeConstrained);
-          if (fileEntry.radiusconstrained())
-            constraintStatus.set(RadiusConstrained);
-        }
-      }
-
-      aprioriSurfacePoint = apriori;
-    }
-
-    if (fileEntry.has_adjustedx() &&
-        fileEntry.has_adjustedy() &&
-        fileEntry.has_adjustedz()) {
-      SurfacePoint adjusted(
-        Displacement(fileEntry.adjustedx(), Displacement::Meters),
-        Displacement(fileEntry.adjustedy(), Displacement::Meters),
-        Displacement(fileEntry.adjustedz(), Displacement::Meters));
-
-      if (fileEntry.adjustedcovar_size() > 0) {
-        symmetric_matrix<double, upper> covar;
-        covar.resize(3);
-        covar.clear();
-        covar(0, 0) = fileEntry.adjustedcovar(0);
-        covar(0, 1) = fileEntry.adjustedcovar(1);
-        covar(0, 2) = fileEntry.adjustedcovar(2);
-        covar(1, 1) = fileEntry.adjustedcovar(3);
-        covar(1, 2) = fileEntry.adjustedcovar(4);
-        covar(2, 2) = fileEntry.adjustedcovar(5);
-        adjusted.SetRectangularMatrix(covar);
-      }
-
-      adjustedSurfacePoint = adjusted;
-    }
-
-    if (majorRad.isValid() && minorRad.isValid() && polarRad.isValid()) {
-      aprioriSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
-      adjustedSurfacePoint.SetRadii(majorRad, minorRad, polarRad);
-    }
-
-    referenceExplicitlySet = false;
-
-    for (int m = 0 ; m < fileEntry.measures_size() ; m++) {
-      ControlMeasure *measure = new ControlMeasure(fileEntry.measures(m));
-      AddMeasure(measure);
-    }
-
-    if (fileEntry.has_referenceindex()) {
-      SetRefMeasure((*measures)[cubeSerials->at(fileEntry.referenceindex())]);
-    }
-
-    // Set edit lock last
-    editLock = fileEntry.editlock();
-  }
 
 
   /**
@@ -440,7 +235,7 @@ namespace Isis {
     }
 
     if (!measures->size()) {
-      ASSERT(referenceMeasure == NULL);
+      ASSERT(!HasRefMeasure());
       referenceMeasure = measure;
     }
     else if (referenceMeasure->IsIgnored() && !measure->IsIgnored() &&
@@ -490,8 +285,9 @@ namespace Isis {
     ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
 
-    if (cm->IsEditLocked())
+    if (cm->IsEditLocked()) {
       return ControlMeasure::MeasureLocked;
+    }
 
     // remove measure from the point's data structures
     measures->remove(serialNumber);
@@ -512,8 +308,9 @@ namespace Isis {
     if (parentNetwork) {
       parentNetwork->measureDeleted(cm);
 
-      if (!IsIgnored() && !cm->IsIgnored())
+      if (!IsIgnored() && !cm->IsIgnored()) {
         parentNetwork->emitNetworkStructureModified();
+      }
     }
 
     delete cm;
@@ -559,8 +356,9 @@ namespace Isis {
    * @author Sharmila Prasad (10/22/2010)
    */
   ControlPoint::Status ControlPoint::ResetApriori() {
-    if (IsEditLocked())
+    if (IsEditLocked()) {
       return PointLocked;
+    }
 
     aprioriSurfacePointSource = SurfacePointSource::None;
     aprioriSurfacePointSourceFile    = "";
@@ -619,12 +417,22 @@ namespace Isis {
 
 
   /**
+   * Checks to see if a reference measure is set.
+   *
+   * @returns bool True if a reference measure is set.
+   */
+  bool ControlPoint::HasRefMeasure() const {
+    return !(referenceMeasure == NULL);
+  }
+
+
+  /**
    * Get the reference control measure.
    *
    * @returns const reference measure for this point
    */
   const ControlMeasure *ControlPoint::GetRefMeasure() const {
-    if (referenceMeasure == NULL) {
+    if (!HasRefMeasure()) {
       QString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -637,7 +445,7 @@ namespace Isis {
    * Get the measure that is the reference directly.
    */
   ControlMeasure *ControlPoint::GetRefMeasure() {
-    if (referenceMeasure == NULL) {
+    if (!HasRefMeasure()) {
       QString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -654,8 +462,9 @@ namespace Isis {
    * @param name The username of the person who last modified this control point
    */
   ControlPoint::Status ControlPoint::SetChooserName(QString name) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     chooserName = name;
     return Success;
   }
@@ -670,8 +479,9 @@ namespace Isis {
    * @param newDateTime The date and time this control point was last modified
    */
   ControlPoint::Status ControlPoint::SetDateTime(QString newDateTime) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     dateTime = newDateTime;
     return Success;
   }
@@ -714,12 +524,14 @@ namespace Isis {
    * @return  (int) status Success or PointLocked
    */
   ControlPoint::Status ControlPoint::SetId(QString newId) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     QString oldId = id;
     id = newId;
-    if (parentNetwork)
+    if (parentNetwork) {
       parentNetwork->UpdatePointReference(this, oldId);
+    }
     return Success;
   }
 
@@ -730,8 +542,9 @@ namespace Isis {
    * @param cm The new reference measure
    */
   ControlPoint::Status ControlPoint::SetRefMeasure(ControlMeasure *cm) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     ASSERT(cm);
     SetExplicitReference(cm);
@@ -745,8 +558,9 @@ namespace Isis {
    * @param index The index of the new reference measure
    */
   ControlPoint::Status ControlPoint::SetRefMeasure(int index) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     if (index < 0 || index >= cubeSerials->size()) {
       QString msg = "Index [";
@@ -765,8 +579,9 @@ namespace Isis {
    * @param sn The serial number of the new reference measure
    */
   ControlPoint::Status ControlPoint::SetRefMeasure(QString sn) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     if (!cubeSerials->contains(sn)) {
       QString msg = "Point [" + id + "] has no measure with serial number [" +
@@ -810,8 +625,9 @@ namespace Isis {
    *                        un-ignore
    */
   ControlPoint::Status ControlPoint::SetIgnored(bool newIgnoreStatus) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
 
     bool oldStatus = ignore;
     ignore = newIgnoreStatus;
@@ -822,10 +638,12 @@ namespace Isis {
       if (parentNetwork) {
         foreach(ControlMeasure * cm, measures->values()) {
           if (!cm->IsIgnored()) {
-            if (ignore)
+            if (ignore) {
               parentNetwork->measureIgnored(cm);
-            else
+            }
+            else {
               parentNetwork->measureUnIgnored(cm);
+            }
           }
         }
         parentNetwork->emitNetworkStructureModified();
@@ -872,8 +690,9 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     type = newType;
     return Success;
@@ -889,8 +708,9 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSource(
     RadiusSource::Source source) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriRadiusSource = source;
     return Success;
@@ -907,8 +727,9 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSourceFile(
     QString sourceFile) {
-    if (editLock)
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriRadiusSourceFile = sourceFile;
     return Success;
@@ -934,14 +755,18 @@ namespace Isis {
       std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
       aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
     }
-    if (editLock)
+    if (editLock) {
       return PointLocked;
-    if (aprioriSP.GetLatSigma().isValid())
+    }
+    if (aprioriSP.GetLatSigma().isValid()) {
       constraintStatus.set(LatitudeConstrained);
-    if (aprioriSP.GetLonSigma().isValid())
+    }
+    if (aprioriSP.GetLonSigma().isValid()) {
       constraintStatus.set(LongitudeConstrained);
-    if (aprioriSP.GetLocalRadiusSigma().isValid())
+    }
+    if (aprioriSP.GetLocalRadiusSigma().isValid()) {
       constraintStatus.set(RadiusConstrained);
+    }
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;
@@ -956,9 +781,10 @@ namespace Isis {
    * @param source Where the surface point came from
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSource(
-    SurfacePointSource::Source source) {
-    if (editLock)
+      SurfacePointSource::Source source) {
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriSurfacePointSource = source;
     return Success;
@@ -973,9 +799,10 @@ namespace Isis {
    * @param sourceFile Where the surface point came from
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSourceFile(
-    QString sourceFile) {
-    if (editLock)
+      QString sourceFile) {
+    if (editLock) {
       return PointLocked;
+    }
     PointModified();
     aprioriSurfacePointSourceFile = sourceFile;
     return Success;
@@ -1073,8 +900,9 @@ namespace Isis {
         else {
           // JAA: Don't stop if we know the lat/lon.  The SetImage may fail
           // but the FocalPlane measures have been set
-          if (GetType() == Fixed)
+          if (GetType() == Fixed) {
             continue;
+          }
 
           // TODO: What do we do
 //          QString msg = "Cannot compute lat/lon/radius (x/y/z) for "
@@ -1102,7 +930,7 @@ namespace Isis {
         || IsLatitudeConstrained()
         || IsLongitudeConstrained()
         || IsRadiusConstrained()) {
-      
+
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
 
@@ -1170,8 +998,9 @@ namespace Isis {
    *                            duplication of code
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
-    if (IsIgnored())
+    if (IsIgnored()) {
       return Failure;
+    }
 
     PointModified();
 
@@ -1180,11 +1009,12 @@ namespace Isis {
 
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
-      if (m->IsIgnored())
+      if (m->IsIgnored()) {
         continue;
+      }
       // The following lines actually check for Candidate measures
       // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured())
+//       if (!m->IsMeasured()) {
 //         continue;
 
       // TODO:  Should we use crater diameter?
@@ -1239,10 +1069,12 @@ namespace Isis {
         double adjLine;
 
         // Step 1. What happens if measured line is 1???  TODO
-        if (computedY < 0)
+        if (computedY < 0) {
           adjLine = m->GetLine() - 1.;
-        else
+        }
+        else {
           adjLine = m->GetLine() + 1.;
+        }
 
         cam->SetImage(sample, adjLine);
         SurfacePoint sp = cam->GetSurfacePoint();
@@ -1256,10 +1088,12 @@ namespace Isis {
         cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY);
         double deltaLine;
 
-        if (computedY < 0)
+        if (computedY < 0) {
           deltaLine = -computedY/scalingY;
-        else
+        }
+        else {
           deltaLine = computedY/scalingY;
+        }
 
         // Now map through the camera steps to take X from slant range to ground
         // range to pixels.  Y just tracks through as 0.
@@ -1322,8 +1156,9 @@ namespace Isis {
    */
 
   ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
-    if (IsIgnored())
+    if (IsIgnored()) {
       return Failure;
+    }
 
     PointModified();
 
@@ -1332,11 +1167,12 @@ namespace Isis {
 
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
-      if (m->IsIgnored())
+      if (m->IsIgnored()) {
         continue;
+      }
       // The following lines actually check for Candidate measures
       // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured())
+//       if (!m->IsMeasured()) {
 //         continue;
 
       // TODO:  Should we use crater diameter?
@@ -1350,8 +1186,9 @@ namespace Isis {
       // going to distorted focal plane or ground range in this case), so we
       // can hold the Spice to calculate residuals in undistorted focal plane
       // coordinates.
-      if (cam->GetCameraType() != 0)  // no need to call setimage for framing camera
+      if (cam->GetCameraType() != 0) {  // no need to call setimage for framing camera
         cam->SetImage(m->GetSample(), m->GetLine());
+      }
 
       cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
       // double mudx = m->GetFocalPlaneMeasuredX();
@@ -1373,6 +1210,16 @@ namespace Isis {
     else {
       return FileName(Application::Name()).name();
     }
+  }
+
+  //! Returns true if the choosername is not empty.
+  bool ControlPoint::HasChooserName() const {
+    return !chooserName.isEmpty();
+  }
+
+  //! Returns true if the datetime is not empty.
+  bool ControlPoint::HasDateTime() const {
+    return !dateTime.isEmpty();
   }
 
 
@@ -1406,10 +1253,12 @@ namespace Isis {
    * the a priori surface point.
    */
   SurfacePoint ControlPoint::GetBestSurfacePoint() const {
-    if (adjustedSurfacePoint.Valid())
+    if (adjustedSurfacePoint.Valid()) {
       return adjustedSurfacePoint;
-    else
+    }
+    else {
       return aprioriSurfacePoint;
+    }
   }
 
 
@@ -1482,14 +1331,18 @@ namespace Isis {
             errMsg += pointTypeString;
             errMsg += "\".";
 
-    if (pointTypeString == "Fixed")
+    if (pointTypeString == "Fixed") {
       type = ControlPoint::Fixed;
-    else if (pointTypeString == "Constrained")
+    }
+    else if (pointTypeString == "Constrained") {
       type = ControlPoint::Constrained;
-    else if (pointTypeString == "Free")
+    }
+    else if (pointTypeString == "Free") {
       type = ControlPoint::Free;
-    else
+    }
+    else {
       throw IException(IException::Programmer, errMsg, _FILEINFO_);
+    }
 
     return type;
   }
@@ -1562,16 +1415,21 @@ namespace Isis {
     str = str.toLower();
     RadiusSource::Source source = RadiusSource::None;
 
-    if (str == "user")
+    if (str == "user") {
       source = RadiusSource::User;
-    else if (str == "averageofmeasures")
+    }
+    else if (str == "averageofmeasures") {
       source = RadiusSource::AverageOfMeasures;
-    else if (str == "ellipsoid")
+    }
+    else if (str == "ellipsoid") {
       source = RadiusSource::Ellipsoid;
-    else if (str == "dem")
+    }
+    else if (str == "dem") {
       source = RadiusSource::DEM;
-    else if (str == "bundlesolution")
+    }
+    else if (str == "bundlesolution") {
       source = RadiusSource::BundleSolution;
+    }
 
     return source;
   }
@@ -1639,16 +1497,21 @@ namespace Isis {
     str = str.toLower();
     SurfacePointSource::Source source = SurfacePointSource::None;
 
-    if (str == "user")
+    if (str == "user") {
       source = SurfacePointSource::User;
-    else if (str == "averageofmeasures")
+    }
+    else if (str == "averageofmeasures") {
       source = SurfacePointSource::AverageOfMeasures;
-    else if (str == "reference")
+    }
+    else if (str == "reference") {
       source = SurfacePointSource::Reference;
-    else if (str == "basemap")
+    }
+    else if (str == "basemap") {
       source = SurfacePointSource::Basemap;
-    else if (str == "bundlesolution")
+    }
+    else if (str == "bundlesolution") {
       source = SurfacePointSource::BundleSolution;
+    }
 
     return source;
   }
@@ -1674,19 +1537,23 @@ namespace Isis {
   }
 
 
-  ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
-  const {
-    return aprioriRadiusSource;
-  }
+   ControlPoint::RadiusSource::Source ControlPoint::GetAprioriRadiusSource()
+       const {
+     return aprioriRadiusSource;
+   }
 
-  bool ControlPoint::HasAprioriCoordinates() {
-    if (aprioriSurfacePoint.GetX().isValid() &&
-        aprioriSurfacePoint.GetY().isValid() &&
-        aprioriSurfacePoint.GetZ().isValid())
-      return true;
 
-    return false;
-  }
+   bool ControlPoint::HasAprioriCoordinates() {
+     if (aprioriSurfacePoint.GetX().isValid() &&
+         aprioriSurfacePoint.GetY().isValid() &&
+         aprioriSurfacePoint.GetZ().isValid()) {
+       return true;
+     }
+
+     return false;
+     // return aprioriSurfacePoint.Valid(); ???
+   }
+
 
   bool ControlPoint::IsConstrained() {
     return constraintStatus.any();
@@ -1708,6 +1575,17 @@ namespace Isis {
     return constraintStatus.count();
   }
 
+
+ /**
+  * Checks to see if the radius source file has been set.
+  *
+  * @return bool True if the radius source file has been set.
+  */
+  bool ControlPoint::HasAprioriRadiusSourceFile() const {
+    return !( aprioriRadiusSourceFile.isEmpty() || aprioriRadiusSourceFile.isNull() );
+  }
+
+
   QString ControlPoint::GetAprioriRadiusSourceFile() const {
     return aprioriRadiusSourceFile;
   }
@@ -1715,6 +1593,16 @@ namespace Isis {
   ControlPoint::SurfacePointSource::Source
   ControlPoint::GetAprioriSurfacePointSource() const {
     return aprioriSurfacePointSource;
+  }
+
+
+ /**
+  * Checks to see if the surface point source file has been set.
+  *
+  * @return bool True if the surface point source file has been set.
+  */
+  bool ControlPoint::HasAprioriSurfacePointSourceFile() const {
+    return !( aprioriSurfacePointSourceFile.isEmpty() || aprioriSurfacePointSourceFile.isNull() );
   }
 
 
@@ -1736,8 +1624,9 @@ namespace Isis {
     int size = 0;
     QList<QString> keys = measures->keys();
     for (int cm = 0; cm < keys.size(); cm++) {
-      if (!(*measures)[keys[cm]]->IsIgnored())
+      if (!(*measures)[keys[cm]]->IsIgnored()) {
         size++;
+      }
     }
     return size;
   }
@@ -1752,8 +1641,9 @@ namespace Isis {
     int size = 0;
     QList<QString> keys = measures->keys();
     for (int cm = 0; cm < keys.size(); cm++) {
-      if ((*measures)[keys[cm]]->IsEditLocked())
+      if ((*measures)[keys[cm]]->IsEditLocked()) {
         size++;
+      }
     }
     return size;
   }
@@ -1783,7 +1673,7 @@ namespace Isis {
    * @returns The cube serial number of the reference measure
    */
   QString ControlPoint::GetReferenceSN() const {
-    if (referenceMeasure == NULL) {
+    if (!HasRefMeasure()) {
       QString msg = "There is no reference measure set in the ControlPoint [" +
           GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1837,7 +1727,7 @@ namespace Isis {
    * measure.
    */
   int ControlPoint::IndexOfRefMeasure() const {
-    if (!referenceMeasure) {
+    if (!HasRefMeasure()) {
       QString msg = "There is no reference measure for point [" + id + "]."
           "  This also means of course that the point is empty!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1865,8 +1755,9 @@ namespace Isis {
     double(ControlMeasure::*statFunc)() const) const {
     Statistics stats;
     foreach(ControlMeasure * cm, *measures) {
-      if (!cm->IsIgnored())
+      if (!cm->IsIgnored()) {
         stats.AddData((cm->*statFunc)());
+      }
     }
 
     return stats;
@@ -1876,8 +1767,9 @@ namespace Isis {
   Statistics ControlPoint::GetStatistic(long dataType) const {
     Statistics stats;
     foreach(ControlMeasure * cm, *measures) {
-      if (!cm->IsIgnored())
+      if (!cm->IsIgnored()) {
         stats.AddData(cm->GetLogData(dataType).GetNumericalValue());
+      }
     }
 
     return stats;
@@ -1895,8 +1787,9 @@ namespace Isis {
     QList< ControlMeasure * > orderedMeasures;
     for (int i = 0; i < cubeSerials->size(); i++) {
       ControlMeasure *measure = measures->value((*cubeSerials)[i]);
-      if (!excludeIgnored || !measure->IsIgnored())
+      if (!excludeIgnored || !measure->IsIgnored()) {
         orderedMeasures.append(measures->value((*cubeSerials)[i]));
+      }
     }
     return orderedMeasures;
   }
@@ -2038,8 +1931,9 @@ namespace Isis {
         ControlMeasure *newMeasure = new ControlMeasure;
         *newMeasure = *i.value();
         AddMeasure(newMeasure);
-        if (other.referenceMeasure == i.value())
+        if (other.referenceMeasure == i.value()) {
           SetRefMeasure(newMeasure);
+        }
       }
 
       id             = other.id;
@@ -2107,18 +2001,21 @@ namespace Isis {
    */
   double ControlPoint::GetSampleResidualRms() const {
       int nmeasures = measures->size();
-      if( nmeasures <= 0 )
+      if ( nmeasures <= 0 ) {
           return 0.0;
+      }
 
       Statistics stats;
 
       for( int i = 0; i < nmeasures; i++) {
           const ControlMeasure* m = GetMeasure(i);
-          if( !m )
+          if ( !m ) {
               continue;
+          }
 
-          if( !m->IsIgnored() || m->IsRejected() )
+          if ( !m->IsIgnored() || m->IsRejected() ) {
               continue;
+          }
 
           stats.AddData(m->GetSampleResidual());
       }
@@ -2135,18 +2032,21 @@ namespace Isis {
    */
   double ControlPoint::GetLineResidualRms() const {
       int nmeasures = measures->size();
-      if( nmeasures <= 0 )
+      if ( nmeasures <= 0 ) {
           return 0.0;
+      }
 
       Statistics stats;
 
       for( int i = 0; i < nmeasures; i++) {
           const ControlMeasure* m = GetMeasure(i);
-          if( !m )
+          if ( !m ) {
               continue;
+          }
 
-          if( !m->IsIgnored() || m->IsRejected() )
+          if ( !m->IsIgnored() || m->IsRejected() ) {
               continue;
+          }
 
           stats.AddData(m->GetLineResidual());
       }
@@ -2163,18 +2063,21 @@ namespace Isis {
    */
   double ControlPoint::GetResidualRms() const {
       int nmeasures = measures->size();
-      if( nmeasures <= 0 )
+      if ( nmeasures <= 0 ) {
           return 0.0;
+      }
 
       Statistics stats;
 
       for( int i = 0; i < nmeasures; i++) {
           const ControlMeasure* m = GetMeasure(i);
-          if( !m )
+          if ( !m ) {
               continue;
+          }
 
-          if( m->IsIgnored() || m->IsRejected() )
+          if ( m->IsIgnored() || m->IsRejected() ) {
               continue;
+          }
 
           stats.AddData(m->GetSampleResidual());
           stats.AddData(m->GetLineResidual());
@@ -2189,13 +2092,15 @@ namespace Isis {
    */
   void ControlPoint::ClearJigsawRejected() {
     int nmeasures = measures->size();
-    if( nmeasures <= 0 )
+    if ( nmeasures <= 0 ) {
         return;
+    }
 
     for( int i = 0; i < nmeasures; i++) {
       ControlMeasure* m = GetMeasure(i);
-      if( !m )
+      if ( !m ) {
         continue;
+      }
 
       m->SetRejected(false);
     }
@@ -2203,145 +2108,4 @@ namespace Isis {
     SetRejected(false);
   }
 
-
-  ControlPointFileEntryV0002 ControlPoint::ToFileEntry() const {
-    ControlPointFileEntryV0002 fileEntry;
-
-    fileEntry.set_id(GetId().toLatin1().data());
-    switch (GetType()) {
-      case ControlPoint::Free:
-        fileEntry.set_type(ControlPointFileEntryV0002::Free);
-        break;
-      case ControlPoint::Constrained:
-        fileEntry.set_type(ControlPointFileEntryV0002::Constrained);
-        break;
-      case ControlPoint::Fixed:
-        fileEntry.set_type(ControlPointFileEntryV0002::Fixed);
-        break;
-    }
-
-    if (!GetChooserName().isEmpty()) {
-      fileEntry.set_choosername(GetChooserName().toLatin1().data());
-    }
-    if (!GetDateTime().isEmpty()) {
-      fileEntry.set_datetime(GetDateTime().toLatin1().data());
-    }
-    if (IsEditLocked())
-      fileEntry.set_editlock(true);
-    if (IsIgnored())
-      fileEntry.set_ignore(true);
-    if (IsRejected())
-      fileEntry.set_jigsawrejected(true);
-
-    if (referenceMeasure && referenceExplicitlySet) {
-      fileEntry.set_referenceindex(IndexOfRefMeasure());
-    }
-
-    switch (GetAprioriSurfacePointSource()) {
-      case ControlPoint::SurfacePointSource::None:
-        break;
-      case ControlPoint::SurfacePointSource::User:
-        fileEntry.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_User);
-        break;
-      case ControlPoint::SurfacePointSource::AverageOfMeasures:
-        fileEntry.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures);
-        break;
-      case ControlPoint::SurfacePointSource::Reference:
-        fileEntry.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_Reference);
-        break;
-      case ControlPoint::SurfacePointSource::Basemap:
-        fileEntry.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_Basemap);
-        break;
-      case ControlPoint::SurfacePointSource::BundleSolution:
-        fileEntry.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
-        break;
-      default:
-        break;
-    }
-    if (!GetAprioriSurfacePointSourceFile().isEmpty()) {
-      fileEntry.set_apriorisurfpointsourcefile(GetAprioriSurfacePointSourceFile().toLatin1().data());
-    }
-
-    switch (GetAprioriRadiusSource()) {
-      case ControlPoint::RadiusSource::None:
-        break;
-      case ControlPoint::RadiusSource::User:
-        fileEntry.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_User);
-        break;
-      case ControlPoint::RadiusSource::AverageOfMeasures:
-        fileEntry.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_AverageOfMeasures);
-        break;
-      case ControlPoint::RadiusSource::Ellipsoid:
-        fileEntry.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_Ellipsoid);
-        break;
-      case ControlPoint::RadiusSource::DEM:
-        fileEntry.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_DEM);
-        break;
-      case ControlPoint::RadiusSource::BundleSolution:
-        fileEntry.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_BundleSolution);
-        break;
-      default:
-        break;
-    }
-
-    if (!GetAprioriRadiusSourceFile().isEmpty()) {
-      fileEntry.set_aprioriradiussourcefile(GetAprioriRadiusSourceFile().toLatin1().data());
-    }
-
-    if (GetAprioriSurfacePoint().Valid()) {
-      SurfacePoint apriori = GetAprioriSurfacePoint();
-      fileEntry.set_apriorix(apriori.GetX().meters());
-      fileEntry.set_aprioriy(apriori.GetY().meters());
-      fileEntry.set_aprioriz(apriori.GetZ().meters());
-
-      symmetric_matrix< double, upper > covar = apriori.GetRectangularMatrix();
-      if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
-          covar(0, 2) != 0. || covar(1, 1) != 0. ||
-          covar(1, 2) != 0. || covar(2, 2) != 0.) {
-        fileEntry.add_aprioricovar(covar(0, 0));
-        fileEntry.add_aprioricovar(covar(0, 1));
-        fileEntry.add_aprioricovar(covar(0, 2));
-        fileEntry.add_aprioricovar(covar(1, 1));
-        fileEntry.add_aprioricovar(covar(1, 2));
-        fileEntry.add_aprioricovar(covar(2, 2));
-      }
-      if (constraintStatus.test(LatitudeConstrained))
-//      if (!IsLatitudeConstrained())
-        fileEntry.set_latitudeconstrained(true);
-      if (constraintStatus.test(LongitudeConstrained))
-//      if (!IsLongitudeConstrained())
-        fileEntry.set_longitudeconstrained(true);
-      if (constraintStatus.test(RadiusConstrained))
-//      if (!IsRadiusConstrained())
-        fileEntry.set_radiusconstrained(true);
-    }
-
-
-    if (GetAdjustedSurfacePoint().Valid()) {
-      SurfacePoint adjusted = GetAdjustedSurfacePoint();
-      fileEntry.set_adjustedx(adjusted.GetX().meters());
-      fileEntry.set_adjustedy(adjusted.GetY().meters());
-      fileEntry.set_adjustedz(adjusted.GetZ().meters());
-
-      symmetric_matrix< double, upper > covar = adjusted.GetRectangularMatrix();
-      if (covar(0, 0) != 0. || covar(0, 1) != 0. ||
-          covar(0, 2) != 0. || covar(1, 1) != 0. ||
-          covar(1, 2) != 0. || covar(2, 2) != 0.) {
-        fileEntry.add_adjustedcovar(covar(0, 0));
-        fileEntry.add_adjustedcovar(covar(0, 1));
-        fileEntry.add_adjustedcovar(covar(0, 2));
-        fileEntry.add_adjustedcovar(covar(1, 1));
-        fileEntry.add_adjustedcovar(covar(1, 2));
-        fileEntry.add_adjustedcovar(covar(2, 2));
-      }
-    }
-
-    //  Process all measures in the point
-    for (int i = 0; i < cubeSerials->size(); i++) {
-      *fileEntry.add_measures() =
-        (*measures)[cubeSerials->at(i)]->ToProtocolBuffer();
-    }
-
-    return fileEntry;
-  }
 }

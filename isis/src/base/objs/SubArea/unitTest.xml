@@ -16,6 +16,9 @@
     <change name="Janet Barrett" date="2009-10-15">
       Original Version
     </change>
+    <change name="Ian Humphrey" date="2017-12-07">
+      Updated default cube locations to testData area
+    </change>
   </history>
 
   <groups>
@@ -32,7 +35,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>unitTest_nomap.cub</item></default>
+	<default><item>$base/testData/SubArea/unitTest_nomap.cub</item></default>
       </parameter>
       <parameter name="FROM2">
         <type>cube</type>
@@ -46,7 +49,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>unitTest_map.cub</item></default>
+	<default><item>$base/testData/SubArea/unitTest_map.cub</item></default>
       </parameter>
       <parameter name="FROM3">
         <type>cube</type>
@@ -60,7 +63,7 @@
         <filter>
           *.cub
         </filter>
-        <default><item>unitTest_mapsimp.cub</item></default>
+	<default><item>$base/testData/SubArea/unitTest_mapsimp.cub</item></default>
       </parameter>
       <parameter name="TO">
         <type>cube</type>

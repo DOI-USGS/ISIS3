@@ -22,7 +22,6 @@
 
 
 #include "Tool.h"
-
 // forward declarations
 class QComboBox;
 class QDialog;
@@ -32,6 +31,7 @@ class QListWidgetItem;
 class QPushButton;
 class QStackedWidget;
 class QString;
+class QVBoxLayout;
 class QWidget;
 
 
@@ -116,16 +116,17 @@ namespace Isis {
    *                          in ::resetList to prevent multiple connections between the ListWidget
    *                          and edit point slot and load cube slot.  Fixes #1655.
    *   @history 2015-05-28 Makayla Shepherd and Ian Humphrey - When changing navigation types from
-   *                          Points to Cubes, and vice versa, and then back to the original type, 
+   *                          Points to Cubes, and vice versa, and then back to the original type,
    *                          the filtered data is saved rather than forcing the user to refilter
    *                          the data. Fixes #2144.
    *   @history 2016-11-18 Makayla Shepherd - Added disconnection and deletion of the Set Apriori
    *                          Dialog on close. Fixes #4490.
    *   @history 2017-01-04 Makayla Shepherd - Made showNavTool() public in order to fix a window
-   *                          management issue that caused the NavTool to go behind the 
+   *                          management issue that caused the NavTool to go behind the
    *                          ViewportMainWindow (parent widget) when using Gnome or Cinnamon. Fixes
    *                          #4541.
-   *
+   *   @history 2018-01-10 Adam Goins - Added the m_historyLayout member variable the class to keep
+   *                          a running history tab of edits made to points.
    *
    */
   class QnetNavTool : public Tool {
@@ -188,11 +189,12 @@ namespace Isis {
       void ignorePoints();
       void deletePoints();
       void resetCubeList();
-      
+      void updateActivityHistory(QString activityMessage);
       void aprioriDialog();
       void setAprioriDialogPoints();
 
     signals:
+      void activityUpdate(QString);
       void loadPointImages (ControlPoint *);
       void loadImage(const QString &);
       void modifyPoint(ControlPoint *);
@@ -219,6 +221,7 @@ namespace Isis {
       QComboBox *m_listCombo;
       QListWidget *m_listBox;
       QLabel *m_filterCountLabel;
+      QVBoxLayout *m_historyLayout;
       int m_filterCount;
 
       QString m_editPointId;

@@ -51,6 +51,10 @@ namespace Isis {
    *                          Fixes #4584.
    *  @history 2017-05-26 Cole Neubauer - Moved parseDependancy from children
    *                          class. Fixes #5167.
+   *  @history 2017-10-26 Kristin Berry - Modified parseSpecification to switch
+   *                          from parsing translation table dependency specifications of the form
+   *                          name:value to strings of the form name|value. Colons are
+   *                          now used for namespaces only.
    */
   class LabelTranslationManager : public PvlTranslationTable {
     public:

@@ -1,7 +1,5 @@
 #include "ControlNetVersioner.h"
 
-#include <string>
-
 #include <QString>
 #include <QTime>
 
@@ -10,32 +8,141 @@
 #include "IException.h"
 #include "IString.h"
 #include "Preference.h"
+#include "Progress.h"
 #include "Pvl.h"
 
 using namespace std;
 using namespace Isis;
 
-void TestNetwork(const QString &filename, bool printNetwork = true, bool pvlInput = false);
+void TestNetwork(const QString &filename, Progress *progress, bool printNetwork = true, bool pvlInput = false);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
-  cerr << "Test ControlNetVersioner" << endl;
-  TestNetwork("./reallyOldNetwork.net"); // No target
-  TestNetwork("./reallyOldNetwork2.net"); // Really odd keywords with target
-  TestNetwork("./oldNetwork.net"); // Another set of odd keywords
-  TestNetwork("./oldNetwork2.net"); // Binary V1
-  TestNetwork("./badNetwork.net"); // Corrupted (based off of oldNetwork2.net)
-  TestNetwork("./semilarge.net", false);
-  TestNetwork("./smallPvlTest.pvl", true, true); // network with rejected jigsaw points
+  Progress *testProgress = new Progress();
+  std::cout << "Test ControlNetVersioner";
+
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", testProgress);     // No target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", testProgress);     // Really odd keywords with target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net", testProgress);     // Another set of odd keywords
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", testProgress); // Binary V1
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net", testProgress);    // Corrupted (based off of oldNetwork2.net)
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", testProgress, false);  // Binary V2
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", testProgress, true, true); // Network with rejected jigsaw points
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl", testProgress, false, false); // Network full of weird test cases (based on PvlNetwork4)
+
+  // Re-test each version without progress
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 0, false);
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", 0, false);
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", 0, false);
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", 0, false);
+
+  std::cout << std::endl << "Test writing from ControlNet objects" << std::endl << std::endl;
+  ControlNet *binaryV2Net = new ControlNet("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net",
+                                           testProgress);
+  ControlNetVersioner *binV2Versioner = new ControlNetVersioner(binaryV2Net);
+  binV2Versioner->write("./binaryV2tmp.net");
+  remove("./binaryV2tmp.net");
+  delete binV2Versioner;
+  binV2Versioner = NULL;
+
+  std::cout << std::endl << "Test reading version 1 protobuf network" << std::endl << std::endl;
+  ControlNetVersioner *binV1Versioner = new ControlNetVersioner(FileName("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net"), testProgress);
+  std::cout << "Take all of the control points and delete them." << std::endl;
+  int pointsTaken = 0;
+  ControlPoint *readPoint = binV1Versioner->takeFirstPoint();
+  while (readPoint != NULL) {
+    pointsTaken++;
+    std::cout << "  " << pointsTaken << (pointsTaken > 1 ? " points taken" : " point taken") << std::endl;
+    delete readPoint;
+    readPoint = binV1Versioner->takeFirstPoint();
+  }
+  delete binV1Versioner;
+  binV1Versioner = NULL;
+
+  std::cout << std::endl << "Test reading version 5 protobuf network" << std::endl << std::endl;
+  ControlNetVersioner *binV5Versioner = new ControlNetVersioner(FileName("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork3_ProtoV0005.net"), testProgress);
+  delete binV5Versioner;
+  binV5Versioner = NULL;
+
+  std::cout << std::endl << "Test writing with invalid target" << std::endl << std::endl;
+  try {
+    binaryV2Net->SetTarget("INVALID_TARGET_NAME");
+    binV2Versioner = new ControlNetVersioner(binaryV2Net);
+  }
+  catch (IException &e) {
+    e.print();
+    if (binV2Versioner) {
+      delete binV2Versioner;
+      binV2Versioner = NULL;
+    }
+  }
+
+  std::cout << std::endl << "Test reading a random PVL file" << std::endl << std::endl;
+  try {
+    ControlNetVersioner invalidVersioner("$base/templates/maps/equirectangular.map");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+
+  std::cout << std::endl << "Test reading a PVL files with missing header information" << std::endl << std::endl;
+  try {
+    ControlNetVersioner invalidVersionerV1("$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+  try {
+    ControlNetVersioner invalidVersionerV2("$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+  try {
+    ControlNetVersioner invalidVersionerV3("$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+  try {
+    ControlNetVersioner invalidVersionerV4("$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+  try {
+    ControlNetVersioner invalidVersionerV5("$control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+
+  std::cout << std::endl << "Test reading a protobuf file with a bad version number" << std::endl << std::endl;
+  try {
+    ControlNetVersioner invalidVersioner("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork_BadVersion.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+
+  std::cout << std::endl << "Test reading a protobuf file with no version number" << std::endl << std::endl;
+  try {
+    ControlNetVersioner invalidVersioner("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork_NoVersion.net");
+  }
+  catch (IException &e) {
+    e.print();
+  }
+
+  delete binaryV2Net;
 }
 
-void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
-  cerr << "Reading: " << filename << "...\n\n";
+void TestNetwork(const QString &filename, Progress *progress, bool printNetwork, bool pvlInput) {
+  std::cout << "\nReading: " << filename << "...\n";
   FileName networkFileName(filename);
 
-  LatestControlNetFile * test = NULL;
-  LatestControlNetFile * test2 = NULL;
-  
+  ControlNetVersioner *test = NULL;
+  ControlNetVersioner *test2 = NULL;
+
   try {
 
     // If we're reading in a Pvl file, this will call the Pvl update cycle, then
@@ -44,55 +151,55 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
     //   convert to Pvl, then update, then convert to binary, and back to pvl.
     //   The reason for the intermediate Pvl is described in
     //   ControlNetVersioner.h.
-    cerr << "Read network..." << endl;
-    test = ControlNetVersioner::Read(networkFileName);
+    std::cout << "\nRead network..." << std::endl;
+    test = new ControlNetVersioner(networkFileName, progress);
 
     if(printNetwork) {
-      cerr << "Converted directly to Pvl:" << endl;
+      std::cout << "Converted directly to Pvl:" << std::endl;
       Pvl pvlVersion(test->toPvl());
-      cerr << pvlVersion << endl;
+
+      // std::cout does not support this operation on a pvl
+      std::cout << pvlVersion << std::endl;
       pvlVersion.write("./tmp.pvl");
     }
 
     // Test the latest binary read/write and Pvl conversion
-    cerr << "Write the network and re-read it..." << endl;
-    ControlNetVersioner::Write(FileName("./tmp"), *test);
-          
+    std::cout << "Write the network and re-read it..." << std::endl;
+    test->write( FileName("./tmp") );
     try {
-      test2 = ControlNetVersioner::Read(FileName("./tmp"));
+      test2 = new ControlNetVersioner( FileName("./tmp") );
     }
     catch(IException &e) {
       remove("./tmp");
       throw;
     }
 
-    cerr << "After reading and writing to a binary form does Pvl match?"
-         << endl;
+    std::cout << "After reading and writing to a binary form does Pvl match?" << std::endl;
+
     if(printNetwork) {
       Pvl pvlVersion2(test2->toPvl());
       pvlVersion2.write("./tmp2.pvl");
       if(system("cmp ./tmp.pvl ./tmp2.pvl")) {
-        cerr << "Reading/Writing results in Pvl differences!" << endl;
+        std::cout << "Reading/Writing results in Pvl differences!" << std::endl;
       }
       else {
-        cerr << "Conversion to Pvl stays consistent" << endl;
+        std::cout << "Conversion to Pvl stays consistent" << std::endl;
       }
     }
 
-    ControlNetVersioner::Write(FileName("./tmp2"), *test2);
+    test2->write(FileName("./tmp2"));
     if(system("cmp ./tmp ./tmp2")) {
-      cerr << "Reading/Writing control network results in binary differences!"
-           << endl;
+      std::cout << "Reading/Writing control network results in binary differences!" << std::endl;
     }
     else {
-      cerr << "Reading/Writing control network is consistent" << endl;
+      std::cout << "Reading/Writing control network is consistent" << std::endl;
     }
 
     if (pvlInput) {
 
-      LatestControlNetFile * cNet2 = NULL;
-      
-      cerr << "Check conversions between the binary format and the pvl format." << endl;
+      ControlNetVersioner *cNet2 = NULL;
+
+      std::cout << "Check conversions between the binary format and the pvl format." << std::endl;
       /*
        * When the input is a pvl, ./tmp is the binary form of the initial input. (pvl1->bin1)
        * Furthermore, ./tmp.pvl is the first binary conversion reverted back to pvl.
@@ -101,7 +208,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
        *
        *                                  a       b       c
        *                            (pvl1 -> bin1 -> pvl2 -> bin2)
-       * 
+       *
        * if (pvl1 != pvl2)
        *        a or b is broken but we don't know which yet
        *        if(bin1 != bin2)
@@ -112,26 +219,26 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
        * else
        *        The conversions are up to date and correct because neither a nor b broke.
        *
-       * 
+       *
        */
-      cNet2 = ControlNetVersioner::Read(FileName("./tmp.pvl"));
+      cNet2 = new ControlNetVersioner(FileName("./tmp.pvl"));
 
-      ControlNetVersioner::Write(FileName("./tmpCNet2"), *cNet2);
+      cNet2->write( FileName("./tmpCNet2") );
 
       //if there are differences between the pvls.
-      QString cmd = "diff -EbB --suppress-common-lines " + filename + " ./tmp.pvl";
+      QString cmd = "diff -EbB --suppress-common-lines -I 'Version.*' " + networkFileName.expanded() + " ./tmp.pvl";
       if(system(cmd.toStdString().c_str())) {
-        
+
         //if the binary files are different.
         if(system("diff -EbB --suppress-common-lines ./tmp ./tmpCNet2")){
-          cerr << "The conversion from binary to pvl is incorrect." << endl;
+          std::cout << "The conversion from binary to pvl is incorrect." << std::endl;
         }
         else {
-          cerr << "The conversion from pvl to binary is incorrect." << endl;
+          std::cout << "The conversion from pvl to binary is incorrect." << std::endl;
         }
       }
       else {
-        cerr << "The conversion methods for pvl->bin and bin->pvl are correct." << endl;
+        std::cout << "The conversion methods for pvl->bin and bin->pvl are correct." << std::endl;
       }
 
       remove("./tmpCNet2");
@@ -150,7 +257,7 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
   catch(IException &e) {
     QStringList errors = e.toString().split("\n");
     errors.removeLast();
-    cerr << errors.join("\n") << endl;
+    std::cout << errors.join("\n") << std::endl;
   }
 
   if(test) {
@@ -163,6 +270,4 @@ void TestNetwork(const QString &filename, bool printNetwork, bool pvlInput) {
     test2 = NULL;
   }
 
-  cerr << endl;
 }
-

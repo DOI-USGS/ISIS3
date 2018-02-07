@@ -162,11 +162,19 @@ namespace Isis {
     else {
       sy = mdiHeight/py;
     }
+<<<<<<< HEAD
     
     return std::max(sx,sy); 
   }
 
   
+=======
+
+    return std::max(sx,sy);
+  }
+
+
+>>>>>>> dev
   /**
    * Tiles the cube viewports over the Cube DN View.
    *
@@ -177,6 +185,7 @@ namespace Isis {
     int vpSize = viewportSize();
 
     QPoint position(0, 0);
+<<<<<<< HEAD
     
     QList<QMdiSubWindow *> windowList = p_mdiArea->subWindowList();
     
@@ -186,12 +195,28 @@ namespace Isis {
       window->setGeometry(rect);
       window->move(position);
      
+=======
+
+    QList<QMdiSubWindow *> windowList = p_mdiArea->subWindowList();
+
+    for (int i = windowList.size() - 1; i >= 0; i--) {
+      QMdiSubWindow *window = windowList[i];
+      window->showNormal();
+      QRect rect(0, 0, vpSize, vpSize);
+      window->setGeometry(rect);
+      window->move(position);
+
+>>>>>>> dev
       position.setX(position.x() + window->width());
       if (position.x() + window->width() > p_mdiArea->width()) {
         position.setX(0);
         position.setY(position.y() + window->height());
       }
+<<<<<<< HEAD
     }  
+=======
+    }
+>>>>>>> dev
   }
 
 

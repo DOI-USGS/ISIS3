@@ -11,7 +11,7 @@ int main() {
 
   //create a dummy Isis::Progress object
   Cube cube;
-  cube.open("red3Test.cub");
+  cube.open("$mro/testData/HiLab/red3Test.cub");
 
   cout << "Testing constructor ...\n";
   HiLab hiLab(&cube);

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <unistd.h>
 
+#include <QString>
+
 #include "Cube.h"
 #include "CubeDataThread.h"
 #include "CubeDataThreadTester.h"
@@ -14,8 +16,10 @@ using namespace Isis;
 using namespace std;
 
 void IsisMain() {
-  ProgramLauncher::RunSystemCommand("cp unitTest.cub unitTest2.cub");
-  ProgramLauncher::RunSystemCommand("cp unitTest.cub unitTest3.cub");
+  QString testFile = FileName("$base/testData/CubeDataThread/unitTest.cub").expanded();
+  QString sysCommand = "cp " + testFile;
+  ProgramLauncher::RunSystemCommand(sysCommand + " unitTest2.cub");
+  ProgramLauncher::RunSystemCommand(sysCommand + " unitTest3.cub");
 
   CubeDataThread *cubeData = new CubeDataThread();
 

@@ -50,6 +50,7 @@ namespace Isis {
    *            not added because it is 4 bytes on 32-bit linux and 8 bytes on
    *            64-bit linux.
    *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
+   *   @history 2018-01-29 Adam Goins - Added uint32_t behavior to EndianSwapper.
    */
   class EndianSwapper {
     private:
@@ -67,6 +68,8 @@ namespace Isis {
        * byte format - all with swapped bytes.
        */
       union {
+        //! Union containing the output uint32_t value with swapped bytes.
+        uint32_t p_uint32;
         //! Union containing the output double precision value with swapped bytes.
         double p_double;
         //! Union containing the output floating point value with swapped bytes.
@@ -93,6 +96,7 @@ namespace Isis {
       float Float(void *buf);
       int ExportFloat(void *buf);
       int Int(void *buf);
+      uint32_t Uint32_t(void *buf);
       long long int LongLongInt(void *buf);
       short int ShortInt(void *buf);
       unsigned short int UnsignedShortInt(void *buf);
