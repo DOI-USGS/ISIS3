@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="lrolola2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Imports LIDAR data from LRO LOLA instrument.
+  </brief>
+
+  <description>
+    <p>
+      Imports LIDAR data from LRO LOLA instrument.
+    </p>
+
+  </description>
+
+  <history>
+    <change name="Makayla Shepherd and Tyler Wilson" date="2017-01-29">
+      Original version
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Lunar Reconnaissance Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input LOLA Lidar CSV
+        </brief>
+        <description>
+          This file is a complied CSV with data from LOLA.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+
+      <parameter name="CUBES">
+         <type>filename</type>
+         <fileMode>input</fileMode>
+         <brief>
+           List with cubes to add as measures to the lidar points.
+         </brief>
+         <filter>
+           *.lis
+         </filter>
+       </parameter>
+       <parameter name="TO">
+          <type>filename</type>
+          <fileMode>output</fileMode>
+          <brief>
+            Output lidar point data 
+          </brief>
+        </parameter>
+        <parameter name="OUTPUTTYPE">
+          <type>string</type>
+          <description>
+            The output type, either binary or json.
+          </description>
+          <default><item>BINARY</item></default>
+          <list>
+            <option value="BINARY">
+              <brief> Binary output file (.dat)</brief>
+            </option>
+            <option value="JSON">
+              <brief> JSON output file (.json)</brief>
+            </option>
+          </list>
+        </parameter>
+        <parameter name="POINTID">
+          <type>string</type>
+          <brief>
+            The pattern to be used to create point ids.
+          </brief>
+          <description>
+            <p>
+              This string will be used to create unique IDs for each control
+              point created by this program. The string must contain a
+              single series
+              of question marks ("?"). For example: "VallesMarineris????"
+            </p>
+            <p>
+              The question marks will be replaced
+              with a number beginning with zero and incremented by one each time
+              a new control point is created. The example above would cause the
+              first control point to have an ID of "VallesMarineris0000", the
+              second ID would be "VallesMarineris0001" and so on.
+              The maximum number of new control points for this example would be
+              10000 with the final ID being "VallesMarineris9999".
+            </p>
+            <p>
+              Note: Make sure there are enough "?"s for all the control
+              points that might be created during this run. If all the possible
+              point IDs are exhausted the program will exit with an error, and 
+              will not produce an output control network file. 
+            </p>
+            <p>
+              Examples of POINTID:
+            </p>
+            <ul>
+              <li>POINTID="JohnDoe?????"</li>
+              <li>POINTID="Quad1_????></li>
+              <li>POINTID="JD_???_test1"</li>
+            </ul>
+          </description>
+        </parameter>
+    </group>
+  </groups>
+</application>
