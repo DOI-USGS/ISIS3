@@ -199,21 +199,23 @@ namespace Isis {
       if (group.hasKeyword("Sample")) {
         double value = toDouble(group["Sample"][0]);
         measure.mutable_measurement()->set_sample(value);
+        group.deleteKeyword("Sample");
       }
       if (group.hasKeyword("Line")) {
         double value = toDouble(group["Line"][0]);
         measure.mutable_measurement()->set_line(value);
+        group.deleteKeyword("Line");
       }
       if (group.hasKeyword("SampleResidual")) {
         double value = toDouble(group["SampleResidual"][0]);
         measure.mutable_measurement()->set_sampleresidual(value);
+        group.deleteKeyword("SampleResidual");
       }
       if (group.hasKeyword("LineResidual")) {
         double value = toDouble(group["LineResidual"][0]);
         measure.mutable_measurement()->set_lineresidual(value);
+        group.deleteKeyword("LineResidual");
       }
-
-
       if (group.hasKeyword("Reference")) {
         if (group["Reference"][0].toLower() == "true") {
           m_pointData->set_referenceindex(groupIndex);
