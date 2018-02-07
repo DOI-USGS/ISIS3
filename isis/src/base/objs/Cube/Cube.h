@@ -162,6 +162,8 @@ namespace Isis {
    *                           and changed ::realDataFileName() to return the absolute path if it is
    *                           relative. Changed ::realDataFileLabel to call realDataFileName to
    *                           make sure we get absolute path.  Fixes #5276.
+   *   @history 2018-01-18 Summer Stapleton - Updated error message in ::create() to address when
+   *                           an IsisPreference file cannot be found. Fixes #5145.
    */
   class Cube {
     public:

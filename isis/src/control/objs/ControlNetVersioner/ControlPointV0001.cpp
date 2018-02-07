@@ -27,7 +27,7 @@ namespace Isis {
   ControlPointV0001::ControlPointV0001(
           QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> pointData,
           QSharedPointer<ControlNetLogDataProtoV0001_Point> logData)
-   : m_pointData(pointData), m_logData(logData) {
+      : m_pointData(pointData), m_logData(logData) {
 
    }
 
@@ -40,8 +40,8 @@ namespace Isis {
    *                   lat/lon to x/y/z.
    */
   ControlPointV0001::ControlPointV0001(PvlObject &pointObject, const QString targetName)
-   : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
-     m_logData(new ControlNetLogDataProtoV0001_Point) {
+      : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
+        m_logData(new ControlNetLogDataProtoV0001_Point) {
     // Clean up the Pvl control point
     // Anything that doesn't have a value is removed
     for (int cpKeyIndex = 0; cpKeyIndex < pointObject.keywords(); cpKeyIndex ++) {
@@ -111,7 +111,7 @@ namespace Isis {
     }
     else if ( pointObject.hasKeyword("AprioriX")
               && pointObject.hasKeyword("AprioriY")
-              && pointObject.hasKeyword("AprioriZ")) {
+              && pointObject.hasKeyword("AprioriZ") ) {
       m_pointData->set_apriorix( toDouble(pointObject["AprioriX"][0]) );
       m_pointData->set_aprioriy( toDouble(pointObject["AprioriY"][0]) );
       m_pointData->set_aprioriz( toDouble(pointObject["AprioriZ"][0]) );
@@ -126,8 +126,8 @@ namespace Isis {
     }
 
     // Ground points were previously flagged by the Held keyword being true.
-    if ( (pointObject.hasKeyword("Held") && pointObject["Held"][0] == "True") ||
-          (pointObject["PointType"][0] == "Ground") ) {
+    if ( (pointObject.hasKeyword("Held") && pointObject["Held"][0] == "True")
+         || (pointObject["PointType"][0] == "Ground") ) {
       m_pointData->set_type(ControlNetFileProtoV0001_PBControlPoint::Ground);
     }
     else if (pointObject["PointType"][0] == "Tie") {
@@ -148,16 +148,19 @@ namespace Isis {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::User);
       }
       else if (source == "AverageOfMeasures") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
       }
       else if (source == "Reference") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::Reference);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::Reference);
       }
       else if (source == "Basemap") {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::Basemap);
       }
       else if (source == "BundleSolution") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
+        m_pointData->set_apriorisurfpointsource(
+                         ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
         QString msg = "Invalid AprioriXYZSource [" + source + "]";
@@ -175,16 +178,19 @@ namespace Isis {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::User);
       }
       else if (source == "AverageOfMeasures") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
+        m_pointData->set_apriorisurfpointsource(
+                         ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
       }
       else if (source == "Reference") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::Reference);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::Reference);
       }
       else if (source == "Basemap") {
         m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::Basemap);
       }
       else if (source == "BundleSolution") {
-        m_pointData->set_apriorisurfpointsource(ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
+        m_pointData->set_apriorisurfpointsource(
+                           ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
         QString msg = "Invalid AprioriLatLonSource [" + source + "]";
@@ -202,7 +208,8 @@ namespace Isis {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::User);
       }
       else if (source == "AverageOfMeasures") {
-        m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
+        m_pointData->set_aprioriradiussource(
+                           ControlNetFileProtoV0001_PBControlPoint::AverageOfMeasures);
       }
       else if (source == "Ellipsoid") {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::Ellipsoid);
@@ -211,7 +218,8 @@ namespace Isis {
         m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::DEM);
       }
       else if (source == "BundleSolution") {
-        m_pointData->set_aprioriradiussource(ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
+        m_pointData->set_aprioriradiussource(
+                           ControlNetFileProtoV0001_PBControlPoint::BundleSolution);
       }
       else {
         QString msg = "Invalid AprioriRadiusSource, [" + source + "]";
@@ -570,7 +578,7 @@ namespace Isis {
    *                                                                    control point data.
    */
   QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> ControlPointV0001::pointData() {
-      return m_pointData;
+    return m_pointData;
   }
 
 
@@ -581,7 +589,7 @@ namespace Isis {
    *                                                              measure log data.
    */
   QSharedPointer<ControlNetLogDataProtoV0001_Point> ControlPointV0001::logData() {
-      return m_logData;
+    return m_logData;
   }
 
 
@@ -594,7 +602,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 1 protobuf representation of the control point that the value
+   * @param[out] point The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -604,15 +612,17 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (point.data()->*setter)(true);
+    }
   }
 
 
@@ -625,7 +635,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 1 protobuf representation of the control point that the value
+   * @param[out] point The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -635,8 +645,9 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
@@ -653,7 +664,7 @@ namespace Isis {
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 1 protobuf representation of the control point that the value
+   * @param[out] point The version 1 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -663,8 +674,9 @@ namespace Isis {
                                QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> point,
                                void (ControlNetFileProtoV0001_PBControlPoint::*setter)(const std::string&)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
@@ -691,15 +703,17 @@ namespace Isis {
                                ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &measure,
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (measure.*setter)(true);
+    }
   }
 
 
@@ -757,8 +771,9 @@ namespace Isis {
                                void (ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure::*setter)
                                       (const std::string &)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
 
     QString value = container[keyName][0];
