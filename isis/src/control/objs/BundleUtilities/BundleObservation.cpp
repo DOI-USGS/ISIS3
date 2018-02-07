@@ -1,18 +1,30 @@
 #include "BundleObservation.h"
 
+// qt lib
 #include <QDebug>
+#include <QList>
 #include <QString>
 #include <QStringList>
 
+// boost lib
+//#include <boost/lexical_cast.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_sparse.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+// Isis lib
 #include "BundleImage.h"
-#include "BundleObservationSolveSettings.h"
+#include "BundlePolynomialContinuityConstraint.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
-#include "LinearAlgebra.h"
+#include "CameraGroundMap.h"
+//#include "LinearAlgebra.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 
 using namespace std;
+using namespace boost::numeric::ublas;
 
 namespace Isis {
 
@@ -30,7 +42,6 @@ namespace Isis {
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
   }
@@ -57,7 +68,6 @@ namespace Isis {
     m_index = 0;
     m_weights.clear();
     m_corrections.clear();
-//    m_solution.clear();
     m_aprioriSigmas.clear();
     m_adjustedSigmas.clear();
 
@@ -75,6 +85,7 @@ namespace Isis {
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
+      // these will be updated during the bundle adjustment
       m_instrumentPosition = (image->camera() ? 
                                (image->camera()->instrumentPosition() ?
                                  image->camera()->instrumentPosition() : NULL)
@@ -112,6 +123,8 @@ namespace Isis {
 
     m_solveSettings = src.m_solveSettings;
 
+    m_continuityConstraints = src.m_continuityConstraints;
+
     m_index = src.m_index;
   }
 
@@ -133,7 +146,7 @@ namespace Isis {
    *
    * @param BundleObservation Reference to the source BundleObservation to assign from
    *
-   * @return @b BundleObservation& Reference to this BundleObservation
+   * @return BundleObservation& Reference to this BundleObservation
    */
   BundleObservation &BundleObservation::operator=(const BundleObservation &src) {
     if (&src != this) {
@@ -147,6 +160,8 @@ namespace Isis {
       m_instrumentRotation = src.m_instrumentRotation;
 
       m_solveSettings = src.m_solveSettings;
+
+      m_continuityConstraints = src.m_continuityConstraints;
     }
     return *this;
   }
@@ -175,7 +190,7 @@ namespace Isis {
    * 
    * @param cubeSerialNumber The serial number of the cube to be returned.
    * 
-   * @return @b BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
+   * @return BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
    */
   BundleImageQsp BundleObservation::imageByCubeSerialNumber(QString cubeSerialNumber) {
     BundleImageQsp bundleImage;
@@ -193,35 +208,45 @@ namespace Isis {
    *
    * @param solveSettings The solve settings to use
    *
-   * @return @b bool Returns true if settings were successfully set
+   * @return bool Returns true if settings were successfully set
    *
    * @internal
    *   @todo initParameterWeights() doesn't return false, so this methods always 
    *         returns true.
    */
   bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
-    m_solveSettings = BundleObservationSolveSettingsQsp(
-                        new BundleObservationSolveSettings(solveSettings));
+    m_solveSettings.reset( new BundleObservationSolveSettings(solveSettings) );
 
     // initialize solution parameters for this observation
     int nCameraAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
     int nCameraPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
 
+    nCameraAngleCoefficients *= m_solveSettings->numberCkPolySegments();
+    nCameraPositionCoefficients *= m_solveSettings->numberSpkPolySegments();
+
     int nParameters = 3*nCameraPositionCoefficients + 2*nCameraAngleCoefficients;
     if (nCameraAngleCoefficients >= 1 && m_solveSettings->solveTwist()) {
       nParameters += nCameraAngleCoefficients;
     }
+
+    // set number of position and rotation piecewise polynomial segments in SPICE position and
+    // rotation members
+    if (m_instrumentPosition) {
+      m_instrumentPosition->setPolynomialSegments(m_solveSettings->numberSpkPolySegments());
+    }
+    if (m_instrumentRotation) {
+      m_instrumentRotation->setPolynomialSegments(m_solveSettings->numberCkPolySegments());
+    }
+
     // size vectors and set to zero
     m_weights.resize(nParameters);
     m_weights.clear();
     m_corrections.resize(nParameters);
     m_corrections.clear();
-//    m_solution.resize(nParameters);
-//    m_solution.clear();
     m_adjustedSigmas.resize(nParameters);
     m_adjustedSigmas.clear();
     m_aprioriSigmas.resize(nParameters);
-    for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to -1.0
+    for ( int i = 0; i < nParameters; i++) // initialize apriori sigmas to Isis::Null
       m_aprioriSigmas[i] = Isis::Null;
 
     if (!initParameterWeights()) {
@@ -235,9 +260,54 @@ namespace Isis {
 
 
   /**
+   * Sets this BundleObserations continuity constraint member variable
+   *
+   * @param polyConstraints piecewise polynomial continuity constraints
+   *
+   */
+  void BundleObservation::setContinuityConstraints(BundlePolynomialContinuityConstraintQsp
+                                                   polyConstraints) {
+    m_continuityConstraints = polyConstraints;
+  }
+
+
+  /**
+   * Returns position contribution of continuity constraints
+   *
+   * @return SparseBlockMatrix Returns position contribution of continuity constraints to the
+   *                              bundle adjustment normal equations
+   */
+  SparseBlockMatrix &BundleObservation::continuityContraintSpkMatrix() {
+    return m_continuityConstraints->normalsSpkMatrix();
+  }
+
+
+  /**
+   * Returns pointing contribution of continuity constraints
+   *
+   * @return SparseBlockMatrix Returns pointing contribution of continuity constraints to the
+   *                              bundle adjustment normal equations
+   */
+  SparseBlockMatrix &BundleObservation::continuityContraintCkMatrix() {
+    return m_continuityConstraints->normalsCkMatrix();
+  }
+
+
+  /**
+   * Returns contribution of continuity constraints to normal equations right hand side
+   *
+   * @return LinearAlgebra::Vector Returns contribution of continuity constraints to the normal
+   *                                  equation hand side
+   */
+  LinearAlgebra::Vector &BundleObservation::continuityRHS() {
+    return m_continuityConstraints->rightHandSideVector();
+  }
+
+
+  /**
    * Accesses the instrument id
    *
-   * @return @b QString Returns the instrument id of the observation
+   * @return QString Returns the instrument id of the observation
    */
   QString BundleObservation::instrumentId() {
     return m_instrumentId;
@@ -247,7 +317,7 @@ namespace Isis {
   /**
    * Accesses the instrument's spice rotation
    *
-   * @return @b SpiceRotation* Returns the SpiceRotation for this observation
+   * @return SpiceRotation* Returns the SpiceRotation for this observation
    */
   SpiceRotation *BundleObservation::spiceRotation() {
     return m_instrumentRotation;
@@ -257,7 +327,7 @@ namespace Isis {
   /**
    * Accesses the instrument's spice position 
    *
-   * @return @b SpicePosition* Returns the SpicePosition for this observation
+   * @return SpicePosition* Returns the SpicePosition for this observation
    */
   SpicePosition *BundleObservation::spicePosition() {
     return m_instrumentPosition;
@@ -267,7 +337,7 @@ namespace Isis {
   /**
    * Accesses the solve parameter weights
    * 
-   * @return @b LinearAlgebra::Vector Returns the parameter weights for solving
+   * @return LinearAlgebra::Vector Returns the parameter weights for solving
    */
   LinearAlgebra::Vector &BundleObservation::parameterWeights() {
     return m_weights;
@@ -277,7 +347,7 @@ namespace Isis {
   /**
    * Accesses the parameter corrections 
    *
-   * @return @b LinearAlgebra::Vector Returns the parameter corrections
+   * @return LinearAlgebra::Vector Returns the parameter corrections
    */
   LinearAlgebra::Vector &BundleObservation::parameterCorrections() {
     return m_corrections;
@@ -285,18 +355,9 @@ namespace Isis {
 
 
   /**
-   * @internal
-   *   @todo 
-   */
-//  LinearAlgebra::Vector &BundleObservation::parameterSolution() {
-//    return m_solution;
-//  }
-
-
-  /**
    * Accesses the a priori sigmas
    *
-   * @return @b LinearAlgebra::Vector Returns the a priori sigmas
+   * @return LinearAlgebra::Vector Returns the a priori sigmas
    */
   LinearAlgebra::Vector &BundleObservation::aprioriSigmas() {
     return m_aprioriSigmas;
@@ -306,7 +367,7 @@ namespace Isis {
   /**
    * Accesses the adjusted sigmas 
    *
-   * @return @b LinearAlgebra::Vector Returns the adjusted sigmas
+   * @return LinearAlgebra::Vector Returns the adjusted sigmas
    */
   LinearAlgebra::Vector &BundleObservation::adjustedSigmas() {
     return m_adjustedSigmas;
@@ -316,7 +377,7 @@ namespace Isis {
   /**
    * Accesses the solve settings
    *
-   * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
+   * @return const BundleObservationSolveSettingsQsp Returns a pointer to the solve
    *                                                    settings for this BundleObservation
    */
   const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() { 
@@ -327,12 +388,14 @@ namespace Isis {
   /**
    * Initializes the exterior orientation 
    *
-   * @return @b bool Returns true upon successful intialization
-   *
-   * @internal
-   *   @todo Should this always return true?
+   * @return bool Returns true upon successful intialization
    */
   bool BundleObservation::initializeExteriorOrientation() {
+    if (size() == 0) {
+      return false;
+    }
+
+    BundleImageQsp image = at(0);
 
     if (m_solveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
@@ -341,32 +404,52 @@ namespace Isis {
       double positiontimeScale = 0.0;
       std::vector<double> posPoly1, posPoly2, posPoly3;
 
+      // number of position polynomial segments we're solving for this observation
+      int spkPolynomialSegments = m_solveSettings->numberSpkPolySegments();
+
+      // loop over images in this observation
       for (int i = 0; i < size(); i++) {
         BundleImageQsp image = at(i);
+        if ( !image->camera() ) {
+          return false;
+        }
         SpicePosition *spicePosition = image->camera()->instrumentPosition();
 
-        if (i > 0) {
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-          spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-          spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
-                                       m_solveSettings->positionInterpolationType());
-        }
-        else {
-          // first, set the degree of the spk polynomial to be fit for a priori values
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
+        // set number of position segments in images spice position
+        spicePosition->setPolynomialSegments(spkPolynomialSegments);
 
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
-          spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
+        // loop over position segments
+        for (int j = 0; j < spkPolynomialSegments; j++) {
+          // if there are more than one image in the observation (see note below)
+          if (i > 0) {
+            spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+            spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
+            spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
+                                         m_solveSettings->positionInterpolationType(),
+                                         j);
+          }
+          // for first image in the observation
+          // NOTE: Typically there is one image per observation.
+          //       When in "Observation Mode" however there may be multiple images in an
+          //       observation. Current examples where observation mode may be used include Lunar
+          //       Orbiter, HiRise, and Apollo Pan.
+          else {
+            // first, set the degree of the spk polynomial to be fit for a priori values
+            spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
 
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+            // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+            // function, or polynomial function over constant hermite spline)
+            // TODO: verify - I think this actually performs the a priori fit
+            spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
 
-          if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
-            positionBaseTime = m_instrumentPosition->GetBaseTime();
-            positiontimeScale = m_instrumentPosition->GetTimeScale();
-            m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
+            // finally, set the degree of the spk polynomial actually used in the bundle adjustment
+            spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+
+            if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
+              positionBaseTime = m_instrumentPosition->GetBaseTime();
+              positiontimeScale = m_instrumentPosition->GetTimeScale();
+              m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
+            }
           }
         }
       }
@@ -379,31 +462,50 @@ namespace Isis {
       double rotationtimeScale = 0.0;
       std::vector<double> anglePoly1, anglePoly2, anglePoly3;
 
+      // number of pointing polynomial segments we're solving for this observation
+      int ckPolynomialSegments = m_solveSettings->numberCkPolySegments();
+
+      // loop over images in this observation
       for (int i = 0; i < size(); i++) {
         BundleImageQsp image = at(i);
-        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-
-        if (i > 0) {
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-          spicerotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-          spicerotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
-                                       m_solveSettings->pointingInterpolationType());
+        if ( !image->camera() ) {
+          return false;
         }
-        else {
-          // first, set the degree of the spk polynomial to be fit for a priori values
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
+        SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
 
-          // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-          // function, or polynomial function over constant hermite spline)
-          // TODO: verify - I think this actually performs the a priori fit
-          spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
+        // set number of rotation segments in images spice position
+        spiceRotation->setPolynomialSegments(ckPolynomialSegments);
 
-          // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-          spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+        // loop over rotation segments
+        for (int j = 0; j < ckPolynomialSegments; j++) {
+          // if there are more than one image in the observation (see note below)
+          if (i > 0) {
+            spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+            spiceRotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
+            spiceRotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
+                                         m_solveSettings->pointingInterpolationType(),j);
+          }
+          // for first image in the observation
+          // NOTE: Typically there is one image per observation.
+          //       When in "Observation Mode" however there may be multiple images in an
+          //       observation. Current examples where observation mode may be used include Lunar
+          //       Orbiter, HiRise, and Apollo Pan.
+          else {
+            // first, set the degree of the ck polynomial to be fit for a priori values
+            spiceRotation->SetPolynomialDegree(m_solveSettings->ckDegree());
 
-          rotationBaseTime = spicerotation->GetBaseTime();
-          rotationtimeScale = spicerotation->GetTimeScale();
-          spicerotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
+            // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+            // function, or polynomial function over constant hermite spline)
+            // TODO: verify - I think this actually performs the a priori fit
+            spiceRotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
+
+            // finally, set the degree of the ck polynomial actually used in the bundle adjustment
+            spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+
+            rotationBaseTime = spiceRotation->GetBaseTime();
+            rotationtimeScale = spiceRotation->GetTimeScale();
+            spiceRotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
+          }
         }
       }
     }
@@ -413,7 +515,7 @@ namespace Isis {
 
 
   /**
-   * Intializes the body rotation 
+   * Initializes the body rotation
    *
    * @todo check to make sure m_bundleTargetBody is valid
    */
@@ -447,58 +549,10 @@ namespace Isis {
   }
 
 
-/*
-  bool BundleObservation::initializeExteriorOrientation() {
-
-    if (m_solveSettings->instrumentPositionSolveOption() !=
-        BundleObservationSolveSettings::NoPositionFactors) {
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpicePosition *spiceposition = image->camera()->instrumentPosition();
-
-        // first, set the degree of the spk polynomial to be fit for a priori values
-        spiceposition->SetPolynomialDegree(m_solveSettings->spkDegree());
-
-        // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-        // function, or polynomial function over constant hermite spline)
-        // TODO: verify - I think this actually performs the a priori fit
-        spiceposition->SetPolynomial(m_solveSettings->positionInterpolationType());
-
-        // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spiceposition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-      }
-    }
-
-    if (m_solveSettings->instrumentPointingSolveOption() !=
-        BundleObservationSolveSettings::NoPointingFactors) {
-
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        SpiceRotation *spicerotation = image->camera()->instrumentRotation();
-
-        // first, set the degree of the spk polynomial to be fit for a priori values
-        spicerotation->SetPolynomialDegree(m_solveSettings->ckDegree());
-
-        // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-        // function, or polynomial function over constant hermite spline)
-        // TODO: verify - I think this actually performs the a priori fit
-        spicerotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
-
-        // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-        spicerotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-      }
-    }
-
-    return true;
-  }
-*/
-
-
   /**
-   * Initializes the paramater weights for solving
+   * Initializes the parameter weights for solving
    * 
-   * @return @b bool Returns true upon successful intialization
+   * @return bool Returns true upon successful intialization
    *
    * @internal  
    *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
@@ -558,44 +612,145 @@ namespace Isis {
       angAccWeight = 1.0 / (angAccWeight * angAccWeight * DEG2RAD * DEG2RAD);
     }
 
+    int numSpkSegments = m_solveSettings->numberSpkPolySegments();
     int nSpkTerms = m_solveSettings->spkSolveDegree()+1;
     nSpkTerms = m_solveSettings->numberCameraPositionCoefficientsSolved();
-    for ( int i = 0; i < nCamPosCoeffsSolved; i++) {
-      if (i % nSpkTerms == 0) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas.at(0);
-       m_weights[i] = posWeight;
-      }
-      if (i % nSpkTerms == 1) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas.at(1);
-       m_weights[i] = velWeight;
-      }
-      if (i % nSpkTerms == 2) {
-       m_aprioriSigmas[i] = aprioriPositionSigmas.at(2);
-       m_weights[i] = accWeight;
+
+    int index = 0;
+    for (int i = 0; i < numSpkSegments; i++) {
+      for ( int j = 0; j < nCamPosCoeffsSolved; j++) {
+        if (j % nSpkTerms == 0) {
+         m_aprioriSigmas[index] = aprioriPositionSigmas.at(0);
+         m_weights[index] = posWeight;
+        }
+        if (j % nSpkTerms == 1) {
+         m_aprioriSigmas[index] = aprioriPositionSigmas.at(1);
+         m_weights[index] = velWeight;
+        }
+        if (j % nSpkTerms == 2) {
+         m_aprioriSigmas[index] = aprioriPositionSigmas.at(2);
+         m_weights[index] = accWeight;
+        }
+        index++;
       }
     }
 
+    int numCkSegments = m_solveSettings->numberCkPolySegments();
     int nCkTerms = m_solveSettings->ckSolveDegree()+1;
     nCkTerms = m_solveSettings->numberCameraAngleCoefficientsSolved();
-    for ( int i = 0; i < nCamAngleCoeffsSolved; i++) {
-      if (i % nCkTerms == 0) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(0);
-        m_weights[nCamPosCoeffsSolved + i] = angWeight;
-      }
-      if (i % nCkTerms == 1) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(1);
-        m_weights[nCamPosCoeffsSolved + i] = angVelWeight;
-      }
-      if (i % nCkTerms == 2) {
-        m_aprioriSigmas[nCamPosCoeffsSolved + i] = aprioriPointingSigmas.at(2);
-        m_weights[nCamPosCoeffsSolved + i] = angAccWeight;
+
+    for (int i = 0; i < numCkSegments; i++) {
+      for ( int j = 0; j < nCamAngleCoeffsSolved; j++) {
+        if (j % nCkTerms == 0) {
+          m_aprioriSigmas[index] = aprioriPointingSigmas.at(0);
+          m_weights[index] = angWeight;
+        }
+        if (j % nCkTerms == 1) {
+          m_aprioriSigmas[index] = aprioriPointingSigmas.at(1);
+          m_weights[index] = angVelWeight;
+        }
+        if (j % nCkTerms == 2) {
+          m_aprioriSigmas[index] = aprioriPointingSigmas.at(2);
+          m_weights[index] = angAccWeight;
+        }
+        index++;
       }
     }
 
-//    for ( int i = 0; i < (int)m_weights.size(); i++ )
-//      std::cout << m_weights[i] << std::endl;
-
     return true;
+  }
+
+
+  /**
+   * Computes bundle adjustment partial derivatives for this observation.
+   *
+   * NOTE: this is different from previous version in that we are using two separate matrices for
+   *       position and pointing partials as opposed to one matrix containing both.
+   *
+   * @param coeffImagePosition Matrix of partial derivatives for position parameters.
+   * @param coeffImagePointing Matrix of partial derivatives for pointing parameters.
+   *
+   */
+void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePosition,
+                                        LinearAlgebra::Matrix &coeffImagePointing) {
+    BundleImageQsp image = at(0);
+
+    // get numbers of spk and ck coefficients being solved
+    int numCamPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
+    int numCamAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+    // resize coeffImagePosition matrix if necessary
+    if ((int) coeffImagePosition.size2() != positionSegmentSize()) {
+      coeffImagePosition.resize(2, positionSegmentSize(), false);
+    }
+
+    // resize coeffImagePointing matrix if necessary
+    if ((int) coeffImagePointing.size2() != pointingSegmentSize()) {
+      coeffImagePointing.resize(2, pointingSegmentSize(), false);
+    }
+
+    if (m_solveSettings->instrumentPositionSolveOption() !=
+        BundleObservationSolveSettings::NoPositionFactors) {
+
+      int index = 0;
+
+      // Add the partial for the x coordinate of the position (differentiating
+      // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
+      for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
+        image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
+                                                    &coeffImagePosition(0, index),
+                                                    &coeffImagePosition(1, index));
+        index++;
+      }
+
+      // Add the partial for the y coordinate of the position
+      for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
+        image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
+                                                    &coeffImagePosition(0, index),
+                                                    &coeffImagePosition(1, index));
+        index++;
+      }
+
+      // Add the partial for the z coordinate of the position
+      for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
+        image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
+                                                    &coeffImagePosition(0, index),
+                                                    &coeffImagePosition(1, index));
+        index++;
+      }
+    }
+
+    if (m_solveSettings->instrumentPointingSolveOption() !=
+        BundleObservationSolveSettings::NoPointingFactors) {
+
+      int index = 0;
+
+      // Add the partials for ra
+      for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
+        image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
+                                                       cameraCoef, &coeffImagePointing(0, index),
+                                                       &coeffImagePointing(1, index));
+        index++;
+      }
+
+      // Add the partials for dec
+      for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
+        image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
+                                                       cameraCoef, &coeffImagePointing(0, index),
+                                                       &coeffImagePointing(1, index));
+        index++;
+      }
+
+      // Add the partial for twist if necessary
+      if (m_solveSettings->solveTwist()) {
+        for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
+          image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
+                                                         cameraCoef, &coeffImagePointing(0, index),
+                                                         &coeffImagePointing(1, index));
+          index++;
+        }
+      }
+    }
   }
 
 
@@ -610,13 +765,12 @@ namespace Isis {
    *                              [not NoPointingFactors]"
    * @throws IException::Unknown "Unable to apply parameter corrections to BundleObservation."
    *
-   * @return @b bool Returns true upon successful application of corrections
+   * @return bool Returns true upon successful application of corrections
    *
    * @internal
    *   @todo always returns true?
    */  
   bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
-
     int index = 0;
 
     try {
@@ -634,36 +788,43 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
+        int numSpkSegments = m_solveSettings->numberSpkPolySegments();
+
         std::vector<double> coefX(nCameraPositionCoefficients);
         std::vector<double> coefY(nCameraPositionCoefficients);
         std::vector<double> coefZ(nCameraPositionCoefficients);
 
-        m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
+        // loop over segments
+        for (int i = 0; i < numSpkSegments; i++) {
 
-        // update X coordinate coefficient(s) and sum parameter correction
-        for (int i = 0; i < nCameraPositionCoefficients; i++) {
-          coefX[i] += corrections(index);
-          index++;
-        }
+          // get spk polynomial for segment i
+          m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ, i);
 
-        // update Y coordinate coefficient(s) and sum parameter correction
-        for (int i = 0; i < nCameraPositionCoefficients; i++) {
-          coefY[i] += corrections(index);
-          index++;
-        }
+          // update X coordinate coefficient(s) and sum parameter correction
+          for (int j = 0; j < nCameraPositionCoefficients; j++) {
+            coefX[j] += corrections(index);
+            index++;
+          }
 
-        // update Z coordinate coefficient(s) and sum parameter correction
-        for (int i = 0; i < nCameraPositionCoefficients; i++) {
-          coefZ[i] += corrections(index);
-          index++;
-        }
+          // update Y coordinate coefficient(s) and sum parameter correction
+          for (int j = 0; j < nCameraPositionCoefficients; j++) {
+            coefY[j] += corrections(index);
+            index++;
+          }
 
-        // apply updates to all images in observation
-        for (int i = 0; i < size(); i++) {
-          BundleImageQsp image = at(i);
-          SpicePosition *spiceposition = image->camera()->instrumentPosition();
-          spiceposition->SetPolynomial(coefX, coefY, coefZ,
-                                       m_solveSettings->positionInterpolationType());
+          // update Z coordinate coefficient(s) and sum parameter correction
+          for (int j = 0; j < nCameraPositionCoefficients; j++) {
+            coefZ[j] += corrections(index);
+            index++;
+          }
+
+          // apply updates for segment i to all images in observation
+          for (int k = 0; k < size(); k++) {
+            BundleImageQsp image = at(k);
+            SpicePosition *spiceposition = image->camera()->instrumentPosition();
+            spiceposition->SetPolynomial(coefX, coefY, coefZ,
+                                         m_solveSettings->positionInterpolationType(), i);
+          }
         }
       }
 
@@ -678,59 +839,121 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        std::vector<double> coefRA(nCameraPositionCoefficients);
-        std::vector<double> coefDEC(nCameraPositionCoefficients);
-        std::vector<double> coefTWI(nCameraPositionCoefficients);
+        int numCkSegments = m_solveSettings->numberCkPolySegments();
 
-        m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+        std::vector<double> coefRA(nCameraAngleCoefficients);
+        std::vector<double> coefDEC(nCameraAngleCoefficients);
+        std::vector<double> coefTWI(nCameraAngleCoefficients);
 
-        // update RA coefficient(s)
-        for (int i = 0; i < nCameraAngleCoefficients; i++) {
-          coefRA[i] += corrections(index);
-          index++;
-        }
+        // loop over segments
+        for (int i = 0; i < numCkSegments; i++) {
 
-        // update DEC coefficient(s)
-        for (int i = 0; i < nCameraAngleCoefficients; i++) {
-          coefDEC[i] += corrections(index);
-          index++;
-        }
+          // get spk polynomial for segment i
+          m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI, i);
 
-        if (m_solveSettings->solveTwist()) {
-          // update TWIST coefficient(s)
-          for (int i = 0; i < nCameraAngleCoefficients; i++) {
-            coefTWI[i] += corrections(index);
+          // update RA coordinate coefficient(s) and sum parameter correction
+          for (int j = 0; j < nCameraAngleCoefficients; j++) {
+            coefRA[j] += corrections(index);
             index++;
           }
-        }
 
-        // apply updates to all images in observation
-        for (int i = 0; i < size(); i++) {
-          BundleImageQsp image = at(i);
-          SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
-          spiceRotation->SetPolynomial(coefRA, coefDEC, coefTWI,
-                                       m_solveSettings->pointingInterpolationType());
+          // update DEC coefficient(s)
+          for (int j = 0; j < nCameraAngleCoefficients; j++) {
+            coefDEC[j] += corrections(index);
+            index++;
+          }
+
+          if (m_solveSettings->solveTwist()) {
+            // update TWIST coefficient(s)
+            for (int j = 0; j < nCameraAngleCoefficients; j++) {
+              coefTWI[j] += corrections(index);
+              index++;
+            }
+          }
+
+          // apply updates to all images in observation
+          for (int k = 0; k < size(); k++) {
+            BundleImageQsp image = at(k);
+            SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
+            spiceRotation->SetPolynomial(coefRA, coefDEC, coefTWI,
+                                         m_solveSettings->pointingInterpolationType(), i);
+          }
         }
       }
 
       // update corrections
       m_corrections += corrections;
-
     } 
     catch (IException &e) {
       QString msg = "Unable to apply parameter corrections to BundleObservation.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
+
+    try {
+      // TODO: temporary location for this?
+      if (m_continuityConstraints) {
+//        clock_t updateContinuityRHSClock1 = clock();
+
+        m_continuityConstraints->updateRightHandSide();
+
+//        clock_t updateContinuityRHSClock2 = clock();
+
+//        double updateContinuityRHS = (updateContinuityRHSClock2 - updateContinuityRHSClock1)
+//            / (double)CLOCKS_PER_SEC;
+
+//        qDebug() << "update Continuity RHS: " << updateContinuityRHS;
+      }
+    }
+    catch (IException &e) {
+      QString msg = "Unable to update continuity constraint right hand side for BundleObservation.";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
+
     return true;
   }
 
 
   /**
+   * Applies piecewise polynomial continuity constraints between segments
+   *
+   * @param diagonalBlock diagonal block of normal equations matrix corresponding to this
+   *                      observation
+   * @param rhs diagonal portion of right hand side vector of normal equations corresponding to this
+   *                     observation
+   */
+//  void BundleObservation::applyContinuityConstraints(LinearAlgebra::Matrix *diagonalBlock,
+//                                                     LinearAlgebra::Vector &rhs) {
+
+//    *diagonalBlock += m_continuityConstraints->normalsMatrix();
+//    rhs += m_continuityConstraints->rightHandSideVector();
+//  }
+
+
+  /**
    * Returns the number of position parameters there are
    *
-   * @return @b int Returns the number of position parameters
+   * @return int Returns the number of position parameters
    */
   int BundleObservation::numberPositionParameters() {
+    int numSegments;
+    if(m_instrumentPosition) {
+      numSegments = m_instrumentPosition->numPolynomialSegments();
+    }
+    else {
+      numSegments = m_solveSettings->numberSpkPolySegments();
+    }
+    int numCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
+
+    return 3.0 * numSegments * numCoefficients;
+  }
+
+
+  /**
+   * Returns the number of position parameters there are per segment
+   *
+   * @return int Returns the number of position parameters
+   */
+  int BundleObservation::numberPositionParametersPerSegment() {
     return 3.0 * m_solveSettings->numberCameraPositionCoefficientsSolved();
   }
 
@@ -738,28 +961,150 @@ namespace Isis {
   /**
    * Returns the number of pointing parameters being solved for
    *
-   * @return @b int Returns the number of pointing parameters
+   * @return int Returns the number of pointing parameters
    */
   int BundleObservation::numberPointingParameters() {
-    int angleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
-
-    if (m_solveSettings->solveTwist()) {
-      return 3.0 * angleCoefficients;
+    int numSegments;
+    if (m_instrumentRotation) {
+      numSegments = m_instrumentRotation->numPolynomialSegments();
     }
-    return 2.0 * angleCoefficients;
+    else {
+      numSegments = m_solveSettings->numberCkPolySegments();
+    }
+    int numCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+    if (!m_solveSettings->solveTwist()) {
+      return 2.0 * numSegments * numCoefficients;
+    }
+
+    return 3.0 * numSegments * numCoefficients;
   }
 
 
   /**
-   * Returns the number of total parameters there are for solving
+   * Returns the number of pointing parameters per segment
+   *
+   * @return int Returns number of pointing parameters per segment
+   */
+  int BundleObservation::numberPointingParametersPerSegment() {
+    int numCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+    if (!m_solveSettings->solveTwist()) {
+      return 2.0 * numCoefficients;
+    }
+
+    return 3.0 * numCoefficients;
+  }
+
+
+
+  /**
+   * Returns the number of total parameters solved for this observation
    *
    * The total number of parameters is equal to the number of position parameters and number of
    * pointing parameters
    *
-   * @return @b int Returns the number of parameters there are
+   * @return int Returns number of parameters solved for this observation
    */
   int BundleObservation::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
+  }
+
+  /**
+   * Returns the number of piecewise polynomial position segments
+   *
+   * @return int Returns number of piecewise polynomial position segments
+   */
+  int BundleObservation::numberPolynomialPositionSegments() {
+    if (m_instrumentPosition) {
+      return m_instrumentPosition->numPolynomialSegments();
+    }
+    return m_solveSettings->numberSpkPolySegments();
+  }
+
+
+  /**
+   * Returns the number of piecewise polynomial pointing segments
+   *
+   * @return int Returns number of piecewise polynomial pointing segments
+   */
+  int BundleObservation::numberPolynomialPointingSegments() {
+    if (m_instrumentRotation) {
+      return m_instrumentRotation->numPolynomialSegments();
+    }
+    return m_solveSettings->numberCkPolySegments();
+  }
+
+
+  /**
+   * Returns total number of piecewise polynomial segments
+   *
+   * Total number of segments is the sum of position and pointing segments
+   *
+   * @return int Returns total number of piecewise polynomial segments
+   */
+  int BundleObservation::numberPolynomialSegments() {
+    return (numberPolynomialPositionSegments() +
+            numberPolynomialPointingSegments());
+  }
+
+
+  /**
+   * Returns size of polynomial position segment
+   *
+   * @return int Returns size of polynomial position segment
+   */
+  int BundleObservation::positionSegmentSize() {
+    return 3.0 * m_solveSettings->numberCameraPositionCoefficientsSolved();
+  }
+
+
+  /**
+   * Returns size of polynomial pointing segment
+   *
+   * @return int Returns size of polynomial pointing segment
+   */
+  int BundleObservation::pointingSegmentSize() {
+
+    if (m_solveSettings->solveTwist()) {
+      return 3.0 * m_solveSettings->numberCameraAngleCoefficientsSolved();
+    }
+
+    return 2.0 * m_solveSettings->numberCameraAngleCoefficientsSolved();
+  }
+
+
+  /**
+   * Returns current position segment index by ephemeris time
+   *
+   * @return int Returns current position segment index by ephemeris time
+   */
+  int BundleObservation::polyPositionSegmentIndex() {
+    return m_instrumentPosition->polySegmentIndex(m_instrumentPosition->EphemerisTime());
+  }
+
+
+  /**
+   * Returns current rotation segment index by ephemeris time
+   *
+   * @return int Returns current rotation segment index by ephemeris time
+   */
+  int BundleObservation::polyRotationSegmentIndex() {
+    return m_instrumentRotation->polySegmentIndex(m_instrumentRotation->EphemerisTime());
+  }
+
+
+  /**
+   * Returns total number of piecewise polynomial continuity constraint equations
+   * used in the adjustment
+   *
+   * @return int Returns total number of piecewise polynomial continuity constraint equations
+   */
+  int BundleObservation::numberContinuityConstraints() const {
+    if (m_continuityConstraints) {
+      return m_continuityConstraints->numberConstraintEquations();
+    }
+    return 0;
   }
 
 
@@ -774,14 +1119,36 @@ namespace Isis {
 
 
   /**
+   * Sets the starting matrix block in the normal equations matrix for this observation
+   *
+   * @param startBlock Value to set the index of the observation to
+   */
+
+  void BundleObservation::setNormalsMatrixStartBlock(int startBlock) {
+    m_normalsEquationsStartBlock = startBlock;
+  }
+
+
+  /**
+   * Accesses the starting matrix block in the normal equations matrix for this observation
+   *
+   * @return int Returns starting matrix block index in the normal equations matrix for this
+   *                observation
+   */
+
+  int BundleObservation::normalsMatrixStartBlock() {
+    return m_normalsEquationsStartBlock;
+  }
+
+
+  /**
    * Accesses the observation's index
    *
-   * @return @b int Returns the observation's index
+   * @return int Returns the observation's index
    */
   int BundleObservation::index() {
     return m_index;
   }
-
 
   /**
    * @brief Creates and returns a formatted QString representing the bundle coefficients and
@@ -793,29 +1160,99 @@ namespace Isis {
    *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
    *     for backwards compatibility.
    *
-   * @return @b QString Returns a formatted QString representing the BundleObservation
+   * @return QString Returns a formatted QString representing the BundleObservation
    *
    * @internal
    *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
    *                           not being solved. Fixes #4464.
    */
-  QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
+  QString BundleObservation::formatBundleContinuityConstraintString() {
+    return m_continuityConstraints->formatBundleOutputString();
+  }
 
+
+  /**
+   * Format the position segment header for bundle output files
+   * 
+   * @param segmentIndex The index of the position segment to format the
+   *                     header for
+   * 
+   * @return QString The formatted segment header with segment number,
+   *                    start time, and stop time.
+   */
+  QString BundleObservation::formatPositionSegmentHeader(int segmentIndex) {
+    QString templateString = "\n    Position Segment Number: %1\n"
+                             "         Segment Start Time: %2\n"
+                             "           Segment End Time: %3\n";
+    if (m_instrumentPosition) {
+      std::vector<double> polyKnots = m_instrumentPosition->polynomialKnots();
+      if (polyKnots.front() != -DBL_MAX &&
+          polyKnots.back() != DBL_MAX) {
+        return templateString.arg(segmentIndex + 1)
+                             .arg(polyKnots[segmentIndex], -20, 'f', 5)
+                             .arg(polyKnots[segmentIndex + 1], -20, 'f', 5);
+      }
+    }
+    return templateString.arg(segmentIndex + 1)
+                         .arg("N/A")
+                         .arg("N/A");
+  }
+
+
+  /**
+   * Format the pointing segment header for bundle output files
+   * 
+   * @param segmentIndex The index of the pointing segment to format the
+   *                     header for
+   * 
+   * @return QString The formatted segment header with segment number,
+   *                    start time, and stop time.
+   */
+  QString BundleObservation::formatPointingSegmentHeader(int segmentIndex) {
+    QString templateString = "\n    Pointing Segment Number: %1\n"
+                             "         Segment Start Time: %2\n"
+                             "           Segment End Time: %3\n";
+    if (m_instrumentRotation) {
+      std::vector<double> polyKnots = m_instrumentRotation->polynomialKnots();
+      if (polyKnots.front() != -DBL_MAX &&
+          polyKnots.back() != DBL_MAX) {
+        return templateString.arg(segmentIndex + 1)
+                             .arg(polyKnots[segmentIndex], -20, 'f', 5)
+                             .arg(polyKnots[segmentIndex + 1], -20, 'f', 5);
+      }
+    }
+    return templateString.arg(segmentIndex + 1)
+                         .arg("N/A")
+                         .arg("N/A");
+  }
+
+
+  /**
+   * @brief Creates and returns a formatted QString representing the position coefficients and
+   * parameters
+   *
+   * @param segmentIndex The index of the segment to display parameters for.
+   * @param errorPropagation Boolean indicating whether or not to attach more information
+   *     (corrections, sigmas, adjusted sigmas...) to the output QString
+   * @param imageCSV Boolean which is set to true if the function is being
+   *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
+   *     for backwards compatibility.
+   *
+   * @return QString Returns a formatted QString representing the position segment
+   *
+   * @internal
+   *   @history 2017-10-06 Jesse Mapel - Original version, created from formatBundleOutputString
+   */
+  QString BundleObservation::formatPositionOutputString(int segmentIndex,
+                                                        bool errorPropagation, bool imageCSV) {
     std::vector<double> coefX;
     std::vector<double> coefY;
     std::vector<double> coefZ;
-    std::vector<double> coefRA;
-    std::vector<double> coefDEC;
-    std::vector<double> coefTWI;
 
     int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
-    int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
     // Indicate if we need to obtain default position or pointing values
     bool useDefaultPosition = false;
-    bool useDefaultPointing = false;
-    // Indicate if we need to use default values when not solving twist
-    bool useDefaultTwist = !(m_solveSettings->solveTwist());
 
     // If we aren't solving for position, set the number of coefficients to 1 so we can output the
     // instrumentPosition's center coordinate values for X, Y, and Z
@@ -823,29 +1260,18 @@ namespace Isis {
       nPositionCoefficients = 1;
       useDefaultPosition = true;
     }
-    // If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
-    // instrumentPointing's center angles for RA, DEC, and TWI
-    if (nPointingCoefficients == 0) {
-      nPointingCoefficients = 1;
-      useDefaultPointing = true;
-    }
 
     // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
     // so we can always output a value for them
     int nPositionParameters = 3 * nPositionCoefficients;
-    int nPointingParameters = 3 * nPointingCoefficients;
-    int nParameters = nPositionParameters + nPointingParameters;
 
     coefX.resize(nPositionCoefficients);
     coefY.resize(nPositionCoefficients);
     coefZ.resize(nPositionCoefficients);
-    coefRA.resize(nPointingCoefficients);
-    coefDEC.resize(nPointingCoefficients);
-    coefTWI.resize(nPointingCoefficients);
 
     if (m_instrumentPosition) {
       if (!useDefaultPosition) {
-        m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
+        m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ, segmentIndex);
       }
       // Use the position's center coordinate if not solving for spacecraft position
       else {
@@ -856,97 +1282,74 @@ namespace Isis {
       }
     }
 
-    if (m_instrumentRotation) {
-      if (!useDefaultPointing) {
-        m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-      }
-      // Use the pointing's center angles if not solving for pointing (rotation)
-      else {
-        const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
-        coefRA[0] = centerAngles[0];
-        coefDEC[0] = centerAngles[1];
-        coefTWI[0] = centerAngles[2];
-      }
-    }
-
-    // for convenience, create vectors of parameters names and values in the correct sequence
-    std::vector<double> finalParameterValues;
+    // for convenience, create lists of parameters names and values in the correct sequence
+    QList<double> finalParameterValues;
     QStringList parameterNamesList;
 
     if (!imageCSV) {
 
-      QString str("%1(t%2)");
+      if (useDefaultPosition) {
+        QString str("%1    ");
 
-      if (nPositionCoefficients > 0) {
         for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefX[i]);
+          finalParameterValues.append(coefX[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  X  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.append(coefY[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  Y  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.append(coefZ[i]);
+          if (i == 0)
+            parameterNamesList.append( str.arg("  Z  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+      }
+      else {
+        QString str("%1(t%2)");
+
+        for (int i = 0; i < nPositionCoefficients; i++) {
+          finalParameterValues.append(coefX[i]);
           if (i == 0)
             parameterNamesList.append( str.arg("  X  ").arg("0") );
           else
             parameterNamesList.append( str.arg("     ").arg(i) );
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefY[i]);
+          finalParameterValues.append(coefY[i]);
           if (i == 0)
             parameterNamesList.append( str.arg("  Y  ").arg("0") );
           else
             parameterNamesList.append( str.arg("     ").arg(i) );
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefZ[i]);
+          finalParameterValues.append(coefZ[i]);
           if (i == 0)
             parameterNamesList.append( str.arg("  Z  ").arg("0") );
           else
             parameterNamesList.append( str.arg("     ").arg(i) );
         }
       }
-      if (nPointingCoefficients > 0) {
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-          if (i == 0)
-            parameterNamesList.append( str.arg(" RA  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-          if (i == 0)
-            parameterNamesList.append( str.arg("DEC  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-          if (i == 0)
-            parameterNamesList.append( str.arg("TWI  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-      }
-
     }// end if(!imageCSV)
 
     else {
       if (nPositionCoefficients > 0) {
         for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefX[i]);
+          finalParameterValues.append(coefX[i]);
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefY[i]);
+          finalParameterValues.append(coefY[i]);
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefZ[i]);
-        }
-      }
-      if (nPointingCoefficients > 0) {
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+          finalParameterValues.append(coefZ[i]);
         }
       }
     }//end else
@@ -966,12 +1369,14 @@ namespace Isis {
     if (!imageCSV) {
       // position parameters
       for (int i = 0; i < nPositionParameters; i++) {
+        int index = nPositionParameters*segmentIndex+i;
         // If not using the default position, we can correctly access sigmas and corrections
         // members
         if (!useDefaultPosition) {
-          correction = m_corrections(i);
-          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+          correction = m_corrections(index);
+          adjustedSigma = QString::number(m_adjustedSigmas[index], 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[index]) ? "FREE"
+                                                      : toString(m_aprioriSigmas[index], 8) );
         }
         if (errorPropagation) {
           qStr = QString("%1%2%3%4%5%6\n").
@@ -993,30 +1398,234 @@ namespace Isis {
         }
         finalqStr += qStr;
       }
-
-      // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
-      // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
-      // according to which parameters are solved
-      int offset = 0;
-      if (useDefaultPosition) {
-        offset = 3;
+    }
+    // this implies we're writing to images.csv
+    else {
+      // position parameters
+      for (int i = 0; i < nPositionParameters; i++) {
+        int index = nPositionParameters*segmentIndex+i;
+        if (!useDefaultPosition) {
+          correction = m_corrections(index);
+          adjustedSigma = QString::number(m_adjustedSigmas[index], 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[index]) ? "FREE" : toString(m_aprioriSigmas[index], 8) );
+        }
+        // Provide default values for position if not solving position
+        else {
+          correction = 0.0;
+          adjustedSigma = "N/A";
+          sigma = "N/A";
+        }
+        qStr = "";
+        if (errorPropagation) {
+          qStr += toString(finalParameterValues[i] - correction) + ",";
+          qStr += toString(correction) + ",";
+          qStr += toString(finalParameterValues[i]) + ",";
+          qStr += sigma + ",";
+          qStr += adjustedSigma + ",";
+        }
+        else {
+          qStr += toString(finalParameterValues[i] - correction) + ",";
+          qStr += toString(correction) + ",";
+          qStr += toString(finalParameterValues[i]) + ",";
+          qStr += sigma + ",";
+          qStr += "N/A,";
+        }
+        finalqStr += qStr;
       }
+    }
+
+    return finalqStr;
+  }
+
+
+  /**
+   * @brief Creates and returns a formatted QString representing the bundle coefficients and
+   * parameters
+   *
+   * @param errorPropagation Boolean indicating whether or not to attach more information
+   *     (corrections, sigmas, adjusted sigmas...) to the output QString
+   * @param imageCSV Boolean which is set to true if the function is being
+   *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
+   *     for backwards compatibility.
+   *
+   * @return QString Returns a formatted QString representing the BundleObservation
+   *
+   * @internal
+   *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
+   *                           not being solved. Fixes #4464.
+   */
+  QString BundleObservation::formatPointingOutputString(int segmentIndex,
+                                                        bool errorPropagation, bool imageCSV) {
+    std::vector<double> coefRA;
+    std::vector<double> coefDEC;
+    std::vector<double> coefTWI;
+
+    int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+    // Indicate if we need to obtain default position or pointing values
+    bool useDefaultPointing = false;
+    // Indicate if we need to use default values when not solving twist
+    bool useDefaultTwist = !(m_solveSettings->solveTwist());
+
+    // If we aren't solving for pointing, set the number of coefficients to 1 so we can output the
+    // instrumentPointing's center angles for RA, DEC, and TWI
+    if (nPointingCoefficients == 0) {
+      nPointingCoefficients = 1;
+      useDefaultPointing = true;
+    }
+
+    // Force number of pointing parameters to be 3 (RA,DEC,TWI)
+    // so we can always output a value for them
+    int nPointingParameters = 3 * nPointingCoefficients;
+
+    // Calculate which the indices of the pointing segment's parameters.
+    //
+    // The parameters are ordered with all of the position parameters first
+    // and all of the pointing parameters after them.
+    //
+    // With n position segments and m pointing segments they are ordered as follows:
+    // [position 1 params]...[position n params][pointing 1 params]...[pointing m params]
+    //
+    // See BundleObservation::applyParameterCorrections for more information
+    int segmentStartIndex = 3 * m_solveSettings->numberCameraPositionCoefficientsSolved()
+                            * m_solveSettings->numberSpkPolySegments()
+                            + nPointingParameters * segmentIndex;
+    // If using default twist, then there are no twist parameters.
+    // So, the starting index would be
+    // 3 * m_solveSettings->numberCameraPositionCoefficientsSolved()
+    // * m_solveSettings->numberSpkPolySegments()
+    // + 2 * nPointingCoefficients * segmentIndex;
+    if (useDefaultTwist) {
+      segmentStartIndex -= nPointingCoefficients * segmentIndex;
+    }
+    // NOTE: This is actually one past the last index so it can be used in for loops
+    int segmentEndIndex = segmentStartIndex + nPointingParameters;
+
+    coefRA.resize(nPointingCoefficients);
+    coefDEC.resize(nPointingCoefficients);
+    coefTWI.resize(nPointingCoefficients);
+
+    if (m_instrumentRotation) {
+      if (!useDefaultPointing) {
+        m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI, segmentIndex);
+      }
+      // Use the pointing's center angles if not solving for pointing (rotation)
+      else {
+        const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
+        coefRA[0] = centerAngles[0];
+        coefDEC[0] = centerAngles[1];
+        coefTWI[0] = centerAngles[2];
+      }
+    }
+
+    // for convenience, create lists of parameters names and values in the correct sequence
+    QList<double> finalParameterValues;
+    QStringList parameterNamesList;
+
+    if (!imageCSV) {
+      if (useDefaultPointing) {
+
+        QString str("%1    ");
+
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefRA[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg(" RA  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefDEC[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("DEC  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefTWI[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("TWI  ") );
+          else
+            parameterNamesList.append( str.arg("     ") );
+        }
+      }
+      else {
+
+        QString str("%1(t%2)");
+
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefRA[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg(" RA  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefDEC[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("DEC  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefTWI[i] * RAD2DEG);
+          if (i == 0)
+            parameterNamesList.append( str.arg("TWI  ").arg("0") );
+          else
+            parameterNamesList.append( str.arg("     ").arg(i) );
+        }
+      }
+
+    }// end if(!imageCSV)
+
+    else {
+      if (nPointingCoefficients > 0) {
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefRA[i] * RAD2DEG);
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefDEC[i] * RAD2DEG);
+        }
+        for (int i = 0; i < nPointingCoefficients; i++) {
+          finalParameterValues.append(coefTWI[i] * RAD2DEG);
+        }
+      }
+    }//end else
+
+    // Save the list of parameter names we've accumulated above
+    m_parameterNamesList = parameterNamesList;
+
+    QString finalqStr = "";
+    QString qStr = "";
+
+    // Set up default values when we are using default position
+    QString sigma = "N/A";
+    QString adjustedSigma = "N/A";
+    double correction = 0.0;
+
+    // this implies we're writing to bundleout.txt
+    if (!imageCSV) {
       // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {
+      // TODO more documentation about indices used
+      int partialIndex = segmentStartIndex;
+      for (int i = 0; i < nPointingParameters; i++) {
         if (!useDefaultPointing) {
           // If solving camera and not solving for twist, provide default values for twist to
           // prevent bad indexing into m_corrections and m_*sigmas
-          // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
-          if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+          // TWIST is last parameter in a segment, corresponding to
+          // nParameters - nPointingCoefficients
+          if ( (i >= (2 * nPointingCoefficients)) && useDefaultTwist) {
             correction = 0.0;
             adjustedSigma = "N/A";
             sigma = "N/A";
           }
           else {
-            correction = m_corrections(i - offset);
-            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-            sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
-                    toString(m_aprioriSigmas[i-offset], 8) );
+            correction = m_corrections(partialIndex);
+            adjustedSigma = QString::number(m_adjustedSigmas(partialIndex)
+                                            * RAD2DEG, 'f', 8);
+            sigma = ( IsSpecial(m_aprioriSigmas[partialIndex]) ? "FREE" :
+                    toString(m_aprioriSigmas[partialIndex], 8) );
+            partialIndex++;
           }
         }
         // We are using default pointing, so provide default correction and sigma values to output
@@ -1045,63 +1654,23 @@ namespace Isis {
         }
         finalqStr += qStr;
       }
-
     }
     // this implies we're writing to images.csv
     else {
-      // position parameters
-      for (int i = 0; i < nPositionParameters; i++) {
-        if (!useDefaultPosition) {
-          correction = m_corrections(i);
-          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
-        }
-        // Provide default values for position if not solving position
-        else {
-          correction = 0.0;
-          adjustedSigma = "N/A";
-          sigma = "N/A";
-        }
-        qStr = "";
-        if (errorPropagation) {
-          qStr += toString(finalParameterValues[i] - correction) + ",";
-          qStr += toString(correction) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
-          qStr += sigma + ",";
-          qStr += adjustedSigma + ",";
-        }
-        else {       
-          qStr += toString(finalParameterValues[i] - correction) + ",";
-          qStr += toString(correction) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
-          qStr += sigma + ",";
-          qStr += "N/A,";
-        }
-        finalqStr += qStr;
-      }
-
-      // If not solving position, we need to offset access to correction and sigma members by -3
-      // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
-      // solved
-      int offset = 0;
-      if (useDefaultPosition) {
-        offset = 3;
-      }
-      // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {        
+      for (int i = segmentStartIndex; i < segmentEndIndex; i++) {
         if (!useDefaultPointing) {
           // Use default values if solving camera but not solving for TWIST to prevent bad indexing
           // into m_corrections and m_*sigmas
-          if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+          if ( (i >= segmentStartIndex + 2 * nPointingCoefficients) && useDefaultTwist) {
             correction = 0.0;
             adjustedSigma = "N/A";
             sigma = "N/A";
           }
           else {
-            correction = m_corrections(i - offset);
-            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-            sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
-                toString(m_aprioriSigmas[i-offset], 8) );
+            correction = m_corrections(i);
+            adjustedSigma = QString::number(m_adjustedSigmas(i) * RAD2DEG, 'f', 8);
+            sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" :
+                                                      toString(m_aprioriSigmas[i], 8) );
           }
         }
         // Provide default values for pointing if not solving pointing
@@ -1111,17 +1680,19 @@ namespace Isis {
           sigma = "N/A";
         }
         qStr = "";
-        if (errorPropagation) {        
-          qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+        if (errorPropagation) {
+          qStr += toString(finalParameterValues[i - segmentStartIndex]
+                           - correction * RAD2DEG) + ",";
           qStr += toString(correction * RAD2DEG) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
+          qStr += toString(finalParameterValues[i - segmentStartIndex]) + ",";
           qStr += sigma + ",";
           qStr += adjustedSigma + ",";
         }
         else {
-          qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+          qStr += toString(finalParameterValues[i - segmentStartIndex]
+                           - correction * RAD2DEG) + ",";
           qStr += toString(correction * RAD2DEG) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
+          qStr += toString(finalParameterValues[i - segmentStartIndex]) + ",";
           qStr += sigma + ",";
           qStr += "N/A,";
         }
@@ -1136,7 +1707,7 @@ namespace Isis {
   /**
    * Access to parameters for CorrelationMatrix to use.
    *
-   * @return @b QStringList Returns a QStringList of the names of the parameters
+   * @return QStringList Returns a QStringList of the names of the parameters
    */
   QStringList BundleObservation::parameterList() {
     return m_parameterNamesList;
@@ -1146,7 +1717,7 @@ namespace Isis {
   /**
    * Access to image names for CorrelationMatrix to use.
    *
-   * @return @b QStringList Returns a QStringList of the image names
+   * @return QStringList Returns a QStringList of the image names
    */
   QStringList BundleObservation::imageNames() {
     return m_imageNames;

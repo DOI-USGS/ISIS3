@@ -150,7 +150,7 @@ namespace Isis {
    *
    * @param other The BundleSettings object to be copied.
    *
-   * @return @b BundleSettings& A reference to the copied BundleSettings object.
+   * @return BundleSettings& A reference to the copied BundleSettings object.
    */
   BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
     if (&other != this) {
@@ -199,7 +199,7 @@ namespace Isis {
    *
    * @see BundleAdjust::validateNetwork()
    *
-   * @return @b bool Indicates whether the network should be validated by
+   * @return bool Indicates whether the network should be validated by
    *                 BundleAdjust.
    *
    */
@@ -300,7 +300,7 @@ namespace Isis {
    * creating error propagation information in the bundle adjust. If error propagation is not
    * turned on, then the inverse correlation matrix file will not be created.
    *
-   * @return @b bool Returns whether or now the inverse correlation matrix is allowed to be created.
+   * @return bool Returns whether or now the inverse correlation matrix is allowed to be created.
    *
    * @see BundleAdjust::errorPropagation()
    */
@@ -313,7 +313,7 @@ namespace Isis {
    * This method is used to determine whether outlier rejection will be
    * performed on this bundle adjustment.
    *
-   * @return @b bool Indicates whether to perform automatic outlier
+   * @return bool Indicates whether to perform automatic outlier
    *                 rejection during the bundle adjustment.
    */
   bool BundleSettings::outlierRejection() const {
@@ -325,7 +325,7 @@ namespace Isis {
    * This method is used to determine whether this bundle adjustment will solve
    * for observation mode.
    *
-   * @return @b bool Indicates whether to solve for observation mode.
+   * @return bool Indicates whether to solve for observation mode.
    */
   bool BundleSettings::solveObservationMode() const {
     return m_solveObservationMode;
@@ -336,7 +336,7 @@ namespace Isis {
    * This method is used to determine whether this bundle adjustment will solve
    * for radius.
    *
-   * @return @b bool Indicates whether to solve for radius.
+   * @return bool Indicates whether to solve for radius.
    */
   bool BundleSettings::solveRadius() const {
     return m_solveRadius;
@@ -347,7 +347,7 @@ namespace Isis {
    * This method is used to determine whether this bundle
    * adjustment will update the cube labels.
    *
-   * @return @b bool Indicates whether to update the cube labels after the bundle adjustment
+   * @return bool Indicates whether to update the cube labels after the bundle adjustment
    *                 is completed.
    */
   bool BundleSettings::updateCubeLabel() const {
@@ -359,7 +359,7 @@ namespace Isis {
    * This method is used to determine whether this bundle adjustment will
    * perform error propagation.
    *
-   * @return @b bool Indicates whether to perform error propagation.
+   * @return bool Indicates whether to perform error propagation.
    */
   bool BundleSettings::errorPropagation() const {
     return m_errorPropagation;
@@ -387,7 +387,7 @@ namespace Isis {
   /**
    * Retrieves the outlier rejection multiplier for the bundle adjustment.
    *
-   * @return @b double The outlier rejection multiplier.
+   * @return double The outlier rejection multiplier.
    */
   double BundleSettings::outlierRejectionMultiplier() const {
     return m_outlierRejectionMultiplier;
@@ -398,7 +398,7 @@ namespace Isis {
    * Retrieves the global a priori sigma latitude value for this bundle
    * adjustment.
    *
-   * @return @b double The global a priori sigma for latitude.
+   * @return double The global a priori sigma for latitude.
    */
   double BundleSettings::globalLatitudeAprioriSigma() const {
     return m_globalLatitudeAprioriSigma;
@@ -409,7 +409,7 @@ namespace Isis {
    * Retrieves the global a priori sigma longitude value for this bundle
    * adjustment.
    *
-   * @return @b double The global a priori sigma for longitude.
+   * @return double The global a priori sigma for longitude.
    */
   double BundleSettings::globalLongitudeAprioriSigma() const {
     return m_globalLongitudeAprioriSigma;
@@ -420,7 +420,7 @@ namespace Isis {
    * Retrieves the global a priori sigma radius value for this bundle
    * adjustment.
    *
-   * @return @b double The global a priori sigma for radius.
+   * @return double The global a priori sigma for radius.
    */
   double BundleSettings::globalRadiusAprioriSigma() const {
     return m_globalRadiusAprioriSigma;
@@ -430,7 +430,7 @@ namespace Isis {
   /**
    * Retrieves the number of observation solve settings.
    *
-   * @return @b int The number of solve settings object for this run of the
+   * @return int The number of solve settings object for this run of the
    *                bundle adjustment.
    */
   int BundleSettings::numberSolveSettings() const {
@@ -445,7 +445,7 @@ namespace Isis {
    * @param observationNumber The observation number associated with the
    *                          BundleObservationSolveSettings object to be accessed.
    *
-   * @return @b BundleObservationSolveSettings The observation settings object that contains
+   * @return BundleObservationSolveSettings The observation settings object that contains
    *                                           the observation number passed.
    *
    * @throw IException::Unknown "Unable to find BundleObservationSolveSettings
@@ -471,7 +471,7 @@ namespace Isis {
    *
    * @param n The index of the BundleObservationSolveSettings object to be
    *          accessed.
-   * @return @b BundleObservationSolveSettings The observation settings object corresponding
+   * @return BundleObservationSolveSettings The observation settings object corresponding
    *                                           to the given index.
    * @throw IException::Unknown "Unable to find BundleObservationSolveSettings
    *                             with given index"
@@ -503,7 +503,7 @@ namespace Isis {
    *
    * @param criteria Convergence criteria name to be converted.
    *
-   * @return @b ConvergenceCriteria The enumeration corresponding to the given name.
+   * @return ConvergenceCriteria The enumeration corresponding to the given name.
    *
    * @throw Isis::Exception::Programmer "Unknown bundle convergence criteria."
    */
@@ -528,7 +528,7 @@ namespace Isis {
    *
    * @param criteria The ConvergenceCriteria enumeration to be converted.
    *
-   * @return @b QString The name associated with the given convergence criteria.
+   * @return QString The name associated with the given convergence criteria.
    *
    * @throw Isis::Exception::Programmer "Unknown bundle convergence criteria enum."
    */
@@ -565,7 +565,7 @@ namespace Isis {
    * Retrieves the convergence criteria to be used to solve the bundle
    * adjustment.
    *
-   * @return @b ConvergenceCriteria The enumeration of the convergence criteria.
+   * @return ConvergenceCriteria The enumeration of the convergence criteria.
    */
   BundleSettings::ConvergenceCriteria BundleSettings::convergenceCriteria() const {
     return m_convergenceCriteria;
@@ -576,7 +576,7 @@ namespace Isis {
    * Retrieves the convergence threshold to be used to solve the bundle
    * adjustment.
    *
-   * @return @b double The threshold that determines convergence.
+   * @return double The threshold that determines convergence.
    */
   double BundleSettings::convergenceCriteriaThreshold() const {
     return m_convergenceCriteriaThreshold;
@@ -683,7 +683,7 @@ namespace Isis {
   /**
    * Retrieves a pointer to target body information for the bundle adjustment.
    *
-   * @return @b BundleTargetBodyQsp A pointer to the BundleTargetBody object for
+   * @return BundleTargetBodyQsp A pointer to the BundleTargetBody object for
    *                                the bundle adjustment to be run.
    */
   BundleTargetBodyQsp BundleSettings::bundleTargetBody() const {
@@ -695,7 +695,7 @@ namespace Isis {
    * This method is used to determine whether the bundle adjustment
    * will solve for target body pole position.
    *
-   * @return @b bool Indicates whether to solve for target pole position.
+   * @return bool Indicates whether to solve for target pole position.
    */
 //  bool BundleSettings::solveTargetBodyPolePosition() const {
 //    return m_solveTargetBodyPolePosition;
@@ -706,7 +706,7 @@ namespace Isis {
    * Retrieves the number of target body parameters. If the BundleTargetBody
    * associated with this bundle adjustment is NULL, this method returns 0.
    *
-   * @return @b int The number of target body parameters.
+   * @return int The number of target body parameters.
    */
   int BundleSettings::numberTargetBodyParameters() const {
     if (!m_bundleTargetBody)
@@ -720,7 +720,7 @@ namespace Isis {
    * This method is used to determine whether the bundle adjustment will solve
    * for target body.
    *
-   * @return @b bool Indicates whether to solve for target body.
+   * @return bool Indicates whether to solve for target body.
    */
   bool BundleSettings::solveTargetBody() const {
     if (!m_bundleTargetBody) {
@@ -738,7 +738,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePoleRA()
    *
-   * @return @b bool Indicates whether to solve for target pole RA.
+   * @return bool Indicates whether to solve for target pole RA.
    */
   bool BundleSettings::solvePoleRA() const {
     if (!m_bundleTargetBody) {
@@ -754,7 +754,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePoleRAVelocity()
    *
-   * @return @b bool Indicates whether to solve for target pole RA velocity.
+   * @return bool Indicates whether to solve for target pole RA velocity.
    */
   bool BundleSettings::solvePoleRAVelocity() const {
     if (!m_bundleTargetBody) {
@@ -770,7 +770,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePoleDeclination()
    *
-   * @return @b bool Indicates whether to solve for target pole declination.
+   * @return bool Indicates whether to solve for target pole declination.
    */
   bool BundleSettings::solvePoleDec() const {
     if (!m_bundleTargetBody) {
@@ -786,7 +786,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePoleDeclinationVelocity()
    *
-   * @return @b bool Indicates whether to solve for target pole declination velocity.
+   * @return bool Indicates whether to solve for target pole declination velocity.
    */
   bool BundleSettings::solvePoleDecVelocity() const {
     if (!m_bundleTargetBody) {
@@ -802,7 +802,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePM()
    *
-   * @return @b bool Indicates whether to solve for target PM.
+   * @return bool Indicates whether to solve for target PM.
    */
   bool BundleSettings::solvePM() const {
     if (!m_bundleTargetBody) {
@@ -818,7 +818,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePMVelocity()
    *
-   * @return @b bool Indicates whether to solve for target PM velocity.
+   * @return bool Indicates whether to solve for target PM velocity.
    */
   bool BundleSettings::solvePMVelocity() const {
     if (!m_bundleTargetBody) {
@@ -834,7 +834,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solvePMAcceleration()
    *
-   * @return @b bool Indicates whether to solve for target PM acceleration.
+   * @return bool Indicates whether to solve for target PM acceleration.
    */
   bool BundleSettings::solvePMAcceleration() const {
     if (!m_bundleTargetBody) {
@@ -850,7 +850,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solveTriaxialRadii()
    *
-   * @return @b bool Indicates whether to solve for target triaxial radii.
+   * @return bool Indicates whether to solve for target triaxial radii.
    */
   bool BundleSettings::solveTriaxialRadii() const {
     if (!m_bundleTargetBody) {
@@ -866,7 +866,7 @@ namespace Isis {
    *
    * @see BundleTargetBody::solveMeanRadius()
    *
-   * @return @b bool Indicates whether to solve for target mean radius.
+   * @return bool Indicates whether to solve for target mean radius.
    */
   bool BundleSettings::solveMeanRadius() const {
     if (!m_bundleTargetBody) {
@@ -939,7 +939,7 @@ namespace Isis {
    * appended to all of the output files created by the bundle
    * adjustment.
    *
-   * @return @b QString A string containing a prefix and/or
+   * @return QString A string containing a prefix and/or
    *                    directory path to be appended to all
    *                    output files.
    */
@@ -1071,7 +1071,7 @@ namespace Isis {
    * @param qName SAX qualified name of the tag.
    * @param attributes The list of attributes for the tag.
    *
-   * @return @b bool Indicates whether to continue reading the XML (usually true).
+   * @return bool Indicates whether to continue reading the XML (usually true).
    */
   bool BundleSettings::XmlHandler::startElement(const QString &namespaceURI,
                                                 const QString &localName,

@@ -29,7 +29,9 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+#include "Histogram.h"
 #include "Table.h"
+#include "PiecewisePolynomial.h"
 #include "PolynomialUnivariate.h"
 
 namespace Isis {
@@ -242,6 +244,8 @@ namespace Isis {
 
       Table Cache(const QString &tableName);
 
+      std::vector<double> timeCache() const;
+
       //! Is this position cached
       bool IsCached() const {
         return (p_cache.size() > 0);
@@ -249,17 +253,31 @@ namespace Isis {
 
       void SetPolynomial(const Source type = PolyFunction);
 
+      PiecewisePolynomial fitPolynomial(const int degree,
+                                        const int segmentCount = 1);
+
       void SetPolynomial(const std::vector<double>& XC,
                          const std::vector<double>& YC,
                          const std::vector<double>& ZC,
-                         const Source type = PolyFunction);
+                         const Source type = PolyFunction,
+                         const int segment = 0);
 
       void GetPolynomial(std::vector<double>& XC,
                          std::vector<double>& YC,
-                         std::vector<double>& ZC);
+                         std::vector<double>& ZC,
+                         const int segment = 0);
 
       //! Set the polynomial degree
       void SetPolynomialDegree(int degree);
+
+      void setPolynomialSegments(int segments);
+
+      int numPolynomialSegments() const;
+      std::vector<double> polynomialKnots() const;
+      std::vector<double> scaledPolynomialKnots() const;
+      int polySegmentIndex(double et) const;
+
+      Histogram computeError(PiecewisePolynomial poly);
 
       //! Return the source of the position
       Source GetSource() {
@@ -319,7 +337,8 @@ namespace Isis {
       void ClearCache();
       void LoadTimeCache();
       void CacheLabel(Table &table);
-      double ComputeVelocityInTime(PartialType var);
+      void PolynomialLabel(Table &table);
+      std::vector<double> computeVelocityInTime(double time);
 
       int p_targetCode;                   //!< target body code
       int p_observerCode;                 //!< observer body code
@@ -343,6 +362,7 @@ namespace Isis {
       std::vector<std::vector<double> > p_cache;         //!< Cached positions
       std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
       std::vector<double> p_coefficients[3];             //!< Coefficients of polynomials fit to 3 coordinates
+      PiecewisePolynomial m_polynomial;   //!< Polynomial fit to the position data.
 
       double p_baseTime;                  //!< Base time used in fit equations
       double p_timeScale;                 //!< Time scale used in fit equations
@@ -350,6 +370,8 @@ namespace Isis {
       //    of degree p_degree has been created and
       //    used to fill the cache
       int p_degree;                       //!< Degree of polynomial function fit to the coordinates of the position
+      int m_segments;                     /**< The number of segments to use in a piecewise
+                                               polynomial fit to the coordinates.*/
       double p_fullCacheStartTime;        //!< Original start time of the complete cache after spiceinit
       double p_fullCacheEndTime;          //!< Original end time of the complete cache after spiceinit
       double p_fullCacheSize;             //!< Orignial size of the complete cache after spiceinit
@@ -362,6 +384,9 @@ namespace Isis {
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
   };
+
+  //! Typdef for SpicePosition QSharedPointer.
+  typedef QSharedPointer<SpicePosition> SpicePositionQsp;
 };
 
 #endif

@@ -379,3 +379,10 @@ Object = Filters
   End_Group
 End_Object
 End
+
+Testing double to hex string methods...
+
+Converting [3.14159] to a hex string...
+Hex string: 6e861bf0f9210940
+Converting back to a double...
+Values match? Yes

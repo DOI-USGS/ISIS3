@@ -84,6 +84,12 @@ namespace Isis {
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id serialization
    *                           for save() (causes segfault in unit test for empty xml). Fixes #4797.
    *   @history 2017-04-27 J Bonn - Updated serialization code and tests.
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -members...
+   *                               int m_numberContinuityConstraintEquations
+   *                           -methods...
+   *                               void setNumberContinuityConstraintEquations
+   *                               int numberContinuityConstraintEquations
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -158,6 +164,7 @@ namespace Isis {
       void incrementNumberConstrainedImageParameters(int incrementAmount);
       void resetNumberConstrainedTargetParameters();
       void incrementNumberConstrainedTargetParameters(int incrementAmount);
+      void setNumberContinuityConstraintEquations(int numberContinuityConstraints);
       void setNumberUnknownParameters(int numberParameters);
       void computeDegreesOfFreedom();
       void computeSigma0(double dvtpv, BundleSettings::ConvergenceCriteria criteria);
@@ -209,6 +216,7 @@ namespace Isis {
       int numberConstrainedPointParameters() const;
       int numberConstrainedImageParameters() const;
       int numberConstrainedTargetParameters() const;
+      int numberContinuityConstraintEquations() const;
       int numberUnknownParameters() const;
       int degreesOfFreedom() const;
       double sigma0() const;
@@ -302,18 +310,19 @@ namespace Isis {
 
       double m_rejectionLimit;                //!< current rejection limit
       // TODO:??? reorder read/write data stream, init, copy constructor, operator=
-      int m_numberObservations;                //!< number of image coordinate observations
-      int m_numberRejectedObservations;        //!< number of rejected image coordinate observations
-      int m_numberUnknownParameters;           //!< total number of parameters to solve for
-      int m_numberImageParameters;             //!< number of image parameters
-      int m_numberConstrainedImageParameters;  //!< number of constrained image parameters
-      int m_numberConstrainedPointParameters;  //!< number of constrained point parameters
-      int m_numberConstrainedTargetParameters; //!< number of constrained target parameters
-      int m_degreesOfFreedom;                  //!< degrees of freedom
-      double m_sigma0;                         //!< std deviation of unit weight
-      double m_elapsedTime;                    //!< elapsed time for bundle
-      double m_elapsedTimeErrorProp;           //!< elapsed time for error propagation
-      double m_radiansToMeters;                //!< radian to meters conversion factor for the body
+      int m_numberObservations;                  //!< # of image coordinate observations
+      int m_numberRejectedObservations;          //!< # of rejected image coordinate observations
+      int m_numberUnknownParameters;             //!< total # of parameters to solve for
+      int m_numberImageParameters;               //!< # of image parameters
+      int m_numberConstrainedImageParameters;    //!< # of constrained image parameters
+      int m_numberConstrainedPointParameters;    //!< # of constrained point parameters
+      int m_numberConstrainedTargetParameters;   //!< # of constrained target parameters
+      int m_numberContinuityConstraintEquations; //!< # of continuity constraint equations
+      int m_degreesOfFreedom;                    //!< degrees of freedom
+      double m_sigma0;                           //!< std deviation of unit weight
+      double m_elapsedTime;                      //!< elapsed time for bundle
+      double m_elapsedTimeErrorProp;             //!< elapsed time for error propagation
+      double m_radiansToMeters;                  //!< radian to meters conversion factor for the body
       bool m_converged;
 
       // Variables for output methods in BundleSolutionInfo

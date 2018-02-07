@@ -26,8 +26,9 @@
 #include <iostream>
 
 // boost library
-#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/symmetric.hpp>
 
 // Qt Library
 #include <QDebug>
@@ -70,6 +71,8 @@ namespace Isis {
    *   @history 2016-08-16 Jesse Mapel - Added BOOST_UBLAS_NO_STD_CERR definition to
    *                           prevent Boost from outputing debug information to standard out
    *                           when throwing exceptions.  Fixes #2302.
+   *   @history 2017-11-01 Ken Edmundson - Added support for Boost compressed matrix and vector
+   *                                       types, including QDebug operators.
    *   @history 2017-12-12 Jeannie Backer - Added SymmetricMatrix typedef.
    *
    *
@@ -104,15 +107,21 @@ namespace Isis {
   class LinearAlgebra {
     public:
       /**
-       * Definition for an Isis::LinearAlgebra::Matrix of doubles. This is a
-       * typedef for a boost matrix.
-       *
-       * Note: This typedef is used so that we can add functionality to an
+       * Definitions for various Isis::LinearAlgebra::Matrix of doubles. These are
+       * typedefs for boost matrices.
+       *  
+       * Note: These typedefs are used so that we can add functionality to an
        * existing matrix type and/or change which third party library's matrix
        * we are using without changing all references to this type in the ISIS
        * API.
        */
       typedef boost::numeric::ublas::matrix<double> Matrix;
+      typedef boost::numeric::ublas::compressed_matrix<double> MatrixCompressed;
+      typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>
+          MatrixUpperTriangular;
+      typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::lower>
+          MatrixLowerTriangular;
+
       /**
        * Definition for an Isis::LinearAlgebra::SymmetrixMatrix of doubles with
        * an upper configuration. This is a typedef for a boost symmetric_matrix.
@@ -133,6 +142,7 @@ namespace Isis {
        * API.
        */
       typedef boost::numeric::ublas::vector<double> Vector;
+      typedef boost::numeric::ublas::compressed_vector<double> VectorCompressed;
 
       // define AxisAngle and EulerAngle
       /**
@@ -238,8 +248,13 @@ namespace Isis {
   // these must be declared outside of the class (at the end since they must be
   // declared after the typedefs)
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Vector &vector);
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::VectorCompressed &vector);
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Matrix &matrix);
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixCompressed &matrix);
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixUpperTriangular &matrix);
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixLowerTriangular &matrix);
   QString toString(const LinearAlgebra::Vector &vector, int precision=15);
+  QString toString(const LinearAlgebra::VectorCompressed &vectorCompressed, int precision=15);
 };
 
 #endif

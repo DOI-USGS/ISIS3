@@ -65,6 +65,12 @@ namespace Isis {
    *   @history 2017-05-09 Ken Edmundson - Added m_startColumn member and mutator/accessor methods
    *                           to SparseBlockColumnMatrix. Done to eliminate lengthy computation of
    *                           leading colums and rows. References #4664.
+   *   @history 2017-11-01 Ken Edmundson - Added m_observationIndex member and mutator/accessor
+   *                           methods to SparseBlockColumnMatrix. Initialized to -1 in constructor.
+   *                           Done primarily to support bundle error propagation. NOTE: Don't like
+   *                           this as it makes the matrix too specific to the bundle. The matrix
+   *                           should ideally be general.
+   * @todo                     Is there a better way for the error propagation change above?
    */
   class SparseBlockColumnMatrix :
       public QMap< int, LinearAlgebra::Matrix * > {
@@ -85,7 +91,9 @@ namespace Isis {
     bool insertMatrixBlock(int nColumnBlock, int nRows, int nCols);
 
     void setStartColumn(int nStartColumn);
+    void setObservationIndex(int observationIndex);
     int startColumn() const;
+    int observationIndex() const;
     int numberOfElements();
     int numberOfRows();
     int numberOfColumns();
@@ -96,6 +104,7 @@ namespace Isis {
     int m_startColumn; /**< starting column for this Block Column in full matrix
                             e.g. for Block Column 4, if the preceding Block Columns each have 6
                             columns, then the starting column for Block Column 4 is 24 */
+    int m_observationIndex; /**< index of BundleObservation */
   };
 
   // operators to read/write SparseBlockColumnMatrix to/from binary disk file
@@ -155,7 +164,7 @@ namespace Isis {
     int getLeadingColumnsForBlock(int nblockColumn);
     int numberOfElements();
     void print(std::ostream& outstream);
-    void printClean(std::ostream& outstream);
+    void printClean(std::ostream& outstream);    
   };
 
   // operators to read/write SparseBlockRowMatrix to/from binary disk file
@@ -163,7 +172,7 @@ namespace Isis {
   QDataStream &operator>>(QDataStream &, SparseBlockRowMatrix &);
 
   // operator to write SparseBlockRowMatrix to QDebug stream
-  QDebug operator<<(QDebug dbg, const SparseBlockRowMatrix &sbcm);
+  QDebug operator<<(QDebug dbg, const SparseBlockRowMatrix &sbrm);
 
   /**
    * @brief SparseBlockMatrix
@@ -209,7 +218,7 @@ namespace Isis {
     void wipe();
     void copy(const SparseBlockMatrix& src);
 
-    bool setNumberOfColumns( int n );
+    void setNumberOfColumns( int n );
     void zeroBlocks();
     bool insertMatrixBlock(int nColumnBlock, int nRowBlock, int nRows, int nCols);
     LinearAlgebra::Matrix *getBlock(int column, int row);

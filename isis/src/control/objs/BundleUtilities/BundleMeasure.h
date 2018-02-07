@@ -64,6 +64,14 @@ namespace Isis {
    *                           methods.  Added typedef for BundleMeasureQsp.  Fixes #4159.
    *   @history 2016-08-18 Jesse Mapel - Changed to no longer inherit from QObject.  Fixes #4192.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2017-07-14 Ken Edmundson - Added members m_polyPositionSegmentIndex and
+   *                           m_polyRotationSegmentIndex; and corresponding accessors and mutators
+   *                           in support of piecewise polynomial implementation.
+   *   @history 2017-11-01 Ken Edmundson - Added members m_normalsPositionBlockIndex and
+   *                           m_normalsPointingBlockIndex; and corresponding accessors and
+   *                           mutators. Also added methods setPolySegmentIndices() and
+   *                           setNormalsBlockIndices(). All in support of piecewise polynomial
+   *                           implementation.
    */
 
   class BundleMeasure {
@@ -83,6 +91,13 @@ namespace Isis {
       void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
 
+      void setPolySegmentIndices();
+      void setNormalsBlockIndices(int solveTargetBody=0);
+      void setPolyPositionSegmentIndex(int index);
+      void setPolyPointingSegmentIndex(int index);
+      void setNormalsPositionBlockIndex(int index);
+      void setNormalsPointingBlockIndex(int index);
+
       bool isRejected() const;
       Camera *camera() const;
       BundleControlPoint *parentControlPoint();
@@ -101,13 +116,22 @@ namespace Isis {
       double focalPlaneMeasuredX() const;
       double focalPlaneMeasuredY() const;
       int observationIndex() const;
+      int polyPositionSegmentIndex() const;
+      int polyPointingSegmentIndex() const;
+      int positionNormalsBlockIndex() const;
+      int pointingNormalsBlockIndex() const;
 
     private:
-      ControlMeasure *m_controlMeasure;         /**< Contained control measure **/
-      BundleControlPoint *m_parentControlPoint; /**< Parent bundle control point that contains this
-                                                     bundle control measure **/
-      QSharedPointer<BundleImage> m_parentBundleImage; /**< Parent image of this bundle control measure **/
-      QSharedPointer<BundleObservation> m_parentObservation; /**< Parent bundle observation **/
+      ControlMeasure *m_controlMeasure;                      //!< ISIS control measure
+      BundleControlPoint *m_parentControlPoint;              //!< Parent bundle control point
+      QSharedPointer<BundleImage> m_parentBundleImage;       //!< Parent image
+      QSharedPointer<BundleObservation> m_parentObservation; //!< Parent bundle observation
+
+      int m_polyPositionSegmentIndex; //!< segment index for piecewise position polynomial
+      int m_polyPointingSegmentIndex; //!< segment index for piecewise rotation polynomial
+
+      int m_normalsPositionBlockIndex; //!< block index into normal equations
+      int m_normalsPointingBlockIndex; //!< block index into normal equations
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

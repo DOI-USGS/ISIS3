@@ -8,12 +8,12 @@ Printing PVL group with settings from the default constructor...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -24,12 +24,12 @@ Testing copy constructor...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -40,12 +40,12 @@ Testing assignment operator to set this equal to itself...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -56,12 +56,12 @@ Testing assignment operator to create a new settings object...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -73,15 +73,42 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 <bundleObservationSolveSettings>
     
     <instrumentId>MyInstrumentId</instrumentId>
-    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" numberPolySegments="0" solveTwist="Yes" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
-            <sigma>3.0</sigma>
             <sigma>4.0</sigma>
+            <sigma>5.0</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="Yes" interpolationType="4">
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
         <aprioriPositionSigmas>
-            <sigma>800.0</sigma>
+            <sigma>900.0</sigma>
+        </aprioriPositionSigmas>
+    </instrumentPositionOptions>
+</bundleObservationSolveSettings> 
+
+
+CK polynomial degree:  2
+CK interpolation type:  "3"
+Solving over existing pointing?  false
+SPK polynomial degree:  2
+SPK interpolation type:  "3"
+Solving over hermite position?  false
+
+<bundleObservationSolveSettings>
+    
+    <instrumentId>MyInstrumentId</instrumentId>
+    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+        <aprioriPointingSigmas>
+            <sigma>2.0</sigma>
+            <sigma>1.0</sigma>
+            <sigma>0.1</sigma>
+        </aprioriPointingSigmas>
+    </instrumentPointingOptions>
+    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
+        <aprioriPositionSigmas>
+            <sigma>50.0</sigma>
+            <sigma>1.0</sigma>
+            <sigma>0.1</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -91,10 +118,10 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas/>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -104,12 +131,12 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas>
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
@@ -121,13 +148,13 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="PositionAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
@@ -140,14 +167,14 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
@@ -161,17 +188,17 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 <bundleObservationSolveSettings>
     
     <instrumentId>MyInstrumentId</instrumentId>
-    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" numberPolySegments="1" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
-            <sigma>1.0</sigma>
             <sigma>N/A</sigma>
             <sigma>3.0</sigma>
+            <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" solveOverHermiteSpline="Yes" interpolationType="4">
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
         <aprioriPositionSigmas>
-            <sigma>8.0</sigma>
             <sigma>9.0</sigma>
+            <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
@@ -181,13 +208,21 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
 Testing static unused enum-to-string and string-to-enum methods...
 "None"
 "AnglesOnly"
+"AnglesOnly"
+"AnglesAndVelocity"
 "AnglesAndVelocity"
 "AnglesVelocityAndAcceleration"
+"AnglesVelocityAndAcceleration"
+"AllPolynomialCoefficients"
 "AllPolynomialCoefficients"
 "None"
 "PositionOnly"
+"PositionOnly"
+"PositionAndVelocity"
 "PositionAndVelocity"
 "PositionVelocityAndAcceleration"
+"PositionVelocityAndAcceleration"
+"AllPolynomialCoefficients"
 "AllPolynomialCoefficients"
 
 Testing XML: write XML from BundleObservationSolveSettings object...
@@ -196,12 +231,12 @@ Testing XML: read XML to BundleObservationSolveSettings object...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -212,12 +247,12 @@ Testing XML: read XML to BundleObservationSolveSettings object...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="PositionOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas>
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
@@ -230,13 +265,13 @@ Testing XML: read XML to BundleObservationSolveSettings object...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="PositionAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
@@ -250,14 +285,14 @@ Testing XML: read XML to BundleObservationSolveSettings object...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="PositionVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas>
             <sigma>N/A</sigma>
             <sigma>N/A</sigma>
@@ -272,17 +307,17 @@ Testing XML: read XML to BundleObservationSolveSettings object...
 <bundleObservationSolveSettings>
     
     <instrumentId>MyInstrumentId</instrumentId>
-    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" numberPolySegments="1" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
-            <sigma>1.0</sigma>
             <sigma>N/A</sigma>
             <sigma>3.0</sigma>
+            <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" solveOverHermiteSpline="Yes" interpolationType="4">
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
         <aprioriPositionSigmas>
-            <sigma>8.0</sigma>
             <sigma>9.0</sigma>
+            <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
@@ -294,16 +329,21 @@ Testing XML: read XML with no attributes or values to object...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
 
+
+Testing observation number methods...
+Observation numbers:  ""
+Add a new observation number
+Observation numbers:  "TestObservation1"
 
 Testing error throws...
 **ERROR** Unknown bundle instrument pointing solve option Nonsense.
@@ -345,28 +385,42 @@ Testing mutators and accessors...
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas/>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
 
 
     output bundle observation...
-0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
-0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+
+    Position Segment Number: 1
+         Segment Start Time: N/A
+           Segment End Time: N/A
+
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
   X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
   Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
   Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
- RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
 
   X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
   Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
   Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+
+
+    Pointing Segment Number: 1
+         Segment Start Time: N/A
+           Segment End Time: N/A
+
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+ RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+
  RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
 DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
 TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
@@ -376,17 +430,17 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
 <bundleObservationSolveSettings>
     
     <instrumentId>MyInstrumentId</instrumentId>
-    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
+    <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" numberPolySegments="1" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
-            <sigma>1.0</sigma>
             <sigma>N/A</sigma>
             <sigma>3.0</sigma>
+            <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" solveOverHermiteSpline="Yes" interpolationType="4">
+    <instrumentPositionOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="8" degree="6" solveDegree="7" numberPolySegments="1" solveOverHermiteSpline="Yes" interpolationType="4">
         <aprioriPositionSigmas>
-            <sigma>8.0</sigma>
             <sigma>9.0</sigma>
+            <sigma>N/A</sigma>
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
@@ -394,41 +448,79 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
 
 
     output bundle observation...
-0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,1.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,1.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
-0.0,0.0,0.0,8.0,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,8.0,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,8.0,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,1.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,3.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,1.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,3.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
-  X  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
-     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
-  Y  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
-     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
-  Z  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
-     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
- RA  (t0)       0.00000000           0.00000000          0.00000000               1.0               N/A
+
+    Position Segment Number: 1
+         Segment Start Time: N/A
+           Segment End Time: N/A
+
+0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,
+0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,
+  X  (t0)       0.00000000           0.00000000          0.00000000               9.0               N/A
      (t1)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t2)       0.00000000           0.00000000          0.00000000               3.0               N/A
+     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
      (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
      (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
      (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-DEC  (t0)       0.00000000           0.00000000          0.00000000               1.0               N/A
+     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
+  Y  (t0)       0.00000000           0.00000000          0.00000000               9.0               N/A
      (t1)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t2)       0.00000000           0.00000000          0.00000000               3.0               N/A
+     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
+  Z  (t0)       0.00000000           0.00000000          0.00000000               9.0               N/A
+     (t1)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
+
+  X  (t0)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+  Y  (t0)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+  Z  (t0)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+
+
+    Pointing Segment Number: 1
+         Segment Start Time: N/A
+           Segment End Time: N/A
+
+0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,3.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,3.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+ RA  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t1)       0.00000000           0.00000000          0.00000000               3.0               N/A
+     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
+DEC  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
+     (t1)       0.00000000           0.00000000          0.00000000               3.0               N/A
+     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
      (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
      (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
      (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
@@ -439,39 +531,15 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
      (t4)       0.00000000           0.00000000          0.00000000               N/A               N/A
      (t5)       0.00000000           0.00000000          0.00000000               N/A               N/A
 
-  X  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
+ RA  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000               3.0        0.00000000
      (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
      (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
      (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
      (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-  Y  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
+DEC  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+     (t1)       0.00000000           0.00000000          0.00000000               3.0        0.00000000
      (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-  Z  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
- RA  (t0)       0.00000000           0.00000000          0.00000000               1.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000               3.0        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-DEC  (t0)       0.00000000           0.00000000          0.00000000               1.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000               3.0        0.00000000
      (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
      (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
      (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
@@ -487,12 +555,12 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
 <bundleObservationSolveSettings>
     
     <instrumentId></instrumentId>
-    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+    <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
             <sigma>N/A</sigma>
         </aprioriPointingSigmas>
     </instrumentPointingOptions>
-    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+    <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
 </bundleObservationSolveSettings> 
@@ -510,16 +578,37 @@ parameter corrections : 0.0     0.0     0.0
 apriori sigmas :        -1.79769313486231e+308     -1.79769313486231e+308     -1.79769313486231e+308     
 adjusted sigmas :       0.0     0.0     0.0     
     output bundle observation...
-0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,
+
+    Position Segment Number: 1
+         Segment Start Time: N/A
+           Segment End Time: N/A
+
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
+0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
   X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
   Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
   Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+
+  X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+  Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+  Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+
+
+    Pointing Segment Number: 1
+         Segment Start Time: N/A
+           Segment End Time: N/A
+
+0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,
+0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,
  RA  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
 DEC  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
 TWI  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
 
-0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,
-init exterior orientiation successful?   "Yes"
+ RA  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+DEC  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+TWI  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
+
+init exterior orientiation successful?   "No"
 apply param corrections successful?
 **ERROR** Unable to apply parameter corrections to BundleObservation.
 **ERROR** Instrument rotation is NULL, but pointing solve option is AnglesOnly.
@@ -528,6 +617,12 @@ apply param corrections successful?
     access images by serial number...
 TestImageFileName
 TestImage2FileName
+
+Get the number of segments
+Number of position segments:  1
+Number of pointing segments:  1
+Total number of segments:  2
+Number of continuity constraints:  0
 
 Testing exceptions...
 **ERROR** Unable to apply parameter corrections to BundleObservation.
@@ -539,9 +634,16 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 Testing BundleObservationVector...
 
+" RA  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000\nDEC  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000\nTWI  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000\n"
+"  X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A\n  Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A\n  Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A\n"
+" RA  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000\nDEC  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000\nTWI  (t0)       0.00000000           0.00000000          0.00000000              FREE        0.00000000\n"
+"  X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A\n  Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A\n  Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A\n"
 number of position parameters:  "0"
-number of pointing parameters:  "0"
-number of parameters:  "0"
+number of pointing parameters:  "6"
+number of parameters:  "6"
+number of continuity constraints:  "0"
+Test copy constructor
+Test assignment operator
 init exterior orientiation successful?   "Yes"
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

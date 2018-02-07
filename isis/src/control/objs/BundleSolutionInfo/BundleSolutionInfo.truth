@@ -25,12 +25,12 @@ Serializing results from the settings/cnet/statistics constructor...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -118,12 +118,12 @@ Serializing test XML object to file...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -210,12 +210,12 @@ Testing XML: Object deserialized as (should match object above):
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -301,12 +301,12 @@ Testing copy constructor...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -392,12 +392,12 @@ Testing assignment operator to set this equal to itself...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -483,12 +483,12 @@ Testing assignment operator to create a new results object...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -574,12 +574,12 @@ Testing mutator methods...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -676,12 +676,12 @@ Serializing test XML object to file...
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -691,9 +691,6 @@ Serializing test XML object to file...
         <correlationMatrix correlationFileName="" covarianceFileName="">
             <imagesAndParameters>
                 <image id="TestImageFileName">
-                    <parameter>  X  (t0)</parameter>
-                    <parameter>  Y  (t0)</parameter>
-                    <parameter>  Z  (t0)</parameter>
                     <parameter> RA  (t0)</parameter>
                     <parameter>DEC  (t0)</parameter>
                     <parameter>TWI  (t0)</parameter>
@@ -779,12 +776,12 @@ Testing XML: Object deserialized as (should match object above):
             <bundleObservationSolveSettings>
                 
                 <instrumentId></instrumentId>
-                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
+                <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" numberPolySegments="1" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
                     <aprioriPointingSigmas>
                         <sigma>N/A</sigma>
                     </aprioriPointingSigmas>
                 </instrumentPointingOptions>
-                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
+                <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" numberPolySegments="1" solveOverHermiteSpline="No" interpolationType="3">
                     <aprioriPositionSigmas/>
                 </instrumentPositionOptions>
             </bundleObservationSolveSettings>
@@ -794,9 +791,6 @@ Testing XML: Object deserialized as (should match object above):
         <correlationMatrix correlationFileName="" covarianceFileName="">
             <imagesAndParameters>
                 <image id="TestImageFileName">
-                    <parameter>  X  (t0)</parameter>
-                    <parameter>  Y  (t0)</parameter>
-                    <parameter>  Z  (t0)</parameter>
                     <parameter> RA  (t0)</parameter>
                     <parameter>DEC  (t0)</parameter>
                     <parameter>TWI  (t0)</parameter>

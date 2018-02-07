@@ -97,7 +97,7 @@ namespace Isis {
    *  
    * @param controlMeasure The ControlMeasure to be converted.
    * 
-   * @return @b BundleMeasure* A pointer to the new BundleMeasure.
+   * @return BundleMeasure* A pointer to the new BundleMeasure.
    */
   BundleMeasureQsp BundleControlPoint::addMeasure(ControlMeasure *controlMeasure) {
 
@@ -253,7 +253,7 @@ namespace Isis {
   /**
    * Accessor for the raw ControlPoint object used for this BundleControlPoint.
    * 
-   * @return @b ControlPoint* A pointer to the raw ControlPoint.
+   * @return ControlPoint* A pointer to the raw ControlPoint.
    */
   ControlPoint *BundleControlPoint::rawControlPoint() const {
     return m_controlPoint;
@@ -263,7 +263,7 @@ namespace Isis {
   /**
    * Method used to determine whether this control point is rejected.
    * 
-   * @return @b bool Indicates whether this control point is rejected.
+   * @return bool Indicates whether this control point is rejected.
    */
   bool BundleControlPoint::isRejected() const {
     return m_controlPoint->IsRejected();
@@ -273,7 +273,7 @@ namespace Isis {
   /**
    * Accesses number of measures associated with this BundleControlPoint.
    * 
-   * @return @b int The number of measures for this point.
+   * @return int The number of measures for this point.
    */
   int BundleControlPoint::numberOfMeasures() const {
     return this->size();
@@ -283,7 +283,7 @@ namespace Isis {
   /**
    * Accesses the number of rejected measures for this BundleControlPoint.
    *
-   * @return @b int Returns the number of rejected measures.
+   * @return int Returns the number of rejected measures.
    *
    * @see ControlPoint::GetNumberOfRejectedMeasures()
    */
@@ -295,7 +295,7 @@ namespace Isis {
   /**
    * Gets the root-mean-square (rms) of the BundleControlPoint's residuals.
    *
-   * @return @b double Returns the rms of the residuals.
+   * @return double Returns the rms of the residuals.
    *
    * @see ControlPoint::GetResidualRms()
    */
@@ -307,7 +307,7 @@ namespace Isis {
   /**
    * Accesses the adjusted SurfacePoint associated with this BundleControlPoint.
    * 
-   * @return @b SurfacePoint The adjusted surface point.
+   * @return SurfacePoint The adjusted surface point.
    */
   SurfacePoint BundleControlPoint::adjustedSurfacePoint() const {
     return m_controlPoint->GetAdjustedSurfacePoint();
@@ -317,7 +317,7 @@ namespace Isis {
   /**
    * Accesses the Point ID associated with this BundleControlPoint. 
    * 
-   * @return @b QString The ID for this point.
+   * @return QString The ID for this point.
    */
   QString BundleControlPoint::id() const {
     return m_controlPoint->GetId();
@@ -327,8 +327,8 @@ namespace Isis {
   /**
    * Accesses BundleControlPoint's type.
    * 
-   * @return @b ControlPoint::PointType The BundleControlPoint's type.  Options are:
-   *                                    Fixed = 0, Constrained = 1, Free = 2.
+   * @return ControlPoint::PointType The BundleControlPoint's type.  Options are:
+   *                                 Fixed = 0, Constrained = 1, Free = 2.
    * 
    * @see ControlPoint::GetType()
    */
@@ -342,7 +342,7 @@ namespace Isis {
    * Accesses the 3 dimensional ordered vector of correction values associated 
    * with latitude, longitude, and radius. 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of correction values.
+   * @return boost::numeric::ublas::bounded_vector<double,3>& The vector of correction values.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::corrections() {
     return m_corrections;
@@ -353,7 +353,7 @@ namespace Isis {
    * Accesses the 3 dimenstional ordered vector of apriori sigmas (apriori 
    * latitude, apriori longitude, apriori radius). 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of apriori sigmas.
+   * @return boost::numeric::ublas::bounded_vector<double,3>& The vector of apriori sigmas.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::aprioriSigmas() {
     return m_aprioriSigmas;
@@ -365,7 +365,7 @@ namespace Isis {
    * Accesses the 3 dimenstional ordered vector of adjusted sigmas (adjusted 
    * latitude, adjusted longitude, adjusted radius). 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of adjusted sigmas.
+   * @return boost::numeric::ublas::bounded_vector<double,3>& The vector of adjusted sigmas.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::adjustedSigmas() {
     return m_adjustedSigmas;
@@ -376,7 +376,7 @@ namespace Isis {
    * Accesses the 3 dimensional ordered vector of weight values associated 
    * with latitude, longitude, and radius. 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The vector of weight values.
+   * @return boost::numeric::ublas::bounded_vector<double,3>& The vector of weight values.
    */
   boost::numeric::ublas::bounded_vector< double, 3 > &BundleControlPoint::weights() {
     return m_weights;
@@ -386,7 +386,7 @@ namespace Isis {
   /**
    * Accesses the 3 dimensional ordered NIC vector. 
    * 
-   * @return @b boost::numeric::ublas::bounded_vector<double,3>& The NIC vector.
+   * @return boost::numeric::ublas::bounded_vector<double,3>& The NIC vector.
    */
   boost::numeric::ublas::bounded_vector<double, 3> &BundleControlPoint::nicVector() {
     return m_nicVector;
@@ -396,7 +396,7 @@ namespace Isis {
   /**
    * Accesses the CholMod matrix associated with this BundleControlPoint.
    * 
-   * @return @b SparseBlockRowMatrix& The CholMod row matrix.
+   * @return SparseBlockRowMatrix& The CholMod row matrix.
    */
   SparseBlockRowMatrix &BundleControlPoint::cholmodQMatrix() {
     return m_cholmodQMatrix;
@@ -411,7 +411,7 @@ namespace Isis {
    *  
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted output summary string.
+   * @return QString The formatted output summary string.
    */
   QString BundleControlPoint::formatBundleOutputSummaryString(bool errorPropagation) const {
 
@@ -448,7 +448,7 @@ namespace Isis {
    * @param RTM Conversion factor from radians to meters. Used to convert the 
    *            latitude and longitude corrections to meters.
    * 
-   * @return @b QString The formatted output detailed string.
+   * @return QString The formatted output detailed string.
    */
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
                                                              double RTM,
@@ -540,7 +540,7 @@ namespace Isis {
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the given double value to be saved off.
    * 
-   * @return @b QString The formatted value, as a string.
+   * @return QString The formatted value, as a string.
    */
   QString BundleControlPoint::formatValue(double value, int fieldWidth, int precision) const {
     QString output;
@@ -560,7 +560,7 @@ namespace Isis {
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * 
-   * @return @b QString The formatted value, as a string.
+   * @return QString The formatted value, as a string.
    */
   QString BundleControlPoint::formatAprioriSigmaString(int version, int fieldWidth,
                                                        int precision, bool solveRadius) const {
@@ -586,7 +586,7 @@ namespace Isis {
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * 
-   * @return @b QString The formatted apriori latitude sigma value, as a string.
+   * @return QString The formatted apriori latitude sigma value, as a string.
    *  
    * @see formatAprioriSigmaString() 
    */
@@ -602,7 +602,7 @@ namespace Isis {
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * 
-   * @return @b QString The formatted apriori longitude sigma value, as a string.
+   * @return QString The formatted apriori longitude sigma value, as a string.
    *  
    * @see formatAprioriSigmaString() 
    */
@@ -618,7 +618,7 @@ namespace Isis {
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * 
-   * @return @b QString The formatted apriori radius sigma value, as a string.
+   * @return QString The formatted apriori radius sigma value, as a string.
    *  
    * @see formatAprioriSigmaString() 
    */
@@ -640,7 +640,7 @@ namespace Isis {
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted value, as a string.
+   * @return QString The formatted value, as a string.
    */
   QString BundleControlPoint::formatAdjustedSigmaString(int type, int fieldWidth, int precision,
                                                         bool errorPropagation) const {
@@ -679,7 +679,7 @@ namespace Isis {
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted adjusted latitude sigma value, as a string.
+   * @return QString The formatted adjusted latitude sigma value, as a string.
    *  
    * @see formatAdjustedSigmaString() 
    */
@@ -696,7 +696,7 @@ namespace Isis {
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted adjusted longitude sigma value, as a string.
+   * @return QString The formatted adjusted longitude sigma value, as a string.
    *  
    * @see formatAdjustedSigmaString() 
    */
@@ -713,7 +713,7 @@ namespace Isis {
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted adjusted radius sigma value, as a string.
+   * @return QString The formatted adjusted radius sigma value, as a string.
    *  
    * @see formatAdjustedSigmaString() 
    */

@@ -141,4 +141,14 @@ int main() {
   Pvl pvlResults;
   pvlTmpl.validatePvl(pvlUser, pvlResults);
   cout << "\n\n**Result PVL**\n" << pvlResults << endl;
+
+  cout << endl;
+  cout << "Testing double to hex string methods..." << endl << endl;
+  double testDouble = 3.14159;
+  cout << "Converting [" << testDouble << "] to a hex string..." << endl;
+  QString convertedString = Pvl::doubleToHexString(testDouble);
+  cout << "Hex string: " << convertedString << endl;
+  cout << "Converting back to a double..." << endl;
+  double reconvertedDouble = Pvl::hexStringToDouble(convertedString);
+  cout << "Values match? " << toString(testDouble == reconvertedDouble) << endl;
 }

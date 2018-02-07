@@ -448,7 +448,7 @@ namespace Isis {
       QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
       QVector<Distance> p_targetRadii;        //!< Radii of target body
 
-      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
+      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
   };
 
   //! This typedef is for future implementation of target body

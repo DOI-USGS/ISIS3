@@ -110,7 +110,7 @@ namespace Isis {
     m_id = NULL;
     m_id = new QUuid(other.m_id->toString());
      // TODO: add check to all copy constructors (verify other.xxx is not null) and operator= ???
-     // or intit all variables in all constructors
+     // or init all variables in all constructors
 
     m_instrumentId = other.m_instrumentId;
     m_instrumentPointingSolveOption = other.m_instrumentPointingSolveOption;
@@ -118,6 +118,7 @@ namespace Isis {
     m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
     m_ckDegree = other.m_ckDegree;
     m_ckSolveDegree = other.m_ckSolveDegree;
+    m_numberCkPolySegments = other.m_numberCkPolySegments;
     m_solveTwist = other.m_solveTwist;
     m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
     m_anglesAprioriSigma = other.m_anglesAprioriSigma;
@@ -126,6 +127,7 @@ namespace Isis {
     m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
     m_spkDegree = other.m_spkDegree;
     m_spkSolveDegree = other.m_spkSolveDegree;
+    m_numberSpkPolySegments = other.m_numberSpkPolySegments;
     m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
     m_positionAprioriSigma = other.m_positionAprioriSigma;
     m_positionInterpolationType = other.m_positionInterpolationType;
@@ -166,6 +168,7 @@ namespace Isis {
       m_numberCamAngleCoefSolved = other.m_numberCamAngleCoefSolved;
       m_ckDegree = other.m_ckDegree;
       m_ckSolveDegree = other.m_ckSolveDegree;
+      m_numberCkPolySegments = other.m_numberCkPolySegments;
       m_solveTwist = other.m_solveTwist;
       m_solvePointingPolynomialOverExisting = other.m_solvePointingPolynomialOverExisting;
       m_pointingInterpolationType = other.m_pointingInterpolationType;
@@ -176,6 +179,7 @@ namespace Isis {
       m_numberCamPosCoefSolved = other.m_numberCamPosCoefSolved;
       m_spkDegree = other.m_spkDegree;
       m_spkSolveDegree = other.m_spkSolveDegree;
+      m_numberSpkPolySegments = other.m_numberSpkPolySegments;
       m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
       m_positionInterpolationType = other.m_positionInterpolationType;
       m_positionAprioriSigma = other.m_positionAprioriSigma;
@@ -202,6 +206,7 @@ namespace Isis {
     //     m_numberCamAngleCoefSolved = 1; // AnglesOnly;
     //     m_ckDegree = 2;
     //     m_ckSolveDegree = 2;
+    //     m_ckPolynomialSegments = 1;
     //     m_solveTwist = true;
     //     m_solvePointingPolynomialOverExisting = false;
     //     m_pointingInterpolationType = SpiceRotation::PolyFunction;
@@ -215,6 +220,7 @@ namespace Isis {
     //     m_numberCamPosCoefSolved = 0; // NoPositionFactors;
     //     m_spkDegree = 2;
     //     m_spkSolveDegree = 2;
+    //     m_spkPolynomialSegments = 1;
     //     m_solvePositionOverHermiteSpline = false;
     //     m_positionInterpolationType = SpicePosition::PolyFunction;
     //     m_positionAprioriSigma.clear();
@@ -240,7 +246,7 @@ namespace Isis {
   /**
    * Accesses the instrument id for this observation.
    *
-   * @return @b QString Returns the instrument id for this observation
+   * @return QString Returns the instrument id for this observation
    */
   QString BundleObservationSolveSettings::instrumentId() const {
     return m_instrumentId;
@@ -262,7 +268,7 @@ namespace Isis {
   /**
    * Returns a list of observation numbers associated with these solve settings.
    *
-   * @return @b QSet<QString> Returns a QSet containing the associated observation numbers.
+   * @return QSet<QString> Returns a QSet containing the associated observation numbers.
    */
   QSet<QString> BundleObservationSolveSettings::observationNumbers() const {
     return m_observationNumbers;
@@ -281,7 +287,7 @@ namespace Isis {
    *
    * @throws IException::Unknown "Unknown bundle instrument point solve option."
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the enumerated
+   * @return BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the enumerated
    *     value of the instrument pointing solve option
    */
   BundleObservationSolveSettings::InstrumentPointingSolveOption
@@ -331,7 +337,7 @@ namespace Isis {
    *
    * @throws IException::Programmer "Unknown pointing solve option enum."
    *
-   * @return @b QString Returns the QString representation of the passed
+   * @return QString Returns the QString representation of the passed
    *                    InstrumentPointingSolveOption
    */
   QString BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
@@ -354,6 +360,7 @@ namespace Isis {
    * @param solveTwist Whether or not to solve for twist
    * @param ckDegree
    * @param ckSolveDegree
+   * @param ckPolynomialSegments Number of segments in piecewise polynomial
    * @param solvePolynomialOverExisting Indicates whether the polynomial will be fit over an
    *                                    existing pointing polynomial
    * @param anglesAprioriSigma A priori angle values
@@ -365,6 +372,7 @@ namespace Isis {
                                            bool solveTwist,
                                            int ckDegree,
                                            int ckSolveDegree,
+                                           int ckPolynomialSegments,
                                            bool solvePolynomialOverExisting,
                                            double anglesAprioriSigma,
                                            double angularVelocityAprioriSigma,
@@ -392,6 +400,14 @@ namespace Isis {
       // solve for the appropriate number of coefficients, based on solve option enum
       m_numberCamAngleCoefSolved = ((int) option);
     }
+
+    // If only solving for only angles,
+    // continuity conditions would force all segments to be the same.
+    // So, just use one segment.
+    if (m_instrumentPointingSolveOption == 1 )
+      m_numberCkPolySegments = 1;
+    else
+      m_numberCkPolySegments = ckPolynomialSegments;
 
     m_anglesAprioriSigma.clear();
     if (m_numberCamAngleCoefSolved > 0) {
@@ -438,7 +454,7 @@ namespace Isis {
   /**
    * Accesses the instrument pointing solve option.
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the
+   * @return BundleObservationSolveSettings::InstrumentPointingSolveOption Returns the
    *     instrument pointing solve option
    */
   BundleObservationSolveSettings::InstrumentPointingSolveOption
@@ -450,7 +466,7 @@ namespace Isis {
   /**
    * Accesses the flag for solving for twist.
    *
-   * @return @b bool Returns whether or not to solve for twist
+   * @return bool Returns whether or not to solve for twist
    */
   bool BundleObservationSolveSettings::solveTwist() const {
     return m_solveTwist;
@@ -460,7 +476,7 @@ namespace Isis {
   /**
    * Accesses the degree of polynomial fit to original camera angles (ckDegree).
    *
-   * @return @b int Returns the degree of the polynomial fit to the original camera angles
+   * @return int Returns the degree of the polynomial fit to the original camera angles
    */
   int BundleObservationSolveSettings::ckDegree() const {
     return m_ckDegree;
@@ -471,7 +487,7 @@ namespace Isis {
    * Accesses the degree of the camera angles polynomial being fit to in the bundle adjustment
    * (ckSolveDegree).
    *
-   * @return @b int Returns the degree of the camera angles polynomial in the bundle adjustment
+   * @return int Returns the degree of the camera angles polynomial in the bundle adjustment
    */
   int BundleObservationSolveSettings::ckSolveDegree()const {
     return m_ckSolveDegree;
@@ -479,9 +495,19 @@ namespace Isis {
 
 
   /**
+   * Accesses the number of segments in the pointing piecewise polynomial.
+   *
+   * @return int Returns the number of segments in the pointing piecewise polynomial.
+   */
+  int BundleObservationSolveSettings::numberCkPolySegments() const {
+    return m_numberCkPolySegments;
+  }
+
+
+  /**
    * Accesses the number of camera angle coefficients in the solution.
    *
-   * @return @b int Returns the number of camera angle coefficients in the solution
+   * @return int Returns the number of camera angle coefficients in the solution
    */
   int BundleObservationSolveSettings::numberCameraAngleCoefficientsSolved() const {
     return m_numberCamAngleCoefSolved;
@@ -491,7 +517,7 @@ namespace Isis {
   /**
    * Whether or not the solve polynomial will be fit over the existing pointing polynomial.
    *
-   * @return @b bool Indicates whether the polynomial will be fit over the existing pointing
+   * @return bool Indicates whether the polynomial will be fit over the existing pointing
    *                 polynomial
    */
   bool BundleObservationSolveSettings::solvePolyOverPointing() const {
@@ -502,7 +528,7 @@ namespace Isis {
   /**
    * Accesses the a priori pointing sigmas.
    *
-   * @return @b QList<double> Returns a QList of the a priori pointing sigmas
+   * @return QList<double> Returns a QList of the a priori pointing sigmas
    */
   QList<double> BundleObservationSolveSettings::aprioriPointingSigmas() const {
     return m_anglesAprioriSigma;
@@ -512,7 +538,7 @@ namespace Isis {
   /**
    * Accesses the SpiceRotation interpolation type for the instrument pointing.
    *
-   * @return @b SpiceRotation::Source Returns the SpiceRotation interpolation type for pointing
+   * @return SpiceRotation::Source Returns the SpiceRotation interpolation type for pointing
    */
   SpiceRotation::Source BundleObservationSolveSettings::pointingInterpolationType() const {
     return m_pointingInterpolationType;
@@ -531,7 +557,7 @@ namespace Isis {
    *
    * @throws IExeption::Unknown "Unknown bundle instrument position solve option."
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the enumerated
+   * @return BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the enumerated
    *     value of the instrument position solve option
    */
   BundleObservationSolveSettings::InstrumentPositionSolveOption
@@ -581,7 +607,7 @@ namespace Isis {
    *
    * @throws IException::Programmer "Unknown position solve option enum."
    *
-   * @return @b QString Returns the QString representation of the passed
+   * @return QString Returns the QString representation of the passed
    *                    InstrumentPointingSolveOption
    */
   QString BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
@@ -603,6 +629,7 @@ namespace Isis {
    * @param option Option for how to solve the instrument position
    * @param spkDegree
    * @param spkSolveDegree
+   * @param spkPolynomialSegments Number of segments in piecewise polynomial
    * @param positionOverHermite Whether or not the polynomial will be fit over an existing Hermite
    *                            spline
    * @param positionAprioriSigma A priori position sigma
@@ -613,6 +640,7 @@ namespace Isis {
                                            InstrumentPositionSolveOption option,
                                            int spkDegree,
                                            int spkSolveDegree,
+                                           int spkPolynomialSegments,
                                            bool positionOverHermite,
                                            double positionAprioriSigma,
                                            double velocityAprioriSigma,
@@ -638,6 +666,14 @@ namespace Isis {
       // solve for the appropriate number of coefficients, based on solve option enum
       m_numberCamPosCoefSolved = ((int) option);
     }
+
+    // If only solving for only position,
+    // continuity conditions would force all segments to be the same.
+    // So, just use one segment.
+    if (m_instrumentPositionSolveOption == 1 )
+      m_numberSpkPolySegments = 1;
+    else
+      m_numberSpkPolySegments = spkPolynomialSegments;
 
     m_positionAprioriSigma.clear();
     if (m_numberCamPosCoefSolved > 0) {
@@ -682,7 +718,7 @@ namespace Isis {
   /**
    * Accesses the instrument position solve option.
    *
-   * @return @b BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the
+   * @return BundleObservationSolveSettings::InstrumentPositionSolveOption Returns the
    *     instrument position solve option
    */
   BundleObservationSolveSettings::InstrumentPositionSolveOption
@@ -694,7 +730,7 @@ namespace Isis {
   /**
    * Accesses the degree of the polynomial fit to the original camera position (spkDegree).
    *
-   * @return @b int Returns the degree of the original camera position polynomial.
+   * @return int Returns the degree of the original camera position polynomial.
    */
   int BundleObservationSolveSettings::spkDegree() const {
     return m_spkDegree;
@@ -702,10 +738,10 @@ namespace Isis {
 
 
   /**
-   * Accesses the degree of thecamera position polynomial being fit to in the bundle adjustment
+   * Accesses the degree of the camera position polynomial being fit to in the bundle adjustment
    * (spkSolveDegree).
    *
-   * @return @b int Returns the degree of the camera position polynomial in the bundle adjustment.
+   * @return int Returns the degree of the camera position polynomial in the bundle adjustment.
    */
   int BundleObservationSolveSettings::spkSolveDegree() const {
     return m_spkSolveDegree;
@@ -713,9 +749,19 @@ namespace Isis {
 
 
   /**
+   * Accesses the number of segments in the position piecewise polynomial.
+   *
+   * @return int Returns the number of segments in the position piecewise polynomial.
+   */
+  int BundleObservationSolveSettings::numberSpkPolySegments() const {
+    return m_numberSpkPolySegments;
+  }
+
+
+  /**
    * Accesses the number of camera position coefficients in the solution.
    *
-   * @return @b int Returns the number of camera position coefficients.
+   * @return int Returns the number of camera position coefficients.
    */
   int BundleObservationSolveSettings::numberCameraPositionCoefficientsSolved() const {
     return m_numberCamPosCoefSolved;
@@ -725,7 +771,7 @@ namespace Isis {
   /**
    * Whether or not the polynomial for solving will be fit over an existing Hermite spline
    *
-   * @return @b bool Returns whether or not to fit the solve polynomial over an existing Hermite
+   * @return bool Returns whether or not to fit the solve polynomial over an existing Hermite
    *                 spline
    */
   bool BundleObservationSolveSettings::solvePositionOverHermite() const {
@@ -736,7 +782,7 @@ namespace Isis {
   /**
    * Accesses the a priori position sigmas.
    *
-   * @return @b QList<double> Returns a QList of the a priori position sigmas
+   * @return QList<double> Returns a QList of the a priori position sigmas
    */
   QList<double> BundleObservationSolveSettings::aprioriPositionSigmas() const {
     return m_positionAprioriSigma;
@@ -746,7 +792,7 @@ namespace Isis {
   /**
    * Accesses the SpicePosition interpolation type for the spacecraft position
    *
-   * @return @b SpicePosition::Source Returns the SpicePositon interpolation type for position
+   * @return SpicePosition::Source Returns the SpicePositon interpolation type for position
    */
   SpicePosition::Source BundleObservationSolveSettings::positionInterpolationType() const {
     return m_positionInterpolationType;
@@ -781,6 +827,7 @@ namespace Isis {
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamAngleCoefSolved));
     stream.writeAttribute("degree", toString(m_ckDegree));
     stream.writeAttribute("solveDegree", toString(m_ckSolveDegree));
+    stream.writeAttribute("numberPolySegments", toString(m_numberCkPolySegments));
     stream.writeAttribute("solveTwist", toString(m_solveTwist));
     stream.writeAttribute("solveOverExisting", toString(m_solvePointingPolynomialOverExisting));
     stream.writeAttribute("interpolationType", toString(m_pointingInterpolationType));
@@ -804,6 +851,7 @@ namespace Isis {
     stream.writeAttribute("numberCoefSolved", toString(m_numberCamPosCoefSolved));
     stream.writeAttribute("degree", toString(m_spkDegree));
     stream.writeAttribute("solveDegree", toString(m_spkSolveDegree));
+    stream.writeAttribute("numberPolySegments", toString(m_numberSpkPolySegments));
     stream.writeAttribute("solveOverHermiteSpline", toString(m_solvePositionOverHermiteSpline));
     stream.writeAttribute("interpolationType", toString(m_positionInterpolationType));
 
@@ -858,7 +906,7 @@ namespace Isis {
    * @param qName
    * @param atts
    *
-   * @return @b bool
+   * @return bool
    *
    * @internal
    *   @todo Document if we decide to use Xml handlers for serialization
@@ -890,6 +938,11 @@ namespace Isis {
         QString ckSolveDegree = atts.value("solveDegree");
         if (!ckSolveDegree.isEmpty()) {
           m_xmlHandlerObservationSettings->m_ckSolveDegree = toInt(ckSolveDegree);
+        }
+
+        QString numberCkPolySegments = atts.value("numberPolySegments");
+        if (!numberCkPolySegments.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_numberCkPolySegments = toInt(numberCkPolySegments);
         }
 
         QString solveTwist = atts.value("solveTwist");
@@ -936,6 +989,12 @@ namespace Isis {
           m_xmlHandlerObservationSettings->m_spkSolveDegree = toInt(spkSolveDegree);
         }
 
+        QString spkPolynomialSegments = atts.value("numberPolySegments");
+        if (!spkPolynomialSegments.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_numberSpkPolySegments = toInt(spkPolynomialSegments);
+        }
+
+
         QString solveOverHermiteSpline = atts.value("solveOverHermiteSpline");
         if (!solveOverHermiteSpline.isEmpty()) {
           m_xmlHandlerObservationSettings->m_solvePositionOverHermiteSpline =
@@ -959,7 +1018,7 @@ namespace Isis {
   /**
    * @param ch
    *
-   * @return @b bool
+   * @return bool
    *
    * @internal
    *   @todo Document if we use Xml handlers for serialization.
@@ -975,7 +1034,7 @@ namespace Isis {
    * @param localName
    * @param qName
    *
-   * @return @b bool
+   * @return bool
    *
    * @internal
    *   @todo Document if we use Xml handlers for serialization.

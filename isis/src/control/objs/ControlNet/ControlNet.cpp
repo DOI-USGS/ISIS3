@@ -60,6 +60,7 @@ namespace Isis {
     pointIds = new QStringList;
 
     m_ownPoints = true;
+
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
   }
