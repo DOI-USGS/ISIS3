@@ -1483,24 +1483,12 @@ namespace Isis {
       if( p_degree == 0) {
         p_velocity = p_cacheVelocity[0];
       }
-<<<<<<< HEAD
       else {
         std::vector<double> veloc = computeVelocityInTime(p_et);
         p_velocity[0] = veloc[0];
         p_velocity[1] = veloc[1];
         p_velocity[2] = veloc[2];
       }
-=======
-      else { 
-        p_velocity[0] = ComputeVelocityInTime(WRT_X);
-        p_velocity[1] = ComputeVelocityInTime(WRT_Y);
-        p_velocity[2] = ComputeVelocityInTime(WRT_Z);
-      }
-        
-//         p_velocity[0] = functionX.DerivativeVar(rtime);
-//         p_velocity[1] = functionY.DerivativeVar(rtime);
-//         p_velocity[2] = functionZ.DerivativeVar(rtime);
->>>>>>> dev
     }
   }
 

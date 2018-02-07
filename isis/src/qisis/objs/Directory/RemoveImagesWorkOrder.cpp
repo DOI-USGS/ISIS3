@@ -37,13 +37,8 @@ namespace Isis {
   RemoveImagesWorkOrder::RemoveImagesWorkOrder(Project *project) :  WorkOrder(project) {
 
     m_isUndoable = false;
-<<<<<<< HEAD
-    QAction::setText(tr("&Delete images from project..."));
-    QUndoCommand::setText(tr("Delete images from project"));
-=======
 
     QAction::setText("&Delete images from project...");
->>>>>>> dev
 
     setModifiesDiskState(true);
   }
@@ -81,11 +76,7 @@ namespace Isis {
    * @description Set up the execution.
    *
    * @return bool True if parent WordOrder can set up the execution.
-<<<<<<< HEAD
-   * 
-=======
    *
->>>>>>> dev
    */
   bool RemoveImagesWorkOrder::setupExecution() {
 
@@ -134,13 +125,6 @@ namespace Isis {
 
   /**
    * @description Remove any selected items from the project directory.
-<<<<<<< HEAD
-   * 
-   * @internal
-   *   @history 2017-08-08 Marjorie Hahn - Created a conditional to check if the currently 
-   *                           selected item to be deleted is actually an image list, so that
-   *                           each image can be removed one by one. Fixes #5074.
-=======
    *
    * @internal
    *   @history 2017-08-08 Marjorie Hahn - Created a conditional to check if the currently
@@ -149,19 +133,10 @@ namespace Isis {
    *   @history 2017-10-04 Cole Neubauer - Moved ImageList to its own loop so images are deleted
    *                           first and we avoid the issue of attempting to delete an image that
    *                           is gone
->>>>>>> dev
    */
   void RemoveImagesWorkOrder::execute() {
 
     QList<ProjectItem *> selectedItems = project()->directory()->model()->selectedItems();
-<<<<<<< HEAD
-    QList<ImageList *> projectImageLists = project()->images();
-
-    foreach (ProjectItem *selectedItem, selectedItems) {
-      
-      if (selectedItem->isImage()) {
-        Image *selectedImage = selectedItem->image();
-=======
     QList<ProjectItem *> needToRemoveItems;
 
 
@@ -172,30 +147,11 @@ namespace Isis {
         Image *selectedImage = selectedItem->image();
         project()->directory()->model()->removeItem(selectedItem);
         
->>>>>>> dev
         foreach (ImageList* projectImageList, projectImageLists) {
           projectImageList->removeAll(selectedImage);
         }
       }
       else if (selectedItem->isImageList()) {
-<<<<<<< HEAD
-        ImageList *selectedImageList = selectedItem->imageList();
-        foreach (Image *selectedImage, *selectedImageList) {
-          foreach (ImageList* projectImageList, projectImageLists) {
-            projectImageList->removeAll(selectedImage);
-          }
-        }
-        project()->removeImages(*selectedImageList);
-      }
-      else {
-        throw IException(IException::User, 
-                         "Item cannot be removed from the project.", 
-                         _FILEINFO_);
-      }
-    }
-    
-    project()->directory()->model()->removeItems(selectedItems);
-=======
         imageListToProcess.append(selectedItem->imageList());
         needToRemoveItems.append(selectedItem);
       }
@@ -215,7 +171,6 @@ namespace Isis {
     }
 
     project()->directory()->model()->removeItems(needToRemoveItems);
->>>>>>> dev
     project()->setClean(false);
   }
 }

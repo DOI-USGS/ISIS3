@@ -120,28 +120,6 @@ int main(void) {
     e.print();
   }
   try {
-<<<<<<< HEAD
-    cout << endl << "Testing parseSpecification method: att@name:value" << endl;
-    transMgr.parseSpecification((QString)"att@name:value");
-
-    cout << endl << "Testing parseSpecification method: tag@name:value" << endl;
-    transMgr.parseSpecification((QString)"tag@name:value");
-
-    cout << endl << "Testing parseSpecification method: att@name" << endl;
-    transMgr.parseSpecification((QString)"att@name");
-
-    cout << endl << "Testing parseSpecification method: new@name" << endl;
-    transMgr.parseSpecification((QString)"new@name");
-
-    cout << endl << "Testing parseSpecification method: name:value" << endl;
-    transMgr.parseSpecification((QString)"name:value");
-
-    cout << endl << "Testing parseSpecification method: value" << endl;
-    transMgr.parseSpecification((QString)"value");
-
-    cout << endl << "Testing parseSpecification method: att:name:value" << endl;
-    transMgr.parseSpecification((QString)"att:name:value");
-=======
     cout << endl << "Testing parseSpecification method: att@name|value" << endl;
     transMgr.parseSpecification((QString)"att@name:value");
 
@@ -197,36 +175,14 @@ int main(void) {
   try {
     cout << endl << "Testing parseSpecification method: not@name|value" << endl;
     transMgr.parseSpecification((QString)"not@name|value");
->>>>>>> dev
   }
   catch(IException &e) {
     e.print();
   }
 
   try {
-<<<<<<< HEAD
-    cout << endl << "Testing parseSpecification method: att@name@value" << endl;
-    transMgr.parseSpecification((QString)"att@name@value");
-  }
-  catch(IException &e) {
-    e.print();
-  }
-
-  try {
-    cout << endl << "Testing parseSpecification method: not@name:value" << endl;
-    transMgr.parseSpecification((QString)"not@name:value");
-  }
-  catch(IException &e) {
-    e.print();
-  }
-
-  try {
-    cout << endl << "Testing parseSpecification method: att@name:value1:value2" << endl;
-    transMgr.parseSpecification((QString)"att@name:value1:value2");
-=======
     cout << endl << "Testing parseSpecification method: att@name|value1|value2" << endl;
     transMgr.parseSpecification((QString)"att@name|value1|value2");
->>>>>>> dev
   }
   catch(IException &e) {
     e.print();
