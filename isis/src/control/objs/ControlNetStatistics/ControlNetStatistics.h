@@ -35,7 +35,6 @@
 
 namespace Isis {
   class ControlNet;
-  class ControlCubeGraphNode;
   class Progress;
   class PvlGroup;
 
@@ -76,7 +75,6 @@ namespace Isis {
    *                           Fixes #996.
    *  @history 2017-12-12 Kristin Berry - Updated std::map to QMap and std::vector to QVector. Fixes
    *                           #5259.
-   *  
    */
   class ControlNetStatistics {
     public:
@@ -248,7 +246,6 @@ namespace Isis {
       SerialNumberList mSerialNumList;           //!< Serial Number List
       ControlNet *mCNet;                         //!< Control Network
       Progress *mProgress;                       //!< Progress state
-      QList<ControlCubeGraphNode *> mCubeGraphNodes;
 
     private:
       QMap<int, int> mPointIntStats;           //!< Contains QMap of different count stats

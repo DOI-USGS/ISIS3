@@ -1052,6 +1052,17 @@ namespace Isis {
 
 
   /**
+   * Get all the valid measures pertaining to a given cube serial number
+   *
+   * @returns A list of all valid measures which are in a given cube
+   */
+  QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
+    ValidateSerialNumber(serialNumber);
+    return (*cubeGraphNodes)[serialNumber]->getValidMeasures();
+  }
+
+
+  /**
    * Copies the content of the a ControlMeasureLessThanFunctor
    *
    * @param other, reference to the other ControlMeasureLessThanFunctor
