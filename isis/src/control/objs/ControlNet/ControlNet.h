@@ -214,7 +214,6 @@ namespace Isis {
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
    *                           adds to the control network. 
    */
-   */
   class ControlNet : public QObject {
       Q_OBJECT
 
