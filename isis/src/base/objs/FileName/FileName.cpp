@@ -63,7 +63,6 @@ namespace Isis {
     m_d->setOriginal(file);
   }
 
-  //! Copy Constructor, creates a copy of a FileName object.
   /**
    * Constructs a copy of a FileName object using another FileName object.
    * @param &other FileName object to copy.
