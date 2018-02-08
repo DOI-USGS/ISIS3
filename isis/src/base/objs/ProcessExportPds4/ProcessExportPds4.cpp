@@ -467,8 +467,8 @@ namespace Isis {
   
   /**
    * This method write out the labels and image data to the specified output file.
-   * Creates an IMG and XML file. 
-   *  
+   * Creates an IMG and XML file.
+   * 
    * @param outFile QString of the name of the output image file. Will create an XML 
    *        and an IMG file with the output file name.
    *
@@ -478,7 +478,7 @@ namespace Isis {
     FileName outputFile(outFile);
 
     // Name for output label
-    QString path(outputFile.originalPath());
+`   QString path(outputFile.originalPath());
     QString name(outputFile.baseName());
     QString labelName = path + "/" + name + ".xml";
 
