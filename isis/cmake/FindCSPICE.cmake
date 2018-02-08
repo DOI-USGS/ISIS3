@@ -13,3 +13,6 @@ find_path(CSPICE_INCLUDE_DIR
 find_library(CSPICE_LIBRARY
   NAMES cspice
 )
+
+message( status "CSPICE INCLUDE" ${CSPICE_INCLUDE_DIR} )
+message( status "CSPICE LIB"  ${CSPICE_LIBRARY} )
