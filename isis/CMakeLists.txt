@@ -68,11 +68,6 @@ set(PACKAGE_VERSION    ${VERSION})
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
-# Other release information
-set(VERSION_DATE              "2017-04-24")
-set(THIRD_PARTY_LIBS_VERSION  "v007")
-set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
-
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
 
