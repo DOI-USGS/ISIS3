@@ -13,3 +13,5 @@ find_path(EIGEN_ROOT_INCLUDE_DIR
   NAME Eigen
   PATH_SUFFIXES eigen eigen3
 )
+
+message( "EIGEN INCLUDE DIR: "  ${EIGEN_ROOT_INCLUDE_DIR} )
