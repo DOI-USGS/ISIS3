@@ -111,81 +111,56 @@ namespace Isis {
    */
   class FileName {
     public:
-
+      // Constructors
       FileName();
-
       FileName(const char *fileName);
-
       FileName(const QString &fileName);
 
+      //! Copy Constructor, creates a copy of a FileName object.
       FileName(const FileName &other);
 
+      //! Destroys the FileName Object
       ~FileName();
 
+      // Methods
       QString originalPath() const;
-
       QString path() const;
-
       QString attributes() const;
-
       QString baseName() const;
-
       QString name() const;
-
       QString extension() const;
-
       QString expanded() const;
-
       QString original() const;
 
       FileName addExtension(const QString &extension) const;
-
       FileName removeExtension() const;
-
       FileName setExtension(const QString &extension) const;
 
       bool isVersioned() const;
-
       bool isNumericallyVersioned() const;
-
       bool isDateVersioned() const;
 
       FileName highestVersion() const;
-
       FileName newVersion() const;
-
       FileName version(long versionNumber) const;
-
       FileName version(QDate versionDate) const;
 
       bool fileExists() const;
-
       QDir dir() const;
-
       static FileName createTempFile(FileName templateFileName = "$TEMPORARY/temp");
-
       QString toString() const;
-
       FileName &operator=(const FileName &rhs);
-
       bool operator==(const FileName &rhs);
-
       bool operator!=(const FileName &rhs);
 
 
     private:
 
       QDate highestVersionDate() const;
-
       long highestVersionNum() const;
-
       void validateVersioningState() const;
-
       QString fileNameQDatePattern() const;
-
-
       QPair<QString, QString> splitNameAroundVersionNum() const;
-
 
     private:
       /**
@@ -198,16 +173,18 @@ namespace Isis {
       class Data : public QSharedData {
         public:
 
+          //Constructors
           Data();
 
+          //! Copy Constructor, creates a copy of a Data object.
           Data(const Data &other);
 
+          //! Destroys the Data Object
           ~Data();
 
+          // Methods
           QString original(bool includeAttributes) const;
-
           void setOriginal(const QString &originalStr);
-
           QString expanded(bool includeAttributes) const;
 
         private:
