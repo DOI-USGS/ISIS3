@@ -478,7 +478,7 @@ namespace Isis {
     FileName outputFile(outFile);
 
     // Name for output label
-`   QString path(outputFile.originalPath());
+    QString path(outputFile.originalPath());
     QString name(outputFile.baseName());
     QString labelName = path + "/" + name + ".xml";
 
