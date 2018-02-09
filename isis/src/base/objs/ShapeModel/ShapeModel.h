@@ -187,9 +187,8 @@ namespace Isis {
       void calculateEllipsoidalSurfaceNormal();
 
       // Intersect ellipse
-      bool intersectEllipsoid(
-                      const std::vector<double> observerPosRelativeToTarget,
-                      const std::vector<double> &observerLookVectorToTarget);
+      bool intersectEllipsoid( const std::vector<double> observerPosRelativeToTarget,
+                               const std::vector<double> &observerLookVectorToTarget);
 
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
