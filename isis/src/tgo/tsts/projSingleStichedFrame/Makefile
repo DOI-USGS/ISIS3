@@ -37,16 +37,16 @@ commands:
 
 	tgocassisstitch $(TSTARGS) \
             fromlist=$(INPUT)/cubelist.lis \
-            outputprefix=$(OUTPUT)/"Narwahl" > /dev/null;
+            outputprefix=$(OUTPUT)/"stitched" > /dev/null;
 
-	$(LS) $(OUTPUT)/Narwahl*.cub > $(OUTPUT)/stitched.lis
+	$(LS) $(OUTPUT)/stitched*.cub > $(OUTPUT)/stitched.lis
 
 	mosrange $(TSTARGS) \
             fromlist=$(OUTPUT)/stitched.lis \
             to=$(OUTPUT)/stitched.map > /dev/null;
 
 	cam2map $(TSTARGS) \
-            from=$(OUTPUT)/Narwahl-2016-11-26T22:50:27.381.cub \
+            from=$(OUTPUT)/stitched-2016-11-26T22:50:27.381.cub \
             to=$(OUTPUT)/projected.cub \
             map=$(OUTPUT)/stitched.map > /dev/null;
 
