@@ -45,6 +45,7 @@
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "LidarData.h"
 #include "LinearAlgebra.h"
 #include "MaximumLikelihoodWFunctions.h" // why not just forward declare???
 #include "ObservationNumberList.h"
@@ -312,6 +313,11 @@ namespace Isis {
                    const QString &cubeList,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
+                   const QString &cnetFile,
+                   const QString &cubeList,
+                   const QString &lidarDataFile,
+                   bool printSummary = true);
+      BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet,
                    SerialNumberList &snlist,
                    bool printSummary = true);
@@ -443,6 +449,8 @@ namespace Isis {
                                                                    Contains only non-ignored
                                                                    control points from the control
                                                                    net.*/
+      QString m_lidarFileName;                               //!< Input lidar point filename.
+      LidarData m_lidarDataSet;                              //!< QList of lidar points.
       BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
                                                                    Each observation contains one or
                                                                    more images.*/

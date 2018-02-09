@@ -40,6 +40,7 @@
 #include "ImageList.h"
 #include "iTime.h"
 #include "Latitude.h"
+#include "LidarControlPoint.h"
 #include "Longitude.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "SpecialPixel.h"
@@ -112,6 +113,53 @@ namespace Isis {
     catch (IException &e) {
       throw;
     }
+    m_bundleResults.setOutputControlNet(m_controlNet);
+    m_serialNumberList = new SerialNumberList(cubeList);
+    m_bundleSettings = bundleSettings;
+    m_bundleTargetBody = bundleSettings->bundleTargetBody();
+
+    init(&progress);
+  }
+
+
+  /**
+   * Construct a BundleAdjust object from the given settings, control network file,
+   * cube list, and lidar point data.
+   *
+   * @param bundleSettings A shared pointer to the BundleSettings to be used.
+   * @param cnetFile The filename of the control network to be used.
+   * @param cubeList The list of filenames of the cubes to be adjusted.
+   * @param printSummary If summaries should be printed each iteration.
+   */
+  BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
+                             const QString &cnetFile,
+                             const QString &cubeList,
+                             const QString &lidarDataFile,
+                             bool printSummary) {
+    m_abort = false;
+    Progress progress;
+    // initialize constructor dependent settings...
+    // m_printSummary, m_cleanUp, m_cnetFileName, m_controlNet,
+    // m_serialNumberList, m_bundleSettings
+    m_printSummary = printSummary;
+    m_cleanUp = true;
+    m_cnetFileName = cnetFile;
+    m_lidarFileName = lidarDataFile;
+    try {
+      m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress) );
+    }
+    catch (IException &e) {
+      throw;
+    }
+
+    // read lidar point data file
+    try {
+      m_lidarDataSet.read(lidarDataFile);
+    }
+    catch (IException &e) {
+      throw;
+    }
+
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = new SerialNumberList(cubeList);
     m_bundleSettings = bundleSettings;
@@ -497,6 +545,43 @@ namespace Isis {
           measure->setParentObservation(observation);
           measure->setParentImage(image);
         }
+      }
+
+      // create BundleLidarControlPoint for each LidarControlPoint and add to BundleControlPoints
+      QList< QSharedPointer<LidarControlPoint> > lidarPoints = m_lidarDataSet.points();
+      int numLidarPoints = lidarPoints.size();
+
+      for (int i = 0; i < numLidarPoints; i++) {
+        QSharedPointer<LidarControlPoint> lidarPointQsp = lidarPoints.at(i);
+
+        // TODO: modify output of lidar point ingestion to not add points with no measures
+        if (lidarPointQsp->GetNumMeasures() <= 0) {
+          continue;
+        }
+        int a=1;
+//        if (point->IsIgnored()) {
+//          continue;
+//        }
+
+//        BundleControlPointQsp bundleControlPoint(new BundleControlPoint(point));
+//        m_bundleControlPoints.append(bundleControlPoint);
+
+//        bundleControlPoint->setWeights(m_bundleSettings, m_metersToRadians);
+
+//        // set parent observation for each BundleMeasure
+
+//        int numMeasures = bundleControlPoint->size();
+//        for (int j = 0; j < numMeasures; j++) {
+//          BundleMeasureQsp measure = bundleControlPoint->at(j);
+//          QString cubeSerialNumber = measure->cubeSerialNumber();
+
+//          BundleObservationQsp observation =
+//              m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
+//          BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
+
+//          measure->setParentObservation(observation);
+//          measure->setParentImage(image);
+//        }
       }
 
     //===========================================================================================//
