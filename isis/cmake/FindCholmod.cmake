@@ -32,3 +32,16 @@ find_library(FORTRAN_LIBRARY      NAMES gfortran
 find_library(BLAS_LIBRARY NAMES blas)
 
 get_filename_component(CHOLMOD_ROOT_INCLUDE_DIR "${CHOLMOD_INCLUDE_DIR}" DIRECTORY)
+
+message( "CHOLMOD INCLUDE: "  ${CHOLMOD_INCLUDE_DIR} )
+message( "CHOLMOD LIB: "  ${CHOLMOD_LIBRARY} )
+message( "CCOLMOD LIB: "  ${CCOLAMD_LIBRARY} )
+message( "CAMD LIB: "  ${CAMD_LIBRARY} )
+message( "AMD LIB: "  ${AMD_LIBRARY} )
+message( "SUITESPARSE LIB: "  ${SUITESPARSE_LIBRARY} )
+message( "FORTRAN LIB: "  ${FORTRAN_LIBRARY} )
+message( "BLAS LIB: "  ${BLAS_LIBRARY} )
+
+if(NOT APPLE)
+  message("LAPACK LIB" ${LAPACK_LIBRARY})
+endif()
