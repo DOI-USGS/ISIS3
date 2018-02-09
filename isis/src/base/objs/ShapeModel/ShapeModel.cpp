@@ -1,6 +1,7 @@
 #include "ShapeModel.h"
 
 #include <QDebug>
+#include <QVector>
 
 #include <algorithm>
 #include <cfloat>
@@ -198,21 +199,23 @@ namespace Isis {
     return acos(angle) * RAD2DEG;
   }
 
+
   /**
-   * Sets the parameters to the Target radii
+   * Override of virtual function for intersectEllipsoid
    *
-   * param &a SpiceDouble reference to be set
-   *
-   * param &b SpiceDouble reference to be set
-   *
-   * param &c SpiceDouble reference to be set
+   * @return tuple of three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
    */
-  void ShapeModel::setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
+  QVector<SpiceDouble> ShapeModel::setTargetRadii() {
+    QVector<SpiceDouble> spiceVector(3);
     // get target radii
     std::vector<Distance> radii = targetRadii();
-    a = radii[0].kilometers();
-    b = radii[1].kilometers();
-    c = radii[2].kilometers();
+    SpiceDouble a = radii[0].kilometers();
+    SpiceDouble b = radii[1].kilometers();
+    SpiceDouble c = radii[2].kilometers();
+    spiceVector.insert(0, a);
+    spiceVector.insert(1, b);
+    spiceVector.insert(2, c);
+    return spiceVector;
   }
 
 
@@ -290,10 +293,11 @@ namespace Isis {
     memcpy(lookB,&observerLookVectorToTarget[0], 3*sizeof(double));
 
     // get target radii
-    SpiceDouble a;
-    SpiceDouble b;
-    SpiceDouble c;
-    setTargetRadii(a, b, c);
+    QVector<SpiceDouble> spiceVector = setTargetRadii();
+
+    SpiceDouble a = spiceVector.at(0);
+    SpiceDouble b = spiceVector.at(1);
+    SpiceDouble c = spiceVector.at(2);
 
     // check if observer look vector intersects the target
     SpiceDouble intersectionPoint[3];

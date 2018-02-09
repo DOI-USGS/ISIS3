@@ -23,9 +23,9 @@
  */
 
 #include <vector>
+#include <QVector>
 
 #include "Spice.h"
-
 
 template<class T> class QVector;
 
@@ -71,17 +71,17 @@ namespace Isis {
    *                           as this is now being handled in the EllipsoidShape class.
    *                           References #1028.
    *   @history 2017-03-23 Kris Becker - added isVisibleFrom() and two
-   *                            intersectSurface() methods to address real
-   *                            occlusions. It is recommended that derived
-   *                            models reimplement this method! Also made
-   *                            setSurfacePoint() & clearSurfacePoint() virtual
-   *                            to give some hope of a consistent internal state
-   *                            in derived models.
-   *   @history 2018-02-05 Cole Neubauer - added virtual method setTargetRadii to be 
-   *                            called from intersectEllipsoid. This is to avoid 
-   *                            redundant code that comes with having intersectEllipsoid be 
-   *                            virtual as the only code that was changed will now be handled
-   *                            in setTargetRadii Fixes m05242 
+   *                           intersectSurface() methods to address real
+   *                           occlusions. It is recommended that derived
+   *                           models reimplement this method! Also made
+   *                           setSurfacePoint() & clearSurfacePoint() virtual
+   *                           to give some hope of a consistent internal state
+   *                           in derived models.
+   *   @history 2018-02-05 Cole Neubauer - added virtual method setTargetRadii to be
+   *                           called from intersectEllipsoid. This is to avoid
+   *                           redundant code that comes with having intersectEllipsoid be
+   *                           virtual as the only code that was changed will now be handled
+   *                           in setTargetRadii Fixes #5242
    */
   class ShapeModel {
     public:
@@ -172,17 +172,14 @@ namespace Isis {
                                  const std::vector<double> lookDirection);
 
     protected:
-      // Virtual function to be called in intersectEllipsoid to avoid redundant code
-      virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c);
-
+      virtual QVector<SpiceDouble> setTargetRadii(); // returns a QVector of SpiceDouble
 
       // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
       void setNormal(const double a, const double b, const double c);
 
-      // accessor and setter for m_hasEllipsoidIntersection
+      // accessor for m_hasEllipsoidIntersection
       bool hasEllipsoidIntersection();
-      // void setHasEllipsoidIntersection(bool status);
 
       // Set shape name
       void setName(QString name);

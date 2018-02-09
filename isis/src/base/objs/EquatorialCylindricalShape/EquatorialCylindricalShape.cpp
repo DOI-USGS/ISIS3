@@ -1,6 +1,7 @@
 #include "EquatorialCylindricalShape.h"
 
 #include <QDebug>
+#include <QVector>
 
 #include <algorithm>
 #include <cfloat>
@@ -20,6 +21,8 @@
 // #include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "Spice.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Table.h"
@@ -419,15 +422,16 @@ namespace Isis {
   /**
    * Override of virtual function for intersectEllipsoid
    *
-   * param &a SpiceDouble reference to be set
-   *
-   * param &b SpiceDouble reference to be set
-   *
-   * param &c SpiceDouble reference to be set
+   * @return tuple of three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
    */
-  void EquatorialCylindricalShape::setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c) {
-    a = m_maxRadius->kilometers();
-    b = m_maxRadius->kilometers();
-    c = m_maxRadius->kilometers();
+  QVector<SpiceDouble> EquatorialCylindricalShape::setTargetRadii() {
+    QVector<SpiceDouble> spiceVector(3);
+    SpiceDouble a = m_maxRadius->kilometers();
+    SpiceDouble b = m_maxRadius->kilometers();
+    SpiceDouble c = m_maxRadius->kilometers();
+    spiceVector.insert(0, a);
+    spiceVector.insert(1, b);
+    spiceVector.insert(2, c);
+    return spiceVector;
   }
 }

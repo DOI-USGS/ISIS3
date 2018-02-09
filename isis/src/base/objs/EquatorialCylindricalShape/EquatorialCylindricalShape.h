@@ -24,6 +24,9 @@
 
 #include "DemShape.h"
 
+#include <QVector>
+
+#include "Spice.h"
 namespace Isis {
   class Pvl;
 
@@ -47,11 +50,11 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
-   *   @history 2018-02-05 Cole Neubauer - Added the setTargetRadii virtual method so that the 
-   *                           intersectEllipsoid method can use a the MaximumRadius found in the
+   *   @history 2018-02-05 Cole Neubauer - Added the setTargetRadii virtual method so that the
+   *                           intersectEllipsoid method can use the MaximumRadius found in the
    *                           ShapeModelStatistics group of the labels (often written during a run of
-   *                           demprep) as a starting radius for the ellipsoid  as opposed to the
-   *                           default radius of the target.
+   *                           demprep) as a starting radius for the ellipsoid as opposed to the
+   *                           default radius of the target. Fixes #5242
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
@@ -66,7 +69,7 @@ namespace Isis {
                             std::vector<double> lookDirection);
 
     protected:
-      virtual void setTargetRadii(SpiceDouble &a, SpiceDouble &b, SpiceDouble &c);
+      virtual QVector<SpiceDouble> setTargetRadii(); // returns a QVector of SpiceDouble
 
 
     private:
