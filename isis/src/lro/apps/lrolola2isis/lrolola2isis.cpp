@@ -113,6 +113,10 @@ void IsisMain() {
       }
     }
     
+    if (lidarPoint->GetNumMeasures() <= 0) {
+      continue;
+    }
+    
     lidarDataSet.insert(QSharedPointer<LidarControlPoint>(lidarPoint));
   }
 
