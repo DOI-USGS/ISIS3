@@ -203,7 +203,7 @@ namespace Isis {
   /**
    * Override of virtual function for intersectEllipsoid
    *
-   * @return tuple of three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
+   * @return QVector of three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
    */
   QVector<SpiceDouble> ShapeModel::setTargetRadii() {
     QVector<SpiceDouble> spiceVector(3);
