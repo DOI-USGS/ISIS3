@@ -422,7 +422,7 @@ namespace Isis {
   /**
    * Override of virtual function for intersectEllipsoid
    *
-   * @return tuple of three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
+   * @return QVector holding three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
    */
   QVector<SpiceDouble> EquatorialCylindricalShape::setTargetRadii() {
     QVector<SpiceDouble> spiceVector(3);
