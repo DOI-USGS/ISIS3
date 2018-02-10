@@ -222,7 +222,7 @@ namespace Isis {
       // Set dalpha to be half the grid spacing for nyquist sampling
       //double dalpha = (PI/180.0)/(2.0*p_demScale);
       double cmin = cos((90.0 - 1.0 / (2.0 * demScale())) * DEG2RAD);
-      double dalpha = MAX(cos(g1lat * DEG2RAD), cmin) / (2.0 * demScale() * DEG2RAD);
+      double dalpha = MAX(cos(g1lat * DEG2RAD), cmin) / (2.0 * demScale() * RAD2DEG);
 
       // Previous Sensor version used local version of this method with lat and lon doubles.  Steven said
       // it didn't make a significant difference in speed.
@@ -335,7 +335,7 @@ namespace Isis {
                 return hasIntersection();
               }
               palt = plen - pradius;
-
+              
               // The altitude relative to surface is +ve at the observation point,
               // so reset g1=p and r1=pradius
               if (palt > tolerance) {
@@ -390,7 +390,7 @@ namespace Isis {
         // put in a test (above) for dd being smaller than the pixel
         // convergence tolerance.  If so the loop exits without an
         // intersection
-        dalpha = MAX(cos(g2lat * DEG2RAD), cmin) / (2.0 * demScale() * DEG2RAD);
+        dalpha = MAX(cos(g2lat * DEG2RAD), cmin) / (2.0 * demScale() * RAD2DEG);
       } // end while
 
       SpiceDouble intersectionPoint[3];
@@ -434,4 +434,5 @@ namespace Isis {
     spiceVector.insert(2, c);
     return spiceVector;
   }
+
 }

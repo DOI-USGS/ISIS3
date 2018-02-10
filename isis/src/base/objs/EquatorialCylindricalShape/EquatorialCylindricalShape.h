@@ -50,6 +50,9 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
+   *   @history 2018-01-05 Cole Neubauer - Fixed units conversion in intersectSurface so that the
+   *                           loop is stepping by radians per pixel, as recommended by Jeff
+   *                           Anderson (LROC team). Fixes #5245
    *   @history 2018-02-05 Cole Neubauer - Added the setTargetRadii virtual method so that the
    *                           intersectEllipsoid method can use the MaximumRadius found in the
    *                           ShapeModelStatistics group of the labels (often written during a run of
