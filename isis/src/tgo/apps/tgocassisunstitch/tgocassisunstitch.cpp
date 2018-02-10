@@ -25,17 +25,17 @@ using namespace Isis;
 
 /**
  * Struct for storing information about a filter.
- * 
+ *
  * @author 2017-09-15 Kristin Berry
- * 
+ *
  * @internal
  *   @history 2017-09-15 Kristin Berry - Original Version
  */
 struct FilterInfo : public PushFrameCameraCcdLayout::FrameletInfo {
   FilterInfo() : FrameletInfo(), m_wavelength(0), m_width(0) { }
   FilterInfo(const int frameid) : FrameletInfo(frameid), m_wavelength(0), m_width(0) { }
-  FilterInfo(const int frameid, QString filterName, int startSample, 
-             int startLine, int samples, int lines, double wavelength, double width) : 
+  FilterInfo(const int frameid, QString filterName, int startSample,
+             int startLine, int samples, int lines, double wavelength, double width) :
              FrameletInfo(frameid, filterName, startSample, startLine, samples, lines),
              m_wavelength(wavelength), m_width(width) { }
   double  m_wavelength; //!< The center wavelength of the filter associated with this framelet
@@ -46,7 +46,7 @@ struct FilterInfo : public PushFrameCameraCcdLayout::FrameletInfo {
 QList<Cube *> g_outputCubes;
 Cube *cube = NULL;
 QStringList g_filterList;
-QList<FilterInfo> g_frameletInfoList; 
+QList<FilterInfo> g_frameletInfoList;
 void unstitchFullFrame(Buffer &in);
 
 void IsisMain() {
@@ -64,8 +64,8 @@ void IsisMain() {
 
   // Determine the filters / framelets in input fullframe image
   Pvl *inputLabel = cube->label();
-  
-  g_frameletInfoList.clear();  
+
+  g_frameletInfoList.clear();
 
   PvlKeyword filterKey = inputLabel->findKeyword("OriginalFilters", PvlObject::Traverse);
   PvlKeyword filterIkCodes = inputLabel->findKeyword("FilterIkCodes", PvlObject::Traverse);
@@ -76,7 +76,7 @@ void IsisMain() {
   PvlKeyword filterWavelength = inputLabel->findKeyword("FilterCenters", PvlObject::Traverse);
   PvlKeyword filterWidth = inputLabel->findKeyword("FilterWidths", PvlObject::Traverse);
   for (int i = 0; i < filterKey.size(); i++) {
-    g_frameletInfoList.append(FilterInfo(filterIkCodes[i].toInt(), 
+    g_frameletInfoList.append(FilterInfo(filterIkCodes[i].toInt(),
                               filterKey[i],
                               filterStartSamples[i].toInt(),
                               filterStartLines[i].toDouble(),
@@ -107,14 +107,14 @@ void IsisMain() {
   // Allocate this number of total cubes of the correct size
   FileName outputFileName(ui.GetFileName("OUTPUTPREFIX"));
 
-  // Sometimes there will be '.'s in an OUTPUT prefix that could 
+  // Sometimes there will be '.'s in an OUTPUT prefix that could
   // be confused with a file extension
-  QString outputBaseName = outputFileName.expanded(); 
+  QString outputBaseName = outputFileName.expanded();
   if (outputFileName.extension() == "cub") {
-   outputBaseName = outputFileName.removeExtension().expanded(); 
+   outputBaseName = outputFileName.removeExtension().expanded();
   }
 
-  // Create and output a list of 
+  // Create and output a list of
   QFile allCubesListFile(outputBaseName + ".lis");
   if (!allCubesListFile.open(QFile::WriteOnly | QFile::Text)) {
     QString msg = "Unable to write file [" + allCubesListFile.fileName() + "]";
@@ -132,15 +132,15 @@ void IsisMain() {
     Cube *frameletCube = new Cube();
 
     frameletCube->setDimensions(g_frameletInfoList[i].m_samples, g_frameletInfoList[i].m_lines, 1);
-    FileName frameletCubeFileName(outputBaseName 
+    FileName frameletCubeFileName(outputBaseName
                                   + "_" + g_frameletInfoList[i].m_filterName
                                   + ".cub");
     frameletCube->create(frameletCubeFileName.expanded());
     g_outputCubes.append(frameletCube);
     allCubesListWriter << frameletCubeFileName.baseName() << ".cub\n";
   }
-  
-  // Unstitch 
+
+  // Unstitch
   p.SetInputCube("FROM");
   p.Progress()->SetText("Processing output cubes.");
   p.StartProcess(unstitchFullFrame);
@@ -155,12 +155,12 @@ void IsisMain() {
     }
     // Update the labels
     Pvl *frameletLabel = g_outputCubes[i]->label();
-    frameletLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(PvlKeyword("Filter", 
+    frameletLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(PvlKeyword("Filter",
                                           g_frameletInfoList[i].m_filterName), PvlObject::Replace);
-    
+
     PvlGroup &bandBin = frameletLabel->findGroup("BandBin", PvlObject::Traverse);
 
-    bandBin.addKeyword(PvlKeyword("Name", g_frameletInfoList[i].m_filterName), 
+    bandBin.addKeyword(PvlKeyword("Name", g_frameletInfoList[i].m_filterName),
                                                 PvlObject::Replace);
     bandBin.addKeyword(PvlKeyword("Center", toString(g_frameletInfoList[i].m_wavelength)));
     bandBin.addKeyword(PvlKeyword("Width", toString(g_frameletInfoList[i].m_width)));
@@ -207,13 +207,18 @@ void IsisMain() {
 
 /**
  * Separates each of the framelets of the input cube into their own separate output cube.
- *  
- * @param in A reference to the input Buffer to process. 
+ *
+ * @param in A reference to the input Buffer to process.
+ * @internal
+ *   @history 2018-02-09 Adam Goins - Modified the second operand of the if() statement
+ *                           from in.Line() < [...] to inLine() <= [...] to write all lines
+ *                           up to and including the last line. Fixes an error where the last lines
+ *                           written would be a line of null pixel DN's.
  */
 void unstitchFullFrame(Buffer &in) {
   for (int i=0; i < g_frameletInfoList.size(); i++) {
     if (in.Line() >= g_frameletInfoList[i].m_startLine
-        && in.Line() < (g_frameletInfoList[i].m_startLine + g_frameletInfoList[i].m_lines)) {
+        && in.Line() <= (g_frameletInfoList[i].m_startLine + g_frameletInfoList[i].m_lines)) {
       int outputCubeLineNumber = (in.Line()-1) % g_frameletInfoList[i].m_startLine + 1;
       LineManager mgr(*g_outputCubes[i]);
       mgr.SetLine(outputCubeLineNumber, 1);
@@ -226,4 +231,3 @@ void unstitchFullFrame(Buffer &in) {
     }
   }
 }
-
