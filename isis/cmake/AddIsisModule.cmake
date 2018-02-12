@@ -163,7 +163,8 @@ function(add_isis_obj folder reqLibs)
   else()
     # Folder with a plugin means that this is a separate library!
     # Add it here and then we are done with the source files.
-
+    
+    set(newSourceFiles ${thisSourceFiles} PARENT_SCOPE)
     if(NOT (${numPlugins} EQUAL 1))
       message( FATAL_ERROR "Error: Multiple plugins found in folder!" )
     endif()

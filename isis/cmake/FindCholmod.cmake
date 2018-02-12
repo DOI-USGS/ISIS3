@@ -16,6 +16,7 @@ find_library(COLAMD_LIBRARY       NAMES colamd)
 find_library(CAMD_LIBRARY         NAMES camd)
 find_library(AMD_LIBRARY          NAMES amd)
 find_library(SUITESPARSE_LIBRARY  NAMES suitesparseconfig)
+
 # OSX does not link against lapack
 if(NOT APPLE)
   find_library(LAPACK_LIBRARY       NAMES lapack)

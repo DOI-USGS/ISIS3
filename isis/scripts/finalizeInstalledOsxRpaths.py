@@ -19,7 +19,7 @@ def fixOneFile(inputPath, resetRpath):
 
     # Search for abs paths to the USGS hard coded location
     needRpath  = False
-    lines      = otoolOutput.split()
+    lines      = [l.decode('utf-8') for l in  otoolOutput.split()]
     numUpdates = 0
     for line in lines:
 
@@ -83,12 +83,15 @@ def main():
     if len(sys.argv) == 3:
         resetRpath = True
     if not os.path.exists(inputFolder):
-        print('Input folder '+inputFolder+' does not exist!')
+        print ('Input folder '+inputFolder+' does not exist!')
         return -1
 
     # Fix all of the .dylib files in the given folder
     files = os.listdir(inputFolder)
     for f in files:
+
+      if '.plugin' in f:
+          continue
 
       fullPath = os.path.join(inputFolder, f)
 
@@ -106,7 +109,8 @@ def main():
       if isBinary or isLib:
           #print fullPath
           numUpdates = fixOneFile(fullPath, resetRpath)
-          print f + ' --> ' + str(numUpdates) + ' changes made.'
+          if numUpdates > 0:
+            print (f + ' --> ' + str(numUpdates) + ' changes made.')
           #raise Exception('DEBUG')
 
 

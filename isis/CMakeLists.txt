@@ -45,6 +45,8 @@ set(CMAKE_PREFIX_PATH
   /usr/local/lib
 )
 
+set(CMAKE_FIND_FRAMEWORK LAST)
+
 include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
@@ -67,6 +69,11 @@ set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
+
+# Other release information
+set(VERSION_DATE              "2017-04-24")
+set(THIRD_PARTY_LIBS_VERSION  "v007")
+set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
@@ -203,7 +210,6 @@ install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/
 
 #Create the inc directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
-
 
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)

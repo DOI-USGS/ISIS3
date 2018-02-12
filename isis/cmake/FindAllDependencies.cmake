@@ -37,6 +37,10 @@ find_program(PROTOC protoc REQUIRED)
 
 include(FindProtobuf)
 
+
+find_package(Geos 3.5.0 REQUIRED)
+
+
 if(APPLE)
   find_package(Qt5 COMPONENTS
                   Core
@@ -124,7 +128,6 @@ find_package(GeoTIFF 2 REQUIRED)
 find_package(TIFF 5 REQUIRED)
 find_package(CSPICE 65 REQUIRED)
 find_package(TNT 1.2.6 REQUIRED)
-find_package(Geos 3.5.0 REQUIRED)
 find_package(GSL 19 REQUIRED)
 find_package(Protobuf 9 REQUIRED)
 find_package(Boost 1.59 REQUIRED)
@@ -141,6 +144,7 @@ find_package(Bullet 2.86 REQUIRED)
 find_package(OpenCV 3.1.0 REQUIRED)
 find_package(NN REQUIRED)
 find_package(Jama REQUIRED)
+
 
 # Only include Kakadu if it is available
 if(${JP2KFLAG})
@@ -181,10 +185,12 @@ foreach (_variableName ${_variableNames})
     endif(_variableName MATCHES "^CMAKE+")
 endforeach()
 
-#list(APPEND ALLLIBDIRS "/usr/lib64")
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
+
+message(${ALLLIBS})
+message(${ALLLIBDIRS})
 
 # message(STATUS "ALL LIBS DIRS: ${ALLLIBDIRS}")
 # message(STATUS "ALL LIBS: ${ALLLIBS}")
@@ -319,7 +325,6 @@ set(RAW_DYNAMIC_LIBS ${QT_DYNAMIC_LIBS}
 
 # For each item in this list, expand the wildcard to get the actual library list.
 foreach(lib ${RAW_DYNAMIC_LIBS})
-
   string(FIND "${lib}" "*" position)
   if(${position} EQUAL -1)
     # No wildcard, just add it.
