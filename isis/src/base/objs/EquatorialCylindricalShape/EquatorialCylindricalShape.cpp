@@ -1,6 +1,7 @@
 #include "EquatorialCylindricalShape.h"
 
 #include <QDebug>
+#include <QVector>
 
 #include <algorithm>
 #include <cfloat>
@@ -20,6 +21,8 @@
 // #include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "Spice.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Table.h"
@@ -28,7 +31,10 @@ using namespace std;
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
+
 namespace Isis {
+
+
   /**
    * Initialize the Isis3 Equatorial Cylindrical shape model.
    *
@@ -329,7 +335,7 @@ namespace Isis {
                 return hasIntersection();
               }
               palt = plen - pradius;
-
+              
               // The altitude relative to surface is +ve at the observation point,
               // so reset g1=p and r1=pradius
               if (palt > tolerance) {
@@ -407,8 +413,26 @@ namespace Isis {
 
     }
 
+    // Do nothing since the DEM intersection was already successful
     setHasIntersection(true);
     return hasIntersection();
   }
-  // Do nothing since the DEM intersection was already successful
+
+
+  /**
+   * Override of virtual function for intersectEllipsoid
+   *
+   * @return QVector holding three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
+   */
+  QVector<SpiceDouble> EquatorialCylindricalShape::setTargetRadii() {
+    QVector<SpiceDouble> spiceVector(3);
+    SpiceDouble a = m_maxRadius->kilometers();
+    SpiceDouble b = m_maxRadius->kilometers();
+    SpiceDouble c = m_maxRadius->kilometers();
+    spiceVector.insert(0, a);
+    spiceVector.insert(1, b);
+    spiceVector.insert(2, c);
+    return spiceVector;
+  }
+
 }

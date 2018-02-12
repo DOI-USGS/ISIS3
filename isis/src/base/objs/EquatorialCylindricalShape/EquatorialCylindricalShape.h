@@ -24,6 +24,9 @@
 
 #include "DemShape.h"
 
+#include <QVector>
+
+#include "Spice.h"
 namespace Isis {
   class Pvl;
 
@@ -50,6 +53,11 @@ namespace Isis {
    *   @history 2018-01-05 Cole Neubauer - Fixed units conversion in intersectSurface so that the
    *                           loop is stepping by radians per pixel, as recommended by Jeff
    *                           Anderson (LROC team). Fixes #5245
+   *   @history 2018-02-05 Cole Neubauer - Added the setTargetRadii virtual method so that the
+   *                           intersectEllipsoid method can use the MaximumRadius found in the
+   *                           ShapeModelStatistics group of the labels (often written during a run of
+   *                           demprep) as a starting radius for the ellipsoid as opposed to the
+   *                           default radius of the target. Fixes #5242
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
@@ -62,6 +70,10 @@ namespace Isis {
       // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
+
+    protected:
+      virtual QVector<SpiceDouble> setTargetRadii(); // returns a QVector of SpiceDouble
+
 
     private:
       Distance *m_minRadius;  //!< Minimum radius value in DEM file
