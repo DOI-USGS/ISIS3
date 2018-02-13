@@ -324,6 +324,21 @@
           *.net
         </filter>
       </parameter>
+      <parameter name="LIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Lidar Point File
+        </brief>
+        <description>
+        This file is a <def>lidar point data</def> generated from <b>lrolola2isis.cpp</b>.
+        It contains <def>lidar control point</def>s and associated measures for simultaneous images.
+        </description>
+        <filter>
+          *.dat *.json
+        </filter>
+      </parameter>
 
  <!-- Turning off USEPVL and SC_PARAMETERS for now. Since we are now using observation numbers
       to obtain the BundleObservationSolveSettings for a BundleObservation (instead of inst. id),

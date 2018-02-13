@@ -78,6 +78,17 @@ void IsisMain() {
       ControlNetQsp cnet = fixHeldImages(cnetFile, heldList, cubeList);
       bundleAdjustment = new BundleAdjust(settings, cnet, cubeList);
     }
+    else if (ui.WasEntered("LIDARDATA")) {
+      QString lidarFile = ui.GetFileName("LIDARDATA");
+
+      // validate lidar point file exists
+      if (!QFile::exists(lidarFile)) {
+        string msg = "Input lidar point file does not exist";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList, lidarFile);
+    }
     else {
       bundleAdjustment = new BundleAdjust(settings, cnetFile, cubeList);
     }

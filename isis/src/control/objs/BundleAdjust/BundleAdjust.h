@@ -45,6 +45,7 @@
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "LidarData.h"
 #include "LinearAlgebra.h"
 #include "MaximumLikelihoodWFunctions.h" // why not just forward declare???
 #include "ObservationNumberList.h"
@@ -303,6 +304,9 @@ namespace Isis {
    *                             bool errorPropagation()
    *                             void applyPolynomialContinuityConstraints()
    *                           - removed bool cholmodInverse() method
+   *   @history 2018-02-12 Ken Edmundson - Removed members m_xResiduals, m_yResiduals, and
+   *                           m_xyResiduals and made them local to the computeResiduals() method.
+   *                           Removed member m_bodyRadii, used only locally in init() method.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -310,6 +314,11 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile,
                    const QString &cubeList,
+                   bool printSummary = true);
+      BundleAdjust(BundleSettingsQsp bundleSettings,
+                   const QString &cnetFile,
+                   const QString &cubeList,
+                   const QString &lidarDataFile,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet,
@@ -379,6 +388,8 @@ namespace Isis {
       // normal equation matrices methods
 
       bool formNormalEquations();
+      bool formPhotoNormals();
+      bool formLidarNormals();
 
       bool computePartials(LinearAlgebra::Matrix  &coeffTarget,          //!< multi-segment version
                            LinearAlgebra::Matrix  &coeffImagePosition,
@@ -434,22 +445,20 @@ namespace Isis {
       BundleSettingsQsp m_bundleSettings;                    //!< Contains the solve settings.
       BundleResults  m_bundleResults;                        //!< Stores the results of the
                                                              //!< bundle adjust.
-      Statistics m_xResiduals;                               //!< x residual statistics.
-      Statistics m_yResiduals;                               //!< y residual statistics.
-      Statistics m_xyResiduals;                              //!< xy residual statistics.
       ControlNetQsp m_controlNet;                            //!< Output control net.
       QString m_cnetFileName;                                //!< The control net filename.
-      QVector <BundleControlPointQsp> m_bundleControlPoints; /**!< Vector of control points.
-                                                                   Contains only non-ignored
-                                                                   control points from the control
-                                                                   net.*/
+
+      QVector <BundleControlPointQsp> m_bundleControlPoints;
+      QVector <BundleControlPointQsp> m_bundleLidarPoints; /**!< Vectors of control and lidar
+                                                                   control points.*/
+      QString m_lidarFileName;                               //!< Input lidar point filename.
+      LidarData m_lidarDataSet;                              //!< QList of lidar points.
       BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
                                                                    Each observation contains one or
                                                                    more images.*/
       SerialNumberList *m_serialNumberList;                  //!< List of image serial numbers.
       BundleTargetBodyQsp m_bundleTargetBody;                /**!< Contains information about the
                                                                    target body.*/
-      Distance m_bodyRadii[3];                               //!< Triaxial body radii in meters.
       bool m_abort;                                          //!< If the bundle should abort.
       QString m_iterationSummary;                            /**!< Summary of the most recently
                                                                    completed iteration.*/

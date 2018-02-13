@@ -38,6 +38,10 @@ namespace Isis {
    * @author 2018-01-29 Makayla Shepherd
    * 
    * @see ControlPoint
+   *
+   * @internal
+   *   @history 2018-01-29 Makayla Shepherd Original version
+   *   @history 2018-02-09 Ken Edmundson Added typedef forLidarControlPointQsp
    */
   
   class LidarControlPoint : public ControlPoint {
@@ -62,6 +66,10 @@ namespace Isis {
     iTime m_time;         //!< The time the lidar point was taken
     
   };
+
+  // typedefs
+  //! Definition for a shared pointer to a LidarControlPoint.
+  typedef QSharedPointer<LidarControlPoint> LidarControlPointQsp;
 }
 
 #endif

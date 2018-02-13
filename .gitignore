@@ -32,6 +32,10 @@ ui_*.h
 # ignore all files created by squish coco
 *csmes
 
+# ignore all files created by qtcreator
+*.pro
+*.pro.user
+
 print.prt
 
 */3rdParty/*

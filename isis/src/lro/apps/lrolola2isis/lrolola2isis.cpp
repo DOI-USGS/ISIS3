@@ -94,7 +94,7 @@ void IsisMain() {
             if (camera->SetGround(lat, lon)) {
         
               ControlMeasure *measure = new ControlMeasure;
-              measure->SetCoordinate(camera->Line(), camera->Sample()); 
+              measure->SetCoordinate(camera->Sample(), camera->Line()); 
               measure->SetCubeSerialNumber(images[j].sn);
           
               lidarPoint->Add(measure);
@@ -111,6 +111,10 @@ void IsisMain() {
         }
         
       }
+    }
+    
+    if (lidarPoint->GetNumMeasures() <= 0) {
+      continue;
     }
     
     lidarDataSet.insert(QSharedPointer<LidarControlPoint>(lidarPoint));

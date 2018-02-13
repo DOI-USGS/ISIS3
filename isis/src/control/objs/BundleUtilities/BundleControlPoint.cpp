@@ -350,7 +350,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the 3 dimenstional ordered vector of apriori sigmas (apriori 
+   * Accesses the 3 dimensional ordered vector of apriori sigmas (apriori
    * latitude, apriori longitude, apriori radius). 
    * 
    * @return boost::numeric::ublas::bounded_vector<double,3>& The vector of apriori sigmas.
@@ -362,7 +362,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the 3 dimenstional ordered vector of adjusted sigmas (adjusted 
+   * Accesses the 3 dimensional ordered vector of adjusted sigmas (adjusted
    * latitude, adjusted longitude, adjusted radius). 
    * 
    * @return boost::numeric::ublas::bounded_vector<double,3>& The vector of adjusted sigmas.
@@ -721,4 +721,19 @@ namespace Isis {
                                                               bool errorPropagation) const {
     return formatAdjustedSigmaString(2, fieldWidth, precision, errorPropagation);
   }
+
+
+  /**
+   * Applies the parameter corrections
+   *
+   * @param corrections Vector of corrections to apply
+   *
+   * @internal
+   *   @todo always returns true?
+   */
+  bool BundleControlPoint::applyParameterCorrections() {
+    //int fred=1;
+    return true;
+  }
+
 }

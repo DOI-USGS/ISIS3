@@ -1,0 +1,110 @@
+#ifndef BundleLidarRangeConstraint_h
+#define BundleLidarRangeConstraint_h
+/**
+ * @file
+ * $Revision: 1.17 $
+ * $Date: 2010/03/27 07:01:33 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
+// Qt Library
+#include <QSharedPointer>
+
+// Isis Library
+#include "BundleConstraint.h"
+#include "BundleObservation.h"
+#include "LinearAlgebra.h"
+#include "SparseBlockMatrix.h"
+
+namespace Isis {
+  /**
+   * @brief Implements 0, 1, and 2-order piecewise polynomial continuity constraints for bundle
+   * adjustment.
+   *
+   * @ingroup ControlNetworks
+   *
+   * @author 2017-03-03 Ken Edmundson
+   *
+   * @internal
+   *   @history 2017-03-03 Ken Edmundson - Original version.
+   *   @history 2017-11-01 Ken Edmundson - Additional modifications to address bundle slowness.
+   */
+  class BundleLidarRangeConstraint : public BundleConstraint {
+    public:
+      // constructors
+      BundleLidarRangeConstraint();
+      BundleLidarRangeConstraint(BundleObservationQsp parentObservation);
+
+      // copy constructor
+      BundleLidarRangeConstraint(const BundleLidarRangeConstraint &src);
+
+      // destructor
+      ~BundleLidarRangeConstraint();
+
+      // Assignment operator
+      BundleLidarRangeConstraint &operator=
+          (const BundleLidarRangeConstraint &src);
+
+      int numberSpkSegments() const;
+      int numberCkSegments() const;
+      int numberSpkCoefficients() const;
+      int numberCkCoefficients() const;
+      int numberConstraintEquations() const;
+
+      void updateRightHandSide();
+      SparseBlockMatrix &normalsSpkMatrix();
+      SparseBlockMatrix &normalsCkMatrix();
+      LinearAlgebra::Vector &rightHandSideVector();
+
+      QString formatBundleOutputString();
+
+    private:
+      void constructMatrices();
+      void positionContinuity(int &designRow);
+      void pointingContinuity(int &designRow);
+
+      BundleObservationQsp m_parentObservation;                //! parent BundleObservation
+
+      // spk related members
+      std::vector<double> m_spkKnots;                          //! scaled spk boundary times
+      int m_numberSpkCoefficients;                             //! # coefficients
+      int m_numberSpkSegments;                                 //! # segments
+      int m_numberSpkBoundaries;                               //! # segment boundaries
+      int m_numberSpkSegmentParameters;
+
+      // ck related members
+      std::vector<double> m_ckKnots;                           //! scaled ck boundary times
+      int m_numberCkCoefficients;                              //! # coefficients
+      int m_numberCkSegments;                                  //! # segments
+      int m_numberCkBoundaries;                                //! # segment boundaries
+      int m_numberCkSegmentParameters;
+
+      int m_numberSegmentParameters;                           //! TODO: # parameters per segment
+      int m_numberParameters;                                  //! TODO: # parameters
+      int m_numberConstraintEquations;                         //! # constraint equations
+      LinearAlgebra::MatrixCompressed m_designMatrix;          //! design matrix
+      SparseBlockMatrix m_normalsSpkMatrix;                    //! normals contribution to position
+      SparseBlockMatrix m_normalsCkMatrix;                     //! normals contribution to pointing
+      LinearAlgebra::Vector m_rightHandSide;                   //! right hand side of normals
+      LinearAlgebra::Vector m_omcVector;                       //! observed minus corrected vector
+  };
+
+  //! Typdef for BundleLidarRangeConstraint QSharedPointer.
+  typedef QSharedPointer<BundleLidarRangeConstraint> BundleLidarRangeConstraintQsp;
+};
+
+#endif
