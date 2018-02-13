@@ -59,15 +59,16 @@ commands:
 	$(MV) $(OUTPUT)/stitched.map $(OUTPUT)/stitched.pvl;
 
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
-         -i $(OUTPUT)/exported.xml > /dev/null;
+         $(OUTPUT)/exported.xml > $(OUTPUT)/exported1.xml;
 
 	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
-          -i $(OUTPUT)/exported.xml > /dev/null;
+         $(OUTPUT)/exported1.xml > $(OUTPUT)/exported2.xml;
 
 	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
-          -i $(OUTPUT)/exported.xml > /dev/null;
+         $(OUTPUT)/exported2.xml > $(OUTPUT)/exported3.xml;
 
 	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
-          -i $(OUTPUT)/exported.xml > /dev/null;
+         $(OUTPUT)/exported3.xml > $(OUTPUT)/exported.txt;
 
-	$(MV) $(OUTPUT)/exported.xml $(OUTPUT)/exported.txt
+	$(RM) $(OUTPUT)/exported.xml $(OUTPUT)/exported1.xml \
+        $(OUTPUT)/exported2.xml $(OUTPUT)/exported3.xml
