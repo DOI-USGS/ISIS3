@@ -10,8 +10,15 @@
 using namespace std;
 using namespace Isis;
 
-/**
- * @author 2017-05-30 Marjorie Hahn
+/** 
+ * Unit test for ProcessExportPds4 class
+ *  
+ * @author 2017-05-30 Marjorie Hahn 
+ *  
+ *  @internal
+ *   @history 2017-05-30 Marjorie Hahn - Original Version
+ *   @history 2016-12-28 Kristin Berry - Updated to test xml input. 
+ *  
  */
 void IsisMain() {
   Preference::Preferences(true);
@@ -60,6 +67,13 @@ void IsisMain() {
     p.WritePds4("temp.img");
     remove("temp.img");
     remove("temp.xml");
+
+    std::cout << std::endl << "Testing xml input" << std::endl; 
+    Isis::ProcessExportPds4 xmlTest;
+    xmlTest.SetInputCube(&cub);
+    xmlTest.WritePds4("tempxml.xml");
+    remove("tempxml.img");
+    remove("tempxml.xml");
 
     std::cout << std::endl << "Testing export pixel types" << std::endl;
 

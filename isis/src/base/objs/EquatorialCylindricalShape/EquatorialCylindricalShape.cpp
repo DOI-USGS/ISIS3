@@ -1,6 +1,7 @@
 #include "EquatorialCylindricalShape.h"
 
 #include <QDebug>
+#include <QVector>
 
 #include <algorithm>
 #include <cfloat>
@@ -20,6 +21,8 @@
 // #include "LinearAlgebra.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "Spice.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Table.h"
@@ -28,13 +31,16 @@ using namespace std;
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
+
 namespace Isis {
+
+
   /**
    * Initialize the Isis3 Equatorial Cylindrical shape model.
    *
    * @param pvl Valid Isis3 cube label.
    */
-  EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) : 
+  EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) :
       DemShape(target, pvl) {
     setName("EquatorialCylindricalShape");
 
@@ -63,11 +69,11 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Destructor for Isis3 Equatorial Cylindrical shape model
    */
   EquatorialCylindricalShape::~EquatorialCylindricalShape() {
-    
+
     delete m_minRadius;
     m_minRadius = NULL;
 
@@ -76,14 +82,14 @@ namespace Isis {
    }
 
 
-  /** 
+  /**
    * Finds the surface intersection point.
-   *  
-   * @param observerBodyFixedPosition  Three dimensional position of the observer, 
+   *
+   * @param observerBodyFixedPosition  Three dimensional position of the observer,
    *                                   in the coordinate system of the target body.
-   * @param observerLookVectorToTarget Three dimensional direction vector from 
+   * @param observerLookVectorToTarget Three dimensional direction vector from
    *                                   the observer to the target.
-   *  
+   *
    * @return @b bool Indicates whether this shape model found a valid surface intersection.
    */
   bool EquatorialCylindricalShape::intersectSurface(vector<double> observerBodyFixedPos,
@@ -91,7 +97,7 @@ namespace Isis {
 
     // try to intersect the surface using the DemShape method
     // if this is successful, return
-    // 
+    //
     // otherwise, (i.e. DemShape::intersectSurface() fails) we will attempt to
     // intersect using the following iterative method...
     if (!DemShape::intersectSurface(observerBodyFixedPos, observerLookVectorToTarget)) {
@@ -142,7 +148,7 @@ namespace Isis {
       // JWB - The commented code here is an alternate way of doing this...
       //       which method has less expensive computing???
       //       I believe the alternate one may be (no need for cosine after naif routines)
-      // 
+      //
       //
       // find the vector to the point found by orthogonally projecting the observer position vector
       // onto the line containing the look direction vector
@@ -190,7 +196,7 @@ namespace Isis {
         return hasIntersection();
       }
 
-      double d0 = observerdist * cospsi0 - radiusDiff; 
+      double d0 = observerdist * cospsi0 - radiusDiff;
       double dm = observerdist * cospsi0 + radiusDiff;
 
       // Set the properties at the first test observation point
@@ -216,7 +222,7 @@ namespace Isis {
       // Set dalpha to be half the grid spacing for nyquist sampling
       //double dalpha = (PI/180.0)/(2.0*p_demScale);
       double cmin = cos((90.0 - 1.0 / (2.0 * demScale())) * DEG2RAD);
-      double dalpha = MAX(cos(g1lat * DEG2RAD), cmin) / (2.0 * demScale() * DEG2RAD);
+      double dalpha = MAX(cos(g1lat * DEG2RAD), cmin) / (2.0 * demScale() * RAD2DEG);
 
       // Previous Sensor version used local version of this method with lat and lon doubles.  Steven said
       // it didn't make a significant difference in speed.
@@ -329,7 +335,7 @@ namespace Isis {
                 return hasIntersection();
               }
               palt = plen - pradius;
-
+              
               // The altitude relative to surface is +ve at the observation point,
               // so reset g1=p and r1=pradius
               if (palt > tolerance) {
@@ -384,14 +390,14 @@ namespace Isis {
         // put in a test (above) for dd being smaller than the pixel
         // convergence tolerance.  If so the loop exits without an
         // intersection
-        dalpha = MAX(cos(g2lat * DEG2RAD), cmin) / (2.0 * demScale() * DEG2RAD);
+        dalpha = MAX(cos(g2lat * DEG2RAD), cmin) / (2.0 * demScale() * RAD2DEG);
       } // end while
 
       SpiceDouble intersectionPoint[3];
       SpiceBoolean found;
 
       NaifStatus::CheckErrors();
-      surfpt_c(&observerBodyFixedPos[0], &observerLookVectorToTarget[0], plen, plen, plen, 
+      surfpt_c(&observerBodyFixedPos[0], &observerLookVectorToTarget[0], plen, plen, plen,
                intersectionPoint, &found);
       NaifStatus::CheckErrors();
 
@@ -407,9 +413,26 @@ namespace Isis {
 
     }
 
+    // Do nothing since the DEM intersection was already successful
     setHasIntersection(true);
     return hasIntersection();
   }
-  // Do nothing since the DEM intersection was already successful
-}
 
+
+  /**
+   * Override of virtual function for intersectEllipsoid
+   *
+   * @return QVector holding three SpiceDoubles: SpiceDouble a, SpiceDouble b, SpiceDouble c
+   */
+  QVector<SpiceDouble> EquatorialCylindricalShape::setTargetRadii() {
+    QVector<SpiceDouble> spiceVector(3);
+    SpiceDouble a = m_maxRadius->kilometers();
+    SpiceDouble b = m_maxRadius->kilometers();
+    SpiceDouble c = m_maxRadius->kilometers();
+    spiceVector.insert(0, a);
+    spiceVector.insert(1, b);
+    spiceVector.insert(2, c);
+    return spiceVector;
+  }
+
+}

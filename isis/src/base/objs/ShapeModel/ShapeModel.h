@@ -23,6 +23,9 @@
  */
 
 #include <vector>
+#include <QVector>
+
+#include "Spice.h"
 
 template<class T> class QVector;
 
@@ -68,12 +71,17 @@ namespace Isis {
    *                           as this is now being handled in the EllipsoidShape class.
    *                           References #1028.
    *   @history 2017-03-23 Kris Becker - added isVisibleFrom() and two
-   *                            intersectSurface() methods to address real
-   *                            occlusions. It is recommended that derived
-   *                            models reimplement this method! Also made
-   *                            setSurfacePoint() & clearSurfacePoint() virtual
-   *                            to give some hope of a consistent internal state
-   *                            in derived models.
+   *                           intersectSurface() methods to address real
+   *                           occlusions. It is recommended that derived
+   *                           models reimplement this method! Also made
+   *                           setSurfacePoint() & clearSurfacePoint() virtual
+   *                           to give some hope of a consistent internal state
+   *                           in derived models.
+   *   @history 2018-02-05 Cole Neubauer - added virtual method setTargetRadii to be
+   *                           called from intersectEllipsoid. This is to avoid
+   *                           redundant code that comes with having intersectEllipsoid be
+   *                           virtual as the only code that was changed will now be handled
+   *                           in setTargetRadii Fixes #5242
    */
   class ShapeModel {
     public:
@@ -93,15 +101,15 @@ namespace Isis {
                                     std::vector<double> lookDirection)=0;
 
       // These two methods are for optional testing of occlusions when checking
-      // specific locations on the body from the observer. The first uses 
-      // localRadius() by default and so may be OK as is. 
+      // specific locations on the body from the observer. The first uses
+      // localRadius() by default and so may be OK as is.
       virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
-      virtual bool intersectSurface(const SurfacePoint &surfpt, 
+      virtual bool intersectSurface(const SurfacePoint &surfpt,
                                     const std::vector<double> &observerPos,
                                     const bool &backCheck = true);
-                                 
+
 
 
       // Return the surface intersection
@@ -164,20 +172,24 @@ namespace Isis {
                                  const std::vector<double> lookDirection);
 
     protected:
+      virtual QVector<SpiceDouble> setTargetRadii(); // returns a QVector of SpiceDouble
 
       // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
       void setNormal(const double a, const double b, const double c);
 
+      // accessor for m_hasEllipsoidIntersection
+      bool hasEllipsoidIntersection();
+
       // Set shape name
       void setName(QString name);
 
       void calculateEllipsoidalSurfaceNormal();
-      bool hasEllipsoidIntersection();
 
       // Intersect ellipse
-      bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
-                              const std::vector<double> &observerLookVectorToTarget);
+      bool intersectEllipsoid( const std::vector<double> observerPosRelativeToTarget,
+                               const std::vector<double> &observerLookVectorToTarget);
+
       bool hasValidTarget() const;
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);

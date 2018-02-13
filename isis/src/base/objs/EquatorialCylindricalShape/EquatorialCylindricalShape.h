@@ -24,14 +24,17 @@
 
 #include "DemShape.h"
 
+#include <QVector>
+
+#include "Spice.h"
 namespace Isis {
   class Pvl;
 
   /**
    * @brief Define shapes and provide utilities for shapes stored as Isis3 EquatorialCylindrical map
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an 
-   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and photometric 
+   * This class will define shapes of Isis3 target bodies with the shape defined by an
+   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and photometric
    * information for the intersection point.
    *
    * @author 2010-07-30 Debbie A. Cook
@@ -47,6 +50,14 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
+   *   @history 2018-01-05 Cole Neubauer - Fixed units conversion in intersectSurface so that the
+   *                           loop is stepping by radians per pixel, as recommended by Jeff
+   *                           Anderson (LROC team). Fixes #5245
+   *   @history 2018-02-05 Cole Neubauer - Added the setTargetRadii virtual method so that the
+   *                           intersectEllipsoid method can use the MaximumRadius found in the
+   *                           ShapeModelStatistics group of the labels (often written during a run of
+   *                           demprep) as a starting radius for the ellipsoid as opposed to the
+   *                           default radius of the target. Fixes #5242
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
@@ -60,6 +71,10 @@ namespace Isis {
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 
+    protected:
+      virtual QVector<SpiceDouble> setTargetRadii(); // returns a QVector of SpiceDouble
+
+
     private:
       Distance *m_minRadius;  //!< Minimum radius value in DEM file
       Distance *m_maxRadius;  //!< Maximum radius value in DEM file
@@ -67,4 +82,3 @@ namespace Isis {
 };
 
 #endif
-
