@@ -68,7 +68,7 @@ namespace Isis {
   };
 
   // typedefs
-  //! Definition for LidarControlPointQsp, a shared pointer to a LidarControlPoint.
+  //! Definition for a shared pointer to a LidarControlPoint.
   typedef QSharedPointer<LidarControlPoint> LidarControlPointQsp;
 }
 

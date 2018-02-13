@@ -299,11 +299,11 @@ namespace Isis {
    *
    * @return bool Returns true upon successful initialization
    */
-  bool BundleObservationVector::initializeBodyRotation() {
+  bool BundleObservationVector::setBodyRotation() {
     int nObservations = size();
     for (int i = 0; i < nObservations; i++) {
       BundleObservationQsp observation = at(i);
-      observation->initializeBodyRotation();
+      observation->setBodyRotation();
     }
 
     return true;

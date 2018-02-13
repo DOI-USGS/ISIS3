@@ -72,6 +72,7 @@ namespace Isis {
    *                               int numberPolynomialPositionSegments()
    *                               int numberPolynomialPointingSegments()
    *                               int numberPolynomialSegments()
+   *   @history 2018-02-12 Ken Edmundson Renamed initializeBodyRotation method to setBodyRotation.
    */
   class BundleObservationVector : public QVector<BundleObservationQsp> {
 
@@ -99,7 +100,7 @@ namespace Isis {
       BundleObservationQsp observationByCubeSerialNumber(QString cubeSerialNumber);
 
       bool initializeExteriorOrientation();
-      bool initializeBodyRotation();
+      bool setBodyRotation();
 
   private:
       //! Map between observation number and pointer to observation.

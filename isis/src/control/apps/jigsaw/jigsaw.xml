@@ -326,6 +326,7 @@
       </parameter>
       <parameter name="LIDARDATA">
         <type>filename</type>
+        <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
         <brief>
           Input Lidar Point File

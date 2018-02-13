@@ -45,3 +45,19 @@ print.prt
 */tsts/*/input/*
 */tsts/*/truth/*
 */tsts/*/output/*
+
+# ignore symbolic links in this directory
+BundleAdjust.cpp
+BundleAdjust.h
+BundleControlPoint.cpp
+BundleControlPoint.h
+BundleLidarControlPoint.cpp
+BundleLidarControlPoint.h
+ControlMeasure.cpp
+ControlMeasure.h
+ControlPoint.cpp
+ControlPoint.h
+LidarControlPoint.cpp
+LidarControlPoint.h
+LidarData.cpp
+LidarData.h

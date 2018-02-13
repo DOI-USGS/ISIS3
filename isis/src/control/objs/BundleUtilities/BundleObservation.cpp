@@ -515,11 +515,11 @@ namespace Isis {
 
 
   /**
-   * Initializes the body rotation
+   * Sets the body rotation
    *
    * @todo check to make sure m_bundleTargetBody is valid
    */
-  void BundleObservation::initializeBodyRotation() {
+  void BundleObservation::setBodyRotation() {
     std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
     std::vector<Angle> decCoefs = m_bundleTargetBody->poleDecCoefs();
     std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
@@ -527,24 +527,6 @@ namespace Isis {
     for (int i = 0; i < size(); i++) {
       BundleImageQsp image = at(i);
       image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);      
-    }
-  }
-
-
-  /**
-   * Updates the body rotation 
-   *
-   * @internal
-   *   @todo Is this a duplicate of initializeBodyRotation?
-   */
-  void BundleObservation::updateBodyRotation() {
-    std::vector<Angle> raCoefs = m_bundleTargetBody->poleRaCoefs();
-    std::vector<Angle> decCoefs = m_bundleTargetBody->poleDecCoefs();
-    std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
-
-    for (int i = 0; i < size(); i++) {
-      BundleImageQsp image = at(i);
-      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
 
@@ -770,7 +752,8 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
    * @internal
    *   @todo always returns true?
    */  
-  bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
+  bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections,
+                                                    bool updateBodyRotation) {
     int index = 0;
 
     try {
@@ -908,6 +891,11 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
       QString msg = "Unable to update continuity constraint right hand side for BundleObservation.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
+
+    if (updateBodyRotation) {
+      setBodyRotation();
+    }
+
 
     return true;
   }

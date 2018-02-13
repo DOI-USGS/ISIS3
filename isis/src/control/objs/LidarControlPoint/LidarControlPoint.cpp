@@ -16,14 +16,11 @@ namespace Isis {
   /**
    * Constructs a LidarControlPoint with the given time, range, and sigma range.
    * 
-   * @param time The time ths point was taken.
-   * @param range The range of the point.
-   * @param sigmaRange The sigmas od the range.
    */
   LidarControlPoint::LidarControlPoint() {
     m_time = iTime();
-    m_range = NULL;
-    m_sigmaRange = NULL;
+    m_range = -1.0;
+    m_sigmaRange = -1.0;
   }
   
   

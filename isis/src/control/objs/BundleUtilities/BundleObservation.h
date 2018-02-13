@@ -105,6 +105,9 @@ namespace Isis {
    *                                                    LinearAlgebra::Matrix &coeffImagePointing)
    *                               SparseBlockMatrix &continuityContraintSpkMatrix()
    *                               SparseBlockMatrix &continuityContraintCkMatrix()
+   *   @history 2018-02-12 Ken Edmundson - Removed method updateBodyRotation and renamed method
+   *                           initializeBodyRotation to setBodyRotation. Modified method
+   *                           applyParameterCorrections to take bool arg to updateBodyRotation.
    */
   class BundleObservation : public QVector<QSharedPointer<BundleImage> > {
 
@@ -113,7 +116,9 @@ namespace Isis {
       BundleObservation();
 
       // constructor
-      BundleObservation(QSharedPointer<BundleImage> image, QString observationNumber, QString instrumentId,
+      BundleObservation(QSharedPointer<BundleImage> image,
+                        QString observationNumber,
+                        QString instrumentId,
                         QSharedPointer<BundleTargetBody> bundleTargetBody);
 
       // copy constructor
@@ -175,15 +180,14 @@ namespace Isis {
 
       void computePartials(LinearAlgebra::Matrix &coeffImagePosition,     //!< multi-segment version
                            LinearAlgebra::Matrix &coeffImagePointing);
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
+      bool applyParameterCorrections(LinearAlgebra::Vector corrections, bool updateBodyRotation);
 
       SparseBlockMatrix &continuityContraintSpkMatrix();
       SparseBlockMatrix &continuityContraintCkMatrix();
       LinearAlgebra::Vector &continuityRHS();
 
       bool initializeExteriorOrientation();
-      void initializeBodyRotation();
-      void updateBodyRotation();
+      void setBodyRotation();
 
       QString formatPositionSegmentHeader(int segmentIndex);
       QString formatPositionOutputString(int segmentIndex,

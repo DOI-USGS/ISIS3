@@ -14,6 +14,7 @@
 #include <QTextStream>
 
 #include "Angle.h"
+#include "CameraFactory.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -21,6 +22,8 @@
 #include "Latitude.h"
 #include "LidarControlPoint.h"
 #include "Longitude.h"
+#include "Progress.h"
+#include "SerialNumberList.h"
 #include "SurfacePoint.h"
 
 
@@ -52,6 +55,82 @@ namespace Isis {
    */
   QList< QSharedPointer<LidarControlPoint> > LidarData::points() const {
     return m_points.values();
+  }
+
+  /**
+   * Creates the ControlNet's image camera's based on the list of Serial Numbers
+   *
+   * @param list The list of Serial Numbers
+   * @param progress A pointer to the progress of creating the cameras
+   * @throws Isis::iException::System - "Unable to create camera
+   *        for cube file"
+   * @throws Isis::iException::User - "Control point measure does
+   *        not have a cube with a matching serial number"
+   * @internal
+   *   @history 2009-01-06 Jeannie Walldren - Fixed typo in
+   *            exception output.
+   *   @history 2016-10-13 Ian Humphrey - Added initial check to see if cameras have already been
+   *                           set, and immediately return if yes. References #4293.
+   */
+  void LidarData::SetImages(SerialNumberList &list, Progress *progress) {
+    // First check if cameras have already been setup via another SetImages call
+    if (p_cameraList.size() > 0) {
+      return;
+    }
+    // Prep for reporting progress
+    if (progress != NULL) {
+      progress->SetText("Setting input images...");
+      progress->SetMaximumSteps(list.size());
+      progress->CheckStatus();
+    }
+    // Open the camera for all the images in the serial number list
+    for (int i = 0; i < list.size(); i++) {
+      QString serialNumber = list.serialNumber(i);
+      QString filename = list.fileName(i);
+      Cube cube(filename, "r");
+
+      try {
+        Isis::Camera *cam = CameraFactory::Create(cube);
+        p_cameraMap[serialNumber] = cam;
+        p_cameraValidMeasuresMap[serialNumber] = 0;
+        p_cameraRejectedMeasuresMap[serialNumber] = 0;
+        p_cameraList.push_back(cam);
+      }
+      catch (IException &e) {
+        QString msg = "Unable to create camera for cube file ";
+        msg += filename;
+        throw IException(e, IException::Unknown, msg, _FILEINFO_);
+      }
+
+      if (progress != NULL)
+        progress->CheckStatus();
+    }
+
+    // Loop through all measures and set the camera
+    QHashIterator< QString, QSharedPointer<LidarControlPoint> > p(m_points);
+    while (p.hasNext()) {
+      p.next();
+      LidarControlPointQsp curPoint = p.value();
+
+      QList< QString > serialNums = curPoint->getCubeSerialNumbers();
+      for (int m = 0; m < serialNums.size(); m++) {
+        ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
+
+        QString serialNumber = curMeasure->GetCubeSerialNumber();
+        if (list.hasSerialNumber(serialNumber)) {
+          curMeasure->SetCamera(p_cameraMap[serialNumber]);
+
+          // increment number of measures for this image (camera)
+          if (!curMeasure->IsIgnored()) p_cameraValidMeasuresMap[serialNumber]++;
+        }
+        else {
+          IString msg = "Control point [" + curPoint->GetId() +
+              "], measure [" + curMeasure->GetCubeSerialNumber() +
+              "] does not have a cube with a matching serial number";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+      }
+    }
   }
 
 
