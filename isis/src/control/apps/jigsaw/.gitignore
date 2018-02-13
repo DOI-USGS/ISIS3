@@ -36,6 +36,10 @@ ui_*.h
 *.pro
 *.pro.user
 
+# ignore all files created by running BundleAdjust
+*bundleout*.txt
+*.csv
+
 print.prt
 
 */3rdParty/*
@@ -63,6 +67,8 @@ BundleObservationVector.cpp
 BundleObservationVector.h
 BundleSettings.cpp
 BundleSettings.h
+BundleTargetBody.cpp
+BundleTargetBody.h
 ControlMeasure.cpp
 ControlMeasure.h
 ControlPoint.cpp
