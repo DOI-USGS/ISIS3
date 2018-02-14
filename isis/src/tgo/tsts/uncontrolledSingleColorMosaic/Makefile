@@ -29,8 +29,8 @@ commands:
              map=$(OUTPUT)/equi.map \
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/basenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*equi.cub > $(OUTPUT)/mosaic.lis;
-	$(MOSAIC) fromlist=$(OUTPUT)/mosaic.lis mosaic=$(OUTPUT)/cassisMosaic.cub > /dev/null;
-	$(EXPORT) from=$(OUTPUT)/cassisMosaic.cub to=$(OUTPUT)/cassisMosaic \
+	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/mosaic.lis mosaic=$(OUTPUT)/cassisMosaic.cub > /dev/null;
+	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/cassisMosaic.cub to=$(OUTPUT)/cassisMosaic \
              pdsversion=pds4 > /dev/null;
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
               $(OUTPUT)/cassisMosaic.xml > $(OUTPUT)/cassisMosaic1.txt;
