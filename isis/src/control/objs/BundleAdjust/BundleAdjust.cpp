@@ -551,6 +551,37 @@ namespace Isis {
       point->ComputeApriori();
     }
 
+    // add BundleLidarControlPoints
+    int numLidarPoints = m_lidarDataSet.points().size();
+    for (int i = 0; i < numLidarPoints; i++) {
+      LidarControlPointQsp lidarPoint = m_lidarDataSet.points().at(i);
+      if (lidarPoint->IsIgnored()) {
+        continue;
+      }
+
+      BundleLidarControlPointQsp bundleLidarPoint(new BundleLidarControlPoint(lidarPoint.data()));
+      m_bundleControlPoints.append(bundleLidarPoint);
+
+      bundleLidarPoint->setWeights(m_bundleSettings, m_metersToRadians);
+
+      // set parent observation for each BundleMeasure
+      int numMeasures = bundleLidarPoint->size();
+      for (int j = 0; j < numMeasures; j++) {
+        BundleMeasureQsp measure = bundleLidarPoint->at(j);
+        QString cubeSerialNumber = measure->cubeSerialNumber();
+
+        BundleObservationQsp observation =
+            m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
+        BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
+
+        measure->setParentObservation(observation);
+        measure->setParentImage(image);
+      }
+
+      lidarPoint->ComputeApriori();
+    }
+
+/*
     // set up vector of BundleLidarControlPoints
     int numLidarPoints = m_lidarDataSet.points().size();
     for (int i = 0; i < numLidarPoints; i++) {
@@ -580,7 +611,7 @@ namespace Isis {
       }
       lidarPoint->ComputeApriori();
     }
-
+*/
     //===========================================================================================//
     //==== Use the bundle settings to initialize more member variables and set up solutions =====//
     //===========================================================================================//
@@ -619,8 +650,8 @@ namespace Isis {
       m_rank += m_bundleSettings->numberTargetBodyParameters();
     }
 
+    // NOTE that this will now include lidar points if any
     int num3DPoints = m_bundleControlPoints.size();
-    num3DPoints += m_bundleLidarPoints.size();
 
     m_bundleResults.setNumberUnknownParameters(m_rank + 3 * num3DPoints);
 
@@ -855,7 +886,7 @@ namespace Isis {
    *
    * @return BundleSolutionInfo A container with settings and results from the adjustment.
    *
-   * @see BundleAdjust::solveCholesky
+   * @see solveCholesky()
    *
    * @todo make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
    */
@@ -906,7 +937,8 @@ namespace Isis {
   //    }
 
       // Compute the apriori lat/lons for each nonheld point
-      m_controlNet->ComputeApriori(); // original location
+      // already done in init() method
+//      m_controlNet->ComputeApriori(); // original location
 
       // ken testing - if solving for target mean radius, set point radius to current mean radius
       // if solving for triaxial radii, set point radius to local radius
@@ -1225,6 +1257,7 @@ namespace Isis {
    * @see formPhotoNormals()
    * @see formLidarNormals()
    */
+/*
   bool BundleAdjust::formNormalEquations() {
     bool status = false;
 
@@ -1248,7 +1281,7 @@ namespace Isis {
 
     return status;
   }
-
+*/
 
   /**
    * Form the least-squares normal equations matrix.
@@ -1261,8 +1294,8 @@ namespace Isis {
    * @see formPointNormals()
    * @see formWeightedNormals()
    */
-//bool BundleAdjust::formNormalEquations() {
-  bool BundleAdjust::formPhotoNormals() {
+bool BundleAdjust::formNormalEquations() {
+//  bool BundleAdjust::formPhotoNormals() {
     bool status = false;
 
     m_bundleResults.setNumberObservations(0);// ???
@@ -1462,8 +1495,6 @@ namespace Isis {
     static LinearAlgebra::Vector n2(3);
     LinearAlgebra::VectorCompressed n1(m_rank);
 
-//    m_RHS.resize(m_rank);
-
     // if solving for target body parameters, set size of coeffTarget
     // (note this size will not change through the adjustment).
     if (m_bundleSettings->solveTargetBody()) {
@@ -1474,8 +1505,8 @@ namespace Isis {
 
     // clear N12, n1, and nj
     N12.clear();
-    n1.clear();
-//    m_RHS.clear();
+//    n1.clear();
+    m_RHS.clear();
 
     // clear static matrices
     coeffPoint3D.clear();
@@ -1967,6 +1998,35 @@ namespace Isis {
 
 
   /**
+   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
+   *
+   * @param alpha A constant multiplier.
+   * @param v2 The output vector.
+   * @param Q A sparse block matrix.
+   * @param v1 A vector.
+   */
+  void BundleAdjust::productAlphaAV(double alpha, bounded_vector<double,3> &v2,
+                                    SparseBlockRowMatrix &Q,
+                                    vector<double> &v1) {
+
+    QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
+
+    int subrangeStart, subrangeEnd;
+
+    while ( Qit.hasNext() ) {
+      Qit.next();
+
+      int columnIndex = Qit.key();
+
+      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
+      subrangeEnd = subrangeStart + Qit.value()->size2();
+
+      v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
+    }
+  }
+
+
+  /**
    * Add piecewise polynomial continuity constraints to normals equations
    *
    * @todo Do we need a general flag indicating there are time-dependent observations in the bundle
@@ -2065,35 +2125,6 @@ namespace Isis {
       t += numParameters;
 
       continuityRHS.clear();
-    }
-  }
-
-
-  /**
-   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
-   *
-   * @param alpha A constant multiplier.
-   * @param v2 The output vector.
-   * @param Q A sparse block matrix.
-   * @param v1 A vector.
-   */
-  void BundleAdjust::productAlphaAV(double alpha, bounded_vector<double,3> &v2,
-                                    SparseBlockRowMatrix &Q,
-                                    LinearAlgebra::Vector &v1) {
-
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
-
-    int subrangeStart, subrangeEnd;
-    
-    while ( Qit.hasNext() ) {
-      Qit.next();
-
-      int columnIndex = Qit.key();
-
-      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
-      subrangeEnd = subrangeStart + Qit.value()->size2();
-      
-      v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
 
@@ -2630,6 +2661,7 @@ namespace Isis {
     obsValue = deltaY / measureCamera->PixelPitch();
     m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
 
+    // TODO: what if camera has been subsampled, is pixel pitch computation still valid?
     observationSigma = 1.4 * measureCamera->PixelPitch();
     observationWeight = 1.0 / observationSigma;
 
@@ -2690,96 +2722,20 @@ namespace Isis {
       t += numParameters;
     }
         
-    // TODO: Below code should move into BundleControlPoint->updateParameterCorrections
-    //       except, what about the productAlphaAV method?
-    
-    // Update lat/lon for each control point
-    double latCorrection, lonCorrection, radCorrection;
-    int pointIndex = 0;
+    // Update lat/lon for each photogrammetric control point
     int numControlPoints = m_bundleControlPoints.size();
     for (int i = 0; i < numControlPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
-
-      if (point->isRejected()) {
-          pointIndex++;
-          continue;
-      }
-
-      // get NIC, Q, and correction vector for this point
-      boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
-      SparseBlockRowMatrix &Q = point->cholmodQMatrix();
-      boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
-
-      // subtract product of Q and nj from NIC
-      productAlphaAV(-1.0, NIC, Q, m_imageSolution);
-
-      // get point parameter corrections
-      latCorrection = NIC(0);
-      lonCorrection = NIC(1);
-      radCorrection = NIC(2);
-
-      SurfacePoint surfacepoint = point->adjustedSurfacePoint();
-
-      double pointLat = surfacepoint.GetLatitude().degrees();
-      double pointLon = surfacepoint.GetLongitude().degrees();
-      double pointRad = surfacepoint.GetLocalRadius().meters();
-
-      pointLat += RAD2DEG * latCorrection;
-      pointLon += RAD2DEG * lonCorrection;
-
-      // Make sure updated values are still in valid range.
-      // TODO What is the valid lon range?
-      if (pointLat < -90.0) {
-        pointLat = -180.0 - pointLat;
-        pointLon = pointLon + 180.0;
-      }
-      if (pointLat > 90.0) {
-        pointLat = 180.0 - pointLat;
-        pointLon = pointLon + 180.0;
-      }
-      while (pointLon > 360.0) {
-        pointLon = pointLon - 360.0;
-      }
-      while (pointLon < 0.0) {
-        pointLon = pointLon + 360.0;
-      }
-
-      pointRad += 1000.*radCorrection;
-
-      // sum and save corrections
-      corrections(0) += latCorrection;
-      corrections(1) += lonCorrection;
-      corrections(2) += radCorrection;
-           
-      // ken testing - if solving for target body mean radius, set radius to current
-      // mean radius value
-      if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
-          || m_bundleTargetBody->solveTriaxialRadii())) {
-        if (m_bundleTargetBody->solveMeanRadius()) {
-          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                               Longitude(pointLon, Angle::Degrees),
-                                               m_bundleTargetBody->meanRadius());
-        }
-        else if (m_bundleTargetBody->solveTriaxialRadii()) {
-            Distance localRadius = m_bundleTargetBody->
-                                       localRadius(Latitude(pointLat, Angle::Degrees),
-                                                   Longitude(pointLon, Angle::Degrees));
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                                 Longitude(pointLon, Angle::Degrees),
-                                                 localRadius);
-        }
-      }
-      else {
-        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                             Longitude(pointLon, Angle::Degrees),
-                                             Distance(pointRad, Distance::Meters));
-      }
-
-      point->setAdjustedSurfacePoint(surfacepoint);
-
-      pointIndex++;
-
-    } // end loop over point corrections
+      point->applyParameterCorrections(m_sparseNormals, m_imageSolution);
+    }
+/*
+    // Update lat/lon for each lidar control point (if we have them)
+    int numLidarPoints = m_bundleLidarPoints.size();
+    for (int i = 0; i < numLidarPoints; i++) {
+      BundleControlPointQsp point = m_bundleLidarPoints.at(i);
+      point->applyParameterCorrections(m_sparseNormals, m_imageSolution);
+    }
+*/
   }
 
 
@@ -2841,6 +2797,7 @@ namespace Isis {
     }
 
     // add vtpv from constrained 3D points
+    // TODO: put method vtpvContribution() into BundleControlPoint
     int pointIndex = 0;
     for (int i = 0; i < numObjectPoints; i++) {
       BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
@@ -2864,6 +2821,7 @@ namespace Isis {
     }
 
     // add vtpv from constrained image parameters
+    // TODO: put method vtpvContribution() into BundleObservation
     for (int i = 0; i < m_bundleObservations.size(); i++) {
       BundleObservationQsp observation = m_bundleObservations.at(i);
 

@@ -30,6 +30,7 @@
 #include "BundleMeasure.h"
 #include "BundleSettings.h"
 #include "ControlPoint.h"
+#include "LinearAlgebra.h"
 #include "SparseBlockMatrix.h"
 #include "SurfacePoint.h"
 
@@ -121,7 +122,15 @@ namespace Isis {
       QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
                                               bool errorPropagation) const;
 
-      bool applyParameterCorrections();
+      void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
+                                     LinearAlgebra::Vector &imageSolution);
+
+//      void productAlphaAV(double alpha,
+//                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
+//                          SparseBlockRowMatrix                                &Q,
+//                          LinearAlgebra::Vector                               &v1);
+      void productAlphaAV(double alpha, SparseBlockMatrix &sparseMatrix,
+                          LinearAlgebra::Vector &v1);
 
     private:
       //!< pointer to the control point object this represents
