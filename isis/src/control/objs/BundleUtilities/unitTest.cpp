@@ -14,6 +14,7 @@
 #include "BundleControlPoint.h"
 #include "BundleImage.h"
 #include "BundleMeasure.h"
+#include "BundlePolynomialContinuityConstraint.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
@@ -137,6 +138,18 @@ int main(int argc, char *argv[]) {
                                        true, 800.0, 900.0, 1000.0);
     printXml(boss);
 
+    boss.setInstrumentPointingSettings(BundleObservationSolveSettings::AnglesVelocityAcceleration,
+                                       true, 1, 3, 1, false, 2.0, 1.0, 0.1);
+    boss.setInstrumentPositionSettings(BundleObservationSolveSettings::PositionVelocityAcceleration,
+                                       6, 3, 1, false, 50.0, 1.0, 0.1);
+    qDebug() << "CK polynomial degree: " << boss.ckDegree();
+    qDebug() << "CK interpolation type: " << toString(boss.pointingInterpolationType());
+    qDebug() << "Solving over existing pointing? " << boss.solvePolyOverPointing();
+    qDebug() << "SPK polynomial degree: " << boss.spkDegree();
+    qDebug() << "SPK interpolation type: " << toString(boss.positionInterpolationType());
+    qDebug() << "Solving over hermite position? " << boss.solvePositionOverHermite();
+    printXml(boss);
+
     BundleObservationSolveSettings solveNone;
     solveNone.setInstrumentPointingSettings(BundleObservationSolveSettings::NoPointingFactors,
                                                true);
@@ -178,13 +191,25 @@ int main(int argc, char *argv[]) {
                                                                                      "anglesonly"));
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                         "ANGLES"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
                                                                               "AnglesAndVelocity"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                     "VELOCITIES"));
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
                                                                   "AnglesVelocityAndAcceleration"));
     qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                  "ACCELERATIONS"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
                                                                       "AllPolynomialCoefficients"));
+    qDebug() << BundleObservationSolveSettings::instrumentPointingSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(
+                                                                                            "ALL"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                               "NOPOSITIONFACTORS"));
@@ -193,13 +218,25 @@ int main(int argc, char *argv[]) {
                                                                                    "positiononly"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                      "POSITIONS"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                             "PositionAndVelocity"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                     "VELOCITIES"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                 "PositionVelocityAndAcceleration"));
     qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
                 BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                  "ACCELERATIONS"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
                                                                       "AllPolynomialCoefficients"));
+    qDebug() << BundleObservationSolveSettings::instrumentPositionSolveOptionToString(
+                BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(
+                                                                                            "ALL"));
     qDebug() << "";
 
 
@@ -303,6 +340,16 @@ int main(int argc, char *argv[]) {
     //  QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
     //  throw IException(IException::Io, msg, _FILEINFO_);
     //}
+
+    qDebug() << "Testing observation number methods...";
+    BundleObservationSolveSettings observationSettings;
+    QStringList observationNumberList = observationSettings.observationNumbers().toList();
+    qDebug() << "Observation numbers: " << observationNumberList.join(", ");
+    qDebug() << "Add a new observation number";
+    observationSettings.addObservationNumber("TestObservation1");
+    observationNumberList = observationSettings.observationNumbers().toList();
+    qDebug() << "Observation numbers: " << observationNumberList.join(", ");
+    qDebug() << "";
 
     qDebug() << "Testing error throws...";
     try {
@@ -411,19 +458,31 @@ int main(int argc, char *argv[]) {
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatPositionSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true);
+    qDebug().noquote() << bo2.formatPointingSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true);
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.formatPositionSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,false);
+    qDebug().noquote() << bo2.formatPositionOutputString(0,true);
+    qDebug().noquote() << bo2.formatPointingSegmentHeader(0);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false,true);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,false);
+    qDebug().noquote() << bo2.formatPointingOutputString(0,true);
 
 
 
@@ -472,9 +531,16 @@ int main(int argc, char *argv[]) {
     // bo3.initializeBodyRotation(); //Seg fault
 
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo3.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo3.formatBundleOutputString(false);
-    qDebug().noquote() << bo3.formatBundleOutputString(true,true);
+    qDebug().noquote() << bo3.formatPositionSegmentHeader(0);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,true,true);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,false,true);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,false);
+    qDebug().noquote() << bo3.formatPositionOutputString(0,true);
+    qDebug().noquote() << bo3.formatPointingSegmentHeader(0);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,true,true);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,false,true);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,false);
+    qDebug().noquote() << bo3.formatPointingOutputString(0,true);
     qDebug() << "init exterior orientiation successful?  "
              << toString(bo3.initializeExteriorOrientation());
     //TODO: We should not have to catch an exception here, we need to use an observation
@@ -502,6 +568,13 @@ int main(int argc, char *argv[]) {
     qDebug() << "    access images by serial number...";
     qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImageSerialNumber")->fileName();
     qDebug().noquote() << bo3.imageByCubeSerialNumber("TestImage2SerialNumber")->fileName();
+    qDebug() << "";
+
+    qDebug() << "Get the number of segments";
+    qDebug() << "Number of position segments: " << bo3.numberPolynomialPositionSegments();
+    qDebug() << "Number of pointing segments: " << bo3.numberPolynomialPointingSegments();
+    qDebug() << "Total number of segments: " << bo3.numberPolynomialSegments();
+    qDebug() << "Number of continuity constraints: " << bo3.numberContinuityConstraints();
     qDebug() << "";
 
     //  See BundleObservation::applyParameterCorrections last catch (exception NOT thrown)
@@ -558,14 +631,27 @@ int main(int argc, char *argv[]) {
     #endif
     BundleObservationVector bov;
     BundleSettingsQsp bundleSettings = BundleSettingsQsp(new BundleSettings);
-    // BundleObservation *obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs1->formatBundleOutputString(true);
-    //obs1 = bov.observationByCubeSerialNumber("obs1");
-    //BundleObservation *obs2 = bov.addNew(bundleImage, "obs2", "InstrumentIdBOV", bundleSettings);
-    //qDebug() << obs2->formatBundleOutputString(true);
+    BundleObservationQsp obs1 = bov.addNew(bi2, "obs1", "InstrumentIdBOV", bundleSettings);
+    qDebug() << obs1->formatPointingOutputString(0, true);
+    qDebug() << obs1->formatPositionOutputString(0, true);
+    obs1 = bov.observationByCubeSerialNumber("obs1");
+    BundleImageQsp bi2Copy(new BundleImage(bi3));
+    BundleObservationQsp obs2 = bov.addNew(bi2Copy, "obs2", "InstrumentIdBOV", bundleSettings);
+    qDebug() << obs2->formatPointingOutputString(0, true);
+    qDebug() << obs2->formatPositionOutputString(0, true);
     qDebug() << "number of position parameters: " << toString(bov.numberPositionParameters());
     qDebug() << "number of pointing parameters: " << toString(bov.numberPointingParameters());
     qDebug() << "number of parameters: " << toString(bov.numberParameters());
+    qDebug() << "number of continuity constraints: "
+             << toString(bov.numberContinuityConstraintEquations());
+
+    qDebug() << "Test copy constructor";
+    BundleObservationVector bov2(bov);
+
+    qDebug() << "Test assignment operator";
+    bov = bov;
+    BundleObservationVector bov3;
+    bov3= bov;
 
 #if 0
     BundleObservation obs1b = *bov.getObservationByCubeSerialNumber("obs1");

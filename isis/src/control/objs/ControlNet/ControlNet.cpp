@@ -60,6 +60,7 @@ namespace Isis {
     pointIds = new QStringList;
 
     m_ownPoints = true;
+
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
   }
@@ -1048,6 +1049,17 @@ namespace Isis {
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
     return (*cubeGraphNodes)[serialNumber]->getMeasures();
+  }
+
+
+  /**
+   * Get all the valid measures pertaining to a given cube serial number
+   *
+   * @returns A list of all valid measures which are in a given cube
+   */
+  QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
+    ValidateSerialNumber(serialNumber);
+    return (*cubeGraphNodes)[serialNumber]->getValidMeasures();
   }
 
 

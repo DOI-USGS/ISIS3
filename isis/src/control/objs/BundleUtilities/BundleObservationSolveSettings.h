@@ -75,7 +75,16 @@ namespace Isis {
    *                           with these settings. Removed the setFromPvl() method. When re-
    *                           implemented, it should be put in jigsaw. References #4293.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
-   *
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -members...
+   *                               int m_numberCkPolySegments
+   *                               int m_numberSpkPolySegments
+   *                           -methods...
+   *                               int numberCkPolySegments
+   *                               int numberCkPolySegments
+   *   @history 2017-11-01 Ken Edmundson - Modified to force number of segments to be 1 if
+   *                                       m_instrumentPointingSolveOption = Angles or
+   *                                       m_instrumentPositionSolveOption = Position.
    *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.
@@ -121,6 +130,7 @@ class BundleObservationSolveSettings {
                                          bool solveTwist,
                                          int ckDegree = 2,
                                          int ckSolveDegree = 2,
+                                         int ckPolynomialSegments = 1,
                                          bool solvePolynomialOverExisting = false,
                                          double anglesAprioriSigma = -1.0,
                                          double angularVelocityAprioriSigma = -1.0,
@@ -129,6 +139,7 @@ class BundleObservationSolveSettings {
       bool solveTwist() const;
       int ckDegree() const;
       int ckSolveDegree() const;
+      int numberCkPolySegments() const;
       int numberCameraAngleCoefficientsSolved() const;
       bool solvePolyOverPointing() const;
       QList<double> aprioriPointingSigmas() const;
@@ -152,6 +163,7 @@ class BundleObservationSolveSettings {
       void setInstrumentPositionSettings(InstrumentPositionSolveOption option,
                                          int spkDegree = 2,
                                          int spkSolveDegree = 2,
+                                         int spkPolynomialSegments = 1,
                                          bool positionOverHermite = false,
                                          double positionAprioriSigma = -1.0,
                                          double velocityAprioriSigma = -1.0,
@@ -159,6 +171,7 @@ class BundleObservationSolveSettings {
       InstrumentPositionSolveOption instrumentPositionSolveOption() const;
       int spkDegree() const;
       int spkSolveDegree() const;
+      int numberSpkPolySegments() const;
       int numberCameraPositionCoefficientsSolved() const;
       bool solvePositionOverHermite() const;
       QList<double> aprioriPositionSigmas() const;
@@ -208,13 +221,14 @@ class BundleObservationSolveSettings {
       // pointing related parameters
       //! Option for how to solve for instrument pointing.
       InstrumentPointingSolveOption m_instrumentPointingSolveOption;
-      int m_numberCamAngleCoefSolved;             /**< The number of camera angle coefficients in
-                                                       solution.*/
-      int m_ckDegree;                             /**< Degree of the polynomial fit to the original
-                                                       camera angles. **/
-      int m_ckSolveDegree;                        /**< Degree of the camera angles polynomial being
-                                                       fit to in the bundle adjustment. **/
-      bool m_solveTwist;                          //!< Solve for "twist" angle.
+      int m_numberCamAngleCoefSolved;           /**< The number of camera angle coefficients in
+                                                     solution.*/
+      int m_ckDegree;                           /**< Degree of the polynomial fit to the original
+                                                     camera angles. **/
+      int m_ckSolveDegree;                      /**< Degree of the camera angles polynomial being
+                                                     fit to in the bundle adjustment. **/
+      int m_numberCkPolySegments;               //!< Number of segments in spk piecewise polynomial.
+      bool m_solveTwist;                        //!< Solve for "twist" angle.
       bool m_solvePointingPolynomialOverExisting; /**< The polynomial will be fit over the existing
                                                        pointing polynomial.*/
       QList<double> m_anglesAprioriSigma; /**< The image position a priori sigmas.The size of the
@@ -240,6 +254,7 @@ class BundleObservationSolveSettings {
                                                   camera position. **/
       int m_spkSolveDegree;                  /**< Degree of the camera position polynomial being
                                                   fit to in the bundle adjustment. **/
+      int m_numberSpkPolySegments;           /**< Number of segments in spk piecewise polynomial. */
       bool m_solvePositionOverHermiteSpline; /**< The polynomial will be fit over an existing
                                                   Hermite spline.*/
       QList<double> m_positionAprioriSigma; /**< The instrument pointing a priori sigmas. The

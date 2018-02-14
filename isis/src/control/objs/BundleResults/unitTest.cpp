@@ -178,6 +178,7 @@ int main(int argc, char *argv[]) {
     results.incrementNumberConstrainedImageParameters(10);
     results.resetNumberConstrainedTargetParameters();
     results.incrementNumberConstrainedTargetParameters(2);
+    results.setNumberContinuityConstraintEquations(3);
     results.setNumberUnknownParameters(13);
     results.setDegreesOfFreedom(14.0);
     results.setSigma0(15.0);
@@ -190,7 +191,12 @@ int main(int argc, char *argv[]) {
     results.setRadiansToMeters(23.68);
     results.setIterations(6);
     printXml(results);
+    qDebug() << "Number of continuity constraints:"
+             << results.numberContinuityConstraintEquations();
     qDebug() << "";
+
+    // Reset this back to 0 for computation methods
+    results.setNumberContinuityConstraintEquations(0);
 
     qDebug() << "Testing more computation methods...";
     results.computeSigma0(28.0, BundleSettings::Sigma0);

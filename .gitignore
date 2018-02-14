@@ -27,6 +27,14 @@ object_script.*.Debug
 *_plugin_import.cpp
 *.moc
 ui_*.h
+*.html
+
+# ignore all files created by squish coco
+*csmes
+
+# ignore all files created by qtcreator
+*.pro
+*.pro.user
 
 print.prt
 
@@ -37,4 +45,3 @@ print.prt
 */tsts/*/input/*
 */tsts/*/truth/*
 */tsts/*/output/*
-

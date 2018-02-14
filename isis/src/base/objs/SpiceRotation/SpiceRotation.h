@@ -30,8 +30,10 @@
 //#include <SpiceZmc.h>
 
 #include "Angle.h"
+#include "Histogram.h"
 #include "Table.h"
 #include "PolynomialUnivariate.h"
+#include "PiecewisePolynomial.h"
 #include "Quaternion.h"
 
 #define J2000Code    1
@@ -348,6 +350,9 @@ namespace Isis {
 
       Table Cache(const QString &tableName);
       void CacheLabel(Table &table);
+      void PolynomialLabel(Table &table);
+
+      std::vector<double> timeCache() const;
 
       void LoadTimeCache();
 
@@ -358,10 +363,14 @@ namespace Isis {
 
       void SetPolynomial(const Source type=PolyFunction);
 
+      PiecewisePolynomial fitPolynomial(const int degree,
+                                        const int segmentCount = 1);
+
       void SetPolynomial(const std::vector<double> &abcAng1,
                          const std::vector<double> &abcAng2,
                          const std::vector<double> &abcAng3,
-                         const Source type = PolyFunction);
+                         const Source type = PolyFunction,
+                         const int segment = 0);
 
       void usePckPolynomial();
       void setPckPolynomial(const std::vector<Angle> &raCoeff,
@@ -370,7 +379,8 @@ namespace Isis {
 
       void GetPolynomial(std::vector<double> &abcAng1,
                          std::vector<double> &abcAng2,
-                         std::vector<double> &abcAng3);
+                         std::vector<double> &abcAng3,
+                         const int segment = 0);
 
       void getPckPolynomial(std::vector<Angle> &raCoeff,
                             std::vector<Angle> &decCoeff,
@@ -378,6 +388,12 @@ namespace Isis {
 
       // Set the polynomial degree
       void SetPolynomialDegree(int degree);
+      void setPolynomialSegments(int segmentCount);
+      int numPolynomialSegments() const;
+      std::vector<double> polynomialKnots() const;
+      std::vector<double> scaledPolynomialKnots() const;
+      int polySegmentIndex(double et) const;
+      Histogram computeError(PiecewisePolynomial poly);
       Source GetSource();
       void SetSource(Source source);
       void ComputeBaseTime();
@@ -428,6 +444,7 @@ namespace Isis {
                                                       coefficients of polynomial
                                                       fit to rotation angles.*/
       int p_degree;                     //!< Degree of fit polynomial for angles
+      int m_segments;                   //!< Number of segments in the polynomial
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
@@ -464,8 +481,8 @@ namespace Isis {
       bool p_degreeApplied;               /**< Flag indicating whether or not a polynomial
                                                of degree p_degree has been created and
                                                used to fill the cache*/
-      std::vector<double> p_coefficients[3];  /**< Coefficients defining functions fit 
-                                                   to 3 pointing angles*/
+      PiecewisePolynomial m_polynomial;   /**< Piecewise polynomial fit over
+                                               the 3 pointing angles.*/
       bool p_noOverride;                  //!< Flag to compute base time;
       double p_overrideBaseTime;          //!< Value set by caller to override computed base time
       double p_overrideTimeScale;         //!< Value set by caller to override computed time scale
@@ -588,6 +605,8 @@ namespace Isis {
       //! Seconds per day for scaling time in seconds to get target body w
       static const double m_dayScale;
   };
+  //! Typdef for SpiceRotation QSharedPointer.
+  typedef QSharedPointer<SpiceRotation> SpiceRotationQsp;
 };
 
 #endif

@@ -68,7 +68,7 @@ namespace Isis {
    * @param matrix The matrix to check. Automatically returns false if not 
    *               square.
    * 
-   * @return @b bool Returns true if the matrix is a square identity matrix 
+   * @return bool Returns true if the matrix is a square identity matrix
    *                 (i.e. there are ones down the diagonal and zeroes elsewhere).
    */
   bool LinearAlgebra::isIdentity(const Matrix &matrix) {
@@ -97,7 +97,7 @@ namespace Isis {
    * @param matrix The matrix to check. Automatically returns false 
    *               if not square.
    * 
-   * @return @b bool Returns true if the matrix is orthogonal.
+   * @return bool Returns true if the matrix is orthogonal.
    */
   bool LinearAlgebra::isOrthogonal(const Matrix &matrix) {
     if (matrix.size1() != matrix.size2()) return false;
@@ -116,7 +116,7 @@ namespace Isis {
    * @param matrix The matrix to check. Automatically returns false if not 2x2 
    *               or 3x3.
    *  
-   * @return @b bool Returns true if the given matrix represents a rotation. 
+   * @return bool Returns true if the given matrix represents a rotation.
    *  
    * @throw IException::Programmer "Unable to determine whether 
    *                                the given matrix is a rotation matrix."
@@ -219,7 +219,7 @@ namespace Isis {
    *  
    * @param vector The matrix to check.
    * 
-   * @return @b bool Returns true if the matrix is all zereos.
+   * @return bool Returns true if the matrix is all zereos.
    */
   bool LinearAlgebra::isZero(const Matrix &matrix) {
     for (unsigned int i = 0; i < matrix.size1(); i++) {
@@ -239,7 +239,7 @@ namespace Isis {
    *  
    * @param vector The vector to check.
    * 
-   * @return @b bool Returns true if the vector is all zereos.
+   * @return bool Returns true if the vector is all zereos.
    */
   bool LinearAlgebra::isZero(const Vector &vector) {
     for (unsigned int i = 0; i < vector.size(); i++) {
@@ -257,7 +257,7 @@ namespace Isis {
    *  
    * @param vector The vector to check.
    * 
-   * @return @b bool Returns true if the size of the given vector is zero.
+   * @return bool Returns true if the size of the given vector is zero.
    * 
    */
   bool LinearAlgebra::isEmpty(const LinearAlgebra::Vector &vector) {
@@ -270,7 +270,7 @@ namespace Isis {
    *  
    * @param vector The vector to check.
    * 
-   * @return @b bool Returns true if the vector is a unit vector.
+   * @return bool Returns true if the vector is a unit vector.
    */
   bool LinearAlgebra::isUnit(const Vector &vector) {
     if (qFuzzyCompare(dotProduct(vector, vector), 1.0)) {
@@ -286,7 +286,7 @@ namespace Isis {
    * 
    * @param matrix The matrix to inverse.
    * 
-   * @return @b LinearAlgebra::Matrix The inverse matrix.
+   * @return LinearAlgebra::Matrix The inverse matrix.
    *  
    * @throw IException::Programmer "The given matrix is not invertible. 
    *                                The determinant is 0.0."
@@ -347,7 +347,7 @@ namespace Isis {
    * 
    * @param matrix The matrix to transpose.
    * 
-   * @return @b LinearAlgebra::Matrix The transposed matrix.
+   * @return LinearAlgebra::Matrix The transposed matrix.
    */
   LinearAlgebra::Matrix LinearAlgebra::transpose(const Matrix &matrix) {
     // no error testing required so call the boost transpose function
@@ -360,7 +360,7 @@ namespace Isis {
    * 
    * @param int The size of the square matrix.
    *  
-   * @return @b LinearAlgebra::Matrix The NxN square matrix.
+   * @return LinearAlgebra::Matrix The NxN square matrix.
    * 
    * @throw IException::Programmer "Can not create identity matrix of negative size."
    */
@@ -386,7 +386,7 @@ namespace Isis {
    * @param rows The number of rows in the returned matrix.
    * @param columns The number of colums in the returned matrix.
    * 
-   * @return @b LinearAlgebra::Matrix A zero-filled matrix.
+   * @return LinearAlgebra::Matrix A zero-filled matrix.
    */
   LinearAlgebra::Matrix LinearAlgebra::zeroMatrix(int rows, int columns) {
     boost::numeric::ublas::zero_matrix<double> m(rows, columns);
@@ -399,7 +399,7 @@ namespace Isis {
    * 
    * @param size Size of the vector.
    * 
-   * @return @b LinearAlgebra::Vector A zero-filled vector.
+   * @return LinearAlgebra::Vector A zero-filled vector.
    */
   LinearAlgebra::Vector LinearAlgebra::zeroVector(int size) {
     boost::numeric::ublas::zero_vector<double> v(size);
@@ -413,7 +413,7 @@ namespace Isis {
    * @param LinearAlgebra::Matrix The 3x3 matrix whose determinant will be 
    *                     calculated.
    *  
-   * @return @b double The determinant of the given matrix.
+   * @return double The determinant of the given matrix.
    *  
    * @throw IException::Programmer "Unable to calculate the determinant for the 
    *                                given matrix. This method only calculates the
@@ -453,7 +453,7 @@ namespace Isis {
    *  
    * @param vector The vector to be normalized.
    *  
-   * @return @b LinearAlgebra::Vector A unit vector from the given vector.
+   * @return LinearAlgebra::Vector A unit vector from the given vector.
    *  
    * @throw IException::Programmer "Unable to normalize the zero vector."
    */
@@ -482,7 +482,7 @@ namespace Isis {
    *  
    * @param vector The vector whose magnitude will be computed.
    * 
-   * @return @b double The magnitude (length) of the given vector.
+   * @return double The magnitude (length) of the given vector.
    */
   double LinearAlgebra::magnitude(const Vector &vector) {
     double magnitude;
@@ -509,7 +509,7 @@ namespace Isis {
    * 
    * @param vector The vector whose absolute maximum will be returned.
    * 
-   * @return @b double The maximum of the absolute values of the vector components.
+   * @return double The maximum of the absolute values of the vector components.
    */
   double LinearAlgebra::absoluteMaximum(const Vector &vector) {
     return boost::numeric::ublas::norm_inf(vector);
@@ -524,7 +524,7 @@ namespace Isis {
    * @param matrix1 The left matrix.
    * @param matrix2 The right matrix.
    *  
-   * @return @b LinearAlgebra::Matrix The resultant matrix product.
+   * @return LinearAlgebra::Matrix The resultant matrix product.
    *  
    * @throw IException::Programmer "Unable to multiply matrices 
    *                                with mismatched dimensions."
@@ -555,7 +555,7 @@ namespace Isis {
    * @param vector The column vector to be multiplied on the right side of 
    *               the matrix.
    *  
-   * @return @b LinearAlgebra::Vector The resultant vector.
+   * @return LinearAlgebra::Vector The resultant vector.
    *  
    * @throw IException::Programmer "Unable to multiply matrix and vector 
    *                                with mismatched dimensions."
@@ -581,7 +581,7 @@ namespace Isis {
    * @param scalar The scalar to be multiplied by each component of the vector.
    * @param vector The vector to be scaled.
    * 
-   * @return @b LinearAlgebra::Vector The resultant scaled vector.
+   * @return LinearAlgebra::Vector The resultant scaled vector.
    */
   LinearAlgebra::Vector LinearAlgebra::multiply(double scalar, const Vector &vector) {
     // no error checks necessary (use the boost operator* method)
@@ -595,7 +595,7 @@ namespace Isis {
    * @param scalar The scalar to be multiplied by each element of the matrix.
    * @param matrix The matrix to be scaled.
    * 
-   * @return @b LinearAlgebra::Matrix The resultant scaled matrix.
+   * @return LinearAlgebra::Matrix The resultant scaled matrix.
    */
   LinearAlgebra::Matrix LinearAlgebra::multiply(double scalar, const Matrix &matrix) {
     // no error checks necessary
@@ -609,7 +609,7 @@ namespace Isis {
    * @param vector1 The first vector.
    * @param vector2 The second vector.
    *  
-   * @return @b LinearAlgebra::Vector The sum of the vectors.
+   * @return LinearAlgebra::Vector The sum of the vectors.
    *  
    * @throw IException::Programmer "Unable to add vectors 
    *                                with mismatched sizes."
@@ -634,7 +634,7 @@ namespace Isis {
    * @param vector1 The vector to the left of the subtraction operator.
    * @param vector2 The vector to the right of the subtraction operator.
    *  
-   * @return @b LinearAlgebra::Vector The difference of the vectors 
+   * @return LinearAlgebra::Vector The difference of the vectors
    *                                  (i.e. vector1 - vector2).
    *  
    * @throw IException::Programmer "Unable to subtract vectors 
@@ -661,7 +661,7 @@ namespace Isis {
    * @param vector1 The vector to the left of the cross product operator.
    * @param vector2 The vector to the right of the cross product operator.
    *  
-   * @return @b LinearAlgebra::Vector The cross product of the given 
+   * @return LinearAlgebra::Vector The cross product of the given
    *                                  vectors (i.e. vector1 x vector2).
    *  
    * @throw IException::Programmer "Unable to calculate the cross 
@@ -696,7 +696,7 @@ namespace Isis {
    * @param vector1 The vector to the left of the cross product operator.
    * @param vector2 The vector to the right of the cross product operator.
    *  
-   * @return @b LinearAlgebra::Vector The normalized cross product of the given vectors 
+   * @return LinearAlgebra::Vector The normalized cross product of the given vectors
    *                                  (i.e. normalize(vector1/absoluteMaximum(vector1) x 
    *                                   vector2/absoluteMaximum(vector2))). 
    */
@@ -732,7 +732,7 @@ namespace Isis {
    * @param vector1 The vector to the left side of the outer product operator.
    * @param vector2 The vector to the right side of the outer product operator.
    *  
-   * @return @b LinearAlgebra::Matrix The outer product matrix of the given vectors.
+   * @return LinearAlgebra::Matrix The outer product matrix of the given vectors.
    *  
    * @throw IException::Programmer "Unable to compute the outer product for 
    *                                vectors with mismatched sizes."
@@ -758,7 +758,7 @@ namespace Isis {
    * @param vector1 The first vector.
    * @param vector2 The second vector.
    * 
-   * @return @b double The dot product of the vectors.
+   * @return double The dot product of the vectors.
    * 
    */
   double LinearAlgebra::dotProduct(const Vector &vector1, const Vector &vector2) {
@@ -776,7 +776,7 @@ namespace Isis {
    * @param vector1 The first vector.
    * @param vector2 The second vector.
    * 
-   * @return @b double The inner product of the vectors.
+   * @return double The inner product of the vectors.
    * 
    * @throw IException::Programmer "Unable to compute the dot product for vectors 
    *                                with mismatched sizes."
@@ -805,7 +805,7 @@ namespace Isis {
    * @param vector1 The vector to the left of the project operator.
    * @param vector2 The vector to the right of the project operator.
    *  
-   * @return @b LinearAlgebra::Vector The resultant vector that is 
+   * @return LinearAlgebra::Vector The resultant vector that is
    *                                  the orthogonal projection of
    *                                  vector1 onto vector2.
    *  
@@ -845,7 +845,7 @@ namespace Isis {
    * @param axis  A vector defining the axis, which must also have three components.
    * @param angle The angle to rotate.
    * 
-   * @return @b LinearAlgebra::Vector The rotated vector.
+   * @return LinearAlgebra::Vector The rotated vector.
    *  
    * @throw IException::Programmer "Unable to rotate vector about the 
    *                                given axis and angle. Vectors must
@@ -904,7 +904,7 @@ namespace Isis {
   * @param vector1 The first vector, denoted A in the description.
   * @param vector2 The second vector, denoted B in the description.
   * 
-  * @return @b LinearAlgebra::Vector A vector perpendicular to vector2 and
+  * @return LinearAlgebra::Vector A vector perpendicular to vector2 and
   *                                  equal to vector1-parallel2 (where
   *                                  parallel2 is some vector that is
   *                                  parallel to vector2).
@@ -942,7 +942,7 @@ namespace Isis {
    * 
    * @param rotationMatrix A matrix representing a rotation.
    * 
-   * @return @b LinearAlgebra::AxisAngle The axis-angle pair representing the rotation.
+   * @return LinearAlgebra::AxisAngle The axis-angle pair representing the rotation.
    * 
    * @throw IException::Programmer "Unable to convert the given matrix to an 
    *                                axis of rotation and a rotation angle. A
@@ -1015,7 +1015,7 @@ namespace Isis {
    * @param rotationMatrix A matrix representing a rotation.
    * @param axes A list containing the order of axes.
    *  
-   * @return @b QList< LinearAlgebra::EulerAngle> The list of 3 Euler angles 
+   * @return QList< LinearAlgebra::EulerAngle> The list of 3 Euler angles
    *                                              with their axes representing the rotation.
    * 
    * @throw IException::Programmer "Unable to convert the given matrix to Euler angles. 
@@ -1182,7 +1182,7 @@ namespace Isis {
    * 
    * @param rotationMatrix A matrix representing a rotation.
    *  
-   * @return @b LinearAlgebra::Vector A unit quaternion representing the rotation. 
+   * @return LinearAlgebra::Vector A unit quaternion representing the rotation.
    *  
    * @throw IException::Programmer "Unable to convert the given matrix to a quaternion.
                                     A 3x3 matrix is required.
@@ -1378,7 +1378,7 @@ namespace Isis {
    * @param axis The axis of rotation for a rotation.
    * @param angle The rotation angle.
    * 
-   * @return @b LinearAlgebra::Matrix The matrix representing the rotation.
+   * @return LinearAlgebra::Matrix The matrix representing the rotation.
    * 
    * @throw IException::Programmer "Unable to convert the given vector and 
    *                                angle to a rotation matrix. The given
@@ -1419,7 +1419,7 @@ namespace Isis {
    * 
    * @param axisAngle The axis-angle pair representation of a rotation
    * 
-   * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
+   * @return LinearAlgebra::Matrix The matrix representation of the rotation.
    * 
    */
   LinearAlgebra::Matrix LinearAlgebra::toMatrix(const AxisAngle &axisAngle) {
@@ -1435,7 +1435,7 @@ namespace Isis {
    * @param angle2 The second angle and its axis.
    * @param angle1 The first angle and its axis.
    * 
-   * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
+   * @return LinearAlgebra::Matrix The matrix representation of the rotation.
    * 
    * @throw IException::Programmer "Unable to convert the given Euler angles to 
    *                                a matrix using the given axis codes. Axis
@@ -1519,7 +1519,7 @@ namespace Isis {
    * 
    * @param eulerAngles The Euler angle representation of a rotation.
    *  
-   * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
+   * @return LinearAlgebra::Matrix The matrix representation of the rotation.
    * 
    * @throw IException::Programmer "Unable to convert the given Euler angles to 
    *                                a matrix. Exactly 3 Euler angles are
@@ -1545,7 +1545,7 @@ namespace Isis {
    * 
    * @param quaternion   A unit quaternion representation of a rotation.
    *  
-   * @return @b LinearAlgebra::Matrix The matrix representation of the rotation.
+   * @return LinearAlgebra::Matrix The matrix representation of the rotation.
    *  
    * @throw IException::Programmer "Unable to convert the given vector to a 
    *                                rotation matrix. The given vector is not
@@ -1644,7 +1644,7 @@ namespace Isis {
    * @param matrix The matrix to pull values from.
    * @param rowIndex The index of the matrix row to grab.
    * 
-   * @return @b LinearAlgebra::Vector A vector whose values match the given row 
+   * @return LinearAlgebra::Vector A vector whose values match the given row
    *                                  of the given matrix.
    * 
    * @throw IException::Programmer "Unable to get the matrix row to the given 
@@ -1667,7 +1667,7 @@ namespace Isis {
    * @param matrix The matrix to pull values from.
    * @param columnIndex The index of the matrix column to grab.
    * 
-   * @return @b LinearAlgebra::Vector A vector whose values match the given 
+   * @return LinearAlgebra::Vector A vector whose values match the given
    *                                  column of the given matrix.
    * 
    * @throw IException::Programmer "Unable to get the matrix column to the given 
@@ -1691,7 +1691,7 @@ namespace Isis {
    * @param v1 The second component of the vector. 
    * @param v2 The third component of the vector.
    * 
-   * @return @b LinearAlgebra::Vector A vector containing the given values.
+   * @return LinearAlgebra::Vector A vector containing the given values.
    * 
    */
   LinearAlgebra::Vector LinearAlgebra::vector(double v0, double v1, double v2) {
@@ -1711,7 +1711,7 @@ namespace Isis {
    * @param v2 The third component of the vector.
    * @param v3 The fourth component of the vector.
    * 
-   * @return @b LinearAlgebra::Vector A vector containing the given values.
+   * @return LinearAlgebra::Vector A vector containing the given values.
    * 
    */
   LinearAlgebra::Vector LinearAlgebra::vector(double v0, double v1, double v2, double v3) {
@@ -1766,7 +1766,7 @@ namespace Isis {
    * @param size The number of elements from the original vector to copy 
    *             to the new vector.
    * 
-   * @return @b LinearAlgebra::Vector A sub-vector containing values from 
+   * @return LinearAlgebra::Vector A sub-vector containing values from
    *                                  the original vector.
    */
   LinearAlgebra::Vector LinearAlgebra::subVector(const Vector &v, int startIndex, int size) {
@@ -1787,12 +1787,31 @@ namespace Isis {
    * @param dbg The stream where the vector will be written.
    * @param vector The vector to be written.
    * 
-   * @return @b QDebug The stream with the QString-formatted vector.
+   * @return QDebug The stream with the QString-formatted vector.
    * 
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Vector &vector) {
     QDebugStateSaver saver(dbg);
     dbg.noquote() << toString(vector);
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::VectorCompressed as a QString and writes
+   * it to a QDebug stream.
+   *
+   * @see toString(LinearAlgebra::VectorCompressed)
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param vector The vector to be written.
+   *
+   * @return QDebug The stream with the QString-formatted vector.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::VectorCompressed &vectorCompressed) {
+    QDebugStateSaver saver(dbg);
+    dbg.noquote() << toString(vectorCompressed);
     return dbg;
   }
 
@@ -1805,10 +1824,82 @@ namespace Isis {
    * @param dbg The stream where the vector will be written.
    * @param matrix The matrix to be written.
    * 
-   * @return @b QDebug The stream with the QString-formatted matrix.
+   * @return QDebug The stream with the QString-formatted matrix.
    * 
    */
   QDebug operator<<(QDebug dbg, const LinearAlgebra::Matrix &matrix) {
+    QDebugStateSaver saver(dbg);
+    for (unsigned int i = 0; i < matrix.size1(); i++) {
+      dbg.noquote() << "    ";
+      for (unsigned int j = 0; j < matrix.size2(); j++) {
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
+      }
+      dbg.noquote() << endl;
+    }
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::MatrixCompressed as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param matrix The matrix to be written.
+   *
+   * @return QDebug The stream with the QString-formatted matrix.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixCompressed &matrix) {
+    QDebugStateSaver saver(dbg);
+    for (unsigned int i = 0; i < matrix.size1(); i++) {
+      dbg.noquote() << "    ";
+      for (unsigned int j = 0; j < matrix.size2(); j++) {
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
+      }
+      dbg.noquote() << endl;
+    }
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::MatrixUpperTriangular as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param matrix The matrix to be written.
+   *
+   * @return QDebug The stream with the QString-formatted matrix.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixUpperTriangular &matrix) {
+    QDebugStateSaver saver(dbg);
+    for (unsigned int i = 0; i < matrix.size1(); i++) {
+      dbg.noquote() << "    ";
+      for (unsigned int j = 0; j < matrix.size2(); j++) {
+        dbg.noquote() << toString(matrix(i, j), 15) << "     ";
+      }
+      dbg.noquote() << endl;
+    }
+    return dbg;
+  }
+
+
+  /**
+   * A global function to format a LinearAlgebra::MatrixLowerTriangular as a QString and
+   * write it to a QDebug stream. There will be 4 spaces between each matrix
+   * entry and each row is written on a new line.
+   *
+   * @param dbg The stream where the vector will be written.
+   * @param matrix The matrix to be written.
+   *
+   * @return QDebug The stream with the QString-formatted matrix.
+   *
+   */
+  QDebug operator<<(QDebug dbg, const LinearAlgebra::MatrixLowerTriangular &matrix) {
     QDebugStateSaver saver(dbg);
     for (unsigned int i = 0; i < matrix.size1(); i++) {
       dbg.noquote() << "    ";
@@ -1829,7 +1920,7 @@ namespace Isis {
    * @param vector The vector to be converted.
    * @param precision Number of significant figures to convert.
    * 
-   * @return @b QString The string-formatted vector.
+   * @return QString The string-formatted vector.
    * 
    */
   QString toString(const LinearAlgebra::Vector &vector, int precision) {
@@ -1841,4 +1932,26 @@ namespace Isis {
     result += " )";
     return result;
   }
+
+       
+  /**
+   * A global function to format LinearAlgebra::VectorCompressed as a QString
+   * with the given precision. The string will be comma-separated entries
+   * encased by parentheses. 
+   *  
+   * @param vectorCompressed The compressed vector to be converted.
+   * @param precision Number of significant figures to convert.
+   * 
+   * @return QString The string-formatted vector.
+   * 
+   */
+  QString toString(const LinearAlgebra::VectorCompressed &vectorCompressed, int precision) {
+    QString result = "( ";
+    for (unsigned int i = 0; i < vectorCompressed.size(); i++) {
+      result += toString(vectorCompressed(i), precision);
+      if (i != vectorCompressed.size() - 1) result += ", ";
+    }
+    result += " )";
+    return result;
+  }       
 }

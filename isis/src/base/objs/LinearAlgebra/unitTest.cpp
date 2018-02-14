@@ -559,8 +559,10 @@ int main(int argc, char *argv[]) {
     qDebug() << "perpendicular([0 1 2], c*[0 1 2]) = " << perpendicularVector;
     perpendicularVector = LinearAlgebra::perpendicular(v012, w345);
     qDebug() << "perpendicular([0 1 2], [3 4 5]) = " << perpendicularVector;
-    qDebug() << "verify: [0 1 2] - perp = " << v012 - perpendicularVector;
-    qDebug() << "        is parallel to [3 4 5] since 0.28*[3 4 5 ] = " << (0.28 * w345);
+    qDebug() << "verify: [0 1 2] - perp = "
+             << LinearAlgebra::Vector(v012 - perpendicularVector);
+    qDebug() << "        is parallel to [3 4 5] since 0.28*[3 4 5 ] = "
+             << LinearAlgebra::Vector(0.28 * w345);
     qDebug() << "";
 
     qDebug() << "";

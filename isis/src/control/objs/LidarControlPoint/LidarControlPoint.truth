@@ -1,0 +1,10 @@
+LidarControlPoint Unit Test
+Testing EditLocking
+Edit locked
+Cannot set range because the point is edit locked
+Cannot set sigma range because the point is edit locked
+Cannot set time because the point is edit locked
+Testing Setters and Getters
+Set the range
+Set the sigma range
+Set the time

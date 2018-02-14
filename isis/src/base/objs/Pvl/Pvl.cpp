@@ -587,4 +587,34 @@ namespace Isis {
     validateAllKeywords((PvlContainer &)pPvlResults);
   }
 
+
+  /**
+   * Helper function to convert a value stored as a hex string into a double.
+   * 
+   * @param hexString The hex string to convert.
+   * 
+   * @return @b double The resultant value.
+   */
+  double Pvl::hexStringToDouble(const QString &hexString) {
+    QByteArray hexBitArray = hexString.toLatin1();
+    QByteArray doubleBitArray = QByteArray::fromHex(hexBitArray);
+    double result = *reinterpret_cast<double*>( doubleBitArray.data() );
+    return result;
+  }
+
+
+  /**
+   * Helper function to convert a double into a hex string.
+   * 
+   * @param double The value to convert.
+   * 
+   * @return @b QString The resultant hex string.
+   */
+  QString Pvl::doubleToHexString(const double &value) {
+    QByteArray doubleBitArray(reinterpret_cast<const char*>(&value), sizeof(value));
+    QByteArray hexBitArray = doubleBitArray.toHex();
+    QString result(hexBitArray);
+    return result;
+  }
+
 } //end namespace isis

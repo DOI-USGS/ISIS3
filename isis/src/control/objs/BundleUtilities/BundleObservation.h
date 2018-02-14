@@ -26,13 +26,14 @@
 #include <QStringList>
 #include <QVector>
 
-#include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
+#include "SparseBlockMatrix.h"
 
-namespace Isis {  
-  class BundleObservationSolveSettings;
+namespace Isis {
+  class BundleImage;
+  class BundlePolynomialContinuityConstraint;
   class SpicePosition;
   class SpiceRotation;
 
@@ -77,16 +78,48 @@ namespace Isis {
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
    *                            parameters when writing images.csv. 
+   *   @history 2017-07-14 Ken Edmundson - Added support for piecewise polynomials...
+   *                           -m_continuityConstraints member.
+   *                           -methods...
+   *                               int numberPolynomialPositionSegments
+   *                               int numberPolynomialPointingSegments
+   *                               int numberPolynomialSegments
+   *                               int numberContinuityConstraints
+   *                               void applyContinuityConstraints
+   *   @history 2017-10-11 Jesse Mapel - Modified output string methods to account for
+   *                           piecewise polynomials.
+   *   @history 2017-10-12 Jesse Mapel - Initialize exterior orientation will now return false
+   *                           if one of the images has a null camera pointer.
+   *   @history 2017-11-01 Ken Edmundson - Additional support for piecewise polynomials...
+   *                           -m_normalsEquationsStartBlock member
+   *                           -methods
+   *                               void setNormalsMatrixStartBlock(int startBlock)
+   *                               int normalsMatrixStartBlock()
+   *                               int numberPositionParametersPerSegment()
+   *                               int numberPointingParametersPerSegment()
+   *                               int positionSegmentSize()
+   *                               int pointingSegmentSize()
+   *                               int polyPositionSegmentIndex()
+   *                               int polyRotationSegmentIndex()
+   *                               void computePartials(LinearAlgebra::Matrix &coeffImagePosition,
+   *                                                    LinearAlgebra::Matrix &coeffImagePointing)
+   *                               SparseBlockMatrix &continuityContraintSpkMatrix()
+   *                               SparseBlockMatrix &continuityContraintCkMatrix()
+   *   @history 2018-02-12 Ken Edmundson - Removed method updateBodyRotation and renamed method
+   *                           initializeBodyRotation to setBodyRotation. Modified method
+   *                           applyParameterCorrections to take bool arg to updateBodyRotation.
    */
-  class BundleObservation : public QVector<BundleImageQsp> {
+  class BundleObservation : public QVector<QSharedPointer<BundleImage> > {
 
     public:
       // default constructor
       BundleObservation();
 
       // constructor
-      BundleObservation(BundleImageQsp image, QString observationNumber, QString instrumentId,
-                        BundleTargetBodyQsp bundleTargetBody);
+      BundleObservation(QSharedPointer<BundleImage> image,
+                        QString observationNumber,
+                        QString instrumentId,
+                        QSharedPointer<BundleTargetBody> bundleTargetBody);
 
       // copy constructor
       BundleObservation(const BundleObservation &src);
@@ -100,19 +133,39 @@ namespace Isis {
       // copy method
       void copy(const BundleObservation &src);
 
-      void append(const BundleImageQsp &value);
+      void append(const QSharedPointer<BundleImage> &value);
 
-      BundleImageQsp imageByCubeSerialNumber(QString cubeSerialNumber);
+      QSharedPointer<BundleImage> imageByCubeSerialNumber(QString cubeSerialNumber);
       
       bool setSolveSettings(BundleObservationSolveSettings solveSettings);
+
+      void setContinuityConstraints(QSharedPointer<BundlePolynomialContinuityConstraint> polyConstraints);
       
       void setIndex(int n);
       int index();
-      
+
+      void setNormalsMatrixStartBlock(int startBlock);
+      int normalsMatrixStartBlock();
+
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
-      
+
+      int numberPolynomialPositionSegments();
+      int numberPolynomialPointingSegments();
+      int numberPolynomialSegments();
+
+      int numberPositionParametersPerSegment();
+      int numberPointingParametersPerSegment();
+
+      int positionSegmentSize();
+      int pointingSegmentSize();
+
+      int polyPositionSegmentIndex();
+      int polyRotationSegmentIndex();
+
+      int numberContinuityConstraints() const;
+
       QString instrumentId();
       
       SpiceRotation *spiceRotation();
@@ -120,20 +173,29 @@ namespace Isis {
      
       LinearAlgebra::Vector &parameterWeights();
       LinearAlgebra::Vector &parameterCorrections();
-//    LinearAlgebra::Vector &parameterSolution();
       LinearAlgebra::Vector &aprioriSigmas();
       LinearAlgebra::Vector &adjustedSigmas();
-      
+
       const BundleObservationSolveSettingsQsp solveSettings();
 
-//    QStringList serialNumbers();
+      void computePartials(LinearAlgebra::Matrix &coeffImagePosition,     //!< multi-segment version
+                           LinearAlgebra::Matrix &coeffImagePointing);
+      bool applyParameterCorrections(LinearAlgebra::Vector corrections, bool updateBodyRotation);
 
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
+      SparseBlockMatrix &continuityContraintSpkMatrix();
+      SparseBlockMatrix &continuityContraintCkMatrix();
+      LinearAlgebra::Vector &continuityRHS();
+
       bool initializeExteriorOrientation();
-      void initializeBodyRotation();
-      void updateBodyRotation();
+      void setBodyRotation();
 
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+      QString formatPositionSegmentHeader(int segmentIndex);
+      QString formatPositionOutputString(int segmentIndex,
+                                         bool errorPropagation, bool imageCSV=false);
+      QString formatPointingSegmentHeader(int segmentIndex);
+      QString formatPointingOutputString(int segmentIndex,
+                                         bool errorPropagation, bool imageCSV=false);
+      QString formatBundleContinuityConstraintString();
       QStringList parameterList();
       QStringList imageNames();
 
@@ -148,33 +210,34 @@ namespace Isis {
                                         augmented with an additional integer. **/
 
       int m_index; //!< Index of this observation.
+      int m_normalsEquationsStartBlock; /**< starting block into normal equations matrix for this
+                                             observation. **/
 
       //! Map between cube serial number and BundleImage pointers.
-      QMap<QString, BundleImageQsp> m_cubeSerialNumberToBundleImageMap;
+      QMap<QString, QSharedPointer<BundleImage> > m_cubeSerialNumberToBundleImageMap;
 
       QStringList m_serialNumbers;      //!< List of all cube serial numbers in observation.
       QStringList m_parameterNamesList; //!< List of all cube parameters.
       QStringList m_imageNames;         //!< List of all cube names.
 
-      QString m_instrumentId;      //!< Spacecraft instrument id.
+      QString m_instrumentId;           //!< Spacecraft instrument id.
 
-      BundleObservationSolveSettingsQsp m_solveSettings; //!< Solve settings for this observation.
+      //!< Solve settings for this observation.
+      QSharedPointer<BundleObservationSolveSettings> m_solveSettings;
 
-      SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (in primary image).
-      SpicePosition *m_instrumentPosition;   //!< Instrument spice position (in primary image).
-//    SpiceRotation *m_bodyRotation;         //!< Instrument body rotation (in primary image).
+      //!< Continuity constraints
+      QSharedPointer<BundlePolynomialContinuityConstraint> m_continuityConstraints;
 
-      BundleTargetBodyQsp m_bundleTargetBody;       //!< QShared pointer to BundleTargetBody.
+      SpiceRotation *m_instrumentRotation;   //!< Instrument spice rotation (primary image).
+      SpicePosition *m_instrumentPosition;   //!< Instrument spice position (primary image).
 
-    // TODO??? change these to LinearAlgebra vectors...
-      LinearAlgebra::Vector m_weights;     //!< Parameter weights.
-      //! Cumulative parameter correction vector.
-      LinearAlgebra::Vector m_corrections;
-      //LinearAlgebra::Vector m_solution;  //!< parameter solution vector.
-      //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_aprioriSigmas;
-      //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_adjustedSigmas; 
+      //!< QShared pointer to BundleTargetBody.
+      QSharedPointer<BundleTargetBody> m_bundleTargetBody;
+
+      LinearAlgebra::Vector m_weights;        //!< Parameter weights.
+      LinearAlgebra::Vector m_corrections;    //!< Cumulative parameter correction vector.
+      LinearAlgebra::Vector m_aprioriSigmas;  //!< A posteriori (adjusted) parameter sigmas.
+      LinearAlgebra::Vector m_adjustedSigmas; //!< A posteriori (adjusted) parameter sigmas.
   };
 
   //! Typdef for BundleObservation QSharedPointer.

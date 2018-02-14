@@ -252,6 +252,9 @@
     <change name="Summer Stapleton" date="2017-08-09">
       Fixed bug where an invalid control net was not throwing exception. Fixes #5068.
     </change>
+    <change name="Ken Edmundson" date="2017-11-01">
+      Added interface for piecewise polynomials.
+    </change>
   </history>
 
   <groups>
@@ -319,6 +322,21 @@
         </description>
         <filter>
           *.net
+        </filter>
+      </parameter>
+      <parameter name="LIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Lidar Point File
+        </brief>
+        <description>
+        This file is a <def>lidar point data</def> generated from <b>lrolola2isis.cpp</b>.
+        It contains <def>lidar control point</def>s and associated measures for simultaneous images.
+        </description>
+        <filter>
+          *.dat *.json
         </filter>
       </parameter>
 
@@ -749,6 +767,19 @@
           the application automatically sets degree to 0.
         </description>
       </parameter>
+      <parameter name="POINTINGSEGMENTS">
+        <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
+        <default>
+          <item>1</item>
+        </default>
+        <brief>
+          Number of segments in piecewise polynomial
+        </brief>
+        <description>
+        Number of segments in piecewise polynomial
+        </description>
+      </parameter>
       <parameter name="CAMSOLVE">
         <type>string</type>
         <brief> Camera pointing parameters to include in the bundle adjustment</brief>
@@ -769,6 +800,7 @@
           <exclusions>
             <item>CKDEGREE</item>
             <item>CKSOLVEDEGREE</item>
+            <item>POINTINGSEGMENTS</item>
             <item>TWIST</item>
             <item>OVEREXISTING</item>
           </exclusions>
@@ -789,6 +821,7 @@
             <exclusions>
               <item>CKDEGREE</item>
               <item>CKSOLVEDEGREE</item>
+              <item>POINTINGSEGMENTS</item>
             </exclusions>
           </option>
 
@@ -894,6 +927,19 @@
         application automatically sets degree to 0.
       </description>
     </parameter>
+    <parameter name="POSITIONSEGMENTS">
+      <type>integer</type>
+      <minimum inclusive="yes">1</minimum>
+      <default>
+        <item>1</item>
+      </default>
+      <brief>
+        Number of segments in piecewise polynomial
+      </brief>
+      <description>
+      Number of segments in piecewise polynomial
+      </description>
+    </parameter>
       <parameter name="SPSOLVE">
         <type>string</type>
         <brief> Spacecraft position parameters to include in the adjustment</brief>
@@ -913,6 +959,7 @@
             <exclusions>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
+              <item>POSITIONSEGMENTS</item>
               <item>OVERHERMITE</item>
             </exclusions>
           </option>
@@ -926,6 +973,7 @@
             <exclusions>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
+              <item>POSITIONSEGMENTS</item>
             </exclusions>
           </option>
 

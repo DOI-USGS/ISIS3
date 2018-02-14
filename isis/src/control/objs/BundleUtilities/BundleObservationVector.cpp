@@ -45,7 +45,7 @@ namespace Isis {
    * 
    * @param src The BundleObservationVector to assign from.
    * 
-   * @return @b BundleObservationVector& A reference to this BundleObservationVector.
+   * @return BundleObservationVector& A reference to this BundleObservationVector.
    */
   BundleObservationVector &BundleObservationVector::operator=(const BundleObservationVector &src) {
     if (&src != this) {
@@ -73,7 +73,7 @@ namespace Isis {
    * 
    * @throws IException::Programmer "Unable to allocate new BundleObservation"
    *
-   * @return @b BundleObservationQsp Returns a pointer to the BundleObservation that was added
+   * @return BundleObservationQsp Returns a pointer to the BundleObservation that was added
    * 
    * @internal
    *   @history 2016-10-13 Ian Humphrey - When appending a new BundleObservation and there are 
@@ -140,6 +140,9 @@ namespace Isis {
 
       append(bundleObservation);
 
+      // initialize exterior orientation (spice) for all BundleImages in BundleObservation
+      bundleObservation->initializeExteriorOrientation();
+
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
@@ -154,7 +157,7 @@ namespace Isis {
   /**
    * Accesses the number of position parameters for the contained BundleObservations.
    *
-   * @return @b int Returns the total number of position parameters for the BundleObservations 
+   * @return int Returns the total number of position parameters for the BundleObservations
    */
   int BundleObservationVector::numberPositionParameters() {
     int positionParameters = 0;
@@ -171,7 +174,7 @@ namespace Isis {
   /**
    * Accesses the number of pointing parameters for the contained BundleObservations.
    *
-   * @return @b int Returns the total number of pointing parameters for the BundleObservations 
+   * @return int Returns the total number of pointing parameters for the BundleObservations
    */
   int BundleObservationVector::numberPointingParameters() {
     int pointingParameters = 0;
@@ -189,10 +192,68 @@ namespace Isis {
    * Returns the sum of the position parameters and pointing parameters for the contained
    * BundleObservations.
    *
-   * @return @b int Returns the total number of parameters for the contained BundleObservations 
+   * @return int Returns the total number of parameters for the contained BundleObservations
    */
   int BundleObservationVector::numberParameters() {
     return numberPositionParameters() + numberPointingParameters();
+  }
+
+  /**
+   * Returns the number of piecewise polynomial position segments
+   *
+   * @return int Returns number of piecewise polynomial position segments
+   */
+  int BundleObservationVector::numberPolynomialPositionSegments() {
+    int positionSegments = 0;
+    for (int i = 0; i < size(); i++) {
+      positionSegments += at(i)->numberPolynomialPositionSegments();
+    }
+
+    return positionSegments;
+  }
+
+
+  /**
+   * Returns the number of piecewise polynomial pointing segments
+   *
+   * @return int Returns number of piecewise polynomial pointing segments
+   */
+  int BundleObservationVector::numberPolynomialPointingSegments() {
+    int pointingSegments = 0;
+    for (int i = 0; i < size(); i++) {
+      pointingSegments += at(i)->numberPolynomialPointingSegments();
+    }
+
+    return pointingSegments;
+  }
+
+
+  /**
+   * Returns total number of piecewise polynomial segments
+   *
+   * Total number of segments is the sum of position and pointing segments
+   *
+   * @return int Returns total number of piecewise polynomial segments
+   */
+  int BundleObservationVector::numberPolynomialSegments() {
+    return (numberPolynomialPositionSegments() +
+            numberPolynomialPointingSegments());
+  }
+
+
+  /**
+   * Returns the total number of continuity constraint equations for the contained
+   * BundleObservations.
+   *
+   * @return int Returns the total number of continuity constraint equations for the contained
+   *                BundleObservations
+   */
+  int BundleObservationVector::numberContinuityConstraintEquations() const {
+    int nconstraints = 0;
+    for( int i = 0; i < size(); i++) {
+      nconstraints += at(i)->numberContinuityConstraints();
+    }
+    return nconstraints;
   }
 
 
@@ -204,7 +265,7 @@ namespace Isis {
    *
    * @param cubeSerialNumber Serial number of a cube to try to find an associated BundleObservation
    *
-   * @return @b BundleObservationQsp Pointer to the associated BundleObservation (NULL if not found)
+   * @return BundleObservationQsp Pointer to the associated BundleObservation (NULL if not found)
    */
   BundleObservationQsp BundleObservationVector::
       observationByCubeSerialNumber(QString cubeSerialNumber) {
@@ -220,7 +281,7 @@ namespace Isis {
   /**
    * Initializes the exterior orientations for the contained BundleObservations.
    *
-   * @return @b bool Returns true upon successful initialization 
+   * @return bool Returns true upon successful initialization
    */
   bool BundleObservationVector::initializeExteriorOrientation() {
     int nObservations = size();
@@ -236,13 +297,13 @@ namespace Isis {
   /**
    * Initializes the body rotations for the contained BundleObservations.
    *
-   * @return @b bool Returns true upon successful initialization 
+   * @return bool Returns true upon successful initialization
    */
-  bool BundleObservationVector::initializeBodyRotation() {
+  bool BundleObservationVector::setBodyRotation() {
     int nObservations = size();
     for (int i = 0; i < nObservations; i++) {
       BundleObservationQsp observation = at(i);
-      observation->initializeBodyRotation();
+      observation->setBodyRotation();
     }
 
     return true;

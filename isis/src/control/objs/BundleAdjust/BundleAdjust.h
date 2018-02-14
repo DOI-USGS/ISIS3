@@ -45,6 +45,7 @@
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
+#include "LidarData.h"
 #include "LinearAlgebra.h"
 #include "MaximumLikelihoodWFunctions.h" // why not just forward declare???
 #include "ObservationNumberList.h"
@@ -285,6 +286,27 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
    *                           in each of the constructors to verify valid control net input.
    *                           Fixes #5068.
+   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *                           -modifications to...
+   *                               ::init
+   *                               ::solveCholesky
+   *                               ::formNormalEquations
+   *                           -methods...
+   *                               void applyPolynomialContinuityConstraints()
+   *   @history 2017-11-01 Ken Edmundson Additional support for piecewise polynomials, primarily for
+   *                                     speed improvement. Normal equations matrix changed to
+   *                                     have a separate block for each position and pointing
+   *                                     segment.
+   *                           - modified methods...
+   *                             bool computePartials(...) and bool formMeasureNormals(...) methods
+   *                             now have separate image coefficient matrices for position and
+   *                             pointing
+   *                             bool errorPropagation()
+   *                             void applyPolynomialContinuityConstraints()
+   *                           - removed bool cholmodInverse() method
+   *   @history 2018-02-12 Ken Edmundson - Removed members m_xResiduals, m_yResiduals, and
+   *                           m_xyResiduals and made them local to the computeResiduals() method.
+   *                           Removed member m_bodyRadii, used only locally in init() method.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -292,6 +314,11 @@ namespace Isis {
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    const QString &cnetFile,
                    const QString &cubeList,
+                   bool printSummary = true);
+      BundleAdjust(BundleSettingsQsp bundleSettings,
+                   const QString &cnetFile,
+                   const QString &cubeList,
+                   const QString &lidarDataFile,
                    bool printSummary = true);
       BundleAdjust(BundleSettingsQsp bundleSettings,
                    QString &cnet,
@@ -361,30 +388,33 @@ namespace Isis {
       // normal equation matrices methods
 
       bool formNormalEquations();
-      bool computePartials(LinearAlgebra::Matrix  &coeffTarget,
-                           LinearAlgebra::Matrix  &coeffImage,
+      bool formPhotoNormals();
+      bool formLidarNormals();
+
+      bool computePartials(LinearAlgebra::Matrix  &coeffTarget,          //!< multi-segment version
+                           LinearAlgebra::Matrix  &coeffImagePosition,
+                           LinearAlgebra::Matrix  &coeffImagePointing,
                            LinearAlgebra::Matrix  &coeffPoint3D,
                            LinearAlgebra::Vector  &coeffRHS,
-                           BundleMeasure          &measure,
-                           BundleControlPoint     &point);
-      bool formMeasureNormals(boost::numeric::ublas::symmetric_matrix<
-                                  double, boost::numeric::ublas::upper >         &N22,
-                              SparseBlockColumnMatrix                            &N12,
-                              boost::numeric::ublas::compressed_vector< double > &n1,
-                              LinearAlgebra::Vector                              &n2,
-                              LinearAlgebra::Matrix                              &coeffTarget,
-                              LinearAlgebra::Matrix                              &coeffImage,
-                              LinearAlgebra::Matrix                              &coeffPoint3D,
-                              LinearAlgebra::Vector                              &coeffRHS,
-                              int                                                observationIndex);
-      bool formPointNormals(boost::numeric::ublas::symmetric_matrix<
-                                double, boost::numeric::ublas::upper >  &N22,
-                            SparseBlockColumnMatrix                     &N12,
-                            LinearAlgebra::Vector                       &n2,
-                            LinearAlgebra::Vector                       &nj,
-                            BundleControlPointQsp                       &point);
-      bool formWeightedNormals(boost::numeric::ublas::compressed_vector< double >  &n1,
-                               LinearAlgebra::Vector                               &nj);
+                           BundleMeasureQsp       measure);
+      bool formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22, //!< multi-segment version
+                              SparseBlockColumnMatrix              &N12,
+                              LinearAlgebra::VectorCompressed      &n1,
+                              LinearAlgebra::Vector                &n2,
+                              LinearAlgebra::Matrix                &coeffTarget,
+                              LinearAlgebra::Matrix                &coeffImagePosition,
+                              LinearAlgebra::Matrix                &coeffImagePointing,
+                              LinearAlgebra::Matrix                &coeffPoint3D,
+                              LinearAlgebra::Vector                &coeffRHS,
+                              BundleMeasureQsp                     measure);
+      bool formPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                            SparseBlockColumnMatrix              &N12,
+                            LinearAlgebra::Vector                &n2,
+                            LinearAlgebra::Vector                &nj,
+                            BundleControlPointQsp                &point);
+      bool formWeightedNormals(LinearAlgebra::VectorCompressed  &n1,
+                               LinearAlgebra::Vector            &nj);
+      void applyPolynomialContinuityConstraints();
 
       // dedicated matrix functions
 
@@ -394,12 +424,10 @@ namespace Isis {
                                SparseBlockRowMatrix  &A,
                                LinearAlgebra::Vector &B,
                                LinearAlgebra::Vector &C);
-      bool invert3x3(boost::numeric::ublas::symmetric_matrix<
-                          double, boost::numeric::ublas::upper >  &m);
-      bool productATransB(boost::numeric::ublas::symmetric_matrix<
-                              double, boost::numeric::ublas::upper >  &N22,
-                          SparseBlockColumnMatrix                     &N12,
-                          SparseBlockRowMatrix                        &Q);
+      bool invert3x3(LinearAlgebra::MatrixUpperTriangular &m);
+      bool productATransB(LinearAlgebra::MatrixUpperTriangular &N22,
+                          SparseBlockColumnMatrix              &N12,
+                          SparseBlockRowMatrix                 &Q);
       void productAlphaAV(double alpha,
                           boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
                           SparseBlockRowMatrix                                &Q,
@@ -409,7 +437,6 @@ namespace Isis {
 
       bool initializeCHOLMODLibraryVariables();
       bool freeCHOLMODLibraryVariables();
-      bool cholmodInverse();
       bool loadCholmodTriplet();
       bool wrapUp();
 
@@ -418,22 +445,20 @@ namespace Isis {
       BundleSettingsQsp m_bundleSettings;                    //!< Contains the solve settings.
       BundleResults  m_bundleResults;                        //!< Stores the results of the
                                                              //!< bundle adjust.
-      Statistics m_xResiduals;                               //!< x residual statistics.
-      Statistics m_yResiduals;                               //!< y residual statistics.
-      Statistics m_xyResiduals;                              //!< xy residual statistics.
       ControlNetQsp m_controlNet;                            //!< Output control net.
       QString m_cnetFileName;                                //!< The control net filename.
-      QVector <BundleControlPointQsp> m_bundleControlPoints; /**!< Vector of control points.
-                                                                   Contains only non-ignored
-                                                                   control points from the control
-                                                                   net.*/
+
+      QVector <BundleControlPointQsp> m_bundleControlPoints;
+      QVector <BundleControlPointQsp> m_bundleLidarPoints; /**!< Vectors of control and lidar
+                                                                   control points.*/
+      QString m_lidarFileName;                               //!< Input lidar point filename.
+      LidarData m_lidarDataSet;                              //!< QList of lidar points.
       BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
                                                                    Each observation contains one or
                                                                    more images.*/
       SerialNumberList *m_serialNumberList;                  //!< List of image serial numbers.
       BundleTargetBodyQsp m_bundleTargetBody;                /**!< Contains information about the
                                                                    target body.*/
-      Distance m_bodyRadii[3];                               //!< Triaxial body radii in meters.
       bool m_abort;                                          //!< If the bundle should abort.
       QString m_iterationSummary;                            /**!< Summary of the most recently
                                                                    completed iteration.*/

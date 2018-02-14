@@ -121,6 +121,8 @@ namespace Isis {
       QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
                                               bool errorPropagation) const;
 
+      bool applyParameterCorrections();
+
     private:
       //!< pointer to the control point object this represents
       ControlPoint *m_controlPoint;
@@ -135,13 +137,18 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector< double, 3 > m_weights;
       //! array of NICs (see Brown, 1976)
       boost::numeric::ublas::bounded_vector<double, 3> m_nicVector;
-      //! The CholMod matrix associated with this point
+      //! The CholMod Q matrix associated with this point (see Brown, 1976)
       SparseBlockRowMatrix m_cholmodQMatrix;
   };
 
   // typedefs
-  //! Definition for BundleControlPointQSP, a shared pointer to a BundleControlPoint.
+  //! Definition for a shared pointer to a BundleControlPoint.
   typedef QSharedPointer<BundleControlPoint> BundleControlPointQsp;
+
+//  References
+//  Brown, D.C., 1976. Evolution and Future of Analytical Photogrammetry. Paper presented to the
+//      International Symposium on “The Changing World of Geodetic Science,” Columbus, Ohio 6-8
+//      October, 1976, The Ohio State University.
 }
 
 #endif // BundleControlPoint_h

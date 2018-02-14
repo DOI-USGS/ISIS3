@@ -1,0 +1,649 @@
+Unit test for SpicePosition
+Testing without cache ... 
+Position information is cached? No
+Time           = -69382819
+Spacecraft (J) = -1730.4646 -1562.2157 2691.2806
+Velocity   (J) = -4.1416836 1.1953724 -1.958384
+Time           = -69382785
+Spacecraft (J) = -1870.766 -1520.585 2623.0012
+Velocity   (J) = -4.083714 1.2452812 -2.0445844
+Time           = -69382751
+Spacecraft (J) = -2009.0152 -1477.2767 2551.8225
+Velocity   (J) = -4.0213953 1.2937033 -2.1283229
+Time           = -69382717
+Spacecraft (J) = -2145.0681 -1432.3446 2477.8337
+Velocity   (J) = -3.9549946 1.3404604 -2.2093006
+Time           = -69382683
+Spacecraft (J) = -2278.7907 -1385.8484 2401.1337
+Velocity   (J) = -3.8848102 1.3853831 -2.2872437
+Time           = -69382648
+Spacecraft (J) = -2410.0592 -1337.8533 2321.8302
+Velocity   (J) = -3.8111674 1.4283184 -2.3619018
+Time           = -69382614
+Spacecraft (J) = -2538.7617 -1288.4295 2240.0396
+Velocity   (J) = -3.7344202 1.4691344 -2.4330338
+Time           = -69382580
+Spacecraft (J) = -2664.7989 -1237.651 2155.8858
+Velocity   (J) = -3.6549742 1.507725 -2.5004234
+Time           = -69382546
+Spacecraft (J) = -2788.0864 -1185.5952 2069.4994
+Velocity   (J) = -3.5732696 1.5440214 -2.5639247
+Time           = -69382512
+Spacecraft (J) = -2908.5545 -1132.3409 1981.0142
+Velocity   (J) = -3.4897306 1.5779899 -2.6234689
+
+Testing with cache ... 
+Position information is cached? Yes
+Time           = -69382819
+Spacecraft (J) = -1730.4646 -1562.2157 2691.2806
+Velocity   (J) = -4.1416836 1.1953724 -1.958384
+Time           = -69382785
+Spacecraft (J) = -1870.766 -1520.585 2623.0012
+Velocity   (J) = -4.083714 1.2452812 -2.0445844
+Time           = -69382751
+Spacecraft (J) = -2009.0152 -1477.2767 2551.8225
+Velocity   (J) = -4.0213953 1.2937033 -2.1283229
+Time           = -69382717
+Spacecraft (J) = -2145.0681 -1432.3446 2477.8337
+Velocity   (J) = -3.9549946 1.3404604 -2.2093006
+Time           = -69382683
+Spacecraft (J) = -2278.7907 -1385.8484 2401.1337
+Velocity   (J) = -3.8848102 1.3853831 -2.2872437
+Time           = -69382648
+Spacecraft (J) = -2410.0592 -1337.8533 2321.8302
+Velocity   (J) = -3.8111674 1.4283184 -2.3619018
+Time           = -69382614
+Spacecraft (J) = -2538.7617 -1288.4295 2240.0396
+Velocity   (J) = -3.7344202 1.4691344 -2.4330338
+Time           = -69382580
+Spacecraft (J) = -2664.7989 -1237.651 2155.8858
+Velocity   (J) = -3.6549742 1.507725 -2.5004234
+Time           = -69382546
+Spacecraft (J) = -2788.0864 -1185.5952 2069.4994
+Velocity   (J) = -3.5732696 1.5440214 -2.5639247
+Time           = -69382512
+Spacecraft (J) = -2908.5545 -1132.3409 1981.0142
+Velocity   (J) = -3.4897306 1.5779899 -2.6234689
+
+Testing tables ... 
+Time           = -69382819
+Spacecraft (J) = -1730.4646 -1562.2157 2691.2806
+Velocity   (J) = -4.1416836 1.1953724 -1.958384
+Time           = -69382785
+Spacecraft (J) = -1870.766 -1520.585 2623.0012
+Velocity   (J) = -4.083714 1.2452812 -2.0445844
+Time           = -69382751
+Spacecraft (J) = -2009.0152 -1477.2767 2551.8225
+Velocity   (J) = -4.0213953 1.2937033 -2.1283229
+Time           = -69382717
+Spacecraft (J) = -2145.0681 -1432.3446 2477.8337
+Velocity   (J) = -3.9549946 1.3404604 -2.2093006
+Time           = -69382683
+Spacecraft (J) = -2278.7907 -1385.8484 2401.1337
+Velocity   (J) = -3.8848102 1.3853831 -2.2872437
+Time           = -69382648
+Spacecraft (J) = -2410.0592 -1337.8533 2321.8302
+Velocity   (J) = -3.8111674 1.4283184 -2.3619018
+Time           = -69382614
+Spacecraft (J) = -2538.7617 -1288.4295 2240.0396
+Velocity   (J) = -3.7344202 1.4691344 -2.4330338
+Time           = -69382580
+Spacecraft (J) = -2664.7989 -1237.651 2155.8858
+Velocity   (J) = -3.6549742 1.507725 -2.5004234
+Time           = -69382546
+Spacecraft (J) = -2788.0864 -1185.5952 2069.4994
+Velocity   (J) = -3.5732696 1.5440214 -2.5639247
+Time           = -69382512
+Spacecraft (J) = -2908.5545 -1132.3409 1981.0142
+Velocity   (J) = -3.4897306 1.5779899 -2.6234689
+
+Testing with polynomial functions...
+Time           = -69382819
+Spacecraft (J) = -1730.3809 -1562.1515 2691.1696
+Velocity   (J) = -4.1345489 1.2039902 -1.9732146
+Time           = -69382785
+Spacecraft (J) = -1870.576 -1520.4279 2622.7297
+Velocity   (J) = -4.0833024 1.2447814 -2.0437395
+Time           = -69382751
+Spacecraft (J) = -2008.8356 -1477.148 2551.5996
+Velocity   (J) = -4.0217855 1.2931158 -2.1273138
+Time           = -69382717
+Spacecraft (J) = -2144.8845 -1432.2194 2477.6167
+Velocity   (J) = -3.9543539 1.3407026 -2.2097271
+Time           = -69382683
+Spacecraft (J) = -2278.5781 -1385.7159 2400.9036
+Velocity   (J) = -3.8839909 1.385416 -2.2873192
+Time           = -69382648
+Spacecraft (J) = -2409.8327 -1337.7296 2321.6147
+Velocity   (J) = -3.811245 1.4278222 -2.3610567
+Time           = -69382614
+Spacecraft (J) = -2538.5481 -1288.323 2239.8537
+Velocity   (J) = -3.7348516 1.4687595 -2.4323857
+Time           = -69382580
+Spacecraft (J) = -2664.5807 -1237.5466 2155.7033
+Velocity   (J) = -3.6540356 1.5079704 -2.5008586
+Time           = -69382546
+Spacecraft (J) = -2787.8226 -1185.4842 2069.3049
+Velocity   (J) = -3.5724973 1.5437867 -2.5635368
+Time           = -69382512
+Spacecraft (J) = -2908.447 -1132.2916 1980.9279
+Velocity   (J) = -3.5040802 1.5738681 -2.6161683
+
+Testing line cache...
+Time           = -69382819
+Spacecraft (J) = -1730.3809 -1562.1515 2691.1696
+Velocity   (J) = -4.1345489 1.2039902 -1.9732146
+Time           = -69382785
+Spacecraft (J) = -1870.576 -1520.4279 2622.7297
+Velocity   (J) = -4.0833024 1.2447814 -2.0437395
+Time           = -69382751
+Spacecraft (J) = -2008.8356 -1477.148 2551.5996
+Velocity   (J) = -4.0217855 1.2931158 -2.1273138
+Time           = -69382717
+Spacecraft (J) = -2144.8845 -1432.2194 2477.6167
+Velocity   (J) = -3.9543539 1.3407026 -2.2097271
+Time           = -69382683
+Spacecraft (J) = -2278.5781 -1385.7159 2400.9036
+Velocity   (J) = -3.8839909 1.385416 -2.2873192
+Time           = -69382648
+Spacecraft (J) = -2409.8327 -1337.7296 2321.6147
+Velocity   (J) = -3.811245 1.4278222 -2.3610567
+Time           = -69382614
+Spacecraft (J) = -2538.5481 -1288.323 2239.8537
+Velocity   (J) = -3.7348516 1.4687595 -2.4323857
+Time           = -69382580
+Spacecraft (J) = -2664.5807 -1237.5466 2155.7033
+Velocity   (J) = -3.6540356 1.5079704 -2.5008586
+Time           = -69382546
+Spacecraft (J) = -2787.8226 -1185.4842 2069.3049
+Velocity   (J) = -3.5724973 1.5437867 -2.5635368
+Time           = -69382512
+Spacecraft (J) = -2908.447 -1132.2916 1980.9279
+Velocity   (J) = -3.5040802 1.5738681 -2.6161683
+
+Testing extrapolation...
+Time           = -69382512
+Spacecraft (J) = -2908.447 -1132.2916 1980.9279
+Time           = -69382512
+Spacecraft (J) = -2908.4473 -1132.2914 1980.9277
+
+Testing Hermite function input ...
+Source = 2
+Time           = -69382819
+Spacecraft (J) = -1730.4646 -1562.2157 2691.2806
+Velocity   (J) = -4.1416825 1.1953732 -1.9583854
+Time           = -69382785
+Spacecraft (J) = -1870.7655 -1520.5846 2623.0005
+Velocity   (J) = -4.0837075 1.2452855 -2.0445915
+Time           = -69382751
+Spacecraft (J) = -2009.0151 -1477.2767 2551.8224
+Velocity   (J) = -4.0214139 1.2936904 -2.1283012
+Time           = -69382717
+Spacecraft (J) = -2145.0676 -1432.3444 2477.8332
+Velocity   (J) = -3.9549721 1.3404711 -2.2093179
+Time           = -69382683
+Spacecraft (J) = -2278.7903 -1385.8483 2401.1334
+Velocity   (J) = -3.8848398 1.385369 -2.2872208
+Time           = -69382648
+Spacecraft (J) = -2410.0587 -1337.8532 2321.83
+Velocity   (J) = -3.81113 1.4283279 -2.3619215
+Time           = -69382614
+Spacecraft (J) = -2538.7609 -1288.4293 2240.0392
+Velocity   (J) = -3.7344494 1.4691269 -2.4330183
+Time           = -69382580
+Spacecraft (J) = -2664.7989 -1237.651 2155.8858
+Velocity   (J) = -3.6549692 1.5077255 -2.5004243
+Time           = -69382546
+Spacecraft (J) = -2788.0864 -1185.5952 2069.4994
+Velocity   (J) = -3.5732659 1.5440215 -2.5639249
+Time           = -69382512
+Spacecraft (J) = -2908.5545 -1132.3409 1981.0142
+Velocity   (J) = -3.4897304 1.5779899 -2.6234689
+
+Testing with polynomial function over Hermite...
+Source = 1
+Time           = -69382819
+Spacecraft (J) = -1730.4648 -1562.2158 2691.2808
+Velocity   (J) = -4.1416825 1.1953732 -1.9583854
+Time           = -69382785
+Spacecraft (J) = -1870.7656 -1520.5847 2623.0007
+Velocity   (J) = -4.0837075 1.2452855 -2.0445915
+Time           = -69382751
+Spacecraft (J) = -2009.0153 -1477.2768 2551.8226
+Velocity   (J) = -4.0214139 1.2936904 -2.1283012
+Time           = -69382717
+Spacecraft (J) = -2145.0677 -1432.3444 2477.8334
+Velocity   (J) = -3.9549721 1.3404711 -2.2093179
+Time           = -69382683
+Spacecraft (J) = -2278.7905 -1385.8483 2401.1335
+Velocity   (J) = -3.8848398 1.385369 -2.2872208
+Time           = -69382648
+Spacecraft (J) = -2410.0589 -1337.8533 2321.8301
+Velocity   (J) = -3.81113 1.4283279 -2.3619215
+Time           = -69382614
+Spacecraft (J) = -2538.7611 -1288.4294 2240.0393
+Velocity   (J) = -3.7344494 1.4691269 -2.4330183
+Time           = -69382580
+Spacecraft (J) = -2664.7991 -1237.6511 2155.886
+Velocity   (J) = -3.6549692 1.5077255 -2.5004243
+Time           = -69382546
+Spacecraft (J) = -2788.0866 -1185.5953 2069.4995
+Velocity   (J) = -3.5732659 1.5440215 -2.5639249
+Time           = -69382512
+Spacecraft (J) = -2908.5547 -1132.341 1981.0143
+Velocity   (J) = -3.4897304 1.5779899 -2.6234689
+
+Test fitting polynomial function over Hermite to new Hermite
+Source = 1
+Time           = -69382819
+Spacecraft (J) = -1730.4648 -1562.2158 2691.2808
+Velocity   (J) = -4.1416825 1.1953732 -1.9583854
+Time           = -69382785
+Spacecraft (J) = -1870.7656 -1520.5847 2623.0007
+Velocity   (J) = -4.0837075 1.2452855 -2.0445915
+Time           = -69382751
+Spacecraft (J) = -2009.0153 -1477.2768 2551.8226
+Velocity   (J) = -4.0214139 1.2936904 -2.1283012
+Time           = -69382717
+Spacecraft (J) = -2145.0677 -1432.3444 2477.8334
+Velocity   (J) = -3.9549721 1.3404711 -2.2093179
+Time           = -69382683
+Spacecraft (J) = -2278.7905 -1385.8483 2401.1335
+Velocity   (J) = -3.8848398 1.385369 -2.2872208
+Time           = -69382648
+Spacecraft (J) = -2410.0589 -1337.8533 2321.8301
+Velocity   (J) = -3.81113 1.4283279 -2.3619215
+Time           = -69382614
+Spacecraft (J) = -2538.7611 -1288.4294 2240.0393
+Velocity   (J) = -3.7344494 1.4691269 -2.4330183
+Time           = -69382580
+Spacecraft (J) = -2664.7991 -1237.6511 2155.886
+Velocity   (J) = -3.6549692 1.5077255 -2.5004243
+Time           = -69382546
+Spacecraft (J) = -2788.0866 -1185.5953 2069.4995
+Velocity   (J) = -3.5732659 1.5440215 -2.5639249
+Time           = -69382512
+Spacecraft (J) = -2908.5547 -1132.341 1981.0143
+Velocity   (J) = -3.4897304 1.5779899 -2.6234689
+
+Test multi-segment polynomials.
+
+Center Time Position: -2343.7353, -1362.4032, 2362.4106, 
+Knots:
+  -69382819
+  -69382718
+  -69382617
+  -69382512
+Scaled Knots:
+  -153.6
+  -52.100892
+  48.819895
+  153.6
+Base Time: -69382665.760519
+Time Scale: 1.0
+Segment 1 coefficients:
+  X: -2344.1585 -3.8638772 0.00092162683
+  Y: -1362.1936 1.4140266 0.00070915004
+  Z: 2362.0642 -2.3364019 -0.0012262659
+Segment 2 coefficients:
+  X: -2343.7353 -3.8476331 0.0010775176
+  Y: -1362.4032 1.4059782 0.00063191208
+  Z: 2362.4106 -2.3231059 -0.0010986672
+Segment 3 coefficients:
+  X: -2343.4523 -3.8592274 0.0011962633
+  Y: -1362.6281 1.4151887 0.00053758084
+  Z: 2362.7875 -2.3385467 -0.00094052681
+Coordinate Partials:
+  X: 1 -50.906148 2591.4359
+  Y: 1 -50.906148 2591.4359
+  Z: 1 -50.906148 2591.4359
+Velocity Partials:
+  X: 0 1 -101.8123
+  Y: 0 1 -101.8123
+  Z: 0 1 -101.8123
+Object = Table
+  Name                 = TestPoly
+  StartByte            = 0
+  Bytes                = 0
+  Records              = Null
+  ByteOrder            = NULL
+  CacheType            = PolyFunction
+  SpkTableStartTime    = -69382819.360519
+  SpkTableEndTime      = -69382512.160519
+  SpkTableOriginalSize = 769.0
+  PolynomialDegree     = 2
+  BaseTime             = -69382665.760519
+  ExactBaseTime        = 7ec50a27c88a90c1
+  TimeScale            = 1.0
+  ExactTimeScale       = 000000000000f03f
+  PolynomialKnots      = (-69382819.360519, -69382717.861411,
+                          -69382616.940624, -69382512.160519)
+  ExactPolynomialKnots = (e52b718dca8a90c1, d31572f7c88a90c1,
+                          cf32c363c78a90c1, 185fa4c0c58a90c1)
+
+  Group = Field
+    Name = J2000SVX
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000SVY
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000SVZ
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+Time           = -69382819
+Segment Index  = 0
+Spacecraft (J) = -1730.418 -1562.2258 2691.2977
+Velocity   (J) = -4.1463364 1.196687 -1.9605772
+Time           = -69382785
+Segment Index  = 0
+Spacecraft (J) = -1870.7818 -1520.5803 2622.9933
+Velocity   (J) = -4.083461 1.2450668 -2.0442358
+Time           = -69382751
+Segment Index  = 0
+Spacecraft (J) = -2009.0008 -1477.2845 2551.8353
+Velocity   (J) = -4.0205856 1.2934466 -2.1278944
+Time           = -69382717
+Segment Index  = 1
+Spacecraft (J) = -2145.0748 -1432.3386 2477.8238
+Velocity   (J) = -3.9573376 1.3416418 -2.2112481
+Time           = -69382683
+Segment Index  = 1
+Spacecraft (J) = -2278.8103 -1385.8385 2401.1173
+Velocity   (J) = -3.883827 1.3847523 -2.2862016
+Time           = -69382648
+Segment Index  = 1
+Spacecraft (J) = -2410.0382 -1337.8677 2321.8541
+Velocity   (J) = -3.8103163 1.4278627 -2.3611551
+Time           = -69382614
+Segment Index  = 2
+Spacecraft (J) = -2538.7577 -1288.4271 2240.0352
+Velocity   (J) = -3.7361865 1.4704812 -2.435284
+Time           = -69382580
+Segment Index  = 2
+Spacecraft (J) = -2664.8112 -1237.6419 2155.8706
+Velocity   (J) = -3.6545747 1.5071562 -2.4994488
+Time           = -69382546
+Segment Index  = 2
+Spacecraft (J) = -2788.0809 -1185.6056 2069.5172
+Velocity   (J) = -3.572963 1.5438312 -2.5636136
+Time           = -69382512
+Segment Index  = 2
+Spacecraft (J) = -2908.5667 -1132.3183 1980.9751
+Velocity   (J) = -3.4913513 1.5805061 -2.6277784
+
+Test loading a polynomial table.
+
+Knots:
+  -69382819
+  -69382718
+  -69382617
+  -69382512
+Base Time: -69382665.760519
+Time Scale: 1.0
+Time           = -69382819
+Segment Index  = 0
+Spacecraft (J) = -1730.418 -1562.2258 2691.2977
+Velocity   (J) = -4.1463364 1.196687 -1.9605772
+Time           = -69382785
+Segment Index  = 0
+Spacecraft (J) = -1870.7818 -1520.5803 2622.9933
+Velocity   (J) = -4.083461 1.2450668 -2.0442358
+Time           = -69382751
+Segment Index  = 0
+Spacecraft (J) = -2009.0008 -1477.2845 2551.8353
+Velocity   (J) = -4.0205856 1.2934466 -2.1278944
+Time           = -69382717
+Segment Index  = 1
+Spacecraft (J) = 0 0 0
+Velocity   (J) = 0 0 0
+Time           = -69382683
+Segment Index  = 1
+Spacecraft (J) = 0 0 0
+Velocity   (J) = 0 0 0
+Time           = -69382648
+Segment Index  = 1
+Spacecraft (J) = 0 0 0
+Velocity   (J) = 0 0 0
+Time           = -69382614
+Segment Index  = 2
+Spacecraft (J) = -2538.7577 -1288.4271 2240.0352
+Velocity   (J) = -3.7361865 1.4704812 -2.435284
+Time           = -69382580
+Segment Index  = 2
+Spacecraft (J) = -2664.8112 -1237.6419 2155.8706
+Velocity   (J) = -3.6545747 1.5071562 -2.4994488
+Time           = -69382546
+Segment Index  = 2
+Spacecraft (J) = -2788.0809 -1185.6056 2069.5172
+Velocity   (J) = -3.572963 1.5438312 -2.5636136
+Time           = -69382512
+Segment Index  = 2
+Spacecraft (J) = -2908.5667 -1132.3183 1980.9751
+Velocity   (J) = -3.4913513 1.5805061 -2.6277784
+
+Test loading a hermite cache from a polynomial.
+
+Object = Table
+  Name                 = HermiteTable
+  StartByte            = 0
+  Bytes                = 0
+  Records              = Null
+  ByteOrder            = NULL
+  CacheType            = HermiteSpline
+  SpkTableStartTime    = -69382819.360519
+  SpkTableEndTime      = -69382512.160519
+  SpkTableOriginalSize = 769.0
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+Time           = -69382819
+Spacecraft (J) = 57694.962 25142.589 -44030.221
+Velocity   (J) = 163663.61 73550.884 -128681.12
+Time           = -69382785
+Spacecraft (J) = 2444470.6 1097866.1 -1920810.8
+Velocity   (J) = -7350.1686 -3297.8411 5770.0308
+Time           = -69382751
+Spacecraft (J) = 673197.96 302081.1 -528531.02
+Velocity   (J) = -80130.753 -36003.363 62990.173
+Time           = -69382717
+Spacecraft (J) = -1905279.5 -856438.79 1498373.7
+Velocity   (J) = -54678.139 -24565.683 42979.312
+Time           = -69382683
+Spacecraft (J) = -1940118.3 -871919.85 1525468
+Velocity   (J) = 69007.673 31015.199 -54262.554
+Time           = -69382648
+Spacecraft (J) = 1975223.5 887676.23 -1553036
+Velocity   (J) = 66361.367 29823.635 -52178.011
+Time           = -69382614
+Spacecraft (J) = 1875275.7 842798.81 -1474520.6
+Velocity   (J) = -55846.289 -25095.937 43906.654
+Time           = -69382580
+Spacecraft (J) = -717580.94 -322380.6 564021.67
+Velocity   (J) = -79802.663 -35861.824 62742.137
+Time           = -69382546
+Spacecraft (J) = -2451885.9 -1101730.8 1927535.5
+Velocity   (J) = -5507.7559 -2474.0262 4328.4376
+Time           = -69382512
+Spacecraft (J) = 23821.173 10879.583 -19034.497
+Velocity   (J) = 167038.43 75067.456 -131334.44
+Original Time Cache:
+  -69382819
+  -69382779
+  -69382739
+  -69382700
+  -69382660
+  -69382620
+  -69382580
+  -69382540
+  -69382513
+
+Test converting from a hermite cache to a polynomial over hermite.
+
+Knots:
+  -69382819
+  -69382666
+  -69382512
+Base Time: -69382665.760519
+Time Scale: 1.0
+Segment 1 coefficients:
+  X: 0 0 0
+  Y: 0 0 0
+  Z: 0 0 0
+Segment 2 coefficients:
+  X: 0 0 0
+  Y: 0 0 0
+  Z: 0 0 0
+Time           = -69382819
+Segment Index  = 0
+Spacecraft (J) = 57694.962 25142.589 -44030.221
+Velocity   (J) = 163663.61 73550.884 -128681.12
+Time           = -69382785
+Segment Index  = 0
+Spacecraft (J) = 2444470.6 1097866.1 -1920810.8
+Velocity   (J) = -7350.1686 -3297.8411 5770.0308
+Time           = -69382751
+Segment Index  = 0
+Spacecraft (J) = 673197.96 302081.1 -528531.02
+Velocity   (J) = -80130.753 -36003.363 62990.173
+Time           = -69382717
+Segment Index  = 0
+Spacecraft (J) = -1905279.5 -856438.79 1498373.7
+Velocity   (J) = -54678.139 -24565.683 42979.312
+Time           = -69382683
+Segment Index  = 0
+Spacecraft (J) = -1940118.3 -871919.85 1525468
+Velocity   (J) = 69007.673 31015.199 -54262.554
+Time           = -69382648
+Segment Index  = 1
+Spacecraft (J) = 1975223.5 887676.23 -1553036
+Velocity   (J) = 66361.367 29823.635 -52178.011
+Time           = -69382614
+Segment Index  = 1
+Spacecraft (J) = 1875275.7 842798.81 -1474520.6
+Velocity   (J) = -55846.289 -25095.937 43906.654
+Time           = -69382580
+Segment Index  = 1
+Spacecraft (J) = -717580.94 -322380.6 564021.67
+Velocity   (J) = -79802.663 -35861.824 62742.137
+Time           = -69382546
+Segment Index  = 1
+Spacecraft (J) = -2451885.9 -1101730.8 1927535.5
+Velocity   (J) = -5507.7559 -2474.0262 4328.4376
+Time           = -69382512
+Segment Index  = 1
+Spacecraft (J) = 23821.173 10879.583 -19034.497
+Velocity   (J) = 167038.43 75067.456 -131334.44
+
+Test a polynomial over hermite with non-zero coefficients.
+
+Segment 1 coefficients:
+  X: 1 0.1 0.01
+  Y: -2 -0.2 -0.02
+  Z: 1.3 0.13 0.013
+Segment 2 coefficients:
+  X: -1 -0.1 -0.01
+  Y: 2 0.2 0.02
+  Z: -1.3 -0.13 -0.013
+Time           = -69382819
+Segment Index  = 0
+Spacecraft (J) = 57915.462 24701.59 -43743.572
+Bias       (J) = 220.49944 -440.99887 286.64927
+Velocity   (J) = 163663.61 73550.884 -128681.12
+Time           = -69382785
+Segment Index  = 0
+Spacecraft (J) = 2444601.6 1097604.1 -1920640.5
+Bias       (J) = 131.00285 -262.0057 170.3037
+Velocity   (J) = -7350.1686 -3297.8411 5770.0308
+Time           = -69382751
+Segment Index  = 0
+Spacecraft (J) = 673262.74 301951.54 -528446.81
+Bias       (J) = 64.777617 -129.55523 84.210902
+Velocity   (J) = -80130.753 -36003.363 62990.173
+Time           = -69382717
+Segment Index  = 0
+Spacecraft (J) = -1905257.7 -856482.43 1498402.1
+Bias       (J) = 21.823744 -43.647488 28.370867
+Velocity   (J) = -54678.139 -24565.683 42979.312
+Time           = -69382683
+Segment Index  = 0
+Spacecraft (J) = -1940116.2 -871924.14 1525470.8
+Bias       (J) = 2.1412289 -4.2824577 2.7835975
+Velocity   (J) = 69007.673 31015.199 -54262.554
+Time           = -69382648
+Segment Index  = 1
+Spacecraft (J) = 1975217.8 887687.69 -1553043.5
+Bias       (J) = -5.7300718 11.460144 -7.4490934
+Velocity   (J) = 66361.367 29823.635 -52178.011
+Time           = -69382614
+Segment Index  = 1
+Spacecraft (J) = 1875243.1 842863.99 -1474563
+Bias       (J) = -32.590273 65.180546 -42.367355
+Velocity   (J) = -55846.289 -25095.937 43906.654
+Time           = -69382580
+Segment Index  = 1
+Spacecraft (J) = -717663.66 -322215.16 563914.14
+Bias       (J) = -82.721832 165.44366 -107.53838
+Velocity   (J) = -79802.663 -35861.824 62742.137
+Time           = -69382546
+Segment Index  = 1
+Spacecraft (J) = -2452042 -1101418.5 1927332.6
+Bias       (J) = -156.12475 312.2495 -202.96217
+Velocity   (J) = -5507.7559 -2474.0262 4328.4376
+Time           = -69382512
+Segment Index  = 1
+Spacecraft (J) = 23568.374 11385.181 -19363.136
+Bias       (J) = -252.79902 505.59805 -328.63873
+Velocity   (J) = 167038.43 75067.456 -131334.44
+
+Test calculation of first coefficient for spacecraft velocity
+  Velocity vector for center time = (0,0,0)
+

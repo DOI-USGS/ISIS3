@@ -1,0 +1,81 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+# Unignore Makefiles, and TestPreferences
+!Makefile
+!TestPreferences
+!*/3rdParty/Makefile
+
+*.cub
+*.o
+*.so
+*.so.*
+*.a
+moc_*
+*.pb.*
+*.lbl
+*.img
+*.kate-swp
+object_script.*.Release
+object_script.*.Debug
+*_plugin_import.cpp
+*.moc
+ui_*.h
+*.html
+
+# ignore all files created by squish coco
+*csmes
+
+# ignore all files created by qtcreator
+*.pro
+*.pro.user
+
+# ignore all files created by running BundleAdjust
+*bundleout*.txt
+*.csv
+
+print.prt
+
+*/3rdParty/*
+*/inc/*
+*/bin/*
+*/lib/*
+*/tsts/*/input/*
+*/tsts/*/truth/*
+*/tsts/*/output/*
+
+# ignore symbolic links in this directory
+BundleAdjust.cpp
+BundleAdjust.h
+BundleControlPoint.cpp
+BundleControlPoint.h
+BundleLidarControlPoint.cpp
+BundleLidarControlPoint.h
+BundleLidarRangeConstraint.cpp
+BundleLidarRangeConstraint.h
+BundleMeasure.cpp
+BundleMeasure.h
+BundleObservation.cpp
+BundleObservation.h
+BundleObservationVector.cpp
+BundleObservationVector.h
+BundleSettings.cpp
+BundleSettings.h
+BundleTargetBody.cpp
+BundleTargetBody.h
+ControlMeasure.cpp
+ControlMeasure.h
+ControlPoint.cpp
+ControlPoint.h
+ControlNet.cpp
+ControlNet.h
+LidarControlPoint.cpp
+LidarControlPoint.h
+LidarData.cpp
+LidarData.h

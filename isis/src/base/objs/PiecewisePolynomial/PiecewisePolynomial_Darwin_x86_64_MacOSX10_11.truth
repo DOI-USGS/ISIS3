@@ -1,0 +1,482 @@
+Unit test for PiecewisePolynomial
+
+Test default constructor
+
+Number of segments: 1
+Space curve dimensions: 3
+Polynomial degree: 0
+Polynomial knots:
+  -1.797693e+308
+  1.797693e+308
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+Dimension 2 coefficients:
+  0.0
+Dimension 3 coefficients:
+  0.0
+Create 1D PiecewisePolynomial:
+
+Number of segments: 1
+Space curve dimensions: 1
+Polynomial degree: 2
+Polynomial knots:
+  -5.0
+  5.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+
+Fit to 1D data:
+
+Number of segments: 2
+Space curve dimensions: 1
+Polynomial degree: 2
+Polynomial knots:
+  -4.0
+  -0.45
+  4.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  1.71009
+  3.96381
+  1.41881
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  1.30584
+  2.16714
+  -0.577498
+
+Calculating residuals for 17 points.
+  -4.0  0.555796
+  -3.5  0.0328341
+  -3.0  0.412059
+  -2.5  0.58188
+  -2.0  0.542295
+  -1.5  0.293306
+  -1.0  0.165089
+  -0.5  0.832888
+  0.0  1.30584
+  0.5  0.495032
+  1.0  0.104523
+  1.5  0.492828
+  2.0  0.669881
+  2.5  0.635683
+  3.0  0.390235
+  3.5  0.0664652
+  4.0  0.734416
+RMS Error: 0.699203
+
+Create 3D PiecewisePolynomial:
+
+Number of segments: 1
+Space curve dimensions: 3
+Polynomial degree: 2
+Polynomial knots:
+  -6.0
+  4.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+Dimension 2 coefficients:
+  0.0
+  0.0
+  0.0
+Dimension 3 coefficients:
+  0.0
+  0.0
+  0.0
+
+Fit to 3D data:
+
+Number of segments: 3
+Space curve dimensions: 3
+Polynomial degree: 2
+Polynomial knots:
+  -5.0
+  -2.20163
+  -0.143386
+  3.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.326359
+  -1.81104
+  -0.474488
+Dimension 2 coefficients:
+  0.217687
+  0.459385
+  0.0170192
+Dimension 3 coefficients:
+  2.78236
+  -0.126021
+  -0.0170145
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  -0.143297
+  -2.23768
+  -0.571381
+Dimension 2 coefficients:
+  -0.0955278
+  0.174855
+  -0.0475988
+Dimension 3 coefficients:
+  3.09553
+  0.158469
+  0.0475945
+
+Segment 3 polynomial:
+Dimension 1 coefficients:
+  -0.112188
+  -1.80376
+  0.941728
+Dimension 2 coefficients:
+  -0.0747881
+  0.46414
+  0.961159
+Dimension 3 coefficients:
+  3.07479
+  -0.130813
+  -0.961156
+
+Calculating residuals for 17 points.
+  -5.0  0.0265874
+  -4.5  0.0101193
+  -4.0  0.0292904
+  -3.5  0.0309258
+  -3.0  0.0150254
+  -2.5  0.0184106
+  -2.0  0.0639678
+  -1.5  0.0723252
+  -1.0  0.0316263
+  -0.5  0.058129
+  0.0  0.154185
+  0.5  0.0393614
+  1.0  0.0354212
+  1.5  0.0701628
+  2.0  0.0648634
+  2.5  0.0195229
+  3.0  0.0658585
+RMS Error: 0.0580648
+
+Test fitting to a single point
+Number of segments: 1
+Space curve dimensions: 3
+Polynomial degree: 0
+Polynomial knots:
+  -1.797693e+308
+  1.797693e+308
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  -2.5
+Dimension 2 coefficients:
+  -1.66667
+Dimension 3 coefficients:
+  3.0
+
+Calculating residuals for 1 points.
+  -5.0  0.0
+RMS Error: 0.0
+
+Test copy constructor
+Number of segments: 1
+Space curve dimensions: 3
+Polynomial degree: 0
+Polynomial knots:
+  -1.797693e+308
+  1.797693e+308
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  -2.5
+Dimension 2 coefficients:
+  -1.66667
+Dimension 3 coefficients:
+  3.0
+
+Test assignment operator
+Number of segments: 3
+Space curve dimensions: 3
+Polynomial degree: 2
+Polynomial knots:
+  -5.0
+  -2.20163
+  -0.143386
+  3.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.326359
+  -1.81104
+  -0.474488
+Dimension 2 coefficients:
+  0.217687
+  0.459385
+  0.0170192
+Dimension 3 coefficients:
+  2.78236
+  -0.126021
+  -0.0170145
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  -0.143297
+  -2.23768
+  -0.571381
+Dimension 2 coefficients:
+  -0.0955278
+  0.174855
+  -0.0475988
+Dimension 3 coefficients:
+  3.09553
+  0.158469
+  0.0475945
+
+Segment 3 polynomial:
+Dimension 1 coefficients:
+  -0.112188
+  -1.80376
+  0.941728
+Dimension 2 coefficients:
+  -0.0747881
+  0.46414
+  0.961159
+Dimension 3 coefficients:
+  3.07479
+  -0.130813
+  -0.961156
+
+Test derivatives
+Derivatives at 0.0:
+  -1.8037616415858
+  0.46413964330994
+  -0.1308128845786
+
+Test segment index accessor
+Segment index for time -10.0: 0
+Segment index for time -1.0: 1
+Segment index for time 3.0: 2
+
+Test refitting polynomials
+Refit 3 segment, 3d polynomial to 5 segments.
+Number of segments: 5
+Space curve dimensions: 3
+Polynomial degree: 2
+Polynomial knots:
+  -5.0
+  -2.17856
+  -1.83507
+  -0.305465
+  0.385805
+  2.92
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.269685
+  -1.84177
+  -0.478498
+Dimension 2 coefficients:
+  0.179148
+  0.438463
+  0.0142865
+Dimension 3 coefficients:
+  2.82051
+  -0.105318
+  -0.0143116
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  0.314718
+  -1.80042
+  -0.46901
+Dimension 2 coefficients:
+  0.212418
+  0.469005
+  0.0212964
+Dimension 3 coefficients:
+  2.78899
+  -0.134256
+  -0.0209531
+
+Segment 3 polynomial:
+Dimension 1 coefficients:
+  -0.22974
+  -2.39382
+  -0.63069
+Dimension 2 coefficients:
+  -0.153201
+  0.0705262
+  -0.0872768
+Dimension 3 coefficients:
+  3.15318
+  0.262659
+  0.0871939
+
+Segment 4 polynomial:
+Dimension 1 coefficients:
+  -0.111386
+  -1.6189
+  0.637726
+Dimension 2 coefficients:
+  -0.0742707
+  0.587315
+  0.758627
+Dimension 3 coefficients:
+  3.07426
+  -0.254026
+  -0.75854
+
+Segment 5 polynomial:
+Dimension 1 coefficients:
+  -0.0635488
+  -1.86689
+  0.959111
+Dimension 2 coefficients:
+  -0.0424016
+  0.422107
+  0.972734
+Dimension 3 coefficients:
+  3.04238
+  -0.0887457
+  -0.972742
+
+Refit 3d zero polynomial to 3 segments.
+Number of segments: 3
+Space curve dimensions: 3
+Polynomial degree: 0
+Polynomial knots:
+  -100.0
+  -33.3333
+  33.3333
+  100.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+Dimension 2 coefficients:
+  0.0
+Dimension 3 coefficients:
+  0.0
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  0.0
+Dimension 2 coefficients:
+  0.0
+Dimension 3 coefficients:
+  0.0
+
+Segment 3 polynomial:
+Dimension 1 coefficients:
+  0.0
+Dimension 2 coefficients:
+  0.0
+Dimension 3 coefficients:
+  0.0
+
+Test changing the polynomials degree
+Number of segments: 3
+Space curve dimensions: 3
+Polynomial degree: 4
+Polynomial knots:
+  -100.0
+  -33.3333
+  33.3333
+  100.0
+
+Segment 1 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+Dimension 2 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+Dimension 3 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+
+Segment 2 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+Dimension 2 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+Dimension 3 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+
+Segment 3 polynomial:
+Dimension 1 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+Dimension 2 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+Dimension 3 coefficients:
+  0.0
+  0.0
+  0.0
+  0.0
+  0.0
+
+Test error throws
+
+
+Polynomial fit errors:
+**PROGRAMMER ERROR** The number of input values [3] and data points [1] do not match.
+**PROGRAMMER ERROR** The number of data points [2] is insufficient to fit polynomials. at least [5] data points are required.
+**PROGRAMMER ERROR** Input values are not sorted in ascending order.
+**PROGRAMMER ERROR** Data point number [7] has the incorrect number of dimensions [2]. Expected [1] dimensions.
+
+Polynomial refitting errors:
+**PROGRAMMER ERROR** Cannot refit polynomials over less than one segment.
+
+Attempt to set to negative degree:
+**PROGRAMMER ERROR** Input degree [-1] must be greater than or equal to 0.
+
+Attempt to set non-positive dimensions:
+**PROGRAMMER ERROR** Input dimensions [0] must be greater than 0.
+
+Setting coefficients errors:
+**PROGRAMMER ERROR** Segment index [4] is invalid. Valid segment indices are between [0] and [1] inclusive.
+**PROGRAMMER ERROR** Invalid number of dimensions [1]. Expected [3] dimensions.
+**PROGRAMMER ERROR** Invalid number of coefficients [2] for dimension number [3]. Expected [3] coefficients.
+
+Attempt to set less than 2 knots:
+**PROGRAMMER ERROR** Invalid number of knots [1]. At least 2 knots must be specified.

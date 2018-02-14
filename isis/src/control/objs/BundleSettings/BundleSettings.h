@@ -281,7 +281,7 @@ namespace Isis {
 
       /**
        * This class is needed to read/write BundleSettings from/to an XML
-       * formateed file.
+       * formatted file.
        *
        * @author 2014-07-21 Ken Edmundson
        *
