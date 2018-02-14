@@ -53,6 +53,12 @@ namespace Isis {
     p_jigsawRejected = false;
     p_ignore = false;
 
+    // TODO: decide on appropriate default values for sample/line sigmas
+    // currently set to 1.4 pixels, only to match what we've done manually
+    // in the BundleAdjust::computePartials method
+    // But, what if image has been subsampled?
+    p_sampleSigma = 1.4;
+    p_lineSigma = 1.4;
   }
 
 

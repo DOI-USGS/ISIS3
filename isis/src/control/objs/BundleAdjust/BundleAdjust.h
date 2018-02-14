@@ -428,6 +428,7 @@ namespace Isis {
       bool productATransB(LinearAlgebra::MatrixUpperTriangular &N22,
                           SparseBlockColumnMatrix              &N12,
                           SparseBlockRowMatrix                 &Q);
+
       void productAlphaAV(double alpha,
                           boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
                           SparseBlockRowMatrix                                &Q,

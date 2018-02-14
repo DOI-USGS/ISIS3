@@ -65,8 +65,12 @@ BundleObservation.cpp
 BundleObservation.h
 BundleObservationVector.cpp
 BundleObservationVector.h
+BundleResults.cpp
+BundleResults.h
 BundleSettings.cpp
 BundleSettings.h
+BundleSolutionInfo.cpp
+BundleSolutionInfo.h
 BundleTargetBody.cpp
 BundleTargetBody.h
 ControlMeasure.cpp

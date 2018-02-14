@@ -2,9 +2,13 @@
 
 #include <QDebug>
 
+// boost lib
+#include <boost/numeric/ublas/vector_proxy.hpp>
+
 #include "ControlMeasure.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "SparseBlockMatrix.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -724,16 +728,106 @@ namespace Isis {
 
 
   /**
-   * Applies the parameter corrections
-   *
-   * @param corrections Vector of corrections to apply
-   *
-   * @internal
-   *   @todo always returns true?
+   * apply parameter corrections for solution.
    */
-  bool BundleControlPoint::applyParameterCorrections() {
-    //int fred=1;
-    return true;
+  void BundleControlPoint::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
+                                                     LinearAlgebra::Vector &imageSolution) {
+
+    // subtract product of Q and nj from NIC
+    productAlphaAV(-1.0, normalsMatrix, imageSolution);
+
+    SurfacePoint surfacepoint = adjustedSurfacePoint();
+
+    double pointLat = surfacepoint.GetLatitude().degrees();
+    double pointLon = surfacepoint.GetLongitude().degrees();
+    double pointRad = surfacepoint.GetLocalRadius().meters();
+
+    pointLat += RAD2DEG * m_nicVector(0);
+    pointLon += RAD2DEG * m_nicVector(1);
+
+    // Make sure updated values are still in valid range.
+    // TODO What is the valid lon range?
+    if (pointLat < -90.0) {
+      pointLat = -180.0 - pointLat;
+      pointLon = pointLon + 180.0;
+    }
+    if (pointLat > 90.0) {
+      pointLat = 180.0 - pointLat;
+      pointLon = pointLon + 180.0;
+    }
+    while (pointLon > 360.0) {
+      pointLon = pointLon - 360.0;
+    }
+    while (pointLon < 0.0) {
+      pointLon = pointLon + 360.0;
+    }
+
+    pointRad += 1000.*m_nicVector(2);
+
+    // sum and save corrections
+    m_corrections += m_nicVector;
+
+/*
+      // ken testing - if solving for target body mean radius, set radius to current
+      // mean radius value
+      // TODO: What if this point is FIXED or CONSTRAINED?
+      //       feels wrong in that case?
+      if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
+          || m_bundleTargetBody->solveTriaxialRadii())) {
+        if (m_bundleTargetBody->solveMeanRadius()) {
+          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                               Longitude(pointLon, Angle::Degrees),
+                                               m_bundleTargetBody->meanRadius());
+        }
+        else if (m_bundleTargetBody->solveTriaxialRadii()) {
+            Distance localRadius = m_bundleTargetBody->
+                                       localRadius(Latitude(pointLat, Angle::Degrees),
+                                                   Longitude(pointLon, Angle::Degrees));
+            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                                 Longitude(pointLon, Angle::Degrees),
+                                                 localRadius);
+        }
+      }
+      else {
+        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                             Longitude(pointLon, Angle::Degrees),
+                                             Distance(pointRad, Distance::Meters));
+      }
+*/
+
+    surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                         Longitude(pointLon, Angle::Degrees),
+                                         Distance(pointRad, Distance::Meters));
+
+    setAdjustedSurfacePoint(surfacepoint);
   }
 
+
+/**
+   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
+   *
+   * @param alpha A constant multiplier.
+   * @param v2 The output vector.
+   * @param Q A sparse block matrix.
+   * @param v1 A vector.
+   */
+  void BundleControlPoint::productAlphaAV(double alpha,
+                                          SparseBlockMatrix &sparseMatrix,
+                                          LinearAlgebra::Vector &v1) {
+
+    QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
+
+    int subrangeStart, subrangeEnd;
+
+    while ( Qit.hasNext() ) {
+      Qit.next();
+
+      int columnIndex = Qit.key();
+
+      subrangeStart = sparseMatrix.at(columnIndex)->startColumn();
+      subrangeEnd = subrangeStart + Qit.value()->size2();
+
+      m_nicVector += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
+    }
+  }
 }
