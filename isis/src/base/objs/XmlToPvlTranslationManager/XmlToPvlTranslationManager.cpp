@@ -240,7 +240,52 @@ namespace Isis {
       cout << endl << "Finding input element:" << endl << endl;
       cout << inputParentElement.tagName() << endl;
     }
-    for (int i = 0; i < inputPosition.size(); i++) {
+
+    Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputPosition",
+                                      transGroup.begin(),
+                                      transGroup.end());
+
+    QDomElement oldInputParentElement = inputParentElement;
+    QString childName;
+    while(it != transGroup.end()) {
+      const PvlKeyword &inputPosition = *it;
+      inputParentElement = oldInputParentElement; 
+
+        for (int i = 0; i < inputPosition.size(); i++) {
+          childName = inputPosition[i];
+          inputParentElement = inputParentElement.firstChildElement(childName);
+          if(inputParentElement.isNull()) {
+            break;
+          }
+          if (isDebug) {
+            indent += "  ";
+            cout << indent << inputParentElement.tagName() << endl;
+          }
+        }
+        if (!inputParentElement.isNull()) {
+          break;
+        }
+        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end()); 
+    }
+     
+    if (inputParentElement.isNull()) {
+      if (hasInputDefault(outputName)) {
+        if (isDebug) {
+          cout << endl << "Could not traverse input position, " <<
+            "using default value: " <<
+            InputDefault(outputName) << endl;
+        }
+        return PvlTranslationTable::Translate( outputName );
+      }
+      else {
+        QString msg = "Failed traversing input position. [" +
+          inputPosition.name() + "] element does not have a child element named [" +
+          childName + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+  
+/*    for (int i = 0; i < inputPosition. csize(); i++) {
       QString childName = inputPosition[i];
       inputParentElement = inputParentElement.firstChildElement(childName);
       if(inputParentElement.isNull()) {
@@ -254,8 +299,7 @@ namespace Isis {
         }
         else {
           QString msg = "Failed traversing input position. [" +
-                        inputParentElement.parentNode().toElement().tagName() +
-                        "] element does not have a child element named [" +
+                        inputPosition.name() + "] element does not have a child element named [" +
                         childName + "].";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -264,7 +308,9 @@ namespace Isis {
         indent += "  ";
         cout << indent << inputParentElement.tagName() << endl;
       }
-    }
+    }*/
+
+
     QDomElement inputKeyElement = inputParentElement.firstChildElement(inputKey);
     if (isDebug) {
       indent += "  ";
