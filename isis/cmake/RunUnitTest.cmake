@@ -50,13 +50,14 @@ set(comp1 ${outputFile})
 set(comp2 ${TRUTH_FILE})
 set(exclusionPath ${truthFolder}/unitTest.exclude)
 if(EXISTS ${exclusionPath})
+  message("Using Exlusion file ${exclusionPath}")
   set(comp1 ${tempDir}/output_exclude.txt)
   set(comp2 ${tempDir}/truth_exclude.txt)
   # This throws out all lines containing a word from the exclusion file.
-  execute_process(COMMAND cat ${outputFile} | grep -v -f ${exclusionPath}
-                  OUTPUT_FILE ${comp1})
-  execute_process(COMMAND cat ${TRUTH_FILE} | grep -v -f ${exclusionPath}
-                  OUTPUT_FILE ${comp2})
+  execute_process(COMMAND "cat ${outputFile} | grep -v -f ${exclusionPath}"
+                  OUTPUT_FILE "${comp1}")
+  execute_process(COMMAND "cat ${TRUTH_FILE} | grep -v -f ${exclusionPath}"
+                  OUTPUT_FILE "${comp2}")
 endif()
 
 # Verify that the files are exactly the same
