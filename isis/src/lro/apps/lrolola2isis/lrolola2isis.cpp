@@ -83,7 +83,8 @@ void IsisMain() {
     lidarPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
     
     for (int j = 0; j < images.size(); j++) {
-      if (images[j].startTime <= time || time <= images[j].endTime) {
+//      if (images[j].startTime <= time || time <= images[j].endTime) {
+      if (time >= images[j].startTime && time <= images[j].endTime) {
         Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
         
         if (cube != NULL) {
