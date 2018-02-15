@@ -207,8 +207,6 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
     archiveGroup.setName("Archive" + QString(frameletBandBin["FilterName"]));
     frameCube.putGroup(archiveGroup);
 
-    std::cout << "Archive Group: " << archiveGroup << std::endl;
-
     AlphaCube frameletAlphaCube(*frameletCube);
     stitchGroup["FilterStartSamples"] += toString(frameletAlphaCube.AlphaSample(0.0));
     stitchGroup["FilterSamples"]      += toString(frameletAlphaCube.BetaSamples());
