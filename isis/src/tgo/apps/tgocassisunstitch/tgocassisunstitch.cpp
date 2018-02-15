@@ -161,7 +161,7 @@ void IsisMain() {
       // The stitched frame has ArchiveRED, ArchiveNIR, ArchivePAN, and ArchiveBLU.
       // We won't add the archive group unless
       if ( group.name().contains("Archive") &&
-           group.name() != "Archive" + g_frameletInfoList[i].m_filterName) {
+           group.name() != "Archive" + g_frameletInfoList[i].m_filterName ) {
              continue;
            }
 
