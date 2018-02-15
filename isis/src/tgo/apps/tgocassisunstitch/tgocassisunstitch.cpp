@@ -235,7 +235,6 @@ void IsisMain() {
  *
  *   @history 2018-02-14 Adam Goins - Modified the copying of the data in the buffer to include
  *                           the sample offset (m_startSample) for a cube.
- *
  */
 void unstitchFullFrame(Buffer &in) {
   for (int i=0; i < g_frameletInfoList.size(); i++) {
