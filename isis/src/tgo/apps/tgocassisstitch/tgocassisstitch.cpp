@@ -117,6 +117,10 @@ QMap<QString, FileName> sortFramelets(FileName frameletListFile) {
  *
  * @param frameletList A list of the framelet cubes to stitch together
  * @param frameFileName The file name of the output frame cube
+ *
+ * @internal
+ *   @history 2018-02-15 Adam Goins - Modified stitchFrame to store the Archive
+ *                           group for ingested framelets. Fixes #5333.
  */
 void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
   // Create the frame cube based on the first framelet cube
