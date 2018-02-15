@@ -75,13 +75,14 @@ void IsisMain() {
   PvlKeyword filterLines = inputLabel->findKeyword("FilterLines", PvlObject::Traverse);
   PvlKeyword filterWavelength = inputLabel->findKeyword("FilterCenters", PvlObject::Traverse);
   PvlKeyword filterWidth = inputLabel->findKeyword("FilterWidths", PvlObject::Traverse);
+
   for (int i = 0; i < filterKey.size(); i++) {
     g_frameletInfoList.append(FilterInfo(filterIkCodes[i].toInt(),
                               filterKey[i],
-                              filterStartSamples[i].toInt(),
+                              filterStartSamples[i].toDouble(),
                               filterStartLines[i].toDouble(),
-                              filterSamples[i].toInt(),
-                              filterLines[i].toInt(),
+                              filterSamples[i].toDouble(),
+                              filterLines[i].toDouble(),
                               filterWavelength[i].toDouble(),
                               filterWidth[i].toDouble()));
   }
@@ -214,9 +215,13 @@ void IsisMain() {
  *                           from in.Line() < [...] to inLine() <= [...] to write all lines
  *                           up to and including the last line. Fixes an error where the last lines
  *                           written would be a line of null pixel DN's.
+ *
+ *   @history 2018-02-14 Adam Goins - Modified the copying of the data in the buffer to include
+ *                           the sample offset (m_startSample) for a cube.
  */
 void unstitchFullFrame(Buffer &in) {
   for (int i=0; i < g_frameletInfoList.size(); i++) {
+
     if (in.Line() >= g_frameletInfoList[i].m_startLine
         && in.Line() <= (g_frameletInfoList[i].m_startLine + g_frameletInfoList[i].m_lines)) {
       int outputCubeLineNumber = (in.Line()-1) % g_frameletInfoList[i].m_startLine + 1;
@@ -224,7 +229,7 @@ void unstitchFullFrame(Buffer &in) {
       mgr.SetLine(outputCubeLineNumber, 1);
 
       for (int j = 0; j < mgr.size(); j++) {
-        mgr[j] = in[j];
+        mgr[j] = in[j + g_frameletInfoList[i].m_startSample];
       }
       g_outputCubes[i]->write(mgr);
       return;

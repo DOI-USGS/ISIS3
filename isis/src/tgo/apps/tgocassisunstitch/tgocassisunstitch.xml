@@ -23,6 +23,11 @@
       but containing other '.'s  in the string to not strip off everything after the last period. For example, if the 
       user inputs CAS-MCO-2016-11-22T16:10:43.505 as the OUTPUTPREFIX, now the 505 will now be retained. 
     </change>
+    
+    <change name="Adam Goins" date="2018-02-15">
+      Updated the application to include the sample offsets when processing lines from the stitched
+      frame into output cubes.
+    </change>
 
   </history>
 
