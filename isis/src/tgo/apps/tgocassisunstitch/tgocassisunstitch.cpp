@@ -30,6 +30,10 @@ using namespace Isis;
  *
  * @internal
  *   @history 2017-09-15 Kristin Berry - Original Version
+ *
+ *   @history 2018-02-15 Adam Goins - Modified unstitch to parse the archive group
+ *                           from the stitched frame. Changed "Name" to "FilterName"
+ *                           in bandBin group.
  */
 struct FilterInfo : public PushFrameCameraCcdLayout::FrameletInfo {
   FilterInfo() : FrameletInfo(), m_wavelength(0), m_width(0) { }
@@ -169,7 +173,8 @@ void IsisMain() {
     frameletLabel->findGroup("Instrument", PvlObject::Traverse).addKeyword(PvlKeyword("Filter",
                                           g_frameletInfoList[i].m_filterName), PvlObject::Replace);
 
-    frameletLabel->findGroup("Archive" + g_frameletInfoList[i].m_filterName, PvlObject::Traverse).setName( "Archive" );
+    // Sets the name from ArchiveRED (or NIR, BLU, PAN) to just "Archive" in the unstitched cube.
+    frameletLabel->findGroup("Archive" + g_frameletInfoList[i].m_filterName, PvlObject::Traverse).setName("Archive");
 
     PvlGroup &bandBin = frameletLabel->findGroup("BandBin", PvlObject::Traverse);
 
