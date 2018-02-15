@@ -43,6 +43,8 @@ namespace Isis {
    *                           Fixes #4715
    *   @history 2017-08-11 Cole Neubauer - Removed isUndoable and set parent member variable
    *                          Fixes #5064
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer check for the images variable in
+   *                          isExecutable to prevent potential seg faults.  References #4492.
    */
   class ImageFileListViewWorkOrder : public WorkOrder {
       Q_OBJECT
