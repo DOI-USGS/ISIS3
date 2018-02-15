@@ -231,9 +231,9 @@ install_third_party()
 # TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
 foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
   get_filename_component(pluginName ${plugin} NAME)
-  if(NOT EXISTS ${CMAKE_BINARY_DIR}/3rdParty/plugins/${pluginName})
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
     execute_process(COMMAND ln -s "${plugin}" ${pluginName}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/3rdParty/plugins")
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
   endif()
 endforeach()
 
