@@ -134,22 +134,13 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
   frameCube.create( frameFileName.expanded() );
 
   // Setup the label for the new cube
-  PvlGroup archGroup = firstFrameletCube.group("Archive");
   PvlGroup kernGroup = firstFrameletCube.group("Kernels");
   PvlGroup instGroup = firstFrameletCube.group("Instrument");
   PvlGroup bandBinGroup("BandBin");
   if ( instGroup.hasKeyword("Filter") ) {
     instGroup["Filter"].setValue("FULLCCD");
   }
-  if ( archGroup.hasKeyword("ProductId") ) {
-    archGroup.deleteKeyword("ProductId");
-  }
-  if ( archGroup.hasKeyword("FileName") ) {
-    archGroup.deleteKeyword("FileName");
-  }
-  if ( archGroup.hasKeyword("Window_Count") ) {
-    archGroup.deleteKeyword("Window_Count");
-  }
+
   bandBinGroup += PvlKeyword("FilterName", "FULLCCD");
 
   // Setup Stitch group keywords
@@ -234,7 +225,6 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
   // Finalize the frame cube label
   frameCube.putGroup(instGroup);
   frameCube.putGroup(kernGroup);
-  frameCube.putGroup(archGroup);
   frameCube.putGroup(bandBinGroup);
   frameCube.putGroup(stitchGroup);
 }
