@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tgocassisstitch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Stitch together multiple TGO CaSSIS framelets into full frame images.
+  </brief>
+
+  <description>
+    Stitch together multiple TGO CaSSIS framelets into full frame images. The
+    labels from the first framelet in each frame are used as a starting point
+    for the frame labels. If spiceinit has been run on the first framelet, then
+    that information will be propagated to the frame. Information that is
+    unique to each framelet, along with the location of each framelet will be
+    output in the "Stitch" group on the frame cubes' label.
+  </description>
+
+  <history>
+    <change name="Jesse Mapel" date="2017-09-09">
+      Original version
+    </change>
+    <change name="Jesse Mapel" date="2017-09-15">
+      Changed name from tgostitch to stitch. Still only works with TGO CaSSIS images. References #5156.
+    </change>
+    <change name="Kristin Berry" date="2017-11-14">
+      Backward Compatibility Issue: Changed name from stitch to tgocassisstitch and
+      changed output parameter name "TO" to "OUTPUTPREFIX."
+    </change>
+  </history>
+
+  <category>
+    <missionItem>ExoMars Trace Gas Orbiter</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A list of TGO CaSSIS framelet images to stitch into full frames.
+        </brief>
+        <description>
+          A list of TGO CaSSIS framelet images to stitch. The images will be
+          sorted into frames based on their serial number the same way that
+          observation mode works in the jigsaw application. So, the list of
+          images can contain framelets from multiple different frames.
+        </description>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+
+      <parameter name="OUTPUTPREFIX">
+         <type>cube</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output ISIS cube basename.
+         </brief>
+         <description>
+           The stitched cubes will be output as this basename plus the last
+           component of the serial number. Usually this will be the start time
+           for the frame.
+         </description>
+         <filter>
+           *.cub
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>
