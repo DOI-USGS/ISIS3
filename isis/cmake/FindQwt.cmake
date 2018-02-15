@@ -7,7 +7,7 @@
 
 FIND_PATH(QWT_INCLUDE_DIR
   NAMES qwt.h
-  PATH_SUFFIXES qwt-qt5 qwt qwt6
+  PATH_SUFFIXES "qwt-qt5" "qwt" "qwt6" "qwt${Qwt_FIND_VERSION}"
 )
 
 find_library(QWT_LIBRARY
