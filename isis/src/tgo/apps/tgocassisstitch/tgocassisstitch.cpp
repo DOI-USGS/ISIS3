@@ -25,7 +25,7 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName);
 
 /**
  * Functor for stitching framelets into a full frame
- * 
+ *
  * @author 2017-09-09 Jesse Mapel
  * @internal
  *   @history 2017-09-09 Original Version.
@@ -37,7 +37,7 @@ public:
   AlphaCube alphaCube() const;
   Cube *outputCube() const;
   void operator()(Isis::Buffer &in) const;
-  
+
 private:
   AlphaCube m_alphaCube;
   Cube *m_outputCube;
@@ -90,9 +90,9 @@ void IsisMain() {
 /**
  * Go through a list of framelet cube files and sort them into frames based on
  * their timing.
- * 
+ *
  * @param frameletList The file containing the list of framelet cubes
- * 
+ *
  * @return @b QMap<QString,FileName> A multi-valued mapping from observation
  *                                   number for a frame to the framelet cube
  *                                   files in that frame.
@@ -114,7 +114,7 @@ QMap<QString, FileName> sortFramelets(FileName frameletListFile) {
 /**
  * Combine several framelet cubes into a single frame cube. The labels from the
  * first framelet will be propegated to the frame cube.
- * 
+ *
  * @param frameletList A list of the framelet cubes to stitch together
  * @param frameFileName The file name of the output frame cube
  */
@@ -203,6 +203,12 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
     stitchGroup["FilterWidths"]    += frameletBandBin["Width"];
     stitchGroup["FilterIkCodes"]   += frameletBandBin["NaifIkCode"];
 
+    PvlGroup archiveGroup = frameletCube->group("Archive");
+    archiveGroup.setName("Archive" + QString(frameletBandBin["FilterName"]));
+    frameCube.putGroup(archiveGroup);
+
+    std::cout << "Archive Group: " << archiveGroup << std::endl;
+
     AlphaCube frameletAlphaCube(*frameletCube);
     stitchGroup["FilterStartSamples"] += toString(frameletAlphaCube.AlphaSample(0.0));
     stitchGroup["FilterSamples"]      += toString(frameletAlphaCube.BetaSamples());
@@ -212,7 +218,7 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
     PvlGroup frameletArchGroup = frameletCube->group("Archive");
     stitchGroup["FilterFileNames"]  += frameletArchGroup["FileName"];
 
-    
+
     Pvl &frameletLabel = *frameletCube->label();
     for(int i = 0; i < frameletLabel.objects(); i++) {
       if( frameletLabel.object(i).isNamed("History") ) {
@@ -234,7 +240,7 @@ void stitchFrame(QList<FileName> frameletList, FileName frameFileName) {
 
 /**
  * Construct a stitch functor for input and output cubes.
- * 
+ *
  * @param inputCube A pointer to the input cube. The alpha cube will be
  *                  extracted from this cube.
  * @param outputCube The output stitched cube that will be written to.
@@ -246,7 +252,7 @@ StitchFunctor::StitchFunctor(Cube *inputCube, Cube *outputCube) :
 /**
  * Return the alpha cube for mapping the input framelet cube into the output
  * frame cube.
- * 
+ *
  * @return @b AlphaCube The framelet cube's alpha cube.
  */
 AlphaCube StitchFunctor::alphaCube() const {
@@ -256,7 +262,7 @@ AlphaCube StitchFunctor::alphaCube() const {
 
 /**
  * Return a pointer to the output frame cube.
- * 
+ *
  * @return @b Cube* The output frame cube.
  */
 Cube *StitchFunctor::outputCube() const {
@@ -267,7 +273,7 @@ Cube *StitchFunctor::outputCube() const {
 /**
  * Process method that maps a line from the input framelet cube to the output
  * frame cube.
- * 
+ *
  * @param in A line of data from the input cube.
  */
 void StitchFunctor::operator()(Isis::Buffer &in) const {
