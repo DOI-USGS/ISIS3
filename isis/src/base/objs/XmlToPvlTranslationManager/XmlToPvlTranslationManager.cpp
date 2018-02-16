@@ -284,32 +284,6 @@ namespace Isis {
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
-  
-/*    for (int i = 0; i < inputPosition. csize(); i++) {
-      QString childName = inputPosition[i];
-      inputParentElement = inputParentElement.firstChildElement(childName);
-      if(inputParentElement.isNull()) {
-        if ( hasInputDefault(outputName) ) {
-          if (isDebug) {
-            cout << endl << "Could not traverse input position, " <<
-                            "using default value: " <<
-                            InputDefault(outputName) << endl;
-          }
-          return PvlTranslationTable::Translate( outputName );
-        }
-        else {
-          QString msg = "Failed traversing input position. [" +
-                        inputPosition.name() + "] element does not have a child element named [" +
-                        childName + "].";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
-      }
-      if (isDebug) {
-        indent += "  ";
-        cout << indent << inputParentElement.tagName() << endl;
-      }
-    }*/
-
 
     QDomElement inputKeyElement = inputParentElement.firstChildElement(inputKey);
     if (isDebug) {
