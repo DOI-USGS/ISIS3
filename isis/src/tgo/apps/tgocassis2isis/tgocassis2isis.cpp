@@ -27,10 +27,17 @@ void IsisMain() {
   try {
     ProcessImport importer;
     translateCoreInfo(xmlFileName, importer);
-    // fails 
-    importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    
+    // Need to check for original file extension as well as file extension from tgocassisrdrgen
+    // for re-imports 
+    try{
+      importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    } 
+    catch (IException e) {
+      importer.SetInputFile(xmlFileName.removeExtension().addExtension("img").expanded());
+    }
     Cube *outputCube = importer.SetOutputCube("TO");
-    // fails above
+
     translateLabels(xmlFileName, outputCube);
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
