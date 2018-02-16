@@ -124,7 +124,7 @@ namespace Isis {
    *  @history 2017-01-25 Jesse Mapel - Created unit test. Fixes #4584.
    *  @history 2017-05-26 Makayla Shepherd - Renamed XmlToPvlTranslationManager.
    *  @history 2018-02-15 Kristin Berry and Summer Stapleton - Updated translate() method to search
-   *                          for multiple values for InputPosition keyword. Fixes #
+   *                          for multiple values for InputPosition keyword. Fixes #5332
    */
   class XmlToPvlTranslationManager : public LabelTranslationManager {
     public:
