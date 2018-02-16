@@ -40,9 +40,9 @@ set(CMAKE_PREFIX_PATH
   /opt/usgs/v007/proprietary/
   /opt/usgs/v007/proprietary/include/
   /opt/usgs/v007/proprietary/lib/
-  /usr/lib
+  /usr/lib/
   /usr/lib64/
-  /usr/local/lib
+  /usr/local/lib/
 )
 
 set(CMAKE_FIND_FRAMEWORK LAST)
