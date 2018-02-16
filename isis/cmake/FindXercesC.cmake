@@ -1,6 +1,6 @@
 find_path(XERCESC_INCLUDE_DIR
   NAMES xercesc/
-  PATH_SUFFIXES xercesc/xercesc-3.1.2/
+  PATH_SUFFIXES "xercesc/xercesc-${XercesC_FIND_VERSION}/"
 )
 # message("XERCESC_INCLUDE_DIR = ${XERCESC_INCLUDE_DIR}")
 

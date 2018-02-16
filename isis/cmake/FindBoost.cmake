@@ -6,10 +6,8 @@
 
 find_path(BOOST_INCLUDE_DIR
   NAME flyweight.hpp
-  PATH_SUFFIXES boost/boost1.59.0/boost/ boost
+  PATH_SUFFIXES "boost/boost${Boost_FIND_VERSION}/boost/" "boost"
 )
-
-message("BOOST_INCLUDE_DIR = ${BOOST_INCLUDE_DIR}")
 
 get_filename_component(BOOST_ROOT_INCLUDE_DIR "${BOOST_INCLUDE_DIR}" DIRECTORY)
 

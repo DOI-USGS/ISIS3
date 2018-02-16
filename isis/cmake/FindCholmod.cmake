@@ -7,7 +7,7 @@
 
 find_path(CHOLMOD_INCLUDE_DIR
   NAME cholmod.h
-  PATH_SUFFIXES SuiteSparse/SuiteSparse4.4.5/SuiteSparse/ SuiteSparse
+  PATH_SUFFIXES "SuiteSparse/SuiteSparse${Cholmod_FIND_VERSION}/SuiteSparse/" "SuiteSparse"
 )
 
 find_library(CHOLMOD_LIBRARY      NAMES cholmod)

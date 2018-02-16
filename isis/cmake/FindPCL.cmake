@@ -7,12 +7,12 @@
 
 find_path(PCL_ROOT_INCLUDE_DIR
   NAME pcl
-  PATH_SUFFIXES pcl-1.8
+  PATH_SUFFIXES "pcl-${PCL_FIND_VERSION}"
 )
 
 find_path(PCL_INCLUDE_DIR
   NAME pcl_base.h
-  PATH_SUFFIXES pcl-1.8/pcl
+  PATH_SUFFIXES "pcl-${PCL_FIND_VERSION}/pcl"
 )
 
 find_library(PCL_COMMON_LIBRARY NAMES pcl_common)
