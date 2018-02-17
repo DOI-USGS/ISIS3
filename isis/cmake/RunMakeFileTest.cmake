@@ -76,4 +76,4 @@ endfunction()
 # Needed for IsisPreferences and other test data to be found
 set(ENV{ISIS3DATA} "${DATA_ROOT}")
 
-run_app_makefile_test(${MAKEFILE} ${INPUT_DIR} ${testOutputDir} ${TRUTH_DIR} ${BIN_DIR})
+run_app_makefile_test(${MAKEFILE} ${INPUT_DIR} ${OUTPUT_DIR} ${TRUTH_DIR} ${BIN_DIR})
