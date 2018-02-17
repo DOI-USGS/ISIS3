@@ -228,8 +228,8 @@ function(add_library_wrapper name sourceFiles libDependencies)
   #  the library should be build both shared and static.
   set(alsoStatic ${ARGN})
 
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/3rdParty/lib)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/3rdParty/lib)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
   # Add library, set dependencies, and add to installation list.
   add_library(${name} SHARED ${sourceFiles})
