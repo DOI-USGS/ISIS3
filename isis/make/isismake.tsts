@@ -83,7 +83,7 @@ endif
 # Make sure all apps use the correct preferences file when testing, unless
 # they have set NOPREFERENCES. This is valid for non-Isis apps.
 ifeq ($(origin NOPREFERENCES), undefined)
-  APPNAME += -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
+  APPNAME += -preference=$(ISISROOT)/TestPreferences
 endif
 
 # set the output variable to the output directory
@@ -105,7 +105,7 @@ FILECOUNTMISMATCH =echo Failed ... Number of files in truth and output folder do
 NOTALLMATCH =echo Failed ... Not all files in truth and output folders match
 
 # Set test arguments for use in category tests
-TSTARGS = -preference=$(ISISROOT)/src/base/objs/Preference/TestPreferences
+TSTARGS = -preference=$(ISISROOT)/TestPreferences
 
 DIRPATTERN=2774
 FILEPATTERN=2664
@@ -113,7 +113,7 @@ DIRLISTPATTERN="drwxrwsr--"
 
 #----------------------------------------------------------------------------
 # Target = help
-# Dependencies = 
+# Dependencies =
 #
 # Displays a list of targets and their descriptions.
 #----------------------------------------------------------------------------
@@ -190,19 +190,19 @@ test: FORCE clean
 	if [ "$(findstring $(TESTNOCLEAN), $(MODE))" != "$(TESTNOCLEAN)" ];        \
 	then                                                                       \
 	  $(MAKE) ccsafeclean;                                                     \
-	fi;                                                                        
-                                                                               
+	fi;
+
 #-------------------------------------------------------------------------     ---
-# Target = compare                                                             
-# Dependencies = All files in the truth and output directories                 
-#                                                                              
-# Iterates over the list of files in the truth directory and                   
-# compares the files against the files in the output directory.                
-# If successful (indicated by presence of casesucceeded.txt),                  
-# prints success message. If not, prints all errors that were                  
-# encountered (found in errors.txt).                                           
+# Target = compare
+# Dependencies = All files in the truth and output directories
+#
+# Iterates over the list of files in the truth directory and
+# compares the files against the files in the output directory.
+# If successful (indicated by presence of casesucceeded.txt),
+# prints success message. If not, prints all errors that were
+# encountered (found in errors.txt).
 #-------------------------------------------------------------------------     ---
-compare: FORCE                                                                 
+compare: FORCE
 	if [ -d "$(OUTPUT)" ]; then                                                \
 	  if [ -d "$(TRUTH)" ]; then                                               \
 	    TRUTHDIR=`$(LS) $(TRUTH)`;                                             \
@@ -249,7 +249,7 @@ compare: FORCE
 # Target = comparefiles
 # Dependencies = All files in the truth and output directories
 #
-# Iterates over the list of files in the truth directory and 
+# Iterates over the list of files in the truth directory and
 # compares the files against the files in the output
 # directory.  If there are any files that are not recognized
 # then an unknown file message is printed. If and only if all
@@ -260,7 +260,7 @@ compare: FORCE
 #
 # Some parts of this target are not very straightforward. For comparing cubes,
 # users may specify make variables within their tests to indicate tolerance or
-# to ignore special pixels when running cubediff 
+# to ignore special pixels when running cubediff
 # (i.e. test_cube.cub.TOLERANCE=0.0000001). The problem here is that within
 # this target, we have the current filename that is being compared stored in a
 # bash variable. We know that the *make* tolerance variable, if it exists, will
@@ -279,7 +279,7 @@ compare: FORCE
 #
 # The workaround is to use make's special variable that is a space-separated
 # list of currently defined make variable *names* (NOT values). This variable
-# is .VARIABLES. The names of each of the currently defined make .TOLERANCE 
+# is .VARIABLES. The names of each of the currently defined make .TOLERANCE
 # variables are extracted from this list, and their values are looked up as
 # well. A new bash variable is used to hold these name/values pairs for each of
 # the tolerances (the name and value is separated by a semicolon). The list of
@@ -292,11 +292,11 @@ compare: FORCE
 # This is only a workaround. The real solution would be to completely get rid
 # of make variable tolerances from all tests and force the use of .DIFF files
 # (like pvldiff uses). However, around 138 tests are currently using make
-# variables to do this, so it would be a considerable undertaking. 
-#  
-#  
+# variables to do this, so it would be a considerable undertaking.
+#
+#
 # 2012-06-26 - Jeannie Backer - Sent stderr of pvldiff and cnetdiff to error
-#                  files instead of /dev/null.  If errors exist, test fails and  
+#                  files instead of /dev/null.  If errors exist, test fails and
 #                  error messages are reported to stdout.  This was already
 #                  being handled for cubediff.
 #----------------------------------------------------------------------------
@@ -502,7 +502,7 @@ comparefiles: FORCE
 
 #----------------------------------------------------------------------------
 # Target = truthdata
-# Dependencies = 
+# Dependencies =
 #
 # Copies the contents of the output directory to the truth
 # directory.  If the truth directory doesn't exist it is created.
@@ -514,10 +514,10 @@ truthdata: FORCE
 
 #----------------------------------------------------------------------------
 # Target = ostruthdata
-# Dependencies = 
+# Dependencies =
 #
 # Copies the contents of the output directory to the truth
-# directory.  If the truth directory corresponding to the 
+# directory.  If the truth directory corresponding to the
 # OS the test is being run on doesn't exist it is created.
 #----------------------------------------------------------------------------
 ostruthdata: FORCE
@@ -536,12 +536,12 @@ ostruthdata: FORCE
 # Target = output
 # Dependencies = FORCE commands modifyFiles
 #
-# Masks target command with a better name to just run the 
-# commands.  If the output directory doesn't exist it is 
+# Masks target command with a better name to just run the
+# commands.  If the output directory doesn't exist it is
 # created.  The force target is needed because the directory
 # output causes make to check the directory output if there
 # is no dependency.  Runs the commands and then
-# modifies the output files based on the variables set 
+# modifies the output files based on the variables set
 # in the test.
 #----------------------------------------------------------------------------
 output: FORCE clean
@@ -550,14 +550,14 @@ output: FORCE clean
 	$(MAKE) modifyFiles;
 
 #----------------------------------------------------------------------------
-# This target is needed to make the output target work. When used as a 
+# This target is needed to make the output target work. When used as a
 # dependency to a target, it forces make to always execute that target.
 #----------------------------------------------------------------------------
 FORCE:
 
 #----------------------------------------------------------------------------
 # Target = clean
-# Dependencies = 
+# Dependencies =
 #
 # Deletes the output directory and all temporary files.
 #----------------------------------------------------------------------------
@@ -567,7 +567,7 @@ clean: FORCE
 
 #----------------------------------------------------------------------------
 # Target = ccsafeclean
-# Dependencies = 
+# Dependencies =
 #
 # Deletes the output directory and all temporary files except the code
 #   coverage files.
@@ -580,11 +580,11 @@ ccsafeclean: FORCE
 # Target = modifyFiles
 # Dependencies = modText modBin
 #
-# Performs the modifications to the files in the output 
-# directory.  Iterates over the output files and modifies 
+# Performs the modifications to the files in the output
+# directory.  Iterates over the output files and modifies
 # the file based on variables such as .SKIPLINES
 # Utilizes the modText and modBin targets to carryout
-# the modifactions. 
+# the modifactions.
 #----------------------------------------------------------------------------
 modifyFiles: FORCE
 	files="$(notdir $(wildcard $(OUTPUT)/*.txt) )"; \
@@ -602,7 +602,7 @@ modifyFiles: FORCE
 
 #----------------------------------------------------------------------------
 # Target = modText
-# Dependencies = 
+# Dependencies =
 #
 # Handles the modifactions of text files in the output
 # directory.  Looks at variables .SKIPLINES and .IGNORELINES.
@@ -637,12 +637,12 @@ modText: FORCE
 
 #----------------------------------------------------------------------------
 # Target = modBin
-# Dependencies = 
+# Dependencies =
 #
 # Handles the modifactions of bin files in the output
 # directory.  Looks at variables .BINSKIP and .BINCOUNT.
 # The variable FILE must be set to the name of the file in
-# the output directory to be modified. 
+# the output directory to be modified.
 #----------------------------------------------------------------------------
 modBin: FORCE
 	if [ "$(FILE)" != "" ]; \
@@ -665,7 +665,7 @@ modBin: FORCE
 # Target = checkin
 # Dependencies = copyInTruth
 #
-# Copies data from the test into the test data area. 
+# Copies data from the test into the test data area.
 # ISIS3TESTDATA needs to be set to know where to copy
 # data for this test to.  Data in the input and all of the truth
 # directories are copied to the test data area.
@@ -720,12 +720,12 @@ checkin: FORCE
 
 #----------------------------------------------------------------------------
 # Target = copyInTruth
-# Dependencies = 
+# Dependencies =
 #
-# Copies all of the truth directories to the value in the 
+# Copies all of the truth directories to the value in the
 # variable DEST.  Iterates over all of the directories in the
 # test that have truth in it.  Creates the directory in DEST
-# and then copies all of the files in the truth directory to 
+# and then copies all of the files in the truth directory to
 # directory in DEST.
 #----------------------------------------------------------------------------
 copyInTruth: FORCE
@@ -744,11 +744,11 @@ copyInTruth: FORCE
 # Target = checkout
 # Dependencies = dirs copyOutTruth
 #
-# Copies data from the test data area into the test. 
+# Copies data from the test data area into the test.
 # ISIS3TESTDATA needs to be set to know where to get the
 # test data from.  Uses the TESTDATA_PATH to get the data
-# for this test.  Copies the files from the input directory in the 
-# TESTDATA_PATH to the input directory of the test.  Then 
+# for this test.  Copies the files from the input directory in the
+# TESTDATA_PATH to the input directory of the test.  Then
 # copies all of the truth directories and their contents to the test.
 # If the input or truth directories exist in the local test a warning
 # is printed and no copying takes place.
@@ -781,10 +781,10 @@ checkout: FORCE
 
 #----------------------------------------------------------------------------
 # Target = copyOutTruth
-# Dependencies = 
+# Dependencies =
 #
-# Copies all of the truth directories from the value in the 
-# variable DEST.  Iterates over all of the directories in 
+# Copies all of the truth directories from the value in the
+# variable DEST.  Iterates over all of the directories in
 # DEST that have truth in it.  Creates the directory in test
 # and then copies all of the files from the DEST directory
 # to the one in the test.
@@ -850,7 +850,7 @@ release: FORCE clean
 
 #----------------------------------------------------------------------------
 # Target = dirs
-# Dependencies =  
+# Dependencies =
 #
 # Creates the necessary directories for the test.
 #----------------------------------------------------------------------------
@@ -859,14 +859,14 @@ dirs: FORCE
 
 #----------------------------------------------------------------------------
 # Target=changePerms
-# Dependencies =  
+# Dependencies =
 #
 # Changes the directory permissions starting at DEST_PATH
 # and preceding up the directory path till a directory is found
-# that matches the DIRLISTPATTERN variable.  Both the 
+# that matches the DIRLISTPATTERN variable.  Both the
 # LOOKUP and DEST_PATH variables need to be set in order
-# to work properly.  LOOKUP is the first directory to start checking 
-# folder permissions on, and DEST_PATH is the full directory 
+# to work properly.  LOOKUP is the first directory to start checking
+# folder permissions on, and DEST_PATH is the full directory
 # path above the LOOKUP directory.
 #----------------------------------------------------------------------------
 changePerms: FORCE
