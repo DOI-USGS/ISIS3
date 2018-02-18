@@ -226,6 +226,10 @@ add_subdirectory(src objects)
 # Set up third party libraries for installation
 install_third_party()
 
+# create 3rdParty directory and its subdirectories
+execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib ${CMAKE_BINARY_DIR}/3rdParty/plugins)
+
+
 # Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
 # - This is required so that the plugins can be found during unit tests.
 # TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
@@ -234,16 +238,11 @@ foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
   if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
     execute_process(COMMAND ln -s "${plugin}" ${pluginName}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+
+    execute_process(COMMAND ln -s "${plugin}" ${pluginName}
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}3rdParty/plugins")
   endif()
 endforeach()
-
-
-# Some unit and app test rely on their plugins being loaded into 3rdParty
-# After all the files are in the lib directory do a copy of all the files
-execute_process(command mkdir ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib/ ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
-execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/*.so* ${CMAKE_BINARY_DIR}/3rdParty/lib/)
-execute_process(COMMAND ls ${CMAKE_BINARY_DIR}/lib/ | grep -v '.so' | xargs cp -t ${CMAKE_BINARY_DIR}/3rdParty/lib/)
-
 
 # Set up documentation build target.
 # - This script is called by running "make docs".

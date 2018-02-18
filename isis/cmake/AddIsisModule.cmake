@@ -181,6 +181,10 @@ function(add_isis_obj folder reqLibs)
     cat(${plugins} ${pluginPath})
     install(PROGRAMS ${pluginPath} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
 
+    set(pluginPath ${CMAKE_BINARY_DIR}/3rdParty/lib/${pluginName})
+    cat(${plugins} ${pluginPath})
+    install(PROGRAMS ${pluginPath} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)
+
     # Record this library name for the caller
     set(newPluginLib ${libName}  PARENT_SCOPE)
   endif()
