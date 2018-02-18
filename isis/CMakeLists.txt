@@ -237,7 +237,7 @@ foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
   if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
     execute_process(COMMAND ln -s "${plugin}" ${pluginName}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-    execute_process(COMMAND cp ${CMAKE_BINARY_DIR}/lib/${pluginName} ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
+    execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/${pluginName} ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
   endif()
 endforeach()
 
