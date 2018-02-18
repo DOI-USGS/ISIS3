@@ -237,6 +237,14 @@ foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
   endif()
 endforeach()
 
+
+# Some unit and app test rely on their plugins being loaded into 3rdParty
+# After all the files are in the lib directory do a copy of all the files
+execute_process(command mkdir ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib/ ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
+execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/*.so* ${CMAKE_BINARY_DIR}/3rdParty/lib/)
+execute_process(COMMAND ls ${CMAKE_BINARY_DIR}/lib/ | grep -v '.so' | xargs cp -t ${CMAKE_BINARY_DIR}/3rdParty/lib/)
+
+
 # Set up documentation build target.
 # - This script is called by running "make docs".
 # - This long call passes all desired variables to the script.
