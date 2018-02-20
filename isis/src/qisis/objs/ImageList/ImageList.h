@@ -23,29 +23,34 @@ namespace Isis {
 
   /**
    * @brief Internalizes a list of images and allows for operations on the entire list
-   * 
+   *
    * This class reads a list of images from an images.xml file and internalizes them
    * as aQList of images.  It also allows for modifications to the entire list of
    * images and storing the image list as an images.xml file.
-   * 
+   *
    * @author 2012-??-?? ???
    *
-   * @internal 
-   * @history 2014-01-08 Tracie Sucharski - Added layer re-ordering connections to all images 
+   * @internal
+   * @history 2014-01-08 Tracie Sucharski - Added layer re-ordering connections to all images
    *                         in list instead of just the first image.  Fixes #1755.
    * @history 2014-06-13 Tracie Sucharski - Added serialNumberList method.
    * @history 2016-06-08 Jesse Mapel - Updated documentation and merged from IPCE to ISIS branch.
    *                         Fixes #3961.
-   * @history 2016-09-19 Tracie Sucharski - Changed serialNumberList method to return a shared 
+   * @history 2016-09-19 Tracie Sucharski - Changed serialNumberList method to return a shared
    *                         pointer. TODO:  Currently, serialNumberList created the list on the
    *                         fly.  For speed, this needs to change so that when the ImageList
    *                         changes, update the serial number list.
    * @history 2017-06-08 Makayla Shepherd - Modified ImageList(QStringList &) to close the image
    *                         cubes after adding them to the list. Fixes #4908.
-   * @history 2017-07-08 Tyler Wilson - Added a try-catch block in ImageList::saveQXmlStreamWriter
-   *                         &stream, const Project *project, FileName newProjectRoot) to
-   *                         stop a seg fault occurring when Save As is called on certain types
-   *                         of corrupt projects.  Fixes #5075.
+   * @history 2017-11-01 Ian Humphrey, Tracie Sucharski - Add dataRoot parameter to the 
+   *                         XmlHandler, during serialization check if images are in results/bundle
+   *                         area and set the dataRoot appropriately. Changed project name to new
+   *                         project root in serialization method because the project name is not
+   *                         changed to new project until it is re-opened. Fixes #4849.
+   * @history 2017-12-08 Tracie Sucharski - Changed save to only copy images if project is saved 
+   *                         to a new location.
+   * @history 2018-01-04 Tracie Sucharski - Changed all serialization to save relative paths so that 
+   *                         projects can be moved to new locations.  Fixes #5276. 
    */
   class ImageList : public QObject, public QList<Image *> {
     Q_OBJECT
@@ -114,21 +119,20 @@ namespace Isis {
       void deleteFromDisk(Project *project);
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
-
     signals:
       void countChanged(int newCount);
 
     private:
       /**
        * This class is used to read an images.xml file into an image list
-       * 
+       *
        * @author 2012-07-01 Steven Lambright
        *
        * @internal
        */
       class XmlHandler : public XmlStackedHandler {
         public:
-          XmlHandler(ImageList *imageList, Project *project);
+          XmlHandler(ImageList *imageList, Project *project, QString dataRoot="");
 
           virtual bool startElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName, const QXmlAttributes &atts);
@@ -146,6 +150,11 @@ namespace Isis {
            * This stores a pointer to the project that the images in the image list will be a part of
            */
           Project *m_project;
+          /**
+           * This is a relative path to the image data.
+           *   e.g. project/images or project/bundle/results/TIMESTAMP/images
+           */
+          QString m_imageDataRoot;
       };
 
 
@@ -182,10 +191,10 @@ namespace Isis {
     private:
       /**
        * Creates an ImageListActionWorkOrder and sets the image list as the data for the work order.
-       * 
+       *
        * @param project The project the work order is for
        * @param action The action the work order performs
-       * 
+       *
        * @return @b QAction * The created work order
        */
       QAction *createWorkOrder(Project *project, ImageListActionWorkOrder::Action action) {
