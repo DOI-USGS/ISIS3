@@ -50,7 +50,6 @@ set(comp1 ${outputFile})
 set(comp2 ${TRUTH_FILE})
 set(exclusionPath ${truthFolder}/unitTest.exclude)
 if(EXISTS ${exclusionPath})
-  message("Using Exlusion file ${exclusionPath}")
   set(comp1 ${tempDir}/output_exclude.txt)
   set(comp2 ${tempDir}/truth_exclude.txt)
   # This throws out all lines containing a word from the exclusion file.
