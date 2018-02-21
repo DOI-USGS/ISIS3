@@ -227,7 +227,7 @@ add_subdirectory(src objects)
 install_third_party()
 
 # Some unit and app test rely on a 3rdParty structure and need to be copied
-execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib ${CMAKE_BINARY_DIR}/3rdParty/plugins)
+execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib ${CMAKE_BINARY_DIR}/3rdParty/plugins)
 
 # Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
 # - This is required so that the plugins can be found during unit tests.
@@ -240,13 +240,6 @@ foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
     execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/${pluginName} ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
   endif()
 endforeach()
-
-
-# Some unit and app test rely on their plugins being loaded into 3rdParty
-# After all the files are in the lib directory do a copy of all the files
-#execute_process(COMMAND mkdir ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib/ ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
-#execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/*.so* ${CMAKE_BINARY_DIR}/3rdParty/lib/)
-#execute_process(COMMAND cp ${CMAKE_BINARY_DIR}/lib/* ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
 
 # Set up documentation build target.
 # - This script is called by running "make docs".
