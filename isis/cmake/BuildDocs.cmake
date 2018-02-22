@@ -495,7 +495,7 @@ function(build_docs)
   message("Building object documentation")
   build_object_docs()
 
-  install(COMMAND cp -rf ${docInstallFolder} ${CMAKE_INSTALL_PREFIX})
+  install(DIRECTORY ${docInstallFolder} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
   message("Finished building object documentation!")
 
