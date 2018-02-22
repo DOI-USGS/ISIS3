@@ -495,7 +495,11 @@ function(build_docs)
   message("Building object documentation")
   build_object_docs()
 
+  execute_process(COMMAND rm -rf ${CMAKE_BINARY_DIR}/docBuild)
+  execute_process(COMMAND cp -rf ${docInstallFolder} ${CMAKE_BINARY_DIR})
+
   message("Finished building object documentation!")
+
 
 endfunction(build_docs)
 
