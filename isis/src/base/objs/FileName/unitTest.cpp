@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   // Variable expansion will change truth data on these
   QStringList filesToTestSafely;
   filesToTestSafely << "$base/testData/isisTruth.cub" << "${base}/testData/isisTruth.cub"
-                    << "$ISISROOT/src/Makefile" << "$ISISROOT/src/Makefile.elifekaM"
+                    << "$ISISROOT/Makefile" << "$ISISROOT/Makefile.elifekaM"
                     << "/$TEMPORARY/unitTest.cpp";
 
   foreach (QString fileToTest, filesToTestSafely) {
@@ -286,7 +286,7 @@ void TestExtensionChanges(QString prefix, QString name, bool showExpandedValues)
   if (!showExpandedValues) {
     toStringMethod = &FileName::original;
   }
-  
+
   cout << prefix << "Testing Extension change [" << name << "]" << endl;
   cout << prefix << "\tBefore modification:      " << (test.*toStringMethod)() << endl;
   cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
