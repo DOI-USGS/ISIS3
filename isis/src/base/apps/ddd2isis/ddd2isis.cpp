@@ -19,12 +19,26 @@ void IsisMain() {
   int noffset = 0;
   int bittype = 0;
   int nbytes = 0;
+  int dataTypeByte = 0;
 
   union {
     char readChars[4];
     long readLong;
     float readFloat;
   } readBytes;
+
+  map<int, int> dataTypes = {
+    {1450901768, 1},
+    {1450902032, 2},
+    {1450902288, 2},
+    {1450902560, 4},
+    {1450902816, 4},
+    {1450903072, 4},
+    {1450903360, 8},
+    {8, 1},
+    {16, 2},
+    {48, 2}
+  };
 
   ifstream fin;
   fin.open(from.c_str(), ios::in | ios::binary);
@@ -68,7 +82,7 @@ void IsisMain() {
   readBytes.readFloat = swp.Float(readBytes.readChars);
   nbytes = (int)readBytes.readLong;
 
-  // Read bytes 12-15 to get bittype
+  // Read bytes 12-15 to get the bit type
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
 
@@ -79,9 +93,14 @@ void IsisMain() {
 
   bittype = readBytes.readLong;
 
+  // Read bytes 16-19 to get the data type
+  // Map the data type to the number of bytes and store in dataTypeByte
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
+  dataTypeByte = dataTypes.find( (int)readBytes.readLong ) ->second;
+  cout << "Number of bytes: " << dataTypes.find(dataTypeByte) -> first<< " = " << dataTypes.find(dataTypeByte) -> second <<endl;
 
+  // Read bytes 20-23 to get offset
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   noffset = (int)readBytes.readLong;
@@ -95,7 +114,7 @@ void IsisMain() {
   results += PvlKeyword( "BitType", toString(bittype) );
   nsamples = nbytes / (bittype / 8);
   results += PvlKeyword( "NumberOfSamples", toString(nsamples) );
-  nbands = nbytes / nsamples;
+  nbands = (bittype / 8) / dataTypeByte;
   results += PvlKeyword( "NumberOfBands", toString(nbands) );
   results += PvlKeyword( "LabelBytes", toString(noffset) );
   Application::Log(results);
