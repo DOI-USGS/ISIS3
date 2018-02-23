@@ -16,4 +16,4 @@ unitTestPath = unitTestExecutable.split("/")
 del unitTestPath[-1]
 unitTestPath = "/".join(unitTestPath)
 
-os.system(unitTestExecutable + ">&" + unitTestPath + "/" unitTestName)
+os.system(unitTestExecutable + ">&" + unitTestPath + "/" + unitTestName)
