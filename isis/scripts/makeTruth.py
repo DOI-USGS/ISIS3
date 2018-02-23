@@ -9,9 +9,9 @@ import os
 
 if not os.environ['ISISROOT']:
     print("The $ISISROOT variable is not set")
-    return
 
-if sys.argv[1].contains("_unit_"):
+
+elif "_unit_" in sys.argv[1]:
     unitTestExecutable = sys.argv[1]
 
     unitTestName = unitTestExecutable.split("_test_")[1] + ".truth"
@@ -21,15 +21,15 @@ if sys.argv[1].contains("_unit_"):
     del unitTestPath[-1]
     unitTestPath = "/".join(unitTestPath)
 
-    os.system(unitTestExecutable + ">&" + unitTestPath + "/" unitTestName)
+    os.system(unitTestExecutable + ">&" + unitTestPath + "/" + unitTestName)
 
 else:
     builddir = os.environ['ISISROOT']
-    apptest = sys.arg[1]
+    apptest = sys.argv[1]
     makefilePath = ""
-    with open(builddir + "/objects/CTestTestfile.cmake") as testFile
+    with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
         for line in testFile:
             if apptest in line:
-                makefilePath = line.split("-P")[1][3:]
+                makefilePath = line.split(" ")[1][11:]
                 break
     print(makefilePath)
