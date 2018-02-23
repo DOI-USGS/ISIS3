@@ -4,6 +4,9 @@ using the scripts then just documenting what you have to do to save
 output as Truth
 '''
 
+import sys
+import os
+
 unitTestExecutable = sys.argv[1]
 
 unitTestName = unitTestExecutable.split("_test_")[1] + ".truth"
