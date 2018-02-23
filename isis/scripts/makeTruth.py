@@ -10,5 +10,10 @@ import os
 unitTestExecutable = sys.argv[1]
 
 unitTestName = unitTestExecutable.split("_test_")[1] + ".truth"
+# we should probably append the path to the front so it ends up in
+# in the same directory as the test
+unitTestPath = unitTestExecutable.split("/")
+del unitTestPath[-1]
+unitTestPath = "/".join(unitTestPath)
 
-os.system(unitTestExecutable + ">&" + unitTestName)
+os.system(unitTestExecutable + ">&" + unitTestPath + "/" unitTestName)
