@@ -30,7 +30,6 @@ else:
     with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
         for line in testFile:
             if apptest in line:
-                makefilePath = line.split(" ")[1][11:]
+                makefilePath = line.split("\" \"")[1][11:]
                 break
     print(makefilePath)
-
