@@ -1,6 +1,6 @@
 find_path(PROTOBUF_INCLUDE_DIR
   NAMES google/
-  PATH_SUFFIXES google-protobuf/protobuf2.6.1/
+  PATH_SUFFIXES "google-protobuf/protobuf${Protobuf_FIND_VERSION}/"
 )
 
 find_library(PROTOBUF_LIBRARY NAMES protobuf)

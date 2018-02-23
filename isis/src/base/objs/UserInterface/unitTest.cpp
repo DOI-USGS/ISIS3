@@ -300,7 +300,11 @@ int main(int argc, char *argv[]) {
     cout << "Testing Invalid Parameter" << endl;
     try {
       int myArgc = 0;
+<<<<<<< HEAD
       strcpy(myArgv[myArgc++], QString(ISISROOT) + "/src/base/apps/highpass/highpass");
+=======
+      strcpy(myArgv[myArgc++], "$ISISROOT/bin/highpass/highpass");
+>>>>>>> fc8baa5a35cffe7b23a01f3cabbc9ff729d42cd5
       strcpy(myArgv[myArgc++], "bogus=parameter");
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);
@@ -888,7 +892,11 @@ int main(int argc, char *argv[]) {
     cout << "Testing -RESTORE with invalid (non-existing) .par file" << endl;
     try {
       int myArgc = 0;
+<<<<<<< HEAD
       strcpy(myArgv[myArgc++], QString(ISISROOT) + "/src/base/apps/highpass/highpass");
+=======
+      strcpy(myArgv[myArgc++], "$ISISROOT/bin/highpass");
+>>>>>>> fc8baa5a35cffe7b23a01f3cabbc9ff729d42cd5
       strcpy(myArgv[myArgc++], "-restore=junk.par");
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);

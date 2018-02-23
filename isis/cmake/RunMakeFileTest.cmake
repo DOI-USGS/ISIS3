@@ -49,21 +49,21 @@ function(run_app_makefile_test makefile inputFolder outputFolder truthFolder bin
 #   set(code "")
 #   execute_process(COMMAND rm -rf ${outputFolder})
 #   execute_process(COMMAND rm -f ${logFile})
-   
+
   execute_process(COMMAND make test WORKING_DIRECTORY ${sourceFolder} OUTPUT_VARIABLE result)
- 
+
   if (result MATCHES "OK")
       set(failed "OFF")
   else()
-       set(failed "ON") 
+       set(failed "ON")
   endif()
 
- 
+
   # If any file failed, the test is a failure.
   if(${failed})
     message(FATAL_ERROR "Test failed.")
-  endif() 
-  
+  endif()
+
 endfunction()
 
 
@@ -77,5 +77,3 @@ endfunction()
 set(ENV{ISIS3DATA} "${DATA_ROOT}")
 
 run_app_makefile_test(${MAKEFILE} ${INPUT_DIR} ${OUTPUT_DIR} ${TRUTH_DIR} ${BIN_DIR})
-
-

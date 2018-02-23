@@ -5,12 +5,11 @@
 #   GEOS_INCLUDE_DIR
 #   GEOS_LIBRARY
 
-
 find_path(GEOS_INCLUDE_DIR
-  NAME geos
-  HINT geom.h
-  PATH_SUFFIXES geos/geos
+  NAME geos.h
+  PATH_SUFFIXES "geos/geos${Geos_FIND_VERSION}" "geos"
 )
+
 find_library(GEOS_LIBRARY
   NAMES geos
 )
