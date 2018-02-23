@@ -75,7 +75,7 @@ namespace Isis {
       if (localFile.fileExists())
         m_projPlugin.read(localFile.expanded());
 
-      FileName systemFile("$ISISROOT/lib/Projection.plugin");
+      FileName systemFile(QString(ISISROOT) + "/lib/Projection.plugin");
       if (systemFile.fileExists())
         m_projPlugin.read(systemFile.expanded());
     }
@@ -143,7 +143,7 @@ namespace Isis {
       if (localFile.fileExists())
         m_projPlugin.read(localFile.expanded());
 
-      FileName systemFile("$ISISROOT/lib/Projection.plugin");
+      FileName systemFile(QString(ISISROOT) + "/lib/Projection.plugin");
       if (systemFile.fileExists())
         m_projPlugin.read(systemFile.expanded());
     }

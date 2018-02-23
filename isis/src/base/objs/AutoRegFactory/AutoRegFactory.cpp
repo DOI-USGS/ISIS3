@@ -70,7 +70,7 @@ namespace Isis {
       p.read("AutoReg.plugin");
     }
     else {
-      p.read("$ISISROOT/lib/AutoReg.plugin");
+      p.read(QString(ISISROOT) + "/lib/AutoReg.plugin");
     }
 
     // Get the algorithm specific plugin and return it

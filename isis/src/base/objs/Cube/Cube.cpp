@@ -2106,7 +2106,7 @@ namespace Isis {
     parameters += " to=" + tempCube.expanded();
 
     if (iApp == NULL) {
-      QString command = "$ISISROOT/bin/pds2isis " + parameters;
+      QString command = QString(ISISROOT) + "/bin/pds2isis " + parameters;
       ProgramLauncher::RunSystemCommand(command);
     }
     else {

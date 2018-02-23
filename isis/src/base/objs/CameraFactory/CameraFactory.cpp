@@ -110,7 +110,7 @@ namespace Isis {
       if (localFile.fileExists())
         m_cameraPlugin.read(localFile.expanded());
 
-      FileName systemFile("$ISISROOT/lib/Camera.plugin");
+      FileName systemFile(QString(ISISROOT) + "/lib/Camera.plugin");
       if (systemFile.fileExists())
         m_cameraPlugin.read(systemFile.expanded());
     }

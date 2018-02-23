@@ -69,7 +69,7 @@ namespace Isis {
     bool loadedOk = lib.load();
 
     if(!loadedOk) {
-      path = "$ISISROOT/lib/";
+      path = QString(ISISROOT) + "/lib/";
       libraryFile = path + library;
     }
 

@@ -18,7 +18,6 @@ if(APPLE)
   set(PLUGIN_DIR "${thirdPartyDir}/ports/libexec/qt5/plugins")
 endif(APPLE)
 
-set(JP2KFLAG 1)
 
 # Add thirdPartyCppFlags
 set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
@@ -148,6 +147,7 @@ find_package(Jama REQUIRED)
 
 # Only include Kakadu if it is available
 if(${JP2KFLAG})
+  message("ENABLING KAKADU")
   find_package(Kakadu)
 endif(${JP2KFLAG})
 

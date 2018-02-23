@@ -182,7 +182,7 @@ namespace Isis {
         m_pointEditor->templateFileName());
     m_templateFileNameLabel->setToolTip("Sub-pixel registration template File.");
 //  QString patternMatchDoc =
-//          FileName("$ISISROOT/doc/documents/PatternMatch/PatternMatch.html").fileName();
+//          FileName(QString(ISISROOT) + "/doc/documents/PatternMatch/PatternMatch.html").fileName();
 //    m_templateFileNameLabel->setOpenExternalLinks(true);
     m_templateFileNameLabel->setWhatsThis("FileName of the sub-pixel "
                   "registration template.  Refer to $ISISROOT/doc/documents/"

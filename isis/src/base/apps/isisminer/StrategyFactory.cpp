@@ -507,8 +507,8 @@ StrategyFactory *StrategyFactory::m_strategymaker = 0;
      }
 
      // Append the ISIS library path
-     if ( !dirlist.contains("$ISISROOT/lib") ) { 
-       dirlist.push_back("$ISISROOT/lib");
+     if ( !dirlist.contains(QString(ISISROOT) + "/lib") ) { 
+       dirlist.push_back(QString(ISISROOT) + "/lib");
      }
 
      // Attempt to load the library

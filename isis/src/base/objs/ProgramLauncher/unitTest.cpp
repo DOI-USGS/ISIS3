@@ -63,7 +63,7 @@ void IsisMain() {
   cerr << "That is the reason for the OS specific truth files. Please ignore the exit codes." << endl;
   cerr << endl;
   try {
-    ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
+    ProgramLauncher::RunSystemCommand(QString(ISISROOT) + "/bin/stats "
         "from=\\$base/testData/ab102401_ideal.cub -pid=999 "
         "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }
@@ -77,7 +77,7 @@ void IsisMain() {
        << endl;
   cerr << endl;
   try {
-    ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
+    ProgramLauncher::RunSystemCommand(QString(ISISROOT) + "/bin/stats "
         "from=unitTest.cub "
         "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
   }

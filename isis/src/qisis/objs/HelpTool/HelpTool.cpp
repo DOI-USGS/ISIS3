@@ -61,7 +61,7 @@ namespace Isis {
    */
   void HelpTool::aboutProgram() {
     FileName file(
-                  "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
+                  QString(ISISROOT) + "/doc/Application/presentation/PrinterFriendly/" +
                   QApplication::applicationName() + "/" +
                   QApplication::applicationName() + ".html");
 

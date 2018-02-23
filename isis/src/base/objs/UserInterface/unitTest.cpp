@@ -14,8 +14,9 @@ int main(int argc, char *argv[]) {
 
   cout << "Unit test for Isis::UserInterface ..." << endl;
 
-  QString unitTestXml = Isis::FileName("$ISISROOT/unitTest/isis3_unit_test_UserInterface.xml").expanded();
-  QString highpass = Isis::FileName("$ISISROOT/bin/xml/highpass.xml").expanded();
+  QString unitTestXml = Isis::FileName(ISISBUILDDIR + "/unitTest/isis3_unit_test_UserInterface.xml").expanded();
+  QString highpass = Isis::FileName(ISISBUILDDIR + "/bin/xml/highpass.xml").expanded();
+
   char *myArgv[15];// = {"unitTest", "from=input.cub", "to=output.cub"};
 
   for (int i = 0; i < 15; i++)
@@ -299,7 +300,7 @@ int main(int argc, char *argv[]) {
     cout << "Testing Invalid Parameter" << endl;
     try {
       int myArgc = 0;
-      strcpy(myArgv[myArgc++], "$ISISROOT/src/base/apps/highpass/highpass");
+      strcpy(myArgv[myArgc++], QString(ISISROOT) + "/src/base/apps/highpass/highpass");
       strcpy(myArgv[myArgc++], "bogus=parameter");
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);
@@ -887,7 +888,7 @@ int main(int argc, char *argv[]) {
     cout << "Testing -RESTORE with invalid (non-existing) .par file" << endl;
     try {
       int myArgc = 0;
-      strcpy(myArgv[myArgc++], "$ISISROOT/src/base/apps/highpass/highpass");
+      strcpy(myArgv[myArgc++], QString(ISISROOT) + "/src/base/apps/highpass/highpass");
       strcpy(myArgv[myArgc++], "-restore=junk.par");
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);

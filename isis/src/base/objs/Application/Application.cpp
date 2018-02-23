@@ -124,7 +124,7 @@ namespace Isis {
       Preference::Preferences(f.name() == "unitTest.xml");
 
       if (!f.fileExists()) {
-        f = "$ISISROOT/bin/xml/" + f.name();
+        f = QString(ISISROOT) + "/bin/xml/" + f.name();
         if (!f.fileExists()) {
           QString message = Message::FileOpen(f.expanded());
           throw IException(IException::Io, message, _FILEINFO_);

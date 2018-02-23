@@ -55,7 +55,7 @@ namespace Isis {
 
   CnetEditorWindow::CnetEditorWindow() {
     // Add the Qt plugin directory to the library path
-    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+    FileName qtpluginpath(QString(ISISROOT) + "/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
     // For some reason GUI style is not detected correctly by Qt for Isis.

@@ -11,7 +11,7 @@ find_path(SUPERLU_INCLUDE_DIR
 )
 
 find_library(SUPERLU_LIBRARY
-  NAMES superlu_4.3
+  NAMES superlu_4.3 superlu 
 )
 
 get_filename_component(SUPERLU_ROOT_INCLUDE_DIR "${SUPERLU_INCLUDE_DIR}" DIRECTORY)

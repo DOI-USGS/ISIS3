@@ -51,7 +51,7 @@ void IsisMain() {
   QString ext = in.extension().toUpper();
   if (ext == "IMQ") {
     try {
-      QString command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " + temp.expanded();
+      QString command = QString(ISISROOT) + "/bin/vdcomp " + in.expanded() + " " + temp.expanded();
       // don't pretend vdcomp is a standard Isis program, just run it
       ProgramLauncher::RunSystemCommand(command);
       in = temp.expanded();

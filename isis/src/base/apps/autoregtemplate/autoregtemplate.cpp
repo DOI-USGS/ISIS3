@@ -11,7 +11,7 @@ void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
 
-  Pvl algos("$ISISROOT/lib/AutoReg.plugin");
+  Pvl algos(QString(ISISROOT) + "/lib/AutoReg.plugin");
   Pvl p;
 
   // Begin creating the mapping group

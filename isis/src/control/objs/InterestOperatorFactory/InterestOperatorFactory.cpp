@@ -62,7 +62,7 @@ namespace Isis {
       p.read("InterestOperator.plugin");
     }
     else {
-      p.read("$ISISROOT/lib/InterestOperator.plugin");
+      p.read(QString(ISISROOT) + "/lib/InterestOperator.plugin");
     }
 
     // Get the algorithm specific plugin and return it

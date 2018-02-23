@@ -73,7 +73,7 @@ namespace Isis {
       p->read("PhotoModel.plugin");
     }
     else {
-      p->read("$ISISROOT/lib/PhotoModel.plugin");
+      p->read(QString(ISISROOT) + "/lib/PhotoModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it
