@@ -54,7 +54,7 @@ else:
     os.system("make truthdata")
     os.system("cp truth " + builddir + "/testOutputDir")
 
-    if os.argc == 3:
+    if len(os.argv) == 3:
         if os.argv[2] == "truth":
             os.system("make checkin")
 
