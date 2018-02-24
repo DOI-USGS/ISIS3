@@ -17,8 +17,11 @@ import os
 
 if not os.environ['ISISROOT']:
     print("The $ISISROOT variable is not set")
+    sys.exit()
 
-elif "_unit_" in sys.argv[1]:
+builddir = os.environ['ISISROOT']
+
+if "_unit_" in sys.argv[1]:
     unitTestExecutable = sys.argv[1]
 
     unitTestName = unitTestExecutable.split("_test_")[1] + ".truth"
@@ -44,7 +47,6 @@ elif "_unit_" in sys.argv[1]:
 
 
 else:
-    builddir = os.environ['ISISROOT']
     apptest = sys.argv[1]
     makefilePath = ""
     with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
