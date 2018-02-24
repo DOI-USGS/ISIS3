@@ -44,7 +44,9 @@ else:
     makefilePath = makefilePath.split("/")
     del makefilePath[-1]
     makefilePath = "/".join(makefilePath)
+    print(makefilePath)
 
     isissrc = makefilePath.split("src")[0]
     print(isissrc)
     os.system("cd " + makefilePath)
+    os.system("mkdir test")
