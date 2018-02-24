@@ -59,4 +59,6 @@ else:
         if sys.argv[2] == "truth":
             os.system("make checkin")
 
-    os.system("make release")
+    # doing this instead of make release because make release
+    # can give feedback to the user that we would rather avoid
+    os.system("rm -rf input output truth print.prt")
