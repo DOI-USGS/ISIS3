@@ -48,5 +48,5 @@ else:
 
     isissrc = makefilePath.split("src")[0]
     print(isissrc)
-    os.system("cd " + makefilePath)
+    os.chdir(makefilePath)
     os.system("mkdir test")
