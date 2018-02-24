@@ -32,18 +32,18 @@ if "_unit_" in sys.argv[1]:
     unitTestPath = "/".join(unitTestPath)
 
     os.system(unitTestExecutable + ">&" + unitTestPath + "/" + unitTestName)
-    print("App Test Output In " + unitTestPath + " As " + unitTestName)
+    print("Unit Test Output In " + unitTestPath + " As " + unitTestName)
 
     if len(sys.argv) == 3:
         if sys.argv[2] == "truth":
             with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
                 for line in testFile:
                     if unitTestName in line:
-                        unitTestPath = line.split("\" \"")[2][13:]
-                        print(unitTestPath)
+                        unitTestSrcPath = line.split("\" \"")[2][13:]
+                        os.system("cp -f " + unitTestPath/unitTestName + " " + unitTestSrcPath)
                         break
 
-            print("Checked In Truth Data")
+            print("Checked In Truth Data To " + unitTestSrcPath)
 
 
 else:
