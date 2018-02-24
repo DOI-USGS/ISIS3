@@ -39,12 +39,12 @@ else:
             if apptest in line:
                 makefilePath = line.split("\" \"")[1][11:]
                 break
-    print(makefilePath)
 
     makefilePath = makefilePath.split("/")
     del makefilePath[-1]
     makefilePath = "/".join(makefilePath)
 
+    # change dir to test dir and run make commands
     os.chdir(makefilePath)
     os.system("make checkout")
     os.system("make output")
@@ -52,6 +52,8 @@ else:
     os.system("rm -rf " + builddir + "/testOutputDir/truth")
     os.system("cp -r truth " + builddir + "/testOutputDir")
     print("App Test Output In " + builddir + "/testOutputDir/truth")
+
+    # check if the user wants data checked in
     if len(sys.argv) == 3:
         if sys.argv[2] == "truth":
             os.system("make checkin")
