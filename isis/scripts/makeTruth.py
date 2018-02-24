@@ -1,7 +1,14 @@
 '''
-Script to create truthData for unitTests. This might be more work
-using the scripts then just documenting what you have to do to save
-output as Truth
+Script to create truthData for tests.
+
+It expects the command in the form of:
+    python makeTruth.py testName
+where testname is the cmake name for the unit or app test
+
+The unit tests are pretty trivial because
+the executable outputs the results of the unitTest to stdout and stderr so we
+just redirect the streams to the file named object.truth where object is the
+ISIS object being tested
 '''
 
 import sys
@@ -33,3 +40,5 @@ else:
                 makefilePath = line.split("\" \"")[1][11:]
                 break
     print(makefilePath)
+    isissrc = makefilePath.split("src")[0]
+    print(isissrc)
