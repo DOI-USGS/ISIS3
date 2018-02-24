@@ -52,10 +52,10 @@ else:
     os.system("make checkout")
     os.system("make output")
     os.system("make truthdata")
-    os.system("rm -r " + builddir + "/testOutputDir/truth")
-    os.system("cp -rf truth " + builddir + "/testOutputDir")
+    os.system("rm -rf " + builddir + "/testOutputDir/truth")
+    os.system("cp -r truth " + builddir + "/testOutputDir")
 
-    if sys.argc == 3:
+    if len(sys.argv) == 3:
         if sys.argv[2] == "truth":
             os.system("make checkin")
 
