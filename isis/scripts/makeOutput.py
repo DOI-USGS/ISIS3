@@ -14,9 +14,9 @@ ISIS object being tested
 import sys
 import os
 
+
 if not os.environ['ISISROOT']:
     print("The $ISISROOT variable is not set")
-
 
 elif "_unit_" in sys.argv[1]:
     unitTestExecutable = sys.argv[1]
@@ -29,6 +29,19 @@ elif "_unit_" in sys.argv[1]:
     unitTestPath = "/".join(unitTestPath)
 
     os.system(unitTestExecutable + ">&" + unitTestPath + "/" + unitTestName)
+    print("App Test Output In " + unitTestPath + " As " + unitTestName)
+
+    if len(sys.argv) == 3:
+        if sys.argv[2] == "truth":
+            with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
+                for line in testFile:
+                    if unitTestName in line:
+                        unitTestPath = line.split("\" \"")[2][13:]
+                        print(unitTestPath)
+                        break
+
+            print("Checked In Truth Data")
+
 
 else:
     builddir = os.environ['ISISROOT']
