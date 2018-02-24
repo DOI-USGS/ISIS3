@@ -58,6 +58,7 @@ else:
     if len(sys.argv) == 3:
         if sys.argv[2] == "truth":
             os.system("make checkin")
+            print("Checked In Truth Data")
 
     # doing this instead of make release because make release
     # can give feedback to the user that we would rather avoid
