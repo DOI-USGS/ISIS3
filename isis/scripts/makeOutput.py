@@ -44,17 +44,14 @@ else:
     makefilePath = makefilePath.split("/")
     del makefilePath[-1]
     makefilePath = "/".join(makefilePath)
-    print(makefilePath)
 
-    isissrc = makefilePath.split("src")[0]
-    print(isissrc)
     os.chdir(makefilePath)
     os.system("make checkout")
     os.system("make output")
     os.system("make truthdata")
     os.system("rm -rf " + builddir + "/testOutputDir/truth")
     os.system("cp -r truth " + builddir + "/testOutputDir")
-
+    print("App Test Output In " + builddir + "/testOutputDir/truth)
     if len(sys.argv) == 3:
         if sys.argv[2] == "truth":
             os.system("make checkin")
