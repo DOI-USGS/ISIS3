@@ -49,4 +49,13 @@ else:
     isissrc = makefilePath.split("src")[0]
     print(isissrc)
     os.chdir(makefilePath)
-    os.system("mkdir test")
+    os.system("make checkout")
+    os.system("make output")
+    os.system("make truthdata")
+    os.system("cp truth " + builddir + "/testOutputDir")
+
+    if os.argc == 3:
+        if os.argv[2] == "truth":
+            os.system("make checkin")
+
+    os.system("make release")
