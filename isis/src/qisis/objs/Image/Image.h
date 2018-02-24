@@ -85,7 +85,12 @@ namespace Isis {
    *                           (the Spacecraft name associated with this image).
    *   @history 2016-06-22 Tyler Wilson - Added documentation to member functions/variables.
    *                           Fixes #3950.
-   *
+   *   @history 2017-10-11 Summer Stapleton - Removed path to instrumentId and spacecraftName in
+   *                           the startElement method. Fixes #5179.
+   *   @history 2017-11-01 Tracie Sucharski - Changed copyToNewProjectRoot to handle Images that are
+   *                           located outside of the import image directories such as the updated
+   *                           Images from a bundle run.  To improve efficiency, return from method
+   *                           if the project root has not changed. Fixes #4849.
    */
 
   class Image : public QObject {
@@ -138,7 +143,7 @@ namespace Isis {
 
     private:
       /**
-       * @brief Process XML in a stack-oriented fashion  
+       * @brief Process XML in a stack-oriented fashion
        *
        * Child class for XmlStackedHandler which is used to process XML in
        * a stack-oriented way.  It's been modified to process an Image object
