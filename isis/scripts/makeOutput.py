@@ -1,14 +1,18 @@
 '''
 Script to create truthData for tests.
 
-It expects the command in the form of:
-    python makeTruth.py testName
+For output it expects the command in the form of:
+    python makeOutput.py testName
 where testname is the cmake name for the unit or app test
 
-The unit tests are pretty trivial because
-the executable outputs the results of the unitTest to stdout and stderr so we
-just redirect the streams to the file named object.truth where object is the
-ISIS object being tested
+To check in truth data the command should be in the form of:
+    python makeOutput.py testName truth
+
+The unit tests are pretty trivial because the executable outputs the results of
+the unitTest to stdout and stderr so we just redirect the streams to the file \
+named object.truth where object is the ISIS object being tested.
+
+The app tests output has to rely on the old make system because the app test do
 '''
 
 import sys
