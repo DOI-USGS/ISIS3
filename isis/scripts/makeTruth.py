@@ -42,5 +42,4 @@ else:
     print(makefilePath)
     isissrc = makefilePath.split("src")[0]
     print(isissrc)
-    os.system("cp " + makefilePath + $ISISROOT +"/testOutputDir")
-    
+    os.system("cp " + makefilePath + builddir +"/testOutputDir")
