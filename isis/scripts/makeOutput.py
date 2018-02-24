@@ -40,7 +40,7 @@ if "_unit_" in sys.argv[1]:
                 for line in testFile:
                     if unitTestName in line:
                         unitTestSrcPath = line.split("\" \"")[2][13:]
-                        os.system("cp -f " + unitTestPath/unitTestName + " " + unitTestSrcPath)
+                        os.system("cp -f " + unitTestPath + "/" + unitTestName + " " + unitTestSrcPath)
                         break
 
             print("Checked In Truth Data To " + unitTestSrcPath)
