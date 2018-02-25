@@ -200,6 +200,12 @@ namespace Isis {
    *                           Target::GetRadii calls to speed up createPoint().
    *   @history 2018-01-12 Adam Goins - Added Progress during reads.
    *   @history 2018-01-24 Jesse Mapel - Fixed c++11 build warnings.
+   *   @history 2018-02-25 Debbie A. Cook - Generalized calls to 
+   *                           ControlPoint::IsLatitudeConstrained to IsCoord1Constained 
+   *                           and added or updated a few comments. *** TODO *** make sure
+   *                           the new methods are fully functional for either coordinate type
+   *                           once the new header keyword is added.
+   *                         
    */
   class ControlNetVersioner {
 

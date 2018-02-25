@@ -70,13 +70,14 @@ namespace Isis {
    *                          and formatBundleOutputDetailString to accept a third argument (bool solveRadius)
    *                          with a default value = false.  References #4317.
    *   @history 2017-07-26 Debbie A. Cook - Added BundleSettings and metersToRadians as arguments 
-   *                           to constructor and moved setWeights call from BundleAdjust::init to 
-   *                           here.   Added m_bundleControlPointCoordinateType.  This option 
+   *                           to constructor and moved setWeights call from BundleAdjust::init into 
+   *                           constructor.   Added m_bundleControlPointCoordinateType.  This option 
    *                           determines how control point coordinates are entered into 
    *                           BundleControlPoint, interpreted throughout the adjustment, and 
    *                           output. The coordinate type needs to be in this class, because
    *                           BundleControlPoints are created without a parent control net and added to 
    *                           a control net later.  Made format methods generic in regards to coordinate type.
+   *                           Added utility method setSigmaWeightFromGlobals.
    *                           Merged methods formatLatitudeAdjustedSigmaString, 
    *                           formatLongitudeAdjustedSigmaString, and formatRadiusAdjustedSigmaString
    *                           into a single generic coordinate method with an additional argument 
@@ -161,12 +162,6 @@ namespace Isis {
                                         bool errorPropagation) const;
       QString formatCoordAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
                                                 bool errorPropagation) const;
-//    QString formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
-//                                              bool errorPropagation) const;
-//    QString formatLongitudeAdjustedSigmaString(int fieldWidth, int precision,
-//                                               bool errorPropagation) const;
-//    QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
-//                                            bool errorPropagation) const;
 
     private:
       // methods

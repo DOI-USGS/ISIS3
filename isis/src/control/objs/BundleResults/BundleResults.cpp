@@ -1,4 +1,5 @@
 #include "BundleResults.h"
+
 #include <QDataStream>
 #include <QDebug>
 #include <QString>
@@ -32,7 +33,7 @@ using namespace boost::numeric::ublas;
 namespace Isis {
 
   /**
-   * Constructs a Results object.
+   * Constructs a BundleResults object.
    * 
    * @param parent The Qt-relationship parent.
    */
@@ -244,6 +245,8 @@ namespace Isis {
 
     // set in BundleAdjust init()
     m_numberHeldImages = 0;
+    
+    // members set while computing bundle stats
     m_rmsImageSampleResiduals.clear();
     m_rmsImageLineResiduals.clear();
     m_rmsImageResiduals.clear();
@@ -254,7 +257,7 @@ namespace Isis {
     m_rmsImageDECSigmas.clear();
     m_rmsImageTWISTSigmas.clear();
 
-    // Initialize coordinate sigma boundaries.  Units are meters for both
+    // Initialize coordinate sigma boundaries.  Units are meters for sigmas in both
     // latitudinal and rectangular coordinates
     m_minSigmaCoord1Distance.setMeters(1.0e+12);
     m_maxSigmaCoord1Distance.setMeters(0.0);
@@ -365,7 +368,7 @@ namespace Isis {
 
 
   /**
-   * Sets the min and max sigma latitude distances and point ids.
+   * Sets the min and max sigma distances and point ids for coordinate 1.
    *
    * @param minLatDist The new minimum sigma latitude distance.
    * @param maxLatDist The new maximum sigma latitude distance.
@@ -382,7 +385,7 @@ namespace Isis {
 
 
   /**
-   * Sets the min and max sigma longitude distances and point ids.
+   * Sets the min and max sigma distances and point ids for coordinate 2.
    *
    * @param minLonDist The new minimum sigma longitude distance.
    * @param maxLonDist The new maximum sigma longitude distance.
@@ -399,7 +402,7 @@ namespace Isis {
 
 
   /**
-   * Sets the min and max sigma radius distances and point ids.
+   * Sets the min and max sigma distances and point ids for coordinate 3.
    *
    * @param minRadDist The new minimum sigma radius distance.
    * @param maxRadDist The new maximum sigma radius distance.
@@ -416,14 +419,14 @@ namespace Isis {
 
 
   /**
-   * Sets the root mean square values of the adjusted latitiude sigmas, adjusted longitude sigmas,
-   * and adjusted radius sigmas.
+   * Sets the root mean square values of the adjusted sigmas for all three coordinates.
    *
-   * @param rmsFromSigmaLatStats The new RMS value of the adjusted latitude sigmas.
-   * @param rmsFromSigmaLonStats The new RMS value of the adjusted longitude sigmas.
-   * @param rmsFromSigmaRadStats The new RMS value of the adjusted radius sigmas.
+   * @param rmsFromSigmaCoord1Stats The new RMS value of the adjusted coord1 sigmas.
+   * @param rmsFromSigmaCoord2Stats The new RMS value of the adjusted coord2 sigmas.
+   * @param rmsFromSigmaCoord3Stats The new RMS value of the adjusted coord3 sigmas.
    */
-  void BundleResults::setRmsFromSigmaStatistics(double rmsFromSigmaCoord1Stats,
+  void BundleResults::setRmsFromSigmaStatistics(
+                                                double rmsFromSigmaCoord1Stats,
                                                 double rmsFromSigmaCoord2Stats,
                                                 double rmsFromSigmaCoord3Stats) {
     m_rmsSigmaCoord1Stats = rmsFromSigmaCoord1Stats;
@@ -960,9 +963,9 @@ namespace Isis {
 
 
   /**
-   * Returns the minimum sigma latitude distance.
+   * Returns the minimum sigma distance for coordinate 1.
    *
-   * @return @b Distance The minimum sigma latitude.
+   * @return @b Distance The minimum sigma for Coord1.
    */
   Distance BundleResults::minSigmaCoord1Distance() const {
     return m_minSigmaCoord1Distance;
@@ -970,9 +973,9 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum sigma latitude distance.
+   * Returns the maximum sigma distance for coordinate 1.
    *
-   * @return @b Distance The maximum sigma latitude.
+   * @return @b Distance The maximum sigma Coord1.
    */
   Distance BundleResults::maxSigmaCoord1Distance() const {
     return m_maxSigmaCoord1Distance;
@@ -980,9 +983,9 @@ namespace Isis {
 
 
   /**
-   * Returns the minimum sigma longitude distance.
+   * Returns the minimum sigma distance for coordinate 2.
    *
-   * @return @b Distance The minimum sigma longitude.
+   * @return @b Distance The minimum sigma Coord2.
    */
   Distance BundleResults::minSigmaCoord2Distance() const {
     return m_minSigmaCoord2Distance;
@@ -990,9 +993,9 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum sigma longitude distance.
+   * Returns the maximum sigma distance for coordinate 2.
    *
-   * @return @b Distance The maximum sigma longitude.
+   * @return @b Distance The maximum sigma Coord2.
    */
   Distance BundleResults::maxSigmaCoord2Distance() const {
     return m_maxSigmaCoord2Distance;
@@ -1000,9 +1003,9 @@ namespace Isis {
 
 
   /**
-   * Returns the minimum sigma redius distance.
+   * Returns the minimum sigma distance for coordinate 3.
    *
-   * @return @b Distance The minimum sigma redius.
+   * @return @b Distance The minimum sigma Coord3.
    */
   Distance BundleResults::minSigmaCoord3Distance() const {
     return m_minSigmaCoord3Distance;
@@ -1010,9 +1013,9 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum sigma redius distance.
+   * Returns the maximum sigma distance for coordinate 3.
    *
-   * @return @b Distance The maximum sigma radius.
+   * @return @b Distance The maximum sigma Coord3.
    */
   Distance BundleResults::maxSigmaCoord3Distance() const {
     return m_maxSigmaCoord3Distance;
@@ -1020,9 +1023,9 @@ namespace Isis {
 
 
   /**
-   * Returns the minimum sigma latitude point id.
+   * Returns the minimum sigma point id for coordinate 1.
    *
-   * @return @b @QString The minimum sigma latitude point id.
+   * @return @b @QString The minimum sigma Coord1 point id.
    */
   QString BundleResults::minSigmaCoord1PointId() const {
     return m_minSigmaCoord1PointId;
@@ -1030,9 +1033,9 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum sigma latitude point id.
+   * Returns the maximum sigma point id for coordinate 1.
    *
-   * @return @b @QString The maximum sigma latitude point id.
+   * @return @b @QString The maximum sigma Coord1 point id.
    */
   QString BundleResults::maxSigmaCoord1PointId() const {
     return m_maxSigmaCoord1PointId;
@@ -1040,7 +1043,7 @@ namespace Isis {
 
 
   /**
-   * Returns the minimum sigma longitude point id.
+   * Returns the minimum sigma point id for coordinate 2.
    *
    * @return @b @QString The minimum sigma longitude point id.
    */
@@ -1050,9 +1053,9 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum sigma longitude point id.
+   * Returns the maximum sigma point id for coordinate 2.
    *
-   * @return @b @QString The maximum sigma longitude point id.
+   * @return @b @QString The maximum sigma Coord2 point id.
    */
   QString BundleResults::maxSigmaCoord2PointId() const {
     return m_maxSigmaCoord2PointId;
@@ -1060,9 +1063,9 @@ namespace Isis {
 
 
   /**
-   * Returns the minimum sigma radius point id.
+   * Returns the minimum sigma point id for coordinate 3.
    *
-   * @return @b @QString The minimum sigma radius point id.
+   * @return @b @QString The minimum sigma Coord3 point id.
    */
   QString BundleResults::minSigmaCoord3PointId() const {
     return m_minSigmaCoord3PointId;
@@ -1070,9 +1073,9 @@ namespace Isis {
 
 
   /**
-   * Returns the maximum sigma radius point id.
+   * Returns the maximum sigma point id for coordinate 3.
    *
-   * @return @b @QString The maximum sigma radius point id.
+   * @return @b @QString The maximum sigma Coord3 point id.
    */
   QString BundleResults::maxSigmaCoord3PointId() const {
     return m_maxSigmaCoord3PointId;
@@ -1080,9 +1083,9 @@ namespace Isis {
 
 
   /**
-   * Returns the RMS of the adjusted latitude sigmas.
+   * Returns the RMS of the adjusted sigmas for coordinate 1.
    *
-   * @return @b double The RMS of the adjusted latitude sigmas.
+   * @return @b double The RMS of the adjusted Coord1 sigmas.
    */
   double BundleResults::sigmaCoord1StatisticsRms() const {
     return m_rmsSigmaCoord1Stats;
@@ -1090,9 +1093,9 @@ namespace Isis {
 
 
   /**
-   * Returns the RMS of the adjusted longitude sigmas.
+   * Returns the RMS of the adjusted sigmas for coordinate 2.
    *
-   * @return @b double The RMS of the adjusted longitude sigmas.
+   * @return @b double The RMS of the adjusted Coord2 sigmas.
    */
   double BundleResults::sigmaCoord2StatisticsRms() const {
     return m_rmsSigmaCoord2Stats;
@@ -1100,9 +1103,9 @@ namespace Isis {
 
 
   /**
-   * Returns the RMS of the adjusted raidus sigmas.
+   * Returns the RMS of the adjusted sigmas for coordinate 3.
    *
-   * @return @b double The RMS of the adjusted radius sigmas.
+   * @return @b double The RMS of the adjusted Coord3 sigmas.
    */
   double BundleResults::sigmaCoord3StatisticsRms() const {
     return m_rmsSigmaCoord3Stats;
@@ -1451,14 +1454,16 @@ namespace Isis {
   SurfacePoint::CoordinateType BundleResults::coordTypeReports() {
     // Get the coordinate type from the output net if it exists.  Otherwise use the default.
     SurfacePoint::CoordinateType type = SurfacePoint::Latitudinal;
-    // if (m_outNet  && m_outNet->IsValid()) {   // ControlNet::IsValid removed
+
     if (m_outNet) {
         type = outputControlNet()->GetCoordType();
     }
+
     return type;
   }
 
 
+  // *** TO DO *** Do we not need this method?
   // SurfacePoint::CoordinateType BundleResults::coordTypeBundle() {
   //   // Get the coordinate type from the output net if it exists.  Otherwise use the default.
   //   SurfacePoint::CoordinateType type = SurfacePoint::Latitudinal;
@@ -1478,7 +1483,7 @@ namespace Isis {
   void BundleResults::save(QXmlStreamWriter &stream, const Project *project) const {
     // Get the coordinate type from the output net if it exists.  Otherwise use the default.
     SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
-    // if (m_outNet  && m_outNet->IsValid()) {     // ControlNet::IsValid removed by another project
+
     if (m_outNet) { 
         coordType = outputControlNet()->GetCoordType();
     }
@@ -1533,6 +1538,7 @@ namespace Isis {
     stream.writeEndElement(); // end residuals element
     stream.writeStartElement("sigmas");
 
+    // Set the label based of the coordinate type set for reports
     switch (coordType) {
       case SurfacePoint::Latitudinal:
         stream.writeAttribute("lat", toString(sigmaCoord1StatisticsRms())); 
@@ -1642,6 +1648,8 @@ namespace Isis {
     stream.writeEndElement(); // end elapsed time
 
     stream.writeStartElement("minMaxSigmas");
+
+    // Write the labels corresponding to the coordinate type set for reports
     switch (coordType) {
       case SurfacePoint::Latitudinal:
         stream.writeStartElement("minLat");
@@ -1792,7 +1800,7 @@ namespace Isis {
                                                const QString &qName,
                                                const QXmlAttributes &atts) {
     m_xmlHandlerCharacters = "";
-   
+
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
 
       if (qName == "correlationMatrix") {

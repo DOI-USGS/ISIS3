@@ -1,12 +1,8 @@
 #include "BundleControlPoint.h"
 
-// qt lib
 #include <QDebug>
 
 // boost lib
-// #include <boost/lexical_cast.hpp>
-// #include <boost/numeric/ublas/io.hpp>
-// #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
 // Isis lib
@@ -23,7 +19,7 @@ namespace Isis {
   /**
    * Constructs a BundleControlPoint object from a ControlPoint. Only the 
    * non-ignored measures are added to the BundleControlPoint. 
-   *     * @param controlPoint Pointer to a ControlPoint that will be used to 
+   * @param controlPoint Pointer to a ControlPoint that will be used to 
    *                     construct this BundleControlPoint.
    */
   BundleControlPoint::BundleControlPoint(const BundleSettingsQsp bundleSettings,
@@ -91,6 +87,7 @@ namespace Isis {
 
     // sanity check
     clear();
+    
     m_controlPoint = src.m_controlPoint;
 
     int numMeasures = src.size();
@@ -105,9 +102,8 @@ namespace Isis {
     m_nicVector = src.m_nicVector;
     m_coordTypeReports = src.m_coordTypeReports;
     m_coordTypeBundle = src.m_coordTypeBundle;
-    // *** TODO *** Why is the cholmodQMatrix not copies? Ask Ken
+    // *** TODO *** Why is the cholmodQMatrix not copied? Ask Ken
   }
-
 
 
   /**
@@ -200,7 +196,7 @@ namespace Isis {
     
     if (m_controlPoint->GetType() == ControlPoint::Free) {
       // Global sigmas are temporary and should not be stored in the control net.  Currently
-      // global sigmas are always in meters.  Make sure units of weights is 1/(var units squared),
+      // global sigmas are always in meters.  Make sure unit of weights is 1/(var unit squared),
       // where var is a value being solved for in the adjustment.  Latitude and longitude are in
       // radians and everything else is in km.
       if (!IsSpecial(globalPointCoord1AprioriSigma)) {
@@ -214,6 +210,7 @@ namespace Isis {
       if (m_coordTypeBundle == SurfacePoint::Latitudinal && !settings->solveRadius()) {
         m_weights[2] = 1.0e+50;
       }
+      //  *** TODO *** delete this note
       // test to prove problem in unitTest DAC
       // else if (settings->solveRadius()) {
       //   m_weights[2] = 0.0;
@@ -229,8 +226,8 @@ namespace Isis {
 
       // Assuming the member variable sigmas are for output reports (internal use only) so use
       //   the report coordinate type to calculate.  All point sigma are in meters.  Radius weights
-      //   are in 1/km^2.  I guess make x/y/z weights the same. *** TODO *** Why  km and not m like
-      //   the sigmas? Weights and corrections go into the bundle so use bundle coordinate type.
+      //   are in 1/km^2.  Make x/y/z weights the same because BundleAdjust works in km.
+      //   Weights and corrections go into the bundle so use bundle coordinate type.
       if ( m_controlPoint->IsCoord1Constrained() ) {
         m_aprioriSigmas[0] =
           m_controlPoint->GetAprioriSurfacePoint().GetSigmaDistance
@@ -662,14 +659,6 @@ namespace Isis {
     int numGoodRays    = numRays - numberOfRejectedMeasures();
     double ResidualRms = residualRms();
 
-    // Set the coordinate type
-    // if (m_controlPoint->Parent()) {
-    //   coordType = m_controlPoint->Parent()->GetCoordType();
-    // }      
-    // double lat         = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
-    // double lon         = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
-    // double rad         = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
-
     // Return generic set of control point coordinates as floating point values - possibly dangerous 
     // because of the potential to confuse units, but convenient.
     SurfacePoint::CoordUnits units = SurfacePoint::Degrees;
@@ -689,15 +678,9 @@ namespace Isis {
                    .arg(numGoodRays, 5)
                    .arg(numRays)
                    .arg(formatValue(ResidualRms, 6, 2))
-                // .arg(formatValue(lat, 16, 8)) // deg
-                // .arg(formatValue(lon, 16, 8)) // deg
-                // .arg(formatValue(rad, 16, 8)) // km
                    .arg(formatValue(cpc1, 16, 8)) // deg            km
                    .arg(formatValue(cpc2, 16, 8)) // deg   OR    km
                    .arg(formatValue(cpc3, 16, 8)) // km            km
-                // .arg(formatLatitudeAdjustedSigmaString(16,8,errorPropagation))  // m
-                // .arg(formatLongitudeAdjustedSigmaString(16,8,errorPropagation)) // m
-                // .arg(formatRadiusAdjustedSigmaString(16,8,errorPropagation));   // m
                    .arg(formatCoordAdjustedSigmaString(SurfacePoint::One, 16, 8, errorPropagation))  // m
                    .arg(formatCoordAdjustedSigmaString(SurfacePoint::Two, 16, 8, errorPropagation)) // m
                    .arg(formatCoordAdjustedSigmaString(SurfacePoint::Three, 16, 8, errorPropagation));   // m
@@ -848,13 +831,6 @@ namespace Isis {
                         .arg(numGoodRays)
                         .arg(numRays);
 
-    // QString labels =
-                     // "\n     Point               Initial                      Total                   Total        "
-                     // "              Final                  Initial              Final\n"
-                     // "Coordinate           Value                 Correction           Correction        "
-                     // "        Value              Accuracy        Accuracy\n"
-                     // "                        (dd/dd/km)             (dd/dd/km)            (Meters)         "
-                     // "     (dd/dd/km)         (Meters)          (Meters)\n";
     QString labels = "\n     Point         Initial               Total               Total        "
                      "      Final             Initial             Final\n"
                      "Coordinate          Value             Correction          Correction        "
@@ -1058,7 +1034,6 @@ namespace Isis {
                                                        bool solveRadius) const {
     QString aprioriSigmaStr;
     QString pointType = ControlPoint::PointTypeToString(type()).toUpper();
-    // std:: cout << "PointType = " << pointType << std::endl;
     if (pointType == "CONSTRAINED" || !solveRadius) {
         pointType = "N/A";
     }
@@ -1066,11 +1041,9 @@ namespace Isis {
     // std::cout << "sigma = " << sigma << std::endl;
     if (IsSpecial(sigma)) { // if globalAprioriSigma <= 0 (including Isis::NUll), then m_aprioriSigmas = Null
       aprioriSigmaStr = QString("%1").arg(pointType, fieldWidth);
-      // std::cout << "special sigma" << std::endl;
     }
     else {
       aprioriSigmaStr = QString("%1").arg(sigma, fieldWidth, 'f', precision);
-      // std::cout << "normal sigma" << std::endl;
     }
     return aprioriSigmaStr;
   }
@@ -1112,12 +1085,6 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
                                                         bool errorPropagation) const {
     QString adjustedSigmaStr;
 
-    // Set the coordinate type
-    // SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
-    // if (m_controlPoint->Parent()) {
-    //   coordType = m_controlPoint->Parent()->GetCoordType();
-    // }      
-
     if (!errorPropagation) {
       adjustedSigmaStr = QString("%1").arg("N/A",fieldWidth);
     }
@@ -1138,14 +1105,14 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
 
 
   /**
-   * Formats the adjusted coordinate 1 sigma value. 
+   * Formats the adjusted coordinate sigma value. 
    *  
    * @param index The coordinate index of the sigma to return.
    * @param fieldWidth The return string's field width.
    * @param precision The precision of the double to be saved off.
    * @param errorPropagation Indicates whether error propagation was selected.
    * 
-   * @return @b QString The formatted adjusted coordinate 1 sigma value, as a string.
+   * @return @b QString The formatted adjusted coordinate sigma value, as a string.
    *  
    * @see formatAdjustedSigmaString() 
    */

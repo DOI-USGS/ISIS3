@@ -58,6 +58,7 @@ namespace Isis {
     m_outlierRejectionMultiplier = 1.0;
 
     // Parameter Uncertainties (Weighting)
+    // The units are meters for either coordinate type
     m_globalPointCoord1AprioriSigma  = Isis::Null;
     m_globalPointCoord2AprioriSigma = Isis::Null;
     m_globalPointCoord3AprioriSigma    = Isis::Null;
@@ -79,7 +80,7 @@ namespace Isis {
 //    m_solveTargetBodyRotationRate = false;
 //    m_solveTargetBodyRadiusMethod = None;
 
-    //Control Points
+    // Control Points
     m_cpCoordTypeReports = SurfacePoint::Latitudinal;
     m_cpCoordTypeBundle = SurfacePoint::Latitudinal;
 
@@ -453,8 +454,7 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma for 1st coordinate value of point for 
-   *  this bundle adjustment. 
+   * Retrieves global a priori sigma for 1st coordinate of points for this bundle 
    * 
    * @return @b double The global a priori sigma for point coordinate 1.
    */
@@ -464,8 +464,7 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma for 2nd coordinate value of point for 
-   * this bundle adjustment. 
+   * Retrieves the global a priori sigma for 2nd coordinate of points for this bundle
    * 
    * @return @b double The global a priori sigma for point coordinate 2.
    */
@@ -475,8 +474,7 @@ namespace Isis {
 
 
   /**
-   * Retrieves the global a priori sigma 3rd coordinate value of point for
-   *  this bundle adjustment. 
+   * Retrieves the global a priori sigma 3rd coordinate of points for this bundle 
    * 
    * @return @b double The global a priori sigma for point coordinate 3.
    */

@@ -56,7 +56,6 @@ namespace Isis {
     referenceMeasure = NULL;
     numberOfRejectedMeasures = 0;
     constraintStatus.reset();
-    // coordType = SurfacePoint::Latitudinal;
   }
 
 
@@ -106,7 +105,6 @@ namespace Isis {
     adjustedSurfacePoint = other.adjustedSurfacePoint;
     numberOfRejectedMeasures = other.numberOfRejectedMeasures;
     constraintStatus = other.constraintStatus;
-    // coordType = other.coordType;
   }
 
 
@@ -132,7 +130,6 @@ namespace Isis {
     aprioriSurfacePointSource = SurfacePointSource::None;
     aprioriRadiusSource = RadiusSource::None;
     constraintStatus.reset();
-    // coordType = SurfacePoint::Latitudinal;
   }
 
   /**
@@ -671,6 +668,14 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAdjustedSurfacePoint(
     SurfacePoint newSurfacePoint) {
+    
+    //  *** Testing for OsirisRex problem with not getting target radii 02-17-2018
+    if (parentNetwork) {
+      std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
+      newSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
+      // coordType = parentNetwork->GetCoordType();
+    }
+
     PointModified();
     adjustedSurfacePoint = newSurfacePoint;
     return Success;
@@ -866,7 +871,7 @@ namespace Isis {
     // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
     // 2013-11-12 KLE I think this check should include points with any
-    // number of constrained coordinates???  I think I agree DAC. 
+    // number of constrained coordinates???  I agree DAC.  *** TODO *** 
     if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
         QString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
@@ -945,9 +950,9 @@ namespace Isis {
     // constrained coordinates > 1" ???
     else if (GetType() == Fixed
         || NumberOfConstrainedCoordinates() == 3
-        || IsLatitudeConstrained()
-        || IsLongitudeConstrained()
-        || IsRadiusConstrained()) {
+        || IsCoord1Constrained()
+        || IsCoord2Constrained()
+        || IsCoord3Constrained()) {
 
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
@@ -955,7 +960,7 @@ namespace Isis {
       return Success;
     }
 
-    // Beyond this point, we assume the point is free ***TBD*** confirm this
+    // Beyond this point, we assume the point is free ***TODO*** confirm this
     // Did we have any measures?
     if (goodMeasures == 0) {
       QString msg = "ControlPoint [" + GetId() + "] has no measures which "
@@ -977,7 +982,7 @@ namespace Isis {
         Displacement((avgY*scale), Displacement::Kilometers),
         Displacement((avgZ*scale), Displacement::Kilometers));
     }
-    // *** TBD *** This block appears to never get executed.  All cases fall into a
+    // *** TODO *** This block appears to never get executed.  All cases fall into a
     // previous if or else block.  It was not added in response to a bug according
     // to history entries either.  I commented it out on 5/31/2017.  If no problems
     // occur in the next 6 months, it can likely be deleted.
@@ -1915,9 +1920,7 @@ namespace Isis {
         other.referenceExplicitlySet == referenceExplicitlySet &&
         other.numberOfRejectedMeasures == numberOfRejectedMeasures &&
         other.cubeSerials == cubeSerials &&
-        // other.coordType == coordType &&
         other.referenceMeasure == referenceMeasure;
-
   }
 
 
@@ -1936,7 +1939,6 @@ namespace Isis {
    *                          deleted some calls that were already handled in
    *                          AddMeasure.
    *   @history 2011-10-03 Tracie Sucharski - Unlock measures before Deleting
-   *   @history 2017-04-25 Debbie A. Cook - added coordType copy.
    */
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
@@ -1977,7 +1979,6 @@ namespace Isis {
       adjustedSurfacePoint = other.adjustedSurfacePoint;
       numberOfRejectedMeasures = other.numberOfRejectedMeasures;
       constraintStatus = other.constraintStatus;
-      // coordType = other.coordType;
     }
 
     return *this;

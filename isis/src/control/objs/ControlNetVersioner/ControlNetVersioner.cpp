@@ -234,7 +234,7 @@ namespace Isis {
       }
 
       if ( controlPoint->GetId().isEmpty() ) {
-        QString msg = "Unbable to write control net to PVL file. "
+        QString msg = "Unable to write control net to PVL file. "
                       "Invalid control point has no point ID value.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -330,6 +330,7 @@ namespace Isis {
 
         if ( aprioriCovarianceMatrix.size1() > 0 ) {
 
+          // Matrix units are meters squared
           PvlKeyword matrix("AprioriCovarianceMatrix");
           matrix += toString(aprioriCovarianceMatrix(0, 0));
           matrix += toString(aprioriCovarianceMatrix(0, 1));
@@ -344,6 +345,7 @@ namespace Isis {
                                           Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
                                           Distance(pvlRadii["PolarRadius"], Distance::Meters) );
 
+            // *** TODO *** What do we do in the case of bundled in rectangular coordinates?
             if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                  && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
                  && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
@@ -372,15 +374,17 @@ namespace Isis {
         }
       }
 
-      if ( controlPoint->IsLatitudeConstrained() ) {
+      // Deal with the generalization here.  *** TODO ***
+      // Once we have a coordinate type in the header, we should specify the correct coordinate
+      if ( controlPoint->IsCoord1Constrained() ) {
         pvlPoint += PvlKeyword("LatitudeConstrained", "True");
       }
 
-      if ( controlPoint->IsLongitudeConstrained() ) {
+      if ( controlPoint->IsCoord2Constrained() ) {
         pvlPoint += PvlKeyword("LongitudeConstrained", "True");
       }
 
-      if ( controlPoint->IsRadiusConstrained() ) {
+      if ( controlPoint->IsCoord2Constrained() ) {
         pvlPoint += PvlKeyword("RadiusConstrained", "True");
       }
 
@@ -1922,14 +1926,15 @@ namespace Isis {
         }
       }
       // this might be redundant... determined by covariance matrix???
-      if ( controlPoint->IsLatitudeConstrained() ) {
-        protoPoint.set_latitudeconstrained(controlPoint->IsLatitudeConstrained());
+      // *** TODO *** Address the generalized coordinates and the constraint differences
+      if ( controlPoint->IsCoord1Constrained() ) {
+        protoPoint.set_latitudeconstrained(controlPoint->IsCoord1Constrained());
       }
-      if ( controlPoint->IsLongitudeConstrained() ) {
-        protoPoint.set_longitudeconstrained(controlPoint->IsLongitudeConstrained());
+      if ( controlPoint->IsCoord2Constrained() ) {
+        protoPoint.set_longitudeconstrained(controlPoint->IsCoord2Constrained());
       }
-      if ( controlPoint->IsRadiusConstrained() ) {
-        protoPoint.set_radiusconstrained(controlPoint->IsRadiusConstrained());
+      if ( controlPoint->IsCoord3Constrained() ) {
+        protoPoint.set_radiusconstrained(controlPoint->IsCoord3Constrained());
       }
 
       SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();

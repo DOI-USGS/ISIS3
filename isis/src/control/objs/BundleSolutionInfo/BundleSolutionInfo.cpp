@@ -1198,7 +1198,6 @@ namespace Isis {
     m_statisticsResults->setCorrMatImgsAndParams(imagesAndParameters);
 
     // output point uncertainty statistics if error propagation is on
-    // *** TBD *** continue generalizing coordinates here after addressing BundleResults DAC
     if (berrorProp) {
       sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
       fpOut << buf;

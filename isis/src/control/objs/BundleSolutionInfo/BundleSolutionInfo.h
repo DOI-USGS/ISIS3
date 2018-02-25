@@ -107,6 +107,11 @@ namespace Isis {
    *                           Fixes #4804, #4837.
    *   @history 2017-07-11 Makayla Shepherd - Added bundle naming capabilities. Fixes #4855.
    *   @history 2017-07-28 Makayla Shepherd - Fixed the default naming tag. Fixes #5069.
+   *   @history 2018-02-21 Debbie A. Cook - Added coordinate types to report and appropriate
+   *                           headings for columns based on the coordinate type.  Also added a utility
+   *                           method to return the coordinate name based on coordinate type and
+   *                           coordinate index.  References #4649 and #501.
+
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

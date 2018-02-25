@@ -18,7 +18,7 @@
  *   USGS in connection therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/dc//documents/Disclaimers/Disclaimers.html
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -38,7 +38,6 @@ class QStringList;
 
 namespace Isis {
   class ControlMeasure;
-  //  class ControlNet;
   class ControlPointFileEntryV0002;
   class Latitude;
   class Longitude;
@@ -517,9 +516,6 @@ namespace Isis {
       bool HasAprioriCoordinates();
 
       bool IsConstrained();
-//    bool IsLatitudeConstrained();
-//    bool IsLongitudeConstrained();
-//    bool IsRadiusConstrained();
       bool IsCoord1Constrained();
       bool IsCoord2Constrained();
       bool IsCoord3Constrained();
@@ -530,7 +526,6 @@ namespace Isis {
 
       QString GetPointTypeString() const;
       PointType GetType() const;
-//     SurfacePoint::CoordinateType getCoordType() const;
 
       static QString RadiusSourceToString(RadiusSource::Source source);
       static RadiusSource::Source StringToRadiusSource(QString str);
