@@ -23,19 +23,15 @@ get_filename_component(truthFolder ${TRUTH_FILE} DIRECTORY)
 #  otherwise a GUI will pop up and ruin the test.
 get_filename_component(binFolder ${TEST_PROG} DIRECTORY)
 get_filename_component(binName   ${TEST_PROG} NAME)
+set(tempDir  ${binFolder}/${binName}_temp)
+execute_process(COMMAND rm -rf ${tempDir})
+execute_process(COMMAND mkdir -p ${tempDir})
 
 execute_process(COMMAND ln -s ${TEST_PROG} ${tempLink})
 execute_process(COMMAND ln -s ${truthFolder}/unitTest.xml ${truthFolder}/${binName}.xml)
 
-message("TEMP DIR: ${tempDir}")
-message("Bin Name: ${binName}")
-message("Bin Folder: ${binFolder}")
-message("TEST_PROG: ${TEST_PROG}")
-message("tempLink: " ${tempLink})
-message("truthFolder" ${truthFolder})
-
 # Run the unit test executable and pipe the output to a text file.
-execute_process(COMMAND ${TEST_PROG}
+execute_process(COMMAND  ./unitTest
                 WORKING_DIRECTORY ${truthFolder}
                 OUTPUT_FILE ${outputFile}
                 ERROR_FILE ${outputFile}

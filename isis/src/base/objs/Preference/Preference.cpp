@@ -134,7 +134,7 @@ namespace Isis {
     else if(unitTest) {
       p_unitTest = unitTest;
       p_preference->clear();
-      p_preference->Load("$ISISROOT/src/base/objs/Preference/TestPreferences");
+      p_preference->Load("$ISISROOT/TestPreferences");
     }
 
     return *p_preference;
