@@ -65,8 +65,9 @@ if(DIFFERENT)
     message(FATAL_ERROR "Test failed - files differ")
     # On error the result file is left around to aid in debugging.
 else()
-  # file(REMOVE ${outputFile}) # On success, clean out the result file.
+  file(REMOVE ${outputFile}) # On success, clean out the result file.
+  execute_process(COMMAND rm -rf ${tempdir})
 endif()
 
 # Clean up our temporary folder
-execute_process(COMMAND rm -f ${truthFolder}/${binName}.xml)
+execute_process(COMMAND rm -f ${truthFolder}/unitTest)
