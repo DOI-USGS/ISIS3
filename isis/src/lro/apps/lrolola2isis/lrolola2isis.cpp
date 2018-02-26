@@ -97,6 +97,7 @@ void IsisMain() {
               ControlMeasure *measure = new ControlMeasure;
               measure->SetCoordinate(camera->Sample(), camera->Line()); 
               measure->SetCubeSerialNumber(images[j].sn);
+              measure->SetType(ControlMeasure::MeasureType::Lidar);
           
               lidarPoint->Add(measure);
             }
@@ -112,6 +113,40 @@ void IsisMain() {
         }
         
       }
+      // End Lidar point section
+      else {
+        // Attempt to back project the point into the image to get other measures
+        // Can this be rearranged to avoid duplicating so much code? Maybe just reset
+        // the measure type each pass through the loop to Candidate.  If time overlaps,
+        // change it to Lidar.
+        Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
+        
+        if (cube != NULL) {
+          
+          Camera *camera = cube->camera();
+          
+          if (camera != NULL) {
+            if (camera->SetGround(lat, lon)) {
+        
+              ControlMeasure *measure = new ControlMeasure;
+              measure->SetCoordinate(camera->Sample(), camera->Line()); 
+              measure->SetCubeSerialNumber(images[j].sn);
+          
+              lidarPoint->Add(measure);
+            }
+          }
+          else {
+            QString msg = "Unable to create a camera from " + images[j].name.expanded();
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+        }
+        else {
+          QString msg = "Unable to open a cube from " + images[j].name.expanded();
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+      }
+      // End Lidar point nonLidar measure section (not simultaneous)
+        
     }
     
     if (lidarPoint->GetNumMeasures() <= 0) {

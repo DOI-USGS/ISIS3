@@ -175,6 +175,7 @@ namespace Isis {
    *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
+   *   @history 2018-02-14 Debbie A. Cook - Added Lidar measure type.
    */
   class ControlMeasure : public QObject {
 
@@ -217,6 +218,8 @@ namespace Isis {
         RegisteredPixel,
         //! Registered to sub-pixel (e.g., pointreg)
         RegisteredSubPixel,
+        //! Backprojected from Lidar point to simultaneous image
+        Lidar,
       };
 
       enum Status {

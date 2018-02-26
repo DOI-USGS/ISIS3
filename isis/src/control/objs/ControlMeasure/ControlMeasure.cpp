@@ -942,6 +942,8 @@ namespace Isis {
       measureType = ControlMeasure::RegisteredPixel;
     else if (str == "registeredsubpixel")
       measureType = ControlMeasure::RegisteredSubPixel;
+    else if (str == "lidar")
+      measureType = ControlMeasure::Lidar;
     else
       throw IException(IException::Programmer, err, _FILEINFO_);
 
@@ -978,6 +980,10 @@ namespace Isis {
 
       case ControlMeasure::RegisteredSubPixel:
         sPrintable = "RegisteredSubPixel";
+        break;
+
+      case ControlMeasure::Lidar:
+        sPrintable = "Lidar";
         break;
     }
 
