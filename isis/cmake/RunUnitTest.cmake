@@ -24,16 +24,18 @@ get_filename_component(truthFolder ${TRUTH_FILE} DIRECTORY)
 get_filename_component(binFolder ${TEST_PROG} DIRECTORY)
 get_filename_component(binName   ${TEST_PROG} NAME)
 
-set(tempDir  ${binFolder}/${binName}_temp)
-set(tempLink ${tempDir}/unitTest)
-execute_process(COMMAND rm -rf ${tempDir})
-execute_process(COMMAND mkdir -p ${tempDir})
 execute_process(COMMAND ln -s ${TEST_PROG} ${tempLink})
-execute_process(COMMAND ln -s ${truthFolder}/unitTest.xml ${tempDir}/unitTest.xml)
+execute_process(COMMAND ln -s ${truthFolder}/unitTest.xml ${truthFolder}/${binName}.xml)
+
+message("TEMP DIR: ${tempDir}")
+message("Bin Name: ${binName}")
+message("Bin Folder: ${binFolder}")
+message("TEST_PROG: ${TEST_PROG}")
+message("tempLink: " ${tempLink})
+message("truthFolder" ${truthFolder})
 
 # Run the unit test executable and pipe the output to a text file.
-#execute_process(COMMAND ${TEST_PROG}
-execute_process(COMMAND ${tempLink}
+execute_process(COMMAND ${TEST_PROG}
                 WORKING_DIRECTORY ${truthFolder}
                 OUTPUT_FILE ${outputFile}
                 ERROR_FILE ${outputFile}
@@ -69,8 +71,8 @@ if(DIFFERENT)
     message(FATAL_ERROR "Test failed - files differ")
     # On error the result file is left around to aid in debugging.
 else()
-  file(REMOVE ${outputFile}) # On success, clean out the result file.
+  # file(REMOVE ${outputFile}) # On success, clean out the result file.
 endif()
 
 # Clean up our temporary folder
-execute_process(COMMAND rm -f ${tempDir})
+execute_process(COMMAND rm -f ${truthFolder}/${binName}.xml)

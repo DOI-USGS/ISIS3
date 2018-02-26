@@ -82,13 +82,6 @@ function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
   # Generate a name for the executable
   set(executableName "${moduleName}_unit_test_${filename}")
 
-  # check for the existance of a unitTest.xml as they need
-  # to be copies over to somehwere the unitTest can access.
-  set(test_xml "${folder}/unitTest.xml")
-  if(EXISTS "${test_xml}")
-    configure_file("${test_xml}" "${CMAKE_BINARY_DIR}/unitTest/${executableName}.xml" COPYONLY)
-  endif()
-
   # Create the executable and link it to the module library
   add_executable( ${executableName} ${testFile})
   set(depLibs "${reqLibs};${matchedLibs}")
