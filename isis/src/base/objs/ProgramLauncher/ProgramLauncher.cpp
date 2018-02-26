@@ -53,7 +53,7 @@ namespace Isis {
   void ProgramLauncher::RunIsisProgram(QString programName,
                                        QString parameters) {
     FileName program(programName);
-    FileName isisExecutableFileName(QString(ISISROOT) + "/bin/" + program.name());
+    FileName isisExecutableFileName("$ISISROOT/bin/" + program.name());
     bool isIsisProgram = false;
 
     if(isisExecutableFileName.fileExists()) {

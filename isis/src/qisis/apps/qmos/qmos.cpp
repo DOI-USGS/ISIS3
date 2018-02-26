@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   Isis::Gui::checkX11();
 
   // Add the Qt plugin directory to the library path
-  FileName qtpluginpath(QString(ISISROOT) + "/3rdParty/plugins");
+  FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
   QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
   QApplication *app = new QIsisApplication(argc, argv);

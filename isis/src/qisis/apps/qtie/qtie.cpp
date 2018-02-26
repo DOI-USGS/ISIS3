@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   try {
 
     // Add the Qt plugin directory to the library path
-    FileName qtpluginpath(QString(ISISROOT) + "/3rdParty/plugins");
+    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
     QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
     QApplication *app = new QApplication(argc, argv);

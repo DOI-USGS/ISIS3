@@ -40,7 +40,7 @@ void IsisMain() {
   }
   catch(IException &e) {
     tempFile = true;
-    QString command = QString(ISISROOT) + "/bin/vdcomp " + in.expanded() + " " +
+    QString command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " +
                      temp.expanded() + " > /dev/null 2>&1";
     int returnValue = system(command.toLatin1().data()) >> 8;
     if(returnValue) {

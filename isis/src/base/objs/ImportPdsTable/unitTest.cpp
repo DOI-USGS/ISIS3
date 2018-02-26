@@ -91,7 +91,7 @@ class ImportPdsTableTester : public ImportPdsTable {
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  Isis::FileName data(QString(ISISROOT) + "/src/base/objs/ImportPdsTable/data/");
+  Isis::FileName data("$ISISROOT/src/base/objs/ImportPdsTable/data/");
 
   QString inputFile = data.expanded() + "VIR_IR_1A_1_332974737_1_HK.LBL";
   if (--argc == 1) { inputFile = argv[1]; }

@@ -1595,7 +1595,7 @@ namespace Isis {
                            toString((int)(p_rightMeasure->GetSample())) + "_" +
                            toString((int)(p_rightMeasure->GetLine()))   + "_";
     QString fname = baseFile + "Search.cub";
-    QString command = QString(ISISROOT) + "/bin/qview \'" + fname + "\'";
+    QString command = "$ISISROOT/bin/qview \'" + fname + "\'";
     p_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
     command += " \'" + fname + "\'";

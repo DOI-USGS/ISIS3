@@ -61,7 +61,7 @@ namespace Isis {
       p.read("PolygonSeeder.plugin");
     }
     else {
-      p.read(QString(ISISROOT) + "/lib/PolygonSeeder.plugin");
+      p.read("$ISISROOT/lib/PolygonSeeder.plugin");
     }
 
     // Get the algorithm specific plugin and return it

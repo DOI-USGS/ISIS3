@@ -876,7 +876,7 @@ namespace Isis {
   // Show help for the current app
   void Gui::AboutProgram() {
     Isis::FileName file((QString)
-                        QString(ISISROOT) + "/doc/Application/presentation/PrinterFriendly/" +
+                        "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
                         Isis::Application::GetUserInterface().ProgramName() +
                         "/" +
                         Isis::Application::GetUserInterface().ProgramName() +

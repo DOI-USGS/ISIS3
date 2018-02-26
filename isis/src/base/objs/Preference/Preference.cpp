@@ -115,11 +115,11 @@ namespace Isis {
 
       // If its a unitTest then load with the unitTest preference file
       if(unitTest) {
-        p_preference->Load(QString(ISISROOT) + "/TestPreferences");
+        p_preference->Load("$ISISROOT/TestPreferences");
       }
       // Otherwise load the Isis system and personal preferences.
       else {
-        p_preference->Load(QString(ISISROOT) + "/IsisPreferences");
+        p_preference->Load("$ISISROOT/IsisPreferences");
 
         Isis::FileName userPref("$HOME/.Isis/IsisPreferences");
         if(userPref.fileExists()) {
@@ -134,7 +134,7 @@ namespace Isis {
     else if(unitTest) {
       p_unitTest = unitTest;
       p_preference->clear();
-      p_preference->Load(QString(ISISROOT) + "/src/base/objs/Preference/TestPreferences");
+      p_preference->Load("$ISISROOT/src/base/objs/Preference/TestPreferences");
     }
 
     return *p_preference;

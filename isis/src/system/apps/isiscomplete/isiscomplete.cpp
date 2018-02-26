@@ -64,7 +64,7 @@ void MakeCompletion(const QString &appName) {
   }
 
   if(appName.compare("isisui") == 0) {
-    QString binPath = FileName(QString(ISISROOT) + "/bin").expanded();
+    QString binPath = FileName("$ISISROOT/bin").expanded();
     cout << "complete isisui 'n@*@F:" << binPath << "/@'; ";
     return;
   }

@@ -73,7 +73,7 @@ namespace Isis {
       p->read("NormModel.plugin");
     }
     else {
-      p->read(QString(ISISROOT) + "/lib/NormModel.plugin");
+      p->read("$ISISROOT/lib/NormModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it
@@ -129,7 +129,7 @@ namespace Isis {
       p->read("NormModel.plugin");
     }
     else {
-      p->read(QString(ISISROOT) + "/lib/NormModel.plugin");
+      p->read("$ISISROOT/lib/NormModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it

@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
     try {
       int myArgc = 0;
 <<<<<<< HEAD
-      strcpy(myArgv[myArgc++], QString(ISISROOT) + "/src/base/apps/highpass/highpass");
+      strcpy(myArgv[myArgc++], "$ISISROOT/src/base/apps/highpass/highpass");
 =======
       strcpy(myArgv[myArgc++], "$ISISROOT/bin/highpass/highpass");
 >>>>>>> fc8baa5a35cffe7b23a01f3cabbc9ff729d42cd5
@@ -893,7 +893,7 @@ int main(int argc, char *argv[]) {
     try {
       int myArgc = 0;
 <<<<<<< HEAD
-      strcpy(myArgv[myArgc++], QString(ISISROOT) + "/src/base/apps/highpass/highpass");
+      strcpy(myArgv[myArgc++], "$ISISROOT/src/base/apps/highpass/highpass");
 =======
       strcpy(myArgv[myArgc++], "$ISISROOT/bin/highpass");
 >>>>>>> fc8baa5a35cffe7b23a01f3cabbc9ff729d42cd5

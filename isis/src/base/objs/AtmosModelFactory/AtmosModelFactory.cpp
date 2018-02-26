@@ -83,7 +83,7 @@ namespace Isis {
       p->read("AtmosModel.plugin");
     }
     else {
-      p->read(QString(ISISROOT) + "/lib/AtmosModel.plugin");
+      p->read("$ISISROOT/lib/AtmosModel.plugin");
     }
 
     // Get the algorithm specific plugin and return it

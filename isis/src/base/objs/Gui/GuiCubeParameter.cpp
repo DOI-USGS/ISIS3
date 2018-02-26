@@ -152,7 +152,7 @@ namespace Isis {
         temp.close();
 
         // Open the cube in Qview
-        QString command = QString(ISISROOT) + "/bin/qview " + cubeName + " &";
+        QString command = "$ISISROOT/bin/qview " + cubeName + " &";
         ProgramLauncher::RunSystemCommand(command);
       }
       // Throw an error if no cube name was entered
