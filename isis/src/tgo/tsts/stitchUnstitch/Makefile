@@ -72,7 +72,7 @@ commands:
 	cubediff $(TSTARGS) \
             from=$(OUTPUT)/stitched-2016-11-26T22:50:27.381.cub \
             from2=$(OUTPUT)/stitched2-2016-11-26T22:50:27.381.cub \
-            to=$(OUTPUT)/sticheddiff> /dev/null;
+            to=$(OUTPUT)/sticheddiff > /dev/null;
 
 	$(RM) $(OUTPUT)/unstitched.lis;
 	$(RM) $(OUTPUT)/cubelist.lis;
