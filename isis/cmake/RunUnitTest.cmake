@@ -26,9 +26,7 @@ get_filename_component(binName   ${TEST_PROG} NAME)
 set(tempDir  ${binFolder}/${binName}_temp)
 execute_process(COMMAND rm -rf ${tempDir})
 execute_process(COMMAND mkdir -p ${tempDir})
-
-execute_process(COMMAND ln -s ${TEST_PROG} ${tempLink})
-execute_process(COMMAND ln -s ${truthFolder}/unitTest.xml ${truthFolder}/${binName}.xml)
+execute_process(COMMAND ln -s ${TEST_PROG} ${truthFolder}/unitTest)
 
 # Run the unit test executable and pipe the output to a text file.
 execute_process(COMMAND  ./unitTest
