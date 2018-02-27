@@ -75,7 +75,7 @@ commands:
   	MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
   	MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
 
-# Create Blu Mosaic
+	# Create Blu Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_bluEqui.cub \
 		map=$(OUTPUT)/equi.map \
   	pixres=mpp resolution=200 -batchlist=$(OUTPUT)/bluBasenames.lis > /dev/null;
@@ -89,7 +89,7 @@ commands:
   	MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
   	MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
 
-# Create Pan Mosaic
+	# Create Pan Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_panEqui.cub \
   	map=$(OUTPUT)/equi.map \
   	pixres=mpp resolution=200 -batchlist=$(OUTPUT)/panBasenames.lis > /dev/null;
@@ -103,7 +103,7 @@ commands:
    	MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
    	MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
 
-# Create Nir Mosaic
+	# Create Nir Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_nirEqui.cub \
   	map=$(OUTPUT)/equi.map \
   	pixres=mpp resolution=200 -batchlist=$(OUTPUT)/nirBasenames.lis > /dev/null;
@@ -117,7 +117,7 @@ commands:
   	MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
   	MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
 
-# Create full color mos
+	# Create full color mos
 	$(LS) $(OUTPUT)/*CassisMosaic.cub > $(OUTPUT)/mosaicList.txt;
 	$(CUBEIT) fromlist=$(OUTPUT)/mosaicList.txt to=$(OUTPUT)/coloredMosaic.cub > /dev/null;
 	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/coloredMosaic.cub to=$(OUTPUT)/coloredMosaic \
