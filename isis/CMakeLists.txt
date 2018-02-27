@@ -45,6 +45,8 @@ set(CMAKE_PREFIX_PATH
   /usr/local/lib/
 )
 
+set(CMAKE_FIND_FRAMEWORK LAST)
+
 include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
@@ -91,7 +93,6 @@ message("Detected Operating System: ${osVersionString}")
 #  as a static library using some specialized code in Utilities.cmake.
 set(BUILD_SHARED_LIBS ON)
 
-
 # Specify flags used
 set(thirdPartyCppFlags -Wall -std=c++11 -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual)
 #set(thirdPartyCppFlags -Wall -ansi -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual)
@@ -104,7 +105,7 @@ option(buildCore       "Build the core ISIS modules"                 ON  )
 option(buildMissions   "Build the mission specific modules"          ON  )
 option(buildStaticCore "Build libisis3 static as well as dynamic"    OFF )
 option(buildTests      "Set up unit, application, and module tests." ON  )
-
+option(JP2KFLAG        "Whether or not to build using JPEG200 support" OFF )
 
 if(EXISTS ${isis3Data})
   set(ENV{ISIS3DATA} "${isis3Data}")
@@ -155,18 +156,16 @@ include(FindAllDependencies)
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
+# inject ISISROOT
+add_definitions( -DISISROOT="${CMAKE_SOURCE_DIR}" )
+add_definitions( -DISISBUILDDIR="${CMAKE_BINARY_DIR}" )
+
 # add isis headers
-
-
 file(GLOB ISIS_HEADERS ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h
 ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp)
 file(COPY ${ISIS_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/inc)
 
 include_directories(${CMAKE_BINARY_DIR}/inc)
-
-# install scripts
-# file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/scripts)
-# file(COPY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 set(CORE_LIB_NAME isis3)
 
@@ -209,7 +208,6 @@ install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/
 #Create the inc directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 
-
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
@@ -224,22 +222,18 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 add_subdirectory(src objects)
 
 # Set up third party libraries for installation
-install_third_party()
+# install_third_party()
 
-# Some unit and app test rely on a 3rdParty structure and need to be copied
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib ${CMAKE_BINARY_DIR}/3rdParty/plugins)
-
-# Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
-# - This is required so that the plugins can be found during unit tests.
-# TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
-foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
-  get_filename_component(pluginName ${plugin} NAME)
-  if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
-    execute_process(COMMAND ln -s "${plugin}" ${pluginName}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-    execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/${pluginName} ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
-  endif()
-endforeach()
+# # Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
+# # - This is required so that the plugins can be found during unit tests.
+# # TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
+# foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
+#   get_filename_component(pluginName ${plugin} NAME)
+#   if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
+#     execute_process(COMMAND ln -s "${plugin}" ${pluginName}
+#     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+#   endif()
+# endforeach()
 
 # Set up documentation build target.
 # - This script is called by running "make docs".

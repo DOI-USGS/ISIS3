@@ -18,7 +18,6 @@ if(APPLE)
   set(PLUGIN_DIR "${thirdPartyDir}/ports/libexec/qt5/plugins")
 endif(APPLE)
 
-set(JP2KFLAG 1)
 
 # Add thirdPartyCppFlags
 set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
@@ -36,6 +35,10 @@ find_program(PROTOC protoc REQUIRED)
 # message(STATUS "${CMAKE_PREFIX_PATH}")
 
 include(FindProtobuf)
+
+
+find_package(Geos 3.5.0 REQUIRED)
+
 
 if(APPLE)
   find_package(Qt5 COMPONENTS
@@ -120,9 +123,9 @@ endif(APPLE)
 
 
 # Some of these will have non-traditional installs with version numbers in the paths in v007
-# For these, we pass in a version number, and use it in the path suffix 
+# For these, we pass in a version number, and use it in the path suffix
 # This only applies to v007, and outside of the building, we should only expect standard installs
-# The v007-specific installs are listed beside their find_package calls below: 
+# The v007-specific installs are listed beside their find_package calls below:
 find_package(Boost     1.59.0  REQUIRED) # "boost/boost${Boost_FIND_VERSION}/boost/"
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED) # "SuiteSparse/SuiteSparse${Cholmod_FIND_VERSION}/SuiteSparse/"
@@ -155,8 +158,10 @@ endif(APPLE)
 
 
 
+
 # Only include Kakadu if it is available
 if(${JP2KFLAG})
+  message("ENABLING KAKADU")
   find_package(Kakadu)
 endif(${JP2KFLAG})
 
@@ -194,7 +199,6 @@ foreach (_variableName ${_variableNames})
     endif(_variableName MATCHES "^CMAKE+")
 endforeach()
 
-#list(APPEND ALLLIBDIRS "/usr/lib64")
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
@@ -332,7 +336,6 @@ set(RAW_DYNAMIC_LIBS ${QT_DYNAMIC_LIBS}
 
 # For each item in this list, expand the wildcard to get the actual library list.
 foreach(lib ${RAW_DYNAMIC_LIBS})
-
   string(FIND "${lib}" "*" position)
   if(${position} EQUAL -1)
     # No wildcard, just add it.

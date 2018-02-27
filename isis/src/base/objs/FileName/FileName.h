@@ -234,7 +234,7 @@ namespace Isis {
        * @returns QString
        * <pre>
        *   for a full file specification of:
-       *    "$ISISROOT/tmp/Peaks.cub+Bsq"
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
        *   expanded() gives:
        *    "/usgs/pkgs/isis3/isis/tmp/Peaks.cub"
        * </pre>
@@ -248,9 +248,9 @@ namespace Isis {
        * @returns QString containing every character in the file name and the path
        * <pre>
        *   for a full file specification of:
-       *    "$ISISROOT/tmp/Peaks.cub+Bsq"
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
        *   original() gives:
-       *    "$ISISROOT/tmp/Peaks.cub+Bsq"
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
        * </pre>
        */
       QString original() const;
@@ -402,7 +402,7 @@ namespace Isis {
        * @returns QString
        * <pre>
        *   for a full file specification of:
-       *    "$ISISROOT/tmp/Peaks.cub+Bsq"
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
        *   toString() gives:
        *    "/usgs/pkgs/isis3/isis/tmp/Peaks.cub"
        * </pre>

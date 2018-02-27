@@ -83,7 +83,7 @@ function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
   set(executableName "${moduleName}_unit_test_${filename}")
 
   # Create the executable and link it to the module library
-  add_executable( ${executableName} ${testFile}  )
+  add_executable( ${executableName} ${testFile})
   set(depLibs "${reqLibs};${matchedLibs}")
   target_link_libraries(${executableName} ${moduleName} ${depLibs})
 
@@ -91,8 +91,6 @@ function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
   add_unit_test_target(${executableName} ${truthFile})
 
 endfunction(make_obj_unit_test)
-
-
 
 
 # Incorporate a single obj folder
@@ -164,6 +162,7 @@ function(add_isis_obj folder reqLibs)
     # Folder with a plugin means that this is a separate library!
     # Add it here and then we are done with the source files.
 
+    set(newSourceFiles ${thisSourceFiles} PARENT_SCOPE)
     if(NOT (${numPlugins} EQUAL 1))
       message( FATAL_ERROR "Error: Multiple plugins found in folder!" )
     endif()

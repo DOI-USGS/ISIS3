@@ -16,6 +16,7 @@ find_library(COLAMD_LIBRARY       NAMES colamd)
 find_library(CAMD_LIBRARY         NAMES camd)
 find_library(AMD_LIBRARY          NAMES amd)
 find_library(SUITESPARSE_LIBRARY  NAMES suitesparseconfig)
+
 # OSX does not link against lapack
 if(NOT APPLE)
   find_library(LAPACK_LIBRARY       NAMES lapack)
@@ -32,3 +33,16 @@ find_library(FORTRAN_LIBRARY      NAMES gfortran
 find_library(BLAS_LIBRARY NAMES blas)
 
 get_filename_component(CHOLMOD_ROOT_INCLUDE_DIR "${CHOLMOD_INCLUDE_DIR}" DIRECTORY)
+
+message( "CHOLMOD INCLUDE: "  ${CHOLMOD_INCLUDE_DIR} )
+message( "CHOLMOD LIB: "  ${CHOLMOD_LIBRARY} )
+message( "CCOLMOD LIB: "  ${CCOLAMD_LIBRARY} )
+message( "CAMD LIB: "  ${CAMD_LIBRARY} )
+message( "AMD LIB: "  ${AMD_LIBRARY} )
+message( "SUITESPARSE LIB: "  ${SUITESPARSE_LIBRARY} )
+message( "FORTRAN LIB: "  ${FORTRAN_LIBRARY} )
+message( "BLAS LIB: "  ${BLAS_LIBRARY} )
+
+if(NOT APPLE)
+  message("LAPACK LIB" ${LAPACK_LIBRARY})
+endif()
