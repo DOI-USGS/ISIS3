@@ -460,7 +460,7 @@ function(build_docs)
   # Set up output directory and a temporary directory for building
   set(docBuildFolder   ${CMAKE_BINARY_DIR}/docBuild)
   set(appDataFolder    ${docBuildFolder}/Application/data)
-  set(docInstallFolder ${CMAKE_INSTALL_PREFIX}/doc) # Final output documentation
+  set(docInstallFolder ${CMAKE_BINARY_DIR}/docs) # Final output documentation
 
   # Clean up existing files
   execute_process(COMMAND rm -rf ${docBuildFolder})
@@ -495,7 +495,11 @@ function(build_docs)
   message("Building object documentation")
   build_object_docs()
 
+  # copy the built docs in the build directory over to the install directory on install
+  execute_process(COMMAND cp -rf ${docInstallFolder} ${CMAKE_INSTALL_PREFIX})
+
   message("Finished building object documentation!")
+
 
 endfunction(build_docs)
 
