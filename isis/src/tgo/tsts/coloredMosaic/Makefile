@@ -139,8 +139,6 @@ commands:
 	$(RM) $(OUTPUT)/nirCassisMosaic.cub;
 	$(RM) $(OUTPUT)/panCassisMosaic.cub;
 	$(RM) $(OUTPUT)/redCassisMosaic.cub;
-
-
 	$(RM) $(OUTPUT)/*coloredMosaic1.txt;
 	$(RM) $(OUTPUT)/*coloredMosaic2.txt;
 	$(RM) $(OUTPUT)/*coloredMosaic3.txt;
