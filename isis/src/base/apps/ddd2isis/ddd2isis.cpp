@@ -33,70 +33,40 @@ void IsisMain() {
    *
    */
 
-   EndianSwapper swp("MSB");
-
-   /*
+   // ifstream read() needs a char* to read values into, so the union
+   // is used to store read values
    union {
      char readChars[4];
      long readLong;
      float readFloat;
-     int readInt;
    } readBytes;
-   */
-   // Used to store the read 4 bytes
-   char inChar[4];
+
+   // ddd files are LSB
+   EndianSwapper swp("MSB");
 
   // Verify that the file is a .ddd by reading in the first 4 bytes and
   // comparing the magic numbers
-  fin.seekg(0);
-  fin.read(inChar, 4);
-
-  if( swp.Int(inChar) != 1659) {
-    string msg = "Input file [" + from + "] does not appear to be in ddd format";
-    throw IException(IException::Io, msg, _FILEINFO_);
-  }
-  /*
   readBytes.readLong = 0;
   fin.seekg(0);
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
 
-  if(readBytes.readLong != 0x67B) {
+  if(readBytes.readLong != 1659) {
     string msg = "Input file [" + from + "] does not appear to be in ddd format";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  */
-
 
   // Read bytes 4-7 to get number of lines
-  fin.read(inChar, 4);
-  int nLines = swp.Int(inChar);
-  /*
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   int nLines = (int) readBytes.readLong;
-  */
 
   // Read bytes 8-11 to get number of bytes
-  fin.read(inChar, 4);
-  int nBytes = swp.Int(inChar);
-
-  /*
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   int nBytes = (int) readBytes.readLong;
-  */
 
-  // Read bytes 12-15 to get the bit type
-  fin.read(inChar, 4);
-
-  if( fin.fail() || fin.eof() ) {
-    string msg = "An error ocurred when reading the input file [" + from + "]";
-    throw IException(IException::Io, msg, _FILEINFO_);
-  }
-  int totalBandBits = swp.Int(inChar);
-
-  /*
+  // Read bytes 12-15 to get the total number of bits out of all the bands
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
 
@@ -104,11 +74,9 @@ void IsisMain() {
     string msg = "An error ocurred when reading the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
+  int totalBandBits = readBytes.readLong;
 
-  int bitType = readBytes.readLong;
-  */
-
-  // Maps the data type of the file to the number of bytes
+  // Maps the bit type of the file to the number of bytes
   map<int, int> dataTypes = {
     {1450901768, 1},
     {1450902032, 2},
@@ -122,28 +90,28 @@ void IsisMain() {
     {48, 2}
   };
 
-  // Read bytes 16-19 to get the data type
-  // Map the data type to the number of bytes and store in dataTypeBytes
-  fin.read(inChar, 4);
-  int bitType = swp.Int(inChar);
-  cout<<"DATA TYPE: " << bitType << endl;
-  int dataTypeBytes = dataTypes.find( bitType ) -> second;
+  // Read bytes 16-19 to get the bit type
+  // Map the bit type to the number of bytes and store in dataTypeBytes
+  fin.read(readBytes.readChars, 4);
+  readBytes.readFloat = swp.Float(readBytes.readChars);
+  int bitType = (int) readBytes.readLong;
 
-  // Read bytes 20-23 to get offset
-  fin.read(inChar, 4);
-  int nOffset = swp.Int(inChar);
-  if (nOffset < 1024) {
-    nOffset = 1024;
+  int dataTypeBytes;
+  //Old header format has no bit type
+  if (bitType == 0) {
+    dataTypeBytes = dataTypes.find( totalBandBits ) -> second;
+  }
+  else{
+    dataTypeBytes = dataTypes.find( bitType ) -> second;
   }
 
-  /*
+  // Read bytes 20-23 to get offset
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   int nOffset = (int) readBytes.readLong;
   if (nOffset < 1024) {
     nOffset = 1024;
   }
-  */
 
   PvlGroup results("FileInfo");
   results += PvlKeyword( "NumberOfLines", toString(nLines) );
@@ -161,7 +129,7 @@ void IsisMain() {
   ProcessImport p;
 
   int bitsPerBand = totalBandBits / nBands;
-  if (ui.WasEntered("TO")) {
+  if ( ui.WasEntered("TO") ) {
     switch(bitsPerBand) {
       case 8:
         p.SetPixelType(Isis::UnsignedByte);
@@ -179,10 +147,9 @@ void IsisMain() {
         throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    if (nBands > 1) {
-      p.SetOrganization(ProcessImport::BIP);
-      cout << "set BIP" << endl;
-    }
+    // ddd files are pixel interleaved
+    p.SetOrganization(ProcessImport::BIP);
+
     p.SetDimensions(nSamples, nLines, nBands);
     p.SetFileHeaderBytes(nOffset);
     p.SetByteOrder(Isis::Msb);
