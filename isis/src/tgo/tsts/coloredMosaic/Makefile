@@ -123,11 +123,17 @@ commands:
 	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/coloredMosaic.cub to=$(OUTPUT)/coloredMosaic \
 		pdsversion=pds4 > /dev/null;
 
+	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
+              $(OUTPUT)/coloredMosaic.xml > $(OUTPUT)/coloredMosaic1.txt;
+	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
+             $(OUTPUT)/coloredMosaic1.txt > $(OUTPUT)/coloredMosaic2.txt;
+	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
+             $(OUTPUT)/coloredMosaic2.txt > $(OUTPUT)/coloredMosaic3.txt;
+	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
+             $(OUTPUT)/coloredMosaic3.txt > $(OUTPUT)/coloredMosaic.txt;
+
 	# Cleanup
 	$(RM) $(OUTPUT)/*B1*cub;
-	$(RM) $(OUTPUT)/*.txt;
-	$(RM) $(OUTPUT)/*.xml;
-	$(RM) $(OUTPUT)/*.img;
 	$(RM) $(OUTPUT)/*.lis;
 	$(RM) $(OUTPUT)/bluCassisMosaic.cub;
 	$(RM) $(OUTPUT)/nirCassisMosaic.cub;
@@ -135,12 +141,9 @@ commands:
 	$(RM) $(OUTPUT)/redCassisMosaic.cub;
 
 
-	$(RM) $(OUTPUT)/*CassisMosaic.xml;
-	$(RM) $(OUTPUT)/*CassisMosaic1.txt;
-	$(RM) $(OUTPUT)/*CassisMosaic2.txt;
-	$(RM) $(OUTPUT)/*CassisMosaic3.txt;
-	$(RM) $(OUTPUT)/coloredMosaic.img;
-	$(RM) $(OUTPUT)/coloredMosaic.xml;
+	$(RM) $(OUTPUT)/*coloredMosaic1.txt;
+	$(RM) $(OUTPUT)/*coloredMosaic2.txt;
+	$(RM) $(OUTPUT)/*coloredMosaic3.txt;
 	$(RM) $(OUTPUT)/*Cubes.lis
 	$(RM) $(OUTPUT)/*Inputs.lis
 	$(RM) $(OUTPUT)/*Basenames.lis
