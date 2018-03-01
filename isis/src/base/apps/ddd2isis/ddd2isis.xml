@@ -30,6 +30,15 @@
       will need to be read in using a combination of the raw2isis and crop
       programs. Fixes #1713.
     </change>
+    <change name="Kaitlyn Lee" date="2018-03-01">
+      We were given a python program that reads in data from a ddd file
+      to use as an example. In the python program, the way they calculate the
+      number of bands is different from the one we previously used. The old
+      formula did the number of total band bits / 8; the formula is now
+      the (number of total band bits / 8) / the number of bytes of the data type
+      of the file's bit type. ddd files are also pixel interleaved, so the program
+      can now process files with multiple bands. Fixes #703.
+    </change>
   </history>
 
   <category>

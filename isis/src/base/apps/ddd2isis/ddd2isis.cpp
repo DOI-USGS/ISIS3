@@ -44,7 +44,7 @@ void IsisMain() {
    // ddd files are LSB
    EndianSwapper swp("MSB");
 
-  // Verify that the file is a .ddd by reading in the first 4 bytes and
+  // Verify that the file is a ddd by reading in the first 4 bytes and
   // comparing the magic numbers
   readBytes.readLong = 0;
   fin.seekg(0);
@@ -76,7 +76,7 @@ void IsisMain() {
   }
   int totalBandBits = readBytes.readLong;
 
-  // Maps the bit type of the file to the number of bytes
+  // Maps the bit type of the file to the number of bytes of that type
   map<int, int> dataTypes = {
     {1450901768, 1},
     {1450902032, 2},
@@ -99,10 +99,10 @@ void IsisMain() {
   int dataTypeBytes;
   //Old header format has no bit type
   if (bitType == 0) {
-    dataTypeBytes = dataTypes.find( totalBandBits ) -> second;
+    dataTypeBytes = dataTypes.find(totalBandBits) -> second;
   }
-  else{
-    dataTypeBytes = dataTypes.find( bitType ) -> second;
+  else {
+    dataTypeBytes = dataTypes.find(bitType) -> second;
   }
 
   // Read bytes 20-23 to get offset
@@ -141,14 +141,17 @@ void IsisMain() {
         p.SetPixelType(Isis::Real);
         break;
       default:
-        IString msg = "Unsupported bit per pixel count [" + IString(totalBandBits) + "]. ";
+        IString msg = "Unsupported bit per pixel count [" + IString(totalBandBits) + "]. "; //Do we need this?
         msg += "(Use the raw2isis and crop programs to import the file in case it is ";
         msg += "line or sample interleaved.)";
         throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    // ddd files are pixel interleaved
-    p.SetOrganization(ProcessImport::BIP);
+    // ddd files with more than one band are pixel interleaved
+    // Having one band is similar to BIP, but this is here for clarification
+    if (nBands > 1) {
+      p.SetOrganization(ProcessImport::BIP);
+    }
 
     p.SetDimensions(nSamples, nLines, nBands);
     p.SetFileHeaderBytes(nOffset);
