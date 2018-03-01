@@ -91,7 +91,7 @@ void IsisMain() {
   };
 
   // Read bytes 16-19 to get the bit type
-  // Map the bit type to the number of bytes and store in dataTypeBytes
+  // Map the bit type to the number of bytes of that data type
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   int bitType = (int) readBytes.readLong;
@@ -113,6 +113,7 @@ void IsisMain() {
     nOffset = 1024;
   }
 
+  //TO DO: Reword
   PvlGroup results("FileInfo");
   results += PvlKeyword( "NumberOfLines", toString(nLines) );
   results += PvlKeyword( "NumberOfBytesPerLine", toString(nBytes) );
@@ -141,7 +142,7 @@ void IsisMain() {
         p.SetPixelType(Isis::Real);
         break;
       default:
-        IString msg = "Unsupported bit per pixel count [" + IString(totalBandBits) + "]. "; //Do we need this?
+        IString msg = "Unsupported bit per pixel count [" + IString(bitsPerBand) + "]. "; //Do we need this?
         msg += "(Use the raw2isis and crop programs to import the file in case it is ";
         msg += "line or sample interleaved.)";
         throw IException(IException::Io, msg, _FILEINFO_);
