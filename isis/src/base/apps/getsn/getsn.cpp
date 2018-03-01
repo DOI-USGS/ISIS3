@@ -34,12 +34,16 @@ void IsisMain() {
   bool WriteObservation = ui.GetBoolean("OBSERVATION");
 
   QString format = ui.GetString("FORMAT");
-  bool pvl;
+  bool pvl = true;
   if (format == "PVL") {
     pvl = true;
   }
-  else {
+  else if (format == "FLAT") {
     pvl = false;
+  }
+  else {
+    QString msg = "Invalid format QString [" + format + "]";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Extract label from cube file
@@ -47,20 +51,20 @@ void IsisMain() {
 
   PvlGroup sn("Results");
 
-  if (WriteFile) sn += PvlKeyword("Filename", from);
-  if (WriteSN) sn += PvlKeyword( "SerialNumber", SerialNumber::Compose( *label, ui.GetBoolean("DEFAULT") ) );
-  if (WriteObservation) sn += PvlKeyword( "ObservationNumber", ObservationNumber::Compose( *label, ui.GetBoolean("DEFAULT") ) );
+  if(WriteFile) sn += PvlKeyword("Filename", from);
+  if(WriteSN) sn += PvlKeyword("SerialNumber", SerialNumber::Compose(*label, ui.GetBoolean("DEFAULT")));
+  if(WriteObservation) sn += PvlKeyword("ObservationNumber", ObservationNumber::Compose(*label, ui.GetBoolean("DEFAULT")));
 
-  if ( ui.WasEntered("TO") ) {
+  if(ui.WasEntered("TO")) {
     // PVL option
     if (pvl) {
       // Create a serial number and observation number for this cube & put it in a pvlgroup for output
       Pvl pvl;
       pvl.addGroup(sn);
-      if ( ui.GetBoolean("APPEND") )
-        pvl.append( ui.GetFileName("TO") );
+      if(ui.GetBoolean("APPEND"))
+        pvl.append(ui.GetFileName("TO"));
       else
-        pvl.write( ui.GetFileName("TO") );
+        pvl.write(ui.GetFileName("TO"));
     }
     // FLAT option
     else {
@@ -79,7 +83,7 @@ void IsisMain() {
     }
 
     // Construct a label with the results
-    if ( ui.IsInteractive() ) {
+    if(ui.IsInteractive()) {
       Application::GuiLog(sn);
     }
   }
