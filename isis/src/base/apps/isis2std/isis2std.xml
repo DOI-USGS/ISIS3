@@ -3,49 +3,49 @@
 <application name="isis2std" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Exports a cube to a PNG, BMP, GIF, TIFF, JPEG, or JPEG 2000
+    Exports a cube to PNG, BMP, TIFF, JPEG, or JPEG 2000
   </brief>
 
   <description>
     <p>
       This program exports an ISIS cube to one of several popular standard image
-      formats.  The current supported formats are BMP,  GIF, JPEG, JP2, PNG, and TIFF.  
+      formats.  The current supported formats are BMP, JPEG, JP2, PNG, and TIFF.
     </p>
     <p>
-      This program uses TrollTech's version of the Qt Library to export BMP, 
-      GIF and JPEG formatted output images. For these format types, due to limitations of Qt, the
-      input file size must not exceed 2 gigabytes and the only valid output bit type is 8BIT. 
+      This program uses TrollTech's version of the Qt Library to export BMP
+      and JPEG formatted output images. For these format types, due to limitations of Qt, the
+      input file size must not exceed 2 gigabytes and the only valid output bit type is 8-bit.
     </p>
     <p>
-      The JPEG2000 (JP2) and TIFF formats do not depend on the Qt library.  These formats do not 
-      have the 2 GB limitation for input files and the output bit type may be 8BIT, U16BIT or S16BIT.
+      The JPEG2000 (JP2) and TIFF formats do not depend on the Qt library.  These formats do not
+      have the 2 GB limitation for input files and the output bit type may be 8-bit, U16-bit or S16-bit.
       For these formats, the writing routines output are streamed lines from the cube, and little
       of the image is held in memory at any one time, therefore increasing the processing speed to
-      convert the file.  It is recommended that large images are exported to JP2  or TIFF format. 
-      For some output image types, users may specify a value for the level of compression 
-      represented as a percentage using the QUALITY parameter. The default is no compression 
+      convert the file.  It is recommended that large images are exported to JP2  or TIFF format.
+      For some output image types, users may specify a value for the level of compression
+      represented as a percentage using the QUALITY parameter. The default is no compression
       (i.e. QUALITY = 100%). For the TIFF format a compression algorithm can be selected.
     </p>
     <p>
-      Each of the input cube parameters (FROM, ALPHA, RED, GREEN, and BLUE) requires a single band 
-      from an ISIS cube. If a cube contains multiple bands, the user must specify a single band of 
-      the input image. To do this, the user must append a plus sign and the band number to be used 
-      to the input file name. For example, inputFile.cub+4 indicates that the 4th band in the cube 
+      Each of the input cube parameters (FROM, ALPHA, RED, GREEN, and BLUE) requires a single band
+      from an ISIS cube. If a cube contains multiple bands, the user must specify a single band of
+      the input image. To do this, the user must append a plus sign and the band number to be used
+      to the input file name. For example, inputFile.cub+4 indicates that the 4th band in the cube
       will be used. No band needs to be specified if the cube only has a single band.
     </p>
     <p>
-      In addition, if the cube has Mapping labels, the program will produce a world file for use 
-      in Arc and/or other GIS packages.  The file will have an extension that uses the first and 
-      last letters for the image extention and a "w". For example, .tif produces a world file 
+      In addition, if the cube has Mapping labels, the program will produce a world file for use
+      in Arc and/or other GIS packages.  The file will have an extension that uses the first and
+      last letters for the image extension and a "w". For example, .tif produces a world file
       extension of .tfw.
     </p>
     <p>
       To ensure acceptable contrast in the output file, the user may select from three stretch
-      options: linear, piecewise-linear, or manual.  
+      options: linear, piecewise-linear, or manual.
     </p>
     <p>
-      Special pixels such as Low Saturation values and Nulls are set to black and High Saturation 
-      values are set to white. See the BITTYPE parameter documentation for more information about 
+      Special pixels such as Low Saturation values and Nulls are set to black and High Saturation
+      values are set to white. See the BITTYPE parameter documentation for more information about
       which output pixel values are assigned for particular input DNs of the various bit types.
     </p>
   </description>
@@ -77,11 +77,11 @@
       and low data in the input is written as a one
     </change>
     <change name="Steven Koechle" date="2007-08-22">
-      Added a check to see that raw image data will be less than 4GB.  
+      Added a check to see that raw image data will be less than 4GB.
       Throw exception if it is too big.
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
     </change>
     <change name="Kris Becker" date="2008-10-17">
       Added QUALITY parameter to set compression levels
@@ -97,7 +97,7 @@
       Added support for JPEG2000 files.
     </change>
     <change name="Stuart Sides and Steven Lambright" date="2012-04-03">
-      Added minimum and maximum input stretch values and output file 
+      Added minimum and maximum input stretch values and output file
       name to the output log. fixes #761
     </change>
     <change name="Travis Addair" date="2012-04-03">
@@ -109,16 +109,19 @@
       completely now. References #579.
     </change>
     <change name="Jeannie Backer" date="2013-06-05">
-      Fixed bug where alpha channel was not being utilized for ARGB option. Fixed bug that mapped 
-      Nulls as the min value for TIFF and JP2 formats. Changed ImageExporter calls to new method 
-      names, where needed. Added test for ARGB parameter. Added xml example. Added appTests to 
-      improve coverage for isis2std program and the ImageExporter and its derived classes. 
+      Fixed bug where alpha channel was not being utilized for ARGB option. Fixed bug that mapped
+      Nulls as the min value for TIFF and JP2 formats. Changed ImageExporter calls to new method
+      names, where needed. Added test for ARGB parameter. Added xml example. Added appTests to
+      improve coverage for isis2std program and the ImageExporter and its derived classes.
       Fixes #1380.
     </change>
     <change name="Jeffrey Covington" date="2015-02-12">
       Changed default compression of TIFF format images to no compression. Added COMPRESSION parameter to
       choose the compression algorithm for TIFF format images. Fixes #1745
-      
+    </change>
+    <change name="Kaitlyn Lee" date="2018-02-08">
+      Removed the option to export as a GIF because Qt does not support GIF
+      exports. Fixes #1667.
     </change>
   </history>
   <category>
@@ -149,7 +152,7 @@
         </brief>
         <description>
           Use this parameter to select the filename and band to export. For
-          example, file.cub+5 will select band 5
+          example, file.cub+5 will select band 5.
         </description>
         <filter>
           *.cub
@@ -164,7 +167,7 @@
         </brief>
         <description>
           Use this parameter to select the filename and band to export. For
-          example, file.cub+5 will select band 5
+          example, file.cub+5 will select band 5.
         </description>
         <filter>
           *.cub
@@ -179,7 +182,7 @@
         </brief>
         <description>
           Use this parameter to select the filename and band to export. For
-          example, file.cub+5 will select band 5
+          example, file.cub+5 will select band 5.
         </description>
         <filter>
           *.cub
@@ -194,7 +197,7 @@
         </brief>
         <description>
           Use this parameter to select the filename and band to export. For
-          example, file.cub+5 will select band 5
+          example, file.cub+5 will select band 5.
         </description>
         <filter>
           *.cub
@@ -209,7 +212,7 @@
         </brief>
         <description>
           Use this parameter to select the filename and band to export. For
-          example, file.cub+5 will select band 5
+          example, file.cub+5 will select band 5.
         </description>
         <filter>
           *.cub
@@ -220,7 +223,7 @@
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          Output file 
+          Output file
         </brief>
         <description>
           Use this parameter to specify the name of the output file.
@@ -232,7 +235,7 @@
         <default><item>GRAYSCALE</item></default>
         <brief>Image mode</brief>
         <description>
-          This parameter specifies the image mode. If GRAYSCALE, a single one-band cube is used.  
+          This parameter specifies the image mode. If GRAYSCALE, a single one-band cube is used.
           If RGB, three one-band cubes are used. If ARGB, four one-band cubes are used.
         </description>
         <list>
@@ -241,8 +244,8 @@
               Output has one channel (gray scaled).
             </brief>
             <description>
-              If this option is chosen, the output image will have a single channel and the user 
-              will be required to specify the parameter FROM.  
+              If this option is chosen, the output image will have a single channel and the user
+              will be required to specify the parameter FROM.
             </description>
             <exclusions>
               <item>ALPHA</item>
@@ -265,7 +268,7 @@
             </brief>
             <description>
               If this option is chosen, the output image will have three channels and the user will
-              be required to specify the parameters RED, GREEN, and BLUE. 
+              be required to specify the parameters RED, GREEN, and BLUE.
             </description>
             <exclusions>
               <item>FROM</item>
@@ -281,8 +284,8 @@
               Output has four channels (alpha, red, green, and blue).
               </brief>
             <description>
-              If this option is chosen, the output image will have four channels and the user will 
-              be required to specify the parameters ALPHA, RED, GREEN, and BLUE. 
+              If this option is chosen, the output image will have four channels and the user will
+              be required to specify the parameters ALPHA, RED, GREEN, and BLUE.
             </description>
             <exclusions>
               <item>FROM</item>
@@ -303,13 +306,13 @@
         <brief>Format of output image</brief>
         <description>
           This parameter is used to select the output format.  It can be one of
-          PNG, BMP, JPEG, TIF, GIF, or JP2.  Note that not all formats may be
+          PNG, BMP, JPEG, TIF, or JP2.  Note that not all formats may be
           available.  It will depend on your installation of the Qt libraries.
           <p>
-          In addition, if the cube has Mapping labels, the program will produce 
-          a world file for use in Arc and/or other GIS packages. The file will 
-          have an extension that uses the first and last letters for the image 
-          extention and a "w". For example, .tif produces a world file extension of .tfw.
+          In addition, if the cube has Mapping labels, the program will produce
+          a world file for use in Arc and/or other GIS packages. The file will
+          have an extension that uses the first and last letters for the image
+          extension and a "w". For example, .tif produces a world file extension of .tfw.
           </p>
         </description>
 
@@ -317,7 +320,7 @@
           <option value="PNG">
             <brief>Output image will be PNG</brief>
             <description>
-              The output image is in PNG (Portable Network Graphics) format. The default extension 
+              The output image is in PNG (Portable Network Graphics) format. The default extension
               for this format is "png."
             </description>
             <exclusions>
@@ -328,19 +331,8 @@
           <option value="BMP">
             <brief>Output image will be BMP</brief>
             <description>
-              The output image is in BMP (Bit Mapped Graphics) format. The default extension for 
+              The output image is in BMP (Bit Mapped Graphics) format. The default extension for
               this format is "bmp."
-            </description>
-            <exclusions>
-              <item>BITTYPE</item>
-              <item>COMPRESSION</item>
-            </exclusions>
-          </option>
-          <option value="GIF">
-            <brief>Output image will be GIF</brief>
-            <description>
-              The output image is in GIF (Graphics Interchange Format) format. The default 
-              extension for this format is "gif."
             </description>
             <exclusions>
               <item>BITTYPE</item>
@@ -357,7 +349,7 @@
           <option value="JPEG">
             <brief>Output image will be JPEG</brief>
             <description>
-              The output image is in JPEG (Joint Photographic Experts Group) format. The default 
+              The output image is in JPEG (Joint Photographic Experts Group) format. The default
               extension for this format is "jpg."
             </description>
             <exclusions>
@@ -368,7 +360,7 @@
           <option value="JP2">
             <brief>Output image will be JPEG2000</brief>
             <description>
-              The output image is in JPEG2000 (Joint Photographic Experts Group 2000) format. The 
+              The output image is in JPEG2000 (Joint Photographic Experts Group 2000) format. The
               default extension for this format is "jp2."
             </description>
             <exclusions>
@@ -377,7 +369,7 @@
             </exclusions>
           </option>
         </list>
-      </parameter> 
+      </parameter>
       <parameter name="QUALITY">
         <type>integer</type>
         <brief>Specify output image quality</brief>
@@ -400,7 +392,7 @@
         <brief>Bit type of output file</brief>
         <description>
           This parameter allows the userPackBits is also known as Macintosh RLE. to set the bit type of the output image.
-          Some FORMAT values will only allow 8BIT outputs.
+          Some FORMAT values will only allow 8-bit outputs.
           16 bit signed (-32767=black, 32768=white)
         </description>
         <list>
@@ -413,14 +405,14 @@
           <option value="U16BIT">
             <brief> Output is 16 bit unsigned integer data </brief>
             <description>
-              Pixel values are within the 16-bit unsigned integer data range from 0 to 65535. This 
+              Pixel values are within the 16-bit unsigned integer data range from 0 to 65535. This
               option is not available for some output formats.
             </description>
           </option>
           <option value="S16BIT">
             <brief> Output is 16 bit signed integer data </brief>
             <description>
-              Pixel values are in 16-bit signed integer data range -32768 to 32767. This option is 
+              Pixel values are in 16-bit signed integer data range -32768 to 32767. This option is
               not available for some output formats.
             </description>
           </option>
@@ -449,7 +441,7 @@
             <description>
               Use PackBits compression on the output TIFF format image. PackBits is also known as Macintosh RLE.
               This compression algorithm should be supported by all TIFF readers that conform to the
-              Baseline TIFF specification. 
+              Baseline TIFF specification.
             </description>
           </option>
           <option value="LZW">
@@ -685,17 +677,17 @@
       </parameter>
     </group>
   </groups>
-  
+
   <examples>
     <example>
       <brief>
-        Example of red/green/blue output of isis2std program. 
+        Example of red/green/blue output of isis2std program.
       </brief>
       <description>
-        This example creates an output TIFF format file from 3 bands of an ISIS cube, designated 
-        red, green, and blue using a linear stretch and 8 bit output type. A histogram is created 
-        from the input values.  Using this histogram, we determine the minimum value to be any DN 
-        in the bottom 0.2% of the data. These DNs will be set to black in the output. Similarly, 
+        This example creates an output TIFF format file from 3 bands of an ISIS cube, designated
+        red, green, and blue using a linear stretch and 8-bit output type. A histogram is created
+        from the input values.  Using this histogram, we determine the minimum value to be any DN
+        in the bottom 0.2% of the data. These DNs will be set to black in the output. Similarly,
         the maximum value is any DN in the top 99.8% of the data and these DNs will be set to white.
       </description>
       <terminalInterface>
@@ -715,7 +707,7 @@
             <description>
               This image show the graphical user interface for this program.
             </description>
-            <thumbnail height="200" width="142" src="assets/thumbs/isis2stdGUI.jpg" caption="isis2std with RGB input and 8BIT output"/>
+            <thumbnail height="200" width="142" src="assets/thumbs/isis2stdGUI.jpg" caption="isis2std with RGB input and 8-bit output"/>
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -768,7 +760,7 @@
             Output image.
           </brief>
           <description>
-            The 8 bit output image, in TIFF format, created using the input red, green, and blue channels.
+            The 8-bit output image, in TIFF format, created using the input red, green, and blue channels.
           </description>
           <thumbnail height="150" width="200" src="assets/thumbs/rgbTIFFoutput.jpg" caption="The color output image."/>
           <parameterName>TO</parameterName>

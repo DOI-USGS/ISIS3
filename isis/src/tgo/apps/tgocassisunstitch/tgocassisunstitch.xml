@@ -17,12 +17,19 @@
     <change name="Kristin Berry" date="2017-11-14">
       Backward Compatibility Issue:  changed application name from unstitch to tgocassisunstitch and
       changed the output parameter name "TO" to "OUTPUTPREFIX" to more accurately reflect its use.
-    </change> 
-     <change name="Kristin Berry" date="2017-11-23">
-      Updated the behavior of the application when the user inputs an OUTPUTPREFIX without the .cub extension, 
-      but containing other '.'s  in the string to not strip off everything after the last period. For example, if the 
-      user inputs CAS-MCO-2016-11-22T16:10:43.505 as the OUTPUTPREFIX, now the 505 will now be retained. 
     </change>
+     <change name="Kristin Berry" date="2017-11-23">
+      Updated the behavior of the application when the user inputs an OUTPUTPREFIX without the .cub extension,
+      but containing other '.'s  in the string to not strip off everything after the last period. For example, if the
+      user inputs CAS-MCO-2016-11-22T16:10:43.505 as the OUTPUTPREFIX, now the 505 will now be retained.
+    </change>
+    <change name="Adam Goins" date="2018-02-15">
+      Updated the application to include the sample offsets when processing lines from the stitched
+      frame into output cubes.
+    </change>
+    <change name="Adam Goins" date="2018-02-15">
+     Modified unstitchFrame to parse the Archive group for each framelet.
+   </change>
 
   </history>
 
@@ -36,10 +43,10 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          A TGO CaSSIS fullframe cube to split into separate framelets. 
+          A TGO CaSSIS fullframe cube to split into separate framelets.
         </brief>
         <description>
-          A TGO CaSSIS fullframe cube to split into separate framelets. 
+          A TGO CaSSIS fullframe cube to split into separate framelets.
         </description>
         <filter>
           *.lis
@@ -54,10 +61,10 @@
          </brief>
          <description>
            The output ISIS cubes will be of the form basename_filter_frameletNumber.cub
-           There will also be a list produced with the same name. 
-	   
+           There will also be a list produced with the same name.
+
 	   This prefix can either be specified in the form "name.cub" or simply "name" without the .cub
-	   extension.  
+	   extension.
          </description>
          <filter>
            *.cub
