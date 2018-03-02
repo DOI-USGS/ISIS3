@@ -37,5 +37,4 @@ commands:
 
 	
 # Cleanup
-	# $(RM) $(OUTPUT)/errors_temp.txt;
 	$(RM) $(OUTPUT)/BROKEN.cub; 
