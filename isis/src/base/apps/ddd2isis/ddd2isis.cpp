@@ -130,7 +130,7 @@ void IsisMain() {
   ProcessImport p;
 
   int bitsPerBand = totalBandBits / nBands;
-  if ( ui.WasEntered("TO") ) {         
+  if ( ui.WasEntered("TO") ) {
     switch(bitsPerBand) {
       case 8:
         p.SetPixelType(Isis::UnsignedByte);
