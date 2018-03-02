@@ -117,7 +117,7 @@ void IsisMain() {
   PvlGroup results("FileInfo");
   results += PvlKeyword( "NumberOfLines", toString(nLines) );
   results += PvlKeyword( "NumberOfBytesPerLine", toString(nBytes) );
-  results += PvlKeyword( "BitType", toString(totalBandBits) );
+  results += PvlKeyword( "BitType", toString(bitType) );
   int nSamples = nBytes / (totalBandBits / 8);
   results += PvlKeyword( "NumberOfSamples", toString(nSamples) );
   int nBands = (totalBandBits / 8) / dataTypeBytes;
@@ -130,7 +130,7 @@ void IsisMain() {
   ProcessImport p;
 
   int bitsPerBand = totalBandBits / nBands;
-  if ( ui.WasEntered("TO") ) {
+  if ( ui.WasEntered("TO") ) {         
     switch(bitsPerBand) {
       case 8:
         p.SetPixelType(Isis::UnsignedByte);
@@ -142,7 +142,7 @@ void IsisMain() {
         p.SetPixelType(Isis::Real);
         break;
       default:
-        IString msg = "Unsupported bit per pixel count [" + IString(bitsPerBand) + "]. "; //Do we need this?
+        IString msg = "Unsupported bit per pixel count [" + IString(bitsPerBand) + "]. "; //Reword?
         msg += "(Use the raw2isis and crop programs to import the file in case it is ";
         msg += "line or sample interleaved.)";
         throw IException(IException::Io, msg, _FILEINFO_);
