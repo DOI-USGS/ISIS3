@@ -138,7 +138,7 @@ namespace Isis {
    * @brief Unserialize LidarData.
    *
    * This method unserializes LidarData from a JSON or binary (QByteArray) file. It will
-   * automatically determine if it is JSON or binary formatted date.
+   * automatically determine if it is JSON or binary formatted data.
    *
    * @param FileName lidarFile Name of the serialized LidarData file to read.
    * @throws IException::User Throws User exception if it cannot open the file passed.
@@ -237,9 +237,17 @@ namespace Isis {
               serialNumber = measureObject["serialNumber"].toString();
             }
 
+            QString type;
+            if (measureObject.contains("type") && measureObject["type"].isString()) {
+              type = measureObject["type"].toString();
+            }
+
             ControlMeasure *measure = new ControlMeasure();
             measure->SetCoordinate(sample, line);
             measure->SetCubeSerialNumber(serialNumber);
+            measure->SetType(measure->StringToMeasureType(type));
+            // std::cout << "InLidarData read type was set to " <<
+            //   measure->StringToMeasureType(type) << std::endl;
             lcp->Add(measure);
           }
         }
@@ -301,6 +309,9 @@ namespace Isis {
         measureObject["line"] = measure->GetLine();
         measureObject["sample"] = measure->GetSample();
         measureObject["serialNumber"] = measure->GetCubeSerialNumber();
+        measureObject["type"] = measure->GetMeasureTypeString();
+        // std::cout << "InLidarData output measure type was set to "
+        //           << measure->GetMeasureTypeString() << std::endl;
         measureArray.append(measureObject);
 
       }
