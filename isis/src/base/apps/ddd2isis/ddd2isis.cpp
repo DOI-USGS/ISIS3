@@ -49,6 +49,10 @@ void IsisMain() {
   readBytes.readLong = 0;
   fin.seekg(0);
   fin.read(readBytes.readChars, 4);
+  if( fin.fail() || fin.eof() ) {
+    string msg = "An error ocurred when reading the input file [" + from + "]";
+    throw IException(IException::Io, msg, _FILEINFO_);
+  }
   readBytes.readFloat = swp.Float(readBytes.readChars);
 
   if(readBytes.readLong != 1659) {
@@ -58,25 +62,33 @@ void IsisMain() {
 
   // Read bytes 4-7 to get number of lines
   fin.read(readBytes.readChars, 4);
+  if( fin.fail() || fin.eof() ) {
+    string msg = "An error ocurred when reading the input file [" + from + "]";
+    throw IException(IException::Io, msg, _FILEINFO_);
+  }
   readBytes.readFloat = swp.Float(readBytes.readChars);
   int nLines = (int) readBytes.readLong;
 
   // Read bytes 8-11 to get number of bytes
   fin.read(readBytes.readChars, 4);
+  if( fin.fail() || fin.eof() ) {
+    string msg = "An error ocurred when reading the input file [" + from + "]";
+    throw IException(IException::Io, msg, _FILEINFO_);
+  }
   readBytes.readFloat = swp.Float(readBytes.readChars);
   int nBytes = (int) readBytes.readLong;
 
   // Read bytes 12-15 to get the total number of bits out of all the bands
   fin.read(readBytes.readChars, 4);
-  readBytes.readFloat = swp.Float(readBytes.readChars);
-
   if( fin.fail() || fin.eof() ) {
     string msg = "An error ocurred when reading the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
+  readBytes.readFloat = swp.Float(readBytes.readChars);
   int totalBandBits = readBytes.readLong;
 
   // Maps the bit type of the file to the number of bytes of that type
+  // Taken directly from a given python program that reads in ddd data
   map<int, int> dataTypes = {
     {1450901768, 1},
     {1450902032, 2},
@@ -113,7 +125,8 @@ void IsisMain() {
     nOffset = 1024;
   }
 
-  //TO DO: Reword
+  fin.close();
+
   PvlGroup results("FileInfo");
   results += PvlKeyword( "NumberOfLines", toString(nLines) );
   results += PvlKeyword( "NumberOfBytesPerLine", toString(nBytes) );
@@ -125,42 +138,37 @@ void IsisMain() {
   results += PvlKeyword( "LabelBytes", toString(nOffset) );
   Application::Log(results);
 
-  fin.close();
-
   ProcessImport p;
 
   int bitsPerBand = totalBandBits / nBands;
-  if ( ui.WasEntered("TO") ) {
-    switch(bitsPerBand) {
-      case 8:
-        p.SetPixelType(Isis::UnsignedByte);
-        break;
-      case 16:
-        p.SetPixelType(Isis::UnsignedWord);
-        break;
-      case 32:
-        p.SetPixelType(Isis::Real);
-        break;
-      default:
-        IString msg = "Unsupported bit per pixel count [" + IString(bitsPerBand) + "]. "; //Reword?
-        msg += "(Use the raw2isis and crop programs to import the file in case it is ";
-        msg += "line or sample interleaved.)";
-        throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    // ddd files with more than one band are pixel interleaved
-    // Having one band is similar to BIP, but this is here for clarification
-    if (nBands > 1) {
-      p.SetOrganization(ProcessImport::BIP);
-    }
-
-    p.SetDimensions(nSamples, nLines, nBands);
-    p.SetFileHeaderBytes(nOffset);
-    p.SetByteOrder(Isis::Msb);
-    p.SetInputFile( ui.GetFileName("FROM") );
-    p.SetOutputCube("TO");
-
-    p.StartProcess();
-    p.EndProcess();
+  switch(bitsPerBand) {
+    case 8:
+      p.SetPixelType(Isis::UnsignedByte);
+      break;
+    case 16:
+      p.SetPixelType(Isis::UnsignedWord);
+      break;
+    case 32:
+      p.SetPixelType(Isis::Real);
+      break;
+    default:
+      IString msg = "Unsupported bit per pixel count [" + IString(bitsPerBand) + "] ";
+      msg += "from [" + from + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
   }
+
+  // ddd files with more than one band are pixel interleaved
+  // Having one band is similar to BIP, but this is here for clarification
+  if (nBands > 1) {
+    p.SetOrganization(ProcessImport::BIP);
+  }
+
+  p.SetDimensions(nSamples, nLines, nBands);
+  p.SetFileHeaderBytes(nOffset);
+  p.SetByteOrder(Isis::Msb);
+  p.SetInputFile( ui.GetFileName("FROM") );
+  p.SetOutputCube("TO");
+
+  p.StartProcess();
+  p.EndProcess();
 }

@@ -7,7 +7,8 @@
   </brief>
 
   <description>
-    This program will import a ddd image into an Isis cube. The ddd format files are created by Malin Space Science Systems.
+    This program will import a ddd image into an Isis cube. The ddd format files
+    are created by Malin Space Science Systems.
   </description>
 
   <history>
@@ -32,12 +33,13 @@
     </change>
     <change name="Kaitlyn Lee" date="2018-03-01">
       We were given a python program that reads in data from a ddd file
-      to use as an example. In the python program, the way they calculate the
-      number of bands is different from the one we previously used. The old
-      formula did the number of total band bits / 8; the formula is now
-      the (number of total band bits / 8) / the number of bytes of the data type
-      of the file's bit type. ddd files are also pixel interleaved, so the program
-      can now process files with multiple bands. Fixes #703.
+      to use as an example. In the python program, the formula they used to
+      calculate the number of bands is different from the one we previously used.
+      The old formula did the number of total band bits / 8; the formula is now
+      (the number of total band bits / 8) / the number of bytes of the data type
+      of the file's bit type. Added the ability to process files with multiple
+      bands. Removed the internal default of the output parameter set to None so
+      that an output file is now requried. Fixes #703.
     </change>
   </history>
 
@@ -64,7 +66,6 @@
       <parameter name="TO">
          <type>cube</type>
          <fileMode>output</fileMode>
-         <internalDefault>None</internalDefault>
          <brief>
            Output Isis cube
          </brief>
