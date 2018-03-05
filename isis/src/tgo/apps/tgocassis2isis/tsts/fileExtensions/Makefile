@@ -31,10 +31,14 @@ commands:
 	if [ `$(APPNAME) \
 		from=$(INPUT)/CAS-MCO-2016-11-22T15.45.50.984-RED-01000-B1.xml \
 		to=$(OUTPUT)/BROKEN.cub \
-		2>> $(OUTPUT)/errors.txt > /dev/null` ]; \
+		2>> $(OUTPUT)/errors_temp.txt > /dev/null` ]; \
 		then true; \
 		fi;
 
+# Remove everything in brackets like filenames/paths from error messages
+	$(SED) 's/\[\([^"]*\)\]//g' $(OUTPUT)/errors_temp.txt \
+	> $(OUTPUT)/errors.txt;
 	
 # Cleanup
+	$(RM) $(OUTPUT)/errors_temp.txt
 	$(RM) $(OUTPUT)/BROKEN.cub; 
