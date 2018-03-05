@@ -213,8 +213,20 @@ namespace Isis {
         lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
                                                  Longitude(longitude, Angle::Units::Degrees),
                                                  Distance(radius, Distance::Units::Kilometers)));
-        
 
+        if (pointObject.contains("simultaneousImages") &&
+                                 pointObject["simultaneousImages"].isArray()) {
+          QJsonArray simultaneousArray =
+                pointObject["simultaneousImages"].toArray();
+           
+              for (int simIndex = 0; simIndex < simultaneousArray.size(); simIndex ++) {
+                QString newSerial;
+                // Unserialize each simultaneous image serial number
+                newSerial =  simultaneousArray[simIndex].toString();
+                lcp->addSimultaneous(newSerial);
+              }              
+        }
+        
         // Unserialize ControlMeasures
         if (pointObject.contains("measures") && pointObject["measures"].isArray()) {
           QJsonArray measureArray = pointObject["measures"].toArray();
@@ -237,17 +249,15 @@ namespace Isis {
               serialNumber = measureObject["serialNumber"].toString();
             }
 
-            QString type;
-            if (measureObject.contains("type") && measureObject["type"].isString()) {
-              type = measureObject["type"].toString();
-            }
+            // QString type;
+            // if (measureObject.contains("type") && measureObject["type"].isString()) {
+            //   type = measureObject["type"].toString();
+            // }
 
             ControlMeasure *measure = new ControlMeasure();
             measure->SetCoordinate(sample, line);
             measure->SetCubeSerialNumber(serialNumber);
-            measure->SetType(measure->StringToMeasureType(type));
-            // std::cout << "InLidarData read type was set to " <<
-            //   measure->StringToMeasureType(type) << std::endl;
+            // measure->SetType(measure->StringToMeasureType(type));
             lcp->Add(measure);
           }
         }
@@ -300,6 +310,13 @@ namespace Isis {
       pointObject["latitude"] = aprioriSurfacePoint.GetLatitude().planetocentric(Angle::Units::Degrees);
       pointObject["longitude"] = aprioriSurfacePoint.GetLongitude().positiveEast(Angle::Units::Degrees);
       pointObject["radius"] = aprioriSurfacePoint.GetLocalRadius().kilometers();
+      
+      // Serialize the list of simultaneous images
+     QJsonArray simultaneousArray;
+      foreach (QString sn, lcp->snSimultaneous()) {
+        simultaneousArray.append(sn);
+      }
+      pointObject["simultaneousImages"] = simultaneousArray;
 
       QJsonArray measureArray;
       // Serialize the ControlMeasures it contains
@@ -309,9 +326,7 @@ namespace Isis {
         measureObject["line"] = measure->GetLine();
         measureObject["sample"] = measure->GetSample();
         measureObject["serialNumber"] = measure->GetCubeSerialNumber();
-        measureObject["type"] = measure->GetMeasureTypeString();
-        // std::cout << "InLidarData output measure type was set to "
-        //           << measure->GetMeasureTypeString() << std::endl;
+        // measureObject["type"] = measure->GetMeasureTypeString();
         measureArray.append(measureObject);
 
       }

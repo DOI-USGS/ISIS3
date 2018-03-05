@@ -21,6 +21,9 @@ namespace Isis {
     m_time = iTime();
     m_range = -1.0;
     m_sigmaRange = -1.0;
+    m_snSimultaneous = NULL;
+
+    m_snSimultaneous = new QStringList;
   }
   
   
@@ -28,6 +31,11 @@ namespace Isis {
    * Destructor
    */
   LidarControlPoint::~LidarControlPoint() {
+    if (m_snSimultaneous) {
+      delete m_snSimultaneous;
+      m_snSimultaneous = NULL;
+    }
+    
   }
   
   
@@ -74,6 +82,17 @@ namespace Isis {
   
   
   /**
+   * Add a measure to the list of simultaneous images of a  LidarControlPoint
+   * 
+   * @param time The serial number of the simultaneous image to add
+   */
+  ControlPoint::Status LidarControlPoint::addSimultaneous(QString newSerial) {
+    m_snSimultaneous->append(newSerial);
+    return ControlPoint::Status::Success;
+  }
+  
+  
+  /**
    * Returns the range of the point
    * 
    * @return double The range
@@ -100,5 +119,15 @@ namespace Isis {
    */
   double LidarControlPoint::sigmaRange() {
     return m_sigmaRange;
+  }
+  
+  
+  /**
+   * Returns the list of serial numbers of simultaneous images of the Lidar point
+   * 
+   * @return QList The list of serial numbers
+   */
+  QList < QString > LidarControlPoint::snSimultaneous() const{
+    return *m_snSimultaneous;
   }
 }

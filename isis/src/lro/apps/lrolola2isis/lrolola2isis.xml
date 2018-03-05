@@ -18,6 +18,13 @@
     <change name="Makayla Shepherd and Tyler Wilson" date="2017-01-29">
       Original version
     </change>
+    <change name="Debbie Cook" date="2018-03-02">
+      Added items that will be needed to bundle adjust:  new point keyword
+      simultaneousImages that is an array of serial numbers of the measures
+      on images taken simultaneously with the Lidar data, a threshold to
+      screen measures that are off the image, and both point (lat/lon/radius)
+      and range constraints.  Also added point type and set it to Constrained.
+    </change>
   </history>
 
   <category>
@@ -72,6 +79,8 @@
             </option>
           </list>
         </parameter>
+    </group>
+    <group name="Processing Parameters">
         <parameter name="POINTID">
           <type>string</type>
           <brief>
@@ -109,6 +118,24 @@
             </ul>
           </description>
         </parameter>
+        <parameter name="THRESHOLD">
+        <type>double</type>
+        <minimum inclusive="yes">0</minimum>
+        <default>
+          <item>0.0</item>
+        </default>
+          <brief>
+            The threshold allowed for points to be off the image in pixels..
+          </brief>
+          <description>
+            <p>
+              This value is used to screen measures during back projection.
+              If a Lidar point maps into an image with coordinates outside
+              of the valid pixel range extended by the threshold value, it
+              will be rejected as a measure for that point.
+            </p>
+          </description>
+        </parameter>            
     </group>
   </groups>
 </application>

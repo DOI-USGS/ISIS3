@@ -37,6 +37,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName dataFile = ui.GetFileName("FROM");
   SerialNumberList cubeList = SerialNumberList(ui.GetFileName("CUBES"));
+  double threshold = ui.GetDouble("THRESHOLD");
 
   QList<LidarCube> images;
   
@@ -83,71 +84,51 @@ void IsisMain() {
     lidarPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
     
     for (int j = 0; j < images.size(); j++) {
-//      if (images[j].startTime <= time || time <= images[j].endTime) {
-      if (time >= images[j].startTime && time <= images[j].endTime) {
-        Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
+      Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
         
-        if (cube != NULL) {
+      if (cube != NULL) {
           
-          Camera *camera = cube->camera();
+        Camera *camera = cube->camera();
           
-          if (camera != NULL) {
-            if (camera->SetGround(lat, lon)) {
+        if (camera != NULL) {
+          if (camera->SetGround(lat, lon)) {
+            double samp = camera->Sample();
+            double line = camera->Line();
+              
+            if (samp > 0.5 - threshold   &&   line > 0.5 - threshold
+                && samp < camera->Samples() + .5  &&  line < camera->Lines() + .5) {
         
               ControlMeasure *measure = new ControlMeasure;
               measure->SetCoordinate(camera->Sample(), camera->Line()); 
               measure->SetCubeSerialNumber(images[j].sn);
-              measure->SetType(ControlMeasure::MeasureType::Lidar);
           
               lidarPoint->Add(measure);
+              if (time >= images[j].startTime && time <= images[j].endTime) {
+                QString newSerial = measure->GetCubeSerialNumber();
+                lidarPoint->addSimultaneous(newSerial);
+              }
             }
-          }
-          else {
-            QString msg = "Unable to create a camera from " + images[j].name.expanded();
-            throw IException(IException::Unknown, msg, _FILEINFO_);
           }
         }
         else {
-          QString msg = "Unable to open a cube from " + images[j].name.expanded();
+          QString msg = "Unable to create a camera from " + images[j].name.expanded();
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
-        
       }
-      // End Lidar point section
       else {
-        // Attempt to back project the point into the image to get other measures
-        // Can this be rearranged to avoid duplicating so much code? Maybe just reset
-        // the measure type each pass through the loop to Candidate.  If time overlaps,
-        // change it to Lidar.
-        Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
-        
-        if (cube != NULL) {
-          
-          Camera *camera = cube->camera();
-          
-          if (camera != NULL) {
-            if (camera->SetGround(lat, lon)) {
-        
-              ControlMeasure *measure = new ControlMeasure;
-              measure->SetCoordinate(camera->Sample(), camera->Line()); 
-              measure->SetCubeSerialNumber(images[j].sn);
-          
-              lidarPoint->Add(measure);
-            }
-          }
-          else {
-            QString msg = "Unable to create a camera from " + images[j].name.expanded();
-            throw IException(IException::Unknown, msg, _FILEINFO_);
-          }
-        }
-        else {
-          QString msg = "Unable to open a cube from " + images[j].name.expanded();
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
-      }
-      // End Lidar point nonLidar measure section (not simultaneous)
-        
+        QString msg = "Unable to open a cube from " + images[j].name.expanded();
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }        
     }
+    // end image loop
+  // Debug lines
+  //   if (lidarPoint->snSimultaneous().size() > 0) {
+  // std::cout << "Number of simultaneous images is " <<
+  //   lidarPoint->snSimultaneous().size() << std::endl;
+  // std::cout << "Row index = " << i << std::endl;
+  // std::cout << "   sn[0] = " << lidarPoint->snSimultaneous()[0] << std::endl;
+  //   }
+  // End debug lines
     
     if (lidarPoint->GetNumMeasures() <= 0) {
       continue;
