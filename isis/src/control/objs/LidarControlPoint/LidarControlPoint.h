@@ -55,15 +55,19 @@ namespace Isis {
     ControlPoint::Status setRange(double range);
     ControlPoint::Status setSigmaRange(double sigmaRange);
     ControlPoint::Status setTime(iTime time);
+    ControlPoint::Status addSimultaneous(QString newSerial);
     
     double range();
     double sigmaRange();
     iTime time();
+    QList < QString > snSimultaneous() const;
     
   private:
     double m_range;       //!< The range
     double m_sigmaRange;  //!< The sigma range
     iTime m_time;         //!< The time the lidar point was taken
+    QStringList *m_snSimultaneous;  //!< Serial number(s) of
+    //!                                                               simultaneous image(s)
     
   };
 
