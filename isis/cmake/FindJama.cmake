@@ -11,4 +11,4 @@ find_path(JAMA_INCLUDE_DIR
 
 get_filename_component(JAMA_ROOT_INCLUDE_DIR "${JAMA_INCLUDE_DIR}" DIRECTORY)
 
-message("JAMA FOUND")
+message( "-- JAMA INCLUDE DIR: ${JAMA_INCLUDE_DIR}")

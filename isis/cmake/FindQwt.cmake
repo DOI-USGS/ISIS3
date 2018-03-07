@@ -15,3 +15,6 @@ find_library(QWT_LIBRARY
 )
 
 get_filename_component(QWT_ROOT_INCLUDE_DIR "${QWT_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- QWT INCLUDE LIB: ${QWT_INCLUDE_DIR}")
+message( "-- QWT LIB: ${QWT_LIBRARY}")

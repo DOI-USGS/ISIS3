@@ -10,3 +10,5 @@ find_path(TNT_INCLUDE_DIR
 )
 
 get_filename_component(TNT_ROOT_INCLUDE_DIR "${TNT_INCLUDE_DIR}" DIRECTORY)
+
+message("-- TNT INCLUDE DIR: ${TNT_INCLUDE_DIR}" )
