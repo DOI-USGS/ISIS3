@@ -15,3 +15,6 @@ find_library(QWT_LIBRARY
 )
 
 get_filename_component(QWT_ROOT_INCLUDE_DIR "${QWT_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- SUPERLU LIB: ${SUPERLU_LIBRARY}")
+message( "-- SUPERLU LIB: ${SUPERLU_LIBRARY}")

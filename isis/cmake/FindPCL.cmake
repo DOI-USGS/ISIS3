@@ -20,3 +20,8 @@ find_library(PCL_OCTREE_LIBRARY NAMES pcl_octree)
 find_library(PCL_IO_LIBRARY     NAMES pcl_io)
 
 get_filename_component(PCL_ROOT_INCLUDE_DIR "${PCL_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- PCL INCLUDE DIR: ${PCL_INCLUDE_DIR}")
+message( "-- PCL COMMON LIB: ${pcl_common}")
+message( "-- PCL OCTREE LIB: ${pcl_octree}")
+message( "-- PCL IO LIB: ${pcl_io}")

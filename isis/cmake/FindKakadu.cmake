@@ -21,3 +21,6 @@ find_library(KAKADU_V_LIBRARY
 )
 
 get_filename_component(KAKADU_ROOT_INCLUDE_DIR "${KAKADU_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- KAKADU INC DIR: ${KAKADU_INCLUDE_DIR}")
+message( "-- KAKADU LIB DIR: ${KAKADU_A_LIBRARY}")

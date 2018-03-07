@@ -16,3 +16,9 @@ find_library(HDF5_HL_LIBRARY      NAMES hdf5_hl)
 find_library(HDF5_HLCPP_LIBRARY   NAMES hdf5_hl_cpp)
 
 get_filename_component(HDF5_ROOT_INCLUDE_DIR "${HDF5_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- HDF5 INCLUDE DIR: ${HDF5_INCLUDE_DIR}")
+message( "-- HDF5 LIB: ${HDF5_LIBRARY}")
+message( "-- HDF5 CPP LIB: ${HDF5_CPP_LIBRARY}")
+message( "-- HDF5 HL LIB: ${HDF5_HL_LIBRARY}")
+message( "-- HDF5 HLCPP LIB: ${HDF5_HLCPP_LIBRARY}")

@@ -4,6 +4,41 @@
 #   go looking for them if they are not?
 #===============================================================================
 
+list(APPEND CMAKE_INCLUDE_PATH
+  /usgs/pkgs/local/v007/include/
+  /usgs/pkgs/local/v007/bin/
+  /usgs/pkgs/local/v007/lib/
+  /usgs/pkgs/local/v007/objects/
+  /usgs/pkgs/local/v007/include/google-protobuf/protobuf2.6.1/
+  /usgs/pkgs/local/v007/include/xercesc/xercesc-3.1.2/
+  /usgs/pkgs/local/v007/include/tiff/tiff-4.0.5/
+  /usr/lib64/
+)
+
+set(CMAKE_PREFIX_PATH
+  /usgs/pkgs/local/v007/include/
+  /usgs/pkgs/local/v007/bin/
+  /usgs/pkgs/local/v007/lib/
+  /usgs/pkgs/local/v007/libexec/
+  /opt/usgs/v007/ports/Library/Frameworks/
+  /opt/usgs/v007/ports/libexec/
+  /opt/usgs/v007/ports/bin/
+  /opt/usgs/v007/ports/lib/
+  /opt/usgs/v007/ports/include/
+  /opt/usgs/v007/ports/libexec/qt5
+  /opt/usgs/v007/ports/libexec/qt5/bin/
+  /opt/usgs/v007/ports/libexec/qt5/lib/
+  /opt/usgs/v007/3rdparty/bin
+  /opt/usgs/v007/3rdparty/include/
+  /opt/usgs/v007/3rdparty/lib/
+  /opt/usgs/v007/proprietary/
+  /opt/usgs/v007/proprietary/include/
+  /opt/usgs/v007/proprietary/lib/
+  /usr/lib/
+  /usr/lib64/
+  /usr/local/lib/
+)
+
 # Specify top level directories
 set(thirdPartyDir "/usgs/pkgs/local/v007")
 set(INCLUDE_DIR "${thirdPartyDir}/include")
@@ -66,7 +101,7 @@ if(APPLE)
                   Widgets
                   Xml
                   XmlPatterns REQUIRED)
-else() #oh god why
+else() # oh god why
   find_path(QT5_CORE_INCLUDE_DIR                 NAMES qchar.h                PATH_SUFFIXES qt/qt5.7.1/QtCore/)
   find_path(QT5_CONCURRENT_INCLUDE_DIR           NAMES qtconcurrentmap.h      PATH_SUFFIXES qt/qt5.7.1/QtConcurrent)
   find_path(QT5_DBUS_INCLUDE_DIR                 NAMES qdbusmacros.h          PATH_SUFFIXES qt/qt5.7.1/QtDBus)
@@ -147,6 +182,7 @@ find_package(TIFF      4.0.5   REQUIRED) # "tiff/tiff-${TIFF_FIND_VERSION}"
 find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 directory is "tnt/tnt126/"
 find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
 find_package(X11       6       REQUIRED)
+find_package(OpenGL            REQUIRED)
 
 # v007 might have different versions installed for our mac and linux systems.
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -156,14 +192,10 @@ else(APPLE)
   find_package(Geos    3.5.1   REQUIRED)
 endif(APPLE)
 
-
-
-
 # Only include Kakadu if it is available
-if(${JP2KFLAG})
-  message("ENABLING KAKADU")
+if(JP2KFLAG)
   find_package(Kakadu)
-endif(${JP2KFLAG})
+endif()
 
 get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
 foreach (_variableName ${_variableNames})

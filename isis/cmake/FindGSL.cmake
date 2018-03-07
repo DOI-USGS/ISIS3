@@ -19,3 +19,7 @@ find_library(GSL_CBLAS_LIBRARY
 )
 
 get_filename_component(GSL_ROOT_INCLUDE_DIR "${GSL_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- GSL INCLUDE DIR: ${GSL_INCLUDE_DIR}")
+message( "-- GSL LIB: ${GSL_LIBRARY}")
+message( "-- GSL CBLAS LIB: ${GSL_CBLAS_LIBRARY}")

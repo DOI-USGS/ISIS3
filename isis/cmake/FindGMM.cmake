@@ -10,3 +10,5 @@ find_path(GMM_INCLUDE_DIR
 )
 
 get_filename_component(GMM_ROOT_INCLUDE_DIR "${GMM_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- GMM INCLUDE DIR: ${GMM_INCLUDE_DIR}")
