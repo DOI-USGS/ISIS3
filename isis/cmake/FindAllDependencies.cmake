@@ -183,6 +183,7 @@ find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 direct
 find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
 find_package(X11       6       REQUIRED)
 find_package(OpenGL            REQUIRED)
+find_package(Kakadu)
 
 # v007 might have different versions installed for our mac and linux systems.
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -191,11 +192,6 @@ if(APPLE)
 else(APPLE)
   find_package(Geos    3.5.1   REQUIRED)
 endif(APPLE)
-
-# Only include Kakadu if it is available
-if(JP2KFLAG)
-  find_package(Kakadu)
-endif()
 
 get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
 foreach (_variableName ${_variableNames})
