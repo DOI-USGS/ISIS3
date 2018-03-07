@@ -31,8 +31,11 @@
 #include "JP2Error.h"
 
 using namespace std;
+
+#if ENABLEJP2K
 using namespace kdu_core;
 using namespace kdu_supp;
+#endif 
 
 namespace Isis {
 
