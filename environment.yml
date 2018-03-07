@@ -69,39 +69,37 @@ dependencies:
   - sqlite=3.20.1=2
   - suitesparse=4.5.4=blas_openblas_200
   - superlu=5.2.1=blas_openblas_201
-  - tk=8.6.7=0
-  - wheel=0.30.0=py27_2
-  - x264=20131217=3
-  - xorg-kbproto=1.0.7=1
-  - xorg-libx11=1.6.4=6
-  - xorg-libxau=1.0.8=3
-  - xorg-libxdmcp=1.1.2=3
-  - xorg-xproto=7.0.31=6
+  - tk=8.6.7
+  - wheel=0.30.0
+  - x264=20131217
+  - xorg-kbproto=1.0.7
+  - xorg-libx11=1.6.4
+  - xorg-libxau=1.0.8
+  - xorg-libxdmcp=1.1.2
+  - xorg-xproto=7.0.31
   - xz=5.2.3=0
   - zlib=1.2.11=0
-  - ca-certificates=2017.08.26=ha1e5d58_0
-  - certifi=2018.1.18=py27_0
-  - gsl=2.2.1=h002c638_3
-  - libcxx=4.0.1=h579ed51_0
-  - libcxxabi=4.0.1=hebd6815_0
-  - mysql=5.7.20=h14d89c2_0
-  - openblas=0.2.19=1
-  - openssl=1.0.2n=hdbc3d79_0
-  - qt=5.6.2=h9975529_14
-  - isisdeps=7=0
-  - bullet=2.86.1=he2aa7b0_0
-  - ds9=7.5=h35e3669_0
-  - embree=2.16.0=h6834224_0
-  - gmm=5.0=h6aef312_0
-  - jama=125=hf0e5908_0
-  - naif=n0066=h90cdba2_0
-  - patchelf=0.9=h879b6ae_0
-  - pcl=1.8.1=h7a71350_0
-  - qhull=7.2.0=h396fa31_0
-  - tbb=4.4=hf7780a4_0
-  - tnt=126=h520b23f_0
-  - vtk=7.1.1=py27h56fd973_0
-  - xalan-c=1.11=h1922a5c_0
-  - xerces-c=3.1.4=h10f7eb2_0
-prefix: /Users/krodriguez/anaconda3/envs/isisdeps
+  - ca-certificates=2017.08.26
+  - certifi=2018.1.18
+  - gsl=2.2.1
+  - libcxx=4.0.1
+  - libcxxabi=4.0.1
+  - mysql=5.7.20
+  - openblas=0.2.19
+  - openssl=1.0.2n
+  - qt=5.6.2
+  - bullet=2.86.1
+  - ds9=7.5
+  - embree=2.16.0
+  - gmm=5.0
+  - jama=125
+  - naif=n0066
+  - patchelf=0.9
+  - pcl=1.8.1
+  - qhull=7.2.0
+  - tbb=4.4
+  - tnt=126
+  - vtk=7.1.1
+  - xalan-c=1.11
+  - xerces-c=3.1.4
 
