@@ -92,7 +92,7 @@ dependencies:
 - ds9=7.5=h35e3669_0
 - embree=2.16.0=h6834224_0
 - gmm=5.0=h6aef312_0
-- naif=n0066=h90cdba2_0
+- naif=n0066
 - patchelf=0.9=h879b6ae_0
 - pcl=1.8.1=h7a71350_0
 - qhull=7.2.0=h396fa31_0
