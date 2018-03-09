@@ -7,7 +7,7 @@
 
 find_path(CSPICE_INCLUDE_DIR
   NAME SpiceUsr.h
-  PATH_SUFFIXES naif
+  PATH_SUFFIXES naif cspice
 )
 
 find_library(CSPICE_LIBRARY

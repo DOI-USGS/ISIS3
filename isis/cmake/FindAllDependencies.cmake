@@ -1,15 +1,15 @@
-#===============================================================================
+#==============================================================================
 # High level script to handle all required 3rd party dependencies
 # - All of them are expected to be in the 3rdParty folder, this script does not
 #   go looking for them if they are not?
 #===============================================================================
 
 message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
-set(CMAKE_LIBRARY_PATH $ENV{$CONDA_PREFIX})
-set(CMAKE_INCLUDE_PATH $ENV{$CONDA_PREFIX})
+list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+message("Test: ${CMAKE_FIND_ROOT_PATH}") 
 
 # Add thirdPartyCppFlags
-set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
+set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals -DGMM_USES_SUPERLU)
 set(thirdPartyCppFlags ${thirdPartyCppFlags} "-DENABLEJP2K=${JP2KFLAG}")
 
 # Paths to required executables
@@ -42,9 +42,9 @@ find_package(Qt5 COMPONENTS
                 Sql
                 Svg
                 Test
-                WebChannel
-                WebEngine
-                WebEngineWidgets
+		WebChannel
+		WebKit
+		WebKitWidgets
                 Widgets
                 Xml
                 XmlPatterns REQUIRED)
@@ -74,15 +74,15 @@ find_package(TIFF      4.0.5   REQUIRED) # "tiff/tiff-${TIFF_FIND_VERSION}"
 find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 directory is "tnt/tnt126/"
 find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
 find_package(X11       6       REQUIRED)
-find_package(OpenGL            REQUIRED)
 find_package(nanoflann         REQUIRED)
-find_package(png               REQUIRED)
+find_package(PNG               REQUIRED)
 find_package(Kakadu)
 
 # v007 might have different versions installed for our mac and linux systems.
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
   find_package(Geos    3.5.0   REQUIRED)
+  find_package(OpenGL            REQUIRED)
 else(APPLE)
   find_package(Geos    3.5.1   REQUIRED)
 endif(APPLE)
