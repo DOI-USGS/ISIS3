@@ -30,8 +30,8 @@ namespace Isis {
   /**
    * @brief Define shapes and provide utilities for shapes stored as Isis3 EquatorialCylindrical map
    *
-   * This class will define shapes of Isis3 target bodies with the shape defined by an 
-   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and photometric 
+   * This class will define shapes of Isis3 target bodies with the shape defined by an
+   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and photometric
    * information for the intersection point.
    *
    * @author 2010-07-30 Debbie A. Cook
@@ -47,6 +47,9 @@ namespace Isis {
    *                           intersection in intersectSurface() method to prevent early return
    *                           and attempt the iterative method even when the ellipsoid is not
    *                           intersected. Fixes #1438
+   *   @history 2018-01-05 Cole Neubauer - Fixed units conversion in intersectSurface so that the
+   *                           loop is stepping by radians per pixel, as recommended by Jeff
+   *                           Anderson (LROC team). Fixes #5245
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
@@ -67,4 +70,3 @@ namespace Isis {
 };
 
 #endif
-

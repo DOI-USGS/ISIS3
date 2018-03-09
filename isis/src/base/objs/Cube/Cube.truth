@@ -356,31 +356,3 @@ End_Object
 End
 0 0 0 20 20 20 39 39 39 0 20 39 0 20 39 0 20 39 
 **PROGRAMMER ERROR** Cannot write to the cube [isisTruth_external2.ecub] because it is opened read-only.
-
-Test reading an ecub that points to detached lbl
-Object = IsisCube
-  Object = Core
-    ^DnFile = IsisCube_02.lbl
-  End_Object
-End_Object
-
-Object = Label
-  Bytes = 65536
-End_Object
-End
-0 0 0 1 1 1 2 2 2 N N N N N N N N N 
-**ERROR** The cube [isisTruth_external3.ecub] does not support storing DN data because it is using an external file for DNs.
-
-Test copying an ecub that points to detached lbl
-Object = IsisCube
-  Object = Core
-    ^DnFile = isisTruth_external3.ecub
-  End_Object
-End_Object
-
-Object = Label
-  Bytes = 65536
-End_Object
-End
-0 0 0 1 1 1 2 2 2 N N N N N N N N N 
-**ERROR** The cube [isisTruth_external3.copy.ecub] does not support storing DN data because it is using an external file for DNs.
