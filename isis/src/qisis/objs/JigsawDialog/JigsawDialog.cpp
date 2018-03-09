@@ -310,12 +310,43 @@ namespace Isis {
    */
   Cube *JigsawDialog::CopyImageToResultsFunctor::operator()(const FileName &image) {
     try {
+      Cube *result = NULL;
+
       // Get the destination folder and create that path.
       FileName destination(QFileInfo(m_destinationFolder, image.name()).absoluteFilePath());
       m_destinationFolder.mkpath(destination.path());
 
-      Cube originalCube(image, "r");
-      return originalCube.copy(destination, CubeAttributeOutput("+External"));
+      // The input FileName will be referencing an imported ecub file.
+      // Need to get the .cub file (via Cube::externalCubeFileName) to copy.
+      // This method returns whatever value is set for the ^DnFile keyword... will not contain
+      // a path if the .ecub and .cub are in the same directory.
+      Cube importCube(image, "r");
+      FileName dnCubeFileName;
+      // The .ecub's ^DnFile is cubeFileName.cub (.ecub sitting next to .cub)
+      if (importCube.externalCubeFileName().path() == ".") {
+
+        QDir relative(m_destinationFolder.absolutePath());
+        dnCubeFileName = FileName(QDir(image.path()).canonicalPath() + "/" + importCube.externalCubeFileName().name());
+        QString s = relative.relativeFilePath(dnCubeFileName.toString());
+        // Locate the DnFile cube by using the input image's (ecub) path and the DnFile name (cub)
+        //dnCubeFileName = FileName(image.path() + "/" + importCube.externalCubeFileName().name());
+        // WHY DO WE NEED TO USE QDIR canonical path? why is the image.path relative and not abs?
+        //dnCubeFileName = FileName(s);
+        dnCubeFileName = FileName(QDir(image.path()).canonicalPath() + "/" +
+                                  importCube.externalCubeFileName().name());
+        Cube dnCube(dnCubeFileName, "r");
+
+
+        result = dnCube.copy(destination, CubeAttributeOutput("+External"));
+        result->relocateDnData(s);
+      }
+      // The .ecub's ^DnFile is an absolute path (.ecub potentially not located next to .cub)
+      else {
+        dnCubeFileName = importCube.externalCubeFileName();
+        Cube dnCube(dnCubeFileName, "r");
+        result = dnCube.copy(destination, CubeAttributeOutput("+External"));
+      }
+      return result;
     }
     // Error tracking should be more robust, see ImportImagesWorkOrder.
     catch (IException &e) {
@@ -348,8 +379,6 @@ namespace Isis {
     //  Write text summary file
     m_bundleSolutionInfo->outputText();
 
-    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
-
     // create output control net
     // Write the new jigged control net with correct path to results folder + runtime
     FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
@@ -362,10 +391,7 @@ namespace Isis {
     foreach (ImageList *imageList, imageLists) {
       // Keep track of the file names of the images that were used in the bundle.
       QStringList imagesToCopy;
-      int temp = 1;
-      if (!imageList->name().isEmpty()) {
-        imageList->setName("import" + QString::number(temp));
-      }
+
       // Now, we iterate through each image in the current image list ("import"), and we determine
       // the location of the image and where to copy it to (as an ecub).
       foreach (Image *image, *imageList) {
@@ -377,54 +403,58 @@ namespace Isis {
       CopyImageToResultsFunctor copyImage(m_project->bundleSolutionInfoRoot() + "/" +
                                           m_bundleSolutionInfo->runTime() + "/images/" +
                                           imageList->name());
-      // Do we need to release the memory for these cubes?
-      // TLS 2017-05-15  I commented following 5 lines of code.  They are causing compile warnings
-      // and are not currently doing anything.  Where are updated cubes written?
-//    QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
-//    for (int i = 0; i < imagesToCopy.size(); i++) {
-//      Cube *c = copiedCubes.resultAt(i);
-//      Table matrix = m_bundleAdjust->cMatrix(i);
-//    }
+      QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
+
+      // Prepare for our adjusted images (ecubs)
+      ImageList *adjustedImages = new ImageList(imageList->name(), imageList->path());
+
+      // Update the adjusted images' labels
+      for (int i = 0; i < imagesToCopy.size(); i++) {
+        Cube *ecub = copiedCubes.resultAt(i);
+        if (ecub) {
+          Process propagateHistory;
+          propagateHistory.SetInputCube(ecub);
+
+          // check for existing polygon, if exists delete it
+          if (ecub->label()->hasObject("Polygon")) {
+            ecub->label()->deleteObject("Polygon");
+          }
+
+          // check for CameraStatistics Table, if exists, delete
+          for (int iobj = 0; iobj < ecub->label()->objects(); iobj++) {
+            PvlObject obj = ecub->label()->object(iobj);
+            if (obj.name() != "Table") continue;
+            if (obj["Name"][0] != QString("CameraStatistics")) continue;
+            ecub->label()->deleteObject(iobj);
+            break;
+          }
+
+          // Timestamp and propagate the instrument pointing table and instrument position table
+          QString bundleTimestamp = "Jigged = " + m_bundleSolutionInfo->runTime();
+          Table cMatrix = m_bundleAdjust->cMatrix(i);
+          Table spVector = m_bundleAdjust->spVector(i);
+          cMatrix.Label().addComment(bundleTimestamp);
+          spVector.Label().addComment(bundleTimestamp);
+          ecub->write(cMatrix);
+          ecub->write(spVector);
+          // The ecub is now adjusted, add this to our list of adjusted images
+          Image *newImage = new Image(ecub);
+          adjustedImages->append(newImage);
+          newImage->closeCube();
+        }
+      }
+      // Tell the BundleSolutionInfo what the adjusted images are
+      m_bundleSolutionInfo->addAdjustedImages(adjustedImages);
     }
+
+    // Tell the project about the BundleSolutionInfo
+    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
     //  Once the bundle has been accepted, re-enable the close button
     m_close->setEnabled(true);
 
-      //TODO: move correlation matrix to correct position in project directory
-  //
-  //       for (int i = 0; i < bundleAdjustment.images(); i++) {
-  //         Process p;
-  //         CubeAttributeInput inAtt;
-  //  4-18-2017 TLS  bundleAdjustment.fileName is an .ecub.  code encompassed by my comment
-  //                 is test code.
-  //         Cube *c = p.SetInputCube(bundleAdjustment.fileName(i), inAtt, ReadWrite);
-  //         //check for existing polygon, if exists delete it
-  //         if (c->label()->hasObject("Polygon")) {
-  //           c->label()->deleteObject("Polygon");
-  //         }
-  //
-  //         // check for CameraStatistics Table, if exists, delete
-  //         for (int iobj = 0; iobj < c->label()->objects(); iobj++) {
-  //           PvlObject obj = c->label()->object(iobj);
-  //           if (obj.name() != "Table") continue;
-  //           if (obj["Name"][0] != QString("CameraStatistics")) continue;
-  //           c->label()->deleteObject(iobj);
-  //           break;
-  //         }
-  //
-  //         //  Get Kernel group and add or replace LastModifiedInstrumentPointing
-  //         //  keyword.
-  //         Table cmatrix = bundleAdjustment.cMatrix(i);
-  //         QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
-  //         cmatrix.Label().addComment(jigComment);
-  //         Table spvector = bundleAdjustment.spVector(i);
-  //         spvector.Label().addComment(jigComment);
-  //         c->write(cmatrix);
-  //         c->write(spvector);
-  //         p.WriteHistory(*c);
-  //       }
   //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
     //This bundle was bad so we should delete all remenants.
 
@@ -507,7 +537,6 @@ namespace Isis {
    */
   void JigsawDialog::errorString(QString error) {
     QString errorStr = "\n" + error;
-//  qDebug()<<"JIgsawDialog::errorString errorStr = "<<errorStr;
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(errorStr) );
 
     updateScrollBar();

@@ -26,13 +26,16 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStringList>
 #include <QtConcurrentMap>
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "SaveProjectWorkOrder.h"
 #include "ProgressBar.h"
 #include "Project.h"
+
 
 namespace Isis {
 
@@ -45,9 +48,9 @@ namespace Isis {
       WorkOrder(project) {
 
     // This workorder is not undoable
-    m_isUndoable = false;
-
+    m_isUndoable = false;   
     QAction::setText(tr("&Open Project"));
+
     QUndoCommand::setText(tr("Open Project"));
     setCreatesCleanState(true);
 
@@ -60,6 +63,7 @@ namespace Isis {
 //    project->open(args.last());
 //    }
   }
+
 
 
   /**
@@ -90,6 +94,22 @@ namespace Isis {
   }
 
 
+
+  /**
+   * @brief This function determines if the given project file name can be opened.
+   * @param projectFileName  The path to the project file.
+   * @return @b bool True if the file exists, False otherwise.
+   */
+  bool OpenProjectWorkOrder::isExecutable(QString projectFileName, bool recentProject) {
+
+    m_recentProject = recentProject;
+    FileName fname = projectFileName;
+    if (!fname.fileExists() )
+      return false;
+
+    return true;
+  }
+
   /**
    * @brief Setup this WorkOrder for execution, deleting the progress bar, determine if there
    *              is a current project and if it has been modified and prompting for project
@@ -103,7 +123,7 @@ namespace Isis {
 
     // We dislike the progress bar
     delete progressBar();
-    
+
     if (success && !project()->isClean() && project()->isOpen() ) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Project Has Unsaved Changes"),
                              QString("Would you like to save your current project?"),
@@ -126,16 +146,26 @@ namespace Isis {
     }
 
     if (success) {
-      m_projectName = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
+      if ("Open Project" == toolTip()) {
+        m_projectPath = QFileDialog::getExistingDirectory(qobject_cast<QWidget *>(parent()),
                                                               tr("Select Project Directory"));
+        if (!m_projectPath.isEmpty()) {
+          QUndoCommand::setText(tr("Open Project [%1]").arg(m_projectPath));
+        }
+      }
+        else {
 
-      if (!m_projectName.isEmpty()) {
-        QUndoCommand::setText(tr("Open Project [%1]").arg(m_projectName));
+           m_projectPath =toolTip();
+
+          //We are dealing with a recent project
+
+            }
+
       }
       else {
         success = false;
       }
-    }
+
 
     return success;
   }
@@ -146,7 +176,15 @@ namespace Isis {
    *
    */
   void OpenProjectWorkOrder::execute() {
-    project()->open(m_projectName);
+    QStringList args = QCoreApplication::arguments();
+    if (args.count() == 2) {
+      project()->open(args.last());
+    }
+    else {     
+      project()->open(m_projectPath);
+    }
+
     project()->setClean(true);
+
   }
 }

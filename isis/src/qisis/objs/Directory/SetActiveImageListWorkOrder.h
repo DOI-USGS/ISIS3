@@ -45,6 +45,8 @@ namespace Isis {
    *   @history 2017-08-03 Cole Neubauer - Created a try catch around a previously unprotected
    *                           error to handle errors thrown in the workorder that halted
    *                           execution. Fixes #5026
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer reference check to imageList variable
+   *                           in isExecutable to prevent potential seg faults.  References #4492.
    */
 
   class SetActiveImageListWorkOrder : public WorkOrder {

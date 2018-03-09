@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QtConcurrentMap>
 
+#include "Camera.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
@@ -34,6 +35,7 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "SaveProjectWorkOrder.h"
+#include "Target.h"
 #include "TextFile.h"
 
 namespace Isis {
@@ -103,7 +105,12 @@ namespace Isis {
    * @return bool True if the user clicked on a project tree node named "Shapes"
    */
   bool ImportImagesWorkOrder::isExecutable(ProjectItem *item) {
-    return (item->text() == "Images");
+
+      if (item) {
+        return (item->text() == "Images");
+      }
+
+     return false;
   }
 
 
@@ -131,7 +138,7 @@ namespace Isis {
           tr("Import Images"), "",
           tr("Isis cubes and list files (*.cub *.lis);;All Files (*)"));
 
-      QStringList stateToSave;
+      QStringList* stateToSave = new QStringList();
 
       if (!fileNames.isEmpty()) {
         foreach (FileName fileName, fileNames) {
@@ -141,26 +148,35 @@ namespace Isis {
             QString lineOfListFile;
 
             while (listFile.GetLine(lineOfListFile)) {
-              if (lineOfListFile.contains(path)){
-                stateToSave.append(lineOfListFile);
+              FileName relFileName(path + "/" + lineOfListFile);
+              if (relFileName.fileExists() ) {
+                stateToSave->append(path + "/" + lineOfListFile);
               }
               else {
-                stateToSave.append(path + "/" + lineOfListFile);
+                FileName absFileName(lineOfListFile);
+                if ( absFileName.fileExists() && lineOfListFile.startsWith("/") ) {
+                  stateToSave->append(lineOfListFile);
+                }
+
+                else {
+                  project()->warn("File " + lineOfListFile + " not found");
+                }
               }
             }
           }
           else {
-            stateToSave.append(fileName.original());
+            stateToSave->append(fileName.original());
           }
         }
 
         QMessageBox::StandardButton saveProjectAnswer = QMessageBox::No;
-        if (stateToSave.count() >= 100 && project()->isTemporaryProject()) {
+        if (stateToSave->count() >= 100 && project()->isTemporaryProject()) {
           saveProjectAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
                    tr("Save Project Before Importing Images"),
                    tr("Would you like to save your project <b>before</b> importing images? It can be "
                       "slow to save your project after these images have been loaded if you do not "
-                      "save now."),
+                      "save now. <br><br>IMPORTANT: WHEN IMPORTING LARGE DATA SETS, SAVING YOUR "
+                      "PROJECT BEFORE IMPORTING IS HIGHLY RECOMMENDED."),
                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                    QMessageBox::Yes);
         }
@@ -171,7 +187,7 @@ namespace Isis {
         }
 
         QMessageBox::StandardButton copyImagesAnswer = QMessageBox::No;
-        if (!fileNames.isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
+        if (!stateToSave->isEmpty() && saveProjectAnswer != QMessageBox::Cancel) {
           copyImagesAnswer = QMessageBox::question(qobject_cast<QWidget *>(parent()),
                    tr("Copy Images into Project"),
                    tr("Should images (DN data) be copied into project?"),
@@ -181,23 +197,23 @@ namespace Isis {
 
         bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
 
-        stateToSave.prepend(copyDnData? "copy" : "nocopy");
+        stateToSave->prepend(copyDnData? "copy" : "nocopy");
 
         if (fileNames.count() > 1) {
-          QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave.count() - 1));
+          QUndoCommand::setText(tr("Import %1 Images").arg(stateToSave->count() - 1));
         }
-        else if (fileNames.count() == 1 && stateToSave.count() > 2) {
+        else if (fileNames.count() == 1 && stateToSave->count() > 2) {
           QUndoCommand::setText(tr("Import %1 Images from %2").arg(
-                        QString::number(stateToSave.count() - 1), fileNames.first()));
+                        QString::number(stateToSave->count() - 1), fileNames.first()));
         }
         else {
           QUndoCommand::setText(tr("Import %1").arg(fileNames.first()));
         }
 
         // The internal data will look like: [ copy|nocopy, img1, img2, ... ]
-        setInternalData(stateToSave);
+        setInternalData(*stateToSave);
 
-        bool doImport = fileNames.count() > 0 && saveProjectAnswer != QMessageBox::Cancel &&
+        bool doImport = stateToSave->count() > 1 && saveProjectAnswer != QMessageBox::Cancel &&
                         copyImagesAnswer != QMessageBox::Cancel;
 
         return doImport;
@@ -293,7 +309,7 @@ namespace Isis {
     try {
       if (!m_newImages->isEmpty()) {
         project()->addImages(*m_newImages);
-      m_list = project()->images().last();
+        m_list = project()->images().last();
 
         delete m_newImages;
         m_newImages = NULL;
@@ -396,19 +412,22 @@ namespace Isis {
           projectImage->relocateDnData(FileName(destination).name());
         }
 
+        //  Set new ecub to readOnly
+        projectImage->reopen();
+
         delete input;
 
         result = projectImage;
       }
       // When we encounter an exception, update the m_errors and m_numErrors to with the exception
       // that occurred.
-      catch (...) {
-      //  m_errorsLock.lock();
+      catch (IException &e) {
+        m_errorsLock.lock();
 
-      //  m_errors->append(e);
-      //  (*m_numErrors)++;
+        m_errors->append(e);
+        (*m_numErrors)++;
 
-        //m_errorsLock.unlock();
+        m_errorsLock.unlock();
       }
     }
 
@@ -509,8 +528,17 @@ namespace Isis {
           Cube *cube = future.resultAt(i);
 
           if (cube) {
+
+            Camera *camera = cube->camera();
+            project()->addCamera(camera);
+            Target *target = camera->target();
+            project()->addTarget(target);
+
             // Create a new image from the result in the thread spawned in WorkOrder::redo().
-            Image *newImage = new Image(future.resultAt(i));
+            Image *newImage = new Image(cube);
+            newImage->closeCube();
+            // Memory for cube is deleted in Image::closeCube()
+            cube = NULL;
 
             // Either use a unique id that was already provided or create one for the new image.
             if (confirmedImagesIds[i].isEmpty()) {
@@ -533,8 +561,6 @@ namespace Isis {
             // (was created) in the GUI thread.
             newImage->moveToThread(thread());
             newImage->displayProperties()->moveToThread(thread());
-
-            newImage->closeCube();
           }
         }
         // Since we temporarily increased the max thread count (by releasing a thread), make sure

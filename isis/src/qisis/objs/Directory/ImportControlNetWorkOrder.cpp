@@ -104,7 +104,11 @@ namespace Isis {
    * @return bool True if the user clicked on a project tree node named "Control Network"
    */
   bool ImportControlNetWorkOrder::isExecutable(ProjectItem *item) {
-    return (item->text() == "Control Networks");
+
+    if (item) {
+      return (item->text() == "Control Networks");
+    }
+    return false;
   }
 
 
@@ -136,7 +140,6 @@ namespace Isis {
 
     return internalData().count() > 0;
   }
-
 
   /**
    * @brief Imports the control network asynchronously.
@@ -186,7 +189,6 @@ namespace Isis {
     }
   }
 
-
   /**
    * @brief Clears progress.
    *
@@ -194,10 +196,6 @@ namespace Isis {
    * from postSyncRedo() to postExecution().
    */
   void ImportControlNetWorkOrder::postExecution() {
-    if (!m_list) {
-      project()->undoStack()->undo();
-      m_list = NULL;
-    }
 
     if (m_warning != "") {
       project()->warn(m_warning);

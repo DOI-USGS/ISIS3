@@ -53,10 +53,9 @@ namespace Isis {
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
    *   @history 2017-07-26 Makayla Shepherd - Fixed a crash that occurs when a failed image import
    *                           is undone. Fixes #5043.
-   *   @history 2017-08-11 Cole Neubauer - Added a pointer to the project item added by the work
-   *                           order. This pointer is used in the Undo funtions. Also unrelated
-   *                           to this ticket fixed importing of a cube list with relative paths
-   *                           #5064
+   *   @history 2017-11-02 Tyler Wilson - Added a  null pointer check on the ProjectItem *item
+   *                           pointer in isExecutable to prevent potential seg faults.
+   *                           References #4492.
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT

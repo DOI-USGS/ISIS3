@@ -8,8 +8,8 @@
   <description>
     <p>
       This program converts an Isis3 control network file from binary into a human readable
-      utf8 pvl formatted file. The output pvl will be written as the latest Pvl version.
-      The most recent Pvl template can be found in the Control data directory under templates/controlnetworks.
+      UTF-8 pvl formatted file. The output .pvl will be written as the latest PVL version.
+      The most recent PVL template can be found in the Control data directory under templates/controlnetworks.
     </p>
   </description>
 
@@ -28,8 +28,8 @@
       Added a basic progress
     </change>
     <change name="Adam Goins" date="2018-01-24">
-      Updated Description to reflect utf file format.
-      Added link to current Pvl template.
+      Updated Description to reflect UTF-8 file format.
+      Added link to current PVL template.
       Added user example.
     </change>
   </history>
@@ -54,10 +54,10 @@
       <type>filename</type>
       <fileMode>output</fileMode>
       <brief>
-              Pvl formated control net file
+              PVL formatted control net file
       </brief>
       <description>
-              A control net file in the Pvl format.
+              A control network file in the PVL format.
       </description>
       <filter>
               *.cnet *.pvl
@@ -67,14 +67,14 @@
   </groups>
   <examples>
     <example>
-      <brief>Converting a binary Control Network to a Pvl network.</brief>
-      <description>A binary V0001 Control Network converted to the latest Pvl network.</description>
+      <brief>Converting a binary Control Network to a PVL network.</brief>
+      <description>A binary V0001 Control Network converted to the latest PVL network.</description>
       <terminalInterface>
         <commandLine>
           from=/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net to=PvlNetwork.pvl
         </commandLine>
         <description>
-          In this example we are converting a binary V0001 network from the test data area to a Pvl network.
+          In this example, we are converting a binary V0001 network from the test data area to a PVL network.
         </description>
       </terminalInterface>
       <inputImages>
@@ -89,20 +89,20 @@
       </inputImages>
       <outputImages>
         <image src="assets/image/OutputNetwork.png" width="500" height="500">
-          <brief>Output Pvl network from cnetbin2pvl</brief>
+          <brief>Output PVL network from cnetbin2pvl</brief>
           <description>
-            This is the Pvl network that results from running cnetbin2pvl.
+            This is the PVL network that results from running cnetbin2pvl.
           </description>
-          <thumbnail caption="Output Pvl network that was made from the existing network." src="assets/image/OutputNetwork.png" width="200" height="165"/>
+          <thumbnail caption="Output PVL network that was made from the existing network." src="assets/image/OutputNetwork.png" width="200" height="165"/>
           <parameterName>TO</parameterName>
         </image>
       </outputImages>
       <guiInterfaces>
         <guiInterface>
           <image width="500" height="500" src="assets/image/cnetbin2pvlGUI.png">
-            <brief>Example Gui</brief>
+            <brief>Example GUI</brief>
             <description>
-              Screenshot of GUI with parameters filled to convert a binary Control Network to a Pvl network.
+              Screenshot of GUI with parameters filled to convert a binary Control Network to a PVL network.
             </description>
             <thumbnail width="200" height="165" caption="Cnetbin2pvl -gui" src="assets/image/cnetbin2pvlGUI.png"/>
           </image>

@@ -80,6 +80,8 @@ namespace Isis {
    * @return @b bool True if the number of images is greater than 0 and less than 50.
    */
   bool CubeDnViewWorkOrder::isExecutable(ImageList *images) {
+    if (!images)
+      return false;
     return (images->count() > 0 && images->count() < 50);
   }
 
@@ -91,6 +93,8 @@ namespace Isis {
    * @return @b bool True if the number of shapes is greater than 0 and less than 20.
    */
   bool CubeDnViewWorkOrder::isExecutable(ShapeList *shapes) {
+    if (!shapes)
+      return false;
     return (shapes->count() > 0 && shapes->count() < 20);
   }
 
