@@ -3,12 +3,12 @@
 #include <iomanip>
 #include <sstream>
 
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QFile>
 #include <QString>
 #include <QStringList>
+#include <QTextStream>
 
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -50,7 +50,7 @@ bool tryKernels(Cube &cube, Pvl &labels, Process &p,
 void packageKernels(QString toFile);
 
 //! Read the spiceinit parameters
-void parseParameters(QDomElement parametersElement);
+void parseParameters(QJsonObject jsonObject);
 
 //! Convert a table into an xml tag
 QString tableToXml(QString tableName, QString file);
@@ -75,7 +75,7 @@ void IsisMain() {
     // Get the single line of encoded XML from the input file that the client, spiceinit, sent us.
     TextFile inFile( ui.GetFileName("FROM") );
     QString hexCode;
-    
+
     // GetLine returns false if it was the last line... so we can't check for problems really
     inFile.GetLine(hexCode);
 
@@ -103,56 +103,27 @@ void IsisMain() {
     QString otherVersion;
 
     if ( !hexCode.isEmpty() ) {
-      // Convert HEX to XML
-      QString xml( QByteArray::fromHex( QByteArray( hexCode.toLatin1() ) ).constData() );
+      // Convert HEX to a QString
+      QString json( QByteArray::fromHex( QByteArray( hexCode.toLatin1() ) ).constData() );
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
-      QDomDocument document;
+      QJsonDocument document;
       QString error;
-      int errorLine, errorCol;
-      if ( document.setContent(QString(xml), &error, &errorLine, &errorCol) ) {
-        QDomElement rootElement = document.firstChild().toElement();
 
-        for ( QDomNode node = rootElement.firstChild();
-              !node .isNull();
-              node = node.nextSibling() ) {
-          QDomElement element = node.toElement();
+      document = QJsonDocument::fromJson(json.toUtf8());
+      QJsonObject jsonObject = document.object();
 
-          // Store off the other isis version
-          if (element.tagName() == "isis_version") {
-            QString encoded = element.firstChild().toText().data();
-            otherVersion = QByteArray::fromHex( encoded.toLatin1() ).constData();
-          }
-          else if (element.tagName() == "parameters") {
-            // Read the spiceinit parameters
-            parseParameters(element);
-          }
-          else if (element.tagName() == "label") {
-            // Get the cube label
-            QString encoded = element.firstChild().toText().data();
-            stringstream labStream;
-            labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
-            labStream >> label;
-          }
-        }
-      }
-      else {
-        QString err = "Unable to read XML. The reason given was [";
-        err += error;
-        err += "] on line [" + toString(errorLine) + "] column [";
-        err += toString(errorCol) + "]";
-        throw IException(IException::Io, err, _FILEINFO_);
-      }
+      parseParameters(jsonObject);
+
+      // Get the cube label
+      QString encoded = jsonObject.value("label").toString();
+      stringstream labStream;
+      labStream << QString( QByteArray::fromHex( encoded.toLatin1() ).constData() );
+      labStream >> label;
+      std::cout << "label: "<<label << '\n';
     }
     else {
       QString msg = "Unable to read input file";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    if ( ui.GetBoolean("CHECKVERSION") && otherVersion != Application::Version() ) {
-      QString msg = "The SPICE server only supports the latest Isis version [" +
-                    Application::Version() + "], version [" + otherVersion +
-                    "] is not compatible";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -243,7 +214,7 @@ void IsisMain() {
     }
 
     FileName inputLabels;
-    
+
     while (ck.at(0).size() != 0 && !kernelSuccess) {
       // create an empty kernel
       Kernel realCkKernel;
@@ -278,7 +249,7 @@ void IsisMain() {
       }
 
       realCkKernel.setKernels(ckKernelList);
-      
+
       /*
        * Create a dummy cube from the labels that spiceinit sent. We do this because the camera
        * classes take a cube instead of a pvl as input.
@@ -523,6 +494,15 @@ bool tryKernels(Cube &cube, Pvl &lab, Process &p,
   return true;
 }
 
+QJsonValue tableToJson(QString file) {
+  QFile tableFile(file);
+  tableFile.open(QIODevice::ReadOnly);
+  QByteArray data = tableFile.readAll();
+  tableFile.close();
+
+  return QJsonValue::fromVariant(data.toHex().constData());
+}
+
 
 QString tableToXml(QString tableName, QString file) {
   QString xml;
@@ -545,104 +525,90 @@ QString tableToXml(QString tableName, QString file) {
 }
 
 
-void parseParameters(QDomElement parametersElement) {
-  for ( QDomNode node = parametersElement.firstChild();
-        !node .isNull();
-        node = node.nextSibling() ) {
-    QDomElement element = node.toElement();
+void parseParameters(QJsonObject jsonObject) {
 
-    if (element.tagName() == "cksmithed") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckSmithed = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "ckrecon") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckRecon = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "ckpredicted") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckPredicted = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "cknadir") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_ckNadir = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "spksmithed") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_spkSmithed = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "spkrecon") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_spkRecon = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "spkpredicted") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_spkPredicted = (attribute.value().toLower() == "yes");
-    }
-    else if (element.tagName() == "shape") {
-      QDomNode node = element.attributes().namedItem("value");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_shapeKernelStr = attribute.value();
-    }
-    else if (element.tagName() == "startpad") {
-      QDomNode node = element.attributes().namedItem("time");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_startPad = attribute.value().toDouble();
-    }
-    else if (element.tagName() == "endpad") {
-      QDomNode node = element.attributes().namedItem("time");
-      QDomAttr attribute = *( (QDomAttr *)&node );
-      g_endPad = attribute.value().toDouble();
-    }
-  }
+    g_ckSmithed = jsonObject.value("cksmithed").toBool();
+    g_ckRecon = jsonObject.value("ckrecon").toBool();
+    g_ckPredicted = jsonObject.value("ckpredicted").toBool();
+    g_ckNadir = jsonObject.value("cknadir").toBool();
+    g_spkSmithed = jsonObject.value("spksmithed").toBool();
+    g_spkRecon = jsonObject.value("spkrecon").toBool();
+    g_spkPredicted = jsonObject.value("spkpredicted").toBool();
+    g_shapeKernelStr = jsonObject.value("shape").toString();
+    g_startPad = jsonObject.value("startpad").toDouble();
+    g_endPad = jsonObject.value("endpad").toDouble();
+
 }
 
 
 void packageKernels(QString toFile) {
-  QString xml;
-  xml += "<spice_data>\n";
-
-  xml += "  <application_log>\n";
+  QJsonObject spiceData;
 
   QString logFile(toFile + ".print");
   Pvl logMessage(logFile);
   QFile::remove(logFile);
   stringstream logStream;
   logStream << logMessage;
-  xml += QString( QByteArray( logStream.str().c_str() ).toHex().constData() ) + "\n";
-  xml += "  </application_log>\n";
-
-  xml += "  <kernels_label>\n";
+  QString logText = QString( QByteArray( logStream.str().c_str() ).toHex().constData() );
+  spiceData.insert("Application Log", QJsonValue::fromVariant(logText));
 
   QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
   QFile::remove(kernLabelsFile);
   stringstream labelStream;
   labelStream << kernLabels;
+  QString labelText = QString( QByteArray( labelStream.str().c_str() ).toHex().constData() );
+  spiceData.insert("Kernels Label", QJsonValue::fromVariant(labelText));
 
-  xml += QString( QByteArray( labelStream.str().c_str() ).toHex().constData() ) + "\n";
+  spiceData.insert("Instrument Pointing", tableToJson(toFile + ".pointing"));
+  spiceData.insert("Instrument Position", tableToJson(toFile + ".position"));
+  spiceData.insert("Body Rotation", tableToJson(toFile + ".bodyrot"));
+  spiceData.insert("Sun Position", tableToJson(toFile + ".sun"));
 
-  xml += "  </kernels_label>\n";
+  QJsonDocument doc(spiceData);
 
-  xml += "  <tables>\n";
-  xml += tableToXml("instrument_pointing", toFile + ".pointing");
-  xml += tableToXml("instrument_position", toFile + ".position");
-  xml += tableToXml("body_rotation", toFile + ".bodyrot");
-  xml += tableToXml("sun_position", toFile + ".sun");
-
-  xml += "  </tables>\n";
-  xml += "</spice_data>\n";
-  QString encodedXml( QByteArray( xml.toLatin1() ).toHex().constData() );
+  // QString xml;
+  // xml += "<spice_data>\n";
+  //
+  // xml += "  <application_log>\n";
+  //
+  // QString logFile(toFile + ".print");
+  // Pvl logMessage(logFile);
+  // QFile::remove(logFile);
+  // stringstream logStream;
+  // logStream << logMessage;
+  // xml += QString( QByteArray( logStream.str().c_str() ).toHex().constData() ) + "\n";
+  // xml += "  </application_log>\n";
+  //
+  // xml += "  <kernels_label>\n";
+  //
+  // QString kernLabelsFile(toFile + ".lab");
+  // Pvl kernLabels(kernLabelsFile);
+  // QFile::remove(kernLabelsFile);
+  // stringstream labelStream;
+  // labelStream << kernLabels;
+  //
+  // xml += QString( QByteArray( labelStream.str().c_str() ).toHex().constData() ) + "\n";
+  //
+  // xml += "  </kernels_label>\n";
+  //
+  // xml += "  <tables>\n";
+  // xml += tableToXml("instrument_pointing", toFile + ".pointing");
+  // xml += tableToXml("instrument_position", toFile + ".position");
+  // xml += tableToXml("body_rotation", toFile + ".bodyrot");
+  // xml += tableToXml("sun_position", toFile + ".sun");
+  //
+  // xml += "  </tables>\n";
+  // xml += "</spice_data>\n";
+  QString encodedXml( doc.toJson().toHex().constData() );
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write( encodedXml.toLatin1() );
+  finalOutput.write(encodedXml.toLatin1());
   finalOutput.close();
+
+  QFile finalsOutput("toFile.txt");
+  finalsOutput.open(QIODevice::WriteOnly);
+  finalsOutput.write(doc.toJson());
+  finalsOutput.close();
 }

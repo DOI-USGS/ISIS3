@@ -1,0 +1,40 @@
+/**
+  @mainpage
+  @author Stefan Frings
+  QtWebApp supports you in writing server-side web application in C++
+  based on the Qt toolkit. It is a light-weight implementation inspired
+  by Java Servlets.
+  <p>
+  Features:
+
+  - HttpListener is a HTTP 1.1 web server with support for
+      - HTTPS
+      - IP v4 and IP v6
+      - persistent connections
+      - pipelining
+      - file uploads
+      - cookies
+      - dynamic thread pool
+      - optional file cache in StaticFileController
+      - optional sessions via HttpSessionStore
+  - The Template engine supports
+      - multi languages via TemplateLoader
+      - optional file cache via TemplateCache
+      - for all text based file formats
+  - The Logger classes provide
+      - automatic backups and file rotation
+      - configurable message format, see LogMessage
+      - messages may contain thread-local info variables
+      - optional ring-buffer for writing debug messages in case of errors
+      - they are configurable at runtime without program restart
+  - The QtService class
+      - Runs the application as a Windows service or Unix daemon
+
+  If you write a real application based on this source, take a look into the Demo
+  applications. They set up a single listener on port 8080, however multiple
+  listeners with individual configurations are also possible.
+  <p>
+  To set up a HA system with loadsharing and/or failover, I recommend an Apache HTTP
+  server with mod_proxy and sticky sessions
+*/
+

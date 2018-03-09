@@ -1,0 +1,7 @@
+26.07.2015 07:42:58.159 1 WARNING 139659983566656 Application has started
+26.07.2015 07:44:21.411 0 DEBUG 140113252636480 RequestHandler: created
+26.07.2015 07:44:21.411 0 DEBUG 140113252636480 HttpListener: Listening on port 8080
+26.07.2015 07:44:21.411 1 WARNING 140113252636480 Application has started
+
+Note: If you don't see new messages here, then the logger might be commented out in main.cpp.
+

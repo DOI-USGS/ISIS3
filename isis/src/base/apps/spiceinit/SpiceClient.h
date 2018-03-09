@@ -5,6 +5,8 @@
 
 class QAuthenticator;
 class QDomElement;
+class QJsonDocument;
+class QJsonValue;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
@@ -24,6 +26,8 @@ namespace Isis {
    * @author ????-??-?? Steven Lambright
    *
    * @internal
+   *    @history 2017-12-19 Summer Stapleton - Updated constructor and sendRequest() to handle Json
+   *                            files rather than xml.
    */
   class SpiceClient : public QThread {
       Q_OBJECT
@@ -44,7 +48,7 @@ namespace Isis {
       Table *positionTable();
       Table *bodyRotationTable();
       Table *sunPositionTable();
-
+      QJsonValue tableToJson(QString file);
     public slots:
       void sendRequest();
 
@@ -55,19 +59,15 @@ namespace Isis {
       void sslErrors(QNetworkReply *, const QList<QSslError> &);
 
     private:
-      static QString yesNo(bool boolVal);
       Table *readTable(QString xmlName, QString tableName);
-      QDomElement rootXMLElement();
-      QDomElement findTag(QDomElement currentElement, QString name);
-      QString elementContents(QDomElement element);
       void checkErrors();
 
     private:
       QString *p_error;
-      QString *p_xml; //!< XML Sent to server
+      QJsonDocument *p_jsonDocument; //!< Json file to send to server
       QString *p_rawResponse;  //!< Server raw response
-      QString *p_response;  //!< Server decoded response
-      QNetworkAccessManager *p_networkMgr; //!< Network manager does request
+      QJsonObject *p_response;  //!< The QJsonObject constructed from the server response
+      QNetworkAccessManager *p_networkMgr; //!< Network manager that makes request
       QNetworkRequest *p_request; //!< Network request sent
   };
 

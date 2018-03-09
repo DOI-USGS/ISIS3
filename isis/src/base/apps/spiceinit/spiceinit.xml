@@ -290,6 +290,10 @@
       Made change to camera construction error throw for better reporting on uninstantiated cameras.
       Fixes #5163.
     </change>
+    <change name="Summer Stapleton" date="2018-01-12">
+      Added information into the "WEB" parameter description of the new JSON format for server 
+      communication.
+    </change>
   </history>
 
   <oldName>
@@ -322,15 +326,41 @@
           Use the ISIS SPICE Web Service
         </brief>
         <description>
-          This option uses the ISIS SPICE Website to get the most up to
-          date kernels available. The ATTACH parameter must be enabled for this option. Manually
-          specifying kernel files is not allowed when this option is used. This service may
-          be temporarily unavailable when new Isis releases are being
-          distributed. Any mismatch in Isis version will cause this option to fail; only
-          the most recent version of ISIS is supported. An active internet
-          connection is required to use this service. Running with this option is slower than downloading the SPICE data locally (download all of $ISIS3DATA) and running spiceinit
-          with the local data. This data can take up a lot of space. The size of the download
-          will depend heavily on the mission and instrument of your input file.
+          <p>
+            This option uses the ISIS SPICE Website to get the most up to
+            date kernels available. The ATTACH parameter must be enabled for this option. Manually
+            specifying kernel files is not allowed when this option is used. This service may
+            be temporarily unavailable when new Isis releases are being distributed. An active 
+            internet connection is required to use this service. Running with this option is slower 
+            than downloading the SPICE data locally (downloading all of $ISIS3DATA) and running 
+            spiceinit with the local data. This data can take up a lot of space, however.
+          </p>
+          <p> 
+            All requests to and responses from the server are implemented using JSON (JavaScript 
+            Object Notation) format. For more information on JSON formatting, visit 
+            <a href="https://www.json.org/">json.org</a>. An example of a simple request is as follows:
+          </p>
+          <pre>
+            
+            {
+              "cknadir": false,
+              "ckpredicted": false,
+              "ckrecon": true,
+              "cksmithed": false,
+              "endPad": 0,
+              "label": &lt;cube label&gt;,
+              "shape": "system",
+              "spkpredicted": false,
+              "spkrecon": true,
+              "spksmithed": false,
+              "startPad": 0
+            }
+          
+          </pre>
+          <p>
+            The size of the response download will depend heavily on the mission and instrument of 
+            your input file.
+          </p>
         </description>
         <exclusions>
           <item>ATTACH</item>
