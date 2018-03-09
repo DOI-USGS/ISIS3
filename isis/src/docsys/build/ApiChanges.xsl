@@ -106,7 +106,7 @@
       <type>HTML</type>
 
       <source>
-        <filename>ParameterChanges.html</filename>
+        <filename>ApiChanges.html</filename>
       </source>
     </file>
   </files>

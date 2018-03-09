@@ -60,7 +60,7 @@ commands:
 	if [[ `$(APPNAME) \
 	  fromlist=$(INPUT)/empty.lis \
 	  cnet=$(INPUT)/notacnet.net \
-	  onet=$(output)/out.net \
+	  onet=$(OUTPUT)/out.net \
 	  radius=yes \
 	  spsolve=positions \
 	  point_radius_sigma=500 \

@@ -22,14 +22,16 @@ namespace Isis {
    * another, saved to disk, or deleted from disk. Overrides several common QList methods for
    * managing a list of Controls as well. Adapted from ImageList
    *
-   * @author 2012-09-01 Tracie Sucharski 
+   * @author 2012-09-01 Tracie Sucharski
    *
-   * @internal 
-   *   @history 2012-09-01 Tracie Sucharski - Original version. 
+   * @internal
+   *   @history 2012-09-01 Tracie Sucharski - Original version.
    *   @history 2015-10-14 Jeffrey Covington - Declared ControlList * as a Qt
    *                           metatype for use with QVariant.
    *   @history 2016-06-06 Ian Humphrey - Updated documentation and coding standards. Fixes #3959.
    *   @history 2017-05-05 Tracie Sucharski - Removed Workorder.h, never used.
+   *   @history 2017-12-08 Tracie Sucharski - When saving project only copy the control if project
+   *                           is being saved to a new location.
    */
   class ControlList : public QObject, public QList<Control *> {
     Q_OBJECT
@@ -103,15 +105,15 @@ namespace Isis {
 
 
       /**
-       * This functor is used for copying the control nets between two projects quickly. This is 
+       * This functor is used for copying the control nets between two projects quickly. This is
        * designed to work with QtConcurrentMap, though the results are all NULL (QtConcurrentMap
        * is much faster than many QtConcurrentRun calls).
        *
        * @author 2012-10-11 Tracie Sucharski - Adapted from Copy ImageDataFunctor
        *
-       * @internal 
-       *   @history 2012-10-11 Tracie Sucharski - Original version. 
-       *  
+       * @internal
+       *   @history 2012-10-11 Tracie Sucharski - Original version.
+       *
        */
       class CopyControlDataFunctor : public std::unary_function<Control * const &, void *> {
         public:
@@ -130,13 +132,13 @@ namespace Isis {
 
       /**
        * Nested class used to write the ControlList object information to an XML file for the
-       * purposes of saving an restoring the state of the object. 
-       * 
+       * purposes of saving an restoring the state of the object.
+       *
        * @see ControlList::save for the expected format
        *
        * @author 2012-09-27 Tracie Sucharski - Adapted from ImageList::XmlHandler
        *
-       * @internal 
+       * @internal
        *   @history 2012-09-27 Tracie Sucharski - Original version.
        */
       class XmlHandler : public XmlStackedHandler {
@@ -151,7 +153,7 @@ namespace Isis {
         private:
           Q_DISABLE_COPY(XmlHandler);
 
-          ControlList *m_controlList; //!< Control list to be read or written 
+          ControlList *m_controlList; //!< Control list to be read or written
           Project *m_project; //!< Project that contains the control list
       };
 

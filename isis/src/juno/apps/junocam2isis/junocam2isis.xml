@@ -7,15 +7,15 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
   <description>
     <p>
-      This program converts a PDS formatted JunoCam image to an ISIS3 
+      This program converts a PDS formatted JunoCam image to an ISIS3
       <def link="Cube">cube</def> format.
      </p>
 
      <p>
-     PDS-formatted JunoCam images contain several framelets and filters in the same image. 
-     For ease in processing with ISIS3, by default one input JunoCam image is converted to several output 
-     ISIS3 cubes and associated lists of cubes. There is one output cube for each framelet of the 
-     PDS formatted JunoCam image, each of which is named with the prefix specified with the "TO" 
+     PDS-formatted JunoCam images contain several framelets and filters in the same image.
+     For ease in processing with ISIS3, by default one input JunoCam image is converted to several output
+     ISIS3 cubes and associated lists of cubes. There is one output cube for each framelet of the
+     PDS formatted JunoCam image, each of which is named with the prefix specified with the "TO"
      user parameter, the filter name, and the 0-indexed framelet number. In the following example,
      if the input image "JunoCamTest.IMG" had 2 framelets for each filter (Red, Blue, Green,
      and Methane), and the following command was run:
@@ -54,7 +54,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
      <p>
      If the FULLCCD parameter is set to yes, instead of outputting one ISIS3 Cube per filter and
-     framelet, junocam2isis will output one ISIS3 Cube for each original observation and will 
+     framelet, junocam2isis will output one ISIS3 Cube for each original observation and will
      contain all the filters that were part of that observation. If the above example was modified
      changed to set the FULLCCD parameter to true,
      </p>
@@ -80,14 +80,18 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <change name="Kris Becker and Kristin Berry" date="2017-08-12">
       Added FULLCCD parameter which provides the ability to create images with
       the framelet set in a single composite output file. Updated labels and
-      documentation. 
+      documentation.
     </change>
     <change name="Jesse Mapel" date="2017-08-21">
       Added two examples, one for the filter mode and one for the full CCD mode.
     </change>
+    <change name="Kaitlyn Lee" date="2018-02-07">
+      Added missionItem under category to classify the program under Juno.
+    </change>
   </history>
 
   <category>
+    <missionItem>Juno</missionItem>
     <categoryItem>Import and Export</categoryItem>
   </category>
 

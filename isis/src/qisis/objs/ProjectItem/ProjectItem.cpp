@@ -27,6 +27,7 @@
 #include <QIcon>
 #include <QStandardItem>
 #include <QVariant>
+#include <QDebug>
 
 #include "BundleResults.h"
 #include "BundleSolutionInfo.h"
@@ -39,6 +40,8 @@
 #include "ProjectItemModel.h"
 #include "Shape.h"
 #include "ShapeList.h"
+#include "Template.h"
+#include "TemplateList.h"
 
 namespace Isis {
   /**
@@ -144,7 +147,7 @@ namespace Isis {
     appendRow( new ProjectItem(control) );
 
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
-    appendRow( new ProjectItem( bundleSolutionInfo->imageList() ) );
+    appendRow( new ProjectItem( bundleSolutionInfo->adjustedImages() ) );
   }
 
 
@@ -250,7 +253,7 @@ namespace Isis {
    *
    * @param[in] shape (Shape *) The Shape to construct from.
    */
-  ProjectItem::ProjectItem(Shape *shape) {\
+  ProjectItem::ProjectItem(Shape *shape) {
     setTextColor(Qt::black);
     setEditable(false);
     setShape(shape);
@@ -288,6 +291,48 @@ namespace Isis {
 
 
   /**
+   * Constructs an item from a Template.
+   *
+   * @param[in] template (Template *) The Template to construct from.
+   */
+  ProjectItem::ProjectItem(Template *newTemplate) {
+    setTextColor(Qt::black);
+    setEditable(false);
+    setTemplate(newTemplate);
+  }
+
+
+  /**
+   * Constructs an item from an TemplateList.
+   *
+   * @param[in] templateList (TemplateList *) The TemplateList to construct from.
+   */
+  ProjectItem::ProjectItem(TemplateList *templateList) {
+
+    setTextColor(Qt::black);
+    setEditable(false);
+    setTemplateList(templateList);
+    foreach (Template *currentTemplate, *templateList) {
+      appendRow(new ProjectItem(currentTemplate));
+    }
+  }
+
+
+  /**
+   * Constructs an item from a list of TemplateList.
+   *
+   * @param[in] shapes (QList<TemplateList *>) The list to construct from.
+   */
+  ProjectItem::ProjectItem(QList<TemplateList *> templates) {
+    setTextColor(Qt::black);
+    setEditable(false);
+    setTemplates();
+    foreach (TemplateList *templateList, templates) {
+      appendRow( new ProjectItem(templateList) );
+    }
+  }
+
+  /**
    * Constructs an item from a GuiCameraQsp
    *
    * @param[in] guiCamera (GuiCameraQsp) The camera to construct from.
@@ -323,12 +368,11 @@ namespace Isis {
   ProjectItem::ProjectItem(Project *project) {
     setTextColor(Qt::black);
     setProject(project);
-//  qDebug()<<"ProjectItem::ProjectItem(Project *project)  rowCount() = "<<rowCount();
     appendRow( new ProjectItem( project->controls() ) );
-//  qDebug()<<"                                            rowCount() afterControls = "<<rowCount();
     appendRow( new ProjectItem( project->images() ) );
-//  qDebug()<<"                                            rowCount() afterImages = "<<rowCount();
     appendRow( new ProjectItem( project->shapes() ) );
+
+    appendRow( new ProjectItem( project->templates() ) );
 
     ProjectItem *targetBodyListItem = new ProjectItem();
     targetBodyListItem->setTargetBodyList();
@@ -341,10 +385,6 @@ namespace Isis {
     ProjectItem *spaceCraftItem = new ProjectItem();
     spaceCraftItem->setSpacecraft();
     appendRow(spaceCraftItem);
-
-    ProjectItem *templatesItem = new ProjectItem();
-    templatesItem->setTemplate();
-    appendRow(templatesItem);
 
     appendRow( new ProjectItem( project->bundleSolutionInfo() ) );
   }
@@ -470,6 +510,26 @@ namespace Isis {
 
 
   /**
+   * Returns the Template stored in the data of the item.
+   *
+   * @return (Template *) The Template of the item.
+   */
+  Template *ProjectItem::getTemplate() const {
+    return data().value<Template *>();
+  }
+
+
+  /**
+   * Returns the TemplateList stored in the data of the item.
+   *
+   * @return (TemplateList *) The TemplateList of the item.
+   */
+  TemplateList *ProjectItem::templateList() const {
+    return data().value<TemplateList *>();
+  }
+
+
+  /**
    * Returns the Control stored in the data of the item.
    *
    * @return @b Control* The Control of the item.
@@ -541,7 +601,7 @@ namespace Isis {
 
 
   bool ProjectItem::isTemplate() const {
-    return data().canConvert<QString>();
+    return data().canConvert<Template *>();
   }
 
 
@@ -850,20 +910,60 @@ namespace Isis {
     setData( QVariant() );
   }
 
-  void ProjectItem::setTemplate() {
+
+  /**
+   * Sets the text, icon, and data corresponding to a Template.
+   *
+   * @param[in] shape (Shape *) The Shape.
+   */
+  void ProjectItem::setTemplate(Template *newTemplate) {
+    setTextColor(Qt::black);
+    setText( QFileInfo( newTemplate->fileName() ).fileName() );
+    setIcon( QIcon(":folder"));
+    setData( QVariant::fromValue<Template *>(newTemplate) );
+  }
+
+
+  /**
+   * Sets the text, icon, and data corresponding to an TemplateList.
+   *
+   * @param[in] templateList (TemplateList *) The TemplateList.
+   */
+  void ProjectItem::setTemplateList(TemplateList *templateList) {
+    setTextColor(Qt::black);
+    if (templateList->name() != "") {
+      setText( templateList->name() );
+    }
+    else {
+      setText( templateList->path() );
+    }
+    setIcon( QIcon(FileName("$base/icons/folder-orange.png")
+                           .expanded()));
+    setData( QVariant::fromValue<TemplateList *>(templateList) );
+  }
+
+
+  /**
+   * Sets the text, icon, and data corresponding to a list of TemplateList.
+   */
+  void ProjectItem::setTemplates() {
     setText("Templates");
-    setIcon( QIcon(":folder") );
+    setIcon( QIcon(FileName("$base/icons/folder-red.png")
+                           .expanded()));
     setData( QVariant() );
 
     ProjectItem *mapsItem = new ProjectItem();
     mapsItem->setText("Maps");
-    mapsItem->setIcon( QIcon(":folder") );
+    setIcon( QIcon(FileName("$base/icons/folder-red.png")
+                           .expanded()));
     mapsItem->setData( QVariant() );
     appendRow(mapsItem);
 
+
     ProjectItem *registrationsItem = new ProjectItem();
     registrationsItem->setText("Registrations");
-    registrationsItem->setIcon( QIcon(":folder") );
+    setIcon( QIcon(FileName("$base/icons/folder-red.png")
+                           .expanded()));
     registrationsItem->setData( QVariant() );
     appendRow(registrationsItem);
   }
@@ -1016,7 +1116,7 @@ namespace Isis {
     else
       setIcon( QIcon(FileName("$base/icons/view-web-browser-dom-tree.png")
                              .expanded()));
-    
+
     setData( QVariant::fromValue<TargetBodyQsp>(targetBody) );
   }
 
@@ -1043,16 +1143,12 @@ namespace Isis {
    * @return @b ProjectItem* The found item.
    */
   ProjectItem *ProjectItem::findItemData(const QVariant &value, int role) {
-//  qDebug()<<"ProjectItem::findItemData  incoming value = "<<value;
-//  qDebug()<<"ProjectItem::findItemData  ProjectItem::data(role) = "<<data(role);
     if ( data(role) == value ) {
       return this;
     }
 
     for (int i=0; i<rowCount(); i++) {
-//    qDebug()<<"ProjectItem::findItemData  BEFORE call: child(i)->findItemData...";
       ProjectItem *item = child(i)->findItemData(value, role);
-//    qDebug()<<"ProjectItem::findItemData  AFTER call: child(i)->findItemData...";
       if (item) {
         return item;
       }
