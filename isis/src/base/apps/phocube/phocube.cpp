@@ -23,7 +23,7 @@ int nbands;
 bool noCamera;
 
 bool dn;
-bool phase; 
+bool phase;
 bool emission;
 bool incidence;
 bool localEmission;
@@ -54,8 +54,8 @@ void phocube(Buffer &out);
 
 
 // Function to create a keyword with same values of a specified count
-template <typename T> PvlKeyword makeKey(const QString &name, 
-                                         const int &nvals, 
+template <typename T> PvlKeyword makeKey(const QString &name,
+                                         const int &nvals,
                                          const T &value);
 
 // Structure containing new mosaic planes
@@ -68,7 +68,7 @@ struct MosData {
 // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
-void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
+void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                    const QString &default_value = "Null");
 
 
@@ -95,7 +95,7 @@ void IsisMain() {
       QString msg = "Mosaic files must contain mapping labels";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
-  } 
+  }
   else {
     try {
       cam = icube->camera();
@@ -149,9 +149,9 @@ void IsisMain() {
     if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
     if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
     if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
-    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
-    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++; 
-    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++; 
+    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
+    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
+    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
     if ((ra = ui.GetBoolean("RADEC"))) nbands++;
     if ((declination = ui.GetBoolean("RADEC"))) nbands++;
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
@@ -169,7 +169,7 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  // If outputting a a dn band, retrieve the orignal values for the filter name from the input cube,
+  // If outputting a dn band, retrieve the orignal values for the filter name from the input cube,
   // if it exists.  Otherwise, the default will be "DN"
   QString bname = "DN";
   if ( dn && icube->hasGroup("BandBin") ) {
@@ -205,20 +205,19 @@ void IsisMain() {
   if (subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
   if (morphologyRank) name += "Morphology Rank";
   if (albedoRank) name += "Albedo Rank";
-  if (ra) name += "Right Ascension";
-  if (declination) name += "Declination";
   if (bodyFixedX) name += "Body Fixed X";
   if (bodyFixedY) name += "Body Fixed Y";
   if (bodyFixedZ) name += "Body Fixed Z";
-
+  if (ra) name += "Right Ascension";
+  if (declination) name += "Declination";
 
   // Create the output cube.  Note we add the input cube to expedite propagation
   // of input cube elements (label, blobs, etc...).  It will be cleared
   // prior to systematic processing only if the DN option is not selected.
-  // If DN is chosen by the user, then we propagate the input buffer with a 
+  // If DN is chosen by the user, then we propagate the input buffer with a
   // different function - one that accepts both input and output buffers.
   (void) p.SetInputCube("FROM", OneBand);
-  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(), 
+  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
                                 icube->lineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
 
@@ -301,6 +300,7 @@ void phocube(Buffer &out) {
       }
 
       if (isGood) {
+
         if(phase) {
           out[index] = cam->PhaseAngle();
           index += 64 * 64;
@@ -418,18 +418,7 @@ void phocube(Buffer &out) {
           out[index] = mosd.m_albedo;
           index += 64 * 64;
         }
-        
-        if (ra) {
-          out[index] = cam->RightAscension();
-          index += 64 * 64;
-        }
-        
-        if (declination) {
-          out[index] = cam->Declination();
-          index += 64 * 64;
-        }
-        
-        
+
         if (!noCamera) {
           double pB[3];
           cam->Coordinate(pB);
@@ -437,7 +426,7 @@ void phocube(Buffer &out) {
           out[index] = pB[0];
           index += 64 * 64;
           }
-        
+
           if (bodyFixedY) {
             out[index] = pB[1];
             index += 64 * 64;
@@ -447,14 +436,34 @@ void phocube(Buffer &out) {
             index += 64 * 64;
           }
         }
-        
       }
-      // Trim outerspace
+
+      // Trim outer space except last two bands when RA and declination are selected
+      // We skip two because RA and declination are always selected together.
       else {
-        for(int b = (skipDN) ? 1 : 0; b < nbands; b++) {
+        int bandsToProcess;
+        if (ra && declination) {
+          bandsToProcess = nbands - 2;
+        }
+        else {
+          bandsToProcess = nbands;
+        }
+
+        for(int b = (skipDN) ? 1 : 0; b < bandsToProcess; b++) {
           out[index] = Isis::NULL8;
           index += 64 * 64;
         }
+      }
+
+      // Export the RA and declination regardless if we are in outer space or not.
+      if (ra) {
+        out[index] = cam->RightAscension();
+        index += 64 * 64;
+      }
+
+      if (declination) {
+        out[index] = cam->Declination();
+        index += 64 * 64;
       }
     }
   }
@@ -525,4 +534,3 @@ void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
   bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
   return;
 }
-
