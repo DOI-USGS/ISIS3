@@ -24,6 +24,7 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
 #include <QMdiSubWindow>
@@ -130,6 +131,7 @@ namespace Isis {
 
     public slots:
       void addView(QWidget *newWidget);
+      void addDock(QMainWindow *newWidgetForDock);
       void removeAllViews();
 
       void setActiveView(AbstractProjectItemView *view);
