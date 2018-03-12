@@ -3,5 +3,5 @@ ifeq ($(ISISROOT), $(BLANK))
 error:
 	echo "Please set ISISROOT";
 else
-	include $(ISISROOT)/make/isismake.objs
+	include $(ISISROOT)/make/isismake.apps
 endif

@@ -91,6 +91,10 @@
       Added conditional to check whether default offsets and multipliers where changed from their
       default values and log them if so.
     </change>
+    <change name="Christopher Combs" date ="2018-01-19">
+      Changed call to SetPdsFile to reflect changes to PvlToPvlTranslationManager. Fixes #4345, 
+      #4421.
+    </change>
   </history>
 
   <category>

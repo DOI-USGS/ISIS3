@@ -2,13 +2,16 @@ Test ControlNetVersioner
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net...
 
 Read network...
-**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net] failed.
+Reading Control Points...
+0% Processed**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net] failed.
 **I/O ERROR** Failed to initialize control point at index [0].
 **I/O ERROR** Unable to get target body radii for [] when calculating covariance matrix.
 
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
 
 Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Converted directly to Pvl:
 Object = ControlNetwork
   NetworkId    = Null
@@ -63,6 +66,8 @@ Reading/Writing control network is consistent
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net...
 
 Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Converted directly to Pvl:
 Object = ControlNetwork
   NetworkId    = TestNet01
@@ -117,6 +122,8 @@ Reading/Writing control network is consistent
 Reading: $control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net...
 
 Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Converted directly to Pvl:
 Object = ControlNetwork
   NetworkId    = Test
@@ -303,6 +310,8 @@ Read network...
 Reading: $control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net...
 
 Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Write the network and re-read it...
 After reading and writing to a binary form does Pvl match?
 Reading/Writing control network is consistent
@@ -310,6 +319,8 @@ Reading/Writing control network is consistent
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl...
 
 Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Converted directly to Pvl:
 Object = ControlNetwork
   NetworkId    = LUNAE_PALUS_THEMIS_DIR
@@ -549,3 +560,115 @@ Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 Check conversions between the binary format and the pvl format.
 The conversion methods for pvl->bin and bin->pvl are correct.
+
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl...
+
+Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Reading: $control/testData/PvlNet_TestNetwork1_V2.net...
+
+Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Write the network and re-read it...
+
+
+Reading: $control/testData/PvlNet_TestNetwork2_V3.net...
+
+Read network...
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
+
+Read network...
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Reading: $control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net...
+
+Read network...
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Reading: $control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net...
+
+Read network...
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl...
+
+Read network...
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
+
+Test writing from ControlNet objects
+
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Adding Control Points to Network...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
+Test reading version 1 protobuf network
+
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Take all of the control points and delete them.
+  1 point taken
+  2 points taken
+  3 points taken
+  4 points taken
+
+Test reading version 5 protobuf network
+
+Reading Control Points...
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
+Test writing with invalid target
+
+
+Test reading a random PVL file
+
+**I/O ERROR** Reading the control network [equirectangular.map] failed.
+**I/O ERROR** Could not determine the control network file type.
+
+Test reading a PVL files with missing header information
+
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net] failed.
+**I/O ERROR** Missing required header information.
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net].
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net] failed.
+**I/O ERROR** Missing required header information.
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net].
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net] failed.
+**I/O ERROR** Missing required header information.
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net].
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net] failed.
+**I/O ERROR** Missing required header information.
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net].
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net] failed.
+**I/O ERROR** Missing required header information.
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net].
+
+Test reading a protobuf file with a bad version number
+
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_ProtoNetwork_BadVersion.net] failed.
+**I/O ERROR** The Protobuf file version [7] is not supported.
+
+Test reading a protobuf file with no version number
+
+**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_ProtoNetwork_NoVersion.net] failed.
+**ERROR** PVL Keyword [StartByte] does not exist in [Object = Core].
