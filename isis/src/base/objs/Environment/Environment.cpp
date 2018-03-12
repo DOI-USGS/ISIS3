@@ -7,10 +7,6 @@
 #include <QStringList>
 #include <QCoreApplication>
 
-#ifndef __APPLE__
-#include <QtDBus>
-#endif
-
 #include "IException.h"
 #include "IString.h"
 #include "TextFile.h"
@@ -60,33 +56,6 @@ namespace Isis {
       std::cout << "PluginPaths=" << pluginPaths.join(";") << "\n";
       QCoreApplication::setLibraryPaths(pluginPaths);
     }
-#endif
-
-#ifndef __APPLE__
-    // We need to force the correct QDBus library to be loaded... to do that, just
-    //   use a symbol in it's library. This only applies to linux and fixes #1228.
-
-    // Long explanation:
-    //   When we run GUI apps, the system (and Qt) work together to figure out
-    //   which runtime libraries are necessary on-the-fly. When QApplication is
-    //   instantiated, it goes into QtGui's style code. The styles ignore our plugin
-    //   path setting (above) on all OS's. So Qt GUI grabs a style from the OS's styles,
-    //   which is a shared library in the kde area. These styles require a version (any version)
-    //   of QtDBus loaded. If QtDBus is not yet loaded, then the style library will grab it.
-    //   However, on Ubuntu 12.04, the style library grabs the system (OS) QDBus library. QDBus
-    //   detects that you've already loaded Isis' QtCore, so the library versions mismatch, and
-    //   it crashes. The problem becomes more interesting because sometimes it picks up the system
-    //   QDBus, and sometimes it picks up Isis' QDBus, and I have no good reason why we pick up
-    //   one versus another; currently, installed apps pick up the system and locally built apps
-    //   pick up Isis' (even when the executables are made to be identical). The end result is no
-    //   installed GUI applications will run and our automated tests fail to catch it. This solution
-    //   bypasses the entire issue by forcing QDBus to be loaded long before any styles are loaded,
-    //   so the style plugins do not need to go and get their own QDBus library.
-    //
-    //   The root cause is that Ubuntu's run time loader is failing to respect
-    //   our executable's rpaths when loading a style library. However, when we link against the
-    //   QBus library directly, we get the right one.
-    QDBusArgument();
 #endif
   }
 
