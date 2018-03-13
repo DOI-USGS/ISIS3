@@ -152,18 +152,18 @@ void IsisMain() {
     if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
     if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
     if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
-    if ((ra = ui.GetBoolean("RADEC"))) nbands++;
-    if ((declination = ui.GetBoolean("RADEC"))) nbands++;
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
+    if ((ra = ui.GetBoolean("RADEC"))) nbands++;
+    if ((declination = ui.GetBoolean("RADEC"))) nbands++;
   }
-  if((dn = ui.GetBoolean("DN"))) nbands++;
-  if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
-  if((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
-  if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
+  if ((dn = ui.GetBoolean("DN"))) nbands++;
+  if ((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
+  if ((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
+  if ((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
 
-  if(nbands < 1) {
+  if (nbands < 1) {
     QString message = "At least one photometry parameter must be entered"
                      "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
     throw IException(IException::User, message, _FILEINFO_);
@@ -237,7 +237,7 @@ void IsisMain() {
   // exists, remove all existing keywords and add the keywords for this app.
   // Otherwise, just put the group in.
   PvlObject &cobj = ocube->label()->findObject("IsisCube");
-  if(!cobj.hasGroup("BandBin")) {
+  if (!cobj.hasGroup("BandBin")) {
     cobj.addGroup(PvlGroup("BandBin"));
   }
 
@@ -282,8 +282,8 @@ void phocube(Buffer &out) {
   // function.  We must compute the offset to start at the second band.
   int skipDN = (dn) ? 64 * 64   :  0;
 
-  for(int i = 0; i < 64; i++) {
-    for(int j = 0; j < 64; j++) {
+  for (int i = 0; i < 64; i++) {
+    for (int j = 0; j < 64; j++) {
 
       MosData mosd, *p_mosd(0);  // For special mosaic angles
 
@@ -291,7 +291,8 @@ void phocube(Buffer &out) {
       double samp = out.Sample(index);
       double line = out.Line(index);
 
-      bool isGood=false;
+      // Checks to see if the point is in outer space
+      bool isGood = false;
       if (noCamera) {
         isGood = proj->SetWorld(samp, line);
       }
@@ -301,19 +302,19 @@ void phocube(Buffer &out) {
 
       if (isGood) {
 
-        if(phase) {
+        if (phase) {
           out[index] = cam->PhaseAngle();
           index += 64 * 64;
         }
-        if(emission) {
+        if (emission) {
           out[index] = cam->EmissionAngle();
           index += 64 * 64;
         }
-        if(incidence) {
+        if (incidence) {
           out[index] = cam->IncidenceAngle();
           index += 64 * 64;
         }
-        if(localEmission || localIncidence) {
+        if (localEmission || localIncidence) {
           Angle phase;
           Angle incidence;
           Angle emission;
@@ -330,8 +331,8 @@ void phocube(Buffer &out) {
             index += 64 * 64;
           }
         }
-        if(latitude) {
-          if(noCamera) {
+        if (latitude) {
+          if (noCamera) {
             out[index] = proj->UniversalLatitude();
           }
           else {
@@ -339,8 +340,8 @@ void phocube(Buffer &out) {
           }
           index += 64 * 64;
         }
-        if(longitude) {
-          if(noCamera) {
+        if (longitude) {
+          if (noCamera) {
             out[index] = proj->UniversalLongitude();
           }
           else {
@@ -348,8 +349,8 @@ void phocube(Buffer &out) {
           }
           index += 64 * 64;
         }
-        if(pixelResolution) {
-          if(noCamera) {
+        if (pixelResolution) {
+          if (noCamera) {
             out[index] = proj->Resolution();
           }
           else {
@@ -357,39 +358,39 @@ void phocube(Buffer &out) {
           }
           index += 64 * 64;
         }
-        if(lineResolution) {
+        if (lineResolution) {
           out[index] = cam->LineResolution();
           index += 64 * 64;
         }
-        if(sampleResolution) {
+        if (sampleResolution) {
           out[index] = cam->SampleResolution();
           index += 64 * 64;
         }
-        if(detectorResolution) {
+        if (detectorResolution) {
           out[index] = cam->DetectorResolution();
           index += 64 * 64;
         }
-        if(obliqueDetectorResolution) {
+        if (obliqueDetectorResolution) {
           out[index] = cam->ObliqueDetectorResolution();
           index += 64 * 64;
         }
-        if(northAzimuth) {
+        if (northAzimuth) {
           out[index] = cam->NorthAzimuth();
           index += 64 * 64;
         }
-        if(sunAzimuth) {
+        if (sunAzimuth) {
           out[index] = cam->SunAzimuth();
           index += 64 * 64;
         }
-        if(spacecraftAzimuth) {
+        if (spacecraftAzimuth) {
           out[index] = cam->SpacecraftAzimuth();
           index += 64 * 64;
         }
-        if(offnadirAngle) {
+        if (offnadirAngle) {
           out[index] = cam->OffNadirAngle();
           index += 64 * 64;
         }
-        if(subSpacecraftGroundAzimuth) {
+        if (subSpacecraftGroundAzimuth) {
           double ssplat, ssplon;
           ssplat = ssplon = 0.0;
           cam->subSpacecraftPoint(ssplat, ssplon);
@@ -397,7 +398,7 @@ void phocube(Buffer &out) {
               cam->UniversalLongitude(), ssplat, ssplon);
           index += 64 * 64;
         }
-        if(subSolarGroundAzimuth) {
+        if (subSolarGroundAzimuth) {
           double sslat, sslon;
           sslat = sslon = 0.0;
           cam->subSolarPoint(sslat,sslon);
@@ -408,13 +409,17 @@ void phocube(Buffer &out) {
 
         // Special Mosaic indexes
         if (morphologyRank) {
-          if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
+          if (!p_mosd) {
+            p_mosd = getMosaicIndicies(*cam, mosd);
+          }
           out[index] = mosd.m_morph;
           index += 64 * 64;
         }
 
         if (albedoRank) {
-          if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
+          if (!p_mosd) {
+            p_mosd = getMosaicIndicies(*cam, mosd);
+          }
           out[index] = mosd.m_albedo;
           index += 64 * 64;
         }
@@ -423,8 +428,8 @@ void phocube(Buffer &out) {
           double pB[3];
           cam->Coordinate(pB);
           if (bodyFixedX) {
-          out[index] = pB[0];
-          index += 64 * 64;
+            out[index] = pB[0];
+            index += 64 * 64;
           }
 
           if (bodyFixedY) {
@@ -439,7 +444,7 @@ void phocube(Buffer &out) {
       }
 
       // Trim outer space except last two bands when RA and declination are selected
-      // We skip two because RA and declination are always selected together.
+      // We always skip two because RA and declination are selected together.
       else {
         int bandsToProcess;
         if (ra && declination) {
@@ -449,13 +454,13 @@ void phocube(Buffer &out) {
           bandsToProcess = nbands;
         }
 
-        for(int b = (skipDN) ? 1 : 0; b < bandsToProcess; b++) {
+        for (int b = (skipDN) ? 1 : 0; b < bandsToProcess; b++) {
           out[index] = Isis::NULL8;
           index += 64 * 64;
         }
       }
 
-      // Export the RA and declination regardless if we are in outer space or not.
+      // Export the RA and declination regardless if the point is in outer space or not.
       if (ra) {
         out[index] = cam->RightAscension();
         index += 64 * 64;
