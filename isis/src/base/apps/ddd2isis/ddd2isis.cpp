@@ -13,12 +13,7 @@ void IsisMain() {
   ProcessImport p;
   IString from = ui.GetFileName("FROM");
   EndianSwapper swp("MSB");
-  int nsamples = 0;
-  int nlines = 0;
-  int nbands = 1;
-  int noffset = 0;
-  int bittype = 0;
-  int nbytes = 0;
+  int nsamples = 0, nlines = 0, nbands = 1, noffset = 0, bittype = 0, nbytes = 0;
 
   union {
     char readChars[4];
@@ -28,7 +23,7 @@ void IsisMain() {
 
   ifstream fin;
   fin.open(from.c_str(), ios::in | ios::binary);
-  if( !fin.is_open() ) {
+  if(!fin.is_open()) {
     string msg = "Cannot open input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -46,8 +41,7 @@ void IsisMain() {
    *
    */
 
-  // Verify that the file is a .ddd by reading in the first 4 bytes and
-  // comparing the magic numbers
+  // Verify the magic number
   readBytes.readLong = 0;
   fin.seekg(0);
   fin.read(readBytes.readChars, 4);
@@ -58,21 +52,18 @@ void IsisMain() {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  // Read bytes 4-7 to get number of lines
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   nlines = (int)readBytes.readLong;
 
-  // Read bytes 8-11 to get number of bytes
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
   nbytes = (int)readBytes.readLong;
 
-  // Read bytes 12-15 to get bittype
   fin.read(readBytes.readChars, 4);
   readBytes.readFloat = swp.Float(readBytes.readChars);
 
-  if( fin.fail() || fin.eof() ) {
+  if(fin.fail() || fin.eof()) {
     string msg = "An error ocurred when reading the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -90,14 +81,14 @@ void IsisMain() {
   }
 
   PvlGroup results("FileInfo");
-  results += PvlKeyword( "NumberOfLines", toString(nlines) );
-  results += PvlKeyword( "NumberOfBytesPerLine", toString(nbytes) );
-  results += PvlKeyword( "BitType", toString(bittype) );
+  results += PvlKeyword("NumberOfLines", toString(nlines));
+  results += PvlKeyword("NumberOfBytesPerLine", toString(nbytes));
+  results += PvlKeyword("BitType", toString(bittype));
   nsamples = nbytes / (bittype / 8);
-  results += PvlKeyword( "NumberOfSamples", toString(nsamples) );
+  results += PvlKeyword("NumberOfSamples", toString(nsamples));
   nbands = nbytes / nsamples;
-  results += PvlKeyword( "NumberOfBands", toString(nbands) );
-  results += PvlKeyword( "LabelBytes", toString(noffset) );
+  results += PvlKeyword("NumberOfBands", toString(nbands));
+  results += PvlKeyword("LabelBytes", toString(noffset));
   Application::Log(results);
 
   fin.close();
@@ -123,7 +114,7 @@ void IsisMain() {
     p.SetDimensions(nsamples, nlines, nbands);
     p.SetFileHeaderBytes(noffset);
     p.SetByteOrder(Isis::Msb);
-    p.SetInputFile( ui.GetFileName("FROM") );
+    p.SetInputFile(ui.GetFileName("FROM"));
     p.SetOutputCube("TO");
 
     p.StartProcess();
@@ -132,3 +123,4 @@ void IsisMain() {
 
   return;
 }
+
