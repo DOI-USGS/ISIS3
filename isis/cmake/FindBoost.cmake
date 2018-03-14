@@ -129,10 +129,6 @@ find_library(BOOST_WAVE_MT_LIBRARY
   NAMES boost_wave-mt boost_wave
 )
 
-#tjw:  not being linked against by ISIS presently
-#find_library(BOOST_LOCAL_MT_LIBRARY
-#  NAMES boost_locale-mt boost_locale
-#)
 find_library(BOOST_RANDOM_MT_LIBRARY
   NAMES boost_random-mt boost_random
 )
