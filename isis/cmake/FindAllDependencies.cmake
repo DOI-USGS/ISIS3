@@ -1,15 +1,15 @@
-#===============================================================================
+#==============================================================================
 # High level script to handle all required 3rd party dependencies
 # - All of them are expected to be in the 3rdParty folder, this script does not
 #   go looking for them if they are not?
 #===============================================================================
 
 message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
-set(CMAKE_LIBRARY_PATH $ENV{$CONDA_PREFIX})
-set(CMAKE_INCLUDE_PATH $ENV{$CONDA_PREFIX})
+list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+message("Test: ${CMAKE_FIND_ROOT_PATH}") 
 
 # Add thirdPartyCppFlags
-set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
+set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals -DGMM_USES_SUPERLU)
 set(thirdPartyCppFlags ${thirdPartyCppFlags} "-DENABLEJP2K=${JP2KFLAG}")
 
 # Paths to required executables
@@ -42,9 +42,9 @@ find_package(Qt5 COMPONENTS
                 Sql
                 Svg
                 Test
-                WebChannel
-                WebEngine
-                WebEngineWidgets
+		WebChannel
+		WebKit
+		WebKitWidgets
                 Widgets
                 Xml
                 XmlPatterns REQUIRED)

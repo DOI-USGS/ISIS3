@@ -17,6 +17,8 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
+#include <QPainter>
+#include <QUrl>
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
