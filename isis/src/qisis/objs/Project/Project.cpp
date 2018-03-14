@@ -2145,6 +2145,12 @@ namespace Isis {
         deleteAllProjectFiles();
         relocateProjectRoot(newDestination);
         m_isTemporaryProject = false;
+
+        // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
+        // working properly. For example, when we save a new project and try to view a control net
+        // the it thinks it's still in the /tmp area
+        // see ticket #5292
+        open(newDestination);
       }
       // Dialog was cancelled
       else {
