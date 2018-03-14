@@ -206,6 +206,11 @@ namespace Isis {
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-03-14 Ken Edmundson - Modified addCnetEditorView method to connect the
+   *                           destroyed signal for the CnetEditorWidget "mainWidget" to the
+   *                           cleanupCnetEditorViewWidgets signal cleanupCnetEditorViewWidgets.
+   *                           Previously the destroyed signal was connected to the QMainWidget
+   *                           "result".
    */
   class Directory : public QObject {
     Q_OBJECT
