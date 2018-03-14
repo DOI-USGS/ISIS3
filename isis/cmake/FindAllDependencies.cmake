@@ -74,15 +74,15 @@ find_package(TIFF      4.0.5   REQUIRED) # "tiff/tiff-${TIFF_FIND_VERSION}"
 find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 directory is "tnt/tnt126/"
 find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
 find_package(X11       6       REQUIRED)
-find_package(OpenGL            REQUIRED)
 find_package(nanoflann         REQUIRED)
-find_package(png               REQUIRED)
+find_package(PNG               REQUIRED)
 find_package(Kakadu)
 
 # v007 might have different versions installed for our mac and linux systems.
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
   find_package(Geos    3.5.0   REQUIRED)
+  find_package(OpenGL            REQUIRED)
 else(APPLE)
   find_package(Geos    3.5.1   REQUIRED)
 endif(APPLE)

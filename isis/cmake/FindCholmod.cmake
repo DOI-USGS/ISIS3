@@ -44,5 +44,5 @@ message( "-- FORTRAN LIB: "  ${FORTRAN_LIBRARY} )
 message( "-- BLAS LIB: "  ${BLAS_LIBRARY} )
 
 if(NOT APPLE)
-  message("LAPACK LIB" ${LAPACK_LIBRARY})
+  message("-- LAPACK LIB: " ${LAPACK_LIBRARY})
 endif()
