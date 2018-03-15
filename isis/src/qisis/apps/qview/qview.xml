@@ -6,7 +6,104 @@
   </brief>
 
   <description>
-    This program will display cubes and allow for interactive analysis.
+    <p>
+      This program will display cubes and allow for interactive analysis. It involves the 
+      implementation of a number of individual tools.
+      
+      
+    </p>
+    <h3>Spatial Plot Tool</h3>
+    <p>
+      This tool is used for analyzing pixel DN values for a manual selection made. It works with two 
+      different modes: linear and rotated rectangle. It is also capable of handling three different 
+      modes of interpolation: Nearest Neighbor, BiLinear and Cubic Convolution. 
+    </p>
+    <h4>Linear</h4>
+    <p>
+      This is the simpler of the two modes for the Spatial Plot Tool. It invloves the drawing of a 
+      line across an opened cube. The selection is started by clicking and holding the mouse where 
+      you would like to start your calculations, at which point you may drag the mouse in any 
+      direction and release the click to extablish the end of your selection.
+    </p>
+    <p>
+      The tool calculates the length of the line in pixels, rounding to the nearest full pixel 
+      value. It then divides the actual length of the line by this rounded length to achieve a 
+      step-size. <strong>Please note:</strong> this step size may be slightly bigger or smaller 
+      than a pixel length, but this difference becomes neglibible for larger selections. For 
+      example, if the length of the drawn line was 6.36 pixels, the tool would round the length to 
+      6 and the step-size would be 6.36/6 (or 1.06).
+    </p>
+    <p>
+      A plot window will be generated with the calculated DN values of the pixels. The first value 
+      to be calculated would be the value where the original mouse click was made. The tool then 
+      calculates the value along the line at each step-sized increment until it reaches where the 
+      mouse-click was released. This means that for a rounded length of 6, the plot would show a 
+      total of 7 plotted DN values.
+    </p>
+    <image src="assets/image/LinearSelection.png" height="400" />
+    <image src="assets/image/LinearPlot.png" height="400" />
+    <p>
+      The images above include an example of the line as drawn in the cube view as well as the 
+      associated plot window. Marking has been added to dilineate where mouse clicks were made and 
+      the DN values were calculated. The mouse was first clicked at dileneation marked "1" on the 
+      cube, and was released at "4". The number from the cube view correlates with the "Pixel 
+      Number" on the plot.
+      
+    </p>
+    <h4>Rotated Rectangle</h4>
+    <p>
+      The more complex of the two modes for the Spatial Plot Tool, this mode involves drawing a 
+      rectangle across an opened cube. The selection is started by clicking and holding the mouse 
+      where you would like to start your calculations, at which point you may drag the mouse in any 
+      direction and release the click to extablish one edge of your selection. You may then 
+      drag the mouse away from this original line to expand in the other direction. A single mouse 
+      click establishes your final selection. <strong>Please note:</strong> the tool will lock 
+      angles to be perpendicular and so your selections will always be a perfect rectangle.
+    </p>
+
+    <p>
+      Similar to the linear mode of this tool, the lengths of the lines in pixels are rounded to the 
+      nearest full pixel value, and then the lengths are divided by this rounded length to establish 
+      a step-size. (Please refer to the Linear section for an example.) <strong>Please note:</strong>
+      the step-size along one edge of the selection may not be the same as the step-size of the 
+      perpendicular edge. This becomes neglibile for larger selections.
+    </p>
+    <p>
+      A plot window will be generated with the calculated DN values. This is done by calculating the 
+      value where the original mouse click was made, then continuing in the direction of that 
+      first-drawn line, calculating the DN value at each step-sized increment until it reaches where 
+      the original mouse-click was released. The tool will then calculate the average of these 
+      values. This average becomes the first value in the plot.
+    </p>
+    <p>
+      The tool will then shift a step-size along the perpendicular edge, and calculate the average DN 
+      value along a line running parallel to the first-drawn line. This average becomes the second 
+      value in the plot. The tool continues this pattern until it has reached the opposite edge of 
+      the rectangle as the first-drawn line.
+    </p>
+    <p>
+      The following example illustrates this process.
+    </p>
+    <image src="assets/image/RRSelection.png" height="400" />
+    <image src="assets/image/RRSelectionMarked.png" height="400" />
+    <image src="assets/image/RRPlot.png" height="400" />
+    <p>
+      The image to the left is the original selection as seen in the cube view, and the image 
+      in the middle is the same view that has been marked for reference purposes. Finally, the image 
+      to the right is the associated plot window. The original mouse click was made at delineation 
+      "1" within the cube view, the original mouse release was made at "5", and the final 
+      mouse click was made at "25". The Spatial Plot Tool calculates the average of the DN values at 
+      dilineations 1-5, and this value is stored as "Pixel Value" 1 in the plot window, while the 
+      averages of 6-10 are stored in 2, 7-15 are stored in 3, 16-20 are stored in 4, and finally
+      21-25 are stored in 5. 
+    </p>
+    <h4>Interpolations</h4>
+    <p>
+      Spatial Plot Tool makes use of Nearest Nighbor, BiLinear and Cubic Convolution interpolations 
+      when calculating the DN values at particular points. <strong>Do be aware that when the tool is 
+      calculating a DN value at a particular point, it is calculating the interpolated DN value at 
+      that point. This may lead to confusion without a proper understanding of interpolations.</strong>
+    </p>
   </description>
 
   <category>
@@ -163,6 +260,9 @@
     <change name="Adam Paquette" date="2017-05-19">
       Readded help menu for the 2D and 3D plot tools. Now properly display in both tools.
       Fixes #2126.
+    </change>
+    <change name="Summer Stapleton" date="2018-03-14">
+      Included documentation for Spatial Plot Tool. Fixes #5281.
     </change>
   </history>
 </application>
