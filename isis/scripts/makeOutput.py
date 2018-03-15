@@ -31,21 +31,20 @@ parser.add_argument('testFullName', action='store', help='Provide the name of th
 parser.add_argument('-t', action='store_true', default=False, help='Flag whether output is sent to truth data')
 
 if "_unit_" in parser.testFullName:
-
     unitTestName = parser.testFullName.split("_test_")[1] + ".truth"
     # we should probably append the path to the front so it ends up in
     # in the same directory as the test
     unitTestPath = builddir + "/unitTest/"
 
     os.system(unitTestPath + unitTestExecutable + ">&" + unitTestPath + "/output/" + unitTestName)
-    print("Unit Test Output In " + unitTestPath + "/output/ As " + unitTestName)
+    print("Unit Test Output In " + builddir + "/testOutputDir/ As " + unitTestName)
 
     if parser.parse_args(['-t']):
         with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
             for line in testFile:
                 if unitTestName in line:
                     unitTestSrcPath = line.split("\" \"")[2][13:]
-                    os.system("cp -f " + unitTestPath + "/output/" + unitTestName + " " + unitTestSrcPath)
+                    os.system("cp -f " + unitTestPath + "/testOutputDir/" + unitTestName + " " + unitTestSrcPath)
                     break
 
         print("Checked In Truth Data To " + unitTestSrcPath)
