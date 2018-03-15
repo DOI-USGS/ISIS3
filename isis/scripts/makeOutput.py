@@ -15,6 +15,7 @@ named object.truth where object is the ISIS object being tested.
 The app tests output has to rely on the old make system because the app test do
 '''
 
+import argparse
 import sys
 import os
 
@@ -25,33 +26,33 @@ if not os.environ['ISISROOT']:
 
 builddir = os.environ['ISISROOT']
 
-if "_unit_" in sys.argv[1]:
-    unitTestExecutable = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('testFullName', action='store', help='Provide the name of the Test to create output of')
+parser.add_argument('-t', action='store_true', default=False, help='Flag whether output is sent to truth data')
 
-    unitTestName = unitTestExecutable.split("_test_")[1] + ".truth"
+if "_unit_" in parser.testFullName:
+
+    unitTestName = parser.testFullName.split("_test_")[1] + ".truth"
     # we should probably append the path to the front so it ends up in
     # in the same directory as the test
-    unitTestPath = unitTestExecutable.split("/")
-    del unitTestPath[-1]
-    unitTestPath = "/".join(unitTestPath)
+    unitTestPath = builddir + "/unitTest/"
 
-    os.system(unitTestExecutable + ">&" + unitTestPath + "/" + unitTestName)
-    print("Unit Test Output In " + unitTestPath + " As " + unitTestName)
+    os.system(unitTestPath + unitTestExecutable + ">&" + unitTestPath + "/output/" + unitTestName)
+    print("Unit Test Output In " + unitTestPath + "/output/ As " + unitTestName)
 
-    if len(sys.argv) == 3:
-        if sys.argv[2] == "truth":
-            with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
-                for line in testFile:
-                    if unitTestName in line:
-                        unitTestSrcPath = line.split("\" \"")[2][13:]
-                        os.system("cp -f " + unitTestPath + "/" + unitTestName + " " + unitTestSrcPath)
-                        break
+    if parser.parse_args(['-t']):
+        with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
+            for line in testFile:
+                if unitTestName in line:
+                    unitTestSrcPath = line.split("\" \"")[2][13:]
+                    os.system("cp -f " + unitTestPath + "/output/" + unitTestName + " " + unitTestSrcPath)
+                    break
 
-            print("Checked In Truth Data To " + unitTestSrcPath)
+        print("Checked In Truth Data To " + unitTestSrcPath)
 
 
 else:
-    apptest = sys.argv[1]
+    apptest = parser.testFullName
     makefilePath = ""
     with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
         for line in testFile:
@@ -73,10 +74,9 @@ else:
     print("App Test Output In " + builddir + "/testOutputDir/truth")
 
     # check if the user wants data checked in
-    if len(sys.argv) == 3:
-        if sys.argv[2] == "truth":
-            os.system("make checkin")
-            print("Checked In Truth Data")
+    if parser.parse_args(['-t']):
+        os.system("make checkin")
+        print("Checked In Truth Data")
 
     # doing this instead of make release because make release
     # can give feedback to the user that we would rather avoid
