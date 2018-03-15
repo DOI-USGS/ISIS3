@@ -206,6 +206,8 @@ namespace Isis {
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-03-14 Tracie Sucharski - Changed MosaicControlNetTool to ControlNetTool in
+   *                           addCubeDnView. References #5026.
    */
   class Directory : public QObject {
     Q_OBJECT
