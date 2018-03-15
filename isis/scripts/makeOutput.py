@@ -29,9 +29,9 @@ builddir = os.environ['ISISROOT']
 parser = argparse.ArgumentParser()
 parser.add_argument('testFullName', action='store', help='Provide the name of the Test to create output of')
 parser.add_argument('-t', action='store_true', default=False, help='Flag whether output is sent to truth data')
-
-if "_unit_" in parser.testFullName:
-    unitTestName = parser.testFullName.split("_test_")[1] + ".truth"
+testInput = parser.parse_args(['test'])
+if "_unit_" in testInput:
+    unitTestName = testInput.split("_test_")[1] + ".truth"
     # we should probably append the path to the front so it ends up in
     # in the same directory as the test
     unitTestPath = builddir + "/unitTest/"
@@ -51,7 +51,7 @@ if "_unit_" in parser.testFullName:
 
 
 else:
-    apptest = parser.testFullName
+    apptest = testInput
     makefilePath = ""
     with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
         for line in testFile:
