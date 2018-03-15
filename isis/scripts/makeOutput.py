@@ -29,7 +29,7 @@ builddir = os.environ['ISISROOT']
 parser = argparse.ArgumentParser()
 parser.add_argument('testFullName', action='store', help='Provide the name of the Test to create output of')
 parser.add_argument('-t', action='store_true', default=False, help='Flag whether output is sent to truth data')
-testInput = parser.parse_args(['test'])
+testInput = parser.parse_args(['test']).test
 if "_unit_" in testInput:
     unitTestName = testInput.split("_test_")[1] + ".truth"
     # we should probably append the path to the front so it ends up in
