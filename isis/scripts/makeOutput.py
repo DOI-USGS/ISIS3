@@ -71,11 +71,11 @@ else:
     os.system("make output")
     os.system("make truthdata")
     os.system("rm -rf " + builddir + "/testOutputDir/truth")
-    os.system("cp -r truth " + builddir + "/testOutputDir")
+    os.system("cp -rf truth " + builddir + "/testOutputDir")
     print("App Test Output In " + builddir + "/testOutputDir/truth")
 
     # check if the user wants data checked in
-    if parser.parse_args(['-t']):
+    if userInput.truth:
         os.system("make checkin")
         print("Checked In Truth Data")
 
