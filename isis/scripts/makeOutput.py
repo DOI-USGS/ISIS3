@@ -27,24 +27,26 @@ if not os.environ['ISISROOT']:
 builddir = os.environ['ISISROOT']
 
 parser = argparse.ArgumentParser()
-parser.add_argument('testFullName', action='store', help='Provide the name of the Test to create output of')
-parser.add_argument('-t', action='store_true', default=False, help='Flag whether output is sent to truth data')
-testInput = parser.parse_args(['test']).test
+parser.add_argument('test', action='store', help='Provide the name of the Test to create output of')
+parser.add_argument('-t', action='store_true', default=False, dest='truth', help='Flag whether output is sent to truth data')
+userInput = parser.parse_args()
+testInput = userInput.test
+
 if "_unit_" in testInput:
     unitTestName = testInput.split("_test_")[1] + ".truth"
     # we should probably append the path to the front so it ends up in
     # in the same directory as the test
     unitTestPath = builddir + "/unitTest/"
 
-    os.system(unitTestPath + unitTestExecutable + ">&" + unitTestPath + "/output/" + unitTestName)
+    os.system(unitTestPath + testInput + ">&" + builddir + "/testOutputDir/" + unitTestName)
     print("Unit Test Output In " + builddir + "/testOutputDir/ As " + unitTestName)
 
-    if parser.parse_args(['-t']):
+    if userInput.truth:
         with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
             for line in testFile:
                 if unitTestName in line:
                     unitTestSrcPath = line.split("\" \"")[2][13:]
-                    os.system("cp -f " + unitTestPath + "/testOutputDir/" + unitTestName + " " + unitTestSrcPath)
+                    os.system("cp -f " + builddir + "/testOutputDir/" + unitTestName + " " + unitTestSrcPath)
                     break
 
         print("Checked In Truth Data To " + unitTestSrcPath)
