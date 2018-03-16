@@ -51,7 +51,6 @@ https://conda.anaconda.org/conda-forge/osx-64/libxcb-1.12-1.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/libxml2-2.9.7-0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/m4-1.4.17-1.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/metis-5.1.0-3.tar.bz2
-https://conda.anaconda.org/usgs-astrogeology/osx-64/naif-n0066-h90cdba2_0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/nanoflann-1.2.2-0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/ncurses-5.9-10.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/ninja-1.7.2-0.tar.bz2
