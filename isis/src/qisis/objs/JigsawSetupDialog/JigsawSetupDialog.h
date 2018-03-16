@@ -50,6 +50,8 @@ namespace Isis {
    *                           allows for proper restoring of user defined weightings.
    *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
    *                           source images. Fixes #5105.
+   *   @history 2018-03-14 Ken Edmundson - Updated to use BundleSolutionInfo new methods to return
+   *                           the input control.
    */
 
   class JigsawSetupDialog : public QDialog {
