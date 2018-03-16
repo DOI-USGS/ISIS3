@@ -209,7 +209,8 @@ namespace Isis {
          }
 
          // Grab the control name that was used in that bundle adjustment.
-         m_selectedControlName = FileName(bundleSolutionInfo.last()->controlNetworkFileName()).name();
+         m_selectedControlName
+             = FileName(bundleSolutionInfo.last()->inputControlNetFileName()).name();
       }
 
       // Clear the dialog displays.
@@ -381,10 +382,13 @@ namespace Isis {
 
     // create output control net
     // Write the new jigged control net with correct path to results folder + runtime
-    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
-                               FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
+    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/Out-" +
+                               runTime + "-" +
+                               FileName(m_bundleSolutionInfo->inputControlNetFileName()).name());
 
     m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
+
+    m_bundleSolutionInfo->setOutputControlNetworkFileName(jiggedControlName);
 
     // Iterate through all of the image lists (the "imports" in the project).
     QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();

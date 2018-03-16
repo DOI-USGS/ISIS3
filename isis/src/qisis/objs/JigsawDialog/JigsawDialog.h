@@ -79,6 +79,8 @@ namespace Isis {
    *                           accepted. Fixes #4960
    *   @history 2017-11-01 Ian Humphrey - Create ecubs in the bundle results directory which contain
    *                           updated SPICE.  Fixes #4804, #4849.
+   *   @history 2018-03-16 Ken Edmundson - Updated to use new BundleSolutionInfo methods to get the
+   *                           input and output control.  Prefix the output control with "Out-".
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
