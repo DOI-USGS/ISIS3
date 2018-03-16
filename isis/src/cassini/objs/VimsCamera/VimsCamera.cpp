@@ -165,19 +165,7 @@ namespace Isis {
     ((VimsSkyMap *)SkyMap())->Init(lab);
 
     LoadCache();
-    // The below code was commented out in place of the above LoadCache() call.
-    // double tol = PixelResolution();
-    //
-    // if (tol < 0.) {
-    //   // Alternative calculation of .01*ground resolution of a pixel
-    //   // tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 1000. / 100.;
-    // }
-    //
-    // if (channel == "VIS") createCache(etStart, etStop, 64 * 64, tol);
-    // if (channel == "IR") createCache(etStart, etStop, 64 * 64, tol);
 
-    //  Call SetImage so that the et is reset to beginning of image w/o
-    //   padding.
     IgnoreProjection(true);
     SetImage(1, 1);
     IgnoreProjection(false);
