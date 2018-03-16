@@ -208,6 +208,11 @@ namespace Isis {
    *                           TemplateEditViewWorkOrder. Fixes #5168.
    *   @history 2018-03-14 Tracie Sucharski - Changed MosaicControlNetTool to ControlNetTool in
    *                           addCubeDnView. References #5026.
+   *   @history 2018-03-14 Ken Edmundson - Modified addCnetEditorView method to connect the
+   *                           destroyed signal for the CnetEditorWidget "mainWidget" to the
+   *                           cleanupCnetEditorViewWidgets signal cleanupCnetEditorViewWidgets.
+   *                           Previously the destroyed signal was connected to the QMainWidget
+   *                           "result".
    */
   class Directory : public QObject {
     Q_OBJECT

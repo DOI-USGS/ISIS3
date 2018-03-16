@@ -674,10 +674,12 @@ namespace Isis {
       mainWidget->pointTableView()->content()->setActiveControlNet(true);
       mainWidget->measureTableView()->content()->setActiveControlNet(true);
     }
-    connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
 
-    //  Connections for control point editing between views
+    // connect destroyed signal for mainWidget to cleanupCnetEditorViewWidgets slot
+    connect(mainWidget, SIGNAL( destroyed(QObject *) ),
+            this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+
+    // Connections for control point editing between views
     connect(mainWidget, SIGNAL(editControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 

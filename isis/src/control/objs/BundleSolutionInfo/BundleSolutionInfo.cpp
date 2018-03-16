@@ -10,6 +10,7 @@
 #include <QXmlStreamWriter>
 
 #include "BundleResults.h"
+#include "ControlList.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -44,7 +45,9 @@ namespace Isis {
 
     m_name = m_runTime;
 
-    m_controlNetworkFileName = new FileName(controlNetworkFileName);
+    m_inputControlNetFileName = new FileName(controlNetworkFileName);
+
+    m_outputControlNetFileName = new FileName();
 
     m_settings = inputSettings;
 
@@ -70,7 +73,8 @@ namespace Isis {
     m_id = new QUuid(QUuid::createUuid());
     m_runTime = "";
     m_name = m_runTime;
-    m_controlNetworkFileName = NULL;
+    m_inputControlNetFileName = NULL;
+    m_outputControlNetFileName = NULL;
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -90,7 +94,8 @@ namespace Isis {
       : m_id(new QUuid(QUuid::createUuid())),
         m_name(src.m_name),
         m_runTime(src.m_runTime),
-        m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
+        m_inputControlNetFileName(new FileName(src.m_inputControlNetFileName->expanded())),
+        m_outputControlNetFileName(new FileName(src.m_outputControlNetFileName->expanded())),
         m_settings(new BundleSettings(*src.m_settings)),
         m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
         m_images(new QList<ImageList *>(*src.m_images)),
@@ -107,8 +112,11 @@ namespace Isis {
   BundleSolutionInfo::~BundleSolutionInfo() {
     delete m_id;
 
-    delete m_controlNetworkFileName;
-    m_controlNetworkFileName = NULL;
+    delete m_inputControlNetFileName;
+    m_inputControlNetFileName = NULL;
+
+    delete m_outputControlNetFileName;
+    m_outputControlNetFileName = NULL;
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
@@ -150,8 +158,11 @@ namespace Isis {
         m_name = src.m_name;
       }
 
-      delete m_controlNetworkFileName;
-      m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
+      delete m_inputControlNetFileName;
+      m_inputControlNetFileName = new FileName(src.m_inputControlNetFileName->expanded());
+
+      delete m_outputControlNetFileName;
+      m_outputControlNetFileName = new FileName(src.m_outputControlNetFileName->expanded());
 
       m_settings = src.m_settings;
 
@@ -167,14 +178,32 @@ namespace Isis {
     return *this;
   }
 
+
+  /**
+   * Returns filename of output bundle images csv file.
+   *
+   * @return QString filename of output bundle images csv file.
+   */
   QString BundleSolutionInfo::savedImagesFilename() {
     return m_csvSavedImagesFilename;
   }
 
+
+  /**
+   * Returns filename of output bundle points csv file.
+   *
+   * @return QString filename of output bundle points csv file.
+   */
   QString BundleSolutionInfo::savedPointsFilename() {
     return m_csvSavedPointsFilename;
   }
 
+
+  /**
+   * Returns filename of output bundle residuals csv file.
+   *
+   * @return QString filename of output bundle residuals csv file.
+   */
   QString BundleSolutionInfo::savedResidualsFilename() {
     return m_csvSavedResidualsFilename;
   }
@@ -216,10 +245,15 @@ namespace Isis {
 
     //TODO do we need to close anything here?
 
-    FileName oldFileName(*m_controlNetworkFileName);
-    FileName newName(project->cnetRoot() + "/" +
-                     oldFileName.dir().dirName() + "/" + oldFileName.name());
-    *m_controlNetworkFileName = newName.expanded();
+    FileName oldInputFileName(*m_inputControlNetFileName);
+    FileName newInputFileName(project->cnetRoot() + "/" +
+                     oldInputFileName.dir().dirName() + "/" + oldInputFileName.name());
+    *m_inputControlNetFileName = newInputFileName.expanded();
+
+    FileName oldOutputFileName(*m_outputControlNetFileName);
+    FileName newOutputFileName(project->cnetRoot() + "/" +
+                     oldOutputFileName.dir().dirName() + "/" + oldOutputFileName.name());
+    *m_outputControlNetFileName = newOutputFileName.expanded();
   }
 
 
@@ -241,6 +275,16 @@ namespace Isis {
    */
   QString BundleSolutionInfo::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
+  }
+
+
+  /**
+   * Sets the output control network filename.
+   *
+   * @param fileName The the output control network filename..
+   */
+  void BundleSolutionInfo::setOutputControlNetworkFileName(FileName fileName) {
+    *m_outputControlNetFileName = fileName;
   }
 
 
@@ -277,12 +321,22 @@ namespace Isis {
 
 
   /**
-   * Returns the name of the control network.
+   * Returns the name of the input control network.
    *
-   * @return @b QString The name of the control network.
+   * @return @b QString The name of the input control network.
    */
-  QString BundleSolutionInfo::controlNetworkFileName() const {
-    return m_controlNetworkFileName->expanded();
+  QString BundleSolutionInfo::inputControlNetFileName() const {
+    return m_inputControlNetFileName->expanded();
+  }
+
+
+  /**
+   * Returns the name of the output control network.
+   *
+   * @return @b QString The name of the output control network.
+   */
+  QString BundleSolutionInfo::outputControlNetFileName() const {
+    return m_outputControlNetFileName->expanded();
   }
 
 
@@ -538,7 +592,7 @@ namespace Isis {
                   Isis::iTime::CurrentLocalTime().toLatin1().data());
     fpOut << buf;
     sprintf(buf, "\n               Network Filename: %s",
-                  m_controlNetworkFileName->expanded().toLatin1().data());
+                  m_inputControlNetFileName->expanded().toLatin1().data());
     fpOut << buf;
     sprintf(buf, "\n                     Network Id: %s",
                   m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
@@ -1502,6 +1556,7 @@ namespace Isis {
   void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
                                 FileName newProjectRoot) const {
 
+    // TODO: comment below not clear, why is this done?
     // This is done for unitTest which has no Project
     QString relativeBundlePath;
     FileName bundleSolutionInfoRoot;
@@ -1521,14 +1576,21 @@ namespace Isis {
                              .arg(bundleSolutionInfoRoot.path()),
                            _FILEINFO_);
         }
-        QString oldFile = oldPath + "/" + m_controlNetworkFileName->name();
-        QString newFile = newPath + "/" + m_controlNetworkFileName->name();
-        //QString outputControlFile = m_statisticsResults->outputControlNet()->
+        QString oldFile = oldPath + "/" + m_inputControlNetFileName->name();
+        QString newFile = newPath + "/" + m_inputControlNetFileName->name();
         if (!QFile::copy(oldFile, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
-                             .arg(m_controlNetworkFileName->name()).arg(newFile),
-                           _FILEINFO_);        
+                             .arg(m_inputControlNetFileName->name()).arg(newFile),
+                           _FILEINFO_);
+        }
+        oldFile = oldPath + "/" + m_outputControlNetFileName->name();
+        newFile = newPath + "/" + m_outputControlNetFileName->name();
+        if (!QFile::copy(oldFile, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_outputControlNetFileName->name()).arg(newFile),
+                           _FILEINFO_);
         }
         newFile = newPath + "/" + FileName(m_csvSavedImagesFilename).name();
         if (!QFile::copy(m_csvSavedImagesFilename, newFile)) {
@@ -1562,14 +1624,28 @@ namespace Isis {
       relativeBundlePath += "/";
     }
 
+    // TODO: so, we can do the stuff below if project is NULL?
+
     stream.writeStartElement("bundleSolutionInfo");
     // save ID, cnet file name, and run time to stream
     stream.writeStartElement("generalAttributes");
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("name", m_name);
     stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName",
-                            relativeBundlePath + m_controlNetworkFileName->name());
+//    stream.writeTextElement("inputFileName",
+//                            relativeBundlePath + m_inputControlNetFileName->name());
+
+    QString relativePath = m_inputControlNetFileName->expanded().remove(project->newProjectRoot());
+    // Get rid of any preceding "/" , but add on ending "/"
+    if (relativePath.startsWith("/")) {
+      relativePath.remove(0,1);
+    }
+
+    stream.writeTextElement("inputFileName",
+                            relativePath);
+
+    stream.writeTextElement("outputFileName",
+                            relativeBundlePath + m_outputControlNetFileName->name());
     stream.writeTextElement("imagesCSV",
                             relativeBundlePath + FileName(m_csvSavedImagesFilename).name());
     stream.writeTextElement("pointsCSV",
@@ -1699,9 +1775,14 @@ namespace Isis {
     else if (localName == "runTime") {
       m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;
     }
-    else if (localName == "fileName") {
-      assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
-      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(
+    else if (localName == "inputFileName") {
+      assert(m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName == NULL);
+      m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName = new FileName(
+        projectRoot + m_xmlHandlerCharacters);
+    }
+    else if (localName == "outputFileName") {
+      assert(m_xmlHandlerBundleSolutionInfo->m_outputControlNetFileName == NULL);
+      m_xmlHandlerBundleSolutionInfo->m_outputControlNetFileName = new FileName(
         projectRoot + m_xmlHandlerCharacters);
     }
     else if (localName == "imagesCSV") {

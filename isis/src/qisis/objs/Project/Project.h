@@ -221,6 +221,10 @@ namespace Isis {
    *                           Corrected the setting of the project root when pening a project from
    *                           the command line. Removed m_projectPath, it is no longer needed since
    *                           m_projectRoot contains the correct path. References #5104.
+   *   @history 2018-03-14 Ken Edmundson - Modified save method to reopen project if we are saving
+   *                           a temporary project to ensure all project files are pointing to the
+   *                           correct directory. Note that this is NOT ideal, particularly it the
+   *                           project has many files.
    */
   class Project : public QObject {
     Q_OBJECT
