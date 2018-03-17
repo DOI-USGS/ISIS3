@@ -1544,14 +1544,45 @@ namespace Isis {
   }
 
 
-  symmetric_matrix<double, upper> SurfacePoint::GetRectangularMatrix()
-      const {
+  symmetric_matrix<double, upper> SurfacePoint::GetRectangularMatrix
+                               (SurfacePoint::CoordUnits units) const {
     if(!p_rectCovar) {
       symmetric_matrix<double, upper> tmp(3);
       tmp.clear();
       return tmp;
     }
 
+    // Make sure the units are valid
+    if (units != Kilometers && units != Meters) {
+      IString msg = "Units must be Kilometers or Meters";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
+    symmetric_matrix<double, upper> covar(3);
+    covar.clear();
+    
+    switch (units) {
+      
+      case Meters:
+        // Convert member matrix to Meters to return
+        covar(0,0) = (*p_rectCovar)(0,0)*1.0e6;
+        covar(0,1) = (*p_rectCovar)(0,1)*1.0e6;
+        covar(0,2) = (*p_rectCovar)(0,2)*1.0e6;
+        covar(1,1) = (*p_rectCovar)(1,1)*1.0e6;
+        covar(1,2) = (*p_rectCovar)(1,2)*1.0e6;
+        covar(2,2) = (*p_rectCovar)(2,2)*1.0e6;
+        return covar;
+        break;
+        
+      case Kilometers:
+        return *p_rectCovar;
+        break;
+        
+    default:
+        IString msg = "Unrecognized unit for a Displacement (must be meters or kilometers).";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
     return *p_rectCovar;
   }
 
@@ -1703,11 +1734,43 @@ namespace Isis {
   }
 
 
-  symmetric_matrix<double, upper> SurfacePoint::GetSphericalMatrix() const {
+  symmetric_matrix<double, upper> SurfacePoint::GetSphericalMatrix
+                               (SurfacePoint::CoordUnits units) const {
     if(!p_sphereCovar) {
       symmetric_matrix<double, upper> tmp(3);
       tmp.clear();
       return tmp;
+    }
+
+    // Make sure the units are valid
+    if (units != Kilometers && units != Meters) {
+      IString msg = "Units must be Kilometers or Meters";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    
+    symmetric_matrix<double, upper> covar(3);
+    covar.clear();
+    
+    switch (units) {
+      
+      case Meters:
+        // Convert member matrix to Meters to return
+        covar(0,0) = (*p_sphereCovar)(0,0)*1.0e6;
+        covar(0,1) = (*p_sphereCovar)(0,1)*1.0e6;
+        covar(0,2) = (*p_sphereCovar)(0,2)*1.0e6;
+        covar(1,1) = (*p_sphereCovar)(1,1)*1.0e6;
+        covar(1,2) = (*p_sphereCovar)(1,2)*1.0e6;
+        covar(2,2) = (*p_sphereCovar)(2,2)*1.0e6;
+        return covar;
+        break;
+        
+      case Kilometers:
+        return *p_sphereCovar;
+        break;
+        
+    default:
+        IString msg = "Unrecognized unit for a Displacement (must be meters or kilometers).";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return *p_sphereCovar;

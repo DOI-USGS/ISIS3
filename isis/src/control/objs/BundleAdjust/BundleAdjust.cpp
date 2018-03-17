@@ -2951,11 +2951,11 @@ namespace Isis {
       boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> pCovar;
       
       if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Rectangular) {
-        pCovar = SurfacePoint.GetSphericalMatrix();
+        pCovar = SurfacePoint.GetSphericalMatrix(SurfacePoint::Kilometers);
       }
       else {
         // Assume Rectangular coordinates 
-        pCovar = SurfacePoint.GetRectangularMatrix();
+        pCovar = SurfacePoint.GetRectangularMatrix(SurfacePoint::Kilometers);
       }
       pCovar += covariance;
       pCovar *= sigma0Squared;

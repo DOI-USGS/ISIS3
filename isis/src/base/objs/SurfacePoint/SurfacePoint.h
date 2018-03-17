@@ -97,12 +97,19 @@ namespace Isis {
    *                           of equatorial in comments.  Corrected conversion of longitude sigma
    *                           from meters to radians in SetSphericalSigmasDistance and from radians
    *                           to meters in GetLonSigmaDistance.  Fixed SetRectangularMatrix to take
-   *                           input in km instead of m.
-   *  
+   *                           input in km instead of m. 
    *   @history 2017-11-20 Debbie A. Cook - added an additional argument to SetRectangularMatrix
    *                           and SetSphericalMatrix to specify the units of the matrix.  This will allow the 
    *                           bundle adjust to set in km and existing software to continue setting in the default 
-   *                           units (meters).  The matrix will be stored in km to avoid extra conversions.
+   *                           units (meters).  The matrix will be stored in km in this object to avoid extra 
+   *                           conversions during processing.
+   *  
+   *   @history 2017-11-20 Debbie A. Cook - added an additional argument to GetRectangularMatrix
+   *                           and GetSphericalMatrix to specify the units of the matrix.  This will allow existing
+   *                           callers to set in m (the default) and bundle adjust software to set in km and 
+   *                           minimize conversions. The matrix is held in this object in km to avoid extra 
+   *                           conversions during the bundle adjustment.  The control net stores the distance
+   *                           values of the matrix in m**2.
    *                                                    
    */
 
@@ -233,7 +240,7 @@ namespace Isis {
       double GetYWeight() const;
       double GetZWeight() const;
       boost::numeric::ublas::symmetric_matrix<double,boost::numeric::ublas::upper> 
-        GetRectangularMatrix() const;
+        GetRectangularMatrix(SurfacePoint::CoordUnits units = SurfacePoint::Meters) const;
       Latitude GetLatitude() const; 
       Longitude GetLongitude() const;
       Distance GetLocalRadius() const;
@@ -246,7 +253,8 @@ namespace Isis {
       Distance GetLocalRadiusSigma() const;
       double GetLocalRadiusWeight() const;
       boost::numeric::ublas::symmetric_matrix
-          <double,boost::numeric::ublas::upper> GetSphericalMatrix() const;
+          <double,boost::numeric::ublas::upper> GetSphericalMatrix
+            (SurfacePoint::CoordUnits units = SurfacePoint::Meters) const;
 
 // Conversion methods (for convenience)
       double DisplacementToDouble(Displacement disp, CoordUnits units);

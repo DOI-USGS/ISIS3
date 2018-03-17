@@ -257,8 +257,14 @@
       instead of lat/lon/radius. References #501.
     </change>
     <change name="Debbie A. Cook" date="2017-09-17">
-      Fixed a problem in the xml that was causing of of the input
+      Fixed a problem in the xml that was causing the input
       parameters to be omitted from the history.  References #501.
+    </change>
+    <change name="Debbie A. Cook" date="2018-03-18">
+      Fixed a problem in the xml that excluded entry of values
+      for latitudinal point sigmas when the coordinate type for
+      reports was set to Rectangular and vice versa.  References
+      #501.
     </change>
   </history>
 
@@ -1084,11 +1090,6 @@
               and reported in planetocentric latitudinal coordinates (latitude,
               longitude, and radius).  
             </description>
-          <exclusions>
-            <item>POINT_X_SIGMA</item>
-            <item>POINT_Y_SIGMA</item>
-            <item>POINT_Z_SIGMA</item>
-          </exclusions>
           </option>
 
           <option value="RECTANGULAR">
@@ -1097,11 +1098,6 @@
               If this option is selected all control points will be adjusted, corrected,
               and reported in body-fixed rectangular coordinates (X, Y, and Z).  
             </description>
-            <exclusions>
-              <item>POINT_LATITUDE_SIGMA</item>
-              <item>POINT_LONGITUDE_SIGMA</item>
-              <item>POINT_RADIUS_SIGMA</item>
-            </exclusions>
           </option>
         </list>
        </parameter>
