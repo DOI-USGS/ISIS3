@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -50,13 +50,16 @@ namespace Isis {
    *
    * @param [in] lab   (Pvl &)  Label used to create camera model
    *
-   * @internal 
+   * @internal
    *   @history 2007-12-12  Tracie Sucharski,  After creating spice cache with
    *                           padding, reset et by calling SetImage(1,1) so that
    *                           et is initialized properly at beginning of image
    *                           without padding.
    * @internal
    *   @history 2011-05-03 Jeannie Walldren - Added NAIF error check.
+   *   @history 2018-03-14 Adam Goins - Changed cache calculations with LoadCache() call.
+   *                           This fixes an error where VimsCamera caused spiceinit to
+   *                           fail when TargetName == SKY. Fixes #5353.
    *
    */
   VimsCamera::VimsCamera(Cube &cube) : Camera(cube) {
@@ -64,7 +67,7 @@ namespace Isis {
     m_instrumentNameShort = "VIMS";
     m_spacecraftNameLong = "Cassini Huygens";
     m_spacecraftNameShort = "Cassini";
-    
+
     NaifStatus::CheckErrors();
 
     Pvl &lab = *cube.label();
@@ -161,18 +164,8 @@ namespace Isis {
     ((VimsGroundMap *)GroundMap())->Init(lab);
     ((VimsSkyMap *)SkyMap())->Init(lab);
 
-    double tol = PixelResolution();
+    LoadCache();
 
-    if (tol < 0.) {
-      // Alternative calculation of .01*ground resolution of a pixel
-      tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 1000. / 100.;
-    }
-
-    if (channel == "VIS") createCache(etStart, etStop, 64 * 64, tol);
-    if (channel == "IR") createCache(etStart, etStop, 64 * 64, tol);
-
-    //  Call SetImage so that the et is reset to beginning of image w/o
-    //   padding.
     IgnoreProjection(true);
     SetImage(1, 1);
     IgnoreProjection(false);
@@ -182,10 +175,10 @@ namespace Isis {
 
 
   /**
-   * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or 
-   * square, depending on the sampling mode.  The first vertex is the top left. 
-   *  
-   * @internal 
+   * Returns the pixel ifov offsets from center of pixel.  For vims this will be a rectangle or
+   * square, depending on the sampling mode.  The first vertex is the top left.
+   *
+   * @internal
    *   @history 2013-08-09 Tracie Sucharski - Add more vertices along each edge.  This might need
    *                          to be a user parameter evenually?  Might be dependent on resolution.
    */
@@ -218,17 +211,16 @@ namespace Isis {
 }
 
 // Plugin
-/** 
- * This is the function that is called in order to instantiate a VimsCamera object. 
+/**
+ * This is the function that is called in order to instantiate a VimsCamera object.
  *
  * @param lab Cube labels
  *
  * @return Isis::Camera* VimsCamera
- * @internal 
+ * @internal
  *   @history 2011-05-03 Jeannie Walldren - Added documentation.  Removed
  *            Cassini namespace.
  */
 extern "C" Isis::Camera *VimsCameraPlugin(Isis::Cube &cube) {
   return new Isis::VimsCamera(cube);
 }
-

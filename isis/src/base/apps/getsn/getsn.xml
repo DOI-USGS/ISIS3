@@ -27,9 +27,9 @@
     <change name="Christopher Austin" date="2008-01-08">
       Augmented observation number and added TO file with APPEND option
     </change>
-    <change name="Steven Koechle" date="2008-04-04"> 
-      Added booleans for which keywords to get. If TO parameter is not entered 
-      output will go to console. Added results group to SessionLog and GuiLog 
+    <change name="Steven Koechle" date="2008-04-04">
+      Added booleans for which keywords to get. If TO parameter is not entered
+      output will go to console. Added results group to SessionLog and GuiLog
       (if applicable)
     </change>
     <change name="Steven Lambright" date="2008-10-31">
@@ -41,6 +41,11 @@
     <change name="Mackenzie Boyd" date="2011-03-07">
       Added FORMAT option to choose between PVL and FLAT format. Effects output
       file only, default is still PVL.
+    </change>
+    <change name="Kaitlyn Lee" date="2018-01-17">
+      Removed unreachable else clause that assumed more than two options are
+      allowed to be entered in for the parameter FORMAT. Added test to default case
+      to increase code coverage.
     </change>
   </history>
 
@@ -70,7 +75,7 @@
             No Output file will be created
         </internalDefault>
         <description>
-          The text file in which the Result Pvl created is either appended or 
+          The text file in which the Result Pvl created is either appended or
           written to.
         </description>
         <filter>
@@ -82,8 +87,8 @@
         <default><item>TRUE</item></default>
         <brief>Appends results on output file</brief>
         <description>
-          Appends the created Results Pvl to the TO parameter output file.  If 
-          this is set to false, then it write the results to the output file 
+          Appends the created Results Pvl to the TO parameter output file.  If
+          this is set to false, then it write the results to the output file
           instead.
         </description>
       </parameter>
@@ -95,9 +100,9 @@
         <default><item>FALSE</item></default>
         <brief>Allows serial number to default to the file name</brief>
         <description>
-          Within the Result Pvl, if the serial number is not know, then Unknown 
-          is displayed in the keyword SerialNumber.  If this parameter is set to 
-          TRUE, then is displays the input cube's filename is displayed in the 
+          Within the Result Pvl, if the serial number is not know, then Unknown
+          is displayed in the keyword SerialNumber.  If this parameter is set to
+          TRUE, then is displays the input cube's filename is displayed in the
           keyword SerialNumber instead.
         </description>
       </parameter>
@@ -111,7 +116,7 @@
           Get the Filename
         </brief>
         <description>
-            If this boolean is not checked then the filename will not be part of 
+            If this boolean is not checked then the filename will not be part of
             the output.
         </description>
       </parameter>
@@ -122,7 +127,7 @@
           Get the Serial Number
         </brief>
         <description>
-            If this boolean is not checked then the Serial Number will not be 
+            If this boolean is not checked then the Serial Number will not be
             part of the output.
         </description>
       </parameter>
@@ -133,7 +138,7 @@
           Get the Observation Number
         </brief>
         <description>
-            If this boolean is not checked then the Observation Number will not 
+            If this boolean is not checked then the Observation Number will not
             be part of the output.
         </description>
       </parameter>
@@ -145,7 +150,7 @@
         <default><item>PVL</item></default>
         <brief>Output format</brief>
         <description>
-          Output format options, either PVL or FLAT may be used to display the 
+          Output format options, either PVL or FLAT may be used to display the
           selected outputs.
         </description>
         <list>
@@ -165,7 +170,7 @@
       </parameter>
     </group>
 
-   
+
   </groups>
 
 </application>

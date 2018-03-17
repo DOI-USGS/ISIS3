@@ -772,7 +772,7 @@ Testing error throws
 **ERROR** PVL Keyword [InputPosition] does not exist in [Group = NoInputPosition].
 
 **ERROR** Failed to translate output value for [BadInputPosition].
-**ERROR** Failed traversing input position. [] element does not have a child element named [Bad_Parent].
+**ERROR** Failed traversing input position. [InputPosition] element does not have a child element named [Bad_Parent].
 
 **ERROR** Failed to translate output value for [InputKeyDoesNotExist].
 **PROGRAMMER ERROR** No value or default value to translate for translation group [InputKeyDoesNotExist] in file [].
