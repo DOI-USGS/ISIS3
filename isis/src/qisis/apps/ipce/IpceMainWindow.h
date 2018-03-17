@@ -121,6 +121,8 @@ namespace Isis {
    *   @history 2018-01-18 Tracie Sucharski - Commented out progressDock until we decide if it's
    *                           needed.  Currently, it is not being used, the progress bar appears in
    *                           the history dock. Fixes #5151.
+   *   @history 2018-03-02 Tracie Sucharski - added static keyword to the m_maxRecentProject member
+   *                           variable, fixes OSX compile warning.  References #5341.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -181,7 +183,7 @@ namespace Isis {
        *   should perform a best-guess for best perfomance.
        */
       int m_maxThreadCount;
-      const int m_maxRecentProjects = 5;
+      static const int m_maxRecentProjects = 5;
 
       QToolBar *m_permToolBar; //!< The toolbar for actions that rarely need to be changed.
       QToolBar *m_activeToolBar; //<! The toolbar for the actions of the current tool.
