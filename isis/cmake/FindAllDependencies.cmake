@@ -7,6 +7,7 @@
 message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
 list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
 
+# Add search USGS maintained libraries
 list(APPEND CMAKE_INCLUDE_PATH
   /usgs/pkgs/local/v007/include/
   /usgs/pkgs/local/v007/bin/
@@ -41,7 +42,6 @@ set(CMAKE_PREFIX_PATH
   /usr/lib64/
   /usr/local/lib/
 )
-
 
 # Add thirdPartyCppFlags
 set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
