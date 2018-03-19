@@ -1,1 +1,0 @@
-This Wiki will describe the process for building ISIS3 using cmake
