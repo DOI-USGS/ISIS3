@@ -71,10 +71,6 @@ find_program(PROTOC protoc REQUIRED)
 
 include(FindProtobuf)
 
-
-find_package(Geos 3.5.0 REQUIRED)
-
-
 if(APPLE)
   find_package(OpenGL            REQUIRED)
   find_package(Qt5 COMPONENTS
@@ -175,6 +171,7 @@ find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED) # Jama version is 1.2.5, but v007 directory is "jama/jama125/"
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
+find_package(OpenGL            REQUIRED)
 find_package(PCL       1.8     REQUIRED) # "pcl-${PCL_FIND_VERSION}"
 find_package(Protobuf  2.6.1   REQUIRED) # "google-protobuf/protobuf${Protobuf_FIND_VERSION}/"
 find_package(Qwt       6       REQUIRED) # "qwt${Qwt_FIND_VERSION}"
@@ -376,7 +373,7 @@ foreach(lib ${RAW_DYNAMIC_LIBS})
   endif()
 endforeach()
 
-message("THIRDPARTYLIBS = ${THIRDPARTYLIBS}")
+# message("THIRDPARTYLIBS = ${THIRDPARTYLIBS}")
 
 # Plugins
 file(GLOB_RECURSE THIRDPARTYPLUGINS "${PLUGIN_DIR}/*${SO}")

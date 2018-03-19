@@ -25,12 +25,14 @@ endif()
 # Dependencies for lapack
 
 # add gcc location for MacOS
-find_library(FORTRAN_LIBRARY      NAMES gfortran
-  NAMES gfortran
-  PATHS /opt/usgs/v007/ports/lib/gcc5/
-)
+# if(APPLE)
+  find_library(FORTRAN_LIBRARY      NAMES gfortran
+    NAMES gfortran
+    PATHS /opt/usgs/v007/ports/lib/gcc5/
+  )
 
-find_library(BLAS_LIBRARY NAMES blas)
+  find_library(BLAS_LIBRARY NAMES blas)
+# endif(APPLE)
 
 get_filename_component(CHOLMOD_ROOT_INCLUDE_DIR "${CHOLMOD_INCLUDE_DIR}" DIRECTORY)
 

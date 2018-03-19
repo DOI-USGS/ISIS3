@@ -10,7 +10,6 @@ cmake_minimum_required(VERSION 3.4)
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# always look for framworks last
 set(CMAKE_FIND_FRAMEWORK LAST)
 
 include(AddIsisModule)
@@ -109,6 +108,7 @@ endif()
 
 if(${testOutputDir} STREQUAL "OFF")
   message("Writing test data folders to = ${CMAKE_BINARY_DIR}/testOutputDir")
+  set(testOutputDir "${CMAKE_BINARY_DIR}/testOutputDir")
   execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/testOutputDir)
 else()
   # User specified a test output folder, make sure it exists.
