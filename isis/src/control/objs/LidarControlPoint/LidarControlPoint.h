@@ -42,6 +42,7 @@ namespace Isis {
    * @internal
    *   @history 2018-01-29 Makayla Shepherd Original version
    *   @history 2018-02-09 Ken Edmundson Added typedef forLidarControlPointQsp
+   *   @history 2018-03-18 Debbie A. Cook Added Simultaneous measures 
    */
   
   class LidarControlPoint : public ControlPoint {
@@ -56,6 +57,7 @@ namespace Isis {
     ControlPoint::Status setSigmaRange(double sigmaRange);
     ControlPoint::Status setTime(iTime time);
     ControlPoint::Status addSimultaneous(QString newSerial);
+
     
     double range();
     double sigmaRange();

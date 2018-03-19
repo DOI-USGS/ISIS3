@@ -26,6 +26,7 @@
 #include "SerialNumberList.h"
 #include "SurfacePoint.h"
 
+using namespace boost::numeric::ublas;
 
 namespace Isis {
 
@@ -203,17 +204,80 @@ namespace Isis {
         if (pointObject.contains("radius") && pointObject["radius"].isDouble()) {
           radius = pointObject["radius"].toDouble();
         }
-
+        
         QSharedPointer<LidarControlPoint> lcp =
             QSharedPointer<LidarControlPoint>(new LidarControlPoint());
         lcp->SetId(id);
         lcp->setTime(iTime(time));
         lcp->setRange(range);
         lcp->setSigmaRange(sigmaRange);
-        lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
-                                                 Longitude(longitude, Angle::Units::Degrees),
-                                                 Distance(radius, Distance::Units::Kilometers)));
 
+        if (pointObject.contains("aprioriMatrix") &&
+                                 pointObject["aprioriMatrix"].isArray()) {
+          QJsonArray  aprioriMatrixArray = pointObject["apriorMatrix"].toArray();
+          boost::numeric::ublas::symmetric_matrix<double, upper> aprioriMatrix(3);
+          aprioriMatrix.clear();
+          aprioriMatrix(0, 0) = aprioriMatrixArray[0].toDouble();
+          aprioriMatrix(0, 1) = aprioriMatrixArray[1].toDouble();
+          aprioriMatrix(0, 2) = aprioriMatrixArray[2].toDouble();
+          aprioriMatrix(1, 1) = aprioriMatrixArray[3].toDouble();
+          aprioriMatrix(1, 2) = aprioriMatrixArray[4].toDouble();
+          aprioriMatrix(2, 2) = aprioriMatrixArray[5].toDouble();
+          
+          lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
+                                                 Longitude(longitude, Angle::Units::Degrees),
+                                                 Distance(radius, Distance::Units::Kilometers),
+                                                   aprioriMatrix));
+          lcp->SetType(ControlPoint::Constrained);
+        }
+        else {
+          lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
+                                                 Longitude(longitude, Angle::Units::Degrees),
+                                                   Distance(radius, Distance::Units::Kilometers)));
+        }
+
+        // Set the adjusted surface point if it exists 
+        if (pointObject.contains("adjustedLatitude") &&
+             pointObject["adjustedLatitude"].isDouble() &&
+             pointObject.contains("adjustedLongitude") &&
+             pointObject["adjustedLongitude"].isDouble() &&
+             pointObject.contains("adjustedRadius") &&
+             pointObject["adjustedRadius"].isDouble()) {
+
+          double adjustedLatitude = 0.0;
+          adjustedLatitude = pointObject["adjustedLatitude"].toDouble();
+
+          double adjustedLongitude = 0.0;
+          adjustedLongitude = pointObject["adjustedLongitude"].toDouble();
+
+          double adjustedRadius = 0.0;
+          adjustedRadius = pointObject["radius"].toDouble();
+        
+          if (pointObject.contains("adjustedMatrix") &&
+              pointObject["adjustedMatrix"].isArray()) {
+            QJsonArray  adjustedMatrixArray = pointObject["adjustedMatrix"].toArray();
+            boost::numeric::ublas::symmetric_matrix<double, upper> adjustedMatrix(3);
+            adjustedMatrix.clear();
+            adjustedMatrix(0, 0) = adjustedMatrixArray[0].toDouble();
+            adjustedMatrix(0, 1) = adjustedMatrixArray[1].toDouble();
+            adjustedMatrix(0, 2) = adjustedMatrixArray[2].toDouble();
+            adjustedMatrix(1, 1) = adjustedMatrixArray[3].toDouble();
+            adjustedMatrix(1, 2) = adjustedMatrixArray[4].toDouble();
+            adjustedMatrix(2, 2) = adjustedMatrixArray[5].toDouble();
+          
+            lcp->SetAdjustedSurfacePoint(SurfacePoint(Latitude(adjustedLatitude, Angle::Units::Degrees),
+                                                     Longitude(adjustedLongitude, Angle::Units::Degrees),
+                                                     Distance(adjustedRadius, Distance::Units::Kilometers),
+                                                     adjustedMatrix));
+            lcp->SetType(ControlPoint::Constrained);
+          }
+          else {
+            lcp->SetAdjustedSurfacePoint(SurfacePoint(Latitude(adjustedLatitude, Angle::Units::Degrees),
+                                                     Longitude(adjustedLongitude, Angle::Units::Degrees),
+                                                     Distance(adjustedRadius, Distance::Units::Kilometers)));
+          }
+        }
+ 
         if (pointObject.contains("simultaneousImages") &&
                                  pointObject["simultaneousImages"].isArray()) {
           QJsonArray simultaneousArray =
@@ -305,14 +369,67 @@ namespace Isis {
       pointObject["range"] = lcp->range();
       pointObject["sigmaRange"] = lcp->sigmaRange();
       pointObject["time"] = lcp->time().Et();
-      // Serialize the lat/lon/radius (AprioriSurfacePoint)
-      SurfacePoint aprioriSurfacePoint = lcp->GetAprioriSurfacePoint();
-      pointObject["latitude"] = aprioriSurfacePoint.GetLatitude().planetocentric(Angle::Units::Degrees);
-      pointObject["longitude"] = aprioriSurfacePoint.GetLongitude().positiveEast(Angle::Units::Degrees);
-      pointObject["radius"] = aprioriSurfacePoint.GetLocalRadius().kilometers();
       
+      // Serialize the AprioriSurfacePoint
+      SurfacePoint aprioriSurfacePoint = lcp->GetAprioriSurfacePoint();
+      if (aprioriSurfacePoint.Valid()) {
+        pointObject["latitude"] = aprioriSurfacePoint.GetLatitude().planetocentric(Angle::Units::Degrees);
+        pointObject["longitude"] = aprioriSurfacePoint.GetLongitude().positiveEast(Angle::Units::Degrees);
+        pointObject["radius"] = aprioriSurfacePoint.GetLocalRadius().kilometers();
+      
+        // Serialize the apriori matrix
+        symmetric_matrix<double, upper> aprioriMatrix = aprioriSurfacePoint.GetSphericalMatrix();
+        QJsonArray aprioriMatrixArray;
+        aprioriMatrixArray += toString(aprioriMatrix(0, 0));
+        aprioriMatrixArray += toString(aprioriMatrix(0, 1));
+        aprioriMatrixArray += toString(aprioriMatrix(0, 2));
+        aprioriMatrixArray += toString(aprioriMatrix(1, 1));
+        aprioriMatrixArray += toString(aprioriMatrix(1, 2));
+        aprioriMatrixArray += toString(aprioriMatrix(2, 2));
+
+        // If the covariance matrix has a value, add it to the PVL point.
+        if ( aprioriMatrix(0, 0) != 0.0
+             || aprioriMatrix(0, 1) != 0.0
+             || aprioriMatrix(0, 2) != 0.0
+             || aprioriMatrix(1, 1) != 0.0
+             || aprioriMatrix(1, 2) != 0.0
+             || aprioriMatrix(2, 2) != 0.0 ) {
+          pointObject["aprioriMatrix"] = aprioriMatrixArray;
+        }
+      }
+      
+      // Serialize the AdjustedSurfacePoint
+      SurfacePoint adjustedSurfacePoint = lcp->GetAdjustedSurfacePoint();
+      if (adjustedSurfacePoint.Valid()) {
+        pointObject["adjustedLatitude"] =
+          adjustedSurfacePoint.GetLatitude().planetocentric(Angle::Units::Degrees);
+        pointObject["adjustedLongitude"] =
+          adjustedSurfacePoint.GetLongitude().positiveEast(Angle::Units::Degrees);
+        pointObject["adjustedRadius"] = adjustedSurfacePoint.GetLocalRadius().kilometers();
+      
+        // Serialize the adjusted matrix
+        symmetric_matrix<double, upper> adjustedMatrix = adjustedSurfacePoint.GetSphericalMatrix();
+        QJsonArray adjustedMatrixArray;
+        adjustedMatrixArray += toString(adjustedMatrix(0, 0));
+        adjustedMatrixArray += toString(adjustedMatrix(0, 1));
+        adjustedMatrixArray += toString(adjustedMatrix(0, 2));
+        adjustedMatrixArray += toString(adjustedMatrix(1, 1));
+        adjustedMatrixArray += toString(adjustedMatrix(1, 2));
+        adjustedMatrixArray += toString(adjustedMatrix(2, 2));
+
+        // If the covariance matrix has a value, add it to the PVL point.
+        if ( adjustedMatrix(0, 0) != 0.0
+             || adjustedMatrix(0, 1) != 0.0
+             || adjustedMatrix(0, 2) != 0.0
+             || adjustedMatrix(1, 1) != 0.0
+             || adjustedMatrix(1, 2) != 0.0
+             || adjustedMatrix(2, 2) != 0.0 ) {
+          pointObject["adjustedMatrix"] = adjustedMatrixArray;
+        }
+      }
+
       // Serialize the list of simultaneous images
-     QJsonArray simultaneousArray;
+      QJsonArray simultaneousArray;
       foreach (QString sn, lcp->snSimultaneous()) {
         simultaneousArray.append(sn);
       }
