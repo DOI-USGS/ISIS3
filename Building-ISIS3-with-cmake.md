@@ -14,9 +14,9 @@ ISIS3 apps are placed in \<install directory\>/bin.  The -GNinja flag specifies 
 Makefile (an alternative Make system to the traditional GNU make system).  The -DJP2FLAG=OFF disables
 JP2000 support.  This is temporary.
 
-## New ENV meanings
-ISISROOT is now the directories that hold the binaries.
+## New Environmental Variable meanings
+$ISISROOT is now the directory that holds the ISIS3 binary files.
 
 ## Custom data and test data directories
-Custom data and test data directories now have to be relative to the new ISISROOT
-Therefore your data or testdata directories must be next to your build or install directories.
+Custom data and test data directories now have to be relative to the new $ISISROOT
+Therefore your data or testdata directories must be at the same hierarchical level as your build or install directories.
