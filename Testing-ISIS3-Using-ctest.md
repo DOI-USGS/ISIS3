@@ -1,3 +1,9 @@
+# Identifying Tests
+The test names are as follows:
+unit test : `<modulename>_unit_test_<objectname>`
+app test : `<appname>_app_test_<testname>`
+cat test :  `<modulename>_module_test_<testname>`
+
 # Running Tests
 
 ISIS tests now work through [ctest](https://cmake.org/cmake/help/v3.4/manual/ctest.1.html). Tests are by default put into the build directory. The most simple way to run test of a certain type is using the `-R <regex>` option, which only runs tests which match the regex. Test names are generally in the form `app_test_<app>`, `unit_test_<obj>`, `module_test_<module>` and so on. We use the naming system to define which test to run using the regex option as outlined below.
@@ -34,7 +40,7 @@ Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each o
 The MakeTruth functionality that exists in the Makefiles of the old make system now exists in a script (makeOutput.py) located in (ISIS3/isis/scripts/makeOutput.py)
 A developer will want output of a test before setting it as truth data. This is currently done with the following command in the form of:
     python3 makeOutput.py test
-where test is the cmake name for the unit (modulename_unit_test_objectname) or app (modulename_app_test_appname) test.
+where test is the cmake name for the unit or app test.
 For unit test this will output a file in the form of Object.Truth in the directory(build/testOutputDir)
 For app test this will output a directory(truth) in the directory(build/testOutputDir) that contains the truth data for the app test.
 
