@@ -1,4 +1,4 @@
-Canonical way to build:
+# QuickStart Guide
 
 * Clone the repo locally:  <repo directory>
 * CD into the clone directory.
