@@ -41,7 +41,12 @@ For app test this will output a directory(truth) in the directory(build/testOutp
 To check in truth data the command should be in the form of:
     python makeOutput.py -t test
 Example makeOutput.py for object Apollo:
+```shell
 command:    python3 ../isis/scripts/makeOutput.py apollo_unit_test_Apollo
 output:     Unit Test Output In /scratch/cmake/isis3_cmake/build/testOutputDir/ As Apollo.truth
+```
+
+```
 command:    python3 ../isis/scripts/makeOutput.py apollo_unit_test_Apollo -t
 output:     Checked In Truth Data To /scratch/cmake/isis3_cmake/isis/src/apollo/objs/Apollo/Apollo.truth
+```
