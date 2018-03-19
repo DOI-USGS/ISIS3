@@ -204,7 +204,7 @@ endif()
 
 # Add a config file to the install bin directory so that QT can find the plugin libraries.
 file(WRITE "${CMAKE_BINARY_DIR}/qt.conf" "[Paths]\nPlugins=../3rdParty/plugins/\n")
-install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/xml)
 
 #Create the inc directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)

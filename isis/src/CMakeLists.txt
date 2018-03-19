@@ -1,44 +1,17 @@
 #===============================================================================
+set(CORE_LIST base database control qisis system)
 
-# Each of these calls will add one library plus multiple apps and unit tests.
-# - The arguments are: (library_name, [list of folders needed for library])
+get_subdirectory_list(${CMAKE_CURRENT_LIST_DIR} modules)
 
-if(${buildCore})
-  add_isis_module(${CORE_LIB_NAME} base database control qisis system)
+# build core into isis library
+add_isis_module(${CORE_LIB_NAME} ${CORE_LIST})
 
-  # This folder is for under-development test code so if it is
-  #  missing just ignore it.
-  # - TODO: The install behavior should be disabled for this folder!
-  if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/local)
-    message("Detected optional directory 'local'")
-    add_isis_module(local local)
-  endif()
+# remove duplicates so we dont build to the core targets twice
+foreach(core ${CORE_LIST})
+  list(REMOVE_ITEM modules "${CMAKE_CURRENT_LIST_DIR}/${core}")
+endforeach()
 
-endif()
-
-if(${buildMissions})
-  add_isis_module(apollo apollo)
-  add_isis_module(cassini cassini)
-  add_isis_module(chandrayaan1 chandrayaan1)
-  add_isis_module(clementine clementine)
-  add_isis_module(dawn dawn)
-  add_isis_module(galileo galileo)
-  add_isis_module(hayabusa hayabusa)
-  add_isis_module(kaguya kaguya)
-  add_isis_module(lo lo)
-  add_isis_module(lro lro)
-  add_isis_module(mariner mariner)
-  add_isis_module(mer mer)
-  add_isis_module(messenger messenger)
-  add_isis_module(mex mex)
-  add_isis_module(mgs mgs)
-  add_isis_module(mro mro)
-  add_isis_module(near near)
-  add_isis_module(newhorizons newhorizons)
-  add_isis_module(odyssey odyssey)
-  add_isis_module(rolo rolo)
-  add_isis_module(rosetta rosetta)
-  add_isis_module(socet socet)
-  add_isis_module(viking viking)
-  add_isis_module(voyager voyager)
-endif()
+foreach( mod ${modules} )
+  string(REPLACE "${CMAKE_CURRENT_LIST_DIR}/" "" strippedmod ${mod})
+  add_isis_module(${strippedmod} ${strippedmod})
+endforeach()
