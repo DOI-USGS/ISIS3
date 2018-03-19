@@ -6,11 +6,51 @@
 
 message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
 list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
-message("Test: ${CMAKE_FIND_ROOT_PATH}") 
+
+list(APPEND CMAKE_INCLUDE_PATH
+  /usgs/pkgs/local/v007/include/
+  /usgs/pkgs/local/v007/bin/
+  /usgs/pkgs/local/v007/lib/
+  /usgs/pkgs/local/v007/objects/
+  /usgs/pkgs/local/v007/include/googleprotobuf/protobuf2.6.1/
+  /usgs/pkgs/local/v007/include/xercesc/xercesc3.1.2/
+  /usgs/pkgs/local/v007/include/tiff/tiff4.0.5/
+  /usr/lib64/
+)
+
+set(CMAKE_PREFIX_PATH
+  /usgs/pkgs/local/v007/include/
+  /usgs/pkgs/local/v007/bin/
+  /usgs/pkgs/local/v007/lib/
+  /usgs/pkgs/local/v007/libexec/
+  /opt/usgs/v007/ports/Library/Frameworks/
+  /opt/usgs/v007/ports/libexec/
+  /opt/usgs/v007/ports/bin/
+  /opt/usgs/v007/ports/lib/
+  /opt/usgs/v007/ports/include/
+  /opt/usgs/v007/ports/libexec/qt5
+  /opt/usgs/v007/ports/libexec/qt5/bin/
+  /opt/usgs/v007/ports/libexec/qt5/lib/
+  /opt/usgs/v007/3rdparty/bin
+  /opt/usgs/v007/3rdparty/include/
+  /opt/usgs/v007/3rdparty/lib/
+  /opt/usgs/v007/proprietary/
+  /opt/usgs/v007/proprietary/include/
+  /opt/usgs/v007/proprietary/lib/
+  /usr/lib/
+  /usr/lib64/
+  /usr/local/lib/
+)
+
 
 # Add thirdPartyCppFlags
-set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals -DGMM_USES_SUPERLU)
+set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
 set(thirdPartyCppFlags ${thirdPartyCppFlags} "-DENABLEJP2K=${JP2KFLAG}")
+
+# Flag to fix numeric literals problem with boost on linux
+if(NOT APPLE)
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals )
+endif()
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)
@@ -43,8 +83,8 @@ find_package(Qt5 COMPONENTS
                 Svg
                 Test
 		WebChannel
-		WebKit
-		WebKitWidgets
+		#WebKit
+		#WebKitWidgets
                 Widgets
                 Xml
                 XmlPatterns REQUIRED)
