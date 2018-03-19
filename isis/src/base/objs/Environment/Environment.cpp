@@ -28,12 +28,7 @@
     if ( !core ) {
       std::cout << "****  Qt Plugin Path is not set because no instance of QCoreApplication ****\n";
     }
-    else {
-      Isis::IString thirdPartyPluginPath = root + "/3rdParty/plugins";
-      pluginPaths << thirdPartyPluginPath.ToQt();
-      core->setLibraryPaths(pluginPaths);
-    }
-   
+
     return;
   }
 
@@ -102,7 +97,7 @@ namespace Isis {
   QString Environment::userName() {
     return getEnvironmentValue("USER", "Unknown");
   }
-  
+
 
   /**
    * @returns the host name.  Returns 'Unknown' if it cannot find the host name.
@@ -110,8 +105,8 @@ namespace Isis {
   QString Environment::hostName() {
     return getEnvironmentValue("HOST", "Unknown");
   }
-  
-  
+
+
   /**
    * @param variable The environment variable to get
    * @param defaultValue The returned value for variable if variable doesn't
@@ -121,16 +116,16 @@ namespace Isis {
    */
   QString Environment::getEnvironmentValue(QString variable,
       QString defaultValue) {
-      
+
     QString value = defaultValue;
-    
+
     char *envValue = getenv(variable.toLatin1().data());
     if (envValue)
       value = envValue;
-      
+
     return value;
   }
-  
+
 
   /**
    * @returns the Isis version in the format isis?.?.?.?qualifier | date

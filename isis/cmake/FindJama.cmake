@@ -6,11 +6,9 @@
 
 find_path(JAMA_INCLUDE_DIR
     NAMES jama_cholesky.h
-    PATH_SUFFIXES
-    jama/jama125/jama
-    /jama
+    PATH_SUFFIXES "jama/jama${Jama_FIND_VERSION}/jama" "/jama"
 )
 
 get_filename_component(JAMA_ROOT_INCLUDE_DIR "${JAMA_INCLUDE_DIR}" DIRECTORY)
 
-message("JAMA FOUND")
+message( "-- JAMA INCLUDE DIR: ${JAMA_INCLUDE_DIR}")

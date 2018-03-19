@@ -4,6 +4,41 @@
 #   go looking for them if they are not?
 #===============================================================================
 
+list(APPEND CMAKE_INCLUDE_PATH
+  /usgs/pkgs/local/v007/include/
+  /usgs/pkgs/local/v007/bin/
+  /usgs/pkgs/local/v007/lib/
+  /usgs/pkgs/local/v007/objects/
+  /usgs/pkgs/local/v007/include/google-protobuf/protobuf2.6.1/
+  /usgs/pkgs/local/v007/include/xercesc/xercesc-3.1.2/
+  /usgs/pkgs/local/v007/include/tiff/tiff-4.0.5/
+  /usr/lib64/
+)
+
+set(CMAKE_PREFIX_PATH
+  /usgs/pkgs/local/v007/include/
+  /usgs/pkgs/local/v007/bin/
+  /usgs/pkgs/local/v007/lib/
+  /usgs/pkgs/local/v007/libexec/
+  /opt/usgs/v007/ports/Library/Frameworks/
+  /opt/usgs/v007/ports/libexec/
+  /opt/usgs/v007/ports/bin/
+  /opt/usgs/v007/ports/lib/
+  /opt/usgs/v007/ports/include/
+  /opt/usgs/v007/ports/libexec/qt5
+  /opt/usgs/v007/ports/libexec/qt5/bin/
+  /opt/usgs/v007/ports/libexec/qt5/lib/
+  /opt/usgs/v007/3rdparty/bin
+  /opt/usgs/v007/3rdparty/include/
+  /opt/usgs/v007/3rdparty/lib/
+  /opt/usgs/v007/proprietary/
+  /opt/usgs/v007/proprietary/include/
+  /opt/usgs/v007/proprietary/lib/
+  /usr/lib/
+  /usr/lib64/
+  /usr/local/lib/
+)
+
 # Specify top level directories
 set(thirdPartyDir "/usgs/pkgs/local/v007")
 set(INCLUDE_DIR "${thirdPartyDir}/include")
@@ -18,7 +53,6 @@ if(APPLE)
   set(PLUGIN_DIR "${thirdPartyDir}/ports/libexec/qt5/plugins")
 endif(APPLE)
 
-set(JP2KFLAG 1)
 
 # Add thirdPartyCppFlags
 set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
@@ -38,6 +72,7 @@ find_program(PROTOC protoc REQUIRED)
 include(FindProtobuf)
 
 if(APPLE)
+  find_package(OpenGL            REQUIRED)
   find_package(Qt5 COMPONENTS
                   Core
                   Concurrent
@@ -63,7 +98,7 @@ if(APPLE)
                   Widgets
                   Xml
                   XmlPatterns REQUIRED)
-else() #oh god why
+else() # oh god why
   find_path(QT5_CORE_INCLUDE_DIR                 NAMES qchar.h                PATH_SUFFIXES qt/qt5.7.1/QtCore/)
   find_path(QT5_CONCURRENT_INCLUDE_DIR           NAMES qtconcurrentmap.h      PATH_SUFFIXES qt/qt5.7.1/QtConcurrent)
   find_path(QT5_DBUS_INCLUDE_DIR                 NAMES qdbusmacros.h          PATH_SUFFIXES qt/qt5.7.1/QtDBus)
@@ -118,34 +153,43 @@ else() #oh god why
   find_library(QT5_XMLPATTERNS_LIBRARY           NAMES Qt5XmlPatterns)
 endif(APPLE)
 
-find_package(Qwt 6 REQUIRED)
-find_package(XercesC 3.1 REQUIRED)
-find_package(GeoTIFF 2 REQUIRED)
-find_package(TIFF 5 REQUIRED)
-find_package(CSPICE 65 REQUIRED)
-find_package(TNT 1.2.6 REQUIRED)
-find_package(Geos 3.5.0 REQUIRED)
-find_package(GSL 19 REQUIRED)
-find_package(Protobuf 9 REQUIRED)
-find_package(Boost 1.59 REQUIRED)
-find_package(X11 6 REQUIRED)
-find_package(GSL 19 REQUIRED)
-find_package(GMM REQUIRED)
-find_package(HDF5 1.8.15 REQUIRED)
-find_package(SuperLU 4.3 REQUIRED)
-find_package(Cholmod 4.4.5 REQUIRED)
-find_package(Embree 2.15.0 REQUIRED)
-find_package(PCL 1.8.0 REQUIRED)
-find_package(Eigen REQUIRED)
-find_package(Bullet 2.86 REQUIRED)
-find_package(OpenCV 3.1.0 REQUIRED)
-find_package(NN REQUIRED)
-find_package(Jama REQUIRED)
 
-# Only include Kakadu if it is available
-if(${JP2KFLAG})
-  find_package(Kakadu)
-endif(${JP2KFLAG})
+# Some of these will have non-traditional installs with version numbers in the paths in v007
+# For these, we pass in a version number, and use it in the path suffix
+# This only applies to v007, and outside of the building, we should only expect standard installs
+# The v007-specific installs are listed beside their find_package calls below:
+find_package(Boost     1.59.0  REQUIRED) # "boost/boost${Boost_FIND_VERSION}/boost/"
+find_package(Bullet    2.86    REQUIRED)
+find_package(Cholmod   4.4.5   REQUIRED) # "SuiteSparse/SuiteSparse${Cholmod_FIND_VERSION}/SuiteSparse/"
+find_package(CSPICE    65      REQUIRED)
+find_package(Eigen             REQUIRED)
+find_package(Embree    2.15.0  REQUIRED)
+find_package(GeoTIFF   2       REQUIRED)
+find_package(GMM       5.0     REQUIRED) # "/gmm/gmm-${GMM_FIND_VERSION}/gmm/"
+find_package(GSL       19      REQUIRED)
+find_package(HDF5      1.8.15  REQUIRED)
+find_package(Jama      125     REQUIRED) # Jama version is 1.2.5, but v007 directory is "jama/jama125/"
+find_package(NN                REQUIRED)
+find_package(OpenCV    3.1.0   REQUIRED)
+find_package(OpenGL            REQUIRED)
+find_package(PCL       1.8     REQUIRED) # "pcl-${PCL_FIND_VERSION}"
+find_package(Protobuf  2.6.1   REQUIRED) # "google-protobuf/protobuf${Protobuf_FIND_VERSION}/"
+find_package(Qwt       6       REQUIRED) # "qwt${Qwt_FIND_VERSION}"
+find_package(SuperLU   4.3     REQUIRED) # "superlu/superlu${SuperLU_FIND_VERSION}/superlu/"
+find_package(TIFF      4.0.5   REQUIRED) # "tiff/tiff-${TIFF_FIND_VERSION}"
+find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 directory is "tnt/tnt126/"
+find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
+find_package(X11       6       REQUIRED)
+find_package(Kakadu)
+
+
+# v007 might have different versions installed for our mac and linux systems.
+# Im this case, we specify the version numbers being searched for in the non-traditional installs.
+if(APPLE)
+  find_package(Geos    3.5.0   REQUIRED)
+else(APPLE)
+  find_package(Geos    3.5.1   REQUIRED)
+endif(APPLE)
 
 get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
 foreach (_variableName ${_variableNames})
@@ -181,7 +225,6 @@ foreach (_variableName ${_variableNames})
     endif(_variableName MATCHES "^CMAKE+")
 endforeach()
 
-#list(APPEND ALLLIBDIRS "/usr/lib64")
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
@@ -319,7 +362,6 @@ set(RAW_DYNAMIC_LIBS ${QT_DYNAMIC_LIBS}
 
 # For each item in this list, expand the wildcard to get the actual library list.
 foreach(lib ${RAW_DYNAMIC_LIBS})
-
   string(FIND "${lib}" "*" position)
   if(${position} EQUAL -1)
     # No wildcard, just add it.
@@ -331,7 +373,7 @@ foreach(lib ${RAW_DYNAMIC_LIBS})
   endif()
 endforeach()
 
-message("THIRDPARTYLIBS = ${THIRDPARTYLIBS}")
+# message("THIRDPARTYLIBS = ${THIRDPARTYLIBS}")
 
 # Plugins
 file(GLOB_RECURSE THIRDPARTYPLUGINS "${PLUGIN_DIR}/*${SO}")

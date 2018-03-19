@@ -5,33 +5,20 @@
 #   GEOS_INCLUDE_DIR
 #   GEOS_LIBRARY
 
+find_path(GEOS_INCLUDE_DIR
+  NAME geos.h
+  PATH_SUFFIXES "geos/geos${Geos_FIND_VERSION}" "geos"
+)
 
-if(APPLE)
-  find_path(GEOS_INCLUDE_DIR
-    NAME geos
-    PATH_SUFFIXES geos/geos3.5.0/
-  )
-  find_library(GEOS_LIBRARY
-    NAMES geos-3.5.0
-  )
-  find_library(GEOS_C_LIBRARY
-    NAMES geos_c
-  )
-else()
-  #changing to 3.5.1 for v007
-  find_path(GEOS_INCLUDE_DIR
-    NAME geos
-    PATH_SUFFIXES geos/geos3.5.1/
-  )
-  #tjw:  Changing to 3.5.1 for v007
-  find_library(GEOS_LIBRARY
-    NAMES geos-3.5.1
-  )
-  
-  find_library(GEOS_C_LIBRARY
-    NAMES geos_c
-  )
+find_library(GEOS_LIBRARY
+  NAMES geos
+)
+find_library(GEOS_C_LIBRARY
+  NAMES geos_c
+)
 
-endif(APPLE)
+message( "-- GEOS INCLUDE DIR: "  ${GEOS_INCLUDE_DIR} )
+message( "-- GEOS LIB: "  ${GEOS_LIBRARY} )
+message( "-- GEOS C LIB: "  ${GEOS_C_LIBRARY} )
 
 get_filename_component(GEOS_ROOT_INCLUDE_DIR "${GEOS_INCLUDE_DIR}" DIRECTORY)

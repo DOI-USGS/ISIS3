@@ -38,7 +38,6 @@ function(add_makefile_test_folder folder prefix_name)
 
     # Call lower level function to finish adding the test.
     add_makefile_test_target(${testName} ${makeFile} ${inputDir} ${outputDir} ${truthDir})
-
 endfunction()
 
 
@@ -46,7 +45,6 @@ endfunction()
 macro(add_makefile_test_target testName makeFile inputDir outputDir truthDir)
 
   set(thisFolder "${PROJECT_SOURCE_DIR}/cmake")
-
   # Set up a cmake script which will execute the command in the makefile
   #  and then check the results against the truth folder.
   add_test(NAME ${testName}

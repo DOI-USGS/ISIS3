@@ -19,7 +19,7 @@ def fixOneFile(inputPath, resetRpath):
 
     # Search for abs paths to the USGS hard coded location
     needRpath  = False
-    lines      = otoolOutput.split()
+    lines      = [l.decode('utf-8') for l in  otoolOutput.split()]
     numUpdates = 0
     for line in lines:
 
@@ -75,7 +75,7 @@ def main():
     # Check input arguments
     usage = 'python finalizeInstalledOsxRpaths.py folder [resetRpath]'
     if len(sys.argv) < 2:
-        print usage
+        print(usage)
         return -1
 
     inputFolder= sys.argv[1]
@@ -83,15 +83,18 @@ def main():
     if len(sys.argv) == 3:
         resetRpath = True
     if not os.path.exists(inputFolder):
-        print 'Input folder '+inputFolder+' does not exist!'
+        print ('Input folder '+inputFolder+' does not exist!')
         return -1
 
     # Fix all of the .dylib files in the given folder
     files = os.listdir(inputFolder)
     for f in files:
 
+      if '.plugin' in f:
+          continue
+
       fullPath = os.path.join(inputFolder, f)
- 
+
       isBinary = (os.path.isfile(fullPath) and (stat.S_IXUSR & os.stat(fullPath)[stat.ST_MODE]))
       isLib    = ('.dylib' in f)
       isFrame  = 'framework' in f
@@ -102,18 +105,16 @@ def main():
           path     = f+'/Versions/Current/'+name
           fullPath = os.path.join(inputFolder, path)
           isLib    = True
-  
+
       if isBinary or isLib:
           #print fullPath
           numUpdates = fixOneFile(fullPath, resetRpath)
-          print f + ' --> ' + str(numUpdates) + ' changes made.' 
+          if numUpdates > 0:
+            print (f + ' --> ' + str(numUpdates) + ' changes made.')
           #raise Exception('DEBUG')
 
-    
+
 
 # Execute main() when called from command line
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

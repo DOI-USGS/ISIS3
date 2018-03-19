@@ -10,40 +10,7 @@ cmake_minimum_required(VERSION 3.4)
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-list(APPEND CMAKE_INCLUDE_PATH
-  /usgs/pkgs/local/v007/include/
-  /usgs/pkgs/local/v007/bin/
-  /usgs/pkgs/local/v007/lib/
-  /usgs/pkgs/local/v007/objects/
-  /usgs/pkgs/local/v007/include/google-protobuf/protobuf2.6.1/
-  /usgs/pkgs/local/v007/include/xercesc/xercesc-3.1.2/
-  /usgs/pkgs/local/v007/include/tiff/tiff-4.0.5/
-  /usr/lib64/
-)
-
-set(CMAKE_PREFIX_PATH
-  /usgs/pkgs/local/v007/include/
-  /usgs/pkgs/local/v007/bin/
-  /usgs/pkgs/local/v007/lib/
-  /usgs/pkgs/local/v007/libexec/
-  /opt/usgs/v007/ports/Library/Frameworks/
-  /opt/usgs/v007/ports/libexec/
-  /opt/usgs/v007/ports/bin/
-  /opt/usgs/v007/ports/lib/
-  /opt/usgs/v007/ports/include/
-  /opt/usgs/v007/ports/libexec/qt5
-  /opt/usgs/v007/ports/libexec/qt5/bin/
-  /opt/usgs/v007/ports/libexec/qt5/lib/
-  /opt/usgs/v007/3rdparty/bin
-  /opt/usgs/v007/3rdparty/include/
-  /opt/usgs/v007/3rdparty/lib/
-  /opt/usgs/v007/proprietary/
-  /opt/usgs/v007/proprietary/include/
-  /opt/usgs/v007/proprietary/lib/
-  /usr/lib
-  /usr/lib64/
-  /usr/local/lib
-)
+set(CMAKE_FIND_FRAMEWORK LAST)
 
 include(AddIsisModule)
 include(Utilities)
@@ -55,7 +22,6 @@ include(InstallThirdParty)
 # Project information
 
 project (USGS_ISIS)
-
 
 # Short and long name of this package
 set(PACKAGE            "ISIS")
@@ -91,20 +57,33 @@ message("Detected Operating System: ${osVersionString}")
 #  as a static library using some specialized code in Utilities.cmake.
 set(BUILD_SHARED_LIBS ON)
 
-
 # Specify flags used
 set(thirdPartyCppFlags -Wall -std=c++11 -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual)
-#set(thirdPartyCppFlags -Wall -ansi -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual)
 
 # Specify user options that can be passed in with the initial CMake command.
-option(isis3Data       "Directory containing Isis3Data"              "NA")
-option(isis3TestData   "Directory containing Isis3TestData"          "NA")
-option(testOutputDir   "Directory to store app test output folders"  "NA")
-option(buildCore       "Build the core ISIS modules"                 ON  )
-option(buildMissions   "Build the mission specific modules"          ON  )
-option(buildStaticCore "Build libisis3 static as well as dynamic"    OFF )
-option(buildTests      "Set up unit, application, and module tests." ON  )
+option(isis3Data       "Directory containing Isis3Data"                 OFF )
+option(isis3TestData   "Directory containing Isis3TestData"             OFF )
+option(testOutputDir   "Directory to store app test output folders"     OFF )
+option(buildCore       "Build the core ISIS modules"                    ON  )
+option(buildMissions   "Build the mission specific modules"             ON  )
+option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
+option(buildTests      "Set up unit, application, and module tests."    ON  )
+option(JP2KFLAG        "Whether or not to build using JPEG2000 support" ON  )
+option(develop         "Use a devleopment configuration"                ON  )
 
+# options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
+# needs to be either 1 or 0 for C style true false
+if(JP2KFLAG)
+  set(JP2KFLAG 1)
+endif()
+
+# Prioritize passed in variables over env vars, probably a better way to do this
+if(DEFINED ENV{ISIS3DATA} AND NOT isis3Data)
+  set(isis3Data $ENV{ISIS3DATA})
+endif()
+if(DEFINED ENV{ISIS3TESTDATA} AND NOT isis3TestData)
+  set(isis3TestData $ENV{ISIS3TESTDATA})
+endif()
 
 if(EXISTS ${isis3Data})
   set(ENV{ISIS3DATA} "${isis3Data}")
@@ -112,12 +91,14 @@ if(EXISTS ${isis3Data})
 else()
   message(WARNING "Isis3Data directory ${isis3Data} not found, unit tests will fail.")
 endif()
+
 if(EXISTS ${isis3TestData})
   set(ENV{ISIS3TESTDATA} "${isis3TestData}")
   message("Using ISIS3TESTDATA = $ENV{ISIS3TESTDATA}")
 else()
   message(WARNING "Isis3TestData directory ${isis3TestData} not found, application and module tests will fail.")
 endif()
+
 #if(EXISTS ${CMAKE_INSTALL_PREFIX})
 #  set(ENV{CMAKE_INSTALL_PREFIX} "${CMAKE_INSTALL_PREFIX}")
 #  message("Using INSTALL PREFIX = $ENV{CMAKE_INSTALL_PREFIX}")
@@ -127,6 +108,7 @@ endif()
 
 if(${testOutputDir} STREQUAL "OFF")
   message("Writing test data folders to = ${CMAKE_BINARY_DIR}/testOutputDir")
+  set(testOutputDir "${CMAKE_BINARY_DIR}/testOutputDir")
   execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/testOutputDir)
 else()
   # User specified a test output folder, make sure it exists.
@@ -155,18 +137,16 @@ include(FindAllDependencies)
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
+# inject ISISROOT
+add_definitions( -DISISROOT="${CMAKE_SOURCE_DIR}" )
+add_definitions( -DISISBUILDDIR="${CMAKE_BINARY_DIR}" )
+
 # add isis headers
-
-
 file(GLOB ISIS_HEADERS ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h
 ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp)
 file(COPY ${ISIS_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/inc)
 
 include_directories(${CMAKE_BINARY_DIR}/inc)
-
-# install scripts
-# file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/scripts)
-# file(COPY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 set(CORE_LIB_NAME isis3)
 
@@ -209,7 +189,6 @@ install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION ${CMAKE_INSTALL_PREFIX}/
 #Create the inc directory
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 
-
 # Create an xml folder in the source directory that we will need later
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
@@ -224,22 +203,18 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 add_subdirectory(src objects)
 
 # Set up third party libraries for installation
-install_third_party()
+# install_third_party()
 
-# Some unit and app test rely on a 3rdParty structure and need to be copied
-execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/3rdParty ${CMAKE_BINARY_DIR}/3rdParty/lib ${CMAKE_BINARY_DIR}/3rdParty/plugins)
-
-# Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
-# - This is required so that the plugins can be found during unit tests.
-# TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
-foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
-  get_filename_component(pluginName ${plugin} NAME)
-  if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
-    execute_process(COMMAND ln -s "${plugin}" ${pluginName}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-    execute_process(COMMAND cp -r ${CMAKE_BINARY_DIR}/lib/${pluginName} ${CMAKE_BINARY_DIR}/3rdParty/plugins/)
-  endif()
-endforeach()
+# # Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
+# # - This is required so that the plugins can be found during unit tests.
+# # TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
+# foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
+#   get_filename_component(pluginName ${plugin} NAME)
+#   if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
+#     execute_process(COMMAND ln -s "${plugin}" ${pluginName}
+#     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+#   endif()
+# endforeach()
 
 # Set up documentation build target.
 # - This script is called by running "make docs".

@@ -4,39 +4,41 @@ Testing ls, grep, sed and pipes ...
 
 ProgramLauncher.cpp
 ProgramLauncher.h
-ProgramLauncher.o
 ProgramLauncher.truth
 Testing stats ... 
 
+greyscale: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 hist: Computing min/max for histogram
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 hist: Gathering histogram
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Group = Results
-  From                    = /usgs/cpkgs/isis3/data/base/testData/ab102401_ide-
-                            al.cub
+  From                    = unitTest.cub
   Band                    = 1
-  Average                 = 0.040536894512714
-  StandardDeviation       = 0.01519314883071
-  Variance                = 2.30831771392117e-04
-  Median                  = 0.037797920878468
-  Mode                    = 0.034160507255072
-  Skew                    = 0.54083067271281
-  Minimum                 = 0.010204331949353
-  Maximum                 = 0.095491595566273
-  Sum                     = 31525.745547011
-  TotalPixels             = 1152000
-  ValidPixels             = 777705
+  Average                 = 24.999999961853
+  StandardDeviation       = 14.728323083889
+  Variance                = 216.92350086341
+  Median                  = 24.489967193103
+  Mode                    = 0.0
+  Skew                    = 0.10388815464838
+  Minimum                 = 0.0
+  Maximum                 = 50.0
+  Sum                     = 62499.999904633
+  TotalPixels             = 2500
+  ValidPixels             = 2500
   OverValidMaximumPixels  = 0
   UnderValidMinimumPixels = 0
-  NullPixels              = 353897
+  NullPixels              = 0
   LisPixels               = 0
   LrsPixels               = 0
   HisPixels               = 0
-  HrsPixels               = 20398
+  HrsPixels               = 0
 End_Group
 
 Testing malformed command... 
+NOTE: The exit code for this test differs on each OS.
+That is the reason for the OS specific truth files. Please ignore the exit codes.
 
 sh: -c: line 0: unexpected EOF while looking for matching `''
 sh: -c: line 1: syntax error: unexpected end of file
@@ -47,10 +49,11 @@ Testing non-existant Isis 3 program...
 **ERROR** Program [chocolatelab] does not appear to be a valid Isis 3 program.
 
 Testing using Isis 3 program as a system program... 
+NOTE: The exit code for this test differs on each OS.
+That is the reason for the OS specific truth files. Please ignore the exit codes.
 
-terminate called after throwing an instance of 'Isis::IException'
-  what():  **ERROR** This process (program) was executed by an existing Isis 3 process. However, we failed to establish a communication channel with the parent (launcher) process. The parent process has a PID of [999].
-**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [6].
+libc++abi.dylib: terminating with uncaught exception of type Isis::IException: **ERROR** This process (program) was executed by an existing Isis 3 process. However, we failed to establish a communication channel with the parent (launcher) process. The parent process has a PID of [999].
+**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/TestPreferences] failed with return status [6].
 
 Testing using Isis 3 program as a system program without pid... 
 
@@ -59,25 +62,24 @@ stats: Computing min/max for histogram
 stats: Gathering histogram
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Group = Results
-  From                    = /usgs/cpkgs/isis3/data/base/testData/ab102401_ide-
-                            al.cub
+  From                    = unitTest.cub
   Band                    = 1
-  Average                 = 0.040536894512714
-  StandardDeviation       = 0.01519314883071
-  Variance                = 2.30831771392117e-04
-  Median                  = 0.037797920878468
-  Mode                    = 0.034160507255072
-  Skew                    = 0.54083067271281
-  Minimum                 = 0.010204331949353
-  Maximum                 = 0.095491595566273
-  Sum                     = 31525.745547011
-  TotalPixels             = 1152000
-  ValidPixels             = 777705
+  Average                 = 24.999999961853
+  StandardDeviation       = 14.728323083889
+  Variance                = 216.92350086341
+  Median                  = 24.489967193103
+  Mode                    = 0.0
+  Skew                    = 0.10388815464838
+  Minimum                 = 0.0
+  Maximum                 = 50.0
+  Sum                     = 62499.999904633
+  TotalPixels             = 2500
+  ValidPixels             = 2500
   OverValidMaximumPixels  = 0
   UnderValidMinimumPixels = 0
-  NullPixels              = 353897
+  NullPixels              = 0
   LisPixels               = 0
   LrsPixels               = 0
   HisPixels               = 0
-  HrsPixels               = 20398
+  HrsPixels               = 0
 End_Group

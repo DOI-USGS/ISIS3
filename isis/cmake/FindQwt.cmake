@@ -7,7 +7,7 @@
 
 FIND_PATH(QWT_INCLUDE_DIR
   NAMES qwt.h
-  PATH_SUFFIXES qwt-qt5 qwt qwt6
+  PATH_SUFFIXES "qwt-qt5" "qwt" "qwt6" "qwt${Qwt_FIND_VERSION}"
 )
 
 find_library(QWT_LIBRARY
@@ -15,3 +15,6 @@ find_library(QWT_LIBRARY
 )
 
 get_filename_component(QWT_ROOT_INCLUDE_DIR "${QWT_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- QWT INCLUDE LIB: ${QWT_INCLUDE_DIR}")
+message( "-- QWT LIB: ${QWT_LIBRARY}")

@@ -26,10 +26,11 @@
 
 using namespace std;
 
-
+#include <QDebug>
 #include <QString>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QSqlDatabase>
 
 #include "DatabaseFactory.h"
 #include "DbAccess.h"
@@ -69,8 +70,10 @@ namespace Isis {
   DatabaseFactory::DatabaseFactory() : _defProfName(""),  _profiles(),
     _defDatabase(""), _dbList() {
 
-//  Checks the existance of the Qt application core.  This is required in order
-//  ensure database driver plugins are loaded - if they exist.
+    // insure the drivers are being loaded
+    loadDrivers();
+    //  Checks the existance of the Qt application core.  This is required in order
+    //  ensure database driver plugins are loaded - if they exist.
     QCoreApplication *cApp = QCoreApplication::instance();
     if(cApp == 0) {
       static char **argv = 0;
@@ -367,6 +370,8 @@ namespace Isis {
    */
   QSqlDatabase DatabaseFactory::create(const QString &driver,
                                        const QString &dbname) {
+
+
     // Check driver availability
     if(!isDriverAvailable(driver)) {
       QString mess = "Driver [" + driver + "] for database [" + dbname
@@ -555,8 +560,7 @@ namespace Isis {
       dbDrivers.add("SQLite", "QSQLITE");
     }
 
-    //  That's it
-    return (dbDrivers);
+    return dbDrivers;
   }
 
   /**
@@ -570,6 +574,8 @@ namespace Isis {
    */
   void DatabaseFactory::loadDrivers() {
     //  Currently relying on Qt plugins - but that could change
+    // Hack to insure drivers are being loaded correctly
+    QSqlDatabase::drivers();
     return;
   }
 

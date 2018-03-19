@@ -6,9 +6,9 @@
 
 find_path(TNT_INCLUDE_DIR
     NAMES tnt.h
-    PATH_SUFFIXES
-    tnt/tnt126/tnt
-    tnt/
+    PATH_SUFFIXES "tnt/tnt${TNT_FIND_VERSION}/tnt" "tnt/"
 )
 
 get_filename_component(TNT_ROOT_INCLUDE_DIR "${TNT_INCLUDE_DIR}" DIRECTORY)
+
+message("-- TNT INCLUDE DIR: ${TNT_INCLUDE_DIR}" )

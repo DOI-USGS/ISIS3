@@ -6,7 +6,9 @@
 
 find_path(GMM_INCLUDE_DIR
   NAMES gmm.h
-  PATH_SUFFIXES /gmm/gmm-5.0/gmm/ gmm
+  PATH_SUFFIXES "/gmm/gmm-${GMM_FIND_VERSION}/gmm/" "gmm"
 )
 
 get_filename_component(GMM_ROOT_INCLUDE_DIR "${GMM_INCLUDE_DIR}" DIRECTORY)
+
+message( "-- GMM INCLUDE DIR: ${GMM_INCLUDE_DIR}")

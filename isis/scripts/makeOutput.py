@@ -2,29 +2,34 @@
 Script to create truthData for tests.
 
 For output it expects the command in the form of:
-    python makeOutput.py testName
-where testname is the cmake name for the unit or app test
+    python3 makeOutput.py test
+
+where test is the cmake name for the unit or app test
 
 To check in truth data the command should be in the form of:
-    python makeOutput.py testName truth
+    python makeOutput.py -t test
+
+The -t option checks in truth data
 
 The unit tests are pretty trivial because the executable outputs the results of
-the unitTest to stdout and stderr so we just redirect the streams to the file \
+the unitTest to stdout and stderr so we just redirect the streams to the file
 named object.truth where object is the ISIS object being tested.
 
-The app tests output has to rely on the old make system because the app test do
+The app tests output has to rely on the old make system because the app test
+infrastructure relies on the old make system. Otherwise all the logic for the old
+makesystem would need to be reimplemented here. Because we wish to replace the testing
+system with something that allows unit and app test to live in the same space the effort
+to recreate the logic is not worth the outcome.
 '''
 
 import argparse
 import sys
 import os
 
-
-if not os.environ['ISISROOT']:
-    print("The $ISISROOT variable is not set")
-    sys.exit()
-
-builddir = os.environ['ISISROOT']
+try:
+    builddir = os.environ['ISISROOT']
+except KeyError:
+    print("The $ISISROOT environment variable is not set")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('test', action='store', help='Provide the name of the Test to create output of')
