@@ -48,6 +48,7 @@ namespace Isis {
     m_isSynchronous = false;
     m_isUndoable = false;
     QAction::setText(tr("&Export Control Network..."));
+    QUndoCommand::setText(tr("Export Control Network..."));
   }
 
 
@@ -97,7 +98,6 @@ namespace Isis {
    * true indicates that there is one control list in the project.
    */
   bool ExportControlNetWorkOrder::isExecutable(ControlList *controls) {
-    // TODO: This shouldn't be executable (in the menu) if there are no imported control networks?
 
     if (controls) {
       return (controls->count() == 1);

@@ -36,6 +36,7 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class BundleResults;
+  class Control;
   class FileName;
   class ImageList;
   class Project;  //TODO does xml stuff need project???
@@ -119,6 +120,8 @@ namespace Isis {
    *   @history 2018-01-17 Tracie Sucharski - Added conditional code to check for null project in
    *                           xml serialization to allow the unitTest to use xml serialization
    *                           without having a project. References #5104.
+   *   @history 2018-03-15 Ken Edmundson - Save input and output control and added methods to return
+   *                           input control and output control.  Update documentation.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -141,12 +144,14 @@ namespace Isis {
 
       void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
+      void setOutputControlNetworkFileName(FileName fileName);
       void setRunTime(QString runTime);
       void setName(QString name);
 
       QList<ImageList *> adjustedImages() const;
       QString id() const;
-      QString controlNetworkFileName() const;
+      QString inputControlNetFileName() const;
+      QString outputControlNetFileName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -203,15 +208,16 @@ namespace Isis {
       //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
       //! object when saving to disk).
       QUuid              *m_id;
-      QString             m_name; //!< The name of the bundle. Defaults to the id
-      QString             m_runTime; //!< The run time of the bundle adjust
-      FileName           *m_controlNetworkFileName; //!< The name of the control network
-      BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust
-      BundleResults      *m_statisticsResults; //!< The results of the bundle adjust
-      QList<ImageList *> *m_images; //!< The list of images as input to the bundle
-      QList<ImageList *> *m_adjustedImages; //!< The list of images that were adjsuted
+      QString             m_name;                        //!< Name of the bundle. Defaults to the id
+      QString             m_runTime;                     //!< Run time of the bundle adjustment
+      FileName           *m_inputControlNetFileName;     //!< Input control network name
+      FileName           *m_outputControlNetFileName;    //!< Output control network name
+      BundleSettingsQsp   m_settings;                    //!< Bundle settings
+      BundleResults      *m_statisticsResults;           //!< Bundle statistical results
+      QList<ImageList *> *m_images;                      //!< Input image list
+      QList<ImageList *> *m_adjustedImages;              //!< Adjusted image list
 
-      // In theory the path in the BundlesSettings can change while running.  So we save the
+      // In theory the path in the BundleSettings can change while running. So we save the
       // filenames actually used when the most recent save of the file was done.
       QString m_csvSavedImagesFilename;
       QString m_csvSavedPointsFilename;

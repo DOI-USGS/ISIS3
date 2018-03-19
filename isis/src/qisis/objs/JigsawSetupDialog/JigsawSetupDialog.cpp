@@ -67,7 +67,7 @@ namespace Isis {
      // Retrieve the control net name used in the last bundle adjustment.
      // Note that this returns a fully specified path and filename, while the cnet combo box
      // only stores file names.
-     selectControl(bundleSolutionInfo.last()->controlNetworkFileName());
+     selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
      fillFromSettings(lastBundleSettings);
     }
 

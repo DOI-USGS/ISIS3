@@ -142,7 +142,7 @@ namespace Isis {
     setBundleSolutionInfo(bundleSolutionInfo);
 
     appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
-    QString cNetFileName = bundleSolutionInfo->controlNetworkFileName();
+    QString cNetFileName = bundleSolutionInfo->outputControlNetFileName();
     Control *control = new Control(cNetFileName);
     appendRow( new ProjectItem(control) );
 
