@@ -1,1 +1,0 @@
-How to test ISIS3 using ctest.
