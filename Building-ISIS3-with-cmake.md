@@ -20,3 +20,19 @@ $ISISROOT is now the directory that holds the ISIS3 binary files.
 ## Custom data and test data directories
 Custom data and test data directories now have to be relative to the new $ISISROOT
 Therefore your data or testdata directories must be at the same hierarchical level as your build or install directories.
+
+## Cleaning builds
+Cleaning all of ISIS
+```
+rm -rf build install
+```
+Cleaning an individual app
+```
+cd build
+rm bin/appname
+```
+Cleaning an individual object
+```
+cd build
+rm `find -name ObjectName.cpp.o`
+```
