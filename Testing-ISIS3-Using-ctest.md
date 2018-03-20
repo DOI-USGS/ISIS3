@@ -44,7 +44,7 @@ The MakeTruth functionality that exists in the Makefiles of the old make system 
 A developer will want output of a test before setting it as truth data. This is currently done with the following command in the form of:
     python3 makeOutput.py test
 where test is the cmake name for the unit or app test.
-For unit test this will output a file in the form of Object.Truth in the directory(build/testOutputDir)
+For unit test this will output a file in the form of <objectname>.Truth in the directory(build/testOutputDir)
 For app test this will output a directory(truth) in the directory(build/testOutputDir) that contains the truth data for the app test.
 
 To check in truth data the command should be in the form of:
