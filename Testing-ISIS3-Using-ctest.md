@@ -36,6 +36,11 @@ App tests still leverage the old make system, they work using the standard ISIS 
 ## Unit Tests
 
 Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest sub-directory of the build directory.
+Steps To Create A New UnitTest:
+1. Create unitTest.cpp under new object directory in ISIS src tree
+2. re-configure cmake
+3. rebuild
+4. Use makeOutput.py (see below) to create new truth data
 
 ## Example Ctest Output
 
