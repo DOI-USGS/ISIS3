@@ -81,3 +81,5 @@ output:     Unit Test Output In /scratch/cmake/isis3_cmake/build/testOutputDir/ 
 command:    python3 ../isis/scripts/makeOutput.py apollo_unit_test_Apollo -t
 output:     Checked In Truth Data To /scratch/cmake/isis3_cmake/isis/src/apollo/objs/Apollo/Apollo.truth
 ```
+
+Ctest functionality extends beyond this wiki. Take a moment to see the ctest documentation for additional capabilities.
