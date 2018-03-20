@@ -5,20 +5,9 @@
 # Library portion of the installation
 function(install_third_party_libs)
 
-
-
   # Where all the library files will go
   set(installLibFolder "${CMAKE_INSTALL_PREFIX}/3rdParty/lib")
   execute_process(COMMAND mkdir -p ${installLibFolder})
-
-  # TEMPORARY CODE TO INSTALL ALL FILES FROM V007/lib into 3rdParty/lib
-  if(APPLE)
-    install(DIRECTORY "/opt/usgs/v007/3rdParty/lib" DESTINATION ${CMAKE_INSTALL_PREFIX})
-    install(DIRECTORY "/opt/usgs/v007/ports/lib" DESTINATION ${CMAKE_INSTALL_PREFIX})
-    install(DIRECTORY "/opt/usgs/v007/proprietary/lib" DESTINATION ${CMAKE_INSTALL_PREFIX})
-  else()
-    install(DIRECTORY "/usgs/pkgs/local/v007/lib" DESTINATION ${CMAKE_INSTALL_PREFIX})
-  endif()
 
   # Loop through all the library files in our list
   foreach(library ${ALLLIBS})
@@ -42,8 +31,6 @@ function(install_third_party_libs)
     # execute_process(COMMAND cp -Lr ${library} ${installLibFolder})
   endif(APPLE)
 endfunction()
-
-
 
 # Plugin portion of the installation
 function(install_third_party_plugins)

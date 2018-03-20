@@ -1,17 +1,21 @@
-#===============================================================================
+#==============================================================================
 # High level script to handle all required 3rd party dependencies
 # - All of them are expected to be in the 3rdParty folder, this script does not
 #   go looking for them if they are not?
 #===============================================================================
 
+message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
+list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+
+# Add search USGS maintained libraries
 list(APPEND CMAKE_INCLUDE_PATH
   /usgs/pkgs/local/v007/include/
   /usgs/pkgs/local/v007/bin/
   /usgs/pkgs/local/v007/lib/
   /usgs/pkgs/local/v007/objects/
-  /usgs/pkgs/local/v007/include/google-protobuf/protobuf2.6.1/
-  /usgs/pkgs/local/v007/include/xercesc/xercesc-3.1.2/
-  /usgs/pkgs/local/v007/include/tiff/tiff-4.0.5/
+  /usgs/pkgs/local/v007/include/googleprotobuf/protobuf2.6.1/
+  /usgs/pkgs/local/v007/include/xercesc/xercesc3.1.2/
+  /usgs/pkgs/local/v007/include/tiff/tiff4.0.5/
   /usr/lib64/
 )
 
@@ -39,24 +43,14 @@ set(CMAKE_PREFIX_PATH
   /usr/local/lib/
 )
 
-# Specify top level directories
-set(thirdPartyDir "/usgs/pkgs/local/v007")
-set(INCLUDE_DIR "${thirdPartyDir}/include")
-set(LIB_DIR     "${thirdPartyDir}/lib")
-set(PLUGIN_DIR  "${thirdPartyDir}/plugins")
-set(BIN_DIR     "${thirdPartyDir}/bin")
-set(LIC_DIR     "${thirdPartyDir}/license")
-
-# Set up plugin dir for OSX to correctly find qt5 plugins for installing
-if(APPLE)
-  set(thirdPartyDir "/opt/usgs/v007")
-  set(PLUGIN_DIR "${thirdPartyDir}/ports/libexec/qt5/plugins")
-endif(APPLE)
-
-
 # Add thirdPartyCppFlags
 set(thirdPartyCppFlags ${thirdPartyCppFlags} -DGMM_USES_SUPERLU)
 set(thirdPartyCppFlags ${thirdPartyCppFlags} "-DENABLEJP2K=${JP2KFLAG}")
+
+# Flag to fix numeric literals problem with boost on linux
+if(NOT APPLE)
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals )
+endif()
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)
@@ -67,34 +61,30 @@ find_program(MOC moc REQUIRED)
 find_program(RCC rcc REQUIRED)
 find_program(PROTOC protoc REQUIRED)
 
-# message(STATUS "${CMAKE_PREFIX_PATH}")
-
-include(FindProtobuf)
-
 if(APPLE)
   find_package(OpenGL            REQUIRED)
   find_package(Qt5 COMPONENTS
                   Core
                   Concurrent
-                  DBus
+                  # DBus
                   Gui
                   Multimedia
                   MultimediaWidgets
                   Network
                   OpenGL # Needed to install mesa-common-dev for this!
-                  Positioning
+                  # Positioning
                   PrintSupport
                   Qml
                   Quick
                   Script
                   ScriptTools
-                  Sensors
+                  # Sensors
                   Sql
                   Svg
                   Test
                   WebChannel
-                  WebEngine
-                  WebEngineWidgets
+                  #WebKit
+                  #WebKitWidgets
                   Widgets
                   Xml
                   XmlPatterns REQUIRED)
@@ -153,7 +143,6 @@ else() # oh god why
   find_library(QT5_XMLPATTERNS_LIBRARY           NAMES Qt5XmlPatterns)
 endif(APPLE)
 
-
 # Some of these will have non-traditional installs with version numbers in the paths in v007
 # For these, we pass in a version number, and use it in the path suffix
 # This only applies to v007, and outside of the building, we should only expect standard installs
@@ -179,6 +168,8 @@ find_package(TIFF      4.0.5   REQUIRED) # "tiff/tiff-${TIFF_FIND_VERSION}"
 find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 directory is "tnt/tnt126/"
 find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
 find_package(X11       6       REQUIRED)
+find_package(nanoflann         REQUIRED)
+find_package(PNG               REQUIRED)
 find_package(Kakadu)
 
 
@@ -186,6 +177,7 @@ find_package(Kakadu)
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
   find_package(Geos    3.5.0   REQUIRED)
+  find_package(OpenGL            REQUIRED)
 else(APPLE)
   find_package(Geos    3.5.1   REQUIRED)
 endif(APPLE)
@@ -199,7 +191,6 @@ foreach (_variableName ${_variableNames})
       list(APPEND ALLINCDIRS "${${_variableName}}")
     endif(_variableName MATCHES ".+_INCLUDE_DIR$")
 endforeach()
-list(APPEND ALLINCDIRS "/opt/usgs/v007/ports/include/" "/opt/usgs/v007/3rdParty/include/")
 
 foreach (_variableName ${_variableNames})
     if (_variableName MATCHES "^CMAKE+")
@@ -228,156 +219,3 @@ list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
 
-# message(STATUS "ALL LIBS DIRS: ${ALLLIBDIRS}")
-# message(STATUS "ALL LIBS: ${ALLLIBS}")
-# message(STATUS "ALL INCS: ${ALLINCDIRS}")
-#---------------------------------------------------------------------------
-#  Define the third party distribution libraries (patterns)
-#---------------------------------------------------------------------------
-
-# On OSX we need to include a LOT of extra libraries!
-set(EXTRA_DYNAMIC_LIBS)
-if(APPLE)
-  set(extras
-    # QT dependencies
-    libpcre16*.dylib
-    libgthread-*.dylib
-    libpcre.*dylib
-    libharfbuzz*.dylib
-    libgraphite2.*dylib
-    libleveldb*.dylib*
-    libsnappy.*dylib
-    libwebp*.dylib
-    libdbus*.dylib
-    libiconv*.dylib
-    liblzma*.dylib
-    libz*.dylib
-    libssl*.dylib
-    libcrypto*.dylib
-    libpng*.dylib
-    libjpeg.*dylib
-    libmng.*dylib
-    liblcms2.*dylib
-    libsqlite3.*dylib
-    postgresql*/libpq.*dylib
-    mysql56/mysql/libmysqlclient*.dylib
-    libiodbc*.dylib
-    # OpenCV dependancies
-    libtbb*.dylib
-    libjasper*.dylib
-    libImath*.dylib
-    libIlmImf*.dylib
-    libIex*.dylib
-    libHalf*.dylib
-    libIlmThread*.dylib
-    libswscale*.dylib
-    # Secondary requirements to all OpenCV dependancies
-    libSDL-1*.dylib
-    libnettle*.dylib
-    libhogweed*.dylib
-    libgmp*.dylib
-    libxvidcore*.dylib
-    libx264*.dylib
-    libvorbisenc*.dylib
-    libvorbis*.dylib
-    libogg*.dylib
-    libtheoraenc*.dylib
-    libtheoradec*.dylib
-    libspeex*.dylib
-    libschroedinger-1*.dylib
-    libopus*.dylib
-    libopenjpeg*.dylib
-    libmp3lame*.dylib
-    libmodplug*.dylib
-    libfreetype*.dylib
-    libbluray*.dylib
-    libass*.dylib
-    libgnutls*.dylib
-    libbz2*.dylib
-    libXrandr*.dylib
-    libXext*.dylib
-    libXrender*.dylib
-    libX11*.dylib
-    libxcb*.dylib
-    libXau*.dylib
-    libXdmcp*.dylib
-    liborc-0*.dylib
-    libxml2*.dylib
-    libfribidi*.dylib
-    libfontconfig*.dylib
-    libexpat*.dylib
-    libintl*.dylib
-    libglib-*.dylib
-    libp11-kit*.dylib
-    libffi*.dylib
-    # OpenCV3 dependencies
-    libavresample*.dylib
-    libxcb-shm*.dylib
-    libsoxr*.dylib
-    libopenjp2*.dylib
-    libOpenNI*.dylib
-    libswresample*.dylib
-    libidn*.dylib
-    libtasn1*.dylib
-    libusb*.dylib
-    # libxerces-c depends on these libraries
-    libicui18n*.dylib
-    libicuuc*.dylib
-    libicudata*.dylib
-    # libgeotiff depends on these libraries
-    libproj*.dylib)
-
-else() # Linux
-  set(extras libtbb.so*)
-endif()
-
-set(EXTRALIBDIR ${LIB_DIR})
-foreach(lib ${extras})
-  set(EXTRA_DYNAMIC_LIBS ${EXTRA_DYNAMIC_LIBS} ${EXTRALIBDIR}/${lib})
-endforeach()
-
-# message("EXTRA_DYNAMIC_LIBS = ${EXTRA_DYNAMIC_LIBS}")
-
-#  Libraries
-set(THIRDPARTYLIBS)
-
-set(RAW_DYNAMIC_LIBS ${QT_DYNAMIC_LIBS}
-                     ${QWT_DYNAMIC_LIBS}
-                     ${XERCES_DYNAMIC_LIBS}
-                     ${GEOTIFF_DYNAMIC_LIBS}
-                     ${HDF5_DYNAMIC_LIBS}
-                     ${TIFF_DYNAMIC_LIBS}
-                     ${NAIF_DYNAMIC_LIBS}
-                     ${GEOS_DYNAMIC_LIBS}
-                     ${GSL_DYNAMIC_LIBS}
-                     ${SUPERLU_DYNAMIC_LIBS}
-                     ${PROTOBUF_DYNAMIC_LIBS}
-                     ${KAKADU_DYNAMIC_LIBS} # Empty if not available
-                     ${CHOLMOD_DYNAMIC_LIBS}
-                     ${OPENCV_DYNAMIC_LIBS}
-                     ${EXTRA_DYNAMIC_LIBS})
-
-# message("THIRDPARTYLIBS = ${RAW_DYNAMIC_LIBS}")
-
-# For each item in this list, expand the wildcard to get the actual library list.
-foreach(lib ${RAW_DYNAMIC_LIBS})
-  string(FIND "${lib}" "*" position)
-  if(${position} EQUAL -1)
-    # No wildcard, just add it.
-    set(THIRDPARTYLIBS ${THIRDPARTYLIBS} ${lib})
-  else()
-    # Expand wildcard, then add.
-    file(GLOB expandedLibs ${lib})
-    set(THIRDPARTYLIBS ${THIRDPARTYLIBS} ${expandedLibs})
-  endif()
-endforeach()
-
-# message("THIRDPARTYLIBS = ${THIRDPARTYLIBS}")
-
-# Plugins
-file(GLOB_RECURSE THIRDPARTYPLUGINS "${PLUGIN_DIR}/*${SO}")
-file(GLOB THIRDPARTYPLUGINFOLDERS "${PLUGIN_DIR}/*")
-
-# message("third party libs = ${THIRDPARTYLIBS}")
-# message("third party plugins = ${THIRDPARTYPLUGINS}")
-# message("third party plugins folders = ${THIRDPARTYPLUGINFOLDERS}")

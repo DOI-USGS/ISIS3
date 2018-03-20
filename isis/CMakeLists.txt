@@ -99,12 +99,9 @@ else()
   message(WARNING "Isis3TestData directory ${isis3TestData} not found, application and module tests will fail.")
 endif()
 
-#if(EXISTS ${CMAKE_INSTALL_PREFIX})
-#  set(ENV{CMAKE_INSTALL_PREFIX} "${CMAKE_INSTALL_PREFIX}")
-#  message("Using INSTALL PREFIX = $ENV{CMAKE_INSTALL_PREFIX}")
-#else()
-#  message(WARNING "Isis3TestData directory ${CMAKE_INSTALL_PREFIX} not found, application and module tests will fail.")
-#endif()
+if(develop)
+  
+endif()
 
 if(${testOutputDir} STREQUAL "OFF")
   message("Writing test data folders to = ${CMAKE_BINARY_DIR}/testOutputDir")

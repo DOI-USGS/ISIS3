@@ -44,6 +44,7 @@ function(add_isis_app folder libDependencies)
 
   # Have the app install with the real name, not the internal name.
   target_link_libraries(${internalAppName} ${libDependencies})
+
   set_target_properties(${internalAppName} PROPERTIES OUTPUT_NAME ${appName})
   install(TARGETS ${internalAppName} DESTINATION bin)
 

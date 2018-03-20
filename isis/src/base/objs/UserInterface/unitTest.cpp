@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Unit test for Isis::UserInterface ..." << endl;
 
-  QString unitTestXml = Isis::FileName(QString(ISISBUILDDIR) + "/unitTest/isis3_unit_test_UserInterface.xml").expanded();
+  QString unitTestXml = Isis::FileName(QString(ISISROOT) + "/src/base/objs/UserInterface/unitTest.xml").expanded();
   QString highpass = Isis::FileName(QString(ISISBUILDDIR) + "/bin/xml/highpass.xml").expanded();
 
   char *myArgv[15];// = {"unitTest", "from=input.cub", "to=output.cub"};

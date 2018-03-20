@@ -35,7 +35,7 @@ using namespace std;
 #if ENABLEJP2K
 using namespace kdu_core;
 using namespace kdu_supp;
-#endif 
+#endif
 
 namespace Isis {
 
