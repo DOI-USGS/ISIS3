@@ -373,10 +373,6 @@ NNLIB = -lnn
 #---------------------------------------------------------------------------
 # Setup for Bullet Physics library
 #---------------------------------------------------------------------------
-#BULLETLIB     = -lBullet2FileLoader -lBullet3Collision -lBullet3Common          \
-#                -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
-#                -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
-#                -lBulletSoftBody    -lLinearMath
 BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
                 -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
                 -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
