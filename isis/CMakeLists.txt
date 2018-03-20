@@ -200,7 +200,7 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 add_subdirectory(src objects)
 
 # Set up third party libraries for installation
-# install_third_party()
+install_third_party()
 
 # # Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
 # # - This is required so that the plugins can be found during unit tests.
