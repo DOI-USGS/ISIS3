@@ -30,8 +30,14 @@ The workflow for creating a new tests will be the same as the old ISIS make syst
 
 ## App Tests
 
-App tests still leverage the old make system, they work using the standard ISIS app test workflow for now. As app tests are simply executable + parameters and checking the output, there exists a possibility for programmatically moving app tests over somewhere else. App tests should simply be re-branded as functional tests and taken out of the ISIS source tree. 
-
+App tests still leverage the old make system, they work using the standard ISIS app test workflow for now. As app tests are simply executable + parameters and checking the output, there exists a possibility for programmatically moving app tests over somewhere else. App tests should simply be re-branded as functional tests and taken out of the ISIS source tree.
+Steps To Create A New UnitTest:
+1. Create a new directory <testname> in <appname>/tsts
+2. Create a Makefile with Test instructions
+3. Use Old Make System To Manage Test Data
+* Make checkout, checking, truthdata etc
+4. reconfigure
+5. rebuild
 
 ## Unit Tests
 
