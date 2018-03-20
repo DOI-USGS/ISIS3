@@ -8,7 +8,7 @@ All cat tests under base, database, control, qisis, and system are listed under 
 
 # Running Tests
 
-ISIS tests now work through [ctest](https://cmake.org/cmake/help/v3.4/manual/ctest.1.html). Unit tests are by default put into the build/unitTest directory. The most simple way to run test of a certain type is using the `-R <regex>` option, which only runs tests which match the regex.
+ISIS tests now work through [ctest](https://cmake.org/cmake/help/v3.9/manual/ctest.1.html). Unit tests are by default put into the build/unitTest directory. The most simple way to run test of a certain type is using the `-R <regex>` option, which only runs tests which match the regex.
 
 It is important to note the many of the tests rely on an ISISROOT environment variable to be set to the build directory. If it is not set you will see almost all tests fail.
 App test must have the bin in the build directory appended to the environment path.
