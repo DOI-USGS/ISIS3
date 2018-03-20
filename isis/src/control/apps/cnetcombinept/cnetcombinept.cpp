@@ -9,7 +9,7 @@
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 
-#include "nanoflann/nanoflann.hpp"
+#include "nanoflann.hpp"
 
 #include "ControlNet.h"
 #include "MeasurePoint.h"
@@ -59,7 +59,7 @@ typedef PointCloudTree<PointType>          CNetPointCloudTree;
 typedef QSharedPointer<CNetPointCloudTree> CubeMeasureTree;
 
 void IsisMain() {
- 
+
   // We will be processing by line
   ProcessByLine pbl;
   UserInterface &ui = Application::GetUserInterface();
@@ -67,13 +67,13 @@ void IsisMain() {
   QStringList cnetfiles;
   int nBase(0);
   if ( ui.WasEntered("CNETBASE") ) {
-    cnetfiles.append(ui.GetAsString("CNETBASE")); 
+    cnetfiles.append(ui.GetAsString("CNETBASE"));
     nBase++;
   }
 
   int nFrom(0);
   if ( ui.WasEntered("CNETFROM") ) {
-    cnetfiles.append(ui.GetAsString("CNETFROM")); 
+    cnetfiles.append(ui.GetAsString("CNETFROM"));
     nFrom++;
   }
 
@@ -127,17 +127,17 @@ void IsisMain() {
 #else
     QScopedPointer<ControlNet> cnet( new ControlNet(cfile) );
 #endif
-    if ( netid.isEmpty() ) { 
-      netid = cnet->GetNetworkId(); 
+    if ( netid.isEmpty() ) {
+      netid = cnet->GetNetworkId();
     }
-    if ( target.isEmpty() ) { 
-      target = cnet->GetTarget(); 
+    if ( target.isEmpty() ) {
+      target = cnet->GetTarget();
     }
-    if ( description.isEmpty() ) { 
-      description = cnet->Description(); 
+    if ( description.isEmpty() ) {
+      description = cnet->Description();
     }
-    if ( radii.isEmpty() )  { 
-      radii = QVector<Distance>::fromStdVector(cnet->GetTargetRadii()); 
+    if ( radii.isEmpty() )  {
+      radii = QVector<Distance>::fromStdVector(cnet->GetTargetRadii());
     }
 
     // Now get list of all cube serials and add all to list
@@ -182,7 +182,7 @@ void IsisMain() {
 
     FileName filename( ui.GetFileName("TOSN") );
     QFile logfile(filename.expanded());
-    if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Truncate | 
+    if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Truncate |
                        QIODevice::Text | QIODevice::Unbuffered) ) {
       QString mess = "Unable to open/create serial number file " + filename.name();
       throw IException(IException::User, mess, _FILEINFO_);
@@ -194,7 +194,7 @@ void IsisMain() {
       sns.next();
       lout << sns.key() << "\n";
     }
-    
+
     logfile.close();
   }
 
@@ -285,7 +285,7 @@ void IsisMain() {
   bool cleanmeasures = ui.GetBoolean("CLEANMEASURES");
   int minmeasures = ui.GetInteger("MINMEASURES");
 
-  // Set up control net here so we can complete all processing in this step 
+  // Set up control net here so we can complete all processing in this step
   QScopedPointer<ControlNet> cnet;
   if ( ui.WasEntered("ONET") ) {
     // std::cout << "\nWriting network...\n";
@@ -295,14 +295,14 @@ void IsisMain() {
       netid = ui.GetString("NETWORKID");
     }
 
-    cnet->SetNetworkId(netid); 
+    cnet->SetNetworkId(netid);
     cnet->SetUserName(Application::UserName());
 
-    if ( ui.WasEntered("DESCRIPTION") ) {  
-      description = ui.GetString("DESCRIPTION"); 
+    if ( ui.WasEntered("DESCRIPTION") ) {
+      description = ui.GetString("DESCRIPTION");
     }
 
-    cnet->SetDescription(description); 
+    cnet->SetDescription(description);
     cnet->SetCreatedDate(Application::DateTime());
     cnet->SetTarget(target, radii);
 #if defined(HAS_WRITE_ONLY_OPTION)
@@ -337,14 +337,14 @@ void IsisMain() {
 
     if ( isValid(m_p) ) {
       vPoints++;
-      
+
       // Processes measures if requested
       if ( true == cleanmeasures ) {
 
         QList<ControlMeasure *> measures = m_p->getMeasures( false );
         BOOST_FOREACH ( ControlMeasure *m, measures) {
-          if ( !isValid(m) ) {  
-            m_p->Delete(m); 
+          if ( !isValid(m) ) {
+            m_p->Delete(m);
             nRemoved++;
           }
         }
@@ -383,7 +383,7 @@ void IsisMain() {
           m_p->SetAprioriSurfacePoint(m_p->GetBestSurfacePoint());
         }
 
-        cnet->AddPoint(m_p); 
+        cnet->AddPoint(m_p);
         oPoints++;
       }
       else { // If not creating control network, ensure points are deleted
@@ -420,4 +420,3 @@ void IsisMain() {
 
   pbl.EndProcess();
 }
-

@@ -29,13 +29,16 @@
 #include <QGridLayout>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMessageBox>
+#include <QRegExp>
 #include <QSettings>
+#include <QSizePolicy>
 #include <QSplitter>
 #include <QStringList>
+#include <QtDebug>
+#include <QVariant>
 #include <QXmlStreamWriter>
 
-#include <QtDebug>
-#include <QMessageBox>
 
 #include "BundleObservation.h"
 #include "BundleObservationView.h"
@@ -62,18 +65,17 @@
 #include "IException.h"
 #include "IString.h"
 #include "ImageFileListViewWorkOrder.h"
+#include "ImageFileListWidget.h"
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
 #include "ImportTemplateWorkOrder.h"
-#include "ImageFileListWidget.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
 #include "MosaicControlNetTool.h"
 #include "MosaicSceneWidget.h"
 #include "OpenProjectWorkOrder.h"
-#include "OpenRecentProjectWorkOrder.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -90,6 +92,8 @@
 #include "TableViewContent.h"
 #include "TargetInfoWidget.h"
 #include "TargetGetInfoWorkOrder.h"
+#include "TemplateEditorWidget.h"
+#include "TemplateEditViewWorkOrder.h"
 #include "ToolPad.h"
 #include "WarningTreeWidget.h"
 #include "WorkOrder.h"
@@ -127,14 +131,15 @@ namespace Isis {
     //connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
              //this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
 
-//     connect( m_project, SIGNAL(projectLoaded(Project *) ),
-//              this, SLOT(updateRecentProjects(Project *) ) );
-//
+     connect( m_project, SIGNAL(projectLoaded(Project *) ),
+              this, SLOT(updateRecentProjects(Project *) ) );
+
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
 
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
+    connect(m_projectItemModel, SIGNAL(cleanProject(bool)), SIGNAL(cleanProject(bool)));
 
 //  qDebug()<<"Directory::Directory  model row counter after addProject = "<<m_projectItemModel->rowCount();
 
@@ -148,9 +153,10 @@ namespace Isis {
       createWorkOrder<Footprint2DViewWorkOrder>();
       createWorkOrder<MatrixViewWorkOrder>();
       createWorkOrder<SensorGetInfoWorkOrder>();
-      createWorkOrder<RemoveImagesWorkOrder>();
+      //createWorkOrder<RemoveImagesWorkOrder>();
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<BundleObservationViewWorkOrder>();
+      createWorkOrder<TemplateEditViewWorkOrder>();
 
       //  Main menu actions
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
@@ -162,10 +168,10 @@ namespace Isis {
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
-      m_openRecentProjectWorkOrder = createWorkOrder<OpenRecentProjectWorkOrder>();
       m_runJigsawWorkOrder = createWorkOrder<JigsawWorkOrder>();
       m_closeProjectWorkOrder = createWorkOrder<CloseProjectWorkOrder>();
       m_renameProjectWorkOrder = createWorkOrder<RenameProjectWorkOrder>();
+      m_recentProjectsLoaded = false;
     }
     catch (IException &e) {
       throw IException(e, IException::Programmer,
@@ -183,13 +189,12 @@ namespace Isis {
    */
   Directory::~Directory() {
 
-    delete m_project;
-
-    foreach (WorkOrder *workOrder, m_workOrders) {
-      delete workOrder;
-    }
-
     m_workOrders.clear();
+
+    if (m_project) {
+      m_project ->deleteLater();
+      m_project = NULL;
+    }
   }
 
 
@@ -292,10 +297,98 @@ namespace Isis {
     m_matrixViewWidgets.clear();
     m_sensorInfoWidgets.clear();
     m_targetInfoWidgets.clear();
+    m_templateEditorWidgets.clear();
+
     m_projectItemModel->clean();
     emit directoryCleaned();
   }
 
+
+  /**
+   * @brief Loads and displays a list of recently opened projects in the file menu.
+   * @internal
+   *   @history Tyler Wilson 2017-10-17 - This function updates the Recent Projects File
+   *                                      menu.  References #4492.
+   *   @history Adam Goins 2017-11-27 - Updated this function to add the most recent
+   *                project to the recent projects menu. References #5216.
+   */
+  void Directory::updateRecentProjects(){
+
+    if (m_recentProjectsLoaded)  {
+      QMenu *recentProjectsMenu = new QMenu("&Recent Projects");
+
+      foreach (QAction *action, m_fileMenuActions) {
+
+        QString actionText(action->text());
+        if (actionText == "&Recent Projects") {
+          // Grab the pointer to the actual ""&Recent Projects" menu in IPCE
+          recentProjectsMenu = qobject_cast<QMenu*>(action->parentWidget());
+          break;
+        }
+      }
+
+      QString projName = m_recentProjects.at(0).split("/").last();
+
+      QAction *openRecentProjectAction = m_openProjectWorkOrder->clone();
+      openRecentProjectAction->setText(projName);
+      openRecentProjectAction->setToolTip(m_recentProjects.at(0));
+
+      if (recentProjectsMenu->isEmpty())
+      {
+        recentProjectsMenu->addAction(openRecentProjectAction);
+        return;
+      }
+
+      QAction *firstAction = recentProjectsMenu->actions().at(0);
+
+      // If the opened project is already the most recent project, return.
+      if (firstAction->text() == projName) {
+        return;
+      }
+
+      // If the action we're placing at the first index already exists,
+      // Then point to that action.
+      foreach (QAction *action, recentProjectsMenu->actions()) {
+        if (action->text() == projName) {
+          openRecentProjectAction = action;
+          break;
+        }
+      }
+
+      recentProjectsMenu->insertAction(firstAction, openRecentProjectAction);
+      if (recentProjectsMenu->actions().length() > Project::maxRecentProjects()) {
+        recentProjectsMenu->removeAction(recentProjectsMenu->actions().last());
+      }
+    }
+    else {
+
+      QMenu *fileMenu = new QMenu();
+      QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
+      int nRecentProjects = m_recentProjects.size();
+
+      for (int i = 0; i < nRecentProjects; i++) {
+        FileName projectFileName = m_recentProjects.at(i);
+
+        if (!projectFileName.fileExists() )
+          continue;
+
+        QAction *openRecentProjectAction = m_openProjectWorkOrder->clone();
+
+        if ( !( (OpenProjectWorkOrder*)openRecentProjectAction )
+             ->isExecutable(m_recentProjects.at(i),true ) )
+          continue;
+
+
+        QString projName = m_recentProjects.at(i).split("/").last();
+        openRecentProjectAction->setText(m_recentProjects.at(i).split("/").last() );
+        openRecentProjectAction->setToolTip(m_recentProjects.at(i));
+        recentProjectsMenu->addAction(openRecentProjectAction);
+        }
+        fileMenu->addSeparator();
+        m_fileMenuActions.append( fileMenu->actions() );
+        m_recentProjectsLoaded = true;
+      }
+  }
 
   /**
    * @brief Initializes the actions that the Directory can provide to a main window.
@@ -321,27 +414,6 @@ namespace Isis {
     fileMenu->addAction(openProjectAction);
     m_permToolBarActions.append(openProjectAction);
 
-    QMenu *recentProjectsMenu = fileMenu->addMenu("&Recent Projects");
-    int nRecentProjects = m_recentProjects.size();
-
-    for (int i = 0; i < nRecentProjects; i++) {
-      FileName projectFileName = m_recentProjects.at(i);
-      if (!projectFileName.fileExists() )
-        continue;
-
-      QAction *openRecentProjectAction = m_openRecentProjectWorkOrder->clone();
-
-      openRecentProjectAction->setData(m_recentProjects.at(i) );
-      openRecentProjectAction->setText(m_recentProjects.at(i) );
-
-      if ( !( (OpenRecentProjectWorkOrder*)openRecentProjectAction )
-           ->isExecutable(m_recentProjects.at(i) ) )
-        continue;
-
-      recentProjectsMenu->addAction(openRecentProjectAction);
-    }
-
-    fileMenu->addSeparator();
 
     QAction *saveAction = m_saveProjectWorkOrder->clone();
     saveAction->setShortcut(Qt::Key_S | Qt::CTRL);
@@ -454,6 +526,7 @@ namespace Isis {
    * @param recentProjects List of projects to add to list.
    */
   void Directory::setRecentProjectsList(QStringList recentProjects) {
+
     m_recentProjects.append(recentProjects);
   }
 
@@ -610,10 +683,10 @@ namespace Isis {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // IMPORTANT TODO::  The following connections seem recursive
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // 
+    //
     // Connection between cneteditor view & other views
     connect(mainWidget, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
-    
+
     // ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
     // deleted or saved
     connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
@@ -850,6 +923,27 @@ namespace Isis {
 
 
   /**
+   * @brief Add template editor view widget to the window.
+   * @return (TemplateEditorWidget*) The widget to view.
+   */
+  TemplateEditorWidget *Directory::addTemplateEditorView(Template *currentTemplate) {
+    TemplateEditorWidget *result = new TemplateEditorWidget(currentTemplate, this);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
+
+    m_templateEditorWidgets.append(result);
+
+    result->setWindowTitle( tr("%1").arg( FileName(currentTemplate->fileName()).name() ) );
+    result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result);
+
+    return result;
+  }
+
+
+  /**
    * @brief Add sensor data view widget to the window.
    * @return @b (SensorInfoWidget*) The widget to view.
    */
@@ -876,7 +970,6 @@ namespace Isis {
    */
 
   ImageFileListWidget *Directory::addImageFileListView() {
-    //qDebug()<<"Directory::addImageFileListView";
     ImageFileListWidget *result = new ImageFileListWidget(this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
@@ -898,9 +991,9 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
-   
+
     //  The model emits this signal when the user double-clicks on the project name, the parent
-    //  node located on the ProjectTreeView. 
+    //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
 
@@ -908,11 +1001,11 @@ namespace Isis {
   }
 
 
-/** 
- * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user 
- * double-clicks the project name, the parent node located on the ProjectTreeView.  A 
+/**
+ * Slot which is connected to the model's signal, projectNameEdited, which is emitted when the user
+ * double-clicks the project name, the parent node located on the ProjectTreeView.  A
  * RenameProjectWorkOrder is created then passed to the Project which executes the WorkOrder.
- *  
+ *
  * @param QString projectName New project name
  */
   void Directory::initiateRenameProjectWorkOrder(QString projectName) {
@@ -922,7 +1015,7 @@ namespace Isis {
     RenameProjectWorkOrder *workOrder = new RenameProjectWorkOrder(projectName, project());
     project()->addToProject(workOrder);
   }
-  
+
 
   /**
    * @brief Gets the ProjectItemModel for this directory.
@@ -1031,10 +1124,7 @@ namespace Isis {
        return;
      }
      m_project->setClean(false);
-     //  For now delete the ChipViewportsWidget also, which must be done first since it is a child
-     //  of ControlPointEditView
- //    delete m_chipViewports;
- //    qDebug()<<"Directory::cleanupControlPointEditViewWidget  m_controlPointEditViewWidget = "<<m_controlPointEditViewWidget;
+
    }
 
 
@@ -1081,13 +1171,26 @@ namespace Isis {
 
 
   /**
+   * @brief Removes pointers to deleted TemplateEditorWidget objects.
+   */
+  void Directory::cleanupTemplateEditorWidgets(QObject *obj) {
+
+    TemplateEditorWidget *templateEditorWidget = static_cast<TemplateEditorWidget *>(obj);
+    if (!templateEditorWidget) {
+      return;
+    }
+    m_templateEditorWidgets.removeAll(templateEditorWidget);
+    m_project->setClean(false);
+  }
+
+
+  /**
    * @brief  Adds a new Project object to the list of recent projects if it has not
    * already been added.
    * @param project A pointer to the Project to add.
    */
   void Directory::updateRecentProjects(Project *project) {
-    if ( !m_recentProjects.contains( project->projectRoot() ) )
-      m_recentProjects.insert( 0, project->projectRoot() );
+    m_recentProjects.insert( 0, project->projectRoot() );
   }
 
 
@@ -1168,6 +1271,21 @@ namespace Isis {
     QList<TargetInfoWidget *> results;
 
     foreach (TargetInfoWidget *widget, m_targetInfoWidgets) {
+      results.append(widget);
+    }
+
+    return results;
+  }
+
+
+  /**
+   * @brief Accessor for the list of TemplateEditorWidgets currently available.
+   * @return @b QList<TemplateEditorWidget *> The list of TemplateEditorWidget objects.
+   */
+  QList<TemplateEditorWidget *> Directory::templateEditorViews() {
+    QList<TemplateEditorWidget *> results;
+
+    foreach (TemplateEditorWidget *widget, m_templateEditorWidgets) {
       results.append(widget);
     }
 
@@ -1586,13 +1704,13 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a left mouse button operation on views 
-   *  
+   * Slot that is connected from a left mouse button operation on views
+   *
    * @param controlPoint (ControlPoint *) The control point selected from view for editing
-   * @param serialNumber (QString) The serial number of Cube that was used to select control point 
+   * @param serialNumber (QString) The serial number of Cube that was used to select control point
    *                     from the CubeDnView.  This parameter will be empty if control point was
    *                     selected from Footprint2DView.
-   *  
+   *
    */
   void Directory::modifyControlPoint(ControlPoint *controlPoint, QString serialNumber) {
 
@@ -1611,10 +1729,10 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a middle mouse button operation on views 
-   *  
+   * Slot that is connected from a middle mouse button operation on views
+   *
    * @param controlPoint (ControlPoint *) The control point selected from view for editing
-   *  
+   *
    */
   void Directory::deleteControlPoint(ControlPoint *controlPoint) {
 
@@ -1625,7 +1743,7 @@ namespace Isis {
         }
       }
       m_editPointId = controlPoint->GetId();
- 
+
       //  Update views with point to be deleted shown as current edit point
       emit redrawMeasures();
 
@@ -1635,17 +1753,17 @@ namespace Isis {
 
 
   /**
-   * Slot that is connected from a right mouse button operation on views 
-   *  
+   * Slot that is connected from a right mouse button operation on views
+   *
    * @param latitude (double) Latitude location where the control point was created
    * @param longitude (double) Longitude location where the control point was created
-   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control 
+   * @param cube (Cube *) The Cube in the CubeDnView that was used to select location for new control
    *                     point.  This parameter will be empty if control point was selected from
    *                     Footprint2DView.
    * @param isGroundSource (bool) Indicates whether the Cube in the CubeDnView that was used to select
    *                     location for new control point is a ground source.  This parameter will be
    *                     empty if control point was selected from Footprint2DView.
-   *  
+   *
    */
   void Directory::createControlPoint(double latitude, double longitude, Cube *cube,
                                      bool isGroundSource) {
@@ -1663,9 +1781,9 @@ namespace Isis {
 
 
   /**
-   * Autosave for control net.  The control net is auto saved to the same directory as the input 
-   * net.  It is saved to controlNetFilename.net.bak. 
-   * 
+   * Autosave for control net.  The control net is auto saved to the same directory as the input
+   * net.  It is saved to controlNetFilename.net.bak.
+   *
    */
   void Directory::makeBackupActiveControl() {
 
@@ -1675,7 +1793,7 @@ namespace Isis {
 
   /**
    * Return the current control point id loaded in the ControlPointEditWidget
-   * 
+   *
    * @return @b QString Id of the control point loaded in the ControlPointEditWidget
    */
   QString Directory::editPointId() {

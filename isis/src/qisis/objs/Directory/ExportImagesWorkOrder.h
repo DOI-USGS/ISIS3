@@ -27,6 +27,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-04-16 J Bonn - Updated to new workorder design #4764.
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer check on the images variable in
+   *                             isExecutable to prevent potential seg faults.  References #4492.
    */
   class ExportImagesWorkOrder : public WorkOrder {
       Q_OBJECT

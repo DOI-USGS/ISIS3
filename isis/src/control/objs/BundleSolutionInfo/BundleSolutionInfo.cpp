@@ -2,6 +2,7 @@
 
 #include <QDataStream>
 #include <QDebug>
+#include <QFile>
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -40,8 +41,8 @@ namespace Isis {
     m_id = new QUuid(QUuid::createUuid());
 
     m_runTime = "";
-    
-    m_name = m_runTime; 
+
+    m_name = m_runTime;
 
     m_controlNetworkFileName = new FileName(controlNetworkFileName);
 
@@ -50,6 +51,8 @@ namespace Isis {
     m_statisticsResults = new BundleResults(outputStatistics);
 
     m_images = new QList<ImageList *>(imgList);
+
+    m_adjustedImages = new QList<ImageList *>;
   }
 
 
@@ -71,6 +74,7 @@ namespace Isis {
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
+    m_adjustedImages = new QList<ImageList *>;
 
     xmlReader->setErrorHandler(new XmlHandler(this, project));
     xmlReader->pushContentHandler(new XmlHandler(this, project));
@@ -90,6 +94,7 @@ namespace Isis {
         m_settings(new BundleSettings(*src.m_settings)),
         m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
         m_images(new QList<ImageList *>(*src.m_images)),
+        m_adjustedImages(new QList<ImageList *>(*src.m_adjustedImages)),
         m_csvSavedImagesFilename(src.m_csvSavedImagesFilename),
         m_csvSavedPointsFilename(src.m_csvSavedPointsFilename),
         m_csvSavedResidualsFilename(src.m_csvSavedResidualsFilename) {
@@ -112,6 +117,13 @@ namespace Isis {
       delete m_images;
       m_images = NULL;
     }
+
+    // if (m_adjustedImages != NULL) {
+    //   qDeleteAll(*m_adjustedImages);
+    //   m_adjustedImages->clear();
+    //   delete m_adjustedImages;
+    //   m_adjustedImages = NULL;
+    // }
   }
 
 
@@ -130,7 +142,7 @@ namespace Isis {
       m_id = new QUuid(QUuid::createUuid());
 
       m_runTime = src.m_runTime;
-      
+
       if (src.m_name == "" || src.m_name == src.m_runTime) {
         m_name = m_runTime;
       }
@@ -148,6 +160,9 @@ namespace Isis {
 
       delete m_images;
       m_images = new QList<ImageList *>(*src.m_images);
+
+      delete m_adjustedImages;
+      m_adjustedImages = new QList<ImageList *>(*src.m_adjustedImages);
     }
     return *this;
   }
@@ -163,6 +178,17 @@ namespace Isis {
   QString BundleSolutionInfo::savedResidualsFilename() {
     return m_csvSavedResidualsFilename;
   }
+
+
+  /**
+   * Adds a list of images that were adjusted (their labels were updated).
+   *
+   * @param ImageList *images The list of images to add that had their labels updated.
+   */
+  void BundleSolutionInfo::addAdjustedImages(ImageList *images) {
+    m_adjustedImages->append(images);
+  }
+
 
   /**
    * Sets the stat results.
@@ -194,6 +220,17 @@ namespace Isis {
     FileName newName(project->cnetRoot() + "/" +
                      oldFileName.dir().dirName() + "/" + oldFileName.name());
     *m_controlNetworkFileName = newName.expanded();
+  }
+
+
+  /**
+   * Returns the list of images that were adjusted after a bundle. This can potentially be an
+   * empty QList if no image labels were updated.
+   *
+   * @return QList<ImageList*> Returns the adjusted images (images with updated labels).
+   */
+  QList<ImageList *> BundleSolutionInfo::adjustedImages() const {
+    return *m_adjustedImages;
   }
 
 
@@ -277,7 +314,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Returns the images used in the bundle
    *
@@ -286,22 +323,22 @@ namespace Isis {
   QList<ImageList *> BundleSolutionInfo::imageList() {
     return *m_images;
   }
-  
-  
+
+
   /**
    * Sets the name of the bundle.
-   * 
+   *
    * @param name QString of the new name
    */
   void BundleSolutionInfo::setName(QString name) {
     m_name = name;
   }
-  
-  
-  /** 
-   * Returns the name of the bundle. The name defaults to the id, unless the name has been set using 
+
+
+  /**
+   * Returns the name of the bundle. The name defaults to the id, unless the name has been set using
    * setName()
-   * 
+   *
    * @return QString Name of the bundle
    */
   QString BundleSolutionInfo::name() const {
@@ -1460,10 +1497,70 @@ namespace Isis {
    *
    * @param stream The stream to which the BundleSolutionInfo will be saved
    * @param project The project to which this BundleSolutionInfo will be saved
-   * @param newProjectRoot The location of the project root directory. This is not used.
+   * @param newProjectRoot The location of the project root directory.
    */
   void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
                                 FileName newProjectRoot) const {
+
+    // This is done for unitTest which has no Project
+    QString relativeBundlePath;
+    FileName bundleSolutionInfoRoot;
+
+    if (project) {
+      bundleSolutionInfoRoot = FileName(Project::bundleSolutionInfoRoot(newProjectRoot.expanded()) +
+                                      "/" + runTime());
+      QString oldPath = project->bundleSolutionInfoRoot(project->projectRoot()) + "/" + runTime();
+      QString newPath = project->bundleSolutionInfoRoot(newProjectRoot.toString()) + "/" + runTime();
+      //  If project is being saved to new area, create directory and copy files
+      if (oldPath != newPath) {
+        //  Create project folder for BundleSolutionInfo
+        QDir bundleDir(newPath);
+        if (!bundleDir.mkpath(bundleDir.path())) {
+          throw IException(IException::Io,
+                           QString("Failed to create directory [%1]")
+                             .arg(bundleSolutionInfoRoot.path()),
+                           _FILEINFO_);
+        }
+        QString oldFile = oldPath + "/" + m_controlNetworkFileName->name();
+        QString newFile = newPath + "/" + m_controlNetworkFileName->name();
+        //QString outputControlFile = m_statisticsResults->outputControlNet()->
+        if (!QFile::copy(oldFile, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_controlNetworkFileName->name()).arg(newFile),
+                           _FILEINFO_);        
+        }
+        newFile = newPath + "/" + FileName(m_csvSavedImagesFilename).name();
+        if (!QFile::copy(m_csvSavedImagesFilename, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_csvSavedImagesFilename).arg(newFile),
+                           _FILEINFO_);        
+        }
+        newFile = newPath + "/" + FileName(m_csvSavedPointsFilename).name();
+        if (!QFile::copy(m_csvSavedPointsFilename, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_csvSavedPointsFilename).arg(newFile),
+                           _FILEINFO_);        
+        }
+        newFile = newPath + "/" + FileName(m_csvSavedResidualsFilename).name();
+        if (!QFile::copy(m_csvSavedResidualsFilename, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_csvSavedResidualsFilename).arg(newFile),
+                           _FILEINFO_);        
+        }
+      }
+
+      // Create relative path for bundleSolutionInfo
+      relativeBundlePath = newPath.remove(project->newProjectRoot());
+      // Get rid of any preceding "/" , but add on ending "/"
+      if (relativeBundlePath.startsWith("/")) {
+        relativeBundlePath.remove(0,1);
+      }
+      relativeBundlePath += "/";
+    }
 
     stream.writeStartElement("bundleSolutionInfo");
     // save ID, cnet file name, and run time to stream
@@ -1471,10 +1568,14 @@ namespace Isis {
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("name", m_name);
     stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName", m_controlNetworkFileName->expanded());
-    stream.writeTextElement("imagesCSV", m_csvSavedImagesFilename);
-    stream.writeTextElement("pointsCSV", m_csvSavedPointsFilename);
-    stream.writeTextElement("residualsCSV", m_csvSavedResidualsFilename);
+    stream.writeTextElement("fileName",
+                            relativeBundlePath + m_controlNetworkFileName->name());
+    stream.writeTextElement("imagesCSV",
+                            relativeBundlePath + FileName(m_csvSavedImagesFilename).name());
+    stream.writeTextElement("pointsCSV",
+                            relativeBundlePath + FileName(m_csvSavedPointsFilename).name());
+    stream.writeTextElement("residualsCSV",
+                            relativeBundlePath + FileName(m_csvSavedResidualsFilename).name());
     stream.writeEndElement(); // end general attributes
 
     // save settings to stream
@@ -1483,17 +1584,15 @@ namespace Isis {
     // save statistics to stream
     m_statisticsResults->save(stream, project);
 
-    // save image lists to stream
-    if ( !m_images->isEmpty() ) {
-      stream.writeStartElement("imageLists");
-
-      FileName newResultsRoot(Project::bundleSolutionInfoRoot(newProjectRoot.expanded()) +
-                              "/" + runTime());
-      for (int i = 0; i < m_images->count(); i++) {
-        m_images->at(i)->save(stream, project, newResultsRoot);
+    if (project) {
+      // save adjusted images lists to stream
+      if (!m_adjustedImages->isEmpty()) {
+        stream.writeStartElement("imageLists");
+        for (int i = 0; i < m_adjustedImages->count(); i++) {
+          m_adjustedImages->at(i)->save(stream, project, bundleSolutionInfoRoot);
+        }
+        stream.writeEndElement();
       }
-
-      stream.writeEndElement();
     }
     stream.writeEndElement(); //end bundleSolutionInfo
   }
@@ -1557,10 +1656,13 @@ namespace Isis {
             BundleSettingsQsp(new BundleSettings(m_xmlHandlerProject, reader()));
       }
       else if (localName == "bundleResults") {
-        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject, reader());
+        m_xmlHandlerBundleSolutionInfo->m_statisticsResults = new BundleResults(m_xmlHandlerProject,
+                                                                                reader());
       }
       else if (localName == "imageList") {
-        m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
+        // m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
+        m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
+            new ImageList(m_xmlHandlerProject, reader()));
       }
     }
     return true;
@@ -1579,6 +1681,12 @@ namespace Isis {
   bool BundleSolutionInfo::XmlHandler::endElement(const QString &namespaceURI,
                                                   const QString &localName,
                                                   const QString &qName) {
+    // This is done for unitTest which has no Project
+    QString projectRoot;
+    if (m_xmlHandlerProject) {
+      projectRoot = m_xmlHandlerProject->projectRoot() + "/";
+    }
+
     if (localName == "id") {
       // all constructors assign a Uuid - we need to give it a one from the XML
       assert(m_xmlHandlerBundleSolutionInfo->m_id);
@@ -1593,16 +1701,20 @@ namespace Isis {
     }
     else if (localName == "fileName") {
       assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
-      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(m_xmlHandlerCharacters);
+      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(
+        projectRoot + m_xmlHandlerCharacters);
     }
     else if (localName == "imagesCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = m_xmlHandlerCharacters;
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = 
+        projectRoot + m_xmlHandlerCharacters;
     }
     else if (localName == "pointsCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedPointsFilename = m_xmlHandlerCharacters;
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedPointsFilename =
+        projectRoot + m_xmlHandlerCharacters;
     }
     else if (localName == "residualsCSV") {
-      m_xmlHandlerBundleSolutionInfo->m_csvSavedResidualsFilename = m_xmlHandlerCharacters;
+      m_xmlHandlerBundleSolutionInfo->m_csvSavedResidualsFilename =
+        projectRoot + m_xmlHandlerCharacters;
     }
 
     m_xmlHandlerCharacters = "";

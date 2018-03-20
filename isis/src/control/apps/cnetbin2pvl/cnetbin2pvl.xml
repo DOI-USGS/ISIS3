@@ -7,8 +7,9 @@
 
   <description>
     <p>
-      This program converts an Isis3 control network file from binary into an 
-    ascii pvl formatted file.
+      This program converts an Isis3 control network file from binary into a human readable
+      UTF-8 pvl formatted file. The output .pvl will be written as the latest PVL version.
+      The most recent PVL template can be found in the Control data directory under templates/controlnetworks.
     </p>
   </description>
 
@@ -25,6 +26,11 @@
     </change>
     <change name="Steven Lambright" date="2011-04-05">
       Added a basic progress
+    </change>
+    <change name="Adam Goins" date="2018-01-24">
+      Updated Description to reflect UTF-8 file format.
+      Added link to current PVL template.
+      Added user example.
     </change>
   </history>
 
@@ -48,15 +54,60 @@
       <type>filename</type>
       <fileMode>output</fileMode>
       <brief>
-              Pvl formated control net file
+              PVL formatted control net file
       </brief>
       <description>
-              A control net file in the Pvl format.
+              A control network file in the PVL format.
       </description>
       <filter>
               *.cnet *.pvl
       </filter>
     </parameter>
-    </group>    
+    </group>
   </groups>
+  <examples>
+    <example>
+      <brief>Converting a binary Control Network to a PVL network.</brief>
+      <description>A binary V0001 Control Network converted to the latest PVL network.</description>
+      <terminalInterface>
+        <commandLine>
+          from=/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net to=PvlNetwork.pvl
+        </commandLine>
+        <description>
+          In this example, we are converting a binary V0001 network from the test data area to a PVL network.
+        </description>
+      </terminalInterface>
+      <inputImages>
+        <image src="assets/image/InputNetwork.png" width="500" height="500">
+          <brief>Input binary V0001 control network</brief>
+          <description>
+            This is the input network that will be ingested by cnetbin2pvl.
+          </description>
+          <thumbnail caption=" Input control network" src="assets/image/InputNetwork.png" width="200" height="165"/>
+          <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/image/OutputNetwork.png" width="500" height="500">
+          <brief>Output PVL network from cnetbin2pvl</brief>
+          <description>
+            This is the PVL network that results from running cnetbin2pvl.
+          </description>
+          <thumbnail caption="Output PVL network that was made from the existing network." src="assets/image/OutputNetwork.png" width="200" height="165"/>
+          <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+      <guiInterfaces>
+        <guiInterface>
+          <image width="500" height="500" src="assets/image/cnetbin2pvlGUI.png">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI with parameters filled to convert a binary Control Network to a PVL network.
+            </description>
+            <thumbnail width="200" height="165" caption="Cnetbin2pvl -gui" src="assets/image/cnetbin2pvlGUI.png"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+    </example>
+  </examples>
 </application>

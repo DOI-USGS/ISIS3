@@ -1,6 +1,8 @@
 #include "Database.h"
 
 #include <QFile>
+#include <QSqlDatabase>
+#include <QDebug>
 
 #include "FileName.h"
 #include "SqlQuery.h"
@@ -12,7 +14,6 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-
   // SQLite
   FileName dbfile("$TEMPORARY/test.db");
   Database testdb("testdb", "SQLite");

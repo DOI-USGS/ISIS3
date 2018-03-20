@@ -40,6 +40,9 @@ namespace Isis {
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
    *                           Fixes #4715
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer check on the controls pointer
+   *                           in the isExecutable function to prevent potential seg faults.
+   *                           References #4492.
    */
   class ViewControlNet3DWorkOrder : public WorkOrder {
       Q_OBJECT

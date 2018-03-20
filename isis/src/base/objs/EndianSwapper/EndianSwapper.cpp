@@ -139,6 +139,28 @@ namespace Isis {
   }
 
   /**
+   * Swaps a 32bit unsigned integer.
+   *
+   * @param buf Input uint32 integer value to swap.
+   */
+  uint32_t EndianSwapper::Uint32_t(void *buf) {
+    uint32_t result = *(uint32_t *)buf;
+
+    if(p_needSwap) {
+      char *ptr = (char *)buf + (sizeof(uint32_t) - 1) * p_needSwap;
+
+      for(unsigned int i = 0; i < sizeof(uint32_t); i++) {
+        p_swapper.p_char[i] = *ptr;
+        ptr += p_swapDirection;
+      }
+
+      result = p_swapper.p_uint32;
+    }
+
+    return result;
+  }
+
+  /**
    * Swaps an 8 byte integer value.
    *
    * @param buf Input integer value to swap.
@@ -203,4 +225,3 @@ namespace Isis {
     return result;
   }
 }
-
