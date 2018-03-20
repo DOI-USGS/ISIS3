@@ -18,10 +18,10 @@ Using the setisis script on your build directory should fix these environment is
 # inside your build directory
 
 ctest               # run all tests
-ctest -R unit       # run unit tests
-ctest -R app        # run app tests
+ctest -R _unit_     # run unit tests
+ctest -R _app_      # run app tests
 ctest -R jigsaw     # run jigsaw's app tests
-ctest -R ControlNet # Run all Control Net related tests
+ctest -R lro        # run all lro tests
 ```
 # Building New Tests
 
@@ -37,6 +37,23 @@ App tests still leverage the old make system, they work using the standard ISIS 
 
 Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest sub-directory of the build directory.
 
+## Example ctest Output
+
+'''
+98% tests passed, 7 tests failed out of 394
+
+Total Test time (real) = 171.11 sec
+
+The following tests FAILED:
+	 11 - isis3_unit_test_Application (Failed)
+	 97 - isis3_unit_test_IException (Failed)
+	174 - isis3_unit_test_Pipeline (Failed)
+	201 - isis3_unit_test_ProcessExportPds4 (Failed)
+	211 - isis3_unit_test_ProgramLauncher (Failed)
+	303 - isis3_unit_test_UserInterface (Failed)
+	338 - isis3_unit_test_MosaicSceneWidget (Failed)
+Errors while running CTest
+'''
 
 ## Make Truth Replacement
 
