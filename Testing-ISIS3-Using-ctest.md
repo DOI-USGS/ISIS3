@@ -8,10 +8,11 @@ All cat tests under base, database, control, qisis, and system are listed under 
 
 # Running Tests
 
-ISIS tests now work through [ctest](https://cmake.org/cmake/help/v3.4/manual/ctest.1.html). Unit tests are by default put into the build/unitTest directory. The most simple way to run test of a certain type is using the `-R <regex>` option, which only runs tests which match the regex. Test names are generally in the form `app_test_<app>`, `unit_test_<obj>`, `module_test_<module>` and so on. We use the naming system to define which test to run using the regex option as outlined below.
+ISIS tests now work through [ctest](https://cmake.org/cmake/help/v3.4/manual/ctest.1.html). Unit tests are by default put into the build/unitTest directory. The most simple way to run test of a certain type is using the `-R <regex>` option, which only runs tests which match the regex.
 
 It is important to note the many of the tests rely on an ISISROOT environment variable to be set to the build directory. If it is not set you will see almost all tests fail.
 App test must have the bin in the build directory appended to the environment path.
+Using the setisis script on your build directory should fix these environment issues for you.
 
 ```
 # inside your build directory
@@ -34,7 +35,7 @@ App tests still leverage the old make system, they work using the standard ISIS 
 
 ## Unit Tests
 
-Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest directory which is inside the build directory. 
+Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest sub-directory of the build directory.
 
 
 ## Make Truth Replacement
@@ -47,7 +48,7 @@ For unit test this will output a file in the form of Object.Truth in the directo
 For app test this will output a directory(truth) in the directory(build/testOutputDir) that contains the truth data for the app test.
 
 To check in truth data the command should be in the form of:
-    python makeOutput.py -t test
+    python3 makeOutput.py -t test
 Example makeOutput.py for object Apollo:
 ```shell
 command:    python3 ../isis/scripts/makeOutput.py apollo_unit_test_Apollo
