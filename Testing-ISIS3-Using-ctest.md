@@ -39,7 +39,7 @@ Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each o
 
 ## Example ctest Output
 
-'''
+```
 98% tests passed, 7 tests failed out of 394
 
 Total Test time (real) = 171.11 sec
@@ -53,7 +53,7 @@ The following tests FAILED:
 	303 - isis3_unit_test_UserInterface (Failed)
 	338 - isis3_unit_test_MosaicSceneWidget (Failed)
 Errors while running CTest
-'''
+```
 
 ## Make Truth Replacement
 
