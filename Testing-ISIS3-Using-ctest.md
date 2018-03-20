@@ -37,7 +37,7 @@ App tests still leverage the old make system, they work using the standard ISIS 
 
 Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest sub-directory of the build directory.
 
-## Example ctest Output
+## Example Ctest Output
 
 ```
 98% tests passed, 7 tests failed out of 394
