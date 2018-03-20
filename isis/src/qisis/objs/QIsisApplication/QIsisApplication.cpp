@@ -7,11 +7,6 @@
 #include <QObject>
 #include <QMessageBox>
 #include <QUrl>
-#if defined(__APPLE__)
-#include <QtWebEngineWidgets/QWebEngineView>
-#else
-#include <QWebEngineView>
-#endif
 
 #include "FileName.h"
 #include "Preference.h"
@@ -92,9 +87,6 @@ namespace Isis {
    * Open a URL in the browser specified by Isis.
    */
   void QIsisApplication::openUrl(QUrl url) {
-     QWebEngineView *view = new QWebEngineView(NULL);
-     view->setAttribute(Qt::WA_DeleteOnClose);
-     view->load(url);
-     view->show();
+     QDesktopServices::openUrl(url);
   }
 }
