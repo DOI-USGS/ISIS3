@@ -70,8 +70,8 @@ To build fx:  `make install fx`
 If you make a change to one class in the ISIS3 API, 
 it compiles and builds everything.  This can take awhile.
 
-###Plugins
+### Plugins
 
-#CMake Behavior When Adding/Removing/Modifying an Object
+## CMake Behavior When Adding/Removing/Modifying an Object
 
 The cmake configure command needs to be executed when adding/removing a new object so that the system sees and compiles it.  
