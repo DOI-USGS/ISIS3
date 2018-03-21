@@ -36,19 +36,18 @@ Cleaning an individual object
 cd build
 rm `find -name ObjectName.cpp.o`
 ```
-If using the Ninja build system:
+Using the Ninja build system:
 
-`ninja -t clean` removes all built objects except for those built by the build generator.
+`ninja -t clean` Removes all built objects except for those built by the build generator.
 
 `ninja -t clean -r rules` Removes all built files specified in rules.ninja (a file which exists in the same directory as build.ninja)
 
-`ninja -t clean <targetname`> Just removes all built objects for the specific target.
+`ninja -t clean \<targetname\>` Just removes all built objects for the specific target.
 
-A nice thing about Ninja is that getting a list of targets is very easy:
+Getting a list of targets using Ninja is very easy:
 
 `ninja -t targets`
 
-This is not as easy if using CMake to generate tradition GNU Makefiles.
 
 ## Building with Debug Flags
 
@@ -69,14 +68,15 @@ To build fx:  `make install fx`
 `make install isis3 -j7`
 If you make a change to one class in the ISIS3 API, 
 it compiles and builds everything.  This can take awhile.
-If you are using Ninja however, the command is:
+
+If you are using Ninja the command is:
 
 `ninja install libisis3.so`
 
-The nice thing about Ninja is that it recompiles whatever class you modified,
+The nice thing about Ninja is that it re-compiles whatever class you modified,
 and then re-links all the applications/objects/unit tests which have dependencies
-on that object.  In the case of a heavily used class like Pixel, this was 865 objects.
-It's still a lot faster then using regular Makefiles.
+on that object.  In the case of a heavily used class like Pixel, this equates to 865 objects.
+It's still a lot faster then using cmake generated Makefiles.
 
 ### Plugins
 
