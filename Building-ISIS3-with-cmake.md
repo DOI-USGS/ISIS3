@@ -69,6 +69,14 @@ To build fx:  `make install fx`
 `make install isis3 -j7`
 If you make a change to one class in the ISIS3 API, 
 it compiles and builds everything.  This can take awhile.
+If you are using Ninja however, the command is:
+
+`ninja install libisis3.so`
+
+The nice thing about Ninja is that it recompiles whatever class you modified,
+and then re-links all the applications/objects/unit tests which have dependencies
+on that object.  In the case of a heavily used class like Pixel, this was 865 objects.
+It's still a lot faster then using regular Makefiles.
 
 ### Plugins
 
