@@ -52,4 +52,7 @@ To build fx:  `make install fx`
 
 # Objects
 
+`make install isis3`
+If you make a change to one class in the ISIS3 API, 
+it compiles and builds everything.
 
