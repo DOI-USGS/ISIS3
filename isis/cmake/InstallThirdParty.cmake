@@ -25,11 +25,6 @@ function(install_third_party_libs)
       execute_process(COMMAND cp -L ${library} ${installLibFolder})
     endif()
   endforeach()
-
-  # Copy over QT Frameworks
-  if(APPLE)
-    # execute_process(COMMAND cp -Lr ${library} ${installLibFolder})
-  endif(APPLE)
 endfunction()
 
 # Plugin portion of the installation
@@ -59,7 +54,6 @@ function(install_third_party_license)
     install(CODE "execute_process(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/3rdParty/)")
   endif()
   install(CODE "execute_process(COMMAND cp -r ${LIC_DIR} ${CMAKE_INSTALL_PREFIX}/3rdParty/license)")
-
 endfunction()
 
 

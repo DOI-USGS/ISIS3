@@ -62,7 +62,6 @@ find_program(RCC rcc REQUIRED)
 find_program(PROTOC protoc REQUIRED)
 
 if(APPLE)
-  find_package(OpenGL            REQUIRED)
   find_package(Qt5 COMPONENTS
                   Core
                   Concurrent
@@ -231,4 +230,3 @@ endforeach()
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
-

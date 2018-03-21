@@ -19,9 +19,9 @@ find_library(GL_LIBRARY
 find_library(GLU_LIBRARY
   NAMES GLU
 )
-message("==================")
-message(${OPENGL_INCLUDE_DIR})
-message(${GL_LIBRARY})
-message(${GLU_LIBRARY})
+
+message( "-- OPENGL INCLUDE DIR: ${OPENGL_INCLUDE_DIR}")
+message( "-- OPENGL LIB: ${GL_LIBRARY}")
+message( "-- OPENGLU LIB: ${GLU_LIBRARY}")
 
 get_filename_component(OPENGL_INCLUDE_DIR "${OPENGL_INCLUDE_DIR}" DIRECTORY)

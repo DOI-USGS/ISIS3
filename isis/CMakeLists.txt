@@ -100,7 +100,7 @@ else()
 endif()
 
 if(develop)
-  
+
 endif()
 
 if(${testOutputDir} STREQUAL "OFF")
@@ -150,11 +150,11 @@ set(CORE_LIB_NAME isis3)
 # Specify relative library include paths which will be set up on
 #  the installed files.
 if(APPLE)
-  set(CMAKE_INSTALL_RPATH "@loader_path/../lib;@loader_path/../3rdParty/lib")
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};@loader_path/../lib;@loader_path/../3rdParty/lib")
 else()
-  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib;$ORIGIN/../3rdParty/lib")
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};$ORIGIN/../lib;$ORIGIN/../3rdParty/lib")
 endif()
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # We will set up some links with these files at the end of the install process so
 #  make sure they are cleared at the start of the install process.
