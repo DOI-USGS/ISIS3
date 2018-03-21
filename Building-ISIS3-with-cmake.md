@@ -39,3 +39,17 @@ rm `find -name ObjectName.cpp.o`
 ## Building with Debug Flags
 
 To build with debug flags add `-DCMAKE_BUILD_TYPE=Debug` to the cmake configuration step. Then, build ISIS and everything will be built with debug flags. If ISIS is already built without debug flags, this will result in a complete re-build of ISIS.
+
+## Building Individual ISIS3 Applications/Objects
+
+# Applications 
+
+The command (from the build directory) is:
+
+`make install <appname>_app`
+
+To build fx:  `make install fx`
+
+# Objects
+
+
