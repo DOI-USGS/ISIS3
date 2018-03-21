@@ -56,7 +56,7 @@ To build with debug flags add `-DCMAKE_BUILD_TYPE=Debug` to the cmake configurat
 
 ## Building Individual ISIS3 Applications/Objects
 
-# Applications 
+### Applications 
 
 The command (from the build directory) is:
 
@@ -64,11 +64,14 @@ The command (from the build directory) is:
 
 To build fx:  `make install fx`
 
-# Objects
+### Objects
 
 `make install isis3 -j7`
 If you make a change to one class in the ISIS3 API, 
 it compiles and builds everything.  This can take awhile.
 
-#Plugins
+###Plugins
 
+#CMake Behavior When Adding/Removing/Modifying an Object
+
+The cmake configure command needs to be executed when adding/removing a new object so that the system sees and compiles it.  
