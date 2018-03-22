@@ -91,3 +91,16 @@ It's still a lot faster then using cmake generated Makefiles.
 ## CMake Behavior When Adding/Removing/Modifying an Object
 
 The cmake configure command needs to be executed when adding/removing a new object so that the system sees and compiles it.  
+
+## Building ISIS3 Documentation
+
+At present under the current system there is no way to build documentation for individual applications/objects.  To build all documentation using the ninja build system, CD into the build directory and enter the following command:
+
+`ninja docs -j7`
+
+If CMake is being used to produce GNU Makefiles, the process is the same, but the command is:
+
+`make docs -j7`
+
+The documentation is placed in install/docs (after being copied over from build/docs).
+
