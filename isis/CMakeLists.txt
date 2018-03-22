@@ -58,12 +58,10 @@ message("Detected Operating System: ${osVersionString}")
 set(BUILD_SHARED_LIBS ON)
 
 # Specify flags used
-set(thirdPartyCppFlags -Wall -std=c++11 -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual)
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
 # sometimes third parties do not set their rpaths correctly
-if(LINUX)
-  set(thirdPartyCppFlags -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
-endif()
+set(thirdPartyCppFlags -Wall -std=c++11 -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual  -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
+
 
 # Specify user options that can be passed in with the initial CMake command.
 option(isis3Data       "Directory containing Isis3Data"                 OFF )
