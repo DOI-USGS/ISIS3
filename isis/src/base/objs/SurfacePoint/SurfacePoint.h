@@ -104,9 +104,9 @@ namespace Isis {
    *                           units (meters).  The matrix will be stored in km in this object to avoid extra 
    *                           conversions during processing.
    *  
-   *   @history 2017-11-20 Debbie A. Cook - added an additional argument to GetRectangularMatrix
+   *   @history 2018-03-07 Debbie A. Cook - added an additional argument to GetRectangularMatrix
    *                           and GetSphericalMatrix to specify the units of the matrix.  This will allow existing
-   *                           callers to set in m (the default) and bundle adjust software to set in km and 
+   *                           callers to get in m (the default) and bundle adjust software to get in km and 
    *                           minimize conversions. The matrix is held in this object in km to avoid extra 
    *                           conversions during the bundle adjustment.  The control net stores the distance
    *                           values of the matrix in m**2.

@@ -2950,7 +2950,7 @@ namespace Isis {
       // Get the TEP by adding the coordinate sigma to its corresponding covar member      
       boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> pCovar;
       
-      if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Rectangular) {
+      if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
         pCovar = SurfacePoint.GetSphericalMatrix(SurfacePoint::Kilometers);
       }
       else {

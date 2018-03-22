@@ -900,7 +900,7 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
     adjustedSurfPt.SetSphericalCoordinates(Latitude(32., Angle::Degrees),
                                 Longitude(120., Angle::Degrees),
                                            Distance(1000., Distance::Meters));
-    adjustedSurfPt.SetMatrix(SurfacePoint::Latitudinal, covarLat);
+    adjustedSurfPt.SetSphericalMatrix(covarLat);
                                 // Angle(1.64192315,Angle::Degrees),
                                 // Angle(1.78752107, Angle::Degrees),
                                 // Distance(38.454887335682053718134171237789, Distance::Meters));

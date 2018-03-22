@@ -458,6 +458,7 @@ namespace Isis {
       (*p_sphereCovar)(0,1) = mat[0][1] * 1.0e6;
       (*p_sphereCovar)(0,2) = mat[0][2] * 1000.0;
       (*p_sphereCovar)(1,1) = mat[1][1] * 1.0e6;
+
       (*p_sphereCovar)(1,2) = mat[1][2] * 1000.0;
       (*p_sphereCovar)(2,2) = mat[2][2];
     }
@@ -1755,11 +1756,11 @@ namespace Isis {
       
       case Meters:
         // Convert member matrix to Meters to return
-        covar(0,0) = (*p_sphereCovar)(0,0)*1.0e6;
-        covar(0,1) = (*p_sphereCovar)(0,1)*1.0e6;
-        covar(0,2) = (*p_sphereCovar)(0,2)*1.0e6;
-        covar(1,1) = (*p_sphereCovar)(1,1)*1.0e6;
-        covar(1,2) = (*p_sphereCovar)(1,2)*1.0e6;
+        covar(0,0) = (*p_sphereCovar)(0,0);
+        covar(0,1) = (*p_sphereCovar)(0,1);
+        covar(0,2) = (*p_sphereCovar)(0,2)*1000.;
+        covar(1,1) = (*p_sphereCovar)(1,1);
+        covar(1,2) = (*p_sphereCovar)(1,2)*1000.;
         covar(2,2) = (*p_sphereCovar)(2,2)*1.0e6;
         return covar;
         break;
