@@ -11,8 +11,7 @@ function(install_third_party_libs)
 
   # Loop through all the library files in our list
   foreach(library ${ALLLIBS})
-    get_filename_component(extension ${library} EXT)
-    if ("${extension}" STREQUAL ".so" OR "${extension}" STREQUAL ".dylib" )
+    if (EXISTS ${library})
       #get path to library in libararypath
       get_filename_component(librarypath ${library} PATH)
 

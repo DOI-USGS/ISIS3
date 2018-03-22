@@ -71,6 +71,14 @@ option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" ON  )
 option(develop         "Use a devleopment configuration"                ON  )
 
+# if cmake install prefix is not set, and conda env is activated, use the
+# conda env as the install directory
+if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
+  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
+endif()
+
+message("Installing in: ${CMAKE_INSTALL_PREFIX}")
+
 # options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
 # needs to be either 1 or 0 for C style true false
 if(JP2KFLAG)
@@ -80,9 +88,11 @@ endif()
 # Prioritize passed in variables over env vars, probably a better way to do this
 if(DEFINED ENV{ISIS3DATA} AND NOT isis3Data)
   set(isis3Data $ENV{ISIS3DATA})
+  set(isis3Data ON)
 endif()
 if(DEFINED ENV{ISIS3TESTDATA} AND NOT isis3TestData)
   set(isis3TestData $ENV{ISIS3TESTDATA})
+  set(isis3TestData ON)
 endif()
 
 if(EXISTS ${isis3Data})

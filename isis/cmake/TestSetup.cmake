@@ -58,6 +58,7 @@ macro(add_makefile_test_target testName makeFile inputDir outputDir truthDir)
            -DTRUTH_DIR=${truthDir}
            -DBIN_DIR=${CMAKE_BINARY_DIR}/bin
            -P ${thisFolder}/RunMakeFileTest.cmake)
+  set_tests_properties(${testName} PROPERTIES LABELS "app")
 
 endmacro()
 
@@ -78,4 +79,6 @@ macro(add_unit_test_target testFile truthFile)
            -DDATA_ROOT=$ENV{ISIS3DATA}
            -DCODE_ROOT=${PROJECT_SOURCE_DIR}
            -P ${thisFolder}/RunUnitTest.cmake)
+
+  set_tests_properties(${testName} PROPERTIES LABELS "unit")
 endmacro()
