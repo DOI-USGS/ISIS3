@@ -210,18 +210,7 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 add_subdirectory(src objects)
 
 # Set up third party libraries for installation
-install_third_party()
-
-# # Create a link from the build/objects directory to each folder in 3rdPartyLibs/plugins.
-# # - This is required so that the plugins can be found during unit tests.
-# # TIP: Set "export QT_DEBUG_PLUGINS=1" to help debug plugin errors.
-# foreach(plugin ${THIRDPARTYPLUGINFOLDERS})
-#   get_filename_component(pluginName ${plugin} NAME)
-#   if(NOT EXISTS ${CMAKE_BINARY_DIR}/lib/${pluginName})
-#     execute_process(COMMAND ln -s "${plugin}" ${pluginName}
-#     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-#   endif()
-# endforeach()
+# install_third_party()
 
 # Set up documentation build target.
 # - This script is called by running "make docs".
