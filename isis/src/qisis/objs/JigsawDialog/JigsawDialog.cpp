@@ -386,8 +386,7 @@ namespace Isis {
     FileName outputControlName;
     if (!m_outputControlName.isEmpty()) {
       outputControlName
-          = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
-                     m_outputControlName + ".net");
+          = FileName(m_project->bundleSolutionInfoRoot() + "/" + m_outputControlName );
     }
     else {
       outputControlName = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/Out-" +
