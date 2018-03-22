@@ -41,6 +41,7 @@ namespace Isis{
    *                           Fixed problem for display of multi-line headers for csv files.
    *                           Set SectionResizeMode to QHeaderView::ResizeToContents so columns are
    *                           displayed at the width of the maximum size of the column content.
+   *                           Fixes #4850.
    */
 
   class BundleObservationView : public AbstractProjectItemView
