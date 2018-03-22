@@ -568,6 +568,11 @@ namespace Isis {
 
     QString str = fileItem->fileName();
 
+    if (str.contains("bundleout")) {
+      result->setWindowTitle( tr("Summary").
+                              arg( m_bundleObservationViews.count() ) );
+      result->setObjectName( result->windowTitle() );
+    }
     if (str.contains("residuals")) {
       result->setWindowTitle( tr("Measure Residuals").
                               arg( m_bundleObservationViews.count() ) );
@@ -673,8 +678,9 @@ namespace Isis {
       mainWidget->pointTableView()->content()->setActiveControlNet(true);
       mainWidget->measureTableView()->content()->setActiveControlNet(true);
     }
-    connect( result, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+
+    connect(mainWidget, SIGNAL( destroyed(QObject *) ),
+            this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
 
     //  Connections for control point editing between views
     connect(mainWidget, SIGNAL(editControlPoint(ControlPoint *, QString)),
@@ -692,7 +698,7 @@ namespace Isis {
     connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
 
     m_cnetEditorViewWidgets.append(mainWidget);
-    m_controlMap.insertMulti(network, result);
+    m_controlMap.insertMulti(network, mainWidget);
 
     result->setWindowTitle(title);
     result->setObjectName(title);

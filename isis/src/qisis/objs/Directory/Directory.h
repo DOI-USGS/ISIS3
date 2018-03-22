@@ -206,6 +206,11 @@ namespace Isis {
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-03-22 Ken Edmundson - Modified m_controlMap value from QWidget to
+   *                           CnetEditorWidget. Added ability to view bundleout.txt file in method
+   *                           addBundleObservationView. Changed connection  to take signal from
+   *                           a CnetEditorWidget instead of a QWidget for destruction of a
+   *                           CnetEditorWidget.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -458,7 +463,7 @@ namespace Isis {
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
 
-      QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
+      QMultiMap<Control*, CnetEditorWidget*> m_controlMap; //!< Map to hold every view with an open Control
 
       QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
 
