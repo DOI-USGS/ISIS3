@@ -52,26 +52,26 @@ find_package(Qt5 COMPONENTS
 # For these, we pass in a version number, and use it in the path suffix
 # This only applies to v007, and outside of the building, we should only expect standard installs
 # The v007-specific installs are listed beside their find_package calls below:
-find_package(Boost     1.59.0  REQUIRED) # "boost/boost${Boost_FIND_VERSION}/boost/"
+find_package(Boost     1.59.0  REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
-find_package(Cholmod   4.4.5   REQUIRED) # "SuiteSparse/SuiteSparse${Cholmod_FIND_VERSION}/SuiteSparse/"
+find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
 find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
-find_package(GMM       5.0     REQUIRED) # "/gmm/gmm-${GMM_FIND_VERSION}/gmm/"
+find_package(GMM       5.0     REQUIRED)
 find_package(GSL       19      REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
-find_package(Jama      125     REQUIRED) # Jama version is 1.2.5, but v007 directory is "jama/jama125/"
+find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
-find_package(PCL       1.8     REQUIRED) # "pcl-${PCL_FIND_VERSION}"
-find_package(Protobuf  2.6.1   REQUIRED) # "google-protobuf/protobuf${Protobuf_FIND_VERSION}/"
-find_package(Qwt       6       REQUIRED) # "qwt${Qwt_FIND_VERSION}"
-find_package(SuperLU   4.3     REQUIRED) # "superlu/superlu${SuperLU_FIND_VERSION}/superlu/"
-find_package(TIFF      4.0.5   REQUIRED) # "tiff/tiff-${TIFF_FIND_VERSION}"
-find_package(TNT       126     REQUIRED) # TNT version is 1.2.6, but v007 directory is "tnt/tnt126/"
-find_package(XercesC   3.1.2   REQUIRED) # "xercesc/xercesc-${XercesC_FIND_VERSION}/"
+find_package(PCL       1.8     REQUIRED)
+find_package(Protobuf  2.6.1   REQUIRED)
+find_package(Qwt       6       REQUIRED)
+find_package(SuperLU   4.3     REQUIRED)
+find_package(TIFF      4.0.5   REQUIRED)
+find_package(TNT       126     REQUIRED)
+find_package(XercesC   3.1.2   REQUIRED) 
 find_package(X11       6       REQUIRED)
 find_package(nanoflann         REQUIRED)
 find_package(PNG               REQUIRED)

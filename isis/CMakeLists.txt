@@ -62,7 +62,6 @@ set(BUILD_SHARED_LIBS ON)
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall -std=c++11 -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual  -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 
-
 # Specify user options that can be passed in with the initial CMake command.
 option(isis3Data       "Directory containing Isis3Data"                 OFF )
 option(isis3TestData   "Directory containing Isis3TestData"             OFF )
