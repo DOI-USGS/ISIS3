@@ -101,6 +101,11 @@ namespace Isis {
    *   @history 2016-10-17 Jesse Mapel - Removed m_SCPVLFilename parameter in accordance with
    *                           USEPVL being removed from jigsaw.  References #4316.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *   @history 2018-03-20 Ken Edmundson
+   *                           1) Temporarily set default for m_createInverseMatrix to false. This
+   *                              is for creating and displaying the correlation matrix, which is
+   *                              currently not working.
+   *                           2) commented out hdf5 header includes in cpp
    *
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)

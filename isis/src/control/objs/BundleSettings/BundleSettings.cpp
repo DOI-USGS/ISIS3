@@ -10,9 +10,10 @@
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
-#include <H5Cpp.h>
-#include <hdf5_hl.h>
-#include <hdf5.h>
+// NOTE: Ken Edmundson - not using hdf5 and may not
+//#include <H5Cpp.h>
+//#include <hdf5_hl.h>
+//#include <hdf5.h>
 
 #include "BundleObservationSolveSettings.h"
 //#include "FileName.h"currently only used in commented code
@@ -52,7 +53,7 @@ namespace Isis {
     m_solveRadius          = false;
     m_updateCubeLabel      = false;
     m_errorPropagation     = false;
-    m_createInverseMatrix  = true;
+    m_createInverseMatrix  = false;
 
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 1.0;
