@@ -79,7 +79,7 @@ function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
   endforeach()
 
   # Generate a name for the executable
-  set(executableName "${moduleName}_unit_test_${filename}")
+  set(executableName "unitTest_${filename}")
 
   # Create the executable and link it to the module library
   add_executable( ${executableName} ${testFile})
@@ -87,7 +87,7 @@ function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
   target_link_libraries(${executableName} ${moduleName} ${depLibs})
 
   # Call function to add the test
-  add_unit_test_target(${executableName} ${truthFile})
+  add_unit_test_target(${executableName} ${truthFile} ${moduleName})
 
 endfunction(make_obj_unit_test)
 
@@ -271,7 +271,11 @@ function(add_isis_module name)
       foreach(val RANGE ${numTests})
         list(GET unitTestFiles ${val} testFile )
         list(GET truthFiles    ${val} truthFile)
-        make_obj_unit_test(${name} ${testFile} ${truthFile} "${reqLibs}" "${pluginLibs}")
+        if(name STREQUAL "isis3")
+          make_obj_unit_test("core" ${testFile} ${truthFile} "${reqLibs}" "${pluginLibs}")
+        else()
+          make_obj_unit_test(${name} ${testFile} ${truthFile} "${reqLibs}" "${pluginLibs}")
+        endif()
       endforeach()
     endif()
 
