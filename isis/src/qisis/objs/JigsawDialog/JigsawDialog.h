@@ -79,8 +79,8 @@ namespace Isis {
    *                           accepted. Fixes #4960
    *   @history 2017-11-01 Ian Humphrey - Create ecubs in the bundle results directory which contain
    *                           updated SPICE.  Fixes #4804, #4849.
-   *   @history 2018-03-22 Ken Edmundson - Added member variable QString m_outputControlName.
-   *                           Added argument QString outputControlFileName to constructor.
+   *   @history 2018-03-22 Ken Edmundson - Added member variable QString m_outputControlName. Added
+   *                           argument QString outputControlFileName to constructor.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
