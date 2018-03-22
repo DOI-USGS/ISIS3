@@ -206,11 +206,11 @@ namespace Isis {
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
-   *   @history 2018-03-22 Ken Edmundson - Modified m_controlMap value from QWidget to
-   *                           CnetEditorWidget. Added ability to view bundleout.txt file in method
-   *                           addBundleObservationView. Changed connection  to take signal from
-   *                           a CnetEditorWidget instead of a QWidget for destruction of a
-   *                           CnetEditorWidget.
+   *   @history 2018-03-14 Ken Edmundson - Modified m_controlMap value from QWidget to
+   *                           CnetEditorWidget and changed connection  to take signal from
+   *                           a CnetEditorWidget instead of a QWidget for destruction of
+   *                           CnetEditorWidgets. Added ability to view bundleout.txt file in method
+   *                           addBundleObservationView.
    */
   class Directory : public QObject {
     Q_OBJECT
