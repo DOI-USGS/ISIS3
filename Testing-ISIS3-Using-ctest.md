@@ -22,6 +22,7 @@ ctest -R _unit_     # run unit tests
 ctest -R _app_      # run app tests
 ctest -R jigsaw     # run jigsaw's app tests
 ctest -R lro        # run all lro tests
+ctest -E tgo        # Run everything but tgo tests
 ```
 # Building New Tests
 
