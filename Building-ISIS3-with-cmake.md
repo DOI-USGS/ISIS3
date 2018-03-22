@@ -11,11 +11,15 @@ From the terminal window:
 cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2FLAG=OFF -GNinja <source directory>
 ninja install -OR- make -j8
 ```
-make will make ISIS inside of your current working directory
-ninja install will install the binaries for user use inside of the \<install directory\>
+``` make ``` will make ISIS inside of your current working directory
 
-ISIS3 apps are placed in \<install directory\>/bin. \<source directory\> is the root `isis` directory of the ISIS source tree.  The -GNinja flag specifies creating Google ninja
-Makefile (an alternative Make system to the traditional GNU make system).  The -DJP2FLAG=OFF disables
+``` ninja install ``` will install the binaries for user use inside of the \<install directory\>
+
+When using ``` ninja install ``` the ISIS3 apps are placed in \<install directory\>/bin. 
+
+\<source directory\> is the root `isis` directory of the ISIS source tree.  
+
+The -GNinja flag specifies creating Google ninja Makefile (an alternative Make system to the traditional GNU make system).  The -DJP2FLAG=OFF disables
 JP2000 support.  This is temporary.
 
 ## New Environmental Variable meanings
