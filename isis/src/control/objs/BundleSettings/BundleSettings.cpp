@@ -10,11 +10,6 @@
 #include <QXmlStreamWriter>
 #include <QXmlInputSource>
 
-// NOTE: Ken Edmundson - not using hdf5 and may not
-//#include <H5Cpp.h>
-//#include <hdf5_hl.h>
-//#include <hdf5.h>
-
 #include "BundleObservationSolveSettings.h"
 //#include "FileName.h"currently only used in commented code
 #include "IException.h"
