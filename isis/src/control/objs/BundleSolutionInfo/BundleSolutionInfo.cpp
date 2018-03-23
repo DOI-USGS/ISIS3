@@ -40,21 +40,13 @@ namespace Isis {
                                          QList<ImageList *> imgList,
                                          QObject *parent) : QObject(parent) {
     m_id = new QUuid(QUuid::createUuid());
-
     m_runTime = "";
-
     m_name = m_runTime;
-
     m_inputControlNetFileName = new FileName(controlNetworkFileName);
-
-    m_outputControlNetFileName = new FileName();
-
+    m_outputControl = NULL;
     m_settings = inputSettings;
-
     m_statisticsResults = new BundleResults(outputStatistics);
-
     m_images = new QList<ImageList *>(imgList);
-
     m_adjustedImages = new QList<ImageList *>;
   }
 
@@ -74,7 +66,7 @@ namespace Isis {
     m_runTime = "";
     m_name = m_runTime;
     m_inputControlNetFileName = NULL;
-    m_outputControlNetFileName = NULL;
+    m_outputControl = NULL;
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -95,14 +87,16 @@ namespace Isis {
         m_name(src.m_name),
         m_runTime(src.m_runTime),
         m_inputControlNetFileName(new FileName(src.m_inputControlNetFileName->expanded())),
-        m_outputControlNetFileName(new FileName(src.m_outputControlNetFileName->expanded())),
         m_settings(new BundleSettings(*src.m_settings)),
         m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
         m_images(new QList<ImageList *>(*src.m_images)),
         m_adjustedImages(new QList<ImageList *>(*src.m_adjustedImages)),
+        m_txtBundleOutputFilename(src.m_txtBundleOutputFilename),
         m_csvSavedImagesFilename(src.m_csvSavedImagesFilename),
         m_csvSavedPointsFilename(src.m_csvSavedPointsFilename),
         m_csvSavedResidualsFilename(src.m_csvSavedResidualsFilename) {
+
+    m_outputControl = new Control(src.m_outputControl->fileName());
   }
 
 
@@ -115,8 +109,8 @@ namespace Isis {
     delete m_inputControlNetFileName;
     m_inputControlNetFileName = NULL;
 
-    delete m_outputControlNetFileName;
-    m_outputControlNetFileName = NULL;
+    delete m_outputControl;
+    m_outputControl = NULL;
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
@@ -161,8 +155,8 @@ namespace Isis {
       delete m_inputControlNetFileName;
       m_inputControlNetFileName = new FileName(src.m_inputControlNetFileName->expanded());
 
-      delete m_outputControlNetFileName;
-      m_outputControlNetFileName = new FileName(src.m_outputControlNetFileName->expanded());
+      delete m_outputControl;
+      m_outputControl = new Control(src.m_outputControl->fileName());
 
       m_settings = src.m_settings;
 
@@ -176,6 +170,16 @@ namespace Isis {
       m_adjustedImages = new QList<ImageList *>(*src.m_adjustedImages);
     }
     return *this;
+  }
+
+
+  /**
+   * Returns bundleout text filename.
+   *
+   * @return QString Bundleout text filename.
+   */
+  QString BundleSolutionInfo::savedBundleOutputFilename() {
+    return m_txtBundleOutputFilename;
   }
 
 
@@ -232,6 +236,8 @@ namespace Isis {
 
 
   /**
+   * TODO: change description below to something more like english.
+   *
    * Change the on-disk file name for the control network used to be where the control network
    * ought to be in the given project.
    *
@@ -250,10 +256,14 @@ namespace Isis {
                      oldInputFileName.dir().dirName() + "/" + oldInputFileName.name());
     *m_inputControlNetFileName = newInputFileName.expanded();
 
-    FileName oldOutputFileName(*m_outputControlNetFileName);
+    FileName oldOutputFileName(m_outputControl->fileName());
     FileName newOutputFileName(project->cnetRoot() + "/" +
                      oldOutputFileName.dir().dirName() + "/" + oldOutputFileName.name());
-    *m_outputControlNetFileName = newOutputFileName.expanded();
+
+    if (m_outputControl) {
+      delete m_outputControl;
+    }
+    m_outputControl = new Control(newOutputFileName.expanded());
   }
 
 
@@ -275,16 +285,6 @@ namespace Isis {
    */
   QString BundleSolutionInfo::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
-  }
-
-
-  /**
-   * Sets the output control network filename.
-   *
-   * @param fileName The the output control network filename..
-   */
-  void BundleSolutionInfo::setOutputControlNetworkFileName(FileName fileName) {
-    *m_outputControlNetFileName = fileName;
   }
 
 
@@ -336,14 +336,34 @@ namespace Isis {
    * @return @b QString The name of the output control network.
    */
   QString BundleSolutionInfo::outputControlNetFileName() const {
-    return m_outputControlNetFileName->expanded();
+    return m_outputControl->fileName();
   }
 
 
   /**
-   * Returns the bundle settings.
+   * Returns the name of the output control network.
    *
-   * @return @b BundleSettingsQsp The bundle settings.
+   * @return @b QString The name of the output control network.
+   */
+  void BundleSolutionInfo::setOutputControl(Control *outputControl) {
+    m_outputControl = outputControl;
+  }
+
+
+  /**
+   * Returns bundle output Control object.
+   *
+   * @return Control* Pointer to bundle output Control object.
+   */
+  Control *BundleSolutionInfo::control() const {
+    return m_outputControl;
+  }
+
+
+  /**
+   * Returns bundle settings.
+   *
+   * @return BundleSettingsQsp Bundle settings.
    */
   BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
     return m_settings;
@@ -1170,6 +1190,8 @@ namespace Isis {
       return false;
     }
 
+    m_txtBundleOutputFilename = ofname;
+
     char buf[1056];
     BundleObservationQsp observation;
 
@@ -1365,19 +1387,16 @@ namespace Isis {
 
     // print column headers
     if (m_settings->errorPropagation()) {
-      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
-              "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
-              "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
-              "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
-              "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),"
-              "(m),(m),(m),(km),(km),(km)\n");
+      sprintf(buf, ",,,,,3-d,3-d,3-d,Sigma,Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
+              "Coordinate,Coordinate\nPoint,Point,Accepted,Rejected,Residual,Latitude,Longitude,"
+              "Radius,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,"
+              "Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),(km)\n");
     }
     else {
-      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,"
-              "Correction,Correction,Correction,Coordinate,Coordinate,"
-              "Coordinate\n,,,,,Latitude,Longitude,Radius,Latitude,"
-              "Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,"
-              "RMS,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+      sprintf(buf, ",,,,,3-d,3-d,3-d,Correction,Correction,Correction,Coordinate,Coordinate,"
+              "Coordinate\nPoint,Point,Accepted,Rejected,Residual,Latitude,Longitude,Radius,"
+              "Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,RMS,(dd),(dd),(km),"
+              "(m),(m),(m),(km),(km),(km)\n");
     }
     fpOut << buf;
 
@@ -1584,12 +1603,19 @@ namespace Isis {
                              .arg(m_inputControlNetFileName->name()).arg(newFile),
                            _FILEINFO_);
         }
-        oldFile = oldPath + "/" + m_outputControlNetFileName->name();
-        newFile = newPath + "/" + m_outputControlNetFileName->name();
+        oldFile = oldPath + "/" + m_outputControl->fileName();
+        newFile = newPath + "/" + m_outputControl->fileName();
         if (!QFile::copy(oldFile, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
-                             .arg(m_outputControlNetFileName->name()).arg(newFile),
+                             .arg(m_outputControl->fileName()).arg(newFile),
+                           _FILEINFO_);
+        }
+        newFile = newPath + "/" + FileName(m_txtBundleOutputFilename).name();
+        if (!QFile::copy(m_txtBundleOutputFilename, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_txtBundleOutputFilename).arg(newFile),
                            _FILEINFO_);
         }
         newFile = newPath + "/" + FileName(m_csvSavedImagesFilename).name();
@@ -1643,9 +1669,10 @@ namespace Isis {
 
     stream.writeTextElement("inputFileName",
                             relativePath);
-
     stream.writeTextElement("outputFileName",
-                            relativeBundlePath + m_outputControlNetFileName->name());
+                            relativeBundlePath + FileName(m_outputControl->fileName()).name());
+    stream.writeTextElement("bundleOutTXT",
+                            relativeBundlePath + FileName(m_txtBundleOutputFilename).name());
     stream.writeTextElement("imagesCSV",
                             relativeBundlePath + FileName(m_csvSavedImagesFilename).name());
     stream.writeTextElement("pointsCSV",
@@ -1736,7 +1763,6 @@ namespace Isis {
                                                                                 reader());
       }
       else if (localName == "imageList") {
-        // m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
         m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
             new ImageList(m_xmlHandlerProject, reader()));
       }
@@ -1781,9 +1807,15 @@ namespace Isis {
         projectRoot + m_xmlHandlerCharacters);
     }
     else if (localName == "outputFileName") {
-      assert(m_xmlHandlerBundleSolutionInfo->m_outputControlNetFileName == NULL);
-      m_xmlHandlerBundleSolutionInfo->m_outputControlNetFileName = new FileName(
-        projectRoot + m_xmlHandlerCharacters);
+      assert(m_xmlHandlerBundleSolutionInfo->m_outputControl == NULL);
+      delete m_xmlHandlerBundleSolutionInfo->m_outputControl;
+      FileName fname(projectRoot + m_xmlHandlerCharacters);
+      m_xmlHandlerBundleSolutionInfo->m_outputControl
+          = new Control(fname.expanded());
+    }
+    else if (localName == "bundleOutTXT") {
+      m_xmlHandlerBundleSolutionInfo->m_txtBundleOutputFilename =
+        projectRoot + m_xmlHandlerCharacters;
     }
     else if (localName == "imagesCSV") {
       m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = 

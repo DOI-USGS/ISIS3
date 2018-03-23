@@ -22,7 +22,6 @@
  */
 
 #include "AbstractProjectItemView.h"
-
 #include "FileItem.h"
 
 namespace Isis{
@@ -36,8 +35,13 @@ namespace Isis{
    * @internal
    *   @history 2017-05-01 Tyler Wilson - Original version.
    *   @history 2017-05-05 Tracie Sucharski - Changed for the serialization of BundleObservation
-   *                           files.  This was implemented create a new ProjectItem type called
+   *                           files. This was implemented create a new ProjectItem type called
    *                           FileItemQsp. Fixes #4839, #4840.
+   *   @history 2018-03-21 Ken Edmundson - Added capability to display either csv or text files.
+   *                           Fixed problem for display of multi-line headers for csv files.
+   *                           Set SectionResizeMode to QHeaderView::ResizeToContents so columns are
+   *                           displayed at the width of the maximum size of the column content.
+   *                           Fixes #4850.
    */
 
   class BundleObservationView : public AbstractProjectItemView
@@ -45,8 +49,11 @@ namespace Isis{
     Q_OBJECT
     public:
       BundleObservationView(FileItemQsp fileItem, QWidget *parent=0);
-      //BundleObservationView(const BundleObservationView &other);
       ~BundleObservationView();
+
+    private:
+      void displayCsvFile(FileItemQsp fileItem);
+      void displayTextFile(FileItemQsp fileItem);
   };
 }
 #endif

@@ -120,8 +120,14 @@ namespace Isis {
    *   @history 2018-01-17 Tracie Sucharski - Added conditional code to check for null project in
    *                           xml serialization to allow the unitTest to use xml serialization
    *                           without having a project. References #5104.
-   *   @history 2018-03-15 Ken Edmundson - Save input and output control and added methods to return
-   *                           input control and output control.  Update documentation.
+   *   @history 2018-03-21 Ken Edmundson - Added...
+   *                           1) member variable m_inputControlNetFileName, accessor method, and
+   *                              serialization support. Also added input control net filename to
+   *                              constructor.
+   *                           2) member variable m_outputControl, associated mutator/accessor, and
+   *                              serialization support.
+   *                           3) member variable m_txtBundleOutputFilename and associated accessor
+   *                              for bundleout.txt file.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -138,13 +144,14 @@ namespace Isis {
       ~BundleSolutionInfo();
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
+      QString savedBundleOutputFilename();
       QString savedImagesFilename();
       QString savedPointsFilename();
       QString savedResidualsFilename();
 
       void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
-      void setOutputControlNetworkFileName(FileName fileName);
+      void setOutputControl(Control *outputControl);
       void setRunTime(QString runTime);
       void setName(QString name);
 
@@ -152,6 +159,7 @@ namespace Isis {
       QString id() const;
       QString inputControlNetFileName() const;
       QString outputControlNetFileName() const;
+      Control *control() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -210,8 +218,8 @@ namespace Isis {
       QUuid              *m_id;
       QString             m_name;                        //!< Name of the bundle. Defaults to the id
       QString             m_runTime;                     //!< Run time of the bundle adjustment
-      FileName           *m_inputControlNetFileName;     //!< Input control network name
-      FileName           *m_outputControlNetFileName;    //!< Output control network name
+      FileName           *m_inputControlNetFileName;     //!< Input control network file name
+      Control            *m_outputControl;               //!< Output control
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results
       QList<ImageList *> *m_images;                      //!< Input image list
@@ -219,6 +227,7 @@ namespace Isis {
 
       // In theory the path in the BundleSettings can change while running. So we save the
       // filenames actually used when the most recent save of the file was done.
+      QString m_txtBundleOutputFilename;
       QString m_csvSavedImagesFilename;
       QString m_csvSavedPointsFilename;
       QString m_csvSavedResidualsFilename;
