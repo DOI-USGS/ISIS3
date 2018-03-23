@@ -75,6 +75,9 @@
       the pixel-location of the input image's center ephemeris time, and (4) compute spacecraft
       velocity values instead of using SPICE velocity data blobs.  Fixes #1672.
     </change>
+    <change name="Jesse Mapel" date="2018-03-23">
+      Added SEMI_MAJOR_AXIS and ECCENTRICITY to the output.
+    </change>
   </history>
 
   <groups>
@@ -110,7 +113,7 @@
 <!--
 Commented this parameter out until HRSC is supported in SS
       <parameter name="HRSC_NADIRCENTERTIME">
-        <brief>Ephemeris time at center of HRSC nadir image 
+        <brief>Ephemeris time at center of HRSC nadir image
         </brief>
         <description>
           Ephemeris time at center of HRSC nadir image.  This is
