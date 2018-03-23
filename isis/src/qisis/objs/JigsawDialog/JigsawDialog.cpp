@@ -386,12 +386,13 @@ namespace Isis {
     FileName outputControlName;
     if (!m_outputControlName.isEmpty()) {
       outputControlName
-          = FileName(m_project->bundleSolutionInfoRoot() + "/" + m_outputControlName );
+          = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
+                     m_outputControlName);
     }
     else {
-      outputControlName = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/Out-" +
-                                 runTime + "-" +
-                                 FileName(m_bundleSolutionInfo->inputControlNetFileName()).name());
+      outputControlName
+          = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/Out-" + runTime + "-" +
+                     FileName(m_bundleSolutionInfo->inputControlNetFileName()).name());
     }
 
     // Write output control net with correct path to results folder + runtime
