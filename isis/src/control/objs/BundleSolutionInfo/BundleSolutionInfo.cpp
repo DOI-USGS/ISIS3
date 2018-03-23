@@ -1387,19 +1387,16 @@ namespace Isis {
 
     // print column headers
     if (m_settings->errorPropagation()) {
-      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
-              "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
-              "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
-              "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
-              "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),"
-              "(m),(m),(m),(km),(km),(km)\n");
+      sprintf(buf, ",,,,,3-d,3-d,3-d,Sigma,Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
+              "Coordinate,Coordinate\nPoint,Point,Accepted,Rejected,Residual,Latitude,Longitude,"
+              "Radius,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,"
+              "Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),(km)\n");
     }
     else {
-      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,"
-              "Correction,Correction,Correction,Coordinate,Coordinate,"
-              "Coordinate\n,,,,,Latitude,Longitude,Radius,Latitude,"
-              "Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,"
-              "RMS,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+      sprintf(buf, ",,,,,3-d,3-d,3-d,Correction,Correction,Correction,Coordinate,Coordinate,"
+              "Coordinate\nPoint,Point,Accepted,Rejected,Residual,Latitude,Longitude,Radius,"
+              "Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,RMS,(dd),(dd),(km),"
+              "(m),(m),(m),(km),(km),(km)\n");
     }
     fpOut << buf;
 
