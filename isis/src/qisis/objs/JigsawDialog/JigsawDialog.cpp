@@ -404,6 +404,8 @@ namespace Isis {
     //       need to make it work, the alternative is the kluge in the JigsawWorkOrder::execute
     //       method
 
+//    m_bundleSolutionInfo->setOutputControlNetworkFileName(jiggedControlName);
+
     // Iterate through all of the image lists (the "imports" in the project).
     QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
     foreach (ImageList *imageList, imageLists) {

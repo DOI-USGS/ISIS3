@@ -211,6 +211,8 @@ namespace Isis {
    *                           a CnetEditorWidget instead of a QWidget for destruction of
    *                           CnetEditorWidgets. Added ability to view bundleout.txt file in method
    *                           addBundleObservationView.
+   *   @history 2018-03-14 Tracie Sucharski - Changed MosaicControlNetTool to ControlNetTool in
+   *                           addCubeDnView. References #5026.
    */
   class Directory : public QObject {
     Q_OBJECT

@@ -35,9 +35,9 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Ipce (Qnet) tool - Handles mouse button actions and drawing control points on viewports
+   * ControlNet (Qnet) tool - Handles mouse button actions and drawing control points on viewports
    *
-   * @param parent Pointer to the parent widget for the Ipce tool
+   * @param parent Pointer to the parent widget for the ControlNet tool
    *
    * @author 2016-09-01 Tracie Sucharski
    *
@@ -56,10 +56,10 @@ namespace Isis {
 
 
   /**
-    * Adds the Ipce tool action to the tool pad.
+    * Adds the ControlNet tool action to the tool pad.
     *
     * @param pad Tool pad
-    * @return @b QAction* Pointer to Tie tool action
+    * @return @b QAction* Pointer to ControlNet tool action
     *
     * @internal
     *   @history 2017-07-25 Tyler Wilson - Set the

@@ -225,6 +225,10 @@ namespace Isis {
    *                           a temporary project to ensure all project files are pointing to the
    *                           correct directory. Note that this is NOT ideal, particularly it the
    *                           project has many files.
+   *   @history 2018-03-14 Tracie Sucharski - Call the appropriate workorder from the methods
+   *                           activeControl and activeImageList when returning a default value.
+   *                           This ensures that all the proper error checking is handled and
+   *                           prevents duplicate code.
    */
   class Project : public QObject {
     Q_OBJECT

@@ -341,6 +341,16 @@ namespace Isis {
 
 
   /**
+   * Returns the name of the output control network.
+   *
+   * @return @b QString The name of the output control network.
+   */
+  void BundleSolutionInfo::setOutputControl(Control *outputControl) {
+    m_outputControl = outputControl;
+  }
+
+
+  /**
    * Returns bundle output Control object.
    *
    * @return Control* Pointer to bundle output Control object.

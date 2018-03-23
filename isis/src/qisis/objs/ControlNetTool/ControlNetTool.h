@@ -29,8 +29,8 @@ namespace Isis {
   class UniversalGroundMap;
 
   /**
-   * @brief ControlNetTool operations ipce, handles mouse events on views for control point editing 
-   *        for the ipce app.
+   * @brief ControlNetTool Handles mouse events on CubeDnViews for control point editing for the 
+   *        ipce app.
    *
    * @ingroup Visualization Tools
    *
@@ -52,6 +52,8 @@ namespace Isis {
    *   @history 2017-08-08 Cole Neubauer - Renamed from IpceTool.  Fixes #5090. 
    *   @history 2017-08-09 Cole Neubauer - Added loadNetwork() for changing inbetween active
    *                           networks Fixes #4567
+   *   @history 2018-03-12 Tracie Sucharski - Fixed some documentation leftover from renaming from
+   *                           IpceTool.  References #5090.
    */
   class ControlNetTool : public Tool {
     Q_OBJECT

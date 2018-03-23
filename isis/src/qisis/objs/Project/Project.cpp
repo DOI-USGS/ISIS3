@@ -66,6 +66,8 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "SerialNumberList.h"
+#include "SetActiveControlWorkOrder.h"
+#include "SetActiveImageListWorkOrder.h"
 #include "Shape.h"
 #include "ShapeList.h"
 #include "ShapeReader.h"
@@ -1700,7 +1702,7 @@ namespace Isis {
    *
    */
   void Project::setActiveControl(QString displayName) {
-    Control *previousControl = m_activeControl;
+    Control *previousControl = m_activeControl; 
     if (m_activeControl) {
       emit activeControlSet(false);
       ProjectItem *item = directory()->model()->findItemData(m_activeControl->
@@ -1714,23 +1716,23 @@ namespace Isis {
       m_activeControl = item->control();
 
       try {
-        activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
-        item->setTextColor(Qt::darkGreen);
+          activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          item->setTextColor(Qt::darkGreen);
       }
       catch(IException e){
-        if (previousControl) {
-          m_activeControl = previousControl;
-          item = directory()->model()->findItemData(m_activeControl->
-                              displayProperties()->displayName(), Qt::DisplayRole);
-          item->setTextColor(Qt::darkGreen);
-          activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          if (previousControl) {
+            m_activeControl = previousControl;
+            item = directory()->model()->findItemData(m_activeControl->
+                                displayProperties()->displayName(), Qt::DisplayRole);
+            item->setTextColor(Qt::darkGreen);
+            activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          }
+          else {
+            m_activeControl = NULL;
+          }
+          throw IException(e);
         }
-        else {
-          m_activeControl = NULL;
-        }
-        throw IException(e);
       }
-    }
     emit activeControlSet(true);
   }
 
@@ -1740,6 +1742,7 @@ namespace Isis {
    *
    * Returns the active control (control network) for views which need to operate on
    * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   * IMPORTANT:  Returns NULL if no active Control. 
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
@@ -1753,8 +1756,12 @@ namespace Isis {
 
     if (!m_activeControl && m_controls->count() == 1) {
       if (m_controls->at(0)->count() == 1 && m_images->count() > 1) {
-        QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
-        setActiveControl(controlName);
+        SetActiveControlWorkOrder *workOrder = new SetActiveControlWorkOrder(this);
+        addToProject(workOrder);
+
+
+//      QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
+//      setActiveControl(controlName);
       }
     }
     return m_activeControl;
@@ -1823,7 +1830,8 @@ namespace Isis {
    * @brief  Returns the active ImageList
    *
    * Returns the active ImageList for views which need to operate on the
-   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
+   * IMPORTANT:  Returns NULL if no active ImageList can be set. 
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
@@ -1833,8 +1841,13 @@ namespace Isis {
   ImageList *Project::activeImageList() {
 
     if (!m_activeImageList && m_images->count() == 1) {
-      QString imageList = m_images->at(0)->name();
-      setActiveImageList(imageList);
+        SetActiveImageListWorkOrder *workOrder = new SetActiveImageListWorkOrder(this);
+        addToProject(workOrder);
+
+
+
+//        QString imageList = m_images->at(0)->name();
+//        setActiveImageList(imageList);
     }
     return m_activeImageList;
   }

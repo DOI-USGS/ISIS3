@@ -51,6 +51,7 @@
 #include "ControlDisplayProperties.h"
 #include "ControlList.h"
 #include "ControlNet.h"
+#include "ControlNetTool.h"
 #include "ControlPointEditView.h"
 #include "ControlPointEditWidget.h"
 #include "CubeDnView.h"
@@ -681,9 +682,9 @@ namespace Isis {
 
     // connect destroyed signal for mainWidget to cleanupCnetEditorViewWidgets slot
     connect(mainWidget, SIGNAL( destroyed(QObject *) ),
-            this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
 
-    // Connections for control point editing between views
+    //  Connections for control point editing between views
     connect(mainWidget, SIGNAL(editControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
@@ -745,13 +746,13 @@ namespace Isis {
     if (!project()->activeControl()) {
       QList<QAction *> toolbar = result->toolPadActions();
       QAction* cnetAction = toolbar[0];
-      MosaicControlNetTool *cnetButton = static_cast<MosaicControlNetTool *>(cnetAction->parent());
+      ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
 
       cnetAction->setEnabled(false);
       connect (project(), SIGNAL(activeControlSet(bool)),
               cnetAction, SLOT(setEnabled(bool)));
       connect (project(), SIGNAL(activeControlSet(bool)),
-              cnetButton, SLOT(loadNetwork()));
+              cnetTool, SLOT(loadNetwork()));
     }
 
     return result;
