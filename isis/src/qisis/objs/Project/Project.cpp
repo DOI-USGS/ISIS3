@@ -1102,12 +1102,17 @@ namespace Isis {
 
   /**
    * Loads bundle solution info into project
+   *
    * @param BundleSolutionInfo
    */
   void Project::loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
     m_bundleSolutionInfo->append(bundleSolutionInfo);
 
+    // add BundleSolutionInfo to project's m_idToBundleSolutionInfoMap
     (*m_idToBundleSolutionInfoMap)[bundleSolutionInfo->id()] = bundleSolutionInfo;
+
+    // add BundleSolutionInfo's control to project's m_idToControlMap
+    (*m_idToControlMap)[bundleSolutionInfo->control()->id()] = bundleSolutionInfo->control();
 
     emit bundleSolutionInfoAdded(bundleSolutionInfo);
   }
@@ -2904,6 +2909,7 @@ namespace Isis {
     else if (localName == "results") {
       foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
         m_project->addBundleSolutionInfo(bundleInfo);
+
         // If BundleSolutionInfo contains adjusted images, add to the project id map.
         if (bundleInfo->adjustedImages().count()) {
           foreach (ImageList *adjustedImageList, bundleInfo->adjustedImages()) {
