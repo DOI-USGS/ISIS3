@@ -111,7 +111,6 @@ namespace Isis {
     m_activeControl = NULL;
     m_activeImageList = NULL;
 
-
     m_numImagesCurrentlyReading = 0;
 
     m_mutex = NULL;
@@ -130,7 +129,6 @@ namespace Isis {
     m_idToBundleSolutionInfoMap = new QMap<QString, BundleSolutionInfo *>;
 
     m_name = "Project";
-
 
     // Look for old projects
     QDir tempDir = QDir::temp();
