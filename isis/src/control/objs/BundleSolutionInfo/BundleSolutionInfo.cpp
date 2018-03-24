@@ -1768,17 +1768,11 @@ namespace Isis {
         m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
             new ImageList(m_xmlHandlerProject, reader()));
       }
-      // TODO: Ken Edmundson - Need to make file handling more automatic instead of always having to
-      //       explicitly create these paths, do we need a
-      //       project->projectBundleSolutionPath() method? And can we let the BundleSolutionInfo
-      //       object create the full path automatically by adding the runTime to the
-      //       projectBundleSolutionPath()?
       else if (localName == "outputControl") {
-        FileName outputControlPath
-            = FileName(m_xmlHandlerProject->projectRoot() + "/results/bundle/"
-                       + m_xmlHandlerBundleSolutionInfo->runTime());
-        m_xmlHandlerBundleSolutionInfo->m_outputControl =
-            new Control(outputControlPath, reader());
+        FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
+                                              + m_xmlHandlerBundleSolutionInfo->runTime());
+
+        m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, reader());
       }
     }
     return true;
