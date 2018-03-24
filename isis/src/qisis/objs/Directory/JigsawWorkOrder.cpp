@@ -178,28 +178,8 @@ namespace Isis {
     // Get the selected control and bundle settings and give them to the JigsawDialog for now.
     Control *selectedControl = proj->control(internalData().first());
 
-    // if selectedControl is NULL, maybe the Control we want is an output Control in a
-    // BundleSolutionInfo, so let's look there (I think the project()->control() method above should
-    // look in the results area for this automatically
-    // this is a workaround because the BundleSolutionInfo's Control is not in the project's control
-    // list
-    if (!selectedControl) {
-      int nBundles = proj->bundleSolutionInfo().size();
-      for (int i = 0; i < nBundles; i++) {
-        BundleSolutionInfo *bundleSolution = proj->bundleSolutionInfo().at(i);
-        Control *bundleControl = bundleSolution->control();
-        if (bundleControl->id() != internalData().first()) {
-            continue;
-        }
-        else {
-          selectedControl = bundleControl;
-        }
-      }
-    }
-
     QString outputControlFileName = internalData().at(1);
 
-//    JigsawDialog *runDialog = new JigsawDialog(project(), m_bundleSettings, selectedControl);
     JigsawDialog *runDialog = new JigsawDialog(project(), m_bundleSettings, selectedControl,
                                                outputControlFileName);
     runDialog->setAttribute(Qt::WA_DeleteOnClose);

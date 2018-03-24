@@ -53,6 +53,9 @@ namespace Isis {
    *                           network filename to internalData. Modified execute method to look for
    *                           input control network in BundleSolutionInfos if not found under main
    *                           part of project tree.
+   *   @history 2018-03-23 Ken Edmundson - In execute method, removed search for input control
+   *                           network in BundleSolutionInfos. No longer needed as control is now
+   *                           properly saved in projects m_idToControlMap.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT
