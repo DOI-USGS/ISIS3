@@ -2,7 +2,7 @@
 # $ conda create --name <env> --file <this file>
 # platform: osx-64
 @EXPLICIT
-https://conda.anaconda.org/usgs-astrogeology/osx-64/bullet-2.86.1-he2aa7b0_0.tar.bz2
+https://conda.anaconda.org/krodriguez/osx-64/bullet-2.86.1-0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/bzip2-1.0.6-1.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/ca-certificates-2018.1.18-0.tar.bz2
 https://conda.anaconda.org/usgs-astrogeology/osx-64/ds9-7.5-h35e3669_0.tar.bz2

@@ -62,8 +62,6 @@ function(add_isis_app folder libDependencies)
 endfunction(add_isis_app)
 
 
-
-
 # Set up the lone unit test in an obj folder
 function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
 
@@ -89,7 +87,7 @@ function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
   target_link_libraries(${executableName} ${moduleName} ${depLibs})
 
   # Call function to add the test
-  add_unit_test_target(${executableName} ${truthFile})
+  add_unit_test_target(${executableName} ${truthFile} ${moduleName})
 
 endfunction(make_obj_unit_test)
 
@@ -273,6 +271,7 @@ function(add_isis_module name)
       foreach(val RANGE ${numTests})
         list(GET unitTestFiles ${val} testFile )
         list(GET truthFiles    ${val} truthFile)
+
         make_obj_unit_test(${name} ${testFile} ${truthFile} "${reqLibs}" "${pluginLibs}")
       endforeach()
     endif()
