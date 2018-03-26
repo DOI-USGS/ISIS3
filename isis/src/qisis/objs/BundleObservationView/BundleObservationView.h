@@ -42,6 +42,8 @@ namespace Isis{
    *                           Set SectionResizeMode to QHeaderView::ResizeToContents so columns are
    *                           displayed at the width of the maximum size of the column content.
    *                           Fixes #4850.
+   *   @history 2018-03-26 Ken Edmundson - Modified displayTextFile method to query for system's
+   *                           fixed width font.
    */
 
   class BundleObservationView : public AbstractProjectItemView

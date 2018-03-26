@@ -134,6 +134,8 @@ namespace Isis {
    *                              the control's id is added to project upon reading back in. Also
    *                              ensures that an open cneteditor widget containing a
    *                              bundlesolutioninfo's output control is serialized properly.
+   *   @history 2018-03-26 Ken Edmundson - modified save method to properly save output control
+   *                           network file.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
