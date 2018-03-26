@@ -8,6 +8,9 @@
 #include <QString>
 #include <QVector>
 
+#include "boost/numeric/ublas/symmetric.hpp"
+#include "boost/numeric/ublas/io.hpp"
+
 class QJsonObject;
 
 namespace Isis {
@@ -31,6 +34,11 @@ namespace Isis {
    *   @history 2018-02-03 Ian Humphrey - Renamed read to readCsv. read() and write()
    *                           methods support JSON or binary serialization. Added
    *                           documentation to new Format enumeration.
+   *   @history 2018-03-19 Debbie A. Cook - Added simultaneousImages, 
+   *                           apriori variance/covariance matrix, adjusted point coordinates,
+   *                           and adjusted variance/covariance matrix to the read and
+   *                           write methods. Ref #5343.
+   *  
    */
   class LidarData {
 

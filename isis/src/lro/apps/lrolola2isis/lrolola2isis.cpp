@@ -17,6 +17,7 @@
 #include "LidarControlPoint.h"
 #include "LidarData.h"
 #include "Longitude.h"
+#include "Target.h"
 #include "SerialNumberList.h"
 #include "UserInterface.h"
 
@@ -38,6 +39,10 @@ void IsisMain() {
   FileName dataFile = ui.GetFileName("FROM");
   SerialNumberList cubeList = SerialNumberList(ui.GetFileName("CUBES"));
   double threshold = ui.GetDouble("THRESHOLD");
+  double rangeSigma = ui.GetDouble("POINT_RANGE_SIGMA");
+  double latSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
+  double lonSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
+  double radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
 
   QList<LidarCube> images;
   
@@ -60,6 +65,9 @@ void IsisMain() {
   lidarDataFile.read(dataFile.expanded());
   LidarData lidarDataSet;
   CubeManager cubeMgr;
+  Distance  majorAx;
+  Distance minorAx;
+  Distance polarAx;
   
   // Set up an automatic id generator for the point ids
   ID pointId = ID(ui.GetString("POINTID"));
@@ -73,16 +81,22 @@ void IsisMain() {
     Longitude lon(row[1].toDouble(), Angle::Units::Degrees);
     Distance radius(row[3].toDouble(), Distance::Units::Kilometers);
     double range = row[4].toDouble();
-    double sigma = 0; //TODO figure out how/where to calculate this
 //     QString quality = row[]; //TODO figure out how/where to find this value
     
     LidarControlPoint *lidarPoint = new LidarControlPoint;
     lidarPoint->SetId(pointId.Next());
     lidarPoint->setTime(time);
     lidarPoint->setRange(range);
-    lidarPoint->setSigmaRange(sigma);
-    lidarPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
+    lidarPoint->setSigmaRange(rangeSigma);
     
+    // Just set the point coordinates for now.  We need to wait until we set
+    // the target radii to be able to set the coordinate sigmas.  The sigmas
+    // will be converted to angles and the target radii are needed to do that.
+    SurfacePoint spoint(lat, lon, radius);
+    // lidarPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
+    
+    bool setSurfacePointRadii = true;
+      
     for (int j = 0; j < images.size(); j++) {
       Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
         
@@ -101,6 +115,38 @@ void IsisMain() {
               ControlMeasure *measure = new ControlMeasure;
               measure->SetCoordinate(camera->Sample(), camera->Line()); 
               measure->SetCubeSerialNumber(images[j].sn);
+
+              if (setSurfacePointRadii) {
+              // Get the radii and set the radii in the SurfacePoint
+                std::vector<Distance>  targetRadii;
+                targetRadii = camera->target()->radii();
+                majorAx = targetRadii[0];
+                minorAx = targetRadii[1];
+                polarAx = targetRadii[2];
+                setSurfacePointRadii = false;
+                spoint.SetRadii(majorAx, minorAx, polarAx);
+                spoint.SetSphericalSigmasDistance(
+                                     Distance(latSigma, Distance::Units::Meters),
+                                     Distance(lonSigma, Distance::Units::Meters),
+                                     Distance(radiusSigma, Distance::Units::Meters));
+                lidarPoint->SetAprioriSurfacePoint(spoint);
+                // if (camera->target()->shape()->hasValidTarget()) {
+                //   targetRadii = camera->target()->shape()->targetRadii();
+                // }
+                // else {
+                //   QString msg = "Valid target not defined in shape model ";
+                //   throw IException(IException::Unknown, msg, _FILEINFO_);
+                // }
+                  
+                // targid = camera->SpkTargetId();
+                // Distance  targetRadii[3];
+                // camera0>getDouble(
+                // camera->radii(targetRadii);
+                // majorAx = targetRadii[0];
+                // minorAx = targetRadii[1];
+                // polarAx = targetRadii[2];
+                // setSurfacePointRadii = false;
+              }
           
               lidarPoint->Add(measure);
               if (time >= images[j].startTime && time <= images[j].endTime) {
@@ -121,14 +167,6 @@ void IsisMain() {
       }        
     }
     // end image loop
-  // Debug lines
-  //   if (lidarPoint->snSimultaneous().size() > 0) {
-  // std::cout << "Number of simultaneous images is " <<
-  //   lidarPoint->snSimultaneous().size() << std::endl;
-  // std::cout << "Row index = " << i << std::endl;
-  // std::cout << "   sn[0] = " << lidarPoint->snSimultaneous()[0] << std::endl;
-  //   }
-  // End debug lines
     
     if (lidarPoint->GetNumMeasures() <= 0) {
       continue;

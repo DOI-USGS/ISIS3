@@ -18,7 +18,7 @@
     <change name="Makayla Shepherd and Tyler Wilson" date="2017-01-29">
       Original version
     </change>
-    <change name="Debbie Cook" date="2018-03-02">
+    <change name="Debbie Cook" date="2018-03-19">
       Added items that will be needed to bundle adjust:  new point keyword
       simultaneousImages that is an array of serial numbers of the measures
       on images taken simultaneously with the Lidar data, a threshold to
@@ -136,6 +136,57 @@
             </p>
           </description>
         </parameter>            
+    </group>
+    <group name="Point Uncertainties">
+         <parameter name="POINT_RANGE_SIGMA">
+          <type>double</type>
+          <brief> Range uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This value will be used as the range uncertainty 
+            for all points.  Units are meters.
+          </description>
+          <default>
+            <item>10.0</item>
+          </default>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+  
+         <parameter name="POINT_LATITUDE_SIGMA">
+          <brief> Latitude uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This value will be used as the latitude uncertainty
+            for all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <default><item>10.</item></default>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+  
+         <parameter name="POINT_LONGITUDE_SIGMA">
+          <brief> Longitude uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This optional value will be used as the longitude 
+            uncertainty for all points. Units are meters. 
+          </description>
+          <type>double</type>
+          <default><item>10.</item></default>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
+
+        <parameter name="POINT_RADIUS_SIGMA">
+          <brief> Radius uncertainty for all points (meters)
+          </brief>
+          <description> 
+            This value will be used as the radius uncertainty for 
+            all points.  Units are meters.
+          </description>
+          <type>double</type>
+          <default><item>10.</item></default>
+          <minimum inclusive="yes">0</minimum>
+        </parameter>
     </group>
   </groups>
 </application>

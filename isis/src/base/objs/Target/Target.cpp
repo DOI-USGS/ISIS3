@@ -58,13 +58,28 @@ namespace Isis {
     m_systemCode = new SpiceInt;
     m_radii.resize(3, Distance());
 
-      m_spice = spice;
+    m_spice = spice;
 
     // If we get this far, we know we have a kernels group.  Spice requires it.
     PvlGroup &kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
     PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     m_name = new QString;
+
+    // *** TODO ***
+    // Is TargetName a required keyword in the Isis labels? If so then if this call fails, the class
+    // should throw an error.  If not then what are the alternatives? Each alternative should be
+    // attempted and an error thrown in the case all options fail.  Basically this value should be
+    // loaded when the objected is created, or the object should not be created.  How can we
+    // tell if the request for the TargetName keyword fails to return anything? Should the
+    // NaifSpkCode, if it exists, override the code associated with the target name in all cases
+    // and not just he Sky case? The trykey settings below will not work for getting m_bodyCode.
+    // The frame code is totally different from the body code usually. SpkCode may work, because
+    // the spk will contail information describing the bode and not its frame.
+    //
+    // Basically, this constructor should load the specified values, including body code and radii,
+    // or throw an error.
+    
     *m_name = inst["TargetName"][0];
     QString trykey = "NaifIkCode";
 
@@ -197,14 +212,23 @@ namespace Isis {
     catch (IException &e) {
       try {
         if (m_spice) {
-          code = m_spice->getInteger("BODY_FRAME_CODE", 0);
+          code = m_spice->getInteger("NAIF_BODY_CODE", 0);  // Changed from BODY_FRAME_CODE
+          //                   which is wrong.  It is a totally different code and not used to label the radii.
+          //                   Stuart says some missions use the frame code to label radii.  Do we need
+          //                   to code for both? Discuss this with Stuart when he returns.  03-19-2018 DAC
           return code;
+        // Add this check for NAIF_SPK_CODE if NAIF_BODY_CODE fails.  Why not just call NaifBodyCode()
+        // or NaifSpkCode()?
         }
-        else if (lab.hasObject("NaifKeywords") 
-                 && lab.findObject("NaifKeywords").hasKeyword("BODY_FRAME_CODE") ) {
-          code = int(lab.findObject("NaifKeywords").findKeyword("BODY_FRAME_CODE"));
-          return code;
-        }
+        // else if (lab.hasObject("NaifKeywords") 
+        //          && lab.findObject("NaifKeywords").hasKeyword("NAIF_BODY_CODE") ) {
+        //   //  *** TODO ***
+        //   // Change from BODY_FRAME_CODE which is not the same as body code.  DAC 3-7-18
+        //   // I don't think this keyword is used in naifkeywords.  Maybe this should search the kernels group.
+        //   // For now comment this section out, because it isn't doing anything.
+        //   code = int(lab.findObject("NaifKeywords").findKeyword("NAIF_BODY_CODE"));
+        //   return code;
+        // }
         else {
           throw IException(e, 
                            IException::Unknown, 
