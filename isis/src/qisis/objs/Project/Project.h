@@ -229,6 +229,9 @@ namespace Isis {
    *                           activeControl and activeImageList when returning a default value.
    *                           This ensures that all the proper error checking is handled and
    *                           prevents duplicate code.
+   *   @history 2018-03-23 Ken Edmundson - Modified loadBundleSolutionInfo method to add the
+   *                           BundleSolutionInfo's output control id to the project member variable
+   *                           m_idToControlMap.
    */
   class Project : public QObject {
     Q_OBJECT

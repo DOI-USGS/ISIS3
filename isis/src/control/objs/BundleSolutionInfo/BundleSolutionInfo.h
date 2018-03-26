@@ -128,6 +128,14 @@ namespace Isis {
    *                              serialization support.
    *                           3) member variable m_txtBundleOutputFilename and associated accessor
    *                              for bundleout.txt file.
+   *   @history 2018-03-23 Ken Edmundson - modified...
+   *                           1) removed serialization of output control filename
+   *                           2) serialization of output control to be more robust, ensuring that
+   *                              the control's id is added to project upon reading back in. Also
+   *                              ensures that an open cneteditor widget containing a
+   *                              bundlesolutioninfo's output control is serialized properly.
+   *   @history 2018-03-26 Ken Edmundson - modified save method to properly save output control
+   *                           network file.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

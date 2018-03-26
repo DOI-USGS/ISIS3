@@ -401,12 +401,6 @@ namespace Isis {
     // create Control with output control net and add to m_bundleSolutionInfo
     m_bundleSolutionInfo->setOutputControl(new Control(m_project, outputControlName.expanded()));
 
-    // TODO: it seems like this new Control should be added to the Project, but this doesn't work
-    //       need to make it work, the alternative is the kluge in the JigsawWorkOrder::execute
-    //       method
-
-//    m_bundleSolutionInfo->setOutputControlNetworkFileName(jiggedControlName);
-
     // Iterate through all of the image lists (the "imports" in the project).
     QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
     foreach (ImageList *imageList, imageLists) {

@@ -1595,16 +1595,8 @@ namespace Isis {
                              .arg(bundleSolutionInfoRoot.path()),
                            _FILEINFO_);
         }
-        QString oldFile = oldPath + "/" + m_inputControlNetFileName->name();
-        QString newFile = newPath + "/" + m_inputControlNetFileName->name();
-        if (!QFile::copy(oldFile, newFile)) {
-          throw IException(IException::Io,
-                           QString("Failed to copy file [%1] to new file [%2]")
-                             .arg(m_inputControlNetFileName->name()).arg(newFile),
-                           _FILEINFO_);
-        }
-        oldFile = oldPath + "/" + m_outputControl->fileName();
-        newFile = newPath + "/" + m_outputControl->fileName();
+        QString oldFile = oldPath + "/" + FileName(m_outputControl->fileName()).name();
+        QString newFile = newPath + "/" + FileName(m_outputControl->fileName()).name();
         if (!QFile::copy(oldFile, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
@@ -1658,8 +1650,6 @@ namespace Isis {
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("name", m_name);
     stream.writeTextElement("runTime", runTime());
-//    stream.writeTextElement("inputFileName",
-//                            relativeBundlePath + m_inputControlNetFileName->name());
 
     QString relativePath = m_inputControlNetFileName->expanded().remove(project->newProjectRoot());
     // Get rid of any preceding "/" , but add on ending "/"
@@ -1669,8 +1659,6 @@ namespace Isis {
 
     stream.writeTextElement("inputFileName",
                             relativePath);
-    stream.writeTextElement("outputFileName",
-                            relativeBundlePath + FileName(m_outputControl->fileName()).name());
     stream.writeTextElement("bundleOutTXT",
                             relativeBundlePath + FileName(m_txtBundleOutputFilename).name());
     stream.writeTextElement("imagesCSV",
@@ -1696,7 +1684,13 @@ namespace Isis {
         }
         stream.writeEndElement();
       }
+
+      // save output control
+      stream.writeStartElement("outputControl");
+      m_outputControl->save(stream, project, relativeBundlePath);
+      stream.writeEndElement();
     }
+
     stream.writeEndElement(); //end bundleSolutionInfo
   }
 
@@ -1766,6 +1760,12 @@ namespace Isis {
         m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
             new ImageList(m_xmlHandlerProject, reader()));
       }
+      else if (localName == "outputControl") {
+        FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
+                                              + m_xmlHandlerBundleSolutionInfo->runTime());
+
+        m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, reader());
+      }
     }
     return true;
   }
@@ -1805,13 +1805,6 @@ namespace Isis {
       assert(m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName == NULL);
       m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName = new FileName(
         projectRoot + m_xmlHandlerCharacters);
-    }
-    else if (localName == "outputFileName") {
-      assert(m_xmlHandlerBundleSolutionInfo->m_outputControl == NULL);
-      delete m_xmlHandlerBundleSolutionInfo->m_outputControl;
-      FileName fname(projectRoot + m_xmlHandlerCharacters);
-      m_xmlHandlerBundleSolutionInfo->m_outputControl
-          = new Control(fname.expanded());
     }
     else if (localName == "bundleOutTXT") {
       m_xmlHandlerBundleSolutionInfo->m_txtBundleOutputFilename =
