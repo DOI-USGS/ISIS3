@@ -33,7 +33,7 @@ using namespace Isis;
 void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
                   double ographicCamPos[3], double omegaPhiKappa[3],
                   double isisFocalPlane2SocetPlateTranspose[3][3]);
-
+      
 void IsisMain() {
 
   // Use a regular Process
@@ -94,7 +94,7 @@ void IsisMain() {
     instrumentId = (QString) orig["InstrumentId"];
     spacecraftName = (QString) orig["SpacecraftName"];
   }
-
+     
   // Get sensor position and orientation (opk) angles
   double ographicCamPos[3] = {0.0, 0.0, 0.0};
   double omegaPhiKappa[3] = {0.0, 0.0, 0.0};
@@ -102,7 +102,7 @@ void IsisMain() {
       {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
   getCamPosOPK(spice, spacecraftName, et, cam, ographicCamPos,
                omegaPhiKappa,isisFocalPlane2SocetPlateTranspose);
-
+  
   // Determine the SOCET Set camera calibration file
   QString socetCamFile = socetCameraCalibrationPath;
 
@@ -122,7 +122,7 @@ void IsisMain() {
       socetCamFile += "VIK2B.cam";
     }
   }
-
+  
   //----------------------------------------.-------------
   //TO DO: Uncomment these lines when MEX SRC is supported
   //----------------------------------------.-------------
@@ -130,7 +130,7 @@ void IsisMain() {
   //  else if (spacecraftName == "MARS_EXPRESS") {
   //    socetCamFile += "SRC.cam";
   //  }
-  //-----------------------------------------------------
+  //----------------------------------------------------- 
   //TO DO: Uncomment these lines when Themis is supported
   //-----------------------------------------------------
   //  // THEMIS VIS images (MARS Odyssey)
@@ -160,13 +160,13 @@ void IsisMain() {
     else {
       socetCamFile += "Galileo_SSI.cam";
     }
-  }
+  } 
   else if (spacecraftName == "Cassini-Huygens") {
     // Get the image filter and replace "/" with "_"
     PvlGroup bandBin = cube.label()->findGroup("BandBin", Pvl::Traverse);
     QString filter = (QString) bandBin["FilterName"];
     filter.replace("/", "_");
-
+    
     socetCamFile += "Cassini_ISSNA_";
     socetCamFile += filter;
     socetCamFile += ".cam";
@@ -205,7 +205,7 @@ void IsisMain() {
   //TO DO: Uncomment these lines when Themis is supported
   //-----------------------------------------------------
   //  if (spacecraftName == "MARS_ODYSSEY") {
-  //    try {
+  //    try { 
   //      summation = (int) detectorMap->SampleScaleFactor();
   //    }
   //    catch (IException &e) {
@@ -248,11 +248,11 @@ void IsisMain() {
   }
   double sizeX = numSamples / pixelSize;
   double sizeY = numLines / pixelSize;
-
+  
   // Make sure the Socet Set project name has the .prj extension
   if (socetProject.endsWith(".prj", Qt::CaseInsensitive) == false)  socetProject += ".prj";
-
-  // Find cube base name w/o extensions & establish the Socet Set support file name
+  
+  // Find cube base name w/o extensions & establish the Socet Set support file name 
   // Note: I'm using the QFileInfo class because the baseName method in the ISIS
   // FileName class only strips the last extension, and we need the core name
   // of the file without any extensions, or path
@@ -353,7 +353,7 @@ void IsisMain() {
     double sampleSumming = (int) detectorMap->SampleScaleFactor();
     double lineSumming = (int) detectorMap->LineScaleFactor();
 
-    // Get the Starting Detector Line/Sample
+    // Get the Starting Detector Line/Sample 
     double startingSample = detectorMap->AdjustedStartingSample();
     double startingLine = detectorMap->AdjustedStartingLine();
 
@@ -419,28 +419,6 @@ void IsisMain() {
     toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
   }
 
-  // Add the target radii
-  Distance targetRadii[3];
-  if (cube.label()->hasGroup("Mapping")) {
-    PvlGroup &mappingGroup = cube.label()->findGroup("Mapping");
-    targetRadii[0].setMeters(toDouble(mappingGroup["EquatorialRadius"][0]));
-    targetRadii[2].setMeters(toDouble(mappingGroup["PolarRadius"][0]));
-  }
-  else {
-    try {
-      cam->radii(targetRadii);
-    }
-    catch (IException &e) {
-      QString msg = "Failed to get target body radii from cube.";
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
-    }
-  }
-  double eccentricity = 1.0 - (targetRadii[2].meters() * targetRadii[2].meters())
-                            / (targetRadii[0].meters() * targetRadii[0].meters());
-  eccentricity = sqrt(eccentricity);
-  toStrm << "SEMI_MAJOR_AXIS  " << targetRadii[0].meters() <<"\n";
-  toStrm << "ECCENTRICITY     " << eccentricity <<"\n";
-
 } //End IsisMain
 
 
@@ -492,7 +470,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
 
   //-----------------------------------------------------
   //TO DO: Uncomment these lines when Themis-VIS is supported
-  //-----------------------------------------------------
+  //----------------------------------------------------- 
   //  else if (spacecraftName == "MARS_ODYSSEY" || spacecraftName == "Galileo Orbiter" ||
   //          spacecraftName == "Cassini-Huygens" || spacecraftName == "Messenger" ) {
   //-----------------------------------------------------
@@ -513,11 +491,11 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   double j2000ToBodyFixedRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
                                                  {0.0, 0.0, 0.0},
                                                  {0.0, 0.0, 0.0}};
-
+                                                 
   double j2000ToCameraRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
                                               {0.0, 0.0, 0.0},
                                               {0.0, 0.0, 0.0}};
-
+    
   for (int j = 0; j < 3; j++) {
     for (int k = 0; k < 3; k++) {
       j2000ToBodyFixedRotationMatrix[j][k] = j2000ToBodyFixedMatrixVector[3 * j + k];
@@ -561,7 +539,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
   double socetPlateToOcentricGroundRotationMatrix[3][3] = {{0.0, 0.0, 0.0},
                                                            {0.0, 0.0, 0.0},
                                                            {0.0, 0.0, 0.0}};
-
+                                                           
   mxmt_c (isisFocalPlane2SocetPlate, cameraToBodyFixedRotationMatrix,
           socetPlateToOcentricGroundRotationMatrix);
 
@@ -615,6 +593,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
 
   // Return the transpose of the isisFocalPlane2SocetPlate matrix for the FrameOffAxis sensor model
   xpose_c(isisFocalPlane2SocetPlate, isisFocalPlane2SocetPlateTranspose);
-
+  
   return;
 }
+
