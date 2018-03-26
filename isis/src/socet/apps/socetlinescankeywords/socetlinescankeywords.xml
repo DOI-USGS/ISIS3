@@ -76,7 +76,7 @@
       velocity values instead of using SPICE velocity data blobs.  Fixes #1672.
     </change>
     <change name="Jesse Mapel" date="2018-03-23">
-      Added SEMI_MAJOR_AXIS and ECCENTRICITY to the output.
+      Added SEMI_MAJOR_AXIS and ECCENTRICITY to the output. Fixes #5362.
     </change>
   </history>
 

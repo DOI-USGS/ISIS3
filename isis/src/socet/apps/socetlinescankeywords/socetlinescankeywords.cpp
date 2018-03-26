@@ -694,6 +694,27 @@ void IsisMain() {
   toStrm << "SENSOR_TYPE USGSAstroLineScanner" << endl;
   toStrm << "SENSOR_MODE UNKNOWN" << endl;
 
+  Distance targetRadii[3];
+  if (cube.label()->hasGroup("Mapping")) {
+    PvlGroup &mappingGroup = cube.label()->findGroup("Mapping");
+    targetRadii[0].setMeters(toDouble(mappingGroup["EquatorialRadius"][0]));
+    targetRadii[2].setMeters(toDouble(mappingGroup["PolarRadius"][0]));
+  }
+  else {
+    try {
+      cam->radii(targetRadii);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to get target body radii from cube.";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+  double eccentricity = 1.0 - (targetRadii[2].meters() * targetRadii[2].meters())
+                            / (targetRadii[0].meters() * targetRadii[0].meters());
+  eccentricity = sqrt(eccentricity);
+  toStrm << "SEMI_MAJOR_AXIS  " << targetRadii[0].meters() <<"\n";
+  toStrm << "ECCENTRICITY     " << eccentricity <<"\n";
+
   toStrm << "FOCAL " << focal << endl;
 
   toStrm << "ATMCO";
@@ -832,28 +853,6 @@ void IsisMain() {
   toStrm << "STARTING_LINE " << startingLine << endl;
   toStrm << "STARTING_EPHEMERIS_TIME " << setprecision(25) << etStart << endl;
   toStrm << "CENTER_EPHEMERIS_TIME " << etCenter << endl;
-
-  // Add the target radii
-  Distance targetRadii[3];
-  if (cube.label()->hasGroup("Mapping")) {
-    PvlGroup &mappingGroup = cube.label()->findGroup("Mapping");
-    targetRadii[0].setMeters(toDouble(mappingGroup["EquatorialRadius"][0]));
-    targetRadii[2].setMeters(toDouble(mappingGroup["PolarRadius"][0]));
-  }
-  else {
-    try {
-      cam->radii(targetRadii);
-    }
-    catch (IException &e) {
-      QString msg = "Failed to get target body radii from cube.";
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
-    }
-  }
-  double eccentricity = 1.0 - (targetRadii[2].meters() * targetRadii[2].meters())
-                            / (targetRadii[0].meters() * targetRadii[0].meters());
-  eccentricity = sqrt(eccentricity);
-  toStrm << "SEMI_MAJOR_AXIS  " << targetRadii[0].meters() <<"\n";
-  toStrm << "ECCENTRICITY     " << eccentricity <<"\n";
 
 } // end main
 
