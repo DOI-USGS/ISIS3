@@ -1595,16 +1595,8 @@ namespace Isis {
                              .arg(bundleSolutionInfoRoot.path()),
                            _FILEINFO_);
         }
-        QString oldFile = oldPath + "/" + m_inputControlNetFileName->name();
-        QString newFile = newPath + "/" + m_inputControlNetFileName->name();
-        if (!QFile::copy(oldFile, newFile)) {
-          throw IException(IException::Io,
-                           QString("Failed to copy file [%1] to new file [%2]")
-                             .arg(m_inputControlNetFileName->name()).arg(newFile),
-                           _FILEINFO_);
-        }
-        oldFile = oldPath + "/" + m_outputControl->fileName();
-        newFile = newPath + "/" + m_outputControl->fileName();
+        QString oldFile = oldPath + "/" + FileName(m_outputControl->fileName()).name();
+        QString newFile = newPath + "/" + FileName(m_outputControl->fileName()).name();
         if (!QFile::copy(oldFile, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
