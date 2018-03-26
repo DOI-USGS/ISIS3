@@ -23,6 +23,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFontDatabase>
 #include <QHeaderView>
 #include <QSizePolicy>
 #include <QStandardItem>
@@ -171,7 +172,12 @@ namespace Isis {
 
     QTextStream in(&file);
     QTextEdit *qText=new QTextEdit();
-    qText->setFontFamily("Courier");
+
+    // From QFontDatabase::systemFont(SystemFont type) method description: returns most adequate
+    //      font for a given typecase (here FixedFont) for proper integration with system's look and
+    //      feel.
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    qText->setFontFamily(fixedFont.family());
 
     while (!in.atEnd()) {
       qText->append(in.readLine());
