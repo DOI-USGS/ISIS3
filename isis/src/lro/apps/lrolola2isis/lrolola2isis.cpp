@@ -68,7 +68,6 @@ void IsisMain() {
   Distance  majorAx;
   Distance minorAx;
   Distance polarAx;
-  bool setSurfacePointRadii = true;
   
   // Set up an automatic id generator for the point ids
   ID pointId = ID(ui.GetString("POINTID"));

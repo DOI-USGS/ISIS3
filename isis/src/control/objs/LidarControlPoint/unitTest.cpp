@@ -11,7 +11,8 @@ int main() {
   
   cout << "LidarControlPoint Unit Test" << endl;
   
-  LidarControlPoint lcp(iTime(13.00), 10, 12);
+  // LidarControlPoint lcp(iTime(13.00), 10, 12);
+  LidarControlPoint lcp;
   
   
   cout << "Testing EditLocking" << endl;
@@ -76,5 +77,19 @@ int main() {
   }
   else {
     cout << "Error: Could not set the time." << endl;
+  }
+
+  cout << "Testing addSimultaneous and getter" << endl;
+  QString newSerial = "LRO/1/286265995:36824/NACL";
+  if (lcp.addSimultaneous(newSerial) == ControlPoint::Status::Success) {
+    cout << "Serial number for simultaneous image added successfully" << endl;
+    QList < QString > simultaneousList = lcp.snSimultaneous();
+    if (simultaneousList[0] != "LRO/1/286265995:36824/NACL") {
+      cout << "Error:  Incorrect serial number added to list:  " <<
+        simultaneousList[0] << endl;
+    }
+  }
+  else {
+      cout << "Add to simultaneous image list failed!" << endl;
   }
 }

@@ -214,14 +214,14 @@ namespace Isis {
 
         if (pointObject.contains("aprioriMatrix") &&
                                  pointObject["aprioriMatrix"].isArray()) {
-          QJsonArray  aprioriMatrixArray = pointObject["apriorMatrix"].toArray();
+          QJsonArray  aprioriMatrixArray = pointObject["aprioriMatrix"].toArray();
           boost::numeric::ublas::symmetric_matrix<double, upper> aprioriMatrix(3);
           aprioriMatrix.clear();
           aprioriMatrix(0, 0) = aprioriMatrixArray[0].toDouble();
-          aprioriMatrix(0, 1) = aprioriMatrixArray[1].toDouble();
-          aprioriMatrix(0, 2) = aprioriMatrixArray[2].toDouble();
+          aprioriMatrix(0, 1) = aprioriMatrix(1, 0) = aprioriMatrixArray[1].toDouble();
+          aprioriMatrix(0, 2) = aprioriMatrix(2, 0) = aprioriMatrixArray[2].toDouble();
           aprioriMatrix(1, 1) = aprioriMatrixArray[3].toDouble();
-          aprioriMatrix(1, 2) = aprioriMatrixArray[4].toDouble();
+          aprioriMatrix(1, 2) = aprioriMatrix(2, 1) = aprioriMatrixArray[4].toDouble();
           aprioriMatrix(2, 2) = aprioriMatrixArray[5].toDouble();
           
           lcp->SetAprioriSurfacePoint(SurfacePoint(Latitude(latitude, Angle::Units::Degrees),
@@ -259,10 +259,10 @@ namespace Isis {
             boost::numeric::ublas::symmetric_matrix<double, upper> adjustedMatrix(3);
             adjustedMatrix.clear();
             adjustedMatrix(0, 0) = adjustedMatrixArray[0].toDouble();
-            adjustedMatrix(0, 1) = adjustedMatrixArray[1].toDouble();
-            adjustedMatrix(0, 2) = adjustedMatrixArray[2].toDouble();
+            adjustedMatrix(0, 1) = adjustedMatrix(1, 0) = adjustedMatrixArray[1].toDouble();
+            adjustedMatrix(0, 2) = adjustedMatrix(2, 0) = adjustedMatrixArray[2].toDouble();
             adjustedMatrix(1, 1) = adjustedMatrixArray[3].toDouble();
-            adjustedMatrix(1, 2) = adjustedMatrixArray[4].toDouble();
+            adjustedMatrix(1, 2) = adjustedMatrix(2, 1) = adjustedMatrixArray[4].toDouble();
             adjustedMatrix(2, 2) = adjustedMatrixArray[5].toDouble();
           
             lcp->SetAdjustedSurfacePoint(SurfacePoint(Latitude(adjustedLatitude, Angle::Units::Degrees),
@@ -380,12 +380,12 @@ namespace Isis {
         // Serialize the apriori matrix
         symmetric_matrix<double, upper> aprioriMatrix = aprioriSurfacePoint.GetSphericalMatrix();
         QJsonArray aprioriMatrixArray;
-        aprioriMatrixArray += toString(aprioriMatrix(0, 0));
-        aprioriMatrixArray += toString(aprioriMatrix(0, 1));
-        aprioriMatrixArray += toString(aprioriMatrix(0, 2));
-        aprioriMatrixArray += toString(aprioriMatrix(1, 1));
-        aprioriMatrixArray += toString(aprioriMatrix(1, 2));
-        aprioriMatrixArray += toString(aprioriMatrix(2, 2));
+        aprioriMatrixArray += aprioriMatrix(0, 0);
+        aprioriMatrixArray += aprioriMatrix(0, 1);
+        aprioriMatrixArray += aprioriMatrix(0, 2);
+        aprioriMatrixArray += aprioriMatrix(1, 1);
+        aprioriMatrixArray += aprioriMatrix(1, 2);
+        aprioriMatrixArray += aprioriMatrix(2, 2);
 
         // If the covariance matrix has a value, add it to the PVL point.
         if ( aprioriMatrix(0, 0) != 0.0
@@ -410,12 +410,12 @@ namespace Isis {
         // Serialize the adjusted matrix
         symmetric_matrix<double, upper> adjustedMatrix = adjustedSurfacePoint.GetSphericalMatrix();
         QJsonArray adjustedMatrixArray;
-        adjustedMatrixArray += toString(adjustedMatrix(0, 0));
-        adjustedMatrixArray += toString(adjustedMatrix(0, 1));
-        adjustedMatrixArray += toString(adjustedMatrix(0, 2));
-        adjustedMatrixArray += toString(adjustedMatrix(1, 1));
-        adjustedMatrixArray += toString(adjustedMatrix(1, 2));
-        adjustedMatrixArray += toString(adjustedMatrix(2, 2));
+        adjustedMatrixArray += adjustedMatrix(0, 0);
+        adjustedMatrixArray += adjustedMatrix(0, 1);
+        adjustedMatrixArray += adjustedMatrix(0, 2);
+        adjustedMatrixArray += adjustedMatrix(1, 1);
+        adjustedMatrixArray += adjustedMatrix(1, 2);
+        adjustedMatrixArray += adjustedMatrix(2, 2);
 
         // If the covariance matrix has a value, add it to the PVL point.
         if ( adjustedMatrix(0, 0) != 0.0
