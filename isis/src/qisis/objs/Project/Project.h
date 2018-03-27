@@ -150,15 +150,11 @@ namespace Isis {
    *                           imports, shape imports, and bundle solution info. Fixes #4855,
    *                           #4979, #4980.
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
-   *
-   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969.
-   *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
    *                           reenable the CNet Tool when a control net is made active.
    *                           Fixes #5046.
    *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969
+   *                           allow for opening of a new project. Fixes #4969.
    *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
    *                           Fixes #4715.
    *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
@@ -235,6 +231,9 @@ namespace Isis {
    *   @history 2018-03-26 Tracie Sucharski - When setting a new active control do not close the old
    *                           active control net if it is still being viewed in a CnetEditorWidget.
    *                           References #5026.
+   *   @history 2018-03-27 Tracie Sucharski - Removed the calls to work orders from activeImageList
+   *                           and activeControl methods.  Additional errors checks needed for
+   *                           default values that are not in work orders.  Fixes #5256.
    */
   class Project : public QObject {
     Q_OBJECT

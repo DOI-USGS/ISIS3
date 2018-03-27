@@ -425,6 +425,7 @@ namespace Isis {
    * are no longer a part of the project.
    */
   void Project::clear() {
+    qDebug()<<"Project::clear()";
     m_clearing = true;
 
     // We need to look through the project.xml and remove every directory not in the project
@@ -504,7 +505,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-
+        qDebug()<<"Project::clear  after cnets cleanup";
         QDir imagesDir(m_projectRoot->path() + "/images/");
         imagesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
         QStringList imagesList = imagesDir.entryList();
@@ -516,7 +517,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-
+        qDebug()<<"Project::clear  after images cleanup";
         QDir shapesDir(m_projectRoot->path() + "/shapes/");
         shapesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
         QStringList shapesList = shapesDir.entryList();
@@ -528,7 +529,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-
+        qDebug()<<"Project::clear  after shapes cleanup";
         QDir bundlesDir(m_projectRoot->path() + "/results/bundle/");
         bundlesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
         QStringList bundleList = bundlesDir.entryList();
@@ -540,7 +541,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-
+        qDebug()<<"Project::clear  after results cleanup";
         projectXml.close();
       }
 
@@ -569,9 +570,11 @@ namespace Isis {
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
     m_workOrderHistory->clear();
-
+    qDebug()<<"Project::clear Before directory->clean()";
     directory()->clean();
+    qDebug()<<"Project::clear After directory->clean()";
     setClean(true);
+    qDebug()<<"Project::clear after setClean";
   }
 
 
@@ -1746,10 +1749,12 @@ namespace Isis {
   /**
    * @brief Return the Active Control (control network)
    *
-   * Returns the active control (control network) for views which need to operate on
+   * @description Returns the active control (control network) for views which need to operate on
    * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
    * IMPORTANT:  Returns NULL if no active Control. 
-   *
+   *  
+   * @return @b Control * Returns the active Control if set, otherwise returns NULL
+   *  
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
    *   @history 2017-05-17 Tracie Sucharski - If no active control set & there is only one control
@@ -1760,14 +1765,11 @@ namespace Isis {
    */
   Control *Project::activeControl() {
 
-    if (!m_activeControl && m_controls->count() == 1) {
-      if (m_controls->at(0)->count() == 1 && m_images->count() > 1) {
-        SetActiveControlWorkOrder *workOrder = new SetActiveControlWorkOrder(this);
-        addToProject(workOrder);
-
-
-//      QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
-//      setActiveControl(controlName);
+    if (!m_activeControl && (m_controls->count() == 1 && m_controls->at(0)->count() ==1)) {
+      //  Can only set a default control if an active imageList exists or if a default can be set
+      if (activeImageList()) {
+        QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
+        setActiveControl(controlName);
       }
     }
     return m_activeControl;
@@ -1837,7 +1839,8 @@ namespace Isis {
    *
    * Returns the active ImageList for views which need to operate on the
    * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView. 
-   * IMPORTANT:  Returns NULL if no active ImageList can be set. 
+   * IMPORTANT:  Returns NULL if active ImageList is not set and a default cannot be set if there 
+   *             are multiple image lists in the project. 
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
@@ -1847,13 +1850,9 @@ namespace Isis {
   ImageList *Project::activeImageList() {
 
     if (!m_activeImageList && m_images->count() == 1) {
-        SetActiveImageListWorkOrder *workOrder = new SetActiveImageListWorkOrder(this);
-        addToProject(workOrder);
-
-
-
-//        QString imageList = m_images->at(0)->name();
-//        setActiveImageList(imageList);
+      QString imageList = m_images->at(0)->name();
+      
+      setActiveImageList(imageList);
     }
     return m_activeImageList;
   }
