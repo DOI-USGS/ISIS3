@@ -99,9 +99,12 @@ namespace Isis {
     */
    void ControlNetTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
-     // TODO:  TLS 7-25-17  This method is called by Project::open before there are any viewports,
-     // so the following command seg faults.  Need to add check for viewports or ??
-     //paintAllViewports();
+    
+     //  Cannot use Tool::cubeViewportList() because it does not properly return a NULL if viewports
+     //  don't exist.
+     if (workspace() && workspace()->cubeViewportList()) {
+       paintAllViewports();
+     }
    }
 
 

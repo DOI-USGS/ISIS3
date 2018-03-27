@@ -54,6 +54,8 @@ namespace Isis {
    *                           networks Fixes #4567
    *   @history 2018-03-12 Tracie Sucharski - Fixed some documentation leftover from renaming from
    *                           IpceTool.  References #5090.
+   *   @history 2018-03-27 Tracie Sucharski - Redraw cube viewports when a new control net is
+   *                           loaded.
    */
   class ControlNetTool : public Tool {
     Q_OBJECT
