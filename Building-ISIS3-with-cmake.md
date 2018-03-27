@@ -8,7 +8,7 @@ From the terminal window:
 * cd into the build directory
 * Enter the following commands:
 
-`cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2FLAG=OFF -GNinja <source directory>`
+`cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2KFLAG=OFF -GNinja <source directory>`
 
 If using the -GNinja flag:  `ninja` -OR- `ninja install`
 
