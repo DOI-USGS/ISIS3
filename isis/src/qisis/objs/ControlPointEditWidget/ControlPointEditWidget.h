@@ -66,8 +66,8 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Added methods to return the current editPoint and
    *                           current editPoint Id.  Removed measure table methods. Fixes #5007,
    *                           #5008.
-  *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
-  *                            SerialNumberList.remove()
+   *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
+   *                            SerialNumberList.remove()
    *   @history 2017-08-09 Christopher Combs - Added QPushButton and slot for reloading a point's
    *                           measures in the ChipViewports. Fixes #5070.
    *   @history 2017-08-09 Christopher Combs - Added Apriori Latitude, Longitude, and Radius to
@@ -77,7 +77,10 @@ namespace Isis {
    *   @history 2017-08-11 Tracie Sucharski - Fixed save point and colorization of buttons.
    *                           Fixes #4984.
    *   @history 2017-08-15 Tracie Sucharski - When ControlPoint is deleted, set the visibility of
-   *                           this widget to false, then to true in loadPoint().  Fixes #5073.
+   *                            this widget to false, then to true in loadPoint().  Fixes #5073.
+   *   @history 2018-03-23 Tracie Sucharski - Update the cnet filename with current cnet.
+   *   @history 2018-03-26 Tracie Sucharski - Update editor if a new active control net is set in
+   *                            ipce. References #4567.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -104,6 +107,7 @@ namespace Isis {
     public slots:
       void setSerialNumberList(SerialNumberList *snList);
       void setControl(Control *control);
+      void setControlFromActive();
       void setEditPoint(ControlPoint *controlPoint, QString serialNumber = "");
       void deletePoint(ControlPoint *controlPoint);
 

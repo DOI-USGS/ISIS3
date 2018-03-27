@@ -232,6 +232,9 @@ namespace Isis {
    *   @history 2018-03-23 Ken Edmundson - Modified loadBundleSolutionInfo method to add the
    *                           BundleSolutionInfo's output control id to the project member variable
    *                           m_idToControlMap.
+   *   @history 2018-03-26 Tracie Sucharski - When setting a new active control do not close the old
+   *                           active control net if it is still being viewed in a CnetEditorWidget.
+   *                           References #5026.
    */
   class Project : public QObject {
     Q_OBJECT

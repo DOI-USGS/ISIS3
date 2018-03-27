@@ -579,18 +579,39 @@ namespace Isis {
   /**
    * New control network being edited
    *
-   * @param cnet (ControlNet *) The control network to edit
-   * @param filename (Qstring) Need filename to write to widget label.  ControlNet doesn't
-   *                       contain a filename.
+   * @param cnet (Control *) The control network to edit
+   *  
    * @internal
   */
   void ControlPointEditWidget::setControl(Control *control) {
     //  TODO  more error checking
     m_controlNet = control->controlNet();
     m_cnetFileName = control->fileName();
+
+    m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
     setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
 
     emit newControlNetwork(m_controlNet);
+  }
+
+
+  /**
+   * New active control was set from ipce 
+   *  
+   * TODO:  This will need to be redesigned with the ::setControl method to better handle editing 
+   * points from different cnets. 
+   */
+  void ControlPointEditWidget::setControlFromActive() {
+
+    if (m_directory->project()->activeControl()) {
+      m_controlNet = m_directory->project()->activeControl()->controlNet();
+      m_cnetFileName = m_directory->project()->activeControl()->fileName();
+
+      m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
+      setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
+
+      emit newControlNetwork(m_controlNet);    
+    }
   }
 
 

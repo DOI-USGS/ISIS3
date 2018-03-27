@@ -533,6 +533,9 @@ namespace Isis {
 
 
   void Directory::newActiveControl(bool newControl) {
+
+    // If the new active control is the same as what is showing in the cnetEditorWidget, allow
+    // editing of control points from the widget, otherwise turnoff from context menu
     foreach(CnetEditorWidget *cnetEditorView, m_cnetEditorViewWidgets) {
       if (cnetEditorView->control() == project()->activeControl()->controlNet()) {
         cnetEditorView->pointTableView()->content()->setActiveControlNet(true);
@@ -618,6 +621,7 @@ namespace Isis {
     QMenuBar *menuBar = new QMenuBar;
     resultLayout->addWidget(menuBar, row, 0, 1, 2);
     row++;
+
     CnetEditorWidget *mainWidget = new CnetEditorWidget(network, configFile.expanded());
     resultLayout->addWidget(mainWidget, row, 0, 1, 2);
     row++;
@@ -743,16 +747,19 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
     connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
 
-    if (!project()->activeControl()) {
-      QList<QAction *> toolbar = result->toolPadActions();
-      QAction* cnetAction = toolbar[0];
-      ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
+    // Note:  This assumes the Control Net tool is the 1st in the toolpad.
+    QList<QAction *> toolbar = result->toolPadActions();
+    QAction* cnetAction = toolbar[0];
+    ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
 
+    connect (project(), SIGNAL(activeControlSet(bool)),
+             cnetAction, SLOT(setEnabled(bool)));
+    connect (project(), SIGNAL(activeControlSet(bool)),
+             cnetTool, SLOT(loadNetwork()));
+
+    //  If an active control has not been set, make the control net tool inactive
+    if (!project()->activeControl()) {
       cnetAction->setEnabled(false);
-      connect (project(), SIGNAL(activeControlSet(bool)),
-              cnetAction, SLOT(setEnabled(bool)));
-      connect (project(), SIGNAL(activeControlSet(bool)),
-              cnetTool, SLOT(loadNetwork()));
     }
 
     return result;
@@ -796,18 +803,19 @@ namespace Isis {
     //  to be drawn with different color/shape.
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
 
-    //  Control Net tool will only be active if the project has an active Control.  Note:  This
-    //  assumes the Control Net tool is the 4th in the toolpad.
-    if (!project()->activeControl()) {
-      QList<QAction *> toolbar = result->toolPadActions();
-      QAction* cnetAction = toolbar[3];
-      MosaicControlNetTool *cnetButton = static_cast<MosaicControlNetTool *>(cnetAction->parent());
+    // Note:  This assumes the Control Net tool is the 4th in the toolpad.
+    QList<QAction *> toolbar = result->toolPadActions();
+    QAction* cnetAction = toolbar[3];
+    MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(cnetAction->parent());
 
+    connect (project(), SIGNAL(activeControlSet(bool)),
+             cnetAction, SLOT(setEnabled(bool)));
+    connect (project(), SIGNAL(activeControlSet(bool)),
+             cnetTool, SLOT(loadNetwork()));
+
+    //  Control Net tool will only be active if the project has an active Control.
+    if (!project()->activeControl()) {
       cnetAction->setEnabled(false);
-      connect (project(), SIGNAL(activeControlSet(bool)),
-              cnetAction, SLOT(setEnabled(bool)));
-      connect (project(), SIGNAL(activeControlSet(bool)),
-              cnetButton, SLOT(loadNetwork()));
     }
 
     return result;
@@ -865,6 +873,8 @@ namespace Isis {
 
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
+      connect (project(), SIGNAL(activeControlSet(bool)),
+               result->controlPointEditWidget(), SLOT(setControlFromActive()));
     }
 
     return controlPointEditView();
@@ -1077,6 +1087,26 @@ namespace Isis {
 
     m_cnetEditorViewWidgets.removeAll(cnetEditorWidget);
     m_project->setClean(false);
+  }
+
+
+  /**
+   * @description Return true if control is not currently being viewed in a CnetEditorWidget 
+   *  
+   * @param Control * Control used to search current CnetEditorWidgets 
+   *  
+   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget 
+   */
+  bool Directory::controlUsedInCnetEditorWidget(Control *control) {
+
+    bool result;
+    if ( m_controlMap.count(control) == 0) {
+      result = false;
+    }
+    else {
+      result = true;
+    }
+    return result;
   }
 
 

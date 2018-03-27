@@ -1711,7 +1711,10 @@ namespace Isis {
       ProjectItem *item = directory()->model()->findItemData(m_activeControl->
                           displayProperties()->displayName(), Qt::DisplayRole);
       item->setTextColor(Qt::black);
-      m_activeControl->closeControlNet();
+      // Make sure active not used in a CnetEditorWidget before closing
+      if (!directory()->controlUsedInCnetEditorWidget(m_activeControl)) {
+        m_activeControl->closeControlNet();
+      }
     }
 
     ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
