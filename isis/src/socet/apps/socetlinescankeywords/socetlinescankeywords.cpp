@@ -712,8 +712,8 @@ void IsisMain() {
   double eccentricity = 1.0 - (targetRadii[2].meters() * targetRadii[2].meters())
                             / (targetRadii[0].meters() * targetRadii[0].meters());
   eccentricity = sqrt(eccentricity);
-  toStrm << "SEMI_MAJOR_AXIS  " << targetRadii[0].meters() <<"\n";
-  toStrm << "ECCENTRICITY     " << eccentricity <<"\n";
+  toStrm << "SEMI_MAJOR_AXIS  " << targetRadii[0].meters() << "\n";
+  toStrm << "ECCENTRICITY     " << eccentricity << "\n";
 
   toStrm << "FOCAL " << focal << endl;
 
