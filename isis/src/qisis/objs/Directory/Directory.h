@@ -212,7 +212,10 @@ namespace Isis {
    *                           CnetEditorWidgets. Added ability to view bundleout.txt file in method
    *                           addBundleObservationView.
    *   @history 2018-03-14 Tracie Sucharski - Changed MosaicControlNetTool to ControlNetTool in
-   *                           addCubeDnView. References #5026.
+   *                           addCubeDnView. Added method controlUsedInCnetEditorWidget so Project
+   *                           knows whether it is safe to close a control net when a new active is
+   *                           set. References #5026.
+   *  
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -267,6 +270,8 @@ namespace Isis {
       QList<QProgressBar *> progressBars();
       ControlPointEditView *controlPointEditView();
 //      ChipViewportsWidget *controlPointChipViewports();
+
+      bool controlUsedInCnetEditorWidget(Control *control);
 
       // Return the control point Id currently in the ControlPointEditWidget, if it exists
       QString editPointId();
