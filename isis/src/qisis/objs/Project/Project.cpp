@@ -425,7 +425,6 @@ namespace Isis {
    * are no longer a part of the project.
    */
   void Project::clear() {
-    qDebug()<<"Project::clear()";
     m_clearing = true;
 
     // We need to look through the project.xml and remove every directory not in the project
@@ -505,7 +504,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-        qDebug()<<"Project::clear  after cnets cleanup";
+
         QDir imagesDir(m_projectRoot->path() + "/images/");
         imagesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
         QStringList imagesList = imagesDir.entryList();
@@ -517,7 +516,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-        qDebug()<<"Project::clear  after images cleanup";
+
         QDir shapesDir(m_projectRoot->path() + "/shapes/");
         shapesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
         QStringList shapesList = shapesDir.entryList();
@@ -529,7 +528,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-        qDebug()<<"Project::clear  after shapes cleanup";
+
         QDir bundlesDir(m_projectRoot->path() + "/results/bundle/");
         bundlesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
         QStringList bundleList = bundlesDir.entryList();
@@ -541,7 +540,7 @@ namespace Isis {
             tempDir.removeRecursively();
           }
         }
-        qDebug()<<"Project::clear  after results cleanup";
+        
         projectXml.close();
       }
 
@@ -570,11 +569,9 @@ namespace Isis {
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
     m_workOrderHistory->clear();
-    qDebug()<<"Project::clear Before directory->clean()";
+    
     directory()->clean();
-    qDebug()<<"Project::clear After directory->clean()";
     setClean(true);
-    qDebug()<<"Project::clear after setClean";
   }
 
 
