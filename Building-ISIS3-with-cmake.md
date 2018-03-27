@@ -7,11 +7,13 @@ From the terminal window:
 * mkdir build
 * cd into the build directory
 * Enter the following commands:
-```
-cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2FLAG=OFF -GNinja <source directory>
-ninja -OR- ninja install -OR- make -j# -OR- make install -j#
-```
-* This is known as the "config step"
+
+`cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2FLAG=OFF -GNinja <source directory>`
+
+If using the -GNinja flag:  `ninja` -OR- `ninja install`
+
+Otherwise: `make -j#` -OR- `make install -j#`
+
 
 * The -GNinja flag specifies creating Google ninja Makefile (an alternative Make system to the traditional GNU make system). Ninja is faster and allows for partial rebuilds, but you can remove this flag if you don't want to use ninja.
 
@@ -19,9 +21,9 @@ ninja -OR- ninja install -OR- make -j# -OR- make install -j#
 
 * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `path/to/isis` 
 
-``` make -OR- ninja ``` will make ISIS inside of your current working directory
+* ``` make -OR- ninja ``` will make ISIS inside of your current working directory
 
-``` make install -OR- ninja install ``` will install the binaries for user use inside of the \<install directory\>
+* ``` make install -OR- ninja install ``` will install the binaries for user use inside of the \<install directory\>
 
 * When using ``` ninja install ``` the ISIS3 apps are placed in \<install directory\>/bin. 
  
