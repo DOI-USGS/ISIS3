@@ -57,11 +57,6 @@ message("Detected Operating System: ${osVersionString}")
 #  as a static library using some specialized code in Utilities.cmake.
 set(BUILD_SHARED_LIBS ON)
 
-# Specify flags used
-# on linux, add the conda prefix to handle possible issues with rpaths at link time
-# sometimes third parties do not set their rpaths correctly
-set(thirdPartyCppFlags -Wall -std=c++11 -DISIS_LITTLE_ENDIAN=1 -fPIC -Wno-unused-parameter -Wno-overloaded-virtual  -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
-
 # Specify user options that can be passed in with the initial CMake command.
 option(isis3Data       "Directory containing Isis3Data"                 OFF )
 option(isis3TestData   "Directory containing Isis3TestData"             OFF )
@@ -71,76 +66,194 @@ option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" ON  )
-option(develop         "Use a devleopment configuration"                ON  )
+option(pybindings      "Turn on to build Python bindings"               OFF )
+
+Iterate through all variables and extract the libraries and include directories
+get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
+
+# Get all include dir variables
+foreach (_variableName ${_variableNames})
+#message("VAR=${_variableName}")
+   if (_variableName MATCHES ".+_INCLUDE_DIR$")
+     list(APPEND ALLINCDIRS "${${_variableName}}")
+   elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
+     list(APPEND ALLINCDIRS "${${_variableName}}")
+   endif(_variableName MATCHES ".+_INCLUDE_DIR$")
+endforeach()
+
+# get all Library variables
+foreach (_variableName ${_variableNames})
+   get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
+   if (_variableName MATCHES "^CMAKE+")
+   elseif (_variableName MATCHES ".+_LIB$")
+     list(APPEND ALLLIBDIRS "${LIBDIR}")
+     list(APPEND ALLLIBS "${${_variableName}}")
+   elseif (_variableName MATCHES ".+_LIBRARY$")
+     list(APPEND ALLLIBDIRS "${LIBDIR}")
+     list(APPEND ALLLIBS "${${_variableName}}")
+   elseif (_variableName MATCHES ".+_LIBRARIES$")
+     list(APPEND ALLLIBDIRS "${LIBDIR}")
+     list(APPEND ALLLIBS "${${_variableName}}")
+   endif()
+endforeach()
+
+# Sometimes we add the same lib more than once (especially with LIBDIRS)
+list(REMOVE_DUPLICATES ALLLIBDIRS)
+list(REMOVE_DUPLICATES ALLLIBS)
+list(REMOVE_DUPLICATES ALLINCDIRS)
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
-  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
+ set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
-
 message("Installing in: ${CMAKE_INSTALL_PREFIX}")
 
 # options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
 # needs to be either 1 or 0 for C style true false
 if(JP2KFLAG)
-  set(JP2KFLAG 1)
+ set(JP2KFLAG 1)
 endif()
 
 # Prioritize passed in variables over env vars, probably a better way to do this
 if(DEFINED ENV{ISIS3DATA} AND NOT isis3Data)
-  set(isis3Data $ENV{ISIS3DATA})
-  set(isis3Data ON)
+ set(isis3Data $ENV{ISIS3DATA})
+ set(isis3Data ON)
 endif()
 if(DEFINED ENV{ISIS3TESTDATA} AND NOT isis3TestData)
-  set(isis3TestData $ENV{ISIS3TESTDATA})
-  set(isis3TestData ON)
+ set(isis3TestData $ENV{ISIS3TESTDATA})
+ set(isis3TestData ON)
 endif()
 
 if(EXISTS ${isis3Data})
-  set(ENV{ISIS3DATA} "${isis3Data}")
-  message("Using ISIS3DATA = $ENV{ISIS3DATA}")
+ set(ENV{ISIS3DATA} "${isis3Data}")
+ message("Using ISIS3DATA = $ENV{ISIS3DATA}")
 else()
-  message(WARNING "Isis3Data directory ${isis3Data} not found, unit tests will fail.")
+ message(WARNING "Isis3Data directory ${isis3Data} not found, unit tests will fail.")
 endif()
 
 if(EXISTS ${isis3TestData})
-  set(ENV{ISIS3TESTDATA} "${isis3TestData}")
-  message("Using ISIS3TESTDATA = $ENV{ISIS3TESTDATA}")
+ set(ENV{ISIS3TESTDATA} "${isis3TestData}")
+ message("Using ISIS3TESTDATA = $ENV{ISIS3TESTDATA}")
 else()
-  message(WARNING "Isis3TestData directory ${isis3TestData} not found, application and module tests will fail.")
-endif()
-
-if(develop)
-
+ message(WARNING "Isis3TestData directory ${isis3TestData} not found, application and module tests will fail.")
 endif()
 
 if(${testOutputDir} STREQUAL "OFF")
-  message("Writing test data folders to = ${CMAKE_BINARY_DIR}/testOutputDir")
-  set(testOutputDir "${CMAKE_BINARY_DIR}/testOutputDir")
-  execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/testOutputDir)
+ message("Writing test data folders to = ${CMAKE_BINARY_DIR}/testOutputDir")
+ set(testOutputDir "${CMAKE_BINARY_DIR}/testOutputDir")
+ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/testOutputDir)
 else()
-  # User specified a test output folder, make sure it exists.
-  message("Writing test data folders to = ${testOutputDir}")
-  execute_process(COMMAND mkdir -p ${testOutputDir})
+ # User specified a test output folder, make sure it exists.
+ message("Writing test data folders to = ${testOutputDir}")
+ execute_process(COMMAND mkdir -p ${testOutputDir})
 endif()
 
-# Set the default library extension based on the platform
+#===============================================================================
+#===============================================================================
+
+message("USING CONDA PREFIX: $ENV{CONDA_PREFIX}")
+list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+
+# Specify flags used
+# on linux, add the conda prefix to handle possible issues with rpaths at link time
+# sometimes third parties do not set their rpaths correctly
+set(thirdPartyCppFlags -Wall                              \
+                       -std=c++11                         \
+                       -DISIS_LITTLE_ENDIAN=1             \
+                       -fPIC -Wno-unused-parameter        \
+                       -Wno-overloaded-virtual            \
+                       -Wl,-rpath,$ENV{CONDA_PREFIX}/lib  \
+                       -DGMM_USES_SUPERLU                 \
+                       -DENABLEJP2K=${JP2KFLAG}           \
+                     )
+
+# Flag to fix numeric literals problem with boost on linux
+if(NOT APPLE)
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals )
+endif()
+
+# Set python bindings configuration
+if(pybindings)
+ find_package(Python REQUIRED)
+
+ # use PYINSTALL_DIR to overwrite python install directory
+ # Better to use find Python script
+ if (NOT DEFINED PYINSTALL_DIR)
+   set(PYINSTALL_PREFIX ${PYTHON_SITE_PACKAGES_DIR})
+ endif()
+endif()
+
+# Paths to required executables
+find_program(XALAN Xalan REQUIRED)
+find_program(LATEX latex)
+find_program(DOXYGEN NAME doxygen PATH_SUFFIXES doxygen REQUIRED)
+find_program(UIC uic REQUIRED)
+find_program(MOC moc REQUIRED)
+find_program(RCC rcc REQUIRED)
+find_program(PROTOC protoc REQUIRED)
+
+find_package(Qt5 COMPONENTS
+                Core
+                Concurrent
+                Gui
+                Multimedia
+                MultimediaWidgets
+                Network
+                OpenGL # Needed to install mesa-common-dev for this!
+                PrintSupport
+                Qml
+                Quick
+                Script
+                ScriptTools
+                Sql
+                Svg
+                Test
+                WebChannel
+                Widgets
+                Xml
+                XmlPatterns REQUIRED)
+
+# Some of these will have non-traditional installs with version numbers in the paths in v007
+# For these, we pass in a version number, and use it in the path suffix
+# This only applies to v007, and outside of the building, we should only expect standard installs
+# The v007-specific installs are listed beside their find_package calls below:
+find_package(Boost     1.59.0  REQUIRED)
+find_package(Bullet    2.86    REQUIRED)
+find_package(Cholmod   4.4.5   REQUIRED)
+find_package(CSPICE    65      REQUIRED)
+find_package(Eigen             REQUIRED)
+find_package(Embree    2.15.0  REQUIRED)
+find_package(GeoTIFF   2       REQUIRED)
+find_package(GMM       5.0     REQUIRED)
+find_package(GSL       19      REQUIRED)
+find_package(HDF5      1.8.15  REQUIRED)
+find_package(Jama      125     REQUIRED)
+find_package(NN                REQUIRED)
+find_package(OpenCV    3.1.0   REQUIRED)
+find_package(PCL       1.8     REQUIRED)
+find_package(Protobuf  2.6.1   REQUIRED)
+find_package(Qwt       6       REQUIRED)
+find_package(SuperLU   4.3     REQUIRED)
+find_package(TIFF      4.0.5   REQUIRED)
+find_package(TNT       126     REQUIRED)
+find_package(XercesC   3.1.2   REQUIRED)
+find_package(X11       6       REQUIRED)
+find_package(nanoflann         REQUIRED)
+find_package(PNG               REQUIRED)
+find_package(Kakadu)
+find_package(Geos    3.5.0   REQUIRED)
+
+# Im this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
-  set(SO ".dylib")
-else()
-  set(SO ".so")
-endif()
-
+  find_package(OpenGL            REQUIRED)
+endif(APPLE)
 
 #===============================================================================
 #===============================================================================
 # Start setting up the build
 # Add extension to find fortran until .so symlink can be added to /usr/lib64
 list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
-
-# Set up all the third party library dependencies.
-include(FindAllDependencies)
 
 # Allow everything to include the 3rd party libraries
 include_directories(SYSTEM ${ALLINCDIRS})
