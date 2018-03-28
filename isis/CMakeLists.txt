@@ -66,10 +66,15 @@ option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" ON  )
-option(pybindings      "Turn on to build Python bindings"               OFF )
+option(pybindings      "Turn on to build Python bindings"               ON )
 
-Iterate through all variables and extract the libraries and include directories
+
+# Iterate through all variables and extract the libraries and include directories
 get_cmake_property(_variableNames VARIABLES) # Get All VARIABLES
+
+set(ALLLIBDIRS "")
+set(ALLLIBS "")
+set(ALLINCDIRS "")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})
@@ -107,36 +112,27 @@ list(REMOVE_DUPLICATES ALLINCDIRS)
 if(DEFINED ENV{CONDA_PREFIX} AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
  set(CMAKE_INSTALL_PREFIX $ENV{CONDA_PREFIX})
 endif()
-message("Installing in: ${CMAKE_INSTALL_PREFIX}")
-
-# options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
-# needs to be either 1 or 0 for C style true false
-if(JP2KFLAG)
- set(JP2KFLAG 1)
-endif()
 
 # Prioritize passed in variables over env vars, probably a better way to do this
 if(DEFINED ENV{ISIS3DATA} AND NOT isis3Data)
  set(isis3Data $ENV{ISIS3DATA})
- set(isis3Data ON)
 endif()
 if(DEFINED ENV{ISIS3TESTDATA} AND NOT isis3TestData)
  set(isis3TestData $ENV{ISIS3TESTDATA})
- set(isis3TestData ON)
 endif()
 
 if(EXISTS ${isis3Data})
  set(ENV{ISIS3DATA} "${isis3Data}")
- message("Using ISIS3DATA = $ENV{ISIS3DATA}")
 else()
  message(WARNING "Isis3Data directory ${isis3Data} not found, unit tests will fail.")
+ set(isis3Data OFF)
 endif()
 
 if(EXISTS ${isis3TestData})
  set(ENV{ISIS3TESTDATA} "${isis3TestData}")
- message("Using ISIS3TESTDATA = $ENV{ISIS3TESTDATA}")
 else()
  message(WARNING "Isis3TestData directory ${isis3TestData} not found, application and module tests will fail.")
+ set(isis3TestData OFF)
 endif()
 
 if(${testOutputDir} STREQUAL "OFF")
@@ -149,24 +145,51 @@ else()
  execute_process(COMMAND mkdir -p ${testOutputDir})
 endif()
 
+message("========================== CONFIGURATION ========================== ")
+message(STATUS "ISIS3DATA: ${isis3Data}")
+message(STATUS "ISISTESTDATA: ${isis3TestData}")
+message(STATUS "TEST OUTPUT DIR: ${testOutputDir}")
+message(STATUS "BUILD STATIC CORE: ${buildStaticCore}")
+message(STATUS "BUILD TESTS: ${buildTests}")
+message(STATUS "BUILD CORE: ${buildCore}")
+message(STATUS "BUILD MISSIONS: ${buildMissions}")
+message(STATUS "JP2K SUPPORT: ${JP2KFLAG}")
+message(STATUS "PYTHON BINDINGS: ${pybindings}")
+message(STATUS "INSTALL LOCATION: ${CMAKE_INSTALL_PREFIX}")
+message("=================================================================== ")
 #===============================================================================
 #===============================================================================
 
-message("USING CONDA PREFIX: $ENV{CONDA_PREFIX}")
-list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+if(EXISTS ENV{CONDA_PREFIX})
+  message("USING CONDA PREFIX: $ENV{CONDA_PREFIX}")
+  list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+endif()
+
+# options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
+# needs to be either 1 or 0 for C style true false
+if(JP2KFLAG)
+ set(JP2KFLAG 1)
+endif()
 
 # Specify flags used
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
 # sometimes third parties do not set their rpaths correctly
-set(thirdPartyCppFlags -Wall                              \
-                       -std=c++11                         \
-                       -DISIS_LITTLE_ENDIAN=1             \
-                       -fPIC -Wno-unused-parameter        \
-                       -Wno-overloaded-virtual            \
-                       -Wl,-rpath,$ENV{CONDA_PREFIX}/lib  \
-                       -DGMM_USES_SUPERLU                 \
-                       -DENABLEJP2K=${JP2KFLAG}           \
+set(thirdPartyCppFlags -Wall
+                       -std=c++11
+                       -DISIS_LITTLE_ENDIAN=1
+                       -fPIC -Wno-unused-parameter
+                       -Wno-overloaded-virtual
+                       -Wl,-rpath,$ENV{CONDA_PREFIX}/lib
+                       -DGMM_USES_SUPERLU
+                       -DENABLEJP2K=${JP2KFLAG}
                      )
+
+ # Append CPP flags set in the third party lib file to the string set in this file.
+ string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+ # Set up the ctest tool which is used to run all of the tests.
+ enable_testing()
+ include(CTest)
 
 # Flag to fix numeric literals problem with boost on linux
 if(NOT APPLE)
@@ -176,7 +199,7 @@ endif()
 # Set python bindings configuration
 if(pybindings)
  find_package(Python REQUIRED)
-
+ find_package(Sip    REQUIRED)
  # use PYINSTALL_DIR to overwrite python install directory
  # Better to use find Python script
  if (NOT DEFINED PYINSTALL_DIR)
@@ -269,7 +292,6 @@ ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp)
 file(COPY ${ISIS_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/inc)
 
 include_directories(${CMAKE_BINARY_DIR}/inc)
-
 set(CORE_LIB_NAME isis3)
 
 # Specify relative library include paths which will be set up on
@@ -283,19 +305,12 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # We will set up some links with these files at the end of the install process so
 #  make sure they are cleared at the start of the install process.
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5.0${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
-EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_BINARY_DIR}/)
-install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
-install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
-
-# Append CPP flags set in the third party lib file to the string set in this file.
-string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
-# Set up the ctest tool which is used to run all of the tests.
-enable_testing()
-include(CTest)
+# install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5.0${SO})")
+# install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5${SO})")
+# install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
+# EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_BINARY_DIR}/)
+# install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
+# install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.

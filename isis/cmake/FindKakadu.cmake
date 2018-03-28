@@ -23,9 +23,9 @@ if(JP2KFLAG)
 
   get_filename_component(KAKADU_ROOT_INCLUDE_DIR "${KAKADU_INCLUDE_DIR}" DIRECTORY)
 
-  message( "-- KAKADU INC DIR: ${KAKADU_INCLUDE_DIR}")
-  message( "-- KAKADU A LIB: ${KAKADU_A_LIBRARY}")
-  message( "-- KAKADU V LIB: ${KAKADU_V_LIBRARY}")
+  message(STATUS "KAKADU INC DIR: ${KAKADU_INCLUDE_DIR}")
+  message(STATUS "KAKADU A LIB: ${KAKADU_A_LIBRARY}")
+  message(STATUS "KAKADU V LIB: ${KAKADU_V_LIBRARY}")
 else()
-  message("-- KAKADU DISABLED")
+  message(STATUS "KAKADU DISABLED")
 endif()

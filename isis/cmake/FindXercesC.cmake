@@ -6,5 +6,5 @@ find_path(XERCESC_INCLUDE_DIR
 
 find_library(XercesC_LIBRARY NAMES xerces-c)
 
-message( "-- XERCES LIB: "  ${XercesC_LIBRARY} )
-message( "-- XERCES INCLUDE DIR: "  ${XERCESC_INCLUDE_DIR} )
+message(STATUS "XERCES LIB: "  ${XercesC_LIBRARY} )
+message(STATUS "XERCES INCLUDE DIR: "  ${XERCESC_INCLUDE_DIR} )
