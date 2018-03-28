@@ -49,9 +49,6 @@ namespace Isis {
     m_spacecraftNameLong = "OSIRIS-REx";
     m_spacecraftNameShort = "OSIRIS-REx";
 
-    Pvl &lab = *cube.label();
-    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
-
     // The general IK code will be used to retrieve the transx,
     // transy, transs and transl from the iak. The focus position specific
     // IK code will be used to find pixel pitch and ccd center in the ik.
@@ -68,12 +65,6 @@ namespace Isis {
     else if (frameCode == -64360) {
       m_instrumentNameLong = "PolyMath Camera";
       m_instrumentNameShort = "PolyCam";
-      if (inst.hasKeyword("PolyCamFocusPositionNaifId")) {
-        if (QString::compare("NONE", inst["PolyCamFocusPositionNaifId"],
-                             Qt::CaseInsensitive) != 0) {
-          frameCode == inst["PolyCamFocusPositionNaifId"][0].toInt();
-        }
-      }
     }
     else {
       QString msg = "Unable to construct OSIRIS-REx camera model. "
@@ -81,7 +72,16 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    Pvl &lab = *cube.label();
+    PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+
     QString ikCode = toString(frameCode);
+    if (inst.hasKeyword("PolyCamFocusPositionNaifId") && frameCode == -64360) {
+      if (QString::compare("NONE", inst["PolyCamFocusPositionNaifId"],
+                           Qt::CaseInsensitive) != 0) {
+        ikCode = inst["PolyCamFocusPositionNaifId"][0];
+      }
+    }
 
     QString focalLength = "INS" + ikCode + "_FOCAL_LENGTH";
     SetFocalLength(getDouble(focalLength));
