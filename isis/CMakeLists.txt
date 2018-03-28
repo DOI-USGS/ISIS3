@@ -155,15 +155,19 @@ message(STATUS "BUILD CORE: ${buildCore}")
 message(STATUS "BUILD MISSIONS: ${buildMissions}")
 message(STATUS "JP2K SUPPORT: ${JP2KFLAG}")
 message(STATUS "PYTHON BINDINGS: ${pybindings}")
-message(STATUS "INSTALL LOCATION: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "INSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
+
+if(EXISTS $ENV{CONDA_PREFIX})
+  message(STATUS "CONDA PREFIX: $ENV{CONDA_PREFIX}")
+  list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX}
+                                   $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
+endif()
 message("=================================================================== ")
+
 #===============================================================================
 #===============================================================================
 
-if(EXISTS ENV{CONDA_PREFIX})
-  message("USING CONDA PREFIX: $ENV{CONDA_PREFIX}")
-  list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX} $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
-endif()
+
 
 # options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
 # needs to be either 1 or 0 for C style true false
