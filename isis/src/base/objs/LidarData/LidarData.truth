@@ -15,6 +15,56 @@ dat
 Testing read(FileName) from binary data... 
 LidarData:
 	LidarControlPoint:
+		id: testLidarControlPoint1
+		latitude:  51
+		longitude: 101
+		radius:    1000
+		range:     65
+		sigmaRange:0.1
+		time:      2018-01-31T14:06:00.1233999
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  51.2
+		adjustedLongitude: 101.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
+		ControlMeasure: 
+			line:   0
+			sample: 1
+			SN:     SN_1-0
+		#END_ControlMeasure.
+		ControlMeasure: 
+			line:   1
+			sample: 1
+			SN:     SN_1-1
+		#END_ControlMeasure.
+	#END_LidarControlPoint.
+
+	LidarControlPoint:
+		id: testLidarControlPoint2
+		latitude:  52
+		longitude: 102
+		radius:    1000
+		range:     75
+		sigmaRange:0.1
+		time:      2018-01-31T14:07:00.1233999
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  52.2
+		adjustedLongitude: 102.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
+		ControlMeasure: 
+			line:   0
+			sample: 2
+			SN:     SN_2-0
+		#END_ControlMeasure.
+		ControlMeasure: 
+			line:   1
+			sample: 2
+			SN:     SN_2-1
+		#END_ControlMeasure.
+	#END_LidarControlPoint.
+
+	LidarControlPoint:
 		id: testLidarControlPoint3
 		latitude:  53
 		longitude: 103
@@ -22,7 +72,11 @@ LidarData:
 		range:     85
 		sigmaRange:0.1
 		time:      2018-01-31T14:08:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  53.2
+		adjustedLongitude: 103.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 3
@@ -43,7 +97,11 @@ LidarData:
 		range:     95
 		sigmaRange:0.1
 		time:      2018-01-31T14:09:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  54.2
+		adjustedLongitude: 104.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 4
@@ -64,7 +122,11 @@ LidarData:
 		range:     105
 		sigmaRange:0.1
 		time:      2018-01-31T14:10:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  55.2
+		adjustedLongitude: 105.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 5
@@ -78,23 +140,27 @@ LidarData:
 	#END_LidarControlPoint.
 
 	LidarControlPoint:
-		id: testLidarControlPoint1
-		latitude:  51
-		longitude: 101
+		id: testLidarControlPoint6
+		latitude:  56
+		longitude: 106
 		radius:    1000
-		range:     65
+		range:     115
 		sigmaRange:0.1
-		time:      2018-01-31T14:06:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		time:      2018-01-31T14:11:00.1233999
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  56.2
+		adjustedLongitude: 106.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
-			sample: 1
-			SN:     SN_1-0
+			sample: 6
+			SN:     SN_6-0
 		#END_ControlMeasure.
 		ControlMeasure: 
 			line:   1
-			sample: 1
-			SN:     SN_1-1
+			sample: 6
+			SN:     SN_6-1
 		#END_ControlMeasure.
 	#END_LidarControlPoint.
 
@@ -106,7 +172,11 @@ LidarData:
 		range:     125
 		sigmaRange:0.1
 		time:      2018-01-31T14:12:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  57.2
+		adjustedLongitude: 107.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 7
@@ -120,27 +190,6 @@ LidarData:
 	#END_LidarControlPoint.
 
 	LidarControlPoint:
-		id: testLidarControlPoint9
-		latitude:  59
-		longitude: 109
-		radius:    1000
-		range:     145
-		sigmaRange:0.1
-		time:      2018-01-31T14:14:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
-		ControlMeasure: 
-			line:   0
-			sample: 9
-			SN:     SN_9-0
-		#END_ControlMeasure.
-		ControlMeasure: 
-			line:   1
-			sample: 9
-			SN:     SN_9-1
-		#END_ControlMeasure.
-	#END_LidarControlPoint.
-
-	LidarControlPoint:
 		id: testLidarControlPoint8
 		latitude:  58
 		longitude: 108
@@ -148,7 +197,11 @@ LidarData:
 		range:     135
 		sigmaRange:0.1
 		time:      2018-01-31T14:13:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  58.2
+		adjustedLongitude: 108.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 8
@@ -162,6 +215,31 @@ LidarData:
 	#END_LidarControlPoint.
 
 	LidarControlPoint:
+		id: testLidarControlPoint9
+		latitude:  59
+		longitude: 109
+		radius:    1000
+		range:     145
+		sigmaRange:0.1
+		time:      2018-01-31T14:14:00.1233998
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  59.2
+		adjustedLongitude: 109.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
+		ControlMeasure: 
+			line:   0
+			sample: 9
+			SN:     SN_9-0
+		#END_ControlMeasure.
+		ControlMeasure: 
+			line:   1
+			sample: 9
+			SN:     SN_9-1
+		#END_ControlMeasure.
+	#END_LidarControlPoint.
+
+	LidarControlPoint:
 		id: testLidarControlPoint10
 		latitude:  60
 		longitude: 110
@@ -169,7 +247,11 @@ LidarData:
 		range:     155
 		sigmaRange:0.1
 		time:      2018-01-31T14:15:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  60.2
+		adjustedLongitude: 110.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 10
@@ -179,48 +261,6 @@ LidarData:
 			line:   1
 			sample: 10
 			SN:     SN_10-1
-		#END_ControlMeasure.
-	#END_LidarControlPoint.
-
-	LidarControlPoint:
-		id: testLidarControlPoint2
-		latitude:  52
-		longitude: 102
-		radius:    1000
-		range:     75
-		sigmaRange:0.1
-		time:      2018-01-31T14:07:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
-		ControlMeasure: 
-			line:   0
-			sample: 2
-			SN:     SN_2-0
-		#END_ControlMeasure.
-		ControlMeasure: 
-			line:   1
-			sample: 2
-			SN:     SN_2-1
-		#END_ControlMeasure.
-	#END_LidarControlPoint.
-
-	LidarControlPoint:
-		id: testLidarControlPoint6
-		latitude:  56
-		longitude: 106
-		radius:    1000
-		range:     115
-		sigmaRange:0.1
-		time:      2018-01-31T14:11:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
-		ControlMeasure: 
-			line:   0
-			sample: 6
-			SN:     SN_6-0
-		#END_ControlMeasure.
-		ControlMeasure: 
-			line:   1
-			sample: 6
-			SN:     SN_6-1
 		#END_ControlMeasure.
 	#END_LidarControlPoint.
 
@@ -229,6 +269,56 @@ LidarData:
 Testing read(FileName) from JSON data... 
 LidarData:
 	LidarControlPoint:
+		id: testLidarControlPoint1
+		latitude:  51
+		longitude: 101
+		radius:    1000
+		range:     65
+		sigmaRange:0.1
+		time:      2018-01-31T14:06:00.1233999
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  51.2
+		adjustedLongitude: 101.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
+		ControlMeasure: 
+			line:   0
+			sample: 1
+			SN:     SN_1-0
+		#END_ControlMeasure.
+		ControlMeasure: 
+			line:   1
+			sample: 1
+			SN:     SN_1-1
+		#END_ControlMeasure.
+	#END_LidarControlPoint.
+
+	LidarControlPoint:
+		id: testLidarControlPoint2
+		latitude:  52
+		longitude: 102
+		radius:    1000
+		range:     75
+		sigmaRange:0.1
+		time:      2018-01-31T14:07:00.1233999
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  52.2
+		adjustedLongitude: 102.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
+		ControlMeasure: 
+			line:   0
+			sample: 2
+			SN:     SN_2-0
+		#END_ControlMeasure.
+		ControlMeasure: 
+			line:   1
+			sample: 2
+			SN:     SN_2-1
+		#END_ControlMeasure.
+	#END_LidarControlPoint.
+
+	LidarControlPoint:
 		id: testLidarControlPoint3
 		latitude:  53
 		longitude: 103
@@ -236,7 +326,11 @@ LidarData:
 		range:     85
 		sigmaRange:0.1
 		time:      2018-01-31T14:08:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  53.2
+		adjustedLongitude: 103.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 3
@@ -257,7 +351,11 @@ LidarData:
 		range:     95
 		sigmaRange:0.1
 		time:      2018-01-31T14:09:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  54.2
+		adjustedLongitude: 104.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 4
@@ -278,7 +376,11 @@ LidarData:
 		range:     105
 		sigmaRange:0.1
 		time:      2018-01-31T14:10:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  55.2
+		adjustedLongitude: 105.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 5
@@ -292,23 +394,27 @@ LidarData:
 	#END_LidarControlPoint.
 
 	LidarControlPoint:
-		id: testLidarControlPoint1
-		latitude:  51
-		longitude: 101
+		id: testLidarControlPoint6
+		latitude:  56
+		longitude: 106
 		radius:    1000
-		range:     65
+		range:     115
 		sigmaRange:0.1
-		time:      2018-01-31T14:06:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		time:      2018-01-31T14:11:00.1233999
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  56.2
+		adjustedLongitude: 106.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
-			sample: 1
-			SN:     SN_1-0
+			sample: 6
+			SN:     SN_6-0
 		#END_ControlMeasure.
 		ControlMeasure: 
 			line:   1
-			sample: 1
-			SN:     SN_1-1
+			sample: 6
+			SN:     SN_6-1
 		#END_ControlMeasure.
 	#END_LidarControlPoint.
 
@@ -320,7 +426,11 @@ LidarData:
 		range:     125
 		sigmaRange:0.1
 		time:      2018-01-31T14:12:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  57.2
+		adjustedLongitude: 107.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 7
@@ -334,27 +444,6 @@ LidarData:
 	#END_LidarControlPoint.
 
 	LidarControlPoint:
-		id: testLidarControlPoint9
-		latitude:  59
-		longitude: 109
-		radius:    1000
-		range:     145
-		sigmaRange:0.1
-		time:      2018-01-31T14:14:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
-		ControlMeasure: 
-			line:   0
-			sample: 9
-			SN:     SN_9-0
-		#END_ControlMeasure.
-		ControlMeasure: 
-			line:   1
-			sample: 9
-			SN:     SN_9-1
-		#END_ControlMeasure.
-	#END_LidarControlPoint.
-
-	LidarControlPoint:
 		id: testLidarControlPoint8
 		latitude:  58
 		longitude: 108
@@ -362,7 +451,11 @@ LidarData:
 		range:     135
 		sigmaRange:0.1
 		time:      2018-01-31T14:13:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  58.2
+		adjustedLongitude: 108.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 8
@@ -376,6 +469,31 @@ LidarData:
 	#END_LidarControlPoint.
 
 	LidarControlPoint:
+		id: testLidarControlPoint9
+		latitude:  59
+		longitude: 109
+		radius:    1000
+		range:     145
+		sigmaRange:0.1
+		time:      2018-01-31T14:14:00.1233998
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  59.2
+		adjustedLongitude: 109.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
+		ControlMeasure: 
+			line:   0
+			sample: 9
+			SN:     SN_9-0
+		#END_ControlMeasure.
+		ControlMeasure: 
+			line:   1
+			sample: 9
+			SN:     SN_9-1
+		#END_ControlMeasure.
+	#END_LidarControlPoint.
+
+	LidarControlPoint:
 		id: testLidarControlPoint10
 		latitude:  60
 		longitude: 110
@@ -383,7 +501,11 @@ LidarData:
 		range:     155
 		sigmaRange:0.1
 		time:      2018-01-31T14:15:00.1233998
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
+		matrix:      [3,3]((0.01,0,0),(0,0.0121,0),(0,0,100))
+		adjustedLatitude:  60.2
+		adjustedLongitude: 110.1
+		adjustedRadius:    1000
+		adjustedMatrix:      [3,3]((0.02,0,0),(0,0.0144,0),(0,0,81))
 		ControlMeasure: 
 			line:   0
 			sample: 10
@@ -393,48 +515,6 @@ LidarData:
 			line:   1
 			sample: 10
 			SN:     SN_10-1
-		#END_ControlMeasure.
-	#END_LidarControlPoint.
-
-	LidarControlPoint:
-		id: testLidarControlPoint2
-		latitude:  52
-		longitude: 102
-		radius:    1000
-		range:     75
-		sigmaRange:0.1
-		time:      2018-01-31T14:07:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
-		ControlMeasure: 
-			line:   0
-			sample: 2
-			SN:     SN_2-0
-		#END_ControlMeasure.
-		ControlMeasure: 
-			line:   1
-			sample: 2
-			SN:     SN_2-1
-		#END_ControlMeasure.
-	#END_LidarControlPoint.
-
-	LidarControlPoint:
-		id: testLidarControlPoint6
-		latitude:  56
-		longitude: 106
-		radius:    1000
-		range:     115
-		sigmaRange:0.1
-		time:      2018-01-31T14:11:00.1233999
-		matrix:      [3,3]((0.028657,0,0),(0,0.0311981,0),(0,0,38.4549))
-		ControlMeasure: 
-			line:   0
-			sample: 6
-			SN:     SN_6-0
-		#END_ControlMeasure.
-		ControlMeasure: 
-			line:   1
-			sample: 6
-			SN:     SN_6-1
 		#END_ControlMeasure.
 	#END_LidarControlPoint.
 
