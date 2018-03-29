@@ -7,10 +7,10 @@ The following is a set of guidelines for contributing to ISIS3.
 
 [Redmine Issues](#redmine-issues)
 
-[How can I contribute?](#steps-to-contribute)
+[How can I contribute?](#how-can-i-contribute)
   * [Report an issue](#redmine-issues)
   * [Suggesting enhancements](#redmine-issues)
-  * [Working on an existing issue](#working-on-an-issue)
+  * [Working on an existing issue](#working-on-an-existing-issue)
   * [Working on an existing enhancement](#working-on-an-enhancement)
   * [Working on a new issue or enhancement](#working-on-a-new-issue)
 
