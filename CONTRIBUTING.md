@@ -4,8 +4,6 @@
 #### Table of Contents
 [I have a question or a problem!](#i-have-a-question-or-a-problem)
 
-[Redmine Issues](#redmine-issues)
-
 [How can I contribute?](#how-can-i-contribute)
   * [Report an issue](#redmine-issues)
   * [Suggesting enhancements](#redmine-issues)
