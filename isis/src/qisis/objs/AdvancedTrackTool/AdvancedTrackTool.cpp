@@ -298,6 +298,7 @@ namespace Isis {
           index++;
       }
     }
+    // cout<<"COUDL NOT FIND: "<< keyword<<endl;
   }
 
   /**
@@ -393,9 +394,12 @@ namespace Isis {
         double lon = cvp->camera()->UniversalLongitude();
 
         double radius = cvp->camera()->LocalRadius().meters();
-        p_tableWin->table()->item(row, getIndex("Planetocentric Latitude"))->setText(QString::number(lat, 'f', 15));
-        p_tableWin->table()->item(row, getIndex("360 Positive East Longitude"))->setText(QString::number(lon, 'f', 15));
-        p_tableWin->table()->item(row, getIndex("Local Radius"))->setText(QString::number(radius, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("Planetocentric Latitude"))->
+                             setText(QString::number(lat, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("360 Positive East Longitude"))->
+                             setText(QString::number(lon, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("Local Radius"))->
+                             setText(QString::number(radius, 'f', 15));
 
         /* 180 Positive East Lon. */
         p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
@@ -407,12 +411,14 @@ namespace Isis {
         Distance radii[3];
         cvp->camera()->radii(radii);
         lat = TProjection::ToPlanetographic(lat, radii[0].meters(), radii[2].meters());
-        p_tableWin->table()->item(row, getIndex("Planetographic Latitude"))->setText(QString::number(lat, 'f', 15));
-        p_tableWin->table()->item(row, getIndex("360 Positive West Longitude"))->setText(QString::number(lon, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("Planetographic Latitude"))->
+                             setText(QString::number(lat, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("360 Positive West Longitude"))->
+                             setText(QString::number(lon, 'f', 15));
 
         /*180 Positive West Lon.  */
         p_tableWin->table()->item(row, getIndex("180 Positive West Longitude"))->setText(
-                                  QString::number(TProjection::To180Domain(lon), 'f', 15));
+                             QString::number(TProjection::To180Domain(lon), 'f', 15));
 
         // Next write out columns, the x/y/z position of the lat/lon, only if set image succeeds
         double pos[3];
@@ -433,7 +439,8 @@ namespace Isis {
         // Write out columns, oblique pixel resolution, only if set image succeeds
         double obliquePRes = cvp->camera()->ObliquePixelResolution();
         if (obliquePRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Pixel Resolution"))->setText(QString::number(obliquePRes));
+          p_tableWin->table()->item(row, getIndex("Oblique Pixel Resolution"))->
+                               setText(QString::number(obliquePRes));
         }
         else {
           p_tableWin->table()->item(row, getIndex("Oblique Pixel Resolution"))->setText("");
@@ -442,7 +449,8 @@ namespace Isis {
         // Write out columns, oblique sample resolution, only if set image succeeds
         double obliqueSRes = cvp->camera()->ObliqueSampleResolution();
         if (obliqueSRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Sample Resolution"))->setText(QString::number(obliqueSRes));
+          p_tableWin->table()->item(row, getIndex("Oblique Sample Resolution"))->
+                               setText(QString::number(obliqueSRes));
         }
         else {
           p_tableWin->table()->item(row, getIndex("Oblique Sample Resolution"))->setText("");
@@ -451,7 +459,8 @@ namespace Isis {
         // Write out columns, oblique line resolution, only if set image succeeds
         double obliqueLRes = cvp->camera()->ObliqueLineResolution();
         if (obliqueLRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Line Resolution"))->setText(QString::number(obliqueLRes));
+          p_tableWin->table()->item(row, getIndex("Oblique Line Resolution"))->
+                               setText(QString::number(obliqueLRes));
         }
         else {
           p_tableWin->table()->item(row, getIndex("Oblique Line Resolution"))->setText("");
@@ -460,7 +469,8 @@ namespace Isis {
         // Write out columns, oblique detector resolution, only if set image succeeds
         double obliqueDRes = cvp->camera()->ObliqueDetectorResolution();
         if (obliqueDRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Detector Resolution"))->setText(QString::number(obliqueDRes));
+          p_tableWin->table()->item(row, getIndex("Oblique Detector Resolution"))->
+                               setText(QString::number(obliqueDRes));
         }
         else {
           p_tableWin->table()->item(row, getIndex("Oblique Detector Resolution"))->setText("");
@@ -497,7 +507,8 @@ namespace Isis {
         double northAzi = cvp->camera()->NorthAzimuth();
         if (cvp->camera()->target()->shape()->name() != "Plane"
             && Isis::IsValidPixel(northAzi)) {
-          p_tableWin->table()->item(row, getIndex("North Azimuth"))->setText(QString::number(northAzi));
+          p_tableWin->table()->item(row, getIndex("North Azimuth"))->
+                               setText(QString::number(northAzi));
         }
         else { // north azimuth is meaningless for ring plane projections
           p_tableWin->table()->item(row, getIndex("North Azimuth"))->setText("");
@@ -505,7 +516,8 @@ namespace Isis {
 
         double sunAzi = cvp->camera()->SunAzimuth();
         if (Isis::IsValidPixel(sunAzi)) {
-          p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->setText(QString::number(sunAzi));
+          p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->
+                               setText(QString::number(sunAzi));
         }
         else { // sun azimuth is null
           p_tableWin->table()->item(row, getIndex("Sun Azimuth"))->setText("");
@@ -513,7 +525,8 @@ namespace Isis {
 
         double spacecraftAzi = cvp->camera()->SpacecraftAzimuth();
         if (Isis::IsValidPixel(spacecraftAzi)) {
-          p_tableWin->table()->item(row, getIndex("Spacecraft Azimuth"))->setText(QString::number(spacecraftAzi));
+          p_tableWin->table()->item(row, getIndex("Spacecraft Azimuth"))->
+                               setText(QString::number(spacecraftAzi));
         }
         else { // spacecraft azimuth is null
           p_tableWin->table()->item(row, getIndex("Spacecraft Azimuth"))->setText("");
@@ -521,47 +534,56 @@ namespace Isis {
 
         // Write out columns solar lon, slant distance, local solar time
         double solarLon = cvp->camera()->solarLongitude().degrees();
-        p_tableWin->table()->item(row, getIndex("Solar Longitude"))->setText(QString::number(solarLon));
+        p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
+                             setText(QString::number(solarLon));
         double slantDistance = cvp->camera()->SlantDistance();
-        p_tableWin->table()->item(row, getIndex("Slant Distance"))->setText(QString::number(slantDistance));
+        p_tableWin->table()->item(row, getIndex("Slant Distance"))->
+                             setText(QString::number(slantDistance));
         double lst = cvp->camera()->LocalSolarTime();
-        p_tableWin->table()->item(row, getIndex("Local Solar Time"))->setText(QString::number(lst));
+        p_tableWin->table()->item(row, getIndex("Local Solar Time"))->
+                             setText(QString::number(lst));
       } // end if set image succeeds
 
       // Always write out the x/y/z of the undistorted focal plane
       CameraDistortionMap *distortedMap = cvp->camera()->DistortionMap();
       double undistortedFocalPlaneX = distortedMap->UndistortedFocalPlaneX();
-      p_tableWin->table()->item(row, UNDISTORTED_FOCAL_X)->setText(QString::number(undistortedFocalPlaneX));
+      p_tableWin->table()->item(row, getIndex("Undistorted Focal X"))->
+                           setText(QString::number(undistortedFocalPlaneX));
       double undistortedFocalPlaneY = distortedMap->UndistortedFocalPlaneY();
-      p_tableWin->table()->item(row, UNDISTORTED_FOCAL_Y)->setText(QString::number(undistortedFocalPlaneY));
+      p_tableWin->table()->item(row, getIndex("Undistorted Focal Y"))->
+                           setText(QString::number(undistortedFocalPlaneY));
       double undistortedFocalPlaneZ = distortedMap->UndistortedFocalPlaneZ();
-      p_tableWin->table()->item(row, UNDISTORTED_FOCAL_Z)->setText(QString::number(undistortedFocalPlaneZ));
+      p_tableWin->table()->item(row, getIndex("Undistorted Focal Z"))->
+                           setText(QString::number(undistortedFocalPlaneZ));
 
       // Always write out the x/y of the distorted focal plane
       CameraFocalPlaneMap *focalPlaneMap = cvp->camera()->FocalPlaneMap();
       double distortedFocalPlaneX = focalPlaneMap->FocalPlaneX();
-      p_tableWin->table()->item(row, DISTORTED_FOCAL_X)->setText(QString::number(distortedFocalPlaneX));
+      p_tableWin->table()->item(row, getIndex("Focal Plane X"))->
+                           setText(QString::number(distortedFocalPlaneX));
       double distortedFocalPlaneY = focalPlaneMap->FocalPlaneY();
-      p_tableWin->table()->item(row, DISTORTED_FOCAL_Y)->setText(QString::number(distortedFocalPlaneY));
+      p_tableWin->table()->item(row, getIndex("Focal Plane Y"))->
+                           setText(QString::number(distortedFocalPlaneY));
 
       // Always write out columns ra/dec, regardless of whether set image succeeds
       double ra = cvp->camera()->RightAscension();
-      p_tableWin->table()->item(row, RIGHT_ASCENSION)->setText(QString::number(ra));
+      p_tableWin->table()->item(row, getIndex("Right Ascension"))->setText(QString::number(ra));
       double dec = cvp->camera()->Declination();
-      p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(dec));
+      p_tableWin->table()->item(row, getIndex("Declination"))->setText(QString::number(dec));
 
       // Always write out columns et and utc, regardless of whether set image succeeds
       iTime time(cvp->camera()->time());
-      p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
+      p_tableWin->table()->item(row, getIndex("Ephemeris Time"))->
+                           setText(QString::number(time.Et(), 'f', 15));
       QString time_utc = time.UTC();
-      p_tableWin->table()->item(row, UTC)->setText(time_utc);
+      p_tableWin->table()->item(row, getIndex("UTC"))->setText(time_utc);
 
       // Always out columns spacecraft position, regardless of whether set image succeeds
       double pos[3];
       cvp->camera()->instrumentPosition(pos);
-      p_tableWin->table()->item(row, SPACECRAFT_X)->setText(QString::number(pos[0]));
-      p_tableWin->table()->item(row, SPACECRAFT_Y)->setText(QString::number(pos[1]));
-      p_tableWin->table()->item(row, SPACECRAFT_Z)->setText(QString::number(pos[2]));
+      p_tableWin->table()->item(row, getIndex("Spacecraft X"))->setText(QString::number(pos[0]));
+      p_tableWin->table()->item(row, getIndex("Spacecraft Y"))->setText(QString::number(pos[1]));
+      p_tableWin->table()->item(row, getIndex("Spacecraft Z"))->setText(QString::number(pos[2]));
     }
 
     else if (cvp->projection() != NULL) {
@@ -579,21 +601,24 @@ namespace Isis {
           while (wlon < 0.0) wlon += 360.0;
           if (tproj->IsSky()) {
             lon = tproj->Longitude();
-            p_tableWin->table()->item(row, RIGHT_ASCENSION)->setText(QString::number(lon, 'f', 15));
-            p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(lat, 'f', 15));
+            p_tableWin->table()->item(row, getIndex("Right Ascension"))->
+                                 setText(QString::number(lon, 'f', 15));
+            p_tableWin->table()->item(row, getIndex("Declination"))->
+                                 setText(QString::number(lat, 'f', 15));
           }
           else {
             double radius = tproj->LocalRadius();
-            p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->
+            p_tableWin->table()->item(row, getIndex("Planetocentric Latitude"))->
                                  setText(QString::number(lat, 'f', 15));
-            p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->
+            p_tableWin->table()->item(row, getIndex("Planetographic Latitude"))->
                                  setText(QString::number(glat, 'f', 15));
-            p_tableWin->table()->item(row, EAST_LON_360)->
+            p_tableWin->table()->item(row, getIndex("360 Positive East Longitude"))->
                                  setText(QString::number(lon, 'f', 15));
-            p_tableWin->table()->item(row, EAST_LON_180)->
+            p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
                                  setText(QString::number(TProjection::To180Domain(lon), 'f', 15));
-            p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(wlon, 'f', 15));
-            p_tableWin->table()->item(row, WEST_LON_180)->
+            p_tableWin->table()->item(row, getIndex("360 Positive West Longitude"))->
+                                 setText(QString::number(wlon, 'f', 15));
+            p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
                                  setText(QString::number(TProjection::To180Domain(wlon), 'f', 15));
             p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
           }
@@ -606,16 +631,18 @@ namespace Isis {
           double wlon = -lon;
           while (wlon < 0.0) wlon += 360.0;
           double radius = lat;
-          p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText("0.0");
-          p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText("0.0");
-          p_tableWin->table()->item(row, EAST_LON_360)->
+          p_tableWin->table()->item(row, getIndex("Planetocentric Latitude"))->setText("0.0");
+          p_tableWin->table()->item(row, getIndex("Planetographic Latitude"))->setText("0.0");
+          p_tableWin->table()->item(row, getIndex("360 Positive East Longitude"))->
                                setText(QString::number(lon, 'f', 15));
-          p_tableWin->table()->item(row, EAST_LON_180)->
+          p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
                                setText(QString::number(RingPlaneProjection::To180Domain(lon), 'f', 15));
-          p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(wlon, 'f', 15));
-          p_tableWin->table()->item(row, WEST_LON_180)->
+          p_tableWin->table()->item(row, getIndex("360 Positive West Longitude"))->
+                               setText(QString::number(wlon, 'f', 15));
+          p_tableWin->table()->item(row, getIndex("180 Positive West Longitude"))->
                                setText(QString::number(RingPlaneProjection::To180Domain(wlon), 'f', 15));
-          p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
+          p_tableWin->table()->item(row, getIndex("Local Radius"))->
+                               setText(QString::number(radius, 'f', 15));
         }
       }
     }
@@ -625,8 +652,10 @@ namespace Isis {
       if (cvp->projection()->SetWorld(sample, line)) {
         double projX = cvp->projection()->XCoord();
         double projY = cvp->projection()->YCoord();
-        p_tableWin->table()->item(row, PROJECTED_X)->setText(QString::number(projX, 'f', 15));
-        p_tableWin->table()->item(row, PROJECTED_Y)->setText(QString::number(projY, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("Projected X"))->
+                             setText(QString::number(projX, 'f', 15));
+        p_tableWin->table()->item(row, getIndex("Projected Y"))->
+                             setText(QString::number(projY, 'f', 15));
       }
     }
 
@@ -635,9 +664,11 @@ namespace Isis {
     QString sSrcFileName = "";
     QString sSrcSerialNum = "";
     TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
-    p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
+    p_tableWin->table()->item(row, getIndex("Track Mosaic Index"))->
+                         setText(QString::number(iMosaicOrigin));
+    p_tableWin->table()->item(row, getIndex("Track Mosaic FileName"))->
+                         setText(QString(sSrcFileName));
+    p_tableWin->table()->item(row, getIndex("Track Mosaic Serial Number"))->
                          setText(QString(sSrcSerialNum));
   }
 
