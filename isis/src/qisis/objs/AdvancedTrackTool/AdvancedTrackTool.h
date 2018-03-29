@@ -130,57 +130,56 @@ namespace Isis {
       QString settingsFilePath() const;
 
       // Used to store information about each check box to later add to the table
-      // New entries can be added anywhere in the map.
-      // Format: {<Header>, {<onByDefault>, <menuText>, <toolTip>}}
+      // New entries can be added anywhere in the QList.
+      // Format: QList<QString>({<Header>, <onByDefault>, <menuText>, <toolTip>}) <<
       // If a toolTip is not needed, use "".
-
-      QList<QList<QString> > checkBoxItems = QList<QList<QString> >()<<
-        QList<QString>({"Id", "false", "Id", ""})<<
-        QList<QString>({"Sample:Line", "true", "Sample:Line", ""})<<
-        QList<QString>({"Band", "false", "Band", ""})<<
-        QList<QString>({"Pixel", "true", "Pixel", ""})<<
-        QList<QString>({"Planetocentric Latitude", "true", "Planetocentric Lat", ""})<<
-        QList<QString>({"Planetographic Latitude", "false", "Planetographic Lat", ""})<<
-        QList<QString>({"360 Positive East Longitude", "true", "360 East Longitude", ""})<<
-        QList<QString>({"360 Positive West Longitude", "false", "360 West Longitude", ""})<<
-        QList<QString>({"180 Positive East Longitude", "true", "180 East Longitude", ""})<<
-        QList<QString>({"180 Positive West Longitude", "false", "180 West Longitude", ""})<<
+      QList<QList<QString> > checkBoxItems = QList<QList<QString> >() <<
+        QList<QString>({"Id", "false", "Id", ""}) <<
+        QList<QString>({"Sample:Line", "true", "Sample:Line", ""}) <<
+        QList<QString>({"Band", "false", "Band", ""}) <<
+        QList<QString>({"Pixel", "true", "Pixel", ""}) <<
+        QList<QString>({"Planetocentric Latitude", "true", "Planetocentric Lat", ""}) <<
+        QList<QString>({"Planetographic Latitude", "false", "Planetographic Lat", ""}) <<
+        QList<QString>({"360 Positive East Longitude", "true", "360 East Longitude", ""}) <<
+        QList<QString>({"360 Positive West Longitude", "false", "360 West Longitude", ""}) <<
+        QList<QString>({"180 Positive East Longitude", "true", "180 East Longitude", ""}) <<
+        QList<QString>({"180 Positive West Longitude", "false", "180 West Longitude", ""}) <<
         QList<QString>({"Projected X:Projected Y", "false", "Projected X:Projected Y",
-                         "X and Y values for a projected image"})<<
-        QList<QString>({"Local Radius", "false", "Radius", ""})<<
+                         "X and Y values for a projected image"}) <<
+        QList<QString>({"Local Radius", "false", "Radius", ""}) <<
         QList<QString>({"Point X:Point Y:Point Z", "false", "XYZ",
-                         "The X, Y, and Z of surface intersection in body-fixed coordinates"})<<
+                         "The X, Y, and Z of surface intersection in body-fixed coordinates"}) <<
         QList<QString>({"Right Ascension:Declination", "false", "Ra:Dec",
-                         "Right Ascension and Declination"})<<
-        QList<QString>({"Resolution", "false", "Resolution", ""})<<
-        QList<QString>({"Oblique Pixel Resolution", "false", "Oblique Pixel Res", ""})<<
-        QList<QString>({"Oblique Sample Resolution", "false", "Oblique Sample Res", ""})<<
-        QList<QString>({"Oblique Line Resolution", "false", "Oblique Line Res", ""})<<
-        QList<QString>({"Oblique Detector Resolution", "false", "Oblique Detector Res", ""})<<
-        QList<QString>({"Phase", "false", "Phase", ""})<<
-        QList<QString>({"Incidence", "false", "Incidence", ""})<<
-        QList<QString>({"Emission", "false", "Emission", ""})<<
-        QList<QString>({"LocalIncidence", "false", "LocalIncidence", ""})<<
-        QList<QString>({"LocalEmission", "false", "LocalEmission", ""})<<
-        QList<QString>({"North Azimuth", "false", "North Azimuth", ""})<<
-        QList<QString>({"Sun Azimuth", "false", "Sun Azimuth", ""})<<
-        QList<QString>({"Solar Longitude", "false", "Solar Longitude", ""})<<
+                         "Right Ascension and Declination"}) <<
+        QList<QString>({"Resolution", "false", "Resolution", ""}) <<
+        QList<QString>({"Oblique Pixel Resolution", "false", "Oblique Pixel Res", ""}) <<
+        QList<QString>({"Oblique Sample Resolution", "false", "Oblique Sample Res", ""}) <<
+        QList<QString>({"Oblique Line Resolution", "false", "Oblique Line Res", ""}) <<
+        QList<QString>({"Oblique Detector Resolution", "false", "Oblique Detector Res", ""}) <<
+        QList<QString>({"Phase", "false", "Phase", ""}) <<
+        QList<QString>({"Incidence", "false", "Incidence", ""}) <<
+        QList<QString>({"Emission", "false", "Emission", ""}) <<
+        QList<QString>({"LocalIncidence", "false", "LocalIncidence", ""}) <<
+        QList<QString>({"LocalEmission", "false", "LocalEmission", ""}) <<
+        QList<QString>({"North Azimuth", "false", "North Azimuth", ""}) <<
+        QList<QString>({"Sun Azimuth", "false", "Sun Azimuth", ""}) <<
+        QList<QString>({"Solar Longitude", "false", "Solar Longitude", ""}) <<
         QList<QString>({"Spacecraft X:Spacecraft Y:Spacecraft Z", "false", "Spacecraft Position",
-                           "The X, Y, and Z of the spacecraft position"})<<
-        QList<QString>({"Spacecraft Azimuth", "false", "Spacecraft Azimuth", ""})<<
-        QList<QString>({"Slant Distance", "false", "Slant Distance", ""})<<
-        QList<QString>({"Focal Plane X:Focal Plane Y", "false", "Focal Plane X:Y", ""})<<
+                           "The X, Y, and Z of the spacecraft position"}) <<
+        QList<QString>({"Spacecraft Azimuth", "false", "Spacecraft Azimuth", ""}) <<
+        QList<QString>({"Slant Distance", "false", "Slant Distance", ""}) <<
+        QList<QString>({"Focal Plane X:Focal Plane Y", "false", "Focal Plane X:Y", ""}) <<
         QList<QString>({"Undistorted Focal X:Undistorted Focal Y: Undistorted Focal Z",
-                           "false", "Undistorted Focal Plane X:Y:Z", ""})<<
-        QList<QString>({"Ephemeris Time", "false", "Ephemeris iTime", ""})<<
-        QList<QString>({"Local Solar Time", "false", "Local Solar iTime", ""})<<
-        QList<QString>({"UTC", "false", "UTC", "Internal time in UTC format"})<<
-        QList<QString>({"Path", "false", "Path", ""})<<
-        QList<QString>({"FileName", "false", "FileName", ""})<<
-        QList<QString>({"Serial Number", "false", "Serial Number", ""})<<
-        QList<QString>({"Track Mosaic Index", "false", "Track Mosaic Index", ""})<<
-        QList<QString>({"Track Mosaic FileName", "false", "Track Mosaic FileName", ""})<<
-        QList<QString>({"Track Mosaic Serial Number", "false", "Track Mosaic Serial Number", ""})<<
+                           "false", "Undistorted Focal Plane X:Y:Z", ""}) <<
+        QList<QString>({"Ephemeris Time", "false", "Ephemeris iTime", ""}) <<
+        QList<QString>({"Local Solar Time", "false", "Local Solar iTime", ""}) <<
+        QList<QString>({"UTC", "false", "UTC", "Internal time in UTC format"}) <<
+        QList<QString>({"Path", "false", "Path", ""}) <<
+        QList<QString>({"FileName", "false", "FileName", ""}) <<
+        QList<QString>({"Serial Number", "false", "Serial Number", ""}) <<
+        QList<QString>({"Track Mosaic Index", "false", "Track Mosaic Index", ""}) <<
+        QList<QString>({"Track Mosaic FileName", "false", "Track Mosaic FileName", ""}) <<
+        QList<QString>({"Track Mosaic Serial Number", "false", "Track Mosaic Serial Number", ""}) <<
         QList<QString>({"Notes", "false", "Notes", ""});
 
       /**
