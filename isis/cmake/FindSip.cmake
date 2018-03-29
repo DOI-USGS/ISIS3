@@ -1,13 +1,4 @@
-
-# Find SIP
-# ~~~~~~~~
-#
-# SIP website: http://www.riverbankcomputing.co.uk/sip/index.php
-#
-# Find the installed version of SIP. FindSIP should be called after Python
-# has been found.
-#
-# This file defines the following variables:
+# Borrowed mostly from the QGIS project: https://github.com/qgis/QGIS
 #
 # SIP_VERSION - The version of SIP found expressed as a 6 digit hex number
 #     suitable for comparison as a string.
@@ -20,10 +11,6 @@
 #
 # SIP_DEFAULT_SIP_DIR - Default directory where .sip files should be installed
 #     into.
-
-# Copyright (c) 2007, Simon Edwards <simon@simonzone.com>
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 IF(SIP_VERSION)
   # Already in cache, be silent

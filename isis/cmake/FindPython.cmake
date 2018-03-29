@@ -1,8 +1,4 @@
-# Find Python
-# ~~~~~~~~~~~
-# Find the Python interpreter and related Python directories.
-#
-# This file defines the following variables:
+# Borrowed mostly from the QGIS project: https://github.com/qgis/QGIS
 #
 # PYTHON_EXECUTABLE - The path and filename of the Python interpreter.
 #
@@ -17,10 +13,6 @@
 # PYTHON_INCLUDE_PATH - Directory holding the python.h include file.
 #
 # PYTHON_LIBRARY, PYTHON_LIBRARIES- Location of the Python library.
-
-# Copyright (c) 2007, Simon Edwards <simon@simonzone.com>
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 INCLUDE(CMakeFindFrameworks)
 
