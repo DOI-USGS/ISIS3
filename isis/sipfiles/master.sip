@@ -1,4 +1,4 @@
-%Module(name=bundle,
+%Module(name=libisispy,
         version=0,
         keyword_arguments="Optional")
 
@@ -22,7 +22,6 @@
     globfree(&glob_result);
     return ret;
   }
-
 
   // Loads library files which match the given regex.
   // All files matching regex are piped into QLibrary and Loaded.
@@ -58,13 +57,6 @@
       }
     }
   }
-%End
-
-%InitialisationCode
-    QString isis_root = QString::fromStdString(getenv("ISISROOT"));
-
-    load_libs(isis_root + "/3rdParty/lib/lib*");
-    load_libs(isis_root + "/lib/libisis*");
 %End
 
 %Include type_conversions.sip
