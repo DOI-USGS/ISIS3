@@ -11,7 +11,6 @@ namespace Isis {
 
       void Write(const QString &filename, bool pvl = false) throw(Isis::IException);
 
-      bool IsValid() const throw(Isis::IException);
       double GetMaximumResidual() throw(Isis::IException);
       QString GetNetworkId() const throw(Isis::IException);
       int GetNumEditLockMeasures() throw(Isis::IException);
