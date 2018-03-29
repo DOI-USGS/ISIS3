@@ -19,15 +19,8 @@
   * [Feedback](#feedback)
 
 [Development Process Checklists](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developer-Checklists)
+[References](#references)
 
-### References
-  * [ISIS3 API Reference](https://isis.astrogeology.usgs.gov/Object/Developer/index.html)
-  * [Tutorials](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops)
-  * [Application Documentation](https://isis.astrogeology.usgs.gov/Application/index.html)
-  * [Coding Standards and Style Guide](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html)
-  * [Documentation](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html#documentation)
-  * [Redmine Issue Lifecycle](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Life_Cycle_of_an_ISIS_Issue)
-  
 ## I have a question or a problem!
 If you have a question about or a problem with ISIS3, please see the [Redmine Issues](#redmine-issues) section.
 
@@ -72,3 +65,13 @@ The following is a set of guidelines for contributing to ISIS3.
 Our response time will depend on availability and scheduling.
 ### Feedback
 Our feedback will address any discrepancies related to the contribution guidelines, our coding standards and style guide, and our code review checklist.
+
+## References
+  * [ISIS3 API Reference](https://isis.astrogeology.usgs.gov/Object/Developer/index.html)
+  * [Tutorials](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops)
+  * [Application Documentation](https://isis.astrogeology.usgs.gov/Application/index.html)
+  * [Coding Standards and Style Guide](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html)
+  * [Documentation](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html#documentation)
+  * [Redmine Issue Lifecycle](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Life_Cycle_of_an_ISIS_Issue)
+  
+
