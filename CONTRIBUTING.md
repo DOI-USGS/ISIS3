@@ -41,6 +41,6 @@ There's lots of ways to contribute to ISIS3.
 4. Add an [impact statement](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Impact_Statement) to the redmine issue. If you don't have the permission to do this, please make a note on the issue with the impact statement.
 5. Make the changes on your fork of the ISIS3 main GitHub repo. Follow the [Guidelines for contributing to the code base](#guidelines-for-contributing-to-the-code-base).
 6. Follow the Developer's Checklist to ensure your changes are ready for review.
-7. Make a pull request. Include the redmine issue number in the title of the pull request. Use the "Fixes #<Insert issue number>" format.
+7. Make a pull request. Include the redmine issue number in the title of the pull request. Use the "Fixes #0000" format.
 8. Work with your code reviewer, tester, and reporter to improve your changes. Your pull request will not be merged in until all parties approve the changes.
 9. Check in your test data. If you are an outside contributer, work with your code reviewer to ensure your tests and test data get checked in.
