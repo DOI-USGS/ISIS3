@@ -44,7 +44,9 @@ void IsisMain() {
   const QString caminfo_program  = "caminfo";
   UserInterface &ui = Application::GetUserInterface();
 
-  QList< QPair<QString, QString> > *general = NULL, *camstats = NULL, *statistics = NULL;
+  QList< QPair<QString, QString> > *general = NULL;
+  QList< QPair<QString, QString> > *camstats = NULL;
+  QList< QPair<QString, QString> > *statistics = NULL;
   BandGeometry *bandGeom = NULL;
 
   // Get input filename
@@ -55,7 +57,7 @@ void IsisMain() {
 
   // if true then run spiceinit, xml default is FALSE
   // spiceinit will use system kernels
-  if(ui.GetBoolean("SPICE")) {
+  if (ui.GetBoolean("SPICE")) {
     QString parameters = "FROM=" + in.expanded();
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
   }
@@ -77,7 +79,7 @@ void IsisMain() {
   // Run camstats on the entire image (all bands)
   // another camstats will be run for each band and output
   // for each band.
-  if(ui.GetBoolean("CAMSTATS")) {
+  if (ui.GetBoolean("CAMSTATS")) {
     camstats = new QList< QPair<QString, QString> >;
 
     QString filename = ui.GetAsString("FROM");
@@ -116,19 +118,19 @@ void IsisMain() {
   }
 
   // Compute statistics for entire cube
-  if(ui.GetBoolean("STATISTICS")) {
+  if (ui.GetBoolean("STATISTICS")) {
     statistics = new QList< QPair<QString, QString> >;
 
     LineManager iline(*incube);
     Statistics stats;
     Progress progress;
     progress.SetText("Statistics...");
-    progress.SetMaximumSteps(incube->lineCount()*incube->bandCount());
+    progress.SetMaximumSteps( incube->lineCount()*incube->bandCount() );
     progress.CheckStatus();
     iline.SetLine(1);
-    for(; !iline.end() ; iline.next()) {
+    for (; !iline.end(); iline.next()) {
       incube->read(iline);
-      stats.AddData(iline.DoubleBuffer(), iline.size());
+      stats.AddData( iline.DoubleBuffer(), iline.size() );
       progress.CheckStatus();
     }
 
@@ -156,32 +158,36 @@ void IsisMain() {
   bool getFootBlob = ui.GetBoolean("USELABEL");
   bool doGeometry = ui.GetBoolean("GEOMETRY");
   bool doPolygon = ui.GetBoolean("POLYGON");
-  if(doGeometry || doPolygon || getFootBlob) {
+  if (doGeometry || doPolygon || getFootBlob) {
     Camera *cam = incube->camera();
 
     QString incType = ui.GetString("INCTYPE");
     int polySinc, polyLinc;
-    if(doPolygon && incType.toUpper() == "VERTICES") {
+    if (doPolygon && incType.toUpper() == "VERTICES") {
       ImagePolygon poly;
       poly.initCube(*incube);
       polySinc = polyLinc = (int)(0.5 + (((poly.validSampleDim() * 2) +
                                  (poly.validLineDim() * 2) - 3.0) /
                                  ui.GetInteger("NUMVERTICES")));
     }
-    else if (incType.toUpper() == "LINCSINC"){
-      if(ui.WasEntered("POLYSINC")) {
+    else if (incType.toUpper() == "LINCSINC") {
+      if (ui.WasEntered("POLYSINC")) {
         polySinc = ui.GetInteger("POLYSINC");
       }
       else {
-        polySinc = (int)(0.5 + 0.10 * incube->sampleCount());
-        if(polySinc == 0) polySinc = 1;
+        polySinc = (int)( 0.5 + 0.10 * incube->sampleCount() );
+        if (polySinc == 0) {
+          polySinc = 1;
+        }
       }
-      if(ui.WasEntered("POLYLINC")) {
+      if ( ui.WasEntered("POLYLINC") ) {
         polyLinc = ui.GetInteger("POLYLINC");
       }
       else {
-        polyLinc = (int)(0.5 + 0.10 * incube->lineCount());
-        if(polyLinc == 0) polyLinc = 1;
+        polyLinc = (int)( 0.5 + 0.10 * incube->lineCount() );
+        if (polyLinc == 0) {
+          polyLinc = 1;
+        }
       }
     }
     else {
@@ -196,15 +202,15 @@ void IsisMain() {
     bandGeom->setMaxEmission(ui.GetDouble("MAXEMISSION"));
     bool precision = ui.GetBoolean("INCREASEPRECISION");
 
-    if (getFootBlob) {
+    if(getFootBlob) {
       // Need to read history to obtain parameters that were used to
       // create the footprint
-      History hist("IsisCube", in.expanded());
+      History hist( "IsisCube", in.expanded() );
       Pvl pvl = hist.ReturnHist();
       PvlObject::PvlObjectIterator objIter;
       bool found = false;
       PvlGroup fpgrp;
-      for (objIter=pvl.endObject()-1; objIter>=pvl.beginObject(); objIter--) {
+      for (objIter = pvl.endObject() - 1; objIter >= pvl.beginObject(); objIter--) {
         if (objIter->name().toUpper() == "FOOTPRINTINIT") {
           found = true;
           fpgrp = objIter->findGroup("UserParameters");
@@ -248,33 +254,35 @@ void IsisMain() {
         bandGeom->setMaxEmission(maxema);
       }
     }
-    
+
     bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
 
     // Check if the user requires valid image center geometry
-    if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
+    if (ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
       QString msg = "Image center does not project in camera model";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
-  if(sFormat.toUpper() == "PVL")
+  if (sFormat.toUpper() == "PVL") {
     GeneratePVLOutput(incube, general, camstats, statistics, bandGeom);
-  else
+  }
+  else {
     GenerateCSVOutput(incube, general, camstats, statistics, bandGeom);
+  }
 
   // Clean the data
   delete general;
   general = NULL;
-  if(camstats) {
+  if (camstats) {
     delete camstats;
     camstats = NULL;
   }
-  if(statistics) {
+  if (statistics) {
     delete statistics;
     statistics = NULL;
   }
-  if(bandGeom) {
+  if (bandGeom) {
     delete bandGeom;
     bandGeom = NULL;
   }
@@ -303,27 +311,28 @@ void GeneratePVLOutput(Cube *incube,
   // Add some common/general things
   PvlObject params("Caminfo");
   PvlObject common("Parameters");
-  for(int i = 0; i < general->size(); i++)
+  for (int i = 0; i < general->size(); i++) {
     common += PvlKeyword((*general)[i].first, (*general)[i].second);
+  }
   params.addObject(common);
 
   // Add the camstats
-  if(camstats) {
+  if (camstats) {
     PvlObject pcband("Camstats");
-    for(int i = 0; i < camstats->size(); i++)
-      pcband += ValidateKey((*camstats)[i].first, toDouble((*camstats)[i].second));
+    for (int i = 0; i < camstats->size(); i++)
+      pcband += ValidateKey( (*camstats)[i].first, toDouble((*camstats)[i].second) );
     params.addObject(pcband);
   }
 
   // Add the input ISIS label if requested
-  if(ui.GetBoolean("ISISLABEL")) {
+  if (ui.GetBoolean("ISISLABEL")) {
     Pvl label = *(incube->label());
     label.setName("IsisLabel");
     params.addObject(label);
   }
 
   // Add the orginal label blob
-  if(ui.GetBoolean("ORIGINALLABEL")) {
+  if (ui.GetBoolean("ORIGINALLABEL")) {
     OriginalLabel orig;
     incube->read(orig);
     Pvl p = orig.ReturnLabels();
@@ -332,22 +341,22 @@ void GeneratePVLOutput(Cube *incube,
   }
 
   // Add the stats
-  if(statistics) {
+  if (statistics) {
     PvlObject sgroup("Statistics");
-    for(int i = 0; i < statistics->size(); i++)
+    for (int i = 0; i < statistics->size(); i++)
       sgroup += ValidateKey((*statistics)[i].first, toDouble((*statistics)[i].second));
     params.addObject(sgroup);
   }
 
   // Add the geometry info
-  if(bandGeom) {
-    if(ui.GetBoolean("GEOMETRY")) {
+  if (bandGeom) {
+    if (ui.GetBoolean("GEOMETRY")) {
       PvlObject ggroup("Geometry");
       bandGeom->generateGeometryKeys(ggroup);
       params.addObject(ggroup);
     }
 
-    if(ui.GetBoolean("POLYGON") || ui.GetBoolean("USELABEL")) {
+    if (ui.GetBoolean("POLYGON") || ui.GetBoolean("USELABEL")) {
       PvlObject ggroup("Polygon");
       bandGeom->generatePolygonKeys(ggroup);
       params.addObject(ggroup);
@@ -359,10 +368,12 @@ void GeneratePVLOutput(Cube *incube,
   QString outFile = ui.GetFileName("TO");
   pout.addObject(params);
 
-  if(ui.GetBoolean("APPEND"))
+  if (ui.GetBoolean("APPEND")) {
     pout.append(outFile);
-  else
+  }
+  else {
     pout.write(outFile);
+  }
 }
 
 
@@ -386,49 +397,51 @@ void GenerateCSVOutput(Cube *incube,
   fstream outFile;
   QString sOutFile = ui.GetAsString("TO");
   bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile).fileExists();
-  if(appending)
+  if (appending) {
     outFile.open(sOutFile.toLatin1().data(), std::ios::out | std::ios::app);
-  else
+  }
+  else {
     outFile.open(sOutFile.toLatin1().data(), std::ios::out);
+  }
 
   // Add some common/general things
-  for(int i = 0; i < general->size(); i++)
-    if((*general)[i].first != "RunDate") {
-      if(not appending) keys += (*general)[i].first + delim;
+  for (int i = 0; i < general->size(); i++)
+    if ( (*general)[i].first != "RunDate") {
+      if (not appending) keys += (*general)[i].first + delim;
       values += (*general)[i].second + delim;
     }
 
   // Add the camstats
-  if(ui.GetBoolean("CAMSTATS")) {
-    for(int i = 0; i < camstats->size(); i++) {
-      if(not appending) keys += "CamStats_" + (*camstats)[i].first + delim;
+  if (ui.GetBoolean("CAMSTATS")) {
+    for (int i = 0; i < camstats->size(); i++) {
+      if (not appending) keys += "CamStats_" + (*camstats)[i].first + delim;
       values += (*camstats)[i].second + delim;
     }
   }
 
   // Add the stats
-  if(ui.GetBoolean("STATISTICS")) {
-    for(int i = 0; i < statistics->size(); i++) {
-      if(not appending) keys += "Stats_" + (*statistics)[i].first + delim;
+  if (ui.GetBoolean("STATISTICS")) {
+    for (int i = 0; i < statistics->size(); i++) {
+      if (not appending) keys += "Stats_" + (*statistics)[i].first + delim;
       values += (*statistics)[i].second + delim;
     }
   }
 
   // Add the geometry info
-  if(ui.GetBoolean("GEOMETRY")) {
+  if (ui.GetBoolean("GEOMETRY")) {
     PvlObject geomGrp("Geometry");
     bandGeom->generateGeometryKeys(geomGrp);
-    for(int i = 0; i < geomGrp.keywords(); i++) {
-      if(not appending) keys += "Geom_" + geomGrp[i].name() + delim;
+    for (int i = 0; i < geomGrp.keywords(); i++) {
+      if (not appending) keys += "Geom_" + geomGrp[i].name() + delim;
       values += geomGrp[i][0] + delim;
     }
   }
 
   if (not appending) {
-    keys.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
+    keys.remove( QRegExp(delim + "$") ); // Get rid of the extra delim char (",")
     outFile << keys << endl;
-  } 
-  values.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
+  }
+  values.remove( QRegExp(delim + "$") ); // Get rid of the extra delim char (",")
   outFile << values << endl;
   outFile.close();
 }
