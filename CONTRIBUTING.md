@@ -20,9 +20,9 @@ The following is a set of guidelines for contributing to ISIS3.
   * [Response time](#Response-time)
   * [Feedback](#feedback)
 
-[Development Process Checklists]
+[Development Process Checklists](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developer-Checklists)
 
-[References]
+### References
   * [ISIS3 API Reference](https://isis.astrogeology.usgs.gov/Object/Developer/index.html)
   * [Tutorials](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops)
   * [Application Documentation](https://isis.astrogeology.usgs.gov/Application/index.html)
