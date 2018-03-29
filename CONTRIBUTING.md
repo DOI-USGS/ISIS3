@@ -27,7 +27,6 @@
   * [Coding Standards and Style Guide](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html)
   * [Documentation](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html#documentation)
   * [Redmine Issue Lifecycle](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Life_Cycle_of_an_ISIS_Issue)
-  * ADD MORE THINGS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
 ## I have a question or a problem!
 If you have a question about or a problem with ISIS3, please see the [Redmine Issues](#redmine-issues) section.
