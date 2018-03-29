@@ -1,9 +1,8 @@
 # Contributing to ISIS3
 # Under Construction
-The following is a set of guidelines for contributing to ISIS3.
-#### Table of Contents
 
-[I have a problem or a question](#i-have-a-question-or-a-problem)
+#### Table of Contents
+[I have a question or a problem!](#i-have-a-question-or-a-problem)
 
 [Redmine Issues](#redmine-issues)
 
@@ -54,4 +53,14 @@ There's lots of ways to contribute to ISIS3.
 9. Check in your test data. If you are an outside contributer, work with your code reviewer to ensure your tests and test data get checked in.
  
 ## Code Base Contribution Guidelines
-
+The following is a set of guidelines for contributing to ISIS3. 
+* Personal style changes will not be accepted
+* Changes to bring code closer to our [Coding Standards and Style Guide](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html) are encouraged.
+* Please be professional, even in comments
+* Variable names must be meaningful
+* All modified code is required to pass our [Coding Standards and Style Guide](https://isis.astrogeology.usgs.gov/documents/CodingStandards/CodingStandards.html)
+* You must write or update tests to exercise any modified code.
+* You must provide test data for any new or modified tests.
+* You must have a Redmine issue assigned to you before submitting a pull request.
+* You must complete the Developer Checklist before submitting your pull request.
+* When submitting a pull request, you must include the Redmine issue number in the title of the pull request. Use the "Fixes #0000" format.
