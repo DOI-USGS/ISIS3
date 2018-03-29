@@ -35,7 +35,7 @@ The following is a set of guidelines for contributing to ISIS3.
 There's lots of ways to contribute to ISIS3.
 
 ### Working on an existing issue
-1. Assign the redmine issue to yourself. If you don't have the permission to do this, please make a note on the issue that you would like to work on it. Please contact <REGENT EMAIL HERE> for permission to work on an issue.
+1. Assign the redmine issue to yourself. If you don't have the permission to do this, please make a note on the issue that you would like to work on it. Please contact ## REGENT EMAIL HERE ## for permission to work on an issue.
 2. Propose a solution on the redmine issue. 
 3. Work with an ISIS3 developer, the issue reporter, and any other interested parties to get feedback on your solution. This may be an iterative process.
 4. Add an [impact statement](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Impact_Statement) to the redmine issue. If you don't have the permission to do this, please make a note on the issue with the impact statement.
