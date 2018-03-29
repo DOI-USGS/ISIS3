@@ -27,7 +27,7 @@ void IsisMain() {
   try {
     ProcessImport importer;
     translateCoreInfo(xmlFileName, importer);
-    // fails 
+    // can we get this name from the input label???
     importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
     Cube *outputCube = importer.SetOutputCube("TO");
     // fails above
@@ -70,9 +70,10 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   // Get the directory where the Tgo translation tables are
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Tgo"];
-  FileName transFile(missionDir + "/translations/tgoCassis.trn");
 
   // Get the translation manager ready
+  missionDir = ".";
+  FileName transFile(missionDir + "/translations/tgoCassis.trn");
   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   QString str;
