@@ -17,6 +17,7 @@
   * [Feedback](#feedback)
 
 [Development Process Checklists](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developer-Checklists)
+
 [References](#references)
 
 ## I have a question or a problem!
