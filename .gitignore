@@ -49,8 +49,6 @@ print.prt
 ### C++ ###
 # Prerequisites
 *.d
-*.cpp
-*.c
 *.hpp
 *.sbf
 
