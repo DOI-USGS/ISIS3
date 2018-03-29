@@ -2,19 +2,26 @@
 # Under Construction
 The following is a set of guidelines for contributing to ISIS3.
 #### Table of Contents
+
 [I have a problem or a question](#redmine-issues)
+
 [Redmine Issues](#redmine-issues)
+
 [How can I contribute?](#steps-to-contribute)
   * [Report an issue](#redmine-issues)
   * [Suggesting enhancements](#redmine-issues)
   * [Working on an existing issue](#working-on-an-issue)
   * [Working on an existing enhancement](#working-on-an-enhancement)
   * [Working on a new issue or enhancement](#working-on-a-new-issue)
+
 [Guidelines for contributing to the code base](#guidelines-for-contributing-to-the-code-base)
+
 [What can I expect from the ISIS3 development team](#What-can-I-expect-from-the-ISIS3-development-team)
   * [Response time](#Response-time)
   * [Feedback](#feedback)
+
 [Development Process Checklists]
+
 [References]
   * [ISIS3 API Reference](https://isis.astrogeology.usgs.gov/Object/Developer/index.html)
   * [Tutorials](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/ISIS_Online_Workshops)
