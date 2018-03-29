@@ -34,10 +34,10 @@ If you have a question about or a problem with ISIS3, please see the [Redmine Is
 
 If you have a question or a problem with contributing to our software please contact ## REGENT EMAIL HERE ##.
 
-## Redmine Issues
-If you have a question about, a problem with, or a suggestion for ISIS3, please read our [Guidelines for reporting Redmine issues](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Guidelines_for_Reporting_Issues). Once you have read that please [submit](https://isis.astrogeology.usgs.gov/fixit/projects/isis/issues/new) a Redmine issue.
-
 ## How can I contribute?
+
+### Redmine Issues
+If you have a question about, a problem with, or a suggestion for ISIS3, please read our [Guidelines for reporting Redmine issues](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Guidelines_for_Reporting_Issues). Once you have read that please [submit](https://isis.astrogeology.usgs.gov/fixit/projects/isis/issues/new) a Redmine issue.
 
 ### Working on an existing issue or enhancement
 1. Assign the redmine issue to yourself. If you don't have the permission to do this, please make a note on the issue that you would like to work on it. Please contact ## REGENT EMAIL HERE ## for permission to work on an issue.
@@ -67,3 +67,9 @@ The following is a set of guidelines for contributing to ISIS3.
 * You must have a Redmine issue assigned to you before submitting a pull request.
 * You must complete the Developer Checklist before submitting your pull request.
 * When submitting a pull request, you must include the Redmine issue number in the title of the pull request. Use the "Fixes #0000" format.
+
+## What can I expect from the ISIS3 development team?
+### Response Time
+Our response time will depend on availablity and scheduling.
+### Feedback
+Our feedback will address any discrepencies related to the contribution guidelines, our coding standards and style guide, and our code review checklist.
