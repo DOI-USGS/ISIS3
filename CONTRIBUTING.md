@@ -3,7 +3,7 @@
 The following is a set of guidelines for contributing to ISIS3.
 #### Table of Contents
 
-[I have a problem or a question](#redmine-issues)
+[I have a problem or a question](#have-a-question-or-a-problem)
 
 [Redmine Issues](#redmine-issues)
 
@@ -31,6 +31,11 @@ The following is a set of guidelines for contributing to ISIS3.
   * [Redmine Issue Lifecycle](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Life_Cycle_of_an_ISIS_Issue)
   * ADD MORE THINGS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
+## Have a question or a problem?
+If you have a question about or a problem with ISIS3, please see the [Redmine Issues](#redmine-issues) section.
+
+If you have a question or a problem with contributing to our software please contact ## REGENT EMAIL HERE ##.
+
 ## Redmine Issues
 If you have a question about ISIS3, problem with outsoftware, or a suggestion for a future software feature, please read our [Guidelines for reporting Redmine issues](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Guidelines_for_Reporting_Issues). Once you have read that please [submit](https://isis.astrogeology.usgs.gov/fixit/projects/isis/issues/new) a Redmine issue.
 
