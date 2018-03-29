@@ -32,7 +32,7 @@ The following is a set of guidelines for contributing to ISIS3.
   * ADD MORE THINGS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
 ## Redmine Issues
-If you have a problem or a suggestion for a future software feature, please read our [Guidelines for reporting Redmine issues](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Guidelines_for_Reporting_Issues). Once you have read that please [submit](https://isis.astrogeology.usgs.gov/fixit/projects/isis/issues/new) a Redmine issue.
+If you have a question about ISIS3, problem with outsoftware, or a suggestion for a future software feature, please read our [Guidelines for reporting Redmine issues](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Guidelines_for_Reporting_Issues). Once you have read that please [submit](https://isis.astrogeology.usgs.gov/fixit/projects/isis/issues/new) a Redmine issue.
 
 ## How can I contribute?
 There's lots of ways to contribute to ISIS3.
