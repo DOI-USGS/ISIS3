@@ -2197,7 +2197,8 @@ namespace Isis {
 
       // *** TODO *** Generalize to pointCoord1, etc.  Should this part be in
       //                        BundleControlPoint::applyParameterCorrections? Yes.  Be
-      //                        careful with units.
+      //                        careful with units.  See updateAdjustedSurfacePointLatitudinally in
+      //                        BundleControlPoint
       if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
         double pointLat = surfacepoint.GetLatitude().degrees();
         double pointLon = surfacepoint.GetLongitude().degrees();
