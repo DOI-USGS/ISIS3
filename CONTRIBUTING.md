@@ -14,7 +14,7 @@ The following is a set of guidelines for contributing to ISIS3.
   * [Working on an existing enhancement](#working-on-an-enhancement)
   * [Working on a new issue or enhancement](#working-on-a-new-issue)
 
-[Guidelines for contributing to the code base](#guidelines-for-contributing-to-the-code-base)
+[Guidelines for Code Base Contributions](#guidelines-for-code-base-contributtions)
 
 [What can I expect from the ISIS3 development team](#What-can-I-expect-from-the-ISIS3-development-team)
   * [Response time](#Response-time)
