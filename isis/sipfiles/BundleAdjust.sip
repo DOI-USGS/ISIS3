@@ -20,7 +20,7 @@ namespace Isis {
       try {
         sipCpp = new sipIsis_BundleAdjust(*wrappedSettings, *a1, *a2, a3);
       }
-      catch (Isis::IException &error) {
+      catch (Isis::IException &error) {Ò
           PyErr_SetString(sipException_Isis_IException, error.what());
           return NULL;
       }

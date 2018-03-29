@@ -145,29 +145,26 @@ else()
  execute_process(COMMAND mkdir -p ${testOutputDir})
 endif()
 
-message("========================== CONFIGURATION ========================== ")
-message(STATUS "ISIS3DATA: ${isis3Data}")
-message(STATUS "ISISTESTDATA: ${isis3TestData}")
-message(STATUS "TEST OUTPUT DIR: ${testOutputDir}")
-message(STATUS "BUILD STATIC CORE: ${buildStaticCore}")
-message(STATUS "BUILD TESTS: ${buildTests}")
-message(STATUS "BUILD CORE: ${buildCore}")
-message(STATUS "BUILD MISSIONS: ${buildMissions}")
-message(STATUS "JP2K SUPPORT: ${JP2KFLAG}")
-message(STATUS "PYTHON BINDINGS: ${pybindings}")
-message(STATUS "INSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
+message("CONFIGURATION")
+message("\tBUILD STATIC CORE: ${buildStaticCore}")
+message("\tBUILD TESTS: ${buildTests}")
+message("\tBUILD CORE: ${buildCore}")
+message("\tBUILD MISSIONS: ${buildMissions}")
+message("\tJP2K SUPPORT: ${JP2KFLAG}")
+message("\tPYTHON BINDINGS: ${pybindings}")
+message("\tISIS3DATA: ${isis3Data}")
+message("\tISISTESTDATA: ${isis3TestData}")
+message("\tTEST OUTPUT DIR: ${testOutputDir}")
+message("\tINSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
+
+#===============================================================================
+#===============================================================================
 
 if(EXISTS $ENV{CONDA_PREFIX})
-  message(STATUS "CONDA PREFIX: $ENV{CONDA_PREFIX}")
+  message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
   list(APPEND CMAKE_FIND_ROOT_PATH $ENV{CONDA_PREFIX}
                                    $ENV{CONDA_PREFIX}/lib/cmake/Qt5)
 endif()
-message("=================================================================== ")
-
-#===============================================================================
-#===============================================================================
-
-
 
 # options only allow on/off but this flag is piped into ISIS as ENABLEJP2K
 # needs to be either 1 or 0 for C style true false
@@ -197,10 +194,10 @@ set(thirdPartyCppFlags -Wall
 
 # Flag to fix numeric literals problem with boost on linux
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals )
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals)
 endif()
 
-# Set python bindings configuration
+# Set python bindings configuration and set target for generating C++ files
 if(pybindings)
  find_package(Python REQUIRED)
  find_package(Sip    REQUIRED)
@@ -209,6 +206,29 @@ if(pybindings)
  if (NOT DEFINED PYINSTALL_DIR)
    set(PYINSTALL_PREFIX ${PYTHON_SITE_PACKAGES_DIR})
  endif()
+
+ # We need to get the locations for sip files, modules, etc.
+ set(ISIS_SIP_DIR "${CMAKE_SOURCE_DIR}/sipfiles")
+ set(ISIS_SIP_MODULE "${CMAKE_SOURCE_DIR}/sipfiles/master.sip")
+ set(SIP_BUILD_FILE "sippy.sbf")
+ set(ISIS_SIP_CODE_DIR ${CMAKE_BINARY_DIR}/sipsrc)
+
+ execute_process(COMMAND mkdir -p "${ISIS_SIP_CODE_DIR}")
+
+ # get the PYQT configuration based flags from Python
+ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
+                 "from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict;print(qtconfigdict['sip_flags'])"
+                 OUTPUT_VARIABLE PYQT_SIP_FLAGS)
+
+ # CMAKE doesn't handle spaces from python well when piping that into the
+ # command because of white space and a trailing new line,
+ # so we turn it into a list
+ string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
+ string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
+
+ add_custom_target(sipfiles
+                  COMMAND ${SIP_BINARY_PATH} -e -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE}
+                  COMMENT "Generating C++ code from sip files")
 endif()
 
 # Paths to required executables
@@ -309,12 +329,12 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # We will set up some links with these files at the end of the install process so
 #  make sure they are cleared at the start of the install process.
-# install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5.0${SO})")
-# install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5${SO})")
-# install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
-# EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_BINARY_DIR}/)
-# install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
-# install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5.0${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
+EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_BINARY_DIR}/)
+install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
+install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
 # Delete any existing plugin files in the build folder so they
 #  don't get filled with duplicate entries.

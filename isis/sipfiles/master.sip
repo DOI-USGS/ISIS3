@@ -56,9 +56,7 @@
                << lib_loader.errorString().toStdString() << endl;
         }
       }
-
     }
-
   }
 %End
 
