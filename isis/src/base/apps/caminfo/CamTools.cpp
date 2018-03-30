@@ -100,22 +100,22 @@ namespace Isis {
   bool BandGeometry::isPointValid(const double &sample, const double &line,
                                   const Camera *camera) const {
     int nl(_nLines), ns(_nSamps);
-    if(camera != 0) {
+    if (camera != 0) {
       nl = camera->Lines();
       ns = camera->Samples();
     }
 
-    if(line < 0.5) return (false);
-    if(line > (nl + 0.5)) return (false);
-    if(sample < 0.5) return (false);
-    if(sample > (ns + 0.5)) return (false);
+    if (line < 0.5) return (false);
+    if (line > (nl + 0.5)) return (false);
+    if (sample < 0.5) return (false);
+    if (sample > (ns + 0.5)) return (false);
     return (true);
   }
 
   bool BandGeometry::hasCenterGeometry() const {
     BandPropertiesListConstIter b;
-    for(b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
-      if(!IsSpecial(b->centerLatitude)) return (true);
+    for (b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
+      if (!IsSpecial(b->centerLatitude)) return (true);
     }
     // No valid center exists
     return (false);
@@ -137,11 +137,11 @@ namespace Isis {
    */
   bool BandGeometry::hasLimb() const {
     BandPropertiesListConstIter b;
-    for(b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
-      if(IsSpecial(b->upperLeftLatitude)) return (true);
-      if(IsSpecial(b->upperRightLatitude)) return (true);
-      if(IsSpecial(b->lowerRightLatitude)) return (true);
-      if(IsSpecial(b->lowerLeftLatitude)) return (true);
+    for (b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
+      if (IsSpecial(b->upperLeftLatitude)) return (true);
+      if (IsSpecial(b->upperRightLatitude)) return (true);
+      if (IsSpecial(b->lowerRightLatitude)) return (true);
+      if (IsSpecial(b->lowerLeftLatitude)) return (true);
     }
     // All outer geometry points are defined
     return (false);
@@ -181,7 +181,7 @@ namespace Isis {
     _isBandIndependent = camera.IsBandIndependent();
     _hasCenterGeom = false;
     int nbands = (_isBandIndependent ? 1 : _nBands);
-    for(int band = 0 ; band < nbands ; band++) {
+    for (int band = 0 ; band < nbands ; band++) {
       //  Compute band geometry properties
       GProperties g;
       g.lines = _nLines;
@@ -203,7 +203,7 @@ namespace Isis {
       g.centerSamp = centerSamp;
 
       // Now compute elements for the center pixel
-      if(camera.SetImage(centerSamp, centerLine)) {
+      if (camera.SetImage(centerSamp, centerLine)) {
         _hasCenterGeom = true;
         g.centerLatitude  = camera.UniversalLatitude();
         g.centerLongitude = camera.UniversalLongitude();
@@ -247,7 +247,7 @@ namespace Isis {
         g.inc   = camera.IncidenceAngle();
 
         //  Parallax values (Corrected 2012-11-23, KJB)
-        if(!IsSpecial(g.emi) && !IsSpecial(g.subSpacecraftGroundAzimuth)) {
+        if (!IsSpecial(g.emi) && !IsSpecial(g.subSpacecraftGroundAzimuth)) {
           double emi_r  = DegToRad(g.emi);
           double ssga_r = DegToRad(g.subSpacecraftGroundAzimuth);
           g.parallaxx = -tan(emi_r) * cos(ssga_r);
@@ -255,7 +255,7 @@ namespace Isis {
         }
 
         // Shadow values (Corrected 2012-11-23, KJB)
-        if(!IsSpecial(g.inc) && !IsSpecial(g.subSolarGroundAzimuth)) {
+        if (!IsSpecial(g.inc) && !IsSpecial(g.subSolarGroundAzimuth)) {
           double inc_r  = DegToRad(g.inc);
           double ssga_r = DegToRad(g.subSolarGroundAzimuth);
           g.shadowx = -tan(inc_r) * cos(ssga_r);
@@ -264,29 +264,29 @@ namespace Isis {
       }
       //  OK...now get corner pixel geometry.  NOTE this resets image
       //  pixel location from center!!!
-      if(camera.SetImage(1.0, 1.0)) {
+      if (camera.SetImage(1.0, 1.0)) {
         g.upperLeftLongitude = camera.UniversalLongitude();
         g.upperLeftLatitude =  camera.UniversalLatitude();
       }
 
-      if(camera.SetImage(1.0, cLine)) {
+      if (camera.SetImage(1.0, cLine)) {
         g.lowerLeftLongitude = camera.UniversalLongitude();
         g.lowerLeftLatitude =  camera.UniversalLatitude();
       }
 
-      if(camera.SetImage(cSamp, cLine)) {
+      if (camera.SetImage(cSamp, cLine)) {
         g.lowerRightLongitude = camera.UniversalLongitude();
         g.lowerRightLatitude =  camera.UniversalLatitude();
       }
 
-      if(camera.SetImage(cSamp, 1.0)) {
+      if (camera.SetImage(cSamp, 1.0)) {
         g.upperRightLongitude = camera.UniversalLongitude();
         g.upperRightLatitude =  camera.UniversalLatitude();
       }
 
       double minRes = camera.LowestImageResolution();
       double maxRes = camera.HighestImageResolution();
-      if(!(IsSpecial(minRes) || IsSpecial(maxRes))) {
+      if (!(IsSpecial(minRes) || IsSpecial(maxRes))) {
         g.grRes = (minRes + maxRes) / 2.0;
       }
 
@@ -295,20 +295,20 @@ namespace Isis {
       _mapping = camMap;
 
       // Test for interesting intersections
-      if(camera.IntersectsLongitudeDomain(camMap)) g.hasLongitudeBoundary = true;
+      if (camera.IntersectsLongitudeDomain(camMap)) g.hasLongitudeBoundary = true;
       camera.SetBand(band + 1);
-      if(camera.SetUniversalGround(90.0, 0.0)) {
-        if(isPointValid(camera.Sample(), camera.Line(), &camera)) {
+      if (camera.SetUniversalGround(90.0, 0.0)) {
+        if (isPointValid(camera.Sample(), camera.Line(), &camera)) {
           g.hasNorthPole = true;
         }
       }
-      if(camera.SetUniversalGround(-90.0, 0.0)) {
-        if(isPointValid(camera.Sample(), camera.Line(), &camera)) {
+      if (camera.SetUniversalGround(-90.0, 0.0)) {
+        if (isPointValid(camera.Sample(), camera.Line(), &camera)) {
           g.hasSouthPole = true;
         }
       }
 
-      if(doPolygon) {
+      if (doPolygon) {
         // Now compute the the image polygon
         ImagePolygon poly;
         poly.Incidence(_maxIncidence);
@@ -318,7 +318,7 @@ namespace Isis {
             increasePrecision);
         geos::geom::MultiPolygon *multiP = poly.Polys();
         _polys.push_back(multiP->clone());
-        if(_combined == 0) {
+        if (_combined == 0) {
           _combined = multiP->clone();
         }
         else {
@@ -356,7 +356,7 @@ namespace Isis {
     //  Compute the remainder of the summary bands since some of the operations
     //  need the camera model
     _summary = getGeometrySummary();
-    if((size() != 1) && doPolygon) {
+    if ((size() != 1) && doPolygon) {
       geos::geom::MultiPolygon *multiP = makeMultiPolygon(_combined);
       _mapping = getProjGeometry(camera, multiP, _summary);
       delete multiP;
@@ -367,7 +367,7 @@ namespace Isis {
 
 
   void BandGeometry::generateGeometryKeys(PvlObject &pband) {
-    if(size() <= 0) {
+    if (size() <= 0) {
       QString mess = "No Band geometry available!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
@@ -414,7 +414,7 @@ namespace Isis {
     pband += ValidateKey("SlantDistance", g.slantDistance);
 
     double aveRes(Null);
-    if(!IsSpecial(g.sampRes) && !IsSpecial(g.lineRes)) {
+    if (!IsSpecial(g.sampRes) && !IsSpecial(g.lineRes)) {
       aveRes = (g.sampRes + g.lineRes) / 2.0;
     }
 
@@ -445,7 +445,7 @@ namespace Isis {
     pband += ValidateKey("ShadowY", g.shadowy);
 
     //  Determine if image crosses Longitude domain
-    if(g.hasLongitudeBoundary) {
+    if (g.hasLongitudeBoundary) {
       pband += PvlKeyword("HasLongitudeBoundary", "TRUE");
     }
     else {
@@ -453,7 +453,7 @@ namespace Isis {
     }
 
     //  Add test for North pole in image
-    if(g.hasNorthPole) {
+    if (g.hasNorthPole) {
       pband += PvlKeyword("HasNorthPole", "TRUE");
     }
     else {
@@ -461,7 +461,7 @@ namespace Isis {
     }
 
     //  Add test for South pole in image
-    if(g.hasSouthPole) {
+    if (g.hasSouthPole) {
       pband += PvlKeyword("HasSouthPole", "TRUE");
     }
     else {
@@ -472,13 +472,13 @@ namespace Isis {
   }
 
   BandGeometry::GProperties BandGeometry::getGeometrySummary() const {
-    if(_isBandIndependent  || (size() == 1)) {
+    if (_isBandIndependent  || (size() == 1)) {
       return (_gBandList[0]);
     }
 
     //  Get the centroid point of the union polygon
     double plon(Null), plat(Null);
-    if(_combined != 0) {
+    if (_combined != 0) {
       geos::geom::Point *center = _combined->getCentroid();
       plon = center->getX();
       plat = center->getY();
@@ -495,12 +495,12 @@ namespace Isis {
     double radius = getRadius();
 
     BandPropertiesListConstIter b;
-    for(b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
+    for (b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
       double thisDist;
 
       // Ensure the center latitude/logitude is defined (typically occurs when
       // no polygon data is available).  This scheme uses the first one defined.
-      if(IsSpecial(plat) || IsSpecial(plon)) {
+      if (IsSpecial(plat) || IsSpecial(plon)) {
         plat = b->centerLatitude;
         plon = b->centerLongitude;
       }
@@ -509,7 +509,7 @@ namespace Isis {
       bool isCloser = isDistShorter(centerDistance, plat, plon,
                                     b->centerLatitude, b->centerLongitude,
                                     radius, thisDist) ;
-      if(isCloser) {
+      if (isCloser) {
         bestBand = *b;
         centerDistance = thisDist;
       }
@@ -518,7 +518,7 @@ namespace Isis {
       isCloser = isDistShorter(ulDist, plat, plon,
                                b->upperLeftLatitude, b->upperLeftLongitude,
                                radius, thisDist);
-      if(!isCloser) {
+      if (!isCloser) {
         corners.upperLeftLatitude = b->upperLeftLatitude;
         corners.upperLeftLongitude = b->upperLeftLongitude;
         ulDist = thisDist;
@@ -527,7 +527,7 @@ namespace Isis {
       isCloser = isDistShorter(urDist, plat, plon,
                                b->upperRightLatitude, b->upperRightLongitude,
                                radius, thisDist);
-      if(!isCloser) {
+      if (!isCloser) {
         corners.upperRightLatitude = b->upperRightLatitude;
         corners.upperRightLongitude = b->upperRightLongitude;
         urDist = thisDist;
@@ -537,7 +537,7 @@ namespace Isis {
       isCloser = isDistShorter(llDist, plat, plon,
                                b->lowerLeftLatitude, b->lowerLeftLongitude,
                                radius, thisDist);
-      if(!isCloser) {
+      if (!isCloser) {
         corners.lowerLeftLatitude = b->lowerLeftLatitude;
         corners.lowerLeftLongitude = b->lowerLeftLongitude;
         llDist = thisDist;
@@ -546,7 +546,7 @@ namespace Isis {
       isCloser = isDistShorter(lrDist, plat, plon,
                                b->lowerRightLatitude, b->lowerRightLongitude,
                                radius, thisDist);
-      if(!isCloser) {
+      if (!isCloser) {
         corners.lowerRightLatitude = b->lowerRightLatitude;
         corners.lowerRightLongitude = b->lowerRightLongitude;
         lrDist = thisDist;
@@ -578,14 +578,14 @@ namespace Isis {
     double clon = g.centerLongitude;
     double minLon = (double) mapping["MinimumLongitude"];
     double maxLon = (double) mapping["MaximumLongitude"];
-    if(IsSpecial(clon)) clon = (minLon + maxLon) / 2.0;
+    if (IsSpecial(clon)) clon = (minLon + maxLon) / 2.0;
 
     //  Make adjustments for center projection type/ranges.
     //  To be consistant with other implementations, do not
     //  convert poles to 180 domain.
     geos::geom::MultiPolygon *poly180(0), *poly(footprint);
-    if(g.hasLongitudeBoundary) {
-      if(!(g.hasNorthPole || g.hasSouthPole)) {
+    if (g.hasLongitudeBoundary) {
+      if (!(g.hasNorthPole || g.hasSouthPole)) {
         // Convert the mapping group contents to 180 Longitude domain
         PvlKeyword &ldkey = mapping["LongitudeDomain"];
         ldkey.setValue("180");
@@ -622,7 +622,7 @@ namespace Isis {
     delete sinu;
     delete poly180;
 
-    if(camera.SetUniversalGround(g.centroidLatitude, g.centroidLongitude)) {
+    if (camera.SetUniversalGround(g.centroidLatitude, g.centroidLongitude)) {
       g.centroidLine = camera.Line();
       g.centroidSample = camera.Sample();
       g.centroidRadius = camera.LocalRadius().meters();
@@ -632,7 +632,7 @@ namespace Isis {
   }
 
   void BandGeometry::generatePolygonKeys(PvlObject &pband) {
-    if(size() <= 0) {
+    if (size() <= 0) {
       QString mess = "No Band geometry available!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
@@ -640,7 +640,7 @@ namespace Isis {
     // Compute surface area - already done in collection phase
     double radius = getRadius();
     double globalCoverage(Null);
-    if(!IsSpecial(radius)) {
+    if (!IsSpecial(radius)) {
       double globalArea = 4.0 * pi_c() * (radius * radius) / (1000.0 * 1000.0);
       globalCoverage = _summary.surfaceArea / globalArea * 100.0;
       globalCoverage = SetRound(globalCoverage, 6);
@@ -653,10 +653,10 @@ namespace Isis {
     pband += ValidateKey("CentroidRadius", _summary.centroidRadius, "meters");
     pband += ValidateKey("SurfaceArea", _summary.surfaceArea, "km^2");
     pband += ValidateKey("GlobalCoverage", globalCoverage, "percent");
-    if(_combined != 0) {
+    if (_combined != 0) {
       pband += PvlKeyword("SampleIncrement", toString(_sampleInc));
       pband += PvlKeyword("LineIncrement", toString(_lineInc));
-      if(_combined->getGeometryTypeId() != geos::geom::GEOS_MULTIPOLYGON) {
+      if (_combined->getGeometryTypeId() != geos::geom::GEOS_MULTIPOLYGON) {
         geos::geom::MultiPolygon *geom = makeMultiPolygon(_combined);
         pband += PvlKeyword("GisFootprint", geom->toString().c_str());
         delete geom;
@@ -677,20 +677,20 @@ namespace Isis {
   double BandGeometry::getRadius() const {
     Statistics polyRadius, centRadius;
     BandPropertiesListConstIter b;
-    for(b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
+    for (b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
       polyRadius.AddData(b->centroidRadius);
       centRadius.AddData(b->radius);
     }
     double radius = polyRadius.Average();
-    if(IsSpecial(radius)) radius = centRadius.Average();
-    if(IsSpecial(radius)) radius = _radius;
+    if (IsSpecial(radius)) radius = centRadius.Average();
+    if (IsSpecial(radius)) radius = _radius;
     return (radius);
   }
 
   double BandGeometry::getPixelResolution() const {
     Statistics groundRes, pixelRes;
     BandPropertiesListConstIter b;
-    for(b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
+    for (b = _gBandList.begin() ; b != _gBandList.end() ; ++b) {
       pixelRes.AddData(b->sampRes);
       pixelRes.AddData(b->lineRes);
       groundRes.AddData(b->grRes);
@@ -701,7 +701,7 @@ namespace Isis {
     }
 
     double res = groundRes.Average();
-    if(IsSpecial(res)) res = pixelRes.Average();
+    if (IsSpecial(res)) res = pixelRes.Average();
     return (res);
   }
 
@@ -717,11 +717,11 @@ namespace Isis {
   bool BandGeometry::isDistShorter(double bestDist, double lat1, double lon1,
                                    double lat2, double lon2, double radius,
                                    double &thisDist) const {
-    if(IsSpecial(lat1)) return (false);
-    if(IsSpecial(lon1)) return (false);
-    if(IsSpecial(lat2)) return (false);
-    if(IsSpecial(lon2)) return (false);
-    if(IsSpecial(radius)) return (false);
+    if (IsSpecial(lat1)) return (false);
+    if (IsSpecial(lon1)) return (false);
+    if (IsSpecial(lat2)) return (false);
+    if (IsSpecial(lon2)) return (false);
+    if (IsSpecial(radius)) return (false);
 
     SurfacePoint point1(
       Latitude(lat1, Angle::Degrees),

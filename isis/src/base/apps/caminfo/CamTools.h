@@ -146,6 +146,8 @@ namespace Isis {
    *                          parallaxy, shadowx, shadowy.  Fixes #1296
    *   @history 2013-02-22 Janet Barrett, Modified the CamTools::collect method to allow a
    *                          footprint blob option. Fixes #1452.
+   *   @history 2018-03-30 Kaitlyn Lee, Added oblique sample, line, pixel,
+   *                          and detector resolutions. Fixes #4100.
    */
   class BandGeometry {
 

@@ -202,7 +202,7 @@ void IsisMain() {
     bandGeom->setMaxEmission(ui.GetDouble("MAXEMISSION"));
     bool precision = ui.GetBoolean("INCREASEPRECISION");
 
-    if(getFootBlob) {
+    if (getFootBlob) {
       // Need to read history to obtain parameters that were used to
       // create the footprint
       History hist( "IsisCube", in.expanded() );
