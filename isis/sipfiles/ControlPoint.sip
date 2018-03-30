@@ -91,8 +91,8 @@ namespace Isis {
       // Status SetAprioriSurfacePointSource(SurfacePointSource::Source source) throw(Isis::IException);
       // Status SetAprioriSurfacePointSourceFile(QString sourceFile) throw(Isis::IException);
 
-//    Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
-//                                      const Distance &radius) throw(Isis::IException);
+      // Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
+      //             const Distance &radius) throw(Isis::IException);
 
       // Status ComputeApriori() throw(Isis::IException);
       // Status ComputeResiduals() throw(Isis::IException);

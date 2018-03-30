@@ -57,6 +57,9 @@ message("Detected Operating System: ${osVersionString}")
 #  as a static library using some specialized code in Utilities.cmake.
 set(BUILD_SHARED_LIBS ON)
 
+# make sure to leave rpaths untouched on install 
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 # Specify user options that can be passed in with the initial CMake command.
 option(isis3Data       "Directory containing Isis3Data"                 OFF )
 option(isis3TestData   "Directory containing Isis3TestData"             OFF )
@@ -349,7 +352,6 @@ if(APPLE)
 else()
   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};$ORIGIN/../lib;$ORIGIN/../3rdParty/lib")
 endif()
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # We will set up some links with these files at the end of the install process so
 #  make sure they are cleared at the start of the install process.
