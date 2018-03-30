@@ -18,6 +18,9 @@ dependencies:
   - libgcc-ng==7.2.0
   - libgfortran==3.0=0
   - libstdcxx-ng==7.2.0
+  - qwt=6.1.3
+  - pyqt=5.6.0
+  - sip=4.18
   - libxcb==1.12=1
   - mysql==5.7.20
   - ncurses==5.9=10
@@ -36,7 +39,7 @@ dependencies:
   - cairo==1.14.6=4
   - certifi==2018.1.18
   - cmake==3.9.1=0
-  - cspice==66=0
+  - cspice==66-0
   - curl==7.55.1=0
   - doxygen==1.8.14=0
   - eigen==3.3.3=0
