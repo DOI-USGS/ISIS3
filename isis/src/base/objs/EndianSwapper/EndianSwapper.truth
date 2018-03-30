@@ -1,5 +1,6 @@
 Size of Double:  8   Double 0x12345678 to HOST:  3.0542e+08
 Size of Float:  4   Float 0x1234 to HOST:  4660
+Size of Uint32_t:  4   Uint32_t 0x1234 to HOST:  4660
 Size of Short Int:  2   Short Int 0x1234 to HOST:  4660
 Size of Unsigned Short Int:  2   Unsigned Short Int 0x1234 to HOST:  4660
 Size of Double:  8   Double 0x12345678 to HOST:  2.55354e-312

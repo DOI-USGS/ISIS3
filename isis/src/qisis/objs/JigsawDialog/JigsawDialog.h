@@ -77,6 +77,8 @@ namespace Isis {
    *   @history 2017-06-14 Ken Edmundson - Write text summary file.
    *   @history 2017-07-27 Cole Neubauer - Added a project->setClean call if the bundle results are
    *                           accepted. Fixes #4960
+   *   @history 2017-11-01 Ian Humphrey - Create ecubs in the bundle results directory which contain
+   *                           updated SPICE.  Fixes #4804, #4849.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT

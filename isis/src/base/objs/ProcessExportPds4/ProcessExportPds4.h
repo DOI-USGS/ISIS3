@@ -67,7 +67,10 @@ namespace Isis {
    *   @history 2017-11-20 Jeannie Backer - Updated StandardImageImage() to re-order the
    *                           Array_3D_Image values properly.
    *   @history 2017-11-21 Kristin Berry - Updated the constructor to add the xml version and 
-   *                           encoding to the beginning of the XML file. 
+   *                           encoding to the beginning of the XML file.
+   *   @history 2018-02-05 Kristin Berry - Updated WritePds4 to remove the .xml and add a .img
+   *                           if the user inputs something of the form filename.xml as the image
+   *                           output name. 
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {

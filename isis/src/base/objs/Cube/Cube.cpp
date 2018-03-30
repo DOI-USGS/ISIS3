@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QMutex>
@@ -369,9 +370,10 @@ namespace Isis {
                "dimensions were (S,L,B) [" + toString(m_samples) + ", " +
                toString(m_lines) + ", " + toString(m_bands) + "] with [" +
                toString(SizeOf(m_pixelType)) + "] bytes per pixel. If you still "
-               "wish to create this cube, the maximum value can be changed in the"
-               " file [~/.Isis/IsisPreferences] within the group "
-               "CubeCustomization, keyword MaximumSize.";
+               "wish to create this cube, the maximum value can be changed in your personal "
+               "preference file located in [~/.Isis/IsisPreferences] within the group "
+               "CubeCustomization, keyword MaximumSize. If you do not have an ISISPreference file, "
+               "please refer to the documentation \"Environment and Preference Setup\". Error ";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -551,6 +553,7 @@ namespace Isis {
     // Figure out the name of the data file
     try {
       PvlObject &core = m_label->findObject("IsisCube").findObject("Core");
+      // Detached labels
       if (core.hasKeyword("^Core")) {
         FileName temp(core["^Core"][0]);
 
@@ -566,6 +569,7 @@ namespace Isis {
 
         m_dataFile = new QFile(realDataFileName().expanded());
       }
+      // External cube files (ecub), ecub contains all labels and SPICE blobs, history
       else if (core.hasKeyword("^DnFile")) {
         FileName dataFileName(core["^DnFile"][0]);
 
@@ -578,9 +582,10 @@ namespace Isis {
 
         m_attached = true;
         m_storesDnData = false;
-
+        *m_dataFileName = FileName(realDataFileName().expanded());
         m_dataFile = new QFile(realDataFileName().expanded());
       }
+      // Typical cube containing labels, SPICE, history and dn data
       else {
         m_dataFileName = new FileName(*m_labelFileName);
         m_attached = true;
@@ -1840,7 +1845,16 @@ namespace Isis {
     else if (!m_storesDnData) {
       ASSERT(m_dataFileName);
       FileName guess = *m_dataFileName;
+      QDir dir(guess.toString());
 
+      // If path is relative and there is a labelFileName, start in directory of the ecub, then
+      // cd to the directory containing the DnFile, since it is relative to the location of the ecub.
+      // We need to turn the relative path into an absolute path.
+      if (dir.isRelative() && m_labelFileName) {
+        QDir dir2(m_labelFileName->originalPath());
+        dir2.cd(guess.path());
+        guess = dir2.absolutePath() + "/" + guess.name();
+      }
       do {
         Pvl guessLabel(guess.expanded());
 
@@ -2079,7 +2093,7 @@ namespace Isis {
 
         FileName temp((*core)["^DnFile"][0]);
         if (!temp.expanded().startsWith("/")) {
-          temp = FileName(FileName(label.fileName()).path() + "/" + temp.original());
+          temp = realDataFileName();
         }
 
         label = Pvl(temp.toString());

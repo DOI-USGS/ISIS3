@@ -22,7 +22,6 @@
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 #include "UserInterface.h"
-#include "ControlCubeGraphNode.h"
 
 #include "stdio.h"
 #include "string.h"
@@ -30,7 +29,7 @@
 using namespace std;
 using namespace Isis;
 
-void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures, 
+void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures,
                           QList <ControlMeasure *> *measToIgnor=NULL);
 
 
@@ -41,14 +40,14 @@ void IsisMain() {
 
   //build a histogram from the control net
   Progress progress;
-  
+
   //read the ControlNet
   ControlNet net(ui.GetFileName("CNET"), &progress);
   //read the file list
   SerialNumberList serialNumList(ui.GetFileName("FROMLIST"), true, &progress);
   //check to make sure all the serial numbers in the net have an associated file name
   QList<QString> cubeSerials = net.GetCubeSerials();
-  bool serFlag=true; 
+  bool serFlag=true;
   for (int i=0;i<cubeSerials.size();i++) {
     QString msg = "No file paths for the following serial numbers:\n";
     if (!serialNumList.hasSerialNumber(cubeSerials[i])) {
@@ -90,7 +89,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }
-  
+
   //analyze the histrogram to determine the boundaries between
     //inocent, suspect, and guilty measures
   double percentile80 = hist.Percent(80);
@@ -104,11 +103,11 @@ void IsisMain() {
   }
 
   if ( bin <0) {  //if Histogram is being inconsistent throw an error
-    string msg = "Histogram resturns the 80th percentile of " + IString(percentile80) + 
+    string msg = "Histogram resturns the 80th percentile of " + IString(percentile80) +
                  " but has no bin containing values that small";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
-  
+
 
     //Now work forward back through the bins looking for local minima and maxima
     //  The idea hear is that if the residuals really belong to a Gaussian distribution
@@ -136,7 +135,7 @@ void IsisMain() {
     //look for significant bumps
   for (int i=1;i<nBins-2;i++) {
     //if i is a local minima
-    if ( binHeight[i-1] > binHeight[i] && binHeight[i] < binHeight[i+1] ) { 
+    if ( binHeight[i-1] > binHeight[i] && binHeight[i] < binHeight[i+1] ) {
       for (int j=i+1;j<nBins-1;j++) {  //find the next local maxima
         //if j is a local maxima
         if ( binHeight[j-1] < binHeight[j] && binHeight[j] > binHeight[j+1] ) {
@@ -144,7 +143,7 @@ void IsisMain() {
            //calculate the height of the bump as a ratio of the height of the local minima
            if (binHeight[i] >0) ratio = (binHeight[j]-binHeight[i])/binHeight[i];
            else ratio = DBL_MAX;
-           //if the first significant bumps save them 
+           //if the first significant bumps save them
            if (ratio > suspectRatio && inocentSuspectB ==0) inocentSuspectB = binCenter[i];
            if (ratio >  guiltyRatio &&  suspectGuiltyB ==0)  suspectGuiltyB = binCenter[i];
            i=j;  //advance to the j position
@@ -156,26 +155,26 @@ void IsisMain() {
     if (inocentSuspectB != 0.0 && suspectGuiltyB != 0.0) break;
   }
 
-  
+
 
     //rembering that the inocentSuspectB can not be less than the user defined floor
-  if ( inocentSuspectB < ui.GetDouble("SUSPECT_FLOOR") ) 
+  if ( inocentSuspectB < ui.GetDouble("SUSPECT_FLOOR") )
     inocentSuspectB = ui.GetDouble("SUSPECT_FLOOR");
     //add also remembering that suspectGuiltyB can not be greater than the user defined ceiling
-  if ( suspectGuiltyB > ui.GetDouble("GUILTY_FLOOR") ) 
+  if ( suspectGuiltyB > ui.GetDouble("GUILTY_FLOOR") )
     suspectGuiltyB = ui.GetDouble("GUILTY_FLOOR");
     //rembering that the suspectGuiltyB can not be less than the user defined floor either
-  if ( suspectGuiltyB < ui.GetDouble("SUSPECT_FLOOR") ) 
+  if ( suspectGuiltyB < ui.GetDouble("SUSPECT_FLOOR") )
     suspectGuiltyB = ui.GetDouble("SUSPECT_FLOOR");
     //finally make sure that inocentSuspectB <= suspectGuiltyB
   if (inocentSuspectB > suspectGuiltyB) inocentSuspectB = suspectGuiltyB;
     //the boundaries between inocent, suspect, and guilty measures have been established
 
   //get an ordered list of all the suspect and guilty measures
-  QList <ControlMeasure *> suspectMeasures 
+  QList <ControlMeasure *> suspectMeasures
        = net.sortedMeasureList(&ControlMeasure::GetResidualMagnitude,inocentSuspectB,DBL_MAX);
 
- 
+
   //print csv column headers
   fprintf(guiltyFile,/*"Guilty points (Residual Magnitudes > %lf) that could not be ignored.\n"
              "PtID:  Point ID Name\n"
@@ -218,15 +217,15 @@ void IsisMain() {
   //we will need a hash of the image original convex hulls and
     //numbers of measures, it will be built on the fly
   QHash<QString,QList<double> > originalCubeStats;
-  
+
 
   //we will also need to know how many islands we started with
-  int numInitialIslands = net.GetNodeConnections().size();
+  int numInitialIslands = net.GetSerialConnections().size();
 
   //user parameters for allowing measure rejection
   double hullReductionLimit = ui.GetDouble("HULL_REDUCTION_PERCENT")/100.0;
   double measureReductionLimit = ui.GetDouble("MEASURE_REDUCTION_PERCENT")/100.0;
-  
+
 
   //now work through the list from the end to the begining setting measures to ignor if we are able
   progress.SetText("Winnowing points");
@@ -234,7 +233,7 @@ void IsisMain() {
   progress.CheckStatus();
   for (int i = suspectMeasures.size() - 1; i > -1; i--) {
     //if the measure to be ignored is one of the last two active measures of a point then both of
-     //the measures and the point must be ignored together so we need the flexibility to test 
+     //the measures and the point must be ignored together so we need the flexibility to test
      //two points at a time
     QList<ControlMeasure*> measGroup;
     bool hullFlag[2]; //hull test pass flags
@@ -251,7 +250,7 @@ void IsisMain() {
     if ( suspectMeasures[i]->Parent()->GetNumValidMeasures() <= 2) {
       QList<ControlMeasure *> tempList = suspectMeasures[i]->Parent()->getMeasures();
       //pull the valid measures out of the list
-      for (int j=0;j<tempList.size();j++) 
+      for (int j=0;j<tempList.size();j++)
         if(!tempList[j]->IsIgnored())
           measGroup.push_back(tempList[j]);
     }
@@ -318,9 +317,9 @@ void IsisMain() {
     for (int j=0; j<measGroup.size(); j++) {
       measGroup[j]->SetIgnored(true);
     }
-    
+
     //if the number of islands has increased the network has split
-    if (net.GetNodeConnections().size() > numInitialIslands) islandFlag = false; //test failed
+    if (net.GetSerialConnections().size() > numInitialIslands) islandFlag = false; //test failed
     else islandFlag = true; //test passed
 
     //Check to see if the network has split
@@ -367,10 +366,10 @@ void IsisMain() {
                     measReduction[j]*100.0,
                     measOriNum[j],
                     measNum[j],
-                    !islandFlag ? "Yes":"No", 
-                    ableToEditFlag[j] ? "Yes":"No", 
+                    !islandFlag ? "Yes":"No",
+                    ableToEditFlag[j] ? "Yes":"No",
                     !groupFlag ? "Yes":"No");
-    
+
       if (!groupFlag && measGroup[j]->GetResidualMagnitude() >= suspectGuiltyB)
         fputs(line, guiltyFile);
       else  //print the stats of ingored points to the other report
@@ -386,7 +385,7 @@ void IsisMain() {
         //of an object point then ignor the point too
       if (measGroup.size() >1)
         measGroup[0]->Parent()->SetIgnored(true);
-    }      
+    }
     progress.CheckStatus();
   }
 
@@ -403,7 +402,7 @@ void IsisMain() {
 
 
 
-void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures, 
+void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures,
                           QList <ControlMeasure *> *measToIgnor) {
 
   int i,j,firstIndex=0;
@@ -418,7 +417,7 @@ void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area,
     //skip measure in the ToIgnor list
     ignorMeas=false;
     if (measToIgnor != NULL) {
-      for (j=0; j<measToIgnor->size() && !ignorMeas; j++) {  
+      for (j=0; j<measToIgnor->size() && !ignorMeas; j++) {
         if (cubeMeasures[i] == (*measToIgnor)[j]) {
           ignorMeas = true;
           break;
@@ -431,10 +430,10 @@ void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area,
       firstIndex =i;
     }
     //build point sequence
-    pts->add(geos::geom::Coordinate(cubeMeasures[i]->GetSample(), cubeMeasures[i]->GetLine())); 
+    pts->add(geos::geom::Coordinate(cubeMeasures[i]->GetSample(), cubeMeasures[i]->GetLine()));
   }
   //Adding the first active point again closes the "linestring"
-  pts->add(geos::geom::Coordinate(cubeMeasures[firstIndex]->GetSample(), 
+  pts->add(geos::geom::Coordinate(cubeMeasures[firstIndex]->GetSample(),
                                   cubeMeasures[firstIndex]->GetLine()));
   if (pts->size() >= 4) {
     // Calculate the convex hull
@@ -449,4 +448,3 @@ void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area,
   validMeasures = pts->size()-1; //subtract one because one point is in there twice
   return;
 }
-

@@ -7,8 +7,8 @@
 
   <description>
     <p>
-      This program is used to load tcsh tab-completion settings for all Isis applications. This 
-      program will NOT run in GUI mode! Call this program like this: 
+      This program is used to load tcsh tab-completion settings for all Isis applications. This
+      program will NOT run in GUI mode! Call this program like this:
       eval `isiscomplete isisapp [isisapp2 isisapp3 ...]`
     </p>
   </description>
@@ -31,7 +31,7 @@
       This program now handles isisui properly
     </change>
     <change name="Kris Becker" date="2009-11-27">
-      Changed the call to Application to provide compatability withg Qt 
+      Changed the call to Application to provide compatability withg Qt
       startup requirements.
     </change>
     <change name="Jai Rideout" date="2011-07-18">
@@ -40,6 +40,8 @@
     <change name="Steven Lambright" date="2011-07-20">
       This program now handles qmos properly
     </change>
+    <change name="Adam Paquette" date="2017-10-04">
+      This program now handles ipce properly. Fixes #5134.
+    </change>
   </history>
 </application>
-

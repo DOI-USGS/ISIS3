@@ -886,67 +886,67 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  cerr << endl << "Test reading an ecub that points to detached lbl" << endl;
-  {
-    Cube externalData;
-    externalData.setExternalDnData("IsisCube_02.lbl");
-    externalData.create("isisTruth_external3.ecub");
-    cerr << *externalData.label() << endl;
-
-    Brick readBrick(3, 3, 2, externalData.pixelType());
-    readBrick.SetBasePosition(1, 1, 1);
-    externalData.read(readBrick);
-    for (int index = 0; index < readBrick.size(); index++) {
-      if (readBrick[index] == Null) {
-        cerr << "N ";
-      }
-      else {
-        cerr << readBrick[index] << " ";
-      }
-    }
-    cerr << endl;
-
-    try {
-      externalData.write(readBrick);
-    }
-    catch (IException &e) {
-      e.print();
-    }
-  }
-
-  cerr << endl << "Test copying an ecub that points to detached lbl" << endl;
-  {
-    Cube externalData;
-    externalData.open("isisTruth_external3.ecub");
-    Cube *copiedCube = externalData.copy("isisTruth_external3.copy.ecub",
-                                         CubeAttributeOutput("+External"));
-    cerr << *copiedCube->label() << endl;
-
-    Brick readBrick(3, 3, 2, copiedCube->pixelType());
-    readBrick.SetBasePosition(1, 1, 1);
-    copiedCube->read(readBrick);
-    for (int index = 0; index < readBrick.size(); index++) {
-      if (readBrick[index] == Null) {
-        cerr << "N ";
-      }
-      else {
-        cerr << readBrick[index] << " ";
-      }
-    }
-    cerr << endl;
-
-    try {
-      copiedCube->write(readBrick);
-    }
-    catch (IException &e) {
-      e.print();
-    }
-    // need to deallocate our copied cube
-    copiedCube->close();
-    delete copiedCube;
-    copiedCube = NULL;
-    
-  }
+//cerr << endl << "Test reading an ecub that points to detached lbl" << endl;
+//{
+//  Cube externalData;
+//  externalData.setExternalDnData("IsisCube_02.lbl");
+//  externalData.create("isisTruth_external3.ecub");
+//  cerr << *externalData.label() << endl;
+//
+//  Brick readBrick(3, 3, 2, externalData.pixelType());
+//  readBrick.SetBasePosition(1, 1, 1);
+//  externalData.read(readBrick);
+//  for (int index = 0; index < readBrick.size(); index++) {
+//    if (readBrick[index] == Null) {
+//      cerr << "N ";
+//    }
+//    else {
+//      cerr << readBrick[index] << " ";
+//    }
+//  }
+//  cerr << endl;
+//
+//  try {
+//    externalData.write(readBrick);
+//  }
+//  catch (IException &e) {
+//    e.print();
+//  }
+//}
+//
+//cerr << endl << "Test copying an ecub that points to detached lbl" << endl;
+//{
+//  Cube externalData;
+//  externalData.open("isisTruth_external3.ecub");
+//  Cube *copiedCube = externalData.copy("isisTruth_external3.copy.ecub",
+//                                       CubeAttributeOutput("+External"));
+//  cerr << *copiedCube->label() << endl;
+//
+//  Brick readBrick(3, 3, 2, copiedCube->pixelType());
+//  readBrick.SetBasePosition(1, 1, 1);
+//  copiedCube->read(readBrick);
+//  for (int index = 0; index < readBrick.size(); index++) {
+//    if (readBrick[index] == Null) {
+//      cerr << "N ";
+//    }
+//    else {
+//      cerr << readBrick[index] << " ";
+//    }
+//  }
+//  cerr << endl;
+//
+//  try {
+//    copiedCube->write(readBrick);
+//  }
+//  catch (IException &e) {
+//    e.print();
+//  }
+//  // need to deallocate our copied cube
+//  copiedCube->close();
+//  delete copiedCube;
+//  copiedCube = NULL;
+//
+//}
 
   remove("IsisCube_00.cub");
   remove("IsisCube_01.cub");
