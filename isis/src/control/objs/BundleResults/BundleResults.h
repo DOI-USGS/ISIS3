@@ -85,9 +85,10 @@ namespace Isis {
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id serialization
    *                           for save() (causes segfault in unit test for empty xml). Fixes #4797.
    *   @history 2017-04-27 J Bonn - Updated serialization code and tests.
-   *   @history 2017-05-30 Debbie A. Cook - generalized control point coordinates.  Methods changed:
-   *                            copy constructor, assignment operator, initialize,  References 
-   *                           #4649 and #501.
+   *   @history 2017-05-30 Debbie A. Cook - Corrected class names in method comments and generalized 
+   *                            control point coordinate names.  Methods changed:  copy constructor, 
+   *                            assignment operator, initialize,  Also added access methods for coordinate types.
+   *                            References #4649 and #501.
    */
   class BundleResults : public QObject {
     Q_OBJECT

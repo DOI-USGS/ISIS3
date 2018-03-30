@@ -422,7 +422,7 @@ namespace Isis {
         else { // spacecraft azimuth is null
           p_tableWin->table()->item(row, SPACECRAFT_AZIMUTH)->setText("");
         }
-        
+
         // Write out columns solar lon, slant distance, local solar time
         double solarLon = cvp->camera()->solarLongitude().degrees();
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
@@ -431,7 +431,7 @@ namespace Isis {
         double lst = cvp->camera()->LocalSolarTime();
         p_tableWin->table()->item(row, SOLAR_TIME)->setText(QString::number(lst));
       } // end if set image succeeds
-      
+
       // Always write out the x/y/z of the undistorted focal plane
       CameraDistortionMap *distortedMap = cvp->camera()->DistortionMap();
       double undistortedFocalPlaneX = distortedMap->UndistortedFocalPlaneX();
@@ -566,9 +566,9 @@ namespace Isis {
       int piSample, int &piOrigin, QString &psSrcFileName,
       QString &psSrcSerialNum) {
       try {
-        Cube *cCube = cvp->cube(); 
+        Cube *cCube = cvp->cube();
         int iTrackBand = -1;
-        
+
         if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
           Pvl *cPvl = cCube->label();
           PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
@@ -582,7 +582,7 @@ namespace Isis {
               }
             }
           }
-          
+
           if(iTrackBand > 0 && iTrackBand <= cCube->bandCount()) {
             Portal cOrgPortal(cCube->sampleCount(), 1,
                               cCube->pixelType());
@@ -593,16 +593,16 @@ namespace Isis {
               case 1:
                 piOrigin -= VALID_MIN1;
                 break;
-                
+
               case 2:
                 piOrigin -= VALID_MIN2;
                 break;
-                
+
               case 4:
                 piOrigin -= FLOAT_MIN;
                 break;
             }
-            
+
             // Get the input file name and serial number
             Table cFileTable(TABLE_MOSAIC_SRC);
             cCube->read(cFileTable);
@@ -613,11 +613,11 @@ namespace Isis {
             }
           }
         }
-      } 
+      }
       catch (IException &e) {
           QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());
       }
-      
+
   }
 
 
@@ -673,7 +673,7 @@ namespace Isis {
       connect(okButton, SIGNAL(clicked()), helpDialog, SLOT(accept()));
   }
 
-  
+
   /**
    * This method records data to the current row.
    *
@@ -686,7 +686,9 @@ namespace Isis {
     p_tableWin->setCurrentRow(p_tableWin->currentRow() + p_numRows);
     p_tableWin->setCurrentIndex(p_tableWin->currentIndex() + p_numRows);
     while(p_tableWin->currentRow() >= p_tableWin->table()->rowCount()) {
+
       row = p_tableWin->table()->rowCount();
+
       p_tableWin->table()->insertRow(row);
       for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
         QTableWidgetItem *item = new QTableWidgetItem("");
@@ -717,14 +719,17 @@ namespace Isis {
    *           added to be connected to the FindTool recordPoint()
    *           signal in qview.
    *  @history 2010-05-07 - Eric Hyer - Now shows the table as well
+   *  @history 2017-11-13 - Adam Goins - Made the call to showTable() first
+   *                            So that the table draws the recorded point if
+   *                            the point is the first point record. Fixes #5143.
    */
   void AdvancedTrackTool::record(QPoint p) {
+    p_tableWin->showTable();
     updateRow(p);
     record();
-    p_tableWin->showTable();
   }
 
-  
+
   /**
    * This method updates the record ID.
    *
@@ -756,13 +761,13 @@ namespace Isis {
    *   close, so you should call this any time you change the preserved state.
    */
   void AdvancedTrackTool::writeSettings() {
-    
+
     QSettings settings(settingsFilePath(), QSettings::NativeFormat);
-  
+
     settings.setValue("showHelpOnStart", m_showHelpOnStart);
   }
 
-  
+
   /**
    * Generate the correct path for the config file.
    *
@@ -775,10 +780,10 @@ namespace Isis {
           "application name before using the Isis::MainWindow class. Window "
           "state and geometry can not be saved and restored", _FILEINFO_);
     }
-    
+
     FileName config(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path() + "/" +
                     "advancedTrackTool.config");
-    
+
     return config.expanded();
   }
 }

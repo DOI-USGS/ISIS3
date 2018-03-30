@@ -184,9 +184,6 @@ namespace Isis {
       double globalPointCoord1AprioriSigma() const;
       double globalPointCoord2AprioriSigma() const;
       double globalPointCoord3AprioriSigma() const;
-      /* double globalLatitudeAprioriSigma() const; */
-      /* double globalLongitudeAprioriSigma() const; */
-      /* double globalRadiusAprioriSigma() const; */
 
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
@@ -359,9 +356,6 @@ namespace Isis {
                                                 Defaults to 1, so no change if rejection = false.*/
 
       // Parameter Uncertainties (Weighting)
-      /* double m_globalLatitudeAprioriSigma;  //!< The global a priori sigma for latitude. */
-      /* double m_globalLongitudeAprioriSigma; //!< The global a priori sigma for longitude. */
-      /* double m_globalRadiusAprioriSigma;    //!< The global a priori sigma for radius. */
       double m_globalPointCoord1AprioriSigma;   //!< The global a priori sigma for latitude or X.
       double m_globalPointCoord2AprioriSigma;   //!< The global a priori sigma for longitude or Y.
       double m_globalPointCoord3AprioriSigma;   //!< The global a priori sigma for radius or Z.
@@ -396,7 +390,6 @@ namespace Isis {
       BundleTargetBodyQsp m_bundleTargetBody; /**< A pointer to the target body
                                                    settings and information.*/
       // Control Points
-      //      SurfacePoint::CoordinateType m_bcpCoordType;  /**< Indicates the coordinate type for
       SurfacePoint::CoordinateType m_cpCoordTypeReports;  /**< Indicates the coordinate type for
                                                    outputting control points in reports.  */
       SurfacePoint::CoordinateType m_cpCoordTypeBundle;     /**< Indicates the coordinate type used 

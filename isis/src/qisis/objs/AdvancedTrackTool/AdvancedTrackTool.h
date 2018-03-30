@@ -47,7 +47,7 @@ namespace Isis {
    *  @history 2008-10-14 Noah Hilt - Added Projected X and Y values to the table.
    *  @history 2008-10-17 Noah Hilt - Added tooltips to certain items in the table
    *                          that did not have descriptive names.
-   *  @history 2010-02-17 Sharmila Prasad -Added the attributes TRACK_MOSAIC_INDEX, 
+   *  @history 2010-02-17 Sharmila Prasad -Added the attributes TRACK_MOSAIC_INDEX,
    *                          TRACK_MOSAIC_FILENAME, TRACK_MOSAIC_SERIAL_NUM to track
    *                          mosaic origin
    *  @history 2010-03-08 Jeannie Walldren - Added record() slot to be able to record a
@@ -61,7 +61,7 @@ namespace Isis {
    *                          the menu bar and a help dialog that displays when the
    *                          tool is opened the first time and when the user opens
    *                          it through the help menu. Fixes #772.
-   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                          coding standards. References #972.
    *  @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                          References #775.
@@ -71,13 +71,17 @@ namespace Isis {
    *  @history 2014-06-17 Jeannie Backer - Modified to print set value to empty strings for
    *                          photometric angles, azimuths, resolutions if not valid.
    *                          References #1659.
-   *  @history 2015-05-13 Makayla Shepherd - Modified to improve handling of 
+   *  @history 2015-05-13 Makayla Shepherd - Modified to improve handling of
    *                          undefined slot behavior. References #2210.
-   *  @history 2015-06-19 Makayla Shepherd - Added distorted Focal Plane and undistorted 
+   *  @history 2015-06-19 Makayla Shepherd - Added distorted Focal Plane and undistorted
    *                          Focal Plane to the table. References #1953.
    *  @history 2015-12-21 Makayla Shepherd - Changed the ordering of the enum to match the order
-   *                          of when the columns are added, in order to fix the incidence and 
+   *                          of when the columns are added, in order to fix the incidence and
    *                          emission angle columns from reporting incorrect numbers. Fixes #2381.
+   *  @history 2017-11-13 Adam Goins - Updated the record(QPoint p) function to call showTable()
+   *                          before it attempts to record a point so that a table is created
+   *                          to record the point into so that the first recorded point is drawn.
+   *                          Fixes #5143.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -118,7 +122,7 @@ namespace Isis {
       void readSettings();
       void writeSettings();
       QString settingsFilePath() const;
-      
+
       /**
        * Enum for column values
        */

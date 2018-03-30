@@ -58,6 +58,7 @@ int main(int argc, char *argv[]) {
     covar(1,1) = 2500.;
     covar(2,2) = 400.;
 
+    // Default is to set covar in meters**2 for length units
     spRec.SetRectangular(Displacement(-424.024048, Displacement::Meters),
                          Displacement(734.4311949, Displacement::Meters),
                          Displacement(529.919264, Displacement::Meters), covar);
@@ -70,7 +71,8 @@ int main(int argc, char *argv[]) {
     double radSig = spRec.GetLocalRadiusSigma().meters();
     symmetric_matrix<double,upper> covarSphere(3);
     covarSphere.clear();
-    covarSphere = spRec.GetSphericalMatrix();
+    // Default is to get matrix with length units in meters**2
+    covarSphere = spRec.GetSphericalMatrix(SurfacePoint::Kilometers);
     
     cout << setprecision(9);
     cout << "  Output spherical..." << endl;
@@ -126,7 +128,7 @@ int main(int argc, char *argv[]) {
                           covarSphere);
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
-    covarRec = spSphere.GetRectangularMatrix();
+    covarRec = spSphere.GetRectangularMatrix(SurfacePoint::Kilometers);
 
     if(fabs(covarRec(0,1)) < 1E-12) covarRec(0,1) = 0.0;
     if(fabs(covarRec(0,2)) < 1E-12) covarRec(0,2) = 0.0;
@@ -173,7 +175,7 @@ int main(int argc, char *argv[]) {
     double radSig = spRec.GetLocalRadiusSigma().meters();
     symmetric_matrix<double,upper> covarSphere(3);
     covarSphere.clear();
-    covarSphere = spRec.GetSphericalMatrix();
+    covarSphere = spRec.GetSphericalMatrix(SurfacePoint::Kilometers);
     
     cout << setprecision(9);
     cout << "  Output spherical..." << endl;
@@ -204,7 +206,7 @@ int main(int argc, char *argv[]) {
                                   Distance::Meters));
     symmetric_matrix<double,upper> covarRec(3);
     covarRec.clear();
-    covarRec = spSphere1.GetRectangularMatrix();
+    covarRec = spSphere1.GetRectangularMatrix(SurfacePoint::Kilometers);
     spSphere2.SetSpherical(Latitude(0.55850536, Angle::Radians),
                               Longitude(2.0943951, Angle::Radians),
                               Distance(1000., Distance::Meters),
@@ -230,7 +232,7 @@ int main(int argc, char *argv[]) {
          << covarRec(2,1) << "  " << covarRec(2,2) << endl;
 
     covarRec.clear();
-    covarRec = spSphere2.GetRectangularMatrix();
+    covarRec = spSphere2.GetRectangularMatrix(SurfacePoint::Kilometers);
     cout << "  4b-Output rectangular from radians..." << endl;
     cout << "    x=" << spSphere2.GetX().meters()
          << " m, y=" << spSphere2.GetY().meters()
@@ -305,7 +307,7 @@ int main(int argc, char *argv[]) {
     radSig = spRecKm.GetLocalRadiusSigma().meters();
     symmetric_matrix<double,upper> covarSphKm(3);
     covarSphKm.clear();
-    covarSphKm = spRecKm.GetSphericalMatrix();
+    covarSphKm = spRecKm.GetSphericalMatrix(SurfacePoint::Kilometers);
     
     cout << setprecision(9);
     cout << "    Output spherical..." << endl;
@@ -346,7 +348,7 @@ int main(int argc, char *argv[]) {
     spSphereKm.SetMatrix(SurfacePoint::Latitudinal, covarSphKm);
     symmetric_matrix<double,upper> covarRecKm(3);
     covarRecKm.clear();
-    covarRecKm = spSphereKm.GetRectangularMatrix();
+    covarRecKm = spSphereKm.GetRectangularMatrix(SurfacePoint::Kilometers);
 
     if(fabs(covarRecKm(0,1)) < 1E-12) covarRecKm(0,1) = 0.0;
     if(fabs(covarRecKm(0,2)) < 1E-12) covarRecKm(0,2) = 0.0;

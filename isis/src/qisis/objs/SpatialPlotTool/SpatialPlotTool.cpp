@@ -420,21 +420,21 @@ namespace Isis {
         /*
          * We have a rotated rectangle:
          *
-         *    --across-->
-         *  --------------
-         *  |A          B|
-         *  |            | |
-         *  |            | |
-         *  |            | |
-         *  |            | |
-         *  |            | | length
-         *  |            | |
-         *  |            | |
-         *  |            | |
-         *  |            | |
-         *  |            | V
-         *  |D          C|
-         *  --------------
+         *    --acrossLength-->
+         *  --------------------
+         *  |A                B|
+         *  |                  | |
+         *  |                  | |
+         *  |                  | |
+         *  |                  | |
+         *  |                  | | rectangleLength
+         *  |                  | |
+         *  |                  | |
+         *  |                  | |
+         *  |                  | |
+         *  |                  | V
+         *  |D                C|
+         *  -------------------
          *
          * A is the point where the user initially clicked to start drawing the
          * rectangle. A is clickSample, clickLine.
@@ -463,15 +463,29 @@ namespace Isis {
         double acrossVectorX = acrossSample - clickSample;
         double acrossVectorY = acrossLine - clickLine;
 
+        // Get length of "green" line on the screen
         int acrossLength = qRound(sqrt(acrossVectorX * acrossVectorX +
                                        acrossVectorY * acrossVectorY));
+                                       
+        // Prevent length of zero for later calculations
+        if (acrossLength == 0) {
+          acrossLength = 1;
+        }
+        
         double sampleStepAcross = (1.0 / (double)acrossLength) * acrossVectorX;
         double lineStepAcross = (1.0 / (double)acrossLength) * acrossVectorY;
 
         double lengthVectorSample = endSample - clickSample;
         double lengthVectorLine = endLine - clickLine;
+        
+        // Get length of "red" line on the screen
         int rectangleLength = qRound(sqrt(lengthVectorSample * lengthVectorSample +
                                           lengthVectorLine * lengthVectorLine));
+                                          
+        // Prevent length of zero for later calculations
+        if (rectangleLength == 0) {
+          rectangleLength = 1;
+        }
 
         SurfacePoint startPoint;
         UniversalGroundMap *groundMap = cvp->universalGroundMap();
@@ -491,7 +505,7 @@ namespace Isis {
           }
         }
 
-        // walk the "green" line on the screen
+        // walk the "red" line on the screen
         for(int index = 0; index <= rectangleLength; index++) {
           Statistics acrossStats;
 
@@ -508,6 +522,8 @@ namespace Isis {
           double sampleMid = sample + (acrossLength / 2.0) * sampleStepAcross;
           double lineMid = line + (acrossLength / 2.0) * lineStepAcross;
 
+          // For each pixel length in the red line direction, we are now recursing through each 
+          // pixel length in the green line's direction and adding the pixel values
           for(int acrossPixel = 0;
               acrossPixel <= acrossLength;
               acrossPixel++) {
