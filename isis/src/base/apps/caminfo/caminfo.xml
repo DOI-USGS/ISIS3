@@ -126,9 +126,9 @@
       CentroidSample    = 478.35374305118
       CentroidLatitude  = -29.488782021364
       CentroidLongitude = 290.21111567036
-      CentroidRadius    = 2440000.0 <meters>
-      SurfaceArea       = 10664470.286639 <km^2>
-      GlobalCoverage    = 14.254427 <percent>
+      CentroidRadius    = 2440000.0 &lt;meters&gt;
+      SurfaceArea       = 10664470.286639 &lt;km^2&gt;
+      GlobalCoverage    = 14.254427 &lt;percent&gt;
       SampleIncrement   = 102
       LineIncrement     = 102
       GisFootprint      = "MULTIPOLYGON (((0.0000000000000000
@@ -174,8 +174,8 @@
 
       Group = Mapping
         TargetName         = Mercury
-        EquatorialRadius   = 2440000.0 <meters>
-        PolarRadius        = 2440000.0 <meters>
+        EquatorialRadius   = 2440000.0 &lt;meters&gt;
+        PolarRadius        = 2440000.0 &lt;meters&gt;
         LatitudeType       = Planetocentric
         LongitudeDirection = PositiveEast
         LongitudeDomain    = 180
@@ -190,7 +190,6 @@
     End_Object
   End_Object
   End
-
 
 </pre>
 
