@@ -63,55 +63,6 @@ namespace Isis {
     connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(syncColumns()));
     p_tableWin->installEventFilter(this);
 
-    // p_tableWin->addToTable(false, "Id", "Id");
-    // p_tableWin->addToTable(true, "Sample:Line", "Sample:Line", -1,
-    //                        Qt::Horizontal, "Sample and Line");
-    // p_tableWin->addToTable(false, "Band", "Band");
-    // p_tableWin->addToTable(true, "Pixel", "Pixel");
-    // p_tableWin->addToTable(true, "Planetocentric Latitude", "Planetocentric Lat");
-    // p_tableWin->addToTable(false, "Planetographic Latitude", "Planetographic Lat");
-    // p_tableWin->addToTable(true, "360 Positive East Longitude", "360 East Longitude");
-    // p_tableWin->addToTable(false, "360 Positive West Longitude", "360 West Longitude");
-    // p_tableWin->addToTable(true, "180 Positive East Longitude", "180 East Longitude");
-    // p_tableWin->addToTable(false, "180 Positive West Longitude", "180 West Longitude");
-    // p_tableWin->addToTable(false, "Projected X:Projected Y", "Projected X:Projected Y", -1,
-    //                        Qt::Horizontal, "X and Y values for a projected image");
-    // p_tableWin->addToTable(false, "Local Radius", "Radius");
-    // p_tableWin->addToTable(false, "Point X:Point Y:Point Z", "XYZ", -1, Qt::Horizontal,
-    //                        "The X, Y, and Z of surface intersection in body-fixed coordinates");
-    // p_tableWin->addToTable(false, "Right Ascension:Declination", "Ra:Dec", -1, Qt::Horizontal,
-    //                        "Right Ascension and Declination");
-    // p_tableWin->addToTable(false, "Resolution", "Resolution");
-    // p_tableWin->addToTable(false, "Oblique Pixel Resolution", "Oblique Pixel Res");
-    // p_tableWin->addToTable(false, "Oblique Sample Resolution", "Oblique Sample Res");
-    // p_tableWin->addToTable(false, "Oblique Line Resolution", "Oblique Line Res");
-    // p_tableWin->addToTable(false, "Oblique Detector Resolution", "Oblique Detector Res");
-    // p_tableWin->addToTable(false, "Phase", "Phase");
-    // p_tableWin->addToTable(false, "Incidence", "Incidence");
-    // p_tableWin->addToTable(false, "Emission", "Emission");
-    // p_tableWin->addToTable(false, "LocalIncidence", "LocalIncidence");
-    // p_tableWin->addToTable(false, "LocalEmission", "LocalEmission");
-    // p_tableWin->addToTable(false, "North Azimuth", "North Azimuth");
-    // p_tableWin->addToTable(false, "Sun Azimuth", "Sun Azimuth");
-    // p_tableWin->addToTable(false, "Solar Longitude", "Solar Longitude");
-    // p_tableWin->addToTable(false, "Spacecraft X:Spacecraft Y:Spacecraft Z", "Spacecraft Position",
-    //                        -1, Qt::Horizontal, "The X, Y, and Z of the spacecraft position");
-    // p_tableWin->addToTable(false, "Spacecraft Azimuth", "Spacecraft Azimuth");
-    // p_tableWin->addToTable(false, "Slant Distance", "Slant Distance");
-    // p_tableWin->addToTable(false, "Focal Plane X:Focal Plane Y", "Focal Plane X:Y");
-    // p_tableWin->addToTable(false, "Undistorted Focal X:Undistorted Focal Y: Undistorted Focal Z",
-    //                        "Undistorted Focal Plane X:Y:Z");
-    // p_tableWin->addToTable(false, "Ephemeris Time", "Ephemeris iTime");
-    // p_tableWin->addToTable(false, "Local Solar Time", "Local Solar iTime");
-    // p_tableWin->addToTable(false, "UTC", "UTC", -1, Qt::Horizontal, "Internal time in UTC format");
-    // p_tableWin->addToTable(false, "Path", "Path");
-    // p_tableWin->addToTable(false, "FileName", "FileName");
-    // p_tableWin->addToTable(false, "Serial Number", "Serial Number");
-    // p_tableWin->addToTable(false, "Track Mosaic Index", "Track Mosaic Index");
-    // p_tableWin->addToTable(false, "Track Mosaic FileName", "Track Mosaic FileName");
-    // p_tableWin->addToTable(false, "Track Mosaic Serial Number", "Track Mosaic Serial Number");
-    // p_tableWin->addToTable(false, "Notes", "Notes");
-
     // Adds each item of checkBoxItems to the table.
     // If a tool tip is specified, we cannot skip parameters, so -1 and
     // Qt::Horizontal are specified.
@@ -298,7 +249,8 @@ namespace Isis {
           index++;
       }
     }
-    // cout<<"COUDL NOT FIND: "<< keyword<<endl;
+    IString msg = "Header [" + keyword + "] not found; make sure spelling is correct";
+    throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   /**
@@ -347,7 +299,7 @@ namespace Isis {
     if (line > cvp->cubeLines() + 0.5) return;
 
     // Write cols 0-2 (id, sample, line)
-    p_tableWin->table()->item(row, getIndex("Id"))->setText(QString::number(p_id));
+    p_tableWin->table()->item(row, getIndex("ID"))->setText(QString::number(p_id));
     p_tableWin->table()->item(row, getIndex("Sample"))->setText(QString::number(sample));
     p_tableWin->table()->item(row, getIndex("Line"))->setText(QString::number(line));
 
@@ -620,7 +572,7 @@ namespace Isis {
                                  setText(QString::number(wlon, 'f', 15));
             p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
                                  setText(QString::number(TProjection::To180Domain(wlon), 'f', 15));
-            p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
+            p_tableWin->table()->item(row, getIndex("Local Radius"))->setText(QString::number(radius, 'f', 15));
           }
         }
         else { // RingPlane
@@ -867,7 +819,7 @@ namespace Isis {
       p_id = 0;
     }
     else {
-      p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, ID)->text().toInt() + 1;
+      p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, getIndex("ID"))->text().toInt() + 1;
     }
   }
 
