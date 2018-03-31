@@ -141,11 +141,16 @@ if(JP2KFLAG)
  set(JP2KFLAG 1)
 endif()
 
+ # Set up the ctest tool which is used to run all of the tests.
+ enable_testing()
+ include(CTest)
+
 # Specify flags used
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -std=c++11
+                       -fPIC
                        -DISIS_LITTLE_ENDIAN=1
                        -fPIC -Wno-unused-parameter
                        -Wno-overloaded-virtual
@@ -153,18 +158,16 @@ set(thirdPartyCppFlags -Wall
                        -DENABLEJP2K=${JP2KFLAG}
                      )
 
- # Append CPP flags set in the third party lib file to the string set in this file.
- string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
- set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
- # Set up the ctest tool which is used to run all of the tests.
- enable_testing()
- include(CTest)
-
 # Flag to fix numeric literals problem with boost on linux
 if(NOT APPLE)
   set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
+
+ # Append CPP flags set in the third party lib file to the string set in this file.
+ string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)

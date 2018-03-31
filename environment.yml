@@ -14,8 +14,6 @@ dependencies:
   - gst-plugins-base
   - gstreamer==1.8.0=0
   - jsoncpp==1.8.3
-  - libgcc==4.8.5=1
-  - libgcc-ng==7.2.0
   - libgfortran==3.0=0
   - libstdcxx-ng==7.2.0
   - qwt=6.1.3
@@ -51,7 +49,7 @@ dependencies:
   - freeglut==3.0.0=4
   - freetype==2.7=1
   - geos==3.5.1=1
-  - geotiff==1.4.2=1
+  - geotiff==1.4.2
   - gettext==0.19.8.1=0
   - giflib==5.1.4=0
   - glib==2.51.4=0
@@ -59,7 +57,7 @@ dependencies:
   - gsl==2.2.1=blas_openblas_3
   - harfbuzz==1.3.4=2
   - hdf5==1.8.18=2
-  - icu==58.2=0
+  - icu==58.2
   - jasper==1.900.1=1
   - jbig==2.1=0
   - jpeg==9b=2
@@ -111,7 +109,6 @@ dependencies:
   - xorg-xproto==7.0.31=6
   - bz2file==0.98
   - cloog==0.18.0=0
-  - gcc==4.8.5=7
   - isl==0.12.2=0
   - protobuf==3.5.1
   - system==5.8=2
@@ -122,8 +119,8 @@ dependencies:
   - jama==125=0
   - pcl==1.8.1=0
   - qhull==7.2.0=0
-  - qt==5.7.1=0
-  - qwt==6.1.3=0
+  - qt==5.6.2
+  - qwt==6.1.3
   - tnt==126=0
   - xalan-c==1.11=0
 prefix: /scratch/anaconda3/envs/isis
