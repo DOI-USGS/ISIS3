@@ -56,6 +56,8 @@ namespace Isis {
    *                           References #2089.
    *   @history 2018-01-12 Summer Stapleton - Prevented lengths of zero for the rotated rectangle 
    *                           selection to address segfault. Fixes #4953.
+   *   @history 2018-01-18 Summer Stapleton - Modified the default interpolation mode to
+   *                           "Nearest Neighbor". Fixes #1949, 5257.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT

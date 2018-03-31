@@ -118,7 +118,7 @@ namespace Isis {
     m_interpolationCombo->addItem("Cubic Convolution",
         Interpolator::CubicConvolutionType);
     m_interpolationCombo->setCurrentIndex(
-        m_interpolationCombo->findText("BiLinear"));
+        m_interpolationCombo->findText("Nearest Neighbor"));
     connect(m_interpolationCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(refreshPlot()));
 
@@ -466,11 +466,6 @@ namespace Isis {
         // Get length of "green" line on the screen
         int acrossLength = qRound(sqrt(acrossVectorX * acrossVectorX +
                                        acrossVectorY * acrossVectorY));
-                                       
-        // Prevent length of zero for later calculations
-        if (acrossLength == 0) {
-          acrossLength = 1;
-        }
         
         double sampleStepAcross = (1.0 / (double)acrossLength) * acrossVectorX;
         double lineStepAcross = (1.0 / (double)acrossLength) * acrossVectorY;

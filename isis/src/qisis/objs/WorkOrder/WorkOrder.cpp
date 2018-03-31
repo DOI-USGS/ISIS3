@@ -40,6 +40,7 @@
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ShapeList.h"
+#include "Template.h"
 #include "XmlStackedHandlerReader.h"
 
 
@@ -55,12 +56,14 @@ namespace Isis {
     m_project = project;
 
     m_context = NoContext;
+    m_data = "";
     m_imageList = new ImageList;
     m_shapeList = new ShapeList;
     m_controlList = NULL;
     m_correlationMatrix = CorrelationMatrix();
     m_guiCamera = GuiCameraQsp();
     m_targetBody = TargetBodyQsp();
+    m_template = NULL;
     m_fileItem = FileItemQsp();
 
     m_isUndoable = true;
@@ -122,6 +125,7 @@ namespace Isis {
     m_targetBody = other.m_targetBody;
     m_fileItem = other.m_fileItem;
     m_internalData = other.m_internalData;
+    m_template = other.m_template;
 
     m_isUndoable = other.m_isUndoable;
     m_isSavedToHistory = other.m_isSavedToHistory;
@@ -165,6 +169,7 @@ namespace Isis {
    * @brief The Destructor
    */
   WorkOrder::~WorkOrder() {
+
     delete m_imageList;
     delete m_shapeList;
     delete m_futureWatcher;
@@ -259,6 +264,10 @@ namespace Isis {
     m_context = context;
   }
 
+  void WorkOrder::setData(QString data) {
+    m_data = data;
+  }
+
 
   /**
    * @brief Sets the ImageList data for this WorkOrder
@@ -314,12 +323,23 @@ namespace Isis {
   }
 
 
+
+
   /**
    * @brief Sets the TargetBody data for this WorkOrder.
    * @param targetBody A QSharedPointer to the TargetBody.
    */
   void WorkOrder::setData(TargetBodyQsp targetBody) {
     m_targetBody = targetBody;
+  }
+
+
+  /**
+   * @brief Sets the TargetBody data for this WorkOrder.
+   * @param targetBody A QSharedPointer to the TargetBody.
+   */
+  void WorkOrder::setData(Template *currentTemplate) {
+    m_template = currentTemplate;
   }
 
 
@@ -386,7 +406,13 @@ namespace Isis {
     else if ( item->isFileItem() ) {
       setData( item->fileItem() );
     }
+    else if ( item->isTemplate() ) {
+      setData( item->getTemplate() );
+    }
   }
+
+
+
 
 
   /**
@@ -397,6 +423,18 @@ namespace Isis {
    * if it is not.
    */
   bool WorkOrder::isExecutable(TargetBodyQsp targetBody) {
+    return false;
+  }
+
+
+  /**
+   * @brief Re-implement this method if your work order utilizes a control list (a list of control
+   * networks) for data in order to operate.
+   * @param controls A list of control networks.
+   * @return @b bool Upon re-implementation, returns True if the WorkOrder is executable, and False
+   * if it is not.
+   */
+  bool WorkOrder::isExecutable(Template *currentTemplate) {
     return false;
   }
 
@@ -482,6 +520,9 @@ namespace Isis {
     }
     else if ( item->isFileItem() ) {
       return isExecutable( item->fileItem() );
+    }
+    else if ( item->isTemplate() ) {
+      return isExecutable( item->getTemplate() );
     }
 
     return false;
@@ -700,6 +741,16 @@ namespace Isis {
   const ShapeList *WorkOrder::shapeList() const {
     QMutexLocker lock(m_transparentConstMutex);
     return const_cast<WorkOrder *>(this)->shapeList();
+  }
+
+
+  /**
+   * @brief WorkOrder::getTemplate
+   * @return @b QSharedPointer Returns a shared pointer to the Template.
+   */
+  Template *WorkOrder::getTemplate() {
+    QMutexLocker locker(project()->workOrderMutex());
+    return m_template;
   }
 
 

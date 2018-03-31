@@ -64,8 +64,9 @@
     <change name="Tracie Sucharski" date="2012-05-04">
       Added error message when input image does not contain Pds labels.
     </change>
-    <change name="Summer Stapleton" date="2017-11-22">
-      Changed returned max value from HRS to HIS in FixDns method.
+    <change name="Christopher Combs" date="2018-01-30">
+      Changed documentation to reflect newly added and unsupported target names
+      in translation files. Fixes #4970.
     </change>
   </history>
   <liens>
@@ -108,6 +109,14 @@
           Use this parameter to select the Cassini PDS Image Label. The file must
           contain PDS labels for Cassini ISS data.  This can be a detached label file with
           pointer to the cube data.
+          
+          <strong>NOTE:</strong> While we support most Cassini ISS Targets for ingestion, some of 
+          the smaller bodies do not currently have support for parameters such as their body radii. 
+          Therefore, spiceinit will fail when run on cubes created with these targets. The current 
+          list of these target bodies is : ANTHE, AEGAEON, BERGELMIR, BESTLA, ERRIAPO, ERRIAPUS,
+          FORNJOT, GREIP, HATI, HYROKKIN, IJIRAQ, JARNSAXA, K07S4, KARI, KIVIUQ, LOGE, MUNDILFARI,
+          NARVI, PAALIAQ, SIARNAQ, SKADI, SKATHI, SKOLL, SURTUR, SUTTUNG, SUTTUNGR, TARVOS, TARQEQ,
+          THRYM, THRYMR, YMIR. 
         </description>
         <filter>
           *.lbl *.LBL
@@ -122,6 +131,9 @@
          </brief>
          <description>
            Use this parameter to select the output filename
+           
+           <strong>NOTE:</strong> The following TARGET_NAMEs will be translated to 'Sky' in the
+           output cube's PVL: SKY, DARK SKY, S8_2004, S12_2004, S13_2004, S14_2004, S18_2004.
          </description>
          <filter>
            *.cub

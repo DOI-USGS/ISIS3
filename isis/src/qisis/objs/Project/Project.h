@@ -40,6 +40,7 @@ class QXmlStreamWriter;
 #include "ImageList.h"
 #include "ShapeList.h"
 #include "TargetBody.h"
+#include "TemplateList.h"
 #include "XmlStackedHandler.h"
 
 namespace Isis {
@@ -53,6 +54,8 @@ namespace Isis {
   class ImageReader;
   class ProgressBar;
   class ShapeReader;
+  class Template;
+  class TemplateList;
   class WorkOrder;
 
   /**
@@ -174,6 +177,50 @@ namespace Isis {
    *                           addTemplateFolder(), templateRoot(), and m_templates as well as
    *                           serialization and structure for importing template filenames
    *                           Fixes #5086.
+   *   @history 2017-09-13 Tracie Sucharski - Fixed problems with cleanup on temporary projects.
+   *                           Remove shapes, controls, and results.
+   *   @history 2017-09-26 Tracie Sucharski - Close Image cube in
+   *                           ::addTargetsFromImportedImagesToProject and
+   *                           ::addCamerasFromImportedImagesToProject.  Fixes #4955.
+   *   @history 2017-10-04 Tracie Sucharski - Comment out connections for
+   *                           addTargetsFromImportedImagesToProject and
+   *                           addCamerasFromImportedImagesToProject.  This functionality needs to
+   *                           be put into the asynchronous process of importing images for speed
+   *                           and memory efficiency.  See ticket #5181.  Fixes #4955.
+   *   @history 2017-10-16 Ian Humphrey - Modified activeControl() to check if any images have been
+   *                           imported into the project before trying to set an active control
+   *                           when there is only one control in the project. Fixes #5160.
+   *   @history 2017-11-01 Tracie Sucharski - Added new member variable for the
+   *                           new project root when a Save As is being executed.  Both the old and
+   *                           new project roots are needed for copying files into the new project
+   *                           folders. Also updated the project name based on the new project.
+   *                           Fixes #4849.
+   *   @history 2017-11-02 Tyler Wilson - Added support for opening Recent Projects from the
+   *                           File Menu.  Fixes #4492.
+   *   @history 2017-11-08 Ian Humphrey - Changed save() from a void to a bool return value. This
+   *                           indicates if the save dialog (for a temp project) is successfully
+   *                           saved (i.e. not cancelled). Fixes #5205.
+   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                           classes. Fixes #5117.
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to
+   *                           not clean. Fixes #5174.
+   *   @history 2017-11-15 Cole Neubauer - Added a check if there was an arg for the command line
+   *                           to avoid creation of new temp project if a user is opening one from
+   *                           the command line #5222
+   *   @history 2017-12-01 Adam Goins - Added the maxRecentProjects() function to return the max
+   *                           number of recent projects to be displayed. Fixes #5216.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168. Also fixed issue with saving
+   *                           a project before save as where isOpen was not set to true.
+   *   @history 2017-12-08 Tracie Sucharski - Added public method to add an Image to the
+   *                           idToImageMap.  This was needed to add Images from the results item.
+   *                           We need to access the map when opening saved projects that contain
+   *                           images from groups other than the main project data area.  This is
+   *                           a temporary fix until the project and model/view is improved.
+   *                           Corrected the setting of the project root when pening a project from
+   *                           the command line. Removed m_projectPath, it is no longer needed since
+   *                           m_projectRoot contains the correct path. References #5104.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -186,18 +233,23 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+
       QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
       void addControl(Control *control);
       QDir addImageFolder(QString prefix);
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
+      void addImagesToIdMap(ImageList images);
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
-      void addTemplates(QList<FileName> templateFiles);
+      void addTemplates(TemplateList *templateFiles);
       QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void addTarget(Target *target);
+      void addCamera(Camera *camera);
+
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void clear();
       bool clearing(); //! Accessor for if the project is clearing or not
@@ -217,12 +269,14 @@ namespace Isis {
       QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
-      void setClean(bool value);
+      QString newProjectRoot() const;
+
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
       void waitForShapeReaderFinished();
       QList<WorkOrder *> workOrderHistory();
+      void writeSettings(FileName projName) const;
 
       void setActiveControl(QString displayName);
       Control  *activeControl();
@@ -254,7 +308,7 @@ namespace Isis {
 
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
-      QList<FileName> templates();
+      QList<TemplateList *> templates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -266,12 +320,18 @@ namespace Isis {
        */
       BundleSettings *bundleSettings() {return m_bundleSettings;}
 
+      /**
+       * Return max number of recent projects to be displayed.
+       * @return Max number of recent Projects
+       */
+      static int maxRecentProjects() { return m_maxRecentProjects; }
+
       QProgressBar *progress();
 
       void removeImages(ImageList &imageList);
 
-      void save();
-      void save(FileName newPath, bool verifyPathDoesntExist = true);
+      bool save();
+      void save(FileName projectPath, bool verifyPathDoesntExist = true);
 
       void addToProject(WorkOrder *);
 
@@ -381,6 +441,12 @@ namespace Isis {
       void projectLoaded(Project *);
 
       /**
+       * Emitted when project is saved.
+       *
+       */
+      void projectSave(FileName projectName);
+
+      /**
        * Emitted when project location moved
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
@@ -394,17 +460,16 @@ namespace Isis {
        */
       void workOrderFinished(WorkOrder *);
 
-      void templatesAdded(QList<FileName> newFileList);
+      void templatesAdded(TemplateList *newTemplates);
 
     public slots:
       void open(QString);
+      void setClean(bool value);
 
     private slots:
       void controlClosed(QObject *control);
       void controlListDeleted(QObject *controlList);
       void imagesReady(ImageList);
-      void addTargetsFromImportedImagesToProject(ImageList *imageList);
-      void addCamerasFromImportedImagesToProject(ImageList *imageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
       void bundleSolutionInfoClosed(QObject *bundleSolutionInfo);
@@ -419,9 +484,12 @@ namespace Isis {
       Project(const Project &other);
       Project &operator=(const Project &rhs);
       void createFolders();
-      ControlList *createOrRetrieveControlList(QString name);
-      ImageList *createOrRetrieveImageList(QString name);
-      ShapeList *createOrRetrieveShapeList(QString name);
+
+      ControlList *createOrRetrieveControlList(QString name, QString path = "");
+      ImageList *createOrRetrieveImageList(QString name, QString path = "");
+      ShapeList *createOrRetrieveShapeList(QString name, QString path = "");
+
+      void writeSettings();
 
 
       QString nextImageListGroupName();
@@ -457,13 +525,15 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<FileName> m_templates;
+          QList<TemplateList *> m_templates;
           WorkOrder *m_workOrder;
       };
 
     private:
 
+      static const int m_maxRecentProjects = 5;
       QDir *m_projectRoot;
+      QString m_newProjectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
       QPointer<Directory> m_directory;
@@ -471,7 +541,7 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
-      QList<FileName> m_templates;
+      QList<TemplateList *> *m_templates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 

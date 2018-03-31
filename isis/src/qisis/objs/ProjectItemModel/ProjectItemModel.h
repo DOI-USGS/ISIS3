@@ -47,6 +47,7 @@ namespace Isis {
   class Project;
   class ProjectItem;
   class TargetBodyList;
+  class TemplateList;
 
   /**
    * Provides access to data stored in a Project through Qt's model-view
@@ -114,8 +115,17 @@ namespace Isis {
    *                           Fixes #5113
    *   @history 2017-08-11 Christopher Combs - Added onTemplatesAdded() and connected it to the
    *                           signal sent by Project. Fixes #5086.
-   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
+   *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open
    *                           source images. Fixes #5105.
+   *   @history 2017-10-30 Adam Goins - Modified currentItem() to return the first selected item
+   *                           in the project tree if there is no valid currentIndex. This would
+   *                           happen if the user was interacting with a cubeDN or footprint view
+   *                           and then tried right clicking on the project tree. Fixes #5111.
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *                           not clean. Fixes #5174.
+   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                           classes. Fixes #5117.
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -165,6 +175,11 @@ namespace Isis {
        * This signal is emitted when a ProjectItem is removed to the model.
        */
       void itemRemoved(ProjectItem *);
+      
+      /**
+       * This signal is emitted whrn a ProjectItem's name is changed.
+       */
+      void cleanProject(bool);
 
 
       /**
@@ -183,7 +198,7 @@ namespace Isis {
       void onControlAdded(Control *control);
       void onControlListAdded(ControlList *controlList);
       void onTargetsAdded(TargetBodyList *targets);
-      void onTemplatesAdded(QList<FileName> newFileList);
+      void onTemplatesAdded(TemplateList *templateList);
       void onGuiCamerasAdded(GuiCameraList *cameras);
       void onRowsInserted(const QModelIndex &parent, int start, int end);
       void onRowsRemoved(const QModelIndex &parent, int start, int end);
