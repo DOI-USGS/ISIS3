@@ -31,7 +31,7 @@ If you have a question or a problem with contributing to our software please con
 If you have a question about, a problem with, or a suggestion for ISIS3, please read our [Guidelines for reporting Redmine issues](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Guidelines_for_Reporting_Issues). Once you have read that please [submit](https://isis.astrogeology.usgs.gov/fixit/projects/isis/issues/new) a Redmine issue.
 
 ### Working on an existing issue or enhancement
-1. Assign the Redmine issue to yourself. If you don't have the permission to do this, please make a note on the issue that you would like to work on it. Please contact ## REGENT EMAIL HERE ## for permission to work on an issue.
+1. Assign the Redmine issue to yourself. If you don't have the permission to do this, please make a note on the issue indicating that you would like to work on it. 
 2. Propose a solution on the redmine issue. 
 3. Work with an ISIS3 developer, the issue reporter, and any other interested parties to get feedback on your solution. This may be an iterative process.
 4. Add an [impact statement](https://isis.astrogeology.usgs.gov/fixit/projects/isis/wiki/Impact_Statement) to the redmine issue. If you don't have the permission to do this, please make a note on the issue with the impact statement.
