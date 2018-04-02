@@ -17,8 +17,8 @@ find_library(GEOS_C_LIBRARY
   NAMES geos_c
 )
 
-message( "-- GEOS INCLUDE DIR: "  ${GEOS_INCLUDE_DIR} )
-message( "-- GEOS LIB: "  ${GEOS_LIBRARY} )
-message( "-- GEOS C LIB: "  ${GEOS_C_LIBRARY} )
+message(STATUS "GEOS INCLUDE DIR: "  ${GEOS_INCLUDE_DIR} )
+message(STATUS "GEOS LIB: "  ${GEOS_LIBRARY} )
+message(STATUS "GEOS C LIB: "  ${GEOS_C_LIBRARY} )
 
 get_filename_component(GEOS_ROOT_INCLUDE_DIR "${GEOS_INCLUDE_DIR}" DIRECTORY)

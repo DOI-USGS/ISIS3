@@ -8,4 +8,4 @@ find_library(X11_LIBRARY
   NAMES X11
 )
 
-message( "-- X11 LIB: "  ${X11_LIBRARY} ) 
+message(STATUS "X11 LIB: "  ${X11_LIBRARY} ) 
