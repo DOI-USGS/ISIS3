@@ -855,8 +855,11 @@ namespace Isis {
       if (network.hasKeyword("TargetRadii")) {
         header.targetRadii.clear();
         for (int i = 0; i < network.findKeyword("TargetRadii").size(); i++) {
-          header.targetRadii.push_back(Distance(toDouble(network.findKeyword("TargetRadii")[i]),
-                                           Distance::Meters));
+          Distance distance = Distance(toDouble(network.findKeyword("TargetRadii")[i]),
+                                           Distance::Meters);
+          if ( distance.isValid() ) {
+            header.targetRadii.push_back(distance);
+          }
         }
       }
       createHeader(header);
@@ -1244,8 +1247,10 @@ namespace Isis {
       if ( protoHeader.targetradii_size() >= 3 ) {
         header.targetRadii.clear();
         for (int i = 0; i < protoHeader.targetradii_size(); i++) {
-          header.targetRadii.push_back(Distance(protoHeader.targetradii(i),
-                                           Distance::Meters));
+          Distance distance = Distance(protoHeader.targetradii(i), Distance::Meters);
+          if ( distance.isValid() ) {
+            header.targetRadii.push_back(distance);
+          }
         }
       }
       createHeader(header);
