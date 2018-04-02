@@ -205,16 +205,12 @@ namespace Isis {
     network += PvlKeyword("LastModified", m_header.lastModified);
     network += PvlKeyword("Description", m_header.description);
     if ( !m_header.targetRadii.empty() ) {
-          //  PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
-          // network += pvlRadii;
-          //  network += PvlKeyword("EquatorialRadius", toString(m_header.equatorialRadius.meters() ) );
-          //  network += PvlKeyword("PolarRadius", toString(m_header.polarRadius.meters()));
           PvlKeyword targetRadii("TargetRadii");
-           targetRadii += toString(m_header.targetRadii[0].meters());
-           targetRadii += toString(m_header.targetRadii[1].meters());
-           targetRadii += toString(m_header.targetRadii[2].meters());
-           network += targetRadii;
-         }
+          for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+            targetRadii += toString(m_header.targetRadii[i].meters());
+          }
+          network += targetRadii;
+      }
     // optionally add username to output?
 
     // This is the Pvl version we're converting to
