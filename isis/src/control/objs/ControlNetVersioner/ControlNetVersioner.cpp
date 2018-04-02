@@ -64,7 +64,13 @@ namespace Isis {
     header.description = net->Description();
     header.userName = net->GetUserName();
 
-    header.targetRadii = net->GetTargetRadii();
+    std::vector<Distance> netRadii = net->GetTargetRadii();
+    if ( netRadii.size() >= 3 &&
+         netRadii[0].isValid() &&
+         netRadii[1].isValid() &&
+         netRadii[2].isValid() ) {
+           header.targetRadii = net->GetTargetRadii();
+         }
     createHeader(header);
   }
 
@@ -204,30 +210,19 @@ namespace Isis {
     network += PvlKeyword("Created", m_header.created);
     network += PvlKeyword("LastModified", m_header.lastModified);
     network += PvlKeyword("Description", m_header.description);
-    if ( !m_header.targetRadii.empty() ) {
-          PvlKeyword targetRadii("TargetRadii");
-          for (uint i = 0; i < m_header.targetRadii.size(); i++) {
-            targetRadii += toString(m_header.targetRadii[i].meters());
-          }
-          network += targetRadii;
+
+    // Grab TargetRadii if they exist.
+    if (!m_header.targetRadii.empty()) {
+        PvlKeyword pvlRadii("TargetRadii");
+        for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+          pvlRadii += toString(m_header.targetRadii[i].meters());
+        }
+        network += pvlRadii;
       }
     // optionally add username to output?
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "5");
-
-    //  Get Target Radii from naif kernel
-    PvlGroup pvlRadii;
-    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
-    if ( target != "" ) {
-      try {
-        NaifStatus::CheckErrors();
-        pvlRadii = Target::radiiGroup(target);
-      }
-      catch (IException) {
-        // leave pvlRadii empty if target is not recognized by NAIF
-      }
-    }
 
     foreach (ControlPoint *controlPoint, m_points) {
       PvlObject pvlPoint("ControlPoint");
@@ -350,11 +345,11 @@ namespace Isis {
           matrix += toString(aprioriCovarianceMatrix(1, 2));
           matrix += toString(aprioriCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+          if ( !m_header.targetRadii.empty() ) {
 
-            aprioriSurfacePoint.SetRadii( Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
+            aprioriSurfacePoint.SetRadii( m_header.targetRadii[0],
+                                          m_header.targetRadii[1],
+                                          m_header.targetRadii[2] );
 
             if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                  && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
@@ -433,11 +428,11 @@ namespace Isis {
           matrix += toString(adjustedCovarianceMatrix(1, 2));
           matrix += toString(adjustedCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+          if ( !m_header.targetRadii.empty() ) {
 
-            adjustedSurfacePoint.SetRadii(Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
+            adjustedSurfacePoint.SetRadii( m_header.targetRadii[0],
+                                           m_header.targetRadii[1],
+                                           m_header.targetRadii[2] );
 
             if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                  && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
@@ -1699,13 +1694,14 @@ namespace Isis {
       m_header.targetName = "Mars";
     }
 
-    if ( !m_header.targetName.isEmpty() ) {
+    if ( m_header.targetRadii.empty() ) {
       try {
-         // attempt to get target radii values...
+          // attempt to get target radii values...
           // The target body raii values are read from the PvlV0005 and BinaryV0005
           // Networks. In the event these values weren't read (from an older network)
           // then we must grab them from the Target::radii group.
-          if ( m_header.targetRadii.empty() ) {
+          if ( !m_header.targetName.isEmpty() ) {
+
             PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
             m_header.targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
                                              Distance::Meters));
