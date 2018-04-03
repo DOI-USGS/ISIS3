@@ -526,5 +526,8 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.so*"
 # Add the Boost libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libboost*.so*"
 
+# Add srtp deps (Qt5WebEngine deps) -- see #5365
+THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libsrtp*.so*"
+
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"
