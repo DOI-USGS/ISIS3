@@ -91,6 +91,7 @@ namespace Isis {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
+      connect(m_directory, SIGNAL(viewClosed(QWidget *)), this, SLOT(removeView(QWidget *)));
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
@@ -226,11 +227,47 @@ namespace Isis {
       if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
         mdiArea->addSubWindow(newWidget);
         newWidget->show();
+        QMdiSubWindow *window = qobject_cast<QMdiSubWindow *>(newWidget);
+        qDebug()<<"IpceMainWindow::addView new subwindow = "<<window<<" widget = "<<newWidget;
         mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(newWidget));
         setActiveView(qobject_cast<AbstractProjectItemView *>(newWidget));
       }
     }
   }
+
+
+  /**
+   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will 
+   * close the given QMdiSubWindow from the QMdiArea.  This will also delete the widget contained 
+   * within the subwindow which is an AbstractProjectItemView. 
+   * 
+   * @param view QWidget* 
+   *
+   */
+  void IpceMainWindow::removeView(QWidget *view) {
+
+    qDebug()<<"IpceMainWindow::removeView active view = "<<view;
+    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
+    if (mdiArea){
+      // Get all QMdiSubWindows, then find subwindow that hold widget
+      QList<QMdiSubWindow *> subWindowList = mdiArea->subWindowList();
+      foreach (QMdiSubWindow *sub, subWindowList) {
+        if (sub->widget() == view) {
+          qDebug()<<"                    active view FOUND";
+          sub->close();
+          break;
+        }
+      }
+//    QMdiSubWindow *window = qobject_cast<QMdiSubWindow *>(view);
+//    qDebug()<<"IpceMainWindow::removeView activewindow = "<<window;
+//    mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(view));
+//    qDebug()<<"IpceMainWindow::removeView";
+//    mdiArea->closeActiveSubWindow();
+      delete view;
+    }
+  }
+
+
   /**
    * Removes All Views in main window, connected to directory signal directoryCleaned()
    */
@@ -238,12 +275,12 @@ namespace Isis {
     setWindowTitle("ipce");
     QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
     if (mdiArea){
-      QMdiSubWindow* window = new QMdiSubWindow();
-      window->show();
-      window->activateWindow();
-      mdiArea->addSubWindow(window);
+//    QMdiSubWindow* window = new QMdiSubWindow();
+//    window->show();
+//    window->activateWindow();
+//    mdiArea->addSubWindow(window);
       mdiArea->closeAllSubWindows();
-      delete window;
+//    delete window;
     }
     if (!m_detachedViews.isEmpty()) {
       foreach ( QMainWindow* view, m_detachedViews ) {
@@ -411,7 +448,13 @@ namespace Isis {
       m_permToolBar->addAction(action);
     }
     foreach (QAction *action, m_permToolBarActions) {
-      m_permToolBar->addAction(action);
+      if (action->text() == "&Save Active Control Network") {
+        m_permToolBar->addSeparator();
+      }
+      m_permToolBar->addAction(action); 
+      if (action->text() == "&Save Active Control Network") {
+        m_permToolBar->addSeparator();
+      }
     }
     m_permToolBar->addSeparator();
     if (m_activeView) {
@@ -514,6 +557,30 @@ namespace Isis {
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
+
+    QAction *saveNet = new QAction("&Save Active Control Network", this);
+    saveNet->setIcon( QIcon::fromTheme("document-save") );
+    saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
+    saveNet->setToolTip("Save current active control network");
+    saveNet->setStatusTip("Save current active control network");
+    QString whatsThis = "<b>Function:</b> Saves the current active<i>"
+                        "control network</i>";
+    saveNet->setWhatsThis(whatsThis);
+    connect(saveNet, SIGNAL(triggered()), m_directory, SLOT(saveActiveControl()));
+    m_permToolBarActions.append(saveNet);
+
+//  m_saveAsNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSaveAs.png"),
+//                            "Save Control Network &As...",
+//                            m_matchTool);
+//  m_saveAsNet->setToolTip("Save current control network to chosen file");
+//  m_saveAsNet->setStatusTip("Save current control network to chosen file");
+//  whatsThis = "<b>Function:</b> Saves the current <i>"
+//      "control network</i> under chosen filename";
+//  m_saveAsNet->setWhatsThis(whatsThis);
+//  connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
+
+
+
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -1045,7 +1112,7 @@ namespace Isis {
     menuBar->addMenu(viewMenu);
 
     if ( !view->settingsMenuActions().isEmpty() ) {
-      QMenu *settingsMenu = new QMenu("&Settings", newWindow);
+      QMenu *settingsMenu = new QMenu("S&ettings", newWindow);
       foreach ( QAction *action, view->settingsMenuActions() ) {
         settingsMenu->addAction(action);
       }
