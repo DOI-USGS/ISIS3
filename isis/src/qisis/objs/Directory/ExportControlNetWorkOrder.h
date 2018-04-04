@@ -29,6 +29,9 @@ namespace Isis {
    *                           isExecutable to prevent potential seg faults.  References #4760.
    *   @history 2018-03-13 Tracie Sucharski - Added Undo text to prevent runtime warning. Also
    *                           correct redmine ticket number in previous history entry.
+   *   @history 2018-03-30 Tracie Sucharski - Copy the control net instead of writing.  This will
+   *                           be faster and will prevent another control net from being read into
+   *                           memory.
    */
   class ExportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
