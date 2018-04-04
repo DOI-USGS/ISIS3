@@ -152,7 +152,8 @@
      Added NaifStatus::CheckErrors() to see if any NAIF errors were signaled. References #2248.
     </change>
     <change name="Kaitlyn Lee" date="2018-02-17">
-     Added the PixelType attribute to the output cube and set it to real. Fixes #5187.
+     Added the PixelType attribute to the output cube and set it to real.
+     Documentation updated by editor. Fixes #5187.
     </change>
   </history>
 
@@ -309,7 +310,7 @@
         <description>
           This is a list of quick settings for the other parameters in the Optimizations group. This
           also includes the ability to disable the shadow computations entirely. These options are
-          provided for those who don't need a lot of customization or don't want to calculate
+          provided for those who do not need a lot of customization or do not want to calculate
           shadow positions.
         </description>
         <list>
@@ -421,7 +422,7 @@
         <description>
           When a ray is determined to be in shadow, every DEM pixel between the original position and
           the point at which the DEM intersected the ray will be marked as in shadow. We then perform no
-          significant work when processing a pixel we previously determined was in
+          significant work when processing a pixel that we previously determined was in
           shadow. This also helps avoid unnecessary ray-DEM intersection checks (because surfaces
           are not shadowed by surfaces already in shadow).
         </description>
@@ -591,7 +592,7 @@
         <image width="458" height="550" src="assets/images/example1_match.jpg">
           <brief>MATCH image for computing the sun position</brief>
           <description>
-            We gather the sun position from this image. In other words, we're trying
+            We gather the sun position from this image. In other words, we are trying
             to make the DEM look like this image.
           </description>
           <thumbnail width="167" height="200" caption="MATCH cube"
