@@ -4,6 +4,7 @@
 
 include(CodeGeneration)
 
+
 # Incorporate an application folder
 function(add_isis_app folder libDependencies)
 
@@ -57,6 +58,7 @@ function(add_isis_app folder libDependencies)
       add_makefile_test_folder(${f} ${appName}_app)
     endforeach()
   endif()
+
 endfunction(add_isis_app)
 
 

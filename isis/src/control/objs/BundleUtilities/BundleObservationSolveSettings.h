@@ -156,7 +156,6 @@ class BundleObservationSolveSettings {
                                          double positionAprioriSigma = -1.0,
                                          double velocityAprioriSigma = -1.0,
                                          double accelerationAprioriSigma = -1.0);
-                                         
       InstrumentPositionSolveOption instrumentPositionSolveOption() const;
       int spkDegree() const;
       int spkSolveDegree() const;

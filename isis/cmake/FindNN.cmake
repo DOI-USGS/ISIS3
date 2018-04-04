@@ -15,5 +15,5 @@ find_library(NN_LIBRARY
 
 get_filename_component(NN_ROOT_INCLUDE_DIR "${NN_INCLUDE_DIR}" DIRECTORY)
 
-message(STATUS "NN INCLUDE DIR: ${NN_INCLUDE_DIR}")
-message(STATUS "NN LIB: ${NN_LIBRARY}")
+message( "-- NN INCLUDE DIR: ${NN_INCLUDE_DIR}")
+message( "-- NN LIB: ${NN_LIBRARY}")
