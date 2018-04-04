@@ -215,7 +215,17 @@ namespace Isis {
    *                           addCubeDnView. Added method controlUsedInCnetEditorWidget so Project
    *                           knows whether it is safe to close a control net when a new active is
    *                           set. References #5026.
-   *  
+   *   @history 2018-03-30 Tracie Sucharski - Use the Control::write to write the control net to
+   *                           disk instead of directly calling ControlNet::Write, so that the
+   *                           Control can keep track of the modified status of the control net.
+   *                           Connect cnetModified signal to Project::activeControlModified so
+   *                           modified state of the active control can be set so project knows
+   *                           that control has unsaved changes.
+   *   @history 2018-04-02 Tracie Sucharski - Cleanup m_controlPointEditViewWidget pointer when
+   *                           the ControlPointEditView is deleted. Added slot to reload the active
+   *                           control net in cneteditor view, effectively discarding any edits.
+   *                           This was done because there is no way to re-load a control net in the
+   *                           CnetEditor widget classes.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -336,6 +346,8 @@ namespace Isis {
       void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
 
+      void viewClosed(QWidget *widget);
+
       void cnetModified();
       void redrawMeasures();
 
@@ -355,6 +367,7 @@ namespace Isis {
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
+      void saveActiveControl();
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
@@ -372,6 +385,7 @@ namespace Isis {
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
       void newActiveControl(bool newControl);
+      void reloadActiveControlInCnetEditorView();
 
     private:
       /**

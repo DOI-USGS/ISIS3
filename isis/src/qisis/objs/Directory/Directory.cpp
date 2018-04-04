@@ -132,11 +132,14 @@ namespace Isis {
     //connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
              //this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
 
-     connect( m_project, SIGNAL(projectLoaded(Project *) ),
+    connect( m_project, SIGNAL(projectLoaded(Project *) ),
               this, SLOT(updateRecentProjects(Project *) ) );
 
+    connect(this, SIGNAL(cnetModified()), m_project, SLOT(activeControlModified()));
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
+    connect(m_project, SIGNAL(discardActiveControlEdits()),
+            this, SLOT(reloadActiveControlInCnetEditorView()));
 
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
@@ -532,7 +535,37 @@ namespace Isis {
   }
 
 
+  /**
+   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a 
+   * new active control and wants to discard any edits in the old active control.  The only view 
+   * which will not be updated with the new control are any CnetEditorViews showing the old active 
+   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the 
+   * CnetEditor view displaying the old control is removed, then recreated.
+   *  
+   */
+  void Directory::reloadActiveControlInCnetEditorView() {
+    qDebug()<<"Directory::reloadActiveControlInCnetEditorView";
+    foreach(CnetEditorWidget *cnetEditorView, m_cnetEditorViewWidgets) {
+      if (cnetEditorView->control() == project()->activeControl()->controlNet()) {
+        emit viewClosed(cnetEditorView);
+//      cnetEditorView->close();
+//      delete cnetEditorView;
+        project()->activeControl()->closeControlNet();
+        project()->activeControl()->openControlNet();
+        addCnetEditorView(project()->activeControl());
+      }
+    }
+  }
+
+
   void Directory::newActiveControl(bool newControl) {
+
+//  if (newControl && m_controlPointEditViewWidget) {
+//    bool closed = m_controlPointEditViewWidget->close();
+//    qDebug()<<"Directory::newActiveControl  CPEditor closed = "<<closed;
+//    emit viewClosed(m_controlPointEditViewWidget);
+//    delete m_controlPointEditViewWidget;
+//  }
 
     // If the new active control is the same as what is showing in the cnetEditorWidget, allow
     // editing of control points from the widget, otherwise turnoff from context menu
@@ -607,7 +640,6 @@ namespace Isis {
   CnetEditorWidget *Directory::addCnetEditorView(Control *network) {
 
     QString title = tr("Cnet Editor View %1").arg( network->displayProperties()->displayName() );
-
     FileName configFile("$HOME/.Isis/" + QApplication::applicationName() + "/" + title + ".config");
 
     // TODO: This layout should be inside of the cnet editor widget, but I put it here to not
@@ -868,8 +900,14 @@ namespace Isis {
 
       //  Create connections between signals from control point edit view and equivalent directory
       //  signals that can then be connected to other views that display control nets.
+      qDebug()<<"ControlPointEditView::addControlPointEditView  before cnetModified connection.";
+//      connect(mainWidget, SIGNAL(cnetModified()),
+//              this, SIGNAL(cnetModified()));
       connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
               this, SIGNAL(cnetModified()));
+      connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
+              m_project, SLOT(activeControlModified()));
+      qDebug()<<"ControlPointEditView::addControlPointEditView  after cnetModified connection.";
 
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
@@ -1071,7 +1109,7 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
-
+    qDebug()<<"Directory::cleanupCnetEditorViewWidgets";
     CnetEditorWidget *cnetEditorWidget = static_cast<CnetEditorWidget *>(obj);
     if (!cnetEditorWidget) {
       return;
@@ -1157,10 +1195,12 @@ namespace Isis {
    */
   void Directory::cleanupControlPointEditViewWidget(QObject *obj) {
 
+    qDebug()<<"Directory::cleanupControlPointEditView";
      ControlPointEditView *controlPointEditView = static_cast<ControlPointEditView *>(obj);
      if (!controlPointEditView) {
        return;
      }
+     m_controlPointEditViewWidget = NULL;
      m_project->setClean(false);
 
    }
@@ -1815,6 +1855,16 @@ namespace Isis {
         latitude, longitude, cube, isGroundSource);
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
+  }
+
+
+  /**
+   * Save the current active control.
+   *
+   */
+  void Directory::saveActiveControl() {
+
+    project()->activeControl()->write();
   }
 
 
