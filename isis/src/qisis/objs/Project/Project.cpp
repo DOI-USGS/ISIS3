@@ -1702,11 +1702,41 @@ namespace Isis {
    *                           being chosen Fixes #4969
    *  @history 2017-08-02 Cole Neubauer - Added functionality to switch between active controls
    *                           Fixes #4567
+   *  @history 2018-03-30 Tracie Sucharski - If current activeControl has been modified, prompt for
+   *                           saving. Emit signal to discardActiveControlEdits.
    *
    */
   void Project::setActiveControl(QString displayName) {
     Control *previousControl = m_activeControl; 
     if (m_activeControl) {
+      qDebug()<<"PRoject::setActiveControl m_activeControl->isModified() = "<<m_activeControl->isModified();
+
+      // If the current active control has been modified, ask user if they want to save or discard
+      // changes.
+      if (m_activeControl->isModified()) {
+        QMessageBox msgBox;
+        msgBox.setText("Save current active control");
+        msgBox.setInformativeText("The current active control has been modified.  Do you want "
+                                  "to save before setting a new active control?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+        switch (ret) {
+          // Save current active control
+          case QMessageBox::Save:
+            qDebug()<<" ** SAVE **";
+            m_activeControl->write();
+            break;
+          // Discard any changes made to cnet
+          case QMessageBox::Discard:
+            emit discardActiveControlEdits();
+            break;
+          // Cancel operation
+          case QMessageBox::Cancel:
+            return;
+        }
+      }
+      qDebug()<<"Project::setActiveControl before emit activeControlSet";
       emit activeControlSet(false);
       ProjectItem *item = directory()->model()->findItemData(m_activeControl->
                           displayProperties()->displayName(), Qt::DisplayRole);
@@ -1770,6 +1800,12 @@ namespace Isis {
       }
     }
     return m_activeControl;
+  }
+
+
+  void Project::activeControlModified() {
+    qDebug()<<"Project::activeControlModified m_activeControl = "<<m_activeControl;
+    m_activeControl->setModified(true);
   }
 
 
