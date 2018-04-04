@@ -13,5 +13,5 @@ find_library(PNG_LIBRARY
   NAMES png
 )
 
-message(STATUS "PNG INCLUDE DIR: ${PNG_INCLUDE_DIR}")
-message(STATUS "PNG LIB: ${PNG_LIBRARY}")
+message( "-- PNG INCLUDE DIR: ${PNG_INCLUDE_DIR}")
+message( "-- PNG LIB: ${PNG_LIBRARY}")

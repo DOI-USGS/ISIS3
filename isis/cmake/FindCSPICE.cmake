@@ -14,5 +14,5 @@ find_library(CSPICE_LIBRARY
   NAMES cspice
 )
 
-message(STATUS "CSPICE INCLUDE: " ${CSPICE_INCLUDE_DIR} )
-message(STATUS "CSPICE LIB: "  ${CSPICE_LIBRARY} )
+message( "-- CSPICE INCLUDE: " ${CSPICE_INCLUDE_DIR} )
+message( "-- CSPICE LIB: "  ${CSPICE_LIBRARY} )
