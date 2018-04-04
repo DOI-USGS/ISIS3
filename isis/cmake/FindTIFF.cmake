@@ -5,5 +5,5 @@ find_path(TIFF_INCLUDE_DIR
 
 find_library(TIFF_LIBRARY NAMES tiff)
 
-message( "-- TIFF INCLUDE DIR: ${TIFF_INCLUDE_DIR}")
-message( "-- TIFF LIB: ${TIFF_LIBRARY}")
+message(STATUS "TIFF INCLUDE DIR: ${TIFF_INCLUDE_DIR}")
+message(STATUS "TIFF LIB: ${TIFF_LIBRARY}")
