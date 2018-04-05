@@ -237,14 +237,20 @@ namespace Isis {
    *                           parent prematurely to be able to set the radii
    *                           in ControlPoint.
    * @history 2017-12-21 Jesse Mapel - Modified to use the ControlNetVersioner.
-   *
+   * @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
+   *                         group to set radii values to those ingested from the versioner
+   *                         if they exist. Otherwise, we call SetTarget with the targetname.
    */
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
 
     FileName cnetFileName(filename);
     ControlNetVersioner versionedReader(cnetFileName, progress);
-
-    SetTarget( versionedReader.targetName() );
+    if ( versionedReader.hasTargetRadii() ) {
+      p_targetRadii = versionedReader.targetRadii();
+    }
+    else {
+      SetTarget( versionedReader.targetName() );
+    }
     p_networkId   = versionedReader.netId();
     p_userName    = versionedReader.userName();
     p_created     = versionedReader.creationDate();
@@ -346,8 +352,8 @@ namespace Isis {
 
 
  /**
-   * Adds a whole point to the control net graph. 
-   *    
+   * Adds a whole point to the control net graph.
+   *
    * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
    * @throws IException::Programmer "Control measure with NULL parent passed to
    *     ControlNet::AddControlCubeGraphNode!"
