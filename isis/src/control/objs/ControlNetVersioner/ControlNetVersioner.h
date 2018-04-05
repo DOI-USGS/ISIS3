@@ -406,6 +406,9 @@ namespace Isis {
    *   @history 2018-03-28 Adam Goins - Added targetRadii groups to the header. Changed the
    *                           versioner to write these values out in a targetRadii group for
    *                           both binary V0005 and PvlV0005 networks. Fixes #5361.
+   *   @history 2018-04-05 Adam Goins - Added hastargetRadii() and targetRadii() to the versioner
+   *                           so that these values can be grabbed from a ControlNet on read.
+   *                           Also Fixes #5361.
    */
   class ControlNetVersioner {
 
@@ -420,6 +423,8 @@ namespace Isis {
       QString lastModificationDate() const;
       QString description() const;
       QString userName() const;
+      bool hasTargetRadii() const;
+      std::vector<Distance> targetRadii() const;
 
       int numPoints() const;
       ControlPoint *takeFirstPoint();

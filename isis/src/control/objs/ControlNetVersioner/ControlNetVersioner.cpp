@@ -167,6 +167,25 @@ namespace Isis {
 
 
   /**
+  * Returns true if the targetRadii in the header has values.
+  *
+  * @return @b boolean True if the targetRadii in the header is populated.
+  */
+  bool ControlNetVersioner::hasTargetRadii() const {
+    return m_header.targetRadii.empty() ? false : true;
+  }
+
+  /**
+  * Returns the targetRadii Distance vector located in the header.
+  *
+  * @return @b std::vector<Distance> A vector containing the target body radii.
+  */
+  std::vector<Distance> ControlNetVersioner::targetRadii() const {
+    return m_header.targetRadii;
+  }
+
+
+  /**
    * Returns the number of points that have been read in or are ready to write out.
    *
    * @return @b int The number of control points stored internally.
