@@ -246,7 +246,9 @@ namespace Isis {
     FileName cnetFileName(filename);
     ControlNetVersioner versionedReader(cnetFileName, progress);
     if ( versionedReader.hasTargetRadii() ) {
-      p_targetRadii = versionedReader.targetRadii();
+      foreach (Distance distance, versionedReader.targetRadii()) {
+        p_targetRadii.push_back(distance);
+      }
     }
     else {
       SetTarget( versionedReader.targetName() );
