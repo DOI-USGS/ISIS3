@@ -108,6 +108,9 @@ namespace Isis {
    *                           ISIS coding standards and removed include for std::string.
    *   @history 2016-06-21 Kris Becker - Properly forward declare QPair as struct not class
    *   @history 2017-04-21 Cole Neubauer - Updated documentation for the class Fixes #4121
+   *   @history 2018-04-06 Kaitlyn Lee - Moved method documentation to cpp file and
+   *                           updated it for consistency. Fixes #5230.
+
    */
   class FileName {
     public:
@@ -116,10 +119,10 @@ namespace Isis {
       FileName(const char *fileName);
       FileName(const QString &fileName);
 
-      //! Copy Constructor, creates a copy of a FileName object.
+      // Copy Constructor, creates a copy of a FileName object.
       FileName(const FileName &other);
 
-      //! Destroys the FileName Object
+      // Destroys the FileName Object
       ~FileName();
 
       // Methods
@@ -173,13 +176,13 @@ namespace Isis {
       class Data : public QSharedData {
         public:
 
-          //Constructors
+          // Constructors
           Data();
 
-          //! Copy Constructor, creates a copy of a Data object.
+          // Copy Constructor, creates a copy of a Data object.
           Data(const Data &other);
 
-          //! Destroys the Data Object
+          // Destroys the Data Object
           ~Data();
 
           // Methods
@@ -188,15 +191,15 @@ namespace Isis {
           QString expanded(bool includeAttributes) const;
 
         private:
-          //! Holds the original file name.
+          // Holds the original file name.
           QString *m_originalFileNameString;
 
 
-          //! Holds the expanded file name.
+          // Holds the expanded file name.
           QString *m_expandedFileNameString;
       };
 
-      //! @see QSharedDataPointer
+      // @see QSharedDataPointer
       QSharedDataPointer<Data> m_d;
   };
 };

@@ -40,13 +40,16 @@ using namespace std;
 
 namespace Isis {
 
-  //! Constructs an empty FileName object.
+  /**
+   * Constructs an empty FileName object.
+   */
   FileName::FileName() {
     m_d = new Data;
   }
 
   /**
    * Constructs a FileName object using a char pointer as a file name.
+   *
    * @param *fileName char pointer representing new filename
    */
   FileName::FileName(const char *file) {
@@ -56,6 +59,7 @@ namespace Isis {
 
   /**
    * Constructs a FileName object using a QString as a file name.
+   *
    * @param &fileName Qstring representing new filename
    */
   FileName::FileName(const QString &file) {
@@ -65,12 +69,15 @@ namespace Isis {
 
   /**
    * Constructs a copy of a FileName object using another FileName object.
+   *
    * @param &other FileName object to copy.
    */
   FileName::FileName(const FileName &other) : m_d(other.m_d) {
   }
 
-  //! Destroys the FileName object.
+  /**
+   * Destroys the FileName object.
+   */
   FileName::~FileName() {
   }
 
@@ -80,13 +87,14 @@ namespace Isis {
    * last slash "/". For filenames created without any slashes
    * the current working directory will be returned.
    *
-   * @returns QString of the path portion of the original filename.
    * <pre>
    *   for a full file specification of:
    *    "/home/me/img/picture.jpg"
    *   originalPath() gives:
    *    "/home/me/img"
    * </pre>
+   *
+   * @return QString of the path portion of the original filename.
    */
   QString FileName::originalPath() const {
     return QFileInfo(m_d->original(false)).path();
@@ -98,13 +106,14 @@ namespace Isis {
    * last slash "/". For filenames created without any slashes
    * the current working directory will be returned.
    *
-   * @returns QString of the path portion of the filename.
    * <pre>
    *   for a full file specification of:
    *    "/home/me/img/picture.jpg"
    *   path() gives:
    *    "/home/me/img"
    * </pre>
+   *
+   * @return QString of the path portion of the filename.
    */
   QString FileName::path() const {
     return QFileInfo(expanded()).path();
@@ -115,13 +124,14 @@ namespace Isis {
    * CubeAttributeInput or CubeAttributeOutput. Filenames without any attributes return an
    * empty QString.
    *
-   * @returns QString of the attributes specified in the filename.
    * <pre>
    *   for a full file specification of:
    *    "/tmp/Peaks.cub+Bsq"
    *   attributes() gives:
    *    "Bsq"
    * </pre>
+   *
+   * @return QString of the attributes specified in the filename.
    */
   QString FileName::attributes() const {
     QString result;
@@ -138,13 +148,14 @@ namespace Isis {
   /**
    * Returns the name of the file without the path and without extensions.
    *
-   * @returns QString containing every character excluding the path and all extensions.
    * <pre>
    *   for a full file specification of:
    *    "/tmp/Peaks.cub.gz"
    *   baseName() gives:
    *    "Peaks"
    * </pre>
+   *
+   * @return QString containing every character excluding the path and all extensions.
    */
   QString FileName::baseName() const {
     return QFileInfo(m_d->original(false)).completeBaseName();
@@ -153,14 +164,15 @@ namespace Isis {
   /**
    * Returns the name of the file excluding the path and the attributes in the file name.
    *
-   * @returns QString containing every character in the file name exluding the path and attributes
-   * of the file.
    * <pre>
    *   for a full file specification of:
    *    "/tmp/Peaks.cub+Bsq"
    *   name() gives:
    *    "Peaks.cub"
    * </pre>
+   *
+   * @return QString containing every character in the file name exluding the path and attributes
+   * of the file.
    */
   QString FileName::name() const {
     return QFileInfo(m_d->original(false)).fileName();
@@ -169,13 +181,14 @@ namespace Isis {
   /**
    * Returns the last extension of the file name.
    *
-   * @returns QString containing every character in the file name after the last "." character.
    * <pre>
    *   for a full file specification of:
    *    "/tmp/Peaks.cub.gz"
    *   extension() gives:
    *    "gz"
    * </pre>
+   *
+   * @return QString containing every character in the file name after the last "." character.
    */
   QString FileName::extension() const {
     return QFileInfo(m_d->original(false)).suffix();
@@ -186,13 +199,14 @@ namespace Isis {
    * Any Isis Preferences or environment variables indicated by $, are changed to what they
    * represent.
    *
-   * @returns QString
    * <pre>
    *   for a full file specification of:
    *    "$ISISROOT/tmp/Peaks.cub+Bsq"
    *   expanded() gives:
    *    "/usgs/pkgs/isis3/isis/tmp/Peaks.cub"
    * </pre>
+   *
+   * @return QString
    */
   QString FileName::expanded() const {
     return m_d->expanded(false);
@@ -201,13 +215,14 @@ namespace Isis {
   /**
    * Returns the full file name including the file path
    *
-   * @returns QString containing every character in the file name and the path
    * <pre>
    *   for a full file specification of:
    *    "$ISISROOT/tmp/Peaks.cub+Bsq"
    *   original() gives:
    *    "$ISISROOT/tmp/Peaks.cub+Bsq"
    * </pre>
+   *
+   * @return QString containing every character in the file name and the path
    */
   QString FileName::original() const {
     return m_d->original(true);
@@ -220,7 +235,7 @@ namespace Isis {
    * @param &extension The new file extension to be added at the end of the file name after all
    * exisiting extensions.
    *
-   * @returns FileName object with added extension
+   * @return FileName object with added extension
    */
   FileName FileName::addExtension(const QString &newExtension) const {
     FileName result = *this;
@@ -241,7 +256,7 @@ namespace Isis {
   /**
    * Removes all extensions in the file name
    *
-   * @returns FileName object with all extensions removed
+   * @return FileName object with all extensions removed
    */
   FileName FileName::removeExtension() const {
     QString attributesStr = attributes();
@@ -260,7 +275,7 @@ namespace Isis {
    *
    * @param &extension The new file extension to replace any current file extensions with
    *
-   * @returns FileName object with all existing extensions replaced by the new extension
+   * @return FileName object with all existing extensions replaced by the new extension
    */
   FileName FileName::setExtension(const QString &newExtension) const {
     FileName result = *this;
@@ -276,7 +291,7 @@ namespace Isis {
    * Checks to see if a file name is versioned by date or numerically. Returns true if file is
    * versioned by date or numerically; returns false otherwise.
    *
-   * @returns Boolean
+   * @return Boolean
    */
   bool FileName::isVersioned() const {
     validateVersioningState();
@@ -288,7 +303,7 @@ namespace Isis {
    * Checks if the file name is versioned numerically. Returns true if the file is versioned
    * numerically; returns false otherwise.
    *
-   * @returns Boolean
+   * @return Boolean
    */
   bool FileName::isNumericallyVersioned() const {
     return FileName(expanded()).name().contains("?");
@@ -298,7 +313,7 @@ namespace Isis {
    * Checks if the file name is versioned by date. Returns true if the file is versioned
    * by date; returns false otherwise.
    *
-   * @returns Boolean
+   * @return Boolean
    */
   bool FileName::isDateVersioned() const {
     return FileName(expanded()).name().contains(QRegExp("\\{.*\\}"));
@@ -308,7 +323,7 @@ namespace Isis {
    * Searches the directory specified in the file name for the highest version of the file name.
    * Returns a FileName object with the file name changed to reflect the highest version.
    *
-   * @returns FileName object
+   * @return FileName object
    */
   FileName FileName::highestVersion() const {
     validateVersioningState();
@@ -341,7 +356,7 @@ namespace Isis {
    * newest version will be the current date. If the file is versioned numerically, the newest
    * version will be the current version plus one.
    *
-   * @returns FileName object with the new version file name.
+   * @return FileName object with the new version file name.
    *
    * @throws Isis::IException::Unknown
    */
@@ -391,7 +406,7 @@ namespace Isis {
    *
    * @param versionNumber number to version the new FileName object
    *
-   * @returns FileName object with the new version file name.
+   * @return FileName object with the new version file name.
    *
    * @throws Isis::IException::Unknown
    */
@@ -431,7 +446,7 @@ namespace Isis {
    *
    * @param versionDate QDate to version the new FileName object
    *
-   * @returns FileName object with the new version file name.
+   * @return FileName object with the new version file name.
    *
    */
   FileName FileName::version(QDate versionDate) const {
@@ -444,7 +459,7 @@ namespace Isis {
    * Returns true if the file exists; false otherwise.
    * If the file is a symlink that points to a nonexistent file, false is returned.
    *
-   * @returns Boolean
+   * @return Boolean
    */
   bool FileName::fileExists() const {
     return QFileInfo(expanded()).exists();
@@ -453,13 +468,14 @@ namespace Isis {
   /**
    * Returns the path of the file's parent directory as a QDir object
    *
-   * @returns QDir
    * <pre>
    *   for a full file specification of:
    *    "/tmp/Peaks.cub+Bsq"
    *   dir() gives:
    *    "/tmp/"
    * </pre>
+   *
+   * @return QDir
    */
   QDir FileName::dir() const {
     return QFileInfo(expanded()).dir();
@@ -470,7 +486,7 @@ namespace Isis {
    *
    * @param templateFileName the file name used to create the temporary file.
    *
-   * @returns FileName object created using the temporary file
+   * @return FileName object created using the temporary file
    *
    * @throws Isis::IException::Io
    */
@@ -502,13 +518,14 @@ namespace Isis {
    * with any Isis Preferences or environment variables indicated by $, changed to what they
    * represent.
    *
-   * @returns QString
    * <pre>
    *   for a full file specification of:
    *    "$ISISROOT/tmp/Peaks.cub+Bsq"
    *   toString() gives:
    *    "/usgs/pkgs/isis3/isis/tmp/Peaks.cub"
    * </pre>
+   *
+   * @return QString
    */
   QString FileName::toString() const {
     return expanded();
@@ -518,10 +535,9 @@ namespace Isis {
    * Clears the current contents of the FileName object and reinitializes it with
    * the argument.
    *
-   * @returns void
-   *
    * @param rhs FileName to replace the current contents of the object.
    *
+   * @return void
    */
   FileName &FileName::operator=(const FileName &rhs) {
     m_d = rhs.m_d;
@@ -532,9 +548,9 @@ namespace Isis {
    * Compares equality of two FileName objects. Returns true if the two objects are equal
    * and false otherwise.
    *
-   * @returns Boolean
-   *
    * @param rhs FileName to compare the current FileName object to.
+   *
+   * @return Boolean
    */
   bool FileName::operator==(const FileName &rhs) {
     QString expandedOfThis = expanded();
@@ -560,9 +576,9 @@ namespace Isis {
    * Compares equality of two FileName objects. Returns false if the two objects are equal
    * and true otherwise.
    *
-   * @returns Boolean
-   *
    * @param rhs FileName to compare the current FileName object to.
+   *
+   * @return Boolean
    */
   bool FileName::operator!=(const FileName &rhs) {
     return !(*this == rhs);
@@ -572,7 +588,7 @@ namespace Isis {
    * This looks through the directory of the file and checks for the highest version date of
    * the file that is versioned date.
    *
-   * @returns QDate
+   * @return QDate
    */
   QDate FileName::highestVersionDate() const {
     QString fileQDatePattern = fileNameQDatePattern();
@@ -635,7 +651,7 @@ namespace Isis {
    * This looks through the directory of the file and checks for the highest version number of
    * the file that is versioned numerically.
    *
-   * @returns long
+   * @return long
    */
   long FileName::highestVersionNum() const {
     QString file = FileName(expanded()).name();
@@ -674,7 +690,7 @@ namespace Isis {
 
   /**
    * This verifies the class invariant when using versioning - that the FileName is in an acceptable
-   *     state to find file version numbers.
+   * state to find file version numbers.
    */
   void FileName::validateVersioningState() const {
     QString file = QFileInfo(expanded()).fileName();
@@ -722,7 +738,7 @@ namespace Isis {
    * This changes the files format. Specifically quotes everything not in {} with single quotes
    * and removes the {} from the file name.
    *
-   * @returns QString
+   * @return QString
    */
   QString FileName::fileNameQDatePattern() const {
     // We need to quote everything not in {} with single quotes.
@@ -752,7 +768,7 @@ namespace Isis {
    * This returns a QPair of the text (before, after) a version number in a file. Before being
    * the text before the version number and after being the text after the version number.
    *
-   * @returns QPair
+   * @return QPair
    */
   QPair<QString, QString> FileName::splitNameAroundVersionNum() const {
     QString file = FileName(expanded()).name();
@@ -770,7 +786,9 @@ namespace Isis {
     return QPair<QString, QString>(before, after);
   }
 
-   //! Data constructor, creates a new Data object.
+   /**
+    * Data constructor, creates a new Data object.
+    */
   FileName::Data::Data() {
     m_originalFileNameString = NULL;
     m_expandedFileNameString = NULL;
@@ -781,6 +799,7 @@ namespace Isis {
 
   /**
    * Data copy constructor, creates a copy of a Data object.
+   *
    * @param &other Data object to copy
    */
   FileName::Data::Data(const Data &other) : QSharedData(other) {
@@ -791,7 +810,9 @@ namespace Isis {
     m_expandedFileNameString = new QString(*other.m_expandedFileNameString);
   }
 
-  //! Destroys the Data object.
+  /**
+   * Destroys the Data object.
+   */
   FileName::Data::~Data() {
     delete m_originalFileNameString;
     m_originalFileNameString = NULL;
@@ -805,9 +826,9 @@ namespace Isis {
    * parameter includeAttributes determines if the returned file name has the variables
    * included.
    *
-   * @returns Qstring
-   *
    * @param includeAttributes boolean to represent whether the attricubtes should be included.
+   *
+   * @return Qstring
    */
   QString FileName::Data::original(bool includeAttributes) const {
     QString result = *m_originalFileNameString;
@@ -900,9 +921,9 @@ namespace Isis {
    *  parameter includeAttributes determines if the returned file name has the variables
    * included.
    *
-   * @returns Qstring
-   *
    * @param includeAttributes boolean to represent whether the attricubtes should be included.
+   *
+   * @return Qstring
    */
   QString FileName::Data::expanded(bool includeAttributes) const {
     QString result = *m_expandedFileNameString;
