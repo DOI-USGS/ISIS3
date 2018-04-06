@@ -9,15 +9,12 @@ channels:
   - defaults
 dependencies:
   - ca-certificates==2017.08.26
-  - dbus==1.10.20=0
+  - dbus
   - future==0.16.0
-  - gst-plugins-base
-  - gstreamer==1.8.0=0
   - jsoncpp==1.8.3
-  - libgfortran==3.0=0
-  - libstdcxx-ng==7.2.0
+  - libgfortran==3.0
   - qwt=6.1.3
-  - pyqt=5.6.0
+  - pyqt
   - sip=4.18
   - libxcb==1.12=1
   - mysql==5.7.20
@@ -46,18 +43,16 @@ dependencies:
   - ffmpeg==3.2.4=3
   - flann==1.8.4=0
   - fontconfig==2.12.1=4
-  - freeglut==3.0.0=4
-  - freetype==2.7=1
   - geos==3.5.1=1
-  - geotiff==1.4.2
+  - geotiff==1.4.2=1
   - gettext==0.19.8.1=0
   - giflib==5.1.4=0
   - glib==2.51.4=0
   - gmp==6.1.2=0
   - gsl==2.2.1=blas_openblas_3
-  - harfbuzz==1.3.4=2
+  - harfbuzz
   - hdf5==1.8.18=2
-  - icu==58.2
+  - icu==58.2=0
   - jasper==1.900.1=1
   - jbig==2.1=0
   - jpeg==9b=2
@@ -83,7 +78,7 @@ dependencies:
   - nn==1.86.0=2
   - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
-  - opencv==3.2.0=np113py36_blas_openblas_203
+  - opencv
   - openssl==1.0.2n=0
   - pcre==8.39=0
   - pixman==0.34.0=1
@@ -98,7 +93,6 @@ dependencies:
   - superlu==5.2.1=blas_openblas_201
   - tbb==4.4_20160526=1
   - tk==8.5.19=2
-  - vtk==8.1.0
   - x264==20131217=3
   - xorg-kbproto==1.0.7=1
   - xorg-libx11==1.6.4=6
@@ -109,18 +103,17 @@ dependencies:
   - xorg-xproto==7.0.31=6
   - bz2file==0.98
   - cloog==0.18.0=0
-  - isl==0.12.2=0
+  - isl==0.12.2
   - protobuf==3.5.1
-  - system==5.8=2
   - libprotobuf==3.2.0=0
   - bullet==2.86.1=0
-  - ds9==7.5=0
-  - gmm==5.0=0
+  - ds9==7.5
+  - gmm==5.0
   - jama==125=0
-  - pcl==1.8.1=0
+  - pcl==1.8.1
   - qhull==7.2.0=0
-  - qt==5.6.2
-  - qwt==6.1.3
+  - qt
+  - qwt==6.1.3=0
   - tnt==126=0
-  - xalan-c==1.11=0
+  - xalan-c==1.11
 prefix: /scratch/anaconda3/envs/isis
