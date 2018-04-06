@@ -1,5 +1,4 @@
 3.5.2.0      # Public version number
-2017-11-04   # Version date
+2018-04-06   # Version date
 v007         # 3rd party libraries version
-beta         # release stage (alpha, beta, stable)
-
+stable       # release stage (alpha, beta, stable)
