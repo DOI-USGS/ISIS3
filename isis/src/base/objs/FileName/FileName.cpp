@@ -50,11 +50,7 @@ namespace Isis {
   /**
    * Constructs a FileName object using a char pointer as a file name.
    *
-<<<<<<< HEAD
    * @param file char pointer representing new filename
-=======
-   * @param *fileName char pointer representing new filename
->>>>>>> 1a09013a7b3d9d1750e5709b9ee5ce2c50d352bb
    */
   FileName::FileName(const char *file) {
     m_d = new Data;
@@ -64,11 +60,7 @@ namespace Isis {
   /**
    * Constructs a FileName object using a QString as a file name.
    *
-<<<<<<< HEAD
    * @param file Qstring representing new filename
-=======
-   * @param &fileName Qstring representing new filename
->>>>>>> 1a09013a7b3d9d1750e5709b9ee5ce2c50d352bb
    */
   FileName::FileName(const QString &file) {
     m_d = new Data;
@@ -240,11 +232,7 @@ namespace Isis {
    * Adds a new extension to the file name. If the current extension is the same as the
    * new extension it will return an unchanged FileName object.
    *
-<<<<<<< HEAD
    * @param newExtension The new file extension to be added at the end of the file name after all
-=======
-   * @param &extension The new file extension to be added at the end of the file name after all
->>>>>>> 1a09013a7b3d9d1750e5709b9ee5ce2c50d352bb
    * exisiting extensions.
    *
    * @return FileName object with added extension
@@ -285,11 +273,7 @@ namespace Isis {
   /**
    * Sets all current file extensions to a new extension in the file name.
    *
-<<<<<<< HEAD
    * @param newExtension The new file extension to replace any current file extensions with
-=======
-   * @param &extension The new file extension to replace any current file extensions with
->>>>>>> 1a09013a7b3d9d1750e5709b9ee5ce2c50d352bb
    *
    * @return FileName object with all existing extensions replaced by the new extension
    */
