@@ -295,7 +295,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 <pre>
         <b>
-        <u>Example for Fedora 21 Linux x86 64-bit Intel compatible systems:</u>
+        <u>Example for Fedora 25 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_FEDORA/isis .
 </pre>
