@@ -627,7 +627,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
             Run the startup script for ISIS. This script assumes you installed
             the ISIS 3 data area in the same directory you installed the ISIS 3
             package. If you did not do this, you will need to modify the script to
-	           indicatethe proper location.
+	           indicate the proper location.
         </p>
 
         <p>
