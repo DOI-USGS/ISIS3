@@ -8,14 +8,14 @@ channels:
   - jlaura
   - defaults
 dependencies:
-  - ca-certificates==2017.08.26
+  - python==3.6
   - dbus
   - future==0.16.0
   - jsoncpp==1.8.3
   - libgfortran==3.0
   - qwt=6.1.3
-  - pyqt
-  - sip=4.18
+  - pyqt==5.6.0
+  - sip==4.18
   - libxcb==1.12=1
   - mysql==5.7.20
   - ncurses==5.9=10
@@ -112,8 +112,8 @@ dependencies:
   - jama==125=0
   - pcl==1.8.1
   - qhull==7.2.0=0
-  - qt
-  - qwt==6.1.3=0
+  - qt=5.6.2
+  - qwt
   - tnt==126=0
   - xalan-c==1.11
 prefix: /scratch/anaconda3/envs/isis

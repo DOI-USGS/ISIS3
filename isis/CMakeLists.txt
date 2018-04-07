@@ -407,15 +407,11 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 # Have CMake process all of the source code and tests.
 add_subdirectory(src objects)
 
-# Set up third party libraries for installation
-# install_third_party()
-
 if(APPLE)
  set(SO ".dylib")
 else()
  set(SO ".so")
 endif()
-
 
 # Set up documentation build target.
 # - This script is called by running "make docs".
