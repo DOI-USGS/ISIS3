@@ -57,7 +57,7 @@ message("Detected Operating System: ${osVersionString}")
 #  as a static library using some specialized code in Utilities.cmake.
 set(BUILD_SHARED_LIBS ON)
 
-# make sure to leave rpaths untouched on install 
+# make sure to leave rpaths untouched on install
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Specify user options that can be passed in with the initial CMake command.
@@ -128,6 +128,10 @@ message("\tINSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
 #===============================================================================
 #===============================================================================
 
+# Set up the ctest tool which is used to run all of the tests.
+enable_testing()
+include(CTest)
+
 # Set up Anaconda prefix in the case with a non-default conda env is activated
 if(EXISTS $ENV{CONDA_PREFIX})
   message("CONDA PREFIX: $ENV{CONDA_PREFIX}")
@@ -157,6 +161,11 @@ set(thirdPartyCppFlags -Wall
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
+
+ # Append CPP flags set in the third party lib file to the string set in this file.
+ string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+
 
 # Flag to fix numeric literals problem with boost on linux
 if(NOT APPLE)
@@ -311,6 +320,12 @@ if(pybindings)
  string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
  string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
  message("Generating C++ code from sip files")
+
+ message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
+ message(STATUS "SIP MODULE: ${ISIS_SIP_MODULE}")
+ message(STATUS "SIP GENERATED CODE DIR: ${ISIS_SIP_CODE_DIR}")
+
+
  execute_process(COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE})
 
  # add target so users can run the command after initial configuration
@@ -392,8 +407,11 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/make DESTINATION ${CMAKE_INSTALL_PREFIX})
 # Have CMake process all of the source code and tests.
 add_subdirectory(src objects)
 
-# Set up third party libraries for installation
-# install_third_party()
+if(APPLE)
+ set(SO ".dylib")
+else()
+ set(SO ".so")
+endif()
 
 # Set up documentation build target.
 # - This script is called by running "make docs".

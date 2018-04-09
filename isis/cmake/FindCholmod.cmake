@@ -28,7 +28,6 @@ endif()
 # if(APPLE)
   find_library(FORTRAN_LIBRARY      NAMES gfortran
     NAMES gfortran
-    PATHS /opt/usgs/v007/ports/lib/gcc5/
   )
 
   find_library(BLAS_LIBRARY NAMES blas)
