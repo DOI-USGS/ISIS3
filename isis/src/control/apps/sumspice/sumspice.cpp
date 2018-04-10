@@ -171,7 +171,7 @@ void IsisMain() {
     }
 
     // This will close the cube but retain all the pertinent info
-    cubesum->WriteHistory();
+    cubesum->writeHistory();
     cubesum->setCube();
     resultSet.append(cubesum);
     progress.CheckStatus();

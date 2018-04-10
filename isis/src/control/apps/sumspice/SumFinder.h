@@ -97,7 +97,7 @@ namespace Isis {
 
       bool update(const unsigned int options);
 
-      void WriteHistory();
+      void writeHistory();
 
    protected:
       virtual bool calculateTimes(Cube &cube,

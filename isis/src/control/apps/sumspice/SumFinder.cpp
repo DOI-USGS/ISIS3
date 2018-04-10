@@ -707,13 +707,13 @@ namespace Isis {
   /**
    * Writes out the History blob to the cube
    */
-  void SumFinder::WriteHistory() {
+  void SumFinder::writeHistory() {
     // confirmValidity(m_cube,"Must set a cube to update History!");
     bool addedHist = false;
     Isis::Pvl &inlab = *m_cube->label();
     for (int i = 0; i < inlab.objects(); i++) {
       if (inlab.object(i).isNamed("History") && Isis::iApp != NULL) {
-        Isis::History h((QString)inlab.object(i)["Name"]);
+        Isis::History h = (QString) inlab.object(i)["Name"];
         m_cube->read(h);
         h.AddEntry();
         m_cube->write(h);
@@ -721,7 +721,7 @@ namespace Isis {
       }
     }
 
-    if(!addedHist && Isis::iApp != NULL) {
+    if (!addedHist && Isis::iApp != NULL) {
       Isis::History h("IsisCube");
       h.AddEntry();
       m_cube->write(h);
