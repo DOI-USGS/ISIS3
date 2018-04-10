@@ -228,10 +228,10 @@ namespace Isis {
     /**
      * This method finds the index of the header in checkBoxItems by looping
      * through checkBoxItems, grabbing the header from each QList, and parsing
-     * the header at ":" to account for check boxes turning on multiple columns
+     * the header at ":" to account for check boxes selecting multiple columns.
      *
      * @param keyword Header to be found
-     * @return int
+     * @return int The index of the item to be added
      */
     int AdvancedTrackTool::getIndex(QString keyword) {
       int index = 0;

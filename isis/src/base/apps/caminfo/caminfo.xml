@@ -363,7 +363,7 @@
     <change name="Kaitlyn Lee" date="2018-03-06">
       Added oblique sample, line, detector, and pixel resolutions to the
       geometry PVL group. Updated example output in application description,
-      so that the addded oblique elements are included.Fixes #4100.
+      so that the addded oblique elements are included. Fixes #4100.
     </change>
   </history>
 

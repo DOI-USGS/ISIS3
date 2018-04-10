@@ -86,11 +86,11 @@ namespace Isis {
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
    *  @history 2018-03-07 Kaitlyn Lee - Added columns for oblique pixel, sample, line,
-`   *                         and detector resolutions. Added checkBoxItems and loop to add
+   *                          and detector resolutions. Added checkBoxItems and loop to add
    *                          the elments to the AdvancedTrackTool, instead of hardcoded method
    *                          calls. Instead of using the enum, I added a method getIndex()
    *                          that calculates what column the element should be added to.
-   *                          Fixes #4100.`
+   *                          Fixes #4100.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
