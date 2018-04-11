@@ -71,7 +71,10 @@ namespace Isis {
    *                           track of the modification state of the control net. Add write method
    *                           to write the control net to disk.  This write method should be called
    *                           by ipce classes instead of calling the ControlNet::Write directly so
-   *                           that control knows the state of the control net.
+   *                           that control knows the state of the control net. If a project
+   *                           is performing a "Save As", and there is a modified active control,the
+   *                           cnet is written out to the new location, it is not save in the old
+   *                           project location.
    */
   class Control : public QObject {
     Q_OBJECT

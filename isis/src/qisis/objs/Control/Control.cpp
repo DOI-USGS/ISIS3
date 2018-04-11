@@ -174,6 +174,7 @@ namespace Isis {
   /**
    * @description Write control net to disk.  This method is used instead of calling 
    * ControlNet::Write directly so that Control knows the modification state of the control net. 
+   * Note that if there is not a control net opened, there should no be any changes to write.
    *  
    * @return @b bool Returns false if there is not a control net open to write 
    *  
@@ -283,17 +284,35 @@ namespace Isis {
    *                       will be copied.
    */
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
-    if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
 
+    if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
+  
       QString newNetworkPath =  project->cnetRoot(newProjectRoot.toString()) + "/" +
                   FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
 
-      QString oldNetworkPath = project->cnetRoot(project->projectRoot()) + "/" +
-                  FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
-      if (!QFile::copy(oldNetworkPath,newNetworkPath) ) {
-        throw IException(IException::Io, "Error saving control net.", _FILEINFO_);
+      // If there is active control & it has been modified, write to disk instead of copying
+      //  Leave control net at old location in unmodified state
+      if (isModified()) {
+        controlNet()->Write(newNetworkPath);
+        setModified(false);
       }
-    }//end outer-if
+      else {
+        QString oldNetworkPath = project->cnetRoot(project->projectRoot()) + "/" +
+                    FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
+        if (!QFile::copy(oldNetworkPath,newNetworkPath) ) {
+          throw IException(IException::Io, "Error saving control net.", _FILEINFO_);
+        }
+      }
+    }
+    //   Project "Save" to current location, if active control exists & is modified, write to disk
+    //  Note:  It does not look like this code is ever executed.  If project is saved with a
+    //         "Save" this method is not called.
+    else {
+      if (isModified()) {
+        write();
+        setModified(false);
+      }
+    }
 
   }
 
