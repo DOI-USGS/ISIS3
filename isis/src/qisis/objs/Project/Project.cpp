@@ -1575,6 +1575,7 @@ namespace Isis {
   /**
    * Change the project's name (GUI only, doesn't affect location on disk).
    */
+
   void Project::setName(QString newName) {
     m_name = newName;
     emit nameChanged(m_name);
@@ -1709,7 +1710,6 @@ namespace Isis {
   void Project::setActiveControl(QString displayName) {
     Control *previousControl = m_activeControl; 
     if (m_activeControl) {
-      qDebug()<<"PRoject::setActiveControl m_activeControl->isModified() = "<<m_activeControl->isModified();
 
       // If the current active control has been modified, ask user if they want to save or discard
       // changes.
@@ -1724,7 +1724,6 @@ namespace Isis {
         switch (ret) {
           // Save current active control
           case QMessageBox::Save:
-            qDebug()<<" ** SAVE **";
             m_activeControl->write();
             break;
           // Discard any changes made to cnet
@@ -1736,7 +1735,6 @@ namespace Isis {
             return;
         }
       }
-      qDebug()<<"Project::setActiveControl before emit activeControlSet";
       emit activeControlSet(false);
       ProjectItem *item = directory()->model()->findItemData(m_activeControl->
                           displayProperties()->displayName(), Qt::DisplayRole);
@@ -1752,7 +1750,7 @@ namespace Isis {
       m_activeControl = item->control();
 
       try {
-          activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
           item->setTextColor(Qt::darkGreen);
       }
       catch(IException e){
@@ -1761,7 +1759,7 @@ namespace Isis {
             item = directory()->model()->findItemData(m_activeControl->
                                 displayProperties()->displayName(), Qt::DisplayRole);
             item->setTextColor(Qt::darkGreen);
-            activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+            m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
           }
           else {
             m_activeControl = NULL;
@@ -1799,12 +1797,13 @@ namespace Isis {
         setActiveControl(controlName);
       }
     }
+
     return m_activeControl;
   }
 
 
   void Project::activeControlModified() {
-    qDebug()<<"Project::activeControlModified m_activeControl = "<<m_activeControl;
+
     m_activeControl->setModified(true);
   }
 
@@ -2209,6 +2208,11 @@ namespace Isis {
       }
     }
     else {
+      //  Save current active control if it has been modified
+      if (activeControl() && activeControl()->isModified()) {
+        activeControl()->write();
+      }
+
       save(m_projectRoot->absolutePath(), false);
       // if (newDestination != )
     }
@@ -2339,7 +2343,7 @@ namespace Isis {
     //  TODO Set newpath member variable.  This is used for some of the data copy methods and is not
     //  the ideal way to handle this.  Maybe change the data copy methods to either take the new
     //  project root in addition to the data root or put the data root in the dataList (ImageList,
-    //  etc.).
+    //  etc.). If performing a "Save", m_newProjectRoot == m_projectRoot
     m_newProjectRoot = newPath.toString();
 
     //  For now set the member variable rather than calling setName which emits signal and updates
