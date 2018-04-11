@@ -39,7 +39,7 @@ namespace Isis {
    * @internal
    *   @history 2015-05-21 Sasha Brownsberger - Original Version.
    *   @history 2017-06-02 Jesse Mapel - Added a distortion map Fixes #4496.
-   *   @history 2017-04-11 Jesse Mapel - Added subwindowing.
+   *   @history 2017-04-11 Jesse Mapel - Added subwindowing. Fixes #5394.
    */
   class RosettaOsirisCamera : public FramingCamera {
     public:
