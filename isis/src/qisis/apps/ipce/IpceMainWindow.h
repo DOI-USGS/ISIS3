@@ -124,7 +124,10 @@ namespace Isis {
    *   @history 2018-03-02 Tracie Sucharski - added static keyword to the m_maxRecentProject member
    *                           variable, fixes OSX compile warning.  References #5341.
    *   @history 2018-04-04 Tracie Sucharski - Added removeView slot which removes the view
-   *                           containing the given widget.
+   *                           containing the given widget. In the closeEvent method check whether
+   *                           there is an active control and if it has been modified as additional
+   *                           test to determine whether project needs saving.
+   *  
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

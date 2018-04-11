@@ -227,10 +227,6 @@ namespace Isis {
       if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
         mdiArea->addSubWindow(newWidget);
         newWidget->show();
-        QMdiSubWindow *window = qobject_cast<QMdiSubWindow *>(newWidget);
-        qDebug()<<"IpceMainWindow::addView new subwindow = "<<window<<" widget = "<<newWidget;
-        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(newWidget));
-        setActiveView(qobject_cast<AbstractProjectItemView *>(newWidget));
       }
     }
   }
@@ -246,14 +242,12 @@ namespace Isis {
    */
   void IpceMainWindow::removeView(QWidget *view) {
 
-    qDebug()<<"IpceMainWindow::removeView active view = "<<view;
     QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
     if (mdiArea){
       // Get all QMdiSubWindows, then find subwindow that hold widget
       QList<QMdiSubWindow *> subWindowList = mdiArea->subWindowList();
       foreach (QMdiSubWindow *sub, subWindowList) {
         if (sub->widget() == view) {
-          qDebug()<<"                    active view FOUND";
           sub->close();
           break;
         }
@@ -873,7 +867,11 @@ namespace Isis {
    * state information before forwarding the event to the QMainWindow.
    */
   void IpceMainWindow::closeEvent(QCloseEvent *event) {
-    if (!m_directory->project()->isClean()) {
+
+    // The active control is checked here for modification because this was the simplest solution
+    // vs changing the project clean state every time the control is modified or saved.
+    if (!m_directory->project()->isClean() || (m_directory->project()->activeControl() &&
+                                               m_directory->project()->activeControl()->isModified())) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Project Has Unsaved Changes"),
                              QString("Would you like to save your current project?"),
                              NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
