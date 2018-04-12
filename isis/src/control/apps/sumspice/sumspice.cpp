@@ -121,7 +121,7 @@ void IsisMain() {
 
   // Determine the update mode
   QString update = ui.GetString("UPDATE").toLower();
-  unsigned int options(0);  // == SumFinder::None
+  unsigned int options = 0;  // == SumFinder::None
   if ( "times"    == update ) options |= (unsigned int) SumFinder::Times;
   if ( "spice"    == update ) options |= (unsigned int) SumFinder::Spice;
   // These are unnecessary if UPDATE=SPICE!
@@ -170,7 +170,8 @@ void IsisMain() {
       }
     }
 
-    // This will close the cube but retain all the pertinent info
+    // This will update the history blob and close the cube,
+    // but retain all the pertinent info
     cubesum->writeHistory();
     cubesum->setCube();
     resultSet.append(cubesum);

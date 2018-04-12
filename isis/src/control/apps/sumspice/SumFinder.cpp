@@ -255,7 +255,7 @@ namespace Isis {
 
     // Otherwise, find the sum file with start ET closest to the
     // cube's ET Note that the sum files are already sorted by ET...
-    for ( int index = 0 ; index < sumFiles.size() ; index++) {
+    for (int index = 0 ; index < sumFiles.size() ; index++) {
       double tdiff = fabs( sumFiles[index]->et() - timeT().Et() );
       m_closest = qMin( m_closest, tdiff );  // Only done here
       if ( tdiff <= tolerance ) {
@@ -308,7 +308,7 @@ namespace Isis {
     double stopDelay = stopExposureDelay(cube);
 
     // Exposure and center time is determined. (Assumes its a framing camera!)
-    exposureTime  = getExposureTime(cube);
+    exposureTime = getExposureTime(cube);
     centerTime = cube.camera()->time();
 
 
@@ -357,7 +357,7 @@ namespace Isis {
     PvlGroup &instGrp = cubeLabels->findGroup("Instrument", Pvl::Traverse);
     PvlKeyword exptime = instGrp["ExposureDuration"];
     QString units = exptime.unit(0).toLower();
-    double etime(toDouble(exptime[0]));
+    double etime = toDouble(exptime[0]);
 
     // Convert to seconds if indicated
     if ( "milliseconds" == units) etime /= 1000.0;
@@ -382,7 +382,7 @@ namespace Isis {
   bool SumFinder::update(const unsigned int options)  {
     confirmValidity(m_cube,"Valid Cube (and SUMFILE) required for updates!");
 
-    bool good(true);
+    bool good = true;
 
     // Reset timing to original times just needs a cube file.
     if ( options & Reset) {
@@ -471,7 +471,7 @@ namespace Isis {
     PvlGroup &instGrp = cubeLabel->findGroup("Instrument", Pvl::Traverse);
     PvlGroup sumtime("SumTimeHistory");
     PvlGroup *sumtPtr = &sumtime;
-    bool addSumGroup(true);  // Assume the object doesn't exist!
+    bool addSumGroup = true;  // Assume the object doesn't exist!
 
     // Some monkey business for Sumtime history object (see below)
     PvlObject &isiscube = cubeLabel->findObject("IsisCube");
@@ -675,7 +675,7 @@ namespace Isis {
   }
 
   int SumFinder::disableSpice(Pvl &label) const {
-    int ndeleted(0);
+    int ndeleted = 0;
 
     if ( label.hasObject("IsisCube") ) {
       PvlObject &iCube = label.findObject("IsisCube");
@@ -705,14 +705,14 @@ namespace Isis {
   }
 
   /**
-   * Writes out the History blob to the cube
+   * Writes out the History blob to m_cube
    */
   void SumFinder::writeHistory() {
     bool addedHist = false;
     Isis::Pvl &inlab = *m_cube->label();
     for (int i = 0; i < inlab.objects(); i++) {
-      if (inlab.object(i).isNamed("History") && Isis::iApp != NULL) {
-        Isis::History h = History( (QString) inlab.object(i)["Name"] );
+      if ( inlab.object(i).isNamed("History") && Isis::iApp != NULL ) {
+        Isis::History h( (QString) inlab.object(i)["Name"] );
         m_cube->read(h);
         h.AddEntry();
         m_cube->write(h);
@@ -721,11 +721,10 @@ namespace Isis {
     }
 
     if (!addedHist && Isis::iApp != NULL) {
-      Isis::History h = History("IsisCube");
+      Isis::History h("IsisCube");
       h.AddEntry();
       m_cube->write(h);
     }
   }
-
 }
 // namespace Isis

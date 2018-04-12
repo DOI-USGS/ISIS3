@@ -314,6 +314,10 @@ sumspice from=st_2395699394_v.lev0.cub sumfile=N2395699394.SUM  update=spice sum
       Changed pvl.DIFF of input for hayabusa app test to ignore file names. Allows test to pass when
       not using default data area. Fixes #4738.
     </change>
+    <change name="Kaitlyn Lee" date="2018-04-12">
+      Added a call to writeHistory() of the SumFinder class that will add a sumspice
+      entry to each input cube's History blob after a successful run. Fixes #4972.
+    </change>
   </history>
 
   <category>
