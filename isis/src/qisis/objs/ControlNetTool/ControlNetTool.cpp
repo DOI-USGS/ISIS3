@@ -101,18 +101,16 @@ namespace Isis {
     */
    void ControlNetTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
-     qDebug()<<"ControlNetTool::setControlNet";
      //  Cannot use Tool::cubeViewportList() because it does not properly return a NULL if viewports
      //  don't exist.
      if (workspace() && workspace()->cubeViewportList()) {
-       qDebug()<<"ControlNetTool::setControlNet  before paintAllViewports";
        paintAllViewports();
      }
    }
 
 
    void ControlNetTool::loadNetwork() {
-     qDebug()<<"ControlNetTool::loadNetwork control";
+
      setControlNet(m_directory->project()->activeControl()->controlNet());
    }
 
