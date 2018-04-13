@@ -295,7 +295,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
 <pre>
         <b>
-        <u>Example for Fedora 21 Linux x86 64-bit Intel compatible systems:</u>
+        <u>Example for Fedora 25 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_FEDORA/isis .
 </pre>
@@ -596,9 +596,16 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
         <p>
             ISIS 3 needs to know where all its pieces are located. We use an
             environment variable called "ISISROOT" to do this. Unix commands must
-            be put into your startup shell scripts.  Assuming you installed ISIS in
-            the directory /work1/isis3 add the following commands to your startup
-            script:
+            be put into your startup shell scripts. There are two different
+            ways to achieve this depending on what shell you are using. If you are
+            unsure what kind of shell you are using, type the following command
+            in the terminal:
+            <pre>
+                echo $SHELL
+            </pre>
+            It is important to note that tsch is a C shell and bash is a Bourne shell.
+            Assuming you installed ISIS in the directory /work1/isis3 add the following
+            commands to your startup script:
         </p>
 
         <p>
@@ -620,7 +627,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
             Run the startup script for ISIS. This script assumes you installed
             the ISIS 3 data area in the same directory you installed the ISIS 3
             package. If you did not do this, you will need to modify the script to
-	    indicatethe proper location.
+	           indicate the proper location.
         </p>
 
         <p>
@@ -682,6 +689,9 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <change name="Adam Paquette" date="2016-06-24">Updated links to the support center.</change>
     <change name="Ian Humphrey" date="2017-01-25">Updated instructions for new supported systems.</change>
     <change name="Summer Stapleton" date="2017-12-29">Updated SPICE Web Service mission information to include newer missions.</change>
+    <change name="Kaitlyn Lee" date="2018-04-04">Added information about tsch being a C shell and bash being a Bourne shell
+      and how to tell what shell a user is using to the UNIX Enviroment Setup section. Fixes #5372.</change>
+    <change name="Ian Humphrey" date="2018-04-06">Updated for latest supported Fedora version (Fedora25).</change>
   </history>
 
   <bibliography>
