@@ -123,21 +123,19 @@ namespace Isis {
       QStringList internalData;
 
       Control *control = NULL;
+
       // See if there are any other control lists in the project and give these to the user as
       // choices for control nets they can export.
-
-
-      if(project()) {
+      if (project()) {
 
         Project *proj = project();
 
         QList<ControlList *> controls = proj->controls();
         if (controls.count() > 0) {
-          ControlList *l=controls.first();
+          ControlList *l = controls.first();
           WorkOrder::setData(l);
           control = controlList()->first();
         }
-
         else {
 
           QMap<Control *, QString> cnetChoices;
@@ -156,8 +154,6 @@ namespace Isis {
 
           control = cnetChoices.key(choice);
           internalData.append(control->id());
-
-
         }
       }
 
@@ -201,11 +197,9 @@ namespace Isis {
       control = controlList()->first();
     }
 
-    try {
-      control->controlNet()->Write(destination);
-    }
-    catch (IException &e) {
-      m_warning = e.toString();
+    QString currentLocation = control->fileName();
+    if (!QFile::copy(currentLocation, destination) ) {
+      m_warning = "Error saving control net.";
     }
   }
 

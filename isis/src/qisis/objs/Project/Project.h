@@ -234,6 +234,23 @@ namespace Isis {
    *   @history 2018-03-27 Tracie Sucharski - Removed the calls to work orders from activeImageList
    *                           and activeControl methods.  Additional errors checks needed for
    *                           default values that are not in work orders.  Fixes #5256.
+   *   @history 2018-03-30 Tracie Sucharski - Added public slot, activeControlModified, which sets
+   *                           the modified state on the active Control. This was done, so that a
+   *                           Control knows if its control net has been modified. Also added
+   *                           signal, discardActiveControlEdits if user does not want to save
+   *                           edits.  This is needed for CnetEditorWidgets that are displaying
+   *                           the modified active control, it will effectively close that
+   *                           CnetEditorView and reload with the original control net.  It was
+   *                           done this way because there is no easy way to reload a control net in
+   *                           the CnetEditor widgets. When saving Project, if there is an active
+   *                           control and it has been modified, write active control to disk.
+   *                           Unfortunately this is done in 2 different places depending on whether
+   *                           a project "Save" or "Save As" is being done.  If "Save As", a
+   *                           modified active cnet is not written out to the original project only
+   *                           to the new project, so this had to be done in
+   *                           Control::copyToNewProjectRoot.  If simply saving current projct,
+   *                           the write is done here in the save method.
+   *  
    */
   class Project : public QObject {
     Q_OBJECT
@@ -475,9 +492,12 @@ namespace Isis {
 
       void templatesAdded(TemplateList *newTemplates);
 
+      void discardActiveControlEdits();
+
     public slots:
       void open(QString);
       void setClean(bool value);
+      void activeControlModified();
 
     private slots:
       void controlClosed(QObject *control);

@@ -73,6 +73,8 @@ namespace Isis {
      QAction *action = new QAction(this);
      action->setIcon(QPixmap(toolIconDir()+"/HILLBLU_molecola.png"));
      action->setToolTip("Control Point Editor (T)");
+     action->setStatusTip("If tool disabled, make sure you have a control net in your project and "
+                          "it is set to the active control.");
      action->setShortcut(Qt::Key_T);
 
      //The object name is being set and used as a key to search with for this action in
@@ -99,7 +101,6 @@ namespace Isis {
     */
    void ControlNetTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
-    
      //  Cannot use Tool::cubeViewportList() because it does not properly return a NULL if viewports
      //  don't exist.
      if (workspace() && workspace()->cubeViewportList()) {
@@ -109,6 +110,7 @@ namespace Isis {
 
 
    void ControlNetTool::loadNetwork() {
+
      setControlNet(m_directory->project()->activeControl()->controlNet());
    }
 
@@ -125,7 +127,7 @@ namespace Isis {
    */
   void ControlNetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp  == NULL) return;
+    if (m_controlNet == NULL || cvp  == NULL) return;
 
     // Determine if the cvp is a Shape
     //  Get all ShapeLists from Project

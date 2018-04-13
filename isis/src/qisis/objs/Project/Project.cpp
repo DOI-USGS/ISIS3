@@ -1575,6 +1575,7 @@ namespace Isis {
   /**
    * Change the project's name (GUI only, doesn't affect location on disk).
    */
+
   void Project::setName(QString newName) {
     m_name = newName;
     emit nameChanged(m_name);
@@ -1702,11 +1703,38 @@ namespace Isis {
    *                           being chosen Fixes #4969
    *  @history 2017-08-02 Cole Neubauer - Added functionality to switch between active controls
    *                           Fixes #4567
+   *  @history 2018-03-30 Tracie Sucharski - If current activeControl has been modified, prompt for
+   *                           saving. Emit signal to discardActiveControlEdits.
    *
    */
   void Project::setActiveControl(QString displayName) {
     Control *previousControl = m_activeControl; 
     if (m_activeControl) {
+
+      // If the current active control has been modified, ask user if they want to save or discard
+      // changes.
+      if (m_activeControl->isModified()) {
+        QMessageBox msgBox;
+        msgBox.setText("Save current active control");
+        msgBox.setInformativeText("The current active control has been modified.  Do you want "
+                                  "to save before setting a new active control?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+        switch (ret) {
+          // Save current active control
+          case QMessageBox::Save:
+            m_activeControl->write();
+            break;
+          // Discard any changes made to cnet
+          case QMessageBox::Discard:
+            emit discardActiveControlEdits();
+            break;
+          // Cancel operation
+          case QMessageBox::Cancel:
+            return;
+        }
+      }
       emit activeControlSet(false);
       ProjectItem *item = directory()->model()->findItemData(m_activeControl->
                           displayProperties()->displayName(), Qt::DisplayRole);
@@ -1722,7 +1750,7 @@ namespace Isis {
       m_activeControl = item->control();
 
       try {
-          activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
           item->setTextColor(Qt::darkGreen);
       }
       catch(IException e){
@@ -1731,7 +1759,7 @@ namespace Isis {
             item = directory()->model()->findItemData(m_activeControl->
                                 displayProperties()->displayName(), Qt::DisplayRole);
             item->setTextColor(Qt::darkGreen);
-            activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+            m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
           }
           else {
             m_activeControl = NULL;
@@ -1769,7 +1797,14 @@ namespace Isis {
         setActiveControl(controlName);
       }
     }
+
     return m_activeControl;
+  }
+
+
+  void Project::activeControlModified() {
+
+    m_activeControl->setModified(true);
   }
 
 
@@ -2173,6 +2208,11 @@ namespace Isis {
       }
     }
     else {
+      //  Save current active control if it has been modified
+      if (activeControl() && activeControl()->isModified()) {
+        activeControl()->write();
+      }
+
       save(m_projectRoot->absolutePath(), false);
       // if (newDestination != )
     }
@@ -2303,7 +2343,7 @@ namespace Isis {
     //  TODO Set newpath member variable.  This is used for some of the data copy methods and is not
     //  the ideal way to handle this.  Maybe change the data copy methods to either take the new
     //  project root in addition to the data root or put the data root in the dataList (ImageList,
-    //  etc.).
+    //  etc.). If performing a "Save", m_newProjectRoot == m_projectRoot
     m_newProjectRoot = newPath.toString();
 
     //  For now set the member variable rather than calling setName which emits signal and updates

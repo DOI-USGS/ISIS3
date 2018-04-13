@@ -585,6 +585,7 @@ namespace Isis {
   */
   void ControlPointEditWidget::setControl(Control *control) {
     //  TODO  more error checking
+    m_control = control;
     m_controlNet = control->controlNet();
     m_cnetFileName = control->fileName();
 
@@ -604,8 +605,9 @@ namespace Isis {
   void ControlPointEditWidget::setControlFromActive() {
 
     if (m_directory->project()->activeControl()) {
-      m_controlNet = m_directory->project()->activeControl()->controlNet();
-      m_cnetFileName = m_directory->project()->activeControl()->fileName();
+      m_control = m_directory->project()->activeControl();
+      m_controlNet = m_control->controlNet();
+      m_cnetFileName = m_control->fileName();
 
       m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
       setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
@@ -1180,7 +1182,7 @@ namespace Isis {
           }
         }
 
-        this->setVisible(false);
+        //this->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) ==
                                           ControlPoint::PointLocked) {
@@ -1189,8 +1191,8 @@ namespace Isis {
           return;
         }
         if (m_editPoint != NULL && m_editPoint->Parent() == NULL) {
-          delete m_editPoint;
-          m_editPoint = NULL;
+//        delete m_editPoint;
+//        m_editPoint = NULL;
         }
       }
 
@@ -1244,7 +1246,10 @@ namespace Isis {
       }
 
       // emit a signal to alert user to save when exiting
+      qDebug()<<"ControlPointEditWidget before cnetModified signal";
       emit cnetModified();
+      qDebug()<<"ControlPointEditWidget after cnetModified signal";
+      emit saveControlNet();
 
       if (m_editPoint != NULL) {
         //  Change Save Point button text to red
@@ -2511,7 +2516,7 @@ namespace Isis {
   */
   void ControlPointEditWidget::saveNet() {
 
-    m_controlNet->Write(m_cnetFileName);
+    m_control->write();
 
     //  Change Save Measure button text back to default
     m_saveNet->setPalette(m_saveDefaultPalette);
@@ -2520,7 +2525,8 @@ namespace Isis {
   }
 
 
-  /**
+  /** 
+   * This was used when ipce used docked widgets. 
    * This method is called from the constructor so that when the
    * Main window is created, it know's it's size and location.
    *

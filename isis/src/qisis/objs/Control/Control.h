@@ -67,13 +67,21 @@ namespace Isis {
    *                           to compare project roots. References #4804, #4849.
    *   @history 2018-01-19 Tracie Sucharski - Do not copy control unless the project root has
    *                           changed. References #5212.
+   *   @history 2018-03-30 Tracie Sucharski - Added setModified and is Modified methods to keep
+   *                           track of the modification state of the control net. Add write method
+   *                           to write the control net to disk.  This write method should be called
+   *                           by ipce classes instead of calling the ControlNet::Write directly so
+   *                           that control knows the state of the control net. If a project
+   *                           is performing a "Save As", and there is a modified active control,the
+   *                           cnet is written out to the new location, it is not save in the old
+   *                           project location.
    */
   class Control : public QObject {
     Q_OBJECT
     public:
       ControlNet *m_controlNet; /**< A pointer to the ControlNet object associated with this
                                                     Control object.*/
-    explicit Control(QString cnetFileName, QObject *parent = 0);
+      explicit Control(QString cnetFileName, QObject *parent = 0);
       explicit Control(Project *project, QString cnetFileName, QObject *parent = 0);
       explicit Control(ControlNet *controlNet, QString cnetFileName, QObject *parent = 0);
       Control(FileName cnetFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
@@ -86,6 +94,10 @@ namespace Isis {
       QString fileName() const;
 
       QString id() const;
+
+      bool isModified();
+      void setModified(bool modified = true);
+      bool write();  
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
       void copyToNewProjectRoot(const Project *project, FileName newProjectRoot);
@@ -122,6 +134,8 @@ namespace Isis {
     private:
       Control(const Control &other);
       Control &operator=(const Control &rhs);
+
+      bool m_modified;
 
       ControlDisplayProperties *m_displayProperties; /**< Contains the display properties for this
                                                           Control object.*/

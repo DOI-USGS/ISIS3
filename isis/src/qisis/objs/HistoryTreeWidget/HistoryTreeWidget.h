@@ -48,6 +48,8 @@ namespace Isis {
       HistoryTreeWidget(Project *project, QWidget *parent = 0);
       virtual ~HistoryTreeWidget();
 
+      void addToHistory(QString historyEntry);
+
     protected:
       int sizeHintForColumn(int column) const;
 

@@ -71,6 +71,8 @@ namespace Isis {
    *                           a ControlNet. Added load and save methods as well as an XmlHandler
    *                           to allow for serialization of the widget into the project.
    *                           Fixes #4989.
+   *   @history 2018-04-11 Tracie Sucharski - Moved the Xml serialization to the newly created
+   *                           CnetEditorView class for ipce.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
@@ -115,9 +117,6 @@ namespace Isis {
       void setMeasureTableSortLimit(int limit);
       void setPointTableSortingEnabled(bool enabled);
       void setPointTableSortLimit(int limit);
-
-      void load(XmlStackedHandlerReader *xmlReader);
-      void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot);
 
 
     public slots:
@@ -191,34 +190,6 @@ namespace Isis {
       QMap< QString, QList< QAction * > > * m_toolBarActions;   //!< QMap of tool bar actions
 
       QString *m_settingsPath; //!< Path to read/write settings
-
-
-    private:
-      /**
-       * This class is a placeholder for future plans to serialize more of
-       * CnetEditorWidget's configurations when saving a project.
-       *  
-       * @author 2017-07-25 Christopher Combs
-       * @internal
-       *   @history 2017-07-25 Christopher Combs - Added Xml StackedHandler class
-       *                           to implement serialization of the CnetEditorWidget.
-       *                           References #4989.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(CnetEditorWidget *cnetEditor);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          CnetEditorWidget *m_cnetEditor;
-      };
   };
 }
 

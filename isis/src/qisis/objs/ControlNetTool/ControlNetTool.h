@@ -56,6 +56,8 @@ namespace Isis {
    *                           IpceTool.  References #5090.
    *   @history 2018-03-27 Tracie Sucharski - Redraw cube viewports when a new control net is
    *                           loaded.
+   *   @history 2018-04-13 Tracie Sucharski - In mouseButtonRelease method return if a control net
+   *                           has not been set.
    */
   class ControlNetTool : public Tool {
     Q_OBJECT

@@ -45,6 +45,7 @@
 #include "BundleObservationViewWorkOrder.h"
 #include "ChipViewportsWidget.h"
 #include "CloseProjectWorkOrder.h"
+#include "CnetEditorView.h"
 #include "CnetEditorViewWorkOrder.h"
 #include "CnetEditorWidget.h"
 #include "Control.h"
@@ -111,8 +112,6 @@ namespace Isis {
    * because the WorkOrders we are attempting to add to the Directory are corrupt.
    */
   Directory::Directory(QObject *parent) : QObject(parent) {
-    //qDebug()<<"Directory::Directory";
-
 
     try {
       m_project = new Project(*this);
@@ -132,17 +131,18 @@ namespace Isis {
     //connect( m_project, SIGNAL(guiCamerasAdded(GuiCameraList *) ),
              //this, SLOT(guiCamerasAddedToProject(GuiCameraList *) ) );
 
-     connect( m_project, SIGNAL(projectLoaded(Project *) ),
+    connect( m_project, SIGNAL(projectLoaded(Project *) ),
               this, SLOT(updateRecentProjects(Project *) ) );
 
+    connect(this, SIGNAL(cnetModified()), m_project, SLOT(activeControlModified()));
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
+    connect(m_project, SIGNAL(discardActiveControlEdits()),
+            this, SLOT(reloadActiveControlInCnetEditorView()));
 
     m_projectItemModel = new ProjectItemModel(this);
     m_projectItemModel->addProject(m_project);
-    connect(m_projectItemModel, SIGNAL(cleanProject(bool)), SIGNAL(cleanProject(bool)));
-
-//  qDebug()<<"Directory::Directory  model row counter after addProject = "<<m_projectItemModel->rowCount();
+    connect(m_projectItemModel, SIGNAL(cleanProject(bool)), this, SIGNAL(cleanProject(bool)));
 
     try {
 
@@ -532,18 +532,46 @@ namespace Isis {
   }
 
 
+  /**
+   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a 
+   * new active control and wants to discard any edits in the old active control.  The only view 
+   * which will not be updated with the new control are any CnetEditorViews showing the old active 
+   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the 
+   * CnetEditor view displaying the old control is removed, then recreated.
+   *  
+   */
+  void Directory::reloadActiveControlInCnetEditorView() {
+
+    foreach(CnetEditorView *cnetEditorView, m_cnetEditorViewWidgets) {
+      if (cnetEditorView->control() == project()->activeControl()) {
+        emit viewClosed(cnetEditorView);
+        project()->activeControl()->closeControlNet();
+        project()->activeControl()->openControlNet();
+        addCnetEditorView(project()->activeControl());
+      }
+    }
+  }
+
+
   void Directory::newActiveControl(bool newControl) {
+
+//  if (newControl && m_controlPointEditViewWidget) {
+//    bool closed = m_controlPointEditViewWidget->close();
+//    qDebug()<<"Directory::newActiveControl  CPEditor closed = "<<closed;
+//    emit viewClosed(m_controlPointEditViewWidget);
+//    delete m_controlPointEditViewWidget;
+//  }
 
     // If the new active control is the same as what is showing in the cnetEditorWidget, allow
     // editing of control points from the widget, otherwise turnoff from context menu
-    foreach(CnetEditorWidget *cnetEditorView, m_cnetEditorViewWidgets) {
-      if (cnetEditorView->control() == project()->activeControl()->controlNet()) {
-        cnetEditorView->pointTableView()->content()->setActiveControlNet(true);
-        cnetEditorView->measureTableView()->content()->setActiveControlNet(true);
+    foreach(CnetEditorView *cnetEditorView, m_cnetEditorViewWidgets) {
+      if (cnetEditorView->control() == project()->activeControl()) {
+        cnetEditorView->cnetEditorWidget()->pointTableView()->content()->setActiveControlNet(true);
+        cnetEditorView->cnetEditorWidget()->measureTableView()->content()->setActiveControlNet(true);
       }
       else {
-        cnetEditorView->pointTableView()->content()->setActiveControlNet(false);
-        cnetEditorView->measureTableView()->content()->setActiveControlNet(false);
+        cnetEditorView->cnetEditorWidget()->pointTableView()->content()->setActiveControlNet(false);
+        cnetEditorView->cnetEditorWidget()->measureTableView()->content()->setActiveControlNet(false);
       }
     }
   }
@@ -601,95 +629,27 @@ namespace Isis {
 
   /**
    * @brief Add the widget for the cnet editor view to the window.
-   * @param network Control net to edit.
-   * @return @b (CnetEditorWidget *) The view to add to the window.
+   * @param Control to edit.
+   * @return @b (CnetEditorView *) The view to add to the window.
    */
-  CnetEditorWidget *Directory::addCnetEditorView(Control *network) {
+  CnetEditorView *Directory::addCnetEditorView(Control *control) {
 
-    QString title = tr("Cnet Editor View %1").arg( network->displayProperties()->displayName() );
-
+    QString title = tr("Cnet Editor View %1").arg( control->displayProperties()->displayName() );
     FileName configFile("$HOME/.Isis/" + QApplication::applicationName() + "/" + title + ".config");
 
-    // TODO: This layout should be inside of the cnet editor widget, but I put it here to not
-    //     conflict with current work in the cnet editor widget code.
-    QWidget *result = new QWidget;
-    QGridLayout *resultLayout = new QGridLayout;
-    result->setLayout(resultLayout);
+    CnetEditorView *result = new CnetEditorView(this, control, configFile);
 
-    int row = 0;
-
-    QMenuBar *menuBar = new QMenuBar;
-    resultLayout->addWidget(menuBar, row, 0, 1, 2);
-    row++;
-
-    CnetEditorWidget *mainWidget = new CnetEditorWidget(network, configFile.expanded());
-    resultLayout->addWidget(mainWidget, row, 0, 1, 2);
-    row++;
-
-    // Populate the menu...
-    QMap< QAction *, QList< QString > > actionMap = mainWidget->menuActions();
-    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
-
-    QMap<QString, QMenu *> topLevelMenus;
-
-    while ( actionMapIterator.hasNext() ) {
-      actionMapIterator.next();
-      QAction *actionToAdd = actionMapIterator.key();
-      QList< QString > location = actionMapIterator.value();
-
-      QMenu *menuToPutActionInto = NULL;
-
-      if ( location.count() ) {
-        QString topLevelMenuTitle = location.takeFirst();
-        if (!topLevelMenus[topLevelMenuTitle]) {
-          topLevelMenus[topLevelMenuTitle] = menuBar->addMenu(topLevelMenuTitle);
-        }
-
-        menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
-      }
-
-      foreach (QString menuName, location) {
-        bool foundSubMenu = false;
-        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
-          if (!foundSubMenu &&
-              possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
-            foundSubMenu = true;
-            menuToPutActionInto = possibleSubMenu->menu();
-          }
-        }
-
-        if (!foundSubMenu) {
-          menuToPutActionInto = menuToPutActionInto->addMenu(menuName);
-        }
-      }
-
-      menuToPutActionInto->addAction(actionToAdd);
+    if (project()->activeControl() && (control == project()->activeControl())) {
+      result->cnetEditorWidget()->pointTableView()->content()->setActiveControlNet(true);
+      result->cnetEditorWidget()->measureTableView()->content()->setActiveControlNet(true);
     }
 
-    QTabWidget *treeViews = new QTabWidget;
-    treeViews->addTab( mainWidget->pointTreeView(), tr("Point View") );
-    treeViews->addTab( mainWidget->serialTreeView(), tr("Serial View") );
-    treeViews->addTab( mainWidget->connectionTreeView(), tr("Connection View") );
-    resultLayout->addWidget(treeViews, row, 0, 1, 1);
-
-    QTabWidget *filterViews = new QTabWidget;
-    filterViews->addTab( mainWidget->pointFilterWidget(), tr("Filter Points and Measures") );
-    filterViews->addTab( mainWidget->serialFilterWidget(), tr("Filter Images and Points") );
-    filterViews->addTab( mainWidget->connectionFilterWidget(), tr("Filter Connections") );
-    resultLayout->addWidget(filterViews, row, 1, 1, 1);
-    row++;
-
-    if (project()->activeControl() && mainWidget->control() == project()->activeControl()->controlNet()) {
-      mainWidget->pointTableView()->content()->setActiveControlNet(true);
-      mainWidget->measureTableView()->content()->setActiveControlNet(true);
-    }
-
-    // connect destroyed signal for mainWidget to cleanupCnetEditorViewWidgets slot
-    connect(mainWidget, SIGNAL( destroyed(QObject *) ),
-             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+    // connect destroyed signal to cleanupCnetEditorViewWidgets slot
+    connect(result, SIGNAL( destroyed(QObject *) ),
+            this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
 
     //  Connections for control point editing between views
-    connect(mainWidget, SIGNAL(editControlPoint(ControlPoint *, QString)),
+    connect(result->cnetEditorWidget(), SIGNAL(editControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -697,21 +657,21 @@ namespace Isis {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //
     // Connection between cneteditor view & other views
-    connect(mainWidget, SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
+    connect(result->cnetEditorWidget(), SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
 
     // ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
     // deleted or saved
-    connect(this, SIGNAL(cnetModified()), mainWidget, SLOT(rebuildModels()));
+    connect(this, SIGNAL(cnetModified()), result->cnetEditorWidget(), SLOT(rebuildModels()));
 
-    m_cnetEditorViewWidgets.append(mainWidget);
-    m_controlMap.insertMulti(network, mainWidget);
+    m_cnetEditorViewWidgets.append(result);
+    m_controlMap.insertMulti(control, result);
 
     result->setWindowTitle(title);
     result->setObjectName(title);
 
     emit newWidgetAvailable(result);
 
-    return mainWidget;
+    return result;
   }
 
 
@@ -868,8 +828,12 @@ namespace Isis {
 
       //  Create connections between signals from control point edit view and equivalent directory
       //  signals that can then be connected to other views that display control nets.
+//      connect(mainWidget, SIGNAL(cnetModified()),
+//              this, SIGNAL(cnetModified()));
       connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
               this, SIGNAL(cnetModified()));
+      connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
+              m_project, SLOT(activeControlModified()));
 
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
@@ -1071,21 +1035,20 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
-
-    CnetEditorWidget *cnetEditorWidget = static_cast<CnetEditorWidget *>(obj);
-    if (!cnetEditorWidget) {
+    
+    CnetEditorView *cnetEditorView = static_cast<CnetEditorView *>(obj);
+    if (!cnetEditorView) {
       return;
     }
 
-    Control *control = m_controlMap.key(cnetEditorWidget);
+    Control *control = m_controlMap.key(cnetEditorView);
+    m_controlMap.remove(control, cnetEditorView);
 
-    m_controlMap.remove(control, cnetEditorWidget);
-
-    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {
+    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {      
       control->closeControlNet();
     }
 
-    m_cnetEditorViewWidgets.removeAll(cnetEditorWidget);
+    m_cnetEditorViewWidgets.removeAll(cnetEditorView);
     m_project->setClean(false);
   }
 
@@ -1161,6 +1124,7 @@ namespace Isis {
      if (!controlPointEditView) {
        return;
      }
+     m_controlPointEditViewWidget = NULL;
      m_project->setClean(false);
 
    }
@@ -1243,12 +1207,12 @@ namespace Isis {
 
   /**
    * @brief Returns a list of all the control network views for this directory.
-   * @return @b QList<CnetEditorWidget *> A pointer list of all the CnetEditorWidget objects.
+   * @return @b QList<CnetEditorView *> A pointer list of all the CnetEditorWidget objects.
    */
-  QList<CnetEditorWidget *> Directory::cnetEditorViews() {
-    QList<CnetEditorWidget *> results;
+  QList<CnetEditorView *> Directory::cnetEditorViews() {
+    QList<CnetEditorView *> results;
 
-    foreach (CnetEditorWidget *widget, m_cnetEditorViewWidgets) {
+    foreach (CnetEditorView *widget, m_cnetEditorViewWidgets) {
       results.append(widget);
     }
 
@@ -1480,7 +1444,7 @@ namespace Isis {
     if ( !m_cnetEditorViewWidgets.isEmpty() ) {
       stream.writeStartElement("cnetEditorViews");
 
-      foreach (CnetEditorWidget *cnetEditorWidget, m_cnetEditorViewWidgets) {
+      foreach (CnetEditorView *cnetEditorWidget, m_cnetEditorViewWidgets) {
         cnetEditorWidget->save(stream, project(), newProjectRoot);
       }
 
@@ -1815,6 +1779,22 @@ namespace Isis {
         latitude, longitude, cube, isGroundSource);
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
+  }
+
+
+  /**
+   * Save the current active control.
+   *
+   */
+  void Directory::saveActiveControl() {
+
+    if (project()->activeControl()) {
+      project()->activeControl()->write();
+      // add to HistoryTreeWidget
+      QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
+        "has been saved.";
+      m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
+    }
   }
 
 

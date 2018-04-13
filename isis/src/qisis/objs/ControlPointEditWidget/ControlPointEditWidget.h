@@ -67,7 +67,7 @@ namespace Isis {
    *                           current editPoint Id.  Removed measure table methods. Fixes #5007,
    *                           #5008.
    *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
-   *                            SerialNumberList.remove()
+   *                           SerialNumberList.remove()
    *   @history 2017-08-09 Christopher Combs - Added QPushButton and slot for reloading a point's
    *                           measures in the ChipViewports. Fixes #5070.
    *   @history 2017-08-09 Christopher Combs - Added Apriori Latitude, Longitude, and Radius to
@@ -77,10 +77,14 @@ namespace Isis {
    *   @history 2017-08-11 Tracie Sucharski - Fixed save point and colorization of buttons.
    *                           Fixes #4984.
    *   @history 2017-08-15 Tracie Sucharski - When ControlPoint is deleted, set the visibility of
-   *                            this widget to false, then to true in loadPoint().  Fixes #5073.
-   *   @history 2018-03-23 Tracie Sucharski - Update the cnet filename with current cnet.
-   *   @history 2018-03-26 Tracie Sucharski - Update editor if a new active control net is set in
-   *                            ipce. References #4567.
+   *                           this widget to false, then to true in loadPoint().  Fixes #5073.
+   *   @history 2018-03-23 Tracie Sucharski - Update the cnet filename with current cnet when it is
+   *                           changed.
+   *   @history 2018-03-26 Tracie Sucharski - Added slot, setControlFromActive which update editor
+   *                           if a new active control net is set in ipce. References #4567.
+   *   @history 2018-03-30 Tracie Sucharski - Save Control in addition to the control net and use
+   *                           Control to write the control net so Control can keep track of the
+   *                           modification state of the control net.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -102,6 +106,7 @@ namespace Isis {
       void newControlNetwork(ControlNet *);
       void stretchChipViewport(Stretch *, CubeViewport *);
       void measureChanged();
+      // temporary signal for quick & dirty autosave in Ipce
       void saveControlNet();
 
     public slots:
@@ -236,9 +241,10 @@ namespace Isis {
       QPointer<QMainWindow> m_measureWindow; //!< Main window for the the measure table widget
       QPointer<QTableWidget> m_measureTable; //!< Table widget for the measures
 
-      QPointer<ControlPoint> m_editPoint; //!< The control point being edited
+      QPointer<ControlPoint> m_editPoint;   //!< The control point being edited
       SerialNumberList *m_serialNumberList; //!< Serial number list for the loaded cubes
-      QPointer<ControlNet> m_controlNet; //!< Current control net
+      QPointer<ControlNet> m_controlNet;    //!< Current control net
+      QPointer<Control> m_control;          //!< Current Control
 
       QPointer<ControlPoint> m_newPoint; //!< New control point
       QString m_lastUsedPointId; //!< Point id of the last used control point
