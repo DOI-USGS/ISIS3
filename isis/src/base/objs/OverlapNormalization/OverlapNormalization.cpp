@@ -177,21 +177,6 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if ( method == LeastSquares::SPARSE ) {
-      m_offsetLsq = NULL;
-      m_gainLsq = NULL;
-      delete m_offsetLsq;
-      delete m_gainLsq;
-      int sparseMatrixRows = m_overlapList.size() + m_idHoldList.size();
-      int sparseMatrixCols = m_offsetFunction->Coefficients();
-      m_offsetLsq = new LeastSquares(*m_offsetFunction, true, sparseMatrixRows, sparseMatrixCols, true);
-      sparseMatrixCols = m_gainFunction->Coefficients();
-      m_gainLsq = new LeastSquares(*m_gainFunction, true, sparseMatrixRows, sparseMatrixCols, true);
-      const std::vector<double> alphaWeight(sparseMatrixCols, 1/1000.0);
-      m_offsetLsq->SetParameterWeights( alphaWeight );
-      m_gainLsq->SetParameterWeights( alphaWeight );
-    }
-
     // Calculate offsets
     if (type != Gains && type != GainsWithoutNormalization) {
       // Add knowns to least squares for each overlap

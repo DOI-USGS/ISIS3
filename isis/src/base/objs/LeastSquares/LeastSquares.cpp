@@ -23,10 +23,6 @@
 #include "jama/jama_svd.h"
 #include "jama/jama_qr.h"
 
-#ifndef __sun__
-#include "gmm/gmm_superlu_interface.h"
-#endif
-
 #include "LeastSquares.h"
 #include "IException.h"
 #include "IString.h"
@@ -46,10 +42,6 @@ namespace Isis {
     p_sparse = sparse;
     p_sigma0 = 0.;
 
-#if defined(__sun__)
-    p_sparse = false;
-#endif
-
     if (p_sparse) {
 
       //  make sure sparse nrows/ncols have been set
@@ -59,20 +51,6 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-#ifndef __sun__
-      gmm::resize(p_sparseA, sparseRows, sparseCols);
-      gmm::resize(p_normals, sparseCols, sparseCols);
-      gmm::resize(p_ATb, sparseCols, 1);
-      p_xSparse.resize(sparseCols);
-
-      if( p_jigsaw ) {
-        p_epsilonsSparse.resize(sparseCols);
-        std::fill_n(p_epsilonsSparse.begin(), sparseCols, 0.0);
-
-        p_parameterWeights.resize(sparseCols);
-      }
-
-#endif
       p_sparseRows = sparseRows;
       p_sparseCols = sparseCols;
     }
@@ -131,48 +109,9 @@ namespace Isis {
       p_sqrtWeight.push_back(sqrt(weight));
     }
 
-    if(p_sparse) {
-#ifndef __sun__
-      FillSparseA(data);
-#endif
-    }
-    else {
-      p_input.push_back(data);
-    }
+
+    p_input.push_back(data);
   }
-
-
-
-  /**
-   *  Invoke this method for each set of knowns for sparse solutions.  The A
-   *  sparse matrix must be filled as we go or we will quickly run out of memory
-   *  for large solutions. So, expand the basis function, apply weights (which is
-   *  done in the Solve method for the non-sparse case.
-   *
-   * @param data A vector of knowns.
-   *
-   * @internal
-   * @history 2008-04-22  Tracie Sucharski - New method for sparse solutions.
-   * @history 2009-12-21  Jeannie Walldren - Changed variable name
-   *          from p_weight to p_sqrtweight.
-   *
-   */
-#ifndef __sun__
-  void LeastSquares::FillSparseA(const std::vector<double> &data) {
-
-    p_basis->Expand(data);
-
-    p_currentFillRow++;
-
-    //  ??? Speed this up using iterator instead of array indices???
-    int ncolumns = (int)data.size();
-
-    for(int c = 0;  c < ncolumns; c++) {
-      p_sparseA(p_currentFillRow, c) = p_basis->Term(c) * p_sqrtWeight[p_currentFillRow];
-    }
-  }
-#endif
-
 
   /**
    * This method returns the data at the given row.
@@ -230,10 +169,6 @@ namespace Isis {
    */
   int LeastSquares::Solve(Isis::LeastSquares::SolveMethod method) {
 
-#if defined(__sun__)
-    if(method == SPARSE) method = QRD;
-#endif
-
     if((method == SPARSE  &&  p_sparseRows == 0)  ||
        (method != SPARSE  &&  Rows() == 0 )) {
       p_solved = false;
@@ -246,12 +181,6 @@ namespace Isis {
     }
     else if(method == QRD) {
       SolveQRD();
-    }
-    else if(method == SPARSE) {
-#ifndef __sun__
-      int column = SolveSparse();
-      return column;
-#endif
     }
     return 0;
   }
@@ -324,8 +253,8 @@ namespace Isis {
     if (coefs.dim1() < p_basis->Coefficients()) {
       QString msg = "Unable to solve least-squares using SVD method. No "
                     "solution available. Not enough knowns or knowns are "
-                    "co-linear ... [Unknowns = " 
-                    + toString(p_basis->Coefficients()) + "] [Knowns = " 
+                    "co-linear ... [Unknowns = "
+                    + toString(p_basis->Coefficients()) + "] [Knowns = "
                     + toString(coefs.dim1()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -422,295 +351,11 @@ namespace Isis {
   }
 
 
-
-
-  /**
-   * @brief  Solve using sparse class
-   *
-   * After all the data has been registered through AddKnown, invoke this
-   * method to solve the system of equations Nx = b, where
-   *
-   * N = ATPA
-   * b = ATPl, and
-   *
-   * N is the "normal equations matrix;
-   * A is the so-called "design" matrix;
-   * P is the observation weight matrix (typically diagonal);
-   * l is the "computed - observed" column vector;
-   *
-   * The solution is achieved using a sparse matrix formulation of
-   * the LU decomposition of the normal equations.
-   *
-   * You can then use the Evaluate and Residual methods freely.
-   *
-   * @internal
-   * @history  2008-04-16 Debbie Cook / Tracie Sucharski, New method
-   * @history  2008-04-23 Tracie Sucharski,  Fill sparse matrix as we go in
-   *                          AddKnown method rather than in the solve method,
-   *                          otherwise we run out of memory very quickly.
-   * @history  2009-04-08 Tracie Sucharski - Added return value which is a
-   *                          column number of a column that contained all zeros.
-   * @history 2009-12-21  Jeannie Walldren - Changed variable name
-   *          from p_weight to p_sqrtweight.
-   * @history 2010        Ken Edmundson
-   * @history 2010-11-20  Debbie A. Cook Merged Ken Edmundson verion with system version
-   * @history 2011-03-17  Ken Edmundson Corrected computation of residuals
-   *
-   */
-#ifndef __sun__
-  int LeastSquares::SolveSparse() {
-
-    // form "normal equations" matrix by multiplying ATA
-    gmm::mult(gmm::transposed(p_sparseA), p_sparseA, p_normals);
-
-    //  Test for any columns with all 0's
-    //  Return column number so caller can determine the appropriate error.
-    int numNonZeros;
-    for(int c = 0; c < p_sparseCols; c++) {
-      numNonZeros = gmm::nnz(gmm::sub_matrix(p_normals,
-                             gmm::sub_interval(0,p_sparseCols),
-                             gmm::sub_interval(c,1)));
-
-      if(numNonZeros == 0) return c + 1;
-    }
-
-    // Create the right-hand-side column vector 'b'
-    gmm::dense_matrix<double> b(p_sparseRows, 1);
-
-    // multiply each element of 'b' by it's associated weight
-    for ( int r = 0; r < p_sparseRows; r++ )
-      b(r,0) = p_expected[r] * p_sqrtWeight[r];
-
-    // form ATb
-    gmm::mult(gmm::transposed(p_sparseA), b, p_ATb);
-
-    // apply parameter weighting if Jigsaw (bundle adjustment)
-    if ( p_jigsaw ) {
-      for( int i = 0; i < p_sparseCols; i++) {
-        double weight = p_parameterWeights[i];
-
-        if( weight <= 0.0 )
-          continue;
-
-        p_normals[i][i] += weight;
-        p_ATb[i] -= p_epsilonsSparse[i]*weight;
-      }
-    }
-
-//    printf("printing rhs\n");
-//    for( int i = 0; i < m_nSparseCols; i++ )
-//      printf("%20.10e\n",m_ATb[i]);
-
-    // decompose normal equations matrix
-    p_SLU_Factor.build_with(p_normals);
-
-    // solve with decomposed normals and right hand side
-    // int perm = 0;  //  use natural ordering
-    int perm = 2;     //  confirm meaning and necessity of
-//  double recond;    //  variables perm and recond
-    p_SLU_Factor.solve(p_xSparse,gmm::mat_const_col(p_ATb,0), perm);
-    // Set the coefficients in our basis equation
-    p_basis->SetCoefficients(p_xSparse);
-
-    // if Jigsaw (bundle adjustment)
-    // add corrections into epsilon vector (keeping track of total corrections)
-    if ( p_jigsaw ) {
-      for( int i = 0; i < p_sparseCols; i++ )
-        p_epsilonsSparse[i] += p_xSparse[i];
-    }
-
-    // test print solution
-//    printf("printing solution vector and epsilons\n");
-//    for( int a = 0; a < p_sparseCols; a++ )
-//      printf("soln[%d]: %lf epsilon[%d]: %lf\n",a,p_xSparse[a],a,p_epsilonsSparse[a]);
-
-//    printf("printing design matrix A\n");
-//    for (int i = 0; i < p_sparseRows; i++ )
-//    {
-//      for (int j = 0; j < p_sparseCols; j++ )
-//      {
-//        if ( j == p_sparseCols-1 )
-//          printf("%20.20e \n",(double)(p_sparseA(i,j)));
-//        else
-//          printf("%20.20e ",(double)(p_sparseA(i,j)));
-//      }
-//    }
-
-    // Compute the image coordinate residuals and sum into Sigma0
-    // (note this is exactly what was being done before, but with less overhead - I think)
-    // ultimately, we should not be using the A matrix but forming the normals
-    // directly. Then we'll have to compute the residuals by back projection
-
-    p_residuals.resize(p_sparseRows);
-    gmm::mult(p_sparseA, p_xSparse, p_residuals);
-    p_sigma0 = 0.0;
-
-    for ( int i = 0; i < p_sparseRows; i++ ) {
-        p_residuals[i] = p_residuals[i]/p_sqrtWeight[i];
-        p_residuals[i] -= p_expected[i];
-        p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
-    }
-
-    // if Jigsaw (bundle adjustment)
-    // add contibution to Sigma0 from constrained parameters
-    if ( p_jigsaw ) {
-      double constrained_vTPv = 0.0;
-
-      for ( int i = 0; i < p_sparseCols; i++ ) {
-        double weight = p_parameterWeights[i];
-
-        if ( weight <= 0.0 )
-          continue;
-
-        constrained_vTPv += p_epsilonsSparse[i]*p_epsilonsSparse[i]*weight;
-      }
-      p_sigma0 += constrained_vTPv;
-    }
-    // calculate degrees of freedom (or redundancy)
-    // DOF = # observations + # constrained parameters - # unknown parameters
-    p_degreesOfFreedom = p_sparseRows + p_constrainedParameters - p_sparseCols;
-
-    if( p_degreesOfFreedom <= 0.0 ) {
-      printf("Observations: %d\nConstrained: %d\nParameters: %d\nDOF: %d\n",
-             p_sparseRows,p_constrainedParameters,p_sparseCols,p_degreesOfFreedom);
-      p_sigma0 = 1.0;
-    }
-    else
-      p_sigma0 = p_sigma0/(double)p_degreesOfFreedom;
-
-    // check for p_sigma0 < 0
-    p_sigma0 = sqrt(p_sigma0);
-
-    // kle testing - output residuals and some stats
-    printf("Sigma0 = %20.10lf\nNumber of Observations = %d\nNumber of Parameters = %d\nNumber of Constrained Parameters = %d\nDOF = %d\n",p_sigma0,p_sparseRows,p_sparseCols,p_constrainedParameters,p_degreesOfFreedom);
-//    printf("printing residuals\n");
-//    for( int k = 0; k < p_sparseRows; k++ )
-//    {
-//      printf("%lf %lf\n",p_residuals[k],p_residuals[k+1]);
-//      k++;
-//    }
-
-    // All done
-    p_solved = true;
-    return 0;
-  }
-#endif
-
-  /**
-   * @brief  Error propagation for sparse least-squares solution
-   *
-   * Computes the variance-covariance matrix of the parameters.
-   * This is the inverse of the normal equations matrix, scaled by
-   * the reference variance (also called variance of unit weight,
-   * etc).
-   *
-   * @internal
-   * @history  2009-11-19 Ken Edmundson, New method
-   *
-   * Notes:
-   *
-   * 1) The SLU_Factor (Super LU Factor) has already been
-   * factorised in each iteration but there is no gmm++ method to
-   * get the inverse of the sparse matrix implementation. so we
-   * have to get it ourselves. This is don by solving the
-   * factorized normals repeatedly with right-hand sides that are
-   * the columns of the identity matrix (which is how gmm - or
-   * anybody else would do it).
-   *
-   * 2) We should create our own matrix library, probably wrapping
-   * the gmm++ library (and perhaps other(s) that may have
-   * additional desired functionality). The inverse function
-   * should be part of the library, along with the capacity for
-   * triangular storage and other decomposition techniques -
-   * notably Cholesky.
-   *
-   * 3) The LU decomposition can be be performed even if the
-   * normal equations are singular. But, we should always be
-   * dealing with a positive-definite matrix (for the bundle
-   * adjustment). Cholesky is faster, more efficient, and requires
-   * a positive-definite matrix, so if it fails, it is an
-   * indication of a singular matrix - bottom line - we should be
-   * using Cholesky. Or a derivative of Cholesky, i.e., UTDU
-   * (LDLT).
-   *
-   * 4) As a consequence of 3), we should be checking for
-   * positive-definite state of the normals, perhaps via the
-   * matrix determinant, prior to solving. There is a check in
-   * place now that checks to see if a column of the design matrix
-   * (or basis?) is all zero. This is equivalent - if a set of
-   * vectors contains the zero vector, then the set is linearly
-   * dependent, and the matrix is not positive-definite. In
-   * Jigsaw, the most likely cause of the normals being
-   * non-positive-definite probably is failure to establish the
-   * datum (i.e. constraining a minimum of seven parameters -
-   * usually 3 coordinates of two points and 1 of a third).
-   */
-#ifndef __sun__
-  bool LeastSquares::SparseErrorPropagation ()
-  {
-    // clear memory
-    gmm::clear(p_ATb);
-    gmm::clear(p_xSparse);
-
-    // for each column of the inverse, solve with a right-hand side consisting
-    // of a column of the identity matrix, putting each resulting solution vectfor
-    // into the corresponding column of the inverse matrix
-    for ( int i = 0; i < p_sparseCols; i++ )
-    {
-      if( i > 0 )
-        p_ATb(i-1,0) = 0.0;
-
-      p_ATb(i,0) = 1.0;
-
-      // solve with decomposed normals and right hand side
-      p_SLU_Factor.solve(p_xSparse,gmm::mat_const_col(p_ATb,0));
-
-      // put solution vector x into current column of inverse matrix
-      gmm::copy(p_xSparse, gmm::mat_row(p_normals, i));
-    }
-
-    // scale inverse by Sigma0 squared to get variance-covariance matrix
-    // if simulated data, we don't scale (effectively scaling by 1.0)
-    //    printf("scaling by Sigma0\n");
-    gmm::scale(p_normals,(p_sigma0*p_sigma0));
-
-//    printf("covariance matrix\n");
-//    for (int i = 0; i < p_sparseCols; i++ )
-//    {
-//      for (int j = 0; j < p_sparseCols; j++ )
-//      {
-//        if ( j == p_sparseCols-1 )
-//          printf("%20.20e \n",(double)(p_sparseInverse(i,j)));
-//        else
-//          printf("%20.20e ",(double)(p_sparseInverse(i,j)));
-//      }
-//    }
-
-    // standard deviations from covariance matrix
-//    printf("parameter standard deviations\n");
-//  for (int i = 0; i < p_sparseCols; i++ )
-//    {
-//      printf("Sigma Parameter %d = %20.20e \n",i+1,sqrt((double)(p_sparseInverse(i,i))));
-//    }
-
-    return true;
-  }
-#endif
-
-
   void LeastSquares::Reset ()
   {
-    if ( p_sparse ) {
-      gmm::clear(p_sparseA);
-      gmm::clear(p_ATb);
-      gmm::clear(p_normals);
-      p_currentFillRow = -1;
-    }
-    else {
-      p_input.clear();
-      //      p_sigma0 = 0.;
-    }
-      p_sigma0 = 0.;
+
+    p_input.clear();
+    p_sigma0 = 0.;
     p_residuals.clear();
     p_expected.clear();
     p_sqrtWeight.clear();

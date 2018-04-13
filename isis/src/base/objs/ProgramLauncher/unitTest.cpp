@@ -25,11 +25,11 @@ void IsisMain() {
   cerr << "Testing stats ... " << endl;
   cerr << endl;
   ProgramLauncher::RunSystemCommand("greyscale to=unitTest.cub enddn=50.0 samples=50 lines=50 "
-        "-preference=$ISISROOT/src/base/objs/Preference/TestPreferences");
+        "-preference=$ISISROOT/TestPreferences");
 
   ProgramLauncher::RunIsisProgram("stats",
         "from=unitTest.cub "
-        "-preference=$ISISROOT/src/base/objs/Preference/TestPreferences");
+        "-preference=$ISISROOT/TestPreferences");
 
   cerr << endl;
   cerr << "Testing malformed command... " << endl;
@@ -65,7 +65,7 @@ void IsisMain() {
   try {
     ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
         "from=\\$base/testData/ab102401_ideal.cub -pid=999 "
-        "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
+        "-preference=\\$ISISROOT/TestPreferences");
   }
   catch(IException &e) {
     e.print();
@@ -79,7 +79,7 @@ void IsisMain() {
   try {
     ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
         "from=unitTest.cub "
-        "-preference=\\$ISISROOT/src/base/objs/Preference/TestPreferences");
+        "-preference=\\$ISISROOT/TestPreferences");
   }
   catch(IException &e) {
     e.print();
