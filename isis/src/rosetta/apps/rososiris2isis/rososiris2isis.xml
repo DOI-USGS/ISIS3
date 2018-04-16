@@ -262,6 +262,10 @@
       Renamed application to rososiris2isis to disambiguate from osiris-rex
       mission utilities. 
     </change>
+    <change name="Jeannie Backer" date="2018-03-29">
+      Fixed typo of FilterName from Fe203 to Fe2O3 (letter O, not zero).
+      Improved error messages. Added tests for all filters. Fixes #5369. 
+    </change>
   </history>
 
   <category>

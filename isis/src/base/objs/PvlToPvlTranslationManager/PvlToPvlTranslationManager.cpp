@@ -104,10 +104,11 @@ namespace Isis {
   /**
    * Returns a translated value. The output name is used to find the input
    * group, keyword, default and tranlations in the translation table. If the
-   * keyword does not exist in the input label, the input default if
-   * available will be used as the input value. This input value
-   * is then used to search all of the translations. If a match is
-   * found the translated value is returned.
+   * keyword does not exist in the input label and an input 
+   * default is available, then this default will be used as the 
+   * input value. This input value is then used to search all of 
+   * the translations. If a match is found the translated value is
+   * returned. 
    *
    * @param nName The output name used to identify the input keyword to be
    *              translated.
@@ -136,7 +137,12 @@ namespace Isis {
 
   /**
    * Translate the requested output name to output values using the input name
-   * and values or default value
+   * and values or default value. 
+   *  
+   * Note: This is a protected method used when automatically 
+   * translating 
+   *  
+   * @see Auto(). 
    *
    * @param nName The output name used to identify the input keyword to be
    *              translated.
@@ -166,7 +172,7 @@ namespace Isis {
 
              for(int v = 0; v < (*con)[(result[0])].size(); v++) {
                key.addValue(PvlTranslationTable::Translate(nName,
-                            (*con)[result[0]][v]),
+                                                           (*con)[result[0]][v]),
                             (*con)[result[0]].unit(v));
              }
 
@@ -178,7 +184,7 @@ namespace Isis {
      }
 
      return PvlKeyword(OutputName(nName),
-                             PvlTranslationTable::Translate(nName, ""));
+                       PvlTranslationTable::Translate(nName, ""));
    }
 
 

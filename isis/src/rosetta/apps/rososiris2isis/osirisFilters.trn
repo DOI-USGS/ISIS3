@@ -1,0 +1,148 @@
+#
+# The group names listed here are the native names used by
+# applications to get the foreign names and values
+#
+# There is only one level of groups the groups are not
+# allowed to be nested
+#
+# The Group names can NOT be repeated.
+#
+# InputGroup is a comma delimited list of objects and/or
+# groups in the foreign label. Traversing this list will
+# lead to the correct level to find the foreign keyword.
+#
+# InputKey is the keyword within the group which holds
+# the information.
+#
+# InputDefault is the value used if there is no value for
+# the keyword
+#
+# Translation is the native and corresponding foreign values.
+# Translation may be repeated as needed.
+#
+
+#input group changed from [ROOT]
+Group = FilterId
+  InputKeyDependencies  = OSINAC
+  OutputName  = FilterId
+  Translation = (1, FFP-UV)
+  Translation = (2, FFP-IR)
+  Translation = (3, Neutral)
+  Translation = (4, NFP-Vis)
+  Translation = (5, Far-UV)
+  Translation = (6, Near-UV)
+  Translation = (1, Blue)
+  Translation = (2, Green)
+  Translation = (3, FFP-Vis)
+  Translation = (4, Orange)
+  Translation = (5, Hydra)
+  Translation = (6, Red)
+  Translation = (1, Ortho)
+  Translation = (2, Near-IR)
+  Translation = (3, Fe2O3)
+  Translation = (4, IR)
+End_Group
+
+Group = FilterCenter
+  InputKeyDependencies  = OSINAC
+  OutputName  = FilterCenter
+  Translation = (600.0, FFP-UV)
+  Translation = (600.0, FFP-IR)
+  Translation = (640.0, Neutral)
+  Translation = (600.0, NFP-Vis)
+  Translation = (269.3, Far-UV)
+  Translation = (360.0, Near-UV)
+  Translation = (480.7, Blue)
+  Translation = (535.7, Green)
+  Translation = (600.0, FFP-Vis)
+  Translation = (649.2, Orange)
+  Translation = (701.2, Hydra)
+  Translation = (743.7, Red)
+  Translation = (805.3, Ortho)
+  Translation = (882.1, Near-IR)
+  Translation = (931.9, Fe2O3)
+  Translation = (989.3, IR)
+End_Group
+
+Group = FilterWidth
+  InputKeyDependencies  = OSINAC
+  OutputName  = FilterWidth
+  Translation = (600.0, FFP-UV)
+  Translation = (600.0, FFP-IR)
+  Translation = (520.0, Neutral)
+  Translation = (600.0, NFP-Vis)
+  Translation = ( 53.6, Far-UV)
+  Translation = ( 51.1, Near-UV)
+  Translation = ( 74.9, Blue)
+  Translation = ( 62.4, Green)
+  Translation = (600.0, FFP-Vis)
+  Translation = ( 84.5, Orange)
+  Translation = ( 22.1, Hydra)
+  Translation = ( 64.1, Red)
+  Translation = ( 40.5, Ortho)
+  Translation = ( 65.9, Near-IR)
+  Translation = ( 34.9, Fe2O3)
+  Translation = ( 38.2, IR)
+End_Group
+
+Group = FilterId
+  InputKeyDependencies  = OSIWAC
+  OutputName  = FilterId
+  Translation = (1, FFP-UV)
+  Translation = (2, FFP-IR)
+  Translation = (3, Neutral)
+  Translation = (4, NFP-Vis)
+  Translation = (5, Far-UV)
+  Translation = (6, Near-UV)
+  Translation = (1, Blue)
+  Translation = (2, Green)
+  Translation = (3, FFP-Vis)
+  Translation = (4, Orange)
+  Translation = (5, Hydra)
+  Translation = (6, Red)
+  Translation = (1, Ortho)
+  Translation = (2, Near-IR)
+  Translation = (3, Fe2O3)
+  Translation = (4, IR)
+End_Group
+
+Group = FilterCenter
+  InputKeyDependencies  = OSIWAC
+  OutputName  = FilterCenter
+  Translation = (  0.0, Empty)
+  Translation = (246.2, UV245)
+  Translation = (259.0, CS)
+  Translation = (295.9, UV295)
+  Translation = (309.7, OH-WAC)
+  Translation = (325.8, UV325)
+  Translation = (335.9, NH)
+  Translation = (375.6, UV375)
+  Translation = (388.4, CN)
+  Translation = (537.2, Green)
+  Translation = (572.1, NH2)
+  Translation = (590.7, Na)
+  Translation = (612.6, VIS610)
+  Translation = (631.6, OI)
+  Translation = (629.8, Red)
+End_Group
+
+Group = FilterWidth
+  InputKeyDependencies  = OSIWAC
+  OutputName  = FilterWidth
+  Translation = (  0.0, Empty)
+  Translation = ( 14.1, UV245)
+  Translation = (  5.6, CS)
+  Translation = ( 10.9, UV295)
+  Translation = (  4.1, OH-WAC)
+  Translation = ( 10.7, UV325)
+  Translation = (  4.1, NH)
+  Translation = (  9.8, UV375)
+  Translation = (  5.2, CN)
+  Translation = ( 63.2, Green)
+  Translation = ( 11.5, NH2)
+  Translation = (  4.7, Na)
+  Translation = (  9.8, VIS610)
+  Translation = (  4.0, OI)
+  Translation = (156.8, Red)
+End_Group
+End

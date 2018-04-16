@@ -240,6 +240,7 @@ namespace Isis {
       cout << endl << "Finding input element:" << endl << endl;
       cout << inputParentElement.tagName() << endl;
     }
+    // traverse the input position path 
     for (int i = 0; i < inputPosition.size(); i++) {
       QString childName = inputPosition[i];
       inputParentElement = inputParentElement.firstChildElement(childName);
@@ -265,6 +266,7 @@ namespace Isis {
         cout << indent << inputParentElement.tagName() << endl;
       }
     }
+    // now get input value at given input position path
     QDomElement inputKeyElement = inputParentElement.firstChildElement(inputKey);
     if (isDebug) {
       indent += "  ";
@@ -289,7 +291,6 @@ namespace Isis {
         inputKeyElement = inputParentElement.firstChildElement(inputKey);
       }
     }
-
     // If the parent element is NULL at this point then we traversed every
     // potential input element and none of them satisfied the dependencies.
     if ( inputParentElement.isNull() ) {
@@ -301,7 +302,8 @@ namespace Isis {
         return PvlTranslationTable::Translate( outputName );
       }
       else {
-        QString msg = "Could not find an input value or default value.";
+        QString msg = "Could not find an input or default value that fits the given input "
+                      "keyword dependencies.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -347,8 +349,9 @@ namespace Isis {
    * dependencies are requirements on the values of attributes of the element
    * and/or the values of sibling elements. The dependencies are specified by
    * strings that are formatted as follows
-   * <code>[tag/att]\@[tagName/attName]:[value]</code>
-   *
+   * <code>[tag/att]\@[tagName/attName]|[value]</code> or 
+   * <code>[tagName/attName]|[value]</code> 
+   * 
    * @param element The element to check dependencies on.
    * @param dependencies A multi-valued keyword were every entry specifies a
    *                     requirement upon either an attribute of the element or
