@@ -65,7 +65,6 @@ namespace Isis {
    *                           Control is created Fixes #5026
    *   @histroy 2017-10-24 Adam Goins - Removed the undoStack() call that occurred when a
    *                           Failed cnet is imported. Fixes #5186
-   *   @history 2018-03-30 Tracie Sucharski - Copy the control net instead of writing.
    */
   class ImportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT
