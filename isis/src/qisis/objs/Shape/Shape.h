@@ -62,7 +62,7 @@ namespace Isis {
    *
    * @author 2016-07-25 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2016-10-21 Tracie Sucharski - Add Image to the Shape class.  This was done because
    *                          the qmos class expect Images, and we want to display a footprint of
    *                          a Shape.

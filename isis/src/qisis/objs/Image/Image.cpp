@@ -2,6 +2,7 @@
 
 #include <QBuffer>
 #include <QDataStream>
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QMutexLocker>
@@ -246,7 +247,7 @@ namespace Isis {
 
 
   /**
-   * @brief Get the Cube pointer associated with this display property. 
+   * @brief Get the Cube pointer associated with this display property.
    *
    * This will allocate the Cube pointer if one is not already present.
    * @throws IException::Programmer "Cube cannot be created"
@@ -255,7 +256,7 @@ namespace Isis {
   Cube *Image::cube() {
     if (!m_cube) {
       try {
-        m_cube = new Cube(m_fileName); 
+        m_cube = new Cube(m_fileName);
       }
       catch (IException &e) {
         throw IException(e, IException::Programmer, "Cube cannot be created", _FILEINFO_);
@@ -267,7 +268,7 @@ namespace Isis {
 
 
   /**
-   * @brief Cleans up the Cube pointer. 
+   * @brief Cleans up the Cube pointer.
    *
    * You want to call this once you are sure you are done
    * with the Cube because the OS will limit how many of these we have open.
@@ -349,9 +350,9 @@ namespace Isis {
 
 
   /**
-   * @brief Calculate a footprint for this image. 
+   * @brief Calculate a footprint for this image.
    *
-   * If the footprint is already stored inside the cube, that will be used instead. 
+   * If the footprint is already stored inside the cube, that will be used instead.
    * If no footprint can be found, this throws an exception.
    * @param cameraMutex A pointer to the camera mutex to lock the camera resource while a footprint
    * is created.
@@ -488,27 +489,43 @@ namespace Isis {
     if (FileName(newProjectRoot) != FileName(project->projectRoot())) {
       Cube origImage(m_fileName);
 
+      // The imageDataRoot will either be PROJECTROOT/images or PROJECTROOT/results/bundle/timestamp/images,
+      // depending on how the newProjectRoot points to.
       FileName newExternalLabelFileName(Project::imageDataRoot(newProjectRoot.toString()) + "/" +
           FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name());
 
-      QScopedPointer<Cube> newExternalLabel(
-          origImage.copy(newExternalLabelFileName, CubeAttributeOutput("+External")));
+      if (m_fileName != newExternalLabelFileName.toString()) {
+        // This cube copy creates a filename w/ecub extension in the new project root, but looks to
+        // be a cube(internal vs external). It changes the DnFile pointer to the old ecub, 
+        // /tmp/tsucharski_ipce/tmpProject/images/import1/AS15-.ecub, but doing a less on file 
+        // immediately after the following call indicates it is a binary file.
+        QScopedPointer<Cube> newExternalLabel(
+            origImage.copy(newExternalLabelFileName, CubeAttributeOutput("+External")));
 
-      // If this is an ecub (it should be) and is pointing to a relative file name,
-      //   then we want to copy the DN cube also.
-      if (!origImage.storesDnData() ) {
-        if (origImage.externalCubeFileName().path() == ".") {
-          Cube dnFile(
-              FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
-
-          FileName newDnFileName = newExternalLabelFileName.setExtension("cub");
-
-          QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
-          newDnFile->close();
-          newExternalLabel->relocateDnData(newDnFileName.name());
-        }
-        else {
-          newExternalLabel->relocateDnData(origImage.externalCubeFileName());
+        // If this is an ecub (it should be) and is pointing to a relative file name,
+        //   then we want to copy the DN cube also.
+        if (!origImage.storesDnData() ) {
+          if (origImage.externalCubeFileName().path() == ".") {
+            Cube dnFile(
+                FileName(m_fileName).path() + "/" + origImage.externalCubeFileName().name());
+            FileName newDnFileName = newExternalLabelFileName.setExtension("cub");
+            QScopedPointer<Cube> newDnFile(dnFile.copy(newDnFileName, CubeAttributeOutput()));
+            newDnFile->close();
+            // Changes the ecube's DnFile pointer in the labels.
+            newExternalLabel->relocateDnData(newDnFileName.name());
+          }
+          else {
+            //  If the the ecub's external cube is pointing to the old project root, update to new
+            //  project root.
+            if (origImage.externalCubeFileName().toString().contains(project->projectRoot())) {
+              QString newExternalCubeFileName = origImage.externalCubeFileName().toString();
+              newExternalCubeFileName.replace(project->projectRoot(), project->newProjectRoot());
+              newExternalLabel->relocateDnData(newExternalCubeFileName); 
+            }
+            else {
+              newExternalLabel->relocateDnData(origImage.externalCubeFileName()); 
+            }
+          }
         }
       }
     }
@@ -818,11 +835,11 @@ namespace Isis {
         }
 
         if (!instrumentId.isEmpty()) {
-          m_image->m_instrumentId = m_imageFolder.expanded() + "/" + instrumentId;
+          m_image->m_instrumentId = instrumentId;
         }
 
         if (!spacecraftName.isEmpty()) {
-          m_image->m_spacecraftName = m_imageFolder.expanded() + "/" + spacecraftName;
+          m_image->m_spacecraftName = spacecraftName;
         }
 
         if (!aspectRatioStr.isEmpty()) {
@@ -915,5 +932,3 @@ namespace Isis {
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }
-
-

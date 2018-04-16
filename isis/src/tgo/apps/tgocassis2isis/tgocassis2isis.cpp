@@ -27,10 +27,20 @@ void IsisMain() {
   try {
     ProcessImport importer;
     translateCoreInfo(xmlFileName, importer);
-    // can we get this name from the input label???
-    importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    
+    if(xmlFileName.removeExtension().addExtension("dat").fileExists()){
+      importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    } 
+    else if (xmlFileName.removeExtension().addExtension("img").fileExists()) {
+      importer.SetInputFile(xmlFileName.removeExtension().addExtension("img").expanded());
+    }
+    else {
+      QString msg = "Cannot find image file for [" + xmlFileName.name() + "]. Confirm that the "
+        ".dat or .img file for this XML exists and is located in the same directory.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    
     Cube *outputCube = importer.SetOutputCube("TO");
-    // fails above
     translateLabels(xmlFileName, outputCube);
 
     FileName outputCubeFileName(ui.GetFileName("TO"));

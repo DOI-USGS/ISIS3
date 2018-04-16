@@ -241,29 +241,47 @@ namespace Isis {
       cout << inputParentElement.tagName() << endl;
     }
     // traverse the input position path 
-    for (int i = 0; i < inputPosition.size(); i++) {
-      QString childName = inputPosition[i];
-      inputParentElement = inputParentElement.firstChildElement(childName);
-      if(inputParentElement.isNull()) {
-        if ( hasInputDefault(outputName) ) {
-          if (isDebug) {
-            cout << endl << "Could not traverse input position, " <<
-                            "using default value: " <<
-                            InputDefault(outputName) << endl;
+    Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputPosition",
+                                      transGroup.begin(),
+                                      transGroup.end());
+
+    QDomElement oldInputParentElement = inputParentElement;
+    QString childName;
+    while(it != transGroup.end()) {
+      const PvlKeyword &inputPosition = *it;
+      inputParentElement = oldInputParentElement; 
+
+        for (int i = 0; i < inputPosition.size(); i++) {
+          childName = inputPosition[i];
+          inputParentElement = inputParentElement.firstChildElement(childName);
+          if(inputParentElement.isNull()) {
+            break;
           }
-          return PvlTranslationTable::Translate( outputName );
+          if (isDebug) {
+            indent += "  ";
+            cout << indent << inputParentElement.tagName() << endl;
+          }
         }
-        else {
-          QString msg = "Failed traversing input position. [" +
-                        inputParentElement.parentNode().toElement().tagName() +
-                        "] element does not have a child element named [" +
-                        childName + "].";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
+        if (!inputParentElement.isNull()) {
+          break;
         }
+        it = transGroup.findKeyword("InputPosition", it + 1, transGroup.end()); 
+    }
+     
+    if (inputParentElement.isNull()) {
+      if (hasInputDefault(outputName)) {
+        if (isDebug) {
+          cout << endl << "Could not traverse input position, " <<
+            "using default value: " <<
+            InputDefault(outputName) << endl;
+        }
+        return PvlTranslationTable::Translate( outputName );
       }
-      if (isDebug) {
-        indent += "  ";
-        cout << indent << inputParentElement.tagName() << endl;
+      else {
+        QString msg = "Failed traversing input position. [" +
+          inputPosition.name() + "] element does not have a child element named [" +
+          childName + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     // now get input value at given input position path
