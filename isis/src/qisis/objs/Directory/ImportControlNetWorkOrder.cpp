@@ -276,22 +276,17 @@ namespace Isis {
     Control *control = NULL;
     try {
       QString cnetFileName = cnetFileNameAndProgress.first.original();
-//    ControlNet *cnet = new ControlNet();
-//    cnet->SetMutex(m_project->mutex());
-
-//      cnet->ReadControl(cnetFileName, cnetFileNameAndProgress.second);
+      ControlNet *cnet = new ControlNet();
+      cnet->SetMutex(m_project->mutex());
+      cnet->ReadControl(cnetFileName, cnetFileNameAndProgress.second);
 
       QString baseFilename = FileName(cnetFileName).name();
       QString destination = m_destinationFolder.canonicalPath() + "/" + baseFilename;
 
-      if (!QFile::copy(cnetFileName, destination) ) {
-        //m_warning = "Error saving control net.";
-      }
+      cnet->Write(destination);
 
-//      cnet->Write(destination);
-
-//    delete cnet;
-//    cnet = NULL;
+      delete cnet;
+      cnet = NULL;
 
       control = new Control(m_project, destination);
       control->closeControlNet();
