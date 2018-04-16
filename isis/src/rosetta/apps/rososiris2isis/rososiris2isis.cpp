@@ -33,7 +33,7 @@ void IsisMain() {
     instId = (QString) lab.findKeyword("INSTRUMENT_ID");
     missionId = (QString) lab.findKeyword("MISSION_ID");
   }
-  catch(IException &e) {
+  catch (IException &e) {
     QString msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
@@ -41,7 +41,7 @@ void IsisMain() {
 
   instId = instId.simplified().trimmed();
   missionId = missionId.simplified().trimmed();
-  if(missionId.compare("ROSETTA", Qt::CaseInsensitive) != 0 
+  if (missionId.compare("ROSETTA", Qt::CaseInsensitive) != 0 
      && instId.compare("OSINAC", Qt::CaseInsensitive) != 0 
      && instId.compare("OSIWAC", Qt::CaseInsensitive) != 0) {
     QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
@@ -141,10 +141,10 @@ void IsisMain() {
   outcube->putGroup(bbGrp);
 
   PvlGroup kerns("Kernels");
-  if(instId.compare("OSINAC", Qt::CaseInsensitive) == 0) {
+  if (instId.compare("OSINAC", Qt::CaseInsensitive) == 0) {
     kerns += PvlKeyword("NaifFrameCode", toString(-226111)); //should I add [-filtno] directly after the number?  That's what Dawn did
   }
-  else if(instId.compare("OSIWAC", Qt::CaseInsensitive) == 0) {
+  else if (instId.compare("OSIWAC", Qt::CaseInsensitive) == 0) {
     kerns += PvlKeyword("NaifFrameCode", toString(-226112));  //should I add [-filtno] directly after the number?  That's what Dawn did
   }
   else {
@@ -164,7 +164,7 @@ void IsisMain() {
 // Flip image by line
 void flipbyline(Buffer &in, Buffer &out) {
   int index = in.size() - 1;
-  for(int i = 0; i < in.size(); i++) {
+  for (int i = 0; i < in.size(); i++) {
     out[i] = in[index - i];
   }
 }

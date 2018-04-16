@@ -71,6 +71,7 @@ namespace Isis {
    *                          PvlToPvlTranslationManager. Fixes #4901.
    *  @history 2018-01-10 Christopher Combs - Changed ProcessDataFilePointer call to reflect 
    *                          changes made to voy2isis. Fixes #4345, #4421.
+   *  @history 2018-04-16 Jeannie Backer - Fixed indentation of history comments.
    *  @todo 2005-02-15 Stuart Sides - add coded example and implementation example
    *                          to class documentation, and finish
    *                          documentation.

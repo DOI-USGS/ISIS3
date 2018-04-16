@@ -82,7 +82,6 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   QString missionDir = (QString) dataDir["Tgo"];
 
   // Get the translation manager ready
-  missionDir = ".";
   FileName transFile(missionDir + "/translations/tgoCassis.trn");
   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
