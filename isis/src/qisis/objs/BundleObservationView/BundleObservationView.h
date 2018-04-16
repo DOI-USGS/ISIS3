@@ -44,6 +44,9 @@ namespace Isis{
    *                           Fixes #4850.
    *   @history 2018-03-26 Ken Edmundson - Modified displayTextFile method to query for system's
    *                           fixed width font.
+   *   @history 2018-04-16 Ken Edmundson - Modified display of residuals.csv to properly show the
+   *                           rejected column if there are rejected measures. Also displays
+   *                           rejected measure row in red.
    */
 
   class BundleObservationView : public AbstractProjectItemView
