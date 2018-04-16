@@ -109,28 +109,31 @@ namespace Isis {
    * then used to search all of the translations. If a match is found the
    * translated value is returned. 
    *
-   * @param nName The output name used to identify the input keyword to be
-   *              translated.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    *
    * @param findex The index into the input keyword array.  Defaults to 0
    *
    * @return string
    */
-  QString PvlToPvlTranslationManager::Translate(QString nName, int findex) {
+  QString PvlToPvlTranslationManager::Translate(QString translationGroupName, int findex) {
     const PvlContainer *con;
     int inst = 0;
     PvlKeyword grp;
 
-    while((grp = InputGroup(nName, inst++)).name() != "") {
+    while((grp = InputGroup(translationGroupName, inst++)).name() != "") {
       if((con = GetContainer(grp)) != NULL) {
-        if(con->hasKeyword(InputKeywordName(nName))) {
-          return PvlTranslationTable::Translate(nName,
-                                                (*con)[InputKeywordName(nName)][findex]);
+        if(con->hasKeyword(InputKeywordName(translationGroupName))) {
+          return PvlTranslationTable::Translate(translationGroupName,
+                                                (*con)[InputKeywordName(translationGroupName)][findex]);
         }
       }
     }
 
-    return PvlTranslationTable::Translate(nName);
+    return PvlTranslationTable::Translate(translationGroupName);
   }
 
 
@@ -143,12 +146,15 @@ namespace Isis {
    *  
    * @see Auto().
    *
-   * @param nName The output name used to identify the input keyword to be
-   *              translated.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    *
    * @return PvlKeyword
    */
-   PvlKeyword PvlToPvlTranslationManager::DoTranslation(const QString nName) {
+   PvlKeyword PvlToPvlTranslationManager::DoTranslation(const QString translationGroupName) {
      const PvlContainer *con = NULL;
      PvlKeyword key;
 
@@ -156,9 +162,9 @@ namespace Isis {
      PvlGroup transGroup;
      PvlKeyword grp;
 
-     while((grp = InputGroup(nName, inst++)).name() != "") {
+     while((grp = InputGroup(translationGroupName, inst++)).name() != "") {
        if((con = GetContainer(grp)) != NULL) {
-         transGroup = TranslationTable().findGroup(nName);
+         transGroup = TranslationTable().findGroup(translationGroupName);
          Pvl::ConstPvlKeywordIterator it = transGroup.findKeyword("InputKey",
                                            transGroup.begin(),
                                            transGroup.end());
@@ -167,10 +173,10 @@ namespace Isis {
          while(it != transGroup.end()) {
            const PvlKeyword &result = *it;
            if(con->hasKeyword(result[0])) {
-             key.setName(OutputName(nName));
+             key.setName(OutputName(translationGroupName));
 
              for(int v = 0; v < (*con)[(result[0])].size(); v++) {
-               key.addValue(PvlTranslationTable::Translate(nName,
+               key.addValue(PvlTranslationTable::Translate(translationGroupName,
                                                            (*con)[result[0]][v]),
                             (*con)[result[0]].unit(v));
              }
@@ -182,8 +188,8 @@ namespace Isis {
        }
      }
 
-     return PvlKeyword(OutputName(nName),
-                       PvlTranslationTable::Translate(nName, ""));
+     return PvlKeyword(OutputName(translationGroupName),
+                       PvlTranslationTable::Translate(translationGroupName, ""));
    }
 
 
@@ -227,16 +233,20 @@ namespace Isis {
   /**
    * Returns the ith input value associated with the output name argument.
    *
-   * @param nName The output name used to identify the input keyword.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    *
    * @param findex The index into the input keyword array.  Defaults to 0
    *
    * @throws IException::Programmer
    */
-  const PvlKeyword &PvlToPvlTranslationManager::InputKeyword(const QString nName) const {
+  const PvlKeyword &PvlToPvlTranslationManager::InputKeyword(const QString translationGroupName) const {
 
     int instanceNumber = 0;
-    PvlKeyword inputGroupKeyword = InputGroup(nName, instanceNumber);
+    PvlKeyword inputGroupKeyword = InputGroup(translationGroupName, instanceNumber);
     bool anInputGroupFound = false;
 
     while(inputGroupKeyword.name() != "") {
@@ -244,31 +254,31 @@ namespace Isis {
       if(containingGroup != NULL) {
         anInputGroupFound = true;
 
-        if(containingGroup->hasKeyword(InputKeywordName(nName))) {
-          return containingGroup->findKeyword(InputKeywordName(nName));
+        if(containingGroup->hasKeyword(InputKeywordName(translationGroupName))) {
+          return containingGroup->findKeyword(InputKeywordName(translationGroupName));
         }
       }
 
       instanceNumber ++;
-      inputGroupKeyword = InputGroup(nName, instanceNumber);
+      inputGroupKeyword = InputGroup(translationGroupName, instanceNumber);
     }
 
     if(anInputGroupFound) {
-      QString msg = "Unable to find input keyword [" + InputKeywordName(nName) +
-                   "] for output name [" + nName + "] in file [" + TranslationTable().fileName() + "]";
+      QString msg = "Unable to find input keyword [" + InputKeywordName(translationGroupName) +
+                   "] for output name [" + translationGroupName + "] in file [" + TranslationTable().fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
       QString container = "";
 
-      for(int i = 0; i < InputGroup(nName).size(); i++) {
+      for(int i = 0; i < InputGroup(translationGroupName).size(); i++) {
         if(i > 0) container += ",";
 
-        container += InputGroup(nName)[i];
+        container += InputGroup(translationGroupName)[i];
       }
 
       QString msg = "Unable to find input group [" + container +
-                   "] for output name [" + nName + "] in file [" + TranslationTable().fileName() + "]";
+                   "] for output name [" + translationGroupName + "] in file [" + TranslationTable().fileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -278,21 +288,25 @@ namespace Isis {
    * Indicates if the input keyword corresponding to the output name exists in
    * the label
    *
-   * @param nName The output name used to identify the input keyword.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    */
-  bool PvlToPvlTranslationManager::InputHasKeyword(const QString nName) {
+  bool PvlToPvlTranslationManager::InputHasKeyword(const QString translationGroupName) {
 
     // Set the current position in the input label pvl
     // by finding the input group corresponding to the output group
     const PvlContainer *con;
     int inst = 0;
-    //while ((con = GetContainer(InputGroup(nName, inst++))) != NULL) {
-    //if ((con = GetContainer (InputGroup(nName))) != NULL) {
+    //while ((con = GetContainer(InputGroup(translationGroupName, inst++))) != NULL) {
+    //if ((con = GetContainer (InputGroup(translationGroupName))) != NULL) {
 
     PvlKeyword grp;
-    while((grp = InputGroup(nName, inst++)).name() != "") {
+    while((grp = InputGroup(translationGroupName, inst++)).name() != "") {
       if((con = GetContainer(grp)) != NULL) {
-        if(con->hasKeyword(InputKeywordName(nName))) return true;
+        if(con->hasKeyword(InputKeywordName(translationGroupName))) return true;
       }
     }
 
@@ -340,10 +354,17 @@ namespace Isis {
 
   /**
    * Create the requsted container and any containers above it and
-   * return a reference to the container
-   * list is an PvlKeyword with an array of container types an their names
+   * return a reference to the container. List is a PvlKeyword 
+   * with an array of container types and their names. 
+   *  
+   * @param translationGroupName The name of the PVL translation 
+   *                        group used to identify the
+   *                        input/output keywords to be
+   *                        translated. Often, this is the
+   *                        same as the output keyword name.
+   * @param pvl Pvl 
    */
-  PvlContainer *PvlToPvlTranslationManager::CreateContainer(const QString nName, Pvl &pvl) {
-    return LabelTranslationManager::CreateContainer(nName, pvl);
+  PvlContainer *PvlToPvlTranslationManager::CreateContainer(const QString translationGroupName, Pvl &pvl) {
+    return LabelTranslationManager::CreateContainer(translationGroupName, pvl);
   }
 } // end namespace isis
