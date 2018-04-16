@@ -105,7 +105,10 @@ namespace Isis {
       header3 = in.readLine();
       lineToken3 = header3.split(",");
 
-      for (int i = 0; i < lineToken1.size(); i++) {
+      lineToken1.append("");
+      lineToken2.append("");
+
+      for (int i = 0; i < lineToken3.size(); i++) {
         QString t1 = lineToken1.at(i);
         QString t2 = lineToken2.at(i);
         QString t3 = lineToken3.at(i);
@@ -123,11 +126,21 @@ namespace Isis {
       // parse line into separate pieces(tokens) with "," as the delimiter
       QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
 
+      bool rejected = false;
+      if (lineToken.at(lineToken.size()-1) == "*") {
+        rejected = true;
+      }
+
       // load parsed data to model accordingly
       for (int i = 0; i < lineToken.size(); i++) {
         QString value = lineToken.at(i);
 
         QStandardItem *item = new QStandardItem(value);
+
+        if (rejected) {
+          item->setData(QColor(200,0,0), Qt::BackgroundRole);
+        }
+
         model->setItem(lineindex, i, item);
       }
       lineindex++;
