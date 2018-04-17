@@ -489,6 +489,10 @@
             <LI>LineResolution</LI>
             <LI>PixelResolution</LI>
             <LI>MeanGroundResolution</LI>
+            <LI>ObliqueSampleResolution</LI>
+            <LI>ObliqueLineResolution</LI>
+            <LI>ObliquePixelResolution</LI>
+            <LI>ObliqueDetectorResolution</LI>
             <LI>SubSolarAzimuth</LI>
             <LI>SubSolarGroundAzimuth</LI>
             <LI>SubSolarLatitude</LI>
