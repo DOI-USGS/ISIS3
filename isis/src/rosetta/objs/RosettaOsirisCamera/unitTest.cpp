@@ -20,11 +20,12 @@ void TestLineSamp(Camera *cam, double samp, double line);
 int main(void) {
   Preference::Preferences(true);
 
-  QString testCubeFile("$rosetta/testData/n20100710t154539230id20f22.cub");
+  QString testNACFile("$rosetta/testData/n20100710t154539230id20f22.cub");
+  QString testWACFile("$rosetta/testData/W20100710T153440162ID30F13.cub");
 
   cout << "Unit Test for RosettaOsirisCameraDistortionMap..." << endl;
   try {
-    Cube c(testCubeFile, "r");
+    Cube c(testNACFile, "r");
     Camera *cam = c.camera();
     RosettaOsirisCameraDistortionMap *testMap = new RosettaOsirisCameraDistortionMap(cam);
     cout << "Create default distortion map" << endl;
@@ -54,7 +55,7 @@ int main(void) {
          << toString( testMap->UndistortedFocalPlaneY() ) << ")" << endl;
     cout << endl;
 
-    cout << "Modify the coefficient matrices" << endl;
+    cout << "Modify the coefficient matrices" << endl << endl;
     LinearAlgebra::Matrix toUndistX = LinearAlgebra::zeroMatrix(4, 4);
     LinearAlgebra::Matrix toUndistY = LinearAlgebra::zeroMatrix(4, 4);
     toUndistX(0, 0) =  1.0; toUndistX(1, 1) =  2.0; toUndistX(2, 2) =  3.0; toUndistX(3, 3) =  4.0;
@@ -147,7 +148,7 @@ int main(void) {
     double knownLat = 66.7031631205835680;
     double knownLon = 95.7688045622468422;
 
-    Cube c(testCubeFile, "r");
+    Cube c(testNACFile, "r");
     RosettaOsirisCamera *cam = (RosettaOsirisCamera *) CameraFactory::Create(c);
     cout << "FileName: " << FileName(c.fileName()).name() << endl;
     cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
@@ -160,7 +161,7 @@ int main(void) {
     cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
     cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
     cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-    
+
     // Test name methods
     cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
     cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
@@ -170,8 +171,8 @@ int main(void) {
     // Test four pixels to make sure the conversions are right
 
     // The asteroid doesn't fill the full image, and the kernels are imperfect
-    // so, 
-    cout << "For upper left of asteroid ..." << endl;
+    // so, test the corners of the asteroid
+    cout << "For upper left corner of asteroid ..." << endl;
     TestLineSamp(cam, 400.0, 1300.0);
 
     cout << "For upper right corner of asteriod ..." << endl;
@@ -205,6 +206,23 @@ int main(void) {
     else {
       cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
     }
+
+    cout << endl << "Test WAC with subwindowing..." << endl << endl;
+
+    Cube wacCube(testWACFile, "r");
+    RosettaOsirisCamera *wideAngleCam = (RosettaOsirisCamera *) CameraFactory::Create(wacCube);
+
+    cout << "For upper left corner of asteroid ..." << endl;
+    TestLineSamp(wideAngleCam, 215.0, 230.0);
+
+    cout << "For upper right corner of asteriod ..." << endl;
+    TestLineSamp(wideAngleCam, 304.0, 235.0);
+
+    cout << "For lower left corner of asteriod..." << endl;
+    TestLineSamp(wideAngleCam, 230.0, 303.0);
+
+    cout << "For lower right corner of asteroid..." << endl;
+    TestLineSamp(wideAngleCam, 299.0, 312.0);
   }
   catch (IException &e) {
     e.print();
@@ -231,4 +249,3 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaLine = ERROR" << endl << endl;
   }
 }
-
