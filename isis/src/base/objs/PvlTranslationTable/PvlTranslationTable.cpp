@@ -35,11 +35,9 @@ using namespace std;
 namespace Isis {
 
   /**
-   * Constructs and initializes a PvlTranslationTable object
+   * Constructs and initializes a PvlTranslationTable object.
    *
-   * @param transFile The translation file to be used
-   *
-   * @throws IException::Io
+   * @param transFile The translation file to be used.
    */
   PvlTranslationTable::PvlTranslationTable(FileName transFile) {
     AddTable(transFile.expanded());
@@ -95,11 +93,9 @@ namespace Isis {
 
 
   /**
-   * Adds the contents of a translation table to the searchable groups/keys
+   * Adds the contents of a translation table to the searchable groups/keys.
    *
    * @param transFile The name of the translation file to be added.
-   *
-   * @throws IException::Io
    */
   void PvlTranslationTable::AddTable(const QString &transFile) {
     p_trnsTbl.read(FileName(transFile).expanded());
@@ -109,9 +105,15 @@ namespace Isis {
   /**
    * Adds the contents of a translation table to the searchable groups/keys
    * Also performs a verification, to ensure that the translation table
-   * is valid
+   * is valid.
    *
    * @param transStm The stream to be added.
+   * 
+   * @throws IException::User - "Unable to find InputKey for group 
+                               in translation file."
+   * @throws IException::User - "Keyword is not valid. Error in file."
+   * @throws IException::User - "Keyword does not have correct number of elements.
+                                 Error in file."
    */
   void PvlTranslationTable::AddTable(std::istream &transStm) {
     transStm >> p_trnsTbl;
@@ -223,7 +225,9 @@ namespace Isis {
    * @return QString The translated value, for the 
    *         output keyword.
    *
-   * @throws IException::Programmer
+   * @throws IException::Programmer - "No value or default value to translate 
+                                      for translation group."
+   * @throws IException::Programmer - "Unable to find translation value in file."
    */
   QString PvlTranslationTable::Translate(const QString translationGroupName,
                                          const QString inputKeyValue) const {
@@ -291,7 +295,8 @@ namespace Isis {
    *
    * @return QString The input group name
    *
-   * @throws IException::Programmer
+   * @throws IException::Programmer - "Keyword [InputPosition] cannot have a comma [,] 
+                                       in the value."
    */
   PvlKeyword PvlTranslationTable::InputGroup(const QString translationGroupName,
                                              const int inst) const {
@@ -388,9 +393,7 @@ namespace Isis {
    *                             translated. Often, this is the
    *                             same as the output keyword name.
    *
-   * @return QString The input default value
-   *
-   * @throws IException::Programmer
+   * @return QString The input default value.
    */
   QString PvlTranslationTable::InputDefault(const QString translationGroupName) const {
 
@@ -489,6 +492,9 @@ namespace Isis {
    * 
    * @return PvlKeyword The OutputPosition keyword from the given 
    *         translation group.
+   *
+   * @throws IException::Programmer - "Unable to find translation keyword [OutputPostion]
+                                       in translation group in file."
    */
   PvlKeyword PvlTranslationTable::OutputPosition(const QString translationGroupName) {
 
