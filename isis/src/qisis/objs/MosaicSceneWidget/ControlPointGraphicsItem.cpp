@@ -62,7 +62,7 @@ namespace Isis {
       setPen(QPen(Qt::darkGreen, 0.0));
     }
     else {// Free
-      setPen(QPen(Qt::blue, 0.0));
+      setPen(QPen(Qt::green, 0.0));
     }
 
     setBrush(Qt::NoBrush);
@@ -96,7 +96,7 @@ namespace Isis {
 
   /**
    * This virtual paint method is called anytime an update() or paintEvent() is called
-   * 
+   *
    * @param painter (QPainter *) Painter used to draw
    * @param style (QStyleOptionGraphicsItem *) Describes parameters used to draw a QGraphicsItem
    * @param widget (QWidget *) Optional argument which indicates the widget that is being painted on
@@ -139,7 +139,7 @@ namespace Isis {
         painter->drawPath(path);
       }
       else {
-        painter->drawLine(centerLeft, centerRight); 
+        painter->drawLine(centerLeft, centerRight);
         painter->drawLine(centerTop, centerBottom);
       }
 
@@ -197,14 +197,14 @@ namespace Isis {
   }
 
 
-  ControlPoint *ControlPointGraphicsItem::controlPoint() { 
-    return m_controlPoint; 
+  ControlPoint *ControlPointGraphicsItem::controlPoint() {
+    return m_controlPoint;
   }
 
-  void ControlPointGraphicsItem::setArrowVisible(bool visible, 
-                                                 bool colorByMeasureCount, 
+  void ControlPointGraphicsItem::setArrowVisible(bool visible,
+                                                 bool colorByMeasureCount,
                                                  int measureCount,
-                                                 bool colorByResidualMagnitude, 
+                                                 bool colorByResidualMagnitude,
                                                  double residualMagnitude) {
     m_showArrow = visible;
     m_colorByMeasureCount = colorByMeasureCount;
@@ -374,4 +374,3 @@ namespace Isis {
 
 
 }
-
