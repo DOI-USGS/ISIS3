@@ -40,7 +40,7 @@ namespace Isis {
    * set the input label before translating. This may be done by using
    * SetLabel(Pvl inputLabel) or Auto(Pvl inputLabel, Pvl outputLabel).
    *
-   * @param transFile The translation file to be used to tranlate keywords in
+   * @param transFile The translation file to be used to translate keywords in
    *                  the input label.
    */
   PvlToPvlTranslationManager::PvlToPvlTranslationManager(const QString &transFile)
@@ -53,8 +53,8 @@ namespace Isis {
    * input label before translating. This may be done by using SetLabel(Pvl
    * inputLabel) or Auto(Pvl inputLabel, Pvl outputLabel).
    *
-   * @param transStrm A stream containing the tranlation table to be used to
-   *                  tranlate keywords in the input label.
+   * @param transStrm A stream containing the translation table to be used to
+   *                  translate keywords in the input label.
    */
   PvlToPvlTranslationManager::PvlToPvlTranslationManager(std::istream &transStrm)
       : LabelTranslationManager(transStrm) {
@@ -66,7 +66,7 @@ namespace Isis {
    *
    * @param inputLabel The Pvl holding the input label.
    *
-   * @param transFile The translation file to be used to tranlate keywords in
+   * @param transFile The translation file to be used to translate keywords in
    *                  the input label.
    */
   PvlToPvlTranslationManager::PvlToPvlTranslationManager(Pvl &inputLabel,
@@ -81,8 +81,8 @@ namespace Isis {
    *
    * @param inputLabel The Pvl holding the input label.
    *
-   * @param transStrm A stream containing the tranlation table to be used to
-   *                  tranlate keywords in the input label.
+   * @param transStrm A stream containing the translation table to be used to
+   *                  translate keywords in the input label.
    */
   PvlToPvlTranslationManager::PvlToPvlTranslationManager(Pvl &inputLabel,
       std::istream &transStrm)
@@ -103,7 +103,7 @@ namespace Isis {
 
   /**
    * Returns a translated value. The output name is used to find the input
-   * group, keyword, default and tranlations in the translation table. If the
+   * group, keyword, default and translations in the translation table. If the
    * keyword does not exist in the input label and an input default is available,
    * then this default will be used as the input value. This input value is
    * then used to search all of the translations. If a match is found the
