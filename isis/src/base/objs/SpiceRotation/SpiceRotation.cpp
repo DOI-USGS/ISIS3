@@ -891,11 +891,6 @@ namespace Isis {
             // Get the barycenter (bc) linear coefficients first (2 for each period).
             // Then we can get the maximum expected coefficients.
             SpiceInt bcCode = centerBodyCode/100;  // Ex: bc code for Jupiter (599) & its moons is 5
-            // For comets, ID codes between 1000000 and 2000000, the precession terms just
-            // use the body code.
-            if (centerBodyCode > 1000000 && centerBodyCode < 2000000) {
-              bcCode = centerBodyCode;
-            }
             naifKeyword = "BODY" + toString(bcCode) + "_NUT_PREC_ANGLES" ;
             dtpool_c(naifKeyword.toLatin1().data(), &found, &numExpected, &naifType);
             std::vector<double>npAngles(numExpected, 0.);
