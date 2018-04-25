@@ -35,7 +35,8 @@ using namespace std;
 
 namespace Isis {
   /**
-   * ControlNet (Qnet) tool - Handles mouse button actions and drawing control points on viewports
+   * ControlNet tool - Handles mouse button actions and drawing control points on viewports in the
+   * CubeDnView for the ipce application. 
    *
    * @param parent Pointer to the parent widget for the ControlNet tool
    *
