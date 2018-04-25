@@ -33,6 +33,7 @@
 #include "QnetPointRangeFilter.h"
 #include "QnetPointTypeFilter.h"
 #include "QnetSetAprioriDialog.h"
+#include "QnetFilter.h"
 #include "QnetTool.h"
 
 #include "Angle.h"
@@ -78,6 +79,8 @@ namespace Isis {
     m_aprioriDialog = NULL;
     m_qnetTool = qnetTool;
     m_filtered = false;
+    m_activeCubeFilter = NULL;
+    m_activePointFilter = NULL;
 
     createNavigationDialog(parent);
     connect(this, SIGNAL(deletedPoints()), this, SLOT(refreshList()));
@@ -1083,7 +1086,11 @@ namespace Isis {
    *                           points and images lists
    *   @history  2009-01-26 Jeannie Walldren - Added filter call for points cube
    *                           name filter.
-   *
+   *   @history  2018-04-25 Adam Goins - Set the respective m_activeFilter to whichever
+   *                           filter is currently selected. This allows both the cube and point
+   *                           filters to be called whenever either one is selected. This fixes an
+   *                           issue where only the active tab would be filtered when there was a
+   *                           change. Fixes #2266. Fixes #2267.
    */
   void QnetNavTool::filter() {
 
@@ -1098,63 +1105,53 @@ namespace Isis {
       PointFilterIndex pointIndex = (PointFilterIndex) tab->currentIndex();
       // We have a jigsaw errors filter
       if (pointIndex == JigsawErrors) {
-        QnetPointJigsawErrorFilter *widget =
+        m_activePointFilter =
           (QnetPointJigsawErrorFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a registration errors filter
-      if (pointIndex == RegistrationErrors) {
-        QnetPointRegistrationErrorFilter *widget =
+      else if (pointIndex == RegistrationErrors) {
+        m_activePointFilter =
           (QnetPointRegistrationErrorFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a point id filter
       else if (pointIndex == Id) {
-        QnetPointIdFilter *widget =
+        m_activePointFilter =
           (QnetPointIdFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a number of images filter
       else if (pointIndex == NumberImages) {
-        QnetPointImagesFilter *widget =
+        m_activePointFilter =
           (QnetPointImagesFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a point type filter
       else if (pointIndex == Type) {
-        QnetPointTypeFilter *widget =
+        m_activePointFilter =
           (QnetPointTypeFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a lat/lon range filter
       else if (pointIndex == LatLonRange) {
-        QnetPointRangeFilter *widget =
+        m_activePointFilter =
           (QnetPointRangeFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a distance filter
       else if (pointIndex == Distance) {
-        QnetPointDistanceFilter *widget =
+        m_activePointFilter =
           (QnetPointDistanceFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a measure filter
       else if (pointIndex == MeasureType) {
-        QnetPointMeasureFilter *widget =
+        m_activePointFilter =
           (QnetPointMeasureFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a goodness of fit filter
       else if(pointIndex == GoodnessOfFit) {
-        QnetPointGoodnessFilter *widget =
+        m_activePointFilter =
           (QnetPointGoodnessFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a cube name filter
       else if (pointIndex == CubeName) {
-        QnetPointCubeNameFilter *widget =
+        m_activePointFilter =
           (QnetPointCubeNameFilter *)(tab->currentWidget());
-        widget->filter();
       }
     }
 
@@ -1163,23 +1160,25 @@ namespace Isis {
       CubeFilterIndex cubeIndex = (CubeFilterIndex) tab->currentIndex();
       // We have a cube name filter
       if (cubeIndex == Name) {
-        QnetCubeNameFilter *widget =
+        m_activeCubeFilter =
           (QnetCubeNameFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a point filter
       else if (cubeIndex == NumberPoints) {
-        QnetCubePointsFilter *widget =
+        m_activeCubeFilter =
           (QnetCubePointsFilter *)(tab->currentWidget());
-        widget->filter();
       }
       // We have a distance filter
       else if (cubeIndex == PointDistance) {
-        QnetCubeDistanceFilter *widget =
+        m_activeCubeFilter =
           (QnetCubeDistanceFilter *)(tab->currentWidget());
-        widget->filter();
       }
     }
+    if (m_activeCubeFilter)
+      m_activeCubeFilter->filter();
+    if (m_activePointFilter)
+      m_activePointFilter->filter();
+
     m_filter->setEnabled(true);
     QApplication::restoreOverrideCursor();
     return;

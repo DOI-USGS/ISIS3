@@ -20,7 +20,6 @@
  *  http://www.usgs.gov/privacy.html.
  */
 
-
 #include "Tool.h"
 // forward declarations
 class QComboBox;
@@ -42,6 +41,7 @@ namespace Isis {
   class QnetSetAprioriDialog;
   class QnetTool;
   class SerialNumberList;
+  class QnetFilter;
 
   /**
    * @brief Qnet Navigation Tool
@@ -127,6 +127,11 @@ namespace Isis {
    *                          #4541.
    *   @history 2018-01-10 Adam Goins - Added the m_historyLayout member variable the class to keep
    *                          a running history tab of edits made to points.
+   *   @history 2018-04-25 Adam Goins - Created the m_activeCubeFilter and m_activePointFilter
+   *                          QnetFilter objects to keep track of which is the active filter for
+   *                          both the 'cubes' and 'point' filter tabs. This allows us to filter
+   *                          both at once whenever a change is made, regardless of which tab
+   *                          is selected. Fixes #2266. Fixes #2267.
    *
    */
   class QnetNavTool : public Tool {
@@ -231,6 +236,8 @@ namespace Isis {
       QnetTool *m_qnetTool;
       QList<int> m_filteredPoints;
       QList<int> m_filteredImages;
+      QnetFilter *m_activeCubeFilter;
+      QnetFilter *m_activePointFilter;
   };
 }
 
