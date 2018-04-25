@@ -49,7 +49,7 @@ namespace Isis {
   class UniversalGroundMap;
 
   /**
-   * @brief Gui for editing ControlPoint
+   * @brief Gui for editing ControlPoints in ipce application
    *
    * @ingroup Visualization Tools
    *
@@ -85,6 +85,9 @@ namespace Isis {
    *   @history 2018-03-30 Tracie Sucharski - Save Control in addition to the control net and use
    *                           Control to write the control net so Control can keep track of the
    *                           modification state of the control net.
+   *   @history 2018-04-25 Tracie Sucharski - Fix bug when creating a control point from CubeDnView
+   *                           or FootprintView if a ground source exists in the serial number list.
+   *                           Fixes #5399.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT

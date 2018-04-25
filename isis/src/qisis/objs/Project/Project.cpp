@@ -2855,7 +2855,7 @@ namespace Isis {
       else if (localName == "imageList") {
         m_imageLists.append(new ImageList(m_project, reader()));
       }
-      else if (localName == "shapeLists") {
+      else if (localName == "shapeList") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
       else if (localName == "templateList") {
