@@ -710,7 +710,6 @@ namespace Isis {
   FileName ControlPointEditWidget::findGroundFile() {
 
     FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
-
     if (m_changeAllGroundLocation) {
       QFileInfo oldFile(groundFile.expanded());
       QFileInfo newFile(m_newGroundDir, oldFile.fileName());
@@ -1028,7 +1027,7 @@ namespace Isis {
 
     Camera *cam;
     for (int i = 0; i < m_serialNumberList->size(); i++) {
-//    if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
+      if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
       if (cam->SetUniversalGround(latitude, longitude)) {
         //  Make sure point is within image boundary
@@ -1246,9 +1245,7 @@ namespace Isis {
       }
 
       // emit a signal to alert user to save when exiting
-      qDebug()<<"ControlPointEditWidget before cnetModified signal";
       emit cnetModified();
-      qDebug()<<"ControlPointEditWidget after cnetModified signal";
       emit saveControlNet();
 
       if (m_editPoint != NULL) {
