@@ -250,6 +250,9 @@ namespace Isis {
    *                           to the new project, so this had to be done in
    *                           Control::copyToNewProjectRoot.  If simply saving current projct,
    *                           the write is done here in the save method.
+   *  @history 2018-04-25 Tracie Sucharski - Fixed typo in XmlHandler::startElement reading
+   *                           imported shapes from a project which caused the shapes to be put in
+   *                           the wrong place on the project tree. Fixes #5274.
    *  
    */
   class Project : public QObject {
