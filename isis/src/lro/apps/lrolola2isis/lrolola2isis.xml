@@ -25,6 +25,13 @@
       screen measures that are off the image, and both point (lat/lon/radius)
       and range constraints.  Also added point type and set it to Constrained.
     </change>
+    <change name="Debbie Cook" date="2018-04-16">
+      Fixed the case where a Lidar point has no simultaneous measures on
+      any images in the input list.  In this case do not write out the
+      point because it has no constraints.  In the future, the
+      functionality may change to include points without simultaneous
+      measures in the bundle adjustment.  References #5343.
+    </change>
   </history>
 
   <category>

@@ -11,6 +11,7 @@
 #include "Distance.h"
 #include "FileName.h"
 #include "ID.h"
+
 #include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -168,7 +169,8 @@ void IsisMain() {
     }
     // end image loop
     
-    if (lidarPoint->GetNumMeasures() <= 0) {
+      if (lidarPoint->GetNumMeasures() <= 0 ||
+          lidarPoint->snSimultaneous().size() <=0) {
       continue;
     }
     
