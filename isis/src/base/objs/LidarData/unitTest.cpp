@@ -28,6 +28,11 @@ void print(const LidarData &lidarData);
  * @internal
  *   @history 2018-01-29 Ian Humphrey - original version.
  *   @history 2018-01-31 Ian Humphrey - added tests for points() and insert().
+ *   @history 2018-03-28 Debbie A Cook - added apriori surface point and 
+ *                               adjusted surface point to the LidarData test.  Also
+ *                               added a sort of the control points before outputting
+ *                               them to compare to make sure they are in a 
+ *                               consistent order.
  */
 int main(int argc, char *argv[]) {
   // Set up our unit test preferences
@@ -72,14 +77,19 @@ int main(int argc, char *argv[]) {
   lat = 50.0;
   lon = 100.0;
   rad = 1000.0;
+  double latAd = 50.2;
+  double lonAd = 100.1;
+  double radAd = 1001.0;
   boost::numeric::ublas::symmetric_matrix<double, upper> aprioriMatrix(3);
   aprioriMatrix.clear();
-  aprioriMatrix(0, 0) = 0.028656965032217;
-  aprioriMatrix(1, 1) = 0.031198128120272;
-  aprioriMatrix(2, 2) = 38.454887335682053718134171237789;
-                                // Angle(1.64192315,Angle::Degrees),
-                                // Angle(1.78752107, Angle::Degrees),
-                                // Distance(38.454887335682053718134171237789, Distance::Meters));
+  aprioriMatrix(0, 0) = .01;
+  aprioriMatrix(1, 1) = 0.0121;
+  aprioriMatrix(2, 2) = 100.;
+  boost::numeric::ublas::symmetric_matrix<double, upper> adjustedMatrix(3);
+  adjustedMatrix.clear();
+  adjustedMatrix(0, 0) = .02;
+  adjustedMatrix(1, 1) = 0.0144;
+  adjustedMatrix(2, 2) = 81.;
   
   for (int i = 1; i < 11; i++) {
     time += 60.0;
@@ -94,10 +104,19 @@ int main(int argc, char *argv[]) {
     SurfacePoint sp(Latitude(lat, Angle::Units::Degrees),
                     Longitude(lon, Angle::Units::Degrees),
                     Distance(rad, Distance::Units::Kilometers));
+    latAd += 1.0;
+    lonAd += 1.0;
+    SurfacePoint sp2(Latitude(latAd, Angle::Units::Degrees),
+                    Longitude(lonAd, Angle::Units::Degrees),
+                    Distance(radAd, Distance::Units::Kilometers));
     sp.SetRadii(Distance(1000.0, Distance::Meters), Distance(1000.0, Distance::Meters),
                 Distance(1000.0, Distance::Meters));
     sp.SetSphericalMatrix(aprioriMatrix);
     lcp->SetAprioriSurfacePoint(sp);
+    sp2.SetRadii(Distance(1000.0, Distance::Meters), Distance(1000.0, Distance::Meters),
+                Distance(1000.0, Distance::Meters));
+    sp2.SetSphericalMatrix(adjustedMatrix);
+    lcp->SetAdjustedSurfacePoint(sp2);
     for (int j = 0; j < 2; j++) {
       ControlMeasure *measure = new ControlMeasure();
       measure->SetCoordinate((double) i, (double) j);
@@ -137,15 +156,34 @@ int main(int argc, char *argv[]) {
   print(fromJson);
   cout << endl;
 
+  // Clean up
+  remove("test.dat");
+  remove("test.json");
+
+}
+
+
+// int cmp (QSharedPointer<LidarControlPoint> lcp1, QSharedPointer<LidarControlPoint> lcp2) {
+int cmpLessThan (QSharedPointer<LidarControlPoint> lcp1, QSharedPointer<LidarControlPoint> lcp2) {
+  // Trim off the id name and only keep the number to compare
+  int num1 = ((lcp1->GetId()).remove(0, 21)).toInt();
+  int num2 = ((lcp2->GetId()).remove(0, 21)).toInt();
+  return num1 < num2;
 }
 
 
 void print(const LidarData &lidarData) {
   QList< QSharedPointer<LidarControlPoint> > points = lidarData.points();
+  
+  // Order the control points so test runs will list points in a consistent order
+  qSort(points.begin(), points.end(), cmpLessThan);
+  
   std::cout << "LidarData:" << std::endl;
   foreach (QSharedPointer<LidarControlPoint> point, points) {
     std::cout << "\tLidarControlPoint:" << std::endl;
     std::cout << "\t\tid: " << point->GetId() << std::endl;;
+
+    // Print the apriori surface point
     SurfacePoint sp = point->GetAprioriSurfacePoint();
     double lat, lon, rad;
     lat = sp.GetLatitude().planetocentric(Angle::Units::Degrees);
@@ -160,6 +198,19 @@ void print(const LidarData &lidarData) {
     // std::cout << "\t\ttime:      " << point->time().Et() << std::endl;
     std::cout << "\t\ttime:      " << point->time().UTC() << std::endl;
     std::cout << "\t\tmatrix:      " << aprioriMatrix << std::endl;
+
+    // Print the adjusted surface point
+    SurfacePoint sp2 = point->GetAdjustedSurfacePoint();
+    double lat2, lon2, rad2;
+    lat2 = sp2.GetLatitude().planetocentric(Angle::Units::Degrees);
+    lon2 = sp2.GetLongitude().positiveEast(Angle::Units::Degrees);
+    rad2 = sp2.GetLocalRadius().kilometers();
+    symmetric_matrix<double, upper> adjustedMatrix = sp2.GetSphericalMatrix();
+    std::cout << "\t\tadjustedLatitude:  " << lat2 << std::endl;
+    std::cout << "\t\tadjustedLongitude: " << lon2 << std::endl;
+    std::cout << "\t\tadjustedRadius:    " << rad2 << std::endl;
+    std::cout << "\t\tadjustedMatrix:      " << adjustedMatrix << std::endl;
+    
     QList<ControlMeasure *> measures = point->getMeasures();
     foreach (ControlMeasure *measure, measures) {
       std::cout << "\t\tControlMeasure: " << std::endl;
