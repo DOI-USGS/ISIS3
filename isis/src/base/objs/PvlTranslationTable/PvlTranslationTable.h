@@ -110,6 +110,8 @@ namespace Isis {
    *                          renamed later) now returns a PvlKeyword.
    *  @history 2017-11-04 Jeannie Backer - Modified Translation input value to make a case
    *                          insensitive comparison.
+   *  @history 2018-04-16 Jeannie Backer - Updated documentation and improved
+   *                          coding standards/style.
    *  
    *  
    *  
@@ -128,16 +130,16 @@ namespace Isis {
       virtual ~PvlTranslationTable();
 
       // Return the associated input group from the trans table
-      virtual PvlKeyword InputGroup(const QString nName, const int inst = 0) const;
+      virtual PvlKeyword InputGroup(const QString translationGroupName, const int inst = 0) const;
 
       // Return the associated input keyword name from the trans table
-      virtual QString InputKeywordName(const QString nName) const;
+      virtual QString InputKeywordName(const QString translationGroupName) const;
 
       // Return the associated input default value from the trans table
-      QString InputDefault(const QString nName) const;
+      QString InputDefault(const QString translationGroupName) const;
 
       // Translate a single input value associated with a output name to a output value
-      QString Translate(const QString nName, const QString fValue = "") const;
+      QString Translate(const QString translationGroupName, const QString inputKeyValue = "") const;
 
       // Add more table entries to the translation table data
       void AddTable(std::istream &transStm);
@@ -148,11 +150,12 @@ namespace Isis {
       const Pvl &TranslationTable() const;
       virtual std::vector< std::pair<QString, int> > validKeywords() const;
 
-      bool hasInputDefault(const QString nName);
-      bool IsAuto(const QString nName);
-      bool IsOptional(const QString nName);
-      PvlKeyword &OutputPosition(const QString nName);
-      QString OutputName(const QString nName);
+      bool hasInputDefault(const QString translationGroupName);
+      bool IsAuto(const QString translationGroupName);
+      bool IsOptional(const QString translationGroupName);
+      PvlKeyword OutputPosition(const QString translationGroupName);
+      QString OutputName(const QString translationGroupName);
+      const PvlGroup &findTranslationGroup(const QString translationGroupName) const;
 
     private:
       Pvl p_trnsTbl;

@@ -80,9 +80,9 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   // Get the directory where the Tgo translation tables are
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Tgo"];
-  FileName transFile(missionDir + "/translations/tgoCassis.trn");
 
   // Get the translation manager ready
+  FileName transFile(missionDir + "/translations/tgoCassis.trn");
   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   QString str;
