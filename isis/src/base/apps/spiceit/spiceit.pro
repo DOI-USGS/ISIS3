@@ -33,7 +33,8 @@ win32 {
 }
 
 # Directories, where the *.h files are stored
-INCLUDEPATH += $$PWD/QtWebApp
+#INCLUDEPATH += $$PWD/QtWebApp
+INCLUDEPATH += /usgs/pkgs/local/v007/src/QtWebApp
 
 # Directory where the release version of the shared library (*.dll or *.so) is stored, and base name of the file.
 CONFIG(release, debug|release) {
