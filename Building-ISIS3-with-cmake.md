@@ -30,7 +30,11 @@ Otherwise: `make -j#` -OR- `make install -j#`
 
 
 ## New Environmental Variable meanings
-$ISISROOT is now the directory that holds the ISIS3 binary files.
+`$ISISROOT` is no longer the ISIS3 source directory. `$ISISROOT` is now either the CMake build directory for development or the install directory for running a deployed copy of ISIS. 
+
+* **Source Directory**: Where the ISIS source code lives (i.e. your local repository)
+* **Build Directory**: Where generated project files live (Makefiles, Ninja files, Xcode project, etc.) and where binaries are built to.  This is where you spend most of your development time. 
+* **Install Directory**: Where the binaries are placed on install. 
 
 ## Custom data and test data directories
 Custom data and test data directories now have to be relative to the new $ISISROOT
