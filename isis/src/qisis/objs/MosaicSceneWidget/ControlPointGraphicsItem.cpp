@@ -52,14 +52,12 @@ namespace Isis {
     if (cp->IsIgnored()) {  // Was red
       setPen(QPen(QColor(255, 255, 0), 0.0)); // set point marker yellow
     }
-    else if (cp->IsEditLocked()) {
-      setPen(QPen(Qt::magenta, 0.0));
+    else if (cp->IsEditLocked()) {  // was magenta
+      setPen(QPen(Qt::red, 0.0));
     }
-    else if (cp->GetType() == ControlPoint::Fixed) {
+    else if ( (cp->GetType() == ControlPoint::Fixed)
+      || (cp->GetType() == ControlPoint::Constrained) ) {
       setPen(QPen(Qt::magenta, 0.0)); // Was green
-    }
-    else if (cp->GetType() == ControlPoint::Constrained) {
-      setPen(QPen(Qt::red, 0.0)); //was darkGreen
     }
     else {// Free
       setPen(QPen(Qt::green, 0.0)); //was blue
