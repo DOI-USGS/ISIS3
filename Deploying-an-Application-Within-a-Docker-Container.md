@@ -9,12 +9,12 @@ Create a file called daemon.json which will be used to config docker.  Place it 
 
 Mine looks like this at present:
 
-`{`
-    `"storage-driver": "overlay2",`
-    `"graph": "/var/lib/docker",`
-    `"debug": false,`
-    `"hosts": ["unix:///var/run/docker.sock","tcp://localhost:6666"]`
-`}`
+`{`<br></br>
+    `"storage-driver": "overlay2",`<br></br>
+    `"graph": "/var/lib/docker",`<br></br>
+    `"debug": false,`<br></br>
+    `"hosts": ["unix:///var/run/docker.sock","tcp://localhost:6666"]`<br></br>
+`}`<br></br>
 
 
 
