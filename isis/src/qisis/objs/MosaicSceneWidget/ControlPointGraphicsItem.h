@@ -20,7 +20,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-05-09 Steven Lambright - Fixed known issue with paint() when zoomed in.
-   *   @history 2011-05-10 Steven Lambright - Added arrow capabilities, fixed problem with 
+   *   @history 2011-05-10 Steven Lambright - Added arrow capabilities, fixed problem with
    *                           boundingRect() that seemed to cause a crash.
    *   @history 2011-06-07 Debbie A. Cook and Tracie Sucharski - Modified point types
    *                           Ground ------> Fixed
@@ -34,8 +34,12 @@ namespace Isis {
    *   @history 2016-10-20 Tracie Sucharski - Remove obsolete code that was commented out.
    *                           Fixes #4479.
    *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
-   *                           center crosshair in red.  Fixes #5007, #5008. 
-   *                   
+   *                           center crosshair in red.  Fixes #5007, #5008.
+   *   @history 2018-05-01 Kaitlyn Lee - Changed colors of control points to match qnet.
+   *                           Colors Changed: free from blue to green, ignored from red to yellow,
+   *                           locked from magenta to red, and constrained (was dark green) and
+   *                           fixed (was green) are now both represented with magenta. Fixes #5401.
+   *
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {
     public:
@@ -70,7 +74,7 @@ namespace Isis {
       bool m_colorByMeasureCount;
       //! Are we coloring the movement arrow based on max CM residual magnitude
       bool m_colorByResidualMagnitude;
-      //! Measure count threshold for colored vs. black 
+      //! Measure count threshold for colored vs. black
       int m_measureCount;
       //! Residual magnitude threshold for colored vs. black
       double m_residualMagnitude;
@@ -78,4 +82,3 @@ namespace Isis {
 }
 
 #endif
-
