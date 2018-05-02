@@ -227,6 +227,8 @@ namespace Isis {
       if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
         mdiArea->addSubWindow(newWidget);
         newWidget->show();
+        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(newWidget));
+        setActiveView(qobject_cast<AbstractProjectItemView *>(newWidget));
       }
     }
   }
