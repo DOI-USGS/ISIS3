@@ -33,8 +33,12 @@ namespace Isis {
    *   @history 2016-10-18 Tracie Sucharski - Added method to return value of the
    *                          subpixelRegister radio button.  If set, all measures in the control
    *                          point created will be subpixel registered.
-   *   @history 2017-07-04 Christopher Combs - Added bools to toggle on specific elements of the
-   *                          dialog to remove similar classes like QnetNewPointDialog. Fixes #4383.
+   *   @history 2017-07-04 Christopher Combs - Combined functionality of dialogs from qnet,
+   *                          qview and ipce applications by adding bools to toggle on specific
+   *                          elements of the dialog to remove similar classes like
+   *                          QnetNewPointDialog. Fixes #4383.
+   *   @history 2018-05-02 Tracie Sucharski - If no shapes available remove option to change point
+   *                          type to "Constrained" or "Fixed". Fixes #5087.
    */
   class NewControlPointDialog : public QDialog {
 

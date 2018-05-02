@@ -20,9 +20,15 @@
 
 namespace Isis {
   /**
-   * NewControlPointDialog constructor
-   * @param parent The parent widget for the
-   *               cube points filter
+   * @description Create dialog for creating a new Control Point
+   *  
+   * @param controlNet               The control net the new control point will be contained in 
+   * @param serialNumberList         The serial number list corresponding to the controlNet 
+   * @param defaultPointId           The default pointID, usually empty string 
+   * @param parent                   Parent widget 
+   * @param pointType                Show the Point Type combo box, default = false 
+   * @param groundSource             Show the Ground Source list, default = false 
+   * @param subpixelRegisterMeasures Show the check box for sub-pixel registration option, default = false
    *
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Set lastPointIdValue
@@ -69,7 +75,7 @@ namespace Isis {
                                      (ControlPoint::PointType) i));
       }
       m_pointTypeCombo->setCurrentIndex(2);
-      QLabel *pointTypeLabel = new QLabel("PointType:");
+      QLabel *pointTypeLabel = new QLabel("Point Type:");
       pointTypeLayout->addWidget(pointTypeLabel);
       pointTypeLayout->addWidget(m_pointTypeCombo);
       connect(m_pointTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(pointTypeChanged(int)));
@@ -180,11 +186,21 @@ namespace Isis {
 
 
   void NewControlPointDialog::setGroundSource(QStringList groundFiles, int numberShapesWithPoint) {
-    m_groundSourceCombo->addItems(groundFiles);
-    for (int i = 0; i < numberShapesWithPoint; i++) {
-      m_groundSourceCombo->setItemData(i, QColor(Qt::red), Qt::ForegroundRole);
+
+    if (groundFiles.count() != 0) {
+      m_groundSourceCombo->addItems(groundFiles); 
+      for (int i = 0; i < numberShapesWithPoint; i++) {
+        m_groundSourceCombo->setItemData(i, QColor(Qt::red), Qt::ForegroundRole);
+      }
+      m_groundSourceCombo->insertSeparator(numberShapesWithPoint);
     }
-    m_groundSourceCombo->insertSeparator(numberShapesWithPoint);
+    else {
+      //  If there are not available shapes, remove constrained/fixed point type from combo
+      m_pointTypeCombo->setToolTip("If Point Type cannot be changed from \"Free\", make sure there "
+                                   "is a shape imported into your project.");
+      m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Constrained"));
+      m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Fixed"));
+    }
   }
 
 
