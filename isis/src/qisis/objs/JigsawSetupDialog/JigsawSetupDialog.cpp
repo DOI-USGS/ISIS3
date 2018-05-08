@@ -60,6 +60,19 @@ namespace Isis {
         m_ui->controlNetworkComboBox->addItem(control->displayProperties()->displayName(), v);
       }
     }
+    // add control nets from bundle solutions, if any
+    int numBundles = project->bundleSolutionInfo().size();
+    for (int i = 0; i < numBundles; i++) {
+      Control *bundleControl = project->bundleSolutionInfo().at(i)->control();
+
+      QVariant v = qVariantFromValue((void*)bundleControl);
+
+      m_ui->controlNetworkComboBox->addItem(bundleControl->displayProperties()->displayName(), v);
+    }
+
+    // initialize default output control network filename
+    FileName fname = m_ui->controlNetworkComboBox->currentText();
+    m_ui->outputControlNet->setText(fname.baseName() + "-out.net");
 
     QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
     if (useLastSettings && bundleSolutionInfo.size() > 0) {
@@ -67,7 +80,7 @@ namespace Isis {
      // Retrieve the control net name used in the last bundle adjustment.
      // Note that this returns a fully specified path and filename, while the cnet combo box
      // only stores file names.
-     selectControl(bundleSolutionInfo.last()->controlNetworkFileName());
+     selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
      fillFromSettings(lastBundleSettings);
     }
 
@@ -85,8 +98,6 @@ namespace Isis {
     m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)));
 
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
-
-
 
     // initializations for target body tab
 
@@ -679,6 +690,11 @@ namespace Isis {
   }
 
 
+  QString JigsawSetupDialog::outputControlName() {
+    return QString(m_ui->outputControlNet->text());
+  }
+
+
   void JigsawSetupDialog::makeReadOnly() {
     m_ui->controlNetworkComboBox->setEnabled(false);
     m_ui->observationModeCheckBox->setEnabled(false);
@@ -1099,5 +1115,10 @@ namespace Isis {
 
   void JigsawSetupDialog::hideTargetParametersGroupBox() {
     m_ui->targetParametersGroupBox->setEnabled(false);
+  }
+
+  void Isis::JigsawSetupDialog::on_controlNetworkComboBox_currentTextChanged(const QString &arg1) {
+    FileName fname = arg1;
+    m_ui->outputControlNet->setText(fname.baseName() + "-out.net");
   }
 }

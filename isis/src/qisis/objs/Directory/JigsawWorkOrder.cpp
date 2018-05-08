@@ -30,6 +30,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#include "BundleSolutionInfo.h"
 #include "Control.h"
 #include "Directory.h"
 #include "JigsawDialog.h"
@@ -114,12 +115,15 @@ namespace Isis {
     bool success = WorkOrder::setupExecution();
 
     if (success) {
+
+      QStringList internalData;
+
       // Create a blocking setup dialog initially and check to make sure we get valid info
       JigsawSetupDialog setup(project());
       if (setup.exec() == QDialog::Accepted) {
         m_bundleSettings = setup.bundleSettings();
         if (setup.selectedControl()) {
-          setInternalData(QStringList(setup.selectedControl()->id()));
+          internalData.append(QStringList(setup.selectedControl()->id()));
         }
         // This else should not happen, the work order should be disabled if there are no controls.
         else {
@@ -127,12 +131,21 @@ namespace Isis {
           QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", msg);
           success = false;
         }
+        // set output control network file name
+        if (!setup.outputControlName().isEmpty()) {
+          internalData.append(setup.outputControlName());
+        }
+        else {
+          QString msg = "You must set an output control network filename.";
+          QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", msg);
+          success = false;
+        }
       }
       else {
         success = false;
       }
+      setInternalData(internalData);
     }
-
 
     return success;
   }
@@ -159,9 +172,16 @@ namespace Isis {
    * @see WorkOrder::execute()
    */
   void JigsawWorkOrder::execute() {
+
+    Project *proj = project();
+
     // Get the selected control and bundle settings and give them to the JigsawDialog for now.
-    Control *selectedControl = project()->control(internalData().first());
-    JigsawDialog *runDialog = new JigsawDialog(project(), m_bundleSettings, selectedControl);
+    Control *selectedControl = proj->control(internalData().first());
+
+    QString outputControlFileName = internalData().at(1);
+
+    JigsawDialog *runDialog = new JigsawDialog(project(), m_bundleSettings, selectedControl,
+                                               outputControlFileName);
     runDialog->setAttribute(Qt::WA_DeleteOnClose);
     runDialog->show();
   }
