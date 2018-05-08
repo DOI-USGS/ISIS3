@@ -39,6 +39,7 @@
 
 class QAction;
 class QDockWidget;
+class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -352,6 +353,7 @@ namespace Isis {
       void directoryCleaned();
       void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
+      void newDockAvailable(QMainWindow *newWidget);
 
       void viewClosed(QWidget *widget);
 
