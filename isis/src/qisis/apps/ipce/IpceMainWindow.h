@@ -24,6 +24,7 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
 #include <QMdiSubWindow>
@@ -127,6 +128,8 @@ namespace Isis {
    *                           containing the given widget. In the closeEvent method check whether
    *                           there is an active control and if it has been modified as additional
    *                           test to determine whether project needs saving.
+   *   @history 2018-05-01 Tracie Sucharski - Code accidently left commented from previous checking.
+   *                           Fixes #5412.
    *  
    */
   class IpceMainWindow : public QMainWindow {
@@ -137,6 +140,7 @@ namespace Isis {
 
     public slots:
       void addView(QWidget *newWidget);
+      void addDock(QMainWindow *newWidgetForDock);
       void removeView(QWidget *view);
       void removeAllViews();
 
