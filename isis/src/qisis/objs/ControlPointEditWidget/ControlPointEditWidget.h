@@ -88,6 +88,8 @@ namespace Isis {
    *   @history 2018-04-25 Tracie Sucharski - Fix bug when creating a control point from CubeDnView
    *                           or FootprintView if a ground source exists in the serial number list.
    *                           Fixes #5399.
+   *   @history 2018-05-02 Tracie Sucharski - Colorize save buttons properly when creating new
+   *                           control point and loading a different control point. 
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -123,6 +125,11 @@ namespace Isis {
                               bool isGroundSource = false);
 
       void updatePointInfo(ControlPoint &updatedPoint);
+      // Changed colorizeSaveNetButton to public slot so it could be called from
+      // Directory::saveActiveControl().  This should be temporary until the modify/save functionality
+      // of active control is re-factored. Also added reset parameter, defaulting to false so button
+      // is red. This default was used so that current calls did not need to be changed.
+      void colorizeSaveNetButton(bool reset = false);
 
     protected:
       bool eventFilter(QObject *o,QEvent *e);
@@ -150,6 +157,8 @@ namespace Isis {
       void measureSaved();
       void checkReference();
       void savePoint();
+
+      void colorizeAllSaveButtons(QString color);
       void colorizeSavePointButton();
 
       void openTemplateFile();
@@ -161,8 +170,6 @@ namespace Isis {
       void setTemplateModified();
       void writeTemplateFile(QString);
       void clearEditPoint();
-
-      void colorizeSaveNetButton();
 
     private:
       void createActions();
