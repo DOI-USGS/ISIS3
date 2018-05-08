@@ -74,11 +74,12 @@ namespace Isis {
         m_pointTypeCombo->insertItem(i, ControlPoint::PointTypeToString(
                                      (ControlPoint::PointType) i));
       }
-      m_pointTypeCombo->setCurrentIndex(2);
+      m_pointTypeCombo->setCurrentText("Free");
       QLabel *pointTypeLabel = new QLabel("Point Type:");
       pointTypeLayout->addWidget(pointTypeLabel);
       pointTypeLayout->addWidget(m_pointTypeCombo);
-      connect(m_pointTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(pointTypeChanged(int)));
+      connect(m_pointTypeCombo, SIGNAL(currentIndexChanged(QString)),
+              this, SLOT(pointTypeChanged(QString)));
     }
 
 
@@ -105,6 +106,7 @@ namespace Isis {
 
     //  Create OK & Cancel buttons
     m_okButton = new QPushButton("OK");
+
     //  If the last point id used was never saved to network, do not set ok
     //  button to faslse
     enableOkButton("");
@@ -153,7 +155,14 @@ namespace Isis {
 
 
   int NewControlPointDialog::pointType() const {
-    return m_pointTypeCombo->currentIndex();
+    int result = ControlPoint::Free;
+    if (m_pointTypeCombo->currentText() == "Constrained") {
+      result = ControlPoint::Constrained;
+    }
+    if (m_pointTypeCombo->currentText() == "Fixed") {
+      result = ControlPoint::Fixed;
+    }
+    return result;
   }
 
 
@@ -178,15 +187,15 @@ namespace Isis {
   }
 
 
-  void NewControlPointDialog::pointTypeChanged(int pointType) {
-    if (pointType == ControlPoint::Constrained || pointType == ControlPoint::Fixed) {
+  void NewControlPointDialog::pointTypeChanged(QString pointType) {
+    if (pointType == "Fixed" || pointType == "Constrained") {
       m_groundSourceCombo->setVisible(true);
     }
   }
 
 
   void NewControlPointDialog::setGroundSource(QStringList groundFiles, int numberShapesWithPoint) {
-
+    //  If groundFiles not empty, add to the list widget for selection
     if (groundFiles.count() != 0) {
       m_groundSourceCombo->addItems(groundFiles); 
       for (int i = 0; i < numberShapesWithPoint; i++) {
@@ -194,12 +203,16 @@ namespace Isis {
       }
       m_groundSourceCombo->insertSeparator(numberShapesWithPoint);
     }
+    // If groundFiles is empty, remove option to change point type to Constrained or Fixed, add a
+    // tooltip to give user hint as to why they don't have option to change point type and set
+    // default point type back to "Free".
     else {
-      //  If there are not available shapes, remove constrained/fixed point type from combo
-      m_pointTypeCombo->setToolTip("If Point Type cannot be changed from \"Free\", make sure there "
-                                   "is a shape imported into your project.");
+      m_pointTypeCombo->setToolTip("The Point Type cannot be changed to \"Fixed\" or "
+                                   "\"Constrained\", because there are no shapes imported into "
+                                   "your project.");
       m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Constrained"));
       m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Fixed"));
+      m_pointTypeCombo->setCurrentText("Free");
     }
   }
 
@@ -243,7 +256,15 @@ namespace Isis {
    *            to the ptIdValue
    */
   void NewControlPointDialog::enableOkButton(const QString &) {
-    m_okButton->setEnabled(!m_ptIdEdit->text().isEmpty() &&
-                           !m_controlNet->ContainsPoint(m_ptIdEdit->text()));
+    bool enable = !m_ptIdEdit->text().isEmpty() &&
+                  !m_controlNet->ContainsPoint(m_ptIdEdit->text());
+    m_okButton->setEnabled(enable);
+    if (enable) {
+      m_okButton->setToolTip("");
+    }
+    else {
+      m_okButton->setToolTip("Cannot create point because Point Id is either empty or the active "
+                             "control net already contains a control point with this point Id.");
+    }
   }
 }
