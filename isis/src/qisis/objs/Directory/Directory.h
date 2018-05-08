@@ -230,7 +230,9 @@ namespace Isis {
    *   @history 2018-04-04 Tracie Sucharski - Created CnetEditorView class to use to add to QMdiArea
    *                           instead of a CnetEditorWidget. This way there is no longer a
    *                           disconnect between what has been added to the QMdiArea and what is
-   *                           stored in m_cnetEditorViewWidgets. 
+   *                           stored in m_cnetEditorViewWidgets.
+   *   @history 2018-05-08 Tracie Sucharski - When saving active control, reset the "Save Net"
+   *                           button to black in the ControlPointEditorWidget.
    */
   class Directory : public QObject {
     Q_OBJECT
