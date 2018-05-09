@@ -57,6 +57,7 @@ class SpiceDbGen {
                            std::vector<QString> & filter, double startOffset, double endOffset);
     void FurnishDependencies(QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
                              QList<Isis::FileName> extras);
+    void setCoverageLevel(QString level); 
 
   private:
     QStringList GetFiles(Isis::FileName location, QString filter);
@@ -65,6 +66,7 @@ class SpiceDbGen {
     Isis::PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables
     QString p_type;
+    QString m_coverageLevel; 
     static const char *calForm;
 };
 

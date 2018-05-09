@@ -40,7 +40,8 @@ const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.###### TDB ::TDB";
 */
 SpiceDbGen::SpiceDbGen(QString type) {
   p_type = type;
-//  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
+  m_coverageLevel = "SEGMENT"; // default
+  //  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
 }
 
 
@@ -156,6 +157,17 @@ QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
 
 
 /**
+ * Sets the desired time coverage level of the Spice database. 
+ * 
+ * @param level The desired time coverage level. May be either Segment or 
+ *              Interval.  
+ */
+void SpiceDbGen::setCoverageLevel(QString level) {
+  m_coverageLevel = level; 
+}
+
+
+/**
   * Format a single kernel file to include the file.
   *
   * @param fileIn   The file name being added
@@ -227,10 +239,16 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
         SPICEDOUBLE_CELL(cover, 200000);
         ssize_c(0, &cover);
         ssize_c(200000, &cover);
-        ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
+
+        // A SPICE SEGMENT is composed of SPICE INTERVALS, and is a more coarse measurement
+        if (QString::compare(m_coverageLevel, "SEGMENT", Qt::CaseInsensitive) == 0 ) {
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover); 
+        }
+        else {
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "INTERVAL", 0.0, "TDB", &cover);
+        }
 
         NaifStatus::CheckErrors();
-
         result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
     }

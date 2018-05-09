@@ -15,19 +15,19 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   PvlGroup dependency("Dependencies");
 
-  //create the database writer based on the kernel type
+  // Create the database writer based on the kernel type
   SpiceDbGen sdg(ui.GetString("TYPE"));
 
-  //Load the SCLK. If it exists, add its location to the dependency group
-  //If there is none, set a flag so that no file is searched for
+  // Load the SCLK. If it exists, add its location to the dependency group
+  // If there is none, set a flag so that no file is searched for
   QList<FileName> sclkFiles = evaluateDependencies(dependency, "SpacecraftClockKernel", "SCLK");
   QList<FileName> lskFiles = evaluateDependencies(dependency, "LeapsecondKernel", "LSK");
   QList<FileName> extraFiles = evaluateDependencies(dependency, "ExtraKernel", "EXTRA");
 
   sdg.FurnishDependencies(sclkFiles, lskFiles, extraFiles);
 
-  //Determine the type of kernel that the user wants a database for. This will
-  //eventually become the name of the object in the output PVL
+  // Determine the type of kernel that the user wants a database for. This will
+  // eventually become the name of the object in the output PVL
   QString kernelType;
   if (ui.GetString("TYPE") == "CK") {
     kernelType = "SpacecraftPointing";
@@ -36,6 +36,18 @@ void IsisMain() {
     kernelType = "SpacecraftPosition";
   }
   PvlObject selections(kernelType);
+
+  // Specify whether to use SPICE segments (made up of SPICE intervals) 
+  // or SPICE intervals for the SPICE database. Naif referes to this as "coverage level" 
+  QString coverageLevel; 
+  if (ui.GetString("LEVEL") == "SEGMENT") {
+    coverageLevel = "SEGMENT"; 
+  }
+  else if (ui.GetString("LEVEL") == "INTERVAL") {
+    coverageLevel = "INTERVAL"; 
+  }
+  // add to Pvl? 
+  sdg.setCoverageLevel(coverageLevel); 
 
   selections += PvlKeyword("RunTime", iTime::CurrentLocalTime());
   selections.addGroup(dependency);
