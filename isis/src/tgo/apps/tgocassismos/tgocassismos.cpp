@@ -31,7 +31,6 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList flist(ui.GetFileName("FROMLIST"));
 
-
   vector<Cube *> clist;
   try {
     if(flist.size() < 1) {
@@ -86,7 +85,6 @@ void IsisMain() {
     proj->SetGround(avgLat, avgLon);
     avgLat = proj->UniversalLatitude();
     avgLon = proj->UniversalLongitude();
-
     // Use camera class to get Inc., emi., phase, and other values
     double Cemiss;
     double Cphase;
@@ -170,14 +168,16 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // get the min and max SCLK values ( do this with QString comp.)
+    // get the min SCLK values ( do this with QString comp.)
     // get the value from the original label blob
     QString startClock;
     QString startTime;
     for(int i = 0; i < (int)clist.size(); i++) {
-      OriginalLabel origLab;
-      clist[i]->read(origLab);
-      PvlGroup timegrp = origLab.ReturnLabels().findGroup("Instrument", Pvl::Traverse);
+      // himos used original label here. 
+
+      Pvl *origLab = clist[i]->label();
+      PvlGroup timegrp = origLab->findGroup("Instrument", Pvl::Traverse);
+
       if(i == 0) {
         startClock = (QString)timegrp["SpacecraftClockStartCount"];
         startTime = (QString)timegrp["StartTime"];
@@ -192,8 +192,7 @@ void IsisMain() {
     }
 
     // Get the blob of original labels from first image in list
-    OriginalLabel org;
-    clist[0]->read(org);
+   // Pvl *org = clist[0]->label();
 
     //close all cubes
     for(int i = 0; i < (int)clist.size(); i++) {
@@ -211,6 +210,7 @@ void IsisMain() {
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // write out new information to new group mosaic
+
 
     PvlGroup mos("Mosaic");
     mos += PvlKeyword("ProductId ", ProdId);
@@ -230,7 +230,7 @@ void IsisMain() {
     PvlObject &lab = mosCube.label()->findObject("IsisCube");
     lab.addGroup(mos);
     //add orginal label blob to the output cube
-    mosCube.write(org);
+//    mosCube.write(org);
     mosCube.close();
 
   }
