@@ -153,8 +153,8 @@
       Fixes #5272.
     </change>
     <change name="Kristin Berry" date="2018-05-09">
-      Added option to specify the time coverage level to be used for the generated database. SPICE segements are made up of SPICE intervals. 
-      Segments (the only old option) are now the default, but interval can be selected if needed. 
+      Added the LEVEL=(SEGMENT*, INTERVAL) option to specify the time coverage level to be used for the generated database. SPICE segements are made up of SPICE intervals. 
+      Segments (the only option in the past) are now the default, but interval can be selected if needed. Fixes #5410. 
     </change>
   </history>
 

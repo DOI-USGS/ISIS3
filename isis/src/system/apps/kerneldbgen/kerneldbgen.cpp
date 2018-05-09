@@ -46,7 +46,6 @@ void IsisMain() {
   else if (ui.GetString("LEVEL") == "INTERVAL") {
     coverageLevel = "INTERVAL"; 
   }
-  // add to Pvl? 
   sdg.setCoverageLevel(coverageLevel); 
 
   selections += PvlKeyword("RunTime", iTime::CurrentLocalTime());

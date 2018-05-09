@@ -240,7 +240,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
         ssize_c(0, &cover);
         ssize_c(200000, &cover);
 
-        // A SPICE SEGMENT is composed of SPICE INTERVALS, and is a more coarse measurement
+        // A SPICE SEGMENT is composed of SPICE INTERVALS
         if (QString::compare(m_coverageLevel, "SEGMENT", Qt::CaseInsensitive) == 0 ) {
           ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover); 
         }
