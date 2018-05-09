@@ -599,25 +599,34 @@ namespace Isis {
     m_bundleObservationViews.append(result);
 
     QString str = fileItem->fileName();
+    FileName fileName = fileItem->fileName();
+
+    // strip out bundle results name from fileName
+    QString path = fileName.originalPath();
+    int pos = path.lastIndexOf("/");
+    QString bundleResultsName = "";
+    if (pos != -1) {
+      bundleResultsName = path.remove(0,pos+1);
+    }
 
     if (str.contains("bundleout")) {
-      result->setWindowTitle( tr("Summary").
-                              arg( m_bundleObservationViews.count() ) );
+      result->setWindowTitle( tr("Summary (%1)").
+                              arg( bundleResultsName ) );
       result->setObjectName( result->windowTitle() );
     }
     if (str.contains("residuals")) {
-      result->setWindowTitle( tr("Measure Residuals").
-                              arg( m_bundleObservationViews.count() ) );
+      result->setWindowTitle( tr("Measure Residuals (%1)").
+                              arg( bundleResultsName ) );
       result->setObjectName( result->windowTitle() );
     }
     else if (str.contains("points")) {
-      result->setWindowTitle( tr("Control Points").
-                              arg( m_bundleObservationViews.count() ) );
+      result->setWindowTitle( tr("Control Points (%1)").
+                              arg( bundleResultsName ) );
       result->setObjectName( result->windowTitle() );
     }
     else if (str.contains("images")) {
-      result->setWindowTitle( tr("Images").
-                              arg( m_bundleObservationViews.count() ) );
+      result->setWindowTitle( tr("Images (%1)").
+                              arg( bundleResultsName ) );
       result->setObjectName( result->windowTitle() );
     }
 
@@ -1794,11 +1803,6 @@ namespace Isis {
       QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
         "has been saved.";
       m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
-    }
-
-    // Make sure the ControlPointEditView "Save Net" button is no longer red
-    if (controlPointEditView()) {
-      controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
     }
   }
 
