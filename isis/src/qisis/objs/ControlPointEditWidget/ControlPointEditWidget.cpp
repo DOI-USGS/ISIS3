@@ -804,17 +804,35 @@ namespace Isis {
     //  is selected
     if (controlPoint->Parent() == NULL) {
       m_editPoint = controlPoint;
+      // New point in editor, so colorize all save buttons
+      colorizeAllSaveButtons("red");
     }
     else {
       m_editPoint = new ControlPoint;
       *m_editPoint = *controlPoint;
+
+      // New point loaded, make sure all save button's text is default black color
+      colorizeAllSaveButtons("black");
     }
 
     loadPoint(serialNumber);
     loadTemplateFile(m_measureEditor->templateFileName());
+  }
 
-    // New point loaded, make sure Save Measure Button text is default
+
+  void ControlPointEditWidget::colorizeAllSaveButtons(QString color) {
+
+    if (color == "black") {
+      // Don't need to colorize save measure button, when loading new measure, the measure editor
+      // will set back to default palette.
     m_savePoint->setPalette(m_saveDefaultPalette);
+      m_saveNet->setPalette(m_saveDefaultPalette);
+    }
+    else if (color == "red") {
+      m_measureEditor->colorizeSaveButton(); 
+      colorizeSavePointButton();
+      colorizeSaveNetButton();
+    }
   }
 
 
@@ -2466,12 +2484,18 @@ namespace Isis {
    *
    * @author 2014-07-11 Tracie Sucharski
    */
-  void ControlPointEditWidget::colorizeSaveNetButton() {
+  void ControlPointEditWidget::colorizeSaveNetButton(bool reset) {
 
+    if (reset) {
+      //  Change Save Net button text back to default black
+      m_saveNet->setPalette(m_saveDefaultPalette);
+    }
+    else {
     QColor qc = Qt::red;
     QPalette p = m_savePoint->palette();
     p.setColor(QPalette::ButtonText,qc);
     m_saveNet->setPalette(p);
+    }
 
   }
 
