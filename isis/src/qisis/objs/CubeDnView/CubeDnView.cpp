@@ -29,7 +29,6 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
-#include <QMenuBar>
 #include <QModelIndex>
 #include <QSize>
 #include <QSizePolicy>
@@ -90,7 +89,7 @@ namespace Isis {
    * @param parent (QWidget *) Pointer to parent widget
    */
   CubeDnView::CubeDnView(Directory *directory, QWidget *parent) :
-                 AbstractProjectItemViewMW(parent) {
+                 AbstractProjectItemView(parent) {
     connect( internalModel()->selectionModel(),
         SIGNAL( currentChanged(const QModelIndex &, const QModelIndex &) ),
              this, SLOT( onCurrentChanged(const QModelIndex &) ) );
@@ -103,52 +102,54 @@ namespace Isis {
     m_workspace = new Workspace(false, this);
     m_workspace->mdiArea()->setActivationOrder(QMdiArea::StackingOrder);
 
-    // Since this is a QMainWindow, set the workspace as the central widget.
-    setCentralWidget(m_workspace);
-
-    createActions(directory);
-
     connect(m_workspace, SIGNAL( cubeViewportActivated(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportActivated(MdiCubeViewport *) ) );
 
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
 
-
-    // !!!!!!!   TODO  LOOK AT THIS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // These connections should be at higher level, directory or project???? ::addCubeDnView().
     Project *activeProject = directory->project();
     // These connect signals listen to the active project, and if a control network
     // or list of control networks is added, then the enableControlNetTool() function is called.
     connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableControlNetTool()));
     connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableControlNetTool()));
-  }
 
 
-  void CubeDnView::createActions(Directory *directory) {
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
 
-    
-    m_permToolBar = addToolBar("Standard Tools");
+    //m_toolBar = new QWidget(this);
+
+    //QHBoxLayout *toolBarLayout = new QHBoxLayout;
+
+    m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
+    //toolBarLayout->addWidget(m_permToolBar);
 
-    m_activeToolBar = addToolBar("Active Tool");
+    m_activeToolBar = new QToolBar("Active Tool", 0);
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
+    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    addToolBar(m_toolPad);
+    //toolBarLayout->addWidget(m_toolPad);
+
+    //m_toolBar->setLayout(toolBarLayout);
+
+    //layout->addWidget(m_toolBar);
+    layout->addWidget(m_workspace);
 
     // Create tools
     ToolList *tools = new ToolList;
 
-    // !!!!!!!   TODO  LOOK AT THIS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //*******   TODO  :   Look at code below.  What is defaultActiveTool used for? Why is NULL
-    // appended??    ***************
     Tool *defaultActiveTool = NULL;
 
     tools->append(new RubberBandTool(this));
+//  QnetTool *qnetTool = new QnetTool(m_workspace);
+    //tools->append(new FileTool(this));
+    //tools->append(new QnetFileTool(qnetTool, this));
     tools->append(NULL);
 
     ControlNetTool *controlNetTool = new ControlNetTool(directory, this);
@@ -198,16 +199,18 @@ namespace Isis {
     tools->append(new StereoTool(this));
     tools->append(new HelpTool(this));
 
-    tools->append(new TrackTool(statusBar()));
+    QStatusBar *statusBar = new QStatusBar(this);
+    layout->addWidget(statusBar);
+    tools->append(new TrackTool(statusBar));
 
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_fileMenu = menuBar()->addMenu("&File");
-    m_viewMenu = menuBar()->addMenu("&View");
-    m_optionsMenu = menuBar()->addMenu("&Options");
-    m_windowMenu = menuBar()->addMenu("&Window");
-    m_helpMenu = menuBar()->addMenu("&Help");
+    m_fileMenu = new QMenu;
+    m_viewMenu = new QMenu;
+    m_optionsMenu = new QMenu;
+    m_windowMenu = new QMenu;
+    m_helpMenu = new QMenu;
 
     for (int i = 0; i < tools->count(); i++) {
       Tool *tool = (*tools)[i];
@@ -250,6 +253,10 @@ namespace Isis {
 
     m_toolPadActions.append( m_toolPad->actions() );
 
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
   }
 
 
@@ -295,7 +302,7 @@ namespace Isis {
       return;
     }
 
-    AbstractProjectItemViewMW::addItem(item);
+    AbstractProjectItemView::addItem(item);
   }
 
 
