@@ -52,24 +52,18 @@ void IsisMain() {
 
     // run the compare function here.  This will conpare the
     // labels of the first cube to the labels of each following cube.
-    PvlKeyword sourceProductId("SourceProductId");
+//     PvlKeyword sourceProductId("SourceProductId");
     QString ProdId;
+    Pvl *pmatch = clist[0]->label();
     for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *pmatch = clist[0]->label();
       Pvl *pcomp = clist[i]->label();
       CompareLabels(*pmatch, *pcomp);
-      PvlGroup g = pcomp->findGroup("Instrument", Pvl::Traverse);
-      if(g.hasKeyword("StitchedProductIds")) {
-        PvlKeyword k = g["StitchedProductIds"];
-        for(int j = 0; j < (int)k.size(); j++) {
-          sourceProductId += g["stitchedProductIds"][j];
-        }
-      }
-      ProdId = (QString)pmatch->findGroup("Archive", Pvl::Traverse)["ObservationId"];
-      QString bandname = (QString)pmatch->findGroup("BandBin", Pvl::Traverse)["Name"];
+      ProdId = (QString)pmatch->findGroup("Archive", Pvl::Traverse)["UniqueIdentifier"];
+      QString bandname = (QString)pmatch->findGroup("BandBin", Pvl::Traverse)["FilterName"];
       bandname = bandname.toUpper();
       ProdId = ProdId + "_" + bandname;
     }
+    
     bool runXY = true;
 
     //calculate the min and max lon
@@ -179,62 +173,23 @@ void IsisMain() {
     // get the min and max SCLK values ( do this with QString comp.)
     // get the value from the original label blob
     QString startClock;
-    QString stopClock;
     QString startTime;
-    QString stopTime;
     for(int i = 0; i < (int)clist.size(); i++) {
       OriginalLabel origLab;
       clist[i]->read(origLab);
-      PvlGroup timegrp = origLab.ReturnLabels().findGroup("TIME_PARAMETERS", Pvl::Traverse);
+      PvlGroup timegrp = origLab.ReturnLabels().findGroup("Instrument", Pvl::Traverse);
       if(i == 0) {
         startClock = (QString)timegrp["SpacecraftClockStartCount"];
-        stopClock = (QString)timegrp["SpacecraftClockStopCount"];
         startTime = (QString)timegrp["StartTime"];
-        stopTime = (QString)timegrp["StopTime"];
       }
       else {
         QString testStartTime = (QString)timegrp["StartTime"];
-        QString testStopTime = (QString)timegrp["StopTime"];
         if(testStartTime < startTime) {
           startTime = testStartTime;
           startClock = (QString)timegrp["SpacecraftClockStartCount"];
         }
-        if(testStopTime > stopTime) {
-          stopTime = testStopTime;
-          stopClock = (QString)timegrp["spacecraftClockStopCount"];
-        }
       }
     }
-
-    //  Concatenate all TDI's and summing and specialProcessingFlat into one keyword
-    PvlKeyword cpmmTdiFlag("cpmmTdiFlag");
-    PvlKeyword cpmmSummingFlag("cpmmSummingFlag");
-    PvlKeyword specialProcessingFlag("SpecialProcessingFlag");
-    for(int i = 0; i < 14; i++) {
-      cpmmTdiFlag += (QString)"";
-      cpmmSummingFlag += (QString)"";
-      specialProcessingFlag += (QString)"";
-    }
-
-    for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *clab = clist[i]->label();
-      PvlGroup cInst = clab->findGroup("Instrument", Pvl::Traverse);
-      OriginalLabel cOrgLab;
-      clist[i]->read(cOrgLab);
-      PvlGroup cGrp = cOrgLab.ReturnLabels().findGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
-      cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:TDI"];
-      cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:BINNING"];
-
-      if(cInst.hasKeyword("Special_Processing_Flag")) {
-        specialProcessingFlag[cInst["CpmmNumber"]] = (QString) cInst["Special_Processing_Flag"];
-      }
-      else {
-        // there may not be the keyword Special_Processing_Flag if no
-        //keyword then set the output to NOMINAL
-        specialProcessingFlag[cInst["CpmmNumber"]] = "NOMINAL";
-      }
-    }
-
 
     // Get the blob of original labels from first image in list
     OriginalLabel org;
@@ -259,11 +214,9 @@ void IsisMain() {
 
     PvlGroup mos("Mosaic");
     mos += PvlKeyword("ProductId ", ProdId);
-    mos += PvlKeyword(sourceProductId);
+//     mos += PvlKeyword(sourceProductId);
     mos += PvlKeyword("StartTime ", startTime);
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
-    mos += PvlKeyword("StopTime ", stopTime);
-    mos += PvlKeyword("SpacecraftClockStopCount ", stopClock);
     mos += PvlKeyword("IncidenceAngle ", toString(Cincid), "DEG");
     mos += PvlKeyword("EmissionAngle ", toString(Cemiss), "DEG");
     mos += PvlKeyword("PhaseAngle ", toString(Cphase), "DEG");
@@ -271,9 +224,6 @@ void IsisMain() {
     mos += PvlKeyword("SolarLongitude ", toString(CsolarLong), "DEG");
     mos += PvlKeyword("SubSolarAzimuth ", toString(CsunAzimuth), "DEG");
     mos += PvlKeyword("NorthAzimuth ", toString(CnorthAzimuth), "DEG");
-    mos += cpmmTdiFlag;
-    mos += cpmmSummingFlag;
-    mos += specialProcessingFlag;
 
     Cube mosCube;
     mosCube.open(ui.GetFileName("TO"), "rw");
@@ -297,21 +247,21 @@ void IsisMain() {
 //Function to compare label - CompareLabels
 void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
   // test of the ObservationId
-  PvlGroup matchgrp = pmatch.findGroup("Archive", Pvl::Traverse);
-  PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
-  QString obsMatch = matchgrp["ObservationId"];
-  QString obsComp = compgrp["ObservationId"];
-
-  if(obsMatch != obsComp) {
-    QString msg = "Images not from the same observation";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
+//   PvlGroup matchgrp = pmatch.findGroup("Archive", Pvl::Traverse);
+//   PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
+//   QString obsMatch = matchgrp["ObservationId"];
+//   QString obsComp = compgrp["ObservationId"];
+// 
+//   if(obsMatch != obsComp) {
+//     QString msg = "Images not from the same observation";
+//     throw IException(IException::User, msg, _FILEINFO_);
+//   }
 
   // Test of the BandBin filter name
   PvlGroup bmatchgrp = pmatch.findGroup("BandBin", Pvl::Traverse);
   PvlGroup bcompgrp = pcomp.findGroup("BandBin", Pvl::Traverse);
-  QString bandMatch = bmatchgrp["Name"];
-  QString bandComp = bcompgrp["Name"];
+  QString bandMatch = bmatchgrp["FilterName"];
+  QString bandComp = bcompgrp["FilterName"];
 
   if(bandMatch != bandComp) {
     QString msg = "Images not the same filter";
