@@ -7,7 +7,6 @@
 
   <description>
     <p>
-  ** The output from this program is required by hirdrgen ** <br/>
   If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.  
   This program produces a mosaic and adds keywords to the label group "Mosaic" that are required 
   by hirdrgen. <br/>
@@ -62,7 +61,7 @@
           Output mosaic
         </brief>
         <description>
-          the output mosaic cube with the new mosaic label group added.
+          The output mosaic cube with the new mosaic label group added.
         </description>
         <filter>
           *.cub
