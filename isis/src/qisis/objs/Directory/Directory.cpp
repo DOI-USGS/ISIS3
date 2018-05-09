@@ -1804,6 +1804,11 @@ namespace Isis {
         "has been saved.";
       m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
     }
+
+    // Make sure the ControlPointEditView "Save Net" button is no longer red
+    if (controlPointEditView()) {
+      controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
+    }
   }
 
 
