@@ -13,6 +13,7 @@
 
 #include "FileName.h"
 #include "ImportPdsTable.h"
+#include "LineManager.h"
 #include "ProcessImportPds.h"
 #include "Table.h"
 #include "UserInterface.h"
@@ -381,6 +382,23 @@ void IsisMain ()
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   outcube->putGroup(kerns);
+
+  // NULL the dark current scans in level 2 images
+  if (procLevel == 2) {
+    const PvlKeyword &frameKey = outcube->group("Instrument").findKeyword("FrameParameter");
+    int darkRate = toInt(frameKey[3]) + 1;
+    LineManager darkLineManager(*outcube);
+
+    for (int band = 1; band <= outcube->bandCount(); band++) {
+      for (int line = 1; line <= outcube->lineCount(); line+=darkRate) {
+        darkLineManager.SetLine(line,band);
+        for (int sample = 0; sample < darkLineManager.size(); sample++) {
+          darkLineManager[sample] = Isis::Null;
+        }
+        outcube->write(darkLineManager);
+      }
+    }
+  }
 
   p.EndProcess ();
 }
