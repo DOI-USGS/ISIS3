@@ -56,6 +56,9 @@
        Fix issues with the translation of housekeeping data. Fixes #5131.
     </change>
     <change name="Jesse Mapel" date="2018-05-14">
+       Fixed compiler warnings from new lvl3 ingestion code.
+    </change>
+    <change name="Jesse Mapel" date="2018-05-14">
        Nulled dark current scans in level 2 data. Fixes #5421.
     </change>
   </history>
