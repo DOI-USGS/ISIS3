@@ -107,7 +107,10 @@
       Added check to verify input input xml file corresponds to valid filter image. 
     </change>
     <change name="Summer Stapleton" date="2018-02-16">
-      Added handling for image file extesnions of either .dat or .img. Fixs #5334. 
+      Added handling for image file extesnions of either .dat or .img. Fixes #5334. 
+    </change>
+    <change name="Kristin Berry and Makayla Shepherd" date="2018-05-15">
+     Updated to ingest images which have been exported using tgocassisrdrgen. Fixes #5418.
     </change>
   </history>
 
