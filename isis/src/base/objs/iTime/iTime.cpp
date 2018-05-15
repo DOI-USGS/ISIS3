@@ -68,8 +68,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Convert the time string to a double ephemeris time
-    SpiceDouble et; 
-    str2et_c(tempTime.toLatin1().data(), &et); 
+    SpiceDouble et;
+    str2et_c(tempTime.toLatin1().data(), &et);
 
     p_et = et;
     NaifStatus::CheckErrors();
