@@ -36,9 +36,10 @@ namespace Isis {
    *   @history 2017-08-02 Tracie Sucharski - Draw the current edit Control Point as a circle with
    *                           center crosshair in red.  Fixes #5007, #5008.
    *   @history 2018-05-01 Kaitlyn Lee - Changed colors of control points to match qnet.
-   *                           Colors Changed: free from blue to green, ignored from red to yellow,
-   *                           locked from magenta to red, and constrained (was dark green) and
-   *                           fixed (was green) are now both represented with magenta. Fixes #5401.
+   *                           Colors Changed: free from blue to darkGreen, locked from magenta
+   *                           to darkGreen, ignored from red to darkYellow,
+   *                           and constrained (was dark green) and fixed (was green)
+   *                           are now both represented with magenta. Fixes #5401.
    *
    */
   class ControlPointGraphicsItem : public QGraphicsRectItem {
