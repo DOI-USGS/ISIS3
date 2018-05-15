@@ -1432,7 +1432,7 @@ namespace Isis {
       stream.writeStartElement("footprintViews");
 
       foreach (Footprint2DView *footprint2DViewWidget, m_footprint2DViewWidgets) {
-        footprint2DViewWidget->mosaicSceneWidget()->save(stream, project(), newProjectRoot);
+        footprint2DViewWidget->save(stream, project(), newProjectRoot);
       }
 
       stream.writeEndElement();
@@ -1502,7 +1502,7 @@ namespace Isis {
 
     if (result) {
       if (localName == "footprint2DView") {
-        m_directory->addFootprint2DView()->mosaicSceneWidget()->load(reader());
+        m_directory->addFootprint2DView()->load(reader());
       }
       else if (localName == "imageFileList") {
         m_directory->addImageFileListView()->load(reader());
@@ -1803,11 +1803,6 @@ namespace Isis {
       QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
         "has been saved.";
       m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
-    }
-
-    // Make sure the ControlPointEditView "Save Net" button is no longer red
-    if (controlPointEditView()) {
-      controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
     }
   }
 
