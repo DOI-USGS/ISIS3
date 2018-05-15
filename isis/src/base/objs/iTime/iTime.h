@@ -72,6 +72,8 @@ namespace Isis {
    *           were signaled. References #2248.
    *  @history 2018-03-15 Adam Goins - Removed deprecated function iTime::UnloadLeapSecondKernel().
    *                          Fixes #5325.
+   *  @history 2018-05-11 Kristin Berry and Makayla Shepherd - Added UTC time format that ends in Z,
+   *                          as this format is used by PDS4 (and the TGO CaSSIS mission.) 
    */
   class iTime {
     public:
