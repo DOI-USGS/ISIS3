@@ -48,7 +48,7 @@ namespace Isis {
 
     m_spacecraftNameLong = "Juno";
     m_spacecraftNameShort = "Juno";
-    
+
     NaifStatus::CheckErrors();
 
     // Set up the camera characteristics
@@ -73,7 +73,7 @@ namespace Isis {
       detMap->SetDetectorSampleSumming(summing);
       detMap->SetDetectorLineSumming(summing);
     }
-    
+
     // Juno codes
     int junoCode = naifIkCode();
     QString juno = toString(junoCode);
@@ -111,7 +111,7 @@ namespace Isis {
 
     // get start et for this frame, in seconds
     double frameStartEt = observationStartEt + startTimeBias + (frameNumber - 1)
-                             * (exposureDur + interFrameDelay + interFrameDelayBias);
+                             * (interFrameDelay + interFrameDelayBias);
     // Set start time to center of exposure time to ensure the proper SPICE data is cached.
     setTime(frameStartEt + exposureDur / 2.0);
 
@@ -123,24 +123,24 @@ namespace Isis {
   /**
    * Destroys the JunoCamera object.
    */
-  JunoCamera::~JunoCamera() { 
+  JunoCamera::~JunoCamera() {
   }
 
 
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
-   * the SpacecraftClockCount keyword value, converted to ephemeris time. The 
-   * StartTime keyword value from the labels represents the shutter open time of 
-   * the observation. This method uses the FramingCamera class implementation, 
-   * returning the given time value as the shutter open and the sum of the time 
+   * the SpacecraftClockCount keyword value, converted to ephemeris time. The
+   * StartTime keyword value from the labels represents the shutter open time of
+   * the observation. This method uses the FramingCamera class implementation,
+   * returning the given time value as the shutter open and the sum of the time
    * value and exposure duration as the shutter close.
-   * 
+   *
    * @param exposureDuration Exposure duration value from the labels, converted
    *                         to seconds.
-   * @param time The SpacecraftClockCount value from the labels, converted to 
+   * @param time The SpacecraftClockCount value from the labels, converted to
    *             ephemeris time
-   * 
+   *
    * @return @b pair < @b iTime, @b iTime > The first value is the shutter
    *         open time and the second is the shutter close time.
    */
@@ -152,9 +152,9 @@ namespace Isis {
 
 
   /**
-   * Retrieves the CK frame ID for the JunoCam instrument. 
-   *  
-   * @return @b int The appropriate instrument code for the "Camera-matrix" 
+   * Retrieves the CK frame ID for the JunoCam instrument.
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
    *                Kernel Frame ID.
    */
   int JunoCamera::CkFrameId() const {
@@ -162,9 +162,9 @@ namespace Isis {
   }
 
 
-  /** 
-    * Retrieves the J2000 CK Reference ID for the JunoCam instrument. 
-    * 
+  /**
+    * Retrieves the J2000 CK Reference ID for the JunoCam instrument.
+    *
     * @return @b int The appropriate instrument code for the "Camera-matrix"
     *                Kernel Reference ID.
     */
@@ -184,10 +184,10 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
     * Retrieves the J2000 SPK Reference ID for the JunoCam instrument.
-    *  
-    * @return @b int The appropriate instrument code for the Spacecraft 
+    *
+    * @return @b int The appropriate instrument code for the Spacecraft
     *                Kernel Reference ID.
     */
   int JunoCamera::SpkReferenceId() const {
