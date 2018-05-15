@@ -48,17 +48,28 @@ namespace Isis {
 
   /**
    * Constructs a iTime object and initializes it to the time from the argument.
-   *
+   *  
+   * This constructor will (temporarily) strip the Z off of the end of an input UTC-formatted time 
+   * if it is present. This time format is used by PDS4, but not presently supported by NAIF calls, 
+   * in particular str2et_c, which is used by this class.  
+   *  
    * @param time A time string formatted in standard UTC or similar format.
-   *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
+   *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789" or
+   *             "2000-12-31T23:59:01.6789Z"
    */
   iTime::iTime(const QString &time) {
     LoadLeapSecondKernel();
+    
+    QString tempTime = time; 
+    if (QString::compare(time.at(time.size() - 1), "Z", Qt::CaseInsensitive) == 0) {
+      tempTime = time.left(time.size() - 1);
+    }
 
     NaifStatus::CheckErrors();
+
     // Convert the time string to a double ephemeris time
-    SpiceDouble et;
-    str2et_c(time.toLatin1().data(), &et);
+    SpiceDouble et; 
+    str2et_c(tempTime.toLatin1().data(), &et); 
 
     p_et = et;
     NaifStatus::CheckErrors();
