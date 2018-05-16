@@ -73,6 +73,7 @@
     <group name="Keywords">
       <parameter name="PRODID">
         <type>string</type>
+        <internalDefault>No Value</internalDefault>
         <brief>
           Poduct ID value
         </brief>
