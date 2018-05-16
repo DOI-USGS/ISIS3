@@ -43,7 +43,7 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
-  if ( ui.WasEntered("PRODID")) {
+  if ( ui.WasEntered("PRODID") ) {
     PvlGroup &archiveGroup = label->findObject("IsisCube").findGroup("Archive");
     try {
       PvlKeyword &prodId = archiveGroup.findKeyword("ProductId");
