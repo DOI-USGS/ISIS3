@@ -5,19 +5,21 @@
 #include "AlphaCube.h"
 #include "Cube.h"
 #include "FileName.h"
+#include "IException.h"
+#include "iTime.h"
 #include "LineManager.h"
 #include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProcessImport.h"
 #include "UserInterface.h"
 #include "XmlToPvlTranslationManager.h"
-#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
 
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
-void translateLabels(FileName &inputLabel, Cube *outputCube);
+void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer);
+void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
 
 void IsisMain() {
 
@@ -41,7 +43,37 @@ void IsisMain() {
     }
     
     Cube *outputCube = importer.SetOutputCube("TO");
-    translateLabels(xmlFileName, outputCube);
+
+    QString transRawFile = "/translations/tgoCassisInstrument.trn";
+    QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
+
+    try {
+      translateLabels(xmlFileName, outputCube, transRawFile); 
+    } 
+    catch (IException &e) {
+      translateLabels(xmlFileName, outputCube, transExportFile);
+      
+      // Try to translate a mapping group
+      try {
+        PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
+        QString missionDir = (QString) dataDir["Tgo"];
+        FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
+
+        // Get the translation manager ready for translating the mapping label
+
+        XmlToPvlTranslationManager labelXlater(xmlFileName, mapTransFile.expanded());
+
+        // Pvl output label
+        Pvl *outputLabel = outputCube->label();
+        labelXlater.Auto(*(outputLabel));
+      } 
+      catch (IException &e) {
+        Pvl *outputLabel = outputCube->label();
+        if(outputLabel->hasGroup("Mapping")) {
+          outputLabel->deleteGroup("Mapping"); 
+        }
+      }
+    }
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
 
@@ -82,11 +114,31 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   QString missionDir = (QString) dataDir["Tgo"];
 
   // Get the translation manager ready
-  FileName transFile(missionDir + "/translations/tgoCassis.trn");
-  XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+  FileName transFile; 
+  try {
+    transFile = FileName(missionDir + "/translations/tgoCassis.trn"); 
+    XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+    translateCoreInfo(labelXlater, importer);
+  } 
+  catch (IException &e) {
+   // if exported, use this!
+   transFile = FileName(missionDir + "/translations/tgoCassisExported.trn"); 
+   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+   translateCoreInfo(labelXlater, importer);
+  }
+}
 
-  QString str;
+/**
+ * Translate core info from labels and set ProcessImport object with 
+ * these values.
+ *
+ * @param labelXlater Reference to the XmlToPvlTranslationManager objcet to use for the translation.
+ * @param importer Reference to the ProcessImport object to which core info will
+ *                 be set.
+ */
+void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer) {
   // Set up the ProcessImport
+  QString str;
   str = labelXlater.Translate("CoreSamples");
   int ns = toInt(str);
   str = labelXlater.Translate("CoreLines");
@@ -95,7 +147,7 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   int nb = toInt(str);
   importer.SetDimensions(ns, nl, nb);
 
-  str = labelXlater.Translate("CoreType");    
+  str = labelXlater.Translate("CoreType");
   importer.SetPixelType(PixelTypeEnumeration(str));
 
   str = labelXlater.Translate("CoreByteOrder");    
@@ -109,7 +161,6 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   importer.SetMultiplier(toDouble(str));
 }
 
-
 /**
  * Translate instrument, bandbin, and archive info from xml label into ISIS3 
  * label and add kernels group. 
@@ -122,11 +173,11 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
  *   @history 2017-01-20 Jeannie Backer - Original Version
  *   @history 2017-01-23 Kristin Berry - Added support for bandBin group and archive group
  */
-void translateLabels(FileName &inputLabel, Cube *outputCube) {
+void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFile) {
   // Get the directory where the Tgo translation tables are
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Tgo"];
-  FileName transFile(missionDir + "/translations/tgoCassisInstrument.trn");
+  FileName transFile(missionDir + instTransFile);
 
   // Get the translation manager ready for translating the instrument label
   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
