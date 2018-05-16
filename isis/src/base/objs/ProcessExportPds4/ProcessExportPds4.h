@@ -71,6 +71,8 @@ namespace Isis {
    *   @history 2018-02-05 Kristin Berry - Updated WritePds4 to remove the .xml and add a .img
    *                           if the user inputs something of the form filename.xml as the image
    *                           output name. 
+   *   @history 2018-05-16 Christopher Combs - Fixed typo in xml namespaces and changed History 
+   *                           attributes to elements. Matches pds validate tool specifations.
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
