@@ -43,14 +43,14 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
-  if ( ui.WasEntered("PRODID") ) {
+  if ( ui.WasEntered("PRODUCTID") ) {
     PvlGroup &archiveGroup = label->findObject("IsisCube").findGroup("Archive");
     try {
       PvlKeyword &prodId = archiveGroup.findKeyword("ProductId");
-      prodId.setValue( ui.GetString("PRODID") );
+      prodId.setValue( ui.GetString("PRODUCTID") );
     }
     catch (IException &e) {
-      archiveGroup.addKeyword( PvlKeyword("ProductId", ui.GetString("PRODID")) );
+      archiveGroup.addKeyword( PvlKeyword("ProductId", ui.GetString("PRODUCTID")) );
     }
   }
 

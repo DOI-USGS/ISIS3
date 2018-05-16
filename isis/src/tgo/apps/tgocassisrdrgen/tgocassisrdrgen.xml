@@ -30,7 +30,7 @@
       Moved code to write out .img and .xml PDS4 data to WritePds4 in ProcessExportPds4.
     </change>
     <change name="Kaitlyn Lee" date="2018-05-16">
-      Added parameter PRODID to set the ProductId keyword. If the keyword does
+      Added parameter PRODUCTID to set the ProductId keyword. If the keyword does
       not exist in the label, it will add it.
     </change>
   </history>
@@ -71,9 +71,9 @@
     </group>
 
     <group name="Keywords">
-      <parameter name="PRODID">
+      <parameter name="PRODUCTID">
         <type>string</type>
-        <internalDefault>No Value</internalDefault>
+        <internalDefault>None</internalDefault>
         <brief>
           Poduct ID value
         </brief>
