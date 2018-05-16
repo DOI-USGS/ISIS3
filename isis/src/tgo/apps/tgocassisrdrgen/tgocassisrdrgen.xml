@@ -23,11 +23,15 @@
       Changed the order that the elements appear in the output label.
     </change>
     <change name="Marjorie Hahn" date="2017-06-05">
-      Added a default test to ensure that if the exported PDS4 data is reingested, 
+      Added a default test to ensure that if the exported PDS4 data is reingested,
       then it is the same as the original cube.
     </change>
     <change name="Marjorie Hahn" date="2017-06-08">
       Moved code to write out .img and .xml PDS4 data to WritePds4 in ProcessExportPds4.
+    </change>
+    <change name="Kaitlyn Lee" date="2018-05-16">
+      Added parameter PRODID to set the ProductId keyword. If the keyword does
+      not exist in the label, it will add it.
     </change>
   </history>
 
@@ -65,5 +69,18 @@
         <filter>*.img</filter>
       </parameter>
     </group>
+
+    <group name="Keywords">
+      <parameter name="PRODID">
+        <type>string</type>
+        <brief>
+          Poduct ID value
+        </brief>
+        <description>
+          Update the default Product ID value.
+        </description>
+      </parameter>
+    </group>
+
   </groups>
 </application>

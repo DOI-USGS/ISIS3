@@ -43,7 +43,18 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
-/*
+  if ( ui.WasEntered("PRODID")) {
+    PvlGroup &archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+    try {
+      PvlKeyword &prodId = archiveGroup.findKeyword("ProductId");
+      prodId.setValue( ui.GetString("PRODID") );
+    }
+    catch (IException &e) {
+      archiveGroup.addKeyword( PvlKeyword("ProductId", ui.GetString("PRODID")) );
+    }
+  }
+
+  /*
   * Add additional pds label data here
   */
 
@@ -67,8 +78,8 @@ void IsisMain() {
   process.addHistory(historyDescription, historyDate);
 
   ProcessExportPds4::translateUnits(pdsLabel);
-  
+
   QString outFile = ui.GetFileName("TO");
-  
+
   process.WritePds4(outFile);
 }
