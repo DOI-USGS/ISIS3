@@ -11,7 +11,7 @@ commands:
 	$(APPNAME) from=$(INPUT)/CAS-MCO-2016-11-26T22.50.30.181-RED-01012-B1_rdrgen.xml \
 	   to=$(OUTPUT)/reingested_unproj.cub > /dev/null;
 	catlab from=$(OUTPUT)/reingested_unproj.cub \
-	  to=$(OUTPUT)/reingested_proj.pvl > /dev/null;
+	  to=$(OUTPUT)/reingested_unproj.pvl > /dev/null;
 
 
 # projected

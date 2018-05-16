@@ -51,18 +51,28 @@ void IsisMain() {
       translateLabels(xmlFileName, outputCube, transRawFile); 
     } 
     catch (IException &e) {
-      translateLabels(xmlFileName, outputCube, transExportFile); 
-      PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-      QString missionDir = (QString) dataDir["Tgo"];
-      FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
+      translateLabels(xmlFileName, outputCube, transExportFile);
+      
+      // Try to translate a mapping group
+      try {
+        PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
+        QString missionDir = (QString) dataDir["Tgo"];
+        FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
 
-      // Get the translation manager ready for translating the mapping label
+        // Get the translation manager ready for translating the mapping label
 
-      XmlToPvlTranslationManager labelXlater(xmlFileName, mapTransFile.expanded());
+        XmlToPvlTranslationManager labelXlater(xmlFileName, mapTransFile.expanded());
 
-      // Pvl output label
-      Pvl *outputLabel = outputCube->label();
-      labelXlater.Auto(*(outputLabel));
+        // Pvl output label
+        Pvl *outputLabel = outputCube->label();
+        labelXlater.Auto(*(outputLabel));
+      } 
+      catch (IException &e) {
+        Pvl *outputLabel = outputCube->label();
+        if(outputLabel->hasGroup("Mapping")) {
+          outputLabel->deleteGroup("Mapping"); 
+        }
+      }
     }
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
