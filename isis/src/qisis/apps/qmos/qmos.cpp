@@ -13,6 +13,10 @@ using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
+  if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
+    std::cerr << "Please set ISISROOT before running any Isis applications" << std::endl;
+    exit(1);
+  }
   Isis::Gui::checkX11();
 
   // Add the Qt plugin directory to the library path
