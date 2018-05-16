@@ -59,7 +59,7 @@ namespace Isis {
 
     QString xmlModel;
     xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch\" ";
-    xmlModel += "schemetypens=\"http://purl.oclc.org/dsdl/schematron\"";
+    xmlModel += "schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
     m_domDoc->appendChild(header);
@@ -404,7 +404,7 @@ namespace Isis {
     xmlModel +=  xmlnsURI;
     xmlModel +=  "/";
     xmlModel +=  sch;
-    xmlModel += "\" schemetypens=\"http://purl.oclc.org/dsdl/schematron\"";
+    xmlModel += "\" schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
     m_domDoc->insertAfter(header, m_domDoc->firstChild());
@@ -753,9 +753,18 @@ namespace Isis {
     // Create the "Modification_Detail" element and add it to the end of the
     // "Modification_History" element.
     QDomElement detailElement = m_domDoc->createElement("Modification_Detail");
-    detailElement.setAttribute("description", description);
-    detailElement.setAttribute("modification_date", date);
-    detailElement.setAttribute("version_id", version);
+
+    QDomElement modDateElement = m_domDoc->createElement("modification_date");
+    PvlToXmlTranslationManager::setElementValue(modDateElement, date);
+    detailElement.appendChild(modDateElement);
+
+    QDomElement versionIdElement = m_domDoc->createElement("version_id");
+    PvlToXmlTranslationManager::setElementValue(versionIdElement, version);
+    detailElement.appendChild(versionIdElement);
+
+    QDomElement descriptionElement = m_domDoc->createElement("description");
+    PvlToXmlTranslationManager::setElementValue(descriptionElement, description);
+    detailElement.appendChild(descriptionElement);
 
     historyElement.insertAfter( detailElement,
                                 historyElement.lastChildElement() );
