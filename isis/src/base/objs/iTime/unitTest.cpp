@@ -40,6 +40,35 @@ int main(int argc, char *argv[]) {
   catch(IException &error) {
     error.print();
   }
+  
+  
+  try {
+    cout << endl;
+    cout << setprecision(9);
+    QString test = "2003/01/02 12:15:01.1234Z";
+    iTime *time = new iTime(test);
+    cout << "  Test of date = " << test << endl;
+    cout << "   Year        = " << time->YearString() << endl;
+    cout << "   Year        = " << time->Year() << endl;
+    cout << "   Month       = " << time->MonthString() << endl;
+    cout << "   Month       = " << time->Month() << endl;
+    cout << "   Day         = " << time->DayString() << endl;
+    cout << "   Day         = " << time->Day() << endl;
+    cout << "   Hour        = " << time->HourString() << endl;
+    cout << "   Hour        = " << time->Hour() << endl;
+    cout << "   Minute      = " << time->MinuteString() << endl;
+    cout << "   Minute      = " << time->Minute() << endl;
+    cout << "   Second      = " << time->SecondString() << endl;
+    cout << "   Second      = " << time->Second() << endl;
+    cout << "   Day of Year = " << time->DayOfYearString() << endl;
+    cout << "   Day of Year = " << time->DayOfYear() << endl;
+    cout << "   Et          = " << time->EtString() << endl;
+    cout << "   Et          = " << time->Et() << endl;
+    cout << "   UTC         = " << time->UTC() << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
 
 
   double saveEt = 0.0;
