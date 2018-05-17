@@ -47,16 +47,18 @@ void IsisMain() {
   // by the user, set it to the Observation Id.
   // This is added before the translation instead of adding it to the exported xml
   // because of the ease of editing pvl vs xml.
-  PvlGroup &archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+  PvlGroup &instrumentGroup = label->findObject("IsisCube").findGroup("Instrument");
   PvlKeyword productId = PvlKeyword("ProductId");
   if ( ui.WasEntered("PRODUCTID") ) {
     productId.setValue( ui.GetString("PRODUCTID") );
+    instrumentGroup.addKeyword(productId);
+
   }
   else {
-    QString observationId = archiveGroup.findKeyword("ObservationId").QString();
+    QString observationId = instrumentGroup.findKeyword("ObservationId")[0];
     productId.setValue(observationId);
   }
-  archiveGroup.addKeyword(productId);
+  instrumentGroup.addKeyword(productId);
 
   /*
   * Add additional pds label data here

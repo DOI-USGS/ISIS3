@@ -62,7 +62,7 @@ void IsisMain() {
       bandname = bandname.toUpper();
       ProdId = ProdId + "_" + bandname;
     }
-    
+
     bool runXY = true;
 
     //calculate the min and max lon
@@ -173,7 +173,7 @@ void IsisMain() {
     QString startClock;
     QString startTime;
     for(int i = 0; i < (int)clist.size(); i++) {
-      // himos used original label here. 
+      // himos used original label here.
 
       Pvl *origLab = clist[i]->label();
       PvlGroup timegrp = origLab->findGroup("Instrument", Pvl::Traverse);
@@ -213,7 +213,7 @@ void IsisMain() {
 
 
     PvlGroup mos("Mosaic");
-    mos += PvlKeyword("ProductId ", ProdId);
+    mos += PvlKeyword("ObservationId ", ProdId);
 //     mos += PvlKeyword(sourceProductId);
     mos += PvlKeyword("StartTime ", startTime);
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
@@ -251,7 +251,7 @@ void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
 //   PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
 //   QString obsMatch = matchgrp["ObservationId"];
 //   QString obsComp = compgrp["ObservationId"];
-// 
+//
 //   if(obsMatch != obsComp) {
 //     QString msg = "Images not from the same observation";
 //     throw IException(IException::User, msg, _FILEINFO_);
