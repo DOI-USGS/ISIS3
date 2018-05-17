@@ -30,8 +30,8 @@
       Moved code to write out .img and .xml PDS4 data to WritePds4 in ProcessExportPds4.
     </change>
     <change name="Kaitlyn Lee" date="2018-05-16">
-      Added parameter PRODUCTID to set the ProductId keyword. If the keyword does
-      not exist in the label, it will add it.
+      Added parameter PRODUCTID to set the ProductId keyword. If the product id is
+      not specified by the user, set the ProductId keyword to the observation id.
     </change>
   </history>
 
