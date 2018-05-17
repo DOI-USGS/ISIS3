@@ -8,8 +8,7 @@
   <description>
     <p>
   If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.  
-  This program produces a mosaic and adds keywords to the label group "Mosaic" that are required 
-  by hirdrgen. <br/>
+  This program produces a mosaic and adds keywords to the label group "Mosaic". <br/>
 
   The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>  
 

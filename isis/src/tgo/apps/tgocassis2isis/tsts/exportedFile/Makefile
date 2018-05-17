@@ -1,7 +1,7 @@
 # This test checks to see if images exported from tgocassisrdrgen can be 
 # re-imported using tgocassis2isis. 
 #
-# history 2018-05-16 Kristin Berry - Original version. References # ????
+# history 2018-05-16 Kristin Berry - Original version. References # 5418
 
 APPNAME = tgocassis2isis 
 
@@ -20,4 +20,4 @@ commands:
 	catlab from=$(OUTPUT)/reingested_proj.cub \
 	  to=$(OUTPUT)/reingested_proj.pvl > /dev/null;
 
-# do mosaic later. 
+# add mosaic test later. 
