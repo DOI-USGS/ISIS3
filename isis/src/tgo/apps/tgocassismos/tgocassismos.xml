@@ -7,12 +7,12 @@
 
   <description>
     <p>
-  If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.  
+  If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.
   This program produces a mosaic and adds keywords to the label group "Mosaic". <br/>
 
-  The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>  
+  The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>
 
-   A new label group, required by tgocassisrdrgen, called "Mosaic"  is added to the image labels of 
+   A new label group, required by tgocassisrdrgen, called "Mosaic"  is added to the image labels of
    the output cube.  The original label blob is also propagated from the first file in the input list.<br/>
    </p>
 
@@ -32,6 +32,9 @@
   <history>
     <change name="Makayla Shepherd" date="2018-05-09">
       Original version.
+    </change>
+    <change name="Adam Goins" date="2018-05-17">
+      Added SpacecraftName and InstrumentId to mosaic group.
     </change>
   </history>
 
