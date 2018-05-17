@@ -43,16 +43,20 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
+  // Add the ProductId keyword for translation. If a product id is not specified
+  // by the user, set it to the Observation Id.
+  // This is added before the translation instead of adding it to the exported xml
+  // because of the ease of editing pvl vs xml.
+  PvlGroup &archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+  PvlKeyword productId = PvlKeyword("ProductId");
   if ( ui.WasEntered("PRODUCTID") ) {
-    PvlGroup &archiveGroup = label->findObject("IsisCube").findGroup("Archive");
-    try {
-      PvlKeyword &prodId = archiveGroup.findKeyword("ProductId");
-      prodId.setValue( ui.GetString("PRODUCTID") );
-    }
-    catch (IException &e) {
-      archiveGroup.addKeyword( PvlKeyword("ProductId", ui.GetString("PRODUCTID")) );
-    }
+    productId.setValue( ui.GetString("PRODUCTID") );
   }
+  else {
+    QString observationId = archiveGroup.findKeyword("ObservationId").QString();
+    productId.setValue(observationId);
+  }
+  archiveGroup.addKeyword(productId);
 
   /*
   * Add additional pds label data here
