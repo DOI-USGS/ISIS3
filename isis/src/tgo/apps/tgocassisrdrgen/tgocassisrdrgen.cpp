@@ -32,8 +32,17 @@ void IsisMain() {
   Cube *icube = process.SetInputCube("FROM");
 
   PvlObject *label= icube->label();
-  PvlKeyword &instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
 
+  PvlKeyword instrument;
+  bool isMosaic;
+  try {
+    instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
+    isMosaic = false;
+  }
+  catch (IException e) {
+    instrument = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("InstrumentId");
+    isMosaic = true;
+  }
   // Check if the cube is able to be translated into a CaSSIS xml file
   // This could very well be unnecessary
   if (!instrument.isEquivalent("CaSSIS")) {
@@ -47,18 +56,42 @@ void IsisMain() {
   // by the user, set it to the Observation Id.
   // This is added before the translation instead of adding it to the exported xml
   // because of the ease of editing pvl vs xml.
-  PvlGroup &instrumentGroup = label->findObject("IsisCube").findGroup("Instrument");
-  PvlKeyword productId = PvlKeyword("ProductId");
-  if ( ui.WasEntered("PRODUCTID") ) {
-    productId.setValue( ui.GetString("PRODUCTID") );
-    instrumentGroup.addKeyword(productId);
 
+  // PvlGroup mainGroup;
+  if (!isMosaic) {
+    PvlGroup &mainGroup = label->findObject("IsisCube").findGroup("Instrument");
+    PvlKeyword productId = PvlKeyword("ProductId");
+    if ( ui.WasEntered("PRODUCTID") ) {
+      productId.setValue( ui.GetString("PRODUCTID") );
+    }
+    else {
+      QString observationId = mainGroup.findKeyword("ObservationId")[0];
+      productId.setValue(observationId);
+    }
+    mainGroup.addKeyword(productId);
   }
   else {
-    QString observationId = instrumentGroup.findKeyword("ObservationId")[0];
-    productId.setValue(observationId);
+    PvlGroup &mainGroup = label->findObject("IsisCube").findGroup("Mosaic");
+    PvlKeyword productId = PvlKeyword("ProductId");
+    if ( ui.WasEntered("PRODUCTID") ) {
+      productId.setValue( ui.GetString("PRODUCTID") );
+    }
+    else {
+      QString observationId = mainGroup.findKeyword("ObservationId")[0];
+      productId.setValue(observationId);
+    }
+    mainGroup.addKeyword(productId);
   }
-  instrumentGroup.addKeyword(productId);
+
+  // PvlKeyword productId = PvlKeyword("ProductId");
+  // if ( ui.WasEntered("PRODUCTID") ) {
+  //   productId.setValue( ui.GetString("PRODUCTID") );
+  // }
+  // else {
+  //   QString observationId = mainGroup.findKeyword("ObservationId")[0];
+  //   productId.setValue(observationId);
+  // }
+  // mainGroup.addKeyword(productId);
 
   /*
   * Add additional pds label data here
