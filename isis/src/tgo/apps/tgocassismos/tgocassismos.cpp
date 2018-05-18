@@ -218,7 +218,7 @@ void IsisMain() {
 
 
     PvlGroup mos("Mosaic");
-    mos += PvlKeyword("ProductId ", ProdId);
+    mos += PvlKeyword("ObservationId ", ProdId);
     mos += PvlKeyword("SpacecraftName", spacecraftName);
     mos += PvlKeyword("InstrumentId", instrumentId);
 //     mos += PvlKeyword(sourceProductId);
