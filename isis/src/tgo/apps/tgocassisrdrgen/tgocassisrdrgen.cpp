@@ -32,7 +32,17 @@ void IsisMain() {
   Cube *icube = process.SetInputCube("FROM");
 
   PvlObject *label= icube->label();
-  PvlKeyword &instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
+
+  bool isMosaic;
+  PvlKeyword instrument;
+  if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
+    instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
+    isMosaic = false;
+  }
+  else if ( label->findObject("IsisCube").hasGroup("Mosaic") ) {
+    instrument = label->findObject("IsisCube").findGroup("Mosaic").findKeyword("InstrumentId");
+    isMosaic = true;
+  }
 
   // Check if the cube is able to be translated into a CaSSIS xml file
   // This could very well be unnecessary
@@ -52,7 +62,6 @@ void IsisMain() {
   if ( ui.WasEntered("PRODUCTID") ) {
     productId.setValue( ui.GetString("PRODUCTID") );
     instrumentGroup.addKeyword(productId);
-
   }
   else {
     QString observationId = instrumentGroup.findKeyword("ObservationId")[0];
