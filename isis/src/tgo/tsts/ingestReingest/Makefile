@@ -1,21 +1,24 @@
-APPNAME =
+INGEST = tgocassis2isis
+SPICE = spiceinit
+RDRGEN = tgocassisrdrgen
+CDIFF = cubediff
 
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	tgocassis2isis $(TSTARGS) \
+	$(INGEST) $(TSTARGS) \
 	    from=$(INPUT)/input.xml to=$(OUTPUT)/ingested.cub > /dev/null;
 
-	spiceinit $(TSTARGS) \
+	$(SPICE) $(TSTARGS) \
 	    from=$(OUTPUT)/ingested.cub ckp=t spkp=t > /dev/null;
 
-	tgocassisrdrgen $(TSTARGS) \
+	$(RDRGEN) $(TSTARGS) \
 	    from=$(OUTPUT)/ingested.cub to=$(OUTPUT)/exported.img > /dev/null;
 
-	tgocassis2isis $(TSTARGS) \
+	$(INGEST) $(TSTARGS) \
 	    from=$(OUTPUT)/exported.xml to=$(OUTPUT)/reingested.cub > /dev/null;
 
-	cubediff $(TSTARGS) \
+	$(CDIFF) $(TSTARGS) \
 	    from=$(OUTPUT)/ingested.cub from2=$(OUTPUT)/reingested.cub > /dev/null;
 
 	$(RM) $(OUTPUT)/exported.xml;
