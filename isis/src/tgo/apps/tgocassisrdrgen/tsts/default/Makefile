@@ -3,28 +3,24 @@ APPNAME = tgocassisrdrgen
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(APPNAME) from=$(INPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub \
-	           to=$(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.img \
+	$(APPNAME) from=$(INPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \
+	           to=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.img \
 		   > /dev/null;
 
 	# Reingest the PDS4 data
-	raw2isis from=$(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.img \
-	         to=$(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub \
-	         SAMPLES=2048 \
-	         LINES=254 \
-	         BITTYPE=REAL \
-	         BYTEORDER=LSB \
+	tgocassis2isis from=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.xml \
+	         to=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \
 		 > /dev/null;
 
 	# Compare the output cube from raw2isis to the original input cube to
 	# ensure that they are identical
-	cubediff from=$(INPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub \
-	         from2=$(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub \
+	cubediff from=$(INPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \
+	         from2=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \
 	         to=$(OUTPUT)/cubediffresults.txt \
 		 > /dev/null;
 
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
-	       $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.xml \
+	       $(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.xml \
 	       > $(OUTPUT)/templabel1.txt;
 	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
 	       $(OUTPUT)/templabel1.txt \
@@ -34,22 +30,22 @@ commands:
 	       > $(OUTPUT)/templabel3.txt;
 	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
 	       $(OUTPUT)/templabel3.txt \
-	       > $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.xmlLabel.txt;
+	       > $(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.xmlLabel.txt;
 
 
-	$(RM) $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.xml \
+	$(RM) $(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.xml \
 	      $(OUTPUT)/templabel1.txt \
 	      $(OUTPUT)/templabel2.txt \
 	      $(OUTPUT)/templabel3.txt;
 
 	# Test PRODUCTID parameter with same input
-	$(APPNAME) from=$(INPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub \
-	           to=$(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00_modifiedId.img \
+	$(APPNAME) from=$(INPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \
+	           to=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1_modifiedId.img \
 						 PRODUCTID=placeholderId \
 		   > /dev/null;
 
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
-	       $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00_modifiedId.xml \
+	       $(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1_modifiedId.xml \
 	       > $(OUTPUT)/templabel1.txt;
 	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
 	       $(OUTPUT)/templabel1.txt \
@@ -59,10 +55,10 @@ commands:
 	       > $(OUTPUT)/templabel3.txt;
 	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
 	       $(OUTPUT)/templabel3.txt \
-	       > $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00_modifiedId.xmlLabel.txt;
+	       > $(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1_modifiedId.xmlLabel.txt;
 
 
-	$(RM) $(OUTPUT)/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00_modifiedId.xml \
+	$(RM) $(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1_modifiedId.xml \
 	      $(OUTPUT)/templabel1.txt \
 	      $(OUTPUT)/templabel2.txt \
 	      $(OUTPUT)/templabel3.txt;
