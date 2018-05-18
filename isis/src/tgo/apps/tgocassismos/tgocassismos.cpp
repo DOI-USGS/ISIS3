@@ -172,6 +172,9 @@ void IsisMain() {
     // get the value from the original label blob
     QString startClock;
     QString startTime;
+    QString instrumentId;
+    QString spacecraftName;
+
     for(int i = 0; i < (int)clist.size(); i++) {
       // himos used original label here.
 
@@ -181,6 +184,8 @@ void IsisMain() {
       if(i == 0) {
         startClock = (QString)timegrp["SpacecraftClockStartCount"];
         startTime = (QString)timegrp["StartTime"];
+        instrumentId = (QString) timegrp["InstrumentId"];
+        spacecraftName = (QString) timegrp["SpacecraftName"];
       }
       else {
         QString testStartTime = (QString)timegrp["StartTime"];
@@ -214,6 +219,8 @@ void IsisMain() {
 
     PvlGroup mos("Mosaic");
     mos += PvlKeyword("ObservationId ", ProdId);
+    mos += PvlKeyword("SpacecraftName", spacecraftName);
+    mos += PvlKeyword("InstrumentId", instrumentId);
 //     mos += PvlKeyword(sourceProductId);
     mos += PvlKeyword("StartTime ", startTime);
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
