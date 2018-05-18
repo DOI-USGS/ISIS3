@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Product_Observational>
+
+  <Identification_Area>
+    <logical_identifier>TBD</logical_identifier>
+    <version_id>UNK</version_id>
+    <title>CaSSIS Data Record</title>
+    <information_model_version>TBD</information_model_version>
+    <product_class>Product_Observational</product_class>
+    <Modification_History>
+      <Modification_Detail>
+        <modification_date>2017-02-02T07:28:14</modification_date>
+        <description>Header_Creation: c_new_header</description>
+        <version_id>V3.1</version_id>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-02-02T07:28:14</modification_date>
+        <description>SC TM Conversion: c_sc_file_resolution</description>
+        <version_id>V1.3</version_id>
+        <version_date>07-Jan-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-02-02T07:28:14</modification_date>
+        <description>SC TM Conversion: c_batch_sc_tm_packets</description>
+        <version_id>V1.11</version_id>
+        <version_date>01-Feb-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-08-25T09:23:24</modification_date>
+        <description>Dataset reconstruction to correct line shift: cassis_reconstruct_shift</description>
+        <version_id>V1.0</version_id>
+        <version_date>25-Aug-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-10-03T09:28:38</modification_date>
+        <description>Bias Subtraction: c_remove_bias</description>
+        <version_id>V1.3</version_id>
+        <version_date>28-Aug-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-10-03T09:28:38</modification_date>
+        <description>Flat field removal (flat_field_170710.dat): c_remove_flat</description>
+        <version_id>V1.3</version_id>
+        <version_date>28-Aug-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-10-03T09:28:38</modification_date>
+        <description>Expansion: c_expand</description>
+        <version_id>V1.1</version_id>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-10-03T09:28:38</modification_date>
+        <description>Absolute_Calibration: c_absolute_calibration</description>
+        <version_id>V1.1</version_id>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-10-03T09:28:38</modification_date>
+        <description>SC TM Conversion: c_top_batch_level0tolevel1</description>
+        <version_id>V1.5</version_id>
+        <version_date>02-Mar-2017</version_date>
+      </Modification_Detail>
+      <Modification_Detail>
+        <modification_date>2017-10-03T09:38:00</modification_date>
+        <description>Command_Verification: c_top_batch_level1tolevel1b</description>
+        <version_id>V1.3</version_id>
+      </Modification_Detail>
+    </Modification_History>
+    <Producer_data>
+      <Producer_full_name>Nicolas Thomas</Producer_full_name>
+      <Producer_id>UBE</Producer_id>
+      <Producer_institution_name>Physikalisches Inst., Universitaet Bern</Producer_institution_name>
+      <Citation_Information>Thomas, N., Cremonese, G., Banaszkiewicz, M., Bridges, J., Byrne, S., da Deppo, V., Debei, S., El-Maarry, M. R., et al. The Colour and Stereo Surface Imaging System (CaSSIS) for ESAs Trace Gas Orbiter. 8th Mars International Conference, 2014. Abstract #1067.</Citation_Information>
+    </Producer_data>
+  </Identification_Area>
+
+  <Observation_Area>
+    <Science_Facets bandwidth="Broad" discipline_name="Imaging" domain="Surface" wavelength_range="Visible"/>
+    <Investigation_Area>
+      <Instrument_Host_Id>TGO</Instrument_Host_Id>
+      <Instrument_Host_Name>TRACE GAS ORBITER</Instrument_Host_Name>
+      <Mission_Id>TRACE GAS ORBITER</Mission_Id>
+      <Mission_Name>EXOMARS TRACE GAS ORBITER</Mission_Name>
+    </Investigation_Area>
+    <Observing_System>
+      <name>Colour and Stereo Surface Imaging System on Exomars Trace Gas Orbiter</name>
+      <description>The scientific imaging system of Exomars TGO</description>
+      <Observing_System_Component>
+        <name>TGO</name>
+        <type>Spacecraft</type>
+        <description>Instrument Host</description>
+      </Observing_System_Component>
+      <Observing_System_Component>
+        <name>CaSSIS</name>
+        <type>Instrument</type>
+        <description>PUSH-FRAME CMOS VISIBLE REFLECTING TELESCOPE</description>
+      </Observing_System_Component>
+    </Observing_System>
+  </Observation_Area>
+
+  <CaSSIS_Header>
+    <CaSSIS_General>
+      <INSTRUMENT_IFOV Unit="rad/px">1.140e-005</INSTRUMENT_IFOV>
+      <TELESCOPE_FOCAL_LENGTH Unit="M"> 0.8770</TELESCOPE_FOCAL_LENGTH>
+      <TELESCOPE_F_NUMBER>  6.50</TELESCOPE_F_NUMBER>
+      <TELESCOPE_TYPE>Three-mirror anastigmat with powered fold mirror</TELESCOPE_TYPE>
+      <DETECTOR_DESC>2D Array</DETECTOR_DESC>
+      <DETECTOR_PIXEL_HEIGHT Unit="MICRON">   10.0</DETECTOR_PIXEL_HEIGHT>
+      <DETECTOR_PIXEL_WIDTH Unit="MICRON">   10.0</DETECTOR_PIXEL_WIDTH>
+      <DETECTOR_TYPE>SI CMOS HYBRID (OSPREY 2K)</DETECTOR_TYPE>
+      <DETECTOR_READ_NOISE Unit="ELECTRON">   61.0</DETECTOR_READ_NOISE>
+      <FILTERS_AVAILABLE>BLU RED NIR PAN</FILTERS_AVAILABLE>
+    </CaSSIS_General>
+    <FSW_HEADER CompressionRatio="0" CompressionRatio_Length="1" CompressionRatio_Tag="5" Data_Length="1040384" Data_Tag="160" Error="0" Error_Length="4" Error_Tag="9" ExposureTimestamp="2f014e8bf23d21d1" ExposureTimestamp_Length="8" ExposureTimestamp_Tag="11" FRAME_HEADER="250B" Offset="0" Offset_Length="4" Offset_Tag="7" PEHK="022c010600402c3f4f0059ff780083ffa220b0ffcf0a192b1a54e775e801000000000000000000000003000000bd0aba0a030900000000920d00000000000000" PEHK_Length="64" PEHK_Tag="80" Position="0" Position_Length="4" Position_Tag="10" ScienceTM_Length="1040553" SequenceCounter="0" SequenceCounter_Length="1" SequenceCounter_Tag="4" Timestamp="2f014e8c6b4b9075" Timestamp_Length="8" Timestamp_Tag="1" TotalDataLength="1040384" TotalDataLength_Length="4" TotalDataLength_Tag="6" Type="0" Type_Length="1" Type_Tag="8" UID="100731832" UID_Length="4" UID_Tag="2" WindowCounter="3" WindowCounter_Length="1" WindowCounter_Tag="3"/>
+    <PEHK_HEADER Address_Accessed="3" Address_Contents="0" Assumed_ROIC_frequency="5.000e+006" Binning_window_1="0" Binning_window_2="0" Binning_window_3="0" Binning_window_4="0" Binning_window_5="0" Binning_window_6="0" Detector_Status="1" Exposure_Time="2.880e-003" Last_Event="0" Number_of_windows="6" PROTECTION_FLAG="0" Spare1="0" Spare2="0" Spare3="0" Status_Word="1" TEC_Control_Byte0="0" TEC_Control_Byte1="0" TEC_Control_Byte2="0" TEC_Control_Byte3="0" TEC_Control_Byte4="0" TEC_Control_Byte5="0" TEC_Control_Byte6="0" TEC_Control_Byte7="0" TEC_Control_Byte8="0" TEC_Control_Byte9="0" TEC_Current="0" TEC_Status="0" T_CH1="0" T_CH2="0" T_FPA1="2749" T_FPA2="2746" T_PE="2307" Test_Status="0" V25_LOSS_FLAG="0" V75_LOSS_FLAG="0" VDET_ANA_OVC="0" VDET_DIG_OVC="0" V_PE33="3474" Window1_End_Col="2047" Window1_End_Row="632" Window1_Start_Col="0" Window1_Start_Row="354" Window2_End_Col="2047" Window2_End_Row="966" Window2_Start_Col="0" Window2_Start_Row="712" Window3_End_Col="2047" Window3_End_Row="1302" Window3_Start_Col="0" Window3_Start_Row="1048" Window4_End_Col="2047" Window4_End_Row="1660" Window4_Start_Col="0" Window4_Start_Row="1409" Window5_End_Col="767" Window5_End_Row="208" Window5_Start_Col="640" Window5_Start_Row="200" Window6_End_Col="1407" Window6_End_Row="1858" Window6_Start_Col="1280" Window6_Start_Row="1850"/>
+    <DERIVED_HEADER_DATA Description="Derived data from HK">
+      <OnboardImageAcquisitionTime Time_Base="UTC">2016-11-22T15:45:50.984</OnboardImageAcquisitionTime>
+      <MissionPhase Phase_Definition="CaSSIS">MCO</MissionPhase>
+      <Filter Form="Acronym">BLU</Filter>
+      <PixelsPossiblySaturated Value="%">      0.00</PixelsPossiblySaturated>
+      <Expanded Flag="N/A">1</Expanded>
+      <ABSOLUTE_CALIBRATION Units="#/DN"> 1.77125e-005</ABSOLUTE_CALIBRATION></DERIVED_HEADER_DATA>
+    <GEOMETRIC_DATA Description="Geometric data from SPICE kernels">
+      <TARGET>Mars</TARGET>
+      <POINTING_RIGHT_ASCENSION Unit="deg (J2000)">248.9103</POINTING_RIGHT_ASCENSION>
+      <POINTING_DECLINATION Unit="deg (J2000)">-6.2186</POINTING_DECLINATION>
+      <HELIOCENTRIC_DISTANCE Unit="AU">1.3854278</HELIOCENTRIC_DISTANCE>
+      <MARSCENTRIC_DISTANCE Unit="km">8522.7</MARSCENTRIC_DISTANCE>
+      <GEOCENTRIC_DISTANCE Unit="AU">1.3848900</GEOCENTRIC_DISTANCE>
+      <PHASE_ANGLE_MARS Unit="deg">94.086</PHASE_ANGLE_MARS>
+      <PIXEL_SCALE_IMAGE_PLANE Unit="m/px">60.82</PIXEL_SCALE_IMAGE_PLANE>
+      <SOLAR_ELONGATION_ANGLE Unit="deg">85.911</SOLAR_ELONGATION_ANGLE>
+      <SUB_SPACECRAFT_LONGITUDE Unit="deg">164.6676</SUB_SPACECRAFT_LONGITUDE>
+      <SUB_SPACECRAFT_LATITUDE Unit="deg">-8.1837</SUB_SPACECRAFT_LATITUDE>
+      <TGO_OFF_NADIR_ANGLE Unit="deg">0.009</TGO_OFF_NADIR_ANGLE>
+      <CASSIS_OFF_NADIR_ANGLE Unit="deg">9.899</CASSIS_OFF_NADIR_ANGLE>
+      <LONGITUDE_IMAGE_CORNERS Unit="deg">(  149.596105,  149.554795,  149.264999,  149.304678)</LONGITUDE_IMAGE_CORNERS>
+      <LATITUDE_IMAGE_CORNERS Unit="deg">(  -9.885884,  -7.799439,  -7.803770,  -9.893033)</LATITUDE_IMAGE_CORNERS>
+      <PHASE_ANGLE_FILTER Unit="deg">     102.888</PHASE_ANGLE_FILTER>
+      <INCIDENCE_ANGLE_FILTER Unit="deg">      80.143</INCIDENCE_ANGLE_FILTER>
+      <EMISSION_ANGLE_FILTER Unit="deg">      24.636</EMISSION_ANGLE_FILTER>
+      <TGO_GROUND_TRACK_VELOCITY Unit="km/s">  0.5735</TGO_GROUND_TRACK_VELOCITY>
+      <TGO_GROUND_TRACK_VECTOR Unit="3 x km/s">  0.1578, -0.5494, -0.0470</TGO_GROUND_TRACK_VECTOR>
+      <PREDICTED_MAXIMUM_EXPOSURE_TIME Unit="ms">   423.6358</PREDICTED_MAXIMUM_EXPOSURE_TIME>
+      <PREDICTED_REQUIRED_REPETITION_FREQUENCY Unit="ms">    97605.7</PREDICTED_REQUIRED_REPETITION_FREQUENCY>
+      <SUB_CASSIS_LONGITUDE Unit="deg">  148.838162</SUB_CASSIS_LONGITUDE>
+      <SUB_CASSIS_LATITUDE Unit="deg">  -8.856727</SUB_CASSIS_LATITUDE>
+      <FORWARD_ROTATION_ANGLE_REQUIRED Unit="deg">   158.600</FORWARD_ROTATION_ANGLE_REQUIRED>
+      <SPICE_KERNEL_MISALIGNMENT_PREDICT Unit="deg">     1.235</SPICE_KERNEL_MISALIGNMENT_PREDICT>
+      <CASSIS_GROUND_TRACK_VELOCITY Unit="km/s">  0.1436</CASSIS_GROUND_TRACK_VELOCITY>
+      <CASSIS_GROUND_TRACK_VECTOR Unit="3 x km/s">  0.0743, -0.1229,  0.0001</CASSIS_GROUND_TRACK_VECTOR>
+      <CASSIS_GROUND_TRACK_FSA_VECTOR Unit="3 x Normalized"> -0.0194, -0.9019,  0.4314</CASSIS_GROUND_TRACK_FSA_VECTOR>
+      <LINE_OF_SIGHT_DISTANCE Unit="km">   5333.653</LINE_OF_SIGHT_DISTANCE>
+      <PIXEL_SCALE_SURFACE Unit="m/px">    67.4178</PIXEL_SCALE_SURFACE>
+      <Kernels_Used Unit="N/A">em16_tgo_cassis_scp_tel_20160314_20161019_s20160414_v01.bc,cassis_ck_p_160312_161127_170201.bc,em16_tgo_sc_fpp_009_01_20160314_20170207_s20170116_v01.bc,em16_tgo_v10.tf,em16_tgo_ops_v02.tf,rssd0002.tf,em16_tgo_cassis_v04.ti,naif0012.tls,PCK00010.TPC,de-403-masses.TPC,em16_tgo_step_20170116.tsc,em16_tgo_fpp_009_01_20160314_20170315_v01.bsp,em16_tgo_flp_001_01_20170314_20180402_v01.bsp,DE432s.BSP,mar097.BSP</Kernels_Used>
+    </GEOMETRIC_DATA>
+    <IMAGE_COMMAND Description="Derived from the command setting the parameter table for this image.">
+      <Parameter_Table_REF Parameter="ECSP0030">2</Parameter_Table_REF>
+      <T_exp Parameter="ECSP1000">300</T_exp>
+      <Num_exp Parameter="ECSP1001">30</Num_exp>
+      <Step_exp Parameter="ECSP1002">4000000</Step_exp>
+      <RIOC_Freq Parameter="ECSP1003">0</RIOC_Freq>
+      <Num_win Parameter="ECSP1004">6</Num_win>
+      <Bin_win1 Parameter="ECSP1005">0</Bin_win1>
+      <Bin_win2 Parameter="ECSP1006">0</Bin_win2>
+      <Bin_win3 Parameter="ECSP1007">0</Bin_win3>
+      <Bin_win4 Parameter="ECSP1008">0</Bin_win4>
+      <Bin_win5 Parameter="ECSP1009">0</Bin_win5>
+      <Bin_win6 Parameter="ECSP100A">0</Bin_win6>
+      <Win1_str Parameter="ECSP100B">2C4</Win1_str>
+      <Win1_end Parameter="ECSP100C">FFE4F2</Win1_end>
+      <Win2_str Parameter="ECSP100D">590</Win2_str>
+      <Win2_end Parameter="ECSP100E">FFE78E</Win2_end>
+      <Win3_str Parameter="ECSP100F">830</Win3_str>
+      <Win3_end Parameter="ECSP1010">FFEA2E</Win3_end>
+      <Win4_str Parameter="ECSP1011">B02</Win4_str>
+      <Win4_end Parameter="ECSP1012">FFECFE</Win4_end>
+      <Win5_str Parameter="ECSP1013">500190</Win5_str>
+      <Win5_end Parameter="ECSP1014">5FE1A2</Win5_end>
+      <Win6_str Parameter="ECSP1015">A00E74</Win6_str>
+      <Win6_end Parameter="ECSP1016">AFEE86</Win6_end>
+      <PE_test Parameter="ECSP1017">0</PE_test>
+      <Win1_CompR Parameter="ECSP1018">0</Win1_CompR>
+      <Win2_CompR Parameter="ECSP1019">0</Win2_CompR>
+      <Win3_CompR Parameter="ECSP101A">0</Win3_CompR>
+      <Win4_CompR Parameter="ECSP101B">0</Win4_CompR>
+      <Win5_CompR Parameter="ECSP101C">0</Win5_CompR>
+      <Win6_CompR Parameter="ECSP101D">0</Win6_CompR>
+      <TEC_start Parameter="ECSP101E">0</TEC_start>
+      <CRC Parameter="ECSP0006">56957</CRC>
+      <Unique_Identifier Parameter="Unique Identifier">100731832</Unique_Identifier>
+      <Coarse_Time Parameter="Coarse_Time">0</Coarse_Time>
+      <Fine_Time Parameter="Fine_Time">0</Fine_Time>
+      <Parameter_Table_REF Parameter="Parameter Table REF">2</Parameter_Table_REF>
+      <CRC Parameter="CRC">41079</CRC>
+      <Unique_Id_Decoded Parameter="Unique_Identifer_Decoded">06010bb8</Unique_Id_Decoded>
+    </IMAGE_COMMAND>
+  </CaSSIS_Header>
+
+  <Errors>
+    <ERROR_BLOCK>Listing</ERROR_BLOCK>
+  </Errors>
+
+  
+
+  
+
+  <File_Area_Observational>
+    <File>
+      <file_name>CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1</file_name>
+      <creation_date_time>2017-10-03T09:38:00</creation_date_time>
+      <comment>CaSSIS specific XML header</comment>
+      <created_file_name>D:\CaSSIS\data\MCO\161122_periapsis_orbit09\level1b\CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1</created_file_name>
+    </File>
+    <Array_2D_Image>
+      <axes>2</axes>
+      <Axis_Array>
+        <axis_name>Sample</axis_name>
+        <sequence_number>1</sequence_number>
+        <elements>2048</elements>
+      </Axis_Array>
+      <Axis_Array>
+        <axis_name>Line</axis_name>
+        <sequence_number>2</sequence_number>
+        <elements>252</elements>
+      </Axis_Array>
+      <Element_Array>
+        <data_type>IEEE754LSBSingle</data_type>
+        <idl_data_type>4</idl_data_type>
+        <order>First_Index_Fastest</order>
+        <unit>DN</unit>
+        <scaling_factor> 1.00</scaling_factor>
+        <offset> 0.00</offset>
+      </Element_Array>
+    </Array_2D_Image>
+  </File_Area_Observational>
+
+</Product_Observational>
