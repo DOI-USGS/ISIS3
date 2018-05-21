@@ -50,7 +50,7 @@ namespace Isis {
 
     // Providing a width of 0 makes pens cosmetic (i.e. always appear as 1 pixel on screen)
     if (cp->IsIgnored()) {
-      setPen(QPen(Qt::darkYellow, 0.0));
+      setPen(QPen(Qt::yellow, 0.0));
     }
     else if ( (cp->GetType() == ControlPoint::Fixed)
       || (cp->GetType() == ControlPoint::Constrained) ) {

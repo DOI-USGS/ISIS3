@@ -37,7 +37,7 @@ namespace Isis {
    *                           center crosshair in red.  Fixes #5007, #5008.
    *   @history 2018-05-01 Kaitlyn Lee - Changed colors of control points to match qnet.
    *                           Colors Changed: free from blue to darkGreen, locked from magenta
-   *                           to darkGreen, ignored from red to darkYellow,
+   *                           to darkGreen, ignored from red to yellow,
    *                           and constrained (was dark green) and fixed (was green)
    *                           are now both represented with magenta. Fixes #5401.
    *
