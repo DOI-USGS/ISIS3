@@ -19,6 +19,8 @@ using namespace Isis;
 
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
 void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer);
+bool translateMappingLabel(FileName inputLabel, Cube *outputCube);
+bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
 void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
 
 void IsisMain() {
@@ -47,31 +49,28 @@ void IsisMain() {
     QString transRawFile = "/translations/tgoCassisInstrument.trn";
     QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
 
+    
+            
     try {
       translateLabels(xmlFileName, outputCube, transRawFile); 
     } 
     catch (IException &e) {
-      translateLabels(xmlFileName, outputCube, transExportFile);
-      
-      // Try to translate a mapping group
-      try {
-        PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
-        QString missionDir = (QString) dataDir["Tgo"];
-        FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
-
-        // Get the translation manager ready for translating the mapping label
-
-        XmlToPvlTranslationManager labelXlater(xmlFileName, mapTransFile.expanded());
-
-        // Pvl output label
-        Pvl *outputLabel = outputCube->label();
-        labelXlater.Auto(*(outputLabel));
-      } 
-      catch (IException &e) {
-        Pvl *outputLabel = outputCube->label();
-        if(outputLabel->hasGroup("Mapping")) {
-          outputLabel->deleteGroup("Mapping"); 
+      if (translateMappingLabel(xmlFileName, outputCube)) {
+        if (!translateMosaicLabel(xmlFileName, outputCube)) {
+          translateLabels(xmlFileName, outputCube, transExportFile);
         }
+        else {
+          Pvl *outputLabel = outputCube->label();
+          if(outputLabel->hasGroup("Instrument")) {
+            outputLabel->deleteGroup("Instrument"); 
+          }
+          if(outputLabel->hasGroup("Archive")) {
+            outputLabel->deleteGroup("Archive"); 
+          }
+        }
+      }
+      else {
+        translateLabels(xmlFileName, outputCube, transExportFile);
       }
     }
 
@@ -160,6 +159,94 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
   str = labelXlater.Translate("CoreMultiplier");
   importer.SetMultiplier(toDouble(str));
 }
+
+
+bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
+  //Translate the Mapping Group
+  try {
+    PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
+    QString missionDir = (QString) dataDir["Tgo"];
+    FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
+
+    // Get the translation manager ready for translating the mapping label
+
+    XmlToPvlTranslationManager labelXMappinglater(xmlFileName, mapTransFile.expanded());
+
+    // Pvl output label
+    Pvl *outputLabel = outputCube->label();
+    labelXMappinglater.Auto(*(outputLabel));
+  }
+  catch (IException &e) {
+    Pvl *outputLabel = outputCube->label();
+    if(outputLabel->hasGroup("Mapping")) {
+      outputLabel->deleteGroup("Mapping"); 
+    }
+    return false;
+  }
+  return true;
+}
+
+
+bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
+  //Now retrieve the logical_identifier to see if this is a mosaic
+  QDomDocument xmlDoc;
+    
+  QFile xmlFile(xmlFileName.expanded());
+  if ( !xmlFile.open(QIODevice::ReadOnly) ) {
+    QString msg = "Could not open label file [" + xmlFileName.expanded() +
+                  "].";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+  QString errmsg;
+  int errline, errcol;
+  if ( !xmlDoc.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
+    xmlFile.close();
+    QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+        + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+        + "], message: " + errmsg;
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+  xmlFile.close();
+  
+  QDomElement inputParentElement = xmlDoc.documentElement();
+  if (!inputParentElement.isNull()) {
+    inputParentElement = inputParentElement.firstChildElement("Identification_Area");
+    if (!inputParentElement.isNull()) {
+      QDomElement logicalId = inputParentElement.firstChildElement("logical_identifier");
+      if (!logicalId.isNull()) {
+        QString logicalIdText = logicalId.text();
+        QStringList logicalIdStringList = logicalIdText.split(":");
+        if (logicalIdStringList.contains("data_mos")) {
+          try {
+            PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
+            QString missionDir = (QString) dataDir["Tgo"];
+            FileName mosaicTransFile(missionDir + "/translations/tgoCassisMosaic.trn");
+
+            // Get the translation manager ready for translating the mapping label
+
+            XmlToPvlTranslationManager labelXMosaiclater(xmlFileName, mosaicTransFile.expanded());
+
+            // Pvl output label
+            Pvl *outputLabel = outputCube->label();
+            labelXMosaiclater.Auto(*(outputLabel));
+            return true;
+          }
+          catch (IException &e) {
+            Pvl *outputLabel = outputCube->label();
+            if(outputLabel->hasGroup("Mosaic")) {
+              outputLabel->deleteGroup("Mosaic"); 
+            }
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
 
 /**
  * Translate instrument, bandbin, and archive info from xml label into ISIS3 
