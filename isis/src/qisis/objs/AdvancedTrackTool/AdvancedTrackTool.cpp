@@ -238,7 +238,6 @@ namespace Isis {
       QList< QList<QString> >::iterator iter;
       for (iter = checkBoxItems.begin(); iter != checkBoxItems.end(); ++iter) {
         QList<QString> currentList = *iter;
-
         QList<QString> splitHeader = currentList[0].split(":");
         QList<QString>::iterator headerIter;
         for (headerIter = splitHeader.begin(); headerIter != splitHeader.end(); ++headerIter) {
@@ -396,36 +395,6 @@ namespace Isis {
         }
         else {
           p_tableWin->table()->item(row, getIndex("Oblique Pixel Resolution"))->setText("");
-        }
-
-        // Write out columns, oblique sample resolution, only if set image succeeds
-        double obliqueSRes = cvp->camera()->ObliqueSampleResolution();
-        if (obliqueSRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Sample Resolution"))->
-                               setText(QString::number(obliqueSRes));
-        }
-        else {
-          p_tableWin->table()->item(row, getIndex("Oblique Sample Resolution"))->setText("");
-        }
-
-        // Write out columns, oblique line resolution, only if set image succeeds
-        double obliqueLRes = cvp->camera()->ObliqueLineResolution();
-        if (obliqueLRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Line Resolution"))->
-                               setText(QString::number(obliqueLRes));
-        }
-        else {
-          p_tableWin->table()->item(row, getIndex("Oblique Line Resolution"))->setText("");
-        }
-
-        // Write out columns, oblique detector resolution, only if set image succeeds
-        double obliqueDRes = cvp->camera()->ObliqueDetectorResolution();
-        if (obliqueDRes != Isis::Null) {
-          p_tableWin->table()->item(row, getIndex("Oblique Detector Resolution"))->
-                               setText(QString::number(obliqueDRes));
-        }
-        else {
-          p_tableWin->table()->item(row, getIndex("Oblique Detector Resolution"))->setText("");
         }
 
         // Write out columns photometric angle values, only if set image succeeds

@@ -85,12 +85,11 @@ namespace Isis {
    *                          before it attempts to record a point so that a table is created
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
-   *  @history 2018-03-07 Kaitlyn Lee - Added columns for oblique pixel, sample, line,
-   *                          and detector resolutions. Added checkBoxItems and loop to add
-   *                          the elments to the AdvancedTrackTool, instead of hardcoded method
-   *                          calls. Instead of using the enum, I added a method getIndex()
-   *                          that calculates what column the element should be added to.
-   *                          Fixes #4100.
+   *  @history 2018-05-22 Kaitlyn Lee - Added column for oblique pixel resolution. Added
+   *                          checkBoxItems and loop to add elments to the AdvancedTrackTool,
+   *                          instead of hardcoded method calls. Instead of using the enum,
+   *                          I added a method getIndex() that calculates what column the 
+   *                          element should be added to. Fixes #4100.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -157,9 +156,6 @@ namespace Isis {
                          "Right Ascension and Declination"}) <<
         QList<QString>({"Resolution", "false", "Resolution", ""}) <<
         QList<QString>({"Oblique Pixel Resolution", "false", "Oblique Pixel Res", ""}) <<
-        QList<QString>({"Oblique Sample Resolution", "false", "Oblique Sample Res", ""}) <<
-        QList<QString>({"Oblique Line Resolution", "false", "Oblique Line Res", ""}) <<
-        QList<QString>({"Oblique Detector Resolution", "false", "Oblique Detector Res", ""}) <<
         QList<QString>({"Phase", "false", "Phase", ""}) <<
         QList<QString>({"Incidence", "false", "Incidence", ""}) <<
         QList<QString>({"Emission", "false", "Emission", ""}) <<
