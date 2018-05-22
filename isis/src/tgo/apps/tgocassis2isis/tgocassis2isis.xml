@@ -115,6 +115,9 @@
     <change name="Kristin Berry and Makayla Shepherd" date="2018-05-15">
      Updated to ingest Mapping groups from images have been exported using tgocassisrdrgen. Fixes #5418.
     </change>
+    <change name="Kristin Berry and Makayla Shepherd" date="2018-05-22">
+     Updated to ingest mosaics exported from tgocassisrdrgen #5418.
+    </change>
   </history>
 
   <category>

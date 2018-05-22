@@ -161,6 +161,13 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
 }
 
 
+/**
+ * Translate the cartographic info from the xml.
+ * 
+ * @param xmlFileName The xml label file name for the input image.
+ * @param outputCube Pointer to output cube where ISIS3 labels will be added and 
+ *                   updated.
+ */
 bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
   //Translate the Mapping Group
   try {
@@ -187,6 +194,13 @@ bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
 }
 
 
+/**
+ * Translate the Mosaic group info from the xml.
+ * 
+ * @param xmlFileName The xml label file name for the input image.
+ * @param outputCube Pointer to output cube where ISIS3 labels will be added and 
+ *                   updated.
+ */
 bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
   //Now retrieve the logical_identifier to see if this is a mosaic
   QDomDocument xmlDoc;
