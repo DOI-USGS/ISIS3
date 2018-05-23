@@ -49,8 +49,6 @@ void IsisMain() {
     QString transRawFile = "/translations/tgoCassisInstrument.trn";
     QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
 
-    
-            
     try {
       translateLabels(xmlFileName, outputCube, transRawFile); 
     } 
@@ -236,14 +234,20 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
           try {
             PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
             QString missionDir = (QString) dataDir["Tgo"];
-            FileName mosaicTransFile(missionDir + "/translations/tgoCassisMosaic.trn");
-
-            // Get the translation manager ready for translating the mapping label
-
-            XmlToPvlTranslationManager labelXMosaiclater(xmlFileName, mosaicTransFile.expanded());
+            
+            FileName bandBinTransFile(missionDir + "/translations/tgoCassisBandBin.trn");
+            // Get the translation manager ready for translating the band bin label
+            XmlToPvlTranslationManager labelXBandBinlater(xmlFileName, bandBinTransFile.expanded());
 
             // Pvl output label
             Pvl *outputLabel = outputCube->label();
+            labelXBandBinlater.Auto(*(outputLabel));
+            
+            FileName mosaicTransFile(missionDir + "/translations/tgoCassisMosaic.trn");
+
+            // Get the translation manager ready for translating the mapping label
+            XmlToPvlTranslationManager labelXMosaiclater(xmlFileName, mosaicTransFile.expanded());
+
             labelXMosaiclater.Auto(*(outputLabel));
             return true;
           }
@@ -251,6 +255,9 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
             Pvl *outputLabel = outputCube->label();
             if(outputLabel->hasGroup("Mosaic")) {
               outputLabel->deleteGroup("Mosaic"); 
+            }
+            if(outputLabel->hasGroup("BandBin")) {
+              outputLabel->deleteGroup("BandBin"); 
             }
             return false;
           }
