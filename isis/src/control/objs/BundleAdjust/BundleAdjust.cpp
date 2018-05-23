@@ -998,7 +998,10 @@ namespace Isis {
   /**
    * Create a BundleSolutionInfo containing the settings and results from the bundle adjustment.
    *
-   * @return @b BundleSolutionInfo A container with solve information from the adjustment.
+   * @return @b BundleSolutionInfo A container with solve information from the adjustment. NOTE:
+   *            Caller takes ownership and is responsible for memory management of returned
+   *            BundleSolutionInfo raw pointer.
+   *
    */
   BundleSolutionInfo *BundleAdjust::bundleSolveInformation() {
     BundleSolutionInfo *bundleSolutionInfo = new BundleSolutionInfo(m_bundleSettings,
