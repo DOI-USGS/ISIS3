@@ -52,7 +52,7 @@ namespace Isis {
 
 
   /**
-   * Constructor. Creates a BundleSolutionInfo.
+   * Constructor. Creates a BundleSolutionInfo from disk.
    *
    * @param project The current project
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
@@ -74,29 +74,6 @@ namespace Isis {
 
     xmlReader->setErrorHandler(new XmlHandler(this, project));
     xmlReader->pushContentHandler(new XmlHandler(this, project));
-  }
-
-
-  /**
-   * Constructor. Creates a BundleSolutionInfo.
-   *
-   * @param src BundleSolutionInfo where the settings and BundleResults are read from.
-   */
-  BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &src)
-      : m_id(new QUuid(QUuid::createUuid())),
-        m_name(src.m_name),
-        m_runTime(src.m_runTime),
-        m_inputControlNetFileName(new FileName(src.m_inputControlNetFileName->expanded())),
-        m_settings(new BundleSettings(*src.m_settings)),
-        m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*src.m_images)),
-        m_adjustedImages(new QList<ImageList *>(*src.m_adjustedImages)),
-        m_txtBundleOutputFilename(src.m_txtBundleOutputFilename),
-        m_csvSavedImagesFilename(src.m_csvSavedImagesFilename),
-        m_csvSavedPointsFilename(src.m_csvSavedPointsFilename),
-        m_csvSavedResidualsFilename(src.m_csvSavedResidualsFilename) {
-
-    m_outputControl = new Control(src.m_outputControl->fileName());
   }
 
 
@@ -126,50 +103,6 @@ namespace Isis {
     //   delete m_adjustedImages;
     //   m_adjustedImages = NULL;
     // }
-  }
-
-
-  /**
-   * Creates an equal operator for BundleSolutionInfos.
-   *
-   * @param src the BundleSolutionInfo that we are comparing the current BundleSolutionInfo to.
-   *
-   * @return @b BundleSolutionInfo Reference to the current BundleSolutionInfo
-   */
-  BundleSolutionInfo &BundleSolutionInfo::operator=(const BundleSolutionInfo &src) {
-
-    if (&src != this) {
-
-      delete m_id;
-      m_id = new QUuid(QUuid::createUuid());
-
-      m_runTime = src.m_runTime;
-
-      if (src.m_name == "" || src.m_name == src.m_runTime) {
-        m_name = m_runTime;
-      }
-      else {
-        m_name = src.m_name;
-      }
-
-      delete m_inputControlNetFileName;
-      m_inputControlNetFileName = new FileName(src.m_inputControlNetFileName->expanded());
-
-      delete m_outputControl;
-      m_outputControl = new Control(src.m_outputControl->fileName());
-
-      m_settings = src.m_settings;
-
-      delete m_statisticsResults;
-      m_statisticsResults = new BundleResults(*src.m_statisticsResults);
-
-      delete m_images;
-      m_images = new QList<ImageList *>(*src.m_images);
-
-      delete m_adjustedImages;
-      m_adjustedImages = new QList<ImageList *>(*src.m_adjustedImages);
-    }
-    return *this;
   }
 
 
@@ -1577,6 +1510,8 @@ namespace Isis {
 
     // TODO: comment below not clear, why is this done?
     // This is done for unitTest which has no Project
+    // SHOULD WE BE CREATING A SERIALIZED PROJECT AS INPUT TO THIS UNIT TEST?
+    QString relativePath;
     QString relativeBundlePath;
     FileName bundleSolutionInfoRoot;
 
@@ -1633,7 +1568,14 @@ namespace Isis {
         }
       }
 
-      // Create relative path for bundleSolutionInfo
+      // Create relativePath
+      relativePath = m_inputControlNetFileName->expanded().remove(project->newProjectRoot());
+      // Get rid of any preceding "/" , but add on ending "/"
+      if (relativePath.startsWith("/")) {
+        relativePath.remove(0,1);
+      }
+
+      // Create relativeBundlePath for bundleSolutionInfo
       relativeBundlePath = newPath.remove(project->newProjectRoot());
       // Get rid of any preceding "/" , but add on ending "/"
       if (relativeBundlePath.startsWith("/")) {
@@ -1650,12 +1592,6 @@ namespace Isis {
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("name", m_name);
     stream.writeTextElement("runTime", runTime());
-
-    QString relativePath = m_inputControlNetFileName->expanded().remove(project->newProjectRoot());
-    // Get rid of any preceding "/" , but add on ending "/"
-    if (relativePath.startsWith("/")) {
-      relativePath.remove(0,1);
-    }
 
     stream.writeTextElement("inputFileName",
                             relativePath);
