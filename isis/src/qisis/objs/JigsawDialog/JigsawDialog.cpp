@@ -109,7 +109,7 @@ namespace Isis {
            this, SLOT(rejectBundleResults()));
 
     m_bundleAdjust = NULL;
-    m_bundleSolutionInfo = NULL;
+//    m_bundleSolutionInfo = NULL;
 
     m_bRunning = false;
 
@@ -138,9 +138,9 @@ namespace Isis {
    * Destructor.
    */
   JigsawDialog::~JigsawDialog() {
-    if (m_bundleSolutionInfo) {
-      delete m_bundleSolutionInfo;
-    }
+//    if (m_bundleSolutionInfo) {
+//      delete m_bundleSolutionInfo;
+//    }
     if (m_bundleAdjust) {
       delete m_bundleAdjust;
       m_bundleAdjust = NULL;
@@ -148,7 +148,7 @@ namespace Isis {
     if (m_ui) {
       delete m_ui;
     }
-    m_bundleSolutionInfo = NULL;
+//    m_bundleSolutionInfo = NULL;
     m_ui = NULL;
   }
 
@@ -463,7 +463,8 @@ namespace Isis {
     }
 
     // Tell the project about the BundleSolutionInfo
-    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+//    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+    m_project->addBundleSolutionInfo(m_bundleSolutionInfo);
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
@@ -501,8 +502,8 @@ namespace Isis {
     // Cleanup the results (bundle solution info)
     // How does this affect m_bundleSettings or m_bundleAdjustment?
     // How does this affect using the last (most recent) settings for the run?
-    delete m_bundleSolutionInfo;
-    m_bundleSolutionInfo = NULL;
+//    delete m_bundleSolutionInfo;
+//    m_bundleSolutionInfo = NULL;
   }
 
 

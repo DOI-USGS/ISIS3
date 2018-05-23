@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -1436,7 +1436,7 @@
          </widget>
          <widget class="QWidget" name="maximumLikelihoodTab">
           <attribute name="title">
-           <string>Maximum Liklihood</string>
+           <string>Maximum Likelihood</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="0" column="0">
@@ -1563,7 +1563,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Maximum Likelihood Estimator Model 2</string>
+                <string>Maximum &amp;Likelihood Estimator Model 2</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel2ComboBox</cstring>
