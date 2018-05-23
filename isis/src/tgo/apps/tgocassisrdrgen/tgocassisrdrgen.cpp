@@ -53,13 +53,15 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
+  // If isMosaic is true, targetGroup will reference the Mosaic group.
+  // Else, targetGroup will reference the Instrument group.
+  PvlGroup &targetGroup = isMosaic ? label->findObject("IsisCube").findGroup("Mosaic")
+                                   : label->findObject("IsisCube").findGroup("Instrument");
+
   // Add the ProductId keyword for translation. If a product id is not specified
   // by the user, set it to the Observation Id.
   // This is added before the translation instead of adding it to the exported xml
   // because of the ease of editing pvl vs xml.
-  PvlGroup &targetGroup = isMosaic ? label->findObject("IsisCube").findGroup("Mosaic")
-                                   : label->findObject("IsisCube").findGroup("Instrument");
-
   PvlKeyword productId = PvlKeyword("ProductId");
   if ( ui.WasEntered("PRODUCTID") ) {
     productId.setValue( ui.GetString("PRODUCTID") );
