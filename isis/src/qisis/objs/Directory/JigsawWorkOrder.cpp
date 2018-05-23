@@ -133,7 +133,6 @@ namespace Isis {
     //     success = false;
     //   }
     // }
-
     return success;
   }
 
