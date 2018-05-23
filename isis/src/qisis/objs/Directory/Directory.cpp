@@ -72,6 +72,7 @@
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
 #include "ImportTemplateWorkOrder.h"
+#include "JigsawDialog.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
@@ -927,6 +928,17 @@ namespace Isis {
 
     result->setWindowTitle( tr("%1").arg( FileName(currentTemplate->fileName()).name() ) );
     result->setObjectName( result->windowTitle() );
+
+    emit newWidgetAvailable(result);
+
+    return result;
+  }
+
+  JigsawDialog *Directory::addJigsawView() {
+    JigsawDialog *result = new JigsawDialog(m_project);
+
+    result->setAttribute(Qt::WA_DeleteOnClose);
+    result->show();
 
     emit newWidgetAvailable(result);
 

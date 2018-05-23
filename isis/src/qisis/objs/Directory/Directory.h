@@ -59,6 +59,7 @@ namespace Isis {
   class Footprint2DView;
   class HistoryTreeWidget;
   class ImageFileListWidget;
+  class JigsawDialog;
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
@@ -253,6 +254,7 @@ namespace Isis {
       CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
+      JigsawDialog *addJigsawView();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);

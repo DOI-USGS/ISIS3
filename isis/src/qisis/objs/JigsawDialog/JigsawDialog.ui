@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>JigsawDialog</class>
- <widget class="QDialog" name="JigsawDialog">
+ <widget class="QFrame" name="JigsawDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>540</width>
-    <height>300</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Jigsaw</string>
@@ -17,9 +21,9 @@
    <iconset>
     <normaloff>icons/jigsaw.png</normaloff>icons/jigsaw.png</iconset>
   </property>
-  <property name="modal">
+<!--   <property name="modal">
    <bool>false</bool>
-  </property>
+  </property> -->
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
@@ -164,8 +168,8 @@
   </widget>
  </widget>
  <resources/>
- <connections>
-  <connection>
+ <connections/>
+<!--   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
    <receiver>JigsawDialog</receiver>
@@ -197,5 +201,5 @@
     </hint>
    </hints>
   </connection>
- </connections>
+ </connections> -->
 </ui>

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QDir>
+#include <QFrame>
 #include <QPointer>
 #include <QWidget>
 
@@ -84,7 +85,7 @@ namespace Isis {
    *                           acceptBundleResults method to take output control network filename
    *                           from the JigsawSetupDialog.
    */
-  class JigsawDialog : public QDialog {
+  class JigsawDialog : public QFrame {
     Q_OBJECT
 
   public:
