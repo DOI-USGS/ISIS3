@@ -171,8 +171,8 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
-<!--   <connection>
+ <connections>
+  <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
    <receiver>JigsawDialog</receiver>
@@ -204,5 +204,5 @@
     </hint>
    </hints>
   </connection>
- </connections> -->
+ </connections>
 </ui>
