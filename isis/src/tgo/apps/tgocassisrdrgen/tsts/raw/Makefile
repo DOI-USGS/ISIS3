@@ -1,7 +1,7 @@
 # Verify that we can export a non-projected and non-mosaiked cube as a TGO CaSSIS image.
 # Test that we can override the product id with the PRODUCTID parameter.
 #
-# history 2018-05-18 Kaitlyn Lee - Changed input cube with an one that has the
+# history 2018-05-18 Kaitlyn Lee - Changed input cube with one that has the
 # 				ObservationId. Added the removal of the modification_date and ISIS version.
 # 				Added testing for PRODUCTID parameter.
 
@@ -13,7 +13,7 @@ commands:
 	$(APPNAME) from=$(INPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \
 	           to=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.img \
 		   > /dev/null;
-			 
+
 	# Reingest output and make sure the cubes are the same
 	raw2isis from=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.img \
 					 to=$(OUTPUT)/CAS-MCO-2016-11-22T15.45.50.984-BLU-03000-B1.cub \

@@ -33,6 +33,11 @@
       Added parameter PRODUCTID to set the ProductId keyword. If the product id is
       not specified by the user, set the ProductId keyword to the observation id.
     </change>
+    <change name="Kaitlyn Lee" date="2018-05-21">
+      Added the check to see if the input cube is a mosaic. If it is, instead of
+      the Instrument group, the cube will have a Mosaic group. So, the ProductId
+      will now be written to the Mosaic group.
+    </change>
   </history>
 
   <category>
