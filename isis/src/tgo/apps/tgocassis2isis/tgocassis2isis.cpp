@@ -323,9 +323,15 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   archiveXlater.Auto(*(outputLabel));
   subXlater.Auto(*(outputLabel));
 
-  // Create YearDoy keyword in Archive group
-  iTime stime(outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
-
+  // Remove trailing "Z" from PDS4 .xml (on re-ingestion) and create YearDoy keyword in Archive group
+  PvlKeyword *startTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"];
+  QString startTimeString = startTime[0];
+  if (QString::compare(startTimeString.at(startTimeString.size() - 1), "Z", Qt::CaseInsensitive) == 0){
+    startTimeString = startTimeString.left(startTimeString.length() - 1);
+    startTime->setValue(startTimeString);
+  }
+  iTime stime(startTimeString);
+  
   PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
                                                   
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
