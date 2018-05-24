@@ -101,12 +101,12 @@ namespace Isis {
     m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
     m_ui->buttonBox->addButton(m_close, QDialogButtonBox::AcceptRole);
 
-    // // Accept will handle saving the results.
-    // connect(m_accept, SIGNAL(clicked(bool)),
-    //        this, SLOT(acceptBundleResults()));
-    // // Reject will handle discarding the results.
-    // connect(m_reject, SIGNAL(clicked(bool)),
-    //        this, SLOT(rejectBundleResults()));
+    // Accept will handle saving the results.
+    connect(m_accept, SIGNAL(clicked(bool)),
+           this, SLOT(acceptBundleResults()));
+    // Reject will handle discarding the results.
+    connect(m_reject, SIGNAL(clicked(bool)),
+           this, SLOT(rejectBundleResults()));
 
     m_bundleAdjust = NULL;
     m_bundleSolutionInfo = NULL;
