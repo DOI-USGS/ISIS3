@@ -86,6 +86,7 @@ namespace Isis {
     m_close = new QPushButton(tr("&Close"));
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
+    m_ui->JigsawRunButton->setEnabled(false);
     m_close->setEnabled(true);
 
     // Add tool tips to the buttons
@@ -180,6 +181,7 @@ namespace Isis {
       m_bundleSettings = setupdlg.bundleSettings();
       // The settings have been modified, might be misleading to keep this check after setup.
       m_ui->useLastSettings->setChecked(false);
+      m_ui->JigsawRunButton->setEnabled(true);
     }
   }
 
