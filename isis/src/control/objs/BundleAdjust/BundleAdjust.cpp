@@ -275,9 +275,8 @@ namespace Isis {
     m_bundleSettings = bundleSettings;
 
     m_abort = false;
-    Progress progress;
     try {
-      m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
+      m_controlNet = ControlNetQsp( new ControlNet(control.fileName()) );
     }
     catch (IException &e) {
       throw;
@@ -551,8 +550,9 @@ namespace Isis {
    *                           printed to stdout. References #4313.
    */
   bool BundleAdjust::validateNetwork() {
+     
     outputBundleStatus("\nValidating network...");
-
+    
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
     int numObservations = m_bundleObservations.size();
@@ -577,7 +577,7 @@ namespace Isis {
     }
 
     outputBundleStatus("Validation complete!...");
-
+    
     return true;
   }
 
@@ -803,7 +803,9 @@ namespace Isis {
 
         // solve the system
         if (!solveSystem()) {
-          printf("solve failed!\n");
+          if (QCoreApplication::applicationName() != "ipce") { 
+            printf("solve failed!\n");
+          }
           m_bundleResults.setConverged(false);
           break;
         }
@@ -958,7 +960,11 @@ namespace Isis {
 
       if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
         clock_t errorPropStartClock = clock();
-        printf("Starting Error Propagation");
+        
+        if (QCoreApplication::applicationName() != "ipce") { 
+          printf("Starting Error Propagation");
+        }
+        
         errorPropagation();
         emit statusUpdate("\n\nError Propagation Complete");
         clock_t errorPropStopClock = clock();
@@ -1067,8 +1073,10 @@ namespace Isis {
     int pointIndex = 0;
     int num3DPoints = m_bundleControlPoints.size();
 
-    printf("\n");
-
+    if (QCoreApplication::applicationName() != "ipce") { 
+      printf("\n");
+    }
+    
     for (int i = 0; i < num3DPoints; i++) {
 
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -1652,7 +1660,9 @@ namespace Isis {
                                                   -1, CHOLMOD_REAL, &m_cholmodCommon);
 
       if ( !m_cholmodTriplet ) {
-        printf("Triplet allocation failure");
+        if (QCoreApplication::applicationName() != "ipce") { 
+          printf("Triplet allocation failure");
+        }
         return false;
       }
 
@@ -1673,7 +1683,9 @@ namespace Isis {
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
 
       if ( !normalsColumn ) {
-        printf("SparseBlockColumnMatrix retrieval failure at column %d", columnIndex);
+        if (QCoreApplication::applicationName() != "ipce") { 
+          printf("SparseBlockColumnMatrix retrieval failure at column %d", columnIndex);
+        }
         return false;
       }
 
@@ -1692,9 +1704,11 @@ namespace Isis {
 
         LinearAlgebra::Matrix *normalsBlock = it.value();
         if ( !normalsBlock ) {
-          printf("matrix block retrieval failure at column %d, row %d", columnIndex, rowIndex);
-          printf("Total # of block columns: %d", numBlockcolumns);
-          printf("Total # of blocks: %d", m_sparseNormals.numberOfBlocks());
+          if (QCoreApplication::applicationName() != "ipce") { 
+            printf("matrix block retrieval failure at column %d, row %d", columnIndex, rowIndex);
+            printf("Total # of block columns: %d", numBlockcolumns);
+            printf("Total # of blocks: %d", m_sparseNormals.numberOfBlocks());
+          }
           return false;
         }
 
@@ -2465,17 +2479,23 @@ namespace Isis {
         medianDev = residuals[midpointIndex];
       }
 
-      std::cout << "median deviation: " << medianDev << std::endl;
-
+      if (QCoreApplication::applicationName() != "ipce") { 
+        std::cout << "median deviation: " << medianDev << std::endl;
+      }
+      
       mad = 1.4826 * medianDev;
 
-      std::cout << "mad: " << mad << "\n";
-
+      if (QCoreApplication::applicationName() != "ipce") { 
+        std::cout << "mad: " << mad << "\n";
+      }
+      
       m_bundleResults.setRejectionLimit(median
                                         + m_bundleSettings->outlierRejectionMultiplier() * mad);
 
-      std::cout << "Rejection Limit: " << m_bundleResults.rejectionLimit() << std::endl;
-
+      if (QCoreApplication::applicationName() != "ipce") { 
+        std::cout << "Rejection Limit: " << m_bundleResults.rejectionLimit() << std::endl;
+      }
+      
       return true;
   }
 
@@ -2526,7 +2546,9 @@ namespace Isis {
 
           // was it previously rejected?
           if ( measure->isRejected() ) {
-            printf("Coming back in: %s\r",point->id().toLatin1().data());
+            if (QCoreApplication::applicationName() != "ipce") { 
+              printf("Coming back in: %s\r",point->id().toLatin1().data());
+            }
             numComingBack++;
             m_controlNet->DecrementNumberOfRejectedMeasuresInImage(measure->cubeSerialNumber());
           }
@@ -2575,7 +2597,9 @@ namespace Isis {
       // do we still have sufficient remaining observations for this 3D point?
       if ( ( numMeasures-numRejected ) < 2 ) {
           point->setRejected(true);
-          printf("Rejecting Entire Point: %s\r",point->id().toLatin1().data());
+          if (QCoreApplication::applicationName() != "ipce") { 
+            printf("Rejecting Entire Point: %s\r",point->id().toLatin1().data());
+          }
       }
       else
           point->setRejected(false);
@@ -2584,12 +2608,17 @@ namespace Isis {
 
     int numberRejectedObservations = 2*totalNumRejected;
 
-    printf("\nRejected Observations:%10d (Rejection Limit:%12.5lf)\n",
+    if (QCoreApplication::applicationName() != "ipce") { 
+      printf("\nRejected Observations:%10d (Rejection Limit:%12.5lf)\n",
             numberRejectedObservations, usedRejectionLimit);
+    }
+    
     m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
 
-    std::cout << "Measures that came back: " << numComingBack << "\n" << std::endl;
-
+    if (QCoreApplication::applicationName() != "ipce") { 
+      std::cout << "Measures that came back: " << numComingBack << "\n" << std::endl;
+    }
+    
     return true;
   }
 
@@ -2659,8 +2688,10 @@ namespace Isis {
     int numObjectPoints = m_bundleControlPoints.size();
 
     std::string currentTime = iTime::CurrentLocalTime().toLatin1().data();
-    printf("     Time: %s\n\n", currentTime.c_str());
-
+    
+    if (QCoreApplication::applicationName() != "ipce") { 
+      printf("     Time: %s\n\n", currentTime.c_str());
+    }
     // create and initialize array of 3x3 matrices for all object points
     std::vector< symmetric_matrix<double> > pointCovariances(numObjectPoints,
                                                              symmetric_matrix<double>(3));
@@ -2799,9 +2830,10 @@ namespace Isis {
 
         // only update point every 100 points
         if (j%100 == 0) {
+          if (QCoreApplication::applicationName() != "ipce") { 
             printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", i+1,
                    numBlockColumns,  j+1, numObjectPoints);
-
+          }
             emit iterationUpdate(i+1, j+1);
         }
 
@@ -2881,10 +2913,16 @@ namespace Isis {
     // free b (right-hand side vector
     cholmod_free_dense(&b,&m_cholmodCommon);
 
-    printf("\n\n");
+    if (QCoreApplication::applicationName() != "ipce") { 
+      printf("\n\n");
+    }
+    
     currentTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
-    printf("\rFilling point covariance matrices: Time %s", currentTime.c_str());
-    printf("\n\n");
+    
+    if (QCoreApplication::applicationName() != "ipce") { 
+      printf("\rFilling point covariance matrices: Time %s", currentTime.c_str());
+      printf("\n\n");
+    }
 
     // now loop over points again and set final covariance stuff
     int pointIndex = 0;
@@ -2897,8 +2935,10 @@ namespace Isis {
       }
 
       if (j%100 == 0) {
-        printf("\rError Propagation: Filling point covariance matrices %8d of %8d\r",j+1,
-               numObjectPoints);
+        if (QCoreApplication::applicationName() != "ipce") { 
+          printf("\rError Propagation: Filling point covariance matrices %8d of %8d\r",j+1,
+                 numObjectPoints);
+        }
       }
 
       // get corresponding point covariance matrix
@@ -3113,8 +3153,10 @@ namespace Isis {
    *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
-    status += "\n";
-    printf("%s", status.toStdString().c_str());
+    if (QCoreApplication::applicationName() != "ipce") { 
+      status += "\n";
+      printf("%s", status.toStdString().c_str());
+    }
   }
 
 
