@@ -412,7 +412,9 @@ namespace Isis {
           projectImage->relocateDnData(FileName(destination).name());
         }
 
-        //  Set new ecub to readOnly
+        //  Set new ecub to readOnly.  When closing cube, the labels were being re-written because
+        // the cube was read/write. This caused a segfault when imported large number of images
+        // because of a label template file being opened too many times. 
         projectImage->reopen();
 
         delete input;

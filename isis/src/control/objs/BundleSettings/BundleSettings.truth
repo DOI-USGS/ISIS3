@@ -120,7 +120,7 @@ Testing mutator methods...
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="Yes" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="Yes" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="1000.0" longitude="2000.0" radius="3000.0"/>
         <outlierRejectionOptions rejection="Yes" multiplier="4.0"/>
         <convergenceCriteriaOptions convergenceCriteria="ParameterCorrections" threshold="0.25" maximumIterations="26"/>
@@ -170,7 +170,7 @@ Testing mutator methods...
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
         <outlierRejectionOptions rejection="No" multiplier="N/A"/>
         <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
@@ -198,7 +198,7 @@ Testing mutator methods...
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
         <outlierRejectionOptions rejection="No" multiplier="N/A"/>
         <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
@@ -275,7 +275,7 @@ Serializing test XML object to file:
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
         <outlierRejectionOptions rejection="No" multiplier="N/A"/>
         <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
@@ -304,7 +304,7 @@ Testing XML: Object deserialized as (should match object above):
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="No" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="N/A" longitude="N/A" radius="N/A"/>
         <outlierRejectionOptions rejection="No" multiplier="N/A"/>
         <convergenceCriteriaOptions convergenceCriteria="Sigma0" threshold="1.0e-10" maximumIterations="50"/>
@@ -334,7 +334,7 @@ Serializing test XML object to file:
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="Yes" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="Yes" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="1000.0" longitude="2000.0" radius="3000.0"/>
         <outlierRejectionOptions rejection="Yes" multiplier="4.0"/>
         <convergenceCriteriaOptions convergenceCriteria="ParameterCorrections" threshold="0.25" maximumIterations="26"/>
@@ -385,7 +385,7 @@ Testing XML: Object deserialized as (should match object above):
 <bundleSettings>
     <globalSettings>
         <validateNetwork>Yes</validateNetwork>
-        <solveOptions solveObservationMode="Yes" solveRadius="Yes" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="Yes"/>
+        <solveOptions solveObservationMode="Yes" solveRadius="Yes" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas latitude="1000.0" longitude="2000.0" radius="3000.0"/>
         <outlierRejectionOptions rejection="Yes" multiplier="4.0"/>
         <convergenceCriteriaOptions convergenceCriteria="ParameterCorrections" threshold="0.25" maximumIterations="26"/>

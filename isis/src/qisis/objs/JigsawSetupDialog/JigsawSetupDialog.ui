@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -94,8 +94,13 @@
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
+                 <property name="font">
+                  <font>
+                   <italic>false</italic>
+                  </font>
+                 </property>
                  <property name="text">
-                  <string>Multiplier</string>
+                  <string>&amp;Multiplier</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -172,7 +177,7 @@
                <item row="11" column="0">
                 <widget class="QLabel" name="sigma0ThresholdLabel">
                  <property name="text">
-                  <string>Sigma0Threshold</string>
+                  <string>Sigma&amp;0 Threshold</string>
                  </property>
                  <property name="buddy">
                   <cstring>sigma0ThresholdLineEdit</cstring>
@@ -182,7 +187,7 @@
                <item row="12" column="0">
                 <widget class="QLabel" name="maximumIterationsLabel">
                  <property name="text">
-                  <string>Maximum Iterations</string>
+                  <string>Ma&amp;ximum Iterations</string>
                  </property>
                  <property name="buddy">
                   <cstring>maximumIterationsLineEdit</cstring>
@@ -264,80 +269,7 @@
              </item>
              <item>
               <layout class="QGridLayout" name="controlNetPositionAndPointingOptionsGridLayout">
-               <item row="12" column="0" colspan="2">
-                <widget class="QCheckBox" name="fitOverPointingCheckBox">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>269</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Fit Polynomial over Existing Pointing</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0">
-                <widget class="QLabel" name="spkDegreeLabel">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>SPKDegree</string>
-                 </property>
-                 <property name="buddy">
-                  <cstring>spkDegreeSpinBox</cstring>
-                 </property>
-                </widget>
-               </item>
-               <item row="9" column="0" colspan="2">
-                <widget class="QLabel" name="pointingSolveOptionsLabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>269</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Instrument Pointing Solve Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0" colspan="2">
-                <widget class="QCheckBox" name="hermiteSplineCheckBox">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Solve over Hermite Spline</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="0">
+               <item row="10" column="0">
                 <widget class="QLabel" name="spkSolveDegreeLabel">
                  <property name="enabled">
                   <bool>true</bool>
@@ -350,7 +282,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
+               <item row="9" column="1">
                 <widget class="QSpinBox" name="spkDegreeSpinBox">
                  <property name="enabled">
                   <bool>true</bool>
@@ -370,87 +302,22 @@
                 </widget>
                </item>
                <item row="8" column="0" colspan="2">
-                <spacer name="spkToCkOptionsverticalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Preferred</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="1" column="0" colspan="2">
-                <widget class="QComboBox" name="controlNetworkComboBox">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0" colspan="2">
-                <widget class="QLabel" name="positionSolveOptionsLabel">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Instrument Solve Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="scaledContents">
+                <widget class="QCheckBox" name="hermiteSplineCheckBox">
+                 <property name="enabled">
                   <bool>false</bool>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0" colspan="2">
-                <widget class="QLabel" name="controlNetworkLabel">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Control Network&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="14" column="1">
-                <widget class="QSpinBox" name="ckSolveDegreeSpinBox">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="value">
-                  <number>2</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="13" column="0">
-                <widget class="QLabel" name="ckDegreeLabel">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
                  <property name="text">
-                  <string>CKDegree</string>
-                 </property>
-                 <property name="buddy">
-                  <cstring>ckDegreeSpinBox</cstring>
+                  <string>Solve over Hermite Spline</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0" colspan="2">
+               <item row="5" column="0" colspan="2">
                 <spacer name="controlNetworkToSpkOptionsVerticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -466,96 +333,33 @@
                  </property>
                 </spacer>
                </item>
-               <item row="7" column="1">
-                <widget class="QSpinBox" name="spkSolveDegreeSpinBox">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
+               <item row="15" column="0" colspan="2">
+                <widget class="QCheckBox" name="fitOverPointingCheckBox">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="value">
-                  <number>2</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="14" column="0">
-                <widget class="QLabel" name="ckSolveDegreeLabel">
-                 <property name="enabled">
-                  <bool>true</bool>
+                 <property name="minimumSize">
+                  <size>
+                   <width>269</width>
+                   <height>0</height>
+                  </size>
                  </property>
                  <property name="text">
-                  <string>CKSolveDegree</string>
-                 </property>
-                 <property name="buddy">
-                  <cstring>ckSolveDegreeSpinBox</cstring>
+                  <string>Fit Polynomial over Existing Pointing</string>
                  </property>
                 </widget>
                </item>
-               <item row="13" column="1">
-                <widget class="QSpinBox" name="ckDegreeSpinBox">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="value">
-                  <number>2</number>
+               <item row="3" column="0">
+                <widget class="QLabel" name="outputControlNet_2">
+                 <property name="text">
+                  <string>Output</string>
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0" colspan="2">
-                <widget class="QComboBox" name="positionComboBox">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Instrument Solve Options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>NONE</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>POSITIONS</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>VELOCITIES</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>ACCELERATIONS</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>ALL</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="10" column="0" colspan="2">
+               <item row="13" column="0" colspan="2">
                 <widget class="QComboBox" name="pointingComboBox">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -599,7 +403,143 @@
                  </item>
                 </widget>
                </item>
+               <item row="9" column="0">
+                <widget class="QLabel" name="spkDegreeLabel">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>SPKDegree</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>spkDegreeSpinBox</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="outputControlNet">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="inputControlNet">
+                 <property name="text">
+                  <string>Input</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0" colspan="2">
+                <widget class="QLabel" name="positionSolveOptionsLabel">
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Instrument Solve Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>false</bool>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0" colspan="2">
+                <widget class="QComboBox" name="positionComboBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Instrument Solve Options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>NONE</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>POSITIONS</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>VELOCITIES</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ACCELERATIONS</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ALL</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="0" column="0" colspan="2">
+                <widget class="QLabel" name="controlNetworkHeader">
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Control Networks&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
                <item row="11" column="0" colspan="2">
+                <spacer name="spkToCkOptionsverticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Preferred</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="17" column="0">
+                <widget class="QLabel" name="ckSolveDegreeLabel">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>C&amp;KSolveDegree</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>ckSolveDegreeSpinBox</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="0">
+                <widget class="QLabel" name="ckDegreeLabel">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>CKDegree</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>ckDegreeSpinBox</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="14" column="0" colspan="2">
                 <widget class="QCheckBox" name="twistCheckBox">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -612,6 +552,98 @@
                  </property>
                  <property name="checked">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="0" colspan="2">
+                <widget class="QLabel" name="pointingSolveOptionsLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>269</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Instrument Pointing Solve Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>false</bool>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="1">
+                <widget class="QSpinBox" name="ckDegreeSpinBox">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="value">
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="1">
+                <widget class="QSpinBox" name="spkSolveDegreeSpinBox">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="value">
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="17" column="1">
+                <widget class="QSpinBox" name="ckSolveDegreeSpinBox">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="value">
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="controlNetworkComboBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
                 </widget>
                </item>
@@ -644,7 +676,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="text">
-                 <string>SPK Initialization Polynomial Degree</string>
+                 <string>SPK Initiali&amp;zation Polynomial Degree</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -785,7 +817,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="text">
-                 <string>CK Initialization Polynomial Degree</string>
+                 <string>C&amp;K Initialization Polynomial Degree</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -839,7 +871,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="text">
-                 <string>CK Solve Polynomial Degree</string>
+                 <string>CK Solve Polyno&amp;mial Degree</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
@@ -959,7 +991,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>meters</string>
+                <string>&amp;meters</string>
                </property>
                <property name="buddy">
                 <cstring>pointLatitudeSigmaLineEdit</cstring>
@@ -1365,7 +1397,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>meters per second squared</string>
+                <string>meters per second s&amp;quared</string>
                </property>
                <property name="buddy">
                 <cstring>accelerationSigmaLineEdit</cstring>
@@ -1404,7 +1436,7 @@
          </widget>
          <widget class="QWidget" name="maximumLikelihoodTab">
           <attribute name="title">
-           <string>Maximum Liklihood</string>
+           <string>Maximum Likelihood</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="0" column="0">
@@ -1456,7 +1488,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Maximum Likelihood Estimator Model 1</string>
+                <string>&amp;Maximum Likelihood Estimator Model 1</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel1ComboBox</cstring>
@@ -1481,7 +1513,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Maximum Likelihood Estimator Model 3</string>
+                <string>Ma&amp;ximum Likelihood Estimator Model 3</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel3ComboBox</cstring>
@@ -1531,7 +1563,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Maximum Likelihood Estimator Model 2</string>
+                <string>Maximum &amp;Likelihood Estimator Model 2</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel2ComboBox</cstring>
@@ -1544,7 +1576,7 @@
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>Model 1 C Quantile</string>
+                <string>Model &amp;1 C Quantile</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel1QuantileLineEdit</cstring>
@@ -1573,7 +1605,7 @@
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>Model 2 C Quantile</string>
+                <string>Model &amp;2 C Quantile</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel2QuantileLineEdit</cstring>
@@ -1678,7 +1710,7 @@
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>Model 3 C Quantile</string>
+                <string>Model &amp;3 C Quantile</string>
                </property>
                <property name="buddy">
                 <cstring>maximumLikelihoodModel3QuantileLineEdit</cstring>
@@ -2296,7 +2328,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>mean radius</string>
+                   <string>&amp;mean radius</string>
                   </property>
                   <attribute name="buttonGroup">
                    <string notr="true">radiiButtonGroup</string>
@@ -2460,7 +2492,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>triaxial radii</string>
+                   <string>tria&amp;xial radii</string>
                   </property>
                   <attribute name="buttonGroup">
                    <string notr="true">radiiButtonGroup</string>
