@@ -636,7 +636,7 @@ namespace Isis {
 
 
   /**
-   * Loads the passed bundle settings into the setup dialog. This is used by JigsawDialog to
+   * Loads the passed bundle settings into the setup dialog. This is used by JigsawRunWidget to
    * load its current settings when not using the last (most recent) bundle settings in the project.
    *
    * @param const BundleSettingsQsp settings Shared pointer to the settings to load up.
