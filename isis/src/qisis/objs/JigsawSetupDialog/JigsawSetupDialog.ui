@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -954,18 +954,18 @@
              <zorder>twistCheckBox_2</zorder>
             </widget>
            </item>
-           <item row="0" column="0">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="0" column="0" rowspan="2">
+            <widget class="QTreeView" name="treeView">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
              </property>
-            </spacer>
+             <property name="headerHidden">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

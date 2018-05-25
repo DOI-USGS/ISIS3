@@ -14,6 +14,7 @@
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
+#include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
 #include "ui_JigsawSetupDialog.h"
 
@@ -87,6 +88,61 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
+    // Proof-of-concept
+//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
+    ProjectItemModel *model = m_project->directory()->model();
+    qDebug() << "Source model row count: " << model->rowCount();
+    ProjectItemProxyModel *proxyModel = new ProjectItemProxyModel(this);
+    //proxyModel->setSourceModel(model);
+
+    // Why do we have to do it this way?
+    // -- For some reason, the isX() methods in ProjectItem aren't working below.
+    for (int i = 0; i < model->rowCount(); i++) {
+      ProjectItem *projectItem = model->item(i);
+      for (int j = 0; j < projectItem->rowCount(); j++) {
+        ProjectItem *imageList = projectItem->child(j);
+        if (imageList->text() == "Images") {
+          for (int k = 0; k < imageList->rowCount(); k++) {
+            ProjectItem *importItem = imageList->child(k);
+            proxyModel->addItem(importItem);
+          }
+        }
+      }
+    }
+
+//    ProjectItem *root = model->item(0);
+//    qDebug() << "root row count : " << root->rowCount();
+//    qDebug() << root->isProject();
+//    qDebug() << root->child(0)->isProject();
+//    ProjectItem *child = static_cast<ProjectItem *>(root->child(0));
+//    qDebug() << child->isControlList();
+//    qDebug() << child->data().value< ControlList * >();
+//    proxyModel->addItem(root->child(0));
+//    QVariant value = child->data();
+//    qDebug() << value;
+//    for (int childIndex = 0; childIndex < root->rowCount(); childIndex++) {
+//      ProjectItem *child = root->child(childIndex);
+
+//      if (child->isBundleResults()) qDebug() << "bundleResults @ " << childIndex;
+//      if (child->isBundleSettings()) qDebug() << "bundleSettings @ " << childIndex;
+//      if (child->isBundleSolutionInfo()) qDebug() << "bundleSolutionInfo @ " << childIndex;
+//      if (child->isControl()) qDebug() << "control @ " << childIndex;
+//      if (child->isControlList()) qDebug() << "controlList @ " << childIndex;
+//      if (child->isCorrelationMatrix()) qDebug() << "correlationMatrix @ " << childIndex;
+//      if (child->isImage()) qDebug() << "image @ " << childIndex;
+//      if (child->isShape()) qDebug() << "shape @ " << childIndex;
+//      if (child->isShapeList()) qDebug() << "shapeList @ " << childIndex;
+//      if (child->isProject()) qDebug() << "project @ " << childIndex;
+//      if (child->isGuiCamera()) qDebug() << "guiCamera @ " << childIndex;
+//      if (child->isTargetBody()) qDebug() << "targetBody @ " << childIndex;
+//      if (child->isFileItem()) qDebug() << "fileItem @ " << childIndex;
+//      if (child->isTemplate()) qDebug() << "template @ " << childIndex;
+//      if (child->isImageList()) qDebug() << "imageList @ " << childIndex;
+
+
+//    }
+    m_ui->treeView->setModel(proxyModel);
+
     m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
 
     QStringList tableHeaders;
