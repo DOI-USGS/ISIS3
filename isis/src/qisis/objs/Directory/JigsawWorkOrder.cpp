@@ -33,7 +33,7 @@
 #include "BundleSolutionInfo.h"
 #include "Control.h"
 #include "Directory.h"
-#include "JigsawDialog.h"
+#include "JigsawRunWidget.h"
 #include "JigsawSetupDialog.h"
 #include "Project.h"
 
@@ -43,11 +43,11 @@ namespace Isis {
    * @brief Constructs a JigsawWorkOrder.
    *
    * This creates a work order to run bundle adjustments. Note that right now,
-   * the design implemented means that this work order finishes after a JigsawDialog
+   * the design implemented means that this work order finishes after a JigsawRunWidget
    * is shown. This work order is synchronous and not undoable. Note is is synchronous
    * in that it simply displays a dialog. The actual bundle adjust is threaded.
    *
-   * @see JigsawDialog
+   * @see JigsawRunWidget
    *
    * @param project The Project that we are going to Bundle Adjust
    *
@@ -99,41 +99,10 @@ namespace Isis {
    *         is greater than 0.
    */
   bool JigsawWorkOrder::isExecutable() {
-    return (project()->controls().size() > 0 && project()->images().size() > 0);
-  }
-
-
-  /**
-   * If WorkOrder:setupExecution() returns true, this creates a setup dialog.
-   *
-   * When the setup is successful (i.e. the user does not cancel the dialog), this work order
-   * will be read to execute.
-   *
-   * @return bool Returns True if setup dialog for the bundle adjustment is successful.
-   */
-  bool JigsawWorkOrder::setupExecution() {
-    bool success = WorkOrder::setupExecution();
-
-    // if (success) {
-    //   // Create a blocking setup dialog initially and check to make sure we get valid info
-    //   JigsawSetupDialog setup(project());
-    //   if (setup.exec() == QDialog::Accepted) {
-    //     m_bundleSettings = setup.bundleSettings();
-    //     if (setup.selectedControl()) {
-    //       setInternalData(QStringList(setup.selectedControl()->id()));
-    //     }
-    //     // This else should not happen, the work order should be disabled if there are no controls.
-    //     else {
-    //       QString msg = "Cannot run a bundle adjustment without a selected control network.";
-    //       QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", msg);
-    //       success = false;
-    //     }
-    //   }
-    //   else {
-    //     success = false;
-    //   }
-    // }
-    return success;
+    // Is this code ever run?
+    return (project()->controls().size() > 0 && 
+            project()->images().size() > 0 &&
+            !project()->directory()->jigsawRunWidget());
   }
 
 
@@ -158,11 +127,11 @@ namespace Isis {
    * @see WorkOrder::execute()
    */
   void JigsawWorkOrder::execute() {
+    JigsawRunWidget *runDialog = project()->directory()->addJigsawView();
 
-    Project *proj = project();
-
-    // Get the selected control and bundle settings and give them to the JigsawDialog for now.
-    // Control *selectedControl = project()->control(internalData().first());
-    JigsawDialog *runDialog = project()->directory()->addJigsawView();
+    if (!runDialog) {
+      QString msg = "Unable to open Jigsaw Run Widget";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 }

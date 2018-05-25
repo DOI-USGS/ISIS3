@@ -1,5 +1,5 @@
-#ifndef JigsawDialog_h
-#define JigsawDialog_h
+#ifndef JigsawRunWidget_h
+#define JigsawRunWidget_h
 
 #include <QDialog>
 #include <QDir>
@@ -11,7 +11,7 @@
 #include "IException.h"
 
 namespace Ui {
-  class JigsawDialog;
+  class JigsawRunWidget;
 }
 
 class QString;
@@ -84,19 +84,23 @@ namespace Isis {
    *                           argument QString outputControlFileName to constructor. Modified
    *                           acceptBundleResults method to take output control network filename
    *                           from the JigsawSetupDialog.
+   *   @history 2018-05-28 Christopher Combs - Name changed from JigsawDialog to JigsawRunWidget.
+   *                           Now inherits from QFrame instead of QDialog. Added support for new
+   *                           workflow in which JigsawSwttingDialog is only ever called from a
+   *                           button on this widget. Fixes #5428. 
    */
-  class JigsawDialog : public QFrame {
+  class JigsawRunWidget : public QFrame {
     Q_OBJECT
 
   public:
-    explicit JigsawDialog(Project *project, QWidget *parent = 0);
-    explicit JigsawDialog(Project *project,
+    explicit JigsawRunWidget(Project *project, QWidget *parent = 0);
+    explicit JigsawRunWidget(Project *project,
                           BundleSettingsQsp bundleSettings,
                           Control *selectedControl,
                           QString outputControlFileName,
                           QWidget *parent = 0);
 
-    ~JigsawDialog();
+    ~JigsawRunWidget();
 
   public slots:
     void outputBundleStatus(QString status);
@@ -149,10 +153,10 @@ namespace Isis {
     void updateScrollBar();
 
   private:
-    /** Captures the most recent results of a bundle. JigsawDialog owns this pointer. */
+    /** Captures the most recent results of a bundle. JigsawRunWidget owns this pointer. */
     BundleSolutionInfo *m_bundleSolutionInfo;
     /** Reference to self's UI generated with QtDesigner. */
-    Ui::JigsawDialog *m_ui;
+    Ui::JigsawRunWidget *m_ui;
   };
 };
 #endif
