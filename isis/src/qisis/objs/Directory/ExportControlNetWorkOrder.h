@@ -26,7 +26,12 @@ namespace Isis {
    *                           it no longer causes a segmentation fault when the user attempts
    *                           to export a control network from the file menu.  Fixes #4760.
    *   @history 2017-11-02 Tyler Wilson - Added a null pointer check on the controls variable in
-   *                           isExecutable to prevent potential seg faults.  References #4492.
+   *                           isExecutable to prevent potential seg faults.  References #4760.
+   *   @history 2018-03-13 Tracie Sucharski - Added Undo text to prevent runtime warning. Also
+   *                           correct redmine ticket number in previous history entry.
+   *   @history 2018-03-30 Tracie Sucharski - Copy the control net instead of writing.  This will
+   *                           be faster and will prevent another control net from being read into
+   *                           memory.
    */
   class ExportControlNetWorkOrder : public WorkOrder {
       Q_OBJECT

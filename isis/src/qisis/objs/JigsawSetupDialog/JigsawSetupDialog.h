@@ -50,6 +50,13 @@ namespace Isis {
    *                           allows for proper restoring of user defined weightings.
    *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
    *                           source images. Fixes #5105.
+   *   @history 2018-03-19 Ken Edmundson - Added bundle output control network file name. Added
+   *                           method on_controlNetworkComboBox_currentTextChanged to update the
+   *                           output control network filename when the input control network
+   *                           selected filename changes. E.g. if input control net name is
+   *                           fred.net, the output filename QLineEdit is automatically changed to
+   *                           fred-out.net. The user can always manually change the output control
+   *                           net name to anything they choose.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -63,9 +70,10 @@ namespace Isis {
                                QWidget *parent = 0);
     ~JigsawSetupDialog();
 
-    Control *selectedControl();// TODO: return const references ???
-    QString selectedControlName();// TODO: return const references ???
-    BundleSettingsQsp bundleSettings();// TODO: return const references ???
+    Control *selectedControl();                                 // TODO: return const references ???
+    QString selectedControlName();                              // TODO: return const references ???
+    QString outputControlName();                                // TODO: return const references ???
+    BundleSettingsQsp bundleSettings();                         // TODO: return const references ???
 
     void loadSettings(const BundleSettingsQsp settings);
     void selectControl(const QString &controlName);
@@ -78,6 +86,7 @@ namespace Isis {
     // general tab
     void on_positionComboBox_currentIndexChanged(int index);
     void on_pointingComboBox_currentIndexChanged(int index);
+    void on_controlNetworkComboBox_currentTextChanged(const QString &arg1);
 
     // maximum liklihood tab
     void on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index);
