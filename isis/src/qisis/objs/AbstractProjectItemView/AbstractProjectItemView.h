@@ -23,10 +23,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QWidget>
+#include <QMainWindow>
 
 class QAction;
 class QDragEnterEvent;
+class QWidget;
 template <typename T> class QList;
 
 namespace Isis {
@@ -60,8 +61,12 @@ namespace Isis {
    *   @history 2016-07-28 Tracie Sucharski - Implemented removeItem and removeItems methods.
    *   @history 2016-08-25 Adam Paquette - Minor updates to documentation.
    *                           Fixes #4299.
+   *   @history 2018-05-29 Tracie Sucharski & Summer Stapleton - updated to inherit from QMainWindow
+   *                           instead of QWidget. This updates all views in the ipce main window 
+   *                           to be main windows themselves, changing from an mdi interface to an
+   *                           sdi interface.
    */
-  class AbstractProjectItemView : public QWidget {
+  class AbstractProjectItemView : public QMainWindow {
 
     Q_OBJECT
 

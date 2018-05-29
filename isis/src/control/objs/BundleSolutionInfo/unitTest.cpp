@@ -90,6 +90,8 @@ int main(int argc, char *argv[]) {
 
     // create default settings and statistics objects to pass into results object
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+    qDebug() << "Created new BundleSettings...";
+
     settings->setOutputFilePrefix("");
     FileName cnetFile("cnetfile.net");
     BundleResults statistics;
@@ -132,15 +134,12 @@ int main(int argc, char *argv[]) {
                              "ObservationNumber1",
                              "Instrument1",
                              BundleSettingsQsp(new BundleSettings));
-
     statistics.setBundleControlPoints(bundleControlPointVector);
     statistics.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     statistics.setObservations(observationVector);
     QList<ImageList *> imgList;
     BundleSolutionInfo results(settings, cnetFile, statistics, imgList, parent);
-
     printXml(results);
-
 
     qDebug() << "";
     qDebug() << "Testing XML serialization 1: round trip serialization of BundleSolution object...";
@@ -168,23 +167,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
     printXml(bsFromXml1);  // Save comparison output to log file
 
-
-
-    qDebug() << "Testing copy constructor...";
-
-    BundleSolutionInfo copySolutionInfo(results);
-    printXml(copySolutionInfo);
-
-    qDebug() << "Testing assignment operator to set this equal to itself...";
-    results = results;
-    printXml(results);
-
-    qDebug() << "Testing assignment operator to create a new results object...";
-
-    BundleSolutionInfo assignmentOpSolutionInfo = results;
-    assignmentOpSolutionInfo = results;
-    printXml(assignmentOpSolutionInfo);
-
     qDebug() << "Testing mutator methods...";
     statistics.setRejectionLimit(0.5);
     results.setOutputStatistics(statistics);
@@ -211,8 +193,6 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     qDebug() << "";
-
-
 
     Statistics rmsStats;
     rmsStats.SetValidRange(0, 100);

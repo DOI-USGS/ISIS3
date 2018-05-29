@@ -1,5 +1,5 @@
-#ifndef CubeDnViewMW_h
-#define CubeDnViewMW_h
+#ifndef CubeDnView_h
+#define CubeDnView_h
 /**
  * @file
  * $Date$
@@ -27,7 +27,7 @@
 #include <QMap>
 #include <QWidgetAction>
 
-#include "AbstractProjectItemViewMW.h"
+#include "AbstractProjectItemView.h"
 #include "FileName.h"
 #include "XmlStackedHandler.h"
 
@@ -81,7 +81,7 @@ namespace Isis {
    *   @history 2017-08-03 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
    *                           Fixes #5090
    */
-  class CubeDnView : public AbstractProjectItemViewMW {
+  class CubeDnView : public AbstractProjectItemView {
 
     Q_OBJECT
 
@@ -123,8 +123,6 @@ namespace Isis {
       void enableControlNetTool();
 
     private slots:
-      void createActions(Directory *directory);
-
       void onCurrentChanged(const QModelIndex &current);
       void onCubeViewportActivated(MdiCubeViewport *);
       void onItemAdded(ProjectItem *item);

@@ -83,6 +83,11 @@ namespace Isis {
    *                           argument QString outputControlFileName to constructor. Modified
    *                           acceptBundleResults method to take output control network filename
    *                           from the JigsawSetupDialog.
+   *   @history 2018-05-22 Ken Edmundson - Modified init() method to not set m_BundleSolutionInfo to
+   *                           NULL because JigsawDialog no longer owns it. Modified destructor to
+   *                           not delete m_BundleSolutionInfo or set it to NULL. Note this is NOT
+   *                           ideal, m_BundleSolutionInfo should be a QSharedPointer, not a raw
+   *                           pointer.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT

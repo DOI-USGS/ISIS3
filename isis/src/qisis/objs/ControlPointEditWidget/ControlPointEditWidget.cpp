@@ -825,7 +825,7 @@ namespace Isis {
     if (color == "black") {
       // Don't need to colorize save measure button, when loading new measure, the measure editor
       // will set back to default palette.
-      m_savePoint->setPalette(m_saveDefaultPalette); 
+    m_savePoint->setPalette(m_saveDefaultPalette);
       m_saveNet->setPalette(m_saveDefaultPalette);
     }
     else if (color == "red") {
@@ -2491,10 +2491,10 @@ namespace Isis {
       m_saveNet->setPalette(m_saveDefaultPalette);
     }
     else {
-      QColor qc = Qt::red; 
-      QPalette p = m_savePoint->palette();
-      p.setColor(QPalette::ButtonText,qc);
-      m_saveNet->setPalette(p);
+    QColor qc = Qt::red;
+    QPalette p = m_savePoint->palette();
+    p.setColor(QPalette::ButtonText,qc);
+    m_saveNet->setPalette(p);
     }
 
   }
