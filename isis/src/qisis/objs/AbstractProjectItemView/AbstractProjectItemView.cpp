@@ -28,6 +28,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QList>
+#include <QMainWindow>
 #include <QWidget>
 
 #include "ProjectItem.h"
@@ -39,9 +40,9 @@ namespace Isis {
   /**
    * Constructs the AbstractProjectItemView.
    *
-   * @param[in] parent (QWidget *) The parent widget
+   * @param[in] parent (QMainWindow *) The parent widget
    */
-  AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QWidget(parent) {
+  AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QMainWindow(parent) {
     m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
   }
