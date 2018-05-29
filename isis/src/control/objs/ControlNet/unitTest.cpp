@@ -31,6 +31,8 @@ using namespace Isis;
  * @author ????-??-?? Unknown
  * @internal
  *   @history 2016-05-11 Jeannie Backer - Added tests for setTarget methods.
+ *   @history 2018-05-29 Kristin Berry - Commented out (to probably be removed) code related to
+ *                                       unused, removed methods. 
  */
 bool lessThan(const ControlMeasure *m1, const ControlMeasure *m2) {
   return m1->GetResidualMagnitude() < m2->GetResidualMagnitude();
@@ -148,67 +150,70 @@ void testConnectivity() {
   if (islands[0].contains(m9->ControlSN())) islands.swap(0, 1);
   cout << "  " << "Island Count = " << islands.size() << endl;
 
-  cout << "\nTesting MinimumSpanningTree()\n";
-  QList< QSet< ControlMeasure * > > spanningTrees;
-  int nodeCount = 0;
-  for (int i = 0; i < islands.size(); i++) {
-    spanningTrees.append(net.MinimumSpanningTree(islands[i], lessThan));
-    nodeCount += islands[i].size();
-  }
-
-  cout << "  " << "Tree Count = " << spanningTrees.size() << endl;
-  cout << "  " << "Graph Node Count = " << nodeCount << endl;
-
-  QList< QMap< QString, ControlMeasure * > > includedMaps;
-  QList< QMap< QString, ControlMeasure * > > excludedMaps;
-  for (int i = 0; i < spanningTrees.size(); i++) {
-    includedMaps.append(QMap< QString, ControlMeasure * >());
-    excludedMaps.append(QMap< QString, ControlMeasure * >());
-  }
-
-  int measureCount = 0;
-  for (int p = 0; p < net.GetNumPoints(); p++) {
-    ControlPoint *point = net.GetPoint(p);
-    for (int m = 0; m < point->GetNumMeasures(); m++) {
-      ControlMeasure *measure = point->GetMeasure(m);
-      measureCount++;
-      for (int i = 0; i < spanningTrees.size(); i++) {
-        if (islands[i].contains(measure->ControlSN())) {
-          if (spanningTrees[i].contains(measure))
-            includedMaps[i].insert(measureNames[measure], measure);
-          else
-            excludedMaps[i].insert(measureNames[measure], measure);
-        }
-      }
-    }
-  }
-  cout << "  " << "Measure Count = " << measureCount << endl;
-
-  int includedMeasures = 0;
-  for (int i = 0; i < spanningTrees.size(); i++) {
-    QSet< ControlMeasure * > measures = spanningTrees[i];
-    includedMeasures += measures.size();
-  }
-
-  if (islands.size() != spanningTrees.size()) {
-    cout << "  " << "Island Count == " << islands.size() << " != " <<
-      spanningTrees.size() << " == MST Count" << endl;
-  }
-  else {
-    cout << "  " << "Island Count == " << islands.size() <<
-      " == MST Count" << endl;
-
-    for (int i = 0; i < spanningTrees.size(); i++) {
-      cout << "\n  " << "Minimum Spanning Tree " << i << endl;
-
-      cout << "    " << "Nodes = " << islands[i].size() << endl;
-      cout << "    " << "Included Measures = " << includedMaps[i].size() << endl;
-      printMeasures(includedMaps[i].values(), measureNames);
-
-      cout << "    " << "Excluded Measures = " << excludedMaps[i].size() << endl;
-      printMeasures(excludedMaps[i].values(), measureNames);
-    }
-  }
+  // This region all has to do with testing the (unused) removed MinimumSpanningTree 
+  // method. It's left in here commented-out for now in case we would like to test 
+  // island functionality here, using similar output, after updating ControlNet to use boost. 
+//cout << "\nTesting MinimumSpanningTree()\n";
+//QList< QSet< ControlMeasure * > > spanningTrees;
+//int nodeCount = 0;
+//for (int i = 0; i < islands.size(); i++) {
+//  spanningTrees.append(net.MinimumSpanningTree(islands[i], lessThan));
+//  nodeCount += islands[i].size();
+//}
+//
+//cout << "  " << "Tree Count = " << spanningTrees.size() << endl;
+//cout << "  " << "Graph Node Count = " << nodeCount << endl;
+//
+//QList< QMap< QString, ControlMeasure * > > includedMaps;
+//QList< QMap< QString, ControlMeasure * > > excludedMaps;
+//for (int i = 0; i < spanningTrees.size(); i++) {
+//  includedMaps.append(QMap< QString, ControlMeasure * >());
+//  excludedMaps.append(QMap< QString, ControlMeasure * >());
+//}
+//
+//int measureCount = 0;
+//for (int p = 0; p < net.GetNumPoints(); p++) {
+//  ControlPoint *point = net.GetPoint(p);
+//  for (int m = 0; m < point->GetNumMeasures(); m++) {
+//    ControlMeasure *measure = point->GetMeasure(m);
+//    measureCount++;
+//    for (int i = 0; i < spanningTrees.size(); i++) {
+//      if (islands[i].contains(measure->ControlSN())) {
+//        if (spanningTrees[i].contains(measure))
+//          includedMaps[i].insert(measureNames[measure], measure);
+//        else
+//          excludedMaps[i].insert(measureNames[measure], measure);
+//      }
+//    }
+//  }
+//}
+//cout << "  " << "Measure Count = " << measureCount << endl;
+//
+//int includedMeasures = 0;
+//for (int i = 0; i < spanningTrees.size(); i++) {
+//  QSet< ControlMeasure * > measures = spanningTrees[i];
+//  includedMeasures += measures.size();
+//}
+//
+//if (islands.size() != spanningTrees.size()) {
+//  cout << "  " << "Island Count == " << islands.size() << " != " <<
+//    spanningTrees.size() << " == MST Count" << endl;
+//}
+//else {
+//  cout << "  " << "Island Count == " << islands.size() <<
+//    " == MST Count" << endl;
+//
+//  for (int i = 0; i < spanningTrees.size(); i++) {
+//    cout << "\n  " << "Minimum Spanning Tree " << i << endl;
+//
+//    cout << "    " << "Nodes = " << islands[i].size() << endl;
+//    cout << "    " << "Included Measures = " << includedMaps[i].size() << endl;
+//    printMeasures(includedMaps[i].values(), measureNames);
+//
+//    cout << "    " << "Excluded Measures = " << excludedMaps[i].size() << endl;
+//    printMeasures(excludedMaps[i].values(), measureNames);
+//  }
+//}
 }
 
 

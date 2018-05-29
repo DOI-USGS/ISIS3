@@ -212,7 +212,10 @@ namespace Isis {
    *   @history 2017-01-19 Jesse Mapel - Added a method to get all of the valid measures in an
    *                           image. Previously, this had to be done throug the graph.
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
-   *                           adds to the control network. 
+   *                           adds to the control network.
+   *  @history 2018-01-26 Kristin Berry - Removed unused methods and associated code:
+   *                           MinimumSpanningTree, 
+   *                           
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -243,9 +246,6 @@ namespace Isis {
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
-      QSet< ControlMeasure * > MinimumSpanningTree(
-          QList< ControlCubeGraphNode *> &island,
-          bool lessThan(const ControlMeasure *, const ControlMeasure *)) const;
       int getEdgeCount() const;
       QString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
@@ -361,73 +361,6 @@ namespace Isis {
         private:
           double(ControlMeasure::*m_accessor)() const;
       };
-
-
-      /**
-       * Encapsulation of a vertex in a minimum spanning tree.  Can be either a
-       * Control Point or a Graph Node.  Each vertex is connected to another by
-       * a measure.  A vertex without a parent vertex is considered a root node,
-       * or the base of its own tree.
-       *
-       * @author ????-??-?? Unknown
-       *
-       * @internal
-       */
-      class ControlVertex {
-        public:
-          //! Construct a vertex from a Graph Node
-          ControlVertex(ControlCubeGraphNode *node) {
-            m_node = node;
-            m_point = NULL;
-            m_parent = NULL;
-          }
-
-          //! Construct a vertex from a Control Point
-          ControlVertex(ControlPoint *point) {
-            m_point = point;
-            m_node = NULL;
-            m_parent = NULL;
-          }
-
-          //! Does not own any of its private data
-          ~ControlVertex() {}
-
-          //! Set the parent vertex, removing the root node status.
-          void setParent(ControlVertex *v) { m_parent = v; }
-
-          //! Get the root node, or greatest ancestor
-          ControlVertex * getRoot() {
-            ControlVertex *current = this;
-            while (current->getParent() != NULL)
-              current = current->getParent();
-            return current;
-          }
-
-          //! Get the parent node.  A root node has no parent.
-          ControlVertex * getParent() { return m_parent; }
-
-          //! Get the node representation of this vertex
-          ControlCubeGraphNode * getNode() { return m_node; }
-
-          //! Get the point representation of this vertex
-          ControlPoint * getPoint() { return m_point; }
-
-          //! Join two nodes by setting one root to be the other's parent
-          static void join(ControlVertex *v1, ControlVertex *v2) {
-            v1->getRoot()->setParent(v2->getRoot());
-          }
-
-        private:
-          //! The possibly non-existant graph node
-          ControlCubeGraphNode *m_node;
-
-          //! The possibly non-existant control point
-          ControlPoint *m_point;
-
-          //! The possibly non-existant parent vertex
-          ControlVertex *m_parent;
-      };
-
 
     private: // data
       //! hash ControlPoints by ControlPoint Id
