@@ -31,12 +31,24 @@
 #include <QMap>
 #include <QVector>
 
+// Boost includes
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
+
+
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
 template< typename A, typename B > struct QPair;
 template< typename T > class QSet;
+
+
+
+
+
 class QMutex;
 class QString;
+
 
 namespace Isis {
   class Camera;
@@ -225,6 +237,25 @@ namespace Isis {
       friend class ControlPoint;
 
     public:
+      // Temporarily put these here: 
+      struct Image {
+        QString serial;
+      };
+
+      struct Connection {
+        int strength = 0;
+      };
+
+      // typedefs to help cut down on templated type bloat
+      typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, Image, Connection> Network;
+      typedef Network::vertex_descriptor ImageVertex;
+      typedef Network::edge_descriptor ImageConnection;
+      typedef std::map<ImageVertex, size_t> VertexIndexMap;
+      typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor;
+      typedef Network::out_edge_iterator ConnectionIterator;
+
+
+
       ControlNet();
       ControlNet(const ControlNet &other);
       ControlNet(const QString &filename, Progress *progress = 0);
@@ -244,6 +275,7 @@ namespace Isis {
       bool ContainsPoint(QString pointId) const;
 
       QList< QString > GetCubeSerials() const;
+      QString GraphToString() const;
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       int getEdgeCount() const;
@@ -358,7 +390,10 @@ namespace Isis {
       QHash< QString, ControlPoint * > * points;
 
       //! hash ControlCubeGraphNodes by CubeSerialNumber
-      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes;
+      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes; // TODO : delete
+
+      QHash<QString, ImageVertex> m_vertexMap; //!< The SN -> vertex hash for the boost graph
+      Network m_controlGraph; //!< The boost graph
       QStringList *pointIds;
       QMutex *m_mutex;
 

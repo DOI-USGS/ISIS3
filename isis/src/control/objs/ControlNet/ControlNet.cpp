@@ -369,8 +369,14 @@ namespace Isis {
     // make sure there is a node for every measure
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn)) {
+       if (!cubeGraphNodes->contains(sn)) {
         cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
+      }
+      // if the graph doesn't have the sn
+      if (!m_vertexMap.contains(sn)) {
+        ImageVertex newVertex = boost::add_vertex(m_controlGraph); 
+        m_vertexMap.insert(sn, newVertex);
+  //    boost::put(indexMapAdaptor, newVertex, i); <-- what does this do? 
       }
     }
 
@@ -393,14 +399,36 @@ namespace Isis {
               node->addConnection(neighborNode, point);
               neighborNode->addConnection(node, point);
             }
+
+            // new graph:
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                         m_vertexMap[sn],
+                                                         m_controlGraph).first;
+            m_controlGraph[connection].strength++;
           }
         }
       }
     }
   }
 
+// temporary print graph to test
+  QString ControlNet::GraphToString() const {
+    // Iterate through the vertices and print them out
+    QString graphString; 
+    VertexIndexMap indexMap;
+    typedef boost::graph_traits<Network>::vertex_iterator vertex_iter;
+    std::pair<vertex_iter, vertex_iter> vp;
+    for(vp = vertices(m_controlGraph); vp.first != vp.second; ++vp.first) {
+      std::cout << indexMap[*vp.first] << " ----- " << indexMap[*vp.second] << std::endl;
+//      graphString.append(" --- ");
+//      graphString.append(indexMap[*vp.second]);
+//      graphString.append('\n');
+    }
+    return graphString;
+   }
 
-  /**
+
+   /**
    * Updates the ControlCubeGraphNode for the measure's serial number to
    * reflect the addition.  If there is currently no ControlCubeGraphNode for
    * this measure's serial, then a new ControlCubeGraphNode is created with
@@ -436,8 +464,16 @@ namespace Isis {
     // make sure there is a node for every measure in this measure's parent
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+
+      // old
       if (!cubeGraphNodes->contains(sn)) {
         cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
+      }
+
+      // if the graph doesn't have the sn (boost) 
+      if (!m_vertexMap.contains(sn)) {
+        ImageVertex newVertex = boost::add_vertex(m_controlGraph); 
+        m_vertexMap.insert(sn, newVertex);
       }
     }
 
@@ -445,6 +481,8 @@ namespace Isis {
     QString serial = measure->GetCubeSerialNumber();
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
     node->addMeasure(measure);
+
+    // new graph: add node to edge or vertex descriptor?? 
 
     // in this measure's node add connections to the other nodes reachable from
     // its point
@@ -459,6 +497,11 @@ namespace Isis {
             node->addConnection(neighborNode, point);
             neighborNode->addConnection(node, point);
           }
+          // new graph (boost): 
+          ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                         m_vertexMap[sn],
+                                                         m_controlGraph).first;
+          m_controlGraph[connection].strength++;
         }
       }
     }
@@ -725,10 +768,12 @@ namespace Isis {
    * @returns The total number of edges in the bi-directional graph for images
    */
   int ControlNet::getEdgeCount() const {
-    int total = 0;
-    foreach (ControlCubeGraphNode * node, *cubeGraphNodes) {
-      total += node->getAdjacentNodes().size();
-    }
+    int total = boost::num_edges(m_controlGraph); 
+
+//  int total = 0;
+//  foreach (ControlCubeGraphNode * node, *cubeGraphNodes) {
+//    total += node->getAdjacentNodes().size();
+//  }
 
     return total;
   }

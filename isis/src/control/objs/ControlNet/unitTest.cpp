@@ -241,11 +241,11 @@ int main() {
   net.AddPoint(p0);
 
   // test ignoring of measures
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
   p0m1->SetIgnored(true);
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
   p0m1->SetIgnored(false);
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
 
   // add another point - testing case where measures are added to points which
   // are already added to a net.
@@ -261,37 +261,37 @@ int main() {
   p1m2->SetCubeSerialNumber("CHARLIE");
   p1->Add(p1m1);
   p1->Add(p1m2);
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
 
   // test ignoring of point
   cout << "testing setting point to ignored.......................\n";
   p1->SetIgnored(true);
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
   p1->SetIgnored(false);
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
 
   // test measure deletion
   cout << "testing measure deletion & addition....................\n";
   p0->Delete(p0m1);
   p0m1 = NULL;
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
   p0m0 = new ControlMeasure;
   p0m0->SetCubeSerialNumber("DELTA");
   p0->Add(p0m0);
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
 
   // test point deletion
   cout << "testing point deletion.................................\n";
   net.DeletePoint(p1);
   p1 = NULL;
-//  cout << net.CubeGraphToString() << "\n";
+  cout << net.GraphToString() << "\n";
 
   cout << "******* Done testing cube graph ***************\n\n\n";
 
   cout << "testing GetCubeSerials... (NOTE: unittest sorts the results)\n";
   QList< QString > serials = net.GetCubeSerials();
-  
-  // Let's sort the data since GetCubeSerials relies on a QHash 
+
+  // Let's sort the data since GetCubeSerials relies on a QHash
   QStringList sortedSerials(serials);
   sortedSerials.sort();
 
@@ -320,7 +320,7 @@ int main() {
   cn1.SetTarget("SomethingStrange", targetRadii);
   vector<Distance> targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
                                     << targRad[1].meters() << ", "
                                     << targRad[2].meters() << ")" << endl;
   cout << endl;
@@ -331,7 +331,7 @@ int main() {
   cn1.SetTarget(label);
   targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
                                     << targRad[1].meters() << ", "
                                     << targRad[2].meters() << ")" << endl;
   cout << endl;
@@ -344,7 +344,7 @@ int main() {
   cn1.SetTarget(label);
   targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
                                     << targRad[1].meters() << ", "
                                     << targRad[2].meters() << ")" << endl;
   cout << endl;
@@ -355,7 +355,7 @@ int main() {
   cn1.SetTarget(label);
   targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
                                     << targRad[1].meters() << ", "
                                     << targRad[2].meters() << ")" << endl;
   cout << endl;
@@ -363,7 +363,7 @@ int main() {
   cn1.SetTarget("");
   targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
                                     << targRad[1].meters() << ", "
                                     << targRad[2].meters() << ")" << endl;
   cout << endl;
@@ -371,7 +371,7 @@ int main() {
   cn1.SetTarget("Mars");
   targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
+  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
                                     << targRad[1].meters() << ", "
                                     << targRad[2].meters() << ")" << endl;
   cout << endl;
@@ -553,96 +553,96 @@ int main() {
   foreach ( QString sn, sortedSNs ) {
     cout << "    " << sn << "\n";
   }
-  
+
   cout << "\nTesting getGraphNode: ";
 //       << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
-       
+
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
 
   testConnectivity();
 
   cout << "\nTesting take() functionality to take owernship of the points in a ControlNet:" << endl;
 
-  cout << "Original control net number of points: " << QString::number(net.GetNumPoints()) << endl; 
+  cout << "Original control net number of points: " << QString::number(net.GetNumPoints()) << endl;
 
-  QList<ControlPoint*> points = net.take(); 
-  
-  cout << "Number of points taken out: " << QString::number(points.length()) << endl; 
-  
-  cout << "Now there should be zero points in the original control net. There are: " 
-       << QString::number(net.GetNumPoints()) << endl; 
+  QList<ControlPoint*> points = net.take();
 
-  cout << "And zero pointIDs in the original control net. There are: " 
-       << QString::number(net.GetPointIds().length()) << endl; 
+  cout << "Number of points taken out: " << QString::number(points.length()) << endl;
 
-  cout << "And zero cubeGraphNodes in the original control net. There are: " 
-       << QString::number(net.GetCubeGraphNodes().length()) << endl; 
+  cout << "Now there should be zero points in the original control net. There are: "
+       << QString::number(net.GetNumPoints()) << endl;
+
+  cout << "And zero pointIDs in the original control net. There are: "
+       << QString::number(net.GetPointIds().length()) << endl;
+
+  cout << "And zero cubeGraphNodes in the original control net. There are: "
+       << QString::number(net.GetCubeGraphNodes().length()) << endl;
 
   //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");
 
   return 0;
-#if 0
-
-  // -------------------------------------------------------------------------
-  // Testing the google protocol buffer methods added to the ControlNet class
-  // SLA 6/30/09
-  // -------------------------------------------------------------------------
-
-  cout << "Enter input cnet: ";
-  string inNet;
-  cin >> inNet;
-  string outFile;
-  cout << "Enter output file (directory & prefix, no extension): ";
-  cin >> outFile;
-
-  ControlNet *cn1 = new ControlNet;
-  cout << "Speed Test for ControlNet ...." << endl << endl;
-  cout << "\nReading from the ascii file....    " << inNet << endl;
-  std::clock_t start = std::clock();
-//  cn1.ReadControl("/work1/tsucharski/protobuf/isis/nets/cnet.net");
-//  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg2.net");
-//  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg_combinedparts.net");
-  cn1->ReadControl(inNet);
-  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
-
-  cout << "\nWriting to the binary file...." << endl;
-  start = std::clock();
-//  cn1.WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
-//  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
-//  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
-  cn1->WritePB(outFile + ".bin");
-  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
-  delete cn1;
-
-//  ControlNet cn2;
-  ControlNet *cn2 = new ControlNet;
-
-  cout << "\nReading from the binary file...." << endl;
-  std::clock_t start2 = std::clock();
-//  cn2.ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
-//  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
-//  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
-  cn2->ReadPBControl(outFile + ".bin");
-  std::cout << ((std::clock() - start2) / (double)CLOCKS_PER_SEC) << " seconds \n";
-
-//  apLat = (*cn2)[2].AprioriLatitude();
-//  cout<<"binaryNet AprioriLatitude = "<<apLat<<endl;
-
-//cout << "\nConverting the binary to Pvl...." << endl;
-//std::clock_t start2 = std::clock();
-//cn1.ConvertBinToPvl();
-//std::cout<< ( ( std::clock() - start2 ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
-
-
-
-  cout << "\nWriting to the Pvl file...." << endl;
-  std::clock_t start3 = std::clock();
-//  cn2.Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.pvl");
-//  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.pvl");
-//  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.pvl");
-  cn2->Write(outFile + ".pvl");
-  std::cout << ((std::clock() - start3) / (double)CLOCKS_PER_SEC) << " seconds \n";
-
-#endif
+//#if 0
+//
+//  // -------------------------------------------------------------------------
+//  // Testing the google protocol buffer methods added to the ControlNet class
+//  // SLA 6/30/09
+//  // -------------------------------------------------------------------------
+//
+//  cout << "Enter input cnet: ";
+//  string inNet;
+//  cin >> inNet;
+//  string outFile;
+//  cout << "Enter output file (directory & prefix, no extension): ";
+//  cin >> outFile;
+//
+//  ControlNet *cn1 = new ControlNet;
+//  cout << "Speed Test for ControlNet ...." << endl << endl;
+//  cout << "\nReading from the ascii file....    " << inNet << endl;
+//  std::clock_t start = std::clock();
+////  cn1.ReadControl("/work1/tsucharski/protobuf/isis/nets/cnet.net");
+////  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg2.net");
+////  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg_combinedparts.net");
+//  cn1->ReadControl(inNet);
+//  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
+//
+//  cout << "\nWriting to the binary file...." << endl;
+//  start = std::clock();
+////  cn1.WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
+////  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
+////  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
+//  cn1->WritePB(outFile + ".bin");
+//  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
+//  delete cn1;
+//
+////  ControlNet cn2;
+//  ControlNet *cn2 = new ControlNet;
+//
+//  cout << "\nReading from the binary file...." << endl;
+//  std::clock_t start2 = std::clock();
+////  cn2.ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
+////  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
+////  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
+//  cn2->ReadPBControl(outFile + ".bin");
+//  std::cout << ((std::clock() - start2) / (double)CLOCKS_PER_SEC) << " seconds \n";
+//
+////  apLat = (*cn2)[2].AprioriLatitude();
+////  cout<<"binaryNet AprioriLatitude = "<<apLat<<endl;
+//
+////cout << "\nConverting the binary to Pvl...." << endl;
+////std::clock_t start2 = std::clock();
+////cn1.ConvertBinToPvl();
+////std::cout<< ( ( std::clock() - start2 ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
+//
+//
+//
+//  cout << "\nWriting to the Pvl file...." << endl;
+//  std::clock_t start3 = std::clock();
+////  cn2.Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.pvl");
+////  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.pvl");
+////  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.pvl");
+//  cn2->Write(outFile + ".pvl");
+//  std::cout << ((std::clock() - start3) / (double)CLOCKS_PER_SEC) << " seconds \n";
+//
+//#endif
 }
