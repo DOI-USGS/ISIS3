@@ -617,113 +617,6 @@ namespace Isis {
 
 
   /**
-   * Random breadth-first search.  This meathod starts at a random serial, and
-   * returns a list with the start serial as well as any serial which is
-   * directly or indirectly connected to it.  The list returned will contain
-   * all the serials in the network if and only if the network is completely
-   * connected.  Otherwise, the list returned will be the entire island on
-   * which a random image resides.
-   *
-   * @returns A List of connected graph nodes
-   */
-  QList< ControlCubeGraphNode * > ControlNet::RandomBFS(
-    QList< ControlCubeGraphNode * > nodes) const {
-    qsrand(42);
-    Shuffle(nodes);
-
-    // for keeping track of visited nodes
-    QMap< ControlCubeGraphNode *, bool > searchList;
-    for (int i = 0; i < nodes.size(); i++)
-      searchList.insert(nodes[i], false);
-
-    // for storing nodes as they are found
-    QSet< ControlCubeGraphNode * > results;
-
-    QQueue< ControlCubeGraphNode * > q;
-    q.enqueue(nodes[0]);
-    while (q.size()) {
-      ControlCubeGraphNode *curNode = q.dequeue();
-      if (!results.contains(curNode)) {
-        // add to results
-        results.insert(curNode);
-        searchList[curNode] = true;
-
-        // add all the neighbors to the queue
-        QList< ControlCubeGraphNode * > neighbors = curNode->getAdjacentNodes();
-        Shuffle(neighbors);
-        for (int i = 0; i < neighbors.size(); i++)
-          q.enqueue(neighbors[i]);
-      }
-    } // end of breadth-first search
-
-    return results.values();
-  }
-
-
-  /**
-   * Shuffles the QStrings in a QList< QString >
-   *
-   * @param list The list to be shuffled
-   */
-  void ControlNet::Shuffle(QList< ControlCubeGraphNode * > & list) const {
-    for (int i = list.size() - 1; i > 0; i--) {
-      // standard form is qrand() / (RAND_MAX + 1.0) * (max + 1 - min) + min
-      // min is always zero here so it is simplified to...
-      int j = (int)(qrand() / (RAND_MAX + 1.0) * (i + 1));
-      qSwap(list[j], list[i]);
-    }
-  }
-
-
-  /**
-   * Calculate the band width and critical edges needed by the adjacency matrix
-   * that could store cube connectivity if that matrix used the same ordering
-   * as is in the provided list.  Note that no adjacency matrices are ever used
-   * in this class!
-   *
-   * Critical edges are edges that contribute to band width.
-   *
-   * @param serials A list of cube serial numbers.
-   *
-   * @returns A QPair such that the first element is the needed bandwidth for
-   *          the serials how they are currently ordered in the list, and the
-   *          second element is the number of critical edges.
-   */
-  QPair< int, int > ControlNet::CalcBWAndCE(QList< QString > serials) const {
-
-    for (int i = 0; i < serials.size(); i++)
-      ASSERT(cubeGraphNodes->contains(serials[i]));
-
-    int bw = 0;
-    QList< int > colWidths;
-
-    for (int i = 0; i < serials.size(); i++) {
-      int colWidth = 0;
-      ControlCubeGraphNode *node1 = (*cubeGraphNodes)[serials[i]];
-      for (int j = 0; j < serials.size(); j++) {
-        if (i != j) {
-          ControlCubeGraphNode *node2 = (*cubeGraphNodes)[serials[j]];
-          int colDiff = abs(i - j);
-          if (node1->isConnected(node2) && colDiff > colWidth)
-            colWidth = colDiff;
-        }
-      }
-      colWidths.append(colWidth);
-      if (colWidth > bw)
-        bw = colWidth;
-    }
-
-    int criticalEdges = 0;
-    foreach(int width, colWidths) {
-      if (width == bw)
-        criticalEdges++;
-    }
-
-    return qMakePair(bw, criticalEdges);
-  }
-
-
-  /**
    * Delete a ControlPoint from the network by the point's address.
    *
    * @param point The point to delete
@@ -817,7 +710,7 @@ namespace Isis {
    */
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
     QList< QList< QString > > islandStrings;
-    QList< QList< ControlCubeGraphNode * > > islands = GetNodeConnections();
+    QList< QList< ControlCubeGraphNode * > > islands;
     for (int i = 0; i < islands.size(); i++) {
       QList< QString > newIsland;
       islandStrings.append(newIsland);
@@ -825,38 +718,6 @@ namespace Isis {
         islandStrings[i].append(islands[i][j]->getSerialNumber());
     }
     return islandStrings;
-  }
-
-
-  /**
-   * This method searches through all the cube serial numbers in the network.
-   * Serials which are connected to other serials through points are grouped
-   * together in the same lists.  The list containing the lists of strings is
-   * nothing more than a list of islands such that each island is a list of
-   * serials which are connected to each other.  If the control network is
-   * completely connected, then this list will only have one element (a list
-   * of all the serials in the network).
-   *
-   * @returns A list of cube islands as graph nodes
-   */
-  QList< QList< ControlCubeGraphNode * > > ControlNet::GetNodeConnections() const {
-    QList< ControlCubeGraphNode * > notYetFound = cubeGraphNodes->values();
-    QList< QList< ControlCubeGraphNode * > > islands;
-
-    do {
-      // extract an island from the nodes which are not yet found
-      QList< ControlCubeGraphNode * > island = RandomBFS(notYetFound);
-
-      // remove newly found nodes from notYetFound
-      for (int i = 0; i < island.size(); i++)
-        notYetFound.removeOne(island[i]);
-
-      // Add island to list of islands
-      islands.append(island);
-    }
-    while (notYetFound.size());
-
-    return islands;
   }
 
 
@@ -870,30 +731,6 @@ namespace Isis {
     }
 
     return total;
-  }
-
-
-  /**
-   * Used for verifying graph intergrity
-   *
-   * @returns A string representation of the cube graph
-   */
-  QString ControlNet::CubeGraphToString() const {
-    QStringList serials;
-    QHashIterator < QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
-    while (i.hasNext()) {
-      i.next();
-      serials << i.value()->getSerialNumber();
-    }
-    qSort(serials);
-
-    QString str;
-    for (int i = 0; i < serials.size(); i++) {
-      str += "  " + serials[i] + "\n"
-          + (*cubeGraphNodes)[serials[i]]->connectionsToString() + "\n";
-    }
-
-    return str;
   }
 
 
@@ -1789,29 +1626,6 @@ namespace Isis {
     }
 
     return GetPoint(pointIds->at(index));
-  }
-
-
-  const ControlCubeGraphNode *ControlNet::getGraphNode(
-      QString serialNumber) const {
-    if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Serial Number [" + serialNumber + "] does not exist in"
-          " the network.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    return cubeGraphNodes->value(serialNumber);
-  }
-
-  ControlCubeGraphNode *ControlNet::getGraphNode(
-      QString serialNumber) {
-    if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Serial Number [" + serialNumber + "] does not exist in"
-          " the network.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    return cubeGraphNodes->value(serialNumber);
   }
 
 

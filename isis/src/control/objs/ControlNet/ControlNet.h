@@ -213,8 +213,9 @@ namespace Isis {
    *                           image. Previously, this had to be done throug the graph.
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
    *                           adds to the control network.
-   *  @history 2018-01-26 Kristin Berry - Removed unused methods and associated code:
-   *                           MinimumSpanningTree, 
+   *   @history 2018-01-26 Kristin Berry - Removed unused methods and associated code:
+   *                           MinimumSpanningTree(), GetNodeConnections(), RandomBFS(), Shuffle(),
+   *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode()
    *                           
    */
   class ControlNet : public QObject {
@@ -245,9 +246,7 @@ namespace Isis {
       QList< QString > GetCubeSerials() const;
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
-      QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
       int getEdgeCount() const;
-      QString CubeGraphToString() const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
@@ -261,9 +260,6 @@ namespace Isis {
       ControlPoint *GetPoint(QString pointId);
       const ControlPoint *GetPoint(int index) const;
       ControlPoint *GetPoint(int index);
-
-      const ControlCubeGraphNode *getGraphNode(QString serialNumber) const;
-      ControlCubeGraphNode *getGraphNode(QString serialNumber);
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
@@ -333,11 +329,6 @@ namespace Isis {
 
 
     private: // graphing functions
-      QList< ControlCubeGraphNode * > RandomBFS(QList <
-          ControlCubeGraphNode * > list) const;
-      void Shuffle(QList< ControlCubeGraphNode * > & list) const;
-      QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
-
       /**
        * @author 2012-04-13 Orrin Thomas
        *

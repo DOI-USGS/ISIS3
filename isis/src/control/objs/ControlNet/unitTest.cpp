@@ -145,14 +145,19 @@ void testConnectivity() {
   net.AddPoint(p4);
   net.AddPoint(p5);
 
-  cout << "\nTesting GetNodeConnections()\n";
-  QList< QList< ControlCubeGraphNode * > > islands = net.GetNodeConnections();
-  if (islands[0].contains(m9->ControlSN())) islands.swap(0, 1);
-  cout << "  " << "Island Count = " << islands.size() << endl;
+// This region is to test the unused and now removed GetNodeConnections methods. It's tempoararily
+// left here commented out in case we want to test something similar after updating ControlNet to
+// use boost.
+
+//cout << "\nTesting GetNodeConnections()\n";
+//QList< QList< ControlCubeGraphNode * > > islands = net.GetNodeConnections();
+//if (islands[0].contains(m9->ControlSN())) islands.swap(0, 1);
+//cout << "  " << "Island Count = " << islands.size() << endl;
 
   // This region all has to do with testing the (unused) removed MinimumSpanningTree 
   // method. It's left in here commented-out for now in case we would like to test 
   // island functionality here, using similar output, after updating ControlNet to use boost. 
+
 //cout << "\nTesting MinimumSpanningTree()\n";
 //QList< QSet< ControlMeasure * > > spanningTrees;
 //int nodeCount = 0;
@@ -236,11 +241,11 @@ int main() {
   net.AddPoint(p0);
 
   // test ignoring of measures
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
   p0m1->SetIgnored(true);
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
   p0m1->SetIgnored(false);
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
 
   // add another point - testing case where measures are added to points which
   // are already added to a net.
@@ -256,30 +261,30 @@ int main() {
   p1m2->SetCubeSerialNumber("CHARLIE");
   p1->Add(p1m1);
   p1->Add(p1m2);
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
 
   // test ignoring of point
   cout << "testing setting point to ignored.......................\n";
   p1->SetIgnored(true);
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
   p1->SetIgnored(false);
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
 
   // test measure deletion
   cout << "testing measure deletion & addition....................\n";
   p0->Delete(p0m1);
   p0m1 = NULL;
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
   p0m0 = new ControlMeasure;
   p0m0->SetCubeSerialNumber("DELTA");
   p0->Add(p0m0);
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
 
   // test point deletion
   cout << "testing point deletion.................................\n";
   net.DeletePoint(p1);
   p1 = NULL;
-  cout << net.CubeGraphToString() << "\n";
+//  cout << net.CubeGraphToString() << "\n";
 
   cout << "******* Done testing cube graph ***************\n\n\n";
 
@@ -549,8 +554,8 @@ int main() {
     cout << "    " << sn << "\n";
   }
   
-  cout << "\nTesting getGraphNode: "
-       << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
+  cout << "\nTesting getGraphNode: ";
+//       << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
        
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
 
