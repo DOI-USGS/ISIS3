@@ -53,9 +53,10 @@ namespace Isis {
     //       net, while the editors might be using a different net.  Will Directory keep track?
     //
 
-
+    QWidget *centralWidget = new QWidget;
+    setCentralWidget(centralWidget);
     QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
+    centralWidget->setLayout(layout);
 
     layout->addWidget(m_controlPointEditWidget);
 
@@ -160,4 +161,3 @@ namespace Isis {
 
 
 }
-

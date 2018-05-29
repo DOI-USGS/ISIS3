@@ -60,8 +60,11 @@ namespace Isis {
     // TODO: This layout should be inside of the cnet editor widget, but I put it here to not
     //     conflict with current work in the cnet editor widget code.
     //QWidget *result = new QWidget;
+
+    QWidget *centralWidget = new QWidget;
+    setCentralWidget(centralWidget);
     QGridLayout *resultLayout = new QGridLayout;
-    setLayout(resultLayout);
+    centralWidget->setLayout(resultLayout);
 
     int row = 0;
 
@@ -168,7 +171,7 @@ namespace Isis {
    * Destructor
    */
   CnetEditorView::~CnetEditorView() {
-    
+
     delete m_cnetEditorWidget;
     delete m_permToolBar;
     delete m_activeToolBar;
@@ -192,9 +195,9 @@ namespace Isis {
 
 
   /**
-   * @description Returns the Control displayed in the CnetEditorWidget 
-   *  
-   * @return (Control *) The Control displayed in the CnetEditorWidget 
+   * @description Returns the Control displayed in the CnetEditorWidget
+   *
+   * @return (Control *) The Control displayed in the CnetEditorWidget
    */
   Control *CnetEditorView::control() {
     return m_control;
@@ -325,4 +328,3 @@ namespace Isis {
     return result;
   }
 }
-
