@@ -23,6 +23,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFontDatabase>
 #include <QHeaderView>
 #include <QSizePolicy>
 #include <QStandardItem>
@@ -30,71 +31,130 @@
 #include <QString>
 #include <QStringList>
 #include <QTableView>
+#include <QTextEdit>
 #include <QTextStream>
 #include <QVBoxLayout>
 
 
-
 namespace Isis {
 
-
-
   /** 
-   * Creates a view showing the CSV file from BundleObservation. 
+   * Creates a view showing the CSV or text files from BundleSolutionInfo.
    * 
-   * @param FileItemQsp fileItem  QSharedPointer to the fileItem from the ProjectItemModel
+   * @param FileItemQsp fileItem QSharedPointer to the fileItem from the ProjectItemModel
    */
   BundleObservationView::BundleObservationView(FileItemQsp fileItem, QWidget *parent):
                          AbstractProjectItemView(parent) {
 
+    if (fileItem->fileName().contains(".csv")) {
+      displayCsvFile(fileItem);
+    }
+    else if (fileItem->fileName().contains(".txt")) {
+      displayTextFile(fileItem);
+    }
+  }
+
+
+  /**
+   * Creates a view showing the CSV file from BundleSolutionInfo.
+   *
+   * @param FileItemQsp fileItem QSharedPointer to the fileItem from the ProjectItemModel
+   */
+  void BundleObservationView::displayCsvFile(FileItemQsp fileItem) {
     QStandardItemModel *model = new QStandardItemModel;
+
+    if (!QFile::exists(fileItem->fileName())) {
+      return;
+    }
+
     QFile file(fileItem->fileName());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      return;
+    }
 
-    if (file.open(QIODevice::ReadOnly)) {
+    int numHeaderLines = 3;
+    if (fileItem->fileName().contains("images")) {
+      numHeaderLines = 2;
+    }
 
-      int lineindex = 0;                     // file line counter
-      QTextStream in(&file);                 // read to text stream
+    QTextStream in(&file);                 // read to text stream
 
-      while (!in.atEnd()) {
+    // read and populate header from first two or three lines
+    QString header1;
+    QString header2;
+    QString header3;
+    QStringList lineToken1;
+    QStringList lineToken2;
+    QStringList lineToken3;
 
-        // read one line from textstream(separated by "\n")
-        QString fileLine = in.readLine();
+    header1 = in.readLine();
+    lineToken1 = header1.split(",");
+    header2 = in.readLine();
+    lineToken2 = header2.split(",");
 
-        // parse the read line into separate pieces(tokens) with "," as the delimiter
-        QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
+    if (numHeaderLines == 2) {
+      for (int i = 0; i < lineToken1.size(); i++) {
+        QString t1 = lineToken1.at(i);
+        QString t2 = lineToken2.at(i);
+        QString head = t1 + "\n" + t2;
+        QStandardItem *v1 = new QStandardItem(head);
+        model->setHorizontalHeaderItem(i,v1);
+      }
+    }
+    if (numHeaderLines == 3) {
+      header3 = in.readLine();
+      lineToken3 = header3.split(",");
 
-        // load parsed data to model accordingly
-        for (int j = 0; j < lineToken.size(); j++) {
-          QString value = lineToken.at(j);
+      lineToken1.append("");
+      lineToken2.append("");
 
-          //  First 2 lines are header, load into model header data
-          if (lineindex < 2) {
-            //qDebug()<<"header = "<<value;
-            //model->setHeaderData(j, Qt::Horizontal, value);
-            //qDebug()<<"header = "<<value;
-            QStandardItem *v1 = new QStandardItem(value);
+      for (int i = 0; i < lineToken3.size(); i++) {
+        QString t1 = lineToken1.at(i);
+        QString t2 = lineToken2.at(i);
+        QString t3 = lineToken3.at(i);
+        QString head = t1 + "\n" + t2 + "\n" + t3;
+        QStandardItem *v1 = new QStandardItem(head);
+        model->setHorizontalHeaderItem(i,v1);
+      }
+    }
 
-            model->setHorizontalHeaderItem(j,v1);
-            //model->setHeaderData(j, Qt::Horizontal, value);
-          }
-          else {
-            QStandardItem *item = new QStandardItem(value);
-            model->setItem(lineindex, j, item);
-          }
-        }
+    // populate remainder of table
+    int lineindex = 0;
+    while (!in.atEnd()) {
+      QString fileLine = in.readLine();
 
-        lineindex++;
+      // parse line into separate pieces(tokens) with "," as the delimiter
+      QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
+
+      bool rejected = false;
+      if (lineToken.at(lineToken.size()-1) == "*") {
+        rejected = true;
       }
 
-      file.close();
+      // load parsed data to model accordingly
+      for (int i = 0; i < lineToken.size(); i++) {
+        QString value = lineToken.at(i);
+
+        QStandardItem *item = new QStandardItem(value);
+
+        if (rejected) {
+          item->setData(QColor(200,0,0), Qt::BackgroundRole);
+        }
+
+        model->setItem(lineindex, i, item);
+      }
+      lineindex++;
     }
+
+    file.close();
 
     QTableView *qtable=new QTableView();
     qtable->setModel(model);
     qtable->setSortingEnabled(true);
-    
-    QHeaderView *headerView = qtable->horizontalHeader();
-    headerView->setStretchLastSection(true);
+
+    // resizes to contents based on entire column
+    // NOTE: QHeaderView::ResizeToContents does not allow user to resize by dragging column divider
+    qtable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -104,17 +164,58 @@ namespace Isis {
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
+  }
+
+
+  /**
+   * Creates a view showing a text file from BundleSolutionInfo.
+   *
+   * @param FileItemQsp fileItem QSharedPointer to the fileItem from the ProjectItemModel
+   */
+  void BundleObservationView::displayTextFile(FileItemQsp fileItem) {
+
+    if (!QFile::exists(fileItem->fileName())) {
+      return;
     }
+
+    QFile file(fileItem->fileName());
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      return;
+    }
+
+    QTextStream in(&file);
+    QTextEdit *qText=new QTextEdit();
+
+    // From QFontDatabase::systemFont(SystemFont type) method description: returns most adequate
+    //      font for a given typecase (here FixedFont) for proper integration with system's look and
+    //      feel.
+    const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    qText->setFontFamily(fixedFont.family());
+
+    while (!in.atEnd()) {
+      qText->append(in.readLine());
+    }
+
+    file.close();
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    layout->addWidget(qText);
+
+    qText->moveCursor(QTextCursor::Start);
+
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
+  }
 
 
   /**
    * Destructor
    */
   BundleObservationView::~BundleObservationView() {
-
   }
-
-
 }
 
 

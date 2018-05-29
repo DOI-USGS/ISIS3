@@ -41,17 +41,21 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QWidgetAction>
+#include <QXmlStreamWriter>
 
 #include "ControlPoint.h"
 #include "Cube.h"
+#include "Directory.h"
 #include "Image.h"
 #include "ImageFileListWidget.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
+#include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "Shape.h"
 #include "ToolPad.h"
+#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
@@ -351,4 +355,92 @@ namespace Isis {
   QList<QAction *> Footprint2DView::toolPadActions() {
     return m_toolPad->actions();
   }
+
+
+  /**
+   * @brief Loads the Footprint2DView from an XML file.
+   * @param xmlReader  The reader that takes in and parses the XML file.
+   */
+  void Footprint2DView::load(XmlStackedHandlerReader *xmlReader) {
+    xmlReader->pushContentHandler( new XmlHandler(this) );
+  }
+
+
+  /**
+   * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML 
+   *        file.
+   * @param stream  The XML stream writer
+   * @param newProjectRoot The FileName of the project this Directory is attached to.
+   *
+   * @internal
+   *   @history 2016-11-07 Ian Humphrey - Restored saving of footprints (footprint2view).
+   *                           References #4486.
+   */
+  void Footprint2DView::save(QXmlStreamWriter &stream, Project *project,
+                             FileName newProjectRoot) const {
+
+    stream.writeStartElement("footprint2DView");
+
+    m_fileListWidget->save(stream, project, newProjectRoot);
+    m_sceneWidget->save(stream, project, newProjectRoot);
+
+    stream.writeEndElement();
+  }
+
+
+  /**
+   * @brief This function sets the Directory pointer for the Directory::XmlHandler class
+   * @param directory The new directory we are setting XmlHandler's member variable to.
+   */
+  Footprint2DView::XmlHandler::XmlHandler(Footprint2DView *footprintView) {
+
+    m_footprintView = footprintView;
+  }
+
+
+  /**
+   * @brief The Destructor for Directory::XmlHandler
+   */
+  Footprint2DView::XmlHandler::~XmlHandler() {
+  }
+
+
+  /**
+   * @brief The XML reader invokes this method at the start of every element in the
+   * XML document.  This method expects <footprint2DView/> and <imageFileList/>
+   * elements.
+   * A quick example using this function:
+   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
+   *
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
+   *
+   */
+  bool Footprint2DView::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
+                                           const QString &qName, const QXmlAttributes &atts) {
+    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
+
+    if (result) {
+      if (localName == "mosaicScene") {
+        m_footprintView->mosaicSceneWidget()->load(reader());
+      }
+      if (localName == "imageFileList") {
+        m_footprintView->m_fileListWidget->load(reader());
+      }
+    }
+    return result;
+  }
+
+
+  bool Footprint2DView::XmlHandler::endElement(const QString &namespaceURI,
+      const QString &localName, const QString &qName) {
+    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
+
+    return result;
+  }
 }
+
