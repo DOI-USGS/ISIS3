@@ -582,67 +582,67 @@ int main() {
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");
 
   return 0;
-//#if 0
-//
-//  // -------------------------------------------------------------------------
-//  // Testing the google protocol buffer methods added to the ControlNet class
-//  // SLA 6/30/09
-//  // -------------------------------------------------------------------------
-//
-//  cout << "Enter input cnet: ";
-//  string inNet;
-//  cin >> inNet;
-//  string outFile;
-//  cout << "Enter output file (directory & prefix, no extension): ";
-//  cin >> outFile;
-//
-//  ControlNet *cn1 = new ControlNet;
-//  cout << "Speed Test for ControlNet ...." << endl << endl;
-//  cout << "\nReading from the ascii file....    " << inNet << endl;
-//  std::clock_t start = std::clock();
-////  cn1.ReadControl("/work1/tsucharski/protobuf/isis/nets/cnet.net");
-////  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg2.net");
-////  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg_combinedparts.net");
-//  cn1->ReadControl(inNet);
-//  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
-//
-//  cout << "\nWriting to the binary file...." << endl;
-//  start = std::clock();
-////  cn1.WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
-////  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
-////  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
-//  cn1->WritePB(outFile + ".bin");
-//  std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
-//  delete cn1;
-//
-////  ControlNet cn2;
-//  ControlNet *cn2 = new ControlNet;
-//
-//  cout << "\nReading from the binary file...." << endl;
-//  std::clock_t start2 = std::clock();
-////  cn2.ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
-////  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
-////  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
-//  cn2->ReadPBControl(outFile + ".bin");
-//  std::cout << ((std::clock() - start2) / (double)CLOCKS_PER_SEC) << " seconds \n";
-//
-////  apLat = (*cn2)[2].AprioriLatitude();
-////  cout<<"binaryNet AprioriLatitude = "<<apLat<<endl;
-//
-////cout << "\nConverting the binary to Pvl...." << endl;
-////std::clock_t start2 = std::clock();
-////cn1.ConvertBinToPvl();
-////std::cout<< ( ( std::clock() - start2 ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
-//
-//
-//
-//  cout << "\nWriting to the Pvl file...." << endl;
-//  std::clock_t start3 = std::clock();
-////  cn2.Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.pvl");
-////  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.pvl");
-////  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.pvl");
-//  cn2->Write(outFile + ".pvl");
-//  std::cout << ((std::clock() - start3) / (double)CLOCKS_PER_SEC) << " seconds \n";
-//
-//#endif
+  #if 0
+
+    // -------------------------------------------------------------------------
+    // Testing the google protocol buffer methods added to the ControlNet class
+    // SLA 6/30/09
+    // -------------------------------------------------------------------------
+
+    cout << "Enter input cnet: ";
+    string inNet;
+    cin >> inNet;
+    string outFile;
+    cout << "Enter output file (directory & prefix, no extension): ";
+    cin >> outFile;
+
+    ControlNet *cn1 = new ControlNet;
+    cout << "Speed Test for ControlNet ...." << endl << endl;
+    cout << "\nReading from the ascii file....    " << inNet << endl;
+    std::clock_t start = std::clock();
+  //  cn1.ReadControl("/work1/tsucharski/protobuf/isis/nets/cnet.net");
+  //  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg2.net");
+  //  cn1->ReadControl("/work1/tsucharski/protobuf/isis/nets/pntreg_combinedparts.net");
+    cn1->ReadControl(inNet);
+    std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
+
+    cout << "\nWriting to the binary file...." << endl;
+    start = std::clock();
+  //  cn1.WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
+  //  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
+  //  cn1->WritePB("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
+    cn1->WritePB(outFile + ".bin");
+    std::cout << ((std::clock() - start) / (double)CLOCKS_PER_SEC) << " seconds \n";
+    delete cn1;
+
+  //  ControlNet cn2;
+    ControlNet *cn2 = new ControlNet;
+
+    cout << "\nReading from the binary file...." << endl;
+    std::clock_t start2 = std::clock();
+  //  cn2.ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.bin");
+  //  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.bin");
+  //  cn2->ReadPBControl("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.bin");
+    cn2->ReadPBControl(outFile + ".bin");
+    std::cout << ((std::clock() - start2) / (double)CLOCKS_PER_SEC) << " seconds \n";
+
+  //  apLat = (*cn2)[2].AprioriLatitude();
+  //  cout<<"binaryNet AprioriLatitude = "<<apLat<<endl;
+
+  //cout << "\nConverting the binary to Pvl...." << endl;
+  //std::clock_t start2 = std::clock();
+  //cn1.ConvertBinToPvl();
+  //std::cout<< ( ( std::clock() - start2 ) / (double)CLOCKS_PER_SEC ) <<" seconds \n";
+
+
+
+    cout << "\nWriting to the Pvl file...." << endl;
+    std::clock_t start3 = std::clock();
+  //  cn2.Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/cnet.pvl");
+  //  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg2.pvl");
+  //  cn2->Write("/work1/tsucharski/protobuf/isis/nets/testMultiMsgs/pntreg_combinedparts.pvl");
+    cn2->Write(outFile + ".pvl");
+    std::cout << ((std::clock() - start3) / (double)CLOCKS_PER_SEC) << " seconds \n";
+
+  #endif
 }
