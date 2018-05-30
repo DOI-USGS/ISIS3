@@ -80,6 +80,8 @@ namespace Isis {
    *                           #5008.
    *   @history 2017-08-03 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
    *                           Fixes #5090
+   *   @history 2018-05-30 Tracie Sucharski & Summer Stapleton - Updated view to handle parent class
+   *                           now inheriting from QMainWindow instead of QWidget. References #5433.
    */
   class CubeDnView : public AbstractProjectItemView {
 
