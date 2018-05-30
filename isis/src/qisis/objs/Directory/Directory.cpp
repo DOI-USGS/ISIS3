@@ -751,7 +751,7 @@ namespace Isis {
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
 
-    emit newWidgetAvailable(result);
+    emit newDockAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
