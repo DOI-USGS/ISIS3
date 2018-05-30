@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QGridLayout>
+#include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -698,7 +699,7 @@ namespace Isis {
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
 
-    emit newWidgetAvailable(result);
+    emit newDockAvailable(result);
 
     //  Connections between mouse button events from view and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
@@ -1803,6 +1804,11 @@ namespace Isis {
       QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
         "has been saved.";
       m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
+    }
+
+    // Make sure the ControlPointEditView "Save Net" button is no longer red
+    if (controlPointEditView()) {
+      controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
     }
   }
 
