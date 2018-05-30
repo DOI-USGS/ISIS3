@@ -72,6 +72,10 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-30 Summer Stapleton - updated the view to remove QMainWindow constructor, 
+   *                           include a central widget and to remove layout capacity. This change 
+   *                           was made to adjust to parent class now inheriting from QMainWindow 
+   *                           instead of QWidget. References #5433.
    */
   class Footprint2DView : public AbstractProjectItemView {
 

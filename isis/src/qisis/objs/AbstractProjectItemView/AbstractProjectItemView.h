@@ -65,6 +65,7 @@ namespace Isis {
    *                           instead of QWidget. This updates all views in the ipce main window 
    *                           to be main windows themselves, changing from an mdi interface to an
    *                           sdi interface.
+   *   @history 2018-05-30 Tracie Sucharski - Added the WindowFlag to set this as a Widget. 
    */
   class AbstractProjectItemView : public QMainWindow {
 
