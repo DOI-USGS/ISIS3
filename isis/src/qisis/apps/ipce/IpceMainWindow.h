@@ -24,6 +24,7 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
 #include <QMdiSubWindow>
@@ -129,6 +130,10 @@ namespace Isis {
    *                           test to determine whether project needs saving.
    *   @history 2018-05-01 Tracie Sucharski - Code accidently left commented from previous checking.
    *                           Fixes #5412.
+   *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
+   *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
+   *                           widget. Added addDock method. This needs further work to clean up and
+   *                           change the mdi interface.
    *  
    */
   class IpceMainWindow : public QMainWindow {
@@ -139,6 +144,7 @@ namespace Isis {
 
     public slots:
       void addView(QWidget *newWidget);
+      void addDock(QMainWindow *newWidgetForDock);
       void removeView(QWidget *view);
       void removeAllViews();
 

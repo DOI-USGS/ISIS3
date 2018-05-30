@@ -76,19 +76,25 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-    QMdiArea *centralWidget = new QMdiArea;
-    centralWidget->setActivationOrder(QMdiArea::StackingOrder);
+//  QMdiArea *centralWidget = new QMdiArea;
+//  centralWidget->setActivationOrder(QMdiArea::StackingOrder);
 
-    connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
-            this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
+//  connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
+//          this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
 
+
+    QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+    centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    //centralWidget->hide();
     setDockNestingEnabled(true);
 
     m_activeView = NULL;
 
     try {
       m_directory = new Directory(this);
+      connect(m_directory, SIGNAL(newDockAvailable(QMainWindow *)),
+              this, SLOT(addDock(QMainWindow *)));
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
       connect(m_directory, SIGNAL(viewClosed(QWidget *)), this, SLOT(removeView(QWidget *)));
@@ -115,6 +121,7 @@ namespace Isis {
     projectTreeView->treeView()->expandAll();
     projectTreeView->installEventFilter(this);
     m_projectDock->setWidget(projectTreeView);
+    m_projectDock->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
@@ -189,9 +196,9 @@ namespace Isis {
     addToolBar(m_toolPad);
     updateToolBarActions();
 
-    setTabbedViewMode();
-    centralWidget->setTabsMovable(true);
-    centralWidget->setTabsClosable(true);
+//  setTabbedViewMode();
+//  centralWidget->setTabsMovable(true);
+//  centralWidget->setTabsClosable(true);
 
     QStringList args = QCoreApplication::arguments();
 
@@ -204,6 +211,23 @@ namespace Isis {
     // above.  They are both called from setActiveView.
     //  setActiveView(projectTreeView);
     // ken testing
+  }
+
+
+  void IpceMainWindow::addDock(QMainWindow *newWidgetForDock) {
+
+    QDockWidget *dock = new QDockWidget(newWidgetForDock->windowTitle(), this, Qt::SubWindow);
+    dock->setWidget(newWidgetForDock);
+    dock->setObjectName(newWidgetForDock->windowTitle());
+
+    // This needs to eventually be a work order...
+    dock->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(newWidgetForDock, SIGNAL(destroyed(QObject *)),
+            dock, SLOT(deleteLater()));
+
+    addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
+//    addDockWidget(area, dock, orientation);
   }
 
 
@@ -275,7 +299,7 @@ namespace Isis {
 //    window->show();
 //    window->activateWindow();
 //    mdiArea->addSubWindow(window);
-      mdiArea->closeAllSubWindows();
+//    mdiArea->closeAllSubWindows();
 //    delete window;
     }
     if (!m_detachedViews.isEmpty()) {
@@ -593,15 +617,15 @@ namespace Isis {
             this, SLOT( toggleViewMode() ) );
     m_viewMenuActions.append(viewModeAction);
 
-    m_cascadeViewsAction = new QAction("Cascade Views", this);
-    connect(m_cascadeViewsAction, SIGNAL( triggered() ),
-            centralWidget(), SLOT( cascadeSubWindows() ) );
-    m_viewMenuActions.append(m_cascadeViewsAction);
-
-    m_tileViewsAction = new QAction("Tile Views", this);
-    connect(m_tileViewsAction, SIGNAL( triggered() ),
-            centralWidget(), SLOT( tileSubWindows() ) );
-    m_viewMenuActions.append(m_tileViewsAction);
+//  m_cascadeViewsAction = new QAction("Cascade Views", this);
+//  connect(m_cascadeViewsAction, SIGNAL( triggered() ),
+//          centralWidget(), SLOT( cascadeSubWindows() ) );
+//  m_viewMenuActions.append(m_cascadeViewsAction);
+//
+//  m_tileViewsAction = new QAction("Tile Views", this);
+//  connect(m_tileViewsAction, SIGNAL( triggered() ),
+//          centralWidget(), SLOT( tileSubWindows() ) );
+//  m_viewMenuActions.append(m_tileViewsAction);
 
     QAction *detachActiveViewAction = new QAction("Detach Active View", this);
     connect(detachActiveViewAction, SIGNAL( triggered() ),
@@ -697,7 +721,7 @@ namespace Isis {
         QSettings::NativeFormat);
 
     projectSettings.setValue("geometry", saveGeometry());
-    projectSettings.setValue("windowState", saveState());
+    //projectSettings.setValue("windowState", saveState());
     projectSettings.setValue("size", size());
     projectSettings.setValue("pos", pos());
 
@@ -810,7 +834,7 @@ namespace Isis {
         .expanded(), QSettings::NativeFormat);
 
     restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("windowState").toByteArray());
+    //restoreState(settings.value("windowState").toByteArray());
 
     QStringList projectNameList;
     QStringList projectPathList;
