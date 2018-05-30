@@ -1,5 +1,5 @@
-#ifndef CubeDnViewMW_h
-#define CubeDnViewMW_h
+#ifndef CubeDnView_h
+#define CubeDnView_h
 /**
  * @file
  * $Date$
@@ -123,8 +123,6 @@ namespace Isis {
       void enableControlNetTool();
 
     private slots:
-      void createActions(Directory *directory);
-
       void onCurrentChanged(const QModelIndex &current);
       void onCubeViewportActivated(MdiCubeViewport *);
       void onItemAdded(ProjectItem *item);
