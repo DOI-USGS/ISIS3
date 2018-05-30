@@ -375,6 +375,7 @@ namespace Isis {
       // if the graph doesn't have the sn
       if (!m_vertexMap.contains(sn)) {
         ImageVertex newVertex = boost::add_vertex(m_controlGraph); 
+        m_controlGraph[newVertex].serial = sn; 
         m_vertexMap.insert(sn, newVertex);
   //    boost::put(indexMapAdaptor, newVertex, i); <-- what does this do? 
       }
@@ -385,6 +386,8 @@ namespace Isis {
       QString serial = measure->GetCubeSerialNumber();
       ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
       node->addMeasure(measure);
+
+      m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
 
       // in this measure's node add connections to the other nodes reachable from
       // its point
@@ -414,16 +417,27 @@ namespace Isis {
 // temporary print graph to test
   QString ControlNet::GraphToString() const {
     // Iterate through the vertices and print them out
+    
+    // Checking to make sure we match...    
+    QList<QString> keys = m_vertexMap.keys();
+    for (int i=0; i< keys.size(); i++) {
+      std::cout << keys[i] << " = " << m_controlGraph[m_vertexMap[keys[i]]].serial << std::endl; 
+    }
+
     QString graphString; 
-    VertexIndexMap indexMap;
     typedef boost::graph_traits<Network>::vertex_iterator vertex_iter;
     std::pair<vertex_iter, vertex_iter> vp;
     for(vp = vertices(m_controlGraph); vp.first != vp.second; ++vp.first) {
-      std::cout << indexMap[*vp.first] << " ----- " << indexMap[*vp.second] << std::endl;
-//      graphString.append(" --- ");
-//      graphString.append(indexMap[*vp.second]);
-//      graphString.append('\n');
+      std::cout << "serial: " << m_controlGraph[*vp.first].serial << std::endl;
+      std::cout << "assoc. measure list: " << m_controlGraph[*vp.first].measures.size() << std::endl;
     }
+
+    typedef boost::graph_traits<Network>::edge_iterator edge_iter;
+    std::pair<edge_iter, edge_iter> ep;
+    edge_iter ei, ei_end;
+    for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei)
+      std::cout << "strength: " << m_controlGraph[*ei].strength << endl;
+
     return graphString;
    }
 
@@ -473,6 +487,8 @@ namespace Isis {
       // if the graph doesn't have the sn (boost) 
       if (!m_vertexMap.contains(sn)) {
         ImageVertex newVertex = boost::add_vertex(m_controlGraph); 
+        m_controlGraph[newVertex].serial = sn; 
+//        m_controlGraph[newVertex].measures = new QList<ControlMeasure*>;  
         m_vertexMap.insert(sn, newVertex);
       }
     }
@@ -482,7 +498,8 @@ namespace Isis {
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
     node->addMeasure(measure);
 
-    // new graph: add node to edge or vertex descriptor?? 
+    // new graph: add measure to vertex descriptor?? 
+    m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
 
     // in this measure's node add connections to the other nodes reachable from
     // its point
@@ -565,6 +582,12 @@ namespace Isis {
             node->addConnection(neighborNode, point);
             neighborNode->addConnection(node, point);
           }
+
+          // new graph:
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                         m_vertexMap[sn],
+                                                         m_controlGraph).first;
+            m_controlGraph[connection].strength++;
         }
       }
     }
@@ -605,6 +628,13 @@ namespace Isis {
       // Break connections
       measureIgnored(measure);
     }
+    
+    // For our new graph, the thing that can happen when we remove a measure
+    // is that an _edge_ may need to be deleted. 
+    // this isn't quite right. 
+//    boost::clear_vertex(vertexMap[testSerial], m_controlGraph);
+//    boost::remove_vertex(vertexMap[testSerial], m_controlGraph);
+//    vertexMap.remove(testSerial);
 
     // Remove the measure from the node.  If this caused the node to be empty,
     // then delete the node.
@@ -649,6 +679,7 @@ namespace Isis {
           neighborNode->removeConnection(node, point);
           node->removeConnection(neighborNode, point);
         }
+
       }
     }
   }
@@ -822,6 +853,7 @@ namespace Isis {
    */
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
+//    return m_controlGraph[m_vertexMap[serialNumber]].measures;  <--- segfaults. 
     return (*cubeGraphNodes)[serialNumber]->getMeasures();
   }
 

@@ -237,9 +237,9 @@ namespace Isis {
       friend class ControlPoint;
 
     public:
-      // Temporarily put these here: 
       struct Image {
         QString serial;
+        QList<ControlMeasure* > measures;
       };
 
       struct Connection {
