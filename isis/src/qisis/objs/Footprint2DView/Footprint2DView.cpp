@@ -61,7 +61,7 @@ namespace Isis {
   /**
    * Constructor.
    *
-   * @param parent (QMainWindow *) Pointer to parent QWidget
+   * @param parent (QMainWindow *) Pointer to parent QMainWindow
    */
   Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) :
                       AbstractProjectItemView(parent) {
