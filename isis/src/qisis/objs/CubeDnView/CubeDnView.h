@@ -79,7 +79,12 @@ namespace Isis {
    *                           ipce tool to redraw control measures on cube viewports. Fixes #5007,
    *                           #5008.
    *   @history 2017-08-03 Cole Neubauer - Changed all references from IpceTool to ControlNetTool
-   *                           Fixes #5090
+   *                           Fixes #5090.
+   *   @history 2018-05-30 Tracie Sucharski - Refactored for new docked interface.  Views are now
+   *                           responsible for creating their menus and toolbars.
+   *                           AbstractProjectItemView now inherits from QMainWindow, so the
+   *                           Workspace of this view is the centralWidget. This needs further work
+   *                           to cleanup and fit in with the new docked view interface.git
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -123,6 +128,8 @@ namespace Isis {
       void enableControlNetTool();
 
     private slots:
+      void createActions(Directory *directory);
+
       void onCurrentChanged(const QModelIndex &current);
       void onCubeViewportActivated(MdiCubeViewport *);
       void onItemAdded(ProjectItem *item);

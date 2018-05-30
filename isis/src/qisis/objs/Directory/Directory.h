@@ -40,6 +40,7 @@
 
 class QAction;
 class QDockWidget;
+class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -240,6 +241,9 @@ namespace Isis {
    *   @history 2018-05-30 Summer Stapleton - updated the emit in addFootprint2DView from 
    *                           newWidgetAvailable to newDockAvailable to handle new signal from 
    *                           IpceMainWindow. References #5433.
+   *   @history 2018-05-30 Tracie Sucharski - Changed for re-factored docked views. Added signal to
+   *                           let IpceMainWindow know there is a new view available for docking.
+   *                           This needs further work to cleanup and change the mdi interface.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -360,6 +364,7 @@ namespace Isis {
       void newWarning();
       void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
+      void newDockAvailable(QMainWindow *newWidget);
 
       void viewClosed(QWidget *widget);
 
