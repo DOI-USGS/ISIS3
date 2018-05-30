@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QMainWindow>
 #include <QMultiMap>
 #include <QObject>
 #include <QPointer>
@@ -236,6 +237,9 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-30 Summer Stapleton - updated the emit in addFootprint2DView from 
+   *                           newWidgetAvailable to newDockAvailable to handle new signal from 
+   *                           IpceMainWindow. References #5433.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -354,6 +358,7 @@ namespace Isis {
     signals:
       void directoryCleaned();
       void newWarning();
+      void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
 
       void viewClosed(QWidget *widget);

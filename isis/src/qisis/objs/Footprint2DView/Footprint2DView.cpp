@@ -61,7 +61,7 @@ namespace Isis {
   /**
    * Constructor.
    *
-   * @param parent Pointer to parent QWidget
+   * @param parent (QMianWindow *) Pointer to parent QWidget
    */
   Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) :
                       AbstractProjectItemView(parent) {
@@ -100,10 +100,10 @@ namespace Isis {
     //  the footprints.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
-    QHBoxLayout *viewlayout = new QHBoxLayout();
-
-    layout->addWidget(statusBar);
+    // QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
+    // QHBoxLayout *viewlayout = new QHBoxLayout();
+    // 
+    // layout->addWidget(statusBar);
 
     m_fileListWidget = new ImageFileListWidget(directory);
 
@@ -118,21 +118,24 @@ namespace Isis {
     imageFileListdock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
     imageFileListdock->setWidget(m_fileListWidget);
+    
+    addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
+    setCentralWidget(m_sceneWidget);
 
-    m_window = new QMainWindow();
-    m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
-    m_window->setCentralWidget(m_sceneWidget);
-    viewlayout->addWidget(m_window);
-    layout->addLayout(viewlayout);
+    // m_window = new QMainWindow();
+    // m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
+    // m_window->setCentralWidget(m_sceneWidget);
+    // viewlayout->addWidget(m_window);
+    // layout->addLayout(viewlayout);
 
-    setLayout(layout);
+    // setLayout(layout);
 
-    m_permToolBar = new QToolBar("Standard Tools", 0);
+    m_permToolBar = addToolBar("Standard Tools");
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
     //toolBarLayout->addWidget(m_permToolBar);
 
-    m_activeToolBar = new QToolBar("Active Tool", 0);
+    m_activeToolBar = addToolBar("Active Tool");
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
     //toolBarLayout->addWidget(m_activeToolBar);
@@ -151,10 +154,10 @@ namespace Isis {
 
     setAcceptDrops(true);
 
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
+    // QSizePolicy policy = sizePolicy();
+    // policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    // policy.setVerticalPolicy(QSizePolicy::Expanding);
+    // setSizePolicy(policy);
   }
 
 

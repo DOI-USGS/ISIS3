@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QGridLayout>
+#include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -698,7 +699,7 @@ namespace Isis {
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
 
-    emit newWidgetAvailable(result);
+    emit newDockAvailable(result);
 
     //  Connections between mouse button events from view and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
@@ -750,7 +751,7 @@ namespace Isis {
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
 
-    emit newWidgetAvailable(result);
+    emit newDockAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
