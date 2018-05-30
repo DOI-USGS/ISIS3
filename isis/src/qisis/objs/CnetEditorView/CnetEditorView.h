@@ -49,8 +49,13 @@ namespace Isis {
    * Ipce view containing the CnetEditorWidget
    *
    * @author 2018-04-04 Tracie Sucharski
-   *    
-   * @internal 
+   *
+   * @internal
+   *    @history 2018-05-28 Kaitlyn Lee - Because AbstractProjectItemView now inherits
+   *                                from QMainWindow, I added a dummy central widget
+   *                                and set its layout to the grid layout. We used to set
+   *                                the whole CnetEditorView widget's layout, now we only
+   *                                set the central widget's layout.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -58,7 +63,7 @@ class CnetEditorView : public AbstractProjectItemView {
   Q_OBJECT
 
   public:
-    CnetEditorView(Directory *directory, Control *control, FileName configFile, 
+    CnetEditorView(Directory *directory, Control *control, FileName configFile,
                    QWidget *parent = 0);
     ~CnetEditorView();
 
