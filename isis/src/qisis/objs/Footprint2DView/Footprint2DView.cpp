@@ -99,7 +99,8 @@ namespace Isis {
     //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
     //  the footprints.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
-
+    
+    setStatusBar(statusBar);
 
     m_fileListWidget = new ImageFileListWidget(directory);
 
