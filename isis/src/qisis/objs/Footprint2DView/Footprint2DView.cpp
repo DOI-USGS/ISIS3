@@ -100,10 +100,6 @@ namespace Isis {
     //  the footprints.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
-    // QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
-    // QHBoxLayout *viewlayout = new QHBoxLayout();
-    // 
-    // layout->addWidget(statusBar);
 
     m_fileListWidget = new ImageFileListWidget(directory);
 
@@ -122,27 +118,17 @@ namespace Isis {
     addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
     setCentralWidget(m_sceneWidget);
 
-    // m_window = new QMainWindow();
-    // m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
-    // m_window->setCentralWidget(m_sceneWidget);
-    // viewlayout->addWidget(m_window);
-    // layout->addLayout(viewlayout);
-
-    // setLayout(layout);
 
     m_permToolBar = addToolBar("Standard Tools");
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
 
     m_activeToolBar = addToolBar("Active Tool");
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
 
 
     m_sceneWidget->addToPermanent(m_permToolBar);
