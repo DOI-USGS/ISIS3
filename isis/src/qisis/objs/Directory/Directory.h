@@ -39,6 +39,7 @@
 
 class QAction;
 class QDockWidget;
+class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -236,6 +237,9 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-30 Tracie Sucharski - Changed for re-factored docked views. Added signal to
+   *                           let IpceMainWindow know there is a new view available for docking.
+   *                           This needs further work to cleanup and change the mdi interface.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -355,6 +359,7 @@ namespace Isis {
       void directoryCleaned();
       void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
+      void newDockAvailable(QMainWindow *newWidget);
 
       void viewClosed(QWidget *widget);
 

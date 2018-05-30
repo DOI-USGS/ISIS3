@@ -43,6 +43,11 @@ namespace Isis {
    * @param[in] parent (QMainWindow *) The parent widget
    */
   AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QMainWindow(parent) {
+
+    setWindowFlags(Qt::Widget);
+
+
+
     m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
   }
