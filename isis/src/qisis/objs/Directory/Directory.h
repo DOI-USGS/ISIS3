@@ -200,10 +200,10 @@ namespace Isis {
    *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
    *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
-   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
+   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created.
    *                           Fixes #5224
    *   @history 2017-12-01 Adam Goins Modified updateRecentProjects() to update the recent projects
-   *                           menu it display a chronologically ordered list of recently loaded 
+   *                           menu it display a chronologically ordered list of recently loaded
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
@@ -236,6 +236,8 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-14 Kaitlyn Lee - addControlPointEditView() and addCnetEditorView() now emit
+   *                           newDockAvailable().
    */
   class Directory : public QObject {
     Q_OBJECT
