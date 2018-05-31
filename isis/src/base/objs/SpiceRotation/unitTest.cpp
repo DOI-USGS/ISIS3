@@ -37,6 +37,8 @@ int main(int argc, char *argv[]) {
   QString mocbsp(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
   QString pck("/usgs/cpkgs/isis3/data/base/kernels/pck/pck00009.tpc");
+  QString cgFK(dir + "ROS_V29.TF");
+  QString cgCK(dir + "CATT_DV_145_02_______00216.BC");
   //QString mocadd(dir+"mocAddendum.ti");
   QString mocspice(dir + "mocSpiceRotationUnitTest.ti");
   furnsh_c(naif.toLatin1().data());
@@ -47,6 +49,8 @@ int main(int argc, char *argv[]) {
   furnsh_c(de.toLatin1().data());
   furnsh_c(pck.toLatin1().data());
   furnsh_c(mocspice.toLatin1().data());
+  furnsh_c(cgFK.toLatin1().data());
+  furnsh_c(cgCK.toLatin1().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;
@@ -251,7 +255,7 @@ int main(int argc, char *argv[]) {
   lookC.push_back(1.);
   vector<double> lookJ = rot.J2000Vector(lookC);
   // Save a J2000 vector for testing target body partial methods later.
-  vector<double> testLookJ(lookJ);  
+  vector<double> testLookJ(lookJ);
   cout << " For lookJ = " << lookJ[0] << " " << lookJ[1] << " " << lookJ[2] << endl;
   vector<double> dAraLookC(3);
   dAraLookC = rot.ToReferencePartial(lookJ, SpiceRotation::WRT_RightAscension, 0);
@@ -434,11 +438,11 @@ int main(int argc, char *argv[]) {
   // Use Galileo Io image with product id = 21I0165 for testing nutation/precession terms.  Mars has none.
   //  tet = -15839262.24291
   // body frame code for Io = 10023
-  // Use Europa for exercising the code using nutation/precession terms.  Mars has none. 
+  // Use Europa for exercising the code using nutation/precession terms.  Mars has none.
   SpiceRotation targrot1(10014);   //Frame code for Mars
   // SpiceRotation targrotV1(10024);   //Frame code for Europa
   // targrotV1.LoadCache(-646009153.46723, -646009153.46723, 1); // This calls LoadPcFromSpice for Europa
-  SpiceRotation targrotV1(10023);   //Frame code for Io  
+  SpiceRotation targrotV1(10023);   //Frame code for Io
   targrotV1.LoadCache(-15839262.24291, -15839262.24291, 1); // This calls LoadPcFromSpice for Io
   targrot1.LoadCache(startTime, endTime, 2); // This calls LoadPcFromSpice for Mars
   cout << "Test CacheLabel for PCK data..." << endl;
@@ -446,8 +450,8 @@ int main(int argc, char *argv[]) {
   Table pcktabV = targrotV1.Cache("Planetary constants test table"); // This calls CacheLabel
   SpiceRotation targrot(10014);  // Mars
   // SpiceRotation targrotV(10024);  // Europa  --  The results for pm will differ slightly from TrigBasis because of the older PCK
-  SpiceRotation targrotV(10023);  // Io  -- 
-  cout << "Test LoadPCFromTable..." << endl; 
+  SpiceRotation targrotV(10023);  // Io  --
+  cout << "Test LoadPCFromTable..." << endl;
   targrot.LoadCache(pcktab);  // This calls LoadPcFromTable
   targrotV.LoadCache(pcktabV);  // This calls LoadPcFromTable
   // Now get the values
@@ -509,7 +513,7 @@ int main(int argc, char *argv[]) {
   // cout << "    Angles = " << pckanglesV[0]*dpr_c() <<","<< pckanglesV[1]*dpr_c() <<","
   //      << pckanglesV[2]*dpr_c() <<endl <<endl;
   // end Europa test
-  
+
   // For testing Io with the nutation/precession terms and a cache size of 1
   tet = -15839262.24291;  // time et for Io
   ibod = 501; // Io
@@ -520,8 +524,8 @@ int main(int argc, char *argv[]) {
        << pckanglesV[2]*dpr_c() <<endl <<endl;
   // end Io test
 
-  // For testing Mars with more than one value in the cache 
-  cout << endl << "  Mars original SPICE values for target body orientation unadjusted" 
+  // For testing Mars with more than one value in the cache
+  cout << endl << "  Mars original SPICE values for target body orientation unadjusted"
        << endl;
   cout << "  Source = " << targrot.GetSource() << endl;
   for (int i = 0; i < 10; i++) {
@@ -571,16 +575,18 @@ int main(int argc, char *argv[]) {
 
     // Test angular velocities 
   cout << endl << endl << "Testing.*" << endl << endl;
+    // Test angular velocities
+  cout << endl << endl << "Testing angular velocity with Io data ..." << endl;
   if (targrotV.HasAngularVelocity()) {
     vector<double> av = targrotV.AngularVelocity();
     cout << "SpiceRotation av = " << av[0] << " " << av[1] << " " << av[2] << endl;
     SpiceDouble tsipm[6][6];
-    sxform_c ( "J2000", "IAU_IO", -15839262.24291, tsipm); 
-    // sxform_c ( "J2000", "IAU_EUROPA", -646009153.46723, tsipm); 
+    sxform_c ( "J2000", "IAU_IO", -15839262.24291, tsipm);
+    // sxform_c ( "J2000", "IAU_EUROPA", -646009153.46723, tsipm);
     SpiceDouble tipm[3][3];
     vector<SpiceDouble> nav(3,0.);
     xf2rav_c (tsipm, tipm, &(nav[0]) );
-    cout << "J2000 to body-fixed Naif av = " << nav[0] << " " << nav[1] << " " << nav[2] << endl; 
+    cout << "J2000 to body-fixed Naif av = " << nav[0] << " " << nav[1] << " " << nav[2] << endl;
   }
   cout << endl;
 
@@ -608,7 +614,7 @@ int main(int argc, char *argv[]) {
        << matchLookJ[1] << " " << matchLookJ[2] << endl;
 
   dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Twist, 1);
-  cout << endl << " dLookB with respect to rotation rate = " << dLookB[0] << " " << 
+  cout << endl << " dLookB with respect to rotation rate = " << dLookB[0] << " " <<
           dLookB[1] << " " << dLookB[2] << endl;
   //If I apply toJ2000Partial to dLookB, I get back lookJ(x,y,0) with roundoff  -- 05-12-2015 DAC
   matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Twist, 1);
@@ -616,7 +622,7 @@ int main(int argc, char *argv[]) {
        << matchLookJ[1] << " " << matchLookJ[2] << endl;
 
   dLookB = targrot.ToReferencePartial(testLookJ, SpiceRotation::WRT_Twist, 0);
-  cout << endl << " dLookB with respect to rotation = " << dLookB[0] << " " << 
+  cout << endl << " dLookB with respect to rotation = " << dLookB[0] << " " <<
           dLookB[1] << " " << dLookB[2] << endl;
   //If I apply toJ2000Partial to dLookB, I get back lookJ(x,y,0) with roundoff  -- 05-12-2015 DAC
   matchLookJ = targrot.toJ2000Partial(dLookB, SpiceRotation::WRT_Twist, 0);
@@ -638,15 +644,28 @@ int main(int argc, char *argv[]) {
   if (frameType == SpiceRotation::BPC)
     cout << "Frame type is binary PCK and cannot be updated" << endl;
 
-  
+
   cout << "End of PCK testing" << endl;
 
-  
+  // Test CK based body rotation
+  cout << endl << endl << "Testing CK based body rotation with 67P/Churyumov–Gerasimenko data ..." << endl;
+
+  SpiceRotation cgRotation(-1000012000);
+  // Test time from Rosetta OSIRIS NAC image n20140901t144253568id30f22
+  double cgTestTime = 462854709.88606;
+  cgRotation.SetEphemerisTime(cgTestTime);
+  vector<double> cgCJ = cgRotation.Matrix();
+  cout << "Time = " << cgRotation.EphemerisTime() << endl;
+  cout << "CJ = " << cgCJ[0] << " " << cgCJ[1] << " " << cgCJ[2] << endl;
+  cout << "     " << cgCJ[3] << " " << cgCJ[4] << " " << cgCJ[5] << endl;
+  cout << "     " << cgCJ[6] << " " << cgCJ[7] << " " << cgCJ[8] << endl;
+
+
   //Test exceptions
   cout << endl << endl << "Testing exceptions..." << endl << endl;
   SpiceRotation testRot(-94031); // MGS_MOC
 
-  // SpiceRotation(frameCode, targetCode) 
+  // SpiceRotation(frameCode, targetCode)
   //     "Cannot find [key] in text kernels
   try {
     cout << endl;
@@ -660,13 +679,13 @@ int main(int argc, char *argv[]) {
   //     "Argument cacheSize must not be less or equal to zero"
   try {
     cout << endl;
-    testRot.LoadCache(10, 20, -1); 
+    testRot.LoadCache(10, 20, -1);
   }
   catch (IException &e) {
     e.print();
   }
 
-  //     "Argument startTime must be less than or equal to endTime"   
+  //     "Argument startTime must be less than or equal to endTime"
   try {
     cout << endl;
     testRot.LoadCache(20, 10, 1);
@@ -688,7 +707,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     testRot.LoadCache(startTime, endTime, 2);
-    testRot.LoadCache(startTime, endTime - 1, 2); 
+    testRot.LoadCache(startTime, endTime - 1, 2);
   }
   catch (IException &e) {
     e.print();
@@ -705,7 +724,7 @@ int main(int argc, char *argv[]) {
   }
 
   // LineCache(tableName)
-  //     "Only cached rotations can be returned as a line cache of quaternions and time" 
+  //     "Only cached rotations can be returned as a line cache of quaternions and time"
   try {
     cout << endl;
     SpiceRotation sr(-94031);
@@ -714,7 +733,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     e.print();
   }
-    
+
   // Cache(tableName)
   //     "To create table source of data must be either Memcache or PolyFunction"
   try {
@@ -739,10 +758,10 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 
-  // DPolynomial(coeffIndex) 
-  //     "Unable to evaluate the derivative of the SPCIE rotation fit 
+  // DPolynomial(coeffIndex)
+  //     "Unable to evaluate the derivative of the SPCIE rotation fit
   //      polynomial for the given coefficient index. Index is negative
-  //      or exceeds degree of polynomial"    
+  //      or exceeds degree of polynomial"
   try {
     cout << endl;
     testRot.DPolynomial(-1);
@@ -752,7 +771,7 @@ int main(int argc, char *argv[]) {
   }
 
   // DPckPolynomial(partialVar, coeffIndex)
-  //     "Unable to evaluate the derivative of the SPCIE rotation fit 
+  //     "Unable to evaluate the derivative of the SPCIE rotation fit
   //      polynomial for the given coefficient index. Index is negative
   //      or exceeds degree of polynomial"
   try {
@@ -780,9 +799,9 @@ int main(int argc, char *argv[]) {
 
   // LoadTimeCache()
   //TODO test its 3 exceptions
-  
+
   // GetFullCacheTime()
-  //    "Time cache not availabe -- rerun spiceinit" 
+  //    "Time cache not availabe -- rerun spiceinit"
   try {
     cout << endl;
     SpiceRotation sr(-94031);
@@ -794,7 +813,7 @@ int main(int argc, char *argv[]) {
 
   // FrameTrace()
   //TODO test its 3 exceptions
-  
+
   // ComputeAv()
   //     "The SpiceRotation pointing angles must be fit to polynomials in order to
   //      compute angular velocity."

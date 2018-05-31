@@ -70,6 +70,8 @@ namespace Isis {
    *           setEt and addition operators
    *  @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
    *           were signaled. References #2248.
+   *  @history 2018-03-15 Adam Goins - Removed deprecated function iTime::UnloadLeapSecondKernel().
+   *                          Fixes #5325.
    */
   class iTime {
     public:
@@ -139,7 +141,7 @@ namespace Isis {
       QString UTC() const;
       static QString CurrentGMT();
       static QString CurrentLocalTime();
-      
+
       void setEt(double et);
       void setUtc(QString utcString);
 
@@ -148,11 +150,9 @@ namespace Isis {
                            passed into the constructor or the operator= member*/
 
       void LoadLeapSecondKernel();
-      void UnloadLeapSecondKernel();
 
       static bool p_lpInitialized;
   };
 };
 
 #endif
-

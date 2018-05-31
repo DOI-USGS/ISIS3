@@ -29,6 +29,7 @@
 #include "SetActiveControlWorkOrder.h"
 #include "SetActiveImageListWorkOrder.h"
 #include "TargetGetInfoWorkOrder.h"
+#include "TemplateEditViewWorkOrder.h"
 
 namespace Isis {
   /**
@@ -74,6 +75,7 @@ namespace Isis {
     tryType<SetActiveControlWorkOrder>(type, project, result);
     tryType<SetActiveImageListWorkOrder>(type, project, result);
     tryType<TargetGetInfoWorkOrder>(type, project, result);
+    tryType<TemplateEditViewWorkOrder>(type, project, result);
 
     if (!result) {
       throw IException(IException::Unknown,

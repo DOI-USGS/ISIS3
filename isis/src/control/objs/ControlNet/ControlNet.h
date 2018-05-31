@@ -211,6 +211,8 @@ namespace Isis {
    *   @history 2018-01-12 Adam Goins - Added Progress support back to Read methods.
    *   @history 2017-01-19 Jesse Mapel - Added a method to get all of the valid measures in an
    *                           image. Previously, this had to be done throug the graph.
+   *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
+   *                           adds to the control network. 
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -322,6 +324,7 @@ namespace Isis {
       void nullify();
       void ValidateSerialNumber(QString serialNumber) const;
       void measureAdded(ControlMeasure *measure);
+      void pointAdded(ControlPoint *point);
       void measureDeleted(ControlMeasure *measure);
       void measureIgnored(ControlMeasure *measure);
       void measureUnIgnored(ControlMeasure *measure);

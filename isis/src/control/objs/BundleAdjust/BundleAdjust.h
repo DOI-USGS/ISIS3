@@ -308,6 +308,13 @@ namespace Isis {
    *   @history 2018-02-12 Ken Edmundson - Removed members m_xResiduals, m_yResiduals, and
    *                           m_xyResiduals and made them local to the computeResiduals() method.
    *                           Removed member m_bodyRadii, used only locally in init() method.
+   *   @history 2018-05-22 Ken Edmundson - Modified methods bundleSolveInformation() and
+   *                           solveCholeskyBR() to return raw pointers to a BundleSolutionInfo object.
+   *                           Also modified resultsReady signal to take a raw pointer to a
+   *                           BundleSolutionInfo object. This was done to avoid using a copy
+   *                           constructor in the BundleSolutionInfo class because it is derived
+   *                           from QObject. Note that we ultimately want to return a QSharedPointer
+   *                           instead of a raw pointer.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -342,7 +349,7 @@ namespace Isis {
                    QList<ImageList *> imgList,
                    bool printSummary);
       ~BundleAdjust();
-      BundleSolutionInfo    solveCholeskyBR();
+      BundleSolutionInfo*    solveCholeskyBR();
 
       QList<ImageList *> imageLists();
 
@@ -378,7 +385,7 @@ namespace Isis {
       bool validateNetwork();
       bool solveSystem();
       void iterationSummary();
-      BundleSolutionInfo bundleSolveInformation();
+      BundleSolutionInfo* bundleSolveInformation();
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();
