@@ -257,7 +257,7 @@ namespace Isis {
       CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
-      JigsawRunWidget *addJigsawView();
+      JigsawRunWidget *addJigsawRunWidget();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
