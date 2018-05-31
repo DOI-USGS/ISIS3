@@ -52,6 +52,8 @@ namespace Isis {
    *   @history 2017-07-18 Cole Neubauer - Added removeImages slot to be able to remove from the
    *                           ImageFileList in IPCE Fixes #4996
    *   @history 2017-08-22 Cole Neuabuer - Added ability to search ImageFileListWidget. Fixes #1556
+   *   @history 2018-05-15 Tracie Sucharski - Fixed xml serialization for Ipce project saves.  Fixes
+   *                            #5422.
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT

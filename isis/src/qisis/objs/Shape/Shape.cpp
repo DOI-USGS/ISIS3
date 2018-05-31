@@ -282,7 +282,7 @@ namespace Isis {
   Cube *Shape::cube() {
     if (!m_cube) {
       try {
-        m_cube = new Cube(m_fileName); 
+        m_cube = new Cube(m_fileName);
       }
       catch (IException &e) {
         throw IException(e, IException::Programmer, "Cube cannot be created", _FILEINFO_);
@@ -337,8 +337,8 @@ namespace Isis {
 
 
   /**
-   * Get the serial number. 
-   * @return SerialNumber The cube's serial number. 
+   * Get the serial number.
+   * @return SerialNumber The cube's serial number.
    */
   QString Shape::serialNumber() {
     return SerialNumber::Compose(*(cube()));
@@ -617,9 +617,9 @@ namespace Isis {
   }
 
 
-  /** 
-   * TODO 
-   */ 
+  /**
+   * TODO
+   */
   void Shape::initCamStats() {
     bool hasCamStats = false;
 
@@ -1015,5 +1015,3 @@ namespace Isis {
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }
-
-

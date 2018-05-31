@@ -62,7 +62,7 @@ namespace Isis {
    *                          namespace wrap inside Isis namespace wrap. Added
    *                          Isis Disclaimer to files. Added NAIF error check
    *                          to constructor.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                          coding standards. References #972.
    *   @history 2012-03-04 Tracie Sucharski - Added new method, PixelIfovOffsets, which will return
    *                           the ifov offsets,in x and y, from the center of the pixel in mm.  The
@@ -78,9 +78,12 @@ namespace Isis {
    *   @history 2015-08-11 Ian Humphrey and Makayla Shepherd - Added new data members and methods
    *                           to get spacecraft and instrument names. Extended unit test to test
    *                           these methods.
-   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
+   *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2018-03-14 Adam Goins - Changed cache calculations with LoadCache() call.
+   *                           This fixes an error where VimsCamera caused spiceinit to
+   *                           fail when TargetName == SKY. Fixes #5353.
    */
   class VimsCamera : public Camera {
     public:
@@ -92,7 +95,7 @@ namespace Isis {
 
       /**
        * The Vims camera is the only point camera we have.
-       *  
+       *
        * @return CameraType Camera::Point
        */
       virtual CameraType GetCameraType() const {
@@ -104,32 +107,32 @@ namespace Isis {
 
       /**
        * CK frame ID -  - Instrument Code from spacit run on CK
-       *  
-       * @return @b int The appropriate instrument code for the "Camera-matrix" 
+       *
+       * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Frame ID
        */
       virtual int CkFrameId() const { return (-82000); }
 
-      /** 
+      /**
        * CK Reference ID - J2000
-       * 
+       *
        * @return @b int The appropriate instrument code for the "Camera-matrix"
        *         Kernel Reference ID
        */
       virtual int CkReferenceId() const { return (1); }
 
-      /** 
+      /**
        *  SPK Center ID - 6 (Saturn)
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Center ID
        */
       virtual int SpkCenterId() const { return 6; }
 
-      /** 
+      /**
        *  SPK Reference ID - J2000
-       *  
-       * @return @b int The appropriate instrument code for the Spacecraft 
+       *
+       * @return @b int The appropriate instrument code for the Spacecraft
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }

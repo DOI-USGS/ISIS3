@@ -118,10 +118,12 @@ namespace Isis {
   bool Footprint2DViewWorkOrder::isExecutable(ShapeList *shapes) {
     bool result = false;
 
-    foreach (Shape *shape, *shapes) {
-      result = result || shape->isFootprintable();
+    if (shapes) {
+      foreach (Shape *shape, *shapes) {
+        result = result || shape->isFootprintable();
+      }
+      return result;
     }
-
     return result;
   }
 

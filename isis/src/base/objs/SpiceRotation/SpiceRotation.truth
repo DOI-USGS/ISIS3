@@ -683,6 +683,13 @@ Frame type is binary PCK and cannot be updated
 End of PCK testing
 
 
+Testing CK based body rotation with 67P/Churyumov–Gerasimenko data ...
+Time = 4.6285471e+08
+CJ = 0.93816333 -0.34618155 -0.002810256
+     0.30996014 0.84356223 -0.43855157
+     0.15418909 0.41056193 0.89870163
+
+
 Testing exceptions...
 
 

@@ -29,8 +29,10 @@ object_script.*.Debug
 ui_*.h
 *.html
 
+
 # ignore all files created by squish coco
 *csmes
+*csexe
 
 # ignore all files created by qtcreator
 *.pro

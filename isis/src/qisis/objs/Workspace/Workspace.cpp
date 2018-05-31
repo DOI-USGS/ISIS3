@@ -338,13 +338,13 @@ namespace Isis {
     QList<QString> cubesToOpen;
 
     // If the file is a cub file, we add the path to it to our list of cubes to open.
-    if ( cubeFileName.suffix() == "cub" || cubeFileName.suffix() == "cube" ) {
-       // cubesToOpen.append(cubeFileName.absoluteFilePath());
-       cubesToOpen.append(cubeFileName.filePath());
+    if ( cubeFileName.suffix() == "cub" || cubeFileName.suffix() == "cube" || cubeFileName.suffix() == "lbl") {
+      // cubesToOpen.append(cubeFileName.absoluteFilePath());
+      cubesToOpen.append(cubeFileName.filePath());
     }
     else {
-      // If the file received isn't a .cub, it has to be a cubelist. We read every cube in the cubelist
-      // And append it to the cubesToOpen QList so that we can open them.
+      // If the file received isn't a cube or label, it has to be a cubelist. We read every cube in
+      // the cubelist and append it to the cubesToOpen QList so that we can open them.
       QFile file(cubename);
       file.open(QIODevice::ReadOnly);
 

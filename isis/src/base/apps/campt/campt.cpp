@@ -30,7 +30,7 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  
+
   // Setup our input cube
   CameraPointInfo campt;
 
@@ -40,15 +40,15 @@ void IsisMain() {
   else
       campt.SetCSVOutput(true);
 
-  campt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString());
+  campt.SetCube( ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString() );
 
   // Grab the provided points (coordinates)
   QList< QPair<double, double> > points = getPoints(ui, ui.WasEntered("COORDLIST"));
-  
+
   // Get the camera point info for coordiante
 
   QList<PvlGroup*> camPoints = getCameraPointInfo(ui, points, campt);
-  
+
   writePoints(ui, camPoints);
 }
 
@@ -60,25 +60,25 @@ QList< QPair<double, double> > getPoints(const UserInterface &ui, bool usePointL
   double point2 = 0.0;
   QList< QPair<double, double> > points;
   QString pointType = ui.GetString("TYPE");
-  
+
   // Check if the provided coordinate list is valid, i.e. a Samp/Line or Lat/Long coordinate per row
   if (usePointList) {
-    
+
     CSVReader reader;
     reader.read(FileName(ui.GetFileName("COORDLIST")).expanded());
-    
+
     if (!reader.isTableValid(reader.getTable()) || reader.columns() != 2) {
       QString msg = "Coordinate file formatted incorrectly.\n"
                     "Each row must have two columns: a sample,line or a latitude,longitude pair.";
-      throw IException(IException::User, msg, _FILEINFO_); 
+      throw IException(IException::User, msg, _FILEINFO_);
     }
-    
+
     for (int row = 0; row < reader.rows(); row++) {
       point1 = toDouble(reader.getRow(row)[0]);
       point2 = toDouble(reader.getRow(row)[1]);
       points.append(QPair<double, double>(point1, point2));
     }
-    
+
   }
   // Grab the coordinate from the ui position parameters if no coordinate list is provided
   else {
@@ -94,12 +94,12 @@ QList< QPair<double, double> > getPoints(const UserInterface &ui, bool usePointL
     }
     points.append(QPair<double, double>(point1, point2));
   }
-  
+
   return points;
 }
 
 
-// Gets the camera information for each point (coordinate). 
+// Gets the camera information for each point (coordinate).
 // Passed in a list of coordinates, passed in by reference a CameraPointInfo object.
 // Returns a list of PvlGroup pointers - these groups contain the camera info for each coordinate.
 QList<PvlGroup*> getCameraPointInfo(const UserInterface &ui,
@@ -117,7 +117,7 @@ QList<PvlGroup*> getCameraPointInfo(const UserInterface &ui,
     type = ui.GetString("TYPE");
   }
   PvlGroup *camPoint = NULL;
- 
+
   // Depending on what type is selected, set values accordingly
   for (int i = 0; i < points.size(); i++) {
 
@@ -166,13 +166,18 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
   bool append = ui.GetBoolean("APPEND");
   QString fileFormat = ui.GetString("FORMAT");
   PvlGroup *point = NULL;
-  
+
   for (int p = 0; p < camPoints.size(); p++) {
       bool fileExists = FileName(outFile).fileExists();
 
     prog.CheckStatus();
     point = camPoints[p];
-    
+
+    // Remove units on look direction vectors
+    point -> findKeyword("LookDirectionBodyFixed").setUnits("");
+    point -> findKeyword("LookDirectionJ2000").setUnits("");
+    point -> findKeyword("LookDirectionCamera").setUnits("");
+
     // write to output file
     if (ui.WasEntered("TO")) {
       // Write the pvl group out to the file
@@ -180,16 +185,15 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
         Pvl temp;
         temp.setTerminator("");
         temp.addGroup((*point));
-  
+
        // we don't want to overwrite successive points in outfile
         if (append || p > 0) {
           temp.append(outFile);
         }
         else {
           temp.write(outFile);
-        }  
+        }
      }
-      
       // Create a flatfile from PVL data
       // The flatfile is comma delimited and can be imported into Excel
       else {
@@ -205,7 +209,7 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
           os.open(outFile.toLatin1().data(), ios::out);
           writeHeader = true;
         }
-        
+
         if (writeHeader) {
           for (int i = 0; i < (*point).keywords(); i++) {
             if ((*point)[i].size() == 3) {
@@ -216,14 +220,14 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
             else {
               os << (*point)[i].name();
             }
-            
+
             if (i < point->keywords() - 1) {
               os << ",";
             }
           }
           os << endl;
         }
-        
+
 
 
         for (int i = 0; i < (*point).keywords(); i++) {
@@ -235,7 +239,7 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
           else {
             os << (QString)(*point)[i];
           }
-          
+
           if (i < (*point).keywords() - 1) {
             os << ",";
           }
@@ -243,15 +247,16 @@ void writePoints(const UserInterface &ui, QList<PvlGroup*> camPoints) {
         os << endl;
       }
     }
-    
+
     // No output file specified
     else {
-      // don't log data - 
+      // don't log data -
       if (ui.GetString("FORMAT") == "FLAT") {
         string msg = "Flat file must have a name.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
+
     // we still want to output the results
     Application::Log((*point));
     delete point;

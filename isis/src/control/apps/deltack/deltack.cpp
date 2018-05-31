@@ -267,12 +267,12 @@ void IsisMain() {
       QObject::connect( bundleAdjust, SIGNAL( statusUpdate(QString) ),
                         bundleAdjust, SLOT( outputBundleStatus(QString) ) );
 
-      BundleSolutionInfo bundleSolution = bundleAdjust->solveCholeskyBR();
+      BundleSolutionInfo *bundleSolution = bundleAdjust->solveCholeskyBR();
 
 
       // Output bundle adjust files
-      bundleSolution.outputText();
-      bundleSolution.outputResiduals();
+      bundleSolution->outputText();
+      bundleSolution->outputResiduals();
 
       Table cmatrix = bundleAdjust->cMatrix(0);
 
@@ -285,6 +285,9 @@ void IsisMain() {
       //cmatrix.Label().findObject("Table",Pvl::Traverse).addKeyword(description);
 
       c.write(cmatrix);
+      
+      delete bundleAdjust;
+      delete bundleSolution;
     }
 
     // Now do final clean up as the update was successful if we reach here...
