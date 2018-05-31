@@ -80,18 +80,20 @@ namespace Isis {
 
   private slots:
 
-    void on_radiusCheckBox_toggled(bool checked);
+    void on_pointRadiusSigmaCheckBox_toggled(bool checked);
     //void on_outlierRejectionCheckBox_toggled(bool checked);
 
     // general tab
-    void on_positionComboBox_currentIndexChanged(int index);
-    void on_pointingComboBox_currentIndexChanged(int index);
-    void on_controlNetworkComboBox_currentTextChanged(const QString &arg1);
+    // void on_positionComboBox_currentIndexChanged(int index);
+    // void on_pointingComboBox_currentIndexChanged(int index);
+    void on_inputControlNetCombo_currentTextChanged(const QString &arg1);
 
     // maximum liklihood tab
     void on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel2ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index);
+    void on_outlierRejectionCheckBox_stateChanged(int arg1);
+
 
     // target body tab
     void on_poleRaCheckBox_stateChanged(int arg1);
@@ -103,7 +105,7 @@ namespace Isis {
     void on_radiiButtonGroupClicked(int arg1);
     void on_aRadiusLineEdit_textChanged(const QString &arg1);
     void on_targetBodyComboBox_currentIndexChanged(int index);
-    void on_spkSolveDegreeSpinBox_2_valueChanged(int arg1);
+    // void on_spkSolveDegreeSpinBox_2_valueChanged(int arg1);
     void on_rightAscensionLineEdit_textChanged(const QString &arg1);
     void on_declinationLineEdit_textChanged(const QString &arg1);
     void on_rightAscensionVelocityLineEdit_textChanged(const QString &arg1);

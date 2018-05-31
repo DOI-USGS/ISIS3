@@ -28,7 +28,7 @@ namespace Isis {
     // care of in the ui setup.
 
     // For example:
-    //   radiusCheckBox is connected to pointRadiusSigmaLabel and pointRadiusSigmaLineEdit
+    //   pointRadiusSigmaCheckBox is connected to pointRadiusSigmaLineEdit
     //   outlierRejectionCheckBox is connected
     //       to outlierRejectionMultiplierLabel and outlierRejectionMultiplierLineEdit
     //
@@ -57,7 +57,7 @@ namespace Isis {
 
         QVariant v = qVariantFromValue((void*)control);
 
-        m_ui->controlNetworkComboBox->addItem(control->displayProperties()->displayName(), v);
+        m_ui->inputControlNetCombo->addItem(control->displayProperties()->displayName(), v);
       }
     }
     // add control nets from bundle solutions, if any
@@ -67,12 +67,12 @@ namespace Isis {
 
       QVariant v = qVariantFromValue((void*)bundleControl);
 
-      m_ui->controlNetworkComboBox->addItem(bundleControl->displayProperties()->displayName(), v);
+      m_ui->inputControlNetCombo->addItem(bundleControl->displayProperties()->displayName(), v);
     }
 
     // initialize default output control network filename
-    FileName fname = m_ui->controlNetworkComboBox->currentText();
-    m_ui->outputControlNet->setText(fname.baseName() + "-out.net");
+    FileName fname = m_ui->inputControlNetCombo->currentText();
+    m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
 
     QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
     if (useLastSettings && bundleSolutionInfo.size() > 0) {
@@ -87,7 +87,7 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
-    m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
+    // m_ui->spkSolveDegreeSpinsBox_2->setValue(-1);
 
     QStringList tableHeaders;
     tableHeaders << "coefficients" << "a priori sigma" << "units";
@@ -201,10 +201,8 @@ namespace Isis {
   }
 
 
-  void JigsawSetupDialog::on_radiusCheckBox_toggled(bool checked) {
-    m_ui->pointRadiusSigmaLabel->setEnabled(checked);
+  void JigsawSetupDialog::on_pointRadiusSigmaCheckBox_toggled(bool checked) {
     m_ui->pointRadiusSigmaLineEdit->setEnabled(checked);
-    m_ui->pointRadiusSigmaUnitsLabel->setEnabled(checked);
   }
 
 
@@ -215,86 +213,107 @@ namespace Isis {
 //  }
 
 
-  void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(int index) {
+//   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(int index) {
 
-    // indices:
-    // 0 = none, 1 = position, 2 = velocity, 3 = acceleration, 4 = all
-    bool solvePosition                  = (bool) (index > 0);
-    bool solveVelocity                  = (bool) (index > 1);
-    bool solveAcceleration              = (bool) (index > 2);
-//    bool solveAllPolynomialCoefficients = (bool) (index > 3);
+//     // indices:
+//     // 0 = none, 1 = position, 2 = velocity, 3 = acceleration, 4 = all
+//     bool solvePosition                  = (bool) (index > 0);
+//     bool solveVelocity                  = (bool) (index > 1);
+//     bool solveAcceleration              = (bool) (index > 2);
+// //    bool solveAllPolynomialCoefficients = (bool) (index > 3);
 
-    m_ui->hermiteSplineCheckBox->setEnabled(solvePosition);
-    m_ui->positionSigmaLabel->setEnabled(solvePosition);
-    m_ui->positionSigmaLineEdit->setEnabled(solvePosition);
-    m_ui->positionSigmaUnitsLabel->setEnabled(solvePosition);
+//     m_ui->hermiteSplineCheckBox->setEnabled(solvePosition);
+//     m_ui->positionSigmaLabel->setEnabled(solvePosition);
+//     m_ui->positionSigmaLineEdit->setEnabled(solvePosition);
+//     m_ui->positionSigmaUnitsLabel->setEnabled(solvePosition);
 
-    m_ui->velocitySigmaLabel->setEnabled(solveVelocity);
-    m_ui->velocitySigmaLineEdit->setEnabled(solveVelocity);
-    m_ui->velocitySigmaUnitsLabel->setEnabled(solveVelocity);
+//     m_ui->velocitySigmaLabel->setEnabled(solveVelocity);
+//     m_ui->velocitySigmaLineEdit->setEnabled(solveVelocity);
+//     m_ui->velocitySigmaUnitsLabel->setEnabled(solveVelocity);
 
-    m_ui->accelerationSigmaLabel->setEnabled(solveAcceleration);
-    m_ui->accelerationSigmaLineEdit->setEnabled(solveAcceleration);
-    m_ui->accelerationSigmaUnitsLabel->setEnabled(solveAcceleration);
+//     m_ui->accelerationSigmaLabel->setEnabled(solveAcceleration);
+//     m_ui->accelerationSigmaLineEdit->setEnabled(solveAcceleration);
+//     m_ui->accelerationSigmaUnitsLabel->setEnabled(solveAcceleration);
 
-//    m_ui->spkDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->spkDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->spkSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->spkSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
 
-  }
+//   }
 
 
-  void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(int index) {
+//   void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(int index) {
 
-    // indices:
-    // 0 = angles, 1 = none, 2 = velocity, 3 = acceleration, 4 = all
-    bool solveAngles                    = (bool) (index == 0 || index > 1);
-    bool solveAngularVelocity           = (bool) (index > 1);
-    bool solveAngularAcceleration       = (bool) (index > 2);
-//    bool solveAllPolynomialCoefficients = (bool) (index > 3);
+//     // indices:
+//     // 0 = angles, 1 = none, 2 = velocity, 3 = acceleration, 4 = all
+//     bool solveAngles                    = (bool) (index == 0 || index > 1);
+//     bool solveAngularVelocity           = (bool) (index > 1);
+//     bool solveAngularAcceleration       = (bool) (index > 2);
+// //    bool solveAllPolynomialCoefficients = (bool) (index > 3);
 
-    m_ui->twistCheckBox->setEnabled(solveAngles);
-    m_ui->fitOverPointingCheckBox->setEnabled(solveAngles);
+//     m_ui->twistCheckBox->setEnabled(solveAngles);
+//     m_ui->fitOverPointingCheckBox->setEnabled(solveAngles);
 
-//    m_ui->ckDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->ckDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->ckSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->ckSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
 
-    m_ui->pointingAnglesSigmaLabel->setEnabled(solveAngles);
-    m_ui->pointingAnglesSigmaLineEdit->setEnabled(solveAngles);
-    m_ui->pointingAnglesSigmaUnitsLabel->setEnabled(solveAngles);
+//     m_ui->pointingAnglesSigmaLabel->setEnabled(solveAngles);
+//     m_ui->pointingAnglesSigmaLineEdit->setEnabled(solveAngles);
+//     m_ui->pointingAnglesSigmaUnitsLabel->setEnabled(solveAngles);
 
-    m_ui->pointingAngularVelocitySigmaLabel->setEnabled(solveAngularVelocity);
-    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(solveAngularVelocity);
-    m_ui->pointingAngularVelocitySigmaUnitsLabel->setEnabled(solveAngularVelocity);
+//     m_ui->pointingAngularVelocitySigmaLabel->setEnabled(solveAngularVelocity);
+//     m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(solveAngularVelocity);
+//     m_ui->pointingAngularVelocitySigmaUnitsLabel->setEnabled(solveAngularVelocity);
 
-    m_ui->pointingAngularAccelerationSigmaLabel->setEnabled(solveAngularAcceleration);
-    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(solveAngularAcceleration);
-    m_ui->pointingAngularAccelerationSigmaUnitsLabel->setEnabled(solveAngularAcceleration);
+//     m_ui->pointingAngularAccelerationSigmaLabel->setEnabled(solveAngularAcceleration);
+//     m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(solveAngularAcceleration);
+//     m_ui->pointingAngularAccelerationSigmaUnitsLabel->setEnabled(solveAngularAcceleration);
 
-  }
+//   }
 
 
   void JigsawSetupDialog::on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index) {
 
     bool model1Selected = (bool) (index > 0);
-    m_ui->maximumLikelihoodModel1QuantileLabel->setEnabled(model1Selected);
+
+    // lock/unlock current tier's quantile and next tier's model
     m_ui->maximumLikelihoodModel1QuantileLineEdit->setEnabled(model1Selected);
     m_ui->maximumLikelihoodModel2Label->setEnabled(model1Selected);
     m_ui->maximumLikelihoodModel2ComboBox->setEnabled(model1Selected);
+    m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(
+                                            m_ui->maximumLikelihoodModel2ComboBox->currentIndex());
 
+    // when setting "NONE", set remaining max likelihood options to false  
+    if (!model1Selected) {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(false);
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(false);
+      m_ui->maximumLikelihoodModel3Label->setEnabled(false);
+      m_ui->maximumLikelihoodModel3ComboBox->setEnabled(false);
+    }
+
+    // sigma and max likelihood options are exclusive
+    m_ui->outlierRejectionCheckBox->setEnabled(!model1Selected);
   }
 
 
   void JigsawSetupDialog::on_maximumLikelihoodModel2ComboBox_currentIndexChanged(int index) {
 
     bool model2Selected = (bool)(index > 0);
-    m_ui->maximumLikelihoodModel2QuantileLabel->setEnabled(model2Selected);
+
+    // lock/unlock current tier's quantile and next tier's model
     m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(model2Selected);
     m_ui->maximumLikelihoodModel3Label->setEnabled(model2Selected);
     m_ui->maximumLikelihoodModel3ComboBox->setEnabled(model2Selected);
+    m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(
+                                            m_ui->maximumLikelihoodModel2ComboBox->currentIndex());
+
+    // when setting "NONE", set remaining max likelihood options to false  
+    if (!model2Selected) {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(false);
+    }
 
   }
 
@@ -302,9 +321,19 @@ namespace Isis {
   void JigsawSetupDialog::on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index) {
 
     bool model3Selected = (bool)(index > 0);
-    m_ui->maximumLikelihoodModel3QuantileLabel->setEnabled(model3Selected);
     m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(model3Selected);
 
+  }
+
+
+  void JigsawSetupDialog::on_outlierRejectionCheckBox_stateChanged(int arg1) {
+
+    m_ui->outlierRejectionMultiplierLineEdit->setEnabled(arg1);
+    m_ui->outlierRejectionMultiplierLabel->setEnabled(arg1);
+
+    // sigma and maxlikelihood options are exclusive
+    m_ui->maximumLikelihoodModel1ComboBox->setEnabled(!arg1);
+    m_ui->maximumLikelihoodModel1Label->setEnabled(!arg1);
   }
 
 
@@ -314,8 +343,8 @@ namespace Isis {
 
     // general tab
     m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
-    m_ui->radiusCheckBox->setChecked(settings->solveRadius());
-    m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
+    m_ui->pointRadiusSigmaCheckBox->setChecked(settings->solveRadius());
+    // m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
     m_ui->errorPropagationCheckBox->setChecked(settings->errorPropagation());
     m_ui->outlierRejectionCheckBox->setChecked(settings->outlierRejection());
     m_ui->outlierRejectionMultiplierLineEdit->setText(toString(settings->outlierRejectionMultiplier()));
@@ -323,7 +352,7 @@ namespace Isis {
     m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
 
 
-    m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
+    // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
     m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
     m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
     m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
@@ -344,7 +373,7 @@ namespace Isis {
       m_ui->twistCheckBox->setEnabled(true);
     }
 
-    m_ui->pointingComboBox->setCurrentIndex(pointingOption);
+    // m_ui->pointingComboBox->setCurrentIndex(pointingOption);
 //    m_ui->pointingComboBox->setCurrentIndex(observationSolveSettings.instrumentPointingSolveOption());
 
 
@@ -432,9 +461,10 @@ namespace Isis {
       radiusSigma = m_ui->pointRadiusSigmaLineEdit->text().toDouble();
     }
     settings->setSolveOptions(m_ui->observationModeCheckBox->isChecked(),
-                              m_ui->updateCubeLabelCheckBox->isChecked(),
+                              false,
+                              // m_ui->updateCubeLabelCheckBox->isChecked(),
                               m_ui->errorPropagationCheckBox->isChecked(),
-                              m_ui->radiusCheckBox->isChecked(),
+                              m_ui->pointRadiusSigmaCheckBox->isChecked(),
                               latitudeSigma,
                               longitudeSigma,
                               radiusSigma);
@@ -462,7 +492,8 @@ namespace Isis {
       angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
     }
     observationSolveSettings.setInstrumentPointingSettings(
-        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
+        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption("ANGLES"),
+        // BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
         m_ui->twistCheckBox->isChecked(),
         m_ui->ckDegreeSpinBox->text().toInt(),
         m_ui->ckSolveDegreeSpinBox->text().toInt(),
@@ -483,7 +514,8 @@ namespace Isis {
       accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
     }
     observationSolveSettings.setInstrumentPositionSettings(
-        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
+        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption("NONE"),
+        // BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
         m_ui->spkDegreeSpinBox->text().toInt(),
         m_ui->spkSolveDegreeSpinBox->text().toInt(),
         m_ui->hermiteSplineCheckBox->isChecked(),
@@ -656,7 +688,7 @@ namespace Isis {
    * @param const QString &controlName The name of the control to try to find in the combo box.
    */
   void JigsawSetupDialog::selectControl(const QString &controlName) {
-    QComboBox &cnetBox = *(m_ui->controlNetworkComboBox);
+    QComboBox &cnetBox = *(m_ui->inputControlNetCombo);
     int foundControlIndex = cnetBox.findText(FileName(controlName).name());
     // We did not find it, so we need to see if the combo box is empty or not.
     if (foundControlIndex == -1) {
@@ -677,40 +709,40 @@ namespace Isis {
 
   Control *JigsawSetupDialog::selectedControl() {
 
-      int nIndex = m_ui->controlNetworkComboBox->currentIndex();
+      int nIndex = m_ui->inputControlNetCombo->currentIndex();
       Control *selectedControl
-                   = (Control *)(m_ui->controlNetworkComboBox->itemData(nIndex).value< void * >());
+                   = (Control *)(m_ui->inputControlNetCombo->itemData(nIndex).value< void * >());
       return selectedControl;
 
   }
 
 
   QString JigsawSetupDialog::selectedControlName() {
-    return QString(m_ui->controlNetworkComboBox->currentText());
+    return QString(m_ui->inputControlNetCombo->currentText());
   }
 
 
   QString JigsawSetupDialog::outputControlName() {
-    return QString(m_ui->outputControlNet->text());
+    return QString(m_ui->outputControlNetLineEdit->text());
   }
 
 
   void JigsawSetupDialog::makeReadOnly() {
-    m_ui->controlNetworkComboBox->setEnabled(false);
+    m_ui->inputControlNetCombo->setEnabled(false);
     m_ui->observationModeCheckBox->setEnabled(false);
-    m_ui->radiusCheckBox->setEnabled(false);
-    m_ui->updateCubeLabelCheckBox->setEnabled(false);
+    m_ui->pointRadiusSigmaCheckBox->setEnabled(false);
+    // m_ui->updateCubeLabelCheckBox->setEnabled(false);
     m_ui->errorPropagationCheckBox->setEnabled(false);
     m_ui->outlierRejectionCheckBox->setEnabled(false);
     m_ui->outlierRejectionMultiplierLineEdit->setEnabled(false);
     m_ui->sigma0ThresholdLineEdit->setEnabled(false);
     m_ui->maximumIterationsLineEdit->setEnabled(false);
-    m_ui->positionComboBox->setEnabled(false);
+    // m_ui->positionComboBox->setEnabled(false);
     m_ui->hermiteSplineCheckBox->setEnabled(false);
     m_ui->spkDegreeSpinBox->setEnabled(false);
     m_ui->spkSolveDegreeSpinBox->setEnabled(false);
     m_ui->twistCheckBox->setEnabled(false);
-    m_ui->pointingComboBox->setEnabled(false);
+    // m_ui->pointingComboBox->setEnabled(false);
     m_ui->fitOverPointingCheckBox->setEnabled(false);
     m_ui->ckDegreeSpinBox->setEnabled(false);
     m_ui->ckSolveDegreeSpinBox->setEnabled(false);
@@ -863,7 +895,7 @@ namespace Isis {
 
       // if we're not solving for target body triaxial radii or mean radius, we CAN solve for point
       // radii so we ensure the point radius checkbox under the general settings tab is enabled
-      m_ui->radiusCheckBox->setEnabled(true);
+      m_ui->pointRadiusSigmaCheckBox->setEnabled(true);
     }
     else if (arg1 == 1) {
       m_ui->aRadiusLabel->setEnabled(true);
@@ -881,8 +913,8 @@ namespace Isis {
       // if we're solving for target body mean radius, we can't solve for point radii
       // so we uncheck and disable the point radius checkbox under the general settings tab
       // and remind the user
-      m_ui->radiusCheckBox->setChecked(false);
-      m_ui->radiusCheckBox->setEnabled(false);
+      m_ui->pointRadiusSigmaCheckBox->setChecked(false);
+      m_ui->pointRadiusSigmaCheckBox->setEnabled(false);
 
       QMessageBox *msgBox = new QMessageBox(QMessageBox::Information, "Triaxial Radii Reminder!",
                   "Individual point radii and target body triaxial radii can't be solved for"
@@ -906,8 +938,8 @@ namespace Isis {
       // if we're solving for target body triaxial radii, we can't solve for point radii
       // so we uncheck and disable the point radius checkbox under the general settings tab
       // and remind the user
-      m_ui->radiusCheckBox->setChecked(false);
-      m_ui->radiusCheckBox->setEnabled(false);
+      m_ui->pointRadiusSigmaCheckBox->setChecked(false);
+      m_ui->pointRadiusSigmaCheckBox->setEnabled(false);
 
       QMessageBox *msgBox = new QMessageBox(QMessageBox::Information, "Mean Radius Reminder!",
                   "Individual point radii and target body mean radius can't be solved for"
@@ -990,45 +1022,45 @@ namespace Isis {
   }
 
 
-  void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_2_valueChanged(int arg1) {
-    if (arg1 == -1) {
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(NONE)");
-      m_ui->positionAprioriSigmaTable->setRowCount(0);
-    }
-    m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
-    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
+  // void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_2_valueChanged(int arg1) {
+  //   if (arg1 == -1) {
+  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(NONE)");
+  //     m_ui->positionAprioriSigmaTable->setRowCount(0);
+  //   }
+  //   m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
+  //   m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
 
-    if (arg1 == 0) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("POSITION");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("meters");
-      //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
-    }
-    else if (arg1 == 1) {
-      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
-      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
-    }
-    else if (arg1 == 2) {
-      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
-      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
-    }
-  /*
-    else if (arg1 == 0) {
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
-      int nRows = m_ui->positionAprioriSigmaTable->rowCount();
+  //   if (arg1 == 0) {
+  //     QTableWidgetItem *twItem = new QTableWidgetItem();
+  //     twItem->setText("POSITION");
+  //     m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+  //     QTableWidgetItem *twItemunits = new QTableWidgetItem();
+  //     twItemunits->setText("meters");
+  //     //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
+  //   }
+  //   else if (arg1 == 1) {
+  //     m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
+  //     m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
+  //   }
+  //   else if (arg1 == 2) {
+  //     m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
+  //     m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
+  //   }
+  // /*
+  //   else if (arg1 == 0) {
+  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
+  //     int nRows = m_ui->positionAprioriSigmaTable->rowCount();
 
-      m_ui->positionAprioriSigmaTable->insertRow(nRows);
-    }
-    else if (arg1 == 1)
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
-    else if (arg1 == 2)
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
-    else
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
-  */
-  }
+  //     m_ui->positionAprioriSigmaTable->insertRow(nRows);
+  //   }
+  //   else if (arg1 == 1)
+  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
+  //   else if (arg1 == 2)
+  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
+  //   else
+  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
+  // */
+  // }
 
 
   void Isis::JigsawSetupDialog::on_rightAscensionLineEdit_textChanged(const QString &arg1) {
@@ -1117,8 +1149,8 @@ namespace Isis {
     m_ui->targetParametersGroupBox->setEnabled(false);
   }
 
-  void Isis::JigsawSetupDialog::on_controlNetworkComboBox_currentTextChanged(const QString &arg1) {
+  void Isis::JigsawSetupDialog::on_inputControlNetCombo_currentTextChanged(const QString &arg1) {
     FileName fname = arg1;
-    m_ui->outputControlNet->setText(fname.baseName() + "-out.net");
+    m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
   }
 }
