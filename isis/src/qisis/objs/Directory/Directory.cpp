@@ -935,7 +935,7 @@ namespace Isis {
     return result;
   }
 
-  JigsawRunWidget *Directory::addJigsawView() {
+  JigsawRunWidget *Directory::addJigsawRunWidget() {
     if (jigsawRunWidget()) {
       return m_jigsawRunWidget;
     }
