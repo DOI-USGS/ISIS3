@@ -254,6 +254,10 @@
     </change>
     <change name="Ken Edmundson" date="2017-11-01">
       Added interface for piecewise polynomials.
+    <change name="Ken Edmundson" date="2018-05-23">
+      Modifed call to bundleAdjustment->solveCholeskyBR() to return a raw pointer to a
+      BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
+      ownership from BundleAdjust.
     </change>
   </history>
 

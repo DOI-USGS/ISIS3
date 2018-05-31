@@ -339,11 +339,65 @@ namespace Isis {
 
     point->parentNetwork = this;
 
-    // notify control network of new (non-ignored) measures
-    foreach(ControlMeasure * measure, point->getMeasures()) {
-      measureAdded(measure);
-    }
+    // notify control network of new point
+    pointAdded(point);
+
     emit networkStructureModified();
+  }
+
+
+ /**
+   * Adds a whole point to the control net graph. 
+   *    
+   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "Control measure with NULL parent passed to
+   *     ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "ControlNet does not contain the point."
+   */
+  void ControlNet::pointAdded(ControlPoint *point) {
+    if (!point) {
+      IString msg = "NULL point passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (!ContainsPoint(point->GetId())) {
+      QString msg = "ControlNet does not contain the point [";
+      msg += point->GetId() + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // make sure there is a node for every measure
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (!cubeGraphNodes->contains(sn)) {
+        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
+      }
+    }
+
+    foreach(ControlMeasure* measure, point->getMeasures()) {
+      // add the measure to the corresponding node
+      QString serial = measure->GetCubeSerialNumber();
+      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+      node->addMeasure(measure);
+
+      // in this measure's node add connections to the other nodes reachable from
+      // its point
+      if (!point->IsIgnored() && !measure->IsIgnored()) {
+        for (int i = 0; i < point->GetNumMeasures(); i++) {
+          ControlMeasure *cm = point->GetMeasure(i);
+          if (!cm->IsIgnored()) {
+            QString sn = cm->GetCubeSerialNumber();
+            ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+
+            if (neighborNode != node) {
+              node->addConnection(neighborNode, point);
+              neighborNode->addConnection(node, point);
+            }
+          }
+        }
+      }
+    }
   }
 
 

@@ -136,6 +136,7 @@ namespace Isis {
       newItem->setForeground(1, Qt::gray);
 
       this->insertTopLevelItem(0, newItem);
+//      invisibleRootItem()->addChild(newItem);
 
       connect(workOrder, SIGNAL(statusChanged(WorkOrder *)),
                 this, SLOT(updateStatus(WorkOrder *)));
@@ -150,10 +151,48 @@ namespace Isis {
       //include those that do not need it.
 
       if(workOrder->progressBar() )  {
-        this->setItemWidget(newItem, 1, new ProgressBar );
+        setItemWidget(newItem, 1, new ProgressBar);
+//        this->setItemWidget(newItem, 1, workOrder->progressBar() );
       }
       scrollToItem(newItem);
       refit();
+  }
+
+
+  /**
+   * Add a non-workorder history to the display.
+   *
+   * @param (QString) historyEntry The string displayed in the history tree
+   */
+  void HistoryTreeWidget::addToHistory(QString historyEntry) {
+
+    QString data = historyEntry;
+
+    QStringList columnData;
+    columnData.append(data);
+
+    QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
+
+
+    // Do font for progress text
+    QFont progressFont = newItem->font(1);
+    progressFont.setItalic(true);
+    newItem->setFont(1, progressFont);
+    newItem->setForeground(1, Qt::gray);
+
+    this->insertTopLevelItem(0, newItem);
+//      invisibleRootItem()->addChild(newItem);
+
+    //Sometimes the pointer returned by this call is 0 (hence the check).
+    //So we are not creating a progress bar for every work order which would
+    //include those that do not need it.
+
+//    if(workOrder->progressBar() )  {
+//      setItemWidget(newItem, 1, new ProgressBar);
+////        this->setItemWidget(newItem, 1, workOrder->progressBar() );
+//    }
+    scrollToItem(newItem);
+    refit();
   }
 
 

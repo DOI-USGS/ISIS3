@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -39,8 +39,8 @@ namespace Isis {
   /**
    * Constructs an OSIRIS-REx Camera Model using the image labels. This model supports MapCam,
    * PolyCam, and SamCam images.
-   *  
-   * @param lab Pvl label from an Osiris Rex MapCam image. 
+   *
+   * @param lab Pvl label from an Osiris Rex MapCam image.
    */
   OsirisRexOcamsCamera::OsirisRexOcamsCamera(Cube &cube) : FramingCamera(cube) {
 
@@ -74,9 +74,11 @@ namespace Isis {
 
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
+
     QString ikCode = toString(frameCode);
-    if (inst.hasKeyword("PolyCamFocusPositionNaifId")) {
-      if (QString::compare("NONE", inst["PolyCamFocusPositionNaifId"], Qt::CaseInsensitive) != 0) {
+    if (inst.hasKeyword("PolyCamFocusPositionNaifId") && frameCode == -64360) {
+      if (QString::compare("NONE", inst["PolyCamFocusPositionNaifId"],
+                           Qt::CaseInsensitive) != 0) {
         ikCode = inst["PolyCamFocusPositionNaifId"][0];
       }
     }
@@ -112,7 +114,7 @@ namespace Isis {
         Spice::getDouble("INS" + ikCode + "_CCD_CENTER", 1) + 1.0);
 
     // Setup distortion map
-    OsirisRexDistortionMap *distortionMap = new OsirisRexDistortionMap(this); 
+    OsirisRexDistortionMap *distortionMap = new OsirisRexDistortionMap(this);
 
     // Different distortion model for each instrument and filter
     PvlGroup bandBin = lab.findGroup("BandBin", Pvl::Traverse);
@@ -135,37 +137,37 @@ namespace Isis {
 
 
   /**
-   * The frame ID for the spacecraft (or instrument) used by the Camera-matrix 
-   * Kernel. For this camera model, the spacecraft frame is used, represented 
-   * by the frame ID -64000. 
-   *  
-   * @return @b int The appropriate code for the Camera-matrix Kernel. 
+   * The frame ID for the spacecraft (or instrument) used by the Camera-matrix
+   * Kernel. For this camera model, the spacecraft frame is used, represented
+   * by the frame ID -64000.
+   *
+   * @return @b int The appropriate code for the Camera-matrix Kernel.
    */
-  int OsirisRexOcamsCamera::CkFrameId() const { 
-    return -64000; 
+  int OsirisRexOcamsCamera::CkFrameId() const {
+    return -64000;
   }
 
 
   /**
-   * The frame ID for the reference coordinate system used by the Camera-matrix 
-   * Kernel. For this mission, the reference frame J2000, represented by the 
-   * frame ID 1. 
+   * The frame ID for the reference coordinate system used by the Camera-matrix
+   * Kernel. For this mission, the reference frame J2000, represented by the
+   * frame ID 1.
    *
-   * @return @b int The appropriate reference frame ID code for the 
+   * @return @b int The appropriate reference frame ID code for the
    *         Camera-matrix Kernel.
    */
-  int OsirisRexOcamsCamera::CkReferenceId() const { 
-    return 1; 
+  int OsirisRexOcamsCamera::CkReferenceId() const {
+    return 1;
   }
 
 
-  /** 
+  /**
    * The reference frame ID for the Spacecraft Kernel is 1, representing J2000.
    *
    * @return @b int The appropriate frame ID code for the Spacecraft Kernel.
    */
-  int OsirisRexOcamsCamera::SpkReferenceId() const { 
-    return 1; 
+  int OsirisRexOcamsCamera::SpkReferenceId() const {
+    return 1;
   }
 
 

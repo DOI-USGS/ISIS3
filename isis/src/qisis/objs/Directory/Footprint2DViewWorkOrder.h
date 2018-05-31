@@ -58,6 +58,8 @@ namespace Isis {
    *   @history 2017-07-24 Cole Neuabuer - Set m_isSavedToHistory to false on construction
    *                           Fixes #4715
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
+   *   @history 2017-11-02 Tyler Wilson - Added a null pointer check for the shapes variable in
+   *                           isExecutable to prevent potential seg faults.  References #4492.
    */
   class Footprint2DViewWorkOrder : public WorkOrder {
       Q_OBJECT

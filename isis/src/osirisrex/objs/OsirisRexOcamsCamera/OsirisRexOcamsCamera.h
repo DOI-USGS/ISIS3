@@ -1,8 +1,8 @@
 #ifndef OsirisRexOcamsCamera_h
 #define OsirisRexOcamsCamera_h
-/** 
- * @file 
- *  
+/**
+ * @file
+ *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
@@ -26,12 +26,12 @@
 
 namespace Isis {
   /**
-   * This class models the behavior and attributes of the OSIRIS-REx Cameras:  Mapping Camera, 
-   * PolyMath Camera, and Sample Camera. 
+   * This class models the behavior and attributes of the OSIRIS-REx Cameras:  Mapping Camera,
+   * PolyMath Camera, and Sample Camera.
    *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Osiris Rex
-   *  
+   *
    * @author  2014-04-02 Janet Barrett
    *
    * @internal
@@ -49,6 +49,8 @@ namespace Isis {
    *                           the Instrument group for focus position specific values (such ase
    *                           focal length) and we read NaifFrameId from the Kernels group the
    *                           instrument frame code. Fixes #5127
+   *   @history 2018-03-27 Jesse Mapel - Changed to only replace the IK code with the PolyCam focus
+   *                                     setting ID if the image is a PolyCam image. Fixes #5213.
    *
    */
   class OsirisRexOcamsCamera : public FramingCamera {
@@ -56,7 +58,7 @@ namespace Isis {
       OsirisRexOcamsCamera(Cube &cube);
       ~OsirisRexOcamsCamera();
 
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
       virtual int CkFrameId() const;
