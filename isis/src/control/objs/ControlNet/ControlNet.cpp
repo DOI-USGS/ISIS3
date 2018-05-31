@@ -170,6 +170,10 @@ namespace Isis {
       cubeGraphNodes->clear();
     }
 
+    // new
+    m_controlGraph.clear();
+    m_vertexMap.clear();
+
     if (pointIds) {
       pointIds->clear();
     }
@@ -414,7 +418,8 @@ namespace Isis {
     }
   }
 
-// temporary print graph to test
+// temporarily print graph to test
+// This doesn't even return a string right now, just couts. 
   QString ControlNet::GraphToString() const {
     // Iterate through the vertices and print them out
     
@@ -498,7 +503,6 @@ namespace Isis {
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
     node->addMeasure(measure);
 
-    // new graph: add measure to vertex descriptor?? 
     m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
 
     // in this measure's node add connections to the other nodes reachable from
@@ -629,20 +633,23 @@ namespace Isis {
       measureIgnored(measure);
     }
     
-    // For our new graph, the thing that can happen when we remove a measure
-    // is that an _edge_ may need to be deleted. 
-    // this isn't quite right. 
-//    boost::clear_vertex(vertexMap[testSerial], m_controlGraph);
-//    boost::remove_vertex(vertexMap[testSerial], m_controlGraph);
-//    vertexMap.remove(testSerial);
-
-    // Remove the measure from the node.  If this caused the node to be empty,
-    // then delete the node.
-    node->removeMeasure(measure);
+    node->removeMeasure(measure); 
     if (!node->getMeasureCount()) {
       delete node;
       node = NULL;
       cubeGraphNodes->remove(serial);
+    }
+
+    // Remove the measure from the node.  
+    m_controlGraph[m_vertexMap[serial]].measures.removeAll(measure);
+
+    // TODO: decrement the strength on the correct edge.
+
+    //If this caused the node to be empty,then delete the node.
+    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
+      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
+      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
+      m_vertexMap.remove(serial);
     }
   }
 
@@ -784,7 +791,12 @@ namespace Isis {
    */
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
     QList< QList< QString > > islandStrings;
-    QList< QList< ControlCubeGraphNode * > > islands;
+
+  //  std::vector<int> component (boost::num_vertices (m_controlGraph));
+//    size_t numComponents = boost::connected_components(m_controlGraph, component)
+                                                       
+
+    QList< QList< ControlCubeGraphNode * > > islands;// = m_controlGraph.
     for (int i = 0; i < islands.size(); i++) {
       QList< QString > newIsland;
       islandStrings.append(newIsland);
@@ -819,7 +831,8 @@ namespace Isis {
    * @returns A list of the Cube Serial Numbers in the ControlNet.
    */
   QList< QString > ControlNet::GetCubeSerials() const {
-    return cubeGraphNodes->keys();
+    return m_vertexMap.keys(); 
+//    return cubeGraphNodes->keys();
   }
 
 
@@ -827,6 +840,7 @@ namespace Isis {
    * @returns A list of all the cube graph nodes in the network
    */
   QList< ControlCubeGraphNode * > ControlNet::GetCubeGraphNodes() {
+    // Just delete function? 
     return cubeGraphNodes->values();
   }
 
@@ -838,11 +852,17 @@ namespace Isis {
    * @param serialNumber the cube serial number to validate
    */
   void ControlNet::ValidateSerialNumber(QString serialNumber) const {
-    if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
-          "the network";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+//  if (!cubeGraphNodes->contains(serialNumber)) {
+//    IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+//        "the network";
+//    throw IException(IException::Programmer, msg, _FILEINFO_);
+//  }
+    if (!m_vertexMap.contains(serialNumber)) {
+          IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+              "the network";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
   }
 
 
@@ -865,7 +885,16 @@ namespace Isis {
    */
   QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
-    return (*cubeGraphNodes)[serialNumber]->getValidMeasures();
+
+    QList< ControlMeasure * > validMeasures;
+
+    QList< ControlMeasure * > measureList = m_controlGraph[m_vertexMap[serialNumber]].measures;  
+    foreach(ControlMeasure * measure, measureList) {
+      if (!measure->IsIgnored())
+        validMeasures.append(measure);
+    }
+
+    return validMeasures;
   }
 
 
@@ -945,11 +974,15 @@ namespace Isis {
   void ControlNet::DeleteMeasuresWithId(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
 
-    ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
-    QList< ControlMeasure * > measures = csn->getMeasures();
-    foreach(ControlMeasure * measure, measures) {
-      measure->Parent()->Delete(measure);
-    }
+    boost::clear_vertex(m_vertexMap[serialNumber], m_controlGraph);
+    boost::remove_vertex(m_vertexMap[serialNumber], m_controlGraph);
+    m_vertexMap.remove(serialNumber);
+
+//  ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
+//  QList< ControlMeasure * > measures = csn->getMeasures();
+//  foreach(ControlMeasure * measure, measures) {
+//    measure->Parent()->Delete(measure);
+//  }
   }
 
 
@@ -1062,7 +1095,14 @@ namespace Isis {
    */
   ControlPoint *ControlNet::FindClosest(QString serialNumber,
       double sample, double line) {
-    if (!cubeGraphNodes->contains(serialNumber)) {
+//  if (!cubeGraphNodes->contains(serialNumber)) {
+//    QString msg = "serialNumber [";
+//    msg += serialNumber;
+//    msg += "] not found in ControlNet";
+//    throw IException(IException::Programmer, msg, _FILEINFO_);
+//  }
+
+    if (!m_vertexMap.contains(serialNumber)) {
       QString msg = "serialNumber [";
       msg += serialNumber;
       msg += "] not found in ControlNet";
@@ -1073,8 +1113,11 @@ namespace Isis {
     double minDist = SEARCH_DISTANCE;
     ControlPoint *closestPoint = NULL;
 
-    ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
-    QList< ControlMeasure * > measures = csn->getMeasures();
+//    ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
+//    QList< ControlMeasure * > measures = csn->getMeasures();
+
+    QList < ControlMeasure * > measures = m_controlGraph[m_vertexMap[serialNumber]].measures;
+
     for (int i = 0; i < measures.size(); i++) {
       ControlMeasure *measureToCheck = measures[i];
 
