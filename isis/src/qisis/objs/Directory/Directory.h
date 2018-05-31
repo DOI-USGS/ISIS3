@@ -59,6 +59,7 @@ namespace Isis {
   class Footprint2DView;
   class HistoryTreeWidget;
   class ImageFileListWidget;
+  class JigsawRunWidget;
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
@@ -236,6 +237,9 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-25 Christopher Combs - Made changes to reflect updates to JigsawRunWidget.
+   *                           Added addJigsawView method and m_jigsawRunWidget member variable.
+   *                           Fixes #5428.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -253,6 +257,7 @@ namespace Isis {
       CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
+      JigsawRunWidget *addJigsawView();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
@@ -289,6 +294,7 @@ namespace Isis {
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
       ControlPointEditView *controlPointEditView();
+      JigsawRunWidget *jigsawRunWidget();
 //      ChipViewportsWidget *controlPointChipViewports();
 
       bool controlUsedInCnetEditorWidget(Control *control);
@@ -374,6 +380,7 @@ namespace Isis {
       void cleanupSensorInfoWidgets(QObject *);
       void cleanupTargetInfoWidgets(QObject *);
       void cleanupTemplateEditorWidgets(QObject *);
+      void cleanupJigsawRunWidget(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
@@ -448,6 +455,8 @@ namespace Isis {
       QPointer<HistoryTreeWidget> m_historyTreeWidget;  //!< Pointer to the HistoryTreeWidget.
       QPointer<Project> m_project;                      //!< Pointer to the Project.
       QPointer<WarningTreeWidget> m_warningTreeWidget;  //!< Pointer to the WarningTreeWidget.
+      QPointer<JigsawRunWidget> m_jigsawRunWidget;         //!< Pointer to the JigsawRunWidget.
+
 
       //!< List of BundleObservationView
       QList< QPointer<BundleObservationView> > m_bundleObservationViews;
