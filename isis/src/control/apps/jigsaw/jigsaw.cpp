@@ -123,7 +123,7 @@ void IsisMain() {
       bundleSolution->outputResiduals();
     }
     
-    bundleSolution.outputLidarCSV();
+    bundleSolution->outputLidarCSV();
 
     // write updated control net
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
