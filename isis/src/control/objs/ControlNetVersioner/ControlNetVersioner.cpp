@@ -1812,12 +1812,20 @@ namespace Isis {
       netInfo.addComment("This group is for informational purposes only");
       netInfo += PvlKeyword("NetworkId", protobufHeader.networkid().c_str());
       netInfo += PvlKeyword("TargetName", protobufHeader.targetname().c_str());
+
+          // Grab TargetRadii if they exist.
+          if (!m_header.targetRadii.empty()) {
+              PvlKeyword pvlRadii("TargetRadii");
+              for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+                pvlRadii += toString(m_header.targetRadii[i].meters());
+              }
+              netInfo += pvlRadii;
+            }
       netInfo += PvlKeyword("UserName", protobufHeader.username().c_str());
       netInfo += PvlKeyword("Created", protobufHeader.created().c_str());
       netInfo += PvlKeyword("LastModified", protobufHeader.lastmodified().c_str());
       netInfo += PvlKeyword("Description", protobufHeader.description().c_str());
       netInfo += PvlKeyword("NumberOfPoints", toString(numPoints));
-
       netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
       netInfo += PvlKeyword("Version", "5");
       protoObj.addGroup(netInfo);
