@@ -26,28 +26,29 @@
 
 // Isis Library
 #include "BundleConstraint.h"
+#include "BundleLidarControlPoint.h"
+#include "BundleMeasure.h"
 #include "BundleObservation.h"
 #include "LinearAlgebra.h"
 #include "SparseBlockMatrix.h"
 
 namespace Isis {
   /**
-   * @brief Implements 0, 1, and 2-order piecewise polynomial continuity constraints for bundle
-   * adjustment.
+   * @brief Implements range constraint between image position and lidar point acquired
+   * simultaneously with the image.
    *
    * @ingroup ControlNetworks
    *
-   * @author 2017-03-03 Ken Edmundson
+   * @author 2018-04-13 Ken Edmundson
    *
    * @internal
-   *   @history 2017-03-03 Ken Edmundson - Original version.
-   *   @history 2017-11-01 Ken Edmundson - Additional modifications to address bundle slowness.
+   *   @history 2017-04-13 Ken Edmundson - Original version.
    */
   class BundleLidarRangeConstraint : public BundleConstraint {
     public:
       // constructors
-      BundleLidarRangeConstraint();
-      BundleLidarRangeConstraint(BundleObservationQsp parentObservation);
+      BundleLidarRangeConstraint(LidarControlPointQsp lidarControlPoint,
+                                 BundleMeasureQsp measure);
 
       // copy constructor
       BundleLidarRangeConstraint(const BundleLidarRangeConstraint &src);
@@ -56,51 +57,53 @@ namespace Isis {
       ~BundleLidarRangeConstraint();
 
       // Assignment operator
-      BundleLidarRangeConstraint &operator=
-          (const BundleLidarRangeConstraint &src);
+      BundleLidarRangeConstraint &operator= (const BundleLidarRangeConstraint &src);
 
-      int numberSpkSegments() const;
-      int numberCkSegments() const;
-      int numberSpkCoefficients() const;
-      int numberCkCoefficients() const;
-      int numberConstraintEquations() const;
+      bool applyConstraint(SparseBlockMatrix &normalsMatrix,
+                           LinearAlgebra::MatrixUpperTriangular& N22,
+                           SparseBlockColumnMatrix& N12,
+                           LinearAlgebra::VectorCompressed& n1,
+                           LinearAlgebra::Vector& n2,
+                           BundleMeasureQsp measure);
 
-      void updateRightHandSide();
-      SparseBlockMatrix &normalsSpkMatrix();
-      SparseBlockMatrix &normalsCkMatrix();
-      LinearAlgebra::Vector &rightHandSideVector();
+      void update();
+      double vtpv();
+      void errorPropagation();
 
-      QString formatBundleOutputString();
+      QString formatBundleOutputString(bool errorProp=false);
 
     private:
-      void constructMatrices();
-      void positionContinuity(int &designRow);
-      void pointingContinuity(int &designRow);
+      void init();
 
-      BundleObservationQsp m_parentObservation;                //! parent BundleObservation
+      LidarControlPointQsp m_parentLidarControlPoint; //!< Parent lidar control point
+      BundleObservationQsp m_bundleObservation;       //!< Associated BundleObservation
+//      SpicePosition *m_instrumentPosition;            //!< Instrument spice position
+//      SpiceRotation *m_bodyRotation;                  //!< Body spice rotation.
 
-      // spk related members
-      std::vector<double> m_spkKnots;                          //! scaled spk boundary times
-      int m_numberSpkCoefficients;                             //! # coefficients
-      int m_numberSpkSegments;                                 //! # segments
-      int m_numberSpkBoundaries;                               //! # segment boundaries
-      int m_numberSpkSegmentParameters;
+      BundleMeasureQsp m_simultaneousMeasure;         /**! Point in image acquired simultaneously
+                                                           with a lidar observation. NOTE this point
+                                                           is a fictitious "measurement". A priori
+                                                           coordinates are obtained by back
+                                                           projection of the lidar 3D point into the
+                                                           image using the image's current exterior
+                                                           orientation. The "measure" is corrected
+                                                           in each iteration of the bundle adjustment
+                                                           by it's residuals.*/
+      LinearAlgebra::Matrix m_coeff_range_image;     //! Partials w/respect to image position
+      LinearAlgebra::Matrix m_coeff_range_point3D;   //! Partials w/respect to lidar point
+      LinearAlgebra::Vector m_coeff_range_RHS;       //! Right hand side of normals
 
-      // ck related members
-      std::vector<double> m_ckKnots;                           //! scaled ck boundary times
-      int m_numberCkCoefficients;                              //! # coefficients
-      int m_numberCkSegments;                                  //! # segments
-      int m_numberCkBoundaries;                                //! # segment boundaries
-      int m_numberCkSegmentParameters;
+      std::vector<double> m_pointBodyFixed;          //! Body fixed coordinates of lidar point
+      std::vector<double> m_cameraJ2K;               //! J2K coordinates of camera
+      std::vector<double> m_cameraBodyFixed;         //! Body fixed coordinates of camera
+      std::vector<double> m_matrixTargetToJ2K;       //! Rotates spacecraft from J2K to body-fixed
 
-      int m_numberSegmentParameters;                           //! TODO: # parameters per segment
-      int m_numberParameters;                                  //! TODO: # parameters
-      int m_numberConstraintEquations;                         //! # constraint equations
-      LinearAlgebra::MatrixCompressed m_designMatrix;          //! design matrix
-      SparseBlockMatrix m_normalsSpkMatrix;                    //! normals contribution to position
-      SparseBlockMatrix m_normalsCkMatrix;                     //! normals contribution to pointing
-      LinearAlgebra::Vector m_rightHandSide;                   //! right hand side of normals
-      LinearAlgebra::Vector m_omcVector;                       //! observed minus corrected vector
+      double m_observedRange;
+      double m_observedRangeSigma;
+      double m_observedRangeWeight;
+      double m_computedRange;
+      double m_adjustedSigma;
+      double m_vtpv;
   };
 
   //! Typdef for BundleLidarRangeConstraint QSharedPointer.

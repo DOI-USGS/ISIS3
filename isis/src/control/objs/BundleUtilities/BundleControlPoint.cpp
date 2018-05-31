@@ -5,6 +5,7 @@
 // boost lib
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
+#include "Camera.h"
 #include "ControlMeasure.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -120,6 +121,11 @@ namespace Isis {
    */
   void BundleControlPoint::computeResiduals() {
     m_controlPoint->ComputeResiduals();
+
+    // compute and store focal plane residuals in millimeters
+    for (int i = 0; i < size(); i++) {
+      at(i)->setFocalPlaneResidualsMillimeters();
+    }
   }
 
 
@@ -398,12 +404,14 @@ namespace Isis {
 
 
   /**
-   * Accesses the CholMod matrix associated with this BundleControlPoint.
+   * Accesses the Q matrix associated with this BundleControlPoint.
+   *
+   * See Brown (1976). Reference at bottom of header.
    * 
-   * @return SparseBlockRowMatrix& The CholMod row matrix.
+   * @return SparseBlockRowMatrix& The Q matrix.
    */
-  SparseBlockRowMatrix &BundleControlPoint::cholmodQMatrix() {
-    return m_cholmodQMatrix;
+  SparseBlockRowMatrix &BundleControlPoint::qMatrix() {
+    return m_qMatrix;
   }
 
 
@@ -728,7 +736,11 @@ namespace Isis {
 
 
   /**
-   * apply parameter corrections for solution.
+   * Apply point parameter corrections for in Bundle Adjustment.
+   *
+   * @param normalsMatrix Normal equations matrix.
+   * @param imageSolution Current iteration solution vector for image parameters.
+   *
    */
   void BundleControlPoint::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
                                                      LinearAlgebra::Vector &imageSolution) {
@@ -815,7 +827,7 @@ namespace Isis {
                                           SparseBlockMatrix &sparseMatrix,
                                           LinearAlgebra::Vector &v1) {
 
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
+    QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_qMatrix);
 
     int subrangeStart, subrangeEnd;
 
@@ -830,4 +842,111 @@ namespace Isis {
       m_nicVector += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
+
+
+  /**
+   * Compute vtpv of image measures (weighted sum of squares of measure residuals).
+   *
+   * @return double weighted sum of squares of measure residuals (vtpv).
+   */
+  double BundleControlPoint::vtpvMeasures() {
+
+    double vtpv = 0.0;
+    double weight = 0.0;
+    double vx,vy;
+
+    for (int i = 0; i < size(); i++) {
+      BundleMeasureQsp measure = at(i);
+
+      weight = measureWeight();
+
+//      weight = 1.0 / weight;
+//      weight *= weight;
+
+      vx = measure->focalPlaneMeasuredX() - measure->focalPlaneComputedX();
+      vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
+
+      vtpv += vx * vx * weight + vy * vy * weight;
+    }
+
+    return vtpv;
+  }
+
+
+  /**
+   * Compute vtpv, the weighted sum of squares of constrained point residuals.
+   *
+   * @return double Weighted sum of squares of constrained point residuals.
+   */
+  double BundleControlPoint::vtpv() {
+
+    double vtpv = 0.0;
+
+    if ( m_weights(0) > 0.0 ) {
+        vtpv += m_corrections(0) * m_corrections(0) * m_weights(0);
+    }
+    if ( m_weights(1) > 0.0 ) {
+        vtpv += m_corrections(1) * m_corrections(1) * m_weights(1);
+    }
+    if ( m_weights(2) > 0.0 ) {
+        vtpv += m_corrections(2) * m_corrections(2) * m_weights(2);
+    }
+
+    return vtpv;
+  }
+
+
+  /**
+   *
+   */
+  double BundleControlPoint::measureSigma() {
+    return 1.4 * at(0)->camera()->PixelPitch();
+  }
+
+  /**
+   *
+   */
+  double BundleControlPoint::measureWeight() {
+    double sigma = measureSigma();
+
+    double weight = 1.0/sigma;
+
+    weight *= weight;
+
+    return weight;
+  }
+
+
+  /**
+   * Base class implementation does nothing.
+   */
+  int BundleControlPoint::applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
+                                                     LinearAlgebra::MatrixUpperTriangular& N22,
+                                                     SparseBlockColumnMatrix& N12,
+                                                     LinearAlgebra::VectorCompressed& n1,
+                                                     LinearAlgebra::Vector& n2,
+                                                     BundleMeasureQsp measure) {
+    return 0;
+  }
+
+
+  /**
+   * Base class implementation does nothing.
+   */
+  double BundleControlPoint::vtpvRangeContribution() {
+    return 0.0;
+  }
+
+
+  /**
+   * Base class implementation does nothing.
+   */
+//  void BundleControlPoint::applyLidarRangeConstraints(SparseBlockMatrix &normalsMatrix,
+//                                                     LinearAlgebra::MatrixUpperTriangular& N22,
+//                                                     SparseBlockColumnMatrix& N12,
+//                                                     LinearAlgebra::VectorCompressed& n1,
+//                                                     LinearAlgebra::Vector& n2,
+//                                                     int numberImagePartials) {
+//    return;
+//  }
 }

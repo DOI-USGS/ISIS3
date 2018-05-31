@@ -91,12 +91,14 @@ namespace Isis {
       void setParentImage(QSharedPointer<BundleImage> image);
       void setRejected(bool reject);
 
+      void setImage();
       void setPolySegmentIndices();
       void setNormalsBlockIndices(int solveTargetBody=0);
       void setPolyPositionSegmentIndex(int index);
       void setPolyPointingSegmentIndex(int index);
       void setNormalsPositionBlockIndex(int index);
       void setNormalsPointingBlockIndex(int index);
+      void setFocalPlaneResidualsMillimeters();
 
       bool isRejected() const;
       Camera *camera() const;
@@ -110,6 +112,8 @@ namespace Isis {
       double line() const;
       double lineResidual() const;
       double residualMagnitude() const;
+      double xFocalPlaneResidual() const;
+      double yFocalPlaneResidual() const;
       QString cubeSerialNumber() const;
       double focalPlaneComputedX() const;
       double focalPlaneComputedY() const;
@@ -121,17 +125,23 @@ namespace Isis {
       int positionNormalsBlockIndex() const;
       int pointingNormalsBlockIndex() const;
 
+      // TODO: testing
+      ControlMeasure *rawMeasure() {return m_controlMeasure;}
+
     private:
       ControlMeasure *m_controlMeasure;                      //!< ISIS control measure
       BundleControlPoint *m_parentControlPoint;              //!< Parent bundle control point
       QSharedPointer<BundleImage> m_parentBundleImage;       //!< Parent image
       QSharedPointer<BundleObservation> m_parentObservation; //!< Parent bundle observation
 
-      int m_polyPositionSegmentIndex; //!< segment index for piecewise position polynomial
-      int m_polyPointingSegmentIndex; //!< segment index for piecewise rotation polynomial
+      int m_polyPositionSegmentIndex;  //!< segment index for piecewise position polynomial
+      int m_polyPointingSegmentIndex;  //!< segment index for piecewise rotation polynomial
 
       int m_normalsPositionBlockIndex; //!< block index into normal equations
       int m_normalsPointingBlockIndex; //!< block index into normal equations
+
+      double m_xFocalPlaneResidual;    //!< x focal plane residual in mm
+      double m_yFocalPlaneResidual;    //!< y focal plane residual in mm
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

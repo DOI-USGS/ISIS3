@@ -35,6 +35,7 @@
 
 // Isis lib
 #include "BundleControlPoint.h"
+#include "BundleControlPointVector.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
 #include "BundleResults.h"
@@ -381,7 +382,7 @@ namespace Isis {
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();
-      double computeResiduals();
+      double computeVtpv();
       bool computeRejectionLimit();
       bool flagOutliers();
 
@@ -415,6 +416,13 @@ namespace Isis {
       bool formWeightedNormals(LinearAlgebra::VectorCompressed  &n1,
                                LinearAlgebra::Vector            &nj);
       void applyPolynomialContinuityConstraints();
+      bool applyLidarRangeConstraint(LinearAlgebra::MatrixUpperTriangular& N22,
+                                     SparseBlockColumnMatrix& N12,
+                                     LinearAlgebra::VectorCompressed& n1,
+                                     LinearAlgebra::Vector& n2,
+                                     int numberImagePartials,
+                                     BundleMeasureQsp measure,
+                                     BundleControlPointQsp point);
 
       // dedicated matrix functions
 
@@ -449,11 +457,12 @@ namespace Isis {
       ControlNetQsp m_controlNet;                            //!< Output control net.
       QString m_cnetFileName;                                //!< The control net filename.
 
-      QVector <BundleControlPointQsp> m_bundleControlPoints;
-      QVector <BundleControlPointQsp> m_bundleLidarPoints; /**!< Vectors of control and lidar
-                                                                   control points.*/
+      BundleControlPointVector m_bundleControlPoints;        //!< Vector of control points.
+
       QString m_lidarFileName;                               //!< Input lidar point filename.
       LidarData m_lidarDataSet;                              //!< QList of lidar points.
+      int m_numLidarConstraints;                             //!< TODO: temp
+
       BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
                                                                    Each observation contains one or
                                                                    more images.*/

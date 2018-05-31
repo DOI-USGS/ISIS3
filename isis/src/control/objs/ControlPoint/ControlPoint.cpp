@@ -755,6 +755,11 @@ namespace Isis {
       std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
       aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
     }
+    // TODO: kluge for lidar
+    else {
+      Distance d = Distance(1737400.0, Distance::Meters);
+      aprioriSP.SetRadii(d,d,d);
+    }
     if (editLock) {
       return PointLocked;
     }

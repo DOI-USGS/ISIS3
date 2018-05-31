@@ -65,16 +65,20 @@ namespace Isis {
    *   @history 2016-08-15 Jesse Mapel - Changed contained member data type to a shared pointer.
    *                           Added wrapper methods for several ControlPoint methods.
    *                           Fixes #4159.
-   *   @history 2016-10-27 Tyler Wilson - Modified formatRadiusAprioriSigmaString, formatAprioriSigmaString,
-   *                          and formatBundleOutputDetailString to accept a third argument (bool solveRadius)
-   *                          with a default value = false.  References #4317.
+   *   @history 2016-10-27 Tyler Wilson - Modified formatRadiusAprioriSigmaString,
+   *                           formatAprioriSigmaString, and formatBundleOutputDetailString to
+   *                           accept a third argument (bool solveRadius) with a default value =
+   *                           false.  References #4317.
+   *   @history 2018-05-01 Ken Edmundson - Renamed m_cholmodQMatrix to just m_QMatrix. This refers
+   *                           to the matrix terminology used by Brown (1976) and has nothing to do
+   *                           with cholmod.
    */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
     public:
       BundleControlPoint(ControlPoint *point); // default constructor
       BundleControlPoint(const BundleControlPoint &src);
-      ~BundleControlPoint();
+      virtual ~BundleControlPoint();
 
       // copy
       BundleControlPoint &operator=(const BundleControlPoint &src);// ??? not implemented
@@ -103,16 +107,19 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector< double, 3 > &adjustedSigmas();
       boost::numeric::ublas::bounded_vector< double, 3 > &weights();
       boost::numeric::ublas::bounded_vector<double, 3> &nicVector();
-      SparseBlockRowMatrix &cholmodQMatrix();
+      SparseBlockRowMatrix &qMatrix();
 
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
-      QString formatBundleOutputDetailString(bool errorPropagation, double RTM, bool solveRadius=false) const;
+      QString formatBundleOutputDetailString(bool errorPropagation, double RTM,
+                                             bool solveRadius=false) const;
       QString formatValue(double value, int fieldWidth, int precision) const;
-      QString formatAprioriSigmaString(int type, int fieldWidth, int precision, bool solveRadius=false) const;
+      QString formatAprioriSigmaString(int type, int fieldWidth, int precision,
+                                       bool solveRadius=false) const;
       QString formatLatitudeAprioriSigmaString(int fieldWidth, int precision) const;
       QString formatLongitudeAprioriSigmaString(int fieldWidth, int precision) const;
-      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision, bool solveRadius=false) const;
+      QString formatRadiusAprioriSigmaString(int fieldWidth, int precision,
+                                             bool solveRadius=false) const;
       QString formatAdjustedSigmaString(int type, int fieldWidth, int precision,
                                         bool errorPropagation) const;
       QString formatLatitudeAdjustedSigmaString(int fieldWidth, int precision,
@@ -122,20 +129,32 @@ namespace Isis {
       QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision, 
                                               bool errorPropagation) const;
 
-      void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                     LinearAlgebra::Vector &imageSolution);
+      virtual void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
+                                             LinearAlgebra::Vector &imageSolution);
 
-//      void productAlphaAV(double alpha,
-//                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
-//                          SparseBlockRowMatrix                                &Q,
-//                          LinearAlgebra::Vector                               &v1);
+      virtual double measureSigma();
+      virtual double measureWeight();
+
+      virtual int applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
+                                            LinearAlgebra::MatrixUpperTriangular& N22,
+                                            SparseBlockColumnMatrix& N12,
+                                            LinearAlgebra::VectorCompressed& n1,
+                                            LinearAlgebra::Vector& n2,
+                                            BundleMeasureQsp measure);
+
+      virtual double vtpvRangeContribution();
+
       void productAlphaAV(double alpha, SparseBlockMatrix &sparseMatrix,
                           LinearAlgebra::Vector &v1);
 
-    private:
+      double vtpv();
+      double vtpvMeasures();
+
+    protected:
       //!< pointer to the control point object this represents
       ControlPoint *m_controlPoint;
 
+    private:
       //! corrections to point parameters
       boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;
       //! apriori sigmas for point parameters
@@ -146,8 +165,8 @@ namespace Isis {
       boost::numeric::ublas::bounded_vector< double, 3 > m_weights;
       //! array of NICs (see Brown, 1976)
       boost::numeric::ublas::bounded_vector<double, 3> m_nicVector;
-      //! The CholMod Q matrix associated with this point (see Brown, 1976)
-      SparseBlockRowMatrix m_cholmodQMatrix;
+      //! The Q matrix associated with this point (see Brown, 1976)
+      SparseBlockRowMatrix m_qMatrix;
   };
 
   // typedefs

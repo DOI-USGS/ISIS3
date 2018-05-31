@@ -199,6 +199,8 @@ namespace Isis {
       QStringList parameterList();
       QStringList imageNames();
 
+      double vtpv();
+
     private:
       bool initParameterWeights();
 

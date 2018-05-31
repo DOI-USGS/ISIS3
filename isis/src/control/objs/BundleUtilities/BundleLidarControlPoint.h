@@ -22,22 +22,18 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include <QVector>
-
 #include <QSharedPointer>
 
 #include "BundleControlPoint.h"
 #include "BundleMeasure.h"
-#include "BundleSettings.h"
-#include "SparseBlockMatrix.h"
-#include "SurfacePoint.h"
+#include "LidarControlPoint.h"
 
 namespace Isis {
 
-  class LidarControlPoint;
+//  class LidarControlPoint;
+  class BundleLidarRangeConstraint;
 
-//  class ControlMeasure;
+  typedef QSharedPointer<BundleLidarRangeConstraint> BundleLidarRangeConstraintQsp;
 
   /**
    * This class holds information about a lidar control point that BundleAdjust requires.
@@ -57,8 +53,8 @@ namespace Isis {
   class BundleLidarControlPoint : public BundleControlPoint {
 
     public:
-      BundleLidarControlPoint(LidarControlPoint *point);
-//      BundleLidarControlPoint(const BundleLidarControlPoint &src);
+      BundleLidarControlPoint(LidarControlPointQsp lidarControlPoint);
+//    BundleLidarControlPoint(const BundleLidarControlPoint &src);
       ~BundleLidarControlPoint();
 
       // copy
@@ -71,6 +67,33 @@ namespace Isis {
 //      LidarControlPoint *rawLidarControlPoint() const;
 
       // string format methods
+
+      void initializeRangeConstraints();
+
+      virtual double measureSigma();
+      virtual double measureWeight();
+
+      virtual int applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
+                                            LinearAlgebra::MatrixUpperTriangular& N22,
+                                            SparseBlockColumnMatrix& N12,
+                                            LinearAlgebra::VectorCompressed& n1,
+                                            LinearAlgebra::Vector& n2,
+                                            BundleMeasureQsp measure);
+
+      virtual void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
+                                             LinearAlgebra::Vector &imageSolution);
+
+      virtual double vtpvRangeContribution();
+
+      int numberRangeConstraints() {return m_rangeConstraints.size();}
+      BundleLidarRangeConstraintQsp rangeConstraint(int n) {return m_rangeConstraints.at(n);}
+
+      double range() {return m_lidarControlPoint->range();}
+      double sigmaRange() {return m_lidarControlPoint->sigmaRange();}
+
+    private:
+      LidarControlPointQsp m_lidarControlPoint;
+      QVector<BundleLidarRangeConstraintQsp> m_rangeConstraints;
   };
 
   // typedefs

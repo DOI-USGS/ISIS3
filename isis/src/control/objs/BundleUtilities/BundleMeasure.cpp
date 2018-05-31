@@ -1,6 +1,7 @@
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
 #include "BundleObservationSolveSettings.h"
+#include "Camera.h"
 #include "IException.h"
 
 #include "ControlMeasure.h"
@@ -109,6 +110,19 @@ namespace Isis {
    */
   void BundleMeasure::setRejected(bool reject) {
     m_controlMeasure->SetRejected(reject); 
+  }
+
+
+  /**
+   * Sets the BundleMeasure's status to rejected or not rejected.
+   *
+   * @param reject True will set the BundleMeasure to rejected.
+   *
+   * @see ControlMeasure::SetRejected(bool reject)
+   */
+  void BundleMeasure::setImage() {
+    m_controlMeasure->Camera()->SetImage(m_controlMeasure->GetSample(),
+                                         m_controlMeasure->GetLine());
   }
 
 
@@ -448,6 +462,19 @@ namespace Isis {
    */
   double BundleMeasure::focalPlaneMeasuredY() const {
     return m_controlMeasure->GetFocalPlaneMeasuredY();
+  }
+
+
+  /**
+   * Computes and sets measure focal plane residuals in millimeters.
+   *
+   */
+  void BundleMeasure::setFocalPlaneResidualsMillimeters() {
+    m_xFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredX() -
+                            m_controlMeasure->GetFocalPlaneComputedX();
+
+    m_yFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredY() -
+                            m_controlMeasure->GetFocalPlaneComputedY();
   }
 
 

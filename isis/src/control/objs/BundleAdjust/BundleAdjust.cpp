@@ -9,7 +9,9 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
+#include <QFutureWatcher>
 #include <QMutex>
+#include <QtConcurrentRun>
 
 // boost lib
 #include <boost/lexical_cast.hpp>
@@ -50,7 +52,7 @@
 #include "Target.h"
 
 using namespace boost::numeric::ublas;
-using namespace Isis;
+//using namespace Isis;
 
 namespace Isis {
 
@@ -559,7 +561,7 @@ namespace Isis {
         continue;
       }
 
-      BundleLidarControlPointQsp bundleLidarPoint(new BundleLidarControlPoint(lidarPoint.data()));
+      BundleLidarControlPointQsp bundleLidarPoint(new BundleLidarControlPoint(lidarPoint));
       m_bundleControlPoints.append(bundleLidarPoint);
 
       bundleLidarPoint->setWeights(m_bundleSettings, m_metersToRadians);
@@ -576,42 +578,14 @@ namespace Isis {
 
         measure->setParentObservation(observation);
         measure->setParentImage(image);
+
+        lidarPoint->ComputeApriori();
       }
 
-      lidarPoint->ComputeApriori();
+      // initialize range constraints
+      bundleLidarPoint->initializeRangeConstraints();
     }
 
-/*
-    // set up vector of BundleLidarControlPoints
-    int numLidarPoints = m_lidarDataSet.points().size();
-    for (int i = 0; i < numLidarPoints; i++) {
-      LidarControlPointQsp lidarPoint = m_lidarDataSet.points().at(i);
-      if (lidarPoint->IsIgnored()) {
-        continue;
-      }
-
-      BundleLidarControlPointQsp bundleLidarPoint(new BundleLidarControlPoint(lidarPoint.data()));
-      m_bundleLidarPoints.append(bundleLidarPoint);
-
-      bundleLidarPoint->setWeights(m_bundleSettings, m_metersToRadians);
-
-      // set parent observation for each BundleMeasure
-      int numMeasures = bundleLidarPoint->size();
-      for (int j = 0; j < numMeasures; j++) {
-        BundleMeasureQsp measure = bundleLidarPoint->at(j);
-        QString cubeSerialNumber = measure->cubeSerialNumber();
-
-        BundleObservationQsp observation =
-            m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
-        BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
-
-        measure->setParentObservation(observation);
-        measure->setParentImage(image);
-        int fred=1;
-      }
-      lidarPoint->ComputeApriori();
-    }
-*/
     //===========================================================================================//
     //==== Use the bundle settings to initialize more member variables and set up solutions =====//
     //===========================================================================================//
@@ -1062,13 +1036,16 @@ namespace Isis {
 
 //        clock_t computeResidualsClock1 = clock();
         // compute residuals
-        vtpv = computeResiduals();
+        m_bundleControlPoints.computeMeasureResiduals();
 //        clock_t computeResidualsClock2 = clock();
 
 //        double computeResidualsTime = (computeResidualsClock2 - computeResidualsClock1)
 //            / (double)CLOCKS_PER_SEC;
 
 //        qDebug() << "BundleAdjust::computeResiduals() elapsed time: " << computeResidualsTime;
+
+        // compute vtpv (weighted sum of squares of residuals
+        vtpv = computeVtpv();
 
         // flag outliers
         if ( m_bundleSettings->outlierRejection() ) {
@@ -1241,47 +1218,12 @@ namespace Isis {
    * @return BundleSolutionInfo A container with solve information from the adjustment.
    */
   BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
-    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults, imageLists());
+    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults,
+                               imageLists());
     results.setRunTime("");
     return results;
   }
 
-
-  /**
-   * Form the least-squares normal equations matrix.
-   *
-   * TODO: how about a much better description here?
-   *
-   * @return bool
-   *
-   * @see formPhotoNormals()
-   * @see formLidarNormals()
-   */
-/*
-  bool BundleAdjust::formNormalEquations() {
-    bool status = false;
-
-    m_bundleResults.setNumberObservations(0);// ???
-    m_bundleResults.resetNumberConstrainedPointParameters();//???
-
-    m_RHS.resize(m_rank);
-
-    // contribution to normal equations matrix from photogrammetry points
-    status = formPhotoNormals();
-
-    // contribution to normal equations matrix from lidar points
-    if (m_bundleLidarPoints.size() > 0) {
-      status = formLidarNormals();
-    }
-
-    // apply piecewise polynomial continuity constraints if necessary
-    if (m_bundleResults.numberContinuityConstraintEquations() > 0) {
-      applyPolynomialContinuityConstraints();
-    }
-
-    return status;
-  }
-*/
 
   /**
    * Form the least-squares normal equations matrix.
@@ -1298,8 +1240,9 @@ bool BundleAdjust::formNormalEquations() {
 //  bool BundleAdjust::formPhotoNormals() {
     bool status = false;
 
-    m_bundleResults.setNumberObservations(0);// ???
-    m_bundleResults.resetNumberConstrainedPointParameters();//???
+    m_bundleResults.setNumberObservations(0);
+    m_bundleResults.resetNumberConstrainedPointParameters();
+    m_bundleResults.setNumberLidarRangeConstraintEquations(0);
 
     // Initialize auxiliary matrices and vectors.
     static LinearAlgebra::Matrix coeffTarget;
@@ -1346,6 +1289,8 @@ bool BundleAdjust::formNormalEquations() {
 
     printf("\n");
 
+    m_numLidarConstraints = 0;
+
     for (int i = 0; i < num3DPoints; i++) {
 
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -1368,186 +1313,9 @@ bool BundleAdjust::formNormalEquations() {
       for (int j = 0; j < numMeasures; j++) {
         BundleMeasureQsp measure = point->at(j);
 
-        // flagged as "JigsawFail" implies this measure has been rejected
-        // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
-        if (measure->isRejected()) {
-          continue;
+        if (measure->parentControlPoint()->id() == "Lidar3768") {
+          int fred=1;
         }
-
-//        clock_t computePartialsClock1 = clock();
-
-        // segment solution
-//        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
-//            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
-          status = computePartials(coeffTarget, coeffImagePosition, coeffImagePointing,
-                                   coeffPoint3D, coeffRHS, measure);
-//        }
-//        else {
-//          status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, measure);
-//        }
-
-//        clock_t computePartialsClock2 = clock();
-//        cumulativeComputePartialsTime += (computePartialsClock2 - computePartialsClock1)
-//            / (double)CLOCKS_PER_SEC;
-
-        if (!status) {
-          // TODO should status be set back to true? JAM
-          // TODO this measure should be flagged as rejected.
-          continue;
-        }
-
-        // update number of observations
-        int numObs = m_bundleResults.numberObservations();
-        m_bundleResults.setNumberObservations(numObs + 2);
-
-//        clock_t formMeasureNormalsClock1 = clock();
-
-        // segment solution
-//        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
-//            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
-        formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImagePosition, coeffImagePointing,
-                           coeffPoint3D, coeffRHS, measure);
-//        }
-//        else {
-//          formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
-//                             measure);
-//        }
-
-//        clock_t formMeasureNormalsClock2 = clock();
-//        cumulativeFormMeasureNormalsTime += (formMeasureNormalsClock2 - formMeasureNormalsClock1)
-//            / (double)CLOCKS_PER_SEC;
-
-      } // end loop over this points measures
-
-//      clock_t formPointNormalsClock1 = clock();
-      formPointNormals(N22, N12, n2, m_RHS, point);
-//      clock_t formPointNormalsClock2 = clock();
-
-//      cumulativeFormPointNormalsTime += (formPointNormalsClock2 - formPointNormalsClock1)
-//          / (double)CLOCKS_PER_SEC;
-
-      pointIndex++;
-
-      numGood3DPoints++;
-    } // end loop over 3D points
-
-//  qDebug() << "cumulative computePartials() Time: " << cumulativeComputePartialsTime;
-//  qDebug() << "cumulative formMeasureNormals() Time: " << cumulativeFormMeasureNormalsTime;
-//  qDebug() << "cumulative formPointNormals() Time: " << cumulativeFormPointNormalsTime;
-
-  // form the reduced normal equations
-//  clock_t formWeightedNormalsClock1 = clock();
-    formWeightedNormals(n1, m_RHS);
-//  clock_t formWeightedNormalsClock2 = clock();
-
-//  double formWeightedNormalsTime = (formWeightedNormalsClock2 - formWeightedNormalsClock1)
-//      / (double)CLOCKS_PER_SEC;
-
-//  qDebug() << "BundleAdjust::formWeightedNormals Time: " << formWeightedNormalsTime;
-
-  // finally if necessary, apply piecewise polynomial continuity constraints
-    if (m_bundleResults.numberContinuityConstraintEquations() > 0) {
-
-//    clock_t applyContinuityClock1 = clock();
-
-      applyPolynomialContinuityConstraints();
-
-//    clock_t applyContinuityClock2 = clock();
-
-//    double applyContinuityTime = (applyContinuityClock2 - applyContinuityClock1)
-//        / (double)CLOCKS_PER_SEC;
-
-//    qDebug() << "applying Continuity Constraints: " << applyContinuityTime;
-    }
-
-    // update number of unknown parameters
-    m_bundleResults.setNumberUnknownParameters(m_rank + 3 * numGood3DPoints);
-
-    return status;
-  }
-
-
-  /**
-   * Form the least-squares normal equations matrix.
-   * Each BundleControlPoint stores its Q matrix and NIC vector.
-   * The covariance matrix for each point will be stored in its adjusted surface point.
-   *
-   * @return bool
-   *
-   * @see formMeasureNormals()
-   * @see formPointNormals()
-   * @see formWeightedNormals()
-   */
-  bool BundleAdjust::formLidarNormals() {
-    bool status = false;
-
-//    m_bundleResults.setNumberObservations(0);// ???
-//    m_bundleResults.resetNumberConstrainedPointParameters();//???
-
-    // Initialize auxiliary matrices and vectors.
-    static LinearAlgebra::Matrix coeffTarget;
-    static LinearAlgebra::Matrix coeffImagePosition;
-    static LinearAlgebra::Matrix coeffImagePointing;
-    static LinearAlgebra::Matrix coeffPoint3D(2, 3);
-    static LinearAlgebra::Vector coeffRHS(2);
-    static LinearAlgebra::MatrixUpperTriangular N22(3);
-    SparseBlockColumnMatrix N12;
-    static LinearAlgebra::Vector n2(3);
-    LinearAlgebra::VectorCompressed n1(m_rank);
-
-    // if solving for target body parameters, set size of coeffTarget
-    // (note this size will not change through the adjustment).
-    if (m_bundleSettings->solveTargetBody()) {
-      int numTargetBodyParameters = m_bundleSettings->numberTargetBodyParameters();
-      // TODO make sure numTargetBodyParameters is greater than 0
-      coeffTarget.resize(2,numTargetBodyParameters);
-    }
-
-    // clear N12, n1, and nj
-    N12.clear();
-//    n1.clear();
-    m_RHS.clear();
-
-    // clear static matrices
-    coeffPoint3D.clear();
-    coeffRHS.clear();
-    N22.clear();
-    n2.clear();
-
-    // TODO timing tests
-//    double cumulativeComputePartialsTime = 0.0;
-//    double cumulativeFormMeasureNormalsTime = 0.0;
-//    double cumulativeFormPointNormalsTime = 0.0;
-
-    // loop over 3D points
-    int numGood3DPoints = 0;
-    int numRejected3DPoints = 0;
-    int pointIndex = 0;
-    int num3DPoints = m_bundleLidarPoints.size();
-
-    printf("\n");
-
-    for (int i = 0; i < num3DPoints; i++) {
-
-      BundleControlPointQsp point = m_bundleLidarPoints.at(i);
-
-      if (point->isRejected()) {
-        numRejected3DPoints++;
-
-        pointIndex++;
-        continue;
-      }
-
-      if ( i != 0 ) {
-        N22.clear();
-        N12.wipe();
-        n2.clear();
-      }
-
-      // loop over measures for this point
-      int numMeasures = point->size();
-      for (int j = 0; j < numMeasures; j++) {
-        BundleMeasureQsp measure = point->at(j);
 
         // flagged as "JigsawFail" implies this measure has been rejected
         // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
@@ -1598,13 +1366,17 @@ bool BundleAdjust::formNormalEquations() {
 //        cumulativeFormMeasureNormalsTime += (formMeasureNormalsClock2 - formMeasureNormalsClock1)
 //            / (double)CLOCKS_PER_SEC;
 
+        m_numLidarConstraints += point->applyLidarRangeConstraint(m_sparseNormals, N22, N12, n1, n2,
+                                                                measure);
+//        applyLidarRangeConstraint(N22, N12, n1, n2, coeffImagePosition.size2(), measure, point);
+
       } // end loop over this points measures
 
 //      clock_t formPointNormalsClock1 = clock();
       formPointNormals(N22, N12, n2, m_RHS, point);
 //      clock_t formPointNormalsClock2 = clock();
 
-//      cumulativeFormPointNormalsTime += (formPointNormalsClock2 - formPointNormalsClock1)
+      //      cumulativeFormPointNormalsTime += (formPointNormalsClock2 - formPointNormalsClock1)
 //          / (double)CLOCKS_PER_SEC;
 
       pointIndex++;
@@ -1643,6 +1415,8 @@ bool BundleAdjust::formNormalEquations() {
 
     // update number of unknown parameters
     m_bundleResults.setNumberUnknownParameters(m_rank + 3 * numGood3DPoints);
+
+    m_bundleResults.setNumberLidarRangeConstraintEquations(m_numLidarConstraints);
 
     return status;
   }
@@ -1832,7 +1606,7 @@ bool BundleAdjust::formNormalEquations() {
                                       BundleControlPointQsp &bundleControlPoint) {
 
     boost::numeric::ublas::bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
-    SparseBlockRowMatrix &Q = bundleControlPoint->cholmodQMatrix();
+    SparseBlockRowMatrix &Q = bundleControlPoint->qMatrix();
 
     NIC.clear();
     Q.zeroBlocks();
@@ -2126,6 +1900,205 @@ bool BundleAdjust::formNormalEquations() {
 
       continuityRHS.clear();
     }
+  }
+
+
+  /**
+   *
+   * Adding range constraint between laser altimeter ground point and camera station
+   *
+   * @author 2018-04-12 Ken Edmundson
+   *
+   * @internal
+   *   @history 2018-04-12 Ken Edmundson - Original version
+   */
+  bool BundleAdjust::applyLidarRangeConstraint(LinearAlgebra::MatrixUpperTriangular& N22,
+                                               SparseBlockColumnMatrix& N12,
+                                               LinearAlgebra::VectorCompressed& n1,
+                                               LinearAlgebra::Vector& n2,
+                                               int numberImagePartials,
+                                               BundleMeasureQsp measure,
+                                               BundleControlPointQsp point) {
+    int i;
+
+    if (!point->id().contains("Lidar")) {
+      return false;
+    }
+
+    QString cubeSerialNumber = measure->cubeSerialNumber();
+
+    if (!((LidarControlPoint*)point->rawControlPoint())->isSimultaneous(cubeSerialNumber)) {
+      return false;
+    }
+
+    double range = ((LidarControlPoint*)point->rawControlPoint())->range();
+    double sigmaRange = ((LidarControlPoint*)point->rawControlPoint())->sigmaRange();
+
+    int imageIndex = measure->positionNormalsBlockIndex();
+
+    LinearAlgebra::Matrix coeff_range_image(1,numberImagePartials);
+    LinearAlgebra::Matrix coeff_range_point3D(1,3);
+    LinearAlgebra::Vector coeff_range_RHS(1);
+
+    coeff_range_image.clear();
+    coeff_range_point3D.clear();
+    coeff_range_RHS.clear();
+
+//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
+
+    // compute partial derivatives for camstation-to-range point condition
+
+    // get ground point in body-fixed coordinates
+    SurfacePoint adjustedSurfacePoint =
+        measure->parentControlPoint()->rawControlPoint()->GetAdjustedSurfacePoint();
+    double xPoint  = adjustedSurfacePoint.GetX().kilometers();
+    double yPoint  = adjustedSurfacePoint.GetY().kilometers();
+    double zPoint  = adjustedSurfacePoint.GetZ().kilometers();
+
+    // get spacecraft position in J2000 coordinates
+    std::vector<double> CameraJ2KXYZ(3);
+    CameraJ2KXYZ = measure->camera()->instrumentPosition()->Coordinate();
+    double xCameraJ2K  = CameraJ2KXYZ[0];
+    double yCameraJ2K  = CameraJ2KXYZ[1];
+    double zCameraJ2K  = CameraJ2KXYZ[2];
+
+    // get spacecraft position in body-fixed coordinates
+    std::vector<double> CameraBodyFixedXYZ(3);
+
+    // "InstrumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
+    // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
+    CameraBodyFixedXYZ = measure->camera()->bodyRotation()->ReferenceVector(CameraJ2KXYZ);
+    double xCamera  = CameraBodyFixedXYZ[0];
+    double yCamera  = CameraBodyFixedXYZ[1];
+    double zCamera  = CameraBodyFixedXYZ[2];
+
+    // computed distance between spacecraft and point
+    double dX = xCamera - xPoint;
+    double dY = yCamera - yPoint;
+    double dZ = zCamera - zPoint;
+    double computed_distance = sqrt(dX*dX+dY*dY+dZ*dZ);
+
+    // observed distance - computed distance
+    double observed_computed = range - computed_distance;
+
+    // get matrix that rotates spacecraft from J2000 to body-fixed
+    std::vector<double> matrix_Target_to_J2K;
+    matrix_Target_to_J2K = measure->camera()->bodyRotation()->Matrix();
+
+    double m11 = matrix_Target_to_J2K[0];
+    double m12 = matrix_Target_to_J2K[1];
+    double m13 = matrix_Target_to_J2K[2];
+    double m21 = matrix_Target_to_J2K[3];
+    double m22 = matrix_Target_to_J2K[4];
+    double m23 = matrix_Target_to_J2K[5];
+    double m31 = matrix_Target_to_J2K[6];
+    double m32 = matrix_Target_to_J2K[7];
+    double m33 = matrix_Target_to_J2K[8];
+
+    // partials w/r to image
+    // auxiliaries
+    double a1 = m11*xCameraJ2K + m12*yCameraJ2K + m13*zCameraJ2K - xPoint;
+    double a2 = m21*xCameraJ2K + m22*yCameraJ2K + m23*zCameraJ2K - yPoint;
+    double a3 = m31*xCameraJ2K + m32*yCameraJ2K + m33*zCameraJ2K - zPoint;
+
+    coeff_range_image(0,0) = (m11*a1 + m21*a2 + m31*a3)/computed_distance;
+    coeff_range_image(0,1) = (m12*a1 + m22*a2 + m32*a3)/computed_distance;
+    coeff_range_image(0,2) = (m13*a1 + m23*a2 + m33*a3)/computed_distance;
+
+//    std::cout << coeff_range_image << std::endl;
+
+    // partials w/r to point
+    double lat    = adjustedSurfacePoint.GetLatitude().radians();
+    double lon    = adjustedSurfacePoint.GetLongitude().radians();
+    double radius = adjustedSurfacePoint.GetLocalRadius().kilometers();
+
+    double sinlat = sin(lat);
+    double coslat = cos(lat);
+    double sinlon = sin(lon);
+    double coslon = cos(lon);
+
+    coeff_range_point3D(0,0) = radius*(sinlat*coslon*a1 + sinlat*sinlon*a2 - coslat*a3)/computed_distance;
+    coeff_range_point3D(0,1) = radius*(coslat*sinlon*a1 - coslat*coslon*a2)/computed_distance;
+    coeff_range_point3D(0,2) = -(coslat*coslon*a1 + coslat*sinlon*a2 + sinlat*a3)/computed_distance;
+
+    // right hand side
+    coeff_range_RHS(0) = observed_computed;
+
+    // multiply coefficients by observation weight
+    double dObservationWeight = 1.0/(sigmaRange*0.001); // converting sigma from meters to km
+    coeff_range_image   *= dObservationWeight;
+    coeff_range_point3D *= dObservationWeight;
+    coeff_range_RHS     *= dObservationWeight;
+
+    // form matrices to be added to normal equation auxiliaries
+    static vector<double> n1_image(numberImagePartials);
+    n1_image.clear();
+
+    // form N11 for the condition partials for image
+//    static symmetric_matrix<double, upper> N11(numberImagePartials);
+//    N11.clear();
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
+
+//    N11 = prod(trans(coeff_range_image), coeff_range_image);
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+    int t = numberImagePartials * imageIndex;
+
+    // insert submatrix at column, row
+//    m_sparseNormals.insertMatrixBlock(imageIndex, imageIndex, numberImagePartials,
+//                                      numberImagePartials);
+
+    (*(*m_sparseNormals[imageIndex])[imageIndex])
+        += prod(trans(coeff_range_image), coeff_range_image);
+
+//    std::cout << (*(*m_sparseNormals[imageIndex])[imageIndex]) << std::endl;
+
+    // form N12_Image
+//    static matrix<double> N12_Image(numberImagePartials, 3);
+//    N12_Image.clear();
+
+//    N12_Image = prod(trans(coeff_range_image), coeff_range_point3D);
+
+//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
+
+    // insert N12_Image into N12
+//    N12.insertMatrixBlock(imageIndex, numberImagePartials, 3);
+    *N12[imageIndex] += prod(trans(coeff_range_image), coeff_range_point3D);
+
+//  printf("N12\n");
+//  std::cout << N12 << std::endl;
+
+    // form n1
+    n1_image = prod(trans(coeff_range_image), coeff_range_RHS);
+
+//  std::cout << "n1_image" << std::endl << n1_image << std::endl;
+
+    // insert n1_image into n1
+    for (i = 0; i < numberImagePartials; i++)
+      n1(i + t) += n1_image(i);
+
+    // form N22
+    N22 += prod(trans(coeff_range_point3D), coeff_range_point3D);
+
+//  std::cout << "N22" << std::endl << N22 << std::endl;
+//  std::cout << "n2" << std::endl << n2 << std::endl;
+
+    // form n2
+    n2 += prod(trans(coeff_range_point3D), coeff_range_RHS);
+
+//  std::cout << "n2" << std::endl << n2 << std::endl;
+
+    m_numLidarConstraints++;
+
+    return true;
   }
 
 
@@ -2511,7 +2484,7 @@ bool BundleAdjust::formNormalEquations() {
     if (measureCamera->GetCameraType() != 0) {
       // Set the Spice to the measured point
       // TODO - can we explain this better?
-      measureCamera->SetImage(measure->sample(), measure->line());
+      measure->setImage();
     }
 
     // we set the measures polynomial segment indices and position and pointing matrix blocks
@@ -2663,6 +2636,12 @@ bool BundleAdjust::formNormalEquations() {
 
     // TODO: what if camera has been subsampled, is pixel pitch computation still valid?
     observationSigma = 1.4 * measureCamera->PixelPitch();
+
+    // TODO: lidar kluge
+    if (measure->parentControlPoint()->id().contains("Lidar")) {
+      observationSigma *=10.0;
+    }
+
     observationWeight = 1.0 / observationSigma;
 
     if (m_bundleResults.numberMaximumLikelihoodModels()
@@ -2692,9 +2671,11 @@ bool BundleAdjust::formNormalEquations() {
 
 
   /**
-   * apply parameter corrections for solution.
+   * Apply parameter corrections for current iteration.
    */
   void BundleAdjust::applyParameterCorrections() {
+
+    qDebug() << m_imageSolution;
 
     int t = 0;
 
@@ -2710,6 +2691,7 @@ bool BundleAdjust::formNormalEquations() {
     }
 
     // Update spice for each BundleObservation
+    // TODO: can we do this faster by threading with QtConcurrent::run?
     int numObservations = m_bundleObservations.size();
     for (int i = 0; i < numObservations; i++) {
       BundleObservationQsp observation = m_bundleObservations.at(i);
@@ -2722,40 +2704,32 @@ bool BundleAdjust::formNormalEquations() {
       t += numParameters;
     }
         
-    // Update lat/lon for each photogrammetric control point
-    int numControlPoints = m_bundleControlPoints.size();
-    for (int i = 0; i < numControlPoints; i++) {
-      BundleControlPointQsp point = m_bundleControlPoints.at(i);
-      point->applyParameterCorrections(m_sparseNormals, m_imageSolution);
-    }
-/*
-    // Update lat/lon for each lidar control point (if we have them)
-    int numLidarPoints = m_bundleLidarPoints.size();
-    for (int i = 0; i < numLidarPoints; i++) {
-      BundleControlPointQsp point = m_bundleLidarPoints.at(i);
-      point->applyParameterCorrections(m_sparseNormals, m_imageSolution);
-    }
-*/
+    // Apply parameter corrections for control points
+    // TODO: can we do this faster by threading with QtConcurrent::run?
+    m_bundleControlPoints.applyParameterCorrections(m_sparseNormals, m_imageSolution);
+
+//    QFuture<void> f1 =
+//        QtConcurrent::run(&m_bundleControlPoints,
+//                          &BundleControlPointVector::applyParameterCorrections, m_sparseNormals,
+//                                                                                m_imageSolution);
+//    f1.waitForFinished();
   }
 
 
   /**
-   * This method computes the focal plane residuals for the measures.
+   * This method computes vtpv. The weighted sum of the squares of residuals.
    *
-   * @return double Weighted sum of the squares of the residuals, vtpv.
+   * @return double Vtpv, the weighted sum of the squares of residuals.
    *
-   * @internal
-   *   @history 2012-01-18 Debbie A. Cook - Fixed the computation of vx
-   *                           and vy to make sure they are focal
-   *                           plane x and y residuals instead of
-   *                           image sample and line residuals.
    */
-  double BundleAdjust::computeResiduals() {
+  double BundleAdjust::computeVtpv() {
     double vtpv = 0.0;
     double vtpvControl = 0.0;
     double vtpvImage = 0.0;
+    double vtpvRange = 0.0;
     double weight;
-    double v, vx, vy;
+    double vx, vy;
+    double rmsx, rmsy, rmsxy;
 
     // x, y, and xy residual stats vectors
     Statistics xResiduals;
@@ -2765,22 +2739,43 @@ bool BundleAdjust::formNormalEquations() {
     // vtpv for image coordinates
     int numObjectPoints = m_bundleControlPoints.size();
 
+    double vtpvTest = m_bundleControlPoints.vtpvMeasureContribution();
+//    m_bundleControlPoints.rmsResiduals(rmsx, rmsy, rmsxy);
+
     for (int i = 0; i < numObjectPoints; i++) {
 
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
-
-      point->computeResiduals();
 
       int numMeasures = point->numberOfMeasures();
       for (int j = 0; j < numMeasures; j++) {
         const BundleMeasureQsp measure = point->at(j);
 
         weight = 1.4 * (measure->camera())->PixelPitch();
+
+        // TODO: lidar kluge
+        if (measure->parentControlPoint()->id().contains("Lidar")) {
+          weight *=10.0;
+        }
+
         weight = 1.0 / weight;
         weight *= weight;
 
         vx = measure->focalPlaneMeasuredX() - measure->focalPlaneComputedX();
         vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
+
+        // TODO: Testing - correct lidar simultaneous measure by it's residual
+        if ( point->id().contains("Lidar", Qt::CaseInsensitive) ) {
+          double newsample = measure->sample() - measure->sampleResidual();
+          double newline   = measure->line() - measure->lineResidual();
+
+          measure->rawMeasure()->SetCoordinate(newsample, newline);
+          Camera* camera = measure->camera();
+
+          camera->SetImage(newsample,newline);
+          double newx = camera->DistortionMap()->UndistortedFocalPlaneX();
+          double newy = camera->DistortionMap()->UndistortedFocalPlaneY();
+          measure->rawMeasure()->SetFocalPlaneMeasured(newx,newy);
+        }
 
         // if rejected, don't include in statistics
         if (measure->isRejected()) {
@@ -2796,54 +2791,22 @@ bool BundleAdjust::formNormalEquations() {
       }
     }
 
-    // add vtpv from constrained 3D points
-    // TODO: put method vtpvContribution() into BundleControlPoint
-    int pointIndex = 0;
-    for (int i = 0; i < numObjectPoints; i++) {
-      BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
+    // vtpv from constrained point parameters
+    vtpvControl = m_bundleControlPoints.vtpvContribution();
 
-      // get weight and correction vector for this point
-      boost::numeric::ublas::bounded_vector<double, 3> weights = bundleControlPoint->weights();
-      boost::numeric::ublas::bounded_vector<double, 3> corrections =
-                                                             bundleControlPoint->corrections();
+    // vtpv from constrained image parameters
+    vtpvImage = m_bundleObservations.vtpvContribution();
 
-      if ( weights(0) > 0.0 ) {
-          vtpvControl += corrections(0) * corrections(0) * weights(0);
-      }
-      if ( weights(1) > 0.0 ) {
-          vtpvControl += corrections(1) * corrections(1) * weights(1);
-      }
-      if ( weights(2) > 0.0 ) {
-          vtpvControl += corrections(2) * corrections(2) * weights(2);
-      }
-
-      pointIndex++;
-    }
-
-    // add vtpv from constrained image parameters
-    // TODO: put method vtpvContribution() into BundleObservation
-    for (int i = 0; i < m_bundleObservations.size(); i++) {
-      BundleObservationQsp observation = m_bundleObservations.at(i);
-
-      // get weight and correction vector for this observation
-      const LinearAlgebra::Vector &weights = observation->parameterWeights();
-      const LinearAlgebra::Vector &corrections = observation->parameterCorrections();
-
-      for (int j = 0; j < (int)corrections.size(); j++) {
-        if (weights[j] > 0.0) {
-          v = corrections[j];
-          vtpvImage += v * v * weights[j];
-        }
-      }
-    }
-
-    // TODO - add vtpv from constrained target body parameters
+    // vtpv from constrained target body parameters
     double vtpvTargetBody = 0.0;
     if ( m_bundleTargetBody) {
       vtpvTargetBody = m_bundleTargetBody->vtpv();
     }
 
-   vtpv = vtpv + vtpvControl + vtpvImage + vtpvTargetBody;
+    // vtpv from lidar point range constraints
+    vtpvRange = m_bundleControlPoints.vtpvRangeContribution();
+
+    vtpv = vtpv + vtpvControl + vtpvImage + vtpvRange + vtpvTargetBody;
 
     // Compute rms for all image coordinate residuals
     // separately for x, y, then x and y together
@@ -3310,7 +3273,7 @@ bool BundleAdjust::formNormalEquations() {
         // get corresponding Q matrix
         // NOTE: we are getting a reference to the Q matrix stored
         //       in the BundleControlPoint for speed (without the & it is dirt slow)
-        SparseBlockRowMatrix &Q = point->cholmodQMatrix();
+        SparseBlockRowMatrix &Q = point->qMatrix();
 
         T.clear();
 
