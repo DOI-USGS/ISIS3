@@ -4,13 +4,10 @@
 #include <QDebug>
 
 // Isis Library
-#include "BundleObservationSolveSettings.h"
+#include "Camera.h"
 #include "SpicePosition.h"
-#include "SpiceRotation.h"
 
 // boost lib
-//#include <boost/lexical_cast.hpp>
-//#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
@@ -23,103 +20,16 @@ namespace Isis {
    * Default constructor
    *
    */
-  BundleLidarRangeConstraint::BundleLidarRangeConstraint() {
-    m_numberCkCoefficients = 0;
-    m_numberSpkCoefficients = 0;
-    m_numberSpkSegments = 0;
-    m_numberCkSegments = 0;
-    m_numberSpkBoundaries = 0;
-    m_numberCkBoundaries = 0;
-    m_numberParameters = 0;
-    m_numberConstraintEquations = 0;
-  }
+  BundleLidarRangeConstraint::BundleLidarRangeConstraint(LidarControlPointQsp lidarControlPoint,
+                                                         BundleMeasureQsp measure) {
+    m_parentLidarControlPoint = lidarControlPoint;
+    m_bundleObservation = measure->parentBundleObservation();
 
+//    m_instrumentPosition = bundleObservation->spicePosition(); // statefulness?
+//    m_bodyRotation = measure->camera()->bodyRotation();        // statefulness?
+    m_simultaneousMeasure = measure;
 
-  /**
-   * Constructor
-   *
-   * @param parentObservation parent BundleObservation
-   */
-  BundleLidarRangeConstraint::
-      BundleLidarRangeConstraint(BundleObservationQsp parentObservation) {
-
-    m_parentObservation = parentObservation;
-
-    // initialize variables
-    m_numberCkCoefficients = 0;
-    m_numberSpkCoefficients = 0;
-    m_numberCkSegments = 0;
-    m_numberSpkSegments = 0;
-    m_numberSpkBoundaries = 0;
-    m_numberCkBoundaries = 0;
-    m_numberSegmentParameters = 0;
-    m_numberParameters = 0;
-    m_numberConstraintEquations = 0;
-
-    BundleObservationSolveSettingsQsp solveSettings = m_parentObservation->solveSettings();
-
-    int nSpkParameters = 0;
-    int nCkParameters = 0;
-
-    if (solveSettings->instrumentPositionSolveOption() !=
-        BundleObservationSolveSettings::NoPositionFactors) {
-
-      m_numberSpkCoefficients = solveSettings->numberCameraPositionCoefficientsSolved();
-      m_numberSpkSegments = solveSettings->numberSpkPolySegments();
-      m_numberSpkBoundaries = m_numberSpkSegments - 1;
-
-      nSpkParameters = 3 * m_numberSpkCoefficients;
-
-      // knots contain scaled time
-      m_spkKnots = parentObservation->spicePosition()->scaledPolynomialKnots();
-
-      // remove end knots, leaving only knots at segment boundaries
-      if (m_spkKnots.size() > 2) {
-        m_spkKnots.pop_back();
-        m_spkKnots.erase(m_spkKnots.begin());
-      }
-    }
-
-    if (solveSettings->instrumentPointingSolveOption() !=
-        BundleObservationSolveSettings::NoPointingFactors) {
-
-      m_numberCkCoefficients = solveSettings->numberCameraAngleCoefficientsSolved();
-      m_numberCkSegments = solveSettings->numberCkPolySegments();
-      m_numberCkBoundaries = m_numberCkSegments - 1;
-
-      nCkParameters = 2 * m_numberCkCoefficients;
-      if (solveSettings->solveTwist()) {
-        nCkParameters += m_numberCkCoefficients;
-      }
-
-      // knots contain scaled time
-      m_ckKnots = parentObservation->spiceRotation()->scaledPolynomialKnots();
-
-      // remove end knots, leaving only knots at segment boundaries
-      if (m_ckKnots.size() > 2) {
-        m_ckKnots.pop_back();
-        m_ckKnots.erase(m_ckKnots.begin());
-      }
-    }
-
-    if (nSpkParameters > 0) {
-      m_numberConstraintEquations = m_numberSpkBoundaries * (m_numberSpkCoefficients-1) * 3.0;
-    }
-    if (nCkParameters > 0) {
-      if (m_parentObservation->solveSettings()->solveTwist()) {
-        m_numberConstraintEquations += m_numberCkBoundaries * (m_numberCkCoefficients-1) * 3.0;
-      }
-      else {
-        m_numberConstraintEquations += m_numberCkBoundaries * (m_numberCkCoefficients-1) * 2.0;
-      }
-    }
-
-    m_numberParameters = m_numberSpkSegments * nSpkParameters + m_numberCkSegments * nCkParameters;
-
-    m_numberSpkSegmentParameters = nSpkParameters;
-    m_numberCkSegmentParameters = nCkParameters;
-
-    constructMatrices();
+    init();
   }
 
 
@@ -139,28 +49,6 @@ namespace Isis {
    */
   BundleLidarRangeConstraint::
       BundleLidarRangeConstraint(const BundleLidarRangeConstraint &src) {
-    m_parentObservation = src.m_parentObservation;
-
-    m_numberSegmentParameters = src.m_numberSegmentParameters;
-    m_numberParameters = src.m_numberParameters;
-    m_numberConstraintEquations = src.m_numberConstraintEquations;
-
-    m_ckKnots = src.m_ckKnots;
-    m_spkKnots = src.m_spkKnots;
-    m_numberCkCoefficients = src.m_numberCkCoefficients;
-    m_numberSpkCoefficients = src.m_numberSpkCoefficients;
-    m_numberCkSegments = src.m_numberCkSegments;
-    m_numberSpkSegments = src.m_numberSpkSegments;
-    m_numberCkBoundaries = src.m_numberCkBoundaries;
-    m_numberSpkBoundaries = src.m_numberSpkBoundaries;
-    m_numberCkSegmentParameters = src.m_numberCkSegmentParameters;
-    m_numberSpkSegmentParameters = src.m_numberSpkSegmentParameters;
-
-    m_designMatrix = src.m_designMatrix;
-    m_normalsSpkMatrix = src.m_normalsSpkMatrix;
-    m_normalsCkMatrix = src.m_normalsCkMatrix;
-    m_rightHandSide = src.m_rightHandSide;
-    m_omcVector = src.m_omcVector;
   }
 
 
@@ -174,34 +62,11 @@ namespace Isis {
    * @return    BundleLidarRangeConstraint& Returns reference to this
    *            BundleLidarRangeConstraint.
    */
-  BundleLidarRangeConstraint
-      &BundleLidarRangeConstraint::
+  BundleLidarRangeConstraint &BundleLidarRangeConstraint::
       operator=(const BundleLidarRangeConstraint &src) {
 
     // Prevent self assignment
     if (this != &src) {
-      m_parentObservation = src.m_parentObservation;
-
-      m_numberSegmentParameters = src.m_numberSegmentParameters;
-      m_numberParameters = src.m_numberParameters;
-      m_numberConstraintEquations = src.m_numberConstraintEquations;
-
-      m_ckKnots = src.m_ckKnots;
-      m_spkKnots = src.m_spkKnots;
-      m_numberCkCoefficients = src.m_numberCkCoefficients;
-      m_numberSpkCoefficients = src.m_numberSpkCoefficients;
-      m_numberCkSegments = src.m_numberCkSegments;
-      m_numberSpkSegments = src.m_numberSpkSegments;
-      m_numberCkBoundaries = src.m_numberCkBoundaries;
-      m_numberSpkBoundaries = src.m_numberSpkBoundaries;
-      m_numberCkSegmentParameters = src.m_numberCkSegmentParameters;
-      m_numberSpkSegmentParameters = src.m_numberSpkSegmentParameters;
-
-      m_designMatrix = src.m_designMatrix;
-      m_normalsSpkMatrix = src.m_normalsSpkMatrix;
-      m_normalsCkMatrix = src.m_normalsCkMatrix;
-      m_rightHandSide = src.m_rightHandSide;
-      m_omcVector = src.m_omcVector;
     }
 
     return *this;
@@ -209,684 +74,479 @@ namespace Isis {
 
 
   /**
-   * Returns number of spk segments in piecewise polynomial.
+   * Initialization
    *
-   * @return int Returns number of spk segments in piecewise polynomial.
+   * TODO: how to handle size of m_coeff_range_image if we are using piecewise polynomials?
    */
-  int BundleLidarRangeConstraint::numberSpkSegments() const {
-    return m_numberSpkSegments;
+  void BundleLidarRangeConstraint::init() {
+    m_observedRange = m_parentLidarControlPoint->range();
+    m_observedRangeSigma = m_parentLidarControlPoint->sigmaRange() * 0.001; // converting to km
+    m_observedRangeWeight = 1.0/m_observedRangeSigma;
+    m_adjustedSigma = 0.0;
+
+    m_coeff_range_image.resize(1, m_bundleObservation->numberPositionParameters());
+    m_coeff_range_point3D.resize(1,3);
+    m_coeff_range_RHS.resize(1);
+
+    m_pointBodyFixed.resize(3);
+    m_cameraJ2K.resize(3);
+    m_cameraBodyFixed.resize(3);
+    m_matrixTargetToJ2K.resize(9);
+
+    update();
   }
 
 
   /**
-   * Returns number of ck segments in piecewise polynomial.
-   *
-   * @return int Returns number of ck segments in piecewise polynomial.
+   * Applies range constraint between image and lidar point acquired simultaneously.
    */
-  int BundleLidarRangeConstraint::numberCkSegments() const {
-    return m_numberCkSegments;
+  bool BundleLidarRangeConstraint::applyConstraint(SparseBlockMatrix &normalsMatrix,
+                                                   LinearAlgebra::MatrixUpperTriangular& N22,
+                                                   SparseBlockColumnMatrix& N12,
+                                                   LinearAlgebra::VectorCompressed& n1,
+                                                   LinearAlgebra::Vector& n2,
+                                                   BundleMeasureQsp measure) {
+    int i;
+
+    if (m_simultaneousMeasure != measure) {
+      return false;
+    }
+
+    if (m_parentLidarControlPoint->GetId() == "Lidar1910")
+      int fred=1;
+
+
+//    int imageIndex = measure->positionNormalsBlockIndex();
+    int imageIndex = m_bundleObservation->polyPositionSegmentIndex();
+
+    m_coeff_range_image.clear();
+    m_coeff_range_point3D.clear();
+    m_coeff_range_RHS.clear();
+
+//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
+
+    // compute partial derivatives for camstation-to-range point condition
+
+    // get matrix that rotates spacecraft from J2000 to body-fixed
+    double m11 = m_matrixTargetToJ2K[0];
+    double m12 = m_matrixTargetToJ2K[1];
+    double m13 = m_matrixTargetToJ2K[2];
+    double m21 = m_matrixTargetToJ2K[3];
+    double m22 = m_matrixTargetToJ2K[4];
+    double m23 = m_matrixTargetToJ2K[5];
+    double m31 = m_matrixTargetToJ2K[6];
+    double m32 = m_matrixTargetToJ2K[7];
+    double m33 = m_matrixTargetToJ2K[8];
+
+    // partials w/r to image
+    // auxiliaries
+    double a1 = m11*m_cameraJ2K[0] + m12*m_cameraJ2K[1] + m13*m_cameraJ2K[2] - m_pointBodyFixed[0];
+    double a2 = m21*m_cameraJ2K[0] + m22*m_cameraJ2K[1] + m23*m_cameraJ2K[2] - m_pointBodyFixed[1];
+    double a3 = m31*m_cameraJ2K[0] + m32*m_cameraJ2K[1] + m33*m_cameraJ2K[2] - m_pointBodyFixed[2];
+
+    m_coeff_range_image(0,0) = (m11*a1 + m21*a2 + m31*a3)/m_computedRange;
+    m_coeff_range_image(0,1) = (m12*a1 + m22*a2 + m32*a3)/m_computedRange;
+    m_coeff_range_image(0,2) = (m13*a1 + m23*a2 + m33*a3)/m_computedRange;
+
+//    std::cout << coeff_range_image << std::endl;
+
+    // partials w/r to point
+    SurfacePoint adjustedSurfacePoint = m_parentLidarControlPoint->GetAdjustedSurfacePoint();
+    double lat    = adjustedSurfacePoint.GetLatitude().radians();
+    double lon    = adjustedSurfacePoint.GetLongitude().radians();
+    double radius = adjustedSurfacePoint.GetLocalRadius().kilometers();
+
+    double sinlat = sin(lat);
+    double coslat = cos(lat);
+    double sinlon = sin(lon);
+    double coslon = cos(lon);
+
+    m_coeff_range_point3D(0,0)
+        = radius*(sinlat*coslon*a1 + sinlat*sinlon*a2 - coslat*a3)/m_computedRange;
+    m_coeff_range_point3D(0,1)
+        = radius*(coslat*sinlon*a1 - coslat*coslon*a2)/m_computedRange;
+    m_coeff_range_point3D(0,2)
+        = -(coslat*coslon*a1 + coslat*sinlon*a2 + sinlat*a3)/m_computedRange;
+
+    // right hand side (observed distance - computed distance)
+    m_coeff_range_RHS(0) = m_observedRange - m_computedRange;
+
+    // multiply coefficients by observation weight
+    m_coeff_range_image   *= m_observedRangeWeight;
+    m_coeff_range_point3D *= m_observedRangeWeight;
+    m_coeff_range_RHS     *= m_observedRangeWeight;
+
+    // form matrices to be added to normal equation auxiliaries
+    // TODO: be careful about need to resize if if different images have different numbers of
+    // parameters
+    int numberImagePartials = m_coeff_range_image.size2();
+    static vector<double> n1_image(numberImagePartials);
+    n1_image.clear();
+
+    // form N11 for the condition partials for image
+//    static symmetric_matrix<double, upper> N11(numberImagePartials);
+//    N11.clear();
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
+
+//    N11 = prod(trans(coeff_range_image), coeff_range_image);
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+    int t = numberImagePartials * imageIndex;
+
+    // insert submatrix at column, row
+//    m_sparseNormals.insertMatrixBlock(imageIndex, imageIndex, numberImagePartials,
+//                                      numberImagePartials);
+
+    (*(*normalsMatrix[imageIndex])[imageIndex])
+        += prod(trans(m_coeff_range_image), m_coeff_range_image);
+
+//    std::cout << (*(*m_sparseNormals[imageIndex])[imageIndex]) << std::endl;
+
+    // form N12_Image
+//    static matrix<double> N12_Image(numberImagePartials, 3);
+//    N12_Image.clear();
+
+//    N12_Image = prod(trans(coeff_range_image), coeff_range_point3D);
+
+//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
+
+    // insert N12_Image into N12
+//    N12.insertMatrixBlock(imageIndex, numberImagePartials, 3);
+    *N12[imageIndex] += prod(trans(m_coeff_range_image), m_coeff_range_point3D);
+
+//  printf("N12\n");
+//  std::cout << N12 << std::endl;
+
+    // form n1
+    n1_image = prod(trans(m_coeff_range_image), m_coeff_range_RHS);
+
+//  std::cout << "n1_image" << std::endl << n1_image << std::endl;
+
+    // insert n1_image into n1
+    for (i = 0; i < numberImagePartials; i++)
+      n1(i + t) += n1_image(i);
+
+    // form N22
+    N22 += prod(trans(m_coeff_range_point3D), m_coeff_range_point3D);
+
+//  std::cout << "N22" << std::endl << N22 << std::endl;
+//  std::cout << "n2" << std::endl << n2 << std::endl;
+
+    // form n2
+    n2 += prod(trans(m_coeff_range_point3D), m_coeff_range_RHS);
+
+//  std::cout << "n2" << std::endl << n2 << std::endl;
+
+    return true;
   }
 
 
   /**
-   * Returns number of spk coefficients in piecewise polynomial
-   *
-   * @return int Returns number of spk coefficients in piecewise polynomial
+   * Applies range constraint between image and lidar point acquired simultaneously.
    */
-  int BundleLidarRangeConstraint::numberSpkCoefficients() const {
-    return m_numberSpkCoefficients;
+/*
+  bool BundleLidarRangeConstraint::applyConstraint(SparseBlockMatrix &normalsMatrix,
+                                                   LinearAlgebra::MatrixUpperTriangular& N22,
+                                                   SparseBlockColumnMatrix& N12,
+                                                   LinearAlgebra::VectorCompressed& n1,
+                                                   LinearAlgebra::Vector& n2,
+                                                   BundleMeasureQsp measure) {
+    int i;
+
+    if (m_simultaneousMeasure != measure) {
+      return false;
+    }
+
+    if (m_parentLidarControlPoint->GetId() == "Lidar1910")
+      int fred=1;
+
+
+//    int imageIndex = measure->positionNormalsBlockIndex();
+    int imageIndex = m_bundleObservation->polyPositionSegmentIndex();
+
+    m_coeff_range_image.clear();
+    m_coeff_range_point3D.clear();
+    m_coeff_range_RHS.clear();
+
+//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
+
+    // compute partial derivatives for camstation-to-range point condition
+
+    // get ground point in body-fixed coordinates
+    SurfacePoint adjustedSurfacePoint = m_parentLidarControlPoint->GetAdjustedSurfacePoint();
+    double xPoint  = adjustedSurfacePoint.GetX().kilometers();
+    double yPoint  = adjustedSurfacePoint.GetY().kilometers();
+    double zPoint  = adjustedSurfacePoint.GetZ().kilometers();
+
+    // get spacecraft position in J2000 coordinates
+    std::vector<double> CameraJ2KXYZ(3);
+    CameraJ2KXYZ = m_simultaneousMeasure->camera()->instrumentPosition()->Coordinate();
+    double time1 = m_simultaneousMeasure->camera()->instrumentPosition()->EphemerisTime();
+    double time2 = m_simultaneousMeasure->camera()->instrumentPosition()->EphemerisTime();
+//    CameraJ2KXYZ = m_instrumentPosition->Coordinate();
+    double xCameraJ2K  = CameraJ2KXYZ[0];
+    double yCameraJ2K  = CameraJ2KXYZ[1];
+    double zCameraJ2K  = CameraJ2KXYZ[2];
+
+    // get spacecraft position in body-fixed coordinates
+    std::vector<double> CameraBodyFixedXYZ(3);
+
+    // "InstrumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
+    // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
+//    CameraBodyFixedXYZ = m_bodyRotation->ReferenceVector(CameraJ2KXYZ);
+    CameraBodyFixedXYZ
+        = m_simultaneousMeasure->camera()->bodyRotation()->ReferenceVector(CameraJ2KXYZ);
+    double xCamera  = CameraBodyFixedXYZ[0];
+    double yCamera  = CameraBodyFixedXYZ[1];
+    double zCamera  = CameraBodyFixedXYZ[2];
+
+    // computed distance between spacecraft and point
+    double dX = xCamera - m_pointBodyFixed[0];
+    double dY = yCamera - m_pointBodyFixed[1];
+    double dZ = zCamera - m_pointBodyFixed[2];
+    m_computedRange = sqrt(dX*dX+dY*dY+dZ*dZ);
+
+    // get matrix that rotates spacecraft from J2000 to body-fixed
+    std::vector<double> matrix_Target_to_J2K;
+    matrix_Target_to_J2K = m_simultaneousMeasure->camera()->bodyRotation()->Matrix();
+
+    double m11 = matrix_Target_to_J2K[0];
+    double m12 = matrix_Target_to_J2K[1];
+    double m13 = matrix_Target_to_J2K[2];
+    double m21 = matrix_Target_to_J2K[3];
+    double m22 = matrix_Target_to_J2K[4];
+    double m23 = matrix_Target_to_J2K[5];
+    double m31 = matrix_Target_to_J2K[6];
+    double m32 = matrix_Target_to_J2K[7];
+    double m33 = matrix_Target_to_J2K[8];
+
+    // partials w/r to image
+    // auxiliaries
+    double a1 = m11*xCameraJ2K + m12*yCameraJ2K + m13*zCameraJ2K - xPoint;
+    double a2 = m21*xCameraJ2K + m22*yCameraJ2K + m23*zCameraJ2K - yPoint;
+    double a3 = m31*xCameraJ2K + m32*yCameraJ2K + m33*zCameraJ2K - zPoint;
+
+    m_coeff_range_image(0,0) = (m11*a1 + m21*a2 + m31*a3)/m_computedRange;
+    m_coeff_range_image(0,1) = (m12*a1 + m22*a2 + m32*a3)/m_computedRange;
+    m_coeff_range_image(0,2) = (m13*a1 + m23*a2 + m33*a3)/m_computedRange;
+
+//    std::cout << coeff_range_image << std::endl;
+
+    // partials w/r to point
+    double lat    = adjustedSurfacePoint.GetLatitude().radians();
+    double lon    = adjustedSurfacePoint.GetLongitude().radians();
+    double radius = adjustedSurfacePoint.GetLocalRadius().kilometers();
+
+    double sinlat = sin(lat);
+    double coslat = cos(lat);
+    double sinlon = sin(lon);
+    double coslon = cos(lon);
+
+    m_coeff_range_point3D(0,0)
+        = radius*(sinlat*coslon*a1 + sinlat*sinlon*a2 - coslat*a3)/m_computedRange;
+    m_coeff_range_point3D(0,1)
+        = radius*(coslat*sinlon*a1 - coslat*coslon*a2)/m_computedRange;
+    m_coeff_range_point3D(0,2)
+        = -(coslat*coslon*a1 + coslat*sinlon*a2 + sinlat*a3)/m_computedRange;
+
+    // right hand side (observed distance - computed distance)
+    m_coeff_range_RHS(0) = m_observedRange - m_computedRange;
+
+    // multiply coefficients by observation weight
+    double dObservationWeight = 1.0/m_observedRangeSigma;
+    m_coeff_range_image   *= dObservationWeight;
+    m_coeff_range_point3D *= dObservationWeight;
+    m_coeff_range_RHS     *= dObservationWeight;
+
+    // form matrices to be added to normal equation auxiliaries
+    // TODO: be careful about need to resize if if different images have different numbers of
+    // parameters
+    int numberImagePartials = m_coeff_range_image.size2();
+    static vector<double> n1_image(numberImagePartials);
+    n1_image.clear();
+
+    // form N11 for the condition partials for image
+//    static symmetric_matrix<double, upper> N11(numberImagePartials);
+//    N11.clear();
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
+//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
+//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
+
+//    N11 = prod(trans(coeff_range_image), coeff_range_image);
+
+//    std::cout << "N11" << std::endl << N11 << std::endl;
+
+    int t = numberImagePartials * imageIndex;
+
+    // insert submatrix at column, row
+//    m_sparseNormals.insertMatrixBlock(imageIndex, imageIndex, numberImagePartials,
+//                                      numberImagePartials);
+
+    (*(*normalsMatrix[imageIndex])[imageIndex])
+        += prod(trans(m_coeff_range_image), m_coeff_range_image);
+
+//    std::cout << (*(*m_sparseNormals[imageIndex])[imageIndex]) << std::endl;
+
+    // form N12_Image
+//    static matrix<double> N12_Image(numberImagePartials, 3);
+//    N12_Image.clear();
+
+//    N12_Image = prod(trans(coeff_range_image), coeff_range_point3D);
+
+//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
+
+    // insert N12_Image into N12
+//    N12.insertMatrixBlock(imageIndex, numberImagePartials, 3);
+    *N12[imageIndex] += prod(trans(m_coeff_range_image), m_coeff_range_point3D);
+
+//  printf("N12\n");
+//  std::cout << N12 << std::endl;
+
+    // form n1
+    n1_image = prod(trans(m_coeff_range_image), m_coeff_range_RHS);
+
+//  std::cout << "n1_image" << std::endl << n1_image << std::endl;
+
+    // insert n1_image into n1
+    for (i = 0; i < numberImagePartials; i++)
+      n1(i + t) += n1_image(i);
+
+    // form N22
+    N22 += prod(trans(m_coeff_range_point3D), m_coeff_range_point3D);
+
+//  std::cout << "N22" << std::endl << N22 << std::endl;
+//  std::cout << "n2" << std::endl << n2 << std::endl;
+
+    // form n2
+    n2 += prod(trans(m_coeff_range_point3D), m_coeff_range_RHS);
+
+//  std::cout << "n2" << std::endl << n2 << std::endl;
+
+    return true;
+  }
+*/
+
+  /**
+   * TODO: complete
+   *
+   */
+  double BundleLidarRangeConstraint::vtpv() {
+    return m_vtpv;
   }
 
 
   /**
-   * Returns number of ck coefficients in piecewise polynomial
+   * TODO: complete
    *
-   * @return int Returns number of ck coefficients in piecewise polynomial
    */
-  int BundleLidarRangeConstraint::numberCkCoefficients() const {
-    return m_numberCkCoefficients;
+  void BundleLidarRangeConstraint::update() {
+
+    if (m_parentLidarControlPoint->GetId() == "Lidar1910")
+      int fred=1;
+
+    // establish camera model for this measure (the unpleasant statefulness thing)
+    m_simultaneousMeasure->setImage();
+
+    SurfacePoint adjustedSurfacePoint = m_parentLidarControlPoint->GetAdjustedSurfacePoint();
+    m_pointBodyFixed[0]  = adjustedSurfacePoint.GetX().kilometers();
+    m_pointBodyFixed[1]  = adjustedSurfacePoint.GetY().kilometers();
+    m_pointBodyFixed[2]  = adjustedSurfacePoint.GetZ().kilometers();
+
+    // "InstrumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
+    // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
+    // get spacecraft position in J2000 coordinates
+    std::vector<double> old_cameraJ2K;
+    old_cameraJ2K = m_cameraJ2K;
+
+    m_cameraJ2K = m_simultaneousMeasure->camera()->instrumentPosition()->Coordinate();
+
+    double d0 = old_cameraJ2K[0] - m_cameraJ2K[0];
+    double d1 = old_cameraJ2K[1] - m_cameraJ2K[1];
+    double d2 = old_cameraJ2K[2] - m_cameraJ2K[2];
+
+    // get spacecraft position in body-fixed coordinates
+    // "InstrumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
+    // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
+    m_cameraBodyFixed
+        = m_simultaneousMeasure->camera()->bodyRotation()->ReferenceVector(m_cameraJ2K);
+
+    // matrix that rotates spacecraft from J2000 to body-fixed
+    m_matrixTargetToJ2K = m_simultaneousMeasure->camera()->bodyRotation()->Matrix();
+
+    // computed distance between spacecraft and point
+    double dX = m_cameraBodyFixed[0] - m_pointBodyFixed[0];
+    double dY = m_cameraBodyFixed[1] - m_pointBodyFixed[1];
+    double dZ = m_cameraBodyFixed[2] - m_pointBodyFixed[2];
+    m_computedRange = sqrt(dX*dX+dY*dY+dZ*dZ);
+
+    double v = m_observedRange - m_computedRange;
+    double p = m_observedRangeWeight * m_observedRangeWeight;
+    m_vtpv = v * v * p;
+    int fred=1;
   }
 
 
   /**
-   * Returns number of continuity constraint equations
-   *
-   * @return int Number of continuity constraint equations
-   */
-  int BundleLidarRangeConstraint::numberConstraintEquations() const {
-    return m_numberConstraintEquations;
-  }
-
-
-  /**
-   * Returns matrix with contribution to position portion of bundle adjustment normal equations from
-   * continuity constraints.
-   *
-   * @return SparseBlockMatrix Matrix with contribution to position portion of bundle adjustment
-   *                           normal equations from continuity constraints.
-   */
-  SparseBlockMatrix &BundleLidarRangeConstraint::normalsSpkMatrix() {
-    return m_normalsSpkMatrix;
-  }
-
-
-  /**
-   * Returns matrix with contribution to pointing portion of bundle adjustment normal equations from
-   * continuity constraints.
-   *
-   * @return SparseBlockMatrix Matrix with contribution to pointing portion of bundle adjustment
-   *                           normal equations from continuity constraints.
-   */
-  SparseBlockMatrix &BundleLidarRangeConstraint::normalsCkMatrix() {
-    return m_normalsCkMatrix;
-  }
-
-
-  /**
-   * Returns vector with contribution to bundle adjustment normal equations right hand side from
-   * continuity constraints.
-   *
-   * @return LinearAlgebra::Vector Vector with contribution to bundle adjustment normal equations
-   *                               right hand side from continuity constraints.
-   */
-  LinearAlgebra::Vector
-      &BundleLidarRangeConstraint::rightHandSideVector() {
-    return m_rightHandSide;
-  }
-
-  /**
-   * Constructs m_normalsSpkMatrix and m_normalsCkMatrix, m_rightHandSide vector, m_designMatrix,
-   * and m_omcVector (or observed - computed vector).
+   * Error propagation for adjusted range sigma.
    *
    * @todo need more documentation on technical aspects of approach.
    */
-  void BundleLidarRangeConstraint::constructMatrices() {
+  void BundleLidarRangeConstraint::errorPropagation() {
 
-    if (m_numberConstraintEquations <= 0 )
-      return;
-
-    // initialize size of right hand side vector
-    // the values in this vector are updated each iteration, but vector size will not change
-    m_rightHandSide.resize(m_numberParameters);
-    m_rightHandSide.clear();
-
-    // initialize size of design matrix
-    // this will not change throughout the bundle adjustment
-    m_designMatrix.resize(m_numberConstraintEquations, m_numberParameters, false);
-    m_designMatrix.clear();
-
-    // initialize size of "observed - computed" vector
-    m_omcVector.resize(m_numberConstraintEquations);
-
-    int designRow=0;
-
-    // spk (position) contribution
-    if (m_numberSpkSegments > 1 && m_numberConstraintEquations > 0 && m_numberSpkCoefficients > 1)
-      positionContinuity(designRow);
-
-    // ck (pointing) contribution
-    if (m_numberCkSegments > 1 && m_numberConstraintEquations > 0 && m_numberCkCoefficients > 1)
-      pointingContinuity(designRow);
-
-    int numPositionParameters = m_parentObservation->numberPositionParametersPerSegment();
-    int numPointingParameters = m_parentObservation->numberPointingParametersPerSegment();
-
-    // initialize and fill position blocks in m_normalsSpkMatrix
-    if (m_numberSpkSegments > 1 && m_numberConstraintEquations > 0 && m_numberSpkCoefficients > 1) {
-      m_normalsSpkMatrix.setNumberOfColumns(m_numberSpkSegments);
-
-      for (int i = 0; i < m_numberSpkSegments; i++) {
-        m_normalsSpkMatrix.insertMatrixBlock(i, i, numPositionParameters, numPositionParameters);
-        LinearAlgebra::Matrix *block = m_normalsSpkMatrix.getBlock(i, i);
-
-        matrix_range<LinearAlgebra::MatrixCompressed>
-            mr1 (m_designMatrix, range (0, m_designMatrix.size1()),
-                range (i*numPositionParameters, (i+1)*numPositionParameters));
-
-        *block += prod(trans(mr1), mr1);
-
-        if (i > 0) {
-          m_normalsSpkMatrix.insertMatrixBlock(i, i-1, numPositionParameters, numPositionParameters);
-          block = m_normalsSpkMatrix.getBlock(i, i-1);
-
-          matrix_range<LinearAlgebra::MatrixCompressed>
-              mr2 (m_designMatrix, range (0, m_designMatrix.size1()),
-                  range ((i-1)*numPositionParameters, i*numPositionParameters));
-
-          *block += prod(trans(mr2), mr1);
-        }
-      }
-    }
-
-    // initialize and fill pointing blocks
-    if (m_numberCkSegments > 1 && m_numberConstraintEquations > 0 && m_numberCkCoefficients > 1) {
-      m_normalsCkMatrix.setNumberOfColumns(m_numberCkSegments);
-
-      int t = numPositionParameters * m_numberSpkSegments;
-
-      for (int i = 0; i < m_numberCkSegments; i++) {
-        m_normalsCkMatrix.insertMatrixBlock(i, i, numPointingParameters, numPointingParameters);
-        LinearAlgebra::Matrix *block = m_normalsCkMatrix.getBlock(i, i);
-
-        matrix_range<LinearAlgebra::MatrixCompressed>
-            mr1 (m_designMatrix, range (0, m_designMatrix.size1()),
-                range (t+i*numPointingParameters, t+(i+1)*+numPointingParameters));
-
-        *block += prod(trans(mr1), mr1);
-
-        if (i > 0) {
-          m_normalsCkMatrix.insertMatrixBlock(i, i-1, numPointingParameters, numPointingParameters);
-          block = m_normalsCkMatrix.getBlock(i, i-1);
-
-          matrix_range<LinearAlgebra::MatrixCompressed>
-              mr2 (m_designMatrix, range (0, m_designMatrix.size1()),
-                  range (t+(i-1)*numPointingParameters, t+i*numPointingParameters));
-
-          *block += prod(trans(mr2), mr1);
-        }
-      }
-    }
-
-    // initialize right hand side vector
-    updateRightHandSide();
   }
 
 
   /**
-   * Constructs portion of m_designMatrix relative to position continuity constraints.
+   * Creates & returns formatted QString for lidar range constraint to output to bundleout_lidar.csv
+   * file.
    *
-   * @param designRow Index of current row of design matrix to fill.
-   *
-   * @todo need more documentation on technical aspects of approach.
+   * @return QString Formatted QString summarizing lidar range constraint to output to
+   *                 bundleout_lidar.csv.
    */
-  void BundleLidarRangeConstraint::positionContinuity(int &designRow) {
-    LinearAlgebra::Vector partials(m_numberParameters);
-    LinearAlgebra::Vector segment1Partials; // segment1 contribution
-    LinearAlgebra::Vector segment2Partials; // segment1 contribution
+  QString BundleLidarRangeConstraint::formatBundleOutputString(bool errorProp) {
 
-    segment1Partials.resize(m_numberSpkCoefficients);
-    segment2Partials.resize(m_numberSpkCoefficients);
+    QString outstr;
 
-    // 0-order continuity
-    // {1,t,t^2}, {-1,-t,-t^2} if 2nd order polynomial; {1,t}, {-1,-t} if 1st order polynomial
+    FileName imageFileName = m_simultaneousMeasure->parentBundleObservation()->imageNames().at(0);
+    QString imageName = imageFileName.baseName();
 
-    double t, t2;
 
-    for (int i = 0; i < m_numberSpkBoundaries; i++) {
-      int segment1Start = m_numberSpkSegmentParameters*i;
-      int segment2Start = segment1Start+m_numberSpkSegmentParameters;
+    //                     measured   apriori   adjusted               adjusted
+    //                      range      sigma     range      residual     sigma
+    // point id  image       (km)       (km)      (km)        (km)       (km)
 
-      // time (t) and time-squared (t2)
-      t = m_spkKnots[i];
-      t2 = t*t;
-
-      segment1Partials(0) = 1.0;
-      segment1Partials(1) = t;
-      if (m_numberSpkCoefficients == 3)
-        segment1Partials(2) = t2;
-
-      segment2Partials(0) = -1.0;
-      segment2Partials(1) = -t;
-      if (m_numberSpkCoefficients == 3)
-        segment2Partials(2) = -t2;
-
-      // zero order in X, Y, and Z
-      for (int j = 0; j < 3; j++) {
-        partials.clear();
-        std::copy(segment1Partials.begin(),segment1Partials.end(),
-                  partials.begin()+segment1Start+m_numberSpkCoefficients*j);
-        std::copy(segment2Partials.begin(),segment2Partials.end(),
-                  partials.begin()+segment2Start+m_numberSpkCoefficients*j);
-
-        partials *= 1.0e+5; // multiply by square root of weight
-
-        row(m_designMatrix,designRow) = partials;
-        designRow++;
-      }
+    if (errorProp) {
+      outstr = QString("%1,%2,%3,%4,%5,%6,%7\n").arg(m_parentLidarControlPoint->GetId(), 16)
+                                          .arg(imageName, 16)
+                                          .arg(m_observedRange, -16, 'f', 8)
+                                          .arg(m_observedRangeSigma, -16, 'f', 2)
+                                          .arg(m_computedRange, -16, 'f', 8)
+                                          .arg(m_observedRange - m_computedRange, -16, 'f', 6)
+                                          .arg(m_adjustedSigma, -16, 'f', 8);
+    }
+    else {
+      outstr = QString("%1,%2,%3,%4,%5,%6\n").arg(m_parentLidarControlPoint->GetId())
+                                          .arg(imageName)
+                                          .arg(m_observedRange)
+                                          .arg(m_observedRangeSigma)
+                                          .arg(m_computedRange)
+                                          .arg(m_observedRange - m_computedRange);
     }
 
-    if (m_numberSpkCoefficients == 3) {
-
-    // 1st-order continuity
-    // {0,1,2t}, {0,-1,-2t} if 2nd order polynomial; {0,1}, {0,-1} if 1st order polynomial
-
-      segment1Partials(0) = 0.0;
-      segment1Partials(1) = 1.0;
-      segment2Partials(0) = 0.0;
-      segment2Partials(1) = -1.0;
-
-      for (int i = 0; i < m_numberSpkBoundaries; i++) {
-        int segment1Start = m_numberSpkSegmentParameters*i;
-        int segment2Start = segment1Start+m_numberSpkSegmentParameters;
-
-        // time (t)
-        t = m_spkKnots[i];
-
-        if (m_numberSpkCoefficients == 3) {
-          segment1Partials(2) = 2.0*t;
-          segment2Partials(2) = -2.0*t;
-        }
-
-        // 1st order in X, Y, and Z
-        for (int j = 0; j < 3; j++) {
-          partials.clear();
-          std::copy(segment1Partials.begin(),segment1Partials.end(),
-                    partials.begin()+segment1Start+m_numberSpkCoefficients*j);
-          std::copy(segment2Partials.begin(),segment2Partials.end(),
-                    partials.begin()+segment2Start+m_numberSpkCoefficients*j);
-
-          partials *= 1.0e+5; // multiply by square root of weight
-
-          row(m_designMatrix,designRow) = partials;
-          designRow++;
-        }
-      }
-    }
-  }
-
-
-  /**
-   * Constructs portion of m_designMatrix relative to pointing continuity constraints.
-   *
-   * @param designRow Index of current row of design matrix to fill.
-   *
-   * @todo need more documentation on technical aspects of approach.
-   */
-  void BundleLidarRangeConstraint::pointingContinuity(int &designRow) {
-    LinearAlgebra::Vector partials(m_numberParameters);
-    LinearAlgebra::Vector segment1Partials; // segment1 contribution
-    LinearAlgebra::Vector segment2Partials; // segment1 contribution
-
-    segment1Partials.resize(m_numberCkCoefficients);
-    segment2Partials.resize(m_numberCkCoefficients);
-
-    bool solveTwist = m_parentObservation->solveSettings()->solveTwist();
-
-    // 0-order continuity
-    // {1,t,t^2}, {-1,-t,-t^2} if 2nd order polynomial; {1,t}, {-1,-t} if 1st order polynomial
-
-    double t, t2;
-
-    for (int i = 0; i < m_numberCkBoundaries; i++) {
-      int segment1Start
-          = (m_numberSpkSegmentParameters*m_numberSpkSegments) + m_numberCkSegmentParameters*i;
-      int segment2Start = segment1Start+m_numberCkSegmentParameters;
-
-      // time (t) and time-squared (t2)
-      t = m_ckKnots[i];
-      t2 = t*t;
-
-      segment1Partials(0) = 1.0;
-      segment1Partials(1) = t;
-      if (m_numberCkCoefficients == 3)
-        segment1Partials(2) = t2;
-
-      segment2Partials(0) = -1.0;
-      segment2Partials(1) = -t;
-      if (m_numberCkCoefficients == 3)
-        segment2Partials(2) = -t2;
-
-      // zero order in RA, DEC, and TWIST
-      for (int j = 0; j < 3; j++) {
-        if (j == 2 && solveTwist == false)
-          break;
-
-        partials.clear();
-        std::copy(segment1Partials.begin(),segment1Partials.end(),
-                  partials.begin()+segment1Start+m_numberCkCoefficients*j);
-        std::copy(segment2Partials.begin(),segment2Partials.end(),
-                  partials.begin()+segment2Start+m_numberCkCoefficients*j);
-
-        partials *= 1.0e+5; // multiply by square root of weight
-
-        row(m_designMatrix,designRow) = partials;
-        designRow++;
-      }
-    }
-
-    if (m_numberCkCoefficients == 3) {
-
-      // 1st-order continuity
-      // {0,1,2t}, {0,-1,-2t} if 2nd order polynomial; {0,1}, {0,-1} if 1st order polynomial
-
-      segment1Partials(0) = 0.0;
-      segment1Partials(1) = 1.0;
-      segment2Partials(0) = 0.0;
-      segment2Partials(1) = -1.0;
-
-      for (int i = 0; i < m_numberCkBoundaries; i++) {
-        int segment1Start
-            = (m_numberSpkSegmentParameters*m_numberSpkSegments) + m_numberCkSegmentParameters*i;
-        int segment2Start = segment1Start+m_numberCkSegmentParameters;
-
-        // time (t)
-        t = m_ckKnots[i];
-
-        if (m_numberCkCoefficients == 3) {
-          segment1Partials(2) = 2.0*t;
-          segment2Partials(2) = -2.0*t;
-        }
-
-        // 1st order in RA, DEC, and TWIST
-        for (int j = 0; j < 3; j++) {
-          if (j == 2 && solveTwist == false)
-            break;
-
-          partials.clear();
-          std::copy(segment1Partials.begin(),segment1Partials.end(),
-                    partials.begin()+segment1Start+m_numberCkCoefficients*j);
-          std::copy(segment2Partials.begin(),segment2Partials.end(),
-                    partials.begin()+segment2Start+m_numberCkCoefficients*j);
-
-          partials *= 1.0e+5; // multiply by square root of weight
-
-          row(m_designMatrix,designRow) = partials;
-          designRow++;
-        }
-      }
-    }
-  }
-
-
-  /**
-   * Updates right hand side vector after parameters have been updated at each iteration.
-   *
-   * @todo need more documentation on technical aspects of approach.
-   */
-  void BundleLidarRangeConstraint::updateRightHandSide() {
-
-    SpicePosition *position = m_parentObservation->spicePosition();
-    SpiceRotation *rotation = m_parentObservation->spiceRotation();
-
-    int designRow = 0;
-
-    bool solveTwist = m_parentObservation->solveSettings()->solveTwist();
-
-    // clear "observed - computed" (omc) and "right-hand side" vectors
-//  LinearAlgebra::Vector omcVector(m_numberConstraintEquations);
-    m_omcVector.clear();
-
-    m_rightHandSide.clear();
-
-    double t, t2;
-
-    if (m_numberSpkSegments > 1) {
-      std::vector<double> seg1CoefX(m_numberSpkCoefficients);
-      std::vector<double> seg1CoefY(m_numberSpkCoefficients);
-      std::vector<double> seg1CoefZ(m_numberSpkCoefficients);
-      std::vector<double> seg2CoefX(m_numberSpkCoefficients);
-      std::vector<double> seg2CoefY(m_numberSpkCoefficients);
-      std::vector<double> seg2CoefZ(m_numberSpkCoefficients);
-
-      // loop over segment boundaries for zero order in X,Y,Z
-      for (int i = 0; i < m_numberSpkBoundaries; i++) {
-
-        position->GetPolynomial(seg1CoefX, seg1CoefY, seg1CoefZ, i);
-        position->GetPolynomial(seg2CoefX, seg2CoefY, seg2CoefZ, i+1);
-
-        // TODO: if 1st order, should we be using 3 coefficients here?
-
-        // time (t) and time-squared (t2)
-        t = m_spkKnots[i];
-        t2 = t*t;
-
-        // 0 order in X
-        m_omcVector(designRow) = -seg1CoefX[0] - seg1CoefX[1]*t + seg2CoefX[0] + seg2CoefX[1]*t;
-        if (m_numberSpkCoefficients == 3) {
-          m_omcVector(designRow) = m_omcVector(designRow) - seg1CoefX[2]*t2 + seg2CoefX[2]*t2;
-        }
-        designRow++;
-        // 0 order in Y
-        m_omcVector(designRow) = -seg1CoefY[0] - seg1CoefY[1]*t + seg2CoefY[0] + seg2CoefY[1]*t;
-        if (m_numberSpkCoefficients == 3) {
-          m_omcVector(designRow) = m_omcVector(designRow) - seg1CoefY[2]*t2 + seg2CoefY[2]*t2;
-        }
-        designRow++;
-        // 0 order in Z
-        m_omcVector(designRow) = -seg1CoefZ[0] - seg1CoefZ[1]*t + seg2CoefZ[0] + seg2CoefZ[1]*t;
-        if (m_numberSpkCoefficients == 3) {
-          m_omcVector(designRow) = m_omcVector(designRow) - seg1CoefZ[2]*t2 + seg2CoefZ[2]*t2;
-        }
-        designRow++;
-      }
-
-      if (m_numberSpkCoefficients == 3) {
-
-        // loop over segment boundaries for 1st order in X,Y,Z
-        for (int i = 0; i < m_numberSpkBoundaries; i++) {
-
-          position->GetPolynomial(seg1CoefX, seg1CoefY, seg1CoefZ, i);
-          position->GetPolynomial(seg2CoefX, seg2CoefY, seg2CoefZ, i+1);
-
-          // time (t)
-          t = m_spkKnots[i];
-
-          // 1st order in X
-          m_omcVector(designRow) = -seg1CoefX[1] + seg2CoefX[1];
-          if (m_numberSpkCoefficients == 3) {
-            m_omcVector(designRow) = m_omcVector(designRow) - 2.0*seg1CoefX[2]*t + 2.0*seg2CoefX[2]*t;
-          }
-          designRow++;
-          // 1st order in Y
-          m_omcVector(designRow) = -seg1CoefY[1] + seg2CoefY[1];
-          if (m_numberSpkCoefficients == 3) {
-            m_omcVector(designRow) = m_omcVector(designRow) - 2.0*seg1CoefY[2]*t + 2.0*seg2CoefY[2]*t;
-          }
-          designRow++;
-          // 1st order in Z
-          m_omcVector(designRow) = -seg1CoefZ[1] + seg2CoefZ[1];
-          if (m_numberSpkCoefficients == 3) {
-            m_omcVector(designRow) = m_omcVector(designRow) - 2.0*seg1CoefZ[2]*t + 2.0*seg2CoefZ[2]*t;
-          }
-          designRow++;
-        }
-      }
-    }
-
-    if (m_numberCkSegments > 1) {
-      std::vector<double> seg1CoefRA(m_numberCkCoefficients);
-      std::vector<double> seg1CoefDEC(m_numberCkCoefficients);
-      std::vector<double> seg1CoefTWIST(m_numberCkCoefficients);
-      std::vector<double> seg2CoefRA(m_numberCkCoefficients);
-      std::vector<double> seg2CoefDEC(m_numberCkCoefficients);
-      std::vector<double> seg2CoefTWIST(m_numberCkCoefficients);
-
-      // loop over segment boundaries for zero order in RA,DEC,TWIST
-      for (int i = 0; i < m_numberCkBoundaries; i++) {
-
-        rotation->GetPolynomial(seg1CoefRA, seg1CoefDEC, seg1CoefTWIST, i);
-        rotation->GetPolynomial(seg2CoefRA, seg2CoefDEC, seg2CoefTWIST, i+1);
-
-        // TODO: if 1st order, should we be using 3 coefficients here?
-
-        // time (t) and time-squared (t2)
-        t = m_ckKnots[i];
-        t2 = t*t;
-
-        // 0 order in RA
-        m_omcVector(designRow) = -seg1CoefRA[0] - seg1CoefRA[1]*t + seg2CoefRA[0] + seg2CoefRA[1]*t;
-        if (m_numberCkCoefficients == 3) {
-          m_omcVector(designRow) = m_omcVector(designRow) - seg1CoefRA[2]*t2 + seg2CoefRA[2]*t2;
-        }
-        designRow++;
-        // 0 order in DEC
-        m_omcVector(designRow)
-            = -seg1CoefDEC[0] - seg1CoefDEC[1]*t + seg2CoefDEC[0] + seg2CoefDEC[1]*t;
-        if (m_numberCkCoefficients == 3) {
-          m_omcVector(designRow) = m_omcVector(designRow) - seg1CoefDEC[2]*t2 + seg2CoefDEC[2]*t2;
-        }
-        designRow++;
-        if (solveTwist) {
-          // 0 order in TWIST
-          m_omcVector(designRow)
-              = -seg1CoefTWIST[0] - seg1CoefTWIST[1]*t + seg2CoefTWIST[0] + seg2CoefTWIST[1]*t;
-          if (m_numberCkCoefficients == 3) {
-            m_omcVector(designRow) = m_omcVector(designRow) - seg1CoefTWIST[2]*t2 + seg2CoefTWIST[2]*t2;
-          }
-          designRow++;
-        }
-      }
-
-      if (m_numberCkCoefficients == 3) {
-
-      // loop over segment boundaries for 1st order in RA,DEC,TWIST
-        for (int i = 0; i < m_numberCkBoundaries; i++) {
-
-          rotation->GetPolynomial(seg1CoefRA, seg1CoefDEC, seg1CoefTWIST, i);
-          rotation->GetPolynomial(seg2CoefRA, seg2CoefDEC, seg2CoefTWIST, i+1);
-
-          // time (t)
-          t = m_ckKnots[i];
-
-          // 1st order in RA
-          m_omcVector(designRow) = -seg1CoefRA[1] + seg2CoefRA[1];
-          if (m_numberCkCoefficients == 3) {
-            m_omcVector(designRow) = m_omcVector(designRow) - 2.0*seg1CoefRA[2]*t + 2.0*seg2CoefRA[2]*t;
-          }
-          designRow++;
-          // 1st order in DEC
-          m_omcVector(designRow) = -seg1CoefDEC[1] + seg2CoefDEC[1];
-          if (m_numberCkCoefficients == 3) {
-            m_omcVector(designRow) = m_omcVector(designRow) - 2.0*seg1CoefDEC[2]*t + 2.0*seg2CoefDEC[2]*t;
-          }
-          designRow++;
-          if (solveTwist) {
-            // 1st order in TWIST
-            m_omcVector(designRow) = -seg1CoefTWIST[1] + seg2CoefTWIST[1];
-            if (m_numberCkCoefficients == 3) {
-              m_omcVector(designRow)
-                  = m_omcVector(designRow) - 2.0*seg1CoefTWIST[2]*t + 2.0*seg2CoefTWIST[2]*t;
-            }
-            designRow++;
-          }
-        }
-      }
-    }
-
-    // NOTE: 1.0e+5 is the square root of the weight applied to the constraint equations
-    // the design matrix has been premultipled by the square root of the weight
-    // we aren't premultiplying the omcVector so we have access to its raw values to output
-    // to the bundleout.txt file as the deltas between 0 and 1st order functions at segment
-    // boundaries
-    m_rightHandSide = prod(trans(m_designMatrix),m_omcVector*1.0e+5);
-  }
-
-  /**
-   * Creates and returns formatted QString summarizing continuity constraints for output to
-     bundleout.txt file.
-   *
-   * @return QString Returns formatted QString summarizing continuity constraints for output to
-   *                 bundleout.txt file.
-   */
-  QString BundleLidarRangeConstraint::formatBundleOutputString() {
-    QString finalqStr = "";
-    QString qStr = "";
-
-    int index = 0;
-
-    if (m_numberSpkBoundaries > 0) {
-      qStr = QString("\nContinuity Constraints\n======================\n\n"
-                     "Position Segments/Boundaries: %1/%2\n"
-                     "         0-order Constraints: %3\n").
-                     arg(m_numberSpkSegments).
-                     arg(m_numberSpkBoundaries).
-                     arg(3*m_numberSpkBoundaries);
-
-      // loop over segment boundaries for 0-order constraints
-      for (int i = 0; i < m_numberSpkBoundaries; i++) {
-        qStr += QString("            Bndry %1 dX/dY/dZ: %2/%3/%4\n").
-                       arg(i+1).
-                       arg(m_omcVector(index), 5, 'e', 1).
-                       arg(m_omcVector(index+1), 5, 'e', 1).
-                       arg(m_omcVector(index+2), 5, 'e', 1);
-        index += 3;
-      }
-
-      if (m_numberSpkCoefficients > 2) {
-        qStr += QString("       1st-order Constraints: %1\n").
-                        arg(3*m_numberSpkBoundaries);
-        // loop over segment boundaries for 1st-order constraints
-        for (int i = 0; i < m_numberSpkBoundaries; i++) {
-          qStr += QString("            Bndry %2 dX/dY/dZ: %3/%4/%5\n").
-                         arg(i+1).
-                         arg(m_omcVector(index), 5, 'e', 1).
-                         arg(m_omcVector(index+1), 5, 'e', 1).
-                         arg(m_omcVector(index+2), 5, 'e', 1);
-          index += 3;
-        }
-      }
-    }
-
-    finalqStr += qStr;
-
-    if (m_numberCkBoundaries > 0) {
-      if (!m_parentObservation->solveSettings()->solveTwist()) {
-        qStr = QString("\nPointing Segments/Boundaries: %1/%2\n"
-                       "         0-order Constraints: %3\n").
-                       arg(m_numberCkSegments).
-                       arg(m_numberCkBoundaries).
-                       arg(2*m_numberCkBoundaries);
-
-        // loop over segment boundaries for 0-order constraints
-        for (int i = 0; i < m_numberCkBoundaries; i++) {
-
-          qStr += QString("            Bndry %1 dRa/dDec: %2/%3\n").
-                         arg(i+1).
-                         arg(m_omcVector(index), 5, 'e', 1).
-                         arg(m_omcVector(index+1), 5, 'e', 1);
-          index += 2;
-        }
-
-        if (m_numberCkCoefficients > 2) {
-          qStr += QString("       1st-order Constraints: %1\n").
-                          arg(2*m_numberCkBoundaries);
-          // loop over segment boundaries for 1st-order constraints
-          for (int i = 0; i < m_numberCkBoundaries; i++) {
-            qStr += QString("            Bndry %2 dRa/dDec: %3/%4\n").
-                           arg(i+1).
-                           arg(m_omcVector(index), 5, 'e', 1).
-                           arg(m_omcVector(index+1), 5, 'e', 1);
-            index += 2;
-          }
-        }
-      }
-      else {
-        qStr = QString("\nPointing Segments/Boundaries: %1/%2\n"
-                       "         0-order Constraints: %3\n").
-                       arg(m_numberCkSegments).
-                       arg(m_numberCkBoundaries).
-                       arg(3*m_numberCkBoundaries);
-
-        // loop over segment boundaries for 0-order constraints
-        for (int i = 0; i < m_numberCkBoundaries; i++) {
-
-          qStr += QString("       Bndry %1 dRa/dDec/dTwi: %2/%3/%4\n").
-                         arg(i+1).
-                         arg(m_omcVector(index), 5, 'e', 1).
-                         arg(m_omcVector(index+1), 5, 'e', 1).
-                         arg(m_omcVector(index+2), 5, 'e', 1);
-          index += 3;
-        }
-
-        if (m_numberCkCoefficients > 2) {
-          qStr += QString("       1st-order Constraints: %1\n").
-                          arg(3*m_numberCkBoundaries);
-          // loop over segment boundaries for 1st-order constraints
-          for (int i = 0; i < m_numberCkBoundaries; i++) {
-            qStr += QString("       Bndry %2 dRa/dDec/dTwi: %3/%4/%5\n").
-                           arg(i+1).
-                           arg(m_omcVector(index), 5, 'e', 1).
-                           arg(m_omcVector(index+1), 5, 'e', 1).
-                           arg(m_omcVector(index+2), 5, 'e', 1);
-            index += 3;
-          }
-        }
-      }
-    }
-
-    finalqStr += qStr;
-
-    return finalqStr;
+    return outstr;
   }
 }
 

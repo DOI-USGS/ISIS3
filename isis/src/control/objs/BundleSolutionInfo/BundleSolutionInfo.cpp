@@ -9,6 +9,7 @@
 #include <QUuid>
 #include <QXmlStreamWriter>
 
+#include "BundleLidarRangeConstraint.h"
 #include "BundleResults.h"
 #include "ControlList.h"
 #include "ControlMeasure.h"
@@ -112,7 +113,6 @@ namespace Isis {
   /**
    * Returns bundleout text filename.
    *
-   * @return BundleSolutionInfo Reference to the current BundleSolutionInfo
    * @return QString Bundleout text filename.
    */
   QString BundleSolutionInfo::savedBundleOutputFilename() {
@@ -909,6 +909,13 @@ namespace Isis {
       fpOut << buf;
     }
 
+    if (m_statisticsResults->numberLidarRangeConstraintEquations() > 0) {
+      sprintf(buf, "\n        Lidar Range Constraints: %6d",
+              m_statisticsResults->numberLidarRangeConstraintEquations());
+      fpOut << buf;
+    }
+
+
     sprintf(buf, "\n                       Unknowns: %6d",
                   m_statisticsResults->numberUnknownParameters());
     fpOut << buf;
@@ -1482,6 +1489,73 @@ namespace Isis {
                 cor_lon_m, cor_rad_m, dX, dY, dZ);
 
       fpOut << buf;
+    }
+
+    fpOut.close();
+
+    return true;
+  }
+
+
+  /**
+   * Outputs lidar data to a csv file.
+   *
+   * @return bool If the point data was successfully output.
+   */
+  bool BundleSolutionInfo::outputLidarCSV() {
+    char buf[1056];
+
+    QString ofname = "bundleout_lidar.csv";
+    ofname = m_settings->outputFilePrefix() + ofname;
+    m_csvSavedPointsFilename = ofname;
+
+    std::ofstream fpOut(ofname.toLatin1().data(), std::ios::out);
+    if (!fpOut) {
+      return false;
+    }
+
+    int numPoints = m_statisticsResults->bundleControlPoints().size();
+
+    //                     measured   apriori   adjusted               adjusted
+    //                      range      sigma     range      residual     sigma
+    // point id  image       (km)       (km)      (km)        (km)       (km)
+
+    // print column headers
+    if (m_settings->errorPropagation()) {
+      sprintf(buf, ",,measured,a priori,adjusted,,adjusted/n"
+              "point,image,range,sigma,range,residual,sigma\n"
+              "id,name,(km),(km),(km),(km)\n");
+    }
+    else {
+      sprintf(buf, ",,measured,a priori,adjusted\n"
+                   "point,image,range,sigma,range,residual\n"
+                   "id,name,(km),(km),(km),(km)\n");
+    }
+    fpOut << buf;
+
+    for (int i = 0; i < numPoints; i++) {
+
+      BundleControlPointQsp point = m_statisticsResults->bundleControlPoints().at(i);
+      if (!point || point->isRejected()) {
+        continue;
+      }
+
+      // NOTE (Edmundson): dynamicCast is likely to be costly, might be ok here since we're just
+      // writing out results after the bundle, but generally I suspect we want avoid this. Probably
+      // indicative of a not so good software design.
+      BundleLidarControlPointQsp lidarPoint = point.dynamicCast<BundleLidarControlPoint>();
+
+      if (!lidarPoint) {
+        continue;
+      }
+
+      int nRangeConstraints = lidarPoint->numberRangeConstraints();
+      for (int j = 0; j < nRangeConstraints; j++) {
+        BundleLidarRangeConstraintQsp rangeConstraint = lidarPoint->rangeConstraint(j);
+
+        QString str = rangeConstraint->formatBundleOutputString();
+        fpOut << str;
+      }
     }
 
     fpOut.close();

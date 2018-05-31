@@ -186,6 +186,7 @@ namespace Isis {
       bool outputText();
       bool outputImagesCSV();
       bool outputPointsCSV();
+      bool outputLidarCSV();
       bool outputResiduals();
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;

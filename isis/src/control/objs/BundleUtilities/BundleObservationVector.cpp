@@ -308,6 +308,23 @@ namespace Isis {
 
     return true;
   }
+
+
+  /**
+   * Compute vtpv, the weighted sum of squares of constrained image parameter residuals.
+   *
+   * @return double Weighted sum of squares of constrained image parameter residuals.
+   */
+  double BundleObservationVector::vtpvContribution() {
+    double vtpvImage = 0;
+
+    for (int i = 0; i < size(); i++) {
+      BundleObservationQsp bundleObservation = at(i);
+      vtpvImage += bundleObservation->vtpv();
+    }
+
+    return vtpvImage;
+  }
 }
 
 

@@ -1,6 +1,7 @@
 #include "LidarControlPoint.h"
 
 #include <QString>
+#include <QVector>
 
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
@@ -127,7 +128,26 @@ namespace Isis {
    * 
    * @return QList The list of serial numbers
    */
-  QList < QString > LidarControlPoint::snSimultaneous() const{
+//QList < QString > LidarControlPoint::snSimultaneous() const{
+  QStringList LidarControlPoint::snSimultaneous() const{
     return *m_snSimultaneous;
   }
+
+
+  /**
+   * Determines if input serial number is in list of simultaneous measure serial numbers.
+   *
+   * @param serialNumber Serial number to check.
+   *
+   * @return bool true if serialNumber is contained in m_snSimultaneous.
+   */
+  bool LidarControlPoint::isSimultaneous(QString serialNumber) {
+
+    if (m_snSimultaneous->contains(serialNumber)) {
+      return true;
+    }
+
+    return false;
+  }
+
 }

@@ -102,6 +102,8 @@ namespace Isis {
       bool initializeExteriorOrientation();
       bool setBodyRotation();
 
+      double vtpvContribution();
+
   private:
       //! Map between observation number and pointer to observation.
       QMap<QString, BundleObservationQsp> m_observationNumberToObservationMap;

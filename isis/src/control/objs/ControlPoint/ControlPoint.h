@@ -697,6 +697,10 @@ namespace Isis {
        */
       int numberOfRejectedMeasures;
   };
+
+  // typedefs
+  //! Definition for a shared pointer to an ISIS ControlPoint.
+  typedef QSharedPointer<ControlPoint> ControlPointQsp;
 }
 
 #endif

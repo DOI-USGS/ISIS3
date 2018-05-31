@@ -32,6 +32,7 @@
 
 // Isis Library
 #include "BundleControlPoint.h"
+#include "BundleLidarControlPoint.h"
 #include "BundleObservationVector.h"
 #include "BundleSettings.h"
 #include "ControlNet.h"
@@ -165,6 +166,7 @@ namespace Isis {
       void resetNumberConstrainedTargetParameters();
       void incrementNumberConstrainedTargetParameters(int incrementAmount);
       void setNumberContinuityConstraintEquations(int numberContinuityConstraints);
+      void setNumberLidarRangeConstraintEquations(int numberLidarRangeConstraints);
       void setNumberUnknownParameters(int numberParameters);
       void computeDegreesOfFreedom();
       void computeSigma0(double dvtpv, BundleSettings::ConvergenceCriteria criteria);
@@ -217,6 +219,7 @@ namespace Isis {
       int numberConstrainedImageParameters() const;
       int numberConstrainedTargetParameters() const;
       int numberContinuityConstraintEquations() const;
+      int numberLidarRangeConstraintEquations() const;
       int numberUnknownParameters() const;
       int degreesOfFreedom() const;
       double sigma0() const;
@@ -313,11 +316,12 @@ namespace Isis {
       int m_numberObservations;                  //!< # of image coordinate observations
       int m_numberRejectedObservations;          //!< # of rejected image coordinate observations
       int m_numberUnknownParameters;             //!< total # of parameters to solve for
-      int m_numberImageParameters;               //!< # of image parameters
-      int m_numberConstrainedImageParameters;    //!< # of constrained image parameters
-      int m_numberConstrainedPointParameters;    //!< # of constrained point parameters
-      int m_numberConstrainedTargetParameters;   //!< # of constrained target parameters
-      int m_numberContinuityConstraintEquations; //!< # of continuity constraint equations
+      int m_numberImageParameters;               //!< # image parameters
+      int m_numberConstrainedImageParameters;    //!< # constrained image parameters
+      int m_numberConstrainedPointParameters;    //!< # constrained point parameters
+      int m_numberConstrainedTargetParameters;   //!< # constrained target parameters
+      int m_numberContinuityConstraintEquations; //!< # continuity constraint equations
+      int m_numberLidarRangeConstraintEquations; //!< # lidar range constraint equations
       int m_degreesOfFreedom;                    //!< degrees of freedom
       double m_sigma0;                           //!< std deviation of unit weight
       double m_elapsedTime;                      //!< elapsed time for bundle
