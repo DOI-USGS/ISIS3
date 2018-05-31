@@ -142,19 +142,24 @@ namespace Isis {
 
 
   /**
-   * Returns a translated value. The output name is used to find the input
-   * group, keyword, default and tranlations in the translation table. If the
-   * keyword does not exist in the input label, the input default if
-   * available will be used as the input value. This input value
-   * is then used to search all of the translations. If a match is
-   * found the translated value is returned.
+   * Returns a translated value. The translation group name is 
+   * used to find the input group, keyword, default and 
+   * tranlations in the translation table. If the keyword does not 
+   * exist in the input label, the input default if available will 
+   * be used as the input value. This input value is then used to 
+   * search all of the translations. If a match is found the 
+   * translated value is returned. 
    *
-   * @param outputName The output name used to identify the input keyword to
-   *                   be translated.
+   * @param translationGroupName The name of the PVL translation 
+   *                        group used to identify the
+   *                        input/output keywords to be
+   *                        translated. Often, this is the
+   *                        same as the output keyword name.
    *
    * @param index The index into the input keyword array.  Defaults to 0
    *
-   * @return string The ISIS cube label value for the outputName.
+   * @return @b QString The translated output value to be 
+   *         placed in the ISIS3 cube label.
    *
    * @throws IException::Unknown "Failed to translate output value."
    * @throws IException::Unknown "Cannot translate value. Xml files can only
@@ -170,7 +175,7 @@ namespace Isis {
    * @throws IException::Unknown "Could not find an input value or default value."
    * @throws IException::Unknown "Input element does not have the named attribute."
    */
-  QString XmlToPvlTranslationManager::Translate(QString outputName, 
+  QString XmlToPvlTranslationManager::Translate(QString translationGroupName, 
                                                 int index) {
     try {
     if (index != 0) {
@@ -182,7 +187,7 @@ namespace Isis {
     const Pvl &transTable = TranslationTable();
     PvlGroup transGroup;
     try {
-      transGroup = transTable.findGroup(outputName);
+      transGroup = transTable.findGroup(translationGroupName);
     }
     catch (IException &e){
       QString msg = "Unable to retrieve translation group from translation table.";
@@ -228,7 +233,7 @@ namespace Isis {
     // Notify what we are translating and what the translating group is.
     if (isDebug) {
       cout << endl << "          ====================          " << endl;
-      cout << endl << "Translating output keyword: " << outputName << endl;
+      cout << endl << "Translating output keyword: " << translationGroupName << endl;
       cout << endl << "Translation group:" << endl;
       cout << transGroup << endl << endl;
     }
@@ -269,13 +274,13 @@ namespace Isis {
     }
      
     if (inputParentElement.isNull()) {
-      if (hasInputDefault(outputName)) {
+      if (hasInputDefault(translationGroupName)) {
         if (isDebug) {
           cout << endl << "Could not traverse input position, " <<
             "using default value: " <<
-            InputDefault(outputName) << endl;
+            InputDefault(translationGroupName) << endl;
         }
-        return PvlTranslationTable::Translate( outputName );
+        return PvlTranslationTable::Translate( translationGroupName );
       }
       else {
         QString msg = "Failed traversing input position. [" +
@@ -312,12 +317,12 @@ namespace Isis {
     // If the parent element is NULL at this point then we traversed every
     // potential input element and none of them satisfied the dependencies.
     if ( inputParentElement.isNull() ) {
-      if ( hasInputDefault(outputName) ) {
+      if ( hasInputDefault(translationGroupName) ) {
         if (isDebug) {
           cout << endl << "No input value found, using default value: " <<
-                          InputDefault(outputName) << endl;
+                          InputDefault(translationGroupName) << endl;
         }
-        return PvlTranslationTable::Translate( outputName );
+        return PvlTranslationTable::Translate( translationGroupName );
       }
       else {
         QString msg = "Could not find an input or default value that fits the given input "
@@ -333,12 +338,12 @@ namespace Isis {
       if ( inputKeyElement.hasAttribute(attributeName) ) {
         inputValue = inputKeyElement.attribute(attributeName);
       }
-      else if (hasInputDefault(outputName) ) {
+      else if (hasInputDefault(translationGroupName) ) {
         if (isDebug) {
           cout << endl << "No input value found, using default value: " <<
-                          InputDefault(outputName) << endl;
+                          InputDefault(translationGroupName) << endl;
         }
-        return PvlTranslationTable::Translate( outputName );
+        return PvlTranslationTable::Translate( translationGroupName );
       }
       else {
         QString msg = "Input element [" + inputKeyElement.tagName() +
@@ -350,10 +355,10 @@ namespace Isis {
     if (isDebug) {
           cout << endl << "Translating input value: " << inputValue << endl;
         }
-    return PvlTranslationTable::Translate( outputName, inputValue.trimmed() );
+    return PvlTranslationTable::Translate( translationGroupName, inputValue.trimmed() );
     }
     catch (IException &e){
-      QString msg = "Failed to translate output value for [" + outputName + "].";
+      QString msg = "Failed to translate output value for [" + translationGroupName + "].";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }

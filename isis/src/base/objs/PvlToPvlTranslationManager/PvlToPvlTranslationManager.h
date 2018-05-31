@@ -71,7 +71,8 @@ namespace Isis {
    *                          PvlToPvlTranslationManager. Fixes #4901.
    *  @history 2018-01-10 Christopher Combs - Changed ProcessDataFilePointer call to reflect 
    *                          changes made to voy2isis. Fixes #4345, #4421.
-   *  @history 2018-04-16 Jeannie Backer - Fixed indentation of history comments.
+   *  @history 2018-04-16 Jeannie Backer - Fixed indentation of history comments and
+   *                          brought code closer to coding standards.
    *  @todo 2005-02-15 Stuart Sides - add coded example and implementation example
    *                          to class documentation, and finish
    *                          documentation.
@@ -92,24 +93,24 @@ namespace Isis {
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      virtual QString Translate(QString nName, int findex = 0);
+      virtual QString Translate(QString translationGroupName, int findex = 0);
 
       // Translate all translation table groups which contain "Auto"
       void Auto(Pvl &outputLabel);
       void Auto(Pvl &inputLabel, Pvl &outputLabel);
 
       // Return the ith input value associated with a output name
-      virtual const PvlKeyword &InputKeyword(const QString nName) const;
+      virtual const PvlKeyword &InputKeyword(const QString translationGroupName) const;
 
       // Return true if the input lable contains the translated group and key names
-      virtual bool InputHasKeyword(const QString nName);
+      virtual bool InputHasKeyword(const QString translationGroupName);
 
       void SetLabel(Pvl &inputLabel);
 
     protected:
-      virtual PvlKeyword DoTranslation(const QString nName);
+      virtual PvlKeyword DoTranslation(const QString translationGroupName);
       virtual const PvlContainer *GetContainer(const PvlKeyword &inputGroup) const;
-      virtual PvlContainer *CreateContainer(const QString nName, Pvl &pvl);
+      virtual PvlContainer *CreateContainer(const QString translationGroupName, Pvl &pvl);
     private:
       Pvl p_fLabel; //!< A Pvl object for the input label file
   };

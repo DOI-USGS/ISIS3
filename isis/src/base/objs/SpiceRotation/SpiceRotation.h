@@ -187,31 +187,37 @@ namespace Isis {
    *   @history 2015-02-20 Jeannie Backer - Improved error messages.
    *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() calls to see if
    *                           any NAIF errors were signaled. References #2248.
-   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache, 
+   *   @history 2015-08-05 Debbie A. Cook - Programmer notes - Modified LoadCache,
    *                           and ComputeAv.
-   *                           Added new methods 
+   *                           Added new methods
    *                           loadPCFromSpice, loadPCFromTable, toJ2000Partial, poleRaCoefs,
-   *                           poleDecCoefs, pmCoefs, poleRaNutPrecCoefs, poleDecNutPrecCoefs, 
+   *                           poleDecCoefs, pmCoefs, poleRaNutPrecCoefs, poleDecNutPrecCoefs,
    *                           pmNutPrecCoefs, sysNutPrecConstants, sysNutPrecCoefs,
    *                           usePckPolynomial, setPckPolynomial(raCoef, decCoef, pmCoef),
    *                           getPckPolynomial, setEphemerisTimePckPolyFunction, getFrameType
-   *                           and members m_frameType, m_tOrientationAvailable, 
+   *                           and members m_frameType, m_tOrientationAvailable,
    *                           m_raPole, m_decPole, m_pm, m_raNutPrec, m_decNutPrec, m_pmNutPrec,
-   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale to support request for 
+   *                           m_sysNutPrec0, m_sysNutPrec1, m_dscale, m_Tscale to support request for
    *                           solving for target body parameters.
-   *                           Also added a new enumerated value for Source, PckPolyFunction, 
+   *                           Also added a new enumerated value for Source, PckPolyFunction,
    *                           and PartialType, WRT_RotationRate.
    *   @history 2016-02-15 Debbie A. Cook - Programmer notes - Added private method
-   *                           setFrameType to set the frame type.  It also loads the planetary 
-   *                           constants for a PCK type. 
+   *                           setFrameType to set the frame type.  It also loads the planetary
+   *                           constants for a PCK type.
    *   @history 2016-06-28 Ian Humphrey - Updated documentation and coding standards. Added new
    *                           tests to unit test. Fixes #3972.
    *   @history 2017-12-13 Ken Edmundson - Added "case DYN:" to methods ToReferencePartial and toJ2000Partial. Fixes #5251.
    *                           This problem was found when trying to bundle M3 images that had been spiceinited with nadir
    *                           pointing. The nadir frame is defined as a Dynamic Frame by Naif.
+   *   @history 2018-04-21 Jesse Mapel - Modified frametype resolution to check if a body centered
+   *                           frame uses a CK or PCK definition. This only occurs for bodies
+   *                           where a pck cannot accurately define for the duration of a mission.
+   *                           The current example is the comet 67P/CHURYUMOV-GERASIMENKO
+   *                           imaged by Rosetta. Some future comet/astroid missions are expected
+   *                           to use a CK defined body fixed reference frame. Fixes #5408.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
-   *  @todo Consider making this a base class with child classes based on frame type or 
+   *  @todo Consider making this a base class with child classes based on frame type or
    *              storage type (polynomial, polynomial over cache, cache, etc.)
    */
   class SpiceRotation {
@@ -236,66 +242,66 @@ namespace Isis {
       /**
        * The rotation can come from one of 3 places for an Isis cube.  The class
        * expects function to be after Memcache.
-       *       Spice - the rotation is calculated by Naif Spice routines with data 
+       *       Spice - the rotation is calculated by Naif Spice routines with data
        *                  read directly from Naif kernels.
-       *       Nadir - the rotation is calculated using the Naif routine twovec with 
+       *       Nadir - the rotation is calculated using the Naif routine twovec with
        *                  the position and velocity vectors of the spacecraft.
-       *       Memcache - the rotation is linearly interpolated from time-based 
+       *       Memcache - the rotation is linearly interpolated from time-based
        *                  values in a table.
-       *       PolyFunction - the rotation is calculated from an nth degree 
+       *       PolyFunction - the rotation is calculated from an nth degree
        *                  polynomial in one variable (time in scaled seconds)
        *       PolyFunctionOverSpice - the rotation is calculated from an nth
        *                  degree polynomial fit over the Naif Spice results.
-       *       PckPolyFunction - The rotation is calculated using the IAU fit 
+       *       PckPolyFunction - The rotation is calculated using the IAU fit
        *                  polynomials in one variable (time in Julian centuries and days).
        */
-      enum Source {            
-        Spice,                   //!< Directly from the kernels 
+      enum Source {
+        Spice,                   //!< Directly from the kernels
         Nadir,                   //!< Nadir pointing
         Memcache,                //!< From cached table
         PolyFunction,            //!< From nth degree polynomial
-        PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial 
+        PolyFunctionOverSpice ,  //!< Kernels plus nth degree polynomial
         PckPolyFunction          //!< Quadratic polynomial function with linear trignometric terms
-      };            
+      };
 
-      /** 
-       * This enumeration indicates whether the partial derivative is taken with 
-       * respect to Right Ascension, Declination, or Twist (or Rotation). 
-       */ 
-      enum PartialType { 
+      /**
+       * This enumeration indicates whether the partial derivative is taken with
+       * respect to Right Ascension, Declination, or Twist (or Rotation).
+       */
+      enum PartialType {
         WRT_RightAscension, //!< With respect to Right Ascension
         WRT_Declination,    //!< With respect to Declination
         WRT_Twist           //!< With respect to Twist or Prime Meridian Rotation
       };
 
-      /** 
+      /**
        * Status of downsizing the cache
-       */ 
-      enum DownsizeStatus { 
-        Yes,  //!< Downsize the cache 
+       */
+      enum DownsizeStatus {
+        Yes,  //!< Downsize the cache
         Done, //!< Cache is downsized
-        No    //!< Do not downsize the cache 
+        No    //!< Do not downsize the cache
       };
 
-      /** 
-       * Enumeration for the frame type of the rotation  
-       */ 
+      /**
+       * Enumeration for the frame type of the rotation
+       */
       enum FrameType {
         UNKNOWN = 0,      //!< Isis specific code for unknown frame type
-        INERTL = 1,       //!< See Naif Frames.req document for 
+        INERTL = 1,       //!< See Naif Frames.req document for
         PCK  = 2,         //!< definitions
-        CK = 3,           //!< 
-        TK = 4,           //!< 
+        CK = 3,           //!<
+        TK = 4,           //!<
         DYN = 5,          //!<
         BPC = 6,          //!< Isis specific code for binary pck
         NOTJ2000PCK = 7   //!< PCK frame not referenced to J2000
-      };                                   
+      };
 
       void SetEphemerisTime(double et);
       double EphemerisTime() const;
 
       std::vector<double> GetCenterAngles();
-      
+
       std::vector<double> Matrix();
       std::vector<double> AngularVelocity();
 
@@ -422,9 +428,9 @@ namespace Isis {
       void setEphemerisTimePolyFunctionOverSpice();
       void setEphemerisTimePckPolyFunction();
       std::vector<double> p_cacheTime;  //!< iTime for corresponding rotation
-      std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as 
-                                                      rotation matrix from J2000 
-                                                      to 1st constant frame (CJ) or 
+      std::vector<std::vector<double> > p_cache; /**< Cached rotations, stored as
+                                                      rotation matrix from J2000
+                                                      to 1st constant frame (CJ) or
                                                       coefficients of polynomial
                                                       fit to rotation angles.*/
       int p_degree;                     //!< Degree of fit polynomial for angles
@@ -435,11 +441,11 @@ namespace Isis {
     private:
       // method
       void setFrameType();
-      std::vector<int> p_constantFrames;  /**< Chain of Naif frame codes in constant 
-                                               rotation TC. The first entry will always 
+      std::vector<int> p_constantFrames;  /**< Chain of Naif frame codes in constant
+                                               rotation TC. The first entry will always
                                                be the target frame code*/
-      std::vector<int> p_timeFrames;      /**< Chain of Naif frame codes in time-based 
-                                               rotation CJ. The last entry will always 
+      std::vector<int> p_timeFrames;      /**< Chain of Naif frame codes in time-based
+                                               rotation CJ. The last entry will always
                                                be 1 (J2000 code)*/
       double p_timeBias;                  //!< iTime bias when reading kernels
 
@@ -449,7 +455,7 @@ namespace Isis {
 
       bool p_matrixSet;                    //!< Flag indicating p_TJ has been set
       bool m_tOrientationAvailable;  //!< Target orientation constants are available
- 
+
 
       FrameType m_frameType;  //!< The type of rotation frame
       Source p_source;                    //!< The source of the rotation data
@@ -464,7 +470,7 @@ namespace Isis {
       bool p_degreeApplied;               /**< Flag indicating whether or not a polynomial
                                                of degree p_degree has been created and
                                                used to fill the cache*/
-      std::vector<double> p_coefficients[3];  /**< Coefficients defining functions fit 
+      std::vector<double> p_coefficients[3];  /**< Coefficients defining functions fit
                                                    to 3 pointing angles*/
       bool p_noOverride;                  //!< Flag to compute base time;
       double p_overrideBaseTime;          //!< Value set by caller to override computed base time
@@ -473,34 +479,34 @@ namespace Isis {
       double p_fullCacheStartTime;        //!< Initial requested starting time of cache
       double p_fullCacheEndTime;          //!< Initial requested ending time of cache
       int p_fullCacheSize;                //!< Initial requested cache size
-      std::vector<double> p_TC;           /**< Rotation matrix from first constant rotation 
+      std::vector<double> p_TC;           /**< Rotation matrix from first constant rotation
                                           (after all time-based rotations in frame chain from
                                            J2000 to target) to the target frame*/
-      std::vector<double> p_CJ;           /**< Rotation matrix from J2000 to first constant 
+      std::vector<double> p_CJ;           /**< Rotation matrix from J2000 to first constant
                                                rotation*/
       std::vector<std::vector<double> > p_cacheAv;
       //!< Cached angular velocities for corresponding rotactions in p_cache
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
-      bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation 
+      bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation
                                                includes angular velocity*/
-      std::vector<double> StateTJ();      /**< State matrix (6x6) for rotating state 
+      std::vector<double> StateTJ();      /**< State matrix (6x6) for rotating state
                                                vectors from J2000 to target frame*/
-      // The remaining items are only used for PCK frame types.  In this case the  
+      // The remaining items are only used for PCK frame types.  In this case the
       // rotation is  stored as a cache, but the coefficients are available for display
-      // or comparison, and the first three coefficient sets can be solved for and 
+      // or comparison, and the first three coefficient sets can be solved for and
       // updated in jigsaw.   The initial coefficient values are read from a Naif PCK.
       //
       // The general equation for the right ascension of the pole is
       //
       // raPole  =  raPole[0] + raPole[1]*Time  + raPole[2]*Time**2 + raNutPrec,
-      //    where 
-      //    raNutPrec  =  raNutPrec1[0]*sin(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) + 
+      //    where
+      //    raNutPrec  =  raNutPrec1[0]*sin(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) +
       //                  raNutPrec1[1]*sin(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
       //                  raNutPrec1[N-1]*sin(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
       // (optional for multiples of nutation precession angles)
       //                  raNutPrec2[0]*sin(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
       //                  raNutPrec2[1]*sin(2*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                  raNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) + 
+      //                  raNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
       //                  raNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
       //                  raNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
       //                  raNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
@@ -508,8 +514,8 @@ namespace Isis {
       // The general equation for the declination of the pole is
       //
       // decPole  =  p_decPole[0] + p_decPole[1]*Time  + p_decPole[2]*Time**2 + decNutPrec,
-      //    where 
-      //    decNutPrec  =  decNutPrec1[0]*cos(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) + 
+      //    where
+      //    decNutPrec  =  decNutPrec1[0]*cos(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) +
       //                   decNutPrec1[1]*cos(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
       //                   decNutPrec1[N-1]*cos(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
       //                   decNutPrec2[0]*cos(2*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
@@ -518,15 +524,15 @@ namespace Isis {
       // (optional for multiples of nutation precession angles)
       //                   decNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
       //                   decNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                   decNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) 
+      //                   decNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time))
       //
       //     and Time is julian centuries since J2000.
       //
       // The general equation for the prime meridian rotation is
       //
       // pm  =  p_pm[0] + p_pm[1]*Dtime  + p_pm[2]*Dtime**2 + pmNutPrec,
-      //    where 
-      //    pmNutPrec  =  pmNutPrec1[0]*sin(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) + 
+      //    where
+      //    pmNutPrec  =  pmNutPrec1[0]*sin(sysNutPrec[0][0] + sysNutPrec[0][1]*Time) +
       //                  pmNutPrec1[1]*sin(sysNutPrec[1][0] + sysNutPrec[1][1]*Time) + ...
       //                  pmNutPrec1[N-1]*sin(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time) +
       // (optional for multiples of nutation precession angles)
@@ -535,24 +541,24 @@ namespace Isis {
       //                  pmNutPrec2[N-1]*sin(2*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) +
       //                  pmNutPrecM[0]*sin(M*(sysNutPrec[0][0] + sysNutPrec[0][1]*Time)) +
       //                  pmNutPrecM[1]*sin(M*(sysNutPrec[1][0] + sysNutPrec[1][1]*Time)) + ...
-      //                  pmNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time)) 
+      //                  pmNutPrecM[N-1]*sin(M*(sysNutPrec[N-1][0] + sysNutPrec[N-1][1]*Time))
       //
-      //     Time is interval in Julian centuries since the standard epoch, 
+      //     Time is interval in Julian centuries since the standard epoch,
       //     dTime is interval in days from the standard epoch (J2000),
       //
-      //     N is the number of nutation/precession terms for the planetary system of the target 
-      //     body,  (possibly including multiple angles as unique terms, 
+      //     N is the number of nutation/precession terms for the planetary system of the target
+      //     body,  (possibly including multiple angles as unique terms,
       //             ie. 2*sysNutPrec[0][0] + sysNutPrec[][1]*Time).
       //
       //     Many of the constants in this equation are 0. for a given body.
       //
-      //     M is included as an option for future improvements.  M = highest multiple (period) 
+      //     M is included as an option for future improvements.  M = highest multiple (period)
       //     of any of the nutation/precession angles included in the equations.
       //
-      //     ***NOTE*** Currently Naif stores multiples (amplitudes) as if they were additional 
-      //                nutation/precession terms (periods) in the equation.  This method works as 
-      //                long as jigsaw does not solve for those values.  In order to solve for 
-      //                those values, the multiples will need to be known so that the partial 
+      //     ***NOTE*** Currently Naif stores multiples (amplitudes) as if they were additional
+      //                nutation/precession terms (periods) in the equation.  This method works as
+      //                long as jigsaw does not solve for those values.  In order to solve for
+      //                those values, the multiples will need to be known so that the partial
       //                derivatives can be correctly calculated.  Some possible ways of doing this
       //                are 1) Convince Naif to change their data format indicating the relation
       //                      2) Make an Isis version of the PCK data and have Isis software to
@@ -561,7 +567,7 @@ namespace Isis {
       //                          and software to apply them when calculating the rotation and partials.
       //
       //                For now this software will handle any terms with the same period and different
-      //                amplitudes as unique terms in the equation (raNutPrec, decNutPrec, 
+      //                amplitudes as unique terms in the equation (raNutPrec, decNutPrec,
       //                and pmNutPrec).
       //
       // The next three vectors will have length 3 (for a quadratic polynomial) if used.
@@ -569,19 +575,19 @@ namespace Isis {
       std::vector<Angle>m_decPole;      //!< Coefficients of a quadratic polynomial fitting pole dec.
       std::vector<Angle>m_pm ;          //!< Coefficients of a quadratic polynomial fitting pole pm.
       //
-      // Currently multiples (terms with periods matching other terms but varying amplitudes) 
-      // are handled as additional terms added to the end of the vector as Naif does (see 
-      // comments in any of the standard Naif PCK. 
-      std::vector<double>m_raNutPrec;    //!< Coefficients of pole right ascension nut/prec terms.  
-      std::vector<double>m_decNutPrec;  //!< Coefficients of pole decliniation nut/prec terms. 
-      std::vector<double>m_pmNutPrec;   //!< Coefficients of prime meridian nut/prec terms.  
+      // Currently multiples (terms with periods matching other terms but varying amplitudes)
+      // are handled as additional terms added to the end of the vector as Naif does (see
+      // comments in any of the standard Naif PCK.
+      std::vector<double>m_raNutPrec;    //!< Coefficients of pole right ascension nut/prec terms.
+      std::vector<double>m_decNutPrec;  //!< Coefficients of pole decliniation nut/prec terms.
+      std::vector<double>m_pmNutPrec;   //!< Coefficients of prime meridian nut/prec terms.
 
       // The periods of bodies in the same system are modeled with a linear equation
       std::vector<Angle>m_sysNutPrec0; //!< Constants of planetary system nut/prec periods
       std::vector<Angle>m_sysNutPrec1; //!< Linear terms of planetary system nut/prec periods
 
       // The following scalars are used in the IAU equations to convert p_et to the appropriate time
-      // units for calculating target body ra, dec, and w.  These need to be initialized in every 
+      // units for calculating target body ra, dec, and w.  These need to be initialized in every
       // constructor.
       //! Seconds per Julian century for scaling time in seconds
       static const double m_centScale;
@@ -591,4 +597,3 @@ namespace Isis {
 };
 
 #endif
-
