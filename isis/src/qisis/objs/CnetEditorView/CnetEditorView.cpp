@@ -66,74 +66,22 @@ namespace Isis {
     QGridLayout *resultLayout = new QGridLayout;
     centralWidget->setLayout(resultLayout);
 
-    int row = 0;
-
-    QMenuBar *menuBar = new QMenuBar;
-    resultLayout->addWidget(menuBar, row, 0, 1, 2);
-    row++;
-
     m_cnetEditorWidget = new CnetEditorWidget(control, configFile.expanded());
     m_control = control;
 
-    resultLayout->addWidget(m_cnetEditorWidget, row, 0, 1, 2);
-    row++;
-
-    // Populate the menu...
-    QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
-    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
-
-    QMap<QString, QMenu *> topLevelMenus;
-
-    while ( actionMapIterator.hasNext() ) {
-      actionMapIterator.next();
-      QAction *actionToAdd = actionMapIterator.key();
-      QList< QString > location = actionMapIterator.value();
-
-      QMenu *menuToPutActionInto = NULL;
-
-      if ( location.count() ) {
-        QString topLevelMenuTitle = location.takeFirst();
-        if (!topLevelMenus[topLevelMenuTitle]) {
-          topLevelMenus[topLevelMenuTitle] = menuBar->addMenu(topLevelMenuTitle);
-        }
-
-        menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
-      }
-
-      foreach (QString menuName, location) {
-        bool foundSubMenu = false;
-        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
-          if (!foundSubMenu &&
-              possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
-            foundSubMenu = true;
-            menuToPutActionInto = possibleSubMenu->menu();
-          }
-        }
-
-        if (!foundSubMenu) {
-          menuToPutActionInto = menuToPutActionInto->addMenu(menuName);
-        }
-      }
-
-      menuToPutActionInto->addAction(actionToAdd);
-    }
+    resultLayout->addWidget(m_cnetEditorWidget, 0, 0, 1, 2);
 
     QTabWidget *treeViews = new QTabWidget;
     treeViews->addTab( m_cnetEditorWidget->pointTreeView(), tr("Point View") );
     treeViews->addTab( m_cnetEditorWidget->serialTreeView(), tr("Serial View") );
     treeViews->addTab( m_cnetEditorWidget->connectionTreeView(), tr("Connection View") );
-    resultLayout->addWidget(treeViews, row, 0, 1, 1);
+    resultLayout->addWidget(treeViews, 1, 0, 1, 1);
 
     QTabWidget *filterViews = new QTabWidget;
     filterViews->addTab( m_cnetEditorWidget->pointFilterWidget(), tr("Filter Points and Measures") );
     filterViews->addTab( m_cnetEditorWidget->serialFilterWidget(), tr("Filter Images and Points") );
     filterViews->addTab( m_cnetEditorWidget->connectionFilterWidget(), tr("Filter Connections") );
-    resultLayout->addWidget(filterViews, row, 1, 1, 1);
-    row++;
-
-
-
-
+    resultLayout->addWidget(filterViews, 1, 1, 1, 1);
 
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");

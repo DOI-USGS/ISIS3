@@ -51,7 +51,7 @@ namespace Isis {
    * @author 2018-04-04 Tracie Sucharski
    *
    * @internal
-   *    @history 2018-05-28 Kaitlyn Lee - Because AbstractProjectItemView now inherits
+   *    @history 2018-06-1 Kaitlyn Lee - Because AbstractProjectItemView now inherits
    *                                from QMainWindow, I added a dummy central widget
    *                                and set its layout to the grid layout. We used to set
    *                                the whole CnetEditorView widget's layout, now we only
