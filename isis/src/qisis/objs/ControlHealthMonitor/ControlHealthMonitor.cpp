@@ -44,12 +44,9 @@
 #include <QHeaderView>
 #include <QDesktopWidget>
 #include <QGridLayout>
-#include <QChart>
-#include <QChartView>
 #include <QWidgetAction>
 #include <QMenu>
-#include <QPieSeries>
-#include <QPieSlice>
+
 #include <ControlNet.h>
 #include <NetworkVitals.h>
 #include <ControlPoint.h>
