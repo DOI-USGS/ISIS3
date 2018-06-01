@@ -40,10 +40,15 @@ namespace Isis {
    * View for editing a single ControlPoint
    *
    * @author 2016-04-06 Tracie Sucharski
-   *    
-   * @internal 
+   *
+   * @internal
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
-   *                           query for shapes and other data from the project. 
+   *                           query for shapes and other data from the project.
+   *   @history 2018-05-28 Kaitlyn Lee - Since AbstractProjectItemView now inherits
+   *                           from QMainWindow, I added a dummy central widget
+   *                           and set its layout to QVBoxLayout. We used to set
+   *                           the whole CnetEditorView widget's layout, now we only
+   *                           set the central widget's layout.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
