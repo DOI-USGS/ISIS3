@@ -179,6 +179,30 @@ namespace Isis {
                                                                 m_ui->meanRadiusLineEdit));
     m_ui->meanRadiusSigmaLineEdit->setValidator(sigmaValidator);
 
+
+
+    // jigsaw run setup general tab validation
+    // global apriori point sigmas
+    m_ui->pointLatitudeSigmaLineEdit->setValidator(new QDoubleValidator(0.0, 360.0, 8, this));
+    m_ui->pointLongitudeSigmaLineEdit->setValidator(new QDoubleValidator(0.0, 360.0, 8, this));
+    m_ui->pointRadiusSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+
+    // outlier rejection
+    m_ui->outlierRejectionMultiplierLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->maximumLikelihoodModel1QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+    m_ui->maximumLikelihoodModel2QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+    m_ui->maximumLikelihoodModel3QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+
+    // convergence criteria
+    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
+
+
+
     // signals for target body tab
 //    connect(m_ui->radiiButtonGroup, SIGNAL(buttonClicked(int)),
 //            this, SLOT(on_radiiGroupClicked(int)));
@@ -1139,6 +1163,125 @@ namespace Isis {
     }
     update();
   }
+
+  // general tab text validation
+  // global apriori point sigmas
+  void Isis::JigsawSetupDialog::on_pointLatitudeSigmaLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->pointLatitudeSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+  void Isis::JigsawSetupDialog::on_pointLongitudeSigmaLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->pointLongitudeSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_pointRadiusSigmaLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->pointRadiusSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+  // outlier rejection
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel1QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel2QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel3QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  // convergence criteria
+  void Isis::JigsawSetupDialog::on_outlierRejectionMultiplierLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_sigma0ThresholdLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->sigma0ThresholdLineEdit->hasAcceptableInput()) {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumIterationsLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumIterationsLineEdit->hasAcceptableInput()) {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
 
   void JigsawSetupDialog::showTargetParametersGroupBox() {
     m_ui->targetParametersGroupBox->setEnabled(true);

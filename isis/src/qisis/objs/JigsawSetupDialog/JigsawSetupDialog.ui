@@ -959,7 +959,7 @@
                      </size>
                     </property>
                     <property name="inputMask">
-                     <string>9999</string>
+                     <string/>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
