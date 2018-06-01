@@ -57,6 +57,8 @@ namespace Isis {
    *                           fred.net, the output filename QLineEdit is automatically changed to
    *                           fred-out.net. The user can always manually change the output control
    *                           net name to anything they choose.
+   *   @history 2018-06-01 Christopher Combs - Added support for ui changes, exclusive options and 
+   *                           input validators.
    */
 
   class JigsawSetupDialog : public QDialog {
