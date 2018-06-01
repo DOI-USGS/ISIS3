@@ -1,4 +1,4 @@
-#include "NetworkVitals.h"
+#include "ControlNetVitals.h"
 
 #include <QList>
 
@@ -10,37 +10,37 @@
 
 namespace Isis {
 
-  NetworkVitals::NetworkVitals(ControlNet *cnet) {
+  ControlNetVitals::ControlNetVitals(ControlNet *cnet) {
     m_controlNet = cnet;
     validate();
   }
 
-  NetworkVitals::~NetworkVitals() {
+  ControlNetVitals::~ControlNetVitals() {
   }
 
-  bool NetworkVitals::hasIslands() {
+  bool ControlNetVitals::hasIslands() {
     // Replace this with graph call!!!$!@$!@$!@$#@%#@$%#@
     return true;
   }
 
-  int NetworkVitals::numIslands() {
+  int ControlNetVitals::numIslands() {
     // replace this with graph call!#@$!#%#@%*($#)
     return 1;
   }
 
-  QList<QString> NetworkVitals::getIslands() {
+  QList<QString> ControlNetVitals::getIslands() {
     // TEMP, replace with graph
     QList<QString> list;
     list.append("CASSIS_01.cub");
     return list;
   }
 
-  int NetworkVitals::numPoints() {
+  int ControlNetVitals::numPoints() {
     return m_controlNet->GetNumPoints();
   }
 
   // REFACTOR
-  int NetworkVitals::numIgnoredPoints() {
+  int ControlNetVitals::numIgnoredPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->IsIgnored()) count++;
@@ -48,12 +48,12 @@ namespace Isis {
     return count;
   }
 
-  int NetworkVitals::numLockedPoints() {
+  int ControlNetVitals::numLockedPoints() {
     return m_controlNet->GetNumEditLockPoints();
   }
 
   // REFACTOR
-  int NetworkVitals::numFixedPoints() {
+  int ControlNetVitals::numFixedPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Fixed") count++;
@@ -62,7 +62,7 @@ namespace Isis {
   }
 
   // REFACTOR
-  int NetworkVitals::numConstraintedPoints() {
+  int ControlNetVitals::numConstraintedPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Constrained") count++;
@@ -71,7 +71,7 @@ namespace Isis {
   }
 
   // REFACTOR
-  int NetworkVitals::numFreePoints() {
+  int ControlNetVitals::numFreePoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Free") count++;
@@ -80,7 +80,7 @@ namespace Isis {
   }
 
   // REFACTOR
-  int NetworkVitals::numPointsBelowMeasureThreshold(int num) {
+  int ControlNetVitals::numPointsBelowMeasureThreshold(int num) {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetNumMeasures() < num) count++;
@@ -88,16 +88,16 @@ namespace Isis {
     return count;
   }
 
-  int NetworkVitals::numImages() {
+  int ControlNetVitals::numImages() {
     return m_controlNet->GetCubeSerials().size();
   }
 
-  int NetworkVitals::numMeasures() {
+  int ControlNetVitals::numMeasures() {
     return m_controlNet->GetNumMeasures();
   }
 
   // REFACTOR
-  int NetworkVitals::numImagesBelowMeasureThreshold(int num) {
+  int ControlNetVitals::numImagesBelowMeasureThreshold(int num) {
     int count = 0;
     foreach(QString serial, m_controlNet->GetCubeSerials()) {
       if (m_controlNet->GetMeasuresInCube(serial).size() < num) count++;
@@ -105,20 +105,20 @@ namespace Isis {
     return count;
   }
   // REFACTOR
-  int NetworkVitals::numImagesBelowHullTolerance(int tolerance) {
+  int ControlNetVitals::numImagesBelowHullTolerance(int tolerance) {
     return 1;
   }
 
-  QList<QString> NetworkVitals::getCubeSerials() {
+  QList<QString> ControlNetVitals::getCubeSerials() {
     return m_controlNet->GetCubeSerials();
   }
 
-  QList<ControlPoint*> NetworkVitals::getAllPoints() {
+  QList<ControlPoint*> ControlNetVitals::getAllPoints() {
     return m_controlNet->GetPoints();
   }
 
   // REFACTOR
-  QList<ControlPoint*> NetworkVitals::getIgnoredPoints() {
+  QList<ControlPoint*> ControlNetVitals::getIgnoredPoints() {
     QList<ControlPoint*> ignoredPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->IsIgnored()) ignoredPoints.append(point);
@@ -126,7 +126,7 @@ namespace Isis {
     return ignoredPoints;
   }
 
-  QList<ControlPoint*> NetworkVitals::getLockedPoints() {
+  QList<ControlPoint*> ControlNetVitals::getLockedPoints() {
     QList<ControlPoint*> lockedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->IsEditLocked()) lockedPoints.append(point);
@@ -134,7 +134,7 @@ namespace Isis {
     return lockedPoints;
   }
 
-  QList<ControlPoint*> NetworkVitals::getFixedPoints() {
+  QList<ControlPoint*> ControlNetVitals::getFixedPoints() {
     QList<ControlPoint*> fixedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Fixed") fixedPoints.append(point);
@@ -142,7 +142,7 @@ namespace Isis {
     return fixedPoints;
   }
 
-  QList<ControlPoint*> NetworkVitals::getConstrainedPoints() {
+  QList<ControlPoint*> ControlNetVitals::getConstrainedPoints() {
     QList<ControlPoint*> constrainedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Constrained") constrainedPoints.append(point);
@@ -150,7 +150,7 @@ namespace Isis {
     return constrainedPoints;
   }
 
-  QList<ControlPoint*> NetworkVitals::getFreePoints() {
+  QList<ControlPoint*> ControlNetVitals::getFreePoints() {
     QList<ControlPoint*> freePoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Free") freePoints.append(point);
@@ -159,7 +159,7 @@ namespace Isis {
   }
 
   // REFACTOR
-  QList<ControlPoint*> NetworkVitals::getPointsBelowMeasureThreshold(int num) {
+  QList<ControlPoint*> ControlNetVitals::getPointsBelowMeasureThreshold(int num) {
     QList<ControlPoint*> belowThreshold;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetNumMeasures() < num) belowThreshold.append(point);
@@ -167,12 +167,12 @@ namespace Isis {
     return belowThreshold;
   }
 
-  QList<QString> NetworkVitals::getAllImageSerials() {
+  QList<QString> ControlNetVitals::getAllImageSerials() {
     return m_controlNet->GetCubeSerials();
   }
 
   // REFACTOR
-  QList<QString> NetworkVitals::getImagesBelowMeasureThreshold(int num) {
+  QList<QString> ControlNetVitals::getImagesBelowMeasureThreshold(int num) {
     QList<QString> imagesBelowThreshold;
     foreach(QString serial, m_controlNet->GetCubeSerials()) {
       if (m_controlNet->GetMeasuresInCube(serial).size() < num) imagesBelowThreshold.append(serial);
@@ -181,30 +181,30 @@ namespace Isis {
   }
 
   // REFACTOR
-  QList<QString> NetworkVitals::getImagesBelowHullTolerance(int num) {
+  QList<QString> ControlNetVitals::getImagesBelowHullTolerance(int num) {
     QList<QString> list;
     list.append("Example.cub");
     return list;
   }
 
-  QString NetworkVitals::getStatus() {
+  QString ControlNetVitals::getStatus() {
     return m_status;
   }
 
-  QString NetworkVitals::getStatusDetails() {
+  QString ControlNetVitals::getStatusDetails() {
     return m_statusDetails;
   }
 
-  QString NetworkVitals::getNetworkId() {
+  QString ControlNetVitals::getNetworkId() {
     return m_controlNet->GetNetworkId();
   }
 
   //
-  // ImageVitals NetworkVitals::getImageVitals(QString serial) {
+  // ImageVitals ControlNetVitals::getImageVitals(QString serial) {
   //   return NULL;
   // }
 
-  void NetworkVitals::validate() {
+  void ControlNetVitals::validate() {
     QString status = "";
     QString details = "";
     if (hasIslands()) {
@@ -236,7 +236,7 @@ namespace Isis {
     updateStatus(status, details);
   }
 
-  void NetworkVitals::updateStatus(QString status, QString details) {
+  void ControlNetVitals::updateStatus(QString status, QString details) {
     m_status = status;
     m_statusDetails = details;
     emit networkChanged();

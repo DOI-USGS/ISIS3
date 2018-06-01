@@ -1,5 +1,5 @@
-#ifndef NetworkVitals_h
-#define NetworkVitals_h
+#ifndef ControlNetVitals_h
+#define ControlNetVitals_h
 /**
  * @file
  * $Revision: 1.2 $
@@ -39,12 +39,12 @@ namespace Isis {
   * @internal
   *   @history 2018-05-28 Adam Goins - Initial Creation.
   */
-  class NetworkVitals : public QObject {
+  class ControlNetVitals : public QObject {
     Q_OBJECT
 
     public:
-      NetworkVitals(ControlNet *net);
-      virtual ~NetworkVitals();
+      ControlNetVitals(ControlNet *net);
+      virtual ~ControlNetVitals();
 
       ControlNet *m_controlNet;
 

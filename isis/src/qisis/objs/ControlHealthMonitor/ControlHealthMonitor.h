@@ -28,7 +28,7 @@
 #include <QTableWidget>
 #include <QProgressBar>
 #include <QPointer>
-#include <NetworkVitals.h>
+#include <ControlNetVitals.h>
 
 
 
@@ -48,7 +48,7 @@ namespace Isis {
     Q_OBJECT
 
     public:
-      ControlHealthMonitor(NetworkVitals *vitals, QWidget *parent=0);
+      ControlHealthMonitor(ControlNetVitals *vitals, QWidget *parent=0);
       ~ControlHealthMonitor();
       void createGui();
       QWidget* createImagesTab();
@@ -77,7 +77,7 @@ namespace Isis {
         void updateImageTable(QList<QString> serials);
         void updatePointTable(QList<ControlPoint*> points);
 
-        NetworkVitals *m_vitals;
+        ControlNetVitals *m_vitals;
 
         QProgressBar *m_statusBar;
 

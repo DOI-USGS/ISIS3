@@ -48,7 +48,7 @@
 #include <QMenu>
 
 #include <ControlNet.h>
-#include <NetworkVitals.h>
+#include <ControlNetVitals.h>
 #include <ControlPoint.h>
 
 
@@ -58,9 +58,10 @@ namespace Isis {
    *
    * @param parent (QWidget *) Pointer to parent widget
    */
-  ControlHealthMonitor::ControlHealthMonitor(NetworkVitals *vitals, QWidget *parent) : QWidget(parent) {
+  ControlHealthMonitor::ControlHealthMonitor(ControlNetVitals *vitals, QWidget *parent) : QWidget(parent) {
     createGui();
     m_vitals = vitals;
+
     connect (m_vitals, SIGNAL(networkChanged()),
             this, SLOT(update()));
     update();

@@ -4,7 +4,7 @@
 #include "Progress.h"
 
 #include "ControlNet.h"
-#include "NetworkVitals.h"
+#include "ControlNetVitals.h"
 
 #include <QApplication>
 
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     // Create a widget
     ControlNet *net = new ControlNet();
     net->ReadControl("simplenet.net");
-    NetworkVitals *vitals = new NetworkVitals(net);
+    ControlNetVitals *vitals = new ControlNetVitals(net);
     ControlHealthMonitor *w = new ControlHealthMonitor(vitals);
     w->show();
 
