@@ -229,14 +229,8 @@ namespace Isis {
     m_ui->pointRadiusSigmaLineEdit->setEnabled(checked);
   }
 
-
-
-//  void JigsawSetupDialog::on_outlierRejectionCheckBox_toggled(bool checked) {
-//    m_ui->outlierRejectionMultiplierLabel->setEnabled(checked);
-//    m_ui->outlierRejectionMultiplierLineEdit->setEnabled(checked);
-//  }
-
-
+//  m_ui->positionComboBox has been removed from the general tab, it is planned to be moved to 
+//  the obs solve settings tab. This function will be commented out until it is added back.
 //   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(int index) {
 
 //     // indices:
@@ -266,7 +260,8 @@ namespace Isis {
 
 //   }
 
-
+//  m_ui->pointingComboBox has been removed from the general tab, it is planned to be moved to 
+//  the obs solve settings tab. This function will be commented out until it is added back.
 //   void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(int index) {
 
 //     // indices:
@@ -1046,45 +1041,45 @@ namespace Isis {
   }
 
 
-  // void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_2_valueChanged(int arg1) {
-  //   if (arg1 == -1) {
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(NONE)");
-  //     m_ui->positionAprioriSigmaTable->setRowCount(0);
-  //   }
-  //   m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
-  //   m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
+  void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int arg1) {
+    if (arg1 == -1) {
+      m_ui->spkSolveDegreeSpinBox->setSuffix("(NONE)");
+      m_ui->positionAprioriSigmaTable->setRowCount(0);
+    }
+    m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
+    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
 
-  //   if (arg1 == 0) {
-  //     QTableWidgetItem *twItem = new QTableWidgetItem();
-  //     twItem->setText("POSITION");
-  //     m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-  //     QTableWidgetItem *twItemunits = new QTableWidgetItem();
-  //     twItemunits->setText("meters");
-  //     //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
-  //   }
-  //   else if (arg1 == 1) {
-  //     m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
-  //     m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
-  //   }
-  //   else if (arg1 == 2) {
-  //     m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
-  //     m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
-  //   }
-  // /*
-  //   else if (arg1 == 0) {
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
-  //     int nRows = m_ui->positionAprioriSigmaTable->rowCount();
+    if (arg1 == 0) {
+      QTableWidgetItem *twItem = new QTableWidgetItem();
+      twItem->setText("POSITION");
+      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+      QTableWidgetItem *twItemunits = new QTableWidgetItem();
+      twItemunits->setText("meters");
+      //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
+    }
+    else if (arg1 == 1) {
+      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
+      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
+    }
+    else if (arg1 == 2) {
+      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
+      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
+    }
+  /*
+    else if (arg1 == 0) {
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
+      int nRows = m_ui->positionAprioriSigmaTable->rowCount();
 
-  //     m_ui->positionAprioriSigmaTable->insertRow(nRows);
-  //   }
-  //   else if (arg1 == 1)
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
-  //   else if (arg1 == 2)
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
-  //   else
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
-  // */
-  // }
+      m_ui->positionAprioriSigmaTable->insertRow(nRows);
+    }
+    else if (arg1 == 1)
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
+    else if (arg1 == 2)
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
+    else
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
+  */
+  }
 
 
   void Isis::JigsawSetupDialog::on_rightAscensionLineEdit_textChanged(const QString &arg1) {
