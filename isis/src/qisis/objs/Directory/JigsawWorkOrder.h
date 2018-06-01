@@ -56,7 +56,7 @@ namespace Isis {
    *   @history 2018-03-23 Ken Edmundson - In execute method, removed search for input control
    *                           network in BundleSolutionInfos. No longer needed as control is now
    *                           properly saved in projects m_idToControlMap.
-   *   @history 2018-05-25 Christopher Combs - Updated to reflect change from JigsawDialog to 
+   *   @history 2018-05-31 Christopher Combs - Updated to reflect change from JigsawDialog to 
    *                           JigsawRunWidget. Removed setupExecution() method. Fixes #5428.
    */
   class JigsawWorkOrder : public WorkOrder {
