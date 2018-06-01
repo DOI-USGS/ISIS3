@@ -641,7 +641,7 @@ namespace Isis {
     // *** TODO *** Find a good value for epsilon
     if (scaler > 0.0000000000000001) {             
       // The next computation is equivalent to
-      //   metersToRadians = 1.0 / () * *p_majorAxis)
+      //   metersToRadians = 1.0 / (scaler * *p_majorAxis)
       //   lonSigRadians = lonSigma * metersToRadians
       lonSigRadians = lonSigma / (scaler * *p_majorAxis);
     }

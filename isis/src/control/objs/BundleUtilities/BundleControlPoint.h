@@ -92,6 +92,11 @@ namespace Isis {
    *                           Reference #4649 and #501.
    *  @history 2018-01-05 Debbie A. Cook - Added new members m_coordTypeReports and
    *                           m_coordTypeBundle to copy method.  Reference #4649 and #501.
+   *  @history 2018-05-31 Debbie A. Cook - Moved code from BundleAdjust::applyParameterCorrections
+   *                           pertaining to updating the adjusted surface point and method productAlphaAv into new
+   *                           methods applyParameterCorrections, updateAdjustedSurfacePointLatitudinally, and
+   *                           updateAdjustedSurfacePointRectangularly in BundleControlPoint.  Reference 
+   *                           #4649 and #501.
   */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
@@ -123,11 +128,11 @@ namespace Isis {
       void zeroNumberOfRejectedMeasures();
       void productAlphaAV(double alpha,
                           SparseBlockMatrix &sparseNormals,
-                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
-                          SparseBlockRowMatrix                                &Q,
+                          // boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
+                          // SparseBlockRowMatrix                                &Q,
                           LinearAlgebra::Vector                               &v1);
       void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
-           SparseBlockMatrix &sparseNormals, double factor, const BundleTargetBodyQsp target);
+           SparseBlockMatrix &sparseNormals, const BundleTargetBodyQsp target);
 
       // accessors
       ControlPoint *rawControlPoint() const;
@@ -165,9 +170,8 @@ namespace Isis {
 
     private:
       // methods
-      void updateAdjustedSurfacePointLatitudinally(double factor,
-                                                   const BundleTargetBodyQsp target);
-      void updateAdjustedSurfacePointRectangularly(double factor);
+      void updateAdjustedSurfacePointLatitudinally(const BundleTargetBodyQsp target);
+      void updateAdjustedSurfacePointRectangularly();
       
       //!< pointer to the control point object this represents
       ControlPoint *m_controlPoint;

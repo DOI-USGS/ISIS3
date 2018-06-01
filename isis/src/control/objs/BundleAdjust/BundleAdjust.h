@@ -290,9 +290,11 @@ namespace Isis {
    *                            BundleAdjust::init to BundleControlPoint constructor.  Don't allow
    *                            solving for triaxial radii when coordinate type is not Latitudinal. 
    *                            Added new optional argument controlPointCoordType to ControlNet 
-   *                            constructor call.  Moved productAlphaAV and control point parameter
-   *                            correction code to BundleControlPoint.
-   *                            References #4649 and #501.
+   *                            constructor call.  References #4649 and #501.
+   *   @history 2018-05-31 Debbie A. Cook - Moved productAlphaAV and control point parameter
+   *                            correction code to BundleControlPoint.  Earlier revised errorPropagation to
+   *                            compute the sigmas via the variance/covariance matrices instead of the sigmas.
+   *                            This should produce more accurate results.  References #4649 and #501.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
