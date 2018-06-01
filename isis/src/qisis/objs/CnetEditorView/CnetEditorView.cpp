@@ -47,7 +47,12 @@
 #include "FileName.h"
 #include "Project.h"
 #include "ToolPad.h"
+#include "ToolList.h"
 #include "XmlStackedHandlerReader.h"
+
+#include "HelpTool.h"
+#include "TrackTool.h"
+
 
 
 namespace Isis {
@@ -66,106 +71,29 @@ namespace Isis {
     QGridLayout *resultLayout = new QGridLayout;
     centralWidget->setLayout(resultLayout);
 
-    int row = 0;
-
-    QMenuBar *menuBar = new QMenuBar;
-    resultLayout->addWidget(menuBar, row, 0, 1, 2);
-    row++;
-
     m_cnetEditorWidget = new CnetEditorWidget(control, configFile.expanded());
     m_control = control;
 
-    resultLayout->addWidget(m_cnetEditorWidget, row, 0, 1, 2);
-    row++;
-
-    // Populate the menu...
-    QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
-    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
-
-    QMap<QString, QMenu *> topLevelMenus;
-
-    while ( actionMapIterator.hasNext() ) {
-      actionMapIterator.next();
-      QAction *actionToAdd = actionMapIterator.key();
-      QList< QString > location = actionMapIterator.value();
-
-      QMenu *menuToPutActionInto = NULL;
-
-      if ( location.count() ) {
-        QString topLevelMenuTitle = location.takeFirst();
-        if (!topLevelMenus[topLevelMenuTitle]) {
-          topLevelMenus[topLevelMenuTitle] = menuBar->addMenu(topLevelMenuTitle);
-        }
-
-        menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
-      }
-
-      foreach (QString menuName, location) {
-        bool foundSubMenu = false;
-        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
-          if (!foundSubMenu &&
-              possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
-            foundSubMenu = true;
-            menuToPutActionInto = possibleSubMenu->menu();
-          }
-        }
-
-        if (!foundSubMenu) {
-          menuToPutActionInto = menuToPutActionInto->addMenu(menuName);
-        }
-      }
-
-      menuToPutActionInto->addAction(actionToAdd);
-    }
+    resultLayout->addWidget(m_cnetEditorWidget, 0, 0, 1, 2);
 
     QTabWidget *treeViews = new QTabWidget;
     treeViews->addTab( m_cnetEditorWidget->pointTreeView(), tr("Point View") );
     treeViews->addTab( m_cnetEditorWidget->serialTreeView(), tr("Serial View") );
     treeViews->addTab( m_cnetEditorWidget->connectionTreeView(), tr("Connection View") );
-    resultLayout->addWidget(treeViews, row, 0, 1, 1);
+    resultLayout->addWidget(treeViews, 1, 0, 1, 1);
 
     QTabWidget *filterViews = new QTabWidget;
     filterViews->addTab( m_cnetEditorWidget->pointFilterWidget(), tr("Filter Points and Measures") );
     filterViews->addTab( m_cnetEditorWidget->serialFilterWidget(), tr("Filter Images and Points") );
     filterViews->addTab( m_cnetEditorWidget->connectionFilterWidget(), tr("Filter Connections") );
-    resultLayout->addWidget(filterViews, row, 1, 1, 1);
-    row++;
+    resultLayout->addWidget(filterViews, 1, 1, 1, 1);
 
-
-
-
-
-    m_permToolBar = new QToolBar("Standard Tools", 0);
-    m_permToolBar->setObjectName("permToolBar");
-    m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
-
-    m_activeToolBar = new QToolBar("Active Tool", 0);
-    m_activeToolBar->setObjectName("activeToolBar");
-    m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
-
-    m_toolPad = new ToolPad("Tool Pad", 0);
-    m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
-
-
-//  m_cnetEditorWidget->addToPermanent(m_permToolBar);
-//  m_cnetEditorWidget->addTo(m_activeToolBar);
-//  m_cnetEditorWidget->addTo(m_toolPad);
-
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
-    setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
+    createMenus();
+    createToolBars();
+    populateMenus();
+    populateToolBars();
+    //createActions();
   }
-
 
   /**
    * Destructor
@@ -182,6 +110,90 @@ namespace Isis {
     m_toolPad = 0;
   }
 
+  void CnetEditorView::createMenus() {
+    m_fileMenu = menuBar()->addMenu("&File");
+    m_tableMenu = menuBar()->addMenu("&Tables");
+    m_helpMenu = menuBar()->addMenu("&Help");
+  }
+
+  void CnetEditorView::createToolBars() {
+    m_permToolBar = addToolBar("Standard Tools");
+    m_permToolBar->setObjectName("permToolBar");
+    m_permToolBar->setIconSize(QSize(22, 22));
+
+    m_toolPad = new ToolPad("Tool Pad", 0);
+    m_toolPad->setObjectName("toolPad");
+    addToolBar(m_toolPad);
+
+    // m_separatorAction = new QAction(this);
+    // m_separatorAction->setSeparator(true);
+  }
+
+  void CnetEditorView::populateToolBars() {
+    QMap< QString, QList< QAction * > > toolActionMap;
+    toolActionMap = m_cnetEditorWidget->toolBarActions();
+    QMapIterator< QString, QList< QAction * > > toolActionIter(toolActionMap);
+
+    while (toolActionIter.hasNext()) {
+      toolActionIter.next();
+      QString objName = toolActionIter.key();
+      QList< QAction * > actionList = toolActionIter.value();
+      foreach (QAction *action, actionList) {
+        m_toolPad->addAction(action);
+      }
+    }
+  }
+
+  void CnetEditorView::populateMenus() {
+    QMap< QAction *, QList< QString > > menuActionMap;
+    menuActionMap = m_cnetEditorWidget->menuActions();
+    QMapIterator< QAction *, QList< QString > > menuActionIter(menuActionMap);
+    QWidget *widget = NULL;
+
+    while (menuActionIter.hasNext()) {
+      menuActionIter.next();
+      QAction *action = menuActionIter.key();
+      QList< QString > location = menuActionIter.value();
+      widget = menuBar();
+
+      while (location.size()) {
+        QString menuName = location.takeFirst();
+        int actListIndex = indexOfActionList(widget->actions(), menuName);
+        widget = widget->actions()[actListIndex]->menu();
+      }
+      widget->addAction(action);
+    }
+  }
+
+
+  void CnetEditorView::createActions() {
+    // saveAct = new QAction(QIcon(FileName("$base/icons/filesave.png").expanded()),
+    //                       tr("&Save"), this);
+    // saveAct->setShortcut(tr("Ctrl+S"));
+    // saveAct->setStatusTip(tr("save changes"));
+    // connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
+    //
+    // saveAsAct = new QAction(QIcon(FileName("$base/icons/filesaveas.png").expanded()),
+    //                         tr("Save&As"), this);
+    // saveAsAct->setStatusTip(tr("Save control network to specified file"));
+    // connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+    //
+    // m_permToolBar->addAction(saveAct);
+    // m_permToolBar->addAction(saveAsAct);
+    // m_fileMenu->addAction(saveAct);
+    // m_fileMenu->addAction(saveAsAct);
+  }
+
+  int CnetEditorView::indexOfActionList(QList< QAction * > actionList,
+      QString actionText) {
+
+    int index = -1;
+    for (int i = 0; index == -1 && i < actionList.size(); i++)
+      if (actionList[i]->text() == actionText)
+        index = i;
+
+    return index;
+  }
 
   /**
    * Returns the cnetEditorWidget.

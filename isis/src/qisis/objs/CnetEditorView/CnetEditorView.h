@@ -79,6 +79,18 @@ class CnetEditorView : public AbstractProjectItemView {
     void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
+    private:
+      void createActions();
+      void createToolBars();
+      void createMenus();
+      int indexOfActionList(QList< QAction * > actionList, QString actionText);
+      void populateToolBars();
+      void populateMenus();
+
+
+    // private slots:
+    //   void save();
+    //   void saveAs();
 
     private:
       /**
@@ -107,11 +119,20 @@ class CnetEditorView : public AbstractProjectItemView {
     QPointer<CnetEditorWidget> m_cnetEditorWidget;
     QPointer<Control> m_control;
 
+    //QAction *saveAct;
+    //QAction *saveAsAct;
+
     QToolBar *m_permToolBar; //!< The permanent tool bar
     QToolBar *m_activeToolBar; //!< The active tool bar
     ToolPad *m_toolPad; //!< The tool pad
+    QMenu *m_fileMenu;
+    QMenu *m_helpMenu;
+    QMenu *m_tableMenu;
 
-    QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
+    QList<QAction *> m_permToolBarActions; //!< The permanent tool bar actions
+    QWidgetAction *m_activeToolBarAction; //!< Widget of the active tool
+    QList<QAction *> m_toolPadActions; //!< The tool pad actions
+    QAction *m_separatorAction;
   };
 }
 
