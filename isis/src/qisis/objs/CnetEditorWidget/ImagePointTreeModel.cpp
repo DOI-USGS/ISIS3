@@ -11,7 +11,6 @@
 #include <QString>
 #include <QtConcurrentMap>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -64,13 +63,15 @@ namespace Isis {
 
 
   ImageParentItem *ImagePointTreeModel::CreateRootItemFunctor::operator()(
-    ControlCubeGraphNode *const &node) const {
+    QString imageSerial) const {
     ImageParentItem *imageItem = NULL;
 
-    imageItem = new ImageParentItem(node, m_avgCharWidth);
+    // TODO connect parent item destroy to image removed from network
+
+    imageItem = new ImageParentItem(imageSerial, m_avgCharWidth);
     imageItem->setSelectable(false);
     imageItem->moveToThread(m_targetThread);
-    QList< ControlMeasure * > measures = node->getMeasures();
+    QList< ControlMeasure * > measures = getControlNetwork()->GetMeasuresInCube(imageSerial);
     for (int j = 0; j < measures.size(); j++) {
       ASSERT(measures[j]);
       ControlPoint *point = measures[j]->Parent();

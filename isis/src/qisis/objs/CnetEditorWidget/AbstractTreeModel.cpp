@@ -501,7 +501,7 @@ namespace Isis {
         flags.testFlag(PointItems)) ||
         (pointerType == AbstractTreeItem::Measure &&
             flags.testFlag(MeasureItems)) ||
-        (pointerType == AbstractTreeItem::CubeGraphNode &&
+        (pointerType == AbstractTreeItem::ImageSerial &&
             flags.testFlag(SerialItems))) {
       return true;
     }
@@ -634,9 +634,9 @@ namespace Isis {
             (ControlMeasure *) item->getPointer())) ? true : false);
         break;
 
-      case AbstractTreeItem::CubeGraphNode:
+      case AbstractTreeItem::ImageSerial:
         item->setVisible((!m_filter || m_filter->evaluate(
-            (ControlCubeGraphNode *) item->getPointer())) ? true : false);
+            *(QString *) item->getPointer())) ? true : false);
         break;
 
       case AbstractTreeItem::None:
@@ -702,4 +702,3 @@ namespace Isis {
     }
   }
 }
-

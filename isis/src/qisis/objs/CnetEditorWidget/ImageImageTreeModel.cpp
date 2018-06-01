@@ -10,7 +10,6 @@
 #include <QString>
 #include <QtConcurrentMap>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 
@@ -62,18 +61,20 @@ namespace Isis {
 
 
   ImageParentItem *ImageImageTreeModel::CreateRootItemFunctor::operator()(
-    ControlCubeGraphNode *const &node) const {
+    const QString imageSerial) const {
+
+    //TODO Connect destroy signals to new items.
+
     ImageParentItem *parentItem =
-      new ImageParentItem(node, m_avgCharWidth);
+      new ImageParentItem(imageSerial, m_avgCharWidth);
     parentItem->setSelectable(false);
     parentItem->moveToThread(m_targetThread);
 
-    QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
+    QList< QString > connectedImages = getControlNetwork()->getAdjacentImages(imageSerial);
 
-    for (int j = 0; j < connectedNodes.size(); j++) {
-      ControlCubeGraphNode *connectedNode = connectedNodes[j];
+    for (int j = 0; j < connectedImages.size(); j++) {
       ImageLeafItem *serialItem =
-        new ImageLeafItem(connectedNode, m_avgCharWidth, parentItem);
+        new ImageLeafItem(connectedImages[j], m_avgCharWidth, parentItem);
       serialItem->setSelectable(false);
       serialItem->moveToThread(m_targetThread);
 
@@ -127,7 +128,7 @@ namespace Isis {
 
       futureRoot = QtConcurrent::mappedReduced(
           getControlNetwork()->GetCubeGraphNodes(),
-          CreateRootItemFunctor(this, QThread::currentThread()),
+          CreateRootItemFunctor(this, getControlNetwork(), QThread::currentThread()),
           &CreateRootItemFunctor::addToRootItem,
           QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 

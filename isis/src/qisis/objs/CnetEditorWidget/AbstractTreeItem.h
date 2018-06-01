@@ -10,7 +10,6 @@ class QVariant;
 
 
 namespace Isis {
-  class ControlCubeGraphNode;
   class ControlPoint;
   class ControlMeasure;
 
@@ -26,6 +25,8 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode usages to
+   *                           image serial number. References #5434.
    */
   class AbstractTreeItem : public QObject {
 
@@ -36,7 +37,7 @@ namespace Isis {
         None,
         Point,
         Measure,
-        CubeGraphNode,
+        ImageSerial,
       };
 
 
@@ -78,7 +79,7 @@ namespace Isis {
       virtual QString getFormattedData(QString columnTitle) const;
 
       virtual bool hasMeasure(ControlMeasure *) const;
-      virtual bool hasNode(ControlCubeGraphNode *) const;
+      virtual bool hasImage(QString imageSerial) const;
       virtual bool hasPoint(ControlPoint *) const;
 
       virtual AbstractTreeItem *getNextVisiblePeer() const;

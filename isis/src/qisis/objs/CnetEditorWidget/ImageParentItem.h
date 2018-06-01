@@ -1,13 +1,13 @@
 #ifndef ImageParentItem_H
 #define ImageParentItem_H
 
+#include <QString>
 
 #include "AbstractImageItem.h"
 #include "AbstractParentItem.h"
 
 
 namespace Isis {
-  class ControlCubeGraphNode;
 
   /**
    * @brief Tree item that is a parent and represents an image
@@ -17,12 +17,14 @@ namespace Isis {
    *
    * @author ????-??-?? Eric Hyer
    *
-   * @internal 
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   * @internal
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
+   *                           References #5434.
    */
   class ImageParentItem : public AbstractImageItem, public AbstractParentItem {
     public:
-      ImageParentItem(ControlCubeGraphNode *node,
+      ImageParentItem(QString imageSerial,
           int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~ImageParentItem();
 

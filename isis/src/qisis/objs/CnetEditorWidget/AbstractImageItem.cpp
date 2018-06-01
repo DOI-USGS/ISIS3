@@ -7,32 +7,22 @@
 #include <QString>
 #include <QVariant>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlNet.h"
 
 
 namespace Isis {
-  AbstractImageItem::AbstractImageItem(ControlCubeGraphNode *cubeGraphNode,
+  AbstractImageItem::AbstractImageItem(QString imageSerial,
       int avgCharWidth, AbstractTreeItem *parent)
-    : AbstractTreeItem(parent) {
-    ASSERT(cubeGraphNode);
-    m_ccgn = cubeGraphNode;
+    : AbstractTreeItem(parent), m_imageSerial(imageSerial) {
     calcDataWidth(avgCharWidth);
-
-    connect(m_ccgn, SIGNAL(destroyed(QObject *)), this, SLOT(sourceDeleted()));
   }
 
 
-  AbstractImageItem::~AbstractImageItem() {
-    m_ccgn = NULL;
-  }
+  AbstractImageItem::~AbstractImageItem() { }
 
 
   QVariant AbstractImageItem::getData() const {
-    if (m_ccgn)
-      return QVariant((QString)m_ccgn->getSerialNumber());
-    else
-      return QVariant();
+    return QVariant(m_imageSerial);
   }
 
 
@@ -51,28 +41,27 @@ namespace Isis {
   }
 
 
-  void AbstractImageItem::deleteSource() {
-    // Shouldn't be deleting ControlCubeGraphNode's!
-    ASSERT(0);
-  }
+  void AbstractImageItem::deleteSource() { }
 
 
   AbstractTreeItem::InternalPointerType AbstractImageItem::getPointerType() const {
-    return AbstractTreeItem::CubeGraphNode;
+    return AbstractTreeItem::ImageSerial;
   }
 
 
   void *AbstractImageItem::getPointer() const {
-    return m_ccgn;
+    return &m_imageSerial;
   }
 
 
-  bool AbstractImageItem::hasNode(ControlCubeGraphNode *node) const {
-    return m_ccgn == node || AbstractTreeItem::hasNode(node);
+  bool AbstractImageItem::hasImage(QString imageSerial) const {
+    return m_imageSerial == imageSerial || AbstractTreeItem::hasImage(imageSerial);
   }
 
 
-  void AbstractImageItem::sourceDeleted() {
-    m_ccgn = NULL;
-  }
+  /**
+   * This method is required to be implemented by the parent AbstractTreeItem class,
+   * but for this it's a NOP.
+   */
+  void AbstractImageItem::sourceDeleted() { }
 }
