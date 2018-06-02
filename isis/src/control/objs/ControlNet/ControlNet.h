@@ -276,7 +276,6 @@ namespace Isis {
 
       QList< QString > GetCubeSerials() const;
       QString GraphToString() const;
-      QList< ControlCubeGraphNode * > GetCubeGraphNodes();
       QList< QList< QString > > GetSerialConnections() const;
       int getEdgeCount() const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);

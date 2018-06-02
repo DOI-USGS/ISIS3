@@ -24,6 +24,7 @@
  */
 
 #include <QObject>
+#include "ControlCubeGraphNode.h"
 
 template< class A> class QVector;
 template< class A> class QList;
@@ -36,7 +37,6 @@ namespace Isis {
   class Camera;
   class ControlMeasureLogData;
   class ControlPoint;
-  class ControlCubeGraphNode;
   class PvlGroup;
   class PvlKeyword;
 

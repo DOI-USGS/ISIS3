@@ -543,7 +543,7 @@ int main() {
 
   cout << "Testing GetCubeGraphNodes\n";
 
-  QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
+/*  QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
   // Use this to sort the output
   QList<QString> sortedSNs;
   foreach ( ControlCubeGraphNode * node, graphnodes ) {
@@ -552,7 +552,7 @@ int main() {
   sort(sortedSNs.begin(), sortedSNs.end());
   foreach ( QString sn, sortedSNs ) {
     cout << "    " << sn << "\n";
-  }
+  }*/
 
   cout << "\nTesting getGraphNode: ";
 //       << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
@@ -575,8 +575,8 @@ int main() {
   cout << "And zero pointIDs in the original control net. There are: "
        << QString::number(net.GetPointIds().length()) << endl;
 
-  cout << "And zero cubeGraphNodes in the original control net. There are: "
-       << QString::number(net.GetCubeGraphNodes().length()) << endl;
+  cout << "And zero cubeGraphNodes in the original control net. There are: ";
+//       << QString::number(net.GetCubeGraphNodes().length()) << endl;
 
   //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");

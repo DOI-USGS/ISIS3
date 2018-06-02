@@ -588,10 +588,10 @@ namespace Isis {
           }
 
           // new graph:
-            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
-                                                         m_vertexMap[sn],
+          ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                       m_vertexMap[sn],
                                                          m_controlGraph).first;
-            m_controlGraph[connection].strength++;
+          m_controlGraph[connection].strength++;
         }
       }
     }
@@ -643,7 +643,13 @@ namespace Isis {
     // Remove the measure from the node.  
     m_controlGraph[m_vertexMap[serial]].measures.removeAll(measure);
 
+    // you're deleting that vertex from the control point's graph.
+
     // TODO: decrement the strength on the correct edge.
+    // Get the parent control point.
+    // Get all other measures for the control point
+    // All of the other serial numbers / verticies you're connected to. 
+    // decrement all their weights. 
 
     //If this caused the node to be empty,then delete the node.
     if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
@@ -833,15 +839,6 @@ namespace Isis {
   QList< QString > ControlNet::GetCubeSerials() const {
     return m_vertexMap.keys(); 
 //    return cubeGraphNodes->keys();
-  }
-
-
-  /**
-   * @returns A list of all the cube graph nodes in the network
-   */
-  QList< ControlCubeGraphNode * > ControlNet::GetCubeGraphNodes() {
-    // Just delete function? 
-    return cubeGraphNodes->values();
   }
 
 
