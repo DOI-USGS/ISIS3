@@ -116,6 +116,7 @@ void IsisMain() {
   ProcessImport jp;
   FileName transFile("$apollo15/translations/apollopantranstable.trn");
   PvlTranslationTable transTable(transFile);
+
   PvlGroup kernels_pvlG;
 
   //scFrameCode and insCode from user input
@@ -140,6 +141,7 @@ void IsisMain() {
   ////////////////////////////////////////////build the cube header instrament group
   PvlGroup inst_pvlG("Instrument");
 
+
   PvlKeyword keyword;
 
   //four that are the same for every panaramic mission
@@ -147,9 +149,17 @@ void IsisMain() {
   keyword.setValue(mission);
   inst_pvlG.addKeyword(keyword);
 
-  keyword.setName("InstrumentName");
-  keyword.setValue(transTable.Translate("InstrumentName","whatever"));
-  inst_pvlG.addKeyword(keyword);
+//  keyword.setName("InstrumentName");
+//  keyword.setValue(transTable.Translate("InstrumentName","whatever"));
+//  inst_pvlG.addKeyword(keyword);
+
+  Pvl fakeInputLabel; // <-- there's nothing in here for this small test case, but I'm not sure that's what you want for the real thing
+  Pvl testOutputLabel; 
+  PvlToPvlTranslationManager translater(fakeInputLabel, transFile.expanded());
+  translater.Auto(testOutputLabel); 
+  // then actually write testOutputLabel to the cube
+
+  std::cout << testOutputLabel << std::endl; 
 
   keyword.setName("InstrumentId");
   keyword.setValue(transTable.Translate("InstrumentId","whatever"));

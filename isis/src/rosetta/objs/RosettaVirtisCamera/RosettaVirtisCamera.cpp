@@ -82,6 +82,7 @@ namespace Isis {
       frameId = "ROS_VIRTIS-M_IR";
     }
 
+    std::cout << "virFrame: " << virFrame << std::endl; 
     instrumentRotation()->SetFrame(virFrame);
 
     // We do not want to downsize the cache
@@ -326,6 +327,7 @@ namespace Isis {
 
       // Store line,
       smInfo.m_lineNum = lineno;
+      std::cout << "line midtime: " << iTime(lineMidTime).UTC() << std::endl; 
       smInfo.m_scanLineEt = lineMidTime;
       smInfo.m_mirrorSin = mirrorSin;
       smInfo.m_mirrorCos = mirrorCos;

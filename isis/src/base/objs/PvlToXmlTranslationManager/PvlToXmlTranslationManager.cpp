@@ -156,18 +156,34 @@ namespace Isis {
 
       const PvlContainer *con = GetContainer(grp);
       if (con != NULL) {
-        if (con->hasKeyword(InputKeywordName(transGroupName))) {
+        if (con->hasKeyword(InputKeywordName(transGroupName)) || 
+            hasInputDefault(transGroupName)) { // < -- we in fact to not have this
 
           QStringList outputName = parseSpecification(OutputName(transGroupName));
-          // Get the InputKey from the input label.
-          PvlKeyword inputKeyword = (*con)[InputKeywordName(transGroupName)];
-          // Translate input keyword value and set the qdomelement
-          // NOTE: We are assuming this is a single valued keyword since
-          //       xml does not allow multiple values
-          QString untranslatedValue = inputKeyword[0];
-          QString translatedValue = PvlTranslationTable::Translate(transGroupName, 
+
+          PvlKeyword inputKeyword;
+          QString translatedValue;
+          QString units;
+          if (con->hasKeyword(InputKeywordName(transGroupName))) {
+            std::cout << "Translating a non-InputDefault as." << std::endl; 
+            // Get the InputKey from the input label.
+            inputKeyword = (*con)[InputKeywordName(transGroupName)];
+            // Translate input keyword value and set the qdomelement
+            // NOTE: We are assuming this is a single valued keyword since
+            //       xml does not allow multiple values
+            QString untranslatedValue = inputKeyword[0];
+            translatedValue = PvlTranslationTable::Translate(transGroupName, 
                                                                    untranslatedValue);
-          QString units = inputKeyword.unit(); 
+            units = inputKeyword.unit(); 
+          }
+          else {
+            // get the InputKey from the InputDefault
+            translatedValue = InputDefault(transGroupName);
+            std::cout << "Translating an InputDefault as: " << translatedValue << std::endl; 
+            units = "";
+          }
+
+
           if (outputName.size() == 2 && outputName[0] == "att") {
             parentElement.setAttribute(outputName[1], translatedValue);
             if (transGroup.hasKeyword("OutputAttributes")) {
