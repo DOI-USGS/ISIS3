@@ -370,12 +370,10 @@ namespace Isis {
       QHash< QString, ControlPoint * > * points;
 
       //! hash ControlCubeGraphNodes by CubeSerialNumber
-//      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes; // TODO : delete
 
       // structs and typedefs for the boost graph
       struct Image {
         QString serial;
-//        QList<ControlMeasure* > measures;
         QHash< ControlPoint *, ControlMeasure * > measures;
       };
 
