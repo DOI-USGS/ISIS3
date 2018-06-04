@@ -374,6 +374,7 @@ namespace Isis {
     // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
     m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
     m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
+    std::cout<<"observationSolveSettings.spkDegree(): " << observationSolveSettings.spkDegree() <<std::endl;
     m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
 
 
@@ -1058,12 +1059,18 @@ namespace Isis {
       //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
     }
     else if (arg1 == 1) {
-      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
-      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
+      QTableWidgetItem *twItem = new QTableWidgetItem();
+      twItem->setText("VELOCITY");
+      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+      QTableWidgetItem *twItemunits = new QTableWidgetItem();
+      twItemunits->setText("m/sec");
     }
     else if (arg1 == 2) {
-      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
-      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
+      QTableWidgetItem *twItem = new QTableWidgetItem();
+      twItem->setText("ACCELERATION");
+      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+      QTableWidgetItem *twItemunits = new QTableWidgetItem();
+      twItemunits->setText("m/s^2");
     }
   /*
     else if (arg1 == 0) {
