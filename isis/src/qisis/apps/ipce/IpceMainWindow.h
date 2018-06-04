@@ -132,8 +132,8 @@ namespace Isis {
    *                           Fixes #5412.
    *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
-   *                           widget. Added addDock method. This needs further work to clean up and
-   *                           change the mdi interface.
+   *                           widget. Added addDock method. Remove all methods having to do with
+   *                           MDI sub-windows, detached views.
    *  
    */
   class IpceMainWindow : public QMainWindow {
@@ -148,9 +148,6 @@ namespace Isis {
       void removeView(QWidget *view);
       void removeAllViews();
 
-      void setActiveView(AbstractProjectItemView *view);
-      void updateMenuActions();
-      void updateToolBarActions();
       void readSettings(Project *);
 
     protected:
@@ -160,25 +157,20 @@ namespace Isis {
     private slots:
       void configureThreadLimit();
       void enterWhatsThisMode();
-      void onSubWindowActivated(QMdiSubWindow *);
 
-      void toggleViewMode();
-      void setTabbedViewMode();
-      void setSubWindowViewMode();
-
-      void closeDetachedView();
-      void detachActiveView();
-      void reattachView();
+      void tabAllViews();
 
       void raiseWarningTab();
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
       void applyMaxThreadCount();
-      void createMenus();
-      void writeSettings(const Project *project) const;
 
       void initializeActions();
+      void createMenus();
+      void createToolBars();
+
+      void writeSettings(const Project *project) const;
 
     private:
       /**
@@ -188,8 +180,9 @@ namespace Isis {
       QPointer<Directory> m_directory;
 
       QDockWidget *m_projectDock;
-      QList<ViewSubWindow *> m_detachedViews; //!< List to keep track of any detached main windows
       QDockWidget *m_warningsDock;
+
+      QList<QDockWidget *> m_dockedWidgets;
       /**
        * This is the "goal" or "estimated" maximum number of active threads running in this program
        *   at once. For now, the GUI consumes 1 thread and QtConcurrent
