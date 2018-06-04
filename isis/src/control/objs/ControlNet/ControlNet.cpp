@@ -590,7 +590,7 @@ namespace Isis {
           // new graph:
           ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                        m_vertexMap[sn],
-                                                         m_controlGraph).first;
+                                                       m_controlGraph).first;
           m_controlGraph[connection].strength++;
         }
       }
@@ -640,18 +640,12 @@ namespace Isis {
       cubeGraphNodes->remove(serial);
     }
 
-    // Remove the measure from the node.  
+    // Remove the measure from the associated node.  
     m_controlGraph[m_vertexMap[serial]].measures.removeAll(measure);
 
-    // you're deleting that vertex from the control point's graph.
+    // Decrement the edge strength & remove edge if -> 0 happens in measureIgnored
 
-    // TODO: decrement the strength on the correct edge.
-    // Get the parent control point.
-    // Get all other measures for the control point
-    // All of the other serial numbers / verticies you're connected to. 
-    // decrement all their weights. 
-
-    //If this caused the node to be empty,then delete the node.
+    // If this caused the node to be empty, then delete the node.
     if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
       boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
       boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
@@ -692,7 +686,15 @@ namespace Isis {
           neighborNode->removeConnection(node, point);
           node->removeConnection(neighborNode, point);
         }
-
+        ImageConnection connection = boost::edge(m_vertexMap[serial],
+                                                 m_vertexMap[sn],
+                                                 m_controlGraph).first;
+        m_controlGraph[connection].strength--;
+        if (m_controlGraph[connection].strength <= 0) {
+          boost::remove_edge(m_vertexMap[serial],
+                             m_vertexMap[sn],
+                             m_controlGraph);
+        }
       }
     }
   }
@@ -798,10 +800,10 @@ namespace Isis {
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
     QList< QList< QString > > islandStrings;
 
+  // boost::put(indexMapAdaptor, newVertex, i);
   //  std::vector<int> component (boost::num_vertices (m_controlGraph));
 //    size_t numComponents = boost::connected_components(m_controlGraph, component)
-                                                       
-
+    
     QList< QList< ControlCubeGraphNode * > > islands;// = m_controlGraph.
     for (int i = 0; i < islands.size(); i++) {
       QList< QString > newIsland;
@@ -848,18 +850,12 @@ namespace Isis {
    *
    * @param serialNumber the cube serial number to validate
    */
-  void ControlNet::ValidateSerialNumber(QString serialNumber) const {
-//  if (!cubeGraphNodes->contains(serialNumber)) {
-//    IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
-//        "the network";
-//    throw IException(IException::Programmer, msg, _FILEINFO_);
-//  }
-    if (!m_vertexMap.contains(serialNumber)) {
-          IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
-              "the network";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
+  bool ControlNet::ValidateSerialNumber(QString serialNumber) const {
 
+    if (!m_vertexMap.contains(serialNumber)) {
+      return false;
+    }
+    return true; 
   }
 
 
@@ -869,9 +865,14 @@ namespace Isis {
    * @returns A list of all measures which are in a given cube
    */
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
-    ValidateSerialNumber(serialNumber);
-    return m_controlGraph[m_vertexMap[serialNumber]].measures;
-//    return (*cubeGraphNodes)[serialNumber]->getMeasures();
+    if( ValidateSerialNumber(serialNumber) ) {
+      return m_controlGraph[m_vertexMap[serialNumber]].measures;
+    }
+    else {
+      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+          "the network";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -881,16 +882,16 @@ namespace Isis {
    * @returns A list of all valid measures which are in a given cube
    */
   QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
-    ValidateSerialNumber(serialNumber);
-
     QList< ControlMeasure * > validMeasures;
+    if (ValidateSerialNumber(serialNumber)) {
 
-    QList< ControlMeasure * > measureList = m_controlGraph[m_vertexMap[serialNumber]].measures;  
-    foreach(ControlMeasure * measure, measureList) {
-      if (!measure->IsIgnored())
-        validMeasures.append(measure);
+      QList< ControlMeasure * > measureList = GetMeasuresInCube(serialNumber);
+
+      foreach(ControlMeasure * measure, measureList) {
+        if (!measure->IsIgnored())
+          validMeasures.append(measure);
+      }
     }
-
     return validMeasures;
   }
 

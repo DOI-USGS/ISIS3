@@ -331,7 +331,7 @@ namespace Isis {
 
     private:
       void nullify();
-      void ValidateSerialNumber(QString serialNumber) const;
+      bool ValidateSerialNumber(QString serialNumber) const;
       void measureAdded(ControlMeasure *measure);
       void pointAdded(ControlPoint *point);
       void measureDeleted(ControlMeasure *measure);
@@ -377,6 +377,7 @@ namespace Isis {
       struct Image {
         QString serial;
         QList<ControlMeasure* > measures;
+//        QHash< ControlPoint *, ControlMeasure * > * measures;
       };
 
       struct Connection {
