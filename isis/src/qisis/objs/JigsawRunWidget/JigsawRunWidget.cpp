@@ -84,30 +84,21 @@ namespace Isis {
     // If aborting a bundle, only close will be enabled.
     m_accept = new QPushButton(tr("&Accept"));
     m_reject = new QPushButton(tr("&Reject"));
-    m_close = new QPushButton(tr("&Close"));
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
     m_ui->JigsawRunButton->setEnabled(false);
-    m_close->setEnabled(true);
 
     // Add tool tips to the buttons
     m_accept->setToolTip(tr("Accept the bundle results and save them to the project."));
     m_reject->setToolTip(tr("Reject and discard the bundle results. This resets the dialog."));
-    m_close->setToolTip(tr("Close this dialog."));
 
-    // Add the buttons to the QDialogButtonBox defined in the UI file.
-    // Note that according to the Qt doc'n for QDialogButtonBox, addButton() causes the
-    // dialog box to take ownership of the QPushButton's, so we don't manually manage their memory.
     m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
     m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
-    m_ui->buttonBox->addButton(m_close, QDialogButtonBox::AcceptRole);
 
     // Accept will handle saving the results.
-    connect(m_accept, SIGNAL(clicked(bool)),
-           this, SLOT(acceptBundleResults()));
+    connect(m_accept, SIGNAL(clicked(bool)), this, SLOT(acceptBundleResults()));
     // Reject will handle discarding the results.
-    connect(m_reject, SIGNAL(clicked(bool)),
-           this, SLOT(rejectBundleResults()));
+    connect(m_reject, SIGNAL(clicked(bool)), this, SLOT(rejectBundleResults()));
 
     m_bundleAdjust = NULL;
     m_bundleSolutionInfo = NULL;
@@ -271,7 +262,6 @@ namespace Isis {
 
       // change "Run" button text to "Abort" (or maybe pause)
       m_bRunning = true;
-      m_close->setEnabled(false);
       m_ui->JigsawRunButton->setText("&Abort");
       update();
     }
@@ -469,8 +459,6 @@ namespace Isis {
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
-    //  Once the bundle has been accepted, re-enable the close button
-    m_close->setEnabled(true);
 
   //       m_ui->convergenceStatusLabel->setText("Bundle converged, camera pointing updated");
     //This bundle was bad so we should delete all remenants.
@@ -493,7 +481,6 @@ namespace Isis {
     // Disable the "Accept" and "Reject" buttons, enable the "Close" button
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
-    m_close->setEnabled(true);
 
     // Clear the dialog so the lcd's are 0 and the status text is cleared.
     clearDialog();
@@ -559,9 +546,6 @@ namespace Isis {
     updateScrollBar();
 
     update();
-
-    //  Re-enable the close button
-    m_close->setEnabled(true);
   }
 
 

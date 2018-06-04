@@ -122,7 +122,6 @@ namespace Isis {
   private:
     bool m_bRunning; /**< Indicates whether or not the bundle adjust is running. */
     QPushButton *m_accept; /**< Dialog's accept button that is used to save the bundle results. */
-    QPushButton *m_close; /**< Dialog's close button that is used to close the dialog. */
     QPushButton *m_reject; /**< Dialog's reject button that is used to discard the results. */
 
     /**
