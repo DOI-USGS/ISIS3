@@ -24,7 +24,6 @@
  */
 
 #include <QObject>
-#include "ControlCubeGraphNode.h"
 
 template< class A> class QVector;
 template< class A> class QList;
@@ -181,7 +180,6 @@ namespace Isis {
       Q_OBJECT
 
       friend class ControlPoint;
-      friend class ControlCubeGraphNode;
     public:
       /**
        * @brief Control network measurement types
@@ -249,7 +247,6 @@ namespace Isis {
       ~ControlMeasure();
 
       ControlPoint *Parent() { return parentPoint; }
-      ControlCubeGraphNode *ControlSN() { return associatedCSN; }
 
       Status SetAprioriLine(double aprioriLine);
       Status SetAprioriSample(double aprioriSample);
@@ -333,7 +330,6 @@ namespace Isis {
 
     private: // data
       ControlPoint *parentPoint;  //!< Pointer to parent ControlPoint, may be null
-      ControlCubeGraphNode *associatedCSN;  //!< Pointer to the Serial Number
       // structure connecting measures in an image
 
       QString *p_serialNumber;
