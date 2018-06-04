@@ -79,6 +79,15 @@ namespace Isis {
    *                           accepted. Fixes #4960
    *   @history 2017-11-01 Ian Humphrey - Create ecubs in the bundle results directory which contain
    *                           updated SPICE.  Fixes #4804, #4849.
+   *   @history 2018-03-22 Ken Edmundson - Added member variable QString m_outputControlName. Added
+   *                           argument QString outputControlFileName to constructor. Modified
+   *                           acceptBundleResults method to take output control network filename
+   *                           from the JigsawSetupDialog.
+   *   @history 2018-05-22 Ken Edmundson - Modified init() method to not set m_BundleSolutionInfo to
+   *                           NULL because JigsawDialog no longer owns it. Modified destructor to
+   *                           not delete m_BundleSolutionInfo or set it to NULL. Note this is NOT
+   *                           ideal, m_BundleSolutionInfo should be a QSharedPointer, not a raw
+   *                           pointer.
    */
   class JigsawDialog : public QDialog {
     Q_OBJECT
@@ -88,6 +97,7 @@ namespace Isis {
     explicit JigsawDialog(Project *project,
                           BundleSettingsQsp bundleSettings,
                           Control *selectedControl,
+                          QString outputControlFileName,
                           QWidget *parent = 0);
 
     ~JigsawDialog();
@@ -106,6 +116,7 @@ namespace Isis {
     Project *m_project;
     Control *m_selectedControl;
     QString m_selectedControlName;
+    QString m_outputControlName;
     BundleSettingsQsp m_bundleSettings;
 
   private:

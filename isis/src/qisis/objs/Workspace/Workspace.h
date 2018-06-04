@@ -79,6 +79,8 @@ namespace Isis {
   *                           class, Shape, which also contains a cube, but not an Image.
   *   @history 2017-09-11 Adam Goins - Added the ability to accept cubelists under any file format.
   *                           Fixes #5099.
+  *   @history 2018-04-13 Christopher Combs - Added .lbl files to the list of single-cube file-extensions
+  *                           to check before reading a cube list in addCubeViewport. Fixes #5350.
   */
   class Workspace : public QWidget {
       Q_OBJECT
