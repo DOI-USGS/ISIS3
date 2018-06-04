@@ -376,8 +376,8 @@ namespace Isis {
       // structs and typedefs for the boost graph
       struct Image {
         QString serial;
-        QList<ControlMeasure* > measures;
-//        QHash< ControlPoint *, ControlMeasure * > * measures;
+//        QList<ControlMeasure* > measures;
+        QHash< ControlPoint *, ControlMeasure * > measures;
       };
 
       struct Connection {

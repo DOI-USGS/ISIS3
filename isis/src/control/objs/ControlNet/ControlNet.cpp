@@ -391,7 +391,8 @@ namespace Isis {
       ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
       node->addMeasure(measure);
 
-      m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
+//      m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
+         m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
 
       // in this measure's node add connections to the other nodes reachable from
       // its point
@@ -503,7 +504,8 @@ namespace Isis {
     ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
     node->addMeasure(measure);
 
-    m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
+//    m_controlGraph[m_vertexMap[serial]].measures.append(measure); 
+       m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
 
     // in this measure's node add connections to the other nodes reachable from
     // its point
@@ -641,7 +643,7 @@ namespace Isis {
     }
 
     // Remove the measure from the associated node.  
-    m_controlGraph[m_vertexMap[serial]].measures.removeAll(measure);
+    m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
 
     // Decrement the edge strength & remove edge if -> 0 happens in measureIgnored
 
