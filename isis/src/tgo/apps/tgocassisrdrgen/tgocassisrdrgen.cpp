@@ -20,7 +20,7 @@ using namespace std;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-    // Check if input file is indeed, a cube
+  // Check if input file is indeed, a cube
   if (ui.GetFileName("FROM").right(3) != "cub") {
     QString msg = "Input file [" + ui.GetFileName("FROM") +
                 "] does not appear to be a cube";
@@ -32,7 +32,7 @@ void IsisMain() {
   Cube *icube = process.SetInputCube("FROM");
 
   PvlObject *label= icube->label();
-  PvlKeyword &instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
+  PvlKeyword &instrument = label->findObject("IsisCube").findKeyword("InstrumentId", Pvl::Traverse);
 
   // Check if the cube is able to be translated into a CaSSIS xml file
   // This could very well be unnecessary
@@ -43,28 +43,13 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
-/*
-  * Add additional pds label data here
-  */
-
+  // std PDS4 label
+  process.StandardPds4Label();
+  // Add additional cassis label data here
   QDomDocument &pdsLabel = process.GetLabel();
   PvlToXmlTranslationManager cubeLab(*(icube->label()),
                                     "$tgo/translations/tgoCassisExport.trn");
   cubeLab.Auto(pdsLabel);
-
-  process.StandardPds4Label();
-
-  // This regular expression matches the pipe followed by the date from
-  // the ISIS version string that Application returns.
-  QRegularExpression versionRegex(" \\| \\d{4}\\-\\d{2}\\-\\d{2}");
-  QString historyDescription = "Created PDS4 output product from ISIS cube with tgocassisrdrgen "
-                               "application from ISIS version "
-                               + Application::Version().remove(versionRegex) + ".";
-  // This regular expression matches the time from the date and time string
-  // that Application returns.
-  QRegularExpression dateRegex("T\\d{2}:\\d{2}:\\d{2}");
-  QString historyDate = Application::DateTime().remove(dateRegex);
-  process.addHistory(historyDescription, historyDate);
 
   ProcessExportPds4::translateUnits(pdsLabel);
   
