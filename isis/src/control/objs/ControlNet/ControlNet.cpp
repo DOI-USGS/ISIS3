@@ -380,7 +380,6 @@ namespace Isis {
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
 
-            // new graph:
             ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                          m_vertexMap[sn],
                                                          m_controlGraph).first;
@@ -744,8 +743,6 @@ namespace Isis {
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
     QList< QList< QString > > islandStrings;
 
-  //  std::vector<int> component (boost::num_vertices (m_controlGraph));
-
     VertexIndexMap indexMap;
     VertexIndexMapAdaptor indexMapAdaptor(indexMap);
 
@@ -759,20 +756,39 @@ namespace Isis {
     size_t numComponents = boost::connected_components(m_controlGraph, componentAdaptor,
                                                       boost::vertex_index_map(indexMapAdaptor));
 
-    std::cout << "Vertices in the first component:" << std::endl;
-    std::cout << numComponents << std::endl; 
-    for (size_t i = 0; i < numComponents; ++i){
-      if (componentAdaptor[i] == 0)
-        std::cout << i << " ";
+//    std::cout << "Number of components:" << std::endl;
+//    std::cout << numComponents << std::endl; 
+//    std::cout << "Size of return: " << componentMap.size() << std::endl; 
+
+    // This is not efficient, but works
+    QHash<int, QList<QString> > islandsByGroup; 
+
+    std::map<ImageVertex, size_t>::iterator it = componentMap.begin();
+    while(it != componentMap.end())
+    {
+      ImageVertex vertex = it->first;
+      QString serial = m_controlGraph[vertex].serial;
+      
+      int group = (int) it->second;
+      
+ //     std::cout << group << "  ::  "  << serial << std::endl; 
+      islandsByGroup[group].append(serial); 
+      
+      ++it;
     }
 
-    QList< QList< ControlCubeGraphNode * > > islands;// = m_controlGraph.
-    for (int i = 0; i < islands.size(); i++) {
-      QList< QString > newIsland;
-      islandStrings.append(newIsland);
-      for (int j = 0; j < islands[i].size(); j++)
-        islandStrings[i].append(islands[i][j]->getSerialNumber());
+//   std::cout << std::endl; 
+
+    QList<int> groups = islandsByGroup.keys();
+    for (int i=0; i<groups.size(); i++) {
+      std::cout << "Group: " << groups[i] << std::endl; 
+      QList<QString> temp = islandsByGroup[groups[i]];
+      islandStrings.append(temp); // <--- this converts to the output format;
+      for (int j=0; j<temp.size();j++) {
+        std::cout << " ----- " << temp[j] << std::endl; 
+      }
     }
+
     return islandStrings;
   }
 

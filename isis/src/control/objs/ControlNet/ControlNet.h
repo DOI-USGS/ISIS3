@@ -369,8 +369,6 @@ namespace Isis {
       //! hash ControlPoints by ControlPoint Id
       QHash< QString, ControlPoint * > * points;
 
-      //! hash ControlCubeGraphNodes by CubeSerialNumber
-
       // structs and typedefs for the boost graph
       struct Image {
         QString serial;
@@ -387,8 +385,10 @@ namespace Isis {
       typedef std::map<ImageVertex, size_t> VertexIndexMap;
       typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor;
       typedef Network::out_edge_iterator ConnectionIterator;
+
       QHash<QString, ImageVertex> m_vertexMap; //!< The SN -> vertex hash for the boost graph
       Network m_controlGraph; //!< The boost graph
+
       QStringList *pointIds;
       QMutex *m_mutex;
 
