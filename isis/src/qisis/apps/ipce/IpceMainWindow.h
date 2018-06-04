@@ -129,6 +129,8 @@ namespace Isis {
    *                           test to determine whether project needs saving.
    *   @history 2018-05-01 Tracie Sucharski - Code accidently left commented from previous checking.
    *                           Fixes #5412.
+   *   @history 2018-05-31 Christopher Combs - Added support for JigsawRunWidget to be created as a 
+   *                           dockable widget in addView(). Fixes #5428.
    *  
    */
   class IpceMainWindow : public QMainWindow {

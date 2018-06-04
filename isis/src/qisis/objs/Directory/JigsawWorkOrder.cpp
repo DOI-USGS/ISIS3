@@ -127,7 +127,7 @@ namespace Isis {
    * @see WorkOrder::execute()
    */
   void JigsawWorkOrder::execute() {
-    JigsawRunWidget *runDialog = project()->directory()->addJigsawView();
+    JigsawRunWidget *runDialog = project()->directory()->addJigsawRunWidget();
 
     if (!runDialog) {
       QString msg = "Unable to open Jigsaw Run Widget";

@@ -84,9 +84,9 @@ namespace Isis {
    *                           argument QString outputControlFileName to constructor. Modified
    *                           acceptBundleResults method to take output control network filename
    *                           from the JigsawSetupDialog.
-   *   @history 2018-05-28 Christopher Combs - Name changed from JigsawDialog to JigsawRunWidget.
+   *   @history 2018-05-31 Christopher Combs - Name changed from JigsawDialog to JigsawRunWidget.
    *                           Now inherits from QFrame instead of QDialog. Added support for new
-   *                           workflow in which JigsawSwttingDialog is only ever called from a
+   *                           workflow in which JigsawSetupDialog is only ever called from a
    *                           button on this widget. Fixes #5428. 
    */
   class JigsawRunWidget : public QFrame {
