@@ -870,8 +870,8 @@ namespace Isis {
    */
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
-//    return m_controlGraph[m_vertexMap[serialNumber]].measures;  <--- segfaults. 
-    return (*cubeGraphNodes)[serialNumber]->getMeasures();
+    return m_controlGraph[m_vertexMap[serialNumber]].measures;
+//    return (*cubeGraphNodes)[serialNumber]->getMeasures();
   }
 
 
