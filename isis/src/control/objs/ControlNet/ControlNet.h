@@ -264,7 +264,6 @@ namespace Isis {
       QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
                                                   double min,double max);
-      void DeleteMeasuresWithId(QString serialNumber);
 
       void ComputeResiduals();
       void ComputeApriori();
@@ -371,7 +370,7 @@ namespace Isis {
       QHash< QString, ControlPoint * > * points;
 
       //! hash ControlCubeGraphNodes by CubeSerialNumber
-      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes; // TODO : delete
+//      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes; // TODO : delete
 
       // structs and typedefs for the boost graph
       struct Image {
