@@ -27,12 +27,15 @@
 #include <QSize>
 
 #include "AbstractProjectItemView.h"
+#include "FileName.h"
+#include "XmlStackedHandler.h"
 
 class QAction;
 class QEvent;
 class QMainWindow;
 class QToolBar;
 class QWidgetAction;
+class QXmlStreamWriter;
 
 namespace Isis {
 
@@ -41,7 +44,9 @@ namespace Isis {
   class Image;
   class ImageFileListWidget;
   class MosaicSceneWidget;
+  class Project;
   class ToolPad;
+  class XmlStackedHandlerReader;
 
   /**
    * View for displaying footprints of images in a QMos like way.
@@ -64,6 +69,9 @@ namespace Isis {
    *                           footprint. Fixes #5050.
    *   @history 2017-08-02 Tracie Sucharski - Fixed connections between views for control point
    *                           editing.  Fixes #5007, #5008.
+   *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
+   *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
+   *                           saved/restored including the ImageFileListWidget. Fixes #5422.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -79,6 +87,9 @@ namespace Isis {
       virtual QList<QAction *> toolPadActions();
 
       QSize sizeHint() const;
+
+      void load(XmlStackedHandlerReader *xmlReader);
+      void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
     signals:
       void modifyControlPoint(ControlPoint *controlPoint);
@@ -96,6 +107,28 @@ namespace Isis {
       void onItemRemoved(ProjectItem *item);
       void onQueueSelectionChanged();
       void onMosItemRemoved(Image *image);
+
+    private:
+      /**
+       * @author 2018-05-11 Tracie Sucharski
+       *
+       * @internal
+       */
+      class XmlHandler : public XmlStackedHandler {
+        public:
+          XmlHandler(Footprint2DView *footprintView);
+          ~XmlHandler();
+
+          virtual bool startElement(const QString &namespaceURI, const QString &localName,
+                                    const QString &qName, const QXmlAttributes &atts);
+          virtual bool endElement(const QString &namespaceURI, const QString &localName,
+                                  const QString &qName);
+
+        private:
+          Q_DISABLE_COPY(XmlHandler);
+
+          Footprint2DView *m_footprintView;      //!< The Footprint2DView
+      };
 
     private:
       MosaicSceneWidget *m_sceneWidget; //!< The scene widget
