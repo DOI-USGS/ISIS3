@@ -53,7 +53,7 @@ namespace Isis {
 
       bool hasIslands();
       int numIslands();
-      QList<QString> getIslands();
+      QList< QList<QString> > getIslands();
 
       int numPoints();
       int numIgnoredPoints();
