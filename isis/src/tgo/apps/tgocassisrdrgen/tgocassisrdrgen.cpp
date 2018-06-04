@@ -33,7 +33,7 @@ void IsisMain() {
 
   PvlObject *label= icube->label();
 
-  bool isMosaic;
+  bool isMosaic = false;
   PvlKeyword instrument;
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
