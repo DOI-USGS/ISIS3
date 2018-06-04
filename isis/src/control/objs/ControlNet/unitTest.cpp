@@ -149,6 +149,9 @@ void testConnectivity() {
   QList< ControlMeasure *> measures = net.GetMeasuresInCube("ALPHA");
   std::cout << "Serial Number: " << measures[0]->GetCubeSerialNumber() << std::endl; 
 
+  std::cout << "Testing GetSerialConnections" << std::endl; 
+  net.GetSerialConnections();
+
 // This region is to test the unused and now removed GetNodeConnections methods. It's tempoararily
 // left here commented out in case we want to test something similar after updating ControlNet to
 // use boost.

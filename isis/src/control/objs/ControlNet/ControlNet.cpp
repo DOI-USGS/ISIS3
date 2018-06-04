@@ -45,7 +45,6 @@ namespace Isis {
   void ControlNet::nullify() {
 
     points = NULL;
-//    cubeGraphNodes = NULL;
     pointIds = NULL;
     m_mutex = NULL;
   }
@@ -56,7 +55,6 @@ namespace Isis {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
-//    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     m_ownPoints = true;
@@ -70,7 +68,6 @@ namespace Isis {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
-//    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     for (int cpIndex = 0; cpIndex < other.GetNumPoints(); cpIndex++) {
@@ -103,7 +100,6 @@ namespace Isis {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
-//    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     m_ownPoints = true;
@@ -128,7 +124,6 @@ namespace Isis {
     clear();
 
     delete points;
-//    delete cubeGraphNodes;
     delete pointIds;
 
     nullify();
@@ -160,17 +155,6 @@ namespace Isis {
       points->clear();
     }
 
-/*    if (cubeGraphNodes) {
-      QHashIterator< QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
-      while (i.hasNext()) {
-        i.next();
-        delete(*cubeGraphNodes)[i.key()];
-        (*cubeGraphNodes)[i.key()] = NULL;
-      }
-      cubeGraphNodes->clear();
-    }*/
-
-    // new
     m_controlGraph.clear();
     m_vertexMap.clear();
 
@@ -373,9 +357,7 @@ namespace Isis {
     // make sure there is a node for every measure
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-   //    if (!cubeGraphNodes->contains(sn)) {
-//        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
-//      }
+
       // if the graph doesn't have the sn
       if (!m_vertexMap.contains(sn)) {
         ImageVertex newVertex = boost::add_vertex(m_controlGraph); 
@@ -387,8 +369,6 @@ namespace Isis {
     foreach(ControlMeasure* measure, point->getMeasures()) {
       // add the measure to the corresponding node
       QString serial = measure->GetCubeSerialNumber();
-//      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
-//      node->addMeasure(measure);
 
         m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
 
@@ -399,12 +379,6 @@ namespace Isis {
           ControlMeasure *cm = point->GetMeasure(i);
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
-      /*      ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-
-            if (neighborNode != node) {
-              node->addConnection(neighborNode, point);
-              neighborNode->addConnection(node, point);
-            }*/
 
             // new graph:
             ImageConnection connection = boost::add_edge(m_vertexMap[serial],
@@ -483,11 +457,6 @@ namespace Isis {
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
 
-      // old
-//      if (!cubeGraphNodes->contains(sn)) {
-//        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
-//      }
-
       // if the graph doesn't have the sn (boost) 
       if (!m_vertexMap.contains(sn)) {
         ImageVertex newVertex = boost::add_vertex(m_controlGraph); 
@@ -498,8 +467,6 @@ namespace Isis {
 
     // add the measure to the corresponding node
     QString serial = measure->GetCubeSerialNumber();
-//    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
-//    node->addMeasure(measure);
 
        m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
 
@@ -510,13 +477,7 @@ namespace Isis {
         ControlMeasure *cm = point->GetMeasure(i);
         if (!cm->IsIgnored()) {
           QString sn = cm->GetCubeSerialNumber();
-         // ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
 
-          //if (neighborNode != node) {
-           // node->addConnection(neighborNode, point);
-            //neighborNode->addConnection(node, point);
-          //}
-          // new graph (boost): 
           ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                          m_vertexMap[sn],
                                                          m_controlGraph).first;
@@ -571,7 +532,6 @@ namespace Isis {
 
     if (!point->IsIgnored()) {
       QString serial = measure->GetCubeSerialNumber();
-//      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
 
       // in this measure's node add connections to the other nodes reachable
       // from its point
@@ -579,13 +539,7 @@ namespace Isis {
         ControlMeasure *cm = point->GetMeasure(i);
         if (!cm->IsIgnored()) {
           QString sn = cm->GetCubeSerialNumber();
-  //        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-    //      if (neighborNode != node) {
-      //      node->addConnection(neighborNode, point);
-        //    neighborNode->addConnection(node, point);
-          //}
 
-          // new graph:
           ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                        m_vertexMap[sn],
                                                        m_controlGraph).first;
@@ -621,8 +575,7 @@ namespace Isis {
   void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
-//    ASSERT(cubeGraphNodes->contains(serial));
-//    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+    ASSERT(m_vertexGraph->contains(serial));
 
     // remove connections to and from this node
     if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
@@ -630,18 +583,10 @@ namespace Isis {
       measureIgnored(measure);
     }
     
-  /*  node->removeMeasure(measure); 
-    if (!node->getMeasureCount()) {
-      delete node;
-      node = NULL;
-      cubeGraphNodes->remove(serial);
-    }*/ 
-
     // Remove the measure from the associated node.  
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
 
     // Decrement the edge strength & remove edge if -> 0 happens in measureIgnored
-
     // If this caused the node to be empty, then delete the node.
     if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
       boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
@@ -666,23 +611,16 @@ namespace Isis {
     }
 
     QString serial = measure->GetCubeSerialNumber();
-/*    if (!cubeGraphNodes->contains(serial)) {
+    if (!m_vertexMap.contains(serial)) {
       QString msg = "Node does not exist for [";
       msg += serial + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
-    }*/
-
-//    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+    }
 
     // remove connections to and from this node
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
       if (m_vertexMap.contains(sn)) {
-/*        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-        if (node != neighborNode) {
-          neighborNode->removeConnection(node, point);
-          node->removeConnection(neighborNode, point);
-        }*/
         if (QString::compare(serial, sn) !=0) {
 //          std::cout << point->GetId() << ":" << serial << " --- " << sn << std::endl; 
 
@@ -806,10 +744,28 @@ namespace Isis {
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
     QList< QList< QString > > islandStrings;
 
-  // boost::put(indexMapAdaptor, newVertex, i);
   //  std::vector<int> component (boost::num_vertices (m_controlGraph));
-//    size_t numComponents = boost::connected_components(m_controlGraph, component)
-    
+
+    VertexIndexMap indexMap;
+    VertexIndexMapAdaptor indexMapAdaptor(indexMap);
+
+    QList< QString> serials = m_vertexMap.keys(); 
+    for (int i = 0; i < serials.size(); i++) {
+      boost::put(indexMapAdaptor, m_vertexMap[serials[i]], i);
+    }
+
+    VertexIndexMap componentMap;
+    VertexIndexMapAdaptor componentAdaptor(componentMap);
+    size_t numComponents = boost::connected_components(m_controlGraph, componentAdaptor,
+                                                      boost::vertex_index_map(indexMapAdaptor));
+
+    std::cout << "Vertices in the first component:" << std::endl;
+    std::cout << numComponents << std::endl; 
+    for (size_t i = 0; i < numComponents; ++i){
+      if (componentAdaptor[i] == 0)
+        std::cout << i << " ";
+    }
+
     QList< QList< ControlCubeGraphNode * > > islands;// = m_controlGraph.
     for (int i = 0; i < islands.size(); i++) {
       QList< QString > newIsland;
@@ -827,11 +783,6 @@ namespace Isis {
   int ControlNet::getEdgeCount() const {
     int total = boost::num_edges(m_controlGraph); 
 
-//  int total = 0;
-//  foreach (ControlCubeGraphNode * node, *cubeGraphNodes) {
-//    total += node->getAdjacentNodes().size();
-//  }
-
     return total;
   }
 
@@ -846,7 +797,6 @@ namespace Isis {
    */
   QList< QString > ControlNet::GetCubeSerials() const {
     return m_vertexMap.keys(); 
-//    return cubeGraphNodes->keys();
   }
 
 
