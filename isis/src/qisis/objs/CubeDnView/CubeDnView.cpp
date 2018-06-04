@@ -77,6 +77,7 @@
 #include "TrackTool.h"
 #include "ToolList.h"
 #include "ToolPad.h"
+
 #include "ViewportMdiSubWindow.h"
 #include "Workspace.h"
 #include "WindowTool.h"
@@ -122,38 +123,39 @@ namespace Isis {
     // or list of control networks is added, then the enableControlNetTool() function is called.
     connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableControlNetTool()));
     connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableControlNetTool()));
+
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
   }
 
 
   void CubeDnView::createActions(Directory *directory) {
 
     
-    m_permToolBar = addToolBar("Standard Tools");
+    m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
+    addToolBar(m_permToolBar);
 
-    m_activeToolBar = addToolBar("Active Tool");
+    m_activeToolBar = new QToolBar("Active Tool", this);
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
+    addToolBar(m_activeToolBar);
 
-    m_toolPad = new ToolPad("Tool Pad", 0);
+    m_toolPad = new ToolPad("Tool Pad", this);
     m_toolPad->setObjectName("toolPad");
-    addToolBar(m_toolPad);
+    addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     // Create tools
     ToolList *tools = new ToolList;
-
-    // !!!!!!!   TODO  LOOK AT THIS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //*******   TODO  :   Look at code below.  What is defaultActiveTool used for? Why is NULL
-    // appended??    ***************
-    Tool *defaultActiveTool = NULL;
 
     tools->append(new RubberBandTool(this));
     tools->append(NULL);
 
     ControlNetTool *controlNetTool = new ControlNetTool(directory, this);
-    defaultActiveTool = controlNetTool;
-    tools->append(defaultActiveTool);
+    tools->append(controlNetTool);
 
     if (directory->project()->activeControl()) {
       controlNetTool->setControlNet(directory->project()->activeControl()->controlNet());
@@ -178,7 +180,9 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), controlNetTool, SLOT(paintAllViewports()));
 
     tools->append(new BandTool(this));
-    tools->append(new ZoomTool(this));
+
+    ZoomTool *zoomTool = new ZoomTool(this);
+    tools->append(zoomTool);
     tools->append(new PanTool(this));
     tools->append(new StretchTool(this));
     tools->append(new FindTool(this));
@@ -243,17 +247,7 @@ namespace Isis {
       }
     }
 
-    m_permToolBarActions.append( m_permToolBar->actions() );
-
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
-    m_toolPadActions.append( m_toolPad->actions() );
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
+    zoomTool->activate(true);
   }
 
 
