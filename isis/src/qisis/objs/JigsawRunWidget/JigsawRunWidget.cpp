@@ -29,9 +29,9 @@ namespace Isis {
   /**
    * @brief Constructor.
    *
-   * Creates a dialog for running a jigsaw (bundle adjustment) and changing the solve settings.
+   * Creates a widget for running a jigsaw (bundle adjustment) and changing the solve settings.
    *
-   * @param Project *project Pointer to the project this dialog belongs to.
+   * @param Project *project Pointer to the project this widget belongs to.
    * @param QWidget *parent Pointer to parent widget.
    */
   JigsawRunWidget::JigsawRunWidget(Project *project, QWidget *parent) : m_ui(new Ui::JigsawRunWidget) {
@@ -44,11 +44,11 @@ namespace Isis {
   /**
    * @brief Constructor that takes bundle settings and a selected control.
    *
-   * Creates a dialog after the jigsaw solve settings have been set up and a control has been
+   * Creates a widget after the jigsaw solve settings have been set up and a control has been
    * selected.
    *
-   * @param Project *project Pointer to the project this dialog belongs to.
-   * @param BundleSettingsQsp bundleSettings Settings to give to this dialog to use for a jigsaw.
+   * @param Project *project Pointer to the project this widget belongs to.
+   * @param BundleSettingsQsp bundleSettings Settings to give to this widget to use for a jigsaw.
    * @param Control *selectedControl Pointer to the selected control to adjust.
    * @param QWidget *parent Pointer to the parent widget.
    */
@@ -90,7 +90,7 @@ namespace Isis {
 
     // Add tool tips to the buttons
     m_accept->setToolTip(tr("Accept the bundle results and save them to the project."));
-    m_reject->setToolTip(tr("Reject and discard the bundle results. This resets the dialog."));
+    m_reject->setToolTip(tr("Reject and discard the bundle results. This resets the widget."));
 
     m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
     m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
@@ -578,9 +578,9 @@ namespace Isis {
 
 
   /**
-   * @brief Notifies the dialog that the bundle thread has finished.
+   * @brief Notifies the widget that the bundle thread has finished.
    *
-   * This slot is used to notify the dialog that the bundle has finished. The bundle thread
+   * This slot is used to notify the widget that the bundle has finished. The bundle thread
    * finishes when the bundle adjust finishes (either successfully or unsuccessfully, or if the
    * user aborts the run).
    */
