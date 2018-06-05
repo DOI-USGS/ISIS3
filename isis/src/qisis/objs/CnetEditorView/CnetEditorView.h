@@ -51,11 +51,13 @@ namespace Isis {
    * @author 2018-04-04 Tracie Sucharski
    *
    * @internal
-   *    @history 2018-05-28 Kaitlyn Lee - Because AbstractProjectItemView now inherits
-   *                                from QMainWindow, I added a dummy central widget
-   *                                and set its layout to the grid layout. We used to set
-   *                                the whole CnetEditorView widget's layout, now we only
-   *                                set the central widget's layout.
+   *    @history 2018-05-28 Kaitlyn Lee - Because AbstractProjectItemView now inherits from QMainWindow,
+   *                              I added a dummy central widget and set its layout to the grid layout.
+   *                              We used to set the whole CnetEditorView widget's layout, now we only
+   *                              set the central widget's layout.
+   *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
+   *                              was moved from the constructor. createToolBars() was copied and edited
+   *                              from CnetEditorWindow.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -80,17 +82,8 @@ class CnetEditorView : public AbstractProjectItemView {
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
     private:
-      void createActions();
       void createToolBars();
       void createMenus();
-      int indexOfActionList(QList< QAction * > actionList, QString actionText);
-      void populateToolBars();
-      void populateMenus();
-
-
-    // private slots:
-    //   void save();
-    //   void saveAs();
 
     private:
       /**
@@ -119,20 +112,13 @@ class CnetEditorView : public AbstractProjectItemView {
     QPointer<CnetEditorWidget> m_cnetEditorWidget;
     QPointer<Control> m_control;
 
-    //QAction *saveAct;
-    //QAction *saveAsAct;
-
     QToolBar *m_permToolBar; //!< The permanent tool bar
     QToolBar *m_activeToolBar; //!< The active tool bar
     ToolPad *m_toolPad; //!< The tool pad
-    QMenu *m_fileMenu;
-    QMenu *m_helpMenu;
-    QMenu *m_tableMenu;
 
     QList<QAction *> m_permToolBarActions; //!< The permanent tool bar actions
-    QWidgetAction *m_activeToolBarAction; //!< Widget of the active tool
+    QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
     QList<QAction *> m_toolPadActions; //!< The tool pad actions
-    QAction *m_separatorAction;
   };
 }
 

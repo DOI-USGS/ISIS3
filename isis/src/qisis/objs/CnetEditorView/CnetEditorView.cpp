@@ -90,9 +90,6 @@ namespace Isis {
 
     createMenus();
     createToolBars();
-    populateMenus();
-    populateToolBars();
-    //createActions();
   }
 
   /**
@@ -110,26 +107,65 @@ namespace Isis {
     m_toolPad = 0;
   }
 
+  /**
+   * Uses the actions created by CnetEditorWidget, tries to find the menus to put
+   * the actions under, and creates the menus if said menus do not exist. Currently,
+   * the menus added are Table and Help.
+   */
   void CnetEditorView::createMenus() {
-    m_fileMenu = menuBar()->addMenu("&File");
-    m_tableMenu = menuBar()->addMenu("&Tables");
-    m_helpMenu = menuBar()->addMenu("&Help");
+    QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
+    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
+    QMap<QString, QMenu *> topLevelMenus;
+
+    while ( actionMapIterator.hasNext() ) {
+      actionMapIterator.next();
+      QAction *actionToAdd = actionMapIterator.key();
+      QList< QString > location = actionMapIterator.value();
+
+      QMenu *menuToPutActionInto = NULL;
+
+      if ( location.count() ) {
+        QString topLevelMenuTitle = location.takeFirst();
+        if (!topLevelMenus[topLevelMenuTitle]) {
+          topLevelMenus[topLevelMenuTitle] = menuBar()->addMenu(topLevelMenuTitle);
+        }
+
+        menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
+      }
+
+      foreach (QString menuName, location) {
+        bool foundSubMenu = false;
+        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
+          if (!foundSubMenu &&
+              possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
+            foundSubMenu = true;
+            menuToPutActionInto = possibleSubMenu->menu();
+          }
+        }
+
+        if (!foundSubMenu) {
+          menuToPutActionInto = menuToPutActionInto->addMenu(menuName);
+        }
+      }
+
+      menuToPutActionInto->addAction(actionToAdd);
+    }
   }
 
+  /**
+   * Uses and adds the actions created by CnetEditorWidget to the view's toolbars
+   * Right now, all actions created in CnetEditorWidget are added to the toolpad.
+   * This was copied from CnetEditorWindow
+   */
   void CnetEditorView::createToolBars() {
-    m_permToolBar = addToolBar("Standard Tools");
-    m_permToolBar->setObjectName("permToolBar");
-    m_permToolBar->setIconSize(QSize(22, 22));
+    // m_permToolBar = addToolBar("Standard Tools");
+    // m_permToolBar->setObjectName("permToolBar");
+    // m_permToolBar->setIconSize(QSize(22, 22));
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
     addToolBar(m_toolPad);
 
-    // m_separatorAction = new QAction(this);
-    // m_separatorAction->setSeparator(true);
-  }
-
-  void CnetEditorView::populateToolBars() {
     QMap< QString, QList< QAction * > > toolActionMap;
     toolActionMap = m_cnetEditorWidget->toolBarActions();
     QMapIterator< QString, QList< QAction * > > toolActionIter(toolActionMap);
@@ -142,57 +178,6 @@ namespace Isis {
         m_toolPad->addAction(action);
       }
     }
-  }
-
-  void CnetEditorView::populateMenus() {
-    QMap< QAction *, QList< QString > > menuActionMap;
-    menuActionMap = m_cnetEditorWidget->menuActions();
-    QMapIterator< QAction *, QList< QString > > menuActionIter(menuActionMap);
-    QWidget *widget = NULL;
-
-    while (menuActionIter.hasNext()) {
-      menuActionIter.next();
-      QAction *action = menuActionIter.key();
-      QList< QString > location = menuActionIter.value();
-      widget = menuBar();
-
-      while (location.size()) {
-        QString menuName = location.takeFirst();
-        int actListIndex = indexOfActionList(widget->actions(), menuName);
-        widget = widget->actions()[actListIndex]->menu();
-      }
-      widget->addAction(action);
-    }
-  }
-
-
-  void CnetEditorView::createActions() {
-    // saveAct = new QAction(QIcon(FileName("$base/icons/filesave.png").expanded()),
-    //                       tr("&Save"), this);
-    // saveAct->setShortcut(tr("Ctrl+S"));
-    // saveAct->setStatusTip(tr("save changes"));
-    // connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
-    //
-    // saveAsAct = new QAction(QIcon(FileName("$base/icons/filesaveas.png").expanded()),
-    //                         tr("Save&As"), this);
-    // saveAsAct->setStatusTip(tr("Save control network to specified file"));
-    // connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
-    //
-    // m_permToolBar->addAction(saveAct);
-    // m_permToolBar->addAction(saveAsAct);
-    // m_fileMenu->addAction(saveAct);
-    // m_fileMenu->addAction(saveAsAct);
-  }
-
-  int CnetEditorView::indexOfActionList(QList< QAction * > actionList,
-      QString actionText) {
-
-    int index = -1;
-    for (int i = 0; index == -1 && i < actionList.size(); i++)
-      if (actionList[i]->text() == actionText)
-        index = i;
-
-    return index;
   }
 
   /**
