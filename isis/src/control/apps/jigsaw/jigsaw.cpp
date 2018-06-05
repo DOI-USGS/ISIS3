@@ -80,24 +80,24 @@ void IsisMain() {
 
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
-    BundleSolutionInfo bundleSolution = bundleAdjustment->solveCholeskyBR();
+    BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();
     
     cout << "\nGenerating report files\n" << endl;
 
     // write output files
     if (ui.GetBoolean("BUNDLEOUT_TXT")) {
-      bundleSolution.outputText();
+      bundleSolution->outputText();
     }
 
     if (ui.GetBoolean("IMAGESCSV")) {
-      bundleSolution.outputImagesCSV();
+      bundleSolution->outputImagesCSV();
     }
 
     if (ui.GetBoolean("OUTPUT_CSV")) {
-      bundleSolution.outputPointsCSV();
+      bundleSolution->outputPointsCSV();
     }
     if (ui.GetBoolean("RESIDUALS_CSV")) {
-      bundleSolution.outputResiduals();
+      bundleSolution->outputResiduals();
     }
     
     // write updated control net
@@ -147,6 +147,7 @@ void IsisMain() {
       gp += PvlKeyword("Status", "Camera pointing NOT updated");
     }
     Application::Log(gp);
+    delete bundleSolution;
   }
   catch(IException &e) {
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));

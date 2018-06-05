@@ -409,6 +409,18 @@ namespace Isis {
    *                           and added or updated a few comments. *** TODO *** make sure
    *                           the new methods are fully functional for either coordinate type
    *                           once the new header keyword is added.
+   *   @history 2018-03-28 Adam Goins - Added targetRadii groups to the header. Changed the
+   *                           versioner to write these values out in a targetRadii group for
+   *                           both binary V0005 and PvlV0005 networks. Fixes #5361.
+   *   @history 2018-04-05 Adam Goins - Added hasTargetRadii() and targetRadii() to the versioner
+   *                           so that these values can be grabbed from a ControlNet on read.
+   *                           Also Fixes #5361.
+   *   @history 2018-06-01 Debbie A. Cook - (added to BundleXYZ 2018-02-25)
+   *                           Generalized calls to ControlPoint::IsLatitudeConstrained to 
+   *                           IsCoord1Constained and added or updated a few comments.
+   *                           *** TODO *** make sure the new methods are fully functional
+   *                           for either coordinate type once the new header keyword is added.
+   *                           
    */
   class ControlNetVersioner {
 
@@ -423,6 +435,8 @@ namespace Isis {
       QString lastModificationDate() const;
       QString description() const;
       QString userName() const;
+      bool hasTargetRadii() const;
+      std::vector<Distance> targetRadii() const;
 
       int numPoints() const;
       ControlPoint *takeFirstPoint();
@@ -477,12 +491,9 @@ namespace Isis {
          * The equatorial radius of the target body
          * used to convert from spherical to rectangular coordinates
          */
-        Distance equatorialRadius;
-        /**
-         * The equatorial radius of the target body
-         * used to convert from spherical to rectangular coordinates
-         */
-        Distance polarRadius;
+
+         std::vector<Distance> targetRadii;
+
       };
 
       //! Typedef for consistent naming of containers for version 2

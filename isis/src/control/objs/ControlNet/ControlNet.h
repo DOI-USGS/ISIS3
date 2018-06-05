@@ -217,7 +217,11 @@ namespace Isis {
    *   @history 2017-01-19 Jesse Mapel - Added a method to get all of the valid measures in an
    *                           image. Previously, this had to be done throug the graph.
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
-   *                           adds to the control network. 
+   *                           adds to the control network.
+   *   @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
+   *                           group to set radii values to those ingested from the versioner
+   *                           if they exist. Otherwise, we call SetTarget with the targetname.
+   *                           Fixes #5361.
    */
   class ControlNet : public QObject {
       Q_OBJECT
