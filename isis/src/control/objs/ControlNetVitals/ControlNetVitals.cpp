@@ -62,7 +62,7 @@ namespace Isis {
   }
 
   // REFACTOR
-  int ControlNetVitals::numConstraintedPoints() {
+  int ControlNetVitals::numConstrainedPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetPointTypeString() == "Constrained") count++;
@@ -209,23 +209,23 @@ namespace Isis {
     QString details = "";
     if (hasIslands()) {
       status = "Broken!";
-      details = "This network has " + toString(numIslands()) + " islands.";
+      details = "This network has " + toString(numIslands()) + " island(s).";
     }
     else {
 
       if (numPointsBelowMeasureThreshold() < 3) {
         status = "Weak!";
-        details += "This network has " + toString(numPointsBelowMeasureThreshold()) + " points with less than 3 measures\n";
+        details += "This network has " + toString(numPointsBelowMeasureThreshold()) + " point(s) with less than 3 measures\n";
       }
 
       if (numImagesBelowMeasureThreshold() < 3) {
         status = "Weak!";
-        details += "This network has " + toString(numImagesBelowMeasureThreshold()) + " images with less than 3 measures\n";
+        details += "This network has " + toString(numImagesBelowMeasureThreshold()) + " image(s) with less than 3 measures\n";
       }
 
       if (numImagesBelowHullTolerance() > 0) {
         status = "Weak!";
-        details += "This network has " + toString(numImagesBelowHullTolerance()) + " images below the Convex Hull Tolerance of 75%\n";
+        details += "This network has " + toString(numImagesBelowHullTolerance()) + " image(s) below the Convex Hull Tolerance of 75%\n";
       }
 
       if (status.isEmpty()) {

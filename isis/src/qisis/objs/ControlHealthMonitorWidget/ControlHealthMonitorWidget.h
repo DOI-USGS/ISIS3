@@ -1,5 +1,5 @@
-#ifndef ControlHealthMonitor_h
-#define ControlHealthMonitor_h
+#ifndef ControlHealthMonitorWidget_h
+#define ControlHealthMonitorWidget_h
 /**
  * @file
  * $Date$
@@ -23,9 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
- #include "AbstractProjectItemView.h"
 #include <QLabel>
 #include <QTableWidget>
+#include <QChartView>
 #include <QProgressBar>
 #include <QPointer>
 #include <ControlNetVitals.h>
@@ -33,7 +33,7 @@
 
 
 namespace Isis {
-
+QT_CHARTS_USE_NAMESPACE
   /**
    * Interface that allows real-time evaluation of the state of a Control Network.
    *
@@ -42,22 +42,29 @@ namespace Isis {
    * @internal
    *   @history 2018-05-28 Adam Goins - Initial Creation.
    */
-  class ControlHealthMonitor : public QWidget {
+  class ControlHealthMonitorWidget : public QWidget {
 
 
     Q_OBJECT
 
     public:
-      ControlHealthMonitor(ControlNetVitals *vitals, QWidget *parent=0);
-      ~ControlHealthMonitor();
+      ControlHealthMonitorWidget(ControlNetVitals *vitals, QWidget *parent=0);
+      ~ControlHealthMonitorWidget();
       void createGui();
       QWidget* createImagesTab();
       QWidget* createPointsTab();
       QWidget* createOverviewTab();
+      QWidget* createGraphTab();
+      void setVitals(ControlNetVitals *vitals) 
       void initializeEverything();
 
     public slots:
       void viewPointAll();
+      void viewPointFree();
+
+      void viewPointFixed();
+      void viewPointConstrained();
+
       void viewPointIgnored();
       void viewPointEditLocked();
       void viewPointFewMeasures();
@@ -77,6 +84,8 @@ namespace Isis {
         void updateImageTable(QList<QString> serials);
         void updatePointTable(QList<ControlPoint*> points);
 
+        QChartView *m_pointChartView;
+
         ControlNetVitals *m_vitals;
 
         QProgressBar *m_statusBar;
@@ -86,6 +95,7 @@ namespace Isis {
         QLabel *m_numPointsLabel;
         QLabel *m_numMeasuresLabel;
         QLabel *m_lastModLabel;
+        QLabel *m_netLabel;
 
         QLabel *m_imagesMeasuresValue;
         QLabel *m_imagesHullValue;
@@ -97,6 +107,9 @@ namespace Isis {
         QLabel *m_pointsEditLockedLabel;
         QLabel *m_pointsFewMeasuresLabel;
         QLabel *m_pointsShowingLabel;
+        QLabel *m_pointsFixedLabel;
+        QLabel *m_pointsFreeLabel;
+        QLabel *m_pointsConstrainedLabel;
 
         QTableWidget *m_historyTable;
         QTableWidget *m_imagesTable;

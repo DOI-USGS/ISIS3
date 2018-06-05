@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
     // Create a widget
     ControlNet *net = new ControlNet();
-    net->ReadControl("simplenet.net");
+    net->ReadControl("/work/projects/progteam/fy18_cnetimprovements/test_data/themis/Themis_SyrtisMajor_Memnonia_Final.net");
     ControlNetVitals *vitals = new ControlNetVitals(net);
     ControlHealthMonitor *w = new ControlHealthMonitor(vitals);
     w->show();

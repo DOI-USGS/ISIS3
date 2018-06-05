@@ -20,7 +20,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "ControlHealthMonitor.h"
+#include "ControlHealthMonitorWidget.h"
 
 
 #include "ControlNet.h"
@@ -46,19 +46,23 @@
 #include <QGridLayout>
 #include <QWidgetAction>
 #include <QMenu>
-
+#include <QChart>
+#include <QChartView>
+#include <QPieSeries>
+#include <QPieSlice>
 #include <ControlNet.h>
 #include <ControlNetVitals.h>
 #include <ControlPoint.h>
 
 
 namespace Isis {
+  QT_CHARTS_USE_NAMESPACE
   /**
    * Explanation
    *
    * @param parent (QWidget *) Pointer to parent widget
    */
-  ControlHealthMonitor::ControlHealthMonitor(ControlNetVitals *vitals, QWidget *parent) : QWidget(parent) {
+  ControlHealthMonitorWidget::ControlHealthMonitorWidget(ControlNetVitals *vitals, QWidget *parent) : QWidget(parent) {
     createGui();
     m_vitals = vitals;
 
@@ -67,7 +71,18 @@ namespace Isis {
     update();
   }
 
-  void ControlHealthMonitor::initializeEverything() {
+  void ControlHealthMonitorWidget::setVitals(ControlNetVitals *vitals) {
+    delete m_vitals;
+    m_vitals = vitals;
+    connect (m_vitals, SIGNAL(networkChanged()),
+             this, SLOT(update()));
+  }
+
+  void ControlHealthMonitorWidget::initializeEverything() {
+    m_pointsFixedLabel       = NULL;
+    m_pointsFreeLabel        = NULL;
+    m_pointsConstrainedLabel = NULL;
+    m_pointChartView         = NULL;
     m_vitals                 = NULL;
     m_statusBar              = NULL;
     m_sizeLabel              = NULL;
@@ -91,7 +106,7 @@ namespace Isis {
     activePointsList         = NULL;
   }
 
-  void ControlHealthMonitor::createGui() {
+  void ControlHealthMonitorWidget::createGui() {
     initializeEverything();
     setWindowTitle("Control Net Health Monitor");
     resize(725, 1100);
@@ -112,29 +127,15 @@ namespace Isis {
     QHBoxLayout *netLayout = new QHBoxLayout;
     netLayout->setAlignment(Qt::AlignLeft);
 
-    QLabel *netLabel = new QLabel("Control Network:");
+    m_netLabel = new QLabel("Control Network:");
     QFont font2("Arial", 14);
-    netLabel->setFont(font2);
-    netLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    m_netLabel->setFont(font2);
+    m_netLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     gridLayout->addWidget(titleLabel);
 
     QFont searchFont("Seqoe UI Symbol", 12);
 
-    QMenu *menu = new QMenu("CaSSIS_01.net");
-    QAction *action = new QAction("CaSSIS_02.net", menu);
-    QAction *action2 = new QAction("CaSSIS_03.net", menu);
-    QAction *action3 = new QAction("CaSSIS_04.net", menu);
-
-    menu->addAction(action);
-    menu->addAction(action2);
-    menu->addAction(action3);
-
-    QPushButton *menuButton = new QPushButton("CaSSIS_01.net");
-    menuButton->setFont(font2);
-    menuButton->setMenu(menu);
-
-    netLayout->addWidget(netLabel);
-    netLayout->addWidget(menuButton);
+    netLayout->addWidget(m_netLabel);
     netWidget->setLayout(netLayout);
 
     gridLayout->addWidget(netWidget);
@@ -185,28 +186,41 @@ namespace Isis {
     QWidget *overviewTab = createOverviewTab();
     QWidget *imagesTab = createImagesTab();
     QWidget *pointsTab = createPointsTab();
+    QWidget *graphTab = createGraphTab();
 
     tabs->insertTab(0, overviewTab, "Overview");
     tabs->insertTab(1, imagesTab, "Images");
     tabs->insertTab(2, pointsTab, "Points");
-
+    tabs->insertTab(3, graphTab, "Graph");
     gridLayout->addWidget(tabs);
 
-    QPushButton *broken = new QPushButton("Broken");
-    connect (broken, SIGNAL(clicked()), this, SLOT(breakNet()));
-    QPushButton *weak = new QPushButton("Weak");
-    connect (weak, SIGNAL(clicked()), this, SLOT(weak()));
-
-    QPushButton *healthy = new QPushButton("Healthy");
-    connect (healthy, SIGNAL(clicked()), this, SLOT(healthy()));
-
-    gridLayout->addWidget(broken);
-    gridLayout->addWidget(weak);
-    gridLayout->addWidget(healthy);
 
   }
 
-  QWidget* ControlHealthMonitor::createOverviewTab() {
+  QWidget* ControlHealthMonitorWidget::createGraphTab() {
+    QWidget *graph = new QWidget();
+
+    QVBoxLayout *graphLayout = new QVBoxLayout;
+    graphLayout->setAlignment(Qt::AlignTop);
+    graphLayout->setSpacing(5);
+
+    m_pointChartView = new QChartView;
+    m_pointChartView->resize(200, 200);
+    m_pointChartView->setRenderHint(QPainter::Antialiasing);
+
+    QChart *chart = new QChart();
+    chart->setTitle("Point Breakdown");
+    chart->setTheme(QChart::ChartThemeBlueCerulean);
+    chart->legend()->setAlignment(Qt::AlignRight);
+    m_pointChartView->setChart(chart);
+    graphLayout->addWidget(m_pointChartView);
+
+    graph->setLayout(graphLayout);
+    return graph;
+
+  }
+
+  QWidget* ControlHealthMonitorWidget::createOverviewTab() {
     QWidget *overview = new QWidget();
 
     QVBoxLayout *overviewLayout = new QVBoxLayout;
@@ -230,6 +244,30 @@ namespace Isis {
     overviewLayout->addWidget(m_statusLabel);
     overviewLayout->addWidget(m_statusDetails);
     overviewLayout->addSpacing(50);
+
+
+    QPushButton *health = new QPushButton("Healthy");
+    QPushButton *weak   = new QPushButton("Weak");
+    QPushButton *broken = new QPushButton("Broken");
+
+    connect (health, SIGNAL(clicked()),
+            this, SLOT(healthy()));
+    connect (weak, SIGNAL(clicked()),
+            this, SLOT(weak()));
+    connect (broken, SIGNAL(clicked()),
+            this, SLOT(breakNet()));
+
+    QHBoxLayout *temp = new QHBoxLayout;
+    temp->setSpacing(15);
+    temp->addWidget(health);
+    temp->addWidget(weak);
+    temp->addWidget(broken);
+
+    QWidget *temp2 = new QWidget;
+    temp2->setLayout(temp);
+
+    overviewLayout->addWidget(temp2);
+
     QLabel *modLabel = new QLabel("Modification History");
     modLabel->setFont(font5);
     overviewLayout->addWidget(modLabel);
@@ -242,6 +280,8 @@ namespace Isis {
     m_historyTable = new QTableWidget();
     m_historyTable->setColumnCount(3);
     m_historyTable->setHorizontalHeaderLabels(headers);
+    m_historyTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
     m_historyTable->horizontalHeader()->setStretchLastSection(true);
     m_historyTable->verticalHeader()->setVisible(false);
     m_historyTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -268,15 +308,20 @@ namespace Isis {
     return overview;
   }
 
-  void ControlHealthMonitor::update() {
+  void ControlHealthMonitorWidget::update() {
     m_numImagesLabel->setText("Images:  " + toString(m_vitals->numImages()));
     m_numPointsLabel->setText("Points " + toString(m_vitals->numPoints()));
     m_numMeasuresLabel->setText("Measures: " + toString(m_vitals->numMeasures()));
+    m_netLabel->setText("Control Network: " + m_vitals->getNetworkId());
     m_statusLabel->setText(m_vitals->getStatus());
     m_statusDetails->setText(m_vitals->getStatusDetails());
     m_imagesMeasuresValue->setText(toString(m_vitals->numImagesBelowMeasureThreshold()));
     m_imagesHullValue->setText(toString(m_vitals->numImagesBelowHullTolerance()));
     m_pointsIgnoredLabel->setText(toString(m_vitals->numIgnoredPoints()));
+    m_pointsFreeLabel->setText(toString(m_vitals->numFreePoints()));
+    m_pointsFixedLabel->setText(toString(m_vitals->numFixedPoints()));
+    m_pointsConstrainedLabel->setText(toString(m_vitals->numConstrainedPoints()));
+
     m_pointsEditLockedLabel->setText(toString(m_vitals->numLockedPoints()));
     m_pointsFewMeasuresLabel->setText(toString(m_vitals->numPointsBelowMeasureThreshold()));
     viewImageAll();
@@ -285,9 +330,36 @@ namespace Isis {
     if (m_vitals->getStatus() == "Broken!") updateStatus(0);
     else if (m_vitals->getStatus() == "Weak!") updateStatus(1);
     else if(m_vitals->getStatus() == "Healthy!") updateStatus(2);
+
+    QPieSeries *series = new QPieSeries();
+  series->append("Ignored", m_vitals->numIgnoredPoints());
+  series->append("Locked", m_vitals->numLockedPoints());
+  series->append("Free", m_vitals->numFreePoints());
+  series->append("Constrained", m_vitals->numConstrainedPoints());
+  series->append("Fixed", m_vitals->numFixedPoints());
+  foreach (QPieSlice *slice, series->slices()) {
+
+    // slice->setExploded();
+    // slice->setPen(QPen(Qt::darkGreen, 2));
+    double percent = slice->percentage() * 100;
+    percent = ( (int) (percent * 100) ) / 100.0;
+    // std::cout << percent / 100.0 << std::endl;
+
+    QString label = slice->label() + " " + toString(percent) + "%";
+
+    if (percent > 0.0) {
+      slice->setLabelVisible();
+    }
+    slice->setLabel(label);
+    // slice->setBrush(Qt::green);
   }
 
-  void ControlHealthMonitor::updateImageTable(QList<QString> serials) {
+  m_pointChartView->chart()->removeAllSeries();
+  m_pointChartView->chart()->addSeries(series);
+
+  }
+
+  void ControlHealthMonitorWidget::updateImageTable(QList<QString> serials) {
     m_imagesTable->setRowCount(0);
     for (int i = 0; i < serials.size(); i++) {
       m_imagesTable->insertRow(i);
@@ -296,7 +368,7 @@ namespace Isis {
     }
   }
 
-  void ControlHealthMonitor::updatePointTable(QList<ControlPoint*> points) {
+  void ControlHealthMonitorWidget::updatePointTable(QList<ControlPoint*> points) {
     m_pointsTable->setRowCount(0);
     for (int i = 0; i < points.size(); i++) {
       ControlPoint *point = points.at(i);
@@ -310,7 +382,7 @@ namespace Isis {
     }
   }
 
-  QWidget* ControlHealthMonitor::createPointsTab() {
+  QWidget* ControlHealthMonitorWidget::createPointsTab() {
     QFont font5("Arial", 12);
     QFont searchFont("Seqoe UI Symbol", 12);
 
@@ -330,10 +402,6 @@ namespace Isis {
      pointsIgnored->setFont(font5);
      m_pointsIgnoredLabel->setFont(font5);
 
-     viewLayout->addWidget(pointsIgnored, 0, 0);
-     viewLayout->addWidget(m_pointsIgnoredLabel, 0, 1);
-     viewLayout->addWidget(viewIgnoredButton, 0, 2);
-
      QLabel *pointsLocked = new QLabel("Points Edit Locked:");
      m_pointsEditLockedLabel  = new QLabel("0");
      QPushButton *viewLockedButton = new QPushButton("View");
@@ -342,9 +410,6 @@ namespace Isis {
      pointsLocked->setFont(font5);
      m_pointsEditLockedLabel->setFont(font5);
 
-     viewLayout->addWidget(pointsLocked, 1, 0);
-     viewLayout->addWidget(m_pointsEditLockedLabel, 1, 1);
-     viewLayout->addWidget(viewLockedButton, 1, 2);
 
      QLabel *pointsMeasure = new QLabel("Less than 3 valid Measures:");
      m_pointsFewMeasuresLabel  = new QLabel("0");
@@ -355,16 +420,65 @@ namespace Isis {
      connect(viewMeasureButton, SIGNAL(clicked()),
              this, SLOT(viewPointFewMeasures()));
 
-     viewLayout->addWidget(pointsMeasure);
-     viewLayout->addWidget(m_pointsFewMeasuresLabel);
-     viewLayout->addWidget(viewMeasureButton);
+     QLabel *freePoints = new QLabel("Points Free:");
+     m_pointsFreeLabel  = new QLabel("0");
+     freePoints->setFont(font5);
+     m_pointsFreeLabel->setFont(font5);
+
+     QPushButton *viewFreePoints = new QPushButton("View");
+     connect(viewFreePoints, SIGNAL(clicked()),
+             this, SLOT(viewPointFree()));
+
+     QLabel *fixedPoints = new QLabel("Points Fixed:");
+     m_pointsFixedLabel  = new QLabel("0");
+     fixedPoints->setFont(font5);
+     m_pointsFixedLabel->setFont(font5);
+
+     QPushButton *viewFixedPoints = new QPushButton("View");
+     connect(viewFixedPoints, SIGNAL(clicked()),
+             this, SLOT(viewPointFixed()));
+
+
+     QLabel *constrainedPoints = new QLabel("Points Constrained:");
+     m_pointsConstrainedLabel  = new QLabel("0");
+     constrainedPoints->setFont(font5);
+     m_pointsConstrainedLabel->setFont(font5);
+
+     QPushButton *viewConstrainedPoints = new QPushButton("View");
+     connect(viewConstrainedPoints, SIGNAL(clicked()),
+             this, SLOT(viewPointConstrained()));
+
+
+     viewLayout->addWidget(freePoints, 0, 0);
+     viewLayout->addWidget(m_pointsFreeLabel, 0, 1);
+     viewLayout->addWidget(viewFreePoints, 0, 2);
+
+     viewLayout->addWidget(fixedPoints, 1, 0);
+     viewLayout->addWidget(m_pointsFixedLabel, 1, 1);
+     viewLayout->addWidget(viewFixedPoints, 1, 2);
+
+     viewLayout->addWidget(constrainedPoints, 2, 0);
+     viewLayout->addWidget(m_pointsConstrainedLabel, 2, 1);
+     viewLayout->addWidget(viewConstrainedPoints, 2, 2);
+
+     viewLayout->addWidget(pointsIgnored, 3, 0);
+     viewLayout->addWidget(m_pointsIgnoredLabel, 3, 1);
+     viewLayout->addWidget(viewIgnoredButton, 3, 2);
+
+
+     viewLayout->addWidget(pointsLocked, 4, 0);
+     viewLayout->addWidget(m_pointsEditLockedLabel, 4, 1);
+     viewLayout->addWidget(viewLockedButton, 4, 2);
+
+     viewLayout->addWidget(pointsMeasure, 5, 0);
+     viewLayout->addWidget(m_pointsFewMeasuresLabel, 5, 1);
+     viewLayout->addWidget(viewMeasureButton, 5, 2);
 
      viewWidget->setLayout(viewLayout);
 
      pointsLayout->addWidget(viewWidget);
 
      m_pointsTable = new QTableWidget();
-     m_pointsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
      QStringList headers3;
      headers3.append("#");
      headers3.append("Point ID");
@@ -382,8 +496,7 @@ namespace Isis {
      m_pointsTable->setSelectionMode(QAbstractItemView::SingleSelection);
      m_pointsTable->setShowGrid(true);
      m_pointsTable->setGeometry(QApplication::desktop()->screenGeometry());
-     m_pointsTable->setColumnWidth(0, 100);
-     m_pointsTable->setColumnWidth(1, 400);
+     m_pointsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
      pointsLayout->addSpacing(30);
 
@@ -401,15 +514,14 @@ namespace Isis {
 
      pointsLayout->addWidget(m_pointsTable);
 
-     // ADD PIE GRAPH FOR FREE / CONSTRAINED / FIXED POINTS
-     // QChart *chart = new QChart();
+
 
    pointsTab->setLayout(pointsLayout);
    return pointsTab;
 
   }
 
-  QWidget* ControlHealthMonitor::createImagesTab() {
+  QWidget* ControlHealthMonitorWidget::createImagesTab() {
 
     QWidget *imagesTab = new QWidget(this);
     QVBoxLayout *imagesLayout = new QVBoxLayout;
@@ -472,9 +584,6 @@ namespace Isis {
     m_imagesTable->setShowGrid(true);
     m_imagesTable->setGeometry(QApplication::desktop()->screenGeometry());
 
-    m_imagesTable->setColumnWidth(0, 100);
-    m_imagesTable->setColumnWidth(1, 400);
-
     imagesLayout->addSpacing(30);
 
     QLineEdit *searchField = new QLineEdit;
@@ -495,21 +604,42 @@ namespace Isis {
     return imagesTab;
   }
 
-  void ControlHealthMonitor::viewPointAll() {
+  void ControlHealthMonitorWidget::viewPointAll() {
     updatePointTable(m_vitals->getAllPoints());
     m_pointsShowingLabel->setText("Showing: All Points <sup>" +
                                   toString(m_vitals->numPoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
-  void ControlHealthMonitor::viewPointIgnored() {
+  void ControlHealthMonitorWidget::viewPointIgnored() {
     updatePointTable(m_vitals->getIgnoredPoints());
     m_pointsShowingLabel->setText("Showing: Ignored Points <sup>" +
                                   toString(m_vitals->numIgnoredPoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
-  void ControlHealthMonitor::viewPointEditLocked() {
+  void ControlHealthMonitorWidget::viewPointFree() {
+    updatePointTable(m_vitals->getFreePoints());
+    m_pointsShowingLabel->setText("Showing: Free Points <sup>" +
+                                  toString(m_vitals->numFreePoints()) +
+                                  " / " + toString(m_vitals->numPoints()) + "</sup>");
+  }
+
+  void ControlHealthMonitorWidget::viewPointFixed() {
+    updatePointTable(m_vitals->getFixedPoints());
+    m_pointsShowingLabel->setText("Showing: Fixed Points <sup>" +
+                                  toString(m_vitals->numFixedPoints()) +
+                                  " / " + toString(m_vitals->numPoints()) + "</sup>");
+  }
+
+  void ControlHealthMonitorWidget::viewPointConstrained() {
+    updatePointTable(m_vitals->getConstrainedPoints());
+    m_pointsShowingLabel->setText("Showing: Constrained Points <sup>" +
+                                  toString(m_vitals->numConstrainedPoints()) +
+                                  " / " + toString(m_vitals->numPoints()) + "</sup>");
+  }
+
+  void ControlHealthMonitorWidget::viewPointEditLocked() {
     updatePointTable(m_vitals->getLockedPoints());
     m_pointsShowingLabel->setText("Showing: Locked Points <sup>" +
                                   toString(m_vitals->numLockedPoints()) +
@@ -517,28 +647,28 @@ namespace Isis {
 
   }
 
-  void ControlHealthMonitor::viewPointFewMeasures() {
+  void ControlHealthMonitorWidget::viewPointFewMeasures() {
     updatePointTable(m_vitals->getPointsBelowMeasureThreshold());
     m_pointsShowingLabel->setText("Showing: Points with less than 3 Measures <sup>" +
                                   toString(m_vitals->numPointsBelowMeasureThreshold()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
-  void ControlHealthMonitor::viewImageAll() {
+  void ControlHealthMonitorWidget::viewImageAll() {
     updateImageTable(m_vitals->getAllImageSerials());
     m_imagesShowingLabel->setText("Showing: All Images <sup>" +
                                   toString(m_vitals->numImages()) +
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
 
-  void ControlHealthMonitor::viewImageFewMeasures() {
+  void ControlHealthMonitorWidget::viewImageFewMeasures() {
     updateImageTable(m_vitals->getImagesBelowMeasureThreshold());
     m_imagesShowingLabel->setText("Showing: Images with less than 3 Measures <sup>" +
                                   toString(m_vitals->numImagesBelowMeasureThreshold()) +
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
 
-  void ControlHealthMonitor::viewImageHullTolerance() {
+  void ControlHealthMonitorWidget::viewImageHullTolerance() {
     updateImageTable(m_vitals->getImagesBelowHullTolerance());
     m_imagesShowingLabel->setText("Showing: Images below a hull tolerance of 75% <sup>" +
                                   toString(m_vitals->numImagesBelowHullTolerance()) +
@@ -549,7 +679,7 @@ namespace Isis {
   /**
    * Destructor
    */
-  ControlHealthMonitor::~ControlHealthMonitor() {
+  ControlHealthMonitorWidget::~ControlHealthMonitorWidget() {
     // delete m_sizeLabel;
     // delete m_numImagesLabel;
     // delete m_numPointsLabel;
@@ -610,17 +740,36 @@ namespace Isis {
 
   }
 
-  void ControlHealthMonitor::breakNet() {
-    this->updateStatus(0);
-  }
-  void ControlHealthMonitor::weak() {
-    this->updateStatus(1);
-  }
-  void ControlHealthMonitor::healthy() {
-    this->updateStatus(2);
+  void ControlHealthMonitorWidget::breakNet() {
+
+    QPalette p = m_statusBar->palette();
+    m_statusLabel->setText("Broken!");
+    m_statusDetails->setText("This Control Network has " + toString(m_vitals->numIslands()) + " island(s).");
+    p.setColor(QPalette::Highlight, Qt::red);
+    p.setColor(QPalette::Text, Qt::black);
+    m_statusBar->setPalette(p);
+
   }
 
-  void ControlHealthMonitor::updateStatus(int code) {
+  void ControlHealthMonitorWidget::weak() {
+    QPalette p = m_statusBar->palette();
+    m_statusLabel->setText("Weak!");
+    m_statusDetails->setText("This Control Network has " + toString(m_vitals->numPointsBelowMeasureThreshold()) + " point(s) with less than 3 valid measures.");
+    p.setColor(QPalette::Highlight, Qt::yellow);
+    p.setColor(QPalette::Text, Qt::black);
+    m_statusBar->setPalette(p);
+  }
+
+  void ControlHealthMonitorWidget::healthy() {
+    QPalette p = m_statusBar->palette();
+    m_statusLabel->setText("Healthy!");
+    m_statusDetails->setText("This Control Network is Healthy.");
+    p.setColor(QPalette::Highlight, Qt::green);
+    p.setColor(QPalette::Text, Qt::white);
+    m_statusBar->setPalette(p);
+  }
+
+  void ControlHealthMonitorWidget::updateStatus(int code) {
     QPalette p = m_statusBar->palette();
     switch(code) {
       case 0:
