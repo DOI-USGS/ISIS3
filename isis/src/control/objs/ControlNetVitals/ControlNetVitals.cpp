@@ -28,11 +28,13 @@ namespace Isis {
     return 1;
   }
 
-  QList<QString> ControlNetVitals::getIslands() {
+  QList< QList<QString> > ControlNetVitals::getIslands() {
     // TEMP, replace with graph
     QList<QString> list;
     list.append("CASSIS_01.cub");
-    return list;
+    QList< QList<QString> > outerList;
+    outerList.append(list);
+    return outerList;
   }
 
   int ControlNetVitals::numPoints() {
@@ -43,7 +45,9 @@ namespace Isis {
   int ControlNetVitals::numIgnoredPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->IsIgnored()) count++;
+      if (point->IsIgnored()) {
+        count++;
+      }
     }
     return count;
   }
@@ -56,7 +60,9 @@ namespace Isis {
   int ControlNetVitals::numFixedPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetPointTypeString() == "Fixed") count++;
+      if (point->GetType() == ControlPoint::Fixed) {
+        count++;
+      }
     }
     return count;
   }
@@ -65,7 +71,9 @@ namespace Isis {
   int ControlNetVitals::numConstrainedPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetPointTypeString() == "Constrained") count++;
+      if (point->GetType() == ControlPoint::Constrained) {
+        count++;
+      }
     }
     return count;
   }
@@ -74,7 +82,9 @@ namespace Isis {
   int ControlNetVitals::numFreePoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetPointTypeString() == "Free") count++;
+      if (point->GetType() == ControlPoint::Free) {
+        count++;
+      }
     }
     return count;
   }
@@ -83,7 +93,9 @@ namespace Isis {
   int ControlNetVitals::numPointsBelowMeasureThreshold(int num) {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetNumMeasures() < num) count++;
+      if (point->GetNumMeasures() < num) {
+        count++;
+      }
     }
     return count;
   }
@@ -100,7 +112,9 @@ namespace Isis {
   int ControlNetVitals::numImagesBelowMeasureThreshold(int num) {
     int count = 0;
     foreach(QString serial, m_controlNet->GetCubeSerials()) {
-      if (m_controlNet->GetMeasuresInCube(serial).size() < num) count++;
+      if (m_controlNet->GetMeasuresInCube(serial).size() < num) {
+        count++;
+      }
     }
     return count;
   }
@@ -137,7 +151,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getFixedPoints() {
     QList<ControlPoint*> fixedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetPointTypeString() == "Fixed") fixedPoints.append(point);
+      if (point->GetType() == ControlPoint::Fixed) fixedPoints.append(point);
     }
     return fixedPoints;
   }
@@ -145,7 +159,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getConstrainedPoints() {
     QList<ControlPoint*> constrainedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetPointTypeString() == "Constrained") constrainedPoints.append(point);
+      if (point->GetType() == ControlPoint::Constrained) constrainedPoints.append(point);
     }
     return constrainedPoints;
   }
@@ -153,7 +167,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getFreePoints() {
     QList<ControlPoint*> freePoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetPointTypeString() == "Free") freePoints.append(point);
+      if (point->GetType() == ControlPoint::Free) freePoints.append(point);
     }
     return freePoints;
   }
