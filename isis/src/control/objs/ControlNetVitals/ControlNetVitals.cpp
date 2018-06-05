@@ -68,7 +68,7 @@ namespace Isis {
   }
 
   // REFACTOR
-  int ControlNetVitals::numConstraintedPoints() {
+  int ControlNetVitals::numConstrainedPoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
       if (point->GetType() == ControlPoint::Constrained) {
@@ -82,7 +82,7 @@ namespace Isis {
   int ControlNetVitals::numFreePoints() {
     int count = 0;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Constrained) {
+      if (point->GetType() == ControlPoint::Free) {
         count++;
       }
     }

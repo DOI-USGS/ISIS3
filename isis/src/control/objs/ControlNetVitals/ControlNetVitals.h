@@ -59,7 +59,7 @@ namespace Isis {
       int numIgnoredPoints();
       int numLockedPoints();
       int numFixedPoints();
-      int numConstraintedPoints();
+      int numConstrainedPoints();
       int numFreePoints();
       int numPointsBelowMeasureThreshold(int num=3);
 
