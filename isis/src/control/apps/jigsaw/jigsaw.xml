@@ -252,6 +252,11 @@
     <change name="Summer Stapleton" date="2017-08-09">
       Fixed bug where an invalid control net was not throwing exception. Fixes #5068.
     </change>
+    <change name="Ken Edmundson" date="2018-05-23">
+      Modifed call to bundleAdjustment->solveCholeskyBR() to return a raw pointer to a
+      BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
+      ownership from BundleAdjust.
+    </change>
   </history>
 
   <groups>

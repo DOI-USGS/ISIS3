@@ -5,19 +5,23 @@
 #include "AlphaCube.h"
 #include "Cube.h"
 #include "FileName.h"
+#include "IException.h"
+#include "iTime.h"
 #include "LineManager.h"
 #include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProcessImport.h"
 #include "UserInterface.h"
 #include "XmlToPvlTranslationManager.h"
-#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
 
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
-void translateLabels(FileName &inputLabel, Cube *outputCube);
+void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer);
+bool translateMappingLabel(FileName inputLabel, Cube *outputCube);
+bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
+void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
 
 void IsisMain() {
 
@@ -27,11 +31,46 @@ void IsisMain() {
   try {
     ProcessImport importer;
     translateCoreInfo(xmlFileName, importer);
-    // can we get this name from the input label???
-    importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    
+    if(xmlFileName.removeExtension().addExtension("dat").fileExists()){
+      importer.SetInputFile(xmlFileName.removeExtension().addExtension("dat").expanded());
+    } 
+    else if (xmlFileName.removeExtension().addExtension("img").fileExists()) {
+      importer.SetInputFile(xmlFileName.removeExtension().addExtension("img").expanded());
+    }
+    else {
+      QString msg = "Cannot find image file for [" + xmlFileName.name() + "]. Confirm that the "
+        ".dat or .img file for this XML exists and is located in the same directory.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    
     Cube *outputCube = importer.SetOutputCube("TO");
-    // fails above
-    translateLabels(xmlFileName, outputCube);
+
+    QString transRawFile = "/translations/tgoCassisInstrument.trn";
+    QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
+
+    try {
+      translateLabels(xmlFileName, outputCube, transRawFile); 
+    } 
+    catch (IException &e) {
+      if (translateMappingLabel(xmlFileName, outputCube)) {
+        if (!translateMosaicLabel(xmlFileName, outputCube)) {
+          translateLabels(xmlFileName, outputCube, transExportFile);
+        }
+        else {
+          Pvl *outputLabel = outputCube->label();
+          if(outputLabel->hasGroup("Instrument")) {
+            outputLabel->deleteGroup("Instrument"); 
+          }
+          if(outputLabel->hasGroup("Archive")) {
+            outputLabel->deleteGroup("Archive"); 
+          }
+        }
+      }
+      else {
+        translateLabels(xmlFileName, outputCube, transExportFile);
+      }
+    }
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
 
@@ -72,12 +111,31 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   QString missionDir = (QString) dataDir["Tgo"];
 
   // Get the translation manager ready
-  missionDir = ".";
-  FileName transFile(missionDir + "/translations/tgoCassis.trn");
-  XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+  FileName transFile; 
+  try {
+    transFile = FileName(missionDir + "/translations/tgoCassis.trn"); 
+    XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+    translateCoreInfo(labelXlater, importer);
+  } 
+  catch (IException &e) {
+   // if exported, use this!
+   transFile = FileName(missionDir + "/translations/tgoCassisExported.trn"); 
+   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+   translateCoreInfo(labelXlater, importer);
+  }
+}
 
-  QString str;
+/**
+ * Translate core info from labels and set ProcessImport object with 
+ * these values.
+ *
+ * @param labelXlater Reference to the XmlToPvlTranslationManager objcet to use for the translation.
+ * @param importer Reference to the ProcessImport object to which core info will
+ *                 be set.
+ */
+void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer) {
   // Set up the ProcessImport
+  QString str;
   str = labelXlater.Translate("CoreSamples");
   int ns = toInt(str);
   str = labelXlater.Translate("CoreLines");
@@ -86,7 +144,7 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   int nb = toInt(str);
   importer.SetDimensions(ns, nl, nb);
 
-  str = labelXlater.Translate("CoreType");    
+  str = labelXlater.Translate("CoreType");
   importer.SetPixelType(PixelTypeEnumeration(str));
 
   str = labelXlater.Translate("CoreByteOrder");    
@@ -102,6 +160,116 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
 
 
 /**
+ * Translate the cartographic info from the xml.
+ * 
+ * @param xmlFileName The xml label file name for the input image.
+ * @param outputCube Pointer to output cube where ISIS3 labels will be added and 
+ *                   updated.
+ */
+bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
+  //Translate the Mapping Group
+  try {
+    PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
+    QString missionDir = (QString) dataDir["Tgo"];
+    FileName mapTransFile(missionDir + "/translations/tgoCassisMapping.trn");
+
+    // Get the translation manager ready for translating the mapping label
+
+    XmlToPvlTranslationManager labelXMappinglater(xmlFileName, mapTransFile.expanded());
+
+    // Pvl output label
+    Pvl *outputLabel = outputCube->label();
+    labelXMappinglater.Auto(*(outputLabel));
+  }
+  catch (IException &e) {
+    Pvl *outputLabel = outputCube->label();
+    if(outputLabel->hasGroup("Mapping")) {
+      outputLabel->deleteGroup("Mapping"); 
+    }
+    return false;
+  }
+  return true;
+}
+
+
+/**
+ * Translate the Mosaic group info from the xml.
+ * 
+ * @param xmlFileName The xml label file name for the input image.
+ * @param outputCube Pointer to output cube where ISIS3 labels will be added and 
+ *                   updated.
+ */
+bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
+  //Now retrieve the logical_identifier to see if this is a mosaic
+  QDomDocument xmlDoc;
+    
+  QFile xmlFile(xmlFileName.expanded());
+  if ( !xmlFile.open(QIODevice::ReadOnly) ) {
+    QString msg = "Could not open label file [" + xmlFileName.expanded() +
+                  "].";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+  QString errmsg;
+  int errline, errcol;
+  if ( !xmlDoc.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
+    xmlFile.close();
+    QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+        + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+        + "], message: " + errmsg;
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+  xmlFile.close();
+  
+  QDomElement inputParentElement = xmlDoc.documentElement();
+  if (!inputParentElement.isNull()) {
+    inputParentElement = inputParentElement.firstChildElement("Identification_Area");
+    if (!inputParentElement.isNull()) {
+      QDomElement logicalId = inputParentElement.firstChildElement("logical_identifier");
+      if (!logicalId.isNull()) {
+        QString logicalIdText = logicalId.text();
+        QStringList logicalIdStringList = logicalIdText.split(":");
+        if (logicalIdStringList.contains("data_mos")) {
+          try {
+            PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
+            QString missionDir = (QString) dataDir["Tgo"];
+            
+            FileName bandBinTransFile(missionDir + "/translations/tgoCassisBandBin.trn");
+            // Get the translation manager ready for translating the band bin label
+            XmlToPvlTranslationManager labelXBandBinlater(xmlFileName, bandBinTransFile.expanded());
+
+            // Pvl output label
+            Pvl *outputLabel = outputCube->label();
+            labelXBandBinlater.Auto(*(outputLabel));
+            
+            FileName mosaicTransFile(missionDir + "/translations/tgoCassisMosaic.trn");
+
+            // Get the translation manager ready for translating the mapping label
+            XmlToPvlTranslationManager labelXMosaiclater(xmlFileName, mosaicTransFile.expanded());
+
+            labelXMosaiclater.Auto(*(outputLabel));
+            return true;
+          }
+          catch (IException &e) {
+            Pvl *outputLabel = outputCube->label();
+            if(outputLabel->hasGroup("Mosaic")) {
+              outputLabel->deleteGroup("Mosaic"); 
+            }
+            if(outputLabel->hasGroup("BandBin")) {
+              outputLabel->deleteGroup("BandBin"); 
+            }
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
+
+/**
  * Translate instrument, bandbin, and archive info from xml label into ISIS3 
  * label and add kernels group. 
  *
@@ -113,11 +281,11 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
  *   @history 2017-01-20 Jeannie Backer - Original Version
  *   @history 2017-01-23 Kristin Berry - Added support for bandBin group and archive group
  */
-void translateLabels(FileName &inputLabel, Cube *outputCube) {
+void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFile) {
   // Get the directory where the Tgo translation tables are
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Tgo"];
-  FileName transFile(missionDir + "/translations/tgoCassisInstrument.trn");
+  FileName transFile(missionDir + instTransFile);
 
   // Get the translation manager ready for translating the instrument label
   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
@@ -155,9 +323,15 @@ void translateLabels(FileName &inputLabel, Cube *outputCube) {
   archiveXlater.Auto(*(outputLabel));
   subXlater.Auto(*(outputLabel));
 
-  // Create YearDoy keyword in Archive group
-  iTime stime(outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
-
+  // Remove trailing "Z" from PDS4 .xml (on re-ingestion) and create YearDoy keyword in Archive group
+  PvlKeyword *startTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"];
+  QString startTimeString = startTime[0];
+  if (QString::compare(startTimeString.at(startTimeString.size() - 1), "Z", Qt::CaseInsensitive) == 0){
+    startTimeString = startTimeString.left(startTimeString.length() - 1);
+    startTime->setValue(startTimeString);
+  }
+  iTime stime(startTimeString);
+  
   PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
                                                   
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));

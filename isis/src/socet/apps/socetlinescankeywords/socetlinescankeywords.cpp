@@ -42,7 +42,7 @@ void IsisMain() {
   // Use a regular Process
   Process p;
 
-  // Get user parameters and error check 
+  // Get user parameters and error check
   UserInterface &ui = Application::GetUserInterface();
   QString from = ui.GetFileName("FROM");
   QString to = FileName(ui.GetFileName("TO")).expanded();
@@ -140,14 +140,14 @@ void IsisMain() {
     QString msg = "Unsupported instrument: " + instrumentId;
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  
+
   int ikCode = cam->naifIkCode();
 
   // Get Focal Length.
   // NOTE:
   //   For MOC Wide Angle, cam->focal_length returns the focal length
   //      in pixels, so we must convert from pixels to mm using the PIXEL_SIZE
-  //      of 0.007 mm gotten from $ISIS3DATA/mgs/kernels/ik/moc20.ti.  (The  
+  //      of 0.007 mm gotten from $ISIS3DATA/mgs/kernels/ik/moc20.ti.  (The
   //      PIXEL_PITCH value gotten from cam->PixelPitch is 1.0 since the
   //      focal length used by ISIS in this case is in pixels)
   //      For reference: the MOC WA blue filter pixel size needs an adjustment
@@ -211,7 +211,7 @@ void IsisMain() {
   //       boresight is not at the detector center, but the boresight is at the
   //       center of a NOPROJ'ED MRO HIRISE image
 
-  // Get line/samp of boresight pixel in detector space (summing == 1) 
+  // Get line/samp of boresight pixel in detector space (summing == 1)
   focalMap->SetFocalPlane(0.0, 0.0);
   double detectorBoresightSample = focalMap->DetectorSample();
   double detectorBoresightLine = focalMap->DetectorLine();
@@ -266,14 +266,14 @@ void IsisMain() {
     //   intTime = exposureDuration * (double) dsum / 1000000.0;
 
   // Get along and cross scan pixel size for NA and WA sensors.
-  // NOTE:  
+  // NOTE:
   //     1) The MOC WA pixel size is gotten from moc20.ti and is 7 microns
   //         HRSC pixel size is from the Instrument Addendum file
   //     2) For others, cam->PixelPitch() returns the pixel pitch (size) in mm.
   double alongScanPxSize = 0.0;
   double crossScanPxSize = 0.0;
 //TO DO: UNCOMMENT THESE LINES ONCE MOC IS WORKING IN SS
-//  if (isMocWARed || isHRSC) { 
+//  if (isMocWARed || isHRSC) {
 //    alongScanPxSize = csum * 0.007;
 //    crossScanPxSize = dsum * 0.007;
 //  }
@@ -308,7 +308,7 @@ void IsisMain() {
 //TO DO: UNCOMMENT THIS LINE ONCE MOC and HRSC IS WORKING IN SS
 //  }
 
-  // Now that we have totalLines, totalSamples, alongScanPxSize and 
+  // Now that we have totalLines, totalSamples, alongScanPxSize and
   // crossScanPxSize, fill the Interior Orientation Coefficient arrays
   double ioCoefLine[10];
   double ioCoefSample[10];
@@ -376,7 +376,7 @@ void IsisMain() {
   sensorPosition[2] = cam->SpacecraftAltitude() * 1000.0;
 
   // Build the ephem data.  If the image label contains the InstrumentPosition
-  // table, use it as a guide for number and spacing of Ephem points. 
+  // table, use it as a guide for number and spacing of Ephem points.
   // Otherwise (i.e, for dejittered HiRISE images), the number and spacing of
   // ephem points based on hardcoded dtEphem value
 
@@ -486,7 +486,7 @@ void IsisMain() {
     }
 
   }
-  else { 
+  else {
     // Calculate the number of ephemeris points that are needed, based on the
     // value of dtEphem (Delta-Time-Ephemeris).  SOCET SET needs the ephemeris
     // points to exceed the image range for interpolation.  For now, attempt a
@@ -635,7 +635,7 @@ void IsisMain() {
     QList<double> quat;
     quaternions.append(quat << vec[0] << vec[1] << vec[2] << vec[3]);
   }
-  
+
   //update quaternions stats
   numQuaternions += 20;
 
@@ -645,7 +645,7 @@ void IsisMain() {
   //quadrtic time of the first quarternion
   double qt0Quat = et0Quat - etCenter;
 
-  //query remaing transformation parameters from Camera Classes  
+  //query remaing transformation parameters from Camera Classes
   //transformation to distortionless focal plane
   double zDirection = distortionMap->ZDirection();
 
@@ -655,7 +655,7 @@ void IsisMain() {
   // For instruments with less than 3 distortion coefficients, set the
   // unused ones to 0.0
   opticalDistCoefs.resize(3, 0);
-    
+
   //transformation from focal plane to detector
   const double *iTransS = focalMap->TransS();
   const double *iTransL = focalMap->TransL();
@@ -693,6 +693,27 @@ void IsisMain() {
   // This is the line scanner sensor model portion of support file:
   toStrm << "SENSOR_TYPE USGSAstroLineScanner" << endl;
   toStrm << "SENSOR_MODE UNKNOWN" << endl;
+
+  Distance targetRadii[3];
+  if (cube.label()->hasGroup("Mapping")) {
+    PvlGroup &mappingGroup = cube.label()->findGroup("Mapping");
+    targetRadii[0].setMeters(toDouble(mappingGroup["EquatorialRadius"][0]));
+    targetRadii[2].setMeters(toDouble(mappingGroup["PolarRadius"][0]));
+  }
+  else {
+    try {
+      cam->radii(targetRadii);
+    }
+    catch (IException &e) {
+      QString msg = "Failed to get target body radii from cube.";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
+  }
+  double eccentricity = 1.0 - (targetRadii[2].meters() * targetRadii[2].meters())
+                            / (targetRadii[0].meters() * targetRadii[0].meters());
+  eccentricity = sqrt(eccentricity);
+  toStrm << "SEMI_MAJOR_AXIS  " << targetRadii[0].meters() << "\n";
+  toStrm << "ECCENTRICITY     " << eccentricity << "\n";
 
   toStrm << "FOCAL " << focal << endl;
 
@@ -760,13 +781,13 @@ void IsisMain() {
     toStrm << " " << ephemRates[i][1];
     toStrm << " " << ephemRates[i][2] << endl;
   }
- 
+
   toStrm << "\n\nDT_QUAT " << dtQuat << endl;
   toStrm << "T0_QUAT " << qt0Quat << endl;
   toStrm << "NUMBER_OF_QUATERNIONS  " << numQuaternions << endl;
   toStrm << "QUATERNIONS" << endl;
   for (int i = 0; i < numQuaternions; i++) {
-    toStrm << " " << quaternions[i][0]; 
+    toStrm << " " << quaternions[i][0];
     toStrm << " " << quaternions[i][1];
     toStrm << " " << quaternions[i][2];
     toStrm << " " << quaternions[i][3] << endl;
@@ -783,7 +804,7 @@ void IsisMain() {
   //      toStrm << " " << lr.GetStartEt();
   //      toStrm << " " << lr.GetLineScanRate();
   //      toStrm << " " << lr.GetStartLine() << endl;
-  //    } 
+  //    }
   //  }
   //  else
   toStrm << "INT_TIME " << intTime << endl;

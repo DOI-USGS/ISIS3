@@ -99,7 +99,11 @@ namespace Isis {
    * @return bool True if the user clicked on a project tree node named "Shapes"
    */
   bool ImportShapesWorkOrder::isExecutable(ProjectItem *item) {
-    return (item->text() == "Shapes");
+    if (item) {
+      return (item->text() == "Shapes");
+    }
+
+    return false;
   }
 
 
@@ -313,6 +317,11 @@ namespace Isis {
           // Make sure the external label has a fully relative path to the DN data
           projectShape->relocateDnData(FileName(destination).name());
         }
+
+        //  Set new ecub to readOnly.  When closing cube, the labels were being re-written because
+        // the cube was read/write. This caused a segfault when imported large number of images
+        // because of a label template file being opened too many times. 
+        projectShape->reopen();
 
         delete input;
 
