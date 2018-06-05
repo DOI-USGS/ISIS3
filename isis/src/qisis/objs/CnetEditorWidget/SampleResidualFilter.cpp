@@ -9,8 +9,9 @@
 namespace Isis {
   SampleResidualFilter::SampleResidualFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
+    ControlNet *network,
     int minimumForSuccess) :
-    AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractNumberFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -23,8 +24,8 @@ namespace Isis {
   }
 
 
-  bool SampleResidualFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool SampleResidualFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromMeasureFilter(imageSerial);
   }
 
 

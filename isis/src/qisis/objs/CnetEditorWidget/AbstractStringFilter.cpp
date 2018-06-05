@@ -15,7 +15,8 @@
 namespace Isis {
   AbstractStringFilter::AbstractStringFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
     nullify();
     createWidget();
   }

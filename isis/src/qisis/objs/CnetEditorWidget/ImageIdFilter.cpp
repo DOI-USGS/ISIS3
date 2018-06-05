@@ -14,7 +14,7 @@
 namespace Isis {
   ImageIdFilter::ImageIdFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
+    ControlNet *network, int minimumForSuccess) : AbstractStringFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -27,11 +27,9 @@ namespace Isis {
   }
 
 
-  bool ImageIdFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
+  bool ImageIdFilter::evaluate(const QString *imageSerial) const {
     return AbstractStringFilter::evaluate(
-        CnetDisplayProperties::getInstance()->getImageName(
-            (QString) node->getSerialNumber()));
+        CnetDisplayProperties::getInstance()->getImageName(*imageSerial));
   }
 
 

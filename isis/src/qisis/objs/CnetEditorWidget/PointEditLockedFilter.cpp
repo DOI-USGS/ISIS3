@@ -13,7 +13,8 @@
 namespace Isis {
   PointEditLockedFilter::PointEditLockedFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -26,9 +27,8 @@ namespace Isis {
   }
 
 
-  bool PointEditLockedFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return AbstractFilter::evaluateImageFromPointFilter(node);
+  bool PointEditLockedFilter::evaluate(const QString *imageSerial) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageSerial);
   }
 
 

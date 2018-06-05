@@ -13,7 +13,7 @@
 namespace Isis {
   ChooserNameFilter::ChooserNameFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
+    ControlNet *network, int minimumForSuccess) : AbstractStringFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -26,8 +26,8 @@ namespace Isis {
   }
 
 
-  bool ChooserNameFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+  bool ChooserNameFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromPointFilter(imageSerial);
   }
 
 

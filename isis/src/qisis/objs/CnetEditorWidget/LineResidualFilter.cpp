@@ -9,7 +9,8 @@
 namespace Isis {
   LineResidualFilter::LineResidualFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -22,8 +23,8 @@ namespace Isis {
   }
 
 
-  bool LineResidualFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool LineResidualFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromMeasureFilter(imageSerial);
   }
 
 
@@ -63,4 +64,3 @@ namespace Isis {
     return "have line residuals which are " + descriptionSuffix();
   }
 }
-

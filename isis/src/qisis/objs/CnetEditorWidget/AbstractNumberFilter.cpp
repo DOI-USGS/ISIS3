@@ -20,7 +20,8 @@
 namespace Isis {
   AbstractNumberFilter::AbstractNumberFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
     nullify();
     createWidget();
   }
@@ -141,4 +142,3 @@ namespace Isis {
     *m_lineEditText = newText;
   }
 }
-

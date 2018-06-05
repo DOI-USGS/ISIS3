@@ -9,7 +9,8 @@
 namespace Isis {
   LineFilter::LineFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -22,8 +23,8 @@ namespace Isis {
   }
 
 
-  bool LineFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool LineFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromMeasureFilter(imageSerial);
   }
 
 

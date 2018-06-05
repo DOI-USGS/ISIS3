@@ -12,8 +12,8 @@
 
 namespace Isis {
   MeasureIgnoredFilter::MeasureIgnoredFilter(
-    AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
-    AbstractFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag, ControlNet *network, int minimumForSuccess) :
+    AbstractFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -21,8 +21,8 @@ namespace Isis {
   }
 
 
-  bool MeasureIgnoredFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return AbstractFilter::evaluateImageFromMeasureFilter(node);
+  bool MeasureIgnoredFilter::evaluate(const QString *imageSerial) const {
+    return AbstractFilter::evaluateImageFromMeasureFilter(imageSerial);
   }
 
 

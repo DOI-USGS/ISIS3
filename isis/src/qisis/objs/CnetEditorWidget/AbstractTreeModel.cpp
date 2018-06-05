@@ -636,7 +636,7 @@ namespace Isis {
 
       case AbstractTreeItem::ImageSerial:
         item->setVisible((!m_filter || m_filter->evaluate(
-            *(QString *) item->getPointer())) ? true : false);
+            (QString *) item->getPointer())) ? true : false);
         break;
 
       case AbstractTreeItem::None:

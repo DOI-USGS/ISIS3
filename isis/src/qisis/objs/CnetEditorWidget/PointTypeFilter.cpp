@@ -12,8 +12,9 @@
 
 namespace Isis {
   PointTypeFilter::PointTypeFilter(AbstractFilter::FilterEffectivenessFlag flag,
+      ControlNet *network,
       int minimumForSuccess) :
-    AbstractMultipleChoiceFilter(flag, minimumForSuccess) {
+    AbstractMultipleChoiceFilter(flag, network, minimumForSuccess) {
     QStringList options;
     options << "Fixed" << "Constrained" << "Free";
     createWidget(options);
@@ -29,8 +30,8 @@ namespace Isis {
   }
 
 
-  bool PointTypeFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+  bool PointTypeFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromPointFilter(imageSerial);
   }
 
 

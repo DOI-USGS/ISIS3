@@ -21,7 +21,8 @@
 namespace Isis {
   MeasureCountFilter::MeasureCountFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
     init();
     createWidget();
   }
@@ -84,8 +85,8 @@ namespace Isis {
   }
 
 
-  bool MeasureCountFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return AbstractFilter::evaluateImageFromPointFilter(node);
+  bool MeasureCountFilter::evaluate(const QString *imageSerial) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageSerial);
   }
 
 

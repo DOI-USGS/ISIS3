@@ -9,7 +9,8 @@
 namespace Isis {
   ResidualMagnitudeFilter::ResidualMagnitudeFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -22,9 +23,8 @@ namespace Isis {
   }
 
 
-  bool ResidualMagnitudeFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool ResidualMagnitudeFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromMeasureFilter(imageSerial);
   }
 
 

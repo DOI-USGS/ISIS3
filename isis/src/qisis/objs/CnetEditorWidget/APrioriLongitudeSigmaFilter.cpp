@@ -9,7 +9,8 @@
 namespace Isis {
   APrioriLongitudeSigmaFilter::APrioriLongitudeSigmaFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -22,9 +23,8 @@ namespace Isis {
   }
 
 
-  bool APrioriLongitudeSigmaFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+  bool APrioriLongitudeSigmaFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromPointFilter(imageSerial);
   }
 
 
@@ -65,4 +65,3 @@ namespace Isis {
         descriptionSuffix();
   }
 }
-

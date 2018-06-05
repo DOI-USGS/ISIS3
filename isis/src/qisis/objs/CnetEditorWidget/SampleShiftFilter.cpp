@@ -9,8 +9,9 @@
 namespace Isis {
   SampleShiftFilter::SampleShiftFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
+    ControlNet *network,
     int minimumForSuccess) :
-    AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractNumberFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -23,8 +24,8 @@ namespace Isis {
   }
 
 
-  bool SampleShiftFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool SampleShiftFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromMeasureFilter(imageSerial);
   }
 
 
@@ -64,4 +65,3 @@ namespace Isis {
     return "have sample shifts which are " + descriptionSuffix();
   }
 }
-

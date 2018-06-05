@@ -15,8 +15,8 @@ using std::cerr;
 
 namespace Isis {
   MeasureJigsawRejectedFilter::MeasureJigsawRejectedFilter(
-    AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
-    AbstractFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag, ControlNet *network, int minimumForSuccess) :
+    AbstractFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -24,8 +24,8 @@ namespace Isis {
   }
 
 
-  bool MeasureJigsawRejectedFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return AbstractFilter::evaluateImageFromMeasureFilter(node);
+  bool MeasureJigsawRejectedFilter::evaluate(const QString *imageSerial) const {
+    return AbstractFilter::evaluateImageFromMeasureFilter(imageSerial);
   }
 
 
@@ -76,4 +76,3 @@ namespace Isis {
     return description;
   }
 }
-

@@ -11,7 +11,8 @@
 
 namespace Isis {
   PointIdFilter::PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
+      ControlNet *network,
+      int minimumForSuccess) : AbstractStringFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -24,8 +25,8 @@ namespace Isis {
   }
 
 
-  bool PointIdFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+  bool PointIdFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromPointFilter(imageSerial);
   }
 
 

@@ -21,7 +21,6 @@
 #include <QVBoxLayout>
 #include <QWriteLocker>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 
@@ -30,8 +29,10 @@
 
 namespace Isis {
   AbstractFilter::AbstractFilter(FilterEffectivenessFlag effectiveness,
-      int minimumForSuccess) {
+      ControlNet *network, int minimumForSuccess) {
     nullify();
+
+    m_controlNet = network;
 
     m_minForSuccess = minimumForSuccess;
 
@@ -45,6 +46,8 @@ namespace Isis {
 
   AbstractFilter::AbstractFilter(const AbstractFilter &other) {
     nullify();
+
+    m_controlnet = other.m_controlNet;
 
     m_minForSuccess = other.m_minForSuccess;
 
@@ -68,6 +71,9 @@ namespace Isis {
 
     delete m_smallFont;
     m_smallFont = NULL;
+
+    // The filter does not own the Control Network so do not delete it!
+    m_controlNet = NULL;
   }
 
 
@@ -283,27 +289,23 @@ namespace Isis {
   }
 
 
-  bool AbstractFilter::evaluateImageFromPointFilter(
-    const ControlCubeGraphNode *node) const {
-    ASSERT(node);
-
+  bool AbstractFilter::evaluateImageFromPointFilter(const QString *imageSerial) const {
     bool evaluation = true;
 
-    if (canFilterImages())
-      evaluation = evaluateFromCount(node->getMeasures(), true);
+    if (canFilterImages()) {
+      evaluation = evaluateFromCount(m_controlNet->GetMeasuresInCube(*imageSerial), true);
+    }
 
     return evaluation;
   }
 
 
-  bool AbstractFilter::evaluateImageFromMeasureFilter(
-    const ControlCubeGraphNode *node) const {
-    ASSERT(node);
-
+  bool AbstractFilter::evaluateImageFromMeasureFilter(const QString *imageSerial) const {
     bool evaluation = true;
 
-    if (canFilterImages())
-      evaluation = evaluateFromCount(node->getMeasures(), false);
+    if (canFilterImages()) {
+      evaluation = evaluateFromCount(m_controlNet->GetMeasuresInCube(*imageSerial), false);
+    }
 
     return evaluation;
   }

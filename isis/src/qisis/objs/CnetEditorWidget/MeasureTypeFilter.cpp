@@ -12,8 +12,8 @@
 
 namespace Isis {
   MeasureTypeFilter::MeasureTypeFilter(
-    AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
-    AbstractMultipleChoiceFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag, ControlNet *network, int minimumForSuccess) :
+    AbstractMultipleChoiceFilter(flag, network, minimumForSuccess) {
     QStringList options;
     options << "Candidate" << "Manual" << "RegisteredPixel" <<
         "RegisteredSubPixel";
@@ -30,8 +30,8 @@ namespace Isis {
   }
 
 
-  bool MeasureTypeFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool MeasureTypeFilter::evaluate(const QString *imageSerial) const {
+    return evaluateImageFromMeasureFilter(imageSerial);
   }
 
 
@@ -91,4 +91,3 @@ namespace Isis {
     return getImageDescription();
   }
 }
-

@@ -13,7 +13,8 @@
 namespace Isis {
   PointIgnoredFilter::PointIgnoredFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    ControlNet *network,
+    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
   }
 
 
@@ -26,8 +27,8 @@ namespace Isis {
   }
 
 
-  bool PointIgnoredFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return AbstractFilter::evaluateImageFromPointFilter(node);
+  bool PointIgnoredFilter::evaluate(const QString *imageSerial) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageSerial);
   }
 
 

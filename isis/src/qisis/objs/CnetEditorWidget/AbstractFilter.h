@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "ControlNet"
 
 class QBoxLayout;
 class QButtonGroup;
@@ -14,7 +15,7 @@ namespace Isis {
   class AbstractFilterSelector;
   class ControlPoint;
   class ControlMeasure;
-  class ControlCubeGraphNode;
+  class QString;
 
   /**
    * @brief Base class for control net filters
@@ -29,6 +30,8 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
+   *                           References #5434.
    */
   class AbstractFilter : public QWidget {
       Q_OBJECT
@@ -43,7 +46,7 @@ namespace Isis {
 
 
     public:
-      AbstractFilter(FilterEffectivenessFlag, int minimumForSuccess = -1);
+      AbstractFilter(FilterEffectivenessFlag, ControlNet *network, int minimumForSuccess = -1);
       AbstractFilter(const AbstractFilter &other);
       virtual ~AbstractFilter();
 
@@ -51,7 +54,7 @@ namespace Isis {
       virtual bool canFilterPoints() const;
       virtual bool canFilterMeasures() const;
 
-      virtual bool evaluate(const ControlCubeGraphNode *) const = 0;
+      virtual bool evaluate(const QString *) const = 0;
       virtual bool evaluate(const ControlPoint *) const = 0;
       virtual bool evaluate(const ControlMeasure *) const = 0;
 
@@ -75,8 +78,8 @@ namespace Isis {
       QBoxLayout *getMainLayout() const;
       QBoxLayout *getInclusiveExclusiveLayout() const;
 
-      bool evaluateImageFromPointFilter(const ControlCubeGraphNode *) const;
-      bool evaluateImageFromMeasureFilter(const ControlCubeGraphNode *) const;
+      bool evaluateImageFromPointFilter(const QString *) const;
+      bool evaluateImageFromMeasureFilter(const QString *) const;
       bool evaluatePointFromMeasureFilter(const ControlPoint *) const;
 
       virtual bool evaluate(const ControlPoint *,
@@ -112,6 +115,7 @@ namespace Isis {
       int m_minForSuccess;
       FilterEffectivenessFlag *m_effectivenessFlags;
       QFont *m_smallFont;
+      ControlNet *m_controlNet;
   };
 
   Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractFilter::FilterEffectivenessFlag)

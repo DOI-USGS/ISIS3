@@ -71,8 +71,8 @@ namespace Isis {
   }
 
 
-  bool FilterWidget::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluate(node, &AbstractFilter::canFilterImages);
+  bool FilterWidget::evaluate(const QString *imageSerial) const {
+    return evaluate(imageSerial, &AbstractFilter::canFilterImages);
   }
 
 
