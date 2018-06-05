@@ -364,6 +364,7 @@ namespace Isis {
     signals:
       void directoryCleaned();
       void newWarning();
+      void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
 
       void viewClosed(QWidget *widget);
