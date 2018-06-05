@@ -102,6 +102,11 @@ namespace Isis {
    *   @history 2016-10-17 Jesse Mapel - Removed m_SCPVLFilename parameter in accordance with
    *                           USEPVL being removed from jigsaw.  References #4316.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *   @history 2018-03-20 Ken Edmundson
+   *                           1) Temporarily set default for m_createInverseMatrix to false. This
+   *                              is for creating and displaying the correlation matrix, which is
+   *                              currently not working.
+   *                           2) commented out hdf5 header includes in cpp
    *
    *   @history 2017-06-25 Debbie Cook - Added m_cpCoordTypeReports and m_cpCoordTypeBundle. 
    *                           The 2nd type determines how control point coordinates are entered 

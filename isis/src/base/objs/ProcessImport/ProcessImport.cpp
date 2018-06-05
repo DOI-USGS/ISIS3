@@ -725,7 +725,7 @@ namespace Isis {
    * This method returns the number of data trailer bytes
    */
   int ProcessImport::DataTrailerBytes() const {
-    return p_dataTrailerBytes; 
+    return p_dataTrailerBytes;
   }
 
 
@@ -1847,11 +1847,6 @@ namespace Isis {
    */
   void ProcessImport::ProcessBip(void funct(Isis::Buffer &out)) {
 
-    // Figure out the number of bytes to read for a single line
-    int readBytes = Isis::SizeOf(p_pixelType);
-    readBytes = readBytes * p_ns * p_nb;
-    char *in = new char [readBytes];
-
     // Set up an Isis::EndianSwapper object
     QString tok(Isis::ByteOrderName(p_byteOrder));
     tok = tok.toUpper();
@@ -1902,6 +1897,11 @@ namespace Isis {
     p_progress->SetMaximumSteps(p_nl);
     p_progress->CheckStatus();
 
+    // Figure out the number of bytes to read for a single line
+    int sampleBytes = Isis::SizeOf(p_pixelType) * p_nb + p_dataPreBytes + p_dataPostBytes;
+    int readBytes = p_ns * sampleBytes;
+    char *in = new char [readBytes];
+
     // Loop for each line
     for(int line = 0; line < p_nl; line++) {
       // Check the last io
@@ -1914,16 +1914,6 @@ namespace Isis {
 
       // Space for storing prefix and suffix data pointers
       vector<char *> tempPre, tempPost;
-
-      // Handle any line prefix bytes
-      pos = fin.tellg();
-      if (p_saveDataPre) {
-        tempPre.push_back(new char[p_dataPreBytes]);
-        fin.read(tempPre.back(), p_dataPreBytes);
-      }
-      else {
-        fin.seekg(p_dataPreBytes, ios_base::cur);
-      }
 
       // Check the last io
       if (!fin.good()) {
@@ -1960,31 +1950,32 @@ namespace Isis {
         // to special pixels
         int osamp = 0;
 
-        for(int samp = band; samp < p_ns * p_nb; samp += p_nb) {
+        for(int samp = 0; samp < p_ns; samp++) {
+          int bufferIndex = p_dataPreBytes + Isis::SizeOf(p_pixelType)*band + samp*sampleBytes;
           switch(p_pixelType) {
             case Isis::UnsignedByte:
-              (*out)[osamp] = (double)((unsigned char *)in)[samp];
+              (*out)[osamp] = (double)((unsigned char *)in)[bufferIndex];
               break;
             case Isis::UnsignedWord:
               (*out)[osamp] =
-                (double)swapper.UnsignedShortInt((unsigned short int *)in+samp);
+                (double)swapper.UnsignedShortInt(&in[bufferIndex]);
               break;
             case Isis::SignedWord:
-              (*out)[osamp] = (double)swapper.ShortInt((short int *)in+samp);
+              (*out)[osamp] = (double)swapper.ShortInt(&in[bufferIndex]);
               break;
             case Isis::SignedInteger:
-              (*out)[samp] = (double)swapper.Int((int *)in+samp);
+              (*out)[samp] = (double)swapper.Int(&in[bufferIndex]);
               break;
             case Isis::Real:
               if(p_vax_convert) {
-                (*out)[osamp]= VAXConversion( (float *)in+samp );
+                (*out)[osamp]= VAXConversion(&in[bufferIndex]);
               }
               else {
-                (*out)[osamp] = (double)swapper.Float((float *)in+samp);
+                (*out)[osamp] = (double)swapper.Float(&in[bufferIndex]);
               }
               break;
             case Isis::Double:
-              (*out)[osamp] = (double)swapper.Double((double *)in+samp);
+              (*out)[osamp] = (double)swapper.Double(&in[bufferIndex]);
               break;
             default:
               break;
@@ -2008,47 +1999,38 @@ namespace Isis {
           funct(*out);
         }
 
-        // Handle any line suffix bytes
-        pos = fin.tellg();
-        if (p_saveDataPost) {
-          tempPost.push_back(new char[p_dataPostBytes]);
-          fin.read(tempPost.back(), p_dataPostBytes);
-        }
-        else {
-          fin.seekg(p_dataPostBytes, ios_base::cur);
-        }
-
-        // Check the last io
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(p_dataPreBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-
-
-        // Save off the prefix bytes vector
-        if (p_saveDataPre) {
-          p_dataPre.push_back(tempPre);
-          tempPre.clear();
-        }
-
-        // Save off the suffix bytes vector
-        if (p_saveDataPost) {
-          p_dataPost.push_back(tempPost);
-          tempPost.clear();
-        }
-
-        // Check the last io
-        if (!fin.good()) {
-          QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       toString((int)pos) + "]. Byte count [" +
-                       toString(p_fileHeaderBytes) + "]" ;
-          throw IException(IException::Io, msg, _FILEINFO_);
-        }
-
       } // End band loop
 
+      // Handle record prefix and suffix
+      if (p_saveDataPre) {
+        for(int samp = 0; samp < p_ns; samp++) {
+          char *samplePrefix = new char[p_dataPreBytes];
+          memcpy(samplePrefix, &in[samp*sampleBytes], p_dataPreBytes);
+          tempPre.push_back(samplePrefix);
+        }
+        p_dataPre.push_back(tempPre);
+        tempPre.clear();
+      }
+      if (p_saveDataPost) {
+        for(int samp = 0; samp < p_ns; samp++) {
+          char *sampleSuffix = new char[p_dataPostBytes];
+          int suffixIndex = p_dataPreBytes + Isis::SizeOf(p_pixelType)*p_nb + samp*sampleBytes;
+          memcpy(sampleSuffix, &in[suffixIndex], p_dataPostBytes);
+          tempPost.push_back(sampleSuffix);
+        }
+        p_dataPost.push_back(tempPost);
+        tempPost.clear();
+      }
+
+      // Check the last io
+      if (!fin.good()) {
+        QString msg = "Cannot read file [" + p_inFile + "]. Position [" +
+                     toString((int)pos) + "]. Byte count [" +
+                     toString(p_dataPreBytes) + "]" ;
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      // Handle the data trailer
       pos = fin.tellg();
       if (p_saveDataTrailer) {
         p_dataTrailer.push_back(new char[p_dataTrailerBytes]);

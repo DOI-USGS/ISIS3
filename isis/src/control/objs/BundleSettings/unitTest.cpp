@@ -47,8 +47,11 @@ void printXml(const T &);
   *                           most likely going to move to HDF5. Fixes #4327.
   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() and replaced with the XML save().
   *                           Fixes #4797.
-  *   @history 2017-06-25 Debbie A. Cook - Updated to reflect added argument for control point
-  *                           coordinate type.  References #4649 and #501.
+  *   @history 2018-05-24 Ken Edmundson - Updated truth data to indicate default value for
+  *                                       m_createInverseMatrix was changed from true to false.
+  *   @history 2018-06-04 Debbie A. Cook - (added to BundleXYZ branch on 2017-06-25) Updated to 
+  *                           reflect added argument for control pointcoordinate type.  References 
+  *                           #4649 and #501.
   *
   *   @todo Truth updated so that the name of the BundleObservationSolveSettings object is Null,
   *         this should be fixed as part of #4292.
@@ -169,7 +172,6 @@ int main(int argc, char *argv[]) {
     // validate the network
     copySettings.setValidateNetwork(true);
     // Assume for now the user interface will prevent any invalid coordinate types in the
-    // setSolveOptions call.
     // set the solve options
     copySettings.setSolveOptions(true, true, true, true, SurfacePoint::Rectangular,
                                   SurfacePoint::Rectangular, 1000.0, 2000.0, 3000.0);

@@ -252,19 +252,26 @@
     <change name="Summer Stapleton" date="2017-08-09">
       Fixed bug where an invalid control net was not throwing exception. Fixes #5068.
     </change>
-   <change name="Debbie A. Cook" date="2017-09-11">
-      Added options for outputting and/or solving for body-fixed x/y/z
-      instead of lat/lon/radius. References #501.
+    <change name="Ken Edmundson" date="2018-05-23">
+      Modifed call to bundleAdjustment->solveCholeskyBR() to return a raw pointer to a
+      BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
+      ownership from BundleAdjust.
     </change>
-    <change name="Debbie A. Cook" date="2017-09-17">
-      Fixed a problem in the xml that was causing the input
-      parameters to be omitted from the history.  References #501.
+   <change name="Debbie A. Cook" date="2018-06-04">
+      (BundleXYZ modified on 2017-09-11) Added options for outputting
+      and/or solving for body-fixed x/y/z instead of lat/lon/radius.
+      References #501.
     </change>
-    <change name="Debbie A. Cook" date="2018-03-18">
-      Fixed a problem in the xml that excluded entry of values
-      for latitudinal point sigmas when the coordinate type for
-      reports was set to Rectangular and vice versa.  References
-      #501.
+    <change name="Debbie A. Cook" date="2018-06-04">
+      (BundleXYZ modified on 2017-09-17) Fixed a problem in the 
+      xml that was causing the input parameters to be omitted from
+      the history.  References #501.
+    </change>
+    <change name="Debbie A. Cook" date="2018-06-04">
+      (BundleXYZ modified on 2018-03-18) Fixed a problem in the xml 
+      that excluded entry of values for latitudinal point sigmas when the 
+      coordinate type for reports was set to Rectangular and vice versa.  
+      References #501.
     </change>
   </history>
 

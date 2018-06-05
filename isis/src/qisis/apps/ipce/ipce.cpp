@@ -26,6 +26,7 @@
 #include <QLocale>
 #include <QTranslator>
 
+#include "FileName.h"
 #include "Gui.h"
 #include "IException.h"
 #include "IpceMainWindow.h"
@@ -35,14 +36,26 @@ using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
-
+  if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
+    std::cerr << "Please set ISISROOT before running any Isis applications" << std::endl;
+    exit(1);
+  }
   Gui::checkX11();
 
   try {
+
+    // Add the Qt plugin directory to the library path
+    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+    QCoreApplication::addLibraryPath(qtpluginpath.expanded());
+
     QApplication *app = new QIsisApplication(argc, argv);
     QApplication::setApplicationName("ipce");
 
     IpceMainWindow *mainWindow = new IpceMainWindow();
+
+    //  For OSX, had problems with cneteditor view because it has it's own menus, caused the
+    //  menubar on OSX to lockup
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar, true);
 
     // We do not want a showMaximized call, as that will negate the settings read during the main
     // window's initialization. References #4358.

@@ -680,7 +680,7 @@ namespace Isis {
    *
    * @TODO make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
    */
-  BundleSolutionInfo BundleAdjust::solveCholeskyBR() {
+  BundleSolutionInfo* BundleAdjust::solveCholeskyBR() {
     solveCholesky();
     return bundleSolveInformation();
   }
@@ -979,8 +979,7 @@ namespace Isis {
       m_bundleResults.setObservations(m_bundleObservations);
       m_bundleResults.setBundleControlPoints(m_bundleControlPoints);
 
-      BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
-      emit resultsReady(results);
+      emit resultsReady(bundleSolveInformation());
 
       emit statusUpdate("\nBundle Complete");
 
@@ -1002,12 +1001,18 @@ namespace Isis {
   /**
    * Create a BundleSolutionInfo containing the settings and results from the bundle adjustment.
    *
-   * @return @b BundleSolutionInfo A container with solve information from the adjustment.
+   * @return @b BundleSolutionInfo A container with solve information from the adjustment. NOTE:
+   *            Caller takes ownership and is responsible for memory management of returned
+   *            BundleSolutionInfo raw pointer.
+   *
    */
-  BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
-    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults, imageLists());
-    results.setRunTime("");
-    return results;
+  BundleSolutionInfo *BundleAdjust::bundleSolveInformation() {
+    BundleSolutionInfo *bundleSolutionInfo = new BundleSolutionInfo(m_bundleSettings,
+                                                                    FileName(m_cnetFileName),
+                                                                    m_bundleResults,
+                                                                    imageLists());
+    bundleSolutionInfo->setRunTime("");
+    return bundleSolutionInfo;
   }
 
 
@@ -1417,35 +1422,6 @@ namespace Isis {
     nj += n1;
 
     return true;
-  }
-
-
-  /**
-   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
-   *
-   * @param alpha A constant multiplier.
-   * @param v2 The output vector.
-   * @param Q A sparse block matrix.
-   * @param v1 A vector.
-   */
-  void BundleAdjust::productAlphaAV(double alpha, bounded_vector<double,3> &v2,
-                                    SparseBlockRowMatrix &Q,
-                                    LinearAlgebra::Vector &v1) {
-
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
-
-    int subrangeStart, subrangeEnd;
-    
-    while ( Qit.hasNext() ) {
-      Qit.next();
-
-      int columnIndex = Qit.key();
-
-      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
-      subrangeEnd = subrangeStart + Qit.value()->size2();
-      
-      v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
-    }
   }
 
 
@@ -2157,128 +2133,22 @@ namespace Isis {
 
       t += numParameters;
     }
-        
-    // *** TODO ***: Below code should move into BundleControlPoint->updateParameterCorrections
-    //       except, what about the productAlphaAV method? Move it too if not used in BundleAdjust elsewhere..
-    //       subrange is a boost function.
-    //   Do something like point->applyParameterCorrections(subrange(m_imageSolution,t,t+numParameters));
-    // Then use generalized correction names coord1Correction, etc.
-    // Update coordinates for each control point
-    double coord1Correction, coord2Correction, coord3Correction;
+    // TODO - When BundleXYZ gets merged into dev, go with Ken's version of merging the updating of
+    //              of the adjusted surface point into BundleControlPoint.
+    
     int pointIndex = 0;
     int numControlPoints = m_bundleControlPoints.size();
+    
     for (int i = 0; i < numControlPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
-      // *** TODO *** move code within point loop to new BundleControlPoint
-      //                     applyParameterCorrections method with arguments m_imageSolution, 
-      //                      conversionFactor (1000 or RAD2DEG), m_sparseNormals,
-      //                       and m_bundleTargetBody.
-      //                       Also move BundleAdjust method productAlphaAV to BundleControlPoint.
 
       if (point->isRejected()) {
           pointIndex++;
           continue;
       }
 
-      // get NIC, Q, and correction vector for this point
-      boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
-      SparseBlockRowMatrix &Q = point->cholmodQMatrix();
-      boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
-      
-      // subtract product of Q and nj from NIC
-      productAlphaAV(-1.0, NIC, Q, m_imageSolution);
-
-      // get point parameter corrections for (lat/lon/radius) or (X/Y/Z)
-      coord1Correction = NIC(0);
-      coord2Correction = NIC(1);
-      coord3Correction = NIC(2);
-
-      SurfacePoint surfacepoint = point->adjustedSurfacePoint();
-
-      // *** TODO *** Generalize to pointCoord1, etc.  Should this part be in
-      //                        BundleControlPoint::applyParameterCorrections? Yes.  Be
-      //                        careful with units.  See updateAdjustedSurfacePointLatitudinally in
-      //                        BundleControlPoint
-      if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
-        double pointLat = surfacepoint.GetLatitude().degrees();
-        double pointLon = surfacepoint.GetLongitude().degrees();
-        double pointRad = surfacepoint.GetLocalRadius().meters();
-
-        pointLat += RAD2DEG * coord1Correction;
-        pointLon += RAD2DEG * coord2Correction;
-
-        // Make sure updated values are still in valid range.
-        // TODO What is the valid lon range?
-        if (pointLat < -90.0) {
-          pointLat = -180.0 - pointLat;
-          pointLon = pointLon + 180.0;
-        }
-        if (pointLat > 90.0) {
-          pointLat = 180.0 - pointLat;
-          pointLon = pointLon + 180.0;
-        }
-        while (pointLon > 360.0) {
-          pointLon = pointLon - 360.0;
-        }
-        while (pointLon < 0.0) {
-          pointLon = pointLon + 360.0;
-        }
-
-        pointRad += 1000.*coord3Correction;
-
-        // sum and save corrections
-        corrections(0) += coord1Correction;
-        corrections(1) += coord2Correction;
-        corrections(2) += coord3Correction;
-           
-        // ken testing - if solving for target body mean radius, set radius to current
-        // mean radius value
-        // Only allow radius options for Latitudinal coordinates
-        if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
-                || m_bundleTargetBody->solveTriaxialRadii())) {
-          if (m_bundleTargetBody->solveMeanRadius()) {
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                                 Longitude(pointLon, Angle::Degrees),
-                                                 m_bundleTargetBody->meanRadius());
-          }
-          else if (m_bundleTargetBody->solveTriaxialRadii()) {
-            Distance localRadius = m_bundleTargetBody->
-              localRadius(Latitude(pointLat, Angle::Degrees),
-                          Longitude(pointLon, Angle::Degrees));
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                                 Longitude(pointLon, Angle::Degrees),
-                                                 localRadius);
-          }
-        }
-        else {
-          // *** TODO *** Use generic coord and/or make a generic method in SurfacePoint like
-          //                        SetCoordinates(m_coordType, coord1, coord2, coord3)
-          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                               Longitude(pointLon, Angle::Degrees),
-                                               Distance(pointRad, Distance::Meters));
-        }
-      }
-      else { // Assume Rectangular
-        double pointX = surfacepoint.GetX().meters();
-        double pointY = surfacepoint.GetY().meters();
-        double pointZ = surfacepoint.GetZ().meters();
-
-        // sum and save corrections
-        corrections(0) += coord1Correction;
-        corrections(1) += coord2Correction;
-        corrections(2) += coord3Correction;
-
-        pointX += 1000. * coord1Correction;
-        pointY += 1000. * coord2Correction;
-        pointZ += 1000. * coord3Correction;
-
-        surfacepoint.SetRectangularCoordinates(Displacement(pointX, Displacement::Meters),
-                                               Displacement(pointY, Displacement::Meters),
-                                               Displacement(pointZ, Displacement::Meters));
-      }
-          
-      point->setAdjustedSurfacePoint(surfacepoint);
-
+      point->applyParameterCorrections(m_imageSolution, m_sparseNormals,
+                                       m_bundleTargetBody); 
       pointIndex++;
 
     } // end loop over point corrections
@@ -2686,7 +2556,7 @@ namespace Isis {
     cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
 
     LinearAlgebra::Matrix T(3, 3);
-    // *** TODO *** make the sigmas generic sigmaCoord1, etc.
+    // *** TODO *** 
     // Can any of the control point specific code be moved to BundleControlPoint?
 
     double sigma0Squared = m_bundleResults.sigma0() * m_bundleResults.sigma0();
@@ -2942,13 +2812,10 @@ namespace Isis {
 
       // Update and reset the matrix
       // Get the Limiting Error Propagation uncertainties:  sigmas for coordinate 1, 2, and 3 in meters
-      // *** TODO ***  Replace lat/lon/rad sigmas with XYZ sigmas.  Be careful with units.
-      // *** to here ***  see notes from Ken's email.  Do X, Y, and Z
-      // like radius below to get rectangular sigmas.
       // 
       SurfacePoint SurfacePoint = point->adjustedSurfacePoint();
 
-      // Get the TEP by adding the coordinate sigma to its corresponding covar member      
+      // Get the TEP by adding the corresponding members of pCovar and covariance      
       boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> pCovar;
       
       if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
@@ -2961,9 +2828,45 @@ namespace Isis {
       pCovar += covariance;
       pCovar *= sigma0Squared;
 
+      // debug lines
+      // if (j < 3) {
+      //   std::cout << " Adjusted surface point ..." << std::endl;
+      //   std:: cout << "     sigmaLat (radians) = " << sqrt(pCovar(0,0)) << std::endl;
+      //   std:: cout << "     sigmaLon (radians) = " << sqrt(pCovar(1,1)) << std::endl;
+      //   std:: cout << "     sigmaRad (km) = " << sqrt(pCovar(2,2)) << std::endl;
+      // std::cout <<  "      Adjusted matrix = " << std::endl;
+      // std::cout << "       " << pCovar(0,0) << "   " << pCovar(0,1) << "   "
+      //           << pCovar(0,2) << std::endl; 
+      // std::cout << "        " << pCovar(1,0) << "   " << pCovar(1,1) << "   "
+      //           << pCovar(1,2) << std::endl; 
+      // std::cout << "        " << pCovar(2,0) << "   " << pCovar(2,1) << "   "
+      //           << pCovar(2,2) << std::endl;
+      // }
+      // end debug
+      
       // Distance units are km**2
       SurfacePoint.SetMatrix(m_bundleSettings->controlPointCoordTypeBundle(),pCovar);
       point->setAdjustedSurfacePoint(SurfacePoint);
+      // // debug lines
+      // if (j < 3) {
+      //   boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> recCovar;
+      //   recCovar = SurfacePoint.GetRectangularMatrix(SurfacePoint::Meters);
+      //   std:: cout << "     sigmaLat (meters) = " << 
+      //     point->adjustedSurfacePoint().GetSigmaDistance(SurfacePoint::Latitudinal,
+      //     SurfacePoint::One).meters() << std::endl;
+      //   std:: cout << "     sigmaLon (meters) = " <<
+      //     point->adjustedSurfacePoint().GetSigmaDistance(SurfacePoint::Latitudinal,
+      //     SurfacePoint::Two).meters() << std::endl;
+      //   std:: cout << "   sigmaRad (km) = " << sqrt(pCovar(2,2)) << std::endl;
+      //   std::cout << "Rectangular matrix with radius in meters" << std::endl;
+      //   std::cout << "       " << recCovar(0,0) << "   " << recCovar(0,1) << "   "
+      //           << recCovar(0,2) << std::endl; 
+      //   std::cout << "        " << recCovar(1,0) << "   " << recCovar(1,1) << "   "
+      //           << recCovar(1,2) << std::endl; 
+      //   std::cout << "        " << recCovar(2,0) << "   " << recCovar(2,1) << "   "
+      //           << recCovar(2,2) << std::endl;
+      // }
+      // // end debug
 
       pointIndex++;
     }

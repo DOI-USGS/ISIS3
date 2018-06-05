@@ -63,6 +63,14 @@ namespace Isis {
     header.lastModified = net->GetLastModified();
     header.description = net->Description();
     header.userName = net->GetUserName();
+
+    std::vector<Distance> netRadii = net->GetTargetRadii();
+    if ( netRadii.size() >= 3 &&
+         netRadii[0].isValid() &&
+         netRadii[1].isValid() &&
+         netRadii[2].isValid() ) {
+           header.targetRadii = net->GetTargetRadii();
+         }
     createHeader(header);
   }
 
@@ -159,6 +167,25 @@ namespace Isis {
 
 
   /**
+  * Returns true if the targetRadii in the header has values.
+  *
+  * @return @b boolean True if the targetRadii in the header is populated.
+  */
+  bool ControlNetVersioner::hasTargetRadii() const {
+    return m_header.targetRadii.empty() ? false : true;
+  }
+
+  /**
+  * Returns the targetRadii Distance vector located in the header.
+  *
+  * @return @b std::vector<Distance> A vector containing the target body radii.
+  */
+  std::vector<Distance> ControlNetVersioner::targetRadii() const {
+    return m_header.targetRadii;
+  }
+
+
+  /**
    * Returns the number of points that have been read in or are ready to write out.
    *
    * @return @b int The number of control points stored internally.
@@ -202,23 +229,19 @@ namespace Isis {
     network += PvlKeyword("Created", m_header.created);
     network += PvlKeyword("LastModified", m_header.lastModified);
     network += PvlKeyword("Description", m_header.description);
+
+    // Grab TargetRadii if they exist.
+    if (!m_header.targetRadii.empty()) {
+        PvlKeyword pvlRadii("TargetRadii");
+        for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+          pvlRadii += toString(m_header.targetRadii[i].meters());
+        }
+        network += pvlRadii;
+      }
     // optionally add username to output?
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "5");
-
-    //  Get Target Radii from naif kernel
-    PvlGroup pvlRadii;
-    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
-    if ( target != "" ) {
-      try {
-        NaifStatus::CheckErrors();
-        pvlRadii = Target::radiiGroup(target);
-      }
-      catch (IException) {
-        // leave pvlRadii empty if target is not recognized by NAIF
-      }
-    }
 
     foreach (ControlPoint *controlPoint, m_points) {
       PvlObject pvlPoint("ControlPoint");
@@ -342,11 +365,11 @@ namespace Isis {
           matrix += toString(aprioriCovarianceMatrix(1, 2));
           matrix += toString(aprioriCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+          if ( !m_header.targetRadii.empty() ) {
 
-            aprioriSurfacePoint.SetRadii( Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
+            aprioriSurfacePoint.SetRadii( m_header.targetRadii[0],
+                                          m_header.targetRadii[1],
+                                          m_header.targetRadii[2] );
 
             // *** TODO *** What do we do in the case of bundled in rectangular coordinates?
             if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
@@ -428,11 +451,11 @@ namespace Isis {
           matrix += toString(adjustedCovarianceMatrix(1, 2));
           matrix += toString(adjustedCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+          if ( !m_header.targetRadii.empty() ) {
 
-            adjustedSurfacePoint.SetRadii(Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
+            adjustedSurfacePoint.SetRadii( m_header.targetRadii[0],
+                                           m_header.targetRadii[1],
+                                           m_header.targetRadii[2] );
 
             if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                  && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
@@ -720,6 +743,7 @@ namespace Isis {
       try {
         PvlObject pointObject = network.object(objectIndex);
         ControlPointV0002 point(pointObject);
+
         m_points.append( createPoint(point) );
 
         if (progress) {
@@ -851,6 +875,16 @@ namespace Isis {
       header.lastModified = network.findKeyword("LastModified")[0];
       header.description = network.findKeyword("Description")[0];
       header.userName = network.findKeyword("UserName")[0];
+      if (network.hasKeyword("TargetRadii")) {
+        header.targetRadii.clear();
+        for (int i = 0; i < network.findKeyword("TargetRadii").size(); i++) {
+          Distance distance = Distance(toDouble(network.findKeyword("TargetRadii")[i]),
+                                           Distance::Meters);
+          if ( distance.isValid() ) {
+            header.targetRadii.push_back(distance);
+          }
+        }
+      }
       createHeader(header);
     }
     catch (IException &e) {
@@ -1174,6 +1208,7 @@ namespace Isis {
   void ControlNetVersioner::readProtobufV0005(const Pvl &header,
                                               const FileName netFile,
                                               Progress *progress) {
+
     // read the header protobuf object
     const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
     const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
@@ -1232,6 +1267,15 @@ namespace Isis {
       header.lastModified = protoHeader.lastmodified().c_str();
       header.description = protoHeader.description().c_str();
       header.userName = protoHeader.username().c_str();
+      if ( protoHeader.targetradii_size() >= 3 ) {
+        header.targetRadii.clear();
+        for (int i = 0; i < protoHeader.targetradii_size(); i++) {
+          Distance distance = Distance(protoHeader.targetradii(i), Distance::Meters);
+          if ( distance.isValid() ) {
+            header.targetRadii.push_back(distance);
+          }
+        }
+      }
       createHeader(header);
     }
     catch (IException &e) {
@@ -1282,7 +1326,7 @@ namespace Isis {
 
         uint32_t size;
         pointCodedInStream.ReadRaw(reinterpret_cast<char *>(&size), sizeof(size));
-        
+
         size = lsb.Uint32_t(&size);
 
         CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
@@ -1361,6 +1405,7 @@ namespace Isis {
    * @return @b ControlPoint* The ControlPoint constructed from the given point.
    */
   ControlPoint *ControlNetVersioner::createPoint(ControlPointV0003 &point) {
+
     ControlPointFileEntryV0002 protoPoint = point.pointData();
     ControlPoint *controlPoint = new ControlPoint;
 
@@ -1525,16 +1570,19 @@ namespace Isis {
 
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
     }
+    if (  !m_header.targetRadii.empty() &&
+          m_header.targetRadii[0].isValid() &&
+          m_header.targetRadii[1].isValid() &&
+          m_header.targetRadii[2].isValid() ) {
 
-    if ( m_header.equatorialRadius.isValid() && m_header.polarRadius.isValid() ) {
       SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
       SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
-      aprioriSurfacePoint.SetRadii(m_header.equatorialRadius,
-                                   m_header.equatorialRadius,
-                                   m_header.polarRadius);
-      adjustedSurfacePoint.SetRadii(m_header.equatorialRadius,
-                                    m_header.equatorialRadius,
-                                    m_header.polarRadius);
+      aprioriSurfacePoint.SetRadii(m_header.targetRadii[0],
+                                   m_header.targetRadii[1],
+                                   m_header.targetRadii[2]);
+      adjustedSurfacePoint.SetRadii(m_header.targetRadii[0],
+                                    m_header.targetRadii[1],
+                                    m_header.targetRadii[2]);
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
       controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
     }
@@ -1674,12 +1722,22 @@ namespace Isis {
       m_header.targetName = "Mars";
     }
 
-    if ( !m_header.targetName.isEmpty() ) {
+    if ( m_header.targetRadii.empty() ) {
       try {
-        // attempt to get target radii values...
-        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
-        m_header.equatorialRadius.setMeters(pvlRadii["EquatorialRadius"]);
-        m_header.polarRadius.setMeters(pvlRadii["PolarRadius"]);
+          // attempt to get target radii values...
+          // The target body raii values are read from the PvlV0005 and BinaryV0005
+          // Networks. In the event these values weren't read (from an older network)
+          // then we must grab them from the Target::radii group.
+          if ( !m_header.targetName.isEmpty() ) {
+
+            PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
+            m_header.targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+                                             Distance::Meters));
+            m_header.targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
+                                             Distance::Meters));
+            m_header.targetRadii.push_back(Distance(pvlRadii["PolarRadius"],
+                                             Distance::Meters));
+          }
        }
        catch (IException &e) {
          // do nothing
@@ -1729,6 +1787,12 @@ namespace Isis {
       protobufHeader.set_description(m_header.description.toLatin1().data());
       protobufHeader.set_username(m_header.userName.toLatin1().data());
 
+      if ( !m_header.targetRadii.empty() ) {
+        for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+          protobufHeader.add_targetradii(m_header.targetRadii[i].meters());
+        }
+      }
+
       streampos coreHeaderSize = protobufHeader.ByteSize();
 
       Pvl p;
@@ -1752,12 +1816,20 @@ namespace Isis {
       netInfo.addComment("This group is for informational purposes only");
       netInfo += PvlKeyword("NetworkId", protobufHeader.networkid().c_str());
       netInfo += PvlKeyword("TargetName", protobufHeader.targetname().c_str());
+
+          // Grab TargetRadii if they exist.
+          if (!m_header.targetRadii.empty()) {
+              PvlKeyword pvlRadii("TargetRadii");
+              for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+                pvlRadii += toString(m_header.targetRadii[i].meters());
+              }
+              netInfo += pvlRadii;
+            }
       netInfo += PvlKeyword("UserName", protobufHeader.username().c_str());
       netInfo += PvlKeyword("Created", protobufHeader.created().c_str());
       netInfo += PvlKeyword("LastModified", protobufHeader.lastmodified().c_str());
       netInfo += PvlKeyword("Description", protobufHeader.description().c_str());
       netInfo += PvlKeyword("NumberOfPoints", toString(numPoints));
-
       netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
       netInfo += PvlKeyword("Version", "5");
       protoObj.addGroup(netInfo);
@@ -1792,6 +1864,12 @@ namespace Isis {
     protobufHeader.set_lastmodified(m_header.lastModified.toLatin1().data());
     protobufHeader.set_description(m_header.description.toLatin1().data());
     protobufHeader.set_username(m_header.userName.toLatin1().data());
+
+    if ( !m_header.targetRadii.empty() ) {
+      for (uint i = 0; i < m_header.targetRadii.size(); i++) {
+        protobufHeader.add_targetradii(m_header.targetRadii[i].meters());
+      }
+    }
 
     // Write out the header
     if ( !protobufHeader.SerializeToOstream(output) ) {

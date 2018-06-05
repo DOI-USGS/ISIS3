@@ -56,6 +56,10 @@ namespace Isis {
    *   @history 2017-11-02 Tyler Wilson - Added a  null pointer check on the ProjectItem *item
    *                           pointer in isExecutable to prevent potential seg faults.
    *                           References #4492.
+   *   @history 2018-04-19 Tracie Sucharski - Fixed bug when importing shapes without DN data. Ecub
+   *                           labels were not complete due to a resulting ecub not being closed
+   *                           properly in thread.  The resulting ecub needs to be re-opened as
+   *                           readOnly to prevent this problem.  Fixes #5274.
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT

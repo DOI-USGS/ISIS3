@@ -275,7 +275,7 @@ namespace Isis {
   /**
    * Sets the member sigmas and weights from a global sigma.. 
    * 
-// *** TBD *** Should index be SurfacePoint::CoordIndex? 
+// *** TODO *** Should index be SurfacePoint::CoordIndex? 
    * @param gSigma The global sigma to assign.
    * @param index The index of the point coordinate being set (0, 1, or 2).
    * @param cFactor The conversion factor applied to gSigma to match bundle variable units.
@@ -310,12 +310,13 @@ namespace Isis {
    */
   void BundleControlPoint::productAlphaAV(double alpha,
                                     SparseBlockMatrix &sparseNormals,
-                                    boost::numeric::ublas::bounded_vector<double,3> &v2,
-                                    SparseBlockRowMatrix &Q,
+                                    // boost::numeric::ublas::bounded_vector<double,3> &v2,
+                                    // SparseBlockRowMatrix &Q,
                                     LinearAlgebra::Vector &v1) {
                                     // LinearAlgebra::Vector<double> &v1) {
 
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
+    // QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
+    QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
 
     int subrangeStart, subrangeEnd;
     
@@ -327,7 +328,8 @@ namespace Isis {
       subrangeStart = sparseNormals.at(columnIndex)->startColumn();
       subrangeEnd = subrangeStart + Qit.value()->size2();
       
-      v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
+      // v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
+      m_nicVector += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
 
@@ -336,125 +338,37 @@ namespace Isis {
    * Apply the parameter corrections to the bundle control point.
    *
    * @param imageSolution Image vector.
-   * @param factor The unit conversion factor to use on lat and lon.
+   * @param factor The unit conversion factor to use on lat and lon rad or x/y/z km.
    * @param target The BundleTargetBody.
    */
   void BundleControlPoint::applyParameterCorrections(LinearAlgebra::Vector imageSolution,
                                                SparseBlockMatrix &sparseNormals,
-                                               double factor, const BundleTargetBodyQsp target) {
-      if (!isRejected()) {
+                                               const BundleTargetBodyQsp target) {
+    if (!isRejected()) {
         
-        // subtract product of Q and nj from NIC
-        productAlphaAV(-1.0, sparseNormals, nicVector(), cholmodQMatrix(), imageSolution);
-
-        // get point parameter corrections
-        // coord1Correction = NIC(0);
-        // coord2Correction = NIC(1);
-        // coord3Correction = NIC(2);
+      // subtract product of Q and nj from NIC
+      productAlphaAV(-1.0, sparseNormals, imageSolution);
         
-        // update adjusted surface point
-        switch (m_coordTypeBundle) {
-          case SurfacePoint::Latitudinal:
-            updateAdjustedSurfacePointLatitudinally(RAD2DEG, target);
-            break;
-          case SurfacePoint::Rectangular:
-            updateAdjustedSurfacePointRectangularly(1000.);
-          default:
-             IString msg ="Unknown surface point coordinate type enum ["
-                + toString(m_coordTypeBundle) + "]." ;
-             throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-        
-        // sum and save corrections
-        m_corrections(0) += m_nicVector[0];
-        m_corrections(1) += m_nicVector[1];
-        m_corrections(2) += m_nicVector[2];
+      // update adjusted surface point appropriately for the coordinate type
+      switch (m_coordTypeBundle) {
+        case SurfacePoint::Latitudinal:
+          updateAdjustedSurfacePointLatitudinally(target);
+          break;
+        case SurfacePoint::Rectangular:
+          updateAdjustedSurfacePointRectangularly();
+          break;
+        default:
+            IString msg ="Unknown surface point coordinate type enum ["
+            + toString(m_coordTypeBundle) + "]." ;
+            throw IException(IException::Programmer, msg, _FILEINFO_);
       }
+        
+      // sum and save corrections
+      m_corrections(0) += m_nicVector[0];
+      m_corrections(1) += m_nicVector[1];
+      m_corrections(2) += m_nicVector[2];
+    }
   }
-
-
-  /**
-   * Apply the parameter corrections to the bundle control point latitudinally.
-   *
-   * @param factor The unit conversion factor to use on lat and lon.
-   * @param target The BundleTargetBody.
-   */
-  void BundleControlPoint::updateAdjustedSurfacePointLatitudinally(double factor,
-                                                             const BundleTargetBodyQsp target) {
-      SurfacePoint surfacepoint = adjustedSurfacePoint();
-      double pointLat = surfacepoint.GetLatitude().degrees();
-      double pointLon = surfacepoint.GetLongitude().degrees();
-      double pointRad = surfacepoint.GetLocalRadius().meters();
-
-      pointLat += factor * m_nicVector[0];
-      pointLon += factor * m_nicVector[1];
-
-      // Make sure updated values are still in valid range.
-      if (pointLat < -90.0) {
-        pointLat = -180.0 - pointLat;
-        pointLon = pointLon + 180.0;
-      }
-      if (pointLat > 90.0) {
-        pointLat = 180.0 - pointLat;
-        pointLon = pointLon + 180.0;
-      }
-      while (pointLon > 360.0) {
-        pointLon = pointLon - 360.0;
-      }
-      while (pointLon < 0.0) {
-        pointLon = pointLon + 360.0;
-      }
-
-      pointRad += 1000.*m_nicVector[2];
-      
-      // ken testing - if solving for target body mean radius, set radius to current
-      // mean radius value
-      // Only allow radius options for Latitudinal coordinates
-      if (target && m_coordTypeBundle == SurfacePoint::Latitudinal
-          && (target->solveMeanRadius() || target->solveTriaxialRadii())) {
-        if (target->solveMeanRadius()) {
-          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                               Longitude(pointLon, Angle::Degrees),
-                                               target->meanRadius());
-        }
-        else if (target->solveTriaxialRadii()) {
-            Distance localRadius = target->localRadius(Latitude(pointLat, Angle::Degrees),
-                                                   Longitude(pointLon, Angle::Degrees));
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                                 Longitude(pointLon, Angle::Degrees),
-                                                 localRadius);
-        }
-      }
-      else {
-        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                             Longitude(pointLon, Angle::Degrees),
-                                             Distance(pointRad, Distance::Meters));
-      }
-
-      setAdjustedSurfacePoint(surfacepoint);
-  }
-
-
-  /**
-   * Apply the parameter corrections to the bundle control point rectangularly.
-   *
-   * @param factor The unit conversion factor to use on the coordinates.
-   */
-  void BundleControlPoint::updateAdjustedSurfacePointRectangularly(double factor) {
-      SurfacePoint surfacepoint = adjustedSurfacePoint();
-      double pointX = surfacepoint.GetX().meters();
-      double pointY = surfacepoint.GetY().meters();
-      double pointZ = surfacepoint.GetZ().meters();
-
-      pointX += factor * m_nicVector[0];
-      pointY += factor * m_nicVector[1];
-      pointZ += factor * m_nicVector[2];
-    
-      surfacepoint.SetRectangularCoordinates(Displacement(pointX, Distance::Meters),
-                                               Displacement(pointX, Distance::Meters),
-                                               Displacement(pointZ, Distance::Meters));
-      setAdjustedSurfacePoint(surfacepoint);
-  } 
 
   
   /**
@@ -570,7 +484,7 @@ namespace Isis {
   }
 
 
-// ***TBD*** Need to add bounded vectors to Linear Algebra class
+// *** TODO *** Need to add bounded vectors to Linear Algebra class
   /**
    * Accesses the 3 dimensional ordered vector of correction values associated 
    * with coord1, coord2, and coord 3 (latitude, longitude, and radius or X, Y, and Z. 
@@ -889,7 +803,7 @@ namespace Isis {
     double Y         = m_controlPoint->GetAdjustedSurfacePoint().GetY().kilometers();
     double Z         = m_controlPoint->GetAdjustedSurfacePoint().GetZ().kilometers();
 
-    // Coordinate corrections are currently set in BundleAdjust::applyParameterCorrections in the
+    // Coordinate corrections are currently set in applyParameterCorrections.  Units depend on
     //  coordTypeBundle coordinates (radians for Latitudinal coordinates and km for Rectangular).
     // point corrections and initial sigmas.....
     double cor_X_m = 0.;                     // X correction, meters
@@ -1120,5 +1034,103 @@ QString BundleControlPoint::formatCoordAdjustedSigmaString(SurfacePoint::CoordIn
                                                                 int fieldWidth, int precision,
                                                                 bool errorPropagation) const {
     return formatAdjustedSigmaString(index, fieldWidth, precision, errorPropagation);
+  }
+
+
+  /**
+   * Apply the parameter corrections to the bundle control point latitudinally.
+   *
+   * @param factor The unit conversion factor to use on lat & lon.  Radius is in km & converted to m
+   * @param target The BundleTargetBody.
+   */
+  void BundleControlPoint::updateAdjustedSurfacePointLatitudinally
+               (const BundleTargetBodyQsp target) {
+      SurfacePoint surfacepoint = adjustedSurfacePoint();
+      double pointLat = surfacepoint.GetLatitude().degrees();
+      double pointLon = surfacepoint.GetLongitude().degrees();
+      double pointRad = surfacepoint.GetLocalRadius().meters();
+
+      // get point parameter corrections
+      double latCorrection = m_nicVector[0];
+      double lonCorrection = m_nicVector[1];
+      double radCorrection = m_nicVector[2];
+
+      // convert to degrees and apply
+      pointLat += RAD2DEG * latCorrection;
+      pointLon += RAD2DEG * lonCorrection;
+
+      // Make sure updated values are still in valid range(0 to 360 for lon and -90 to 90 for lat)
+      if (pointLat < -90.0) {
+        pointLat = -180.0 - pointLat;
+        pointLon = pointLon + 180.0;
+      }
+      if (pointLat > 90.0) {
+        pointLat = 180.0 - pointLat;
+        pointLon = pointLon + 180.0;
+      }
+      while (pointLon > 360.0) {
+        pointLon = pointLon - 360.0;
+      }
+      while (pointLon < 0.0) {
+        pointLon = pointLon + 360.0;
+      }
+
+      // convert to meters and apply
+      pointRad += 1000. * radCorrection;
+      
+      // ken testing - if solving for target body mean radius, set radius to current
+      // mean radius value
+      // Only allow radius options for Latitudinal coordinates
+      if (target && (target->solveMeanRadius() || target->solveTriaxialRadii()) ) {
+        if (target->solveMeanRadius()) {
+          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                               Longitude(pointLon, Angle::Degrees),
+                                               target->meanRadius());
+        }
+        else if (target->solveTriaxialRadii()) {
+            Distance localRadius = target->localRadius(Latitude(pointLat, Angle::Degrees),
+                                                   Longitude(pointLon, Angle::Degrees));
+            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                                 Longitude(pointLon, Angle::Degrees),
+                                                 localRadius);
+        }
+      }
+      else {
+        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
+                                             Longitude(pointLon, Angle::Degrees),
+                                             Distance(pointRad, Distance::Meters));
+      }
+      // Reset the point now that it has been updated
+      setAdjustedSurfacePoint(surfacepoint);
+  }
+
+
+  /**
+   * Apply the parameter corrections to the bundle control point rectangularly.
+   *
+   * @param factor The unit conversion factor to use on the coordinates.
+   */
+  void BundleControlPoint::updateAdjustedSurfacePointRectangularly() {
+      SurfacePoint surfacepoint = adjustedSurfacePoint();
+      double pointX = surfacepoint.GetX().meters();
+      double pointY = surfacepoint.GetY().meters();
+      double pointZ = surfacepoint.GetZ().meters();
+
+      // get point parameter corrections
+      double XCorrection = m_nicVector[0];
+      double YCorrection = m_nicVector[1];
+      double ZCorrection = m_nicVector[2];
+
+      // Convert corrections to meters and apply
+      pointX += 1000. * XCorrection;
+      pointY += 1000. * YCorrection;
+      pointZ += 1000. * ZCorrection;
+    
+      surfacepoint.SetRectangularCoordinates(
+                                             Displacement(pointX, Displacement::Meters),
+                                             Displacement(pointY, Displacement::Meters),
+                                             Displacement(pointZ, Displacement::Meters));
+      // Reset the point now that it has been updated
+      setAdjustedSurfacePoint(surfacepoint);
   }
 }

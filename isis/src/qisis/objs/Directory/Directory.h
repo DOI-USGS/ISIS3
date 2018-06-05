@@ -49,6 +49,7 @@ namespace Isis {
   class BundleObservation;
   class BundleObservationView;
   class ChipViewportsWidget;
+  class CnetEditorView;
   class CnetEditorWidget;
   class Control;
   class ControlNet;
@@ -206,6 +207,35 @@ namespace Isis {
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-03-14 Ken Edmundson - Modified m_controlMap value from QWidget to
+   *                           CnetEditorWidget and changed connection  to take signal from
+   *                           a CnetEditorWidget instead of a QWidget for destruction of
+   *                           CnetEditorWidgets. Added ability to view bundleout.txt file in method
+   *                           addBundleObservationView.
+   *   @history 2018-03-14 Tracie Sucharski - Changed MosaicControlNetTool to ControlNetTool in
+   *                           addCubeDnView. Added method controlUsedInCnetEditorWidget so Project
+   *                           knows whether it is safe to close a control net when a new active is
+   *                           set. References #5026.
+   *   @history 2018-03-30 Tracie Sucharski - Use the Control::write to write the control net to
+   *                           disk instead of directly calling ControlNet::Write, so that the
+   *                           Control can keep track of the modified status of the control net.
+   *                           Connect cnetModified signal to Project::activeControlModified so
+   *                           modified state of the active control can be set so project knows
+   *                           that control has unsaved changes.
+   *   @history 2018-04-02 Tracie Sucharski - Cleanup m_controlPointEditViewWidget pointer when
+   *                           the ControlPointEditView is deleted. Added slot to reload the active
+   *                           control net in cneteditor view, effectively discarding any edits.
+   *                           This was done because there is no way to re-load a control net in the
+   *                           CnetEditor widget classes.
+   *   @history 2018-04-04 Tracie Sucharski - Created CnetEditorView class to use to add to QMdiArea
+   *                           instead of a CnetEditorWidget. This way there is no longer a
+   *                           disconnect between what has been added to the QMdiArea and what is
+   *                           stored in m_cnetEditorViewWidgets.
+   *   @history 2018-05-08 Tracie Sucharski - When saving active control, reset the "Save Net"
+   *                           button to black in the ControlPointEditorWidget.
+   *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
+   *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
+   *                           saved/restored including the ImageFileListWidget. Fixes #5422.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -220,7 +250,7 @@ namespace Isis {
       QStringList recentProjectsList();
 
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
-      CnetEditorWidget *addCnetEditorView(Control *network);
+      CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
       MatrixSceneWidget *addMatrixView();
@@ -249,7 +279,7 @@ namespace Isis {
       QList<QAction *> toolPadActions();
 
       QList<BundleObservationView *> bundleObservationViews();
-      QList<CnetEditorWidget *> cnetEditorViews();
+      QList<CnetEditorView *> cnetEditorViews();
       QList<CubeDnView *> cubeDnViews();
       QList<Footprint2DView *> footprint2DViews();
       QList<MatrixSceneWidget *> matrixViews();
@@ -260,6 +290,8 @@ namespace Isis {
       QList<QProgressBar *> progressBars();
       ControlPointEditView *controlPointEditView();
 //      ChipViewportsWidget *controlPointChipViewports();
+
+      bool controlUsedInCnetEditorWidget(Control *control);
 
       // Return the control point Id currently in the ControlPointEditWidget, if it exists
       QString editPointId();
@@ -324,6 +356,8 @@ namespace Isis {
       void newWarning();
       void newWidgetAvailable(QWidget *newWidget);
 
+      void viewClosed(QWidget *widget);
+
       void cnetModified();
       void redrawMeasures();
 
@@ -343,6 +377,7 @@ namespace Isis {
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
+      void saveActiveControl();
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
@@ -360,6 +395,7 @@ namespace Isis {
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
       void newActiveControl(bool newControl);
+      void reloadActiveControlInCnetEditorView();
 
     private:
       /**
@@ -415,7 +451,7 @@ namespace Isis {
 
       //!< List of BundleObservationView
       QList< QPointer<BundleObservationView> > m_bundleObservationViews;
-      QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;  //!< List of CnetEditorWidgets
+      QList< QPointer<CnetEditorView> > m_cnetEditorViewWidgets;  //!< List of CnetEditorViews
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
@@ -458,7 +494,7 @@ namespace Isis {
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
 
-      QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
+      QMultiMap<Control*, CnetEditorView *> m_controlMap; //!< Map to hold every view with an open Control
 
       QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
 
