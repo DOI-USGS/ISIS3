@@ -130,14 +130,14 @@ namespace Isis {
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-
+    addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     m_sceneWidget->addToPermanent(m_permToolBar);
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
 
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
+//  m_activeToolBarAction = new QWidgetAction(this);
+//  m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
 
     setAcceptDrops(true);
 

@@ -238,8 +238,8 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
-   *   @history 2018-05-30 Summer Stapleton - updated the emit in addFootprint2DView from
-   *                           newWidgetAvailable to newDockAvailable to handle new signal from
+   *   @history 2018-05-30 Summer Stapleton - updated the emit in addFootprint2DView from 
+   *                           newWidgetAvailable to newDockAvailable to handle new signal from 
    *                           IpceMainWindow. References #5433.
    *   @history 2018-05-30 Tracie Sucharski - Changed for re-factored docked views. Added signal to
    *                           let IpceMainWindow know there is a new view available for docking.
