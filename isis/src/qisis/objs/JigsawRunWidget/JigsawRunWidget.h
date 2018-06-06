@@ -3,7 +3,9 @@
 
 #include <QDialog>
 #include <QDir>
+#include <QDockWidget>
 #include <QFrame>
+#include <QMessageBox>
 #include <QPointer>
 #include <QWidget>
 
@@ -15,6 +17,7 @@ namespace Ui {
 }
 
 class QString;
+class QThread;
 
 namespace Isis {
   class BundleAdjust;
@@ -89,7 +92,7 @@ namespace Isis {
    *                           workflow in which JigsawSetupDialog is only ever called from a
    *                           button on this widget. Fixes #5428. 
    */
-  class JigsawRunWidget : public QFrame {
+  class JigsawRunWidget : public QDockWidget {
     Q_OBJECT
 
   public:
@@ -101,12 +104,16 @@ namespace Isis {
                           QWidget *parent = 0);
 
     ~JigsawRunWidget();
+    void closeEvent(QCloseEvent *event);
+
 
   public slots:
     void outputBundleStatus(QString status);
     void errorString(QString error);
     void reportException(QString exception);
-    void updateIterationSigma0(int iteration, double sigma0);
+    void updateIteration(int iteration);
+    void updatePoint(int point);
+    void updateStatus(QString status);
     void bundleFinished(BundleSolutionInfo *bundleSolutionInfo);
     void notifyThreadFinished();
 
@@ -123,6 +130,7 @@ namespace Isis {
     bool m_bRunning; /**< Indicates whether or not the bundle adjust is running. */
     QPushButton *m_accept; /**< widget's accept button that is used to save the bundle results. */
     QPushButton *m_reject; /**< widget's reject button that is used to discard the results. */
+    QThread *m_bundleThread; /**< separate thread for running bundle adjust calculations in. */
 
     /**
      * Functor used to copy images to a specified destination directory. This is used by

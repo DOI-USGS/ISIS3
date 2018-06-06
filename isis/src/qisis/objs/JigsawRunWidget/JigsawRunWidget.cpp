@@ -1,6 +1,7 @@
 #include "JigsawRunWidget.h"
 
 #include <QtConcurrent>
+#include <QCloseEvent>
 #include <QDebug>
 #include <QDir>
 #include <QFuture>
@@ -37,6 +38,7 @@ namespace Isis {
   JigsawRunWidget::JigsawRunWidget(Project *project, QWidget *parent) : m_ui(new Ui::JigsawRunWidget) {
     m_project = project;
     m_selectedControl = NULL;
+    m_bundleThread = NULL;
     init();
   }
 
@@ -63,6 +65,7 @@ namespace Isis {
     m_selectedControl = selectedControl;
     m_selectedControlName = FileName(selectedControl->fileName()).name();
     m_outputControlName = outputControlFileName;
+    m_bundleThread = NULL;
     init();
   }
 
@@ -92,8 +95,8 @@ namespace Isis {
     m_accept->setToolTip(tr("Accept the bundle results and save them to the project."));
     m_reject->setToolTip(tr("Reject and discard the bundle results. This resets the widget."));
 
-    m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
-    m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
+    // m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
+    // m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
 
     // Accept will handle saving the results.
     connect(m_accept, SIGNAL(clicked(bool)), this, SLOT(acceptBundleResults()));
@@ -110,11 +113,6 @@ namespace Isis {
       m_ui->useLastSettings->setEnabled(false);
     }
 
-    m_ui->iterationLcdNumber->setDigitCount(3);
-
-    m_ui->sigma0LcdNumber->setMode(QLCDNumber::Dec);
-    m_ui->sigma0LcdNumber->setDigitCount(5);
-
     QString lastSettingsToolTip("Use the settings from the most recently accepted bundle adjust.");
     QString lastSettingsWhat("When checked, the settings from the most recently accepted bundle "
                              "adjust (i.e. the most recent bundle results in the project) will be "
@@ -123,6 +121,7 @@ namespace Isis {
     m_ui->useLastSettings->setWhatsThis(lastSettingsWhat);
 
     // setWindowFlags(Qt::WindowStaysOnTopHint);
+
   }
 
 
@@ -132,16 +131,20 @@ namespace Isis {
   JigsawRunWidget::~JigsawRunWidget() {
     if (m_bundleSolutionInfo) {
       delete m_bundleSolutionInfo;
+      m_bundleSolutionInfo = NULL;
     }
     if (m_bundleAdjust) {
-      delete m_bundleAdjust;
-      m_bundleAdjust = NULL;
+      m_bundleAdjust->deleteLater();
+      // m_bundleAdjust = NULL;
+    }
+    if (m_bundleThread) {
+      m_bundleThread->quit();
+      m_bundleThread = NULL;
     }
     if (m_ui) {
       delete m_ui;
+      m_ui = NULL;
     }
-    m_bundleSolutionInfo = NULL;
-    m_ui = NULL;
   }
 
 
@@ -211,7 +214,7 @@ namespace Isis {
       // Clear the dialog displays.
       clearDialog();
 
-      QThread *bundleThread = new QThread;
+      m_bundleThread = new QThread;
 
       // Make sure to clean up any previously run bundle adjusts.
       if (m_bundleAdjust) {
@@ -222,7 +225,7 @@ namespace Isis {
       m_bundleAdjust = new BundleAdjust(m_bundleSettings, *m_selectedControl, m_project->images(),
                                         false);
 
-      m_bundleAdjust->moveToThread(bundleThread);
+      m_bundleAdjust->moveToThread(m_bundleThread);
 
       // Track the status updates bundle adjust gives and update the dialog.
       connect( m_bundleAdjust, SIGNAL( statusUpdate(QString) ),
@@ -233,11 +236,17 @@ namespace Isis {
                this, SLOT( errorString(QString) ) );
 
       // Update the iteration dialog element when the bundle updates its iteration count.
-      connect( m_bundleAdjust, SIGNAL( iterationUpdate(int, double) ),
-               this, SLOT( updateIterationSigma0(int, double) ) );
+      connect( m_bundleAdjust, SIGNAL( iterationUpdate(int) ),
+               this, SLOT( updateIteration(int) ) );
+
+      connect( m_bundleAdjust, SIGNAL( pointUpdate(int) ),
+               this, SLOT( updatePoint(int) ) );
+
+      connect( m_bundleAdjust, SIGNAL( statusBarUpdate(QString) ),
+               this, SLOT( updateStatus(QString) ) );
 
       // When we start the bundle thread, run the bundle adjustment.
-      connect( bundleThread, SIGNAL( started() ),
+      connect( m_bundleThread, SIGNAL( started() ),
                m_bundleAdjust, SLOT( solveCholesky() ) );
 
       // When the bundle adjust says results are ready, we can allow the dialog to update the
@@ -246,19 +255,23 @@ namespace Isis {
                this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
 
       // Schedule the bundle thread for deletion when it finishes.
-      connect( bundleThread, SIGNAL( finished() ),
-               bundleThread, SLOT( deleteLater() ) );
+      connect( m_bundleThread, SIGNAL( finished() ),
+               m_bundleThread, SLOT( deleteLater() ) );
 
       // ken testing
       // Notify the dialog that the bundle thread is finished, and update the gui elements.
-      connect( bundleThread, SIGNAL( finished() ),
+      connect( m_bundleThread, SIGNAL( finished() ),
                this, SLOT( notifyThreadFinished() ) );
 
       // Tell the thread to quit (stop) when the bundle adjust finishes (successfully or not)
       connect( m_bundleAdjust, SIGNAL( finished() ),
-               bundleThread, SLOT( quit() ) );
+               m_bundleThread, SLOT( quit() ) );
 
-      bundleThread->start();
+      m_ui->imagesLcdNumber->display(m_bundleAdjust->numberOfImages());
+      m_ui->pointsLcdNumber->display(m_bundleAdjust->controlNet()->GetNumPoints());
+      m_ui->measuresLcdNumber->display(m_bundleAdjust->controlNet()->GetNumMeasures());
+
+      m_bundleThread->start();
 
       // change "Run" button text to "Abort" (or maybe pause)
       m_bRunning = true;
@@ -267,9 +280,9 @@ namespace Isis {
     }
     else {
       // Make sure to abort the bundle if it is currently running.
-      m_bundleAdjust->abortBundle();
-      m_bRunning = false;
       m_ui->JigsawRunButton->setText("&Aborting...");
+      m_ui->statusOutputLabel->setText("Aborting...");
+      m_bundleAdjust->abortBundle();
       update();
     }
   }
@@ -501,9 +514,19 @@ namespace Isis {
    * the state of the buttons.
    */
   void JigsawRunWidget::clearDialog() {
-    m_ui->iterationLcdNumber->display(0);
-    m_ui->sigma0LcdNumber->display(0);
     m_ui->statusUpdatesLabel->clear();
+    m_ui->iterationLcdNumber->display(0);
+    m_ui->pointLcdNumber->display(0);
+
+    m_ui->imagesLcdNumber->display(0);
+    m_ui->pointsLcdNumber->display(0);
+    m_ui->measuresLcdNumber->display(0);
+
+    m_ui->rmsAdjustedPointSigmasGroupBox->setEnabled(false);
+    m_ui->latitudeLcdNumber->display(0);
+    m_ui->longitudeLcdNumber->display(0);
+    m_ui->radiusLcdNumber->display(0);
+
     updateScrollBar();
   }
 
@@ -569,10 +592,30 @@ namespace Isis {
    *
    * @param error Error status of bundle.
    */
-  void JigsawRunWidget::updateIterationSigma0(int iteration, double sigma0) {
+  void JigsawRunWidget::updateIteration(int iteration) {
     m_ui->iterationLcdNumber->display(iteration);
-    m_ui->sigma0LcdNumber->display(sigma0);
+    update();
+  }
 
+
+    /**
+   * Update the label or text edit area with the error message by appending to list and refreshing.
+   *
+   * @param error Error status of bundle.
+   */
+  void JigsawRunWidget::updatePoint(int point) {
+    m_ui->pointLcdNumber->display(point);
+    update();
+  }
+
+
+      /**
+   * Update the label or text edit area with the error message by appending to list and refreshing.
+   *
+   * @param error Error status of bundle.
+   */
+  void JigsawRunWidget::updateStatus(QString status) {
+    m_ui->statusOutputLabel->setText(status);
     update();
   }
 
@@ -590,10 +633,35 @@ namespace Isis {
 
     // set Run button text back to "Run"
     m_ui->JigsawRunButton->setText("&Run");
+
+    if (m_bundleAdjust->isAborted()) {
+      m_ui->statusOutputLabel->setText("Aborted");
+    }
+
+    if (m_bundleSettings->errorPropagation()) {
+      m_ui->latitudeLcdNumber->display(
+                              m_bundleSolutionInfo->bundleResults().sigmaLatitudeStatisticsRms());
+      m_ui->longitudeLcdNumber->display(
+                              m_bundleSolutionInfo->bundleResults().sigmaLongitudeStatisticsRms());
+
+      if (m_bundleSettings->solveRadius()) {
+        m_ui->radiusLcdNumber->display(
+                              m_bundleSolutionInfo->bundleResults().sigmaRadiusStatisticsRms());
+      }
+      else {
+        m_ui->radiusLcdNumber->setEnabled(false);
+      }
+      
+    }
+    else {
+      m_ui->latitudeLcdNumber->setEnabled(false);
+      m_ui->longitudeLcdNumber->setEnabled(false);
+      m_ui->radiusLcdNumber->setEnabled(false);
+    }
+
     // Since this slot is invoked when the thread finishes, the bundle adjustment is no longer
     // running.
     m_bRunning = false;
-
     updateScrollBar();
 
     update();
@@ -618,6 +686,30 @@ namespace Isis {
     m_accept->setEnabled(true);
     m_reject->setEnabled(true);
   }
+
+
+  void JigsawRunWidget::closeEvent(QCloseEvent *event) {
+    if( m_bRunning ) {
+      QMessageBox::StandardButton resBtn = 
+          QMessageBox::question(this, 
+                                "WARNING",
+                                tr("You are about to abort the bundle adjustment. Are you sure?\n"),
+                                QMessageBox::No | QMessageBox::Yes);
+      if (resBtn != QMessageBox::Yes) { 
+        event->ignore();
+        return;
+      }
+      else if (m_bRunning) { // check m_bRunning again just in case the bundle has finished
+        // We need to wait for the bundle adjust thread to finish before deleting the
+        // JigsawRunWidget so that we dont close the widget before the thread is finished 
+        connect(m_bundleThread, SIGNAL(finished()), this, SLOT(deleteLater()));
+        m_bundleAdjust->abortBundle();
+        return;
+      }
+    } 
+    event->accept();
+
+  }
 }
 
   /**
@@ -626,7 +718,7 @@ namespace Isis {
    * 2015-08-24 Notes added: Ken Edmundson
    *
    * If a bundle is NOT currently running, we ...
-   *   1) create a QThread object (bundleThread)
+   *   1) create a QThread object (m_bundleThread)
    *   2) create a new pointer to a BundleAdjust object (m_bundleAdjust)
    *   3) move the BundleAdjust object to the QThread
    *   4) connect signals & slots to ...

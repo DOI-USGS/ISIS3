@@ -215,10 +215,12 @@ namespace Isis {
    * @param[in] newWidget (QWidget *)
    */
   void IpceMainWindow::addView(QWidget *newWidget) {
-    if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
+    if (qobject_cast<JigsawRunWidget *>(newWidget)) {
+      splitDockWidget(m_projectDock, (QDockWidget*)newWidget, Qt::Vertical);
+    }
+    else if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||
-         qobject_cast<TemplateEditorWidget *>(newWidget)||
-         qobject_cast<JigsawRunWidget *>(newWidget)) {
+         qobject_cast<TemplateEditorWidget *>(newWidget)) {
       QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
       dock->setAttribute(Qt::WA_DeleteOnClose, true);
       dock->setWidget(newWidget);

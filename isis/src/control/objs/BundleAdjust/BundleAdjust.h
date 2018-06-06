@@ -317,6 +317,7 @@ namespace Isis {
       BundleSolutionInfo    solveCholeskyBR();
 
       QList<ImageList *> imageLists();
+      bool isAborted();
 
     public slots:
       bool solveCholesky();
@@ -338,7 +339,9 @@ namespace Isis {
     signals:
       void statusUpdate(QString);
       void error(QString);
-      void iterationUpdate(int, double);
+      void iterationUpdate(int);
+      void pointUpdate(int);
+      void statusBarUpdate(QString);
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
       void finished();
 
