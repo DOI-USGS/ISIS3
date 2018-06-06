@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -309,6 +309,9 @@
                       <width>1000</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Image measures are flagged as rejected if their residuals are greater than the multiplier times the current standatd deviation (sigma)</string>
                     </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
@@ -956,7 +959,7 @@
                      </size>
                     </property>
                     <property name="inputMask">
-                     <string>9999</string>
+                     <string/>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1007,6 +1010,9 @@
                       <width>100</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Solve for local point radii</string>
                     </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
@@ -1111,6 +1117,9 @@
                       <height>40</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Constrain position and pointing for images within an observation to be identical</string>
+                    </property>
                     <property name="text">
                      <string>Observation Mode</string>
                     </property>
@@ -1135,6 +1144,9 @@
                       <width>16777215</width>
                       <height>40</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Compute adjusted parameter uncertainties</string>
                     </property>
                     <property name="text">
                      <string>Error Propagation</string>
@@ -1243,7 +1255,7 @@
                  <number>-1</number>
                 </property>
                 <property name="value">
-                 <number>0</number>
+                 <number>-1</number>
                 </property>
                </widget>
               </item>

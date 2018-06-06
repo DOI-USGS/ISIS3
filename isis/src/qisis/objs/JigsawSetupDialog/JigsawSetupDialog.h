@@ -57,6 +57,8 @@ namespace Isis {
    *                           fred.net, the output filename QLineEdit is automatically changed to
    *                           fred-out.net. The user can always manually change the output control
    *                           net name to anything they choose.
+   *   @history 2018-06-01 Christopher Combs - Added support for ui changes, exclusive options and 
+   *                           input validators.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -88,12 +90,24 @@ namespace Isis {
     // void on_pointingComboBox_currentIndexChanged(int index);
     void on_inputControlNetCombo_currentTextChanged(const QString &arg1);
 
-    // maximum liklihood tab
+    // general tab - line edit validators 
+    void on_pointLatitudeSigmaLineEdit_textChanged(const QString &arg1);
+    void on_pointLongitudeSigmaLineEdit_textChanged(const QString &arg1);
+    void on_pointRadiusSigmaLineEdit_textChanged(const QString &arg1);
+
+    void on_outlierRejectionMultiplierLineEdit_textChanged(const QString &arg1);
+    void on_maximumLikelihoodModel1QuantileLineEdit_textChanged(const QString &arg1);
+    void on_maximumLikelihoodModel2QuantileLineEdit_textChanged(const QString &arg1);
+    void on_maximumLikelihoodModel3QuantileLineEdit_textChanged(const QString &arg1);
+
+    void on_sigma0ThresholdLineEdit_textChanged(const QString &arg1);
+    void on_maximumIterationsLineEdit_textChanged(const QString &arg1);
+
+    // general tab - outlier rejection exclusivity lock/unlocks
     void on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel2ComboBox_currentIndexChanged(int index);
     void on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index);
     void on_outlierRejectionCheckBox_stateChanged(int arg1);
-
 
     // target body tab
     void on_poleRaCheckBox_stateChanged(int arg1);
@@ -105,7 +119,7 @@ namespace Isis {
     void on_radiiButtonGroupClicked(int arg1);
     void on_aRadiusLineEdit_textChanged(const QString &arg1);
     void on_targetBodyComboBox_currentIndexChanged(int index);
-    // void on_spkSolveDegreeSpinBox_2_valueChanged(int arg1);
+    void on_spkSolveDegreeSpinBox_valueChanged(int arg1);
     void on_rightAscensionLineEdit_textChanged(const QString &arg1);
     void on_declinationLineEdit_textChanged(const QString &arg1);
     void on_rightAscensionVelocityLineEdit_textChanged(const QString &arg1);

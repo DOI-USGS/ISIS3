@@ -179,6 +179,30 @@ namespace Isis {
                                                                 m_ui->meanRadiusLineEdit));
     m_ui->meanRadiusSigmaLineEdit->setValidator(sigmaValidator);
 
+
+
+    // jigsaw run setup general tab validation
+    // global apriori point sigmas
+    m_ui->pointLatitudeSigmaLineEdit->setValidator(new QDoubleValidator(0.0, 360.0, 8, this));
+    m_ui->pointLongitudeSigmaLineEdit->setValidator(new QDoubleValidator(0.0, 360.0, 8, this));
+    m_ui->pointRadiusSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+
+    // outlier rejection
+    m_ui->outlierRejectionMultiplierLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->maximumLikelihoodModel1QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+    m_ui->maximumLikelihoodModel2QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+    m_ui->maximumLikelihoodModel3QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+
+    // convergence criteria
+    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
+
+
+
     // signals for target body tab
 //    connect(m_ui->radiiButtonGroup, SIGNAL(buttonClicked(int)),
 //            this, SLOT(on_radiiGroupClicked(int)));
@@ -205,14 +229,8 @@ namespace Isis {
     m_ui->pointRadiusSigmaLineEdit->setEnabled(checked);
   }
 
-
-
-//  void JigsawSetupDialog::on_outlierRejectionCheckBox_toggled(bool checked) {
-//    m_ui->outlierRejectionMultiplierLabel->setEnabled(checked);
-//    m_ui->outlierRejectionMultiplierLineEdit->setEnabled(checked);
-//  }
-
-
+//  m_ui->positionComboBox has been removed from the general tab, it is planned to be moved to 
+//  the obs solve settings tab. This function will be commented out until it is added back.
 //   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(int index) {
 
 //     // indices:
@@ -242,7 +260,8 @@ namespace Isis {
 
 //   }
 
-
+//  m_ui->pointingComboBox has been removed from the general tab, it is planned to be moved to 
+//  the obs solve settings tab. This function will be commented out until it is added back.
 //   void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(int index) {
 
 //     // indices:
@@ -355,6 +374,7 @@ namespace Isis {
     // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
     m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
     m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
+    std::cout<<"observationSolveSettings.spkDegree(): " << observationSolveSettings.spkDegree() <<std::endl;
     m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
 
 
@@ -1022,45 +1042,51 @@ namespace Isis {
   }
 
 
-  // void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_2_valueChanged(int arg1) {
-  //   if (arg1 == -1) {
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(NONE)");
-  //     m_ui->positionAprioriSigmaTable->setRowCount(0);
-  //   }
-  //   m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
-  //   m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
+  void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int arg1) {
+    if (arg1 == -1) {
+      m_ui->spkSolveDegreeSpinBox->setSuffix("(NONE)");
+      m_ui->positionAprioriSigmaTable->setRowCount(0);
+    }
+    m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
+    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
 
-  //   if (arg1 == 0) {
-  //     QTableWidgetItem *twItem = new QTableWidgetItem();
-  //     twItem->setText("POSITION");
-  //     m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-  //     QTableWidgetItem *twItemunits = new QTableWidgetItem();
-  //     twItemunits->setText("meters");
-  //     //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
-  //   }
-  //   else if (arg1 == 1) {
-  //     m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
-  //     m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
-  //   }
-  //   else if (arg1 == 2) {
-  //     m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
-  //     m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
-  //   }
-  // /*
-  //   else if (arg1 == 0) {
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
-  //     int nRows = m_ui->positionAprioriSigmaTable->rowCount();
+    if (arg1 == 0) {
+      QTableWidgetItem *twItem = new QTableWidgetItem();
+      twItem->setText("POSITION");
+      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+      QTableWidgetItem *twItemunits = new QTableWidgetItem();
+      twItemunits->setText("meters");
+      //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
+    }
+    else if (arg1 == 1) {
+      QTableWidgetItem *twItem = new QTableWidgetItem();
+      twItem->setText("VELOCITY");
+      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+      QTableWidgetItem *twItemunits = new QTableWidgetItem();
+      twItemunits->setText("m/sec");
+    }
+    else if (arg1 == 2) {
+      QTableWidgetItem *twItem = new QTableWidgetItem();
+      twItem->setText("ACCELERATION");
+      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+      QTableWidgetItem *twItemunits = new QTableWidgetItem();
+      twItemunits->setText("m/s^2");
+    }
+  /*
+    else if (arg1 == 0) {
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
+      int nRows = m_ui->positionAprioriSigmaTable->rowCount();
 
-  //     m_ui->positionAprioriSigmaTable->insertRow(nRows);
-  //   }
-  //   else if (arg1 == 1)
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
-  //   else if (arg1 == 2)
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
-  //   else
-  //     m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
-  // */
-  // }
+      m_ui->positionAprioriSigmaTable->insertRow(nRows);
+    }
+    else if (arg1 == 1)
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
+    else if (arg1 == 2)
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
+    else
+      m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
+  */
+  }
 
 
   void Isis::JigsawSetupDialog::on_rightAscensionLineEdit_textChanged(const QString &arg1) {
@@ -1139,6 +1165,125 @@ namespace Isis {
     }
     update();
   }
+
+  // general tab text validation
+  // global apriori point sigmas
+  void Isis::JigsawSetupDialog::on_pointLatitudeSigmaLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->pointLatitudeSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+  void Isis::JigsawSetupDialog::on_pointLongitudeSigmaLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->pointLongitudeSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_pointRadiusSigmaLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->pointRadiusSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+  // outlier rejection
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel1QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel2QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel3QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  // convergence criteria
+  void Isis::JigsawSetupDialog::on_outlierRejectionMultiplierLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_sigma0ThresholdLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->sigma0ThresholdLineEdit->hasAcceptableInput()) {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumIterationsLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumIterationsLineEdit->hasAcceptableInput()) {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    else {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    update();
+  }
+
 
   void JigsawSetupDialog::showTargetParametersGroupBox() {
     m_ui->targetParametersGroupBox->setEnabled(true);
