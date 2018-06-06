@@ -240,12 +240,14 @@ namespace Isis {
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
    *   @history 2018-05-30 Kaitlyn Lee - addControlPointEditView() and addCnetEditorView() now emit
    *                           newDockAvailable().
-   *   @history 2018-05-30 Summer Stapleton - updated the emit in addFootprint2DView from 
-   *                           newWidgetAvailable to newDockAvailable to handle new signal from 
+   *   @history 2018-05-30 Summer Stapleton - updated the emit in addFootprint2DView from
+   *                           newWidgetAvailable to newDockAvailable to handle new signal from
    *                           IpceMainWindow. References #5433.
    *   @history 2018-05-30 Tracie Sucharski - Changed for re-factored docked views. Added signal to
    *                           let IpceMainWindow know there is a new view available for docking.
    *                           This needs further work to cleanup and change the mdi interface.
+   *   @history 2018-06-06 Kaitlyn Lee - Changed the emit in addBundleObservationView() from newWidgetAvailable()
+   *                           to newDockAvailable().
    */
   class Directory : public QObject {
     Q_OBJECT

@@ -631,7 +631,7 @@ namespace Isis {
       result->setObjectName( result->windowTitle() );
     }
 
-    emit newWidgetAvailable(result);
+    emit newDockAvailable(result);
 
     return result;
   }
