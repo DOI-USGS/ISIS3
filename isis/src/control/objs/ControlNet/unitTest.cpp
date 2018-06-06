@@ -10,7 +10,6 @@
 #include <QString>
 #include <QVector>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
@@ -286,6 +285,14 @@ int main() {
   p0m0->SetCubeSerialNumber("DELTA");
   p0->Add(p0m0);
   cout << net.GraphToString() << "\n";
+  
+  // test FindClosest()
+  cout << "testing FindClosest....................\n";
+  p1m0->SetCoordinate(1.0, 1.0);
+  p0m0->SetCoordinate(1.0, 2.0);
+
+  ControlPoint *closestPoint = net.FindClosest("ALPHA", 1.0,1.0);
+  cout << "Closest Point ID: " << closestPoint->GetId() << endl; 
 
   // test point deletion
   cout << "testing point deletion.................................\n";
@@ -548,8 +555,6 @@ int main() {
   remove("temp.bin");
   remove("temp2.bin");
 
-  cout << "Testing GetCubeGraphNodes\n";
-
 /*  QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
   // Use this to sort the output
   QList<QString> sortedSNs;
@@ -560,9 +565,6 @@ int main() {
   foreach ( QString sn, sortedSNs ) {
     cout << "    " << sn << "\n";
   }*/
-
-  cout << "\nTesting getGraphNode: ";
-//       << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
 
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
 
@@ -582,10 +584,7 @@ int main() {
   cout << "And zero pointIDs in the original control net. There are: "
        << QString::number(net.GetPointIds().length()) << endl;
 
-  cout << "And zero cubeGraphNodes in the original control net. There are: ";
-//       << QString::number(net.GetCubeGraphNodes().length()) << endl;
-
-  //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
+    //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");
 
   return 0;

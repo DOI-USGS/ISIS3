@@ -397,28 +397,38 @@ namespace Isis {
    * @returns A string representation of the ControlNet graph
    */
   QString ControlNet::GraphToString() const {
-    // Iterate through the vertices and print them out
-    
-    // Checking to make sure we match...    
-    QList<QString> keys = m_vertexMap.keys();
-    for (int i=0; i< keys.size(); i++) {
-      std::cout << keys[i] << " = " << m_controlGraph[m_vertexMap[keys[i]]].serial << std::endl; 
-    }
+    /*QList<QList<QString>> serialConnections = GetSerialConnections();
 
-    QString graphString; 
+    for (int i=0; i < serialConnections.size(); i++) {
+        std::cout << "\n\n" << std::endl; 
+      for (int j=0; j< serialConnections[i].size(); j++) {
+        std::cout << serialConnections[i][j] << std::endl; 
+      }
+    }*/
+
+    /*QString graphString; 
     typedef boost::graph_traits<Network>::vertex_iterator vertex_iter;
     std::pair<vertex_iter, vertex_iter> vp;
     for(vp = vertices(m_controlGraph); vp.first != vp.second; ++vp.first) {
-      std::cout << "serial: " << m_controlGraph[*vp.first].serial << std::endl;
-      std::cout << "assoc. measure list: " << m_controlGraph[*vp.first].measures.size() << std::endl;
-    }
+      std::cout << m_controlGraph[*vp.first].serial << " : \n" << std::endl;
+      QHash<ControlPoint*, ControlMeasure*> measures = m_controlGraph[*vp.first].measures;
+      QList<ControlPoint*> keys = measures.keys();
+      for (int i=0; i < keys.size(); i++) {
+        std::cout << "     " << measures[keys[i]]->GetCubeSerialNumber() << " : " << keys[i]->GetId() << std::endl; 
+      }
+    }*/
 
     typedef boost::graph_traits<Network>::edge_iterator edge_iter;
-    std::pair<edge_iter, edge_iter> ep;
     edge_iter ei, ei_end;
-    for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei)
-      std::cout << "strength: " << m_controlGraph[*ei].strength << endl;
+    for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei) {
+      ImageVertex sourceImage = source(*ei, m_controlGraph);
+      ImageVertex targetImage = target(*ei, m_controlGraph);
+      if (sourceImage != targetImage) {
+        std::cout << m_controlGraph[sourceImage].serial << " [" << m_controlGraph[sourceImage].measures.size() << "] " << "---------" << m_controlGraph[targetImage].serial << " [" << m_controlGraph[targetImage].measures.size() << "] strength: " << " [" << m_controlGraph[*ei].strength << "]" << std::endl;
+      }
+    }
 
+    QString graphString; 
     return graphString;
    }
 

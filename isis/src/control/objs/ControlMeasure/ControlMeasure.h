@@ -174,6 +174,10 @@ namespace Isis {
    *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
+   *   @history 2018-01-26 Kristin Berry - Removed code related to now-unused ControlCubeGraphNode,
+   *                           as part of the switch to using the boost graph library.
+   *                           References #5434
+   *                           
    */
   class ControlMeasure : public QObject {
 

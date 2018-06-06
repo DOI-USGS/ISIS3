@@ -36,9 +36,7 @@ int main() {
   ControlMeasure m;
   qDebug() << "Test 1 Default values";
   m.SetChooserName("ManuallySet");
-  qDebug() << "Set Chooser Name" ; 
   m.SetDateTime("2001-01-01T00:00:00");
-  qDebug() << "Set DateTime" ; 
   outit(m);
 
   m.SetCubeSerialNumber("Test");
@@ -54,33 +52,33 @@ int main() {
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   qDebug() << "Test 2";
-  //  outit(m);
+  outit(m);
 
   m.SetType(ControlMeasure::Candidate);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   qDebug() << "Test 3";
-  //  outit(m);
+  outit(m);
 
   m.SetType(ControlMeasure::Manual);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   m.SetEditLock(true);
   qDebug() << "Test 4";
-  //   outit(m);
+  outit(m);
 
   m.SetType(ControlMeasure::RegisteredPixel);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   m.SetEditLock(false);
   qDebug() << "Test 5";
-  //  outit(m);
+  outit(m);
 
   m.SetType(ControlMeasure::RegisteredSubPixel);
   m.SetChooserName("Bob");
   m.SetDateTime("2005-05-03T00:00:00");
   qDebug() << "Test 6";
-  //  outit(m);
+  outit(m);
 
   m.SetLogData(ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit, 5.0));
   m.SetChooserName("Bob");
@@ -188,21 +186,13 @@ int main() {
 }
 
 void outit(ControlMeasure &m) {
-  qDebug() << "In outit";
   ControlNet net;
-  qDebug() << "made the net";
   ControlPoint *pt = new ControlPoint;
-  qDebug() << "made the point";
   pt->Add(new ControlMeasure(m));
-  qDebug() << "added the measure";
   pt->SetId("CP01");
-    qDebug() << "added the measure";
   pt->SetChooserName("Me");
-    qDebug() << "added the measure";
   pt->SetDateTime("Yesterday");
-    qDebug() << "added the measure";
   net.AddPoint(pt);
-  qDebug() << "added the point";
   net.SetNetworkId("Identifier");
   net.SetCreatedDate("Yesterday");
   net.SetModifiedDate("Yesterday");

@@ -221,7 +221,10 @@ namespace Isis {
    *                           adds to the control network.
    *   @history 2018-01-26 Kristin Berry - Removed unused methods and associated code:
    *                           MinimumSpanningTree(), GetNodeConnections(), RandomBFS(), Shuffle(),
-   *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode()
+   *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode(). References #5434
+   *  @history 2018-01-26 Kristin Berry - Updated to use the boost graph library instead of our
+   *                           custom graph structure ControlCubeGraphNode. 
+   *                           
    *                           
    */
   class ControlNet : public QObject {
