@@ -12,6 +12,8 @@ namespace Isis {
 
   ControlNetVitals::ControlNetVitals(ControlNet *cnet) {
     m_controlNet = cnet;
+    connect(cnet, SIGNAL(networkStructureModified()),
+            this, SLOT(validate()));
     validate();
   }
 
