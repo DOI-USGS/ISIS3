@@ -13,11 +13,12 @@
 
 namespace Isis {
 
-  ObservationSolveSettingsProxyModel::ObservationSolveSettingsProxyModel(QObject *parent) : QIdentityProxyModel(parent) {
+  SubTreeProxyModel::SubTreeProxyModel(QObject *parent) :
+      QIdentityProxyModel(parent) {
   }
 
 
-  QModelIndex ObservationSolveSettingsProxyModel::mapFromSource(const QModelIndex &sourceIndex) const {
+  QModelIndex SubTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex) const {
     // return QIdentityProxyModel::mapFromSource(sourceIndex);
     qDebug() << "BEGIN mapFromSource(" << sourceIndex << ")";
     // QModelIndex parent = sourceIndex.parent();
@@ -25,6 +26,11 @@ namespace Isis {
     // if (!sourceIndex.isValid()) {
     //   return m_root;
     // }
+
+    // check if the model index corresponds to the invisible root item in source model
+    if (sourceIndex == static_cast<QStandardItemModel *>(sourceModel())->invisibleRootItem()->index()) {
+      return createIndex(sourceIndex.row(), 0, sourceIndex.internalId());
+    }
 
     // First check to see if the source index is the proxy root
     if (sourceIndex == m_root) {
@@ -88,13 +94,13 @@ namespace Isis {
   }
 
 
-  QModelIndex ObservationSolveSettingsProxyModel::mapToSource(const QModelIndex &proxyIndex) const {
+  QModelIndex SubTreeProxyModel::mapToSource(const QModelIndex &proxyIndex) const {
     // return proxyIndex;
     return QIdentityProxyModel::mapToSource(proxyIndex);
   }
 
 
-  void ObservationSolveSettingsProxyModel::setSourceModel(QAbstractItemModel *newSourceModel) {
+  void SubTreeProxyModel::setSourceModel(QAbstractItemModel *newSourceModel) {
     // QVariant data = newSourceModel->data(newSourceModel->index(0,0,QModelIndex()));
     // qDebug() << data;
     // qDebug() << "can convert to project item: " << data.canConvert<ProjectItem *>();
@@ -125,7 +131,7 @@ namespace Isis {
   }
 
 
-  bool ObservationSolveSettingsProxyModel::setRoot(const QStandardItem *item) {
+  bool SubTreeProxyModel::setRoot(const QStandardItem *item) {
     qDebug() << "setRoot() item->index() " << item->index();
     qDebug() << "\titem->parent()->index() " << item->parent()->index();
     m_root = QPersistentModelIndex(item->index());

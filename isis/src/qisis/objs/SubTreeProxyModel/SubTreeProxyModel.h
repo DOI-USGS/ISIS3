@@ -12,11 +12,11 @@ class QVariant;
 
 namespace Isis {
   
-  class ObservationSolveSettingsProxyModel : public QIdentityProxyModel {
+  class SubTreeProxyModel : public QIdentityProxyModel {
     Q_OBJECT
 
     public:
-      explicit ObservationSolveSettingsProxyModel(QObject *parent = 0);
+      explicit SubTreeProxyModel(QObject *parent = 0);
 
       QModelIndex mapFromSource(const QModelIndex &sourceIndex) const Q_DECL_OVERRIDE;
       QModelIndex mapToSource(const QModelIndex &proxyIndex) const Q_DECL_OVERRIDE;
