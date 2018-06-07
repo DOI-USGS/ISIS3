@@ -55,7 +55,7 @@ QT_CHARTS_USE_NAMESPACE
       QWidget* createPointsTab();
       QWidget* createOverviewTab();
       QWidget* createGraphTab();
-      void setVitals(ControlNetVitals *vitals) 
+      void setVitals(ControlNetVitals *vitals);
       void initializeEverything();
 
     public slots:
@@ -73,9 +73,6 @@ QT_CHARTS_USE_NAMESPACE
       void viewImageFewMeasures();
       void viewImageHullTolerance();
 
-      void breakNet();
-      void weak();
-      void healthy();
       void update();
 
 
@@ -85,38 +82,32 @@ QT_CHARTS_USE_NAMESPACE
         void updatePointTable(QList<ControlPoint*> points);
 
         QChartView *m_pointChartView;
-
         ControlNetVitals *m_vitals;
-
         QProgressBar *m_statusBar;
-
-        QLabel *m_sizeLabel;
-        QLabel *m_numImagesLabel;
-        QLabel *m_numPointsLabel;
-        QLabel *m_numMeasuresLabel;
-        QLabel *m_lastModLabel;
-        QLabel *m_netLabel;
-
-        QLabel *m_imagesMeasuresValue;
-        QLabel *m_imagesHullValue;
-        QLabel *m_imagesShowingLabel;
-        QLabel *m_statusLabel;
-        QLabel *m_statusDetails;
-
-        QLabel *m_pointsIgnoredLabel;
-        QLabel *m_pointsEditLockedLabel;
-        QLabel *m_pointsFewMeasuresLabel;
-        QLabel *m_pointsShowingLabel;
-        QLabel *m_pointsFixedLabel;
-        QLabel *m_pointsFreeLabel;
-        QLabel *m_pointsConstrainedLabel;
 
         QTableWidget *m_historyTable;
         QTableWidget *m_imagesTable;
         QTableWidget *m_pointsTable;
 
-        QStringList *activeImageList;
-        QStringList *activePointsList;
+        QLabel *m_imagesHullValue;
+        QLabel *m_imagesMeasuresValue;
+        QLabel *m_imagesShowingLabel;
+        QLabel *m_lastModLabel;
+        QLabel *m_netLabel;
+        QLabel *m_numImagesLabel;
+        QLabel *m_numMeasuresLabel;
+        QLabel *m_numPointsLabel;
+        QLabel *m_pointsConstrainedLabel;
+        QLabel *m_pointsEditLockedLabel;
+        QLabel *m_pointsFewMeasuresLabel;
+        QLabel *m_pointsFixedLabel;
+        QLabel *m_pointsFreeLabel;
+        QLabel *m_pointsIgnoredLabel;
+        QLabel *m_pointsShowingLabel;
+        QLabel *m_sizeLabel;
+        QLabel *m_statusDetails;
+        QLabel *m_statusLabel;
+
   };
 }
 

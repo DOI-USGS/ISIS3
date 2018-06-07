@@ -32,9 +32,9 @@
 #include <QVBoxLayout>
 #include <QWidgetAction>
 
+#include "ControlHealthMonitorWidget.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "ControlHealthMonitorWidget.h"
 #include "Directory.h"
 #include "ToolPad.h"
 
@@ -43,18 +43,11 @@ namespace Isis {
   /**
    * Constructor.
    */
-  ControlHealthMonitorView::ControlHealthMonitorView(Directory *directory, QWidget *parent) :
+  ControlHealthMonitorView::ControlHealthMonitorView(ControlNet *controlNet, QWidget *parent) :
                         AbstractProjectItemView(parent) {
 
-    ControlNetVitals *vitals = new ControlNetVitals(directory->project()->activeControl()->controlNet());
-
+    ControlNetVitals *vitals = new ControlNetVitals(controlNet);
     m_ControlHealthMonitorWidget = new ControlHealthMonitorWidget(vitals, parent);
-
-    //  TODO How are control nets and serial number lists going to be handled?  I assume there can
-    //       be several active control nets depending on the view, ie. jigsaw might operate on one
-    //       net, while the editors might be using a different net.  Will Directory keep track?
-    //
-
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -111,8 +104,7 @@ namespace Isis {
   /**
    * Returns the ControlHealthMonitorWidget.
    *
-   * @return (ControlHealthMonitorWidget *) The ControlHealthMonitorWidget used to
-   *         display the footprints.
+   * @return (ControlHealthMonitorWidget *) The currently active ControlHealthMonitorWidget.
    */
   ControlHealthMonitorWidget *ControlHealthMonitorView::controlHealthMonitorWidget() {
     return m_ControlHealthMonitorWidget;

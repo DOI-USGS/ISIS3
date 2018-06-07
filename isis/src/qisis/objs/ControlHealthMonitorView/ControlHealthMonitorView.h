@@ -34,16 +34,16 @@ namespace Isis {
   class Directory;
   class ProjectItem;
   class ControlHealthMonitorWidget;
+  class ControlNet;
   class ToolPad;
 
   /**
-   * View for editing a single ControlPoint
+   * View for the Control Net Health Monitor
    *
-   * @author 2016-04-06 Tracie Sucharski
+   * @author 2018-06-07 Adam Goins
    *
    * @internal
-   *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
-   *                           query for shapes and other data from the project.
+   *   @history 2018-06-07 Adam Goins - Initial Version.
    */
 
 class ControlHealthMonitorView : public AbstractProjectItemView {
@@ -51,7 +51,7 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
   Q_OBJECT
 
   public:
-    ControlHealthMonitorView(Directory *directory, QWidget *parent = 0);
+    ControlHealthMonitorView(ControlNet *controlNet, QWidget *parent = 0);
     ~ControlHealthMonitorView();
 
     virtual QList<QAction *> permToolBarActions();
@@ -69,9 +69,9 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
   private:
     QPointer<ControlHealthMonitorWidget> m_ControlHealthMonitorWidget;
 
-    QToolBar *m_permToolBar; //!< The permanent tool bar
+    ToolPad *m_toolPad;        //!< The tool pad
+    QToolBar *m_permToolBar;   //!< The permanent tool bar
     QToolBar *m_activeToolBar; //!< The active tool bar
-    ToolPad *m_toolPad; //!< The tool pad
 
     QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
   };
