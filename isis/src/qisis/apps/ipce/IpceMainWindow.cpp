@@ -46,6 +46,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "JigsawRunWidget.h"
 #include "MosaicSceneWidget.h"
 #include "ProgressWidget.h"
 #include "Project.h"
@@ -216,7 +217,8 @@ namespace Isis {
   void IpceMainWindow::addView(QWidget *newWidget) {
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||
-         qobject_cast<TemplateEditorWidget *>(newWidget)) {
+         qobject_cast<TemplateEditorWidget *>(newWidget)||
+         qobject_cast<JigsawRunWidget *>(newWidget)) {
       QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
       dock->setAttribute(Qt::WA_DeleteOnClose, true);
       dock->setWidget(newWidget);

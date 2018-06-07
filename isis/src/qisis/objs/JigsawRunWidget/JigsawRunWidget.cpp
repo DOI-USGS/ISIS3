@@ -1,4 +1,4 @@
-#include "JigsawDialog.h"
+#include "JigsawRunWidget.h"
 
 #include <QtConcurrent>
 #include <QDebug>
@@ -22,7 +22,7 @@
 #include "iTime.h"
 #include "Process.h"
 #include "Project.h"
-#include "ui_JigsawDialog.h"
+#include "ui_JigsawRunWidget.h"
 
 namespace Isis {
 
@@ -34,8 +34,7 @@ namespace Isis {
    * @param Project *project Pointer to the project this dialog belongs to.
    * @param QWidget *parent Pointer to parent widget.
    */
-  JigsawDialog::JigsawDialog(Project *project, QWidget *parent) :
-      QDialog(parent), m_ui(new Ui::JigsawDialog) {
+  JigsawRunWidget::JigsawRunWidget(Project *project, QWidget *parent) : m_ui(new Ui::JigsawRunWidget) {
     m_project = project;
     m_selectedControl = NULL;
     init();
@@ -53,11 +52,12 @@ namespace Isis {
    * @param Control *selectedControl Pointer to the selected control to adjust.
    * @param QWidget *parent Pointer to the parent widget.
    */
-  JigsawDialog::JigsawDialog(Project *project,
+  JigsawRunWidget::JigsawRunWidget(Project *project,
                              BundleSettingsQsp bundleSettings,
                              Control *selectedControl,
                              QString outputControlFileName,
-                             QWidget *parent) : QDialog(parent), m_ui(new Ui::JigsawDialog) {
+                             QWidget *parent) : m_ui(new Ui::JigsawRunWidget) {
+
     m_project = project;
     m_bundleSettings = bundleSettings;
     m_selectedControl = selectedControl;
@@ -72,10 +72,10 @@ namespace Isis {
    *
    * Delegate method that helps the constructors. This is used to reduce repeated code.
    */
-  void JigsawDialog::init() {
+  void JigsawRunWidget::init() {
     m_ui->setupUi(this);
 
-    // Note: The buttons are added to the UI setup from the JigsawDialog.ui file.
+    // Note: The buttons are added to the UI setup from the JigsawRunWidget.ui file.
     // These could have been added to the UI file itself (as XML).
 
     // Three buttons: Accept, Reject, Close. Initially only close is enabled.
@@ -87,6 +87,7 @@ namespace Isis {
     m_close = new QPushButton(tr("&Close"));
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
+    m_ui->JigsawRunButton->setEnabled(false);
     m_close->setEnabled(true);
 
     // Add tool tips to the buttons
@@ -130,14 +131,14 @@ namespace Isis {
     m_ui->useLastSettings->setToolTip(lastSettingsToolTip);
     m_ui->useLastSettings->setWhatsThis(lastSettingsWhat);
 
-    setWindowFlags(Qt::WindowStaysOnTopHint);
+    // setWindowFlags(Qt::WindowStaysOnTopHint);
   }
 
 
   /**
    * Destructor.
    */
-  JigsawDialog::~JigsawDialog() {
+  JigsawRunWidget::~JigsawRunWidget() {
     if (m_bundleSolutionInfo) {
       delete m_bundleSolutionInfo;
     }
@@ -153,7 +154,7 @@ namespace Isis {
   }
 
 
-  void JigsawDialog::on_JigsawSetupButton_pressed() {
+  void JigsawRunWidget::on_JigsawSetupButton_pressed() {
 
     // Each time the SetUp button is pressed, create JigsawSetupDialog object with
     // project,
@@ -181,11 +182,12 @@ namespace Isis {
       m_bundleSettings = setupdlg.bundleSettings();
       // The settings have been modified, might be misleading to keep this check after setup.
       m_ui->useLastSettings->setChecked(false);
+      m_ui->JigsawRunButton->setEnabled(true);
     }
   }
 
 
-  void JigsawDialog::on_JigsawRunButton_clicked() {
+  void JigsawRunWidget::on_JigsawRunButton_clicked() {
     // Once a bundle is run, the previous results cannot be accepted or rejected.
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
@@ -287,7 +289,7 @@ namespace Isis {
    * Constructs a image copier functor for copying images used in the bundle adjustment to the
    * bundle solution info results (when the bundle is accepted).
    */
-  JigsawDialog::CopyImageToResultsFunctor::CopyImageToResultsFunctor(const QDir &destination) {
+  JigsawRunWidget::CopyImageToResultsFunctor::CopyImageToResultsFunctor(const QDir &destination) {
     m_destinationFolder = destination;
   }
 
@@ -295,7 +297,7 @@ namespace Isis {
   /**
    * Destructor.
    */
-  JigsawDialog::CopyImageToResultsFunctor::~CopyImageToResultsFunctor() {
+  JigsawRunWidget::CopyImageToResultsFunctor::~CopyImageToResultsFunctor() {
     m_destinationFolder = QDir();
   }
 
@@ -311,7 +313,7 @@ namespace Isis {
    * @return Cube* Returns a pointer to the external cube copy. Returns NULL if an error
    *               occurs.
    */
-  Cube *JigsawDialog::CopyImageToResultsFunctor::operator()(const FileName &image) {
+  Cube *JigsawRunWidget::CopyImageToResultsFunctor::operator()(const FileName &image) {
     try {
       Cube *result = NULL;
 
@@ -363,7 +365,7 @@ namespace Isis {
    * Accepts the bundle results and saves them to the project. The "Accept" and "Reject" buttons
    * will be disabled.
    */
-  void JigsawDialog::acceptBundleResults() {
+  void JigsawRunWidget::acceptBundleResults() {
     m_accept->setEnabled(false);
     m_reject->setEnabled(false);
 
@@ -485,7 +487,7 @@ namespace Isis {
    * Rejects the bundle results and discards them. The "Accept" and "Reject" buttons will be
    * disabled.
    */
-  void JigsawDialog::rejectBundleResults() {
+  void JigsawRunWidget::rejectBundleResults() {
     // TODO should there be a prompt to user (are you sure?) -- Annoying?
     // TODO Add tooltip/what'sthis for the buttons!!!! (CTR)
     // Disable the "Accept" and "Reject" buttons, enable the "Close" button
@@ -511,7 +513,7 @@ namespace Isis {
    * reset the lcd displays to 0, and update the scroll on the scroll bar. This does NOT affect
    * the state of the buttons.
    */
-  void JigsawDialog::clearDialog() {
+  void JigsawRunWidget::clearDialog() {
     m_ui->iterationLcdNumber->display(0);
     m_ui->sigma0LcdNumber->display(0);
     m_ui->statusUpdatesLabel->clear();
@@ -522,7 +524,7 @@ namespace Isis {
   /**
    * Updates the scroll bar to position to its maximum setting (the bottom).
    */
-  void JigsawDialog::updateScrollBar() {
+  void JigsawRunWidget::updateScrollBar() {
     m_ui->statusUpdateScrollArea->verticalScrollBar()->setSliderPosition(
         m_ui->statusUpdateScrollArea->verticalScrollBar()->maximum());
   }
@@ -534,7 +536,7 @@ namespace Isis {
    *
    * @param status Current status of bundle.
    */
-  void JigsawDialog::outputBundleStatus(QString status) {
+  void JigsawRunWidget::outputBundleStatus(QString status) {
     QString updateStr = "\n" + status;
 
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(updateStr) );
@@ -550,7 +552,7 @@ namespace Isis {
    *
    * @param error Error status of bundle.
    */
-  void JigsawDialog::errorString(QString error) {
+  void JigsawRunWidget::errorString(QString error) {
     QString errorStr = "\n" + error;
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(errorStr) );
 
@@ -568,7 +570,7 @@ namespace Isis {
    *
    * @param error Error status of bundle.
    */
-  void JigsawDialog::reportException(QString exception) {
+  void JigsawRunWidget::reportException(QString exception) {
     QString exceptionStr = "\n" + exception;
     m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(exceptionStr) );
 
@@ -583,7 +585,7 @@ namespace Isis {
    *
    * @param error Error status of bundle.
    */
-  void JigsawDialog::updateIterationSigma0(int iteration, double sigma0) {
+  void JigsawRunWidget::updateIterationSigma0(int iteration, double sigma0) {
     m_ui->iterationLcdNumber->display(iteration);
     m_ui->sigma0LcdNumber->display(sigma0);
 
@@ -598,7 +600,7 @@ namespace Isis {
    * finishes when the bundle adjust finishes (either successfully or unsuccessfully, or if the
    * user aborts the run).
    */
-  void JigsawDialog::notifyThreadFinished() {
+  void JigsawRunWidget::notifyThreadFinished() {
     //QString str = "\nThread Finished signal received";
     //m_ui->statusUpdatesLabel->setText( m_ui->statusUpdatesLabel->text().append(str) );
 
@@ -623,7 +625,7 @@ namespace Isis {
    *
    * @param bundleSolutionInfo The results of the bundle run.
    */
-  void JigsawDialog::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
+  void JigsawRunWidget::bundleFinished(BundleSolutionInfo *bundleSolutionInfo) {
 
     bundleSolutionInfo->setRunTime( Isis::iTime::CurrentLocalTime().toLatin1().data() );
     m_bundleSolutionInfo = bundleSolutionInfo;

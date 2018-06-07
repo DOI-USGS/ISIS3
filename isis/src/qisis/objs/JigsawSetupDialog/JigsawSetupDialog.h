@@ -36,9 +36,9 @@ namespace Isis {
    *   @history 2016-08-18 Jeannie Backer - Removed all references to deprecated solve methods
    *                           SpeckialK and OldSparse. References #4162.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
-   *   @history 2017-04-25 Ian Humphrey - Added public loadSettings() to allow JigsawDialog to
+   *   @history 2017-04-25 Ian Humphrey - Added public loadSettings() to allow JigsawRunWidget to
    *                           load its current settings into the setup dialog. Fixes #4817.
-   *   @history 2017-04-27 Ian Humphrey - Added selectControl() to allow JigsawDialog to
+   *   @history 2017-04-27 Ian Humphrey - Added selectControl() to allow JigsawRunWidget to
    *                           properly tell the setup dialog which control to select in its
    *                           combo box. References #4817.
    *   @history 2017-05-16 Tracie Sucharski - Comment qDebug statements.
