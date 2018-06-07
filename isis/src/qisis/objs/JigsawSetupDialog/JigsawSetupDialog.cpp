@@ -3,8 +3,10 @@
 #include <vector>
 
 #include <QDebug>
+#include <QIdentityProxyModel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
 #include "BundleSolutionInfo.h"
@@ -13,7 +15,9 @@
 #include "Control.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "ObservationSolveSettingsProxyModel.h"
 #include "Project.h"
+#include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
 #include "ui_JigsawSetupDialog.h"
 
@@ -87,6 +91,7 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
+    createObservationSolveSettingsTreeView();
     m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
 
     QStringList tableHeaders;
@@ -520,7 +525,6 @@ namespace Isis {
         }
       }
     }
-
     // target body
     // ensure user entered something to adjust
     if (m_ui->poleRaCheckBox->isChecked()              ||
@@ -636,7 +640,7 @@ namespace Isis {
 
 
   /**
-   * Loads the passed bundle settings into the setup dialog. This is used by JigsawRunWidget to
+   * Loads the passed bundle settings into the setup dialog. This is used by JigsawDialog to
    * load its current settings when not using the last (most recent) bundle settings in the project.
    *
    * @param const BundleSettingsQsp settings Shared pointer to the settings to load up.
@@ -1120,5 +1124,31 @@ namespace Isis {
   void Isis::JigsawSetupDialog::on_controlNetworkComboBox_currentTextChanged(const QString &arg1) {
     FileName fname = arg1;
     m_ui->outputControlNet->setText(fname.baseName() + "-out.net");
+  }
+
+
+  void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
+    // Proof-of-concept
+//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
+    ProjectItemModel *model = m_project->directory()->model();
+    SubTreeProxyModel *osspm = new SubTreeProxyModel;
+    osspm->setSourceModel(model);
+
+    // find the root "Images" and set it in the proxy
+    QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
+    qDebug() << "ITEM: " << item << ", " << item->text();
+    qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
+    // i think source model tries to add top root item, which is invalid???
+    osspm->setRoot(item);    
+
+    m_ui->treeView->setModel(osspm);
+
+
+
+    // Try to loop through the view here to add the "groups" so they aren't part of the model
+
+    // Add apply button to the tab view
+    // set the text to bold?
+
   }
 }

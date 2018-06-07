@@ -122,6 +122,8 @@ namespace Isis {
     void showTargetParametersGroupBox();
     void hideTargetParametersGroupBox();
 
+    void createObservationSolveSettingsTreeView();
+
   private:
     Ui::JigsawSetupDialog *m_ui;
     Project *m_project;
