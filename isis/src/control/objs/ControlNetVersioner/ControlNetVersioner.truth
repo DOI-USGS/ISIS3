@@ -20,6 +20,7 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = Null
+  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -76,6 +77,7 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = "Test Network"
+  TargetRadii  = (2575000.0, 2575000.0, 2575000.0)
   Version      = 5
 
   Object = ControlPoint
@@ -132,6 +134,7 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
+  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -329,6 +332,7 @@ Object = ControlNetwork
   Created      = 2012-01-04T12:09:57
   LastModified = 2012-01-04T12:09:57
   Description  = "Themis Day IR Network: Lunae Palus, Lat(0,30) Lon(270-315)"
+  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -559,7 +563,12 @@ After reading and writing to a binary form does Pvl match?
 Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 Check conversions between the binary format and the pvl format.
-The conversion methods for pvl->bin and bin->pvl are correct.
+8c8,9
+<   Version      = 3
+---
+>   TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
+>   Version      = 5
+The conversion from pvl to binary is incorrect.
 
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl...
 
