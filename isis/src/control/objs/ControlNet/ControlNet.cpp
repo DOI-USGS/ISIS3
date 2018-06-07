@@ -397,38 +397,42 @@ namespace Isis {
    * @returns A string representation of the ControlNet graph
    */
   QString ControlNet::GraphToString() const {
-    /*QList<QList<QString>> serialConnections = GetSerialConnections();
-
-    for (int i=0; i < serialConnections.size(); i++) {
-        std::cout << "\n\n" << std::endl; 
-      for (int j=0; j< serialConnections[i].size(); j++) {
-        std::cout << serialConnections[i][j] << std::endl; 
-      }
-    }*/
-
-    /*QString graphString; 
-    typedef boost::graph_traits<Network>::vertex_iterator vertex_iter;
-    std::pair<vertex_iter, vertex_iter> vp;
-    for(vp = vertices(m_controlGraph); vp.first != vp.second; ++vp.first) {
-      std::cout << m_controlGraph[*vp.first].serial << " : \n" << std::endl;
-      QHash<ControlPoint*, ControlMeasure*> measures = m_controlGraph[*vp.first].measures;
-      QList<ControlPoint*> keys = measures.keys();
-      for (int i=0; i < keys.size(); i++) {
-        std::cout << "     " << measures[keys[i]]->GetCubeSerialNumber() << " : " << keys[i]->GetId() << std::endl; 
-      }
-    }*/
-
+    QString graphString; 
     typedef boost::graph_traits<Network>::edge_iterator edge_iter;
     edge_iter ei, ei_end;
+
     for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei) {
       ImageVertex sourceImage = source(*ei, m_controlGraph);
       ImageVertex targetImage = target(*ei, m_controlGraph);
       if (sourceImage != targetImage) {
-        std::cout << m_controlGraph[sourceImage].serial << " [" << m_controlGraph[sourceImage].measures.size() << "] " << "---------" << m_controlGraph[targetImage].serial << " [" << m_controlGraph[targetImage].measures.size() << "] strength: " << " [" << m_controlGraph[*ei].strength << "]" << std::endl;
+        graphString.append(m_controlGraph[sourceImage].serial);
+        graphString.append( " [" );
+        QList<ControlPoint*> sourcePoints = m_controlGraph[sourceImage].measures.keys(); 
+        for (int i=0; i < sourcePoints.size(); i++) {
+          if (i>0) {
+            graphString.append(", "); 
+          }
+          graphString.append(sourcePoints[i]->GetId()); 
+        }
+       // graphString.append(QString::number(m_controlGraph[sourceImage].measures.size())); 
+        graphString.append("] --------- ");
+        graphString.append(m_controlGraph[targetImage].serial);
+        graphString.append(" [");
+
+        QList<ControlPoint*> targetPoints = m_controlGraph[targetImage].measures.keys(); 
+        for (int i=0; i < targetPoints.size(); i++) {
+          if (i>0) {
+            graphString.append(", "); 
+          }
+          graphString.append(targetPoints[i]->GetId()); 
+        }
+
+//        graphString.append(QString::number(m_controlGraph[targetImage].measures.size()));  
+        graphString.append("] edge strength: [");
+        graphString.append(QString::number(m_controlGraph[*ei].strength));
+        graphString.append("]\n"); 
       }
     }
-
-    QString graphString; 
     return graphString;
    }
 
