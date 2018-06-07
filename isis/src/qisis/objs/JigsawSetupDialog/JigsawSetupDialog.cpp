@@ -3,8 +3,10 @@
 #include <vector>
 
 #include <QDebug>
+#include <QIdentityProxyModel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
 #include "BundleSolutionInfo.h"
@@ -13,6 +15,7 @@
 #include "Control.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "ObservationSolveSettingsProxyModel.h"
 #include "Project.h"
 #include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
@@ -88,61 +91,7 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
-    // Proof-of-concept
-//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
-    ProjectItemModel *model = m_project->directory()->model();
-    qDebug() << "Source model row count: " << model->rowCount();
-    ProjectItemProxyModel *proxyModel = new ProjectItemProxyModel(this);
-    //proxyModel->setSourceModel(model);
-
-    // Why do we have to do it this way?
-    // -- For some reason, the isX() methods in ProjectItem aren't working below.
-    for (int i = 0; i < model->rowCount(); i++) {
-      ProjectItem *projectItem = model->item(i);
-      for (int j = 0; j < projectItem->rowCount(); j++) {
-        ProjectItem *imageList = projectItem->child(j);
-        if (imageList->text() == "Images") {
-          for (int k = 0; k < imageList->rowCount(); k++) {
-            ProjectItem *importItem = imageList->child(k);
-            proxyModel->addItem(importItem);
-          }
-        }
-      }
-    }
-
-//    ProjectItem *root = model->item(0);
-//    qDebug() << "root row count : " << root->rowCount();
-//    qDebug() << root->isProject();
-//    qDebug() << root->child(0)->isProject();
-//    ProjectItem *child = static_cast<ProjectItem *>(root->child(0));
-//    qDebug() << child->isControlList();
-//    qDebug() << child->data().value< ControlList * >();
-//    proxyModel->addItem(root->child(0));
-//    QVariant value = child->data();
-//    qDebug() << value;
-//    for (int childIndex = 0; childIndex < root->rowCount(); childIndex++) {
-//      ProjectItem *child = root->child(childIndex);
-
-//      if (child->isBundleResults()) qDebug() << "bundleResults @ " << childIndex;
-//      if (child->isBundleSettings()) qDebug() << "bundleSettings @ " << childIndex;
-//      if (child->isBundleSolutionInfo()) qDebug() << "bundleSolutionInfo @ " << childIndex;
-//      if (child->isControl()) qDebug() << "control @ " << childIndex;
-//      if (child->isControlList()) qDebug() << "controlList @ " << childIndex;
-//      if (child->isCorrelationMatrix()) qDebug() << "correlationMatrix @ " << childIndex;
-//      if (child->isImage()) qDebug() << "image @ " << childIndex;
-//      if (child->isShape()) qDebug() << "shape @ " << childIndex;
-//      if (child->isShapeList()) qDebug() << "shapeList @ " << childIndex;
-//      if (child->isProject()) qDebug() << "project @ " << childIndex;
-//      if (child->isGuiCamera()) qDebug() << "guiCamera @ " << childIndex;
-//      if (child->isTargetBody()) qDebug() << "targetBody @ " << childIndex;
-//      if (child->isFileItem()) qDebug() << "fileItem @ " << childIndex;
-//      if (child->isTemplate()) qDebug() << "template @ " << childIndex;
-//      if (child->isImageList()) qDebug() << "imageList @ " << childIndex;
-
-
-//    }
-    m_ui->treeView->setModel(proxyModel);
-
+    createObservationSolveSettingsTreeView();
     m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
 
     QStringList tableHeaders;
@@ -1176,5 +1125,129 @@ namespace Isis {
   void Isis::JigsawSetupDialog::on_controlNetworkComboBox_currentTextChanged(const QString &arg1) {
     FileName fname = arg1;
     m_ui->outputControlNet->setText(fname.baseName() + "-out.net");
+  }
+
+
+  void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
+    // Proof-of-concept
+//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
+    ProjectItemModel *model = m_project->directory()->model();
+    ProjectItemProxyModel *proxyModel = new ProjectItemProxyModel(this);
+    QStandardItemModel *tModel = new QStandardItemModel;
+    //proxyModel->setSourceModel(model);
+
+    ObservationSolveSettingsProxyModel *osspm = new ObservationSolveSettingsProxyModel;
+    osspm->setSourceModel(model);
+
+    // find the root "Images" and set it in the proxy
+    QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
+    qDebug() << "ITEM: " << item << ", " << item->text();
+    qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
+    // i think source model tries to add top root item, which is invalid???
+    //osspm->setRoot(item);    
+
+
+
+    // Why do we have to do it this way?
+    // -- For some reason, the isX() methods in ProjectItem aren't working below.
+    // QStandardItem *root = tModel->invisibleRootItem();
+    // for (int i = 0; i < model->rowCount(); i++) {
+    //   ProjectItem *projectItem = model->item(i);
+    //   for (int j = 0; j < projectItem->rowCount(); j++) {
+    //     ProjectItem *imageList = projectItem->child(j);
+    //     if (imageList->text() == "Images") {
+    //       for (int k = 0; k < imageList->rowCount(); k++) {
+    //         QStandardItem *groupItem = new QStandardItem("Group1");
+    //         ProjectItem *importItem = imageList->child(k);
+    //         groupItem->appendRow(static_cast<QStandardItem *>(importItem));
+    //         tModel->appendRow(groupItem);
+    //       }
+    //     }
+    //   }
+    // }
+
+    // ProjectItemModel *sourceModel = model;
+    //loop through the levels of the original source model tree
+    /* (root item)
+     * Project
+     * - Images
+     *   - import1
+     *     - img1
+     *     - imgN
+     *   - importN
+     */
+    // QIdentityProxyModel *m = new QIdentityProxyModel;
+    // m->setSourceModel(sourceModel);
+    // Setting the source model will allow changing it (e.g. changing the name of the project int
+    // the tree in the proxy model will be reflected in the main project tree view as well)
+    //m->setSourceModel(sourceModel);
+//    qDebug() << "proxy model row count: " << model->rowCount();
+//    qDebug() << "proxy model col count: " << model->columnCount();
+//    qDebug() << "can we get first item? " << model->index(0,0);
+//    qDebug() << "does parent node have children? " << model->children().count();
+//    m->setData(model->index(0,0), QVariant("test"));
+//    ProjectItem *p = NULL;
+//    QVariant qvp = model->data(model->index(0,0), Qt::DisplayRole);
+//    qDebug() << "can convert to ProjectItem? " << qvp.value<ProjectItem*>();
+    // for (int rootIndex = 0; rootIndex < m->rowCount(); rootIndex++) {
+    //   ProjectItem *projectItem = sourceModel->item(rootIndex);
+    //   qDebug() << m->insertRows(0, 1);
+    //   QModelIndex projectQMI = m->index(0, 1);
+    //   qDebug() << m->setData(projectQMI, QVariant::fromValue(projectItem));
+    //   for (int projectChild = 0; projectChild < projectItem->rowCount(); projectChild++) {
+    //     ProjectItem *imageList = projectItem->child(projectChild);
+    //     if (imageList->text() == "Images") {
+    //       for (int imageListChild = 0; imageListChild < imageList->rowCount(); imageListChild++) {
+    //         ProjectItem *importItem = imageList->child(imageListChild);
+    //         //QStandardItem *group = new QStandardItem("Group1");
+    //         //group->appendRow(static_cast<QStandardItem *>(importItem));
+            //m->insertRow(group);
+            //m->appendRow(static_cast<QStandardItem *>(importItem));
+            //m->insertRows(0, 1);
+          // }
+    //     }
+    //   }
+    // }
+
+//    ProjectItem *root = model->item(0);
+//    qDebug() << "root row count : " << root->rowCount();
+//    qDebug() << root->isProject();
+//    qDebug() << root->child(0)->isProject();
+//    ProjectItem *child = static_cast<ProjectItem *>(root->child(0));
+//    qDebug() << child->isControlList();
+//    qDebug() << child->data().value< ControlList * >();
+//    proxyModel->addItem(root->child(0));
+//    QVariant value = child->data();
+//    qDebug() << value;
+//    for (int childIndex = 0; childIndex < root->rowCount(); childIndex++) {
+//      ProjectItem *child = root->child(childIndex);
+
+//      if (child->isBundleResults()) qDebug() << "bundleResults @ " << childIndex;
+//      if (child->isBundleSettings()) qDebug() << "bundleSettings @ " << childIndex;
+//      if (child->isBundleSolutionInfo()) qDebug() << "bundleSolutionInfo @ " << childIndex;
+//      if (child->isControl()) qDebug() << "control @ " << childIndex;
+//      if (child->isControlList()) qDebug() << "controlList @ " << childIndex;
+//      if (child->isCorrelationMatrix()) qDebug() << "correlationMatrix @ " << childIndex;
+//      if (child->isImage()) qDebug() << "image @ " << childIndex;
+//      if (child->isShape()) qDebug() << "shape @ " << childIndex;
+//      if (child->isShapeList()) qDebug() << "shapeList @ " << childIndex;
+//      if (child->isProject()) qDebug() << "project @ " << childIndex;
+//      if (child->isGuiCamera()) qDebug() << "guiCamera @ " << childIndex;
+//      if (child->isTargetBody()) qDebug() << "targetBody @ " << childIndex;
+//      if (child->isFileItem()) qDebug() << "fileItem @ " << childIndex;
+//      if (child->isTemplate()) qDebug() << "template @ " << childIndex;
+//      if (child->isImageList()) qDebug() << "imageList @ " << childIndex;
+
+
+//    }
+    m_ui->treeView->setModel(model);
+
+
+
+    // Try to loop through the view here to add the "groups" so they aren't part of the model
+
+    // Add apply button to the tab view
+    // set the text to bold?
+
   }
 }
