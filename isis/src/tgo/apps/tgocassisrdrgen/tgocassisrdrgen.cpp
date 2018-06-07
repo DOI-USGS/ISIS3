@@ -32,12 +32,10 @@ void IsisMain() {
   Cube *icube = process.SetInputCube("FROM");
 
   PvlObject *label= icube->label();
-  bool isMosaic = false;
   PvlGroup targetGroup;
   QString logicalId = "urn:esa:psa:em16_tgo_frd:";
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Instrument");
-    isMosaic = false;
     if (label->hasGroup("Mapping")) {
       logicalId += "data_projected:";
     }
@@ -46,8 +44,7 @@ void IsisMain() {
     }
   }
   else if ( label->findObject("IsisCube").hasGroup("Mosaic") ) {
-    instrument = label->findObject("IsisCube").findGroup("Mosaic");
-    isMosaic = true;
+    targetGroup = label->findObject("IsisCube").findGroup("Mosaic");
     logicalId = "data_mosaic";
   }
 
