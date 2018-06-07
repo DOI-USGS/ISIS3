@@ -11,6 +11,7 @@
 
 class QLabel;
 template< class T > class QList;
+template< typename U, typename V > class QPair;
 class QPushButton;
 class QString;
 class QTextEdit;
@@ -18,7 +19,7 @@ class QVBoxLayout;
 
 
 namespace Isis {
-  class ControlCubeGraphNode;
+  class ControlNet;
   class ControlMeasure;
   class ControlPoint;
   class FilterGroup;
@@ -65,7 +66,7 @@ namespace Isis {
         for (int i = 0; looking && i < m_filterGroups->size(); i++) {
           if (m_filterGroups->at(i)->hasFilter(meth))
             looking = !(m_filterGroups->at(i)->evaluate(t, meth) ^
-                m_andGroupsTogether);
+                      m_andGroupsTogether);
         }
 
         // It is good that we are still looking for failures if we were
@@ -75,7 +76,7 @@ namespace Isis {
         return !(looking ^ m_andGroupsTogether) || !hasFilter(meth);
       }
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *point) const;
       bool evaluate(const ControlMeasure *measure) const;
 

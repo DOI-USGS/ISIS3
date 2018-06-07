@@ -3,11 +3,11 @@
 
 #include <QWidget>
 
-#include "ControlNet"
-
 class QBoxLayout;
 class QButtonGroup;
 class QCheckBox;
+template< typename U, typename V > class QPair;
+class QString;
 template< typename T > class QFlags;
 
 
@@ -15,7 +15,7 @@ namespace Isis {
   class AbstractFilterSelector;
   class ControlPoint;
   class ControlMeasure;
-  class QString;
+  class ControlNet;
 
   /**
    * @brief Base class for control net filters
@@ -46,7 +46,7 @@ namespace Isis {
 
 
     public:
-      AbstractFilter(FilterEffectivenessFlag, ControlNet *network, int minimumForSuccess = -1);
+      AbstractFilter(FilterEffectivenessFlag, int minimumForSuccess = -1);
       AbstractFilter(const AbstractFilter &other);
       virtual ~AbstractFilter();
 
@@ -54,7 +54,7 @@ namespace Isis {
       virtual bool canFilterPoints() const;
       virtual bool canFilterMeasures() const;
 
-      virtual bool evaluate(const QString *) const = 0;
+      virtual bool evaluate(const QPair<QString, ControlNet *> *) const = 0;
       virtual bool evaluate(const ControlPoint *) const = 0;
       virtual bool evaluate(const ControlMeasure *) const = 0;
 
@@ -78,8 +78,8 @@ namespace Isis {
       QBoxLayout *getMainLayout() const;
       QBoxLayout *getInclusiveExclusiveLayout() const;
 
-      bool evaluateImageFromPointFilter(const QString *) const;
-      bool evaluateImageFromMeasureFilter(const QString *) const;
+      bool evaluateImageFromPointFilter(const QPair<QString, ControlNet *> *) const;
+      bool evaluateImageFromMeasureFilter(const QPair<QString, ControlNet *> *) const;
       bool evaluatePointFromMeasureFilter(const ControlPoint *) const;
 
       virtual bool evaluate(const ControlPoint *,
@@ -115,7 +115,6 @@ namespace Isis {
       int m_minForSuccess;
       FilterEffectivenessFlag *m_effectivenessFlags;
       QFont *m_smallFont;
-      ControlNet *m_controlNet;
   };
 
   Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractFilter::FilterEffectivenessFlag)

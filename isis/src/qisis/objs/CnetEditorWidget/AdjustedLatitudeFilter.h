@@ -3,13 +3,11 @@
 
 #include "AbstractNumberFilter.h"
 
-
+template< typename U, typename V > class QPair;
 class QString;
-
 
 namespace Isis {
   class AbstractFilterSelector;
-  class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
 
@@ -33,11 +31,11 @@ namespace Isis {
 
     public:
       AdjustedLatitudeFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          ControlNet *network, int minimumForSuccess = -1);
+                             int minimumForSuccess = -1);
       AdjustedLatitudeFilter(const AdjustedLatitudeFilter &other);
       virtual ~AdjustedLatitudeFilter();
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

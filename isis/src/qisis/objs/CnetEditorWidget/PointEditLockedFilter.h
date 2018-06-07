@@ -3,11 +3,13 @@
 
 #include "AbstractFilter.h"
 
+template< typename U, typename V > class QPair;
+class QString;
 
 namespace Isis {
-  class ControlCubeGraphNode;
-  class ControlPoint;
   class ControlMeasure;
+  class ControlNet;
+  class ControlPoint;
 
   /**
    * @brief Allows filtering by a control point's edit lock status
@@ -28,11 +30,11 @@ namespace Isis {
 
     public:
       PointEditLockedFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          ControlNet *network, int minimumForSuccess = -1);
+            int minimumForSuccess = -1);
       PointEditLockedFilter(const AbstractFilter &other);
       virtual ~PointEditLockedFilter();
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

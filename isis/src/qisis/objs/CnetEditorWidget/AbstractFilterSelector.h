@@ -15,8 +15,7 @@ class QPushButton;
 class QReadWriteLock;
 
 namespace Isis {
-  class AbstractFilter;
-  class ControlCubeGraphNode;
+  class ControlNet;
   class ControlMeasure;
   class ControlPoint;
 

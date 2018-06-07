@@ -2,22 +2,25 @@
 
 #include "GoodnessOfFitFilter.h"
 
-#include "ControlCubeGraphNode.h"
+#include <QPair>
+#include <QString>
+
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 #include "SpecialPixel.h"
 
 
 namespace Isis {
   GoodnessOfFitFilter::GoodnessOfFitFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  GoodnessOfFitFilter::GoodnessOfFitFilter(
-    const GoodnessOfFitFilter &other) : AbstractNumberFilter(other) {
+  GoodnessOfFitFilter::GoodnessOfFitFilter(const GoodnessOfFitFilter &other)
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -25,8 +28,8 @@ namespace Isis {
   }
 
 
-  bool GoodnessOfFitFilter::evaluate(const QString *imageSerial) const {
-    return evaluateImageFromMeasureFilter(imageSerial);
+  bool GoodnessOfFitFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -37,9 +40,9 @@ namespace Isis {
 
   bool GoodnessOfFitFilter::evaluate(const ControlMeasure *measure) const {
     double goodness = Null;
+
     if (measure->HasLogData(ControlMeasureLogData::GoodnessOfFit)) {
-      goodness = measure->GetLogData(
-          ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
+      goodness = measure->GetLogData(ControlMeasureLogData::GoodnessOfFit).GetNumericalValue();
     }
 
     return AbstractNumberFilter::evaluate(goodness);

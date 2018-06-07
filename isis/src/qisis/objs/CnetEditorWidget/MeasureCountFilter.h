@@ -2,20 +2,19 @@
 #define MeasureCountFilter_H
 
 
-// parent
 #include "AbstractFilter.h"
-
 
 class QButtonGroup;
 class QLineEdit;
+template< typename U, typename V > class QPair;
 class QSpinBox;
 class QString;
 
 
 namespace Isis {
-  class AbstractFilterSelector;
-  class ControlPoint;
   class ControlMeasure;
+  class ControlNet;
+  class ControlPoint;
 
   /**
    * @brief Allows filtering by the number of measures in a control point
@@ -37,11 +36,11 @@ namespace Isis {
 
     public:
       MeasureCountFilter(AbstractFilter::FilterEffectivenessFlag,
-          ControlNet *network, int minimumForSuccess = -1);
+            int minimumForSuccess = -1);
       MeasureCountFilter(const MeasureCountFilter &other);
       virtual ~MeasureCountFilter();
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

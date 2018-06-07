@@ -2,18 +2,18 @@
 
 #include "MeasureIgnoredFilter.h"
 
-#include <iostream>
+#include <QPair>
+#include <QString>
 
-#include <QHBoxLayout>
-
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 
 namespace Isis {
   MeasureIgnoredFilter::MeasureIgnoredFilter(
-    AbstractFilter::FilterEffectivenessFlag flag, ControlNet *network, int minimumForSuccess) :
-    AbstractFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
   }
 
 
@@ -21,8 +21,8 @@ namespace Isis {
   }
 
 
-  bool MeasureIgnoredFilter::evaluate(const QString *imageSerial) const {
-    return AbstractFilter::evaluateImageFromMeasureFilter(imageSerial);
+  bool MeasureIgnoredFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return AbstractFilter::evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -43,15 +43,19 @@ namespace Isis {
 
   QString MeasureIgnoredFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "measure that is ";
-    else
+    }
+    else {
       description += "measures that are ";
+    }
 
-    if (inclusive())
+    if (inclusive()) {
       description += "ignored";
-    else
+    }
+    else {
       description += "not ignored";
+    }
 
     return description;
   }
@@ -65,10 +69,12 @@ namespace Isis {
   QString MeasureIgnoredFilter::getMeasureDescription() const {
     QString description = "are ";
 
-    if (inclusive())
+    if (inclusive()) {
       description += "ignored";
-    else
+    }
+    else {
       description += "not ignored";
+    }
 
     return description;
   }

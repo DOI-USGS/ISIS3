@@ -2,11 +2,12 @@
 
 #include "ImageParentItem.h"
 
+#include "ControlNet.h"
 
 namespace Isis {
-  ImageParentItem::ImageParentItem(QString imageSerial,
-      int avgCharWidth, AbstractTreeItem *parent)
-    : AbstractTreeItem(parent), AbstractImageItem(imageSerial, avgCharWidth) {
+  ImageParentItem::ImageParentItem(QString imageSerial, ControlNet *net,
+                                   int avgCharWidth, AbstractTreeItem *parent)
+        : AbstractTreeItem(parent), AbstractImageItem(imageSerial, net, avgCharWidth) {
   }
 
 

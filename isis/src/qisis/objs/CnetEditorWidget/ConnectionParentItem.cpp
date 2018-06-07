@@ -6,9 +6,9 @@
 
 
 namespace Isis {
-  ConnectionParentItem::ConnectionParentItem(QString imageSerial,
-      int avgCharWidth, AbstractTreeItem *parent)
-    : AbstractTreeItem(parent), AbstractImageItem(imageSerial, avgCharWidth) {
+  ConnectionParentItem::ConnectionParentItem(QString imageSerial, ControlNet *net,
+                                             int avgCharWidth, AbstractTreeItem *parent)
+        : AbstractTreeItem(parent), AbstractImageItem(imageSerial, net, avgCharWidth) {
   }
 
 

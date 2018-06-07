@@ -31,7 +31,7 @@ namespace Isis {
 
     public:
       AbstractMultipleChoiceFilter(AbstractFilter::FilterEffectivenessFlag,
-          ControlNet *network, int minimumForSuccess = -1);
+                                   int minimumForSuccess = -1);
       AbstractMultipleChoiceFilter(const AbstractMultipleChoiceFilter &other);
       virtual ~AbstractMultipleChoiceFilter();
 

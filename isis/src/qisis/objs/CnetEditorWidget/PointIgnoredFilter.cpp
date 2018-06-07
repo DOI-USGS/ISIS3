@@ -2,24 +2,22 @@
 
 #include "PointIgnoredFilter.h"
 
-#include <iostream>
+#include <QPair>
+#include <QString>
 
-#include <QHBoxLayout>
-
-#include "ControlCubeGraphNode.h"
+#include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 
 
 namespace Isis {
   PointIgnoredFilter::PointIgnoredFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
   }
 
 
-  PointIgnoredFilter::PointIgnoredFilter(const AbstractFilter &other)
-    : AbstractFilter(other) {
+  PointIgnoredFilter::PointIgnoredFilter(const AbstractFilter &other) : AbstractFilter(other) {
   }
 
 
@@ -27,8 +25,8 @@ namespace Isis {
   }
 
 
-  bool PointIgnoredFilter::evaluate(const QString *imageSerial) const {
-    return AbstractFilter::evaluateImageFromPointFilter(imageSerial);
+  bool PointIgnoredFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageAndNet);
   }
 
 
@@ -50,15 +48,19 @@ namespace Isis {
   QString PointIgnoredFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
 
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "point that is ";
-    else
+    }
+    else {
       description += "points that are ";
+    }
 
-    if (inclusive())
+    if (inclusive()) {
       description += "ignored";
-    else
+    }
+    else {
       description += "not ignored";
+    }
 
     return description;
   }
@@ -67,10 +69,12 @@ namespace Isis {
   QString PointIgnoredFilter::getPointDescription() const {
     QString description = "are ";
 
-    if (inclusive())
+    if (inclusive()) {
       description += "ignored";
-    else
+    }
+    else {
       description += "not ignored";
+    }
 
     return description;
   }

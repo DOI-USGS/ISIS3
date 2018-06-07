@@ -1,10 +1,7 @@
 #ifndef AbstractStringFilter_H
 #define AbstractStringFilter_H
 
-
-// parent
 #include "AbstractFilter.h"
-
 
 class QLineEdit;
 class QString;
@@ -33,7 +30,7 @@ namespace Isis {
 
     public:
       AbstractStringFilter(AbstractFilter::FilterEffectivenessFlag,
-          ControlNet *network, int minimumForSuccess = -1);
+                           int minimumForSuccess = -1);
       AbstractStringFilter(const AbstractStringFilter &other);
       virtual ~AbstractStringFilter();
 

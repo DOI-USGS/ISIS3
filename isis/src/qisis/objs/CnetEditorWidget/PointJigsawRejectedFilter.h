@@ -3,11 +3,13 @@
 
 #include "AbstractFilter.h"
 
+template< typename U, typename V > class QPair;
+class QString;
 
 namespace Isis {
-  class ControlCubeGraphNode;
-  class ControlPoint;
   class ControlMeasure;
+  class ControlNet;
+  class ControlPoint;
 
   /**
    * @brief Allows filtering by a control point's jigsaw rejected status
@@ -28,11 +30,11 @@ namespace Isis {
 
     public:
       PointJigsawRejectedFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          ControlNet *network, int minimumForSuccess = -1);
+            int minimumForSuccess = -1);
       PointJigsawRejectedFilter(const AbstractFilter &other);
       virtual ~PointJigsawRejectedFilter();
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

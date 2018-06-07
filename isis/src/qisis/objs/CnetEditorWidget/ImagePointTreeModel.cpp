@@ -40,8 +40,9 @@ namespace Isis {
 
 
   ImagePointTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
-    AbstractTreeModel *tm, QThread *tt) {
+    AbstractTreeModel *tm, ControlNet *net, QThread *tt) {
     m_treeModel = tm;
+    m_controlNet = net;
     m_targetThread = tt;
     m_avgCharWidth = QFontMetrics(
         m_treeModel->getView()->getContentFont()).averageCharWidth();
@@ -51,6 +52,7 @@ namespace Isis {
   ImagePointTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
     const CreateRootItemFunctor &other) {
     m_treeModel = other.m_treeModel;
+    m_controlNet = other.m_controlNet;
     m_targetThread = other.m_targetThread;
     m_avgCharWidth = other.m_avgCharWidth;
   }
@@ -58,6 +60,7 @@ namespace Isis {
 
   ImagePointTreeModel::CreateRootItemFunctor::~CreateRootItemFunctor() {
     m_targetThread = NULL;
+    m_controlNet = NULL;
     m_treeModel = NULL;
   }
 
@@ -68,10 +71,10 @@ namespace Isis {
 
     // TODO connect parent item destroy to image removed from network
 
-    imageItem = new ImageParentItem(imageSerial, m_avgCharWidth);
+    imageItem = new ImageParentItem(imageSerial, m_controlNet, m_avgCharWidth);
     imageItem->setSelectable(false);
     imageItem->moveToThread(m_targetThread);
-    QList< ControlMeasure * > measures = getControlNetwork()->GetMeasuresInCube(imageSerial);
+    QList< ControlMeasure * > measures = m_controlNet->GetMeasuresInCube(imageSerial);
     for (int j = 0; j < measures.size(); j++) {
       ASSERT(measures[j]);
       ControlPoint *point = measures[j]->Parent();
@@ -130,8 +133,8 @@ namespace Isis {
       }
 
       futureRoot = QtConcurrent::mappedReduced(
-          getControlNetwork()->GetCubeGraphNodes(),
-          CreateRootItemFunctor(this, QThread::currentThread()),
+          getControlNetwork()->GetCubeSerials(),
+          CreateRootItemFunctor(this, getControlNetwork(), QThread::currentThread()),
           &CreateRootItemFunctor::addToRootItem,
           QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 

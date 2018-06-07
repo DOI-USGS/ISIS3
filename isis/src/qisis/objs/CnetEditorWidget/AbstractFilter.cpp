@@ -15,6 +15,7 @@
 #include <QMargins>
 #include <QMenu>
 #include <QMenuBar>
+#include <QPair>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QString>
@@ -22,6 +23,7 @@
 #include <QWriteLocker>
 
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 
 #include "AbstractFilterSelector.h"
@@ -29,10 +31,8 @@
 
 namespace Isis {
   AbstractFilter::AbstractFilter(FilterEffectivenessFlag effectiveness,
-      ControlNet *network, int minimumForSuccess) {
+                                 int minimumForSuccess) {
     nullify();
-
-    m_controlNet = network;
 
     m_minForSuccess = minimumForSuccess;
 
@@ -46,8 +46,6 @@ namespace Isis {
 
   AbstractFilter::AbstractFilter(const AbstractFilter &other) {
     nullify();
-
-    m_controlnet = other.m_controlNet;
 
     m_minForSuccess = other.m_minForSuccess;
 
@@ -71,9 +69,6 @@ namespace Isis {
 
     delete m_smallFont;
     m_smallFont = NULL;
-
-    // The filter does not own the Control Network so do not delete it!
-    m_controlNet = NULL;
   }
 
 
@@ -289,22 +284,26 @@ namespace Isis {
   }
 
 
-  bool AbstractFilter::evaluateImageFromPointFilter(const QString *imageSerial) const {
+  bool AbstractFilter::evaluateImageFromPointFilter(
+        const QPair<QString, ControlNet *> *imageAndNet) const {
     bool evaluation = true;
 
     if (canFilterImages()) {
-      evaluation = evaluateFromCount(m_controlNet->GetMeasuresInCube(*imageSerial), true);
+      evaluation = evaluateFromCount(imageAndNet->second->GetMeasuresInCube(imageAndNet->first),
+                                     true);
     }
 
     return evaluation;
   }
 
 
-  bool AbstractFilter::evaluateImageFromMeasureFilter(const QString *imageSerial) const {
+  bool AbstractFilter::evaluateImageFromMeasureFilter(
+        const QPair<QString, ControlNet *> *imageAndNet) const {
     bool evaluation = true;
 
     if (canFilterImages()) {
-      evaluation = evaluateFromCount(m_controlNet->GetMeasuresInCube(*imageSerial), false);
+      evaluation = evaluateFromCount(imageAndNet->second->GetMeasuresInCube(imageAndNet->first),
+                                     false);
     }
 
     return evaluation;

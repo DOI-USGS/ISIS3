@@ -2,23 +2,24 @@
 
 #include "ChooserNameFilter.h"
 
+#include <QPair>
 #include <QString>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "IString.h"
 
 
 namespace Isis {
   ChooserNameFilter::ChooserNameFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network, int minimumForSuccess) : AbstractStringFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
   }
 
 
   ChooserNameFilter::ChooserNameFilter(const ChooserNameFilter &other)
-    : AbstractStringFilter(other) {
+        : AbstractStringFilter(other) {
   }
 
 
@@ -26,8 +27,8 @@ namespace Isis {
   }
 
 
-  bool ChooserNameFilter::evaluate(const QString *imageSerial) const {
-    return evaluateImageFromPointFilter(imageSerial);
+  bool ChooserNameFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromPointFilter(imageAndNet);
   }
 
 

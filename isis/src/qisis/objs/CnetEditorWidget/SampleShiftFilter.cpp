@@ -2,21 +2,23 @@
 
 #include "SampleShiftFilter.h"
 
-#include "ControlCubeGraphNode.h"
+#include <QPair>
+#include <QString>
+
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 
 namespace Isis {
   SampleShiftFilter::SampleShiftFilter(
     AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) :
-    AbstractNumberFilter(flag, network, minimumForSuccess) {
+    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  SampleShiftFilter::SampleShiftFilter(
-    const SampleShiftFilter &other) : AbstractNumberFilter(other) {
+  SampleShiftFilter::SampleShiftFilter(const SampleShiftFilter &other)
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -24,8 +26,8 @@ namespace Isis {
   }
 
 
-  bool SampleShiftFilter::evaluate(const QString *imageSerial) const {
-    return evaluateImageFromMeasureFilter(imageSerial);
+  bool SampleShiftFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -46,10 +48,12 @@ namespace Isis {
 
   QString SampleShiftFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "measure that has a sample shift which is ";
-    else
+    }
+    else {
       description += "measures that have sample shifts which are ";
+    }
 
     description += descriptionSuffix();
     return description;

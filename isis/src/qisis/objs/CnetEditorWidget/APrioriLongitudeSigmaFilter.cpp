@@ -2,20 +2,24 @@
 
 #include "APrioriLongitudeSigmaFilter.h"
 
+#include <QPair>
+#include <QString>
+
+#include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Longitude.h"
 
 
 namespace Isis {
   APrioriLongitudeSigmaFilter::APrioriLongitudeSigmaFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
   APrioriLongitudeSigmaFilter::APrioriLongitudeSigmaFilter(
-    const APrioriLongitudeSigmaFilter &other) : AbstractNumberFilter(other) {
+        const APrioriLongitudeSigmaFilter &other) : AbstractNumberFilter(other) {
   }
 
 
@@ -23,20 +27,19 @@ namespace Isis {
   }
 
 
-  bool APrioriLongitudeSigmaFilter::evaluate(const QString *imageSerial) const {
-    return evaluateImageFromPointFilter(imageSerial);
+  bool APrioriLongitudeSigmaFilter::evaluate(
+        const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
-  bool APrioriLongitudeSigmaFilter::evaluate(
-    const ControlPoint *point) const {
+  bool APrioriLongitudeSigmaFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-        point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters());
+          point->GetAprioriSurfacePoint().GetLonSigmaDistance().meters());
   }
 
 
-  bool APrioriLongitudeSigmaFilter::evaluate(
-    const ControlMeasure *measure) const {
+  bool APrioriLongitudeSigmaFilter::evaluate(const ControlMeasure *measure) const {
     return true;
   }
 

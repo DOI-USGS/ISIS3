@@ -2,24 +2,23 @@
 
 #include "PointEditLockedFilter.h"
 
-#include <iostream>
-
-#include <QHBoxLayout>
+#include <QPair>
+#include <QString>
 
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 
 
 namespace Isis {
   PointEditLockedFilter::PointEditLockedFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
   }
 
 
   PointEditLockedFilter::PointEditLockedFilter(const AbstractFilter &other)
-    : AbstractFilter(other) {
+        : AbstractFilter(other) {
   }
 
 
@@ -27,8 +26,8 @@ namespace Isis {
   }
 
 
-  bool PointEditLockedFilter::evaluate(const QString *imageSerial) const {
-    return AbstractFilter::evaluateImageFromPointFilter(imageSerial);
+  bool PointEditLockedFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageAndNet);
   }
 
 
@@ -50,15 +49,19 @@ namespace Isis {
   QString PointEditLockedFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
 
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "point that is ";
-    else
+    }
+    else {
       description += "points that are ";
+    }
 
-    if (inclusive())
+    if (inclusive()) {
       description += "edit locked";
-    else
+    }
+    else {
       description += "not edit locked";
+    }
 
     return description;
   }
@@ -67,10 +70,12 @@ namespace Isis {
   QString PointEditLockedFilter::getPointDescription() const {
     QString description = "are ";
 
-    if (inclusive())
+    if (inclusive()) {
       description += "edit locked";
-    else
+    }
+    else {
       description += "not edit locked";
+    }
 
     return description;
   }

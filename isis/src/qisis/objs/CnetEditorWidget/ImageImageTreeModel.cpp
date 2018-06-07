@@ -38,8 +38,9 @@ namespace Isis {
 
 
   ImageImageTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
-    AbstractTreeModel *tm, QThread *tt) {
+    AbstractTreeModel *tm, ControlNet *net, QThread *tt) {
     m_treeModel = tm;
+    m_controlNet = net;
     m_targetThread = tt;
     m_avgCharWidth = QFontMetrics(
         m_treeModel->getView()->getContentFont()).averageCharWidth();
@@ -49,6 +50,7 @@ namespace Isis {
   ImageImageTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
     const CreateRootItemFunctor &other) {
     m_treeModel = other.m_treeModel;
+    m_controlNet = other.m_controlNet;
     m_targetThread = other.m_targetThread;
     m_avgCharWidth = other.m_avgCharWidth;
   }
@@ -56,6 +58,7 @@ namespace Isis {
 
   ImageImageTreeModel::CreateRootItemFunctor::~CreateRootItemFunctor() {
     m_treeModel = NULL;
+    m_controlNet = NULL;
     m_targetThread = NULL;
   }
 
@@ -63,22 +66,20 @@ namespace Isis {
   ImageParentItem *ImageImageTreeModel::CreateRootItemFunctor::operator()(
     const QString imageSerial) const {
 
-    //TODO Connect destroy signals to new items.
-
     ImageParentItem *parentItem =
-      new ImageParentItem(imageSerial, m_avgCharWidth);
+          new ImageParentItem(imageSerial, m_controlNet, m_avgCharWidth);
     parentItem->setSelectable(false);
     parentItem->moveToThread(m_targetThread);
 
-    QList< QString > connectedImages = getControlNetwork()->getAdjacentImages(imageSerial);
+    QList< QString > connectedImages = m_controlNet->getAdjacentImages(imageSerial);
 
     for (int j = 0; j < connectedImages.size(); j++) {
-      ImageLeafItem *serialItem =
-        new ImageLeafItem(connectedImages[j], m_avgCharWidth, parentItem);
-      serialItem->setSelectable(false);
-      serialItem->moveToThread(m_targetThread);
+      ImageLeafItem *childItem =
+            new ImageLeafItem(connectedImages[j], m_controlNet, m_avgCharWidth, parentItem);
+      childItem->setSelectable(false);
+      childItem->moveToThread(m_targetThread);
 
-      parentItem->addChild(serialItem);
+      parentItem->addChild(childItem);
     }
 
     return parentItem;
@@ -127,7 +128,7 @@ namespace Isis {
       }
 
       futureRoot = QtConcurrent::mappedReduced(
-          getControlNetwork()->GetCubeGraphNodes(),
+          getControlNetwork()->GetCubeSerials(),
           CreateRootItemFunctor(this, getControlNetwork(), QThread::currentThread()),
           &CreateRootItemFunctor::addToRootItem,
           QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);

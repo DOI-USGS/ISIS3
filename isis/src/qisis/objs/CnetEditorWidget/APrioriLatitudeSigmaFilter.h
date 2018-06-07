@@ -3,14 +3,12 @@
 
 #include "AbstractNumberFilter.h"
 
-
+template< typename U, typename V > class QPair;
 class QString;
 
-
 namespace Isis {
-  class ControlCubeGraphNode;
-  class AbstractFilterSelector;
   class ControlMeasure;
+  class ControlNet;
   class ControlPoint;
 
   /**
@@ -33,11 +31,11 @@ namespace Isis {
 
     public:
       APrioriLatitudeSigmaFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          ControlNet *network, int minimumForSuccess = -1);
+            int minimumForSuccess = -1);
       APrioriLatitudeSigmaFilter(const APrioriLatitudeSigmaFilter &other);
       virtual ~APrioriLatitudeSigmaFilter();
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

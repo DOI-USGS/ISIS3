@@ -10,26 +10,26 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMargins>
+#include <QPair>
 #include <QRadioButton>
 #include <QSpinBox>
+#include <QString>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 
 
 namespace Isis {
   MeasureCountFilter::MeasureCountFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) : AbstractFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
     init();
     createWidget();
   }
 
 
-  MeasureCountFilter::MeasureCountFilter(const MeasureCountFilter &other)
-    : AbstractFilter(other) {
+  MeasureCountFilter::MeasureCountFilter(const MeasureCountFilter &other) : AbstractFilter(other) {
     init();
     createWidget();
 
@@ -85,14 +85,14 @@ namespace Isis {
   }
 
 
-  bool MeasureCountFilter::evaluate(const QString *imageSerial) const {
-    return AbstractFilter::evaluateImageFromPointFilter(imageSerial);
+  bool MeasureCountFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageAndNet);
   }
 
 
   bool MeasureCountFilter::evaluate(const ControlPoint *point) const {
     return (point->getMeasures().size() >= m_count && m_minimum) ||
-        (point->getMeasures().size() <= m_count && !m_minimum);
+           (point->getMeasures().size() <= m_count && !m_minimum);
   }
 
 

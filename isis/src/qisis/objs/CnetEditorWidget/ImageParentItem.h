@@ -8,6 +8,7 @@
 
 
 namespace Isis {
+  class ControlNet;
 
   /**
    * @brief Tree item that is a parent and represents an image
@@ -24,8 +25,8 @@ namespace Isis {
    */
   class ImageParentItem : public AbstractImageItem, public AbstractParentItem {
     public:
-      ImageParentItem(QString imageSerial,
-          int avgCharWidth, AbstractTreeItem *parent = 0);
+      ImageParentItem(QString imageSerial, ControlNet *net,
+                      int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~ImageParentItem();
 
 

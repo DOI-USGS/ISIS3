@@ -2,21 +2,20 @@
 
 #include "MeasureJigsawRejectedFilter.h"
 
-#include <iostream>
+#include <QPair>
+#include <QString>
 
-#include <QHBoxLayout>
-
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
-
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 using std::cerr;
 
 
 namespace Isis {
   MeasureJigsawRejectedFilter::MeasureJigsawRejectedFilter(
-    AbstractFilter::FilterEffectivenessFlag flag, ControlNet *network, int minimumForSuccess) :
-    AbstractFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
+        AbstractFilter(flag, minimumForSuccess) {
   }
 
 
@@ -24,8 +23,9 @@ namespace Isis {
   }
 
 
-  bool MeasureJigsawRejectedFilter::evaluate(const QString *imageSerial) const {
-    return AbstractFilter::evaluateImageFromMeasureFilter(imageSerial);
+  bool MeasureJigsawRejectedFilter::evaluate(
+        const QPair<QString, ControlNet *> *imageAndNet) const {
+    return AbstractFilter::evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -46,15 +46,19 @@ namespace Isis {
 
   QString MeasureJigsawRejectedFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "measure that is ";
-    else
+    }
+    else {
       description += "measures that are ";
+    }
 
-    if (inclusive())
+    if (inclusive()) {
       description += "jigsaw rejected";
-    else
+    }
+    else {
       description += "not jigsaw rejected";
+    }
 
     return description;
   }
@@ -68,10 +72,12 @@ namespace Isis {
   QString MeasureJigsawRejectedFilter::getMeasureDescription() const {
     QString description = "are ";
 
-    if (inclusive())
+    if (inclusive()) {
       description += "jigsaw rejected";
-    else
+    }
+    else {
       description += "not jigsaw rejected";
+    }
 
     return description;
   }

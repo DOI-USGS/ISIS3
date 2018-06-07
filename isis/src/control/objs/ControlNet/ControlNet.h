@@ -217,6 +217,9 @@ namespace Isis {
    *                           group to set radii values to those ingested from the versioner
    *                           if they exist. Otherwise, we call SetTarget with the targetname.
    *                           Fixes #5361.
+   *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
+   *                           Previously this functionality was only available through the
+   *                           ControlCubeGraphNode class. References #5434.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -252,6 +255,7 @@ namespace Isis {
           bool lessThan(const ControlMeasure *, const ControlMeasure *)) const;
       int getEdgeCount() const;
       QString CubeGraphToString() const;
+      QList< QString > getAdjacentImages(QString serialNumber) const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,

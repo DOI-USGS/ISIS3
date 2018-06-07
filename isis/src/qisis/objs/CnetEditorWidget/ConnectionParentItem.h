@@ -5,8 +5,10 @@
 #include "AbstractImageItem.h"
 #include "AbstractParentItem.h"
 
+class QString;
 
 namespace Isis {
+  class ControlNet;
 
   /**
    * @brief Tree item that is a parent and represents an image
@@ -24,8 +26,8 @@ namespace Isis {
   class ConnectionParentItem : public AbstractImageItem,
     public AbstractParentItem {
     public:
-      ConnectionParentItem(QString imageSerial,
-          int avgCharWidth, AbstractTreeItem *parent = 0);
+      ConnectionParentItem(QString imageSerial, ControlNet *net,
+                           int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~ConnectionParentItem();
 
       void addChild(AbstractTreeItem *child);

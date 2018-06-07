@@ -8,6 +8,7 @@
 
 
 namespace Isis {
+  class ControlNet;
 
   /**
    * @brief Tree item that is a leaf and represents an image
@@ -24,8 +25,8 @@ namespace Isis {
    */
   class ImageLeafItem : public AbstractImageItem, public AbstractLeafItem {
     public:
-      ImageLeafItem(QString imageSerial,
-          int avgCharWidth, AbstractTreeItem *parent = 0);
+      ImageLeafItem(QString imageSerial, ControlNet *net,
+                    int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~ImageLeafItem();
 
 

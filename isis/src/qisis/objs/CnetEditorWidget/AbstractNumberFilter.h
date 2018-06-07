@@ -33,7 +33,7 @@ namespace Isis {
 
     public:
       AbstractNumberFilter(AbstractFilter::FilterEffectivenessFlag,
-          ControlNet *network, int minimumForSuccess = -1);
+                           int minimumForSuccess = -1);
       AbstractNumberFilter(const AbstractNumberFilter &other);
       virtual ~AbstractNumberFilter();
 

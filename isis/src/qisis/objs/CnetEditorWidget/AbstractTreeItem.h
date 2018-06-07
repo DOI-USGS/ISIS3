@@ -37,7 +37,7 @@ namespace Isis {
         None,
         Point,
         Measure,
-        ImageSerial,
+        ImageAndNet,
       };
 
 

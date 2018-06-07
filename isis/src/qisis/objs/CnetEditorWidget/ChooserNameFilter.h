@@ -3,14 +3,13 @@
 
 #include "AbstractStringFilter.h"
 
-
+template< typename U, typename V > class QPair;
 class QString;
 
-
 namespace Isis {
-  class AbstractFilterSelector;
-  class ControlPoint;
   class ControlMeasure;
+  class ControlNet;
+  class ControlPoint;
 
   /**
    * @brief Allows filtering by the chooser name
@@ -31,11 +30,11 @@ namespace Isis {
 
     public:
       ChooserNameFilter(AbstractFilter::FilterEffectivenessFlag,
-          ControlNet *network, int minimumForSuccess = -1);
+            int minimumForSuccess = -1);
       ChooserNameFilter(const ChooserNameFilter &other);
       virtual ~ChooserNameFilter();
 
-      bool evaluate(const QString *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

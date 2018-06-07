@@ -497,12 +497,9 @@ namespace Isis {
     AbstractTreeItem::InternalPointerType pointerType =
       item->getPointerType();
 
-    if ((pointerType == AbstractTreeItem::Point &&
-        flags.testFlag(PointItems)) ||
-        (pointerType == AbstractTreeItem::Measure &&
-            flags.testFlag(MeasureItems)) ||
-        (pointerType == AbstractTreeItem::ImageSerial &&
-            flags.testFlag(SerialItems))) {
+    if ((pointerType == AbstractTreeItem::Point && flags.testFlag(PointItems)) ||
+        (pointerType == AbstractTreeItem::Measure && flags.testFlag(MeasureItems)) ||
+        (pointerType == AbstractTreeItem::ImageAndNet && flags.testFlag(ImageItems))) {
       return true;
     }
     else {
@@ -634,9 +631,9 @@ namespace Isis {
             (ControlMeasure *) item->getPointer())) ? true : false);
         break;
 
-      case AbstractTreeItem::ImageSerial:
+      case AbstractTreeItem::ImageAndNet:
         item->setVisible((!m_filter || m_filter->evaluate(
-            (QString *) item->getPointer())) ? true : false);
+            (QPair<QString, ControlNet *> *) item->getPointer())) ? true : false);
         break;
 
       case AbstractTreeItem::None:

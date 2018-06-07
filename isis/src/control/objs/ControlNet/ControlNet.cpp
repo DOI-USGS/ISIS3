@@ -1105,6 +1105,33 @@ namespace Isis {
 
 
   /**
+   * Get all images connected to a given image by common control points.
+   *
+   * @param serialNumber the serial number of the image to find images adjacent to.
+   *
+   * @returns @b QList<QString> The serial numbers of all adjacent images.
+   *
+   * @TODO Replace this with updated graph functionality once boost graph is in.
+   */
+  QList< QString > ControlNet::getAdjacentImages(QString serialNumber) const {
+    if (!cubeGraphNodes->contains(serialNumber)) {
+      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+          "the network";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    const ControlCubeGraphNode *queryNode = getGraphNode(serialNumber);
+    QList< ControlCubeGraphNode * > adjacentNodes = queryNode->getAdjacentNodes();
+    QList< QString > adjacentSerials;
+    foreach(ControlCubeGraphNode * adjacentNode, adjacentNodes) {
+      adjacentSerials.append(adjacentNode->getSerialNumber());
+    }
+
+    return adjacentSerials;
+  }
+
+
+  /**
    * Get all the measures pertaining to a given cube serial number
    *
    * @returns A list of all measures which are in a given cube

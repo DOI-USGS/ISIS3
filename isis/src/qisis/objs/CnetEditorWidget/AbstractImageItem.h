@@ -4,12 +4,11 @@
 
 #include "AbstractTreeItem.h"
 
-
 class QString;
 class QVariant;
 
-
 namespace Isis {
+  class ControlNet;
 
   /**
    * @brief Base class for an image item in the tree
@@ -27,8 +26,8 @@ namespace Isis {
    */
   class AbstractImageItem : public virtual AbstractTreeItem {
     public:
-      AbstractImageItem(QString imageSerial,
-          int avgCharWidth, AbstractTreeItem *parent = 0);
+      AbstractImageItem(QString imageSerial, ControlNet *net,
+                        int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~AbstractImageItem();
 
       QVariant getData() const;
@@ -50,7 +49,7 @@ namespace Isis {
 
 
     private:
-      QString m_imageSerial;
+      QPair<QString, ControlNet *> *m_imageAndNet;
   };
 }
 

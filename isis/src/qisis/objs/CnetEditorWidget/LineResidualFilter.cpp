@@ -2,20 +2,23 @@
 
 #include "LineResidualFilter.h"
 
-#include "ControlCubeGraphNode.h"
+#include <QPair>
+#include <QString>
+
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 
 namespace Isis {
   LineResidualFilter::LineResidualFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    ControlNet *network,
-    int minimumForSuccess) : AbstractNumberFilter(flag, network, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
   LineResidualFilter::LineResidualFilter(const LineResidualFilter &other)
-    : AbstractNumberFilter(other) {
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -23,8 +26,8 @@ namespace Isis {
   }
 
 
-  bool LineResidualFilter::evaluate(const QString *imageSerial) const {
-    return evaluateImageFromMeasureFilter(imageSerial);
+  bool LineResidualFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -45,10 +48,13 @@ namespace Isis {
 
   QString LineResidualFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
+
+    if (getMinForSuccess() == 1) {
       description += "measure that has a line residual which is ";
-    else
+    }
+    else {
       description += "measures that have line residuals which are ";
+    }
 
     description += descriptionSuffix();
     return description;
