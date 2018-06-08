@@ -288,6 +288,8 @@ namespace Isis {
    * to allow for a new project to be opened in IPCE.
    */
   void Directory::clean() {
+    emit directoryCleaned();
+
     m_historyTreeWidget->clear();
     m_warningTreeWidget->clear();
     m_bundleObservationViews.clear();
@@ -302,7 +304,6 @@ namespace Isis {
     m_templateEditorWidgets.clear();
 
     m_projectItemModel->clean();
-    emit directoryCleaned();
   }
 
 
@@ -314,7 +315,7 @@ namespace Isis {
    *   @history Adam Goins 2017-11-27 - Updated this function to add the most recent
    *                project to the recent projects menu. References #5216.
    */
-  void Directory::updateRecentProjects(){
+  void Directory::updateRecentProjects() {
 
     if (m_recentProjectsLoaded)  {
       QMenu *recentProjectsMenu = new QMenu("&Recent Projects");
@@ -534,12 +535,12 @@ namespace Isis {
 
 
   /**
-   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a
-   * new active control and wants to discard any edits in the old active control.  The only view
-   * which will not be updated with the new control are any CnetEditorViews showing the old active
-   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the
+   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a 
+   * new active control and wants to discard any edits in the old active control.  The only view 
+   * which will not be updated with the new control are any CnetEditorViews showing the old active 
+   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the 
    * CnetEditor view displaying the old control is removed, then recreated.
-   *
+   *  
    */
   void Directory::reloadActiveControlInCnetEditorView() {
 
@@ -679,7 +680,7 @@ namespace Isis {
     result->setWindowTitle(title);
     result->setObjectName(title);
 
-    emit newDockAvailable(result);
+    emit newWidgetAvailable(result);
 
     return result;
   }
@@ -699,7 +700,7 @@ namespace Isis {
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
 
-    emit newDockAvailable(result);
+    emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from view and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *, QString)),
@@ -750,11 +751,10 @@ namespace Isis {
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
-
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
-
-    emit newDockAvailable(result);
+                    
+    emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
     connect(result, SIGNAL(modifyControlPoint(ControlPoint *)),
@@ -826,7 +826,7 @@ namespace Isis {
 
       connect(result, SIGNAL(destroyed(QObject *)),
               this, SLOT(cleanupControlPointEditViewWidget(QObject *)));
-      emit newDockAvailable(result);
+      emit newWidgetAvailable(result);
 
 // 2017-06-09 Ken commented out for Data Workshop demo
 //      m_chipViewports = new ChipViewportsWidget(result);
@@ -1048,7 +1048,7 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
-
+    
     CnetEditorView *cnetEditorView = static_cast<CnetEditorView *>(obj);
     if (!cnetEditorView) {
       return;
@@ -1057,7 +1057,7 @@ namespace Isis {
     Control *control = m_controlMap.key(cnetEditorView);
     m_controlMap.remove(control, cnetEditorView);
 
-    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {
+    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {      
       control->closeControlNet();
     }
 
@@ -1067,11 +1067,11 @@ namespace Isis {
 
 
   /**
-   * @description Return true if control is not currently being viewed in a CnetEditorWidget
-   *
-   * @param Control * Control used to search current CnetEditorWidgets
-   *
-   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget
+   * @description Return true if control is not currently being viewed in a CnetEditorWidget 
+   *  
+   * @param Control * Control used to search current CnetEditorWidgets 
+   *  
+   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget 
    */
   bool Directory::controlUsedInCnetEditorWidget(Control *control) {
 
