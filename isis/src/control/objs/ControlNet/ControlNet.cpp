@@ -152,8 +152,8 @@ namespace Isis {
       points->clear();
     }
 
-    m_controlGraph.clear();
     m_vertexMap.clear();
+    m_controlGraph.clear();
 
     if (pointIds) {
       pointIds->clear();
