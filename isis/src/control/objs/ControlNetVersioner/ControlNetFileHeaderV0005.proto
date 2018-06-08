@@ -9,6 +9,6 @@ message ControlNetFileHeaderV0005 {
   optional string lastModified = 4;
   optional string description  = 5;
   optional string userName     = 6;
-  optional int32  numPoints    = 7; 
+  optional int32  numPoints    = 7;
+  repeated double targetRadii = 10;
 }
-
