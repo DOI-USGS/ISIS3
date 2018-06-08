@@ -1,3 +1,4 @@
+
 #ifndef SubTreeProxyModel_h
 #define SubTreeProxyModel_h
 
