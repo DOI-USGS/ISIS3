@@ -13,9 +13,23 @@
 
 namespace Isis {
 
-  SubTreeProxyModel::SubTreeProxyModel(QObject *parent) :
-      QIdentityProxyModel(parent) {
+
+  /**
+   * @brief Constructs a SubTreeProxyModel.
+   *
+   * Constructs a SubTreeProxyModel that can be used to operate on a sub-section of the source
+   * model. By default, the sub tree will be identical to the source model. The setRoot() method
+   * can be used to specify where the subtree starts. An example of usage can be found in
+   * JigsawDialog::createObservationSolveSettingsTreeView().
+   *
+   * @param QObject *parent The parent of this SubTreeProxyModel.
+   *
+   * @see JigsawDialog::createObservationSolveSettingsTreeView()
+   * @see SubTreeProxyModel::setRoot()
+   */
+  SubTreeProxyModel::SubTreeProxyModel(QObject *parent) : QIdentityProxyModel(parent) {
   }
+
 
   // Returns the model index in the proxy model corresponding to the sourceIndex from the
   // source model
@@ -58,44 +72,8 @@ namespace Isis {
     else {
       return QModelIndex();
     }
-
-    // int sourceRow = sourceIndex.row();
-    // int rootRow = m_root.row();
-
-    // Siblings of the proxy root are NOT part of the subtree
-    /* Item 0        (the source tree root; the proxy root's parent)
-     * - Item 0      (a sibling of the proxy root)
-     * - Item 1      (the proxy root, m_root)
-     *   - Item 0    (a child of the proxy root)
-     * - Item 2      (a sibling of the proxy root)
-    //  */
-    // if (sourceIndex.parent() == m_root.parent()) {
-    //   return QModelIndex();
-    // }
-
-    // // Ancestors of the proxy root are NOT part of the subtree
-    // QModelIndex parentIndex = sourceIndex.parent();
-    // while (parentIndex.isValid()) {
-    //   parentIndex = parentIndex.parent();
-    // }
-
-
-    // if (sourceRow != rootRow) {
-    //   return QModelIndex();
-    // }
-    // QModelIndex sourceParent = sourceIndex.parent();
-
-    // See if there 
-    // Check to see if we are at the root
-    // if (!sourceParent.isValid()) {
-      
-    // }
-    // else {
-
-    // }
-    // int targetRow = sourceRow;
-    // return QIdentityProxyModel::mapFromSource(sourceIndex);
   }
+
 
   //Returns the model index in the source that corresponds to the proxy index
   //in the proxy model
@@ -137,16 +115,8 @@ namespace Isis {
 
 
   bool SubTreeProxyModel::setRoot(const QStandardItem *item) {
-    qDebug() << "setRoot() item->index() " << item->index();
-    qDebug() << "\titem->parent()->index() " << item->parent()->index();
-    //m_root = QPersistentModelIndex(item->index());
-
     QAbstractItemModel::removeRows(1,2,item->index());
 
-
-
-
-    //qDebug() << "Perisentent Model Index ROOT: " << m_root << " is valid ? " << (m_root.isValid() ? "yes" : "no");
     qDebug() << "Persistent's PARENT: " << m_root.parent();
     if (m_root.isValid()) {
       qDebug() <<"m_root is valid";
@@ -158,12 +128,6 @@ namespace Isis {
       return false;
     }
   }
-  
-  // bool ObservationSolveSettingsProxyModel::filterAcceptsRow(int sourceRow, 
-  //                                                           const QModelIndex &sourceParent) const {
-  //   QModelIndex mIndex = sourceModel()->index(sourceRow, 0, sourceParent);
-
-  // }
 
 
 }
