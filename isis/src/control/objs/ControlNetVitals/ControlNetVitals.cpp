@@ -225,7 +225,7 @@ namespace Isis {
     QString details = "";
     if (hasIslands()) {
       status = "Broken!";
-      details = "This network has " + toString(numIslands()) + " island(s).";
+      details = "This network has " + toString(numIslands()) + " islands.";
     }
     else {
 

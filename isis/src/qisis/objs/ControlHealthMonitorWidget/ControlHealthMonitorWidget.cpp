@@ -105,8 +105,6 @@ namespace Isis {
     else if (m_vitals->getStatus() == "Healthy!") updateStatus(2);
 
     QPieSeries *series = new QPieSeries();
-    series->append("Ignored", m_vitals->numIgnoredPoints());
-    series->append("Locked", m_vitals->numLockedPoints());
     series->append("Free", m_vitals->numFreePoints());
     series->append("Constrained", m_vitals->numConstrainedPoints());
     series->append("Fixed", m_vitals->numFixedPoints());
