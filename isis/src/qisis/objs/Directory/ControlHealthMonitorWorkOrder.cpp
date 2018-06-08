@@ -79,8 +79,8 @@ namespace Isis {
    * @param controls (ControlList *) The ControlList chosen from the project tree.
    * @return  @b bool True if  we can set as active, False otherwise.
    */
-  bool ControlHealthMonitorWorkOrder::isExecutable() {
-    return !project()->activeControl();
+  bool ControlHealthMonitorWorkOrder::isExecutable(ControlList *controls) {
+    return !!controls;
   }
 
   /**
@@ -92,7 +92,7 @@ namespace Isis {
 
     bool success = WorkOrder::setupExecution();
     if (success) {
-      if (!project()->activeControl()) {
+      if (!isExecutable(controlList())) {
 
         QMessageBox::critical(NULL, tr("Unable to load Control Net Health Monitor."),
                               tr("You must first set an active control in order to view the health monitor."));

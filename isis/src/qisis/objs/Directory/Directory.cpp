@@ -811,7 +811,7 @@ namespace Isis {
       }
 
       ControlHealthMonitorView *result = new ControlHealthMonitorView(project()->activeControl()->controlNet());
-      result->setWindowTitle(tr("Control Net Health Monitor"));
+      result->setWindowTitle(tr("Control NetHealth Monitor"));
       result->setObjectName(result->windowTitle());
 
       m_controlHealthMonitorView = result;
