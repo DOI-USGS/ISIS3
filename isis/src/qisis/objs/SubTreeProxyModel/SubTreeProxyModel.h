@@ -1,4 +1,5 @@
-#ifndef SubtreeProxyModel_h
+
+#ifndef SubTreeProxyModel_h
 #define SubTreeProxyModel_h
 
 #include <QIdentityProxyModel>
