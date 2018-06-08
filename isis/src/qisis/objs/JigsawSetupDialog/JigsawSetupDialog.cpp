@@ -15,7 +15,7 @@
 #include "Control.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
-#include "ObservationSolveSettingsProxyModel.h"
+#include "SubTreeProxyModel.h"
 #include "Project.h"
 #include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
@@ -1128,20 +1128,39 @@ namespace Isis {
 
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
-    // Proof-of-concept
+    // Proof-of-
+
+    qDebug() << "JigsawSetupDialog::createObservationSolveSettingsTreeView()";
+
 //    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
     ProjectItemModel *model = m_project->directory()->model();
+
     SubTreeProxyModel *osspm = new SubTreeProxyModel;
     osspm->setSourceModel(model);
 
+
+     //QModelIndex SubTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
     // find the root "Images" and set it in the proxy
     QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
     qDebug() << "ITEM: " << item << ", " << item->text();
     qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
+
+
     // i think source model tries to add top root item, which is invalid???
-    osspm->setRoot(item);    
+    //osspm->setRoot(item);
 
     m_ui->treeView->setModel(osspm);
+
+    //Set the root index to display the subtree we are interesting in.  This requires
+    //computing the proxy index from the source model.
+     m_ui->treeView->setRootIndex(osspm->mapFromSource(item->index() ));
+
+
+
+
+
+
+
 
 
 

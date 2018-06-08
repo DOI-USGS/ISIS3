@@ -1,5 +1,5 @@
-#ifndef ObservationSolveSettingsProxyModel_h
-#define ObservationSolveSettingsProxyModel_h
+#ifndef SubtreeProxyModel_h
+#define SubTreeProxyModel_h
 
 #include <QIdentityProxyModel>
 #include <QPersistentModelIndex>
