@@ -1386,7 +1386,8 @@ namespace Isis {
       }
     }
     m_isOpen = true;
-    writeSettings();
+    // TODO: TLS 2018-06-07  Why writeSettings here?
+    //writeSettings();
     emit projectLoaded(this);
   }
 
@@ -2208,7 +2209,9 @@ namespace Isis {
       }
     }
     else {
-      //  Save current active control if it has been modified
+      //  Save current active control if it has been modified. If "Save As" is being processed,
+      //  the active control is written in the Control::copyToNewProjectRoot so the control in
+      //  current project is not modified.
       if (activeControl() && activeControl()->isModified()) {
         activeControl()->write();
       }
