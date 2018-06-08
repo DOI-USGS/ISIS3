@@ -144,7 +144,7 @@ void testConnectivity() {
   net.AddPoint(p4);
   net.AddPoint(p5);
 
-  std::cout << "Getting measures in cube: " << std::endl; 
+  std::cout << "Getting measures in cube with SN: ALPHA: " << std::endl; 
   QList< ControlMeasure *> measures = net.GetMeasuresInCube("ALPHA");
   std::cout << "Serial Number: " << measures[0]->GetCubeSerialNumber() << std::endl; 
 
@@ -194,7 +194,9 @@ int main() {
   p1m1->SetCubeSerialNumber("BRAVO");
   ControlMeasure *p1m2 = new ControlMeasure;
   p1m2->SetCubeSerialNumber("CHARLIE");
+  cout << net.GraphToString() << "\n";
   p1->Add(p1m1);
+  cout << net.GraphToString() << "\n";
   p1->Add(p1m2);
   cout << net.GraphToString() << "\n";
 
@@ -484,17 +486,15 @@ int main() {
   remove("temp.bin");
   remove("temp2.bin");
 
-/*  QList< ControlCubeGraphNode * > graphnodes = net.GetCubeGraphNodes();
+  QList< QString > graphSNs = net.GetCubeSerials();
   // Use this to sort the output
-  QList<QString> sortedSNs;
-  foreach ( ControlCubeGraphNode * node, graphnodes ) {
-    sortedSNs.append(node->getSerialNumber());
-  }
-  sort(sortedSNs.begin(), sortedSNs.end());
-  foreach ( QString sn, sortedSNs ) {
+  sort(graphSNs.begin(), graphSNs.end());
+  foreach ( QString sn, graphSNs ) {
     cout << "    " << sn << "\n";
-  }*/
+  }
 
+
+  cout << net.GraphToString() << endl; 
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
 
   testConnectivity();

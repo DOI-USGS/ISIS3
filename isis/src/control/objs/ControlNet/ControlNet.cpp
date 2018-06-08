@@ -335,7 +335,7 @@ namespace Isis {
    *    
    * @throws IException::Programmer "NULL measure passed to ControlNet::pointAdded!"
    * @throws IException::Programmer "Control measure with NULL parent passed to
-   *     ControlNet::pointAdded!"
+   *     ControlNet::pointAdded"
    * @throws IException::Programmer "ControlNet does not contain the point."
    */
   void ControlNet::pointAdded(ControlPoint *point) {
@@ -376,14 +376,16 @@ namespace Isis {
           ControlMeasure *cm = point->GetMeasure(i);
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
-
-            // If the edge doesn't already exist, this adds and returns the edge. 
-            // If the edge already exists, this just returns it. (The use of a set
-            // forces the edges to be unique.)
-            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+            
+            if (QString::compare(sn, serial) != 0) {
+              // If the edge doesn't already exist, this adds and returns the edge. 
+              // If the edge already exists, this just returns it. (The use of a set
+              // forces the edges to be unique.)
+              ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                          m_vertexMap[sn],
                                                          m_controlGraph).first;
-            m_controlGraph[connection].strength++;
+              m_controlGraph[connection].strength++;
+            }
           }
         }
       }
@@ -398,9 +400,10 @@ namespace Isis {
    */
   QString ControlNet::GraphToString() const {
     QString graphString; 
+    
     typedef boost::graph_traits<Network>::edge_iterator edge_iter;
     edge_iter ei, ei_end;
-
+    
     for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei) {
       ImageVertex sourceImage = source(*ei, m_controlGraph);
       ImageVertex targetImage = target(*ei, m_controlGraph);
@@ -428,9 +431,9 @@ namespace Isis {
         }
 
 //        graphString.append(QString::number(m_controlGraph[targetImage].measures.size()));  
-        graphString.append("] edge strength: [");
-        graphString.append(QString::number(m_controlGraph[*ei].strength));
-        graphString.append("]\n"); 
+        graphString.append("]");// edge strength: [");
+    //    graphString.append(QString::number(m_controlGraph[*ei].strength));
+        graphString.append("\n"); 
       }
     }
     return graphString;
@@ -469,22 +472,17 @@ namespace Isis {
       msg += point->GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
-    // Make sure there is a node for every measure in this measure's parent
-    for (int i = 0; i < point->GetNumMeasures(); i++) {
-      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-
-      // If the graph doesn't have the sn, add the node.
-      if (!m_vertexMap.contains(sn)) {
-        Image newImage;
-        newImage.serial = sn; 
-        ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph); 
-        m_vertexMap.insert(sn, newVertex);
-      }
-    }
-
     // Add the measure to the corresponding node
     QString serial = measure->GetCubeSerialNumber();
+
+    // If the graph doesn't have the sn, add a node for it
+    if (!m_vertexMap.contains(serial)) {
+      Image newImage;
+      newImage.serial = serial; 
+      ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph); 
+      m_vertexMap.insert(serial, newVertex);
+    }
+
     m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
 
     // in this measure's node add connections to the other nodes reachable from
@@ -495,17 +493,21 @@ namespace Isis {
         if (!cm->IsIgnored()) {
           QString sn = cm->GetCubeSerialNumber();
 
-          // If the edge doesn't already exist, this adds and returns the edge. 
-          // If the edge already exists, this just returns it. (The use of a set
-          // forces the edges to be unique.)
-          ImageConnection connection = boost::add_edge(m_vertexMap[serial],
-                                                         m_vertexMap[sn],
-                                                         m_controlGraph).first;
-          m_controlGraph[connection].strength++;
+
+          if (QString::compare(sn, serial) != 0) {
+            // If the edge doesn't already exist, this adds and returns the edge. 
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                       m_vertexMap[sn],
+                                                       m_controlGraph).first;
+            m_controlGraph[connection].strength++;
+          }
         }
       }
     }
   }
+
 
 
   /**
@@ -560,13 +562,15 @@ namespace Isis {
         if (!cm->IsIgnored()) {
           QString sn = cm->GetCubeSerialNumber();
 
-          // If the edge doesn't already exist, this adds and returns the edge. 
-          // If the edge already exists, this just returns it. (The use of a set
-          // forces the edges to be unique.)
-          ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+          if (QString::compare(sn, serial) != 0) {
+            // If the edge doesn't already exist, this adds and returns the edge. 
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                        m_vertexMap[sn],
                                                        m_controlGraph).first;
-          m_controlGraph[connection].strength++;
+            m_controlGraph[connection].strength++;
+          }
         }
       }
     }
@@ -612,12 +616,13 @@ namespace Isis {
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent()); 
 
 
+// We decided in a meeting that we do not want to delete the node when all measures are removed. 
     // If this caused the node to be empty, then delete the node.
-    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
-      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
-      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
-      m_vertexMap.remove(serial);
-    }
+//    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
+//      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
+//      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
+//      m_vertexMap.remove(serial);
+//    }
   }
 
 
