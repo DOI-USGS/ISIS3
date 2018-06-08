@@ -77,6 +77,7 @@ endif
 #---------------------------------------------------------------------------
 QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt4.6.2
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/Qt
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtChrats
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtCore
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtAssistant
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtGui
@@ -90,7 +91,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtWebKit
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtXml
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.6.2/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
-QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest -lQtOpenGL -lQtWebKit
+QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest -lQtOpenGL -lQtWebKit -QtCharts
 
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc
@@ -252,6 +253,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCharts.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so*[^g]"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so*[^g]"
