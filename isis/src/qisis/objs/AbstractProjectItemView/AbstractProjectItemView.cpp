@@ -148,7 +148,23 @@ namespace Isis {
     }
   }
 
-  
+
+  void AbstractProjectItemView::moveEvent(QMoveEvent *event) {
+    QMainWindow::moveEvent(event);
+    std::cout << "Move event" << std::endl; 
+    
+    emit windowChangeEvent(false);
+  }
+
+
+  void AbstractProjectItemView::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+    std::cout << "Resize event" << std::endl; 
+    
+    emit windowChangeEvent(false);
+  }
+
+
   /**
    * Returns a list of actions appropriate for the permanent tool bar.
    *

@@ -81,6 +81,9 @@ namespace Isis {
       virtual void dragMoveEvent(QDragMoveEvent *event);
       virtual void dropEvent(QDropEvent *event);
 
+      virtual void moveEvent(QMoveEvent *event);
+      virtual void resizeEvent(QResizeEvent *event);
+
       virtual QList<QAction *> permToolBarActions();
       virtual QList<QAction *> activeToolBarActions();
       virtual QList<QAction *> toolPadActions();
@@ -99,6 +102,9 @@ namespace Isis {
 
       virtual ProjectItemModel *internalModel();
       virtual void setInternalModel(ProjectItemModel *model);
+      
+    signals:
+      void windowChangeEvent(bool event);
 
     public slots:
       virtual void addItem(ProjectItem *item);
