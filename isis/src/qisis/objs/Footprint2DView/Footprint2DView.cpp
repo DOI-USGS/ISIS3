@@ -153,7 +153,6 @@ namespace Isis {
    */
   Footprint2DView::~Footprint2DView() {
     delete m_fileListWidget;
-    delete m_window;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;

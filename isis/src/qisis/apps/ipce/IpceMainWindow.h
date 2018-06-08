@@ -132,8 +132,11 @@ namespace Isis {
    *                           Fixes #5412.
    *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
-   *                           widget. Added addDock method. Remove all methods having to do with
-   *                           MDI sub-windows, detached views.
+   *                           widget. Remove all methods having to do with MDI sub-windows,
+   *                           detached views.  The dock widgets holding the views are saved off
+   *                           for cleanup because there is no way to get the dock from the view.
+   *                           Cleanup connections are made for the views and the docks to ensure
+   *                           that cleanup happens for both.  Fixes #5433.
    *  
    */
   class IpceMainWindow : public QMainWindow {
@@ -143,8 +146,8 @@ namespace Isis {
       ~IpceMainWindow();
 
     public slots:
-      void addView(QWidget *newWidget);
-      void addDock(QMainWindow *newWidgetForDock);
+      void addView(QWidget *newWidget, Qt::DockWidgetArea area = Qt::LeftDockWidgetArea,
+                   Qt::Orientation orientation = Qt::Horizontal);
       void removeView(QWidget *view);
       void removeAllViews();
 
@@ -182,7 +185,8 @@ namespace Isis {
       QDockWidget *m_projectDock;
       QDockWidget *m_warningsDock;
 
-      QList<QDockWidget *> m_dockedWidgets;
+      QList<QDockWidget *> m_viewDocks; //!< QDockWidgets holding the views
+
       /**
        * This is the "goal" or "estimated" maximum number of active threads running in this program
        *   at once. For now, the GUI consumes 1 thread and QtConcurrent
