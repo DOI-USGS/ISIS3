@@ -47,7 +47,12 @@
 #include "FileName.h"
 #include "Project.h"
 #include "ToolPad.h"
+#include "ToolList.h"
 #include "XmlStackedHandlerReader.h"
+
+#include "HelpTool.h"
+#include "TrackTool.h"
+
 
 
 namespace Isis {
@@ -83,37 +88,9 @@ namespace Isis {
     filterViews->addTab( m_cnetEditorWidget->connectionFilterWidget(), tr("Filter Connections") );
     resultLayout->addWidget(filterViews, 1, 1, 1, 1);
 
-    m_permToolBar = new QToolBar("Standard Tools", 0);
-    m_permToolBar->setObjectName("permToolBar");
-    m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
-
-    m_activeToolBar = new QToolBar("Active Tool", 0);
-    m_activeToolBar->setObjectName("activeToolBar");
-    m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
-
-    m_toolPad = new ToolPad("Tool Pad", 0);
-    m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
-
-
-//  m_cnetEditorWidget->addToPermanent(m_permToolBar);
-//  m_cnetEditorWidget->addTo(m_activeToolBar);
-//  m_cnetEditorWidget->addTo(m_toolPad);
-
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
-    setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
+    createMenus();
+    createToolBars();
   }
-
 
   /**
    * Destructor
@@ -130,6 +107,78 @@ namespace Isis {
     m_toolPad = 0;
   }
 
+  /**
+   * Uses the actions created by CnetEditorWidget, tries to find the menus to put
+   * the actions under, and creates the menus if said menus do not exist. Currently,
+   * the menus added are Table and Help.
+   */
+  void CnetEditorView::createMenus() {
+    QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
+    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
+    QMap<QString, QMenu *> topLevelMenus;
+
+    while ( actionMapIterator.hasNext() ) {
+      actionMapIterator.next();
+      QAction *actionToAdd = actionMapIterator.key();
+      QList< QString > location = actionMapIterator.value();
+
+      QMenu *menuToPutActionInto = NULL;
+
+      if ( location.count() ) {
+        QString topLevelMenuTitle = location.takeFirst();
+        if (!topLevelMenus[topLevelMenuTitle]) {
+          topLevelMenus[topLevelMenuTitle] = menuBar()->addMenu(topLevelMenuTitle);
+        }
+
+        menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
+      }
+
+      foreach (QString menuName, location) {
+        bool foundSubMenu = false;
+        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
+          if (!foundSubMenu &&
+              possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
+            foundSubMenu = true;
+            menuToPutActionInto = possibleSubMenu->menu();
+          }
+        }
+
+        if (!foundSubMenu) {
+          menuToPutActionInto = menuToPutActionInto->addMenu(menuName);
+        }
+      }
+
+      menuToPutActionInto->addAction(actionToAdd);
+    }
+  }
+
+  /**
+   * Uses and adds the actions created by CnetEditorWidget to the view's toolbars
+   * Right now, all actions created in CnetEditorWidget are added to the toolpad.
+   * This was copied from CnetEditorWindow
+   */
+  void CnetEditorView::createToolBars() {
+    // m_permToolBar = addToolBar("Standard Tools");
+    // m_permToolBar->setObjectName("permToolBar");
+    // m_permToolBar->setIconSize(QSize(22, 22));
+
+    m_toolPad = new ToolPad("Tool Pad", 0);
+    m_toolPad->setObjectName("toolPad");
+    addToolBar(m_toolPad);
+
+    QMap< QString, QList< QAction * > > toolActionMap;
+    toolActionMap = m_cnetEditorWidget->toolBarActions();
+    QMapIterator< QString, QList< QAction * > > toolActionIter(toolActionMap);
+
+    while (toolActionIter.hasNext()) {
+      toolActionIter.next();
+      QString objName = toolActionIter.key();
+      QList< QAction * > actionList = toolActionIter.value();
+      foreach (QAction *action, actionList) {
+        m_toolPad->addAction(action);
+      }
+    }
+  }
 
   /**
    * Returns the cnetEditorWidget.
