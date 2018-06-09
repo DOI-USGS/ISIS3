@@ -114,13 +114,19 @@ namespace Isis {
    */
   void CnetEditorView::createMenus() {
     QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
-    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
+    QMapIterator< QAction *, QList< QString > > actionMapIter(actionMap);
     QMap<QString, QMenu *> topLevelMenus;
 
-    while ( actionMapIterator.hasNext() ) {
-      actionMapIterator.next();
-      QAction *actionToAdd = actionMapIterator.key();
-      QList< QString > location = actionMapIterator.value();
+    while ( actionMapIter.hasNext() ) {
+      actionMapIter.next();
+      QAction *actionToAdd = actionMapIter.key();
+      QList< QString > location = actionMapIter.value();
+
+      // Skip the Help menu for now because we do not want to add the "What's This?"
+      // action (it is in the main help menu of IPCE)
+      if (location.first() == "&Help") {
+        continue;
+      }
 
       QMenu *menuToPutActionInto = NULL;
 
@@ -158,24 +164,24 @@ namespace Isis {
    * This was copied from CnetEditorWindow
    */
   void CnetEditorView::createToolBars() {
-    // m_permToolBar = addToolBar("Standard Tools");
-    // m_permToolBar->setObjectName("permToolBar");
-    // m_permToolBar->setIconSize(QSize(22, 22));
+    m_permToolBar = addToolBar("Standard Tools");
+    m_permToolBar->setObjectName("permToolBar");
+    m_permToolBar->setIconSize(QSize(22, 22));
 
-    m_toolPad = new ToolPad("Tool Pad", 0);
-    m_toolPad->setObjectName("toolPad");
-    addToolBar(m_toolPad);
+    // m_toolPad = new ToolPad("Tool Pad", 0);
+    // m_toolPad->setObjectName("toolPad");
+    // addToolBar(m_toolPad);
 
-    QMap< QString, QList< QAction * > > toolActionMap;
-    toolActionMap = m_cnetEditorWidget->toolBarActions();
-    QMapIterator< QString, QList< QAction * > > toolActionIter(toolActionMap);
+    QMap< QString, QList< QAction * > > actionMap;
+    actionMap = m_cnetEditorWidget->toolBarActions();
+    QMapIterator< QString, QList< QAction * > > actionIter(actionMap);
 
-    while (toolActionIter.hasNext()) {
-      toolActionIter.next();
-      QString objName = toolActionIter.key();
-      QList< QAction * > actionList = toolActionIter.value();
+    while (actionIter.hasNext()) {
+      actionIter.next();
+      QString objName = actionIter.key();
+      QList< QAction * > actionList = actionIter.value();
       foreach (QAction *action, actionList) {
-        m_toolPad->addAction(action);
+        m_permToolBar->addAction(action);
       }
     }
   }
