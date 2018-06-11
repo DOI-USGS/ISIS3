@@ -98,22 +98,28 @@ namespace Isis {
       void WritePds4(QString outFile);
       QDomElement getElement(QStringList xmlPath, QDomElement parent=QDomElement());
       void addHistory(QString description, QString date = "tbd", QString version = "1.0");
+      void setLogicalId(QString lid);
+      void setSchemaLocation(QString schema);
 
       static void translateUnits(QDomDocument &label,
                                  QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
 
-    protected:
       void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
+    protected:
+//      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
       void identificationArea();
       void standardInstrument();
       void standardBandBin(); 
       void displaySettings();
+      void fileAreaObservational();
+      QString imageObjectType(Pvl &inputLabel);
       QString PDS4PixelType(PixelType pixelType, ByteOrder endianType);
       static QMap<QString, QString> createUnitMap(Pvl configPvl);
       static void translateChildUnits(QDomElement parent, QMap<QString, QString> transMap);
 
-      QDomDocument *m_domDoc;               //!< XML label
-      QString m_schemaLocation;             //!< QString with all schema locations required
+      QDomDocument *m_domDoc;               //!< XML label.
+      QString m_schemaLocation;             //!< QString with all schema locations required.
+      QString m_lid;                        //!< QString with specified logical identifier.
 
   };
 }

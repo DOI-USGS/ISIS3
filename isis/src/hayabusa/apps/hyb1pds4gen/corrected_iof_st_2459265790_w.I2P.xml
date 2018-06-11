@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational xmlns="http://pds.nasa.gov/pds4/pds/v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd http://pds.nasa.gov/pds4/disp/v1 http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.xsd http://pds.nasa.gov/pds4/sp/v1 http://pds.nasa.gov/pds4/sp/v1/PDS4_SP_1100.xsd" xmlns:disp="http://pds.nasa.gov/pds4/disp/v1" xmlns:sp="http://pds.nasa.gov/pds4/sp/v1">
+ <Identification_Area>
+  <logical_identifier>urn:nasa:pds:TBD:TBD:TBD</logical_identifier>
+  <version_id>1.0</version_id>
+  <title>PDS4 product exported from ISIS3 cube.</title>
+  <information_model_version>1.8.0.0</information_model_version>
+  <product_class>Product_Observational</product_class>
+  <Modification_History>
+   <Modification_Detail description="Created PDS4 output product from ISIS cube with tgocassisrdrgen application from ISIS version 3.5.2.0 beta." modification_date="2018-05-14" version_id="1.0"/>
+  </Modification_History>
+ </Identification_Area>
+ <Observation_Area>
+  <Time_Coordinates>
+   <start_date_time>2005-10-14T10:25:46Z</start_date_time>
+   <stop_date_time>2005-10-14T10:25:46Z</stop_date_time>
+  </Time_Coordinates>
+  <Investigation_Area>
+   <name>HAYABUSA</name>
+   <type>Mission</type>
+   <Internal_Reference>
+    <reference_type>data_to_investigation</reference_type>
+   </Internal_Reference>
+  </Investigation_Area>
+  <Observing_System>
+   <name>HAYABUSA AMICA</name>
+   <Observing_System_Component>
+    <name>HAYABUSA</name>
+    <type>Spacecraft</type>
+   </Observing_System_Component>
+   <Observing_System_Component>
+    <name>AMICA</name>
+    <type>Instrument</type>
+   </Observing_System_Component>
+  </Observing_System>
+  <Discipline_Area>
+   <img:Imaging>
+    <img:Imaging_Instrument_Parameters>
+     <img:exposure_duration unit="s">.0328</img:exposure_duration>
+    </img:Imaging_Instrument_Parameters>
+    <img:Local_Internal_Reference>
+     <img:local_identifier_reference>Image_Object</img:local_identifier_reference>
+     <img:local_reference_type>imaging_parameters_to_image_object</img:local_reference_type>
+    </img:Local_Internal_Reference>
+    <img:Image_Product_Information>
+     <img:Filter>
+      <img:filter_number>1</img:filter_number>
+     </img:Filter>
+    </img:Image_Product_Information>
+   </img:Imaging>
+   <disp:Display_Settings>
+    <Local_Internal_Reference>
+     <local_identifier_reference>3D_Image_Object</local_identifier_reference>
+     <local_reference_type>display_settings_to_array</local_reference_type>
+    </Local_Internal_Reference>
+    <disp:Display_Direction>
+     <disp:horizontal_display_axis>Sample</disp:horizontal_display_axis>
+     <disp:horizontal_display_direction>Left to Right</disp:horizontal_display_direction>
+     <disp:vertical_display_axis>Line</disp:vertical_display_axis>
+     <disp:vertical_display_direction>Top to Bottom</disp:vertical_display_direction>
+    </disp:Display_Direction>
+   </disp:Display_Settings>
+  </Discipline_Area>
+  <Target_Identification>
+   <name>Itokawa</name>
+   <type>Asteroid</type>
+  </Target_Identification>
+ </Observation_Area>
+ <File_Area_Observational>
+  <File>
+   <file_name>corrected_iof_st_2459265790_w.I2P.img</file_name>
+  </File>
+  <Array_2D_Image>
+   <local_identifier>Image_Object</local_identifier>
+   <offset unit="byte">0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <elements>256</elements>
+    <axis_name>Sample</axis_name>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <elements>256</elements>
+    <axis_name>Line</axis_name>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+  </Array_2D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+
