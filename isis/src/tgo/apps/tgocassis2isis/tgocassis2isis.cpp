@@ -24,7 +24,6 @@ bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
 void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
 
 void IsisMain() {
-
   UserInterface &ui = Application::GetUserInterface();
   FileName xmlFileName = ui.GetFileName("FROM");
 
@@ -49,26 +48,28 @@ void IsisMain() {
     QString transRawFile = "/translations/tgoCassisInstrument.trn";
     QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
 
+    // first assume lev1b image
+    Pvl *outputLabel = outputCube->label();
     try {
       translateLabels(xmlFileName, outputCube, transRawFile); 
     } 
     catch (IException &e) {
+
       if (translateMappingLabel(xmlFileName, outputCube)) {
         if (!translateMosaicLabel(xmlFileName, outputCube)) {
           translateLabels(xmlFileName, outputCube, transExportFile);
         }
         else {
-          Pvl *outputLabel = outputCube->label();
-          if(outputLabel->hasGroup("Instrument")) {
-            outputLabel->deleteGroup("Instrument"); 
-          }
-          if(outputLabel->hasGroup("Archive")) {
-            outputLabel->deleteGroup("Archive"); 
+          if(outputLabel->findObject("IsisCube").hasGroup("Instrument")) {
+            outputLabel->findObject("IsisCube").deleteGroup("Instrument"); 
           }
         }
       }
       else {
         translateLabels(xmlFileName, outputCube, transExportFile);
+        if(outputLabel->findObject("IsisCube").hasGroup("Mapping")) {
+          outputLabel->findObject("IsisCube").deleteGroup("Mapping"); 
+        }
       }
     }
 
@@ -103,7 +104,6 @@ void IsisMain() {
  *  
  * @internal
  *   @history 2017-01-20 Jeannie Backer - Original Version
- *   @history 2017-01-21 Krisitn Berry - Flipped ns & nl. They're flipped in the CaSSIS header.
  */
 void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
   // Get the directory where the Tgo translation tables are
@@ -118,12 +118,14 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
     translateCoreInfo(labelXlater, importer);
   } 
   catch (IException &e) {
-   // if exported, use this!
-   transFile = FileName(missionDir + "/translations/tgoCassisExported.trn"); 
-   XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
-   translateCoreInfo(labelXlater, importer);
+    e.print();
+    // if exported, use this!
+    transFile = FileName(missionDir + "/translations/tgoCassisRdr.trn"); 
+    XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
+    translateCoreInfo(labelXlater, importer);
   }
 }
+
 
 /**
  * Translate core info from labels and set ProcessImport object with 
@@ -132,6 +134,10 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
  * @param labelXlater Reference to the XmlToPvlTranslationManager objcet to use for the translation.
  * @param importer Reference to the ProcessImport object to which core info will
  *                 be set.
+ *  
+ * @internal
+ *   @history 2017-01-20 Jeannie Backer - Original Version
+ *   @history 2017-01-21 Krisitn Berry - Flipped ns & nl. They're flipped in the CaSSIS header.
  */
 void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer) {
   // Set up the ProcessImport
@@ -314,8 +320,9 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
 
   // Create the Archive Group
   FileName archiveTransFile(missionDir + "/translations/tgoCassisArchive.trn");
-  FileName subTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
   XmlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
+
+  FileName subTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
   XmlToPvlTranslationManager subXlater(inputLabel, subTransFile.expanded());
 
   // Pvl output label
