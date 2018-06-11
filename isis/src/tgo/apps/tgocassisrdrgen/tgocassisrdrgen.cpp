@@ -33,7 +33,8 @@ void IsisMain() {
 
   PvlObject *label= icube->label();
 
-  bool isMosaic = false; 
+  bool isMosaic = false;
+
   PvlKeyword instrument;
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     instrument = label->findObject("IsisCube").findGroup("Instrument").findKeyword("InstrumentId");
@@ -53,7 +54,6 @@ void IsisMain() {
     throw  IException(IException::User, msg, _FILEINFO_);
   }
 
-<<<<<<< Updated upstream
   // If isMosaic is true, targetGroup will reference the Mosaic group.
   // Else, targetGroup will reference the Instrument group.
   PvlGroup &targetGroup = isMosaic ? label->findObject("IsisCube").findGroup("Mosaic")
