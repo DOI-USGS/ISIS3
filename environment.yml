@@ -14,7 +14,6 @@ dependencies:
   - gst-plugins-base
   - gstreamer==1.8.0=0
   - jsoncpp==1.8.3
-  - libgcc==4.8.5=1
   - libgcc-ng==7.2.0
   - libgfortran==3.0=0
   - libstdcxx-ng==7.2.0
@@ -108,7 +107,6 @@ dependencies:
   - xorg-xproto==7.0.31=6
   - bz2file==0.98
   - cloog==0.18.0=0
-  - gcc==4.8.5=7
   - isl==0.12.2=0
   - protobuf==3.5.1
   - system==5.8=2
