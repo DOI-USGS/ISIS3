@@ -23,6 +23,8 @@ namespace Isis {
     CnetEditorWidget *cnetWidget) : QDialog(cnetWidget) {
     m_cnetWidget = cnetWidget;
 
+    setWindowTitle("Table Sorting Dialog");
+
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setColumnMinimumWidth(0, 20);
     setLayout(mainLayout);
@@ -200,4 +202,3 @@ namespace Isis {
       m_measureSortingCheckBox->isChecked());
   }
 }
-
