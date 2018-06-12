@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QItemSelection>
 
 #include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
@@ -16,6 +17,7 @@
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
+#include "ProjectItem.h"
 #include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
 #include "SubTreeProxyModel.h"
@@ -50,6 +52,11 @@ namespace Isis {
     if (readOnly) {
       makeReadOnly();
     }
+
+
+
+    //connect( m_project->directory()->model(), SIGNAL(selectionChanged(QList<ProjectItem *> &)),
+    //         this, SLOT(on_projectItemSelectionChanged(const QList<ProjectItem *> &) ) );
 
     // initializations for general tab
 
@@ -194,6 +201,7 @@ namespace Isis {
     connect(m_ui->aRadiusLineEdit, SIGNAL(editingFinished()), SLOT(checkIsValid()));
     connect(m_ui->aRadiusLineEdit, SIGNAL(textChanged(QString)), SLOT(on_aRadiusLineEdit_textChanged(QString)));
   }
+
 
 
   JigsawSetupDialog::~JigsawSetupDialog() {
@@ -1130,6 +1138,11 @@ namespace Isis {
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
     // Proof-of-
 
+    QList<ProjectItem *> selectedItems = m_project->directory()->model()->selectedItems();
+
+    foreach(ProjectItem *item,selectedItems){
+      qDebug() << "Selected Item:  " << item->text();
+    }
     qDebug() << "JigsawSetupDialog::createObservationSolveSettingsTreeView()";
 
 //    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
@@ -1141,33 +1154,23 @@ namespace Isis {
 
      //QModelIndex SubTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
     // find the root "Images" and set it in the proxy
-    QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
-    qDebug() << "ITEM: " << item << ", " << item->text();
-    qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
+    //QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
+    //qDebug() << "ITEM: " << item << ", " << item->text();
+    //qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
 
 
     // i think source model tries to add top root item, which is invalid???
-    //osspm->setRoot(item);
 
     m_ui->treeView->setModel(osspm);
 
-    //Set the root index to display the subtree we are interesting in.  This requires
+    //Set the root index to display the subtree we are interested in.  This requires
     //computing the proxy index from the source model.
-     m_ui->treeView->setRootIndex(osspm->mapFromSource(item->index() ));
+    if (selectedItems.count() > 0) {
+      m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
+
+    }
 
 
-
-
-
-
-
-
-
-
-    // Try to loop through the view here to add the "groups" so they aren't part of the model
-
-    // Add apply button to the tab view
-    // set the text to bold?
 
   }
 }
