@@ -38,6 +38,9 @@
       the Instrument group, the cube will have a Mosaic group. So, the ProductId
       will now be written to the Mosaic group.
     </change>
+    <change name="Kristin Berry" date="2018-06-12">
+      Updated to use the tgoCassisExportMosaic.trn translation file when the input cube is a mosaic.
+    </change>
   </history>
 
   <category>

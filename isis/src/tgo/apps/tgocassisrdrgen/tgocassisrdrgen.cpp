@@ -110,8 +110,16 @@ void IsisMain() {
   * Add additional pds label data here
   */
   QDomDocument &pdsLabel = process.GetLabel();
-  PvlToXmlTranslationManager cubeLab(*(icube->label()),
-                                    "$tgo/translations/tgoCassisExport.trn");
+
+
+  // The default translation for for non-mosaicked output
+  QString exportTranslationFile = "$tgo/translations/tgoCassisExport.trn"; 
+
+  if (logicalId.contains("data_mosaic")) {
+    exportTranslationFile = "$tgo/translations/tgoCassisExportMosaic.trn";
+  }
+
+  PvlToXmlTranslationManager cubeLab(*(icube->label()), exportTranslationFile);
   cubeLab.Auto(pdsLabel);
 
   ProcessExportPds4::translateUnits(pdsLabel);
