@@ -92,6 +92,20 @@ namespace Isis {
   }
 
 
+/**
+ * This method is no longer necessary and will remain commented out until it needs to be implemented 
+ *  
+ * If WorkOrder:setupExecution() returns true, this creates a setup dialog.   
+ *    
+ * When the setup is successful (i.e. the user does not cancel the dialog), this work order   
+ * will be read to execute.   
+ *    
+ * @return bool Returns True if setup dialog for the bundle adjustment is successful.   
+ */   
+// bool JigsawWorkOrder::setupExecution() {    
+// }
+
+
   /**
    * This check is used by Directory::supportedActions(DataType data).
    *
