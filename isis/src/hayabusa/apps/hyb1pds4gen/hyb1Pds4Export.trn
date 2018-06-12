@@ -1,0 +1,38 @@
+# Translation for Hayabusa 1 export from ISIS3 cube to PDS4 product.
+#
+# Note these translations must be are ordered based on the required PDS4 order.
+#
+# history 2018-05-09 Jeannie Backer - Original version.
+
+Group = RadianceScalingFactor
+  Auto
+  Optional
+  InputKey         = RadianceScaleFactor
+  InputPosition    = (IsisCube, Instrument)
+  OutputName       = img:radiance_scaling_factor
+  OutputAttributes = unit|???
+  OutputPosition   = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Radiometric_Correction_Parameters)
+  Translation      = (*, *)
+End_Group
+
+Group = FirstSample
+  Auto
+  Optional
+  InputKey        = FirstSample 
+  InputPosition   = (IsisCube, Instrument)
+  OutputName      = img:first_sample
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
+  Translation     = (*, *)
+End_Group
+
+Group = FirstLine
+  Auto
+  Optional
+  InputKey        = FirstLine 
+  InputPosition   = (IsisCube, Instrument)
+  OutputName      = img:first_line
+  OutputPosition  = (Product_Observational, Observation_Area, Discipline_Area, img:Imaging, img:Imaging_Instrument_Parameters)
+  Translation     = (*, *)
+End_Group
+
+

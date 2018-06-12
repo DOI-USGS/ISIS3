@@ -13,17 +13,23 @@ void testIn(int iss, int isl, int isb, int ins = 0, int inl = 0, int inb = 0);
 void testOut(int piSamples, int piLines, int piBands, int piPriority,
              int originBand);
 /**
- * unitTest for ProcessMosaic
- * tests for correct area drop, tracking origin,  origin band,
- * priorities input, mosaic and band, options to allow HS, LS and NULL
- * pixels from input to mosaic, each time displaying the contents of the
- * input and mosaic pixels for the area under consideration
+ * Unit test for ProcessMosaic. 
+ *  
+ * Tests for correct area drop, tracking origin,  origin band, 
+ * priorities input, mosaic and band, options to allow HS, LS 
+ * and NULL pixels from input to mosaic, each time displaying 
+ * the contents of the input and mosaic pixels for the area 
+ * under consideration 
  *
  * Also tests for exceptions like number of input and output images to
  * be exactly one each, band cannot be priority if Track is set off and
  * more
  *
- * @author sprasad (10/14/2009)
+ * @author 2009-10-14 Sharmila Prasad 
+ *  
+ *  @internal
+ *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
+ *                           test output.
  */
 void IsisMain() {
 
@@ -497,7 +503,9 @@ void IsisMain() {
     m.EndProcess();
   }
   catch (IException &e) {
-    e.print();
+    QString message = e.toString();
+    qDebug();
+    qDebug() << message.replace(QRegExp("cube.*base/testData"), "cube [base/testData");
     p.EndProcess();
     qDebug() << "";
   }
