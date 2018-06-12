@@ -27,7 +27,7 @@ Unit test for Isis::Target
   Testing unknown target ...
 **ERROR** Unable to look up NAIF body code for this Target.
 **I/O ERROR** Could not convert Target [Mard] to NAIF body code.
-**ERROR** BODY_FRAME_CODE not found for this Target.
+**ERROR** BODY_CODE not found for this Target.
 **I/O ERROR** Could not convert Target [Mard] to NAIF body code.
 
 
@@ -191,9 +191,8 @@ End_Group
 
 RETURNS: 
 
-**ERROR** **I/O ERROR** Could not convert Target [Chewbaca] to NAIF body code.
-**ERROR** Unable to find radii for target code [2101955]. Target code was not found in furnished kernels.
-**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(KERNELVARNOTFOUND)]. The Naif error is [The variable BODY2101955_RADII could not be found in the kernel pool.].
+**ERROR** Unable to find Equatorial and Polar radii for target [Chewbaca].
+**I/O ERROR** Unable to find target radii for given target [Chewbaca].
 -------------------------------
 
 -------------------------------
