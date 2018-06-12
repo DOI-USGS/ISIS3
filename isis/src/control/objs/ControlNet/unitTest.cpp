@@ -162,9 +162,6 @@ cout << "  " << "Island Count = " << islands.size() << endl;
 int main() {
   qsrand(42);
 
-  // Set the global hash seed to ensure consistent vertex and edge ordering
-  qSetGlobalQHashSeed(2255);
-
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
 
@@ -240,6 +237,7 @@ int main() {
   foreach(QString serial, adjacentSerials) {
     cout << "  " << serial << endl;
   }
+  cout << endl;
 
   // test point deletion
   cout << "testing point deletion.................................\n";

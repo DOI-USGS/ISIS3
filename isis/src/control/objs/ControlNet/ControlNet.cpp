@@ -12,6 +12,7 @@
 #include <QPair>
 #include <QScopedPointer>
 #include <QSet>
+#include <QStringList>
 #include <QTime>
 #include <QVector>
 
@@ -411,41 +412,57 @@ namespace Isis {
   QString ControlNet::GraphToString() const {
     QString graphString;
 
-    typedef boost::graph_traits<Network>::edge_iterator edge_iter;
-    edge_iter ei, ei_end;
+    QStringList images = GetCubeSerials();
+    images.sort();
 
-    for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei) {
-      ImageVertex sourceImage = source(*ei, m_controlGraph);
-      ImageVertex targetImage = target(*ei, m_controlGraph);
-      if (sourceImage != targetImage) {
-        graphString.append(m_controlGraph[sourceImage].serial);
-        graphString.append( " [" );
-        QList<ControlPoint*> sourcePoints = m_controlGraph[sourceImage].measures.keys();
-        for (int i=0; i < sourcePoints.size(); i++) {
-          if (i>0) {
-            graphString.append(", ");
-          }
-          graphString.append(sourcePoints[i]->GetId());
-        }
-       // graphString.append(QString::number(m_controlGraph[sourceImage].measures.size()));
-        graphString.append("] --------- ");
-        graphString.append(m_controlGraph[targetImage].serial);
-        graphString.append(" [");
+    QHash<QString, QStringList> imagePointIds;
 
-        QList<ControlPoint*> targetPoints = m_controlGraph[targetImage].measures.keys();
-        for (int i=0; i < targetPoints.size(); i++) {
-          if (i>0) {
-            graphString.append(", ");
-          }
-          graphString.append(targetPoints[i]->GetId());
+    foreach(QString imageSerial, images) {
+      QList<ControlPoint *> imagePoints = m_controlGraph[m_vertexMap[imageSerial]].measures.keys();
+      QStringList pointIds;
+      foreach(ControlPoint *point, imagePoints) {
+        pointIds.append(point->GetId());
+      }
+      pointIds.sort();
+      imagePointIds.insert(imageSerial, pointIds);
+    }
+
+    foreach(QString imageSerial, images) {
+      QStringList adjacentImages = getAdjacentImages(imageSerial);
+      adjacentImages.sort();
+      foreach(QString adjacentSerial, adjacentImages) {
+        if (QString::compare(adjacentSerial, imageSerial) < 0) {
+          continue;
         }
 
-//        graphString.append(QString::number(m_controlGraph[targetImage].measures.size()));
-        graphString.append("]");// edge strength: [");
-    //    graphString.append(QString::number(m_controlGraph[*ei].strength));
+        QStringList commonPoints;
+        QList<QString>::const_iterator imageIt = imagePointIds[imageSerial].cbegin();
+        QList<QString>::const_iterator adjacentIt = imagePointIds[adjacentSerial].cbegin();
+        while (imageIt != imagePointIds[imageSerial].cend() &&
+               adjacentIt != imagePointIds[adjacentSerial].cend()) {
+          int stringDiff = QString::compare(*imageIt, *adjacentIt);
+          if (stringDiff < 0) {
+            imageIt++;
+          }
+          else if(stringDiff == 0) {
+            commonPoints.append(*imageIt);
+            imageIt++;
+            adjacentIt++;
+          }
+          else {
+            adjacentIt++;
+          }
+        }
+
+        graphString.append(imageSerial);
+        graphString.append(" ----[");
+        graphString.append(commonPoints.join(","));
+        graphString.append("]---- ");
+        graphString.append(adjacentSerial);
         graphString.append("\n");
       }
     }
+
     return graphString;
    }
 
