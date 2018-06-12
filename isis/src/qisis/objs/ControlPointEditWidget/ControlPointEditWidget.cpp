@@ -219,8 +219,6 @@ namespace Isis {
     saveMeasureLayout->insertStretch(-1);
 
     m_cnetFileNameLabel = new QLabel("Control Network: " + m_cnetFileName);
-    m_cnetFileNameLabel->setToolTip("Name of opened control network file.");
-    m_cnetFileNameLabel->setWhatsThis("Name of opened control network file.");
 
     m_templateFileNameLabel = new QLabel("Template File: " +
         m_measureEditor->templateFileName());
