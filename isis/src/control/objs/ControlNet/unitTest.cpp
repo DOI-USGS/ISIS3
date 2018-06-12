@@ -5,9 +5,11 @@
 #include <sstream>
 #include <ctime>
 
+#include <QHash>
 #include <QList>
 #include <QSet>
 #include <QString>
+#include <QStringList>
 #include <QVector>
 
 #include "ControlMeasure.h"
@@ -25,8 +27,8 @@ using namespace std;
 using namespace Isis;
 
 /**
- * Unit test for ControlNet class 
- *  
+ * Unit test for ControlNet class
+ *
  * @author ????-??-?? Unknown
  * @internal
  *   @history 2016-05-11 Jeannie Backer - Added tests for setTarget methods.
@@ -144,21 +146,24 @@ void testConnectivity() {
   net.AddPoint(p4);
   net.AddPoint(p5);
 
-  std::cout << "Getting measures in cube with SN: ALPHA: " << std::endl; 
+  std::cout << "Getting measures in cube with SN: ALPHA: " << std::endl;
   QList< ControlMeasure *> measures = net.GetMeasuresInCube("ALPHA");
-  std::cout << "Serial Number: " << measures[0]->GetCubeSerialNumber() << std::endl; 
+  std::cout << "Serial Number: " << measures[0]->GetCubeSerialNumber() << std::endl;
 
-  std::cout << "Testing GetSerialConnections" << std::endl; 
+  std::cout << "Testing GetSerialConnections" << std::endl;
   net.GetSerialConnections();
 
 cout << "\nTesting GetSerialConnections()\n";
-QList< QList< QString > > islands = net.GetSerialConnections(); 
+QList< QList< QString > > islands = net.GetSerialConnections();
 cout << "  " << "Island Count = " << islands.size() << endl;
 }
 
 
 int main() {
   qsrand(42);
+
+  // Set the global hash seed to ensure consistent vertex and edge ordering
+  qSetGlobalQHashSeed(2255);
 
   Preference::Preferences(true);
   cout << "UnitTest for ControlNet ...." << endl << endl;
@@ -216,14 +221,25 @@ int main() {
   p0m0->SetCubeSerialNumber("DELTA");
   p0->Add(p0m0);
   cout << net.GraphToString() << "\n";
-  
+
   // test FindClosest()
   cout << "testing FindClosest....................\n";
   p1m0->SetCoordinate(1.0, 1.0);
   p0m0->SetCoordinate(1.0, 2.0);
 
   ControlPoint *closestPoint = net.FindClosest("ALPHA", 1.0,1.0);
-  cout << "Closest Point ID: " << closestPoint->GetId() << endl; 
+  cout << "Closest Point ID: " << closestPoint->GetId() << endl << endl;
+
+  // test getAdjacentImages()
+  cout << "testing getAdjacentImages....................\n";
+
+  QStringList adjacentSerials = net.getAdjacentImages("ALPHA");
+  // We cannot gaurantee order on this list, so sort it for testing purposes
+  adjacentSerials.sort();
+  cout << "Adjacent Images: " << endl;
+  foreach(QString serial, adjacentSerials) {
+    cout << "  " << serial << endl;
+  }
 
   // test point deletion
   cout << "testing point deletion.................................\n";
@@ -494,7 +510,7 @@ int main() {
   }
 
 
-  cout << net.GraphToString() << endl; 
+  cout << net.GraphToString() << endl;
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
 
   testConnectivity();

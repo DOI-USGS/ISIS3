@@ -866,21 +866,20 @@ namespace Isis {
    * @param serialNumber the serial number of the image to find images adjacent to.
    *
    * @returns @b QList<QString> The serial numbers of all adjacent images.
-   *
-   * @TODO Replace this with updated graph functionality once boost graph is in.
    */
   QList< QString > ControlNet::getAdjacentImages(QString serialNumber) const {
-    if (!cubeGraphNodes->contains(serialNumber)) {
+    if (!ValidateSerialNumber(serialNumber)) {
       QString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    const ControlCubeGraphNode *queryNode = getGraphNode(serialNumber);
-    QList< ControlCubeGraphNode * > adjacentNodes = queryNode->getAdjacentNodes();
     QList< QString > adjacentSerials;
-    foreach(ControlCubeGraphNode * adjacentNode, adjacentNodes) {
-      adjacentSerials.append(adjacentNode->getSerialNumber());
+
+    AdjacencyIterator adjIt, adjEnd;
+    boost::tie(adjIt, adjEnd) = boost::adjacent_vertices(m_vertexMap[serialNumber], m_controlGraph);
+    for( ; adjIt != adjEnd; adjIt++) {
+      adjacentSerials.append(m_controlGraph[*adjIt].serial);
     }
 
     return adjacentSerials;

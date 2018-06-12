@@ -48,7 +48,6 @@ namespace Isis {
   class Camera;
   class ControlMeasure;
   class ControlPoint;
-  class ControlCubeGraphNode;
   class Distance;
   class Progress;
   class Pvl;
@@ -242,10 +241,6 @@ namespace Isis {
 
     public:
 
-      QList< ControlCubeGraphNode * > GetCubeGraphNodes() {
-        QList<ControlCubeGraphNode *> lst;
-        return lst;} ; // TEMPORARY DELETE
-
       ControlNet();
       ControlNet(const ControlNet &other);
       ControlNet(const QString &filename, Progress *progress = 0);
@@ -378,8 +373,6 @@ namespace Isis {
       //! hash ControlPoints by ControlPoint Id
       QHash< QString, ControlPoint * > * points;
 
-      //! hash ControlCubeGraphNodes by CubeSerialNumber
-
       // structs and typedefs for the boost graph
       struct Image {
         QString serial;
@@ -390,12 +383,18 @@ namespace Isis {
         int strength = 0;
       };
 
-      typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, Image, Connection> Network;
+      typedef boost::adjacency_list<boost::setS,
+                                    boost::listS,
+                                    boost::undirectedS,
+                                    Image,
+                                    Connection> Network;
       typedef Network::vertex_descriptor ImageVertex;
       typedef Network::edge_descriptor ImageConnection;
       typedef std::map<ImageVertex, size_t> VertexIndexMap;
       typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor;
       typedef Network::out_edge_iterator ConnectionIterator;
+      typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator;
+
       QHash<QString, ImageVertex> m_vertexMap; //!< The SN -> vertex hash for the boost graph
       Network m_controlGraph; //!< The boost graph
       QStringList *pointIds;
