@@ -161,6 +161,9 @@ namespace Isis {
       void tabAllViews();
 
       void raiseWarningTab();
+      
+      void writeSettings(const Project *project) const;
+      
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
@@ -169,8 +172,6 @@ namespace Isis {
       void initializeActions();
       void createMenus();
       void createToolBars();
-
-      void writeSettings(const Project *project) const;
 
     private:
       /**

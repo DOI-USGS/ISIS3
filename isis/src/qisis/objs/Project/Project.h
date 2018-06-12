@@ -475,9 +475,9 @@ namespace Isis {
 
       /**
        * Emitted when project is saved.
-       *
+       * receivers: IpceMainWindow
        */
-      void projectSave(FileName projectName);
+      void projectSave(const Project *);
 
       /**
        * Emitted when project location moved

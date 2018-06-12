@@ -102,6 +102,8 @@ namespace Isis {
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
+      connect(m_directory->project(), SIGNAL(projectSave(const Project *)),
+              this, SLOT(writeSettings(const Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
               this, SLOT( raiseWarningTab() ) );
     }
@@ -170,6 +172,8 @@ namespace Isis {
 //  setTabbedViewMode();
 //  centralWidget->setTabsMovable(true);
 //  centralWidget->setTabsClosable(true);
+    // Read default app settings
+    readSettings(m_directory->project() );
 
     QStringList args = QCoreApplication::arguments();
 
@@ -400,8 +404,6 @@ namespace Isis {
     connect(activateWhatsThisAct, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     m_helpMenuActions.append(activateWhatsThisAct);
-
-    readSettings(m_directory->project() );
   }
 
 
@@ -551,20 +553,24 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     QString appName = QApplication::applicationName();
-    QSettings projectSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(),
-        QSettings::NativeFormat);
+    
+    QString filePath = project->newProjectRoot() + "/ipce.config";  
+    if (project->isTemporaryProject()) {
+      filePath = "$HOME/.Isis/" + appName + "/ipce.config";
+    }
+        
+    QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     QSettings globalSettings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
           .expanded(),
         QSettings::NativeFormat);
 
-    projectSettings.setValue("geometry", saveGeometry());
-    //projectSettings.setValue("windowState", saveState());
-    projectSettings.setValue("size", size());
-    projectSettings.setValue("pos", pos());
+    projectSettings.setValue("geometry", QVariant(geometry()));
+    projectSettings.setValue("windowState", saveState());
+    projectSettings.sync();
+//  projectSettings.setValue("size", size());
+//  projectSettings.setValue("pos", pos());
 
     projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
@@ -634,6 +640,7 @@ namespace Isis {
       }
     }
     globalSettings.endGroup();
+    globalSettings.sync();
   }
 
 
@@ -651,8 +658,10 @@ namespace Isis {
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
    *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it
-   *                                      was messing with the positions of widgets after a
-   *                                      project was loaded.  Fixes #5075.
+   *                was messing with the positions of widgets after a project was loaded.  
+   *                Fixes #5075.
+   *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
+   *                If that does not exist then we read from .Isis/ipce/ipce.config.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -660,6 +669,17 @@ namespace Isis {
       QString msg = "Cannot read settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    
+    // Set the path of the settings file
+    // The default is to assume that the project has an ipce.config in it
+    // If the file does not exist then we read settings from .Isis/ipce/ipce.config
+    QString appName = QApplication::applicationName();
+    QString filePath = project->projectRoot() + "/ipce.config";
+    
+    if (!FileName(filePath).fileExists()) {
+      filePath = "$HOME/.Isis/" + appName + "/ipce.config";
+    }
+    
     if (project->name() == "Project") {
       setWindowTitle("ipce");
     }
@@ -668,14 +688,12 @@ namespace Isis {
       QString projName = project->name();
       setWindowTitle(projName );
     }
-    QString appName = QApplication::applicationName();
 
-    QSettings settings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-        .expanded(), QSettings::NativeFormat);
+    // TODO Need to decide what the default geometry is
+    QSettings settings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
-    restoreGeometry(settings.value("geometry").toByteArray());
-    //restoreState(settings.value("windowState").toByteArray());
+    setGeometry(settings.value("geometry").value<QRect>());
+    restoreState(settings.value("windowState").toByteArray());
 
     QStringList projectNameList;
     QStringList projectPathList;
