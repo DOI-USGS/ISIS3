@@ -9,8 +9,12 @@ namespace Ui {
   class JigsawSetupDialog;
 }
 
+class QItemSelection;
+
+
 namespace Isis {
   class Project;
+  class ProjectItem;
   class Control;
 
   /**
@@ -79,6 +83,9 @@ namespace Isis {
     void selectControl(const QString &controlName);
 
   private slots:
+
+
+    //void on_projectItemSelectionChanged(const QList<ProjectItem *> selectedItems);
 
     void on_radiusCheckBox_toggled(bool checked);
     //void on_outlierRejectionCheckBox_toggled(bool checked);
