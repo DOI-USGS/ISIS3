@@ -96,7 +96,7 @@ void IsisMain() {
   // The default translation for for non-mosaicked output
   QString exportTranslationFile = "$tgo/translations/tgoCassisExport.trn"; 
 
-  if (logicalId.contains("data_mosaic")) {
+  if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     exportTranslationFile = "$tgo/translations/tgoCassisExportMosaic.trn";
   }
 
