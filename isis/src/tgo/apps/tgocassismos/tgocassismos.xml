@@ -36,6 +36,9 @@
     <change name="Adam Goins" date="2018-05-17">
       Added SpacecraftName and InstrumentId to mosaic group.
     </change>
+    <change name="Kristin Berry" date="2018-06-12">
+      Removed the "_filtername" from the ProductId. 
+    </change>
   </history>
 
   <groups>

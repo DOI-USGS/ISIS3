@@ -38,7 +38,7 @@ void IsisMain() {
 
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Instrument");
-    if (label->hasGroup("Mapping")) {
+    if (label->findObject("IsisCube").hasGroup("Mapping")) {
       logicalId += "data_projected:";
     }
     else {
@@ -47,7 +47,7 @@ void IsisMain() {
   }
   else if ( label->findObject("IsisCube").hasGroup("Mosaic") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Mosaic");
-    logicalId = "data_mosaic";
+    logicalId += "data_mosaic:";
   }
 
   // Check if the cube is able to be translated into a CaSSIS xml file
