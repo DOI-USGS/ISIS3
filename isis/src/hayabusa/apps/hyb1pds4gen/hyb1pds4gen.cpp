@@ -33,6 +33,9 @@ void IsisMain() {
   Cube *inputCube = process.SetInputCube("FROM");
   Pvl *inputLabel = inputCube->label();
 
+  QString logicalId = ui.GetString("PDS4LOGICALIDENTIFIER");
+  process.setLogicalId(logicalId);
+
   QDomDocument &pdsLabel = process.StandardPds4Label();
   /*
    * Add additional pds label data here
