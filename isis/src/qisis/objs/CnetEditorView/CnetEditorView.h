@@ -57,7 +57,7 @@ namespace Isis {
    *                              set the central widget's layout.
    *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
    *                              was moved from the constructor. createToolBars() was copied and edited
-   *                              from CnetEditorWindow.
+   *                              from CnetEditorWindow. Fixes #5416
    */
 
 class CnetEditorView : public AbstractProjectItemView {
