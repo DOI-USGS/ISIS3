@@ -83,10 +83,10 @@
         <type>string</type>
         <internalDefault>None</internalDefault>
         <brief>
-          Poduct ID value
+          Product ID value
         </brief>
         <description>
-          Update the default Product ID value.
+          Update the default Product ID value. This value will be the last section of the PDS4 logical_identifier value.
         </description>
       </parameter>
     </group>

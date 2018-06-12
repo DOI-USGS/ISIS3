@@ -91,6 +91,22 @@
         </filter>
       </parameter>
     </group>
+
+    <group name="Keywords">
+      <parameter name="PDS4LOGICALIDENTIFIER">
+        <type>string</type>
+        <brief>
+          String value for the PDS4 logical_identifier keyword.
+        </brief>
+        <description>
+          This value is used to set the required PDS4 value, logical_identifier. It should be a
+          6-part colon separated string of the form 
+          <b>urn:space_agency:archiving_agency:pds_approved_bundle_id:pds_approved_collection_id:product_id</b>.
+          Note that space_agency is generally "nasa" and archiving_agency is generally "pds".
+        </description>
+      </parameter>
+    </group>
+
   </groups>
 
 </application>
