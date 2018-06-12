@@ -341,8 +341,8 @@ namespace Isis {
 
 
  /**
-   * Adds a whole point to the control net graph. 
-   *    
+   * Adds a whole point to the control net graph.
+   *
    * @throws IException::Programmer "NULL measure passed to ControlNet::pointAdded!"
    * @throws IException::Programmer "Control measure with NULL parent passed to
    *     ControlNet::pointAdded"
@@ -368,8 +368,8 @@ namespace Isis {
       // If the graph doesn't have the sn, add a node for it
       if (!m_vertexMap.contains(sn)) {
         Image newImage;
-        newImage.serial = sn; 
-        ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph); 
+        newImage.serial = sn;
+        ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph);
         m_vertexMap.insert(sn, newVertex);
       }
     }
@@ -377,7 +377,7 @@ namespace Isis {
     foreach(ControlMeasure* measure, point->getMeasures()) {
       // Add the measure to the corresponding node
       QString serial = measure->GetCubeSerialNumber();
-      m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
+      m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
 
       // In this measure's node add connections to the other nodes reachable from
       // its point
@@ -386,9 +386,9 @@ namespace Isis {
           ControlMeasure *cm = point->GetMeasure(i);
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
-            
+
             if (QString::compare(sn, serial) != 0) {
-              // If the edge doesn't already exist, this adds and returns the edge. 
+              // If the edge doesn't already exist, this adds and returns the edge.
               // If the edge already exists, this just returns it. (The use of a set
               // forces the edges to be unique.)
               ImageConnection connection = boost::add_edge(m_vertexMap[serial],
@@ -409,41 +409,41 @@ namespace Isis {
    * @returns A string representation of the ControlNet graph
    */
   QString ControlNet::GraphToString() const {
-    QString graphString; 
-    
+    QString graphString;
+
     typedef boost::graph_traits<Network>::edge_iterator edge_iter;
     edge_iter ei, ei_end;
-    
+
     for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei) {
       ImageVertex sourceImage = source(*ei, m_controlGraph);
       ImageVertex targetImage = target(*ei, m_controlGraph);
       if (sourceImage != targetImage) {
         graphString.append(m_controlGraph[sourceImage].serial);
         graphString.append( " [" );
-        QList<ControlPoint*> sourcePoints = m_controlGraph[sourceImage].measures.keys(); 
+        QList<ControlPoint*> sourcePoints = m_controlGraph[sourceImage].measures.keys();
         for (int i=0; i < sourcePoints.size(); i++) {
           if (i>0) {
-            graphString.append(", "); 
+            graphString.append(", ");
           }
-          graphString.append(sourcePoints[i]->GetId()); 
+          graphString.append(sourcePoints[i]->GetId());
         }
-       // graphString.append(QString::number(m_controlGraph[sourceImage].measures.size())); 
+       // graphString.append(QString::number(m_controlGraph[sourceImage].measures.size()));
         graphString.append("] --------- ");
         graphString.append(m_controlGraph[targetImage].serial);
         graphString.append(" [");
 
-        QList<ControlPoint*> targetPoints = m_controlGraph[targetImage].measures.keys(); 
+        QList<ControlPoint*> targetPoints = m_controlGraph[targetImage].measures.keys();
         for (int i=0; i < targetPoints.size(); i++) {
           if (i>0) {
-            graphString.append(", "); 
+            graphString.append(", ");
           }
-          graphString.append(targetPoints[i]->GetId()); 
+          graphString.append(targetPoints[i]->GetId());
         }
 
-//        graphString.append(QString::number(m_controlGraph[targetImage].measures.size()));  
+//        graphString.append(QString::number(m_controlGraph[targetImage].measures.size()));
         graphString.append("]");// edge strength: [");
     //    graphString.append(QString::number(m_controlGraph[*ei].strength));
-        graphString.append("\n"); 
+        graphString.append("\n");
       }
     }
     return graphString;
@@ -488,12 +488,12 @@ namespace Isis {
     // If the graph doesn't have the sn, add a node for it
     if (!m_vertexMap.contains(serial)) {
       Image newImage;
-      newImage.serial = serial; 
-      ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph); 
+      newImage.serial = serial;
+      ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph);
       m_vertexMap.insert(serial, newVertex);
     }
 
-    m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure; 
+    m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
 
     // in this measure's node add connections to the other nodes reachable from
     // its point
@@ -505,7 +505,7 @@ namespace Isis {
 
 
           if (QString::compare(sn, serial) != 0) {
-            // If the edge doesn't already exist, this adds and returns the edge. 
+            // If the edge doesn't already exist, this adds and returns the edge.
             // If the edge already exists, this just returns it. (The use of a set
             // forces the edges to be unique.)
             ImageConnection connection = boost::add_edge(m_vertexMap[serial],
@@ -573,7 +573,7 @@ namespace Isis {
           QString sn = cm->GetCubeSerialNumber();
 
           if (QString::compare(sn, serial) != 0) {
-            // If the edge doesn't already exist, this adds and returns the edge. 
+            // If the edge doesn't already exist, this adds and returns the edge.
             // If the edge already exists, this just returns it. (The use of a set
             // forces the edges to be unique.)
             ImageConnection connection = boost::add_edge(m_vertexMap[serial],
@@ -619,14 +619,14 @@ namespace Isis {
       // Break connections
       measureIgnored(measure);
     }
-    
-    // Remove the measure from the associated node.  
+
+    // Remove the measure from the associated node.
     // Conceptually, I think this belongs in measureIgnored, but it isn't done
-    // for the old graph. 
-    m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent()); 
+    // for the old graph.
+    m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
 
 
-// We decided in a meeting that we do not want to delete the node when all measures are removed. 
+// We decided in a meeting that we do not want to delete the node when all measures are removed.
     // If this caused the node to be empty, then delete the node.
 //    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
 //      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
@@ -637,8 +637,8 @@ namespace Isis {
 
 
   /**
-   * Updates the edges in the ControlNet graph to reflect the ignored 
-   * measure. If this was the last measure connecting one node to another, 
+   * Updates the edges in the ControlNet graph to reflect the ignored
+   * measure. If this was the last measure connecting one node to another,
    * then the edge is deleted as well.
    *
    * @param measure The measure set to ignored from the network.
@@ -664,18 +664,18 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Decrement the edge strength for edges from this node 
-    // Remove edge if the strength becomes 0. 
+    // Decrement the edge strength for edges from this node
+    // Remove edge if the strength becomes 0.
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
       if (m_vertexMap.contains(sn)) {
         if (QString::compare(serial, sn) !=0) {
-//          std::cout << point->GetId() << ":" << serial << " --- " << sn << std::endl; 
+//          std::cout << point->GetId() << ":" << serial << " --- " << sn << std::endl;
 
-          // We need to check if the edge still exists. 
-          // boost doesn't add separate edges for A -> B and B -> A like the old graph. 
+          // We need to check if the edge still exists.
+          // boost doesn't add separate edges for A -> B and B -> A like the old graph.
           // result.first is the ImageConnection, if found
-          // result.second is true if the edge exists; otherwise false. 
+          // result.second is true if the edge exists; otherwise false.
           std::pair<ImageConnection, bool> result = boost::edge(m_vertexMap[serial],
                                                                 m_vertexMap[sn],
                                                                 m_controlGraph);
@@ -798,7 +798,7 @@ namespace Isis {
     VertexIndexMapAdaptor indexMapAdaptor(indexMap);
 
     // Needed to use connected_componenets
-    QList< QString> serials = m_vertexMap.keys(); 
+    QList< QString> serials = m_vertexMap.keys();
     for (int i = 0; i < serials.size(); i++) {
       boost::put(indexMapAdaptor, m_vertexMap[serials[i]], i);
     }
@@ -813,14 +813,14 @@ namespace Isis {
     {
       QString serial = m_controlGraph[it->first].serial;
       int group = (int) it->second;
-      
+
       if (group > islandStrings.size() - 1) {
-        QList<QString> tempList; 
+        QList<QString> tempList;
         tempList.append(serial);
-        islandStrings.append(tempList); 
+        islandStrings.append(tempList);
       }
       else {
-        islandStrings[group].append(serial); 
+        islandStrings[group].append(serial);
       }
       ++it;
     }
@@ -832,7 +832,7 @@ namespace Isis {
    * @returns The total number of edges in the bi-directional graph for images
    */
   int ControlNet::getEdgeCount() const {
-    return boost::num_edges(m_controlGraph); 
+    return boost::num_edges(m_controlGraph);
   }
 
 
@@ -845,7 +845,7 @@ namespace Isis {
    * @returns A list of the Cube Serial Numbers in the ControlNet.
    */
   QList< QString > ControlNet::GetCubeSerials() const {
-    return m_vertexMap.keys(); 
+    return m_vertexMap.keys();
   }
 
 
@@ -871,7 +871,7 @@ namespace Isis {
    */
   QList< QString > ControlNet::getAdjacentImages(QString serialNumber) const {
     if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+      QString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -897,7 +897,7 @@ namespace Isis {
       IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
       throw IException(IException::Programmer, msg, _FILEINFO_);
-      
+
     }
     return m_controlGraph[m_vertexMap[serialNumber]].measures.values();
   }
@@ -905,7 +905,7 @@ namespace Isis {
 
   /**
    * Get all the valid measures pertaining to a given cube serial number
-   *  
+   *
    * @returns A list of all valid measures which are in a given cube
    */
   QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
