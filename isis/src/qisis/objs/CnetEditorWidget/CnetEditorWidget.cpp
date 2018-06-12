@@ -75,6 +75,8 @@ namespace Isis {
 
     m_updatingSelection = false;
 
+    m_sortDialog = NULL;
+
     m_control = control;
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
         this, SLOT(rebuildModels()));
@@ -1015,12 +1017,14 @@ namespace Isis {
 
 
   /**
-   * Configures the sorting dialog
+   * Configures the sorting dialog.
+   * If one does not already exist, create it, then show the dialog
    */
   void CnetEditorWidget::configSorting() {
-    CnetEditorSortConfigDialog *dialog = new CnetEditorSortConfigDialog(this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
+    if (!m_sortDialog) {
+      m_sortDialog = new CnetEditorSortConfigDialog(this);
+    }
+    m_sortDialog->show();
   }
 
 
