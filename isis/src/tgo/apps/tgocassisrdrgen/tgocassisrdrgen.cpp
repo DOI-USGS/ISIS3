@@ -86,25 +86,6 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
-/*
-  if (!isMosaic) {
-    // Add the ProductId keyword for translation. If a product id is not specified
-    // by the user, set it to the Observation Id.
-    // This is added before the translation instead of adding it to the exported xml
-    // because of the ease of editing pvl vs xml.
-    PvlGroup &instrumentGroup = label->findObject("IsisCube").findGroup("Instrument");
-    PvlKeyword productId = PvlKeyword("ProductId");
-    if ( ui.WasEntered("PRODUCTID") ) {
-      productId.setValue( ui.GetString("PRODUCTID") );
-      instrumentGroup.addKeyword(productId);
-    }
-    else {
-      QString observationId = instrumentGroup.findKeyword("ObservationId")[0];
-      productId.setValue(observationId);
-    }
-    instrumentGroup.addKeyword(productId);
-  }
-*/
 
   /*
   * Add additional pds label data here
