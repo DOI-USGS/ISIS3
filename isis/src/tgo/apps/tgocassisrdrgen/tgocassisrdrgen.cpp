@@ -32,11 +32,13 @@ void IsisMain() {
   Cube *icube = process.SetInputCube("FROM");
 
   PvlObject *label= icube->label();
+
   PvlGroup targetGroup;
   QString logicalId = "urn:esa:psa:em16_tgo_frd:";
+
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Instrument");
-    if (label->hasGroup("Mapping")) {
+    if (label->findObject("IsisCube").hasGroup("Mapping")) {
       logicalId += "data_projected:";
     }
     else {
@@ -45,7 +47,7 @@ void IsisMain() {
   }
   else if ( label->findObject("IsisCube").hasGroup("Mosaic") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Mosaic");
-    logicalId = "data_mosaic";
+    logicalId += "data_mosaic:";
   }
 
   // Check if the cube is able to be translated into a CaSSIS xml file
@@ -84,12 +86,21 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
+
   /*
   * Add additional pds label data here
   */
   QDomDocument &pdsLabel = process.GetLabel();
-  PvlToXmlTranslationManager cubeLab(*(icube->label()),
-                                    "$tgo/translations/tgoCassisExport.trn");
+
+
+  // The default translation for for non-mosaicked output
+  QString exportTranslationFile = "$tgo/translations/tgoCassisExport.trn"; 
+
+  if (label->findObject("IsisCube").hasGroup("Mosaic")) {
+    exportTranslationFile = "$tgo/translations/tgoCassisExportMosaic.trn";
+  }
+
+  PvlToXmlTranslationManager cubeLab(*(icube->label()), exportTranslationFile);
   cubeLab.Auto(pdsLabel);
 
   ProcessExportPds4::translateUnits(pdsLabel);

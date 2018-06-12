@@ -58,9 +58,6 @@ void IsisMain() {
       Pvl *pcomp = clist[i]->label();
       CompareLabels(*pmatch, *pcomp);
       ProdId = (QString)pmatch->findGroup("Archive", Pvl::Traverse)["UniqueIdentifier"];
-      QString bandname = (QString)pmatch->findGroup("BandBin", Pvl::Traverse)["FilterName"];
-      bandname = bandname.toUpper();
-      ProdId = ProdId + "_" + bandname;
     }
 
     bool runXY = true;
