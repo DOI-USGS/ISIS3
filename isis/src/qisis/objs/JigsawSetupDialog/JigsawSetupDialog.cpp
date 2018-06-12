@@ -16,11 +16,11 @@
 #include "Control.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
-#include "SubTreeProxyModel.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
+#include "SubTreeProxyModel.h"
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {

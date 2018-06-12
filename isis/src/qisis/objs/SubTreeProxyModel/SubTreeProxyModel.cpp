@@ -29,7 +29,10 @@ namespace Isis {
     // }
 
     // check if the model index corresponds to the invisible root item in source model
-    if (sourceIndex == static_cast<QStandardItemModel *>(sourceModel())->invisibleRootItem()->index()) {
+    if (sourceIndex == 
+            static_cast<QStandardItemModel *>(sourceModel())->invisibleRootItem()->index()) {
+      qDebug() << "creating index for invisible root item "
+          << static_cast<QStandardItemModel *>(sourceModel())->invisibleRootItem()->index();
       return createIndex(sourceIndex.row(), 0, sourceIndex.internalId());
     }
 
