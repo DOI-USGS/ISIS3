@@ -150,15 +150,11 @@ namespace Isis {
    *                           imports, shape imports, and bundle solution info. Fixes #4855,
    *                           #4979, #4980.
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
-   *
-   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969.
-   *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
    *                           reenable the CNet Tool when a control net is made active.
    *                           Fixes #5046.
    *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969
+   *                           allow for opening of a new project. Fixes #4969.
    *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
    *                           Fixes #4715.
    *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
@@ -221,6 +217,43 @@ namespace Isis {
    *                           Corrected the setting of the project root when pening a project from
    *                           the command line. Removed m_projectPath, it is no longer needed since
    *                           m_projectRoot contains the correct path. References #5104.
+   *   @history 2018-03-14 Ken Edmundson - Modified save method to reopen project if we are saving
+   *                           a temporary project to ensure all project files are pointing to the
+   *                           correct directory. Note that this is NOT ideal, particularly it the
+   *                           project has many files.
+   *   @history 2018-03-14 Tracie Sucharski - Call the appropriate workorder from the methods
+   *                           activeControl and activeImageList when returning a default value.
+   *                           This ensures that all the proper error checking is handled and
+   *                           prevents duplicate code.
+   *   @history 2018-03-23 Ken Edmundson - Modified loadBundleSolutionInfo method to add the
+   *                           BundleSolutionInfo's output control id to the project member variable
+   *                           m_idToControlMap.
+   *   @history 2018-03-26 Tracie Sucharski - When setting a new active control do not close the old
+   *                           active control net if it is still being viewed in a CnetEditorWidget.
+   *                           References #5026.
+   *   @history 2018-03-27 Tracie Sucharski - Removed the calls to work orders from activeImageList
+   *                           and activeControl methods.  Additional errors checks needed for
+   *                           default values that are not in work orders.  Fixes #5256.
+   *   @history 2018-03-30 Tracie Sucharski - Added public slot, activeControlModified, which sets
+   *                           the modified state on the active Control. This was done, so that a
+   *                           Control knows if its control net has been modified. Also added
+   *                           signal, discardActiveControlEdits if user does not want to save
+   *                           edits.  This is needed for CnetEditorWidgets that are displaying
+   *                           the modified active control, it will effectively close that
+   *                           CnetEditorView and reload with the original control net.  It was
+   *                           done this way because there is no easy way to reload a control net in
+   *                           the CnetEditor widgets. When saving Project, if there is an active
+   *                           control and it has been modified, write active control to disk.
+   *                           Unfortunately this is done in 2 different places depending on whether
+   *                           a project "Save" or "Save As" is being done.  If "Save As", a
+   *                           modified active cnet is not written out to the original project only
+   *                           to the new project, so this had to be done in
+   *                           Control::copyToNewProjectRoot.  If simply saving current projct,
+   *                           the write is done here in the save method.
+   *  @history 2018-04-25 Tracie Sucharski - Fixed typo in XmlHandler::startElement reading
+   *                           imported shapes from a project which caused the shapes to be put in
+   *                           the wrong place on the project tree. Fixes #5274.
+   *  
    */
   class Project : public QObject {
     Q_OBJECT
@@ -462,9 +495,12 @@ namespace Isis {
 
       void templatesAdded(TemplateList *newTemplates);
 
+      void discardActiveControlEdits();
+
     public slots:
       void open(QString);
       void setClean(bool value);
+      void activeControlModified();
 
     private slots:
       void controlClosed(QObject *control);

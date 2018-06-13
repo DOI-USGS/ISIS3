@@ -126,6 +126,10 @@ namespace Isis {
    *                           not clean. Fixes #5174.
    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                           classes. Fixes #5117.
+   *   @history 2018-03-22 Ken Edmundson - Modified method onBundleSolutionInfoAdded to append the
+   *                           bundleoutput.txt (Summary) file to the BundleSolution Statistics
+   *                           node. Also changed the name of the Images node under Statistics to
+   *                           Image to prevent Import Images to appear on it's context menu.
    */
   class ProjectItemModel : public QStandardItemModel {
 

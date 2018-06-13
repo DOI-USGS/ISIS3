@@ -56,12 +56,13 @@ namespace Isis {
   JigsawDialog::JigsawDialog(Project *project,
                              BundleSettingsQsp bundleSettings,
                              Control *selectedControl,
+                             QString outputControlFileName,
                              QWidget *parent) : QDialog(parent), m_ui(new Ui::JigsawDialog) {
-
     m_project = project;
     m_bundleSettings = bundleSettings;
     m_selectedControl = selectedControl;
     m_selectedControlName = FileName(selectedControl->fileName()).name();
+    m_outputControlName = outputControlFileName;
     init();
   }
 
@@ -108,7 +109,7 @@ namespace Isis {
            this, SLOT(rejectBundleResults()));
 
     m_bundleAdjust = NULL;
-    m_bundleSolutionInfo = NULL;
+//    m_bundleSolutionInfo = NULL;
 
     m_bRunning = false;
 
@@ -137,9 +138,9 @@ namespace Isis {
    * Destructor.
    */
   JigsawDialog::~JigsawDialog() {
-    if (m_bundleSolutionInfo) {
-      delete m_bundleSolutionInfo;
-    }
+//    if (m_bundleSolutionInfo) {
+//      delete m_bundleSolutionInfo;
+//    }
     if (m_bundleAdjust) {
       delete m_bundleAdjust;
       m_bundleAdjust = NULL;
@@ -147,7 +148,7 @@ namespace Isis {
     if (m_ui) {
       delete m_ui;
     }
-    m_bundleSolutionInfo = NULL;
+//    m_bundleSolutionInfo = NULL;
     m_ui = NULL;
   }
 
@@ -175,6 +176,7 @@ namespace Isis {
 
     if (setupdlg.exec() == QDialog::Accepted) {
       m_selectedControlName = setupdlg.selectedControlName();
+      m_outputControlName = setupdlg.outputControlName();
       m_selectedControl = setupdlg.selectedControl();
       m_bundleSettings = setupdlg.bundleSettings();
       // The settings have been modified, might be misleading to keep this check after setup.
@@ -209,7 +211,8 @@ namespace Isis {
          }
 
          // Grab the control name that was used in that bundle adjustment.
-         m_selectedControlName = FileName(bundleSolutionInfo.last()->controlNetworkFileName()).name();
+         m_selectedControlName
+             = FileName(bundleSolutionInfo.last()->inputControlNetFileName()).name();
       }
 
       // Clear the dialog displays.
@@ -379,12 +382,24 @@ namespace Isis {
     //  Write text summary file
     m_bundleSolutionInfo->outputText();
 
-    // create output control net
-    // Write the new jigged control net with correct path to results folder + runtime
-    FileName jiggedControlName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
-                               FileName(m_bundleSolutionInfo->controlNetworkFileName()).name());
+    // create output control net file name
+    FileName outputControlName;
+    if (!m_outputControlName.isEmpty()) {
+      outputControlName
+          = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/" +
+                     m_outputControlName);
+    }
+    else {
+      outputControlName
+          = FileName(m_project->bundleSolutionInfoRoot() + "/" + runTime + "/Out-" + runTime + "-" +
+                     FileName(m_bundleSolutionInfo->inputControlNetFileName()).name());
+    }
 
-    m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(jiggedControlName.toString());
+    // Write output control net with correct path to results folder + runtime
+    m_bundleSolutionInfo->bundleResults().outputControlNet()->Write(outputControlName.toString());
+
+    // create Control with output control net and add to m_bundleSolutionInfo
+    m_bundleSolutionInfo->setOutputControl(new Control(m_project, outputControlName.expanded()));
 
     // Iterate through all of the image lists (the "imports" in the project).
     QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
@@ -448,7 +463,8 @@ namespace Isis {
     }
 
     // Tell the project about the BundleSolutionInfo
-    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+//    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+    m_project->addBundleSolutionInfo(m_bundleSolutionInfo);
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);
@@ -486,8 +502,8 @@ namespace Isis {
     // Cleanup the results (bundle solution info)
     // How does this affect m_bundleSettings or m_bundleAdjustment?
     // How does this affect using the last (most recent) settings for the run?
-    delete m_bundleSolutionInfo;
-    m_bundleSolutionInfo = NULL;
+//    delete m_bundleSolutionInfo;
+//    m_bundleSolutionInfo = NULL;
   }
 
 

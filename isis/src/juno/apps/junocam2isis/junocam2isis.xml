@@ -88,6 +88,9 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <change name="Kaitlyn Lee" date="2018-02-07">
       Added missionItem under category to classify the program under Juno.
     </change>
+    <change name="Kristin Berry" date="2018-03-27">
+      Fixed problem with having too many open files. See #5232 for more information. 
+    </change>
   </history>
 
   <category>
