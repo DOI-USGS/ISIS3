@@ -1467,6 +1467,7 @@ namespace Isis {
   void WorkOrder::addCloneToProject() {
     if (project()) {
       project()->addToProject(clone());
+      project()->loadProjectSettings();
     }
   }
 

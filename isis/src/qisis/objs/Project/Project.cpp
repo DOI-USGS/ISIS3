@@ -1388,7 +1388,6 @@ namespace Isis {
     m_isOpen = true;
     // TODO: TLS 2018-06-07  Why writeSettings here?
     emit projectSave((const Project *)this);
-    emit projectLoaded(this);
   }
 
 
@@ -2198,7 +2197,7 @@ namespace Isis {
         relocateProjectRoot(newDestination);
         m_isTemporaryProject = false;
 
-//         emit projectSave((const Project *)this);
+        emit projectSave((const Project *)this);
         
         // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
         // working properly. For example, when we save a new project and try to view a control net
@@ -2218,7 +2217,7 @@ namespace Isis {
       }
 
       save(m_projectRoot->absolutePath(), false);
-//       emit projectSave((const Project *)this);
+      emit projectSave((const Project *)this);
     }
 
     return saveDialogCompleted;
@@ -2508,7 +2507,12 @@ namespace Isis {
       directory()->showWarning(line);
     }
   }
-
+  
+  
+  void Project::loadProjectSettings() {
+    emit projectLoaded(this);
+  }
+  
 
   void Project::storeWarning(QString text) {
     m_warnings->append(text);
