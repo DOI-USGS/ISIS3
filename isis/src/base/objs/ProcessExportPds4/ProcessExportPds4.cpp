@@ -410,6 +410,14 @@ namespace Isis {
                 "http://pds.nasa.gov/pds4/sp/v1"); 
     }
 
+    if (imageObject.compare("Array_2D_Image") == 0) {
+      // Add header info
+      addSchema("PDS4_IMG_1900.sch", 
+                "PDS4_IMG_1900.xsd",
+                "xmlns:img", 
+                "http://pds.nasa.gov/pds4/img/v1"); 
+    }
+    
     QString translationFile = "$base/translations/pds4ExportBandBin";
     translationFile += imageObject.remove(0,9); // remove first 9 characters: Array_2D_ or Array_3D_
     translationFile += ".trn";
