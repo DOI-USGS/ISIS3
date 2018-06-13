@@ -8,7 +8,7 @@ From the terminal window:
 * cd into the build directory
 * Enter the following commands:
 
-`cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2KFLAG=OFF -GNinja <source directory>`
+`cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
 
 If using the -GNinja flag:  `ninja` -OR- `ninja install`
 
@@ -18,6 +18,8 @@ Otherwise: `make -j#` -OR- `make install -j#`
 * The -GNinja flag specifies creating Google ninja Makefile (an alternative Make system to the traditional GNU make system). Ninja is faster and allows for partial rebuilds, but you can remove this flag if you don't want to use ninja.
 
 * The -DJP2FLAG=OFF disables JP2000 support.  This is temporary.
+
+* The -Dpybindings=OFF disables the bundle adjust python bindings.  This is temporary.
 
 * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `path/to/isis` 
 
