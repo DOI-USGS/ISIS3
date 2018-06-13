@@ -535,12 +535,12 @@ namespace Isis {
 
 
   /**
-   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a 
-   * new active control and wants to discard any edits in the old active control.  The only view 
-   * which will not be updated with the new control are any CnetEditorViews showing the old active 
-   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the 
+   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a
+   * new active control and wants to discard any edits in the old active control.  The only view
+   * which will not be updated with the new control are any CnetEditorViews showing the old active
+   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the
    * CnetEditor view displaying the old control is removed, then recreated.
-   *  
+   *
    */
   void Directory::reloadActiveControlInCnetEditorView() {
 
@@ -1046,7 +1046,7 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
-    
+
     CnetEditorView *cnetEditorView = static_cast<CnetEditorView *>(obj);
     if (!cnetEditorView) {
       return;
@@ -1055,7 +1055,7 @@ namespace Isis {
     Control *control = m_controlMap.key(cnetEditorView);
     m_controlMap.remove(control, cnetEditorView);
 
-    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {      
+    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {
       control->closeControlNet();
     }
 
@@ -1065,11 +1065,11 @@ namespace Isis {
 
 
   /**
-   * @description Return true if control is not currently being viewed in a CnetEditorWidget 
-   *  
-   * @param Control * Control used to search current CnetEditorWidgets 
-   *  
-   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget 
+   * @description Return true if control is not currently being viewed in a CnetEditorWidget
+   *
+   * @param Control * Control used to search current CnetEditorWidgets
+   *
+   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget
    */
   bool Directory::controlUsedInCnetEditorWidget(Control *control) {
 
@@ -1797,21 +1797,21 @@ namespace Isis {
    * Save the current active control.
    *
    */
-  void Directory::saveActiveControl() {
-
-    if (project()->activeControl()) {
-      project()->activeControl()->write();
-      // add to HistoryTreeWidget
-      QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
-        "has been saved.";
-      m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
-    }
-
-    // Make sure the ControlPointEditView "Save Net" button is no longer red
-    if (controlPointEditView()) {
-      controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
-    }
-  }
+  // void Directory::saveActiveControl() {
+  //
+  //   if (project()->activeControl()) {
+  //     project()->activeControl()->write();
+  //     // add to HistoryTreeWidget
+  //     QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
+  //       "has been saved.";
+  //     m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
+  //   }
+  //
+  //   // Make sure the ControlPointEditView "Save Net" button is no longer red
+  //   if (controlPointEditView()) {
+  //     controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
+  //   }
+  // }
 
 
   /**

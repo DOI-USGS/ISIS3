@@ -238,6 +238,7 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-06-13 Kaitlyn Lee - Commented out saveActiveControl() since it is not currently being used.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -380,7 +381,7 @@ namespace Isis {
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
-      void saveActiveControl();
+      //void saveActiveControl();
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
