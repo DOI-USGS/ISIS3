@@ -136,11 +136,3 @@ find_library(BOOST_RANDOM_MT_LIBRARY
 find_library(BOOST_WSERIALIZATION_MT_LIBRARY
   NAMES boost_wserialization-mt boost_wserialization
 )
-
-find_library(PYTHON_LIBRARY
-  NAMES python2 python2.7 python3
-)
-
-find_library(C_LIBRARY
-  NAMES c
-)

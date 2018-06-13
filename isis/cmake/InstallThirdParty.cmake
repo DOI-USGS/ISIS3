@@ -11,8 +11,7 @@ function(install_third_party_libs)
 
   # Loop through all the library files in our list
   foreach(library ${ALLLIBS})
-    get_filename_component(extension ${library} EXT)
-    if ("${extension}" STREQUAL ".so" OR "${extension}" STREQUAL ".dylib" )
+    if (EXISTS ${library})
       #get path to library in libararypath
       get_filename_component(librarypath ${library} PATH)
 
@@ -25,11 +24,6 @@ function(install_third_party_libs)
       execute_process(COMMAND cp -L ${library} ${installLibFolder})
     endif()
   endforeach()
-
-  # Copy over QT Frameworks
-  if(APPLE)
-    # execute_process(COMMAND cp -Lr ${library} ${installLibFolder})
-  endif(APPLE)
 endfunction()
 
 # Plugin portion of the installation
@@ -59,7 +53,6 @@ function(install_third_party_license)
     install(CODE "execute_process(COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/3rdParty/)")
   endif()
   install(CODE "execute_process(COMMAND cp -r ${LIC_DIR} ${CMAKE_INSTALL_PREFIX}/3rdParty/license)")
-
 endfunction()
 
 
