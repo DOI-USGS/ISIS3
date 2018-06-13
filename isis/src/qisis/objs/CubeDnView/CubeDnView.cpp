@@ -115,21 +115,11 @@ namespace Isis {
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
 
-
-    // !!!!!!!   TODO  LOOK AT THIS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // These connections should be at higher level, directory or project???? ::addCubeDnView().
-    Project *activeProject = directory->project();
-    // These connect signals listen to the active project, and if a control network
-    // or list of control networks is added, then the enableControlNetTool() function is called.
-    connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableControlNetTool()));
-    connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableControlNetTool()));
-
     QSizePolicy policy = sizePolicy();
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
   }
-
 
   void CubeDnView::createActions(Directory *directory) {
 
@@ -207,7 +197,6 @@ namespace Isis {
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_fileMenu = menuBar()->addMenu("&File");
     m_viewMenu = menuBar()->addMenu("&View");
     m_optionsMenu = menuBar()->addMenu("&Options");
     m_windowMenu = menuBar()->addMenu("&Window");
@@ -225,10 +214,7 @@ namespace Isis {
         if (!tool->menuName().isEmpty()) {
           QString menuName = tool->menuName();
 
-          if (menuName == "&File") {
-            tool->addTo(m_fileMenu);
-          }
-          else if (menuName == "&View") {
+          if (menuName == "&View") {
             tool->addTo(m_viewMenu);
           }
           else if (menuName == "&Options") {
@@ -252,21 +238,22 @@ namespace Isis {
 
 
   /**
-   * @description enableControlNetTool:  This is a slot function which
-   * is called when the active project emits a signal to the CubeDnView
-   * object after a control network (or a list of control networks)
-   * has been added.  It enables the control network editor tool if it
-   * has been disabled.
+   * This is a slot function which is called when directory emits a siganl to
+   * CubeDnView when an active control network is set. It enables the control
+   * network editor tool in the toolpad.
    */
-  void CubeDnView::enableControlNetTool() {
+  void CubeDnView::enableControlNetTool(bool value) {
 
-    foreach (QAction * action, m_toolPadActions) {
+    foreach (QAction * action, m_toolPad->actions()) {
       if (action->objectName() == "ControlNetTool") {
-        action->setDisabled(false);
+        action->setEnabled(value);
+        if (value) {
+          ControlNetTool *cnetTool = static_cast<ControlNetTool *>(action->parent());
+          cnetTool->loadNetwork();
+        }
       }
     }
   }
-
 
   /**
    * Destructor

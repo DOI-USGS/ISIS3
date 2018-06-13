@@ -238,6 +238,9 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() now connects
+   *                           to enableControlNetTool() in CubeDnView, instead of enabling the tool 
+   *                           directly.
    */
   class Directory : public QObject {
     Q_OBJECT

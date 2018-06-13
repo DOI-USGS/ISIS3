@@ -535,12 +535,12 @@ namespace Isis {
 
 
   /**
-   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a 
-   * new active control and wants to discard any edits in the old active control.  The only view 
-   * which will not be updated with the new control are any CnetEditorViews showing the old active 
-   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the 
+   * @description This slot was created specifically for the CnetEditorWidgets when user chooses a
+   * new active control and wants to discard any edits in the old active control.  The only view
+   * which will not be updated with the new control are any CnetEditorViews showing the old active
+   * control.  CnetEditorWidget classes do not have the ability to reload a control net, so the
    * CnetEditor view displaying the old control is removed, then recreated.
-   *  
+   *
    */
   void Directory::reloadActiveControlInCnetEditorView() {
 
@@ -719,19 +719,19 @@ namespace Isis {
     connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
 
     // Note:  This assumes the Control Net tool is the 1st in the toolpad.
-    QList<QAction *> toolbar = result->toolPadActions();
-    QAction* cnetAction = toolbar[0];
-    ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
+    // QList<QAction *> toolbar = result->toolPadActions();
+    // QAction* cnetAction = toolbar[0];
+    // ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
 
     connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetAction, SLOT(setEnabled(bool)));
-    connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetTool, SLOT(loadNetwork()));
+             result, SLOT(enableControlNetTool(bool)));
+    // connect (project(), SIGNAL(activeControlSet(bool)),
+    //          cnetTool, SLOT(loadNetwork()));
 
     //  If an active control has not been set, make the control net tool inactive
-    if (!project()->activeControl()) {
-      cnetAction->setEnabled(false);
-    }
+    // if (!project()->activeControl()) {
+    //   cnetAction->setEnabled(false);
+    // }
 
     return result;
   }
@@ -1046,7 +1046,7 @@ namespace Isis {
    * @brief Removes pointers to deleted CnetEditorWidget objects.
    */
   void Directory::cleanupCnetEditorViewWidgets(QObject *obj) {
-    
+
     CnetEditorView *cnetEditorView = static_cast<CnetEditorView *>(obj);
     if (!cnetEditorView) {
       return;
@@ -1055,7 +1055,7 @@ namespace Isis {
     Control *control = m_controlMap.key(cnetEditorView);
     m_controlMap.remove(control, cnetEditorView);
 
-    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {      
+    if ( m_controlMap.count(control) == 0 && project()->activeControl() != control) {
       control->closeControlNet();
     }
 
@@ -1065,11 +1065,11 @@ namespace Isis {
 
 
   /**
-   * @description Return true if control is not currently being viewed in a CnetEditorWidget 
-   *  
-   * @param Control * Control used to search current CnetEditorWidgets 
-   *  
-   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget 
+   * @description Return true if control is not currently being viewed in a CnetEditorWidget
+   *
+   * @param Control * Control used to search current CnetEditorWidgets
+   *
+   * @return @b (bool) Returns true if control is currently being viewed in CnetEditorWidget
    */
   bool Directory::controlUsedInCnetEditorWidget(Control *control) {
 

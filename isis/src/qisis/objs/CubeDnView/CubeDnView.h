@@ -86,9 +86,12 @@ namespace Isis {
    *                           Workspace of this view is the centralWidget. This needs further work
    *                           to cleanup and fit in with the new docked view interface.git
    *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
-   *                           view has its own toolbar, so having getters that return toolbar actions
-   *                           are unnecessary. Removed methods that returned menu and toolbar actions.
+   *                           view has its own toolbar, so having getters that return toolbar
+   *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                           Removed methods that returned menu and toolbar actions.
    *                           toolPadActions() is still needed because it is used in Directory.
+   *                           Removed connections that connected the project and CubeDnView and called
+   *                           enableControlNetTool() because Directory now does this.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -118,7 +121,7 @@ namespace Isis {
 
     public slots:
       void addItem(ProjectItem *item);
-      void enableControlNetTool();
+      void enableControlNetTool(bool value);
 
     private slots:
       void createActions(Directory *directory);
@@ -161,7 +164,6 @@ namespace Isis {
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items
       Workspace *m_workspace; //!< The workspace
 
-      QMenu *m_fileMenu; //!< File menu for storing actions
       QMenu *m_viewMenu; //!< View menu for storing actions
       QMenu *m_optionsMenu; //!< Options menu for storing actions
       QMenu *m_windowMenu; //!< Window menu for storing actions
@@ -172,8 +174,6 @@ namespace Isis {
       QToolBar *m_permToolBar; //!< A tool bar for storing actions
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions
-
-      QList<QAction *> m_toolPadActions; //!< The tool pad actions
   };
 }
 
