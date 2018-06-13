@@ -551,7 +551,7 @@ namespace Isis {
    */
   bool BundleAdjust::validateNetwork() {
      
-    outputBundleStatus("\nValidating network...");
+    outputBundleStatus("Validating network...");
     
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
