@@ -420,6 +420,16 @@ namespace Isis {
 //      ZConstrained = 5;
       };
 
+      enum ModType {
+        MeasureAdded,
+        MeasureDeleted,
+        MeasureModified,
+        EditLockModified,
+        IgnoredModified,
+        TypeModified,
+        RejectedModified
+      };
+
       // This stuff input to jigsaw
       // How did apriori source get computed??
       struct SurfacePointSource {
@@ -546,6 +556,9 @@ namespace Isis {
       int IndexOfRefMeasure() const;
       bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
+      void emitMeasureModified(ControlMeasure *measure, int modType, QVariant oldValue, QVariant newValue);
+
+
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
       Statistics GetStatistic(long dataType) const;

@@ -12,7 +12,11 @@ namespace Isis {
 
   ControlNetVitals::ControlNetVitals(ControlNet *cnet) {
     m_controlNet = cnet;
-    connect(cnet, SIGNAL(networkStructureModified()),
+    connect(cnet, SIGNAL(networkModified(int, QVariant, QVariant)),
+            this, SLOT(validate()));
+    connect(cnet, SIGNAL(pointModified(ControlPoint *, int, QVariant, QVariant)),
+            this, SLOT(validate()));
+    connect(cnet, SIGNAL(measureModified(ControlMeasure *, int, QVariant, QVariant)),
             this, SLOT(validate()));
     validate();
   }
@@ -221,6 +225,7 @@ namespace Isis {
   // }
 
   void ControlNetVitals::validate() {
+    std::cout << "Vital update was called" << std::endl;
     QString status = "";
     QString details = "";
     if (hasIslands()) {
@@ -255,6 +260,7 @@ namespace Isis {
   void ControlNetVitals::updateStatus(QString status, QString details) {
     m_status = status;
     m_statusDetails = details;
+    std::cout << "Emitting a change" << std::endl;
     emit networkChanged();
   }
 

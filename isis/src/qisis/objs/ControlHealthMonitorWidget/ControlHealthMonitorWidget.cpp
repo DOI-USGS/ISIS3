@@ -84,7 +84,8 @@ namespace Isis {
    *
    */
   void ControlHealthMonitorWidget::update() {
-    m_numImagesLabel->setText("Images:  " + toString(m_vitals->numImages()));
+    std::cout << "Update Called" << std::endl;
+    m_numImagesLabel->setText("Images: " + toString(m_vitals->numImages()));
     m_numPointsLabel->setText("Points " + toString(m_vitals->numPoints()));
     m_numMeasuresLabel->setText("Measures: " + toString(m_vitals->numMeasures()));
     m_netLabel->setText("Control Network: " + m_vitals->getNetworkId());

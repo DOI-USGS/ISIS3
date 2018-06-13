@@ -177,7 +177,7 @@ namespace Isis {
    *   @history 2018-01-26 Kristin Berry - Removed code related to now-unused ControlCubeGraphNode,
    *                           as part of the switch to using the boost graph library.
    *                           References #5434
-   *                           
+   *
    */
   class ControlMeasure : public QObject {
 
@@ -224,6 +224,16 @@ namespace Isis {
       enum Status {
         Success,
         MeasureLocked
+      };
+
+      enum ModType {
+        AprioriLineModified,
+        AprioriSampleModified,
+        CoordinatesModified,
+        EditLockModified,
+        IgnoredModified,
+        ResidualModified,
+        TypeModified
       };
 
       enum DataField {
