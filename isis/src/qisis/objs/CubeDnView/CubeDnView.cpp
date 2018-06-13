@@ -133,7 +133,7 @@ namespace Isis {
 
   void CubeDnView::createActions(Directory *directory) {
 
-    
+
     m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -296,7 +296,6 @@ namespace Isis {
     AbstractProjectItemView::addItem(item);
   }
 
-
   /**
    * Returns the suggested size
    *
@@ -317,92 +316,6 @@ namespace Isis {
 
     return item->isShape();
   }
-
-
-  /**
-   * Returns a list of actions appropriate for a file menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::fileMenuActions() {
-    return m_fileMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a project menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::projectMenuActions() {
-    return QList<QAction *>();
-  }
-
-  /**
-   * Returns a list of actions appropriate for an edit menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::editMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a view menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::viewMenuActions() {
-    QList<QAction *> result;
-    result.append( m_viewMenu->actions() );
-    result.append(m_separatorAction);
-    result.append( m_windowMenu->actions() );
-    return result;
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a settings menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::settingsMenuActions() {
-    return m_optionsMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a help menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::helpMenuActions() {
-    return m_helpMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the permanent tool bar.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::permToolBarActions() {
-    return m_permToolBar->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
-  }
-
 
   /**
    * Returns a list of actions for the tool pad.

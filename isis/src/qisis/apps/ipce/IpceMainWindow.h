@@ -112,7 +112,7 @@ namespace Isis {
    *                           detached views from the m_detachedViews list appropriately.
    *                           This fixes an issue where a detached view would appear to be
    *                           open even after it has been closed. Fixes #5109.
-   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it 
+   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it
    *                           was screwing up the display of widgets when a project is loaded.
    *                           Also switched the order in which a project is saved.  A project is
    *                           cleared after it is saved, and not before (which had been the previous
@@ -137,7 +137,9 @@ namespace Isis {
    *                           for cleanup because there is no way to get the dock from the view.
    *                           Cleanup connections are made for the views and the docks to ensure
    *                           that cleanup happens for both.  Fixes #5433.
-   *  
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having an active toolbar and tool pad is
+   *                           not needed.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -197,8 +199,6 @@ namespace Isis {
       static const int m_maxRecentProjects = 5;
 
       QToolBar *m_permToolBar; //!< The toolbar for actions that rarely need to be changed.
-      QToolBar *m_activeToolBar; //<! The toolbar for the actions of the current tool.
-      QToolBar *m_toolPad; //<! The toolbar for the actions that activate tools.
 
       QMenu *m_fileMenu; //!< Menu for the file actions
       QMenu *m_projectMenu; //!< Menu for the project actions
@@ -215,13 +215,9 @@ namespace Isis {
       QList<QAction *> m_helpMenuActions;//!< Internal list of help actions
 
       QList<QAction *> m_permToolBarActions;//!< Internal list of permanent toolbar actions
-      QList<QAction *> m_activeToolBarActions;//!< Internal list of active toolbar actions
-      QList<QAction *> m_toolPadActions;//!< Internal list of toolpad actions
 
       QAction *m_cascadeViewsAction; //!< Action that cascades the mdi area
       QAction *m_tileViewsAction; //!< Action that tiles the mdi area
-
-      AbstractProjectItemView *m_activeView; //!< The active view
   };
 }
 

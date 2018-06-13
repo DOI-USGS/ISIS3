@@ -85,6 +85,10 @@ namespace Isis {
    *                           AbstractProjectItemView now inherits from QMainWindow, so the
    *                           Workspace of this view is the centralWidget. This needs further work
    *                           to cleanup and fit in with the new docked view interface.git
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having getters that return toolbar actions
+   *                           are unnecessary. Removed methods that returned menu and toolbar actions.
+   *                           toolPadActions() is still needed because it is used in Directory.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -94,15 +98,6 @@ namespace Isis {
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
 
-      virtual QList<QAction *> fileMenuActions();
-      virtual QList<QAction *> projectMenuActions();
-      virtual QList<QAction *> editMenuActions();
-      virtual QList<QAction *> viewMenuActions();
-      virtual QList<QAction *> settingsMenuActions();
-      virtual QList<QAction *> helpMenuActions();
-
-      virtual QList<QAction *> permToolBarActions();
-      virtual QList<QAction *> activeToolBarActions();
       virtual QList<QAction *> toolPadActions();
 
       QSize sizeHint() const;
@@ -111,8 +106,6 @@ namespace Isis {
 
       void load(XmlStackedHandlerReader *xmlReader, Project *project);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
-
-
 
     signals:
       void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber);
@@ -180,8 +173,6 @@ namespace Isis {
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions
 
-      QList<QAction *> m_permToolBarActions; //!< The permanent tool bar actions
-      QWidgetAction *m_activeToolBarAction; //!< Widget of the active tool
       QList<QAction *> m_toolPadActions; //!< The tool pad actions
   };
 }
