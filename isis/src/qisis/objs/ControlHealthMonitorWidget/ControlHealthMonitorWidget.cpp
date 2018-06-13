@@ -104,27 +104,27 @@ namespace Isis {
     else if (m_vitals->getStatus() == "Weak!") updateStatus(1);
     else if (m_vitals->getStatus() == "Healthy!") updateStatus(2);
 
-    QPieSeries series;
-    series.append("Free", m_vitals->numFreePoints());
-    series.append("Constrained", m_vitals->numConstrainedPoints());
-    series.append("Fixed", m_vitals->numFixedPoints());
-
-    foreach (QPieSlice *slice, series->slices()) {
-
-      // Get the percent and round it to two decimal places.
-      double percent = slice->percentage() * 100;
-      percent = ( (int) (percent * 100) ) / 100.0;
-
-      QString label = slice->label() + " " + toString(percent) + "%";
-
-      if (percent > 0.0) {
-        slice->setLabelVisible();
-      }
-      slice->setLabel(label);
-    }
+    // QPieSeries series;
+    // series.append("Free", m_vitals->numFreePoints());
+    // series.append("Constrained", m_vitals->numConstrainedPoints());
+    // series.append("Fixed", m_vitals->numFixedPoints());
     //
-    m_pointChartView->chart()->removeAllSeries();
-    m_pointChartView->chart()->addSeries(series);
+    // foreach (QPieSlice *slice, series->slices()) {
+    //
+    //   // Get the percent and round it to two decimal places.
+    //   double percent = slice->percentage() * 100;
+    //   percent = ( (int) (percent * 100) ) / 100.0;
+    //
+    //   QString label = slice->label() + " " + toString(percent) + "%";
+    //
+    //   if (percent > 0.0) {
+    //     slice->setLabelVisible();
+    //   }
+    //   slice->setLabel(label);
+    // }
+    // //
+    // m_pointChartView->chart()->removeAllSeries();
+    // m_pointChartView->chart()->addSeries(series);
 
     viewImageAll();
     viewPointAll();
@@ -604,17 +604,17 @@ namespace Isis {
     QVBoxLayout *graphLayout = new QVBoxLayout;
     graphLayout->setAlignment(Qt::AlignTop);
     graphLayout->setSpacing(5);
-
-    m_pointChartView = new QChartView;
-    m_pointChartView->resize(200, 200);
-    m_pointChartView->setRenderHint(QPainter::Antialiasing);
-
-    QChart *chart = new QChart();
-    chart->setTitle("Point Breakdown");
-    chart->setTheme(QChart::ChartThemeBlueCerulean);
-    chart->legend()->setAlignment(Qt::AlignRight);
-    m_pointChartView->setChart(chart);
-    graphLayout->addWidget(m_pointChartView);
+    //
+    // m_pointChartView = new QChartView;
+    // m_pointChartView->resize(200, 200);
+    // m_pointChartView->setRenderHint(QPainter::Antialiasing);
+    //
+    // QChart *chart = new QChart();
+    // chart->setTitle("Point Breakdown");
+    // chart->setTheme(QChart::ChartThemeBlueCerulean);
+    // chart->legend()->setAlignment(Qt::AlignRight);
+    // m_pointChartView->setChart(chart);
+    // graphLayout->addWidget(m_pointChartView);
 
     graph->setLayout(graphLayout);
     return graph;
