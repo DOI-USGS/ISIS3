@@ -629,7 +629,7 @@ namespace Isis {
   void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
-    ASSERT(m_vertexGraph->contains(serial));
+    ASSERT(m_vertexMap.contains(serial));
 
     // Remove connections to and from this node
     if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
