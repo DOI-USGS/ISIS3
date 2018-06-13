@@ -410,7 +410,8 @@ namespace Isis {
                 "http://pds.nasa.gov/pds4/sp/v1"); 
     }
 
-    if (imageObject.compare("Array_2D_Image") == 0) {
+    if ( (imageObject.compare("Array_2D_Image") == 0) || 
+         (imageObject.compare("Array_3D_Image") == 0) ) {
       // Add header info
       addSchema("PDS4_IMG_1900.sch", 
                 "PDS4_IMG_1900.xsd",
