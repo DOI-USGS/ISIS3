@@ -205,7 +205,6 @@ bool translateMappingLabel(FileName xmlFileName, Cube *outputCube) {
  *                   updated.
  */
 bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
-  //Now retrieve the logical_identifier to see if this is a mosaic
   QDomDocument xmlDoc;
     
   QFile xmlFile(xmlFileName.expanded());
@@ -226,7 +225,7 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
   }
 
   xmlFile.close();
-  
+
   QDomElement inputParentElement = xmlDoc.documentElement();
   if (!inputParentElement.isNull()) {
     inputParentElement = inputParentElement.firstChildElement("Identification_Area");
@@ -235,24 +234,20 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
       if (!logicalId.isNull()) {
         QString logicalIdText = logicalId.text();
         QStringList logicalIdStringList = logicalIdText.split(":");
-        if (logicalIdStringList.contains("data_mos")) {
+        if (logicalIdStringList.contains("data_mosaic")) {
           try {
             PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory"); 
             QString missionDir = (QString) dataDir["Tgo"];
-            
-            FileName bandBinTransFile(missionDir + "/translations/tgoCassisBandBin.trn");
+            FileName bandBinTransFile(missionDir + "/translations/tgoCassisMosaicBandBin.trn");
             // Get the translation manager ready for translating the band bin label
             XmlToPvlTranslationManager labelXBandBinlater(xmlFileName, bandBinTransFile.expanded());
-
             // Pvl output label
             Pvl *outputLabel = outputCube->label();
             labelXBandBinlater.Auto(*(outputLabel));
-            
             FileName mosaicTransFile(missionDir + "/translations/tgoCassisMosaic.trn");
 
-            // Get the translation manager ready for translating the mapping label
+            // Get the translation manager ready for translating the mosaic label
             XmlToPvlTranslationManager labelXMosaiclater(xmlFileName, mosaicTransFile.expanded());
-
             labelXMosaiclater.Auto(*(outputLabel));
             return true;
           }
