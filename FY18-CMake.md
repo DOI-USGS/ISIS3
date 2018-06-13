@@ -6,6 +6,7 @@ Below is a tentative plan for the completion of the CMake work for FY18. If you 
 * All ‘small’ bugs that are currently identified have been squashed.
   - Tests timing out (cam2map related?) - (Jesse to lead)
   - Update protobuf files to protobuf3 (currently 2) - (Jesse to lead)
+    - Done
   - Anaconda Qt build is missing PosgreSQL - (Kelvin or Ian, Post GCC update)
   - Linux has to use GCC 4.8.5 - update to a modern gcc - 7.x (whatever the current folks are using)
     - Kelvin has demoed doing this in CSM (meta.yaml and build.sh in https://github.com/USGS-Astrogeology/conda-libcsm/tree/master/recipes and documentation: https://github.com/USGS-Astrogeology/conda-libcsm/pull/1)
