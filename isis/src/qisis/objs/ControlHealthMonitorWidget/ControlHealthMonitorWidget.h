@@ -73,6 +73,10 @@ QT_CHARTS_USE_NAMESPACE
       void viewImageFewMeasures();
       void viewImageHullTolerance();
 
+      void broken();
+      void weak();
+      void healthy();
+
       void update();
 
 

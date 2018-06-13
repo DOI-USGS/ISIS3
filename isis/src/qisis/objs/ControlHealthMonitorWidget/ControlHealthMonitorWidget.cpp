@@ -104,10 +104,10 @@ namespace Isis {
     else if (m_vitals->getStatus() == "Weak!") updateStatus(1);
     else if (m_vitals->getStatus() == "Healthy!") updateStatus(2);
 
-    QPieSeries *series = new QPieSeries();
-    series->append("Free", m_vitals->numFreePoints());
-    series->append("Constrained", m_vitals->numConstrainedPoints());
-    series->append("Fixed", m_vitals->numFixedPoints());
+    QPieSeries series;
+    series.append("Free", m_vitals->numFreePoints());
+    series.append("Constrained", m_vitals->numConstrainedPoints());
+    series.append("Fixed", m_vitals->numFixedPoints());
 
     foreach (QPieSlice *slice, series->slices()) {
 
@@ -122,12 +122,31 @@ namespace Isis {
       }
       slice->setLabel(label);
     }
-
+    //
     m_pointChartView->chart()->removeAllSeries();
     m_pointChartView->chart()->addSeries(series);
 
     viewImageAll();
     viewPointAll();
+  }
+
+  void ControlHealthMonitorWidget::broken() {
+    updateStatus(0);
+    m_statusLabel->setText("Broken!");
+    m_statusDetails->setText("This network has 2 islands.");
+  }
+
+  void ControlHealthMonitorWidget::weak() {
+    updateStatus(1);
+    m_statusLabel->setText("Weak!");
+    m_statusDetails->setText("This network has " + toString(m_vitals->numPointsBelowMeasureThreshold()) + " points "
+                             + "with less than 3 measures.");
+  }
+
+  void ControlHealthMonitorWidget::healthy() {
+    updateStatus(2);
+    m_statusLabel->setText("Healthy!");
+    m_statusDetails->setText("This network is healthy.");
   }
 
   /*
@@ -334,6 +353,30 @@ namespace Isis {
     m_historyTable->setGeometry(QApplication::desktop()->screenGeometry());
 
     overviewLayout->addWidget(m_historyTable);
+
+
+    QWidget *tempWidget = new QWidget;
+    QHBoxLayout *tempLayout = new QHBoxLayout;
+
+    tempLayout->setSpacing(15);
+
+    QPushButton *broken = new QPushButton("Broken");
+    QPushButton *weak = new QPushButton("Weak");
+    QPushButton *healthy = new QPushButton("Healthy");
+
+    connect (broken,  SIGNAL(clicked()), this, SLOT(broken()));
+    connect (weak,    SIGNAL(clicked()), this, SLOT(weak()));
+    connect (healthy, SIGNAL(clicked()), this, SLOT(healthy()));
+
+    tempLayout->addWidget(broken);
+    tempLayout->addWidget(weak);
+    tempLayout->addWidget(healthy);
+
+    tempWidget->setLayout(tempLayout);
+    overviewLayout->addWidget(tempWidget);
+
+
+
     overview->setLayout(overviewLayout);
     return overview;
   }
@@ -344,6 +387,8 @@ namespace Isis {
   */
   QWidget* ControlHealthMonitorWidget::createImagesTab() {
     QFont fontSmall("Arial", 12);
+    QFont fontMedium("Arial", 14);
+
 
     // This is the parent QWidget for the images tab.
     QWidget *imagesTab = new QWidget();
@@ -409,7 +454,7 @@ namespace Isis {
     imagesLayout->addSpacing(30);
 
     m_imagesShowingLabel = new QLabel("");
-    m_imagesShowingLabel->setFont(fontSmall);
+    m_imagesShowingLabel->setFont(fontMedium);
 
     imagesLayout->addWidget(m_imagesShowingLabel);
     imagesLayout->addWidget(m_imagesTable);
@@ -425,6 +470,8 @@ namespace Isis {
   QWidget* ControlHealthMonitorWidget::createPointsTab() {
 
     QFont fontSmall("Arial", 12);
+    QFont fontMedium("Arial", 14);
+
     QFont searchFont("Seqoe UI Symbol", 12);
 
     // This is the main parent widget for the points tab.
@@ -538,7 +585,7 @@ namespace Isis {
     pointsLayout->addSpacing(30);
 
     m_pointsShowingLabel = new QLabel("");
-    m_pointsShowingLabel->setFont(fontSmall);
+    m_pointsShowingLabel->setFont(fontMedium);
 
     pointsLayout->addWidget(m_pointsShowingLabel);
     pointsLayout->addWidget(m_pointsTable);
@@ -743,7 +790,6 @@ namespace Isis {
     delete m_vitals;
 
     m_historyTable           = NULL;
-
     m_imagesHullValue        = NULL;
     m_imagesMeasuresValue    = NULL;
     m_imagesShowingLabel     = NULL;
