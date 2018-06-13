@@ -30,7 +30,6 @@
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "ControlCubeGraphNode.h"
 #include "IString.h"
 #include "iTime.h"
 #include "SpecialPixel.h"
@@ -84,13 +83,11 @@ namespace Isis {
     p_sampleResidual = other.p_sampleResidual;
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
-    associatedCSN = other.associatedCSN;
   }
 
 
   //! initialize pointers and other data to NULL
   void ControlMeasure::InitializeToNull() {
-
     // Previously these were initialized to 0.0 in the constructor.
     p_sample = Null;
     p_line = Null;
@@ -117,7 +114,6 @@ namespace Isis {
     p_measuredEphemerisTime = Null;
 
     parentPoint = NULL;
-    associatedCSN = NULL;
   }
 
 
@@ -145,7 +141,6 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    associatedCSN = NULL;
   }
 
 
@@ -1055,7 +1050,6 @@ namespace Isis {
     p_focalPlaneMeasuredY = other.p_focalPlaneMeasuredY;
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
-    associatedCSN = other.associatedCSN;
 
     return *this;
   }

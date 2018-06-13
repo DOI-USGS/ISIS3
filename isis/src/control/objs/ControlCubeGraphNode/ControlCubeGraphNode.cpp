@@ -90,7 +90,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    measure->associatedCSN = this;
+//    measure->associatedCSN = this;
     ASSERT(!measures->contains(measure->Parent()));
     (*measures)[measure->Parent()] = measure;
   }
@@ -102,7 +102,7 @@ namespace Isis {
       ASSERT(0);
     }
 
-    measure->associatedCSN = NULL;
+//    measure->associatedCSN = NULL;
   }
 
 
