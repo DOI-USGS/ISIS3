@@ -118,7 +118,6 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer) {
     translateCoreInfo(labelXlater, importer);
   } 
   catch (IException &e) {
-    e.print();
     // if exported, use this!
     transFile = FileName(missionDir + "/translations/tgoCassisRdr.trn"); 
     XmlToPvlTranslationManager labelXlater(inputLabel, transFile.expanded());
