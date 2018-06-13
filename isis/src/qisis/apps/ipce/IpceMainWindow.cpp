@@ -338,6 +338,7 @@ namespace Isis {
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
 
+    // 6-13-18 Kaitlyn Lee - Commented this out because it is not currently being used
     // QAction *saveNet = new QAction("&Save Active Control Network", this);
     // saveNet->setIcon( QIcon::fromTheme("document-save") );
     // saveNet->setShortcut(Qt::CTRL + Qt::Key_S);

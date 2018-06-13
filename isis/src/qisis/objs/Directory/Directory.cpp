@@ -1795,7 +1795,7 @@ namespace Isis {
 
   /**
    * Save the current active control.
-   *
+   * 6-13-18 Kaitlyn Lee - Commented this out because it is not currently being used
    */
   // void Directory::saveActiveControl() {
   //
