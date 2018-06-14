@@ -3,9 +3,12 @@
 #include <vector>
 
 #include <QDebug>
+#include <QIdentityProxyModel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QItemSelection>
 
 #include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
@@ -14,7 +17,10 @@
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
+#include "SubTreeProxyModel.h"
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
@@ -46,6 +52,11 @@ namespace Isis {
     if (readOnly) {
       makeReadOnly();
     }
+
+
+
+    //connect( m_project->directory()->model(), SIGNAL(selectionChanged(QList<ProjectItem *> &)),
+    //         this, SLOT(on_projectItemSelectionChanged(const QList<ProjectItem *> &) ) );
 
     // initializations for general tab
 
@@ -87,7 +98,9 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
-    // m_ui->spkSolveDegreeSpinsBox_2->setValue(-1);
+
+    createObservationSolveSettingsTreeView();
+    m_ui->spkSolveDegreeSpinBox->setValue(-1);
 
     QStringList tableHeaders;
     tableHeaders << "coefficients" << "a priori sigma" << "units";
@@ -213,6 +226,7 @@ namespace Isis {
     connect(m_ui->aRadiusLineEdit, SIGNAL(editingFinished()), SLOT(checkIsValid()));
     connect(m_ui->aRadiusLineEdit, SIGNAL(textChanged(QString)), SLOT(on_aRadiusLineEdit_textChanged(QString)));
   }
+
 
 
   JigsawSetupDialog::~JigsawSetupDialog() {
@@ -374,7 +388,6 @@ namespace Isis {
     // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
     m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
     m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
-    std::cout<<"observationSolveSettings.spkDegree(): " << observationSolveSettings.spkDegree() <<std::endl;
     m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
 
 
@@ -572,7 +585,6 @@ namespace Isis {
         }
       }
     }
-
     // target body
     // ensure user entered something to adjust
     if (m_ui->poleRaCheckBox->isChecked()              ||
@@ -688,7 +700,7 @@ namespace Isis {
 
 
   /**
-   * Loads the passed bundle settings into the setup dialog. This is used by JigsawRunWidget to
+   * Loads the passed bundle settings into the setup dialog. This is used by JigsawDialog to
    * load its current settings when not using the last (most recent) bundle settings in the project.
    *
    * @param const BundleSettingsQsp settings Shared pointer to the settings to load up.
@@ -1169,77 +1181,77 @@ namespace Isis {
   // general tab text validation
   // global apriori point sigmas
   void Isis::JigsawSetupDialog::on_pointLatitudeSigmaLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->pointLatitudeSigmaLineEdit->hasAcceptableInput()) {
-      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (arg1 == "" || m_ui->pointLatitudeSigmaLineEdit->hasAcceptableInput()) {
       m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
   void Isis::JigsawSetupDialog::on_pointLongitudeSigmaLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->pointLongitudeSigmaLineEdit->hasAcceptableInput()) {
-      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (arg1 == "" || m_ui->pointLongitudeSigmaLineEdit->hasAcceptableInput()) {
       m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
 
   void Isis::JigsawSetupDialog::on_pointRadiusSigmaLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->pointRadiusSigmaLineEdit->hasAcceptableInput()) {
-      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (arg1 == "" || m_ui->pointRadiusSigmaLineEdit->hasAcceptableInput()) {
       m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
   // outlier rejection
   void Isis::JigsawSetupDialog::on_maximumLikelihoodModel1QuantileLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
-      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
       m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
 
   void Isis::JigsawSetupDialog::on_maximumLikelihoodModel2QuantileLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
-      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
       m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
 
   void Isis::JigsawSetupDialog::on_maximumLikelihoodModel3QuantileLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
-      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
       m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
@@ -1247,39 +1259,39 @@ namespace Isis {
 
   // convergence criteria
   void Isis::JigsawSetupDialog::on_outlierRejectionMultiplierLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
-      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
       m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
 
   void Isis::JigsawSetupDialog::on_sigma0ThresholdLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->sigma0ThresholdLineEdit->hasAcceptableInput()) {
-      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (m_ui->sigma0ThresholdLineEdit->hasAcceptableInput()) {
       m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
 
 
   void Isis::JigsawSetupDialog::on_maximumIterationsLineEdit_textChanged(const QString &arg1) {
-    if (!m_ui->maximumIterationsLineEdit->hasAcceptableInput()) {
-      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: red }");
-      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    }
-    else {
+    if (m_ui->maximumIterationsLineEdit->hasAcceptableInput()) {
       m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: white }");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     }
     update();
   }
@@ -1297,5 +1309,45 @@ namespace Isis {
   void Isis::JigsawSetupDialog::on_inputControlNetCombo_currentTextChanged(const QString &arg1) {
     FileName fname = arg1;
     m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
+  }
+
+
+  void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
+    // Proof-of-
+
+    QList<ProjectItem *> selectedItems = m_project->directory()->model()->selectedItems();
+
+    foreach(ProjectItem *item,selectedItems){
+      qDebug() << "Selected Item:  " << item->text();
+    }
+    qDebug() << "JigsawSetupDialog::createObservationSolveSettingsTreeView()";
+
+//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
+    ProjectItemModel *model = m_project->directory()->model();
+
+    SubTreeProxyModel *osspm = new SubTreeProxyModel;
+    osspm->setSourceModel(model);
+
+
+     //QModelIndex SubTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
+    // find the root "Images" and set it in the proxy
+    //QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
+    //qDebug() << "ITEM: " << item << ", " << item->text();
+    //qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
+
+
+    // i think source model tries to add top root item, which is invalid???
+
+    m_ui->treeView->setModel(osspm);
+
+    //Set the root index to display the subtree we are interested in.  This requires
+    //computing the proxy index from the source model.
+    if (selectedItems.count() > 0) {
+      m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
+
+    }
+
+
+
   }
 }
