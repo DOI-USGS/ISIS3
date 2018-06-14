@@ -30,26 +30,35 @@ commands:
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/basenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*equi.cub > $(OUTPUT)/mosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/mosaic.lis mosaic=$(OUTPUT)/cassisMosaic.cub > /dev/null;
+
 	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/cassisMosaic.cub to=$(OUTPUT)/cassisMosaic \
              pdsversion=pds4 > /dev/null;
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
-              $(OUTPUT)/cassisMosaic.xml > $(OUTPUT)/cassisMosaic1.txt;
+               $(OUTPUT)/cassisMosaic.xml \
+	       > $(OUTPUT)/tempLabel1.txt;
 	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
-             $(OUTPUT)/cassisMosaic1.txt > $(OUTPUT)/cassisMosaic2.txt;
+	       $(OUTPUT)/tempLabel1.txt \
+	       > $(OUTPUT)/tempLabel2.txt;
 	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
-             $(OUTPUT)/cassisMosaic2.txt > $(OUTPUT)/cassisMosaic3.txt;
-	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
-             $(OUTPUT)/cassisMosaic3.txt > $(OUTPUT)/cassisMosaic.txt;
+	       $(OUTPUT)/tempLabel2.txt \
+	       > $(OUTPUT)/tempLabel3.txt;
+	$(SED) 's+\modification_date.*>+\modification_date>+' \
+	       $(OUTPUT)/tempLabel3.txt \
+	       > $(OUTPUT)/tempLabel4.txt
+	$(SED) 's+\ISIS version.*<+\ISIS version.<+' \
+	       $(OUTPUT)/tempLabel4.txt \
+               > $(OUTPUT)/cassisMosaic.xmlLabel.txt;
+	catlab from=$(OUTPUT)/cassisMosaic.cub \
+	       to=$(OUTPUT)/cassisMosaic.pvl >& /dev/null;
 
 	# Cleanup
-	$(RM) $(OUTPUT)/cassisMosaic.xml;
-	$(RM) $(OUTPUT)/cassisMosaic1.txt;
-	$(RM) $(OUTPUT)/cassisMosaic2.txt;
-	$(RM) $(OUTPUT)/cassisMosaic3.txt;
 	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl
-	$(RM) $(OUTPUT)/cubes.lis
-	$(RM) $(OUTPUT)/inputs.lis
-	$(RM) $(OUTPUT)/basenames.lis
-	$(RM) $(OUTPUT)/relative.lis
-	$(RM) $(OUTPUT)/mosaic.lis
+	$(RM) $(OUTPUT)/cassisMosaic.xml;
+	$(RM) $(OUTPUT)/tempLabel1.txt;
+	$(RM) $(OUTPUT)/tempLabel2.txt;
+	$(RM) $(OUTPUT)/tempLabel3.txt;
+	$(RM) $(OUTPUT)/tempLabel4.txt;
+	$(RM) $(OUTPUT)/*.lis
+	$(RM) $(OUTPUT)/*equi.cub;
+	$(RM) $(OUTPUT)/*B1.cub;
 
