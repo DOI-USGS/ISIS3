@@ -100,7 +100,7 @@ namespace Isis {
     // initializations for observation solve settings tab
 
     createObservationSolveSettingsTreeView();
-    m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
+    m_ui->spkSolveDegreeSpinBox->setValue(-1);
 
     QStringList tableHeaders;
     tableHeaders << "coefficients" << "a priori sigma" << "units";
