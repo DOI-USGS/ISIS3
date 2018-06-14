@@ -137,6 +137,7 @@ namespace Isis {
    *                           for cleanup because there is no way to get the dock from the view.
    *                           Cleanup connections are made for the views and the docks to ensure
    *                           that cleanup happens for both.  Fixes #5433.
+   *   @history 2018-06-13 Tracie Sucharski - Fixed cleanup of views and QDockWidgets. 
    *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                           view has its own toolbar, so having an active toolbar and tool pad is
    *                           not needed.
@@ -154,6 +155,7 @@ namespace Isis {
       void removeAllViews();
 
       void readSettings(Project *);
+      void writeSettings(Project *project);
 
     protected:
       void closeEvent(QCloseEvent *event);
@@ -166,6 +168,7 @@ namespace Isis {
       void tabAllViews();
 
       void raiseWarningTab();
+      void cleanupViewDockList(QObject *obj);
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
@@ -175,7 +178,6 @@ namespace Isis {
       void createMenus();
       void createToolBars();
 
-      void writeSettings(const Project *project) const;
 
     private:
       /**

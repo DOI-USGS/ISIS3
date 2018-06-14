@@ -93,11 +93,14 @@ namespace Isis {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)), this, SLOT(removeView(QWidget *)));
+      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+              this, SLOT(removeView(QWidget *)));
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
+      connect(m_directory->project(), SIGNAL(projectSaved(Project *)),
+              this, SLOT(writeSettings(Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
               this, SLOT( raiseWarningTab() ) );
     }
@@ -163,9 +166,6 @@ namespace Isis {
     createMenus();
     createToolBars();
 
-//  setTabbedViewMode();
-//  centralWidget->setTabsMovable(true);
-//  centralWidget->setTabsClosable(true);
     // Read default app settings
     readSettings(m_directory->project() );
 
@@ -205,8 +205,21 @@ namespace Isis {
     // Connections for cleanup in both directions to make sure both views and docks are cleaned up
     connect(newWidget, SIGNAL(destroyed(QObject *)), dock, SLOT(deleteLater()));
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
+    // The list of dock widgets needs cleanup as each view is destroyed
+    connect(dock, SIGNAL(destroyed(QObject *)),
+            this, SLOT(cleanupViewDockList(QObject *)));
+
     // Save view docks for cleanup during a project close
     m_viewDocks.append(dock);
+  }
+
+
+  void IpceMainWindow::cleanupViewDockList(QObject *obj) {
+
+    QDockWidget *dock = static_cast<QDockWidget *>(obj);
+    if (dock) {
+      m_viewDocks.removeAll(dock);
+    }
   }
 
 
@@ -218,7 +231,7 @@ namespace Isis {
    *
    */
   void IpceMainWindow::removeView(QWidget *view) {
-
+    
     view->close();
     delete view;
   }
@@ -229,22 +242,13 @@ namespace Isis {
    */
   void IpceMainWindow::removeAllViews() {
     setWindowTitle("ipce");
-//  qDebug()<<"IpceMainWindow::removeAllViews  directory footprint count = "<<m_directory->footprint2DViews().count();
-//  qDebug()<<"                                directory cube disp count = "<<m_directory->cubeDnViews().count();
-
-    // Find all children of IpceMainWindow and close
-    QList<QDockWidget *> dockedWidgets = findChildren<QDockWidget *>();
-//  qDebug()<<"           # docks before removal = "<<dockedWidgets.count();
     foreach (QDockWidget *dock, m_viewDocks) {
-      removeDockWidget(dock);
-      m_viewDocks.removeAll(dock);
-      delete dock;
+      if (dock) {
+        removeDockWidget(dock);
+        m_viewDocks.removeAll(dock);
+        delete dock;
+      }
     }
-
-    QList<QDockWidget *> dockedWidgets2 = findChildren<QDockWidget *>();
-//  qDebug()<<"           any docks left"<<dockedWidgets2.count();
-//  qDebug()<<"IpceMainWindow::removeAllViews  directory footprint count = "<<m_directory->footprint2DViews().count();
-//  qDebug()<<"                                directory cube disp count = "<<m_directory->cubeDnViews().count();
     m_viewDocks.clear();
   }
 
@@ -525,7 +529,7 @@ namespace Isis {
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
    */
-  void IpceMainWindow::writeSettings(const Project *project) const {
+  void IpceMainWindow::writeSettings(Project *project) {
 
     // Ensure that we are not using a NULL pointer
     if (!project) {
@@ -737,7 +741,7 @@ namespace Isis {
         m_directory->project()->save();
       }
     }
-    writeSettings(m_directory->project());
+    //writeSettings(m_directory->project());
     m_directory->project()->clear();
 
     QMainWindow::closeEvent(event);
