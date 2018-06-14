@@ -275,9 +275,8 @@ namespace Isis {
     m_bundleSettings = bundleSettings;
 
     m_abort = false;
-    Progress progress;
     try {
-      m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
+      m_controlNet = ControlNetQsp( new ControlNet(control.fileName()) );
     }
     catch (IException &e) {
       throw;
