@@ -121,7 +121,6 @@ namespace Isis {
     addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
     setCentralWidget(m_sceneWidget);
 
-
     m_permToolBar = addToolBar("Standard Tools");
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -149,15 +148,7 @@ namespace Isis {
       m_controlNetTool->setEnabled(false);
     }
 
-//  m_activeToolBarAction = new QWidgetAction(this);
-//  m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
     setAcceptDrops(true);
-
-    // QSizePolicy policy = sizePolicy();
-    // policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    // policy.setVerticalPolicy(QSizePolicy::Expanding);
-    // setSizePolicy(policy);
   }
 
 
@@ -327,27 +318,17 @@ namespace Isis {
   }
 
   /**
-   * This is a slot function which is called when directory emits a siganl to
-   * CubeDnView when an active control network is set. It enables the control
-   * network editor tool in the toolpad.
+   * A slot function that is called when directory emits a siganl that an active
+   * control network is set. It enables the control network editor tool in the
+   * toolpad and loads the network.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
     m_controlNetTool->setEnabled(value);
-    if (value) {
-      MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(m_controlNetTool->parent());
-      cnetTool->loadNetwork();
-    }
+    // if (value) {
+    //   MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(m_controlNetTool->parent());
+    //   cnetTool->loadNetwork();
+    // }
   }
-
-  // /**
-  //  * Returns a list of actions for the tool pad.
-  //  *
-  //  * @return @b QList<QAction*> The actions
-  //  */
-  // QList<QAction *> Footprint2DView::toolPadActions() {
-  //   return m_toolPad->actions();
-  // }
-
 
   /**
    * @brief Loads the Footprint2DView from an XML file.

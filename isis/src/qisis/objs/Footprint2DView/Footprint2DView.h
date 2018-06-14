@@ -78,6 +78,15 @@ namespace Isis {
    *                           instead of QWidget. References #5433.
    *   @history 2018-06-08 Tracie Sucharski - Remove deletion of m_window from destructor. This
    *                           member variable no longer exists.
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having getters that return toolbar
+   *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                           Removed methods that returned menu and toolbar actions.
+   *                           Made it so that on default and if there is no active control net,
+   *                           the Control Net Tool will be disabled.
+   *                           Added enableControlNetTool(bool) so when an active control net is set,
+   *                           the tool becomes enabled.
+
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -88,8 +97,6 @@ namespace Isis {
       ~Footprint2DView();
 
       MosaicSceneWidget *mosaicSceneWidget();
-
-      //virtual QList<QAction *> toolPadActions();
 
       QSize sizeHint() const;
 
@@ -148,9 +155,7 @@ namespace Isis {
       QToolBar *m_activeToolBar; //!< The active tool bar
       ToolPad *m_toolPad; //!< The tool pad
 
-      QAction *m_controlNetTool;
-
-      QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
+      QAction *m_controlNetTool;  //!< The Control Point Editor Tool
   };
 }
 
