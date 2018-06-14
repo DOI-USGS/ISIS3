@@ -85,6 +85,8 @@ namespace Isis {
    *                           AbstractProjectItemView now inherits from QMainWindow, so the
    *                           Workspace of this view is the centralWidget. This needs further work
    *                           to cleanup and fit in with the new docked view interface.git
+   *   @history 2018-06-12 Kaitlyn Lee - Removed help menu and the "What's This?" action because the
+   *                           ipce help menu has this action.
    *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                           view has its own toolbar, so having getters that return toolbar
    *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
