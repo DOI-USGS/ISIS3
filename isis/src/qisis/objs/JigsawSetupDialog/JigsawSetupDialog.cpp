@@ -374,7 +374,6 @@ namespace Isis {
     // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
     m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
     m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
-    std::cout<<"observationSolveSettings.spkDegree(): " << observationSolveSettings.spkDegree() <<std::endl;
     m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
 
 
