@@ -133,7 +133,7 @@ namespace Isis {
 
   void CubeDnView::createActions(Directory *directory) {
 
-    
+
     m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -200,7 +200,7 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-    tools->append(new HelpTool(this));
+    //tools->append(new HelpTool(this));
 
     tools->append(new TrackTool(statusBar()));
 
@@ -211,7 +211,7 @@ namespace Isis {
     m_viewMenu = menuBar()->addMenu("&View");
     m_optionsMenu = menuBar()->addMenu("&Options");
     m_windowMenu = menuBar()->addMenu("&Window");
-    m_helpMenu = menuBar()->addMenu("&Help");
+    //m_helpMenu = menuBar()->addMenu("&Help");
 
     for (int i = 0; i < tools->count(); i++) {
       Tool *tool = (*tools)[i];

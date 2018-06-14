@@ -76,6 +76,8 @@ namespace Isis {
    *                           include a central widget and to remove layout capacity. This change 
    *                           was made to adjust to parent class now inheriting from QMainWindow 
    *                           instead of QWidget. References #5433.
+   *   @history 2018-06-08 Tracie Sucharski - Remove deletion of m_window from destructor. This
+   *                           member variable no longer exists.
    */
   class Footprint2DView : public AbstractProjectItemView {
 

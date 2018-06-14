@@ -93,16 +93,15 @@ namespace Isis {
 
     try {
       m_directory = new Directory(this);
-      connect(m_directory, SIGNAL(newDockAvailable(QMainWindow *)),
-              this, SLOT(addDock(QMainWindow *)));
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)), this, SLOT(removeView(QWidget *)));
+      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+              this, SLOT(removeView(QWidget *)));
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
-      connect(m_directory->project(), SIGNAL(projectSave(Project *)),
+      connect(m_directory->project(), SIGNAL(projectSaved(Project *)),
               this, SLOT(writeSettings(Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
               this, SLOT( raiseWarningTab() ) );
@@ -169,9 +168,12 @@ namespace Isis {
     createMenus();
     createToolBars();
 
+<<<<<<< HEAD
 //  setTabbedViewMode();
 //  centralWidget->setTabsMovable(true);
 //  centralWidget->setTabsClosable(true);
+=======
+>>>>>>> upstream/ipceDocks
     // Read default app settings
     readSettings(m_directory->project() );
 
@@ -184,55 +186,60 @@ namespace Isis {
   }
 
 
-  void IpceMainWindow::addDock(QMainWindow *newWidgetForDock) {
-
-    QDockWidget *dock = new QDockWidget(newWidgetForDock->windowTitle(), this, Qt::SubWindow);
-    dock->setWidget(newWidgetForDock);
-    dock->setObjectName(newWidgetForDock->windowTitle());
-
-    // This needs to eventually be a work order...
-    dock->setAttribute(Qt::WA_DeleteOnClose);
-
-    connect(newWidgetForDock, SIGNAL(destroyed(QObject *)),
-            dock, SLOT(deleteLater()));
-
-    addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
-//    addDockWidget(area, dock, orientation);
-  }
-
-
   /**
-   * This is connected from Directory's newWidgetAvailable signal and called when re-attaching a
-   * view which was detached from the MDI main window.
+   * This is connected from Directory's newWidgetAvailable signal
    *
    * @param[in] newWidget (QWidget *)
    */
-  void IpceMainWindow::addView(QWidget *newWidget) {
+  void IpceMainWindow::addView(QWidget *newWidget, Qt::DockWidgetArea area,
+                               Qt::Orientation orientation) {
+
+    QDockWidget *dock = new QDockWidget(newWidget->windowTitle(), this);
+    dock->setWidget(newWidget);
+    dock->setObjectName(newWidget->windowTitle());
+    dock->setAttribute(Qt::WA_DeleteOnClose);
+    dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+                      QDockWidget::DockWidgetFloatable);
+
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||
          qobject_cast<TemplateEditorWidget *>(newWidget)) {
-      QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
-      dock->setAttribute(Qt::WA_DeleteOnClose, true);
-      dock->setWidget(newWidget);
-      dock->setObjectName(newWidget->windowTitle());
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
     }
     else {
-
+      addDockWidget(area, dock, orientation);
     }
-//    m_dockedWidgets.append
+
+    // Connections for cleanup in both directions to make sure both views and docks are cleaned up
+    connect(newWidget, SIGNAL(destroyed(QObject *)), dock, SLOT(deleteLater()));
+    connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
+    // The list of dock widgets needs cleanup as each view is destroyed
+    connect(dock, SIGNAL(destroyed(QObject *)),
+            this, SLOT(cleanupViewDockList(QObject *)));
+
+    // Save view docks for cleanup during a project close
+    m_viewDocks.append(dock);
+  }
+
+
+  void IpceMainWindow::cleanupViewDockList(QObject *obj) {
+
+    QDockWidget *dock = static_cast<QDockWidget *>(obj);
+    if (dock) {
+      m_viewDocks.removeAll(dock);
+    }
   }
 
 
   /**
    * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will 
-   * close the given view and delete the view.
+   * close the given view and delete the view. This was written to handle
    * 
    * @param view QWidget* 
    *
    */
   void IpceMainWindow::removeView(QWidget *view) {
-
+    
     view->close();
     delete view;
   }
@@ -243,17 +250,14 @@ namespace Isis {
    */
   void IpceMainWindow::removeAllViews() {
     setWindowTitle("ipce");
-
-
-
-    QList<QDockWidget *> docks = tabifiedDockWidgets(m_projectDock);
-    if(docks.count() > 1) {
-      foreach ( QDockWidget* widget, docks ) {
-        if(widget != m_projectDock) {
-          delete widget;
-        }
+    foreach (QDockWidget *dock, m_viewDocks) {
+      if (dock) {
+        removeDockWidget(dock);
+        m_viewDocks.removeAll(dock);
+        delete dock;
       }
     }
+    m_viewDocks.clear();
   }
 
 
@@ -567,6 +571,7 @@ namespace Isis {
         QSettings::NativeFormat);
 
     projectSettings.setValue("geometry", QVariant(geometry()));
+<<<<<<< HEAD
     
     // If we try to restore a state when we don't have the cubes for a view it could cause a crash
     // Therefore we only want to save the state if we are NOT saving to the default area
@@ -574,6 +579,11 @@ namespace Isis {
       projectSettings.setValue("windowState", saveState());
     }
     projectSettings.sync();
+=======
+    projectSettings.setValue("windowState", saveState());
+//  projectSettings.setValue("size", size());
+//  projectSettings.setValue("pos", pos());
+>>>>>>> upstream/ipceDocks
 
     projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
@@ -702,6 +712,7 @@ namespace Isis {
     
     QSettings settings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
+<<<<<<< HEAD
     if (!setFullScreen) {
       setGeometry(settings.value("geometry").value<QRect>());
       restoreState(settings.value("windowState").toByteArray());
@@ -709,6 +720,10 @@ namespace Isis {
     else {
       this->showMaximized();
     }
+=======
+    setGeometry(settings.value("geometry").value<QRect>());
+    restoreState(settings.value("windowState").toByteArray());
+>>>>>>> upstream/ipceDocks
 
     QStringList projectNameList;
     QStringList projectPathList;
@@ -788,7 +803,7 @@ namespace Isis {
         m_directory->project()->save();
       }
     }
-    writeSettings(m_directory->project());
+    //writeSettings(m_directory->project());
     m_directory->project()->clear();
 
     QMainWindow::closeEvent(event);
