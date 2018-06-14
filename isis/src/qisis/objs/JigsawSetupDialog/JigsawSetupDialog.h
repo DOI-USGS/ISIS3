@@ -9,8 +9,12 @@ namespace Ui {
   class JigsawSetupDialog;
 }
 
+class QItemSelection;
+
+
 namespace Isis {
   class Project;
+  class ProjectItem;
   class Control;
 
   /**
@@ -83,6 +87,7 @@ namespace Isis {
   private slots:
 
     void on_pointRadiusSigmaCheckBox_toggled(bool checked);
+    //void on_projectItemSelectionChanged(const QList<ProjectItem *> selectedItems);
     //void on_outlierRejectionCheckBox_toggled(bool checked);
 
     // general tab
@@ -137,6 +142,8 @@ namespace Isis {
     void fillFromSettings(const BundleSettingsQsp settings);
     void showTargetParametersGroupBox();
     void hideTargetParametersGroupBox();
+
+    void createObservationSolveSettingsTreeView();
 
   private:
     Ui::JigsawSetupDialog *m_ui;
