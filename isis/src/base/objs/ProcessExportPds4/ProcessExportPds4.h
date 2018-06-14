@@ -73,6 +73,8 @@ namespace Isis {
    *                           output name. 
    *   @history 2018-05-16 Christopher Combs - Fixed typo in xml namespaces and changed History 
    *                           attributes to elements. Matches pds validate tool specifations.
+   *   @history 2018-06-12 Kristin Berry - Added schema associated with the img class when it is
+   *                           used.
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
