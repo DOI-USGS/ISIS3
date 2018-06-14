@@ -495,7 +495,6 @@ namespace Isis {
 
       Status ComputeApriori();
       Status ComputeResiduals();
-      Status ComputeResiduals_Millimeters();
 
       SurfacePoint GetAdjustedSurfacePoint() const;
 
