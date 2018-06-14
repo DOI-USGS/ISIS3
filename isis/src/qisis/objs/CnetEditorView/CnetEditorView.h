@@ -58,6 +58,10 @@ namespace Isis {
    *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
    *                              was moved from the constructor. createToolBars() was copied and edited
    *                              from CnetEditorWindow. Fixes #5416
+   *    @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                              view has its own toolbar, so having getters that return toolbar
+   *                              actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                              Removed methods that returned menu and toolbar actions.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -68,10 +72,6 @@ class CnetEditorView : public AbstractProjectItemView {
     CnetEditorView(Directory *directory, Control *control, FileName configFile,
                    QWidget *parent = 0);
     ~CnetEditorView();
-
-    virtual QList<QAction *> permToolBarActions();
-    virtual QList<QAction *> activeToolBarActions();
-    virtual QList<QAction *> toolPadActions();
 
     CnetEditorWidget *cnetEditorWidget();
     Control *control();
@@ -113,12 +113,6 @@ class CnetEditorView : public AbstractProjectItemView {
     QPointer<Control> m_control;
 
     QToolBar *m_permToolBar; //!< The permanent tool bar
-    QToolBar *m_activeToolBar; //!< The active tool bar
-    ToolPad *m_toolPad; //!< The tool pad
-
-    QList<QAction *> m_permToolBarActions; //!< The permanent tool bar actions
-    QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
-    QList<QAction *> m_toolPadActions; //!< The tool pad actions
   };
 }
 

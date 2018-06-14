@@ -46,14 +46,10 @@
 #include "Directory.h"
 #include "FileName.h"
 #include "Project.h"
-#include "ToolPad.h"
 #include "ToolList.h"
 #include "XmlStackedHandlerReader.h"
-
-#include "HelpTool.h"
-#include "TrackTool.h"
-
-
+// #include "HelpTool.h"
+// #include "TrackTool.h"
 
 namespace Isis {
   /**
@@ -99,12 +95,8 @@ namespace Isis {
 
     delete m_cnetEditorWidget;
     delete m_permToolBar;
-    delete m_activeToolBar;
-    delete m_toolPad;
 
     m_permToolBar = 0;
-    m_activeToolBar = 0;
-    m_toolPad = 0;
   }
 
   /**
@@ -168,10 +160,6 @@ namespace Isis {
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
 
-    // m_toolPad = new ToolPad("Tool Pad", 0);
-    // m_toolPad->setObjectName("toolPad");
-    // addToolBar(m_toolPad);
-
     QMap< QString, QList< QAction * > > actionMap;
     actionMap = m_cnetEditorWidget->toolBarActions();
     QMapIterator< QString, QList< QAction * > > actionIter(actionMap);
@@ -215,41 +203,6 @@ namespace Isis {
   QSize CnetEditorView::sizeHint() const {
     return QSize(800, 600);
   }
-
-
-  /**
-   * Returns a list of actions for the permanent tool bar.
-   *
-   * @return (QList<QAction *>) The actions
-   */
-  QList<QAction *> CnetEditorView::permToolBarActions() {
-    return m_permToolBar->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return (QList<QAction *>) The actions
-   */
-  QList<QAction *> CnetEditorView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
-  }
-
-
-  /**
-   * Returns a list of actions for the tool pad.
-   *
-   * @return (QList<QAction *>) The actions
-   */
-  QList<QAction *> CnetEditorView::toolPadActions() {
-    return m_toolPad->actions();
-  }
-
-
-
 
   /**
    * This method pushes a new XmlHandler into the parser stack.
