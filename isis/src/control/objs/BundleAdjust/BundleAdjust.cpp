@@ -275,8 +275,9 @@ namespace Isis {
     m_bundleSettings = bundleSettings;
 
     m_abort = false;
+    Progress progress;
     try {
-      m_controlNet = ControlNetQsp( new ControlNet(control.fileName()) );
+      m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
     }
     catch (IException &e) {
       throw;
@@ -551,7 +552,7 @@ namespace Isis {
    */
   bool BundleAdjust::validateNetwork() {
      
-    outputBundleStatus("Validating network...");
+    outputBundleStatus("\nValidating network...");
     
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
@@ -576,7 +577,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    outputBundleStatus("Validation complete!...");
+    outputBundleStatus("\nValidation complete!...\n");
     
     return true;
   }
@@ -803,7 +804,7 @@ namespace Isis {
 
         // solve the system
         if (!solveSystem()) {
-          outputBundleStatus("solve failed!");
+          outputBundleStatus("\nsolve failed!");
           m_bundleResults.setConverged(false);
           break;
         }
@@ -855,20 +856,20 @@ namespace Isis {
         char format = 'f';
         int precision = 10;
 
-        emit statusUpdate(QString("Iteration: %1")
+        emit statusUpdate(QString("Iteration: %1 \n")
                                   .arg(m_iteration));
-        emit statusUpdate(QString("Sigma0: %1")
+        emit statusUpdate(QString("Sigma0: %1 \n")
                                   .arg(m_bundleResults.sigma0(),
                                        fieldWidth,
                                        format,
                                        precision));
-        emit statusUpdate(QString("Observations: %1")
+        emit statusUpdate(QString("Observations: %1 \n")
                                   .arg(m_bundleResults.numberObservations()));
-        emit statusUpdate(QString("Constrained Parameters:%1")
+        emit statusUpdate(QString("Constrained Parameters:%1 \n")
                                   .arg(m_bundleResults.numberConstrainedPointParameters()));
-        emit statusUpdate(QString("Unknowns: %1")
+        emit statusUpdate(QString("Unknowns: %1 \n")
                                   .arg(m_bundleResults.numberUnknownParameters()));
-        emit statusUpdate(QString("Degrees of Freedom: %1")
+        emit statusUpdate(QString("Degrees of Freedom: %1 \n")
                                   .arg(m_bundleResults.degreesOfFreedom()));
         emit iterationUpdate(m_iteration, m_bundleResults.sigma0());
 
@@ -914,7 +915,7 @@ namespace Isis {
 
           if ( numConvergedParams == numImgParams ) {
             m_bundleResults.setConverged(true);
-            emit statusUpdate("Bundle has converged");
+            emit statusUpdate("Bundle has converged\n");
             break;
           }
         }
@@ -923,8 +924,8 @@ namespace Isis {
         clock_t iterationStopClock = clock();
         double iterationTime = (iterationStopClock - iterationStartClock)
                                 / (double)CLOCKS_PER_SEC;
-        emit statusUpdate( QString("End of Iteration %1").arg(m_iteration) );
-        emit statusUpdate( QString("Elapsed Time: %1").arg(iterationTime,
+        emit statusUpdate( QString("End of Iteration %1 \n").arg(m_iteration) );
+        emit statusUpdate( QString("Elapsed Time: %1 \n").arg(iterationTime,
                                                            fieldWidth,
                                                            format,
                                                            precision) );
@@ -959,10 +960,10 @@ namespace Isis {
       if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
         clock_t errorPropStartClock = clock();
         
-        outputBundleStatus("Starting Error Propagation");
+        outputBundleStatus("\nStarting Error Propagation");
         
         errorPropagation();
-        emit statusUpdate("\n\nError Propagation Complete");
+        emit statusUpdate("\n\nError Propagation Complete\n");
         clock_t errorPropStopClock = clock();
         m_bundleResults.setElapsedTimeErrorProp((errorPropStopClock - errorPropStartClock)
                                                 / (double)CLOCKS_PER_SEC);
@@ -980,7 +981,7 @@ namespace Isis {
 
       emit resultsReady(bundleSolveInformation());
 
-      emit statusUpdate("\nBundle Complete");
+      emit statusUpdate("\nBundle Complete\n");
 
       iterationSummary();
     }
@@ -1069,7 +1070,7 @@ namespace Isis {
     int pointIndex = 0;
     int num3DPoints = m_bundleControlPoints.size();
 
-    outputBundleStatus("\n");
+    outputBundleStatus("\n\n");
     
     for (int i = 0; i < num3DPoints; i++) {
 
@@ -1654,7 +1655,7 @@ namespace Isis {
                                                   -1, CHOLMOD_REAL, &m_cholmodCommon);
 
       if ( !m_cholmodTriplet ) {
-        outputBundleStatus("Triplet allocation failure\n");
+        outputBundleStatus("\nTriplet allocation failure\n");
         return false;
       }
 
@@ -1675,7 +1676,7 @@ namespace Isis {
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
 
       if ( !normalsColumn ) {
-        QString status = "SparseBlockColumnMatrix retrieval failure at column " + columnIndex;
+        QString status = "\nSparseBlockColumnMatrix retrieval failure at column " + columnIndex;
         outputBundleStatus(status);
         return false;
       }
@@ -1695,7 +1696,7 @@ namespace Isis {
 
         LinearAlgebra::Matrix *normalsBlock = it.value();
         if ( !normalsBlock ) {
-          QString status = "matrix block retrieval failure at column ";
+          QString status = "\nmatrix block retrieval failure at column ";
           status.append(columnIndex);
           status.append(", row ");
           status.append(rowIndex);
@@ -2474,14 +2475,14 @@ namespace Isis {
         medianDev = residuals[midpointIndex];
       }
 
-      QString status = "median deviation: ";
+      QString status = "\nmedian deviation: ";
       status.append(QString("%1").arg(medianDev));
       status.append("\n");
       outputBundleStatus(status);
       
       mad = 1.4826 * medianDev;
 
-      status = "mad: ";
+      status = "\nmad: ";
       status.append(QString("%1").arg(mad));
       status.append("\n");
       outputBundleStatus(status);
@@ -2489,7 +2490,7 @@ namespace Isis {
       m_bundleResults.setRejectionLimit(median
                                         + m_bundleSettings->outlierRejectionMultiplier() * mad);
 
-      status = "Rejection Limit: ";
+      status = "\nRejection Limit: ";
       status.append(QString("%1").arg(m_bundleResults.rejectionLimit()));
       status.append("\n");
       outputBundleStatus(status);
@@ -2520,6 +2521,8 @@ namespace Isis {
     int numComingBack = 0;
 
     int numObjectPoints = m_bundleControlPoints.size();
+    
+    outputBundleStatus("\n");
     for (int i = 0; i < numObjectPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
@@ -2617,7 +2620,7 @@ namespace Isis {
     
     m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
 
-    status = "Measures that came back: ";
+    status = "\nMeasures that came back: ";
     status.append(QString("%1").arg(numComingBack));
     status.append("\n");
     outputBundleStatus(status);
@@ -2694,7 +2697,7 @@ namespace Isis {
     
     QString status = "     Time: ";
     status.append(currentTime.c_str());
-    status.append("\n");
+    status.append("\n\n");
     outputBundleStatus(status); 
     
     // create and initialize array of 3x3 matrices for all object points
@@ -2836,13 +2839,13 @@ namespace Isis {
         // only update point every 100 points
         if (j%100 == 0) {
           QString status = "\rError Propagation: Inverse Block ";
-          status.append(QString("%1").arg(i+1));
+          status.append(QString::number(i+1));
           status.append(" of ");
-          status.append(QString("%1").arg(numBlockColumns));
+          status.append(QString::number(numBlockColumns));
           status.append("; Point ");
-          status.append(QString("%1").arg(j+1));
+          status.append(QString::number(j+1));
           status.append(" of ");
-          status.append(QString("%1").arg(numObjectPoints));
+          status.append(QString::number(numObjectPoints));
           outputBundleStatus(status);
           emit iterationUpdate(i+1, j+1);
         }
@@ -2900,7 +2903,7 @@ namespace Isis {
           }
 
           catch (std::exception &e) {
-            outputBundleStatus("\n");
+            outputBundleStatus("\n\n");
             QString msg = "Input data and settings are not sufficiently stable "
                           "for error propagation.";
             throw IException(IException::User, msg, _FILEINFO_);
@@ -2923,14 +2926,14 @@ namespace Isis {
     // free b (right-hand side vector
     cholmod_free_dense(&b,&m_cholmodCommon);
 
-    outputBundleStatus("\n");
+    outputBundleStatus("\n\n");
      
     currentTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
     
     status = "\rFilling point covariance matrices: Time ";
     status.append(currentTime.c_str());
     outputBundleStatus(status);
-    outputBundleStatus("\n");
+    outputBundleStatus("\n\n");
 
     // now loop over points again and set final covariance stuff
     int pointIndex = 0;
@@ -3164,7 +3167,6 @@ namespace Isis {
    */
   void BundleAdjust::outputBundleStatus(QString status) {
     if (QCoreApplication::applicationName() != "ipce") { 
-      printf("\n");
       printf("%s", status.toStdString().c_str());
     }
   }
