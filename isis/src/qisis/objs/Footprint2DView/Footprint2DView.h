@@ -72,9 +72,9 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
-   *   @history 2018-05-30 Summer Stapleton - updated the view to remove QMainWindow constructor, 
-   *                           include a central widget and to remove layout capacity. This change 
-   *                           was made to adjust to parent class now inheriting from QMainWindow 
+   *   @history 2018-05-30 Summer Stapleton - updated the view to remove QMainWindow constructor,
+   *                           include a central widget and to remove layout capacity. This change
+   *                           was made to adjust to parent class now inheriting from QMainWindow
    *                           instead of QWidget. References #5433.
    *   @history 2018-06-08 Tracie Sucharski - Remove deletion of m_window from destructor. This
    *                           member variable no longer exists.
@@ -88,9 +88,8 @@ namespace Isis {
       ~Footprint2DView();
 
       MosaicSceneWidget *mosaicSceneWidget();
-      virtual QList<QAction *> permToolBarActions();
-      virtual QList<QAction *> activeToolBarActions();
-      virtual QList<QAction *> toolPadActions();
+
+      //virtual QList<QAction *> toolPadActions();
 
       QSize sizeHint() const;
 
@@ -104,6 +103,9 @@ namespace Isis {
 
       void redrawMeasures();
       void controlPointAdded(QString newPointId);
+
+    public slots:
+      void enableControlNetTool(bool value);
 
     protected:
       bool eventFilter(QObject *watched, QEvent *event);
@@ -145,6 +147,8 @@ namespace Isis {
       QToolBar *m_permToolBar; //!< The permanent tool bar
       QToolBar *m_activeToolBar; //!< The active tool bar
       ToolPad *m_toolPad; //!< The tool pad
+
+      QAction *m_controlNetTool;
 
       QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
   };

@@ -17,7 +17,7 @@ namespace Isis {
 
   /**
    * //TODO: Remove debug printout & comment
-   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal. 
+   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal.
    *                           Is there a better design?  This might go away if we emit signals,
    *                           which only IPCE classes would connect to.
    * @brief Handles Control Net displays
@@ -123,6 +123,8 @@ namespace Isis {
       void displayNewControlPoint(QString pointId);
       void displayChangedControlPoint(QString pointId);
       void displayUponControlPointDeletion();
+      void loadNetwork();
+
 
     protected:
       QAction *getPrimaryAction();
@@ -136,7 +138,6 @@ namespace Isis {
       void displayControlNet();
       void displayConnectivity();
       void closeNetwork();
-      void loadNetwork();
       void randomizeColors();
 
       void objectDestroyed(QObject *);
@@ -169,4 +170,3 @@ namespace Isis {
 };
 
 #endif
-

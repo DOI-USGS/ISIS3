@@ -775,19 +775,19 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
 
     // Note:  This assumes the Control Net tool is the 4th in the toolpad.
-    QList<QAction *> toolbar = result->toolPadActions();
-    QAction* cnetAction = toolbar[3];
-    MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(cnetAction->parent());
+    // QList<QAction *> toolbar = result->toolPadActions();
+    // QAction* cnetAction = toolbar[3];
+    // MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(cnetAction->parent());
 
     connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetAction, SLOT(setEnabled(bool)));
-    connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetTool, SLOT(loadNetwork()));
-
-    //  Control Net tool will only be active if the project has an active Control.
-    if (!project()->activeControl()) {
-      cnetAction->setEnabled(false);
-    }
+             result, SLOT(enableControlNetTool(bool)));
+    // connect (project(), SIGNAL(activeControlSet(bool)),
+    //          cnetTool, SLOT(loadNetwork()));
+    //
+    // //  Control Net tool will only be active if the project has an active Control.
+    // if (!project()->activeControl()) {
+    //   cnetAction->setEnabled(false);
+    // }
 
     return result;
   }
