@@ -52,16 +52,16 @@ namespace Isis {
    *
    * @internal
    *    @history 2018-06-01 Kaitlyn Lee - Because AbstractProjectItemView now inherits from QMainWindow,
-   *                              I added a dummy central widget and set its layout to the grid layout.
-   *                              We used to set the whole CnetEditorView widget's layout, now we only
-   *                              set the central widget's layout.
+   *                            I added a dummy central widget and set its layout to the grid layout.
+   *                            We used to set the whole CnetEditorView widget's layout, now we only
+   *                            set the central widget's layout.
    *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
-   *                              was moved from the constructor. createToolBars() was copied and edited
-   *                              from CnetEditorWindow. Fixes #5416
+   *                            was moved from the constructor. createToolBars() was copied and edited
+   *                            from CnetEditorWindow. Fixes #5416
    *    @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
-   *                              view has its own toolbar, so having getters that return toolbar
-   *                              actions to fill the toolbar of the IpceMainWindow are unnecessary.
-   *                              Removed methods that returned menu and toolbar actions.
+   *                            view has its own toolbar, so having getters that return toolbar
+   *                            actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                            Removed methods that returned menu and toolbar actions.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -85,7 +85,6 @@ class CnetEditorView : public AbstractProjectItemView {
     void createToolBars();
     void createMenus();
 
-    private:
       /**
        * @author 2012-09-?? Steven Lambright
        *

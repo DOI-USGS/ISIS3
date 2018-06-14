@@ -153,6 +153,9 @@ namespace Isis {
 
     delete m_connectionModel;
     m_connectionModel = NULL;
+
+    delete m_sortDialog;
+    m_sortDialog = NULL;
   }
 
 
@@ -191,6 +194,8 @@ namespace Isis {
     m_control = NULL;
     m_settingsPath = NULL;
     m_workingVersion = NULL;
+
+    m_sortDialog = NULL;
   }
 
 

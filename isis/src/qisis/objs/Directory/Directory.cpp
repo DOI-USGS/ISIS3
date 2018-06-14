@@ -393,6 +393,7 @@ namespace Isis {
       }
   }
 
+
   /**
    * @brief Initializes the actions that the Directory can provide to a main window.
    *
@@ -1791,6 +1792,7 @@ namespace Isis {
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
   }
+
 
   /**
    * Autosave for control net.  The control net is auto saved to the same directory as the input

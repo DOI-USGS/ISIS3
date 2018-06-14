@@ -217,7 +217,6 @@ namespace Isis {
 
 
   void IpceMainWindow::cleanupViewDockList(QObject *obj) {
-
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
     if (dock) {
       m_viewDocks.removeAll(dock);
@@ -226,14 +225,12 @@ namespace Isis {
 
 
   /**
-   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
+   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
    * close the given view and delete the view. This was written to handle
    *
-   * @param view QWidget*
-   *
+   * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-    
     view->close();
     delete view;
   }
@@ -781,5 +778,4 @@ namespace Isis {
   void IpceMainWindow::raiseWarningTab() {
     m_warningsDock->raise();
   }
-
 }

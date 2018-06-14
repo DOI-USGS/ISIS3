@@ -382,7 +382,6 @@ namespace Isis {
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
-      //void saveActiveControl();
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
