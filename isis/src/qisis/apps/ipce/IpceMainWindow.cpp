@@ -168,12 +168,10 @@ namespace Isis {
     createMenus();
     createToolBars();
 
-<<<<<<< HEAD
 //  setTabbedViewMode();
 //  centralWidget->setTabsMovable(true);
 //  centralWidget->setTabsClosable(true);
-=======
->>>>>>> upstream/ipceDocks
+
     // Read default app settings
     readSettings(m_directory->project() );
 
@@ -571,7 +569,6 @@ namespace Isis {
         QSettings::NativeFormat);
 
     projectSettings.setValue("geometry", QVariant(geometry()));
-<<<<<<< HEAD
     
     // If we try to restore a state when we don't have the cubes for a view it could cause a crash
     // Therefore we only want to save the state if we are NOT saving to the default area
@@ -579,11 +576,7 @@ namespace Isis {
       projectSettings.setValue("windowState", saveState());
     }
     projectSettings.sync();
-=======
-    projectSettings.setValue("windowState", saveState());
-//  projectSettings.setValue("size", size());
-//  projectSettings.setValue("pos", pos());
->>>>>>> upstream/ipceDocks
+
 
     projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
@@ -712,7 +705,6 @@ namespace Isis {
     
     QSettings settings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
-<<<<<<< HEAD
     if (!setFullScreen) {
       setGeometry(settings.value("geometry").value<QRect>());
       restoreState(settings.value("windowState").toByteArray());
@@ -720,10 +712,6 @@ namespace Isis {
     else {
       this->showMaximized();
     }
-=======
-    setGeometry(settings.value("geometry").value<QRect>());
-    restoreState(settings.value("windowState").toByteArray());
->>>>>>> upstream/ipceDocks
 
     QStringList projectNameList;
     QStringList projectPathList;
