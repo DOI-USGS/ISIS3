@@ -159,8 +159,8 @@ namespace Isis {
    * class value for m_lookJ is set by this method.
    *
    * @param point Surface point (ground position) 
-   * @param cudx [out] Pointer to computed undistored x focal plane coordinate
-   * @param cudy [out] Pointer to computed undistored y focal plane coordinate
+   * @param cudx [out] Pointer to computed undistorted x focal plane coordinate
+   * @param cudy [out] Pointer to computed undistorted y focal plane coordinate
    *
    * @return @b bool If conversion was successful
    */
