@@ -81,9 +81,9 @@ class CnetEditorView : public AbstractProjectItemView {
     void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
-    private:
-      void createToolBars();
-      void createMenus();
+  private:
+    void createToolBars();
+    void createMenus();
 
     private:
       /**
