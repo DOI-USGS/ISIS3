@@ -61,7 +61,6 @@ namespace Isis {
     double range();
     double sigmaRange();
     iTime time();
-//    QList < QString > snSimultaneous() const;
     QStringList snSimultaneous() const;
     bool isSimultaneous(QString serialNumber);
 

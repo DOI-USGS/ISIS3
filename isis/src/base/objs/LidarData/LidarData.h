@@ -38,7 +38,8 @@ namespace Isis {
    *                           apriori variance/covariance matrix, adjusted point coordinates,
    *                           and adjusted variance/covariance matrix to the read and
    *                           write methods. Ref #5343.
-   *  
+   *   @history 2018-06-14 Ken Edmundson - Added typedef for QSharedPointer to LidarData object.
+   *
    */
   class LidarData {
 
@@ -71,5 +72,8 @@ namespace Isis {
       QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
   };
 
-};
+  // typedefs
+  //! Definition for a shared pointer to a LidarData object.
+  typedef QSharedPointer<LidarData> LidarDataQsp;
+}
 #endif

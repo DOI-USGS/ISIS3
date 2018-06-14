@@ -1001,6 +1001,9 @@ namespace Isis {
    * @history 2012-01-18 Debbie A. Cook, Revised to call
    *                            ComputeResidualsMillimeters() to avoid
    *                            duplication of code
+   * @history 2018-06-13 Debbie A. Cook, Ken Edmundson, Removed method ComputeResidualsMillimeters()
+   *                            and the call to it that was in this method. Added computation of
+   *                            focal plane computedx and computedy here.
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (IsIgnored()) {
@@ -1033,7 +1036,26 @@ namespace Isis {
       // measurement sample/line to get the computed sample/line.  This must be
       // done manually because the camera will compute a new time for line scanners,
       // instead of using the measured time.
-      ComputeResiduals_Millimeters();
+//      ComputeResiduals_Millimeters();
+      double cudx = 0.0;
+      double cudy = 0.0;
+
+      // Map the lat/lon/radius of the control point through the Spice of the
+      // measurement sample/line to get the computed undistorted focal plane
+      // coordinates (mm if not radar).  This works for radar too because in
+      // the undistorted focal plane, y has not been set to 0 (set to 0 when
+      // going to distorted focal plane or ground range in this case), so we
+      // can hold the Spice to calculate residuals in undistorted focal plane
+      // coordinates.
+      if (cam->GetCameraType() != 0) {  // no need to call setimage for framing camera
+        cam->SetImage(m->GetSample(), m->GetLine());
+      }
+
+      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      // double mudx = m->GetFocalPlaneMeasuredX();
+      // double mudy = m->GetFocalPlaneMeasuredY();
+
+      m->SetFocalPlaneComputed(cudx, cudy);
 
       if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
 
@@ -1041,7 +1063,7 @@ namespace Isis {
         // but some of the camera maps could fail.  One that won't is the
         // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
         // distortion map and have residuals in undistorted pixels.
-        if (!fpmap->SetFocalPlane(m->GetFocalPlaneComputedX(), m->GetFocalPlaneComputedY())) {
+        if (!fpmap->SetFocalPlane(cudx, cudy)) {
           QString msg = "Sanity check #1 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1142,71 +1164,6 @@ namespace Isis {
     return Success;
   }
 
-  /**
-   * This method computes the residuals for a point.
-   *
-   * @history 2008-07-17  Tracie Sucharski -  Added ptid and measure serial
-   *                            number to the unable to map to surface error.
-   * @history 2010-12-06  Tracie Sucharski - Renamed from ComputeErrors
-   * @history 2011-03-19  Debbie A. Cook - Changed to use the Camera classes
-   *                            like ComputeResiduals and get the correct
-   *                            calculations for each camera type.
-   * @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
-   *                            was really checking for Candidate measures.
-   * @history 2012-01-18 Debbie A. Cook - Made radar case the same as
-   *                            other instruments and removed incorrect
-   *                            call to SetResidual, which was setting
-   *                            focal plane residuals in x and y instead
-   *                            of image residuals in sample and line.
-   */
-
-  ControlPoint::Status ControlPoint::ComputeResiduals_Millimeters() {
-    if (IsIgnored()) {
-      return Failure;
-    }
-
-    PointModified();
-
-    // Loop for each measure to compute the error
-    QList<QString> keys = measures->keys();
-
-    for (int j = 0; j < keys.size(); j++) {
-      ControlMeasure *m = (*measures)[keys[j]];
-      if (m->IsIgnored()) {
-        continue;
-      }
-      // The following lines actually check for Candidate measures
-      // Commented out on 2011-03-24 by DAC
-//       if (!m->IsMeasured()) {
-//         continue;
-
-      // TODO:  Should we use crater diameter?
-      Camera *cam = m->Camera();
-      double cudx, cudy;
-
-      // Map the lat/lon/radius of the control point through the Spice of the
-      // measurement sample/line to get the computed undistorted focal plane
-      // coordinates (mm if not radar).  This works for radar too because in
-      // the undistorted focal plane, y has not been set to 0 (set to 0 when
-      // going to distorted focal plane or ground range in this case), so we
-      // can hold the Spice to calculate residuals in undistorted focal plane
-      // coordinates.
-      if (cam->GetCameraType() != 0) {  // no need to call setimage for framing camera
-        cam->SetImage(m->GetSample(), m->GetLine());
-      }
-
-      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
-      // double mudx = m->GetFocalPlaneMeasuredX();
-      // double mudy = m->GetFocalPlaneMeasuredY();
-
-      m->SetFocalPlaneComputed(cudx, cudy);
-
-      // This is wrong.  The stored residual is in pixels (sample,line), not x and y
-      // m->SetResidual(mudx - cudx, mudy - cudy);
-    }
-
-    return Success;
-  }
 
   QString ControlPoint::GetChooserName() const {
     if (chooserName != "") {
@@ -1217,10 +1174,12 @@ namespace Isis {
     }
   }
 
+
   //! Returns true if the choosername is not empty.
   bool ControlPoint::HasChooserName() const {
     return !chooserName.isEmpty();
   }
+
 
   //! Returns true if the datetime is not empty.
   bool ControlPoint::HasDateTime() const {

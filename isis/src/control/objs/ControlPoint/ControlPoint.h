@@ -343,6 +343,9 @@ namespace Isis {
    *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
+   *   @history 2018-06-13 Debbie A. Cook, Ken Edmundson, Removed method
+   *                           ComputeResidualsMillimeters() and added computation of focal plane
+   *                           computedx and computedy to ComputeResiduals method.
    */
   class ControlPoint : public QObject {
 
@@ -492,7 +495,6 @@ namespace Isis {
 
       Status ComputeApriori();
       Status ComputeResiduals();
-      Status ComputeResiduals_Millimeters();
 
       SurfacePoint GetAdjustedSurfacePoint() const;
 
