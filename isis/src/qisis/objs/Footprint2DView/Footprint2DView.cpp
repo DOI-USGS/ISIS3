@@ -151,7 +151,6 @@ namespace Isis {
     setAcceptDrops(true);
   }
 
-
   /**
    * Destructor
    */
@@ -321,6 +320,8 @@ namespace Isis {
    * A slot function that is called when directory emits a siganl that an active
    * control network is set. It enables the control network editor tool in the
    * toolpad and loads the network.
+   * TODO 2018-06-14 Kaitlyn Lee - Commented out code that loads the network,
+   * since it does not actually load the network. Left it here to research further.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
     m_controlNetTool->setEnabled(value);
