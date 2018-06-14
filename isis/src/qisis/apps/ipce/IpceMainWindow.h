@@ -134,7 +134,10 @@ namespace Isis {
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
    *                           widget. Added addDock method. Remove all methods having to do with
    *                           MDI sub-windows, detached views.
-   *  
+   *   @history 2018-06-14 Makayla Shepherd - ipce now defaults to full screen if there is not an
+   *                           ipce.config in the project or in ~/.Isis/ipce.
+   *   @history 2018-06-14 Makayla Shepherd - We are no longer saving the state of a temporary
+   *                           project.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -162,7 +165,7 @@ namespace Isis {
 
       void raiseWarningTab();
       
-      void writeSettings(const Project *project) const;
+      void writeSettings(Project *project);
       
     private:
       Q_DISABLE_COPY(IpceMainWindow);
