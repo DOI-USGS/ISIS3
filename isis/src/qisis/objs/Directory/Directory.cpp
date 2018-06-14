@@ -718,24 +718,11 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
     connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
 
-    // Note:  This assumes the Control Net tool is the 1st in the toolpad.
-    // QList<QAction *> toolbar = result->toolPadActions();
-    // QAction* cnetAction = toolbar[0];
-    // ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
-
     connect (project(), SIGNAL(activeControlSet(bool)),
              result, SLOT(enableControlNetTool(bool)));
-    // connect (project(), SIGNAL(activeControlSet(bool)),
-    //          cnetTool, SLOT(loadNetwork()));
-
-    //  If an active control has not been set, make the control net tool inactive
-    // if (!project()->activeControl()) {
-    //   cnetAction->setEnabled(false);
-    // }
 
     return result;
   }
-
 
   /**
    * @brief Add the qmos view widget to the window.
@@ -774,20 +761,8 @@ namespace Isis {
     //  to be drawn with different color/shape.
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
 
-    // Note:  This assumes the Control Net tool is the 4th in the toolpad.
-    // QList<QAction *> toolbar = result->toolPadActions();
-    // QAction* cnetAction = toolbar[3];
-    // MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(cnetAction->parent());
-
     connect (project(), SIGNAL(activeControlSet(bool)),
              result, SLOT(enableControlNetTool(bool)));
-    // connect (project(), SIGNAL(activeControlSet(bool)),
-    //          cnetTool, SLOT(loadNetwork()));
-    //
-    // //  Control Net tool will only be active if the project has an active Control.
-    // if (!project()->activeControl()) {
-    //   cnetAction->setEnabled(false);
-    // }
 
     return result;
   }
