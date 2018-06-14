@@ -5,7 +5,6 @@ channels:
   - conda-forge
   - probcomp
   - anaconda
-  - jlaura
   - defaults
 dependencies:
   - libgfortran==3.0
@@ -47,7 +46,7 @@ dependencies:
   - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
   - opencv==3.3.0
-  - nanoflann==1.22
+  - nanoflann==1.2.2
   - gmm==5.0
   - jama==125
   - openssl==1.0.2n=0
