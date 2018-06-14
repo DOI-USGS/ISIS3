@@ -285,6 +285,8 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
    *                           in each of the constructors to verify valid control net input.
    *                           Fixes #5068.
+   *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
+   *                           aborted. Added emits for status updates to the run widget.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

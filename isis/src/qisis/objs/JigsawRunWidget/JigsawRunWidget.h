@@ -91,6 +91,10 @@ namespace Isis {
    *                           Now inherits from QFrame instead of QDialog. Added support for new
    *                           workflow in which JigsawSetupDialog is only ever called from a
    *                           button on this widget. Fixes #5428. 
+   *   @history 2018-06-14 Christopher Combs - Made changes according to new design mockup. Added 
+   *                           status bar, control net info, and rms adj point sigmas sections. 
+   *                           Removed buttons for close and reject. Now inherits from QDockWidget
+   *                           instead of QFrame, and handles close event if a bundle is running. 
    */
   class JigsawRunWidget : public QDockWidget {
     Q_OBJECT
