@@ -137,8 +137,8 @@ namespace Isis {
    *                           for cleanup because there is no way to get the dock from the view.
    *                           Cleanup connections are made for the views and the docks to ensure
    *                           that cleanup happens for both.  Fixes #5433.
-   *   @history 2018-06-13 Kaitlyn Lee - Commented out code adding the save active control net button and
-   *                           the toolpad, since they are not currently being used.
+   *   @history 2018-06-13 Kaitlyn Lee - Removed code adding the save active control net button and
+   *                           the toolpad, since control nets can be saved with the project save button.
    *
    */
   class IpceMainWindow : public QMainWindow {

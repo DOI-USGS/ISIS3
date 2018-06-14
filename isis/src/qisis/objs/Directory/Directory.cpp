@@ -1792,28 +1792,6 @@ namespace Isis {
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
   }
 
-
-  /**
-   * Save the current active control.
-   * 6-13-18 Kaitlyn Lee - Commented this out because it is not currently being used
-   */
-  // void Directory::saveActiveControl() {
-  //
-  //   if (project()->activeControl()) {
-  //     project()->activeControl()->write();
-  //     // add to HistoryTreeWidget
-  //     QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
-  //       "has been saved.";
-  //     m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
-  //   }
-  //
-  //   // Make sure the ControlPointEditView "Save Net" button is no longer red
-  //   if (controlPointEditView()) {
-  //     controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
-  //   }
-  // }
-
-
   /**
    * Autosave for control net.  The control net is auto saved to the same directory as the input
    * net.  It is saved to controlNetFilename.net.bak.
