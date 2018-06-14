@@ -464,7 +464,6 @@ namespace Isis {
     QSize iconSize(25, 45);
     m_permToolBar->setIconSize(iconSize);
     m_permToolBar->setObjectName("PermanentToolBar");
-    m_permToolBar->setToolTip("PermanentToolBar");
 
     addToolBar(m_permToolBar);
 
