@@ -102,14 +102,6 @@ namespace Isis {
     strncpy(env, "LANG=en_US", 1023);
     putenv(env);
 
-    // Verify ISISROOT was set
-    if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
-      QString message = "Please set ISISROOT before running any Isis "
-          "applications";
-      cerr << message << endl;
-      abort();
-    }
-
     // add qt path to 3rdParty so no default is taken from enviroment
     QString pluginPath = getenv("ISISROOT");
     pluginPath.append("/3rdParty/lib/");
