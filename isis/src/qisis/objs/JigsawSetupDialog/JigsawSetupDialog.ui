@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -311,7 +311,9 @@
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Image measures are flagged as rejected if their residuals are greater than the multiplier times the current standatd deviation (sigma)</string>
+                     <string>Image measures are flagged as rejected if their residuals are greater 
+than the multiplier times the current standard deviation (sigma). 
+Valid Range: 1.0e-10 to 1.0e+10</string>
                     </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
@@ -388,6 +390,9 @@
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1.0e-10 to 1.0</string>
+                    </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
@@ -454,6 +459,12 @@
                       <width>100</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="acceptDrops">
+                     <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1.0e-10 to 1.0</string>
                     </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -545,6 +556,9 @@
                       <width>100</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1.0e-10 to 1.0</string>
                     </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -716,6 +730,9 @@
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1.0e-10 to 1.0e+10</string>
+                    </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;Sigma&amp;amp;0 Threshold&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
@@ -781,6 +798,9 @@
                       <width>100</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1 to 10,000</string>
                     </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;Ma&amp;amp;ximum Iterations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -933,6 +953,9 @@
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 0.0 to 360.0</string>
+                    </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
                     </property>
@@ -1012,7 +1035,8 @@
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Solve for local point radii</string>
+                     <string>Solve for local point radii. 
+Valid Range: 1.0e-10 to 1.0e+10</string>
                     </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
@@ -1038,6 +1062,9 @@
                       <width>100</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 0.0 to 360.0</string>
                     </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Latitude&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
