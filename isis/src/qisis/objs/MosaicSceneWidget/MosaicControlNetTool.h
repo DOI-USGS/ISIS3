@@ -123,8 +123,6 @@ namespace Isis {
       void displayNewControlPoint(QString pointId);
       void displayChangedControlPoint(QString pointId);
       void displayUponControlPointDeletion();
-      void loadNetwork();
-
 
     protected:
       QAction *getPrimaryAction();
@@ -138,6 +136,7 @@ namespace Isis {
       void displayControlNet();
       void displayConnectivity();
       void closeNetwork();
+      void loadNetwork();
       void randomizeColors();
 
       void objectDestroyed(QObject *);
