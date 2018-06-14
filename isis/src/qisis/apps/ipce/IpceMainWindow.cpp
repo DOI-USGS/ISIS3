@@ -102,8 +102,8 @@ namespace Isis {
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
-      connect(m_directory->project(), SIGNAL(projectSave(const Project *)),
-              this, SLOT(writeSettings(const Project *)));
+      connect(m_directory->project(), SIGNAL(projectSave(Project *)),
+              this, SLOT(writeSettings(Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
               this, SLOT( raiseWarningTab() ) );
     }
@@ -545,7 +545,7 @@ namespace Isis {
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
    */
-  void IpceMainWindow::writeSettings(const Project *project) const {
+  void IpceMainWindow::writeSettings(Project *project) {
 
     // Ensure that we are not using a NULL pointer
     if (!project) {
@@ -567,10 +567,13 @@ namespace Isis {
         QSettings::NativeFormat);
 
     projectSettings.setValue("geometry", QVariant(geometry()));
-    projectSettings.setValue("windowState", saveState());
+    
+    // If we try to restore a state when we don't have the cubes for a view it could cause a crash
+    // Therefore we only want to save the state if we are NOT saving to the default area
+    if (!project->isTemporaryProject()) {
+      projectSettings.setValue("windowState", saveState());
+    }
     projectSettings.sync();
-//  projectSettings.setValue("size", size());
-//  projectSettings.setValue("pos", pos());
 
     projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
@@ -676,8 +679,15 @@ namespace Isis {
     QString appName = QApplication::applicationName();
     QString filePath = project->projectRoot() + "/ipce.config";
     
+    bool setFullScreen = false;
     if (!FileName(filePath).fileExists()) {
       filePath = "$HOME/.Isis/" + appName + "/ipce.config";
+      
+      // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in 
+      // in full screen. Meaning the default geometry is full screen
+      if (!FileName(filePath).fileExists()) {
+        setFullScreen = true;
+      }
     }
     
     if (project->name() == "Project") {
@@ -689,11 +699,16 @@ namespace Isis {
       setWindowTitle(projName );
     }
 
-    // TODO Need to decide what the default geometry is
+    
     QSettings settings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
-    setGeometry(settings.value("geometry").value<QRect>());
-    restoreState(settings.value("windowState").toByteArray());
+    if (!setFullScreen) {
+      setGeometry(settings.value("geometry").value<QRect>());
+      restoreState(settings.value("windowState").toByteArray());
+    }
+    else {
+      this->showMaximized();
+    }
 
     QStringList projectNameList;
     QStringList projectPathList;
