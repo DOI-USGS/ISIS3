@@ -52,6 +52,9 @@ namespace Isis {
    *   @history 2017-09-18 Jeannie Backer - Added check to verify that values
    *                           passed into SetFocalPlane and SetUndistortedFocalPlane
    *                           are within valid range. References #5155
+   *   @history 2018-06-14 Kristin Berry - Switched from using qFuzzyCompare to
+   *                           abs(val) < epsilon for comparison to fix "distortion
+   *                           model not being applied" error. 
    */
   class TgoCassisDistortionMap : public CameraDistortionMap {
     public:
