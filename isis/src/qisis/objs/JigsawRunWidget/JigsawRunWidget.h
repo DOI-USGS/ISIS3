@@ -132,8 +132,6 @@ namespace Isis {
 
   private:
     bool m_bRunning; /**< Indicates whether or not the bundle adjust is running. */
-    QPushButton *m_accept; /**< widget's accept button that is used to save the bundle results. */
-    QPushButton *m_reject; /**< widget's reject button that is used to discard the results. */
     QThread *m_bundleThread; /**< separate thread for running bundle adjust calculations in. */
 
     /**
@@ -156,10 +154,9 @@ namespace Isis {
     };
 
   private slots:
-    void on_JigsawSetupButton_pressed();
+    void on_JigsawSetupButton_clicked();
     void on_JigsawRunButton_clicked();
-    void acceptBundleResults();
-    void rejectBundleResults();
+    void on_JigsawAcceptButton_clicked();
     void clearDialog();
     void updateScrollBar();
 

@@ -81,27 +81,9 @@ namespace Isis {
     // Note: The buttons are added to the UI setup from the JigsawRunWidget.ui file.
     // These could have been added to the UI file itself (as XML).
 
-    // Three buttons: Accept, Reject, Close. Initially only close is enabled.
-    // Close is only disabled when a bundle is running.
-    // After a bundle is successfully run, reject and accept are enabled.
-    // If aborting a bundle, only close will be enabled.
-    m_accept = new QPushButton(tr("&Accept"));
-    m_reject = new QPushButton(tr("&Reject"));
-    m_accept->setEnabled(false);
-    m_reject->setEnabled(false);
+
+    // After a bundle is successfully run, accept is enabled.
     m_ui->JigsawRunButton->setEnabled(false);
-
-    // Add tool tips to the buttons
-    m_accept->setToolTip(tr("Accept the bundle results and save them to the project."));
-    m_reject->setToolTip(tr("Reject and discard the bundle results. This resets the widget."));
-
-    // m_ui->buttonBox->addButton(m_accept, QDialogButtonBox::ActionRole);
-    // m_ui->buttonBox->addButton(m_reject, QDialogButtonBox::ActionRole);
-
-    // Accept will handle saving the results.
-    connect(m_accept, SIGNAL(clicked(bool)), this, SLOT(acceptBundleResults()));
-    // Reject will handle discarding the results.
-    connect(m_reject, SIGNAL(clicked(bool)), this, SLOT(rejectBundleResults()));
 
     m_bundleAdjust = NULL;
     m_bundleSolutionInfo = NULL;
@@ -148,7 +130,7 @@ namespace Isis {
   }
 
 
-  void JigsawRunWidget::on_JigsawSetupButton_pressed() {
+  void JigsawRunWidget::on_JigsawSetupButton_clicked() {
 
     // Each time the SetUp button is pressed, create JigsawSetupDialog object with
     // project,
@@ -183,8 +165,7 @@ namespace Isis {
 
   void JigsawRunWidget::on_JigsawRunButton_clicked() {
     // Once a bundle is run, the previous results cannot be accepted or rejected.
-    m_accept->setEnabled(false);
-    m_reject->setEnabled(false);
+    m_ui->JigsawAcceptButton->setEnabled(false);
 
     if (!m_bRunning) {
       // ??? warning dialogs ???
@@ -289,88 +270,10 @@ namespace Isis {
 
 
   /**
-   * Constructs a image copier functor for copying images used in the bundle adjustment to the
-   * bundle solution info results (when the bundle is accepted).
+   * Accepts the bundle results and saves them to the project. The "Accept" button will be disabled.
    */
-  JigsawRunWidget::CopyImageToResultsFunctor::CopyImageToResultsFunctor(const QDir &destination) {
-    m_destinationFolder = destination;
-  }
-
-
-  /**
-   * Destructor.
-   */
-  JigsawRunWidget::CopyImageToResultsFunctor::~CopyImageToResultsFunctor() {
-    m_destinationFolder = QDir();
-  }
-
-
-  /**
-   * @brief Callable operator that copies an image to the bundle solution info results.
-   *
-   * This makes the functor callable - this will copy the passed FileName and return a pointer
-   * to the newly copied external cube.
-   *
-   * @param const FileName &image File name of the image to create an external copy of.
-   *
-   * @return Cube* Returns a pointer to the external cube copy. Returns NULL if an error
-   *               occurs.
-   */
-  Cube *JigsawRunWidget::CopyImageToResultsFunctor::operator()(const FileName &image) {
-    try {
-      Cube *result = NULL;
-
-      // Get the destination folder and create that path.
-      FileName destination(QFileInfo(m_destinationFolder, image.name()).absoluteFilePath());
-      m_destinationFolder.mkpath(destination.path());
-
-      // The input FileName will be referencing an imported ecub file.
-      // Need to get the .cub file (via Cube::externalCubeFileName) to copy.
-      // This method returns whatever value is set for the ^DnFile keyword... will not contain
-      // a path if the .ecub and .cub are in the same directory.
-      Cube importCube(image, "r");
-      FileName dnCubeFileName;
-      // The .ecub's ^DnFile is cubeFileName.cub (.ecub sitting next to .cub)
-      if (importCube.externalCubeFileName().path() == ".") {
-
-        QDir relative(m_destinationFolder.absolutePath());
-        dnCubeFileName = FileName(QDir(image.path()).canonicalPath() + "/" + importCube.externalCubeFileName().name());
-        QString s = relative.relativeFilePath(dnCubeFileName.toString());
-        // Locate the DnFile cube by using the input image's (ecub) path and the DnFile name (cub)
-        //dnCubeFileName = FileName(image.path() + "/" + importCube.externalCubeFileName().name());
-        // WHY DO WE NEED TO USE QDIR canonical path? why is the image.path relative and not abs?
-        //dnCubeFileName = FileName(s);
-        dnCubeFileName = FileName(QDir(image.path()).canonicalPath() + "/" +
-                                  importCube.externalCubeFileName().name());
-        Cube dnCube(dnCubeFileName, "r");
-
-
-        result = dnCube.copy(destination, CubeAttributeOutput("+External"));
-        result->relocateDnData(s);
-      }
-      // The .ecub's ^DnFile is an absolute path (.ecub potentially not located next to .cub)
-      else {
-        dnCubeFileName = importCube.externalCubeFileName();
-        Cube dnCube(dnCubeFileName, "r");
-        result = dnCube.copy(destination, CubeAttributeOutput("+External"));
-      }
-      return result;
-    }
-    // Error tracking should be more robust, see ImportImagesWorkOrder.
-    catch (IException &e) {
-      std::cout << "\nerror: " << e.what();
-      return NULL;
-    }
-  }
-
-
-  /**
-   * Accepts the bundle results and saves them to the project. The "Accept" and "Reject" buttons
-   * will be disabled.
-   */
-  void JigsawRunWidget::acceptBundleResults() {
-    m_accept->setEnabled(false);
-    m_reject->setEnabled(false);
+  void JigsawRunWidget::on_JigsawAcceptButton_clicked() {
+    m_ui->JigsawAcceptButton->setEnabled(false);
 
     // create bundle results folder
     QString runTime = m_bundleSolutionInfo->runTime();
@@ -485,26 +388,78 @@ namespace Isis {
 
 
   /**
-   * Rejects the bundle results and discards them. The "Accept" and "Reject" buttons will be
-   * disabled.
+   * Constructs a image copier functor for copying images used in the bundle adjustment to the
+   * bundle solution info results (when the bundle is accepted).
    */
-  void JigsawRunWidget::rejectBundleResults() {
-    // TODO should there be a prompt to user (are you sure?) -- Annoying?
-    // TODO Add tooltip/what'sthis for the buttons!!!! (CTR)
-    // Disable the "Accept" and "Reject" buttons, enable the "Close" button
-    m_accept->setEnabled(false);
-    m_reject->setEnabled(false);
+  JigsawRunWidget::CopyImageToResultsFunctor::CopyImageToResultsFunctor(const QDir &destination) {
+    m_destinationFolder = destination;
+  }
 
-    // Clear the dialog so the lcd's are 0 and the status text is cleared.
-    clearDialog();
-    QString statusText("Bundle Rejected.\n\n");
-    m_ui->statusUpdatesLabel->setText(statusText);
 
-    // Cleanup the results (bundle solution info)
-    // How does this affect m_bundleSettings or m_bundleAdjustment?
-    // How does this affect using the last (most recent) settings for the run?
-    delete m_bundleSolutionInfo;
-    m_bundleSolutionInfo = NULL;
+  /**
+   * Destructor.
+   */
+  JigsawRunWidget::CopyImageToResultsFunctor::~CopyImageToResultsFunctor() {
+    m_destinationFolder = QDir();
+  }
+
+
+  /**
+   * @brief Callable operator that copies an image to the bundle solution info results.
+   *
+   * This makes the functor callable - this will copy the passed FileName and return a pointer
+   * to the newly copied external cube.
+   *
+   * @param const FileName &image File name of the image to create an external copy of.
+   *
+   * @return Cube* Returns a pointer to the external cube copy. Returns NULL if an error
+   *               occurs.
+   */
+  Cube *JigsawRunWidget::CopyImageToResultsFunctor::operator()(const FileName &image) {
+    try {
+      Cube *result = NULL;
+
+      // Get the destination folder and create that path.
+      FileName destination(QFileInfo(m_destinationFolder, image.name()).absoluteFilePath());
+      m_destinationFolder.mkpath(destination.path());
+
+      // The input FileName will be referencing an imported ecub file.
+      // Need to get the .cub file (via Cube::externalCubeFileName) to copy.
+      // This method returns whatever value is set for the ^DnFile keyword... will not contain
+      // a path if the .ecub and .cub are in the same directory.
+      Cube importCube(image, "r");
+      FileName dnCubeFileName;
+      // The .ecub's ^DnFile is cubeFileName.cub (.ecub sitting next to .cub)
+      if (importCube.externalCubeFileName().path() == ".") {
+
+        QDir relative(m_destinationFolder.absolutePath());
+        dnCubeFileName = FileName(QDir(image.path()).canonicalPath() + "/" + importCube.externalCubeFileName().name());
+        QString s = relative.relativeFilePath(dnCubeFileName.toString());
+        // Locate the DnFile cube by using the input image's (ecub) path and the DnFile name (cub)
+        //dnCubeFileName = FileName(image.path() + "/" + importCube.externalCubeFileName().name());
+        // WHY DO WE NEED TO USE QDIR canonical path? why is the image.path relative and not abs?
+        //dnCubeFileName = FileName(s);
+        dnCubeFileName = FileName(QDir(image.path()).canonicalPath() + "/" +
+                                  importCube.externalCubeFileName().name());
+        Cube dnCube(dnCubeFileName, "r");
+
+
+        result = dnCube.copy(destination, CubeAttributeOutput("+External"));
+        result->relocateDnData(s);
+      }
+      // The .ecub's ^DnFile is an absolute path (.ecub potentially not located next to .cub)
+      else {
+        dnCubeFileName = importCube.externalCubeFileName();
+        Cube dnCube(dnCubeFileName, "r");
+        result = dnCube.copy(destination, CubeAttributeOutput("+External"));
+      }
+      return result;
+    }
+    // Error tracking should be more robust, see ImportImagesWorkOrder.
+    catch (IException &e) {
+      std::cout << "\nerror: " << e.what();
+      return NULL;
+    }
   }
 
 
@@ -683,8 +638,7 @@ namespace Isis {
     m_bundleSolutionInfo = bundleSolutionInfo;
 
     // Since results are available, the user can accept (save) or reject(discard) the results.
-    m_accept->setEnabled(true);
-    m_reject->setEnabled(true);
+    m_ui->JigsawAcceptButton->setEnabled(true);
   }
 
 

@@ -3094,7 +3094,7 @@ namespace Isis {
     /**
    * Returns if the BundleAdjust has been aborted.
    *
-   * @return @b bool If the BundleAdjust converged.
+   * @return @b bool If the BundleAdjust was aborted.
    */
   bool BundleAdjust::isAborted() {
     return m_abort;

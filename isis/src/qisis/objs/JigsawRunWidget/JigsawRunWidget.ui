@@ -562,7 +562,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="JigsawAcceptButton">
                <property name="enabled">
                 <bool>false</bool>
                </property>
