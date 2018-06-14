@@ -236,14 +236,12 @@ namespace Isis {
     zoomTool->activate(true);
   }
 
-
   /**
-   * This is a slot function which is called when directory emits a siganl to
-   * CubeDnView when an active control network is set. It enables the control
-   * network editor tool in the toolpad.
+   * A slot function that is called when directory emits a siganl that an active
+   * control network is set. It enables the control network editor tool in the
+   * toolpad and loads the network.
    */
   void CubeDnView::enableControlNetTool(bool value) {
-
     foreach (QAction * action, m_toolPad->actions()) {
       if (action->objectName() == "ControlNetTool") {
         action->setEnabled(value);
@@ -303,16 +301,6 @@ namespace Isis {
 
     return item->isShape();
   }
-
-  /**
-   * Returns a list of actions for the tool pad.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::toolPadActions() {
-    return m_toolPad->actions();
-  }
-
 
   /**
    * Slot to connect to the currentChanged() signal from a selection

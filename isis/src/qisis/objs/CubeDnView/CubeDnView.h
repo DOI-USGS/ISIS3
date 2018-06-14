@@ -89,7 +89,6 @@ namespace Isis {
    *                           view has its own toolbar, so having getters that return toolbar
    *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
    *                           Removed methods that returned menu and toolbar actions.
-   *                           toolPadActions() is still needed because it is used in Directory.
    *                           Removed connections that connected the project and CubeDnView and called
    *                           enableControlNetTool() because Directory now does this.
    */
@@ -100,8 +99,6 @@ namespace Isis {
     public:
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
-
-      virtual QList<QAction *> toolPadActions();
 
       QSize sizeHint() const;
 
