@@ -83,7 +83,14 @@ namespace Isis {
       ProcessExportPds4();
       ~ProcessExportPds4();
 
+      enum ImageType {
+        StandardImage,
+        BinSetSpectrum,
+        UniformlySampledSpectrum
+      };
+
       QDomDocument &StandardPds4Label();
+      QDomDocument &SpectralPds4Label();
       void StandardAllMapping();
 
       void CreateImageLabel();
@@ -102,6 +109,7 @@ namespace Isis {
       void addHistory(QString description, QString date = "tbd", QString version = "1.0");
       void setLogicalId(QString lid);
       void setSchemaLocation(QString schema);
+      void setImageType(ImageType imageType);
 
       static void translateUnits(QDomDocument &label,
                                  QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
@@ -114,7 +122,6 @@ namespace Isis {
       void standardBandBin(); 
       void displaySettings();
       void fileAreaObservational();
-      QString imageObjectType(Pvl &inputLabel);
       QString PDS4PixelType(PixelType pixelType, ByteOrder endianType);
       static QMap<QString, QString> createUnitMap(Pvl configPvl);
       static void translateChildUnits(QDomElement parent, QMap<QString, QString> transMap);
@@ -122,6 +129,7 @@ namespace Isis {
       QDomDocument *m_domDoc;               //!< XML label.
       QString m_schemaLocation;             //!< QString with all schema locations required.
       QString m_lid;                        //!< QString with specified logical identifier.
+      ImageType m_imageType;                //!< Type of image data to be written.
 
   };
 }
