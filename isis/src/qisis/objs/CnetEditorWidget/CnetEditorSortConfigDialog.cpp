@@ -23,7 +23,7 @@ namespace Isis {
     CnetEditorWidget *cnetWidget) : QDialog(cnetWidget) {
     m_cnetWidget = cnetWidget;
 
-    setWindowTitle("Table Sorting Dialog");
+    setWindowTitle("Table Sorting");
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setColumnMinimumWidth(0, 20);

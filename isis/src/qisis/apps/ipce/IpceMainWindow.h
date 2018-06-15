@@ -200,8 +200,6 @@ namespace Isis {
       static const int m_maxRecentProjects = 5;
 
       QToolBar *m_permToolBar; //!< The toolbar for actions that rarely need to be changed.
-      //QToolBar *m_activeToolBar; //<! The toolbar for the actions of the current tool.
-      //QToolBar *m_toolPad; //<! The toolbar for the actions that activate tools.
 
       QMenu *m_fileMenu; //!< Menu for the file actions
       QMenu *m_projectMenu; //!< Menu for the project actions
