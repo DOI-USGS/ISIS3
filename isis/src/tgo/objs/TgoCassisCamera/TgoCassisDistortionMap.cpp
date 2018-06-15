@@ -114,12 +114,10 @@ namespace Isis {
     // So, whenever x or y are too far from center or divider is near zero,
     // return the given inputs
     
-    double epsilon = 0.0005;
-    if ( (abs(divider) < epsilon) 
-         || dx < -0.5*m_pixelPitch*m_width  - 0.2
-         || dx >  0.5*m_pixelPitch*m_width  + 0.2
-         || dy < -0.5*m_pixelPitch*m_height - 0.2
-         || dy >  0.5*m_pixelPitch*m_height + 0.2 ) {
+    if ( dx < -0.5*m_pixelPitch*m_width  - 0.2 ||
+         dx >  0.5*m_pixelPitch*m_width  + 0.2 ||
+         dy < -0.5*m_pixelPitch*m_height - 0.2 ||
+         dy >  0.5*m_pixelPitch*m_height + 0.2 ) {
       p_undistortedFocalPlaneX = dx;
       p_undistortedFocalPlaneY = dy;
 
@@ -183,12 +181,10 @@ namespace Isis {
     // So, whenever x or y are too far from center or divider is near zero,
     // return the given inputs
 
-    double epsilon = 0.0005;
-    if ( (abs(divider) < epsilon)
-         || ux < -0.5*m_pixelPitch*m_width  - 0.2
-         || ux >  0.5*m_pixelPitch*m_width  + 0.2
-         || uy < -0.5*m_pixelPitch*m_height - 0.2
-         || uy >  0.5*m_pixelPitch*m_height + 0.2 ) {
+    if ( ux < -0.5*m_pixelPitch*m_width  - 0.2 ||
+         ux >  0.5*m_pixelPitch*m_width  + 0.2 ||
+         uy < -0.5*m_pixelPitch*m_height - 0.2 ||
+         uy >  0.5*m_pixelPitch*m_height + 0.2 ) {
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
 
@@ -201,7 +197,6 @@ namespace Isis {
 
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
-    std::cout << "Difference ux-dx, uy-dy: " << ux-dx << ", " <<uy-dy << std::endl; 
     return true;
   }
 
