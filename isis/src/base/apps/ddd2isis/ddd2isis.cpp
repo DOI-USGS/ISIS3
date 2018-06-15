@@ -50,7 +50,7 @@ void IsisMain() {
   fin.seekg(0);
   fin.read(readBytes.readChars, 4);
   if( fin.fail() || fin.eof() ) {
-    string msg = "An error ocurred when reading the input file [" + from + "]";
+    string msg = "Could not read the magic number in the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   readBytes.readFloat = swp.Float(readBytes.readChars);
@@ -63,7 +63,7 @@ void IsisMain() {
   // Read bytes 4-7 to get number of lines
   fin.read(readBytes.readChars, 4);
   if( fin.fail() || fin.eof() ) {
-    string msg = "An error ocurred when reading the input file [" + from + "]";
+    string msg = "Could not read the number of lines in the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   readBytes.readFloat = swp.Float(readBytes.readChars);
@@ -72,7 +72,7 @@ void IsisMain() {
   // Read bytes 8-11 to get number of bytes
   fin.read(readBytes.readChars, 4);
   if( fin.fail() || fin.eof() ) {
-    string msg = "An error ocurred when reading the input file [" + from + "]";
+    string msg = "Could not read the number of bytes in the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   readBytes.readFloat = swp.Float(readBytes.readChars);
@@ -81,7 +81,7 @@ void IsisMain() {
   // Read bytes 12-15 to get the total number of bits out of all the bands
   fin.read(readBytes.readChars, 4);
   if( fin.fail() || fin.eof() ) {
-    string msg = "An error ocurred when reading the input file [" + from + "]";
+    string msg = "Could not read the number of bits in the input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   readBytes.readFloat = swp.Float(readBytes.readChars);
