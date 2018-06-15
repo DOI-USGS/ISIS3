@@ -253,9 +253,8 @@ namespace Isis {
 
     // notify parent network if we have one
     if (parentNetwork) {
-      parentNetwork->measureAdded(measure);
+      parentNetwork->emitNewMeasure(measure);
       parentNetwork->emitNetworkStructureModified();
-      parentNetwork->emitPointModified(this, ControlPoint::MeasureAdded, measure->GetCubeSerialNumber(), 0);
     }
   }
 
@@ -307,11 +306,10 @@ namespace Isis {
 
     // notify parent network of the change
     if (parentNetwork) {
-      parentNetwork->measureDeleted(cm);
+      parentNetwork->emitMeasureRemoved(cm);
 
       if (!IsIgnored() && !cm->IsIgnored()) {
         parentNetwork->emitNetworkStructureModified();
-        parentNetwork->emitPointModified(this, ControlPoint::MeasureDeleted, serialNumber, 0);
       }
     }
 
@@ -323,7 +321,7 @@ namespace Isis {
     return ControlMeasure::Success;
   }
 
-  void ControlPoint::emitMeasureModified(ControlMeasure *measure, int modType, QVariant oldValue, QVariant newValue) {
+  void ControlPoint::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue) {
     if (parentNetwork) {
       parentNetwork->emitMeasureModified(measure, modType, oldValue, newValue);
     }
@@ -522,9 +520,6 @@ namespace Isis {
    * @param reject True to reject a measure, false to include it in the adjustment
    */
   ControlPoint::Status ControlPoint::SetRejected(bool reject) {
-    if (parentNetwork) {
-      parentNetwork->emitPointModified(this, ControlPoint::RejectedModified, jigsawRejected, reject);
-    }
     jigsawRejected = reject;
     return Success;
   }

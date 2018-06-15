@@ -227,13 +227,7 @@ namespace Isis {
       };
 
       enum ModType {
-        AprioriLineModified,
-        AprioriSampleModified,
-        CoordinatesModified,
-        EditLockModified,
-        IgnoredModified,
-        ResidualModified,
-        TypeModified
+        IgnoredModified
       };
 
       enum DataField {

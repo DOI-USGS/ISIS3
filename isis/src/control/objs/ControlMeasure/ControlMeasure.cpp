@@ -149,9 +149,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::AprioriLineModified, p_aprioriLine, aprioriLine);
-    }
+
     p_aprioriLine = aprioriLine;
     return Success;
   }
@@ -162,9 +160,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::AprioriSampleModified, p_aprioriSample, aprioriSample);
-    }
+
     p_aprioriSample = aprioriSample;
     return Success;
   }
@@ -252,11 +248,6 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
-    QPoint old(p_sample, p_line);
-    QPoint newer(sample, line);
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::CoordinatesModified, old, newer);
-    }
 
     p_sample = sample;
     p_line = line;
@@ -302,9 +293,6 @@ namespace Isis {
 
 
   ControlMeasure::Status ControlMeasure::SetEditLock(bool editLock) {
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::EditLockModified, p_editLock, editLock);
-    }
     p_editLock = editLock;
     return Success;
   }
@@ -377,12 +365,11 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
 
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::IgnoredModified, p_ignore, newIgnoreStatus);
-    }
 
     bool oldStatus = p_ignore;
     p_ignore = newIgnoreStatus;
+
+    Parent()->emitMeasureModified(this, IgnoredModified, oldStatus, p_ignore);
 
     // only update if there was a change in status
     if (oldStatus != p_ignore) {
@@ -393,6 +380,7 @@ namespace Isis {
         cnet->emitNetworkStructureModified();
       }
     }
+
 
     return Success;
   }
@@ -425,13 +413,6 @@ namespace Isis {
 
     MeasureModified();
 
-    QPoint old(p_sampleResidual, p_lineResidual);
-    QPoint newer(sampResidual, lineResidual);
-
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::ResidualModified, old, newer);
-    }
-
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
     return Success;
@@ -453,9 +434,6 @@ namespace Isis {
       return MeasureLocked;
     MeasureModified();
 
-    if (parentPoint) {
-      parentPoint->emitMeasureModified(this, ControlMeasure::TypeModified, p_measureType, type);
-    }
     p_measureType = type;
     return Success;
   }

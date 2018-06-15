@@ -20,7 +20,7 @@
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
+ *   http://www.usgs.gov/privacy.html
  */
 
 // This is needed for the QVariant macro
@@ -39,6 +39,9 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
+
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
 template< typename A, typename B > struct QPair;
@@ -49,8 +52,6 @@ class QString;
 
 namespace Isis {
   class Camera;
-  class ControlMeasure;
-  class ControlPoint;
   class ControlCubeGraphNode;
   class Distance;
   class Progress;
@@ -240,15 +241,12 @@ namespace Isis {
       friend class ControlMeasure;
       friend class ControlPoint;
 
-      enum ModType {
-        Cleared,
-        PointAdded,
-        PointDeleted,
-        PointModified,
-        Swapped
-      };
-
     public:
+
+      enum ModType {
+        Swapped,
+        GraphModified
+      };
 
       QList< ControlCubeGraphNode * > GetCubeGraphNodes() {
         QList<ControlCubeGraphNode *> lst;
@@ -344,23 +342,30 @@ namespace Isis {
 
     signals:
       void networkStructureModified();
-      void pointModified(ControlPoint *point, int type, QVariant oldValue, QVariant newValue);
-      void measureModified(ControlMeasure *measure, int type, QVariant oldValue, QVariant newValue);
-      void networkModified(int type, QVariant oldValue, QVariant newValue);
+      void networkModified(ControlNet::ModType type);
+      void pointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
+      void measureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
+      void pointDeleted(ControlPoint *point);
+      void newPoint(ControlPoint *);
+      void newMeasure(ControlMeasure *);
+      void measureRemoved(ControlMeasure *);
+
+
 
     private:
       void nullify();
       bool ValidateSerialNumber(QString serialNumber) const;
       void measureAdded(ControlMeasure *measure);
-      void pointAdded(ControlPoint *point);
       void measureDeleted(ControlMeasure *measure);
       void measureIgnored(ControlMeasure *measure);
       void measureUnIgnored(ControlMeasure *measure);
       void UpdatePointReference(ControlPoint *point, QString oldId);
       void emitNetworkStructureModified();
-      void emitMeasureModified(ControlMeasure *measure, int type, QVariant oldValue, QVariant newValue);
-      void emitPointModified(ControlPoint *point, int type, QVariant oldValue, QVariant newValue);
-
+      void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
+      void emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
+      void emitNewMeasure(ControlMeasure *measure);
+      void emitMeasureRemoved(ControlMeasure *measure);
+      void pointAdded(ControlPoint *point);
 
     private: // graphing functions
       /**

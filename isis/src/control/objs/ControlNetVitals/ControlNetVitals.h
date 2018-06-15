@@ -23,11 +23,13 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <unordered_set>
+
+#include <QStringList>
+
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-
-#include <QStringList>
 
 namespace Isis {
   class ControlNet;
@@ -46,14 +48,11 @@ namespace Isis {
       ControlNetVitals(ControlNet *net);
       virtual ~ControlNetVitals();
 
-      ControlNet *m_controlNet;
-
-      QString m_status;
-      QString m_statusDetails;
+      void initializeVitals();
 
       bool hasIslands();
       int numIslands();
-      QList< QList<QString> > getIslands();
+      const QList< QList<QString> > &getIslands();
 
       int numPoints();
       int numIgnoredPoints();
@@ -94,9 +93,31 @@ namespace Isis {
 
     public slots:
       void validate();
+      void validateNetwork(ControlNet::ModType);
+      void addPoint(ControlPoint *);
+      void pointModified(ControlPoint *, ControlPoint::ModType, QVariant, QVariant);
+      void deletePoint(ControlPoint *);
+      void addMeasure(ControlMeasure *);
+      void measureModified(ControlMeasure *, ControlMeasure::ModType, QVariant, QVariant);
+      void deleteMeasure(ControlMeasure *);
 
 
     private:
+      ControlNet *m_controlNet;
+
+      QString m_status;
+      QString m_statusDetails;
+
+      QList< QList< QString > > m_islandList;
+
+      QMap<int, int> m_pointMeasureCounts;
+      QMap<int, int> m_imageMeasureCounts;
+      QMap<ControlPoint::PointType, int> m_pointTypeCounts;
+
+      int m_numPointsIgnored;
+      int m_numPointsLocked;
+
+
       // QHash<QString, ImageVitals> m_imageVitals;
 
       // class ImageVitals {

@@ -29,6 +29,7 @@
 #include <QObject>
 #include <QString>
 
+#include "ControlMeasure.h"
 #include "SurfacePoint.h"
 
 template< typename A, typename B > class QHash;
@@ -36,7 +37,6 @@ template< typename A, typename B > class QHash;
 class QStringList;
 
 namespace Isis {
-  class ControlMeasure;
   class ControlNet;
   class ControlPointFileEntryV0002;
   class Latitude;
@@ -421,13 +421,9 @@ namespace Isis {
       };
 
       enum ModType {
-        MeasureAdded,
-        MeasureDeleted,
-        MeasureModified,
         EditLockModified,
         IgnoredModified,
-        TypeModified,
-        RejectedModified
+        TypeModified
       };
 
       // This stuff input to jigsaw
@@ -556,7 +552,7 @@ namespace Isis {
       int IndexOfRefMeasure() const;
       bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
-      void emitMeasureModified(ControlMeasure *measure, int modType, QVariant oldValue, QVariant newValue);
+      void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue);
 
 
 

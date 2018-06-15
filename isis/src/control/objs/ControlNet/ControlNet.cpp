@@ -127,7 +127,7 @@ namespace Isis {
     nullify();
   }
 
-  void ControlNet::emitMeasureModified(ControlMeasure *measure, int type, QVariant oldValue, QVariant newValue) {
+  void ControlNet::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
     std::cout << "Measure modified" << std::endl;
     std::cout << "Old value: " << oldValue.toString() << std::endl;
     std::cout << "New value: " << newValue.toString() << std::endl;
@@ -135,7 +135,7 @@ namespace Isis {
 
   }
 
-  void ControlNet::emitPointModified(ControlPoint *point, int type, QVariant oldValue, QVariant newValue) {
+  void ControlNet::emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue) {
     std::cout << "Point modified" << std::endl;
     std::cout << point << std::endl;
 
@@ -355,7 +355,6 @@ namespace Isis {
     pointAdded(point);
 
     emit networkStructureModified();
-    emit networkModified(ControlNet::PointAdded, 0, point->GetId());
   }
 
 
@@ -410,15 +409,22 @@ namespace Isis {
               // If the edge doesn't already exist, this adds and returns the edge.
               // If the edge already exists, this just returns it. (The use of a set
               // forces the edges to be unique.)
-              ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+              ImageConnection connection;
+              bool edgeAdded;
+              boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
                                                          m_vertexMap[sn],
-                                                         m_controlGraph).first;
+                                                         m_controlGraph);
               m_controlGraph[connection].strength++;
+
+              if (edgeAdded) {
+                emit networkModified(GraphModified);
+              }
             }
           }
         }
       }
     }
+    emit newPoint(point);
   }
 
 
@@ -466,6 +472,11 @@ namespace Isis {
       }
     }
     return graphString;
+   }
+
+
+   void ControlNet::emitNewMeasure(ControlMeasure *measure) {
+     emit newMeasure(measure);
    }
 
 
@@ -527,14 +538,21 @@ namespace Isis {
             // If the edge doesn't already exist, this adds and returns the edge.
             // If the edge already exists, this just returns it. (The use of a set
             // forces the edges to be unique.)
-            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+            ImageConnection connection;
+            bool edgeAdded;
+            boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
                                                        m_vertexMap[sn],
-                                                       m_controlGraph).first;
+                                                       m_controlGraph);
             m_controlGraph[connection].strength++;
+
+            if (edgeAdded) {
+              emit networkModified(GraphModified);
+            }
           }
         }
       }
     }
+    emit newMeasure(measure);
   }
 
 
@@ -595,10 +613,16 @@ namespace Isis {
             // If the edge doesn't already exist, this adds and returns the edge.
             // If the edge already exists, this just returns it. (The use of a set
             // forces the edges to be unique.)
-            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+            ImageConnection connection;
+            bool edgeAdded;
+            boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
                                                        m_vertexMap[sn],
-                                                       m_controlGraph).first;
+                                                       m_controlGraph);
             m_controlGraph[connection].strength++;
+
+            if (edgeAdded) {
+              emit networkModified(GraphModified);
+            }
           }
         }
       }
@@ -621,6 +645,11 @@ namespace Isis {
   }
 
 
+  void ControlNet::emitMeasureRemoved(ControlMeasure *measure) {
+    emit measureRemoved(measure);
+  }
+
+
   /**
    * Updates the node for this measure's serial number to
    * reflect the deletion.  If this is the only measure left in the containing
@@ -632,6 +661,8 @@ namespace Isis {
     ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
     ASSERT(m_vertexGraph->contains(serial));
+
+    emit measureRemoved(measure);
 
     // Remove connections to and from this node
     if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
@@ -705,6 +736,7 @@ namespace Isis {
               boost::remove_edge(m_vertexMap[serial],
                                  m_vertexMap[sn],
                                  m_controlGraph);
+              emit networkModified(GraphModified);
             }
           }
         }
@@ -758,8 +790,10 @@ namespace Isis {
 
     // notify CubeSerialNumbers of the loss of this point
     foreach(ControlMeasure * measure, point->getMeasures()) {
-      measureDeleted(measure);
+      emit measureRemoved(measure);
     }
+
+    emit pointDeleted(point);
 
     // delete point
     points->remove(pointId);
@@ -769,9 +803,6 @@ namespace Isis {
 
     if (!wasIgnored)
       emit networkStructureModified();
-      emit networkModified(ControlNet::PointDeleted, pointId, 0);
-
-
     return ControlPoint::Success;
   }
 
@@ -1676,7 +1707,7 @@ namespace Isis {
       i2.next().value()->parentNetwork = &other;
     }
 
-    emit networkModified(ControlNet::Swapped, other.GetNetworkId(), this->GetNetworkId());
+    emit networkModified(ControlNet::Swapped);
 
   }
 

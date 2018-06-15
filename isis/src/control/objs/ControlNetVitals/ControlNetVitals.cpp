@@ -12,96 +12,336 @@ namespace Isis {
 
   ControlNetVitals::ControlNetVitals(ControlNet *cnet) {
     m_controlNet = cnet;
-    connect(cnet, SIGNAL(networkModified(int, QVariant, QVariant)),
-            this, SLOT(validate()));
-    connect(cnet, SIGNAL(pointModified(ControlPoint *, int, QVariant, QVariant)),
-            this, SLOT(validate()));
-    connect(cnet, SIGNAL(measureModified(ControlMeasure *, int, QVariant, QVariant)),
-            this, SLOT(validate()));
+
+    initializeVitals();
+
+    connect(cnet, SIGNAL(networkModified(ControlNet::ModType)),
+            this, SLOT(validateNetwork(ControlNet::ModType)));
+
+    connect(cnet, SIGNAL(newPoint(ControlPoint*)),
+            this, SLOT(addPoint(ControlPoint*)));
+    connect(cnet, SIGNAL(pointModified(ControlPoint *, ControlPoint::ModType, QVariant, QVariant)),
+            this, SLOT(pointModified(ControlPoint *, ControlPoint::ModType, QVariant, QVariant)));
+    connect(cnet, SIGNAL(pointDeleted(ControlPoint*)),
+            this, SLOT(deletePoint(ControlPoint*)));
+
+    connect(cnet, SIGNAL(newMeasure(ControlMeasure*)),
+            this, SLOT(addMeasure(ControlMeasure*)));
+    connect(cnet, SIGNAL(measureModified(ControlMeasure *, ControlMeasure::ModType, QVariant, QVariant)),
+            this, SLOT(measureModified(ControlMeasure *, ControlMeasure::ModType, QVariant, QVariant)));
+    connect(cnet, SIGNAL(measureRemoved(ControlMeasure*)),
+            this, SLOT(deleteMeasure(ControlMeasure*)));
+
     validate();
+  }
+
+  void ControlNetVitals::initializeVitals() {
+
+    m_islandList = m_controlNet->GetSerialConnections();
+
+    m_numPointsIgnored = 0;
+    m_numPointsLocked = 0;
+
+    m_pointMeasureCounts.clear();
+    m_imageMeasureCounts.clear();
+    m_pointTypeCounts.clear();
+
+    m_pointTypeCounts.insert(ControlPoint::Free, 0);
+    m_pointTypeCounts.insert(ControlPoint::Constrained, 0);
+    m_pointTypeCounts.insert(ControlPoint::Fixed, 0);
+
+    foreach(ControlPoint* point, m_controlNet->GetPoints()) {
+      addPoint(point);
+    }
+
+    foreach(QString serial, m_controlNet->GetCubeSerials()) {
+      int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
+      if ( !m_imageMeasureCounts.contains(numValidMeasures) ) {
+        m_imageMeasureCounts.insert(numValidMeasures, 1);
+      }
+      else {
+        m_imageMeasureCounts[numValidMeasures]++;
+      }
+    }
+  }
+
+
+  /**
+   * Unlike, deletePoint, this method does modify counters based on measures
+   * because the ControlNet does not emit separate measureAdded signals for
+   * efficiency reasons.
+   */
+  void ControlNetVitals::addPoint(ControlPoint *point) {
+    std::cout << "Point added" << std::endl;
+    if (point->IsIgnored()) {
+      m_numPointsIgnored++;
+      return;
+    }
+
+    if (point->IsEditLocked()) {
+      m_numPointsLocked++;
+    }
+
+    m_pointTypeCounts[point->GetType()]++;
+
+    int numValidMeasures = point->GetNumValidMeasures();
+    if ( !m_pointMeasureCounts.contains(numValidMeasures) ) {
+      m_pointMeasureCounts.insert(numValidMeasures, 1);
+    }
+
+    else {
+      m_pointMeasureCounts[numValidMeasures]++;
+    }
+    validate();
+  }
+
+
+  void ControlNetVitals::pointModified(ControlPoint *point, ControlPoint::ModType type,
+                                       QVariant oldValue, QVariant newValue) {
+    switch(type) {
+      case ControlPoint::EditLockModified:
+
+        if (oldValue.toBool()) {
+          m_numPointsLocked--;
+        }
+
+        if (newValue.toBool()) {
+          m_numPointsLocked++;
+        }
+
+        break;
+
+      case ControlPoint::IgnoredModified:
+
+        if (oldValue.toBool()) {
+          m_numPointsIgnored--;
+          if (point->IsEditLocked()) {
+            m_numPointsLocked++;
+          }
+          m_pointTypeCounts[point->GetType()]++;
+          int numValidMeasures = point->GetNumValidMeasures();
+          if ( !m_pointMeasureCounts.contains(numValidMeasures) ) {
+            m_pointMeasureCounts.insert(numValidMeasures, 1);
+          }
+          else {
+            m_pointMeasureCounts[numValidMeasures]++;
+          }
+        }
+
+        if (newValue.toBool()) {
+          m_numPointsIgnored++;
+          if (point->IsEditLocked()) {
+            m_numPointsLocked--;
+          }
+          m_pointTypeCounts[point->GetType()]--;
+          int numValidMeasures = point->GetNumValidMeasures();
+          if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
+            m_pointMeasureCounts.remove(numValidMeasures);
+          }
+        }
+
+        break;
+
+      case ControlPoint::TypeModified:
+
+        m_pointTypeCounts[ControlPoint::PointType(oldValue.toInt())]--;
+        m_pointTypeCounts[ControlPoint::PointType(newValue.toInt())]++;
+
+        break;
+
+      default:
+        // no operation
+        break;
+    }
+    validate();
+
+  }
+
+  /**
+   * This does not modify any counters based on the measures in the point
+   * because separate measureDeleted signals will be emitted by the ControlNet.
+   * addPoint does add modify counters based on measures because ControlNet does
+   * not emit separate measureAdded signals for efficiency reasons.
+   */
+  void ControlNetVitals::deletePoint(ControlPoint *point) {
+    std::cout << "Point deleted" << std::endl;
+    if (point->IsIgnored()) {
+      m_numPointsIgnored--;
+      validate();
+      return;
+    }
+
+
+
+    if (point->IsEditLocked()) {
+      m_numPointsLocked--;
+    }
+
+    m_pointTypeCounts[point->GetType()]--;
+    validate();
+
+  }
+
+  void ControlNetVitals::addMeasure(ControlMeasure *measure) {
+    ControlPoint *point = measure->Parent();
+    if (point) {
+      // By this time, the measure has been added to its parent point, so the
+      // old count is the current count minus one.
+      int numValidMeasures = point->GetNumValidMeasures();
+      if ( --m_pointMeasureCounts[numValidMeasures - 1] < 1 ) {
+        m_pointMeasureCounts.remove(numValidMeasures - 1);
+      }
+      if ( !m_pointMeasureCounts.contains(numValidMeasures) ) {
+        m_pointMeasureCounts.insert(numValidMeasures, 1);
+      }
+      else {
+        m_pointMeasureCounts[numValidMeasures]++;
+      }
+    }
+
+    QString serial = measure->GetCubeSerialNumber();
+    int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
+    if ( !m_imageMeasureCounts.contains(numValidMeasures) ) {
+      m_imageMeasureCounts.insert(numValidMeasures, 1);
+    }
+    else {
+      m_imageMeasureCounts[numValidMeasures]++;
+    }
+
+    validate();
+  }
+
+  void ControlNetVitals::measureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
+
+    switch (type) {
+      case ControlMeasure::IgnoredModified:
+
+        if ( !oldValue.toBool() && newValue.toBool() ) {
+          return addMeasure(measure);
+        }
+        else if ( oldValue.toBool() && !newValue.toBool() ) {
+          return deleteMeasure(measure);
+        }
+        break;
+
+      default:
+        // No operation.
+        break;
+
+    }
+    validate();
+  }
+
+
+  void ControlNetVitals::deleteMeasure(ControlMeasure *measure) {
+
+    ControlPoint *point = measure->Parent();
+    if (point) {
+      // By this time, the measure is still a valid measure in the parent control point.
+      int numValidMeasures = point->GetNumValidMeasures();
+
+      if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
+        m_pointMeasureCounts.remove(numValidMeasures);
+      }
+      if ( !m_pointMeasureCounts.contains(numValidMeasures - 1) ) {
+        m_pointMeasureCounts.insert(numValidMeasures - 1, 1);
+      }
+      else {
+        m_pointMeasureCounts[numValidMeasures - 1]++;
+      }
+    }
+
+    QString serial = measure->GetCubeSerialNumber();
+    int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
+
+    if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
+      m_pointMeasureCounts.remove(numValidMeasures);
+    }
+
+    if ( !m_imageMeasureCounts.contains(numValidMeasures - 1) ) {
+      m_imageMeasureCounts.insert(numValidMeasures - 1, 1);
+    }
+    else {
+      m_imageMeasureCounts[numValidMeasures - 1]++;
+    }
+
+    validate();
+  }
+
+
+  void ControlNetVitals::validateNetwork(ControlNet::ModType type) {
+    switch (type) {
+      case ControlNet::Swapped:
+        initializeVitals();
+        break;
+      case ControlNet::GraphModified:
+        m_islandList = m_controlNet->GetSerialConnections();
+        break;
+      default:
+        // No operation.
+        break;
+    }
+
+    validate();
+
   }
 
   ControlNetVitals::~ControlNetVitals() {
   }
 
+
   bool ControlNetVitals::hasIslands() {
-    // Replace this with graph call!!!$!@$!@$!@$#@%#@$%#@
-    return true;
+    return numIslands() > 1;
   }
+
 
   int ControlNetVitals::numIslands() {
-    // replace this with graph call!#@$!#%#@%*($#)
-    return 1;
+    return m_islandList.size();
   }
 
-  QList< QList<QString> > ControlNetVitals::getIslands() {
-    // TEMP, replace with graph
-    QList<QString> list;
-    list.append("CASSIS_01.cub");
-    QList< QList<QString> > outerList;
-    outerList.append(list);
-    return outerList;
+
+  const QList< QList<QString> > &ControlNetVitals::getIslands() {
+    return m_islandList;
   }
+
 
   int ControlNetVitals::numPoints() {
     return m_controlNet->GetNumPoints();
   }
 
-  // REFACTOR
+
   int ControlNetVitals::numIgnoredPoints() {
-    int count = 0;
-    foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->IsIgnored()) {
-        count++;
-      }
-    }
-    return count;
+    return m_numPointsIgnored;
   }
+
 
   int ControlNetVitals::numLockedPoints() {
-    return m_controlNet->GetNumEditLockPoints();
+    return m_numPointsLocked;
   }
 
-  // REFACTOR
+
   int ControlNetVitals::numFixedPoints() {
-    int count = 0;
-    foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Fixed) {
-        count++;
-      }
-    }
-    return count;
+    return m_pointTypeCounts[ControlPoint::Fixed];
   }
 
-  // REFACTOR
+
   int ControlNetVitals::numConstrainedPoints() {
-    int count = 0;
-    foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Constrained) {
-        count++;
-      }
-    }
-    return count;
+    return m_pointTypeCounts[ControlPoint::Constrained];
   }
 
-  // REFACTOR
+
   int ControlNetVitals::numFreePoints() {
-    int count = 0;
-    foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Free) {
-        count++;
-      }
-    }
-    return count;
+    return m_pointTypeCounts[ControlPoint::Free];
   }
 
-  // REFACTOR
+
   int ControlNetVitals::numPointsBelowMeasureThreshold(int num) {
     int count = 0;
-    foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetNumMeasures() < num) {
-        count++;
+    foreach(int measureCount, m_pointMeasureCounts) {
+      if (measureCount > num) {
+        break;
       }
+      count += m_pointMeasureCounts[measureCount];
     }
     return count;
   }
@@ -110,28 +350,34 @@ namespace Isis {
     return m_controlNet->GetCubeSerials().size();
   }
 
+
   int ControlNetVitals::numMeasures() {
     return m_controlNet->GetNumMeasures();
   }
 
-  // REFACTOR
+
   int ControlNetVitals::numImagesBelowMeasureThreshold(int num) {
     int count = 0;
-    foreach(QString serial, m_controlNet->GetCubeSerials()) {
-      if (m_controlNet->GetMeasuresInCube(serial).size() < num) {
-        count++;
+    foreach(int measureCount, m_imageMeasureCounts) {
+      if (measureCount > num) {
+        break;
       }
+      count += m_imageMeasureCounts[measureCount];
     }
     return count;
   }
+
+
   // REFACTOR
   int ControlNetVitals::numImagesBelowHullTolerance(int tolerance) {
-    return 1;
+    return 0;
   }
+
 
   QList<QString> ControlNetVitals::getCubeSerials() {
     return m_controlNet->GetCubeSerials();
   }
+
 
   QList<ControlPoint*> ControlNetVitals::getAllPoints() {
     return m_controlNet->GetPoints();
@@ -146,6 +392,7 @@ namespace Isis {
     return ignoredPoints;
   }
 
+
   QList<ControlPoint*> ControlNetVitals::getLockedPoints() {
     QList<ControlPoint*> lockedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -153,6 +400,7 @@ namespace Isis {
     }
     return lockedPoints;
   }
+
 
   QList<ControlPoint*> ControlNetVitals::getFixedPoints() {
     QList<ControlPoint*> fixedPoints;
@@ -162,6 +410,7 @@ namespace Isis {
     return fixedPoints;
   }
 
+
   QList<ControlPoint*> ControlNetVitals::getConstrainedPoints() {
     QList<ControlPoint*> constrainedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -170,6 +419,7 @@ namespace Isis {
     return constrainedPoints;
   }
 
+
   QList<ControlPoint*> ControlNetVitals::getFreePoints() {
     QList<ControlPoint*> freePoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -177,6 +427,7 @@ namespace Isis {
     }
     return freePoints;
   }
+
 
   // REFACTOR
   QList<ControlPoint*> ControlNetVitals::getPointsBelowMeasureThreshold(int num) {
@@ -187,9 +438,11 @@ namespace Isis {
     return belowThreshold;
   }
 
+
   QList<QString> ControlNetVitals::getAllImageSerials() {
     return m_controlNet->GetCubeSerials();
   }
+
 
   // REFACTOR
   QList<QString> ControlNetVitals::getImagesBelowMeasureThreshold(int num) {
@@ -203,28 +456,27 @@ namespace Isis {
   // REFACTOR
   QList<QString> ControlNetVitals::getImagesBelowHullTolerance(int num) {
     QList<QString> list;
-    list.append("Example.cub");
     return list;
   }
+
 
   QString ControlNetVitals::getStatus() {
     return m_status;
   }
 
+
   QString ControlNetVitals::getStatusDetails() {
     return m_statusDetails;
   }
+
 
   QString ControlNetVitals::getNetworkId() {
     return m_controlNet->GetNetworkId();
   }
 
-  //
-  // ImageVitals ControlNetVitals::getImageVitals(QString serial) {
-  //   return NULL;
-  // }
 
   void ControlNetVitals::validate() {
+
     QString status = "";
     QString details = "";
     if (hasIslands()) {
@@ -233,12 +485,12 @@ namespace Isis {
     }
     else {
 
-      if (numPointsBelowMeasureThreshold() < 3) {
+      if (numPointsBelowMeasureThreshold() > 0) {
         status = "Weak!";
         details += "This network has " + toString(numPointsBelowMeasureThreshold()) + " point(s) with less than 3 measures\n";
       }
 
-      if (numImagesBelowMeasureThreshold() < 3) {
+      if (numImagesBelowMeasureThreshold() > 0) {
         status = "Weak!";
         details += "This network has " + toString(numImagesBelowMeasureThreshold()) + " image(s) with less than 3 measures\n";
       }
