@@ -10,6 +10,14 @@
 
 namespace Isis {
 
+
+  /**
+   *  Constructs a ControlNetVitals object from a ControlNet.
+   *  once complete, it calls the validate() method to evaluate the current status
+   *  of the newly ingested Control Network.
+   *
+   *  @param cnet The Control Network that we will be tracking vitals for.
+   */
   ControlNetVitals::ControlNetVitals(ControlNet *cnet) {
     m_controlNet = cnet;
 
@@ -35,6 +43,12 @@ namespace Isis {
     validate();
   }
 
+
+  /**
+   *  This will initialize all necessary values and set up the point measure and
+   *  image measure QMaps appropriately.
+   *
+   */
   void ControlNetVitals::initializeVitals() {
 
     m_islandList = m_controlNet->GetSerialConnections();
@@ -67,12 +81,20 @@ namespace Isis {
 
 
   /**
-   * Unlike, deletePoint, this method does modify counters based on measures
-   * because the ControlNet does not emit separate measureAdded signals for
-   * efficiency reasons.
+   *  This SLOT is designed to intercept the newPoint() signal emitted from a ControlNetwork
+   *  whenever a new point has been added. It observes the Control Point and increments the
+   *  appropriate internal counters to reflect the addition of this new point.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  Unlike deletePoint(), this method does modify counters based on measures
+   *  because the ControlNet does not emit separate measureAdded signals for
+   *  efficiency reasons.
+   *
+   *  @param point The ControlPoint being added to the network.
    */
   void ControlNetVitals::addPoint(ControlPoint *point) {
-    std::cout << "Point added" << std::endl;
     if (point->IsIgnored()) {
       m_numPointsIgnored++;
       return;
@@ -96,6 +118,23 @@ namespace Isis {
   }
 
 
+  /**
+   *  This SLOT is designed to receive a signal emitted from the Control Network
+   *  whenever a modification is made to a Control Point. This SLOT receives the
+   *  ControlPoint that was modified, as well with the ControlPoint::ModType enum
+   *  indicating what type of modification was made to the Control Point.
+   *
+   *  We then increment or decrement the appropriate internal counters based on which type
+   *  of modification was made to the Control Point.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  @param point The Control Point that was modified in the observed Control Network.
+   *  @param type The type of modification that was made to the Control Point.
+   *  @param oldValue The old value (if any) of whatever modification was made to the Control Point.
+   *  @param newValue The new value (if any) of whatever modification was made to the Control Point.
+   */
   void ControlNetVitals::pointModified(ControlPoint *point, ControlPoint::ModType type,
                                        QVariant oldValue, QVariant newValue) {
     switch(type) {
@@ -157,31 +196,54 @@ namespace Isis {
 
   }
 
+
   /**
-   * This does not modify any counters based on the measures in the point
-   * because separate measureDeleted signals will be emitted by the ControlNet.
-   * addPoint does add modify counters based on measures because ControlNet does
-   * not emit separate measureAdded signals for efficiency reasons.
+   *  This SLOT is designed to intercept the removePoint() signal emitted by a Control Network
+   *  whenever a point is deleted. It observes the to-be deleted point and decrements the
+   *  appropriate internal counters to reflect the removal of this point.
+   *
+   *  This does not modify any counters based on the measures in the point
+   *  because separate measureDeleted signals will be emitted by the ControlNet.
+   *  addPoint does add modify counters based on measures because ControlNet does
+   *  not emit separate measureAdded signals for efficiency reasons.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  @param point The Control Point being deleted from the Control Network.
    */
   void ControlNetVitals::deletePoint(ControlPoint *point) {
-    std::cout << "Point deleted" << std::endl;
     if (point->IsIgnored()) {
       m_numPointsIgnored--;
       validate();
       return;
     }
-
-
-
     if (point->IsEditLocked()) {
       m_numPointsLocked--;
     }
 
     m_pointTypeCounts[point->GetType()]--;
     validate();
-
   }
 
+
+  /**
+   *  This SLOT is designed to intercept the newMeasure() signal emitted by a Control Network
+   *  whenever a measure is added to one of it's Control Points.
+   *  It grabs the parent Control Point of the Measure and decrements the pointMeasureCount QMap
+   *  at the old measure count for the Control Point and increments the pointMeasureCount at the
+   *  new measure count for the Control Point to reflect the addition of this measure.
+   *
+   *  This does not modify any counters based on the measures in the point
+   *  because separate measureDeleted signals will be emitted by the ControlNet.
+   *  addPoint does add modify counters based on measures because ControlNet does
+   *  not emit separate measureAdded signals for efficiency reasons.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  @param measure The Control Measure being added to a Control Point in the network.
+   */
   void ControlNetVitals::addMeasure(ControlMeasure *measure) {
     ControlPoint *point = measure->Parent();
     if (point) {
@@ -211,6 +273,22 @@ namespace Isis {
     validate();
   }
 
+
+  /**
+   *  This SLOT is designed to intercept the measureModified() signal emitted by a Control Network
+   *  whenever a measure is modified in one of it's Control Points. This SLOT receives the
+   *  ControlMeasure that was modified, as well with the ControlMeasure::ModType enum
+   *  indicating what type of modification was made to the Control Measure. The appropriate methods
+   *  are called depending on which modification was made.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  @param point The Control Measure that was modified in the observed Control Network.
+   *  @param type The type of modification that was made to the Control Measure.
+   *  @param oldValue The old value (if any) of whatever modification was made to the Control Measure.
+   *  @param newValue The new value (if any) of whatever modification was made to the Control Measure.
+   */
   void ControlNetVitals::measureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
 
     switch (type) {
@@ -233,6 +311,16 @@ namespace Isis {
   }
 
 
+  /**
+   *  This SLOT is designed to intercept the measureRemoved() signal emitted by a Control Network
+   *  whenever a Control Measure is deleted. It observes the to-be deleted point and decrements the
+   *  appropriate internal counters to reflect the removal of this Control Measure.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  @param point The Control Measure being deleted from a Control Point in the Control Network.
+   */
   void ControlNetVitals::deleteMeasure(ControlMeasure *measure) {
 
     ControlPoint *point = measure->Parent();
@@ -269,6 +357,17 @@ namespace Isis {
   }
 
 
+  /**
+   *  This SLOT is designed to intercept the networkModified() signal emitted by a Control Network
+   *  whenever a modification is made to the network. This SLOT receives the ControlNet::ModType
+   *  enum indicating what type of modication was made to the Control Network. It then acts
+   *  based on what type of change was made.
+   *
+   *  Once complete, we then call the validate() method to re-validate the status and
+   *  details of the Control Network.
+   *
+   *  @param point The type of modification that was made to the observed Control Network.
+   */
   void ControlNetVitals::validateNetwork(ControlNet::ModType type) {
     switch (type) {
       case ControlNet::Swapped:
@@ -281,60 +380,120 @@ namespace Isis {
         // No operation.
         break;
     }
-
     validate();
-
   }
 
+
+  /**
+   *  De-constructor
+   */
   ControlNetVitals::~ControlNetVitals() {
   }
 
 
+  /**
+   *  This method is designed to return true if islands exist in the ControlNet Graph
+   *  and False otherwise.
+   *
+   *  @return True if islands exist, False otherwise.
+   */
   bool ControlNetVitals::hasIslands() {
     return numIslands() > 1;
   }
 
 
+  /**
+   *  This method is designed to return the number of islands that exist in the
+   *  ControlNet Graph.
+   *
+   *  @return The number of islands present in the ControlNet Graph.
+   */
   int ControlNetVitals::numIslands() {
     return m_islandList.size();
   }
 
 
+  /**
+   *  This method is designed to return a QList containing each island present in the ControlNet.
+   *
+   *  Each island is composed of another QList containing the cube serials for all images in that island.
+   *
+   *  @return A QList containing a QList of cube serials for each island present in the Control Net.
+   */
   const QList< QList<QString> > &ControlNetVitals::getIslands() {
     return m_islandList;
   }
 
 
+  /**
+   *  This method is designed to return the number of points in the observed Control Network.
+   *  It is a wrapper for the ControlNet::GetNumPoints() call of the observed Control Network.
+   *
+   *  @return The number of points in the Control Network.
+   */
   int ControlNetVitals::numPoints() {
     return m_controlNet->GetNumPoints();
   }
 
 
+  /**
+   *  This method is designed to return the number of ignored points in the Control Network.
+   *
+   *  @return The number of ignored points in the Control Network.
+   */
   int ControlNetVitals::numIgnoredPoints() {
     return m_numPointsIgnored;
   }
 
 
+  /**
+   *  This method is designed to return the number of edit locked points in the Control Network.
+   *
+   *  @return The number of edit locked points in the Control Network.
+   */
   int ControlNetVitals::numLockedPoints() {
     return m_numPointsLocked;
   }
 
 
+  /**
+   *  This method is designed to return the number of fixed points in the Control Network.
+   *
+   *  @return The number of fixed points in the Control Network.
+   */
   int ControlNetVitals::numFixedPoints() {
     return m_pointTypeCounts[ControlPoint::Fixed];
   }
 
 
+  /**
+   *  This method is designed to return the number of constrained points in the Control Network.
+   *
+   *  @return The number of constrained points in the Control Network.
+   */
   int ControlNetVitals::numConstrainedPoints() {
     return m_pointTypeCounts[ControlPoint::Constrained];
   }
 
 
+  /**
+   *  This method is designed to return the number of free points in the Control Network.
+   *
+   *  @return The number of free points in the Control Network.
+   */
   int ControlNetVitals::numFreePoints() {
     return m_pointTypeCounts[ControlPoint::Free];
   }
 
 
+  /**
+   *  This method is designed to return the number of points that fall below a measure threshold.
+   *
+   *  For instance, a measure threshold of 3 would return all points with less than 3 measures.
+   *
+   *  @param num The number of measures a point needs to have to meet the threshold.
+   *  @return The number of points with number of measures less than the threshold.
+   */
   int ControlNetVitals::numPointsBelowMeasureThreshold(int num) {
     int count = 0;
     foreach(int measureCount, m_pointMeasureCounts) {
@@ -346,16 +505,35 @@ namespace Isis {
     return count;
   }
 
+
+  /**
+   *  This method is designed to return the number of images in the Control Network.
+   *
+   *  @return The number of images in the Control Network.
+   */
   int ControlNetVitals::numImages() {
     return m_controlNet->GetCubeSerials().size();
   }
 
 
+  /**
+   *  This method is designed to return the number of measures in the Control Network.
+   *
+   *  @return The number of measures in the Control Network.
+   */
   int ControlNetVitals::numMeasures() {
     return m_controlNet->GetNumMeasures();
   }
 
 
+  /**
+   *  This method is designed to return the number of images that fall below a measure threshold.
+   *
+   *  For instance, a measure threshold of 3 would return all images with less than 3 measures.
+   *
+   *  @param num The number of measures an image needs to have to meet the threshold.
+   *  @return The number of images with number of measures less than the threshold.
+   */
   int ControlNetVitals::numImagesBelowMeasureThreshold(int num) {
     int count = 0;
     foreach(int measureCount, m_imageMeasureCounts) {
@@ -369,21 +547,44 @@ namespace Isis {
 
 
   // REFACTOR
+  /**
+   *  This method is designed to return the number of images that fall below a hull tolerance.
+   *
+   *  For instance, a tolerance of .75 would return all images with a hull tolerance of < 75%.
+   *
+   *  @param num The number of measures an image needs to have to meet the threshold.
+   *  @return The number of images with number of measures less than the threshold.
+   */
   int ControlNetVitals::numImagesBelowHullTolerance(int tolerance) {
     return 0;
   }
 
 
+  /**
+   *  This method is designed to return all cube serials present in the Control Network.
+   *
+   *  @return A QList<QString> containing all cube serials in the Control Network.
+   */
   QList<QString> ControlNetVitals::getCubeSerials() {
     return m_controlNet->GetCubeSerials();
   }
 
 
+  /**
+   *  This method is designed to return all points in the Control Network.
+   *
+   *  @return A QList<ControlPoint*> containing all points in the Control Network.
+   */
   QList<ControlPoint*> ControlNetVitals::getAllPoints() {
     return m_controlNet->GetPoints();
   }
 
-  // REFACTOR
+
+  /**
+   *  This method is designed to return all ignored points in the Control Network.
+   *
+   *  @return A QList<ControlPoint*> containing all ignored points in the Control Network.
+   */
   QList<ControlPoint*> ControlNetVitals::getIgnoredPoints() {
     QList<ControlPoint*> ignoredPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -393,6 +594,11 @@ namespace Isis {
   }
 
 
+  /**
+   *  This method is designed to return all edit locked points in the Control Network.
+   *
+   *  @return A QList<ControlPoint*> containing all edit locked points in the Control Network.
+   */
   QList<ControlPoint*> ControlNetVitals::getLockedPoints() {
     QList<ControlPoint*> lockedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -402,6 +608,11 @@ namespace Isis {
   }
 
 
+  /**
+   *  This method is designed to return all fixed points in the Control Network.
+   *
+   *  @return A QList<ControlPoint*> containing all fixed points in the Control Network.
+   */
   QList<ControlPoint*> ControlNetVitals::getFixedPoints() {
     QList<ControlPoint*> fixedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -411,6 +622,11 @@ namespace Isis {
   }
 
 
+  /**
+   *  This method is designed to return all constrained points in the Control Network.
+   *
+   *  @return A QList<ControlPoint*> containing all constrained points in the Control Network.
+   */
   QList<ControlPoint*> ControlNetVitals::getConstrainedPoints() {
     QList<ControlPoint*> constrainedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -420,6 +636,11 @@ namespace Isis {
   }
 
 
+  /**
+   *  This method is designed to return all free points in the Control Network.
+   *
+   *  @return A QList<ControlPoint*> containing all free points in the Control Network.
+   */
   QList<ControlPoint*> ControlNetVitals::getFreePoints() {
     QList<ControlPoint*> freePoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -429,7 +650,14 @@ namespace Isis {
   }
 
 
-  // REFACTOR
+  /**
+   *  This method is designed to return all points that fall below a measure threshold.
+   *
+   *  For instance, a measure threshold of 3 would return all points with less than 3 measures.
+   *
+   *  @param num The number of measures a point needs to have to meet the threshold.
+   *  @return All of points with number of measures less than the threshold.
+   */
   QList<ControlPoint*> ControlNetVitals::getPointsBelowMeasureThreshold(int num) {
     QList<ControlPoint*> belowThreshold;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
@@ -439,12 +667,15 @@ namespace Isis {
   }
 
 
-  QList<QString> ControlNetVitals::getAllImageSerials() {
-    return m_controlNet->GetCubeSerials();
-  }
-
-
-  // REFACTOR
+  /**
+   *  This method is designed to return a QList containing cube serials for all images
+   *  that fall below a measure threshold.
+   *
+   *  For instance, a measure threshold of 3 would return all images with less than 3 measures.
+   *
+   *  @param num The number of measures an image needs to have to meet the threshold.
+   *  @return A QList<QString> containing all images with number of measures less than the threshold.
+   */
   QList<QString> ControlNetVitals::getImagesBelowMeasureThreshold(int num) {
     QList<QString> imagesBelowThreshold;
     foreach(QString serial, m_controlNet->GetCubeSerials()) {
@@ -453,28 +684,72 @@ namespace Isis {
     return imagesBelowThreshold;
   }
 
-  // REFACTOR
+
+  /**
+   *  This method is designed to return a QList containing cube serials for all images
+   *  that fall below a convex hull tolerance threshold.
+   *
+   *  For instance, a tolerance of .75 would return all images with a hull tolerance less than 75%.
+   *
+   *  @param num The hull tolerance (decimal percent) an image needs to meet the threshold.
+   *  @return A QList<QString> containing all images with a hull tolerance below the threshold.
+   */
   QList<QString> ControlNetVitals::getImagesBelowHullTolerance(int num) {
     QList<QString> list;
     return list;
   }
 
 
+  /**
+   *  This method is designed to return the current status of the network.
+   *
+   *  The possible values are "Healthy!", "Weak!", "Broken!"
+   *
+   *  @return A QString indicating the status of the Control Network.
+   */
   QString ControlNetVitals::getStatus() {
     return m_status;
   }
 
 
+  /**
+   *  This method is designed to return details for the status of the network.
+   *
+   *  This QString could contain several details if the status is weak, if more than one
+   *  factor contribute to the weakness of the network. Details are separated by newline '\n'
+   *  in the QString.
+   *
+   *  @return A QString containing details for the status of the Control Network.
+   */
   QString ControlNetVitals::getStatusDetails() {
     return m_statusDetails;
   }
 
 
+  /**
+   *  This method is designed to return networkId of the observed Control Network.
+   *
+   *  It is a wrapper for the ControlNet::GetNetworkId() call of the observed Control Network.
+   *
+   *  @return A QString containing the NetworkId of the Control Network.
+   */
   QString ControlNetVitals::getNetworkId() {
     return m_controlNet->GetNetworkId();
   }
 
 
+  /**
+   *  This method is designed to evaluate the current vitals of the network to determine
+   *  if any weaknesses are present and update the status of the network.
+   *
+   *  The network status is split into 3 states: Healthy, Weak, and Broken.
+   *
+   *  Healthy - A network is healthy if there are no weaknesses found and it is not broken.
+   *  Weak    - A network is weak if it has points that fall below the measure threshold,
+   *            A network is weak if it has images that fall below the measure threshold,
+   *            A network is weak if it has images that fall below a Convex Hull tolerance.
+   *  Broken  - A network is broken if it has more than 1 island.
+   */
   void ControlNetVitals::validate() {
 
     QString status = "";
@@ -505,10 +780,6 @@ namespace Isis {
         details = "This network is healthy.";
       }
     }
-    updateStatus(status, details);
-  }
-
-  void ControlNetVitals::updateStatus(QString status, QString details) {
     m_status = status;
     m_statusDetails = details;
     emit networkChanged();
