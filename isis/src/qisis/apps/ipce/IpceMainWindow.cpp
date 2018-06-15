@@ -664,8 +664,6 @@ namespace Isis {
 
     QString appName = QApplication::applicationName();
 
-    qDebug()<<"readSettings filename = "<<FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config").expanded();
-
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
           .expanded(), QSettings::NativeFormat);
@@ -678,7 +676,6 @@ namespace Isis {
       QStringList projectPathList;
       settings.beginGroup("recent_projects");
       QStringList keys = settings.allKeys();
-      qDebug()<<"::readSettings keys.count = "<<keys.count();
       QRegExp underscore("%%%%%");
 
       foreach (QString key, keys) {
@@ -692,7 +689,6 @@ namespace Isis {
       settings.endGroup();
 
       QStringList projectPathReverseList;
-      qDebug()<<"::readSettings projectPathList.count = "<<projectPathList.count();
       for (int i = projectPathList.count()-1;i>=0;i--) {
         projectPathReverseList.append(projectPathList[i]);
       }
@@ -710,12 +706,9 @@ namespace Isis {
           break;
        }
 
-
-      qDebug()<<"::readSettings before setRecentProjectsList projectPathListTruncated.count = "<<projectPathListTruncated.count();
       m_directory->setRecentProjectsList(projectPathListTruncated);
       m_directory->updateRecentProjects();
       m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
-      qDebug()<<"::readSettings thread = "<<m_maxThreadCount;
       applyMaxThreadCount();
     }
     //  Project specific settings
