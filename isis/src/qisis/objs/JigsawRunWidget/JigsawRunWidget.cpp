@@ -309,65 +309,68 @@ namespace Isis {
     // create Control with output control net and add to m_bundleSolutionInfo
     m_bundleSolutionInfo->setOutputControl(new Control(m_project, outputControlName.expanded()));
 
-    // Iterate through all of the image lists (the "imports" in the project).
-    QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
-    foreach (ImageList *imageList, imageLists) {
-      // Keep track of the file names of the images that were used in the bundle.
-      QStringList imagesToCopy;
+    if (m_ui->detachedLabelsCheckBox->isChecked()) {
+      // Iterate through all of the image lists (the "imports" in the project).
+      QList<ImageList *> imageLists = m_bundleSolutionInfo->imageList();
+      foreach (ImageList *imageList, imageLists) {
+        // Keep track of the file names of the images that were used in the bundle.
+        QStringList imagesToCopy;
 
-      // Now, we iterate through each image in the current image list ("import"), and we determine
-      // the location of the image and where to copy it to (as an ecub).
-      foreach (Image *image, *imageList) {
-        FileName original(image->fileName());
-        // Update our list of tracked file names for the images we are going to copy.
-        imagesToCopy.append(original.expanded());
-      }
-      // Concurrently copy the bundled images as ecub's to the bundle solution info results.
-      CopyImageToResultsFunctor copyImage(m_project->bundleSolutionInfoRoot() + "/" +
-                                          m_bundleSolutionInfo->runTime() + "/images/" +
-                                          imageList->name());
-      QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
-
-      // Prepare for our adjusted images (ecubs)
-      ImageList *adjustedImages = new ImageList(imageList->name(), imageList->path());
-
-      // Update the adjusted images' labels
-      for (int i = 0; i < imagesToCopy.size(); i++) {
-        Cube *ecub = copiedCubes.resultAt(i);
-        if (ecub) {
-          Process propagateHistory;
-          propagateHistory.SetInputCube(ecub);
-
-          // check for existing polygon, if exists delete it
-          if (ecub->label()->hasObject("Polygon")) {
-            ecub->label()->deleteObject("Polygon");
-          }
-
-          // check for CameraStatistics Table, if exists, delete
-          for (int iobj = 0; iobj < ecub->label()->objects(); iobj++) {
-            PvlObject obj = ecub->label()->object(iobj);
-            if (obj.name() != "Table") continue;
-            if (obj["Name"][0] != QString("CameraStatistics")) continue;
-            ecub->label()->deleteObject(iobj);
-            break;
-          }
-
-          // Timestamp and propagate the instrument pointing table and instrument position table
-          QString bundleTimestamp = "Jigged = " + m_bundleSolutionInfo->runTime();
-          Table cMatrix = m_bundleAdjust->cMatrix(i);
-          Table spVector = m_bundleAdjust->spVector(i);
-          cMatrix.Label().addComment(bundleTimestamp);
-          spVector.Label().addComment(bundleTimestamp);
-          ecub->write(cMatrix);
-          ecub->write(spVector);
-          // The ecub is now adjusted, add this to our list of adjusted images
-          Image *newImage = new Image(ecub);
-          adjustedImages->append(newImage);
-          newImage->closeCube();
+        // Now, we iterate through each image in the current image list ("import"), and we determine
+        // the location of the image and where to copy it to (as an ecub).
+        foreach (Image *image, *imageList) {
+          FileName original(image->fileName());
+          // Update our list of tracked file names for the images we are going to copy.
+          imagesToCopy.append(original.expanded());
         }
+        // Concurrently copy the bundled images as ecub's to the bundle solution info results.
+        CopyImageToResultsFunctor copyImage(m_project->bundleSolutionInfoRoot() + "/" +
+                                            m_bundleSolutionInfo->runTime() + "/images/" +
+                                            imageList->name());
+        QFuture<Cube *> copiedCubes = QtConcurrent::mapped(imagesToCopy, copyImage);
+
+        // Prepare for our adjusted images (ecubs)
+        ImageList *adjustedImages = new ImageList(imageList->name(), imageList->path());
+
+        // Update the adjusted images' labels
+        for (int i = 0; i < imagesToCopy.size(); i++) {
+          Cube *ecub = copiedCubes.resultAt(i);
+          if (ecub) {
+            Process propagateHistory;
+            propagateHistory.SetInputCube(ecub);
+
+            // check for existing polygon, if exists delete it
+            if (ecub->label()->hasObject("Polygon")) {
+              ecub->label()->deleteObject("Polygon");
+            }
+
+            // check for CameraStatistics Table, if exists, delete
+            for (int iobj = 0; iobj < ecub->label()->objects(); iobj++) {
+              PvlObject obj = ecub->label()->object(iobj);
+              if (obj.name() != "Table") continue;
+              if (obj["Name"][0] != QString("CameraStatistics")) continue;
+              ecub->label()->deleteObject(iobj);
+              break;
+            }
+
+            // Timestamp and propagate the instrument pointing table and instrument position table
+            QString bundleTimestamp = "Jigged = " + m_bundleSolutionInfo->runTime();
+            Table cMatrix = m_bundleAdjust->cMatrix(i);
+            Table spVector = m_bundleAdjust->spVector(i);
+            cMatrix.Label().addComment(bundleTimestamp);
+            spVector.Label().addComment(bundleTimestamp);
+            ecub->write(cMatrix);
+            ecub->write(spVector);
+            // The ecub is now adjusted, add this to our list of adjusted images
+            Image *newImage = new Image(ecub);
+            adjustedImages->append(newImage);
+            newImage->closeCube();
+          }
+        }
+        // Tell the BundleSolutionInfo what the adjusted images are
+        m_bundleSolutionInfo->addAdjustedImages(adjustedImages);
       }
-      // Tell the BundleSolutionInfo what the adjusted images are
-      m_bundleSolutionInfo->addAdjustedImages(adjustedImages);
+      
     }
 
     // Tell the project about the BundleSolutionInfo

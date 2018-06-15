@@ -479,9 +479,18 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QCheckBox" name="checkBox">
+            <widget class="QCheckBox" name="detachedLabelsCheckBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="text">
               <string>Write Detached Image Labels on Accept</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="tristate">
+              <bool>false</bool>
              </property>
             </widget>
            </item>

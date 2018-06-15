@@ -95,6 +95,8 @@ namespace Isis {
    *                           status bar, control net info, and rms adj point sigmas sections. 
    *                           Removed buttons for close and reject. Now inherits from QDockWidget
    *                           instead of QFrame, and handles close event if a bundle is running. 
+   *   @history 2018-06-15 Christopher Combs - Implemented "Write detached labels" checkbox. 
+   *                           made changes to on_JigsawAcceptButton_clicked to reflect this.
    */
   class JigsawRunWidget : public QDockWidget {
     Q_OBJECT
