@@ -210,9 +210,7 @@ namespace Isis {
 
     // If one control network was imported, then activeControl() will set the
     // active control to that control network
-    if (project()->controls().count() == 1) {
-      project()->activeControl();
-    }
+    project()->activeControl();
   }
 
   /**
