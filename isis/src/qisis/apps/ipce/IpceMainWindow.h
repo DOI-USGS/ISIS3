@@ -141,6 +141,10 @@ namespace Isis {
    *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                           view has its own toolbar, so having an active toolbar and tool pad is
    *                           not needed.
+   *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
+   *                           must be called before initializeActions to get the recent projects
+   *                           from the config file.
+   *  
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
