@@ -12,6 +12,8 @@ namespace Isis {
 
   ControlNetVitals::ControlNetVitals(ControlNet *cnet) {
     m_controlNet = cnet;
+    connect(cnet, SIGNAL(networkStructureModified()),
+            this, SLOT(validate()));
     validate();
   }
 
@@ -229,17 +231,17 @@ namespace Isis {
 
       if (numPointsBelowMeasureThreshold() < 3) {
         status = "Weak!";
-        details += "This network has " + toString(numPointsBelowMeasureThreshold()) + " points with less than 3 measures\n";
+        details += "This network has " + toString(numPointsBelowMeasureThreshold()) + " point(s) with less than 3 measures\n";
       }
 
       if (numImagesBelowMeasureThreshold() < 3) {
         status = "Weak!";
-        details += "This network has " + toString(numImagesBelowMeasureThreshold()) + " images with less than 3 measures\n";
+        details += "This network has " + toString(numImagesBelowMeasureThreshold()) + " image(s) with less than 3 measures\n";
       }
 
       if (numImagesBelowHullTolerance() > 0) {
         status = "Weak!";
-        details += "This network has " + toString(numImagesBelowHullTolerance()) + " images below the Convex Hull Tolerance of 75%\n";
+        details += "This network has " + toString(numImagesBelowHullTolerance()) + " image(s) below the Convex Hull Tolerance of 75%\n";
       }
 
       if (status.isEmpty()) {
