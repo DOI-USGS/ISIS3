@@ -102,14 +102,6 @@ namespace Isis {
     strncpy(env, "LANG=en_US", 1023);
     putenv(env);
 
-    // Verify ISISROOT was set
-    if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
-      QString message = "Please set ISISROOT before running any Isis "
-          "applications";
-      cerr << message << endl;
-      abort();
-    }
-
     // Get the starting cpu time, direct I/Os, page faults, and swaps
     //p_startClock = clock();
     p_startDirectIO = DirectIO();

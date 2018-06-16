@@ -623,9 +623,9 @@ namespace Isis {
   }
 
 
-  void MosaicSceneWidget::save(QXmlStreamWriter &stream, Project *, FileName) const {
+  void MosaicSceneWidget::save(QXmlStreamWriter &stream, Project *, FileName ) const {
     if (m_projection) {
-      stream.writeStartElement("footprint2DView");
+      stream.writeStartElement("mosaicScene");
 
       stream.writeStartElement("projection");
       PvlGroup mapping = m_projection->Mapping();

@@ -160,6 +160,43 @@ namespace Isis {
 
 
   /**
+   * Add a non-workorder history to the display.
+   *
+   * @param (QString) historyEntry The string displayed in the history tree
+   */
+  void HistoryTreeWidget::addToHistory(QString historyEntry) {
+
+    QString data = historyEntry;
+
+    QStringList columnData;
+    columnData.append(data);
+
+    QTreeWidgetItem *newItem = new QTreeWidgetItem(columnData);
+
+
+    // Do font for progress text
+    QFont progressFont = newItem->font(1);
+    progressFont.setItalic(true);
+    newItem->setFont(1, progressFont);
+    newItem->setForeground(1, Qt::gray);
+
+    this->insertTopLevelItem(0, newItem);
+//      invisibleRootItem()->addChild(newItem);
+
+    //Sometimes the pointer returned by this call is 0 (hence the check).
+    //So we are not creating a progress bar for every work order which would
+    //include those that do not need it.
+
+//    if(workOrder->progressBar() )  {
+//      setItemWidget(newItem, 1, new ProgressBar);
+////        this->setItemWidget(newItem, 1, workOrder->progressBar() );
+//    }
+    scrollToItem(newItem);
+    refit();
+  }
+
+
+  /**
    * We need to manually manage these progress widgets because QTreeWidget does a poor job of it.
    *   This should be called when the progress bar instances have changed (new progress, lost a
    *   progress, etc...). This is not necessary when the progress values have changed.
