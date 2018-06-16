@@ -37,8 +37,6 @@
 #include <QTabWidget>
 #include <QToolBar>
 #include <QtXml>
-#include <QVBoxLayout>
-#include <QWidgetAction>
 
 #include "Control.h"
 #include "ControlNet.h"
@@ -46,10 +44,7 @@
 #include "Directory.h"
 #include "FileName.h"
 #include "Project.h"
-#include "ToolList.h"
 #include "XmlStackedHandlerReader.h"
-// #include "HelpTool.h"
-// #include "TrackTool.h"
 
 namespace Isis {
   /**
