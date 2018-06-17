@@ -21,7 +21,7 @@ using namespace Isis;
 #include <vector>
 
 //functions in the code
-void CompareLabels(Pvl &match, Pvl &comp);
+void compareLabels(Pvl &match, Pvl &comp);
 
 
 void IsisMain() {
@@ -29,35 +29,32 @@ void IsisMain() {
   // Get the list of cubes to mosaic
 
   UserInterface &ui = Application::GetUserInterface();
-  FileList flist(ui.GetFileName("FROMLIST"));
+  FileList fromList(ui.GetFileName("FROMLIST"));
 
-  vector<Cube *> clist;
+  vector<Cube *> cubeList;
   try {
-    if(flist.size() < 1) {
+    if (fromList.size() < 1) {
       QString msg = "the list file [" + ui.GetFileName("FROMLIST") +
                     "does not contain any data";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // open all the cube and place in vector clist
+    // open all the cube and place in vector cubeList
 
-    for(int i = 0; i < flist.size(); i++) {
-      Cube *c = new Cube();
-      clist.push_back(c);
-      c->open(flist[i].toString());
+    for (int i = 0; i < fromList.size(); i++) {
+      Cube *cube = new Cube();
+      cubeList.push_back(cube);
+      cube->open(fromList[i].toString());
     }
 
 
 
     // run the compare function here.  This will conpare the
     // labels of the first cube to the labels of each following cube.
-//     PvlKeyword sourceProductId("SourceProductId");
-    QString ProdId;
-    Pvl *pmatch = clist[0]->label();
-    for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *pcomp = clist[i]->label();
-      CompareLabels(*pmatch, *pcomp);
-      ProdId = (QString)pmatch->findGroup("Archive", Pvl::Traverse)["UniqueIdentifier"];
+    Pvl *matchLabel = cubeList[0]->label();
+    for (int i = 0; i < (int)cubeList.size(); i++) {
+      Pvl *compareLabel = cubeList[i]->label();
+      compareLabels(*matchLabel, *compareLabel);
     }
 
     bool runXY = true;
@@ -69,37 +66,37 @@ void IsisMain() {
     double maxLon = -DBL_MAX;
     double avgLat;
     double avgLon;
-    for(int i = 0; i < (int)clist.size(); i++) {
-      TProjection *proj = (TProjection *) clist[i]->projection();
-      if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
-      if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
-      if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
-      if(proj->MaximumLongitude() > maxLon) maxLon = proj->MaximumLongitude();
+    for (int i = 0; i < (int)cubeList.size(); i++) {
+      TProjection *proj = (TProjection *) cubeList[i]->projection();
+      if (proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
+      if (proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
+      if (proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
+      if (proj->MaximumLongitude() > maxLon) maxLon = proj->MaximumLongitude();
     }
     avgLat = (minLat + maxLat) / 2;
     avgLon = (minLon + maxLon) / 2;
-    TProjection *proj = (TProjection *) clist[0]->projection();
+    TProjection *proj = (TProjection *) cubeList[0]->projection();
     proj->SetGround(avgLat, avgLon);
     avgLat = proj->UniversalLatitude();
     avgLon = proj->UniversalLongitude();
     // Use camera class to get Inc., emi., phase, and other values
-    double Cemiss;
-    double Cphase;
-    double Cincid;
-    double ClocalSolTime;
-    double CsolarLong;
-    double CsunAzimuth;
-    double CnorthAzimuth;
-    for(int i = 0; i < (int)clist.size(); i++) {
-      Camera *cam = clist[i]->camera();
-      if(cam->SetUniversalGround(avgLat, avgLon)) {
-        Cemiss = cam->EmissionAngle();
-        Cphase = cam->PhaseAngle();
-        Cincid = cam->IncidenceAngle();
-        ClocalSolTime = cam->LocalSolarTime();
-        CsolarLong = cam->solarLongitude().degrees();
-        CsunAzimuth = cam->SunAzimuth();
-        CnorthAzimuth = cam->NorthAzimuth();
+    double emissionAngle;
+    double phaseAngle;
+    double incidenceAngle;
+    double localSolarTime;
+    double solarLongitude;
+    double sunAzimuth;
+    double northAzimuth;
+    for (int i = 0; i < (int)cubeList.size(); i++) {
+      Camera *cam = cubeList[i]->camera();
+      if (cam->SetUniversalGround(avgLat, avgLon)) {
+        emissionAngle = cam->EmissionAngle();
+        phaseAngle = cam->PhaseAngle();
+        incidenceAngle = cam->IncidenceAngle();
+        localSolarTime = cam->LocalSolarTime();
+        solarLongitude = cam->solarLongitude().degrees();
+        sunAzimuth = cam->SunAzimuth();
+        northAzimuth = cam->NorthAzimuth();
         runXY = false;
         break;
       }
@@ -109,34 +106,34 @@ void IsisMain() {
     //pole images that would fail when using projection set universal ground.
     // This is run if no intersect is found when using lat and lon in
     // projection space.
-    if(runXY) {
+    if (runXY) {
       double startX = DBL_MAX;
       double endX = DBL_MIN;
       double startY = DBL_MAX;
       double endY =  DBL_MIN;
-      for(int i = 0; i < (int)clist.size(); i++) {
-        TProjection *proj = (TProjection *) clist[i]->projection();
+      for (int i = 0; i < (int)cubeList.size(); i++) {
+        TProjection *proj = (TProjection *) cubeList[i]->projection();
         proj->SetWorld(0.5, 0.5);
-        if(i == 0) {
+        if (i == 0) {
           startX = proj->XCoord();
           endY = proj->YCoord();
         }
         else {
-          if(proj->XCoord() < startX) startX =  proj->XCoord();
-          if(proj->YCoord() > endY) endY = proj->YCoord();
+          if (proj->XCoord() < startX) startX =  proj->XCoord();
+          if (proj->YCoord() > endY) endY = proj->YCoord();
         }
-        Pvl *p = clist[i]->label();
+        Pvl *p = cubeList[i]->label();
         double nlines = p->findGroup("Dimensions", Pvl::Traverse)["Lines"];
         double nsamps = p->findGroup("Dimensions", Pvl::Traverse)["Samples"];
 
         proj->SetWorld((nsamps + 0.5), (nlines + 0.5));
-        if(i == 0) {
+        if (i == 0) {
           endX = proj->XCoord();
           startY = proj->YCoord();
         }
         else {
-          if(proj->XCoord() > endX) endX =  proj->XCoord();
-          if(proj->YCoord() < startY) startY = proj->YCoord();
+          if (proj->XCoord() > endX) endX =  proj->XCoord();
+          if (proj->YCoord() < startY) startY = proj->YCoord();
         }
       }
 
@@ -145,22 +142,22 @@ void IsisMain() {
       double sample = proj->ToWorldX(avgX);
       double line = proj->ToWorldY(avgY);
 
-      for(int i = 0; i < (int)clist.size(); i++) {
-        Camera *cam = clist[i]->camera();
-        if(cam->SetImage(sample, line)) {
-          Cemiss = cam->EmissionAngle();
-          Cphase = cam->PhaseAngle();
-          Cincid = cam->IncidenceAngle();
-          ClocalSolTime = cam->LocalSolarTime();
-          CsolarLong = cam->solarLongitude().degrees();
-          CsunAzimuth = cam->SunAzimuth();
-          CnorthAzimuth = cam->NorthAzimuth();
+      for (int i = 0; i < (int)cubeList.size(); i++) {
+        Camera *cam = cubeList[i]->camera();
+        if (cam->SetImage(sample, line)) {
+          emissionAngle = cam->EmissionAngle();
+          phaseAngle = cam->PhaseAngle();
+          incidenceAngle = cam->IncidenceAngle();
+          localSolarTime = cam->LocalSolarTime();
+          solarLongitude = cam->solarLongitude().degrees();
+          sunAzimuth = cam->SunAzimuth();
+          northAzimuth = cam->NorthAzimuth();
           runXY = false;
           break;
         }
       }
     }
-    if(runXY) {
+    if (runXY) {
       QString msg = "Camera did not intersect images to gather stats";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -171,63 +168,64 @@ void IsisMain() {
     QString startTime;
     QString instrumentId;
     QString spacecraftName;
+    QString observationId;
 
-    for(int i = 0; i < (int)clist.size(); i++) {
+    for (int i = 0; i < (int)cubeList.size(); i++) {
       // himos used original label here.
 
-      Pvl *origLab = clist[i]->label();
-      PvlGroup timegrp = origLab->findGroup("Instrument", Pvl::Traverse);
+      Pvl *origLab = cubeList[i]->label();
+      PvlGroup instGroup = origLab->findGroup("Instrument", Pvl::Traverse);
 
-      if(i == 0) {
-        startClock = (QString)timegrp["SpacecraftClockStartCount"];
-        startTime = (QString)timegrp["StartTime"];
-        instrumentId = (QString) timegrp["InstrumentId"];
-        spacecraftName = (QString) timegrp["SpacecraftName"];
+      if (i == 0) {
+        spacecraftName = instGroup["SpacecraftName"][0];
+        instrumentId =   instGroup["InstrumentId"][0];
+        observationId =  instGroup["ObservationId"][0];
+        startTime =      instGroup["StartTime"][0];
+        startClock =     instGroup["SpacecraftClockStartCount"][0];
       }
       else {
-        QString testStartTime = (QString)timegrp["StartTime"];
-        if(testStartTime < startTime) {
+        QString testStartTime = instGroup["StartTime"][0];
+        if (testStartTime < startTime) {
           startTime = testStartTime;
-          startClock = (QString)timegrp["SpacecraftClockStartCount"];
+          startClock = instGroup["SpacecraftClockStartCount"][0];
         }
       }
     }
 
     // Get the blob of original labels from first image in list
-   // Pvl *org = clist[0]->label();
+   // Pvl *org = cubeList[0]->label();
 
     //close all cubes
-    for(int i = 0; i < (int)clist.size(); i++) {
-      clist[i]->close();
-      delete clist[i];
+    for (int i = 0; i < (int)cubeList.size(); i++) {
+      cubeList[i]->close();
+      delete cubeList[i];
     }
-    clist.clear();
+    cubeList.clear();
 
     // automos step
     QString list = ui.GetFileName("FROMLIST");
     QString toMosaic = ui.GetFileName("TO");
-    QString MosaicPriority = ui.GetString("PRIORITY");
+    QString mosaicPriority = ui.GetString("PRIORITY");
 
-    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
+    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority;
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // write out new information to new group mosaic
 
 
     PvlGroup mos("Mosaic");
-    mos += PvlKeyword("ObservationId ", ProdId);
     mos += PvlKeyword("SpacecraftName", spacecraftName);
     mos += PvlKeyword("InstrumentId", instrumentId);
-//     mos += PvlKeyword(sourceProductId);
+    mos += PvlKeyword("ObservationId ", observationId);
     mos += PvlKeyword("StartTime ", startTime);
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
-    mos += PvlKeyword("IncidenceAngle ", toString(Cincid), "DEG");
-    mos += PvlKeyword("EmissionAngle ", toString(Cemiss), "DEG");
-    mos += PvlKeyword("PhaseAngle ", toString(Cphase), "DEG");
-    mos += PvlKeyword("LocalTime ", toString(ClocalSolTime), "LOCALDAY/24");
-    mos += PvlKeyword("SolarLongitude ", toString(CsolarLong), "DEG");
-    mos += PvlKeyword("SubSolarAzimuth ", toString(CsunAzimuth), "DEG");
-    mos += PvlKeyword("NorthAzimuth ", toString(CnorthAzimuth), "DEG");
+    mos += PvlKeyword("IncidenceAngle ", toString(incidenceAngle), "degrees");
+    mos += PvlKeyword("EmissionAngle ", toString(emissionAngle), "degrees");
+    mos += PvlKeyword("PhaseAngle ", toString(phaseAngle), "degrees");
+    mos += PvlKeyword("LocalTime ", toString(localSolarTime), "localday/24");
+    mos += PvlKeyword("SolarLongitude ", toString(solarLongitude), "degrees");
+    mos += PvlKeyword("SubSolarAzimuth ", toString(sunAzimuth), "degrees");
+    mos += PvlKeyword("NorthAzimuth ", toString(northAzimuth), "degrees");
 
     Cube mosCube;
     mosCube.open(ui.GetFileName("TO"), "rw");
@@ -239,35 +237,39 @@ void IsisMain() {
 
   }
   catch(IException &e) {
-    for(int i = 0; i < (int)clist.size(); i++) {
-      clist[i]->close();
-      delete clist[i];
+    for (int i = 0; i < (int)cubeList.size(); i++) {
+      cubeList[i]->close();
+      delete cubeList[i];
     }
     QString msg = "The mosaic [" + ui.GetFileName("TO") + "] was NOT created";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 } // end of isis main
 
-//Function to compare label - CompareLabels
-void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
+
+/**
+ * Function to verify that label values match.
+ */
+void compareLabels(Pvl &matchLabel, Pvl &compareLabel) {
   // test of the ObservationId
-//   PvlGroup matchgrp = pmatch.findGroup("Archive", Pvl::Traverse);
-//   PvlGroup compgrp = pcomp.findGroup("Archive", Pvl::Traverse);
-//   QString obsMatch = matchgrp["ObservationId"];
-//   QString obsComp = compgrp["ObservationId"];
-//
-//   if(obsMatch != obsComp) {
-//     QString msg = "Images not from the same observation";
-//     throw IException(IException::User, msg, _FILEINFO_);
-//   }
+   PvlGroup matchArchive = matchLabel.findGroup("Archive", Pvl::Traverse);
+   PvlGroup compareArchive = compareLabel.findGroup("Archive", Pvl::Traverse);
+
+   QString matchObsId = matchArchive["ObservationId"];
+   QString compareObsId = compareArchive["ObservationId"];
+
+   if (matchObsId != compareObsId) {
+     QString msg = "Images not from the same observation";
+     throw IException(IException::User, msg, _FILEINFO_);
+   }
 
   // Test of the BandBin filter name
-  PvlGroup bmatchgrp = pmatch.findGroup("BandBin", Pvl::Traverse);
-  PvlGroup bcompgrp = pcomp.findGroup("BandBin", Pvl::Traverse);
-  QString bandMatch = bmatchgrp["FilterName"];
-  QString bandComp = bcompgrp["FilterName"];
+  PvlGroup matchBandBin = matchLabel.findGroup("BandBin", Pvl::Traverse);
+  PvlGroup compareBandBin = compareLabel.findGroup("BandBin", Pvl::Traverse);
+  QString matchFilter = matchBandBin["FilterName"];
+  QString compareFilter = compareBandBin["FilterName"];
 
-  if(bandMatch != bandComp) {
+  if (matchFilter != compareFilter) {
     QString msg = "Images not the same filter";
     throw IException(IException::User, msg, _FILEINFO_);
   }

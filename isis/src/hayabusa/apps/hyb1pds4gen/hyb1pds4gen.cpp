@@ -51,7 +51,7 @@ void IsisMain() {
 
     ProcessExportPds4::translateUnits(pdsLabel);
 
-  }
+ 6hbg41} 
   else { // AMICA
 
     QDomDocument &pdsLabel = process.StandardPds4Label();
