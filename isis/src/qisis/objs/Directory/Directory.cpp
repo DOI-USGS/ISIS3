@@ -393,6 +393,7 @@ namespace Isis {
       }
   }
 
+
   /**
    * @brief Initializes the actions that the Directory can provide to a main window.
    *
@@ -1765,27 +1766,6 @@ namespace Isis {
         latitude, longitude, cube, isGroundSource);
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
-  }
-
-
-  /**
-   * Save the current active control.
-   *
-   */
-  void Directory::saveActiveControl() {
-
-    if (project()->activeControl()) {
-      project()->activeControl()->write();
-      // add to HistoryTreeWidget
-      QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
-        "has been saved.";
-      m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
-    }
-
-    // Make sure the ControlPointEditView "Save Net" button is no longer red
-    if (controlPointEditView()) {
-      controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
-    }
   }
 
 

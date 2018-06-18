@@ -140,7 +140,8 @@ namespace Isis {
    *   @history 2018-06-13 Tracie Sucharski - Fixed cleanup of views and QDockWidgets.
    *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                           view has its own toolbar, so having an active toolbar and tool pad is
-   *                           not needed.
+   *                           not needed. Removed code adding the save active control net button and
+   *                           the toolpad, since control nets can be saved with the project save button.
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
