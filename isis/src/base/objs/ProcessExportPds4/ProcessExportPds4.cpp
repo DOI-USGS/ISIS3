@@ -416,7 +416,8 @@ namespace Isis {
     
     // Get the input Isis cube label and find the BandBin group if it has one
     if (m_imageType == StandardImage) {
-      imageBandBin();
+      //imageBandBin();
+      translateBandBinImage(inputLabel);
     }
     else {
       // Add header info
@@ -425,16 +426,16 @@ namespace Isis {
                 "xmlns:sp", 
                 "http://pds.nasa.gov/pds4/sp/v1");
       if (m_imageType == UniformlySampledSpectrum) {
-        imageBandBinSpectrum();
+        translateBandBinSpectrumUniform(inputLabel);
       }
       else if (m_imageType == BinSetSpectrum) {
-        imageBandBinSpectrumBinSet();
+        translateBandBinSpectrumBinSet(inputLabel);
       }
     }
   }
 
 
-  void ProcessExportPds4::translateBandBinImage() {
+  void ProcessExportPds4::translateBandBinImage(Pvl *inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinImage.trn";
     FileName translationFileName(translationFile);
@@ -443,7 +444,7 @@ namespace Isis {
   }
 
 
-  void ProcessExportPds4::translateBandBinSpectrumUniform() {
+  void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl *inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumUniform.trn";
     FileName translationFileName(translationFile);
@@ -582,7 +583,7 @@ namespace Isis {
   }
 
 
-  void ProcessExportPds4::translateBandBinSpectrumBinSet() {
+  void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl *inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
     FileName translationFileName(translationFile);
