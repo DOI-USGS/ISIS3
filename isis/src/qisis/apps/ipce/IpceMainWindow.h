@@ -142,8 +142,9 @@ namespace Isis {
    *   @history 2018-06-13 Tracie Sucharski - Fixed cleanup of views and QDockWidgets. 
    *   @history 2018-06-14 Makayla Shepherd - ipce now defaults to full screen if there is not an
    *                           ipce.config in the project or in ~/.Isis/ipce.
-   *   @history 2018-06-14 Makayla Shepherd - We are no longer saving the state of a temporary
-   *                           project.
+   *   @history 2018-06-14 Makayla Shepherd - Stopped saving the state of a temporary project.
+   *   @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of 
+   *                           the project. 
    *  
    */
   class IpceMainWindow : public QMainWindow {
