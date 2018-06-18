@@ -369,7 +369,9 @@ namespace Isis {
     bool oldStatus = p_ignore;
     p_ignore = newIgnoreStatus;
 
-    Parent()->emitMeasureModified(this, IgnoredModified, oldStatus, p_ignore);
+    if (Parent()) {
+      Parent()->emitMeasureModified(this, IgnoredModified, oldStatus, p_ignore);
+    }
 
     // only update if there was a change in status
     if (oldStatus != p_ignore) {
