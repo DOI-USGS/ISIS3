@@ -97,8 +97,6 @@ namespace Isis {
   QSize ControlPointEditView::sizeHint() const {
     return QSize(800, 600);
   }
-<<<<<<< HEAD
-=======
 
 
   /**
@@ -131,5 +129,4 @@ namespace Isis {
   QList<QAction *> ControlPointEditView::toolPadActions() {
     return m_toolPad->actions();
   }
->>>>>>> 1001bc94a06dc2dc3a66150daac19cd5356ced42
 }
