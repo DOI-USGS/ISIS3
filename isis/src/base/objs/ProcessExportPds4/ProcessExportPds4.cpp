@@ -438,7 +438,7 @@ namespace Isis {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinImage.trn";
     FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
   }
 
@@ -447,10 +447,10 @@ namespace Isis {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumUniform.trn";
     FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
-    PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
     // fix multi-valued bandbin info
     QStringList xmlPath;
     xmlPath << "Product_Observational"
@@ -529,7 +529,7 @@ namespace Isis {
       axisBinSetElement = m_domDoc->createElement("sp:Axis_Bin_Set");
       spectralCharElement.appendChild(axisBinSetElement);
     }
-    int bands = (int)inputLabel->findObject("IsisCube")
+    int bands = (int)inputLabel.findObject("IsisCube")
                                 .findObject("Core")
                                 .findGroup("Dimensions")
                                 .findKeyword("Bands");
@@ -586,10 +586,10 @@ namespace Isis {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
     FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
-    PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
     // fix multi-valued bandbin info
     QStringList xmlPath;
     xmlPath << "Product_Observational"
