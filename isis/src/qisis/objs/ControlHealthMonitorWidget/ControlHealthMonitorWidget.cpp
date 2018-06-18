@@ -735,7 +735,7 @@ namespace Isis {
    *
    */
   void ControlHealthMonitorWidget::viewImageAll() {
-    updateImageTable(m_vitals->getAllImageSerials());
+    updateImageTable(m_vitals->getCubeSerials());
     m_imagesShowingLabel->setText("Showing: All Images <sup>" +
                                   toString(m_vitals->numImages()) +
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
