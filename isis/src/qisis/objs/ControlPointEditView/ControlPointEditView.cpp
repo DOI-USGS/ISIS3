@@ -158,6 +158,4 @@ namespace Isis {
   QList<QAction *> ControlPointEditView::toolPadActions() {
     return m_toolPad->actions();
   }
-
-
 }
