@@ -89,8 +89,6 @@ namespace Isis {
     //centralWidget->hide();
     setDockNestingEnabled(true);
 
-    m_activeView = NULL;
-
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
@@ -466,7 +464,6 @@ namespace Isis {
     QSize iconSize(25, 45);
     m_permToolBar->setIconSize(iconSize);
     m_permToolBar->setObjectName("PermanentToolBar");
-
     addToolBar(m_permToolBar);
 
     foreach ( QAction *action, m_directory->permToolBarActions() ) {
