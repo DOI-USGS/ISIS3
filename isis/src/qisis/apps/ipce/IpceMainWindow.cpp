@@ -227,14 +227,14 @@ namespace Isis {
 
 
   /**
-   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will 
+   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
    * close the given view and delete the view. This was written to handle
-   * 
-   * @param view QWidget* 
+   *
+   * @param view QWidget*
    *
    */
   void IpceMainWindow::removeView(QWidget *view) {
-    
+
     view->close();
     delete view;
   }
@@ -342,6 +342,10 @@ namespace Isis {
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
+
+    QAction *tabViewsAction = new QAction("Tab Views", this);
+    connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabAllViews()) );
+    m_viewMenuActions.append(tabViewsAction);
 
     QAction *saveNet = new QAction("&Save Active Control Network", this);
     saveNet->setIcon( QIcon::fromTheme("document-save") );
@@ -486,7 +490,7 @@ namespace Isis {
 
   /**
    * Create the tool bars and populates them with QActions from several sources. Actions are taken
-   * from an internal list of QActions and the Directory. 
+   * from an internal list of QActions and the Directory.
    */
   void IpceMainWindow::createToolBars() {
     m_permToolBar = new QToolBar(this);
@@ -514,11 +518,11 @@ namespace Isis {
     foreach (QAction *action, m_permToolBarActions) {
       if (action->text() == "&Save Active Control Network") {
         m_permToolBar->addSeparator();
-        m_permToolBar->addAction(action); 
+        m_permToolBar->addAction(action);
         m_permToolBar->addSeparator();
       }
       else {
-        m_permToolBar->addAction(action); 
+        m_permToolBar->addAction(action);
       }
     }
   }
@@ -715,10 +719,10 @@ namespace Isis {
     else {
       setWindowTitle( project->name() );
       if (settings.contains("geometry")) {
-        setGeometry(settings.value("geometry").value<QRect>()); 
+        setGeometry(settings.value("geometry").value<QRect>());
       }
       if (settings.contains("windowState")) {
-        restoreState(settings.value("windowState").toByteArray()); 
+        restoreState(settings.value("windowState").toByteArray());
       }
 
       // The geom/state isn't enough for main windows to correctly remember
@@ -809,14 +813,17 @@ namespace Isis {
 
 
   /**
-   * PlaceHolder for the option to tab all views. (This was setTabbedViewMode in the old code)
+   * Tabs all views inside of the main window.
    */
   void IpceMainWindow::tabAllViews() {
-//  QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-//  mdiArea->setViewMode(QMdiArea::TabbedView);
-//  m_cascadeViewsAction->setEnabled(false);
-//  m_tileViewsAction->setEnabled(false);
+  QDockWidget *firstView = m_viewDocks.first();
+  foreach (QDockWidget *currentView, m_viewDocks) {
+    if (currentView == firstView) {
+      continue;
+    }
+    tabifyDockWidget(firstView, currentView);
   }
+}
 
 
 /**

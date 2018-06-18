@@ -112,7 +112,7 @@ namespace Isis {
    *                           detached views from the m_detachedViews list appropriately.
    *                           This fixes an issue where a detached view would appear to be
    *                           open even after it has been closed. Fixes #5109.
-   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it 
+   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it
    *                           was screwing up the display of widgets when a project is loaded.
    *                           Also switched the order in which a project is saved.  A project is
    *                           cleared after it is saved, and not before (which had been the previous
@@ -141,7 +141,7 @@ namespace Isis {
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
-   *  
+   *
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
