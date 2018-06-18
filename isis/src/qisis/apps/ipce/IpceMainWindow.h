@@ -159,7 +159,6 @@ namespace Isis {
       void removeAllViews();
 
       void readSettings(Project *);
-      void writeSettings(Project *project);
 
     protected:
       void closeEvent(QCloseEvent *event);
