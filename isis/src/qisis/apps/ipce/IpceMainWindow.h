@@ -145,6 +145,9 @@ namespace Isis {
    *   @history 2018-06-14 Makayla Shepherd - Stopped saving the state of a temporary project.
    *   @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of 
    *                           the project. 
+   *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
+   *                           must be called before initializeActions to get the recent projects
+   *                           from the config file.
    *  
    */
   class IpceMainWindow : public QMainWindow {
