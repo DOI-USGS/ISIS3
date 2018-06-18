@@ -292,6 +292,8 @@ namespace Isis {
    *                           constructor in the BundleSolutionInfo class because it is derived
    *                           from QObject. Note that we ultimately want to return a QSharedPointer
    *                           instead of a raw pointer.
+   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust. 
+   *                           Fixes #4171.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
