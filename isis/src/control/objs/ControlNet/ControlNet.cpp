@@ -127,20 +127,12 @@ namespace Isis {
     nullify();
   }
 
-  void ControlNet::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
-    std::cout << "Measure modified" << std::endl;
-    std::cout << "Old value: " << oldValue.toString() << std::endl;
-    std::cout << "New value: " << newValue.toString() << std::endl;
-    emit measureModified(measure, type, oldValue, newValue);
 
+  void ControlNet::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
+    emit measureModified(measure, type, oldValue, newValue);
   }
 
   void ControlNet::emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue) {
-    std::cout << "Point modified" << std::endl;
-    std::cout << point << std::endl;
-
-    std::cout << "Old value: " << oldValue.toString() << std::endl;
-    std::cout << "New value: " << newValue.toString() << std::endl;
     emit pointModified(point, type, oldValue, newValue);
   }
 
