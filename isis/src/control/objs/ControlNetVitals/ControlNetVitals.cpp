@@ -353,6 +353,12 @@ namespace Isis {
       m_imageMeasureCounts[numValidMeasures - 1]++;
     }
 
+    // std::cout << "MEasure deleted" << std::endl;
+    // foreach(int key, m_pointMeasureCounts) {
+    //   std::cout << "Key: " << key << "   value: " << m_pointMeasureCounts[key];
+    // }
+
+
     validate();
   }
 
@@ -416,7 +422,7 @@ namespace Isis {
   /**
    *  This method is designed to return a QList containing each island present in the ControlNet.
    *
-   *  Each island is composed of another QList containing the cube serials for all images in that island.
+   *  Each island is composed of another QList containing the cube serials for all cubes in that island.
    *
    *  @return A QList containing a QList of cube serials for each island present in the Control Net.
    */
