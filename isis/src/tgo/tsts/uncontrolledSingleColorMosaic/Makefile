@@ -3,17 +3,17 @@
 #
 # @history 2017-02-13 Kristin Berry - Original version, many things borrowed from 
 #                             singleFrameletProjection cat test. 
+#          2018-06-16 Kristin Berry - Upated to use tgocassismos and tgocassisrdrgen.
 #
 
 INGEST = tgocassis2isis
 SPICE = spiceinit
 MAPFILE = mosrange
 PROJECT = cam2map
-MOSAIC = automos
-EXPORT = isis2pds
+MOSAIC = tgocassismos
+EXPORT = tgocassisrdrgen
 
 include $(ISISROOT)/make/isismake.tsts
-
 
 commands:
 	$(LS) $(INPUT)/*.xml > $(OUTPUT)/inputs.lis;
@@ -29,10 +29,9 @@ commands:
              map=$(OUTPUT)/equi.map \
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/basenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*equi.cub > $(OUTPUT)/mosaic.lis;
-	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/mosaic.lis mosaic=$(OUTPUT)/cassisMosaic.cub > /dev/null;
+	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/mosaic.lis to=$(OUTPUT)/cassisMosaic.cub > /dev/null;
 
-	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/cassisMosaic.cub to=$(OUTPUT)/cassisMosaic \
-             pdsversion=pds4 > /dev/null;
+	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/cassisMosaic.cub to=$(OUTPUT)/cassisMosaic.img > /dev/null;
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
                $(OUTPUT)/cassisMosaic.xml \
 	       > $(OUTPUT)/tempLabel1.txt;
@@ -49,7 +48,7 @@ commands:
 	       $(OUTPUT)/tempLabel4.txt \
                > $(OUTPUT)/cassisMosaic.xmlLabel.txt;
 	catlab from=$(OUTPUT)/cassisMosaic.cub \
-	       to=$(OUTPUT)/cassisMosaic.pvl >& /dev/null;
+	       to=$(OUTPUT)/cassisMosaic.pvl > /dev/null;
 
 	# Cleanup
 	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl
