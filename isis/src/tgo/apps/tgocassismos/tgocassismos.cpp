@@ -175,11 +175,12 @@ void IsisMain() {
 
       Pvl *origLab = cubeList[i]->label();
       PvlGroup instGroup = origLab->findGroup("Instrument", Pvl::Traverse);
+      PvlGroup archiveGroup = origLab->findGroup("Archive", Pvl::Traverse);
 
       if (i == 0) {
         spacecraftName = instGroup["SpacecraftName"][0];
         instrumentId =   instGroup["InstrumentId"][0];
-        observationId =  instGroup["ObservationId"][0];
+        observationId =  archiveGroup["ObservationId"][0];
         startTime =      instGroup["StartTime"][0];
         startClock =     instGroup["SpacecraftClockStartCount"][0];
       }
@@ -237,6 +238,7 @@ void IsisMain() {
 
   }
   catch(IException &e) {
+    e.print();
     for (int i = 0; i < (int)cubeList.size(); i++) {
       cubeList[i]->close();
       delete cubeList[i];
