@@ -177,7 +177,12 @@ namespace Isis {
    *   @history 2018-01-26 Kristin Berry - Removed code related to now-unused ControlCubeGraphNode,
    *                           as part of the switch to using the boost graph library.
    *                           References #5434
-   *
+   *   @history 2018-06-15 Adam Goins & Jesse Mapel - Added the ModType enum, as well as a series
+   *                           of calls to parentNetwork()->emitPointModified() whenever a change
+   *                           is made to a Control Point or any of it's measures. This is done
+   *                           to allow for communication between the ControlNetVitals class
+   *                           and changes made to the Control Network that it is observing.
+   *                           Fixes #5435.
    */
   class ControlMeasure : public QObject {
 
