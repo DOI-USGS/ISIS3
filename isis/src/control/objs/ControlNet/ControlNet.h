@@ -223,8 +223,6 @@ namespace Isis {
    *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode(). References #5434
    *  @history 2018-01-26 Kristin Berry - Updated to use the boost graph library instead of our
    *                           custom graph structure ControlCubeGraphNode.
-   *
-   *
    *   @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
    *                           group to set radii values to those ingested from the versioner
    *                           if they exist. Otherwise, we call SetTarget with the targetname.

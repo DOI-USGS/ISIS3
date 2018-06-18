@@ -375,7 +375,9 @@ namespace Isis {
       }
     }
 
-    foreach(ControlMeasure* measure, point->getMeasures()) {
+    QList< ControlMeasure * > measures = point->getMeasures();
+    for(int i = 0; i < measures.size(); i++) {
+      ControlMeasure* measure = measures[i];
       // Add the measure to the corresponding node
       QString serial = measure->GetCubeSerialNumber();
       m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
@@ -383,20 +385,17 @@ namespace Isis {
       // In this measure's node add connections to the other nodes reachable from
       // its point
       if (!point->IsIgnored() && !measure->IsIgnored()) {
-        for (int i = 0; i < point->GetNumMeasures(); i++) {
-          ControlMeasure *cm = point->GetMeasure(i);
+        for (int j = i + 1; j < measures.size(); j++) {
+          ControlMeasure *cm = measures[j];
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
-
-            if (QString::compare(sn, serial) != 0) {
-              // If the edge doesn't already exist, this adds and returns the edge.
-              // If the edge already exists, this just returns it. (The use of a set
-              // forces the edges to be unique.)
-              ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+            // If the edge doesn't already exist, this adds and returns the edge.
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                          m_vertexMap[sn],
                                                          m_controlGraph).first;
-              m_controlGraph[connection].strength++;
-            }
+            m_controlGraph[connection].strength++;
           }
         }
       }
@@ -629,7 +628,7 @@ namespace Isis {
   void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
-    ASSERT(m_vertexGraph->contains(serial));
+    ASSERT(m_vertexMap.contains(serial));
 
     // Remove connections to and from this node
     if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
