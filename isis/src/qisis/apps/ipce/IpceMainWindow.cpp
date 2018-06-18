@@ -218,7 +218,6 @@ namespace Isis {
 
 
   void IpceMainWindow::cleanupViewDockList(QObject *obj) {
-
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
     if (dock) {
       m_viewDocks.removeAll(dock);
@@ -227,14 +226,12 @@ namespace Isis {
 
 
   /**
-   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will 
+   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
    * close the given view and delete the view. This was written to handle
-   * 
-   * @param view QWidget* 
    *
+   * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-    
     view->close();
     delete view;
   }
@@ -342,30 +339,6 @@ namespace Isis {
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
-
-    QAction *saveNet = new QAction("&Save Active Control Network", this);
-    saveNet->setIcon( QIcon::fromTheme("document-save") );
-    saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
-    saveNet->setToolTip("Save current active control network");
-    saveNet->setStatusTip("Save current active control network");
-    QString whatsThis = "<b>Function:</b> Saves the current active<i>"
-                        "control network</i>";
-    saveNet->setWhatsThis(whatsThis);
-    connect(saveNet, SIGNAL(triggered()), m_directory, SLOT(saveActiveControl()));
-    m_permToolBarActions.append(saveNet);
-
-//  m_saveAsNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSaveAs.png"),
-//                            "Save Control Network &As...",
-//                            m_matchTool);
-//  m_saveAsNet->setToolTip("Save current control network to chosen file");
-//  m_saveAsNet->setStatusTip("Save current control network to chosen file");
-//  whatsThis = "<b>Function:</b> Saves the current <i>"
-//      "control network</i> under chosen filename";
-//  m_saveAsNet->setWhatsThis(whatsThis);
-//  connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
-
-
-
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -486,40 +459,22 @@ namespace Isis {
 
   /**
    * Create the tool bars and populates them with QActions from several sources. Actions are taken
-   * from an internal list of QActions and the Directory. 
+   * from an internal list of QActions and the Directory.
    */
   void IpceMainWindow::createToolBars() {
     m_permToolBar = new QToolBar(this);
-    m_activeToolBar = new QToolBar(this);
-    m_toolPad = new QToolBar(this);
-
     QSize iconSize(25, 45);
-
     m_permToolBar->setIconSize(iconSize);
-    m_activeToolBar->setIconSize(iconSize);
-    m_toolPad->setIconSize(iconSize);
-
     m_permToolBar->setObjectName("PermanentToolBar");
-    m_activeToolBar->setObjectName("ActiveToolBar");
-    m_toolPad->setObjectName("ToolPad");
 
     addToolBar(m_permToolBar);
-    addToolBar(m_activeToolBar);
-    addToolBar(m_toolPad);
 
     foreach ( QAction *action, m_directory->permToolBarActions() ) {
       m_permToolBar->addAction(action);
     }
 
     foreach (QAction *action, m_permToolBarActions) {
-      if (action->text() == "&Save Active Control Network") {
-        m_permToolBar->addSeparator();
-        m_permToolBar->addAction(action); 
-        m_permToolBar->addSeparator();
-      }
-      else {
-        m_permToolBar->addAction(action); 
-      }
+      m_permToolBar->addAction(action);
     }
   }
 
@@ -825,5 +780,4 @@ namespace Isis {
   void IpceMainWindow::raiseWarningTab() {
     m_warningsDock->raise();
   }
-
 }

@@ -97,4 +97,39 @@ namespace Isis {
   QSize ControlPointEditView::sizeHint() const {
     return QSize(800, 600);
   }
+<<<<<<< HEAD
+=======
+
+
+  /**
+   * Returns a list of actions for the permanent tool bar.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> ControlPointEditView::permToolBarActions() {
+    return m_permToolBar->actions();
+  }
+
+
+  /**
+   * Returns a list of actions for the active tool bar.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> ControlPointEditView::activeToolBarActions() {
+    QList<QAction *> actions;
+    actions.append(m_activeToolBarAction);
+    return actions;
+  }
+
+
+  /**
+   * Returns a list of actions for the tool pad.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> ControlPointEditView::toolPadActions() {
+    return m_toolPad->actions();
+  }
+>>>>>>> 1001bc94a06dc2dc3a66150daac19cd5356ced42
 }
