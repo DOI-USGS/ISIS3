@@ -253,6 +253,7 @@ namespace Isis {
 
     // notify parent network if we have one
     if (parentNetwork) {
+      parentNetwork->measureAdded(measure);
       parentNetwork->emitNewMeasure(measure);
       parentNetwork->emitNetworkStructureModified();
     }
@@ -655,7 +656,7 @@ namespace Isis {
             }
           }
         }
-        parentNetwork->emitNetworkStructureModified();
+        parentNetwork->emitPointModified(this, ControlPoint::IgnoredModified, oldStatus, ignore);
       }
     }
 
