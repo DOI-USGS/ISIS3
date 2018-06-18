@@ -68,6 +68,9 @@ namespace Isis {
    *   @history 2018-05-30 Tracie Sucharski - Added the WindowFlag to set this as a Widget.
    *   @history 2018-06-15 Kaitlyn Lee - Removed methods returing toolbar and menu actions because each
    *                            individual has its own toolbar. These methods are not needed anymore.
+   *   @History 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
+   *                           windowChangeEvent signal to allow project to recognize a new save
+   *                           state. Fixes #5114
    */
   class AbstractProjectItemView : public QMainWindow {
 
@@ -83,6 +86,9 @@ namespace Isis {
       virtual void dragMoveEvent(QDragMoveEvent *event);
       virtual void dropEvent(QDropEvent *event);
 
+      virtual void moveEvent(QMoveEvent *event);
+      virtual void resizeEvent(QResizeEvent *event);
+
       virtual QList<QAction *> contextMenuActions();
 
       virtual ProjectItem *currentItem();
@@ -90,6 +96,9 @@ namespace Isis {
 
       virtual ProjectItemModel *internalModel();
       virtual void setInternalModel(ProjectItemModel *model);
+      
+    signals:
+      void windowChangeEvent(bool event);
 
     public slots:
       virtual void addItem(ProjectItem *item);

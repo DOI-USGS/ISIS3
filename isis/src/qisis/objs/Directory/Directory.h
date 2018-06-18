@@ -243,6 +243,9 @@ namespace Isis {
    *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
    *                           Removed  saveActiveControl() since users can save the control
    *                           network with the project save button.
+   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
+   *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
+   *                           to allow for saving of the project at these times. Fixes #5114.
    */
   class Directory : public QObject {
     Q_OBJECT

@@ -149,6 +149,20 @@ namespace Isis {
   }
 
 
+  void AbstractProjectItemView::moveEvent(QMoveEvent *event) {
+    QMainWindow::moveEvent(event);
+    
+    emit windowChangeEvent(false);
+  }
+
+
+  void AbstractProjectItemView::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+    
+    emit windowChangeEvent(false);
+  }
+
+  
   /**
    * Returns a list of actions appropriate for a context menu.
    *

@@ -598,6 +598,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupBundleObservationViews(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_bundleObservationViews.append(result);
 
@@ -659,6 +662,9 @@ namespace Isis {
     // connect destroyed signal to cleanupCnetEditorViewWidgets slot
     connect(result, SIGNAL( destroyed(QObject *) ),
             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+            
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+            m_project, SLOT(setClean(bool)));
 
     //  Connections for control point editing between views
     connect(result->cnetEditorWidget(), SIGNAL(editControlPoint(ControlPoint *, QString)),
@@ -697,6 +703,9 @@ namespace Isis {
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets(QObject *) ) );
+   
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
@@ -739,7 +748,10 @@ namespace Isis {
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
-
+            
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+            m_project, SLOT(setClean(bool)));
+                    
     emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
@@ -825,7 +837,10 @@ namespace Isis {
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
       connect (project(), SIGNAL(activeControlSet(bool)),
-               result->controlPointEditWidget(), SLOT(setControlFromActive()));
+              result->controlPointEditWidget(), SLOT(setControlFromActive()));
+               
+      connect(result, SIGNAL(windowChangeEvent(bool)),
+              m_project, SLOT(setClean(bool)));
     }
 
     return controlPointEditView();
@@ -858,6 +873,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_matrixViewWidgets.append(result);
 
@@ -879,6 +897,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_targetInfoWidgets.append(result);
 
@@ -900,6 +921,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_templateEditorWidgets.append(result);
 
@@ -922,6 +946,9 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupSensorInfoWidgets(QObject *) ) );
 
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
+
     m_sensorInfoWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg(camera->displayProperties()->displayName() ) );
@@ -943,6 +970,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_fileListWidgets.append(result);
 
@@ -965,6 +995,9 @@ namespace Isis {
     //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
+            
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+            m_project, SLOT(setClean(bool)));
 
     return result;
   }
