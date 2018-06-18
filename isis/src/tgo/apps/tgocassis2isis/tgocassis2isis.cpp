@@ -1,6 +1,7 @@
 #include "Isis.h"
 
 #include <QString>
+#include <QtMath>
 
 #include "AlphaCube.h"
 #include "Cube.h"
@@ -11,6 +12,7 @@
 #include "OriginalXmlLabel.h"
 #include "Preference.h"
 #include "ProcessImport.h"
+#include "PvlTranslationTable.h"
 #include "UserInterface.h"
 #include "XmlToPvlTranslationManager.h"
 
@@ -22,6 +24,7 @@ void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &im
 bool translateMappingLabel(FileName inputLabel, Cube *outputCube);
 bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
 void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
+QString convertUniqueIdToObservationId(Pvl &outputLabel);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -50,6 +53,7 @@ void IsisMain() {
 
     // first assume lev1b image
     Pvl *outputLabel = outputCube->label();
+    QString target = "";
     try {
       translateLabels(xmlFileName, outputCube, transRawFile); 
     } 
@@ -72,6 +76,8 @@ void IsisMain() {
         }
       }
     }
+
+    convertUniqueIdToObservationId(*outputLabel);
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
 
@@ -426,5 +432,61 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
                          frameletStartSample - 0.5, frameletStartLine - 0.5,
                          frameletEndSample + 0.5, frameletEndLine + 0.5);
   frameletArea.UpdateGroup(*outputCube);
+
 }
 
+
+QString convertUniqueIdToObservationId(Pvl &outputLabel) {
+
+  if (outputLabel.findObject("IsisCube").hasGroup("Mosaic")) {
+    return ""; // translation file should auto translate this case to Mosaic group.
+               // For any other product, this ID goes in the Archive group.
+  }
+
+  QString target = "";
+  if (outputLabel.findObject("IsisCube").hasGroup("Instrument")) {
+    target = outputLabel.findGroup("Instrument", Pvl::Traverse)
+                        .findKeyword("TargetName")[0];
+  }
+  else {
+    target = outputLabel.findGroup("Mapping", Pvl::Traverse)
+                        .findKeyword("TargetName")[0];
+  }
+
+  PvlGroup &archiveGroup = outputLabel.findGroup("Archive", Pvl::Traverse);
+  QString uniqueId = archiveGroup.findKeyword("UniqueIdentifier")[0];
+
+  bool ok = false;
+  QString observationId = "";
+	int uniqueIdDecimalValue = uniqueId.toInt(&ok, 16);
+
+  int operationPeriod = (uniqueIdDecimalValue & 1879048192);
+  operationPeriod /= qPow(2,28);
+  FileName transFile("$tgo/translations/tgoCassisOperationPeriod.trn");
+  PvlTranslationTable transTable(transFile);
+  observationId = transTable.Translate("OperationPeriod", toString(operationPeriod));
+
+  int orbitNumber = (uniqueIdDecimalValue & 268433408);
+  orbitNumber /= qPow(2,11);
+  observationId += "_";
+  observationId += QString("%1").arg(orbitNumber, 6, 10, QChar('0'));
+
+  int orbitPhase = (uniqueIdDecimalValue & 2044);
+  if (target.compare("mars", Qt::CaseInsensitive) == 0) {
+    orbitPhase /= qPow(2,2);
+  }
+  else {
+    orbitPhase = 900;
+  }
+  observationId += "_";
+  observationId += QString("%1").arg(orbitPhase, 3, 10, QChar('0'));
+
+  int imageType = (uniqueIdDecimalValue & 3);
+  observationId += "_";
+  observationId += toString(imageType);
+
+  archiveGroup += PvlKeyword("ObservationId", observationId);
+
+  return observationId;
+
+}

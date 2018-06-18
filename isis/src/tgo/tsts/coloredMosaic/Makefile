@@ -9,7 +9,7 @@ INGEST = tgocassis2isis
 SPICE = spiceinit
 MAPFILE = mosrange
 PROJECT = cam2map
-MOSAIC = automos
+MOSAIC = tgocassismos
 EXPORT = isis2pds
 GETKEY = getkey
 CUBEIT = cubeit
@@ -71,11 +71,7 @@ commands:
             pixres=mpp resolution=200 -batchlist=$(OUTPUT)/redBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*redEqui.cub > $(OUTPUT)/redMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/redMosaic.lis \
-	    mosaic=$(OUTPUT)/redCassisMosaic.cub grange='USER' \
-	    MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-	    MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-	    MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-	    MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	    to=$(OUTPUT)/redCassisMosaic.cub;# > /dev/null;
 
 # Create Blu Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_bluEqui.cub \
@@ -83,11 +79,8 @@ commands:
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/bluBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*bluEqui.cub > $(OUTPUT)/bluMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/bluMosaic.lis \
-	    mosaic=$(OUTPUT)/bluCassisMosaic.cub grange='USER' \
-	    MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-	    MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-	    MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-	    MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	    to=$(OUTPUT)/bluCassisMosaic.cub;# \
+	    > /dev/null;
 
 # Create Pan Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_panEqui.cub \
@@ -95,11 +88,8 @@ commands:
             pixres=mpp resolution=200 -batchlist=$(OUTPUT)/panBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*panEqui.cub > $(OUTPUT)/panMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/panMosaic.lis \
-	   mosaic=$(OUTPUT)/panCassisMosaic.cub grange='USER' \
-	   MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-	   MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-	   MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-	   MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	   to=$(OUTPUT)/panCassisMosaic.cub;# \
+	    > /dev/null;
 
 # Create Nir Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_nirEqui.cub \
@@ -107,11 +97,8 @@ commands:
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/nirBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*nirEqui.cub > $(OUTPUT)/nirMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/nirMosaic.lis \
-	    mosaic=$(OUTPUT)/nirCassisMosaic.cub grange='USER' \
-	    MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-	    MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-	    MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-	    MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	    to=$(OUTPUT)/nirCassisMosaic.cub;# \
+	    > /dev/null;
 
 # Create full color mos
 	$(LS) $(OUTPUT)/*CassisMosaic.cub > $(OUTPUT)/mosaicList.lis;
@@ -135,15 +122,15 @@ commands:
                > $(OUTPUT)/coloredMosaic.xmlLabel.txt;
 
 	# Cleanup
-	$(RM) $(OUTPUT)/coloredMosaic.xml;
-	$(RM) $(OUTPUT)/tempLabel1.txt;
-	$(RM) $(OUTPUT)/tempLabel2.txt;
-	$(RM) $(OUTPUT)/tempLabel3.txt;
-	$(RM) $(OUTPUT)/tempLabel4.txt;
-	$(RM) $(OUTPUT)/*.lis;
-	$(RM) $(OUTPUT)/CAS-MCO*.cub;
-	$(RM) $(OUTPUT)/bluCassisMosaic.cub;
-	$(RM) $(OUTPUT)/nirCassisMosaic.cub;
-	$(RM) $(OUTPUT)/panCassisMosaic.cub;
-	$(RM) $(OUTPUT)/redCassisMosaic.cub;
-	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl
+#	$(RM) $(OUTPUT)/coloredMosaic.xml;
+#	$(RM) $(OUTPUT)/tempLabel1.txt;
+#	$(RM) $(OUTPUT)/tempLabel2.txt;
+#	$(RM) $(OUTPUT)/tempLabel3.txt;
+#	$(RM) $(OUTPUT)/tempLabel4.txt;
+#	$(RM) $(OUTPUT)/*.lis;
+#	$(RM) $(OUTPUT)/CAS-MCO*.cub;
+#	$(RM) $(OUTPUT)/bluCassisMosaic.cub;
+#	$(RM) $(OUTPUT)/nirCassisMosaic.cub;
+#	$(RM) $(OUTPUT)/panCassisMosaic.cub;
+#	$(RM) $(OUTPUT)/redCassisMosaic.cub;
+#	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl

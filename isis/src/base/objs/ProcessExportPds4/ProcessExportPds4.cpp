@@ -408,210 +408,239 @@ namespace Isis {
   void ProcessExportPds4::standardBandBin() {
     Pvl *inputLabel = InputCubes[0]->label(); 
     if ( !inputLabel->findObject("IsisCube").hasGroup("BandBin") ) return;
+    // Add header info
+    addSchema("PDS4_IMG_1900.sch", 
+              "PDS4_IMG_1900.xsd",
+              "xmlns:img", 
+              "http://pds.nasa.gov/pds4/img/v1"); 
     
-    // Spectra
     // Get the input Isis cube label and find the BandBin group if it has one
-    QString translationFile = "$base/translations/";
     if (m_imageType == StandardImage) {
-      translationFile += "pds4ExportBandBinImage.trn";
+      imageBandBin();
     }
-    else if (m_imageType == UniformlySampledSpectrum) {
-      translationFile += "pds4ExportBandBinSpectrumUniform.trn";
-    }
-    else if (m_imageType == BinSetSpectrum) {
-      translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
-    }
-    FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
-    xlator.Auto(*m_domDoc);
-
-    if (m_imageType == StandardImage) {
-      // Add header info
-      addSchema("PDS4_IMG_1900.sch", 
-                "PDS4_IMG_1900.xsd",
-                "xmlns:img", 
-                "http://pds.nasa.gov/pds4/img/v1"); 
-    }
-    else { // spectral
-      PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    else {
       // Add header info
       addSchema("PDS4_SP_1100.sch", 
                 "PDS4_SP_1100.xsd",
                 "xmlns:sp", 
                 "http://pds.nasa.gov/pds4/sp/v1");
-      // fix multi-valued bandbin info
-      QStringList xmlPath;
-      xmlPath << "Product_Observational"
-              << "Observation_Area"
-              << "Discipline_Area"
-              << "sp:Spectral_Characteristics";
-      QDomElement baseElement = m_domDoc->documentElement();
-      QDomElement spectralCharElement = getElement(xmlPath, baseElement);
-
-      // Axis_Bin_Set for variable bin widths
-      // required - bin_sequence_number, center_value, bin_width
-      // optional - detector_number, grating_position, original_bin_number, scaling_factor, value_offset, Filter
-      // ... see schema for more...
-      if (m_imageType == BinSetSpectrum) {
-        PvlKeyword center;
-        if (bandBinGroup.hasKeyword("Center")) {
-          center = bandBinGroup["Center"];
-        }
-        else if (bandBinGroup.hasKeyword("FilterCenter")) {
-          center = bandBinGroup["FilterCenter"];
-        }
-        else {
-          QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
-                        "Translation for PDS4 required value [center_value] not found.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-        PvlKeyword width;
-        if (bandBinGroup.hasKeyword("Width")) {
-          width = bandBinGroup["Width"];
-        }
-        else if (bandBinGroup.hasKeyword("FilterWidth")) {
-          width = bandBinGroup["FilterWidth"];
-        }
-        else {
-          QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
-                        "Translation for PDS4 required value [bin_width] not found.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-
-        QString units = center.unit();
-        
-        if (!width.unit().isEmpty() ) {
-          if (units.isEmpty()) {
-            units = width.unit();
-          }
-          if (units.compare(width.unit(), Qt::CaseInsensitive) != 0) {
-            QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
-                          "Unknown or unmatching units for [center_value] and [bin_width].";
-            throw IException(IException::Programmer, msg, _FILEINFO_);
-          }
-        }
-
-        PvlKeyword originalBand;
-        if (bandBinGroup.hasKeyword("OriginalBand")) {
-          originalBand = bandBinGroup["OriginalBand"];
-        }
-        PvlKeyword name;
-        if (bandBinGroup.hasKeyword("Name")) {
-          name = bandBinGroup["Name"];
-        }
-        else if (bandBinGroup.hasKeyword("FilterName")) {
-          name = bandBinGroup["FilterName"];
-        }
-        else if (bandBinGroup.hasKeyword("FilterId")) {
-          name = bandBinGroup["FilterId"];
-        }
-        PvlKeyword number;
-        if (bandBinGroup.hasKeyword("Number")) {
-          number = bandBinGroup["Number"];
-        }
-        else if (bandBinGroup.hasKeyword("FilterNumber")) {
-          number = bandBinGroup["FilterNumber"];
-        }
-
-        QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Bin_Set");
-        if (axisBinSetElement.isNull()) {
-          axisBinSetElement = m_domDoc->createElement("sp:Axis_Bin_Set");
-          spectralCharElement.appendChild(axisBinSetElement);
-        }
-        int bands = (int)inputLabel->findObject("IsisCube")
-                                    .findObject("Core")
-                                    .findGroup("Dimensions")
-                                    .findKeyword("Bands");
-      
-        for (int i = 0; i < bands; i++) {
-
-          QDomElement bin = m_domDoc->createElement("sp:Bin");
-          axisBinSetElement.appendChild(bin);
-          
-          QDomElement binSequenceNumber = m_domDoc->createElement("sp:bin_sequence_number");
-          PvlToXmlTranslationManager::setElementValue(binSequenceNumber, toString(i+1));
-          bin.appendChild(binSequenceNumber);
-
-
-          QDomElement centerValue = m_domDoc->createElement("sp:center_value");
-          PvlToXmlTranslationManager::setElementValue(centerValue, center[i], units);
-          bin.appendChild(centerValue);
-        
-          QDomElement binWidth = m_domDoc->createElement("sp:bin_width");
-          if (width.size() == bands) {
-            PvlToXmlTranslationManager::setElementValue(binWidth, width[i] , units);
-          }
-          else {
-            PvlToXmlTranslationManager::setElementValue(binWidth, width[0] , units);
-          }
-          bin.appendChild(binWidth);
-        
-          QDomElement originalBinNumber = m_domDoc->createElement("sp:original_bin_number");
-          if (originalBand.size() > 0) {
-            PvlToXmlTranslationManager::setElementValue(originalBinNumber, originalBand[i]);
-            bin.appendChild(originalBinNumber);
-          }
-
-          if (name.size() > 0 || number.size() > 0) {
-            QDomElement filter = m_domDoc->createElement("sp:Filter");
-            bin.appendChild(filter);
-            if (name.size() > 0) {
-              QDomElement filterName = m_domDoc->createElement("sp:filter_name");
-              PvlToXmlTranslationManager::setElementValue(filterName, name[i]);
-              filter.appendChild(filterName);
-            }
-            if (number.size() > 0) {
-              QDomElement filterNumber= m_domDoc->createElement("sp:filter_number");
-              PvlToXmlTranslationManager::setElementValue(filterNumber, number[i]);
-              filter.appendChild(filterNumber);
-            }
-          }
-        }
+      if (m_imageType == UniformlySampledSpectrum) {
+        imageBandBinSpectrum();
       }
-      else if (m_imageType == UniformlySampledSpectrum) {
-        // Axis_Uniformly_Sampled
-        // required - sampling_parameter_type (frequency, wavelength, wavenumber)
-        //            sampling_interval (units Hz, Angstrom, cm**-1, respectively)
-        //            bin_width  (units Hz, Angstrom, cm**-1, respectively)
-        //            first_center_value  (units Hz, Angstrom, cm**-1, respectively)
-        //            last_center_value  (units Hz, Angstrom, cm**-1, respectively) 
-        //            Local_Internal_Reference 
-        //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
-        //            Local_Internal_Reference:local_identifier_reference, 
-        //                1. At least one Axis_Array:axis_name must match the 
-        //                   value of the local_identifier_reference in the 
-        //                   Axis_Uniformly_Sampled.
-        //                   Set Axis_Uniformly_Sampled:local_identifier_reference = Axis_Array:axis_name = Band
-        //                2. At least one Array_3D_Spectrum:local_identifier must match 
-        //                   the value of the local_identifier_reference in the
-        //                   Spectral_Characteristics.
-        //                   Set Spectral_Characteristics:local_identifier_reference = Array_3D_Spectrum:local_identifier = Spectral_Array_Object
-        //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
-        PvlKeyword center("Center");
-        if (bandBinGroup.hasKeyword("FilterCenter")) {
-          center = bandBinGroup["FilterCenter"];
-        }
-        else if (bandBinGroup.hasKeyword("Center")) {
-          center = bandBinGroup["Center"];
-        }
-        else {
-          QString msg = "Unable to translate BandBin info for UniformlySpacedSpectrum. "
-                        "Translation for PDS4 required value [last_center_value] not found.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-        QString lastCenter = center[center.size() - 1];
-      
-        QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Uniformly_Sampled");
-        if (axisBinSetElement.isNull()) {
-          axisBinSetElement = m_domDoc->createElement("sp:Axis_Uniformly_Sampled");
-          spectralCharElement.appendChild(axisBinSetElement);
-        }
-
-        QDomElement lastCenterElement = m_domDoc->createElement("sp:last_center_value");
-        PvlToXmlTranslationManager::setElementValue(lastCenterElement, lastCenter);
-        spectralCharElement.appendChild(lastCenterElement);
+      else if (m_imageType == BinSetSpectrum) {
+        imageBandBinSpectrumBinSet();
       }
     }
+  }
+
+
+  void ProcessExportPds4::translateBandBinImage() {
+    QString translationFile = "$base/translations/";
+    translationFile += "pds4ExportBandBinImage.trn";
+    FileName translationFileName(translationFile);
+    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    xlator.Auto(*m_domDoc);
+  }
+
+
+  void ProcessExportPds4::translateBandBinSpectrumUniform() {
+    QString translationFile = "$base/translations/";
+    translationFile += "pds4ExportBandBinSpectrumUniform.trn";
+    FileName translationFileName(translationFile);
+    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    xlator.Auto(*m_domDoc);
+
+    PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    // fix multi-valued bandbin info
+    QStringList xmlPath;
+    xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "sp:Spectral_Characteristics";
+    QDomElement baseElement = m_domDoc->documentElement();
+    QDomElement spectralCharElement = getElement(xmlPath, baseElement);
+
+    // Axis_Bin_Set for variable bin widths
+    // required - bin_sequence_number, center_value, bin_width
+    // optional - detector_number, grating_position, original_bin_number, scaling_factor, value_offset, Filter
+    // ... see schema for more...
+    PvlKeyword center;
+    if (bandBinGroup.hasKeyword("Center")) {
+      center = bandBinGroup["Center"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterCenter")) {
+      center = bandBinGroup["FilterCenter"];
+    }
+    else {
+      QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+                    "Translation for PDS4 required value [center_value] not found.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    PvlKeyword width;
+    if (bandBinGroup.hasKeyword("Width")) {
+      width = bandBinGroup["Width"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterWidth")) {
+      width = bandBinGroup["FilterWidth"];
+    }
+    else {
+      QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+                    "Translation for PDS4 required value [bin_width] not found.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    QString units = center.unit();
+
+    if (!width.unit().isEmpty() ) {
+      if (units.isEmpty()) {
+        units = width.unit();
+      }
+      if (units.compare(width.unit(), Qt::CaseInsensitive) != 0) {
+        QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+                      "Unknown or unmatching units for [center_value] and [bin_width].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    PvlKeyword originalBand;
+    if (bandBinGroup.hasKeyword("OriginalBand")) {
+      originalBand = bandBinGroup["OriginalBand"];
+    }
+    PvlKeyword name;
+    if (bandBinGroup.hasKeyword("Name")) {
+      name = bandBinGroup["Name"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterName")) {
+      name = bandBinGroup["FilterName"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterId")) {
+      name = bandBinGroup["FilterId"];
+    }
+    PvlKeyword number;
+    if (bandBinGroup.hasKeyword("Number")) {
+      number = bandBinGroup["Number"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterNumber")) {
+      number = bandBinGroup["FilterNumber"];
+    }
+
+    QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Bin_Set");
+    if (axisBinSetElement.isNull()) {
+      axisBinSetElement = m_domDoc->createElement("sp:Axis_Bin_Set");
+      spectralCharElement.appendChild(axisBinSetElement);
+    }
+    int bands = (int)inputLabel->findObject("IsisCube")
+                                .findObject("Core")
+                                .findGroup("Dimensions")
+                                .findKeyword("Bands");
+
+    for (int i = 0; i < bands; i++) {
+
+      QDomElement bin = m_domDoc->createElement("sp:Bin");
+      axisBinSetElement.appendChild(bin);
+
+      QDomElement binSequenceNumber = m_domDoc->createElement("sp:bin_sequence_number");
+      PvlToXmlTranslationManager::setElementValue(binSequenceNumber, toString(i+1));
+      bin.appendChild(binSequenceNumber);
+
+
+      QDomElement centerValue = m_domDoc->createElement("sp:center_value");
+      PvlToXmlTranslationManager::setElementValue(centerValue, center[i], units);
+      bin.appendChild(centerValue);
+
+      QDomElement binWidth = m_domDoc->createElement("sp:bin_width");
+      if (width.size() == bands) {
+        PvlToXmlTranslationManager::setElementValue(binWidth, width[i] , units);
+      }
+      else {
+        PvlToXmlTranslationManager::setElementValue(binWidth, width[0] , units);
+      }
+      bin.appendChild(binWidth);
+
+      QDomElement originalBinNumber = m_domDoc->createElement("sp:original_bin_number");
+      if (originalBand.size() > 0) {
+        PvlToXmlTranslationManager::setElementValue(originalBinNumber, originalBand[i]);
+        bin.appendChild(originalBinNumber);
+      }
+
+      if (name.size() > 0 || number.size() > 0) {
+        QDomElement filter = m_domDoc->createElement("sp:Filter");
+        bin.appendChild(filter);
+        if (name.size() > 0) {
+          QDomElement filterName = m_domDoc->createElement("sp:filter_name");
+          PvlToXmlTranslationManager::setElementValue(filterName, name[i]);
+          filter.appendChild(filterName);
+        }
+        if (number.size() > 0) {
+          QDomElement filterNumber= m_domDoc->createElement("sp:filter_number");
+          PvlToXmlTranslationManager::setElementValue(filterNumber, number[i]);
+          filter.appendChild(filterNumber);
+        }
+      }
+    }
+    
+  }
+
+
+  void ProcessExportPds4::translateBandBinSpectrumBinSet() {
+    QString translationFile = "$base/translations/";
+    translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
+    FileName translationFileName(translationFile);
+    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    xlator.Auto(*m_domDoc);
+
+    PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    // fix multi-valued bandbin info
+    QStringList xmlPath;
+    xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "sp:Spectral_Characteristics";
+    QDomElement baseElement = m_domDoc->documentElement();
+    QDomElement spectralCharElement = getElement(xmlPath, baseElement);
+
+    // Axis_Uniformly_Sampled
+    // required - sampling_parameter_type (frequency, wavelength, wavenumber)
+    //            sampling_interval (units Hz, Angstrom, cm**-1, respectively)
+    //            bin_width  (units Hz, Angstrom, cm**-1, respectively)
+    //            first_center_value  (units Hz, Angstrom, cm**-1, respectively)
+    //            last_center_value  (units Hz, Angstrom, cm**-1, respectively) 
+    //            Local_Internal_Reference 
+    //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
+    //            Local_Internal_Reference:local_identifier_reference, 
+    //                1. At least one Axis_Array:axis_name must match the 
+    //                   value of the local_identifier_reference in the 
+    //                   Axis_Uniformly_Sampled.
+    //                   Set Axis_Uniformly_Sampled:local_identifier_reference = Axis_Array:axis_name = Band
+    //                2. At least one Array_3D_Spectrum:local_identifier must match 
+    //                   the value of the local_identifier_reference in the
+    //                   Spectral_Characteristics.
+    //                   Set Spectral_Characteristics:local_identifier_reference = Array_3D_Spectrum:local_identifier = Spectral_Array_Object
+    //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
+    PvlKeyword center("Center");
+    if (bandBinGroup.hasKeyword("FilterCenter")) {
+      center = bandBinGroup["FilterCenter"];
+    }
+    else if (bandBinGroup.hasKeyword("Center")) {
+      center = bandBinGroup["Center"];
+    }
+    else {
+      QString msg = "Unable to translate BandBin info for UniformlySpacedSpectrum. "
+                    "Translation for PDS4 required value [last_center_value] not found.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    QString lastCenter = center[center.size() - 1];
+
+    QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Uniformly_Sampled");
+    if (axisBinSetElement.isNull()) {
+      axisBinSetElement = m_domDoc->createElement("sp:Axis_Uniformly_Sampled");
+      spectralCharElement.appendChild(axisBinSetElement);
+    }
+
+    QDomElement lastCenterElement = m_domDoc->createElement("sp:last_center_value");
+    PvlToXmlTranslationManager::setElementValue(lastCenterElement, lastCenter);
+    spectralCharElement.appendChild(lastCenterElement);
+    
   }
 
 
