@@ -45,7 +45,7 @@ void IsisMain() {
    EndianSwapper swp("MSB");
 
   // Verify that the file is a ddd by reading in the first 4 bytes and
-  // comparing the magic numbers
+  // comparing the magic numbers. The magic number for a ddd file is 1659.
   readBytes.readLong = 0;
   fin.seekg(0);
   fin.read(readBytes.readChars, 4);
