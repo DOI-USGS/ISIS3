@@ -56,16 +56,18 @@ namespace Isis {
    * @author 2015-10-21 Jeffrey Covington
    * @internal
    *   @history 2015-10-21 Jeffrey Covington - Original version.
-   *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards. 
+   *   @history 2016-06-27 Ian Humphrey - Minor updates to documentation and coding standards.
    *                           Fixes #4004.
    *   @history 2016-07-28 Tracie Sucharski - Implemented removeItem and removeItems methods.
    *   @history 2016-08-25 Adam Paquette - Minor updates to documentation.
    *                           Fixes #4299.
    *   @history 2018-05-29 Tracie Sucharski & Summer Stapleton - updated to inherit from QMainWindow
-   *                           instead of QWidget. This updates all views in the ipce main window 
+   *                           instead of QWidget. This updates all views in the ipce main window
    *                           to be main windows themselves, changing from an mdi interface to an
    *                           sdi interface.
    *   @history 2018-05-30 Tracie Sucharski - Added the WindowFlag to set this as a Widget.
+   *   @history 2018-06-15 Kaitlyn Lee - Removed methods returing toolbar and menu actions because each
+   *                            individual has its own toolbar. These methods are not needed anymore.
    *   @History 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
    *                           windowChangeEvent signal to allow project to recognize a new save
    *                           state. Fixes #5114
@@ -79,7 +81,7 @@ namespace Isis {
 
       virtual void setModel(ProjectItemModel *model);
       virtual ProjectItemModel *model();
-      
+
       virtual void dragEnterEvent(QDragEnterEvent *event);
       virtual void dragMoveEvent(QDragMoveEvent *event);
       virtual void dropEvent(QDropEvent *event);
@@ -87,19 +89,8 @@ namespace Isis {
       virtual void moveEvent(QMoveEvent *event);
       virtual void resizeEvent(QResizeEvent *event);
 
-      virtual QList<QAction *> permToolBarActions();
-      virtual QList<QAction *> activeToolBarActions();
-      virtual QList<QAction *> toolPadActions();
- 
       virtual QList<QAction *> contextMenuActions();
 
-      virtual QList<QAction *> fileMenuActions();
-      virtual QList<QAction *> projectMenuActions();
-      virtual QList<QAction *> editMenuActions();
-      virtual QList<QAction *> viewMenuActions();
-      virtual QList<QAction *> settingsMenuActions();
-      virtual QList<QAction *> helpMenuActions();
-      
       virtual ProjectItem *currentItem();
       virtual QList<ProjectItem *> selectedItems();
 
