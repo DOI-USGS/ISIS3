@@ -68,13 +68,13 @@ namespace Isis {
    * @param parent (QWidget *) Pointer to parent widget
    */
   ControlHealthMonitorWidget::ControlHealthMonitorWidget(ControlNetVitals *vitals, QWidget *parent) : QWidget(parent) {
-
     createGui();
     m_vitals = vitals;
     connect (m_vitals, SIGNAL(networkChanged()),
             this, SLOT(update()));
     update();
   }
+
 
   /**
    *  This SLOT is called whenever the is a change made to the network embedded in the
@@ -130,6 +130,7 @@ namespace Isis {
     viewPointAll();
   }
 
+
   void ControlHealthMonitorWidget::broken() {
     updateStatus(0);
     m_statusLabel->setText("Broken!");
@@ -148,6 +149,7 @@ namespace Isis {
     m_statusLabel->setText("Healthy!");
     m_statusDetails->setText("This network is healthy.");
   }
+
 
   /*
    *  This SLOT is designed to update the values in the gui to properly represent
@@ -178,6 +180,7 @@ namespace Isis {
     }
     m_statusBar->setPalette(p);
   }
+
 
   /**
    *  This method is responsible for creating all of the components that comprise the GUI.
@@ -274,6 +277,7 @@ namespace Isis {
     gridLayout->addWidget(tabs);
   }
 
+
   /**
   *  Initializes all member variables to NULL.
   *
@@ -300,6 +304,7 @@ namespace Isis {
     m_statusLabel            = NULL;
     m_vitals                 = NULL;
   }
+
 
   /*
   *  This method creates the Overview tab.
@@ -354,7 +359,6 @@ namespace Isis {
 
     overviewLayout->addWidget(m_historyTable);
 
-
     QWidget *tempWidget = new QWidget;
     QHBoxLayout *tempLayout = new QHBoxLayout;
 
@@ -375,11 +379,10 @@ namespace Isis {
     tempWidget->setLayout(tempLayout);
     overviewLayout->addWidget(tempWidget);
 
-
-
     overview->setLayout(overviewLayout);
     return overview;
   }
+
 
   /*
   *  This method creates the Images tab.
@@ -388,7 +391,6 @@ namespace Isis {
   QWidget* ControlHealthMonitorWidget::createImagesTab() {
     QFont fontSmall("Arial", 12);
     QFont fontMedium("Arial", 14);
-
 
     // This is the parent QWidget for the images tab.
     QWidget *imagesTab = new QWidget();
@@ -430,7 +432,6 @@ namespace Isis {
     tempLayout->addWidget(button2, 1, 2);
 
     temp->setLayout(tempLayout);
-
     imagesLayout->addWidget(temp);
 
     // Create the table.
@@ -463,6 +464,7 @@ namespace Isis {
     return imagesTab;
   }
 
+
   /*
   *  This method creates the Points tab.
   *
@@ -471,7 +473,6 @@ namespace Isis {
 
     QFont fontSmall("Arial", 12);
     QFont fontMedium("Arial", 14);
-
     QFont searchFont("Seqoe UI Symbol", 12);
 
     // This is the main parent widget for the points tab.
@@ -594,6 +595,7 @@ namespace Isis {
     return pointsTab;
   }
 
+
   /*
   *  This method creates the Graph tab.
   *
@@ -621,6 +623,7 @@ namespace Isis {
 
   }
 
+
   /*
   *  This method loads a QList of cube serials into the images table.
   *
@@ -633,6 +636,7 @@ namespace Isis {
        m_imagesTable->setItem(i, 1, new QTableWidgetItem(serials.at(i)));
      }
    }
+
 
   /*
    *  This method loads a QList of ControlPoint* into the points table.
@@ -652,6 +656,7 @@ namespace Isis {
     }
   }
 
+
   /*
    *  This SLOT is designed to view all points in the Control Network.
    *
@@ -662,6 +667,7 @@ namespace Isis {
                                   toString(m_vitals->numPoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view ignored points in the Control Network.
@@ -674,6 +680,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view free points in the Control Network.
    *
@@ -684,6 +691,7 @@ namespace Isis {
                                   toString(m_vitals->numFreePoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view fixed points in the Control Network.
@@ -696,6 +704,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view constrained points in the Control Network.
    *
@@ -706,6 +715,7 @@ namespace Isis {
                                   toString(m_vitals->numConstrainedPoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view locked points in the Control Network.
@@ -719,6 +729,7 @@ namespace Isis {
 
   }
 
+
   /*
    *  This SLOT is designed to view points with less than 3 valid measures in the Control Network.
    *
@@ -729,6 +740,7 @@ namespace Isis {
                                   toString(m_vitals->numPointsBelowMeasureThreshold()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view all images in the Control Network.
@@ -741,6 +753,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view images with less than 3 valid measures in the Control Network.
    *
@@ -752,6 +765,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view images below the Convex Hull Tolerance in the Control Network.
    *
@@ -762,6 +776,7 @@ namespace Isis {
                                   toString(m_vitals->numImagesBelowHullTolerance()) +
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
+
 
   /**
    * Destructor
