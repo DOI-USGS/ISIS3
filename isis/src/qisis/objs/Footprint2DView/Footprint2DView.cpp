@@ -320,15 +320,12 @@ namespace Isis {
    * A slot function that is called when directory emits a siganl that an active
    * control network is set. It enables the control network editor tool in the
    * toolpad and loads the network.
-   * TODO 2018-06-14 Kaitlyn Lee - Commented out code that loads the network,
-   * since it does not actually load the network. Left it here to research further.
+   * We do not load the network here because the network does not open until
+   * the tool is enabled. This is done in MosaicControlNetTool::updateTool() and
+   * is connected in MosaicTool.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
     m_controlNetTool->setEnabled(value);
-    // if (value) {
-    //   MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(m_controlNetTool->parent());
-    //   cnetTool->loadNetwork();
-    // }
   }
 
   /**

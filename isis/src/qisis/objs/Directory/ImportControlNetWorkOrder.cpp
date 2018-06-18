@@ -208,8 +208,9 @@ namespace Isis {
     m_status = WorkOrderFinished;
     m_readProgresses.clear();
 
-    // If one control network was imported, then activeControl() will set the
-    // active control to that control network
+    // If one control network was imported, no active control has been set, and no
+    // other control networks exist in the project, then activeControl() will set
+    // the active control to the newly imported control network.
     project()->activeControl();
   }
 
