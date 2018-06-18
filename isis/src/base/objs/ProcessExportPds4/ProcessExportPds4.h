@@ -125,9 +125,9 @@ namespace Isis {
       QString PDS4PixelType(PixelType pixelType, ByteOrder endianType);
       static QMap<QString, QString> createUnitMap(Pvl configPvl);
       static void translateChildUnits(QDomElement parent, QMap<QString, QString> transMap);
-      void translateBandBinImage();
-      void translateBandBinSpectrumUniform();
-      void translateBandBinSpectrumBinSet();
+      void translateBandBinImage(Pvl &inputLabel);
+      void translateBandBinSpectrumUniform(Pvl &inputLabel);
+      void translateBandBinSpectrumBinSet(Pvl &inputLabel);
 
       QDomDocument *m_domDoc;               //!< XML label.
       QString m_schemaLocation;             //!< QString with all schema locations required.
