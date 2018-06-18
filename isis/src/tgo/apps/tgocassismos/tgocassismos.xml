@@ -39,6 +39,9 @@
     <change name="Kristin Berry" date="2018-06-12">
       Removed the "_filtername" from the ProductId. 
     </change>
+    <change name="Kristin Berry" date="2018-06-16">
+      Update to read the ObservationId from the Archive Group. 
+    </change>
   </history>
 
   <groups>
