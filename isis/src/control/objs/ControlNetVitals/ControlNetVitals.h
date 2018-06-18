@@ -37,12 +37,20 @@ namespace Isis {
 
   /**
   *
-  *  @brief Control Net Vitals
+  *  @brief ControlNetVitals
   *
   *  This class is designed to represent the health of a control network.
-  *  It utilizes signals and slots to listen for changes in an observed Control Network
-  *  and re-evaluates the health of a network whenever a change is made.
-  *  It tracks several statistics, and is intended to be the back-end for the ControlHealthMonitor.
+  *  It utilizes signals and slots to listen for changes in an observed Control Network and
+  *  re-evaluates the health of a network whenever a change is made.
+  *  It tracks several statistics, and is intended to be the back-end for the ControlHealthMonitorWidget
+  *  that is located in IPCE
+  *
+  *  The ControlNetVitals class keeps track of several member variables that are a running counter
+  *  for network statistics in regard to the observed network. It creates these variables upon
+  *  intialization and references these internal variables when returning certain statistics
+  *  about a Control Network that can't be accessed by wrapper methods for the network itself.
+  *  It then listens for specific signals to be emitted whenever a change is made to the network
+  *  to update it's internal counters with respect to that change.
   *
   *  @author 2018-05-28 Adam Goins
   *
