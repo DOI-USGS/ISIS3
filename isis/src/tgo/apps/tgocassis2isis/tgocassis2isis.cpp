@@ -437,7 +437,6 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
 
 
 QString convertUniqueIdToObservationId(Pvl &outputLabel) {
-
   if (outputLabel.findObject("IsisCube").hasGroup("Mosaic")) {
     return ""; // translation file should auto translate this case to Mosaic group.
                // For any other product, this ID goes in the Archive group.
@@ -458,7 +457,7 @@ QString convertUniqueIdToObservationId(Pvl &outputLabel) {
 
   bool ok = false;
   QString observationId = "";
-	int uniqueIdDecimalValue = uniqueId.toInt(&ok, 16);
+  int uniqueIdDecimalValue = uniqueId.toInt(&ok, 16);
 
   int operationPeriod = (uniqueIdDecimalValue & 1879048192);
   operationPeriod /= qPow(2,28);

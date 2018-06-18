@@ -79,6 +79,7 @@ void IsisMain() {
     proj->SetGround(avgLat, avgLon);
     avgLat = proj->UniversalLatitude();
     avgLon = proj->UniversalLongitude();
+
     // Use camera class to get Inc., emi., phase, and other values
     double emissionAngle;
     double phaseAngle;
@@ -223,7 +224,7 @@ void IsisMain() {
     mos += PvlKeyword("IncidenceAngle ", toString(incidenceAngle), "degrees");
     mos += PvlKeyword("EmissionAngle ", toString(emissionAngle), "degrees");
     mos += PvlKeyword("PhaseAngle ", toString(phaseAngle), "degrees");
-    mos += PvlKeyword("LocalTime ", toString(localSolarTime), "localday/24");
+    mos += PvlKeyword("LocalTime ", toString(localSolarTime)); 
     mos += PvlKeyword("SolarLongitude ", toString(solarLongitude), "degrees");
     mos += PvlKeyword("SubSolarAzimuth ", toString(sunAzimuth), "degrees");
     mos += PvlKeyword("NorthAzimuth ", toString(northAzimuth), "degrees");
