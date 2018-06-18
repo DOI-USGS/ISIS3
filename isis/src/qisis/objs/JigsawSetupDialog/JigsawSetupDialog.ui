@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -96,16 +96,13 @@
                     <set>Qt::AlignCenter</set>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_11">
-                    <item row="0" column="1">
-                     <widget class="QComboBox" name="inputControlNetCombo">
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="outputControlNetLineEdit">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
-                      </property>
-                      <property name="sizeAdjustPolicy">
-                       <enum>QComboBox::AdjustToContents</enum>
                       </property>
                      </widget>
                     </item>
@@ -150,13 +147,16 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="outputControlNetLineEdit">
+                    <item row="0" column="1">
+                     <widget class="QComboBox" name="inputControlNetCombo">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
+                      </property>
+                      <property name="sizeAdjustPolicy">
+                       <enum>QComboBox::AdjustToContents</enum>
                       </property>
                      </widget>
                     </item>
@@ -188,11 +188,117 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Outlier Rejection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Outlier Rejection Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                   </widget>
                  </item>
                 </layout>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="groupBox_8">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string/>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_4">
+                  <item row="1" column="3">
+                   <spacer name="horizontalSpacer_7">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="1" column="0">
+                   <spacer name="horizontalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="outlierRejectionMultiplierLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Outlier Rejection Multiplier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>3.0</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                    <property name="placeholderText">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QCheckBox" name="outlierRejectionCheckBox">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>1000</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Image measures are flagged as rejected if their residuals are greater 
+than the multiplier times the current standard deviation (sigma).
+
+Must be positive.</string>
+                    </property>
+                    <property name="layoutDirection">
+                     <enum>Qt::LeftToRight</enum>
+                    </property>
+                    <property name="text">
+                     <string>Sigma Multiplier</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
                <item>
                 <widget class="QGroupBox" name="groupBox_7">
@@ -224,219 +330,6 @@
                   <bool>false</bool>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_14">
-                  <item row="7" column="3">
-                   <widget class="QLineEdit" name="maximumLikelihoodModel3QuantileLineEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>0.5</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0" colspan="4">
-                   <widget class="QLabel" name="maxLikelihoodEstimationLabel">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Maximum Likelihood Estimation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2" alignment="Qt::AlignHCenter">
-                   <widget class="QLineEdit" name="outlierRejectionMultiplierLineEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Outlier Rejection Multiplier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                    <property name="text">
-                     <string>3.0</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                    <property name="placeholderText">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1" alignment="Qt::AlignRight">
-                   <widget class="QCheckBox" name="outlierRejectionCheckBox">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>1000</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Image measures are flagged as rejected if their residuals are greater 
-than the multiplier times the current standard deviation (sigma). 
-Valid Range: 1.0e-10 to 1.0e+10</string>
-                    </property>
-                    <property name="layoutDirection">
-                     <enum>Qt::LeftToRight</enum>
-                    </property>
-                    <property name="text">
-                     <string>Sigma</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="3">
-                   <widget class="QLineEdit" name="maximumLikelihoodModel1QuantileLineEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>0.5</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="3">
-                   <widget class="QLineEdit" name="maximumLikelihoodModel2QuantileLineEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>0.5</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="0" alignment="Qt::AlignRight">
-                   <widget class="QLabel" name="maximumLikelihoodModel2Label">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Valid Range: 1.0e-10 to 1.0</string>
-                    </property>
-                    <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>maximumLikelihoodModel2ComboBox</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QLabel" name="outlierRejectionMultiplierLabel">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>1000</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <italic>false</italic>
-                     </font>
-                    </property>
-                    <property name="contextMenuPolicy">
-                     <enum>Qt::ActionsContextMenu</enum>
-                    </property>
-                    <property name="text">
-                     <string>&amp;Multiplier</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                    <property name="buddy">
-                     <cstring>outlierRejectionMultiplierLineEdit</cstring>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="7" column="0" alignment="Qt::AlignRight">
                    <widget class="QLabel" name="maximumLikelihoodModel3Label">
                     <property name="enabled">
@@ -537,6 +430,23 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                     </item>
                    </widget>
                   </item>
+                  <item row="4" column="0" colspan="4">
+                   <widget class="QLabel" name="maxLikelihoodEstimationLabel">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>Maximum Likelihood Estimation and Sigma Multiplier are exclusive options. 
+Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
+                    </property>
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Maximum Likelihood Estimation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="5" column="0" alignment="Qt::AlignRight">
                    <widget class="QLabel" name="maximumLikelihoodModel1Label">
                     <property name="sizePolicy">
@@ -606,21 +516,105 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                     </item>
                    </widget>
                   </item>
-                  <item row="3" column="0" colspan="4">
-                   <spacer name="verticalSpacer_6">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
+                  <item row="5" column="3">
+                   <widget class="QLineEdit" name="maximumLikelihoodModel1QuantileLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
                     </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
-                    <property name="sizeHint" stdset="0">
+                    <property name="maximumSize">
                      <size>
-                      <width>20</width>
-                      <height>20</height>
+                      <width>100</width>
+                      <height>16777215</height>
                      </size>
                     </property>
-                   </spacer>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0" alignment="Qt::AlignRight">
+                   <widget class="QLabel" name="maximumLikelihoodModel2Label">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1.0e-10 to 1.0</string>
+                    </property>
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>maximumLikelihoodModel2ComboBox</cstring>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="3">
+                   <widget class="QLineEdit" name="maximumLikelihoodModel3QuantileLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="3">
+                   <widget class="QLineEdit" name="maximumLikelihoodModel2QuantileLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -954,7 +948,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Valid Range: 0.0 to 360.0</string>
+                     <string>Valid Range: 1.0e-10 to 1.0e+10</string>
                     </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
@@ -1036,6 +1030,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                     </property>
                     <property name="toolTip">
                      <string>Solve for local point radii. 
+
 Valid Range: 1.0e-10 to 1.0e+10</string>
                     </property>
                     <property name="layoutDirection">
@@ -1064,7 +1059,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Valid Range: 0.0 to 360.0</string>
+                     <string>Valid Range: 1.0e-10 to 1.0e+10</string>
                     </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Latitude&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

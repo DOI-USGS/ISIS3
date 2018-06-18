@@ -145,7 +145,7 @@ namespace Isis {
     m_ui->noneRadiiRadioButton->setChecked(true);
 
     // validators for target body entries...
-    QDoubleValidator *sigmaValidator = new QDoubleValidator(0.0, 1.0e+10, 8, this);
+    QDoubleValidator *sigmaValidator = new QDoubleValidator(0.0, 1.0e+4, 8, this);
     sigmaValidator->setNotation(QDoubleValidator::ScientificNotation);
 
     // right ascension valid range is from 0 to 360 degrees
@@ -196,8 +196,8 @@ namespace Isis {
 
     // jigsaw run setup general tab validation
     // global apriori point sigmas
-    m_ui->pointLatitudeSigmaLineEdit->setValidator(new QDoubleValidator(0.0, 360.0, 8, this));
-    m_ui->pointLongitudeSigmaLineEdit->setValidator(new QDoubleValidator(0.0, 360.0, 8, this));
+    m_ui->pointLatitudeSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->pointLongitudeSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8,this));
     m_ui->pointRadiusSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
 
     // outlier rejection
@@ -327,6 +327,10 @@ namespace Isis {
       m_ui->maximumLikelihoodModel3ComboBox->setEnabled(false);
     }
 
+    on_maximumLikelihoodModel1QuantileLineEdit_textChanged("");
+    on_maximumLikelihoodModel2QuantileLineEdit_textChanged("");
+    on_maximumLikelihoodModel3QuantileLineEdit_textChanged("");
+
     // sigma and max likelihood options are exclusive
     m_ui->outlierRejectionCheckBox->setEnabled(!model1Selected);
   }
@@ -340,31 +344,36 @@ namespace Isis {
     m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(model2Selected);
     m_ui->maximumLikelihoodModel3Label->setEnabled(model2Selected);
     m_ui->maximumLikelihoodModel3ComboBox->setEnabled(model2Selected);
-    m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(
-                                            m_ui->maximumLikelihoodModel2ComboBox->currentIndex());
+    m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(
+                                            m_ui->maximumLikelihoodModel3ComboBox->currentIndex());
 
     // when setting "NONE", set remaining max likelihood options to false  
     if (!model2Selected) {
       m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(false);
     }
 
+    on_maximumLikelihoodModel2QuantileLineEdit_textChanged("");
+    on_maximumLikelihoodModel3QuantileLineEdit_textChanged("");
   }
 
 
   void JigsawSetupDialog::on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index) {
 
     bool model3Selected = (bool)(index > 0);
+
     m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(model3Selected);
+    on_maximumLikelihoodModel3QuantileLineEdit_textChanged("");
 
   }
 
 
   void JigsawSetupDialog::on_outlierRejectionCheckBox_stateChanged(int arg1) {
 
+    on_outlierRejectionMultiplierLineEdit_textChanged("");
     m_ui->outlierRejectionMultiplierLineEdit->setEnabled(arg1);
-    m_ui->outlierRejectionMultiplierLabel->setEnabled(arg1);
 
     // sigma and maxlikelihood options are exclusive
+    m_ui->maxLikelihoodEstimationLabel->setEnabled(!arg1);
     m_ui->maximumLikelihoodModel1ComboBox->setEnabled(!arg1);
     m_ui->maximumLikelihoodModel1Label->setEnabled(!arg1);
   }
@@ -1219,8 +1228,9 @@ namespace Isis {
 
   // outlier rejection
   void Isis::JigsawSetupDialog::on_maximumLikelihoodModel1QuantileLineEdit_textChanged(const QString &arg1) {
-    if (m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
-      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+    if (!m_ui->maximumLikelihoodModel1QuantileLineEdit->isEnabled() ||
+        m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     }
     else {
@@ -1232,8 +1242,9 @@ namespace Isis {
 
 
   void Isis::JigsawSetupDialog::on_maximumLikelihoodModel2QuantileLineEdit_textChanged(const QString &arg1) {
-    if (m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
-      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+    if (!m_ui->maximumLikelihoodModel2QuantileLineEdit->isEnabled() ||
+        m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     }
     else {
@@ -1245,8 +1256,9 @@ namespace Isis {
 
 
   void Isis::JigsawSetupDialog::on_maximumLikelihoodModel3QuantileLineEdit_textChanged(const QString &arg1) {
-    if (m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
-      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+    if (!m_ui->maximumLikelihoodModel3QuantileLineEdit->isEnabled() ||
+        m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     }
     else {
@@ -1259,8 +1271,9 @@ namespace Isis {
 
   // convergence criteria
   void Isis::JigsawSetupDialog::on_outlierRejectionMultiplierLineEdit_textChanged(const QString &arg1) {
-    if (m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
-      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+    if (!m_ui->outlierRejectionCheckBox->isChecked() || 
+        m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("");
       m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     }
     else {
