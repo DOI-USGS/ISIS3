@@ -41,6 +41,9 @@
     <change name="Kristin Berry" date="2018-06-12">
       Updated to use the tgoCassisExportMosaic.trn translation file when the input cube is a mosaic.
     </change>
+  <change name="Kristin Berry" date="2018-06-18">
+      Updated to look in the Archive group for the ObservationId when setting a default ProductId. 
+    </change>
   </history>
 
   <category>

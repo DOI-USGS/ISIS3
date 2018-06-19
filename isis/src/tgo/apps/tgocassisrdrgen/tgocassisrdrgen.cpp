@@ -68,7 +68,14 @@ void IsisMain() {
     productId.setValue( ui.GetString("PRODUCTID") );
   }
   else {
-    QString observationId = targetGroup.findKeyword("ObservationId")[0];
+    QString observationId = "";
+    if (targetGroup.hasKeyword("ObservationId")) {
+      observationId = targetGroup.findKeyword("ObservationId")[0];
+    }
+    else {
+      observationId = label->findObject("IsisCube").findGroup("Archive")
+                                                   .findKeyword("ObservationId")[0];
+    }
     productId.setValue(observationId);
   }
   targetGroup.addKeyword(productId);  
