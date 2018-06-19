@@ -98,6 +98,15 @@ namespace Isis {
 
   }
 
+  /**
+   *  This SLOT is designed to intercept the openPointEditor() signal that's emitted
+   *  Whenever a point is double clicked on inside of the ControlHealthMonitorWidget.
+   *
+   *  It is designed to open the ControlPointEditWidget and edit the point that was
+   *  selected in the health monitor.
+   *
+   *  @param point The Control Point to be editted.
+   */
   void ControlHealthMonitorView::openPointEditor(ControlPoint *point) {
     ControlPointEditWidget* widget = m_directory->addControlPointEditView()->controlPointEditWidget();
 
@@ -109,6 +118,12 @@ namespace Isis {
   }
 
 
+  /**
+   *  This SLOT is designed to intercept the openImageEditor() signal that's emitted
+   *  Whenever an image is double clicked on inside of the ControlHealthMonitorWidget.
+   *
+   *  It is designed to open the CubeDnView and populate it with the selected cubes.
+   */
   void ControlHealthMonitorView::openImageEditor() {
     m_directory->addCubeDnView();
   }
