@@ -78,6 +78,7 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
+  // addSchema must be called after StandardPds4Label()
   process.addSchema("PDS4_PSA_1000.sch", 
                     "PDS4_PSA_1000.xsd",
                     "xmlns:psa", 

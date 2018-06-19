@@ -752,6 +752,8 @@ namespace Isis {
 
   /**
    * Adds necessary information to the xml header for a pds4 class. 
+   *  
+   * This must be called after StandardPds4Label() to work correctly.  
    * 
    * @param sch Schematron filename without path
    * @param xsd Schema filename without path

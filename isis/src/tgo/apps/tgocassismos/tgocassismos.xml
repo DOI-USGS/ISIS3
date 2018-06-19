@@ -13,7 +13,7 @@
   The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>
 
    A new label group, required by tgocassisrdrgen, called "Mosaic"  is added to the image labels of
-   the output cube.  The original label blob is also propagated from the first file in the input list.<br/>
+   the output cube. The StartTime and SpacecraftClockStartCount will be propagated from first cube in the input list.<br/>
    </p>
 
 <p>
