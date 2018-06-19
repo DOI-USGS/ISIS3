@@ -16,6 +16,7 @@ find_library(COLAMD_LIBRARY       NAMES colamd)
 find_library(CAMD_LIBRARY         NAMES camd)
 find_library(AMD_LIBRARY          NAMES amd)
 find_library(SUITESPARSE_LIBRARY  NAMES suitesparseconfig)
+find_library(BLAS_LIBRARY NAMES blas)
 
 # OSX does not link against lapack
 if(NOT APPLE)
@@ -24,14 +25,6 @@ endif()
 
 # Dependencies for lapack
 
-# add gcc location for MacOS
-# if(APPLE)
-  find_library(FORTRAN_LIBRARY      NAMES gfortran
-    NAMES gfortran
-  )
-
-  find_library(BLAS_LIBRARY NAMES blas)
-# endif(APPLE)
 
 get_filename_component(CHOLMOD_ROOT_INCLUDE_DIR "${CHOLMOD_INCLUDE_DIR}" DIRECTORY)
 
