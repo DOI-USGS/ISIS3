@@ -143,6 +143,9 @@ namespace Isis {
    *                           was deleted or added to the control net.  Renamed deleteControlPoint
    *                           signal to controlPointDeleted.  Removed some unneeded connections.
    *                           Fixes #5007, #5008.
+   *   @history 2018-05-14 Tracie Sucharski - Change the xml tag from footprint2DView to
+   *                           mosaicScene. Reference #5422.
+   *  
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

@@ -38,12 +38,12 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Constructs a Rosetta Osiris NAC Framing Camera object. 
+   * Constructs a Rosetta Osiris NAC Framing Camera object.
    *
    * @param cube The image cube.
    *
    * @author Stuart Sides
-   * 
+   *
    * @internal
    * @history modified by Sasha Brownsberger
    */
@@ -56,7 +56,10 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
 
-    // The Osiris focal length is fixed and is designed not to change throught the operational 
+    Pvl &lab = *cube.label();
+    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
+
+    // The Osiris focal length is fixed and is designed not to change throught the operational
     // temperature.  For OSIRIS, the focal length is in mm, so we shouldn't need the unit conversion
 
     QString ikCode =  toString(naifIkCode());
@@ -66,7 +69,7 @@ namespace Isis {
     SetFocalLength(focalLength);
 
     // For setting the pixel pitch, the Naif keyword PIXEL_SIZE is used instead of the ISIS
-    // default of PIXEL_PITCH, so set the value directly.  Needs to be converted from microns to mm.   
+    // default of PIXEL_PITCH, so set the value directly.  Needs to be converted from microns to mm.
     QString pp = "INS" + ikCode + "_PIXEL_SIZE";
 
     double pixelPitch = Spice::getDouble(pp);
@@ -77,7 +80,12 @@ namespace Isis {
     // out the affine transforms from detector samp,line to focal plane x,y.
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    new CameraDetectorMap(this);
+    CameraDetectorMap *detectorMap = new CameraDetectorMap(this);
+    detectorMap->SetStartingDetectorSample((double) inst["FirstLineSample"]);
+    // Because images are flipped on ingestion,
+    // the first line on the label is actually the last line.
+    detectorMap->SetStartingDetectorLine(2050 - cube.lineCount() - (double) inst["FirstLine"]);
+
     RosettaOsirisCameraDistortionMap* distortionMap = new RosettaOsirisCameraDistortionMap(this);
 
     // Setup the ground and sky map
@@ -85,8 +93,6 @@ namespace Isis {
     new CameraSkyMap(this);
 
     // Setup clock start and stop times.
-    Pvl &lab = *cube.label();
-    PvlGroup &inst = lab.findGroup("Instrument", Pvl::Traverse);
     QString clockStartCount = inst["SpacecraftClockStartCount"];
     double start = getClockTime(clockStartCount).Et();
     // QString clockStopCount = inst["SpacecraftClockStopCount"];
@@ -111,7 +117,7 @@ namespace Isis {
     distortionMap->setBoresight(referenceSample, referenceLine);
 
     iTime centerTime = start + (exposureTime / 2.0);
-    setTime( centerTime ); 
+    setTime( centerTime );
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();
@@ -122,10 +128,10 @@ namespace Isis {
 
 
   /**
-   * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and 
+   * Returns the shutter open and close times.  The LORRI camera doesn't use a shutter to start and
    * end an observation, but this function is being used to get the observation start and end times,
-   * so we will simulate a shutter. 
-   * 
+   * so we will simulate a shutter.
+   *
    * @param exposureDuration ExposureDuration keyword value from the labels,
    *                         converted to seconds.
    * @param time The StartTime keyword value from the labels, converted to
@@ -147,7 +153,7 @@ namespace Isis {
 
   /**
    * Initialize the distortion map using the paramters from the NAIF SPICE kernels.
-   * 
+   *
    * @param ikCode The NAIF IK code of the instrument
    * @param[out] distortionMap The distortion map that will be initialized
    */
@@ -181,7 +187,7 @@ namespace Isis {
  * @return Isis::Camera* OsirisNacCamera
  * @internal
  *   @history 2015-05-21 Sasha Brownsberger - Added documentation.  Removed Lorri
- *            namespace.  Added OsirisNac name.  
+ *            namespace.  Added OsirisNac name.
  */
 extern "C" Isis::Camera *RosettaOsirisCameraPlugin(Isis::Cube &cube) {
   return new Isis::RosettaOsirisCamera(cube);

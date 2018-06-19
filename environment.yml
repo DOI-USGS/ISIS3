@@ -5,7 +5,6 @@ channels:
   - conda-forge
   - probcomp
   - anaconda
-  - jlaura
   - defaults
 dependencies:
   - pcl==1.8.1=h6bb024c_1
