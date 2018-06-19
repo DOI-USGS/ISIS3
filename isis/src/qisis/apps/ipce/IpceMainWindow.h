@@ -145,6 +145,11 @@ namespace Isis {
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
+   *   @history 2018-06-20 Makayla Shepherd - ipce now defaults to full screen if there is not an
+   *                           ipce.config in the project or in ~/.Isis/ipce.
+   *   @history 2018-06-20 Makayla Shepherd - Stopped saving the state of a temporary project.
+   *   @history 2018-06-20 Makayla Shepherd - Save and Save As now save the geometry and state of 
+   *                           the project.
    *  
    */
   class IpceMainWindow : public QMainWindow {

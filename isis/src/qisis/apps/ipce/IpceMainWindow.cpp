@@ -504,10 +504,13 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     QString appName = QApplication::applicationName();
-    QSettings projectSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(),
-        QSettings::NativeFormat);
+    
+    QString filePath = project->newProjectRoot() + "/ipce.config";  
+    if (project->isTemporaryProject()) {
+      filePath = "$HOME/.Isis/" + appName + "/ipce.config";
+    }
+        
+    QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     QSettings globalSettings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
@@ -515,9 +518,14 @@ namespace Isis {
         QSettings::NativeFormat);
 
     projectSettings.setValue("geometry", QVariant(geometry()));
-    projectSettings.setValue("windowState", saveState());
-//  projectSettings.setValue("size", size());
-//  projectSettings.setValue("pos", pos());
+    
+    // If we try to restore a state when we don't have the cubes for a view it could cause a crash
+    // Therefore we only want to save the state if we are NOT saving to the default area
+    if (!project->isTemporaryProject()) {
+      projectSettings.setValue("windowState", saveState());
+    }
+    projectSettings.sync();
+
 
     projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
@@ -587,6 +595,7 @@ namespace Isis {
       }
     }
     globalSettings.endGroup();
+    globalSettings.sync();
   }
 
 
@@ -606,6 +615,8 @@ namespace Isis {
    *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it
    *                                      was messing with the positions of widgets after a
    *                                      project was loaded.  Fixes #5075.
+   *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
+   *                If that does not exist then we read from .Isis/ipce/ipce.config.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -613,73 +624,91 @@ namespace Isis {
       QString msg = "Cannot read settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
+    // Set the path of the settings file
+    // The default is to assume that the project has an ipce.config in it
+    // If the file does not exist then we read settings from .Isis/ipce/ipce.config
     QString appName = QApplication::applicationName();
-
-    QSettings settings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(), QSettings::NativeFormat);
-
-    // General settings
+    QString filePath = project->projectRoot() + "/ipce.config";
+    
+    bool setFullScreen = false;
+    if (!FileName(filePath).fileExists()) {
+      filePath = "$HOME/.Isis/" + appName + "/ipce.config";
+      
+      // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in 
+      // in full screen. Meaning the default geometry is full screen
+      if (!FileName(filePath).fileExists()) {
+        setFullScreen = true;
+      }
+    }
+    
     if (project->name() == "Project") {
       setWindowTitle("ipce");
-
-      QStringList projectNameList;
-      QStringList projectPathList;
-      settings.beginGroup("recent_projects");
-      QStringList keys = settings.allKeys();
-      QRegExp underscore("%%%%%");
-
-      foreach (QString key, keys) {
-        QString childKey = "recent_projects/"+key;
-        QString projectPath = settings.value(key).toString();
-        QString projectName = projectPath.split("/").last();
-        projectPathList.append(projectPath) ;
-        projectNameList.append(projectName);
-      }
-
-      settings.endGroup();
-
-      QStringList projectPathReverseList;
-      for (int i = projectPathList.count()-1;i>=0;i--) {
-        projectPathReverseList.append(projectPathList[i]);
-      }
-
-      QStringList projectPathListTruncated;
-
-      int i =0;
-
-      foreach (QString proj,projectPathReverseList) {
-        if (i <= m_maxRecentProjects) {
-          projectPathListTruncated.append(proj);
-          i++;
-        }
-        else
-          break;
-       }
-
-      m_directory->setRecentProjectsList(projectPathListTruncated);
-      m_directory->updateRecentProjects();
-      m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
-      applyMaxThreadCount();
     }
-    //  Project specific settings
     else {
       setWindowTitle( project->name() );
-      if (settings.contains("geometry")) {
-        setGeometry(settings.value("geometry").value<QRect>()); 
-      }
-      if (settings.contains("windowState")) {
-        restoreState(settings.value("windowState").toByteArray()); 
-      }
-
-      // The geom/state isn't enough for main windows to correctly remember
-      //   their position and size, so let's restore those on top of
-      //   the geom and state.
-      if (!settings.value("pos").toPoint().isNull()) {
-        move(settings.value("pos").toPoint());
-      }
     }
+
+    
+    QSettings settings(FileName(filePath).expanded(), QSettings::NativeFormat);
+
+    if (!setFullScreen) {
+      setGeometry(settings.value("geometry").value<QRect>());
+      restoreState(settings.value("windowState").toByteArray());
+    }
+    else {
+      this->showMaximized();
+    }
+
+    QStringList projectNameList;
+    QStringList projectPathList;
+    settings.beginGroup("recent_projects");
+    QStringList keys = settings.allKeys();
+
+    QRegExp underscore("%%%%%");
+
+    foreach (QString key, keys) {
+      QString childKey = "recent_projects/"+key;
+      QString projectPath = settings.value(key).toString();
+      QString projectName = projectPath.split("/").last();
+      projectPathList.append(projectPath) ;
+      projectNameList.append(projectName);
+    }
+
+    settings.endGroup();
+
+    QStringList projectPathReverseList;
+
+    for (int i = projectPathList.count()-1;i>=0;i--) {
+      projectPathReverseList.append(projectPathList[i]);
+    }
+
+    QStringList projectPathListTruncated;
+
+    int i =0;
+
+    foreach (QString proj,projectPathReverseList) {
+      if (i <= m_maxRecentProjects) {
+        projectPathListTruncated.append(proj);
+        i++;
+      }
+      else
+        break;
+     }
+
+
+    m_directory->setRecentProjectsList(projectPathListTruncated);
+    m_directory->updateRecentProjects();
+
+    // The geom/state isn't enough for main windows to correctly remember
+    //   their position and size, so let's restore those on top of
+    //   the geom and state.
+    if (!settings.value("pos").toPoint().isNull())
+      move(settings.value("pos").toPoint());
+
+    m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
+    applyMaxThreadCount();
+
   }
 
 
