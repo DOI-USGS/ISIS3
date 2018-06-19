@@ -23,8 +23,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <unordered_set>
-
 #include <QStringList>
 
 #include "ControlMeasure.h"
@@ -43,12 +41,12 @@ namespace Isis {
   *  It utilizes signals and slots to listen for changes in an observed Control Network and
   *  re-evaluates the health of a network whenever a change is made.
   *  It tracks several statistics, and is intended to be the back-end for the ControlHealthMonitorWidget
-  *  that is located in IPCE
+  *  that is located in IPCE.
   *
   *  The ControlNetVitals class keeps track of several member variables that are a running counter
-  *  for network statistics in regard to the observed network. It creates these variables upon
-  *  intialization and references these internal variables when returning certain statistics
-  *  about a Control Network that can't be accessed by wrapper methods for the network itself.
+  *  for network statistics in regard to the health of the observed network. It creates these
+  *  variables upon intialization and references these internal variables when returning certain
+  *  statistics about a Control Network that can't be accessed by wrapper methods for the network itself.
   *  It then listens for specific signals to be emitted whenever a change is made to the network
   *  to update it's internal counters with respect to that change.
   *
@@ -71,6 +69,8 @@ namespace Isis {
       bool hasIslands();
       int numIslands();
       const QList< QList<QString> > &getIslands();
+
+      ControlPoint *getPoint(QString id);
 
       int numPoints();
       int numIgnoredPoints();
@@ -101,8 +101,11 @@ namespace Isis {
       QString getStatus();
       QString getStatusDetails();
 
+      void emitHistoryEntry(QString entry, QString id, QVariant oldValue, QVariant newValue);
+
     signals:
       void networkChanged();
+      void historyEntry(QString, QString, QVariant, QVariant, QString);
 
     public slots:
       void validate();

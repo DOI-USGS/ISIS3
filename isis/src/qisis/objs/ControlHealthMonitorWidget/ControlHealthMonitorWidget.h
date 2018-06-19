@@ -59,6 +59,11 @@ QT_CHARTS_USE_NAMESPACE
       void initializeEverything();
 
     public slots:
+      void emitOpenImageEditor();
+      void emitOpenPointEditor();
+
+      void historyEntry(QString, QString, QVariant, QVariant, QString);
+
       void viewPointAll();
       void viewPointFree();
 
@@ -79,6 +84,9 @@ QT_CHARTS_USE_NAMESPACE
 
       void update();
 
+    signals:
+      void openPointEditor(ControlPoint *point);
+      void openImageEditor();
 
     private:
         void updateStatus(int code);
@@ -88,6 +96,10 @@ QT_CHARTS_USE_NAMESPACE
         QChartView *m_pointChartView;
         ControlNetVitals *m_vitals;
         QProgressBar *m_statusBar;
+        QProgressBar *m_pointsFreeProgressbar;
+        QProgressBar *m_pointsConstrainedProgressbar;
+        QProgressBar *m_pointsFixedProgressbar;
+
 
         QTableWidget *m_historyTable;
         QTableWidget *m_imagesTable;
@@ -108,7 +120,6 @@ QT_CHARTS_USE_NAMESPACE
         QLabel *m_pointsFreeLabel;
         QLabel *m_pointsIgnoredLabel;
         QLabel *m_pointsShowingLabel;
-        QLabel *m_sizeLabel;
         QLabel *m_statusDetails;
         QLabel *m_statusLabel;
 

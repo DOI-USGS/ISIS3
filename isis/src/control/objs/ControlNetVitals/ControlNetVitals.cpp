@@ -1,6 +1,9 @@
 #include "ControlNetVitals.h"
 
+#include <QDateTime>
 #include <QList>
+#include <QPair>
+#include <QVariant>
 
 #include "IException.h"
 #include "IString.h"
@@ -80,6 +83,11 @@ namespace Isis {
   }
 
 
+  void ControlNetVitals::emitHistoryEntry(QString entry, QString id, QVariant oldValue, QVariant newValue) {
+    emit historyEntry(entry, id, oldValue, newValue, QDateTime::currentDateTime().toString());
+  }
+
+
   /**
    *  This SLOT is designed to intercept the newPoint() signal emitted from a ControlNetwork
    *  whenever a new point has been added. It observes the Control Point and increments the
@@ -95,6 +103,8 @@ namespace Isis {
    *  @param point The ControlPoint being added to the network.
    */
   void ControlNetVitals::addPoint(ControlPoint *point) {
+    emitHistoryEntry("Control Point Added", point->GetId(), "", "");
+
     if (point->IsIgnored()) {
       m_numPointsIgnored++;
       return;
@@ -137,8 +147,13 @@ namespace Isis {
    */
   void ControlNetVitals::pointModified(ControlPoint *point, ControlPoint::ModType type,
                                        QVariant oldValue, QVariant newValue) {
+
+    QString historyEntry;
+
     switch(type) {
       case ControlPoint::EditLockModified:
+
+        historyEntry = "Point Edit Lock Modified";
 
         if (oldValue.toBool()) {
           m_numPointsLocked--;
@@ -148,9 +163,14 @@ namespace Isis {
           m_numPointsLocked++;
         }
 
+        emitHistoryEntry( historyEntry, point->GetId(),
+                          oldValue, newValue );
+
         break;
 
       case ControlPoint::IgnoredModified:
+
+        historyEntry = "Point Ignored Modified";
 
         if (oldValue.toBool()) {
           m_numPointsIgnored--;
@@ -179,12 +199,21 @@ namespace Isis {
           }
         }
 
+        emitHistoryEntry( historyEntry, point->GetId(),
+                          oldValue, newValue );
+
         break;
 
       case ControlPoint::TypeModified:
 
+        historyEntry = "Point Type Modified";
+
         m_pointTypeCounts[ControlPoint::PointType(oldValue.toInt())]--;
         m_pointTypeCounts[ControlPoint::PointType(newValue.toInt())]++;
+
+        emitHistoryEntry( historyEntry, point->GetId(),
+                          ControlPoint::PointTypeToString(ControlPoint::PointType(oldValue.toInt())),
+                          ControlPoint::PointTypeToString(ControlPoint::PointType(newValue.toInt())) );
 
         break;
 
@@ -192,8 +221,13 @@ namespace Isis {
         // no operation
         break;
     }
+
     validate();
 
+  }
+
+  ControlPoint* ControlNetVitals::getPoint(QString id) {
+    return m_controlNet->GetPoint(id);
   }
 
 
@@ -213,6 +247,9 @@ namespace Isis {
    *  @param point The Control Point being deleted from the Control Network.
    */
   void ControlNetVitals::deletePoint(ControlPoint *point) {
+
+    emitHistoryEntry("Control Point Deleted", point->GetId(), "", "");
+
     if (point->IsIgnored()) {
       m_numPointsIgnored--;
       validate();
@@ -245,6 +282,8 @@ namespace Isis {
    *  @param measure The Control Measure being added to a Control Point in the network.
    */
   void ControlNetVitals::addMeasure(ControlMeasure *measure) {
+    emitHistoryEntry("Control Measure Added", measure->GetCubeSerialNumber(), "", "");
+
     ControlPoint *point = measure->Parent();
     if (point) {
       // By this time, the measure has been added to its parent point, so the
@@ -291,8 +330,12 @@ namespace Isis {
    */
   void ControlNetVitals::measureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
 
+    QString historyEntry;
+
     switch (type) {
       case ControlMeasure::IgnoredModified:
+
+        historyEntry = "Measure Ignored Modified";
 
         if ( !oldValue.toBool() && newValue.toBool() ) {
           return addMeasure(measure);
@@ -307,6 +350,9 @@ namespace Isis {
         break;
 
     }
+
+    emitHistoryEntry(historyEntry, measure->GetCubeSerialNumber(), "", "");
+
     validate();
   }
 
@@ -322,6 +368,9 @@ namespace Isis {
    *  @param point The Control Measure being deleted from a Control Point in the Control Network.
    */
   void ControlNetVitals::deleteMeasure(ControlMeasure *measure) {
+
+    emitHistoryEntry("Control Measure Deleted", measure->GetCubeSerialNumber(), "", "");
+
 
     ControlPoint *point = measure->Parent();
     if (point) {
@@ -352,13 +401,6 @@ namespace Isis {
     else {
       m_imageMeasureCounts[numValidMeasures - 1]++;
     }
-
-    // std::cout << "MEasure deleted" << std::endl;
-    // foreach(int key, m_pointMeasureCounts) {
-    //   std::cout << "Key: " << key << "   value: " << m_pointMeasureCounts[key];
-    // }
-
-
     validate();
   }
 
@@ -375,11 +417,16 @@ namespace Isis {
    *  @param point The type of modification that was made to the observed Control Network.
    */
   void ControlNetVitals::validateNetwork(ControlNet::ModType type) {
+
+    QString historyEntry;
+
     switch (type) {
       case ControlNet::Swapped:
+        emitHistoryEntry("Control Net Swapped", m_controlNet->GetNetworkId(), "", "");
         initializeVitals();
         break;
       case ControlNet::GraphModified:
+        emitHistoryEntry("Control Net Graph Modified", m_controlNet->GetNetworkId(), "", "");
         m_islandList = m_controlNet->GetSerialConnections();
         break;
       default:
@@ -501,14 +548,15 @@ namespace Isis {
    *  @return The number of points with number of measures less than the threshold.
    */
   int ControlNetVitals::numPointsBelowMeasureThreshold(int num) {
-    int count = 0;
-    foreach(int measureCount, m_pointMeasureCounts) {
-      if (measureCount > num) {
-        break;
-      }
-      count += m_pointMeasureCounts[measureCount];
-    }
-    return count;
+    // int count = 0;
+    // foreach(int measureCount, m_pointMeasureCounts) {
+    //   if (measureCount >= num) {
+    //     continue;
+    //   }
+    //   count += m_pointMeasureCounts[measureCount];
+    // }
+    // return count;
+    return getPointsBelowMeasureThreshold(num).size();
   }
 
 
