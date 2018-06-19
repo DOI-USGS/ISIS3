@@ -1327,6 +1327,7 @@ namespace Isis {
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
 
+     QList<ProjectItem *> selectedChildItems = m_project->directory()->model()->selectedChildItems();
 
     QList<ProjectItem *> selectedItems = m_project->directory()->model()->selectedItems();
 
@@ -1335,12 +1336,18 @@ namespace Isis {
 
     SortFilterProxyModel *osspm = new SortFilterProxyModel;
     osspm->setSourceModel(model);
-    QList<ProjectItem*> selected = model->selectedItems();
+    QList<ProjectItem*> selected = model->selectedChildItems();
 
     //selected.append(selectedItems[0]->parent() );
 
+    qDebug() << "Selected Child items:  ";
+    foreach(ProjectItem * item,selectedChildItems) {
+      qDebug() << item->index().data(0).toString();
+
+    }
+
     qDebug() << "Selected items:  ";
-    foreach(ProjectItem * item,selected) {
+    foreach(ProjectItem * item,selectedItems) {
       qDebug() << item->index().data(0).toString();
 
     }

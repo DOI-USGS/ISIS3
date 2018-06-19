@@ -155,6 +155,7 @@ namespace Isis {
 
       ProjectItem *currentItem();
       QList<ProjectItem *> selectedItems();
+      QList<ProjectItem *> selectedChildItems();
 
       void appendRow(ProjectItem *item);
       void clean();

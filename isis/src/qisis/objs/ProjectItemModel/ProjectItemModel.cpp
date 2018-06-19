@@ -171,8 +171,29 @@ namespace Isis {
     QItemSelection selection = selectionModel()->selection();
     QList<ProjectItem *> items;
 
+
     foreach ( QModelIndex index, selection.indexes() ) {
       items.append( itemFromIndex(index) );
+    }
+
+    return items;
+  }
+
+  QList<ProjectItem *> ProjectItemModel::selectedChildItems() {
+    QItemSelection selection = selectionModel()->selection();
+    QList<ProjectItem *> items;
+
+
+    foreach ( QModelIndex ix, selection.indexes() ) {
+      items.append( itemFromIndex(ix) );
+      if (this->hasChildren(ix)) {
+        int numChildren = this->rowCount(ix);
+        for (int i = 0; i < numChildren;i++) {
+          QModelIndex ixchild = this->index(i,0,ix);
+          items.append(this->itemFromIndex(ixchild ));
+
+          }
+      }
     }
 
     return items;
@@ -697,6 +718,7 @@ namespace Isis {
         item->image()->displayProperties()->setSelected(false);
       }
     }
+
   }
 
 
