@@ -40,6 +40,8 @@
 #include <QDateTime>
 #include <QTreeView>
 #include <QVariant>
+#include <QTabWidget>
+
 
 #include "AbstractProjectItemView.h"
 #include "Directory.h"
@@ -85,6 +87,8 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+    //setDockOptions(GroupedDragging | AllowTabbedDocks);
     //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
     setDockNestingEnabled(true);
@@ -344,7 +348,7 @@ namespace Isis {
     m_permToolBarActions.append(exitAction);
 
     QAction *tabViewsAction = new QAction("Tab Views", this);
-    connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabAllViews()) );
+    connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
     m_viewMenuActions.append(tabViewsAction);
 
     QAction *saveNet = new QAction("&Save Active Control Network", this);
@@ -493,7 +497,7 @@ namespace Isis {
    * from an internal list of QActions and the Directory.
    */
   void IpceMainWindow::createToolBars() {
-    m_permToolBar = new QToolBar(this);
+    m_permToolBar = new QToolBar("Permanent Toolbar", this);
     m_activeToolBar = new QToolBar(this);
     m_toolPad = new QToolBar(this);
 
@@ -813,17 +817,24 @@ namespace Isis {
 
 
   /**
-   * Tabs all views inside of the main window.
+   * Tabs all open attached/detached views
    */
-  void IpceMainWindow::tabAllViews() {
-  QDockWidget *firstView = m_viewDocks.first();
-  foreach (QDockWidget *currentView, m_viewDocks) {
-    if (currentView == firstView) {
-      continue;
+  void IpceMainWindow::tabViews() {
+    // tabifyDockWidget() takes two widgets and tabs them, so an easy way to do
+    // this is to grab the first view and tab the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
+
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tabbed. If it is attached,
+      // this will have no affect.
+      currentView->setFloating(false);
+
+      if (currentView == firstView) {
+        continue;
+      }
+      tabifyDockWidget(firstView, currentView);
     }
-    tabifyDockWidget(firstView, currentView);
   }
-}
 
 
 /**
