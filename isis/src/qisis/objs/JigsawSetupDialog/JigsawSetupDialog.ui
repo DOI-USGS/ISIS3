@@ -330,44 +330,7 @@ Must be positive.</string>
                   <bool>false</bool>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_14">
-                  <item row="7" column="0" alignment="Qt::AlignRight">
-                   <widget class="QLabel" name="maximumLikelihoodModel3Label">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="acceptDrops">
-                     <bool>false</bool>
-                    </property>
-                    <property name="toolTip">
-                     <string>Valid Range: 1.0e-10 to 1.0</string>
-                    </property>
-                    <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                    <property name="buddy">
-                     <cstring>maximumLikelihoodModel3ComboBox</cstring>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="1" colspan="2">
+                  <item row="6" column="1" colspan="2">
                    <widget class="QComboBox" name="maximumLikelihoodModel1ComboBox">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -392,7 +355,73 @@ Must be positive.</string>
                     </item>
                    </widget>
                   </item>
-                  <item row="6" column="1" colspan="2">
+                  <item row="8" column="3">
+                   <widget class="QLineEdit" name="maximumLikelihoodModel3QuantileLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="3">
+                   <widget class="QLineEdit" name="maximumLikelihoodModel2QuantileLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="3">
+                   <widget class="QLineEdit" name="maximumLikelihoodModel1QuantileLineEdit">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>100</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1" colspan="2">
                    <widget class="QComboBox" name="maximumLikelihoodModel2ComboBox">
                     <property name="enabled">
                      <bool>false</bool>
@@ -430,25 +459,11 @@ Must be positive.</string>
                     </item>
                    </widget>
                   </item>
-                  <item row="4" column="0" colspan="4">
-                   <widget class="QLabel" name="maxLikelihoodEstimationLabel">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
+                  <item row="7" column="0" alignment="Qt::AlignRight">
+                   <widget class="QLabel" name="maximumLikelihoodModel2Label">
+                    <property name="enabled">
+                     <bool>false</bool>
                     </property>
-                    <property name="toolTip">
-                     <string>Maximum Likelihood Estimation and Sigma Multiplier are exclusive options. 
-Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
-                    </property>
-                    <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Maximum Likelihood Estimation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0" alignment="Qt::AlignRight">
-                   <widget class="QLabel" name="maximumLikelihoodModel1Label">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -471,14 +486,14 @@ Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
                      <string>Valid Range: 1.0e-10 to 1.0</string>
                     </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="buddy">
-                     <cstring>maximumLikelihoodModel1ComboBox</cstring>
+                     <cstring>maximumLikelihoodModel2ComboBox</cstring>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="1" colspan="2">
+                  <item row="8" column="1" colspan="2">
                    <widget class="QComboBox" name="maximumLikelihoodModel3ComboBox">
                     <property name="enabled">
                      <bool>false</bool>
@@ -516,33 +531,8 @@ Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
                     </item>
                    </widget>
                   </item>
-                  <item row="5" column="3">
-                   <widget class="QLineEdit" name="maximumLikelihoodModel1QuantileLineEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>0.5</string>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="6" column="0" alignment="Qt::AlignRight">
-                   <widget class="QLabel" name="maximumLikelihoodModel2Label">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
+                   <widget class="QLabel" name="maximumLikelihoodModel1Label">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -565,23 +555,29 @@ Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
                      <string>Valid Range: 1.0e-10 to 1.0</string>
                     </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="buddy">
-                     <cstring>maximumLikelihoodModel2ComboBox</cstring>
+                     <cstring>maximumLikelihoodModel1ComboBox</cstring>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="3">
-                   <widget class="QLineEdit" name="maximumLikelihoodModel3QuantileLineEdit">
+                  <item row="8" column="0" alignment="Qt::AlignRight">
+                   <widget class="QLabel" name="maximumLikelihoodModel3Label">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
                     </property>
                     <property name="maximumSize">
                      <size>
@@ -589,30 +585,47 @@ Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
                       <height>16777215</height>
                      </size>
                     </property>
+                    <property name="acceptDrops">
+                     <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Valid Range: 1.0e-10 to 1.0</string>
+                    </property>
                     <property name="text">
-                     <string>0.5</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Model 3&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="buddy">
+                     <cstring>maximumLikelihoodModel3ComboBox</cstring>
                     </property>
                    </widget>
                   </item>
-                  <item row="6" column="3">
-                   <widget class="QLineEdit" name="maximumLikelihoodModel2QuantileLineEdit">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
+                  <item row="4" column="0" colspan="4">
+                   <widget class="QLabel" name="maxLikelihoodEstimationLabel">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>100</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="toolTip">
+                     <string>Maximum Likelihood Estimation and Sigma Multiplier are exclusive options. 
+Set Model 1 to &quot;NONE&quot; before checking Sigma Multiplier.</string>
                     </property>
                     <property name="text">
-                     <string>0.5</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Maximum Likelihood Estimation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="3" alignment="Qt::AlignHCenter">
+                   <widget class="QLabel" name="CQuantileLabel">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>C Quantile</string>
                     </property>
                    </widget>
                   </item>
