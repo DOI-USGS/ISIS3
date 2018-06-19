@@ -90,7 +90,7 @@ namespace Isis {
    *                           Fixes #5399.
    *   @history 2018-05-02 Tracie Sucharski - Colorize save buttons properly when creating new
    *                           control point and loading a different control point.
-   *   @history 2018-06-19 Adam Goins - Fixes updating references in selectLeftMeasure and
+   *   @history 2018-06-19 Adam Goins - Fixed updating references in selectLeftMeasure and
    *                           selectRightMeasure to fix a segfault that was occuring. #Fixes #5435
    */
   class ControlPointEditWidget : public QWidget {
