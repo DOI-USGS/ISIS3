@@ -20,7 +20,7 @@
 #include "ProjectItem.h"
 #include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
-#include "SubTreeProxyModel.h"
+#include "SortFilterProxyModel.h"
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
@@ -1136,37 +1136,50 @@ namespace Isis {
 
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
-    // Proof-of-
+
 
     QList<ProjectItem *> selectedItems = m_project->directory()->model()->selectedItems();
 
-    foreach(ProjectItem *item,selectedItems){
-      qDebug() << "Selected Item:  " << item->text();
-    }
-    qDebug() << "JigsawSetupDialog::createObservationSolveSettingsTreeView()";
 
-//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
     ProjectItemModel *model = m_project->directory()->model();
 
-    SubTreeProxyModel *osspm = new SubTreeProxyModel;
+    SortFilterProxyModel *osspm = new SortFilterProxyModel;
     osspm->setSourceModel(model);
+    QList<ProjectItem*> selected = model->selectedItems();
+
+    //selected.append(selectedItems[0]->parent() );
+
+    qDebug() << "Selected items:  ";
+    foreach(ProjectItem * item,selected) {
+      qDebug() << item->index().data(0).toString();
+
+    }
 
 
-     //QModelIndex SubTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
-    // find the root "Images" and set it in the proxy
-    //QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
-    //qDebug() << "ITEM: " << item << ", " << item->text();
-    //qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
+    //osspm->setDynamicSortFilter(true);
 
+    m_ui->treeView->setRootIsDecorated(true);
 
-    // i think source model tries to add top root item, which is invalid???
-
+    osspm->setSelectedItems(selected );
     m_ui->treeView->setModel(osspm);
+
+
+    qDebug() << "Parent=" << selectedItems[0]->parent()->index().data(0).toString();
+
 
     //Set the root index to display the subtree we are interested in.  This requires
     //computing the proxy index from the source model.
     if (selectedItems.count() > 0) {
-      m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
+      //qDebug() << "parent = " << selectedItems[0]->parent()->text();
+      osspm->setRoot(selectedItems[0]->parent());
+
+
+
+      //if ( selectedItems[0]->parent()->index().data(0).toString().isEmpty()) {
+          m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->parent()->index()));
+
+          qDebug() << "Setting parent to:  " << (selectedItems[0]->parent()->index()).data(0).toString();
+
 
     }
 
