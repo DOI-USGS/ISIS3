@@ -34,7 +34,7 @@ void IsisMain() {
   PvlObject *label= icube->label();
 
   PvlGroup targetGroup;
-  QString logicalId = "urn:esa:psa:em16_tgo_frd:";
+  QString logicalId = "urn:esa:psa:em16_tgo_cas:";
 
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Instrument");
