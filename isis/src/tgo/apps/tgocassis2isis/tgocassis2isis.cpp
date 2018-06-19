@@ -70,10 +70,10 @@ void IsisMain() {
         }
       }
       else {
-        translateLabels(xmlFileName, outputCube, transExportFile);
         if(outputLabel->findObject("IsisCube").hasGroup("Mapping")) {
           outputLabel->findObject("IsisCube").deleteGroup("Mapping"); 
         }
+        translateLabels(xmlFileName, outputCube, transExportFile);
       }
     }
 

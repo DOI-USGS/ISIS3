@@ -416,8 +416,7 @@ namespace Isis {
     
     // Get the input Isis cube label and find the BandBin group if it has one
     if (m_imageType == StandardImage) {
-      //imageBandBin();
-      translateBandBinImage(inputLabel);
+      translateBandBinImage(*inputLabel);
     }
     else {
       // Add header info
@@ -426,32 +425,32 @@ namespace Isis {
                 "xmlns:sp", 
                 "http://pds.nasa.gov/pds4/sp/v1");
       if (m_imageType == UniformlySampledSpectrum) {
-        translateBandBinSpectrumUniform(inputLabel);
+        translateBandBinSpectrumUniform(*inputLabel);
       }
       else if (m_imageType == BinSetSpectrum) {
-        translateBandBinSpectrumBinSet(inputLabel);
+        translateBandBinSpectrumBinSet(*inputLabel);
       }
     }
   }
 
 
-  void ProcessExportPds4::translateBandBinImage(Pvl *inputLabel) {
+  void ProcessExportPds4::translateBandBinImage(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinImage.trn";
     FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
   }
 
 
-  void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl *inputLabel) {
+  void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumUniform.trn";
     FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
-    PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
     // fix multi-valued bandbin info
     QStringList xmlPath;
     xmlPath << "Product_Observational"
@@ -530,7 +529,7 @@ namespace Isis {
       axisBinSetElement = m_domDoc->createElement("sp:Axis_Bin_Set");
       spectralCharElement.appendChild(axisBinSetElement);
     }
-    int bands = (int)inputLabel->findObject("IsisCube")
+    int bands = (int)inputLabel.findObject("IsisCube")
                                 .findObject("Core")
                                 .findGroup("Dimensions")
                                 .findKeyword("Bands");
@@ -583,14 +582,14 @@ namespace Isis {
   }
 
 
-  void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl *inputLabel) {
+  void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
     FileName translationFileName(translationFile);
-    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
-    PvlGroup bandBinGroup = inputLabel->findObject("IsisCube").findGroup("BandBin");
+    PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
     // fix multi-valued bandbin info
     QStringList xmlPath;
     xmlPath << "Product_Observational"
