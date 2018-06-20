@@ -145,7 +145,15 @@ namespace Isis {
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
-   *  
+   *   @history 2018-06-19 Kaitlyn Lee - Added tabViews() and the menu option under the View menu to
+   *                           tab the views. Currently, this can tab all attached/detached views. I
+   *                           left the line setting dock options to allow grouped dragging, but tabbing
+   *                           views does not always work with this enabled. With this option enabled, the
+   *                           type of a view will randomly change and setting its type has no effect.
+   *                           Use windowType() to get the type. Also added the toolbar title in the
+   *                           permanent toolbar constructor. 
+   *
+   *
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -170,7 +178,7 @@ namespace Isis {
       void configureThreadLimit();
       void enterWhatsThisMode();
 
-      void tabAllViews();
+      void tabViews();
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
