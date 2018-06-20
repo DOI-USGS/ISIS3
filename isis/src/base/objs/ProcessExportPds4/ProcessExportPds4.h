@@ -75,6 +75,9 @@ namespace Isis {
    *                           attributes to elements. Matches pds validate tool specifations.
    *   @history 2018-06-12 Kristin Berry - Added schema associated with the img class when it is
    *                           used.
+   *   @history 2018-06-19 Kristin Berry - Updated to use PDS schema version 1.10.0.0 and use
+   *                           different display settings for Standard and Spectral images. 
+   *                           
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {

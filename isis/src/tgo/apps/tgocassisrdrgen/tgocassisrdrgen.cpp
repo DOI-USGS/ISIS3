@@ -68,7 +68,14 @@ void IsisMain() {
     productId.setValue( ui.GetString("PRODUCTID") );
   }
   else {
-    QString observationId = targetGroup.findKeyword("ObservationId")[0];
+    QString observationId = "";
+    if (targetGroup.hasKeyword("ObservationId")) {
+      observationId = targetGroup.findKeyword("ObservationId")[0];
+    }
+    else {
+      observationId = label->findObject("IsisCube").findGroup("Archive")
+                                                   .findKeyword("ObservationId")[0];
+    }
     productId.setValue(observationId);
   }
   targetGroup.addKeyword(productId);  
@@ -78,6 +85,7 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
+  // addSchema must be called after StandardPds4Label()
   process.addSchema("PDS4_PSA_1000.sch", 
                     "PDS4_PSA_1000.xsd",
                     "xmlns:psa", 

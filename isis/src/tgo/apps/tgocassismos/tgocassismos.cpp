@@ -20,7 +20,7 @@ using namespace Isis;
 
 #include <vector>
 
-//functions in the code
+// functions in the code
 void compareLabels(Pvl &match, Pvl &comp);
 
 
@@ -46,8 +46,6 @@ void IsisMain() {
       cubeList.push_back(cube);
       cube->open(fromList[i].toString());
     }
-
-
 
     // run the compare function here.  This will conpare the
     // labels of the first cube to the labels of each following cube.
@@ -212,8 +210,7 @@ void IsisMain() {
     QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority;
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
-    // write out new information to new group mosaic
-
+    // write out new information to the new mosaic group
 
     PvlGroup mos("Mosaic");
     mos += PvlKeyword("SpacecraftName", spacecraftName);

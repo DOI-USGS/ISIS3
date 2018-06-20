@@ -64,7 +64,7 @@ namespace Isis {
     m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd"; 
 
     QString xmlModel;
-    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch\" ";
+    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1A00.sch\" ";
     xmlModel += "schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
@@ -389,7 +389,14 @@ namespace Isis {
 
     Pvl *inputLabel = InputCubes[0]->label(); 
     FileName translationFileName;
-    translationFileName = "$base/translations/pds4ExportDisplaySettings.trn";
+
+    if (m_imageType == StandardImage) {
+      translationFileName = "$base/translations/pds4ExportDisplaySettings.trn"; 
+    }
+    else {
+      translationFileName = "$base/translations/pds4ExportDisplaySettingsSpectrum.trn";
+    }
+
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
@@ -751,6 +758,8 @@ namespace Isis {
 
   /**
    * Adds necessary information to the xml header for a pds4 class. 
+   *  
+   * This must be called after StandardPds4Label() to work correctly.  
    * 
    * @param sch Schematron filename without path
    * @param xsd Schema filename without path
