@@ -658,11 +658,27 @@ namespace Isis {
   }
 
 
+  /**
+   *  This method is designed to be called whenever a user double-clicks on an image
+   *  in the image table of the images tab. It will grab the selected images and emit
+   *  the openImageEditor() signal, emitting with it the images that were selected.
+   *
+   *  The openImageEditor() signal is intercepted by the ControlHealthMonitorView
+   *  and opens the CubeDnView with the images selected.
+   */
   void ControlHealthMonitorWidget::emitOpenImageEditor() {
     emit openImageEditor();
   }
 
 
+  /**
+   *  This method is designed to be called whenever a user double-clicks on a point
+   *  in the point table of the points tab. It will grab the selected point and emit
+   *  the openPointEditor() signal, emitting with it the point that was selected.
+   *
+   *  The openPointEditor() signal is intercepted by the ControlHealthMonitorView
+   *  and opens the ControlPointEditWidget with that point selected.
+   */
   void ControlHealthMonitorWidget::emitOpenPointEditor() {
     // Get the point
     QModelIndex pointId = m_pointsTable->selectionModel()->selectedIndexes()[1];
