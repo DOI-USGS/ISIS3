@@ -2,21 +2,23 @@
 
 #include "PointIdFilter.h"
 
+#include <QPair>
 #include <QString>
 
-#include "ControlCubeGraphNode.h"
+#include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "IString.h"
 
 
 namespace Isis {
-  PointIdFilter::PointIdFilter(AbstractFilter::FilterEffectivenessFlag flag,
-      int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
+  PointIdFilter::PointIdFilter(
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
   }
 
 
-  PointIdFilter::PointIdFilter(const PointIdFilter &other)
-    : AbstractStringFilter(other) {
+  PointIdFilter::PointIdFilter(const PointIdFilter &other) : AbstractStringFilter(other) {
   }
 
 
@@ -24,8 +26,8 @@ namespace Isis {
   }
 
 
-  bool PointIdFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+  bool PointIdFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
@@ -47,10 +49,12 @@ namespace Isis {
   QString PointIdFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
 
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "point with it's ID ";
-    else
+    }
+    else {
       description += "points with IDs ";
+    }
 
     description += descriptionSuffix();
     return description;

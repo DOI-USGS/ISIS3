@@ -43,8 +43,8 @@ namespace Isis {
       enum InterestingItems {
         PointItems = 1,
         MeasureItems = 2,
-        SerialItems = 4,
-        AllItems = PointItems | MeasureItems | SerialItems
+        ImageItems = 4,
+        AllItems = PointItems | MeasureItems | ImageItems
       };
       Q_DECLARE_FLAGS(InterestingItemsFlag, InterestingItems)
 

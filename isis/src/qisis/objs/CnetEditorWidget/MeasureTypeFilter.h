@@ -3,14 +3,13 @@
 
 #include "AbstractMultipleChoiceFilter.h"
 
-
+template< typename U, typename V > class QPair;
 class QString;
 
-
 namespace Isis {
-  class AbstractFilterSelector;
-  class ControlPoint;
   class ControlMeasure;
+  class ControlNet;
+  class ControlPoint;
 
   /**
    * @brief Filters by measure type
@@ -22,19 +21,21 @@ namespace Isis {
    *
    * @author 2012-01-05 Jai Rideout
    *
-   * @internal 
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   * @internal
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
+   *                           References #5434.
    */
   class MeasureTypeFilter : public AbstractMultipleChoiceFilter {
       Q_OBJECT
 
     public:
       MeasureTypeFilter(AbstractFilter::FilterEffectivenessFlag,
-          int minimumForSuccess = -1);
+            int minimumForSuccess = -1);
       MeasureTypeFilter(const MeasureTypeFilter &other);
       virtual ~MeasureTypeFilter();
 
-      bool evaluate(const ControlCubeGraphNode *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 
@@ -47,4 +48,3 @@ namespace Isis {
 }
 
 #endif
-

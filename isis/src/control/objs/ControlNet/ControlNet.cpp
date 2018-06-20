@@ -399,7 +399,10 @@ namespace Isis {
           ControlMeasure *cm = measures[j];
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
+<<<<<<< HEAD
 
+=======
+>>>>>>> f024deed7876ee9acb8ea442cfec337575e089fa
             // If the edge doesn't already exist, this adds and returns the edge.
             // If the edge already exists, this just returns it. (The use of a set
             // forces the edges to be unique.)
@@ -664,8 +667,11 @@ namespace Isis {
     ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
     ASSERT(m_vertexMap.contains(serial));
+<<<<<<< HEAD
 
     emit measureRemoved(measure);
+=======
+>>>>>>> f024deed7876ee9acb8ea442cfec337575e089fa
 
     // Remove connections to and from this node
     if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
