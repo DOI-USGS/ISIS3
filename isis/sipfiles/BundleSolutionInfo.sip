@@ -9,13 +9,12 @@ class BundleSolutionInfo : public QObject {
   %End
 
  public:
-   BundleSolutionInfo(const Isis::BundleSolutionInfo &src) throw(Isis::IException);
+   BundleSolutionInfo();
 
    void setOutputStatistics(Isis::BundleResults statisticsResults) throw(Isis::IException);
    void setRunTime(QString runTime) throw(Isis::IException);
 
    QString id() const throw(Isis::IException);
-   QString controlNetworkFileName() const throw(Isis::IException);
    QSharedPointer<Isis::BundleSettings> bundleSettings() throw(Isis::IException);
    Isis::BundleResults bundleResults() throw(Isis::IException);
    QString runTime() const throw(Isis::IException);

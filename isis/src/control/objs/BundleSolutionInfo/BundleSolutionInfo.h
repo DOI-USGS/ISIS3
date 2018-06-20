@@ -153,6 +153,8 @@ namespace Isis {
       BundleSolutionInfo(Project *project,
                     XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
+      BundleSolutionInfo();
+
       ~BundleSolutionInfo();
 
       QString savedBundleOutputFilename();
@@ -231,7 +233,6 @@ namespace Isis {
       //       These methods are declared as private to prevent the developer from calling default
       //       operators. These will generate a compiler error if the developer attempts to use
       //       them.
-      BundleSolutionInfo();
       BundleSolutionInfo(const BundleSolutionInfo &src);
       BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 

@@ -10,6 +10,8 @@ namespace Isis {
     %End
 
   public:
+    // Stuff in the square brackets [] indicate the C++ interface while the sip
+    // function name indicates the C python function interface
     BundleAdjust(PyObject* settings, const QString &cnetFile, const QString &cubeList, bool printSummary = true) throw(Isis::IException) [(QSharedPointer<Isis::BundleSettings>, QString, QString, bool)];
     %MethodCode
       int sipErr = 0;
@@ -26,6 +28,15 @@ namespace Isis {
       }
     %End
 
-    Isis::BundleSolutionInfo solveCholeskyBR() throw(Isis::IException) ;
+    Isis::BundleSolutionInfo* solveCholeskyBR();
+    %MethodCode
+      try {
+        return sipConvertFromType(sipCpp->solveCholeskyBR(), sipType_Isis_BundleSolutionInfo, NULL);
+      }
+      catch (Isis::IException &error) {
+          PyErr_SetString(sipException_Isis_IException, error.what());
+          return NULL;
+      }
+    %End
    };
 };

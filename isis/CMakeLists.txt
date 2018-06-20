@@ -296,7 +296,7 @@ if(pybindings)
   if (NOT DEFINED PYINSTALL_DIR)
     set(PYINSTALL_DIR ${PYTHON_SITE_PACKAGES_DIR})
   endif()
-  message("PYTHON BINDINGS INSTALL DIR: ${PYINSTALL_DIR}")
+  message(STATUS "PYTHON BINDINGS INSTALL DIR: ${PYINSTALL_DIR}")
 
  # We need to get the locations for sip files, modules, etc.
  set(ISIS_SIP_DIR "${CMAKE_SOURCE_DIR}/sipfiles")
@@ -317,14 +317,20 @@ if(pybindings)
  # CMAKE doesn't handle spaces from python well when piping that into the
  # command because of white space and a trailing new line,
  # so we turn it into a list
+ message(STATUS "Getting SIP config...")
+ message(STATUS "Attempting 'python -c \"from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict; print(qtconfigdict['sip_flags'])\"'")
+
+ if (${PYQT_SIP_FLAGS} STREQUAL "")
+    message(FATAL_ERROR "print(qtconfigdict['sip_flags']) returned empty string, is sip installed? Python binding can be disabled with pybindings=OFF")
+ endif()
  string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
  string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
- message("Generating C++ code from sip files")
-
+ 
+ message(STATUS "FLAGS: ${PYQT_SIP_FLAGS}")
+ message(STATUS "Generating C++ code from sip files")
  message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
  message(STATUS "SIP MODULE: ${ISIS_SIP_MODULE}")
  message(STATUS "SIP GENERATED CODE DIR: ${ISIS_SIP_CODE_DIR}")
-
 
  execute_process(COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE})
 
@@ -337,7 +343,9 @@ if(pybindings)
  add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
  target_link_libraries(isispy ${ALLLIBS})
  target_link_libraries(isispy isis3)
- set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3)
+ set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3
+                                         INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}
+                                         INSTALL_RPATH ${CMAKE_SOURCE_DIR})
  add_dependencies(isispy sipfiles)
 
  install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})
