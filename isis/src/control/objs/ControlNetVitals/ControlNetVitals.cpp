@@ -83,6 +83,20 @@ namespace Isis {
   }
 
 
+  /**
+   *  This method is designed to be called whenever a modification is made to the network,
+   *  or any of it's control points or measures. It receives all of the components that
+   *  make up the history entry (the comment, the ID of what was modified, oldValue, newValue)
+   *  and emits them along with a timestamp of when the modification was made.
+   *
+   *  The historyEntry() will pass these values on to the listening SLOT in the health monitor
+   *  widget so that it can be displayed in the history table.
+   *
+   *  @param entry The history comment that includes what modification was made.
+   *  @param id The ID of the object modified. This can be a point id, measure serial, or net id.
+   *  @param oldValue The oldValue the object had before the modification.
+   *  @param newValue The newValue the object had after its modification.
+   */
   void ControlNetVitals::emitHistoryEntry(QString entry, QString id, QVariant oldValue, QVariant newValue) {
     emit historyEntry(entry, id, oldValue, newValue, QDateTime::currentDateTime().toString());
   }
@@ -226,6 +240,14 @@ namespace Isis {
 
   }
 
+
+  /**
+   *  This method is designed to return the Control Point with the associated point id
+   *  from the Control Network.
+   *
+   *  @param id The Point ID of the control point to be fetched.
+   *  @return The Control Point with the associated point id.
+   */
   ControlPoint* ControlNetVitals::getPoint(QString id) {
     return m_controlNet->GetPoint(id);
   }
@@ -348,11 +370,9 @@ namespace Isis {
       default:
         // No operation.
         break;
-
     }
 
     emitHistoryEntry(historyEntry, measure->GetCubeSerialNumber(), "", "");
-
     validate();
   }
 
