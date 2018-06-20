@@ -52,7 +52,8 @@ class QString;
 
 namespace Isis {
   class Camera;
-  class ControlCubeGraphNode;
+  class ControlMeasure;
+  class ControlPoint;
   class Distance;
   class Progress;
   class Pvl;
@@ -232,6 +233,12 @@ namespace Isis {
    *                           group to set radii values to those ingested from the versioner
    *                           if they exist. Otherwise, we call SetTarget with the targetname.
    *                           Fixes #5361.
+   *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
+   *                           Previously this functionality was only available through the
+   *                           ControlCubeGraphNode class. References #5434.
+   *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
+   *                           Previously this functionality was only available through the
+   *                           ControlCubeGraphNode class. References #5434.
    *   @history 2018-06-15 Adam Goins & Jesse Mapel - Added the ModType enum, as well as a series
    *                           of signals that are emitted whenever a change is made to a
    *                           Control Point or any of it's measures, or to the network itself.
@@ -251,10 +258,6 @@ namespace Isis {
         Swapped,
         GraphModified
       };
-
-      QList< ControlCubeGraphNode * > GetCubeGraphNodes() {
-        QList<ControlCubeGraphNode *> lst;
-        return lst;} ; // TEMPORARY DELETE
 
       ControlNet();
       ControlNet(const ControlNet &other);
@@ -278,6 +281,7 @@ namespace Isis {
       QString GraphToString() const;
       QList< QList< QString > > GetSerialConnections() const;
       int getEdgeCount() const;
+      QList< QString > getAdjacentImages(QString serialNumber) const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
@@ -400,8 +404,6 @@ namespace Isis {
       //! hash ControlPoints by ControlPoint Id
       QHash< QString, ControlPoint * > * points;
 
-      //! hash ControlCubeGraphNodes by CubeSerialNumber
-
       // structs and typedefs for the boost graph
       struct Image {
         QString serial;
@@ -412,12 +414,18 @@ namespace Isis {
         int strength = 0;
       };
 
-      typedef boost::adjacency_list<boost::setS, boost::listS, boost::undirectedS, Image, Connection> Network;
+      typedef boost::adjacency_list<boost::setS,
+                                    boost::listS,
+                                    boost::undirectedS,
+                                    Image,
+                                    Connection> Network;
       typedef Network::vertex_descriptor ImageVertex;
       typedef Network::edge_descriptor ImageConnection;
       typedef std::map<ImageVertex, size_t> VertexIndexMap;
       typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor;
       typedef Network::out_edge_iterator ConnectionIterator;
+      typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator;
+
       QHash<QString, ImageVertex> m_vertexMap; //!< The SN -> vertex hash for the boost graph
       Network m_controlGraph; //!< The boost graph
       QStringList *pointIds;

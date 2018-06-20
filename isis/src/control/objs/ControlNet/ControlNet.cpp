@@ -12,6 +12,7 @@
 #include <QPair>
 #include <QScopedPointer>
 #include <QSet>
+#include <QStringList>
 #include <QTime>
 #include <QVariant>
 #include <QVector>
@@ -384,7 +385,9 @@ namespace Isis {
       }
     }
 
-    foreach(ControlMeasure* measure, point->getMeasures()) {
+    QList< ControlMeasure * > measures = point->getMeasures();
+    for(int i = 0; i < measures.size(); i++) {
+      ControlMeasure* measure = measures[i];
       // Add the measure to the corresponding node
       QString serial = measure->GetCubeSerialNumber();
       m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
@@ -392,26 +395,18 @@ namespace Isis {
       // In this measure's node add connections to the other nodes reachable from
       // its point
       if (!point->IsIgnored() && !measure->IsIgnored()) {
-        for (int i = 0; i < point->GetNumMeasures(); i++) {
-          ControlMeasure *cm = point->GetMeasure(i);
+        for (int j = i + 1; j < measures.size(); j++) {
+          ControlMeasure *cm = measures[j];
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
 
-            if (QString::compare(sn, serial) != 0) {
-              // If the edge doesn't already exist, this adds and returns the edge.
-              // If the edge already exists, this just returns it. (The use of a set
-              // forces the edges to be unique.)
-              ImageConnection connection;
-              bool edgeAdded;
-              boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
+            // If the edge doesn't already exist, this adds and returns the edge.
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
                                                          m_vertexMap[sn],
-                                                         m_controlGraph);
-              m_controlGraph[connection].strength++;
-
-              if (edgeAdded) {
-                emit networkModified(GraphModified);
-              }
-            }
+                                                         m_controlGraph).first;
+            m_controlGraph[connection].strength++;
           }
         }
       }
@@ -428,41 +423,57 @@ namespace Isis {
   QString ControlNet::GraphToString() const {
     QString graphString;
 
-    typedef boost::graph_traits<Network>::edge_iterator edge_iter;
-    edge_iter ei, ei_end;
+    QStringList images = GetCubeSerials();
+    images.sort();
 
-    for (tie(ei, ei_end) = edges(m_controlGraph); ei != ei_end; ++ei) {
-      ImageVertex sourceImage = source(*ei, m_controlGraph);
-      ImageVertex targetImage = target(*ei, m_controlGraph);
-      if (sourceImage != targetImage) {
-        graphString.append(m_controlGraph[sourceImage].serial);
-        graphString.append( " [" );
-        QList<ControlPoint*> sourcePoints = m_controlGraph[sourceImage].measures.keys();
-        for (int i=0; i < sourcePoints.size(); i++) {
-          if (i>0) {
-            graphString.append(", ");
-          }
-          graphString.append(sourcePoints[i]->GetId());
-        }
-       // graphString.append(QString::number(m_controlGraph[sourceImage].measures.size()));
-        graphString.append("] --------- ");
-        graphString.append(m_controlGraph[targetImage].serial);
-        graphString.append(" [");
+    QHash<QString, QStringList> imagePointIds;
 
-        QList<ControlPoint*> targetPoints = m_controlGraph[targetImage].measures.keys();
-        for (int i=0; i < targetPoints.size(); i++) {
-          if (i>0) {
-            graphString.append(", ");
-          }
-          graphString.append(targetPoints[i]->GetId());
+    foreach(QString imageSerial, images) {
+      QList<ControlPoint *> imagePoints = m_controlGraph[m_vertexMap[imageSerial]].measures.keys();
+      QStringList pointIds;
+      foreach(ControlPoint *point, imagePoints) {
+        pointIds.append(point->GetId());
+      }
+      pointIds.sort();
+      imagePointIds.insert(imageSerial, pointIds);
+    }
+
+    foreach(QString imageSerial, images) {
+      QStringList adjacentImages = getAdjacentImages(imageSerial);
+      adjacentImages.sort();
+      foreach(QString adjacentSerial, adjacentImages) {
+        if (QString::compare(adjacentSerial, imageSerial) < 0) {
+          continue;
         }
 
-//        graphString.append(QString::number(m_controlGraph[targetImage].measures.size()));
-        graphString.append("]");// edge strength: [");
-    //    graphString.append(QString::number(m_controlGraph[*ei].strength));
+        QStringList commonPoints;
+        QList<QString>::const_iterator imageIt = imagePointIds[imageSerial].cbegin();
+        QList<QString>::const_iterator adjacentIt = imagePointIds[adjacentSerial].cbegin();
+        while (imageIt != imagePointIds[imageSerial].cend() &&
+               adjacentIt != imagePointIds[adjacentSerial].cend()) {
+          int stringDiff = QString::compare(*imageIt, *adjacentIt);
+          if (stringDiff < 0) {
+            imageIt++;
+          }
+          else if(stringDiff == 0) {
+            commonPoints.append(*imageIt);
+            imageIt++;
+            adjacentIt++;
+          }
+          else {
+            adjacentIt++;
+          }
+        }
+
+        graphString.append(imageSerial);
+        graphString.append(" ----[");
+        graphString.append(commonPoints.join(","));
+        graphString.append("]---- ");
+        graphString.append(adjacentSerial);
         graphString.append("\n");
       }
     }
+
     return graphString;
    }
 
@@ -652,7 +663,7 @@ namespace Isis {
   void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
     QString serial = measure->GetCubeSerialNumber();
-    ASSERT(m_vertexGraph->contains(serial));
+    ASSERT(m_vertexMap.contains(serial));
 
     emit measureRemoved(measure);
 
@@ -901,6 +912,32 @@ namespace Isis {
    */
   bool ControlNet::ValidateSerialNumber(QString serialNumber) const {
     return m_vertexMap.contains(serialNumber);
+  }
+
+
+  /**
+   * Get all images connected to a given image by common control points.
+   *
+   * @param serialNumber the serial number of the image to find images adjacent to.
+   *
+   * @returns @b QList<QString> The serial numbers of all adjacent images.
+   */
+  QList< QString > ControlNet::getAdjacentImages(QString serialNumber) const {
+    if (!ValidateSerialNumber(serialNumber)) {
+      QString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+          "the network";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    QList< QString > adjacentSerials;
+
+    AdjacencyIterator adjIt, adjEnd;
+    boost::tie(adjIt, adjEnd) = boost::adjacent_vertices(m_vertexMap[serialNumber], m_controlGraph);
+    for( ; adjIt != adjEnd; adjIt++) {
+      adjacentSerials.append(m_controlGraph[*adjIt].serial);
+    }
+
+    return adjacentSerials;
   }
 
 
