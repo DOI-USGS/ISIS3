@@ -85,20 +85,21 @@ namespace Isis {
   bool SortFilterProxyModel::filterAcceptsRow(int sourceRow,
                                                         const QModelIndex &sourceParent) const {
 
-    //static QList<QModelIndex> accepted = selectedIndices;
 
-    qDebug() << "filterAcceptsRow";
+
     bool accept(false);
 
     if (this->sourceModel()!=nullptr) {
 
+
        QModelIndex ix = this->sourceModel()->index( sourceRow, 0, sourceParent );
        if (ix.isValid() ) {
+
+        #if 0
          if (this->sourceModel()->hasChildren(ix) ) {
            qDebug() << "Has children:  " << ix.data(0).toString();
            accept = true;
          }
-
 
          if (selectedIndices.contains(ix)  && (this->sourceModel()->hasChildren(ix))) {
            qDebug() << "Accepted (has children):" << ix.data(0).toString();
@@ -111,21 +112,31 @@ namespace Isis {
              //}
            }
 
+      #endif
+         qDebug()<< "***************";
+         foreach(QModelIndex ix,selectedIndices)
+           qDebug() << ix.data(0).toString();
 
-         if (selectedIndices.contains(ix) ) {
-           qDebug() << "Accepted:  " << ix.data(0).toString();
+         qDebug()<< "***************";
+
+         if (selectedIndices.contains(ix)  ) {
+           qDebug() << "Accepted:  " << ix << ":" << ix.data(0).toString();
            accept = true;
          }
 
-         qDebug() << "Rejected:  " << ix.data(0).toString();
+         else {
+         qDebug() << "Rejected:  " << ix << ":" << ix.data(0).toString();
+
+         }
 
        }//end if (ix.isValid() )
 
-
+    }
+ return accept;
 
     }
-     return accept;
-  }
+
+
 
 
 }//end namespace

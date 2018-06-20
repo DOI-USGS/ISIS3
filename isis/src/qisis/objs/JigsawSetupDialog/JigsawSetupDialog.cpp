@@ -1336,7 +1336,7 @@ namespace Isis {
 
     SortFilterProxyModel *osspm = new SortFilterProxyModel;
     osspm->setSourceModel(model);
-    QList<ProjectItem*> selected = model->selectedChildItems();
+    //QList<ProjectItem*> selected = model->selectedChildItems();
 
     //selected.append(selectedItems[0]->parent() );
 
@@ -1346,36 +1346,35 @@ namespace Isis {
 
     }
 
-    qDebug() << "Selected items:  ";
-    foreach(ProjectItem * item,selectedItems) {
-      qDebug() << item->index().data(0).toString();
-
-    }
+    //qDebug() << "Selected items:  ";
+    //foreach(ProjectItem * item,selectedItems) {
+    //  qDebug() << item->index().data(0).toString();
+    //}
 
 
     //osspm->setDynamicSortFilter(true);
 
-    m_ui->treeView->setRootIsDecorated(true);
 
-    osspm->setSelectedItems(selected );
+    osspm->setSelectedItems(selectedChildItems );
     m_ui->treeView->setModel(osspm);
+    //m_ui->treeView->setRootIsDecorated(false);
 
 
-    qDebug() << "Parent=" << selectedItems[0]->parent()->index().data(0).toString();
+    //qDebug() << "Parent=" << selectedItems[0]->parent()->index().data(0).toString();
 
 
     //Set the root index to display the subtree we are interested in.  This requires
     //computing the proxy index from the source model.
-    if (selectedItems.count() > 0) {
+    if (selectedChildItems.count() > 0) {
       //qDebug() << "parent = " << selectedItems[0]->parent()->text();
-      osspm->setRoot(selectedItems[0]->parent());
+      //osspm->setRoot(selectedChildItems[0]->parent());
 
 
 
       //if ( selectedItems[0]->parent()->index().data(0).toString().isEmpty()) {
-          m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->parent()->index()));
+          m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedChildItems[0]->parent()->parent()->index()));
 
-          qDebug() << "Setting parent to:  " << (selectedItems[0]->parent()->index()).data(0).toString();
+          qDebug() << "Setting parent to:  " << (selectedItems[0]->parent()->parent()->index()).data(0).toString();
 
 
     }

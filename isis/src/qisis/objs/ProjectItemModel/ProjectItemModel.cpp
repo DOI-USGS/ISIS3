@@ -191,9 +191,24 @@ namespace Isis {
         for (int i = 0; i < numChildren;i++) {
           QModelIndex ixchild = this->index(i,0,ix);
           items.append(this->itemFromIndex(ixchild ));
-
           }
       }
+      if( this->itemFromIndex(ix)->parent() ->hasChildren()) {
+        ProjectItem * parent = this->itemFromIndex(ix)->parent();
+        qDebug() << "Appending parent:  " << parent->index().data(0).toString();
+        if (!items.contains(parent)){
+          items.append(parent);
+        }
+      }
+
+      if (this->itemFromIndex(ix)->parent()->parent() ){
+        ProjectItem *grandparent = this->itemFromIndex(ix)->parent()->parent();
+        if (!items.contains(grandparent)) {
+          items.append(grandparent);
+        }
+
+      }
+
     }
 
     return items;
