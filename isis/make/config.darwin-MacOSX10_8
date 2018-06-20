@@ -102,7 +102,6 @@ ifeq (,$(findstring $(QTFRAMEWORKDIR)/QtCore.framework,$(wildcard $(QTFRAMEWORKD
 endif
 
 QTINCDIR  = -I$(QTDIR)/share/qt4/mkspecs/macx-g++
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtCharts.framework/Headers
 QTINCDIR += -I$(QTFRAMEWORKDIR)/QtCore.framework/Headers
 QTINCDIR += -I$(QTFRAMEWORKDIR)/QtAssistant.framework/Headers
 QTINCDIR += -I$(QTFRAMEWORKDIR)/QtGui.framework/Headers
@@ -329,7 +328,6 @@ THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXml.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtNetwork.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSql.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtGui.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtCharts.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtCore.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSvg.framework"
 THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebKit.framework"

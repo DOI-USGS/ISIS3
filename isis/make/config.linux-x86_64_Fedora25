@@ -89,7 +89,6 @@ THIRDPARTYLICPATH := $(ISIS3LOCAL)/license/
 #---------------------------------------------------------------------------
 QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt5.7.1
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/Qt
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtCharts
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtCore
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtAssistant
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtConcurrent
@@ -116,7 +115,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtWidgets
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXml
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
-QTLIB    = -lQt5Core -lQt5Concurrent -lQt5XmlPatterns -lQt5Xml -lQt5Network -lQt5Sql -lQt5Gui -lQt5PrintSupport -lQt5Positioning -lQt5Qml -lQt5Quick -lQt5Sensors -lQt5Svg -lQt5Test -lQt5OpenGL -lQt5Widgets -lQt5Multimedia -lQt5MultimediaWidgets -lQt5WebChannel -lQt5WebEngine -lQt5WebEngineWidgets -lQt5DBus -lQt5Charts
+QTLIB    = -lQt5Core -lQt5Concurrent -lQt5XmlPatterns -lQt5Xml -lQt5Network -lQt5Sql -lQt5Gui -lQt5PrintSupport -lQt5Positioning -lQt5Qml -lQt5Quick -lQt5Sensors -lQt5Svg -lQt5Test -lQt5OpenGL -lQt5Widgets -lQt5Multimedia -lQt5MultimediaWidgets -lQt5WebChannel -lQt5WebEngine -lQt5WebEngineWidgets -lQt5DBus
 
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc
@@ -302,14 +301,14 @@ FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
 #QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
 
 #---------------------------------------------------------------------------
-# Set up for Embree libraries 
+# Set up for Embree libraries
 #---------------------------------------------------------------------------
 EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
 EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
 EMBREELIB    = -lembree
 
 #---------------------------------------------------------------------------
-# Set up for OpenCV libraries 
+# Set up for OpenCV libraries
 #
 # Add the following line to your app's Makefile (see the NN notes)
 # ALLLIBS += $(OPENCVLIBS)
@@ -346,11 +345,11 @@ NNLIB = -lnn
 BULLETLIB     = -lBullet3Collision  -lBullet3Common          \
                 -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
                 -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
-                -lBulletSoftBody    -lLinearMath 
+                -lBulletSoftBody    -lLinearMath
 #BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
 #                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
 #                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
-#                -lLinearMath 
+#                -lLinearMath
 BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
 BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
 
@@ -369,9 +368,6 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #---------------------------------------------------------------------------
 
 # Qt Libraries
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Charts.so"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Charts.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Charts.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"

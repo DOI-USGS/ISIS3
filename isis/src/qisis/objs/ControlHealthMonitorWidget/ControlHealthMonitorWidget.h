@@ -33,7 +33,6 @@
 
 
 namespace Isis {
-QT_CHARTS_USE_NAMESPACE
   /**
    * Interface that allows real-time evaluation of the state of a Control Network.
    *
