@@ -85,8 +85,14 @@ namespace Isis {
    *                           AbstractProjectItemView now inherits from QMainWindow, so the
    *                           Workspace of this view is the centralWidget. This needs further work
    *                           to cleanup and fit in with the new docked view interface.git
-   *   @history 2017-08-03 Kaitlyn Lee - Removed help menu and the "What's This?" action because the
+   *   @history 2018-06-12 Kaitlyn Lee - Removed help menu and the "What's This?" action because the
    *                           ipce help menu has this action.
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having getters that return toolbar
+   *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                           Removed methods that returned menu and toolbar actions.
+   *                           Removed connections that connected the project and CubeDnView and called
+   *                           enableControlNetTool() because Directory now does this.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -96,25 +102,12 @@ namespace Isis {
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
 
-      virtual QList<QAction *> fileMenuActions();
-      virtual QList<QAction *> projectMenuActions();
-      virtual QList<QAction *> editMenuActions();
-      virtual QList<QAction *> viewMenuActions();
-      virtual QList<QAction *> settingsMenuActions();
-      virtual QList<QAction *> helpMenuActions();
-
-      virtual QList<QAction *> permToolBarActions();
-      virtual QList<QAction *> activeToolBarActions();
-      virtual QList<QAction *> toolPadActions();
-
       QSize sizeHint() const;
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 
       void load(XmlStackedHandlerReader *xmlReader, Project *project);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
-
-
 
     signals:
       void modifyControlPoint(ControlPoint *controlPoint, QString serialNumber);
@@ -127,7 +120,7 @@ namespace Isis {
 
     public slots:
       void addItem(ProjectItem *item);
-      void enableControlNetTool();
+      void enableControlNetTool(bool value);
 
     private slots:
       void createActions(Directory *directory);
@@ -170,7 +163,6 @@ namespace Isis {
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items
       Workspace *m_workspace; //!< The workspace
 
-      QMenu *m_fileMenu; //!< File menu for storing actions
       QMenu *m_viewMenu; //!< View menu for storing actions
       QMenu *m_optionsMenu; //!< Options menu for storing actions
       QMenu *m_windowMenu; //!< Window menu for storing actions
@@ -181,10 +173,6 @@ namespace Isis {
       QToolBar *m_permToolBar; //!< A tool bar for storing actions
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions
-
-      QList<QAction *> m_permToolBarActions; //!< The permanent tool bar actions
-      QWidgetAction *m_activeToolBarAction; //!< Widget of the active tool
-      QList<QAction *> m_toolPadActions; //!< The tool pad actions
   };
 }
 

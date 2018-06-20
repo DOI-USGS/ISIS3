@@ -49,10 +49,7 @@ namespace Isis {
    *                           and set its layout to QVBoxLayout. We used to set
    *                           the whole CnetEditorView widget's layout, now we only
    *                           set the central widget's layout.
-   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
-   *                           view has its own toolbar, so having getters that return toolbar
-   *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
-   *                           Removed toolbars and methods that returned menu and toolbar actions.
+   *   @history 2018-06-13 Kaitlyn Lee - Removed toolbars, since they are not needed.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
@@ -68,7 +65,7 @@ class ControlPointEditView : public AbstractProjectItemView {
 //  setEditPoint(ControlPoint *editPoint);
 //  createNewPoint(QString serialNumber, Latitude lat, Longitude lon);
 
-    QSize sizeHint() const;
+  QSize sizeHint() const;
 
   private:
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
