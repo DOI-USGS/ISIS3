@@ -122,6 +122,9 @@
       Stripped the "Z" from the StartTime value in the "Instrument" group to handle re-ingestion 
       of PDS4 compliant .xml files.
     </change>
+    <change name="Kristin Berry" date="2018-06-19">
+      Updated to use separate archive translation files for raw cassis data and cassis data which has been exported using tgocassisrdrgen. 
+    </change>
   </history>
 
   <category>

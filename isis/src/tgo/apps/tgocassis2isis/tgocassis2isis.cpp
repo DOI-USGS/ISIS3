@@ -23,7 +23,7 @@ void translateCoreInfo(FileName &inputLabel, ProcessImport &importer);
 void translateCoreInfo(XmlToPvlTranslationManager labelXlater, ProcessImport &importer);
 bool translateMappingLabel(FileName inputLabel, Cube *outputCube);
 bool translateMosaicLabel(FileName inputLabel, Cube *outputCube);
-void translateLabels(FileName &inputLabel, Cube *outputCube, QString transFile);
+void translateLabels(FileName &inputLabel, Cube *outputCube, bool reingesing=false);
 QString convertUniqueIdToObservationId(Pvl &outputLabel);
 
 void IsisMain() {
@@ -48,20 +48,17 @@ void IsisMain() {
     
     Cube *outputCube = importer.SetOutputCube("TO");
 
-    QString transRawFile = "/translations/tgoCassisInstrument.trn";
-    QString transExportFile = "/translations/tgoCassisExportedInstrument.trn";
-
     // first assume lev1b image
     Pvl *outputLabel = outputCube->label();
     QString target = "";
     try {
-      translateLabels(xmlFileName, outputCube, transRawFile); 
+      translateLabels(xmlFileName, outputCube, false); 
     } 
     catch (IException &e) {
 
       if (translateMappingLabel(xmlFileName, outputCube)) {
         if (!translateMosaicLabel(xmlFileName, outputCube)) {
-          translateLabels(xmlFileName, outputCube, transExportFile);
+          translateLabels(xmlFileName, outputCube, true);
         }
         else {
           if(outputLabel->findObject("IsisCube").hasGroup("Instrument")) {
@@ -73,7 +70,7 @@ void IsisMain() {
         if(outputLabel->findObject("IsisCube").hasGroup("Mapping")) {
           outputLabel->findObject("IsisCube").deleteGroup("Mapping"); 
         }
-        translateLabels(xmlFileName, outputCube, transExportFile);
+        translateLabels(xmlFileName, outputCube, true);
       }
     }
 
@@ -287,7 +284,13 @@ bool translateMosaicLabel(FileName xmlFileName, Cube *outputCube) {
  *   @history 2017-01-20 Jeannie Backer - Original Version
  *   @history 2017-01-23 Kristin Berry - Added support for bandBin group and archive group
  */
-void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFile) {
+void translateLabels(FileName &inputLabel, Cube *outputCube, bool reingesting) { 
+  QString instTransFile = "/translations/tgoCassisInstrument.trn"; 
+  
+  if (reingesting) {
+    instTransFile = "/translations/tgoCassisExportedInstrument.trn";
+  }
+
   // Get the directory where the Tgo translation tables are
   PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
   QString missionDir = (QString) dataDir["Tgo"];
@@ -319,7 +322,13 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   bandBin.findKeyword("Width").setUnits("nm");
 
   // Create the Archive Group
-  FileName archiveTransFile(missionDir + "/translations/tgoCassisArchive.trn");
+  QString archiveTransString = "/translations/tgoCassisArchive.trn"; 
+  
+  if (reingesting) {
+    archiveTransString = "/translations/tgoCassisExportedArchive.trn";
+  }
+
+  FileName archiveTransFile(missionDir + archiveTransString);
   XmlToPvlTranslationManager archiveXlater(inputLabel, archiveTransFile.expanded());
 
   FileName subTransFile(missionDir + "/translations/tgoCassisSubWindow.trn");
