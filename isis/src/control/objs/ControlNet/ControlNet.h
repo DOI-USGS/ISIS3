@@ -236,7 +236,6 @@ namespace Isis {
    *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
    *                           Previously this functionality was only available through the
    *                           ControlCubeGraphNode class. References #5434.
-<<<<<<< HEAD
    *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
    *                           Previously this functionality was only available through the
    *                           ControlCubeGraphNode class. References #5434.
@@ -246,8 +245,6 @@ namespace Isis {
    *                           These signals exist for the purpose of communication between the
    *                           ControlNetVitals class, and the network that it is observing.
    *                           Fixes #5435.
-=======
->>>>>>> f024deed7876ee9acb8ea442cfec337575e089fa
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -257,14 +254,11 @@ namespace Isis {
 
     public:
 
-<<<<<<< HEAD
       enum ModType {
         Swapped,
         GraphModified
       };
 
-=======
->>>>>>> f024deed7876ee9acb8ea442cfec337575e089fa
       ControlNet();
       ControlNet(const ControlNet &other);
       ControlNet(const QString &filename, Progress *progress = 0);
