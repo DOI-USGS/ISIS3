@@ -138,7 +138,9 @@ namespace Isis {
    *                           Cleanup connections are made for the views and the docks to ensure
    *                           that cleanup happens for both.  Fixes #5433.
    *   @history 2018-06-13 Tracie Sucharski - Fixed cleanup of views and QDockWidgets.
-   *   @history 2018-06-13 Kaitlyn Lee - Removed code adding the save active control net button and
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having an active toolbar and tool pad is
+   *                           not needed. Removed code adding the save active control net button and
    *                           the toolpad, since control nets can be saved with the project save button.
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
@@ -220,13 +222,9 @@ namespace Isis {
       QList<QAction *> m_helpMenuActions;//!< Internal list of help actions
 
       QList<QAction *> m_permToolBarActions;//!< Internal list of permanent toolbar actions
-      QList<QAction *> m_activeToolBarActions;//!< Internal list of active toolbar actions
-      QList<QAction *> m_toolPadActions;//!< Internal list of toolpad actions
 
       QAction *m_cascadeViewsAction; //!< Action that cascades the mdi area
       QAction *m_tileViewsAction; //!< Action that tiles the mdi area
-
-      AbstractProjectItemView *m_activeView; //!< The active view
   };
 }
 

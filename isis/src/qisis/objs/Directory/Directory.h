@@ -238,8 +238,14 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
-   *   @history 2018-06-13 Kaitlyn Lee - Removed  saveActiveControl() since users can save the control
+   *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
+   *                           addFootprint2DView() now connects to enableControlNetTool() in
+   *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
+   *                           Removed  saveActiveControl() since users can save the control
    *                           network with the project save button.
+   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
+   *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
+   *                           to allow for saving of the project at these times. Fixes #5114.
    */
   class Directory : public QObject {
     Q_OBJECT
