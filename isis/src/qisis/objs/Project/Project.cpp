@@ -2429,6 +2429,7 @@ namespace Isis {
     directoryStateWriter.writeEndDocument();
     m_isOpen = true;
 
+    m_isTemporaryProject = false;
     emit projectSaved(this);
   }
 

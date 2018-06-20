@@ -513,7 +513,7 @@ namespace Isis {
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     QSettings globalSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
+        FileName("$HOME/.Isis/" + appName + "/ipce.config")
           .expanded(),
         QSettings::NativeFormat);
 
@@ -525,9 +525,6 @@ namespace Isis {
       projectSettings.setValue("windowState", saveState());
     }
     projectSettings.sync();
-
-
-    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
     globalSettings.setValue("maxThreadCount", m_maxThreadCount);
     globalSettings.setValue("maxRecentProjects",m_maxRecentProjects);
@@ -662,20 +659,23 @@ namespace Isis {
 
     QStringList projectNameList;
     QStringList projectPathList;
-    settings.beginGroup("recent_projects");
-    QStringList keys = settings.allKeys();
+    QSettings globalSettings(
+                FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(), 
+                QSettings::NativeFormat);
+    globalSettings.beginGroup("recent_projects");
+    QStringList keys = globalSettings.allKeys();
 
     QRegExp underscore("%%%%%");
 
     foreach (QString key, keys) {
       QString childKey = "recent_projects/"+key;
-      QString projectPath = settings.value(key).toString();
+      QString projectPath = globalSettings.value(key).toString();
       QString projectName = projectPath.split("/").last();
       projectPathList.append(projectPath) ;
       projectNameList.append(projectName);
     }
 
-    settings.endGroup();
+    globalSettings.endGroup();
 
     QStringList projectPathReverseList;
 
@@ -706,7 +706,7 @@ namespace Isis {
     if (!settings.value("pos").toPoint().isNull())
       move(settings.value("pos").toPoint());
 
-    m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
+    m_maxThreadCount = globalSettings.value("maxThreadCount", m_maxThreadCount).toInt();
     applyMaxThreadCount();
 
   }
