@@ -88,7 +88,6 @@ THIRDPARTYLICPATH := $(ISIS3LOCAL)/license/
 #---------------------------------------------------------------------------
 QTINCDIR = -I$(ISIS3LOCAL)/include/qt/qt5.7.1
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/Qt
-QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtCharts
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtCore
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtAssistant
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtConcurrent
@@ -115,7 +114,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtWidgets
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXml
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
-QTLIB    = -lQt5Core -lQt5Concurrent -lQt5XmlPatterns -lQt5Xml -lQt5Network -lQt5Sql -lQt5Gui -lQt5PrintSupport -lQt5Positioning -lQt5Qml -lQt5Quick -lQt5Sensors -lQt5Svg -lQt5Test -lQt5OpenGL -lQt5Widgets -lQt5Multimedia -lQt5MultimediaWidgets -lQt5WebChannel -lQt5WebEngine -lQt5WebEngineWidgets -lQt5DBus -lQt5Charts
+QTLIB    = -lQt5Core -lQt5Concurrent -lQt5XmlPatterns -lQt5Xml -lQt5Network -lQt5Sql -lQt5Gui -lQt5PrintSupport -lQt5Positioning -lQt5Qml -lQt5Quick -lQt5Sensors -lQt5Svg -lQt5Test -lQt5OpenGL -lQt5Widgets -lQt5Multimedia -lQt5MultimediaWidgets -lQt5WebChannel -lQt5WebEngine -lQt5WebEngineWidgets -lQt5DBus
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc
 RCC      = $(ISIS3LOCAL)/bin/rcc
@@ -359,9 +358,6 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #---------------------------------------------------------------------------
 
 # Qt Libraries
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Charts.so"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Charts.so.5"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Charts.so.5.7*[^g]"
 
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"

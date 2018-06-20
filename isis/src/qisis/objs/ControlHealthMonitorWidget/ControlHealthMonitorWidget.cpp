@@ -57,8 +57,6 @@
 
 namespace Isis {
 
-  QT_CHARTS_USE_NAMESPACE
-
   /**
    * This class is the front end representation of a ControlNetVitals object.
    * It will accept a ControlNetVitals object upon initialization and reflects the current

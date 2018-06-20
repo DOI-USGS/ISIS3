@@ -109,7 +109,6 @@ QTDIR        = $(ISIS3EXEC)/qt5
 QTFRAMEWORKDIR   = $(QTDIR)/lib
 
 QTINCDIR  = -I$(QTDIR)/mkspecs/macx-clang
-QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtCharts.framework/Headers
 QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtCore.framework/Headers
 QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtConcurrent.framework/Headers
 QTINCDIR += -isystem $(QTFRAMEWORKDIR)/QtDBus.framework/Headers
