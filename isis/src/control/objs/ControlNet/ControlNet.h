@@ -230,6 +230,9 @@ namespace Isis {
    *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
    *                           Previously this functionality was only available through the
    *                           ControlCubeGraphNode class. References #5434.
+   *   @history 2018-06-06 Jesse Mapel - Added a point ignored and un-ignored methods. This will
+   *                           prevent edge strengths getting incremented or decremented twice.
+   *                           References #5434.
    */
   class ControlNet : public QObject {
       Q_OBJECT
