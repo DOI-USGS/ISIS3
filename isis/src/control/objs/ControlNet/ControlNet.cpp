@@ -867,9 +867,11 @@ namespace Isis {
 
   /**
    * Does a check to ensure that the given serial number is contained within
-   * the network.  If it is not, then an exception is thrown
+   * the network.
    *
    * @param serialNumber the cube serial number to validate
+   *
+   * @return @b bool If the serial number is contained in the network.
    */
   bool ControlNet::ValidateSerialNumber(QString serialNumber) const {
     return m_vertexMap.contains(serialNumber);
@@ -1671,7 +1673,6 @@ namespace Isis {
    */
   void ControlNet::swap(ControlNet &other) {
     std::swap(points, other.points);
-//    std::swap(cubeGraphNodes, other.cubeGraphNodes);
     std::swap(pointIds, other.pointIds);
     std::swap(m_mutex, other.m_mutex);
     std::swap(p_targetName, other.p_targetName);
