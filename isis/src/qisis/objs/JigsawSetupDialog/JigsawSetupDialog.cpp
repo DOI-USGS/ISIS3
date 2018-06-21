@@ -1377,9 +1377,9 @@ namespace Isis {
 
 
 // Commented out since it contains some unimplemented functions (i.e. pseudo-code)
-#if 0
-  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
 
+  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {}
+#if 0
     // Get the current selected images
     QAbstractProxyModel *model = m_ui->treeView->model();
     // QItemSelectionModel *selectionModel = m_ui->treeView->selectionModel();
