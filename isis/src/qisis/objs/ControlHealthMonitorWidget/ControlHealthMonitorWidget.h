@@ -25,7 +25,6 @@
 
 #include <QLabel>
 #include <QTableWidget>
-#include <QChartView>
 #include <QProgressBar>
 #include <QPointer>
 #include <ControlNetVitals.h>
@@ -84,7 +83,7 @@ namespace Isis {
         void updateImageTable(QList<QString> serials);
         void updatePointTable(QList<ControlPoint*> points);
 
-        QChartView *m_pointChartView;
+        // QChartView *m_pointChartView;
         ControlNetVitals *m_vitals;
         QProgressBar *m_statusBar;
 

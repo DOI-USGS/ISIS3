@@ -46,10 +46,6 @@
 #include <QGridLayout>
 #include <QWidgetAction>
 #include <QMenu>
-#include <QChart>
-#include <QChartView>
-#include <QPieSeries>
-#include <QPieSlice>
 #include <ControlNet.h>
 #include <ControlNetVitals.h>
 #include <ControlPoint.h>
@@ -286,7 +282,7 @@ namespace Isis {
     m_numImagesLabel         = NULL;
     m_numMeasuresLabel       = NULL;
     m_numPointsLabel         = NULL;
-    m_pointChartView         = NULL;
+    // m_pointChartView         = NULL;
     m_pointsEditLockedLabel  = NULL;
     m_pointsFewMeasuresLabel = NULL;
     m_pointsIgnoredLabel     = NULL;
@@ -775,7 +771,7 @@ namespace Isis {
     delete m_numImagesLabel;
     delete m_numMeasuresLabel;
     delete m_numPointsLabel;
-    delete m_pointChartView;
+    // delete m_pointChartView;
     delete m_pointsEditLockedLabel;
     delete m_pointsFewMeasuresLabel;
     delete m_pointsIgnoredLabel;
@@ -796,7 +792,7 @@ namespace Isis {
     m_numImagesLabel         = NULL;
     m_numMeasuresLabel       = NULL;
     m_numPointsLabel         = NULL;
-    m_pointChartView         = NULL;
+    // m_pointChartView         = NULL;
     m_pointsEditLockedLabel  = NULL;
     m_pointsFewMeasuresLabel = NULL;
     m_pointsIgnoredLabel     = NULL;
