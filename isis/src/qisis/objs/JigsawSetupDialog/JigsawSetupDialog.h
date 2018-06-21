@@ -63,6 +63,9 @@ namespace Isis {
    *                           net name to anything they choose.
    *   @history 2018-06-01 Christopher Combs - Added support for ui changes, exclusive options and 
    *                           input validators.
+   *   @history 2018-06-21 Ian Humphrey - Added on_applySettingsPushButtonClicked() to listen for when
+   *                           the apply button is clicked on the observation solve settings tab.
+   *                           References #497.
    *   @history 2018-06-21 Tyler Wilson - Added support in the Bundle Observations Solve Settings
    *                           (BOSS) tab for displaying user-selected images from the main Project
    *                           treeview.  All changes were made in the
@@ -135,6 +138,8 @@ namespace Isis {
     void on_declinationVelocityLineEdit_textChanged(const QString &arg1);
     void on_spinRateLineEdit_textChanged(const QString &arg1);
     void on_primeMeridianOffsetLineEdit_textChanged(const QString &arg1);
+    
+    void on_applySettingsPushButton_clicked();
 
     public slots:
     void slotTextChanged(const QString &text);

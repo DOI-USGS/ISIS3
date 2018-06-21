@@ -260,6 +260,19 @@ namespace Isis {
 
 
   /**
+   * Removes an observation number from this solve settings. The observation is no longer
+   * associated with this solve settings.
+   *
+   * @param QString observationNumber The observation number to remove from this solve settings.
+   * @return bool Returns true if the observation number passed was actually removed; otherwise
+   *              returns false.
+   */
+  bool BundleObservationSolveSettings::removeObservationNumber(QString observationNumber) {
+    return m_observationNumbers.remove(observationNumber);
+  }
+
+
+  /**
    * Returns a list of observation numbers associated with these solve settings.
    *
    * @return @b QSet<QString> Returns a QSet containing the associated observation numbers.

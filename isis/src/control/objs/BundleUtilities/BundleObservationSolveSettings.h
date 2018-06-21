@@ -75,6 +75,9 @@ namespace Isis {
    *                           with these settings. Removed the setFromPvl() method. When re-
    *                           implemented, it should be put in jigsaw. References #4293.
    *   @history 2017-04-24 Ian Humphrey - Removed pvlObject(). Fixes #4797.
+   *   @history 2018-06-21 Ian Humphrey - Added removeObservationNumber() to be able to remove an
+   *                           observation number from a BundleObservationSolveSettings.
+   *                           References #497.
    *
    *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
@@ -99,6 +102,7 @@ class BundleObservationSolveSettings {
       void setInstrumentId(QString instrumentId);
       QString instrumentId() const;
       void addObservationNumber(QString observationNumber);
+      bool removeObservationNumber(QString observationNumber);
       QSet<QString> observationNumbers() const;
 
 
