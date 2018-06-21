@@ -132,6 +132,8 @@ namespace Isis {
    *                           Fixes #5412.
    *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
+   *                           widget. Added addDock method. Remove all methods having to do with
+   *                           MDI sub-windows, detached views.
    *                           widget. Remove all methods having to do with MDI sub-windows,
    *                           detached views.  The dock widgets holding the views are saved off
    *                           for cleanup because there is no way to get the dock from the view.
@@ -142,6 +144,11 @@ namespace Isis {
    *                           view has its own toolbar, so having an active toolbar and tool pad is
    *                           not needed. Removed code adding the save active control net button and
    *                           the toolpad, since control nets can be saved with the project save button.
+   *   @history 2018-06-14 Makayla Shepherd - ipce now defaults to full screen if there is not an
+   *                           ipce.config in the project or in ~/.Isis/ipce.
+   *   @history 2018-06-14 Makayla Shepherd - Stopped saving the state of a temporary project.
+   *   @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of 
+   *                           the project. 
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
@@ -165,7 +172,6 @@ namespace Isis {
       void removeAllViews();
 
       void readSettings(Project *);
-      void writeSettings(Project *project);
 
     protected:
       void closeEvent(QCloseEvent *event);
@@ -178,6 +184,9 @@ namespace Isis {
       void tabAllViews();
 
       void raiseWarningTab();
+      
+      void writeSettings(Project *project);
+
       void cleanupViewDockList(QObject *obj);
     private:
       Q_DISABLE_COPY(IpceMainWindow);
@@ -187,7 +196,6 @@ namespace Isis {
       void initializeActions();
       void createMenus();
       void createToolBars();
-
 
     private:
       /**

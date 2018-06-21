@@ -170,6 +170,9 @@ namespace Isis {
     createMenus();
     createToolBars();
 
+    // Read default app settings
+    readSettings(m_directory->project() );
+
     QStringList args = QCoreApplication::arguments();
 
     if (args.count() == 2) {
@@ -610,8 +613,8 @@ namespace Isis {
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
    *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it
-   *                                      was messing with the positions of widgets after a
-   *                                      project was loaded.  Fixes #5075.
+   *                was messing with the positions of widgets after a project was loaded.  
+   *                Fixes #5075.
    *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
    *                If that does not exist then we read from .Isis/ipce/ipce.config.
    */
@@ -633,7 +636,7 @@ namespace Isis {
       filePath = "$HOME/.Isis/" + appName + "/ipce.config";
       
       // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in 
-      // in full screen. Meaning the default geometry is full screen
+      // in full screen. In other words the default geometry is full screen
       if (!FileName(filePath).fileExists()) {
         setFullScreen = true;
       }
@@ -645,7 +648,6 @@ namespace Isis {
     else {
       setWindowTitle( project->name() );
     }
-
     
     QSettings settings(FileName(filePath).expanded(), QSettings::NativeFormat);
 

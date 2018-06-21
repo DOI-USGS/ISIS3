@@ -375,6 +375,8 @@ namespace Isis {
       template<typename Data> void warn(QString text, Data relevantData);
 
       void warn(QString text);
+      
+      void loadProjectSettings();
 
     signals:
       /**

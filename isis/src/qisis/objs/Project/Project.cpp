@@ -2508,7 +2508,7 @@ namespace Isis {
     }
   }
 
-
+  
   void Project::storeWarning(QString text) {
     m_warnings->append(text);
   }
