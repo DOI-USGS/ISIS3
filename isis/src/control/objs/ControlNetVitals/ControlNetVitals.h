@@ -23,21 +23,39 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QStringList>
+
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-
-#include <QStringList>
 
 namespace Isis {
   class ControlNet;
 
 
   /**
-  * @author 2018-05-28 Adam Goins
   *
-  * @internal
-  *   @history 2018-05-28 Adam Goins - Initial Creation.
+  *  @brief ControlNetVitals
+  *
+  *  This class is designed to represent the health of a control network.
+  *  It utilizes signals and slots to listen for changes in an observed Control Network and
+  *  re-evaluates the health of a network whenever a change is made.
+  *  It tracks several statistics, and is intended to be the back-end for the ControlHealthMonitorWidget
+  *  that is located in IPCE.
+  *
+  *  The ControlNetVitals class keeps track of several member variables that are a running counter
+  *  for network statistics in regard to the health of the observed network. It creates these
+  *  variables upon intialization and references these internal variables when returning certain
+  *  statistics about a Control Network that can't be accessed by wrapper methods for the network itself.
+  *  It then listens for specific signals to be emitted whenever a change is made to the network
+  *  to update it's internal counters with respect to that change.
+  *
+  *  @author 2018-05-28 Adam Goins
+  *
+  *  @internal
+  *    @history 2018-05-28 Adam Goins - Initial Creation.
+  *    @history 2018-06-14 Adam Goins & Jesse Maple - Refactored method calls and Signal/Slot usage.
+  *    @history 2018-06-15 Adam Goins - Added documentation.
   */
   class ControlNetVitals : public QObject {
     Q_OBJECT
@@ -46,14 +64,13 @@ namespace Isis {
       ControlNetVitals(ControlNet *net);
       virtual ~ControlNetVitals();
 
-      ControlNet *m_controlNet;
-
-      QString m_status;
-      QString m_statusDetails;
+      void initializeVitals();
 
       bool hasIslands();
       int numIslands();
-      QList< QList<QString> > getIslands();
+      const QList< QList<QString> > &getIslands();
+
+      ControlPoint *getPoint(QString id);
 
       int numPoints();
       int numIgnoredPoints();
@@ -77,59 +94,53 @@ namespace Isis {
       QList<ControlPoint*> getFreePoints();
       QList<ControlPoint*> getPointsBelowMeasureThreshold(int num=3);
 
-      QList<QString> getAllImageSerials();
       QList<QString> getImagesBelowMeasureThreshold(int num=3);
       QList<QString> getImagesBelowHullTolerance(int num=75);
 
       QString getNetworkId();
       QString getStatus();
       QString getStatusDetails();
-      void updateStatus(QString status, QString details);
 
-
-      // ImageVitals getImageVitals(QString serial);
+      void emitHistoryEntry(QString entry, QString id, QVariant oldValue, QVariant newValue);
 
     signals:
       void networkChanged();
+      void historyEntry(QString, QString, QVariant, QVariant, QString);
 
     public slots:
       void validate();
+      void validateNetwork(ControlNet::ModType);
+      void addPoint(ControlPoint *);
+      void pointModified(ControlPoint *, ControlPoint::ModType, QVariant, QVariant);
+      void deletePoint(ControlPoint *);
+      void addMeasure(ControlMeasure *);
+      void measureModified(ControlMeasure *, ControlMeasure::ModType, QVariant, QVariant);
+      void deleteMeasure(ControlMeasure *);
 
 
     private:
-      // QHash<QString, ImageVitals> m_imageVitals;
+      ControlNet *m_controlNet;
 
-      // class ImageVitals {
-      //   public:
-      //     ImageVitals(QString cubeSerial,
-      //                 QList<ControlMeasure*> measures,
-      //                 QList<ControlMeasure*> validMeasures) {
-      //       m_serial = cubeSerial;
-      //       m_measures = measures;
-      //       m_validMeasures = validMeasures;
-      //     }
-      //     ~ImageVitals() {}
-      //
-      //     QString getSerial {
-      //       return m_serial;
-      //     }
-      //
-      //     QList<ControlMeasure> getMeasures() {
-      //       return m_measures;
-      //     };
-      //
-      //     QList<ControlMeasure> getValidMeasures() {
-      //       return m_validMeasures;
-      //     }
-      //
-      //
-      //
-      //   private:
-      //     QString m_serial;
-      //     QList<ControlMeasure*> m_measures;
-      //     QList<ControlMeasure*> m_validMeasures;
-      //     ControlNet *m_controlNet;
-      // };
+      QString m_status;
+      QString m_statusDetails;
+
+      QList< QList< QString > > m_islandList;
+
+      // The measureCount maps track how many points/images have how many measures.
+      // For instance, if I wanted to know how many points have 3 measures I would query
+      // the m_pointMeasureCounts with a key of 3 and it would return how many points
+      // have 3 measures. The same is true for imageMeasureCounts, except for images.
+      QMap<int, int> m_pointMeasureCounts;
+      QMap<int, int> m_imageMeasureCounts;
+
+      // The pointTypeCounts operates in the same fashion as the above two, except
+      // that the key would be the ControlPoint::PointType you're searching for.
+      // For instance, if I wanted to know how many points were fixed I would query
+      // This map at key ControlPoint::Fixed and it would return how many fixed points there are.
+      QMap<ControlPoint::PointType, int> m_pointTypeCounts;
+
+      int m_numPointsIgnored;
+      int m_numPointsLocked;
   };
 };
 

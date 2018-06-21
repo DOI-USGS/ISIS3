@@ -238,6 +238,9 @@ namespace Isis {
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
    *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
+   *                           Fixes #5435.
+   *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
+   *                           directory instance rather than the activeControl. Fixes #5435.
    *
    */
   class Directory : public QObject {

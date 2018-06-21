@@ -24,6 +24,7 @@
 
 #include <QList>
 #include <QStringList>
+#include <QPoint>
 
 #include "Application.h"
 #include "Camera.h"
@@ -148,6 +149,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_aprioriLine = aprioriLine;
     return Success;
   }
@@ -158,6 +160,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_aprioriSample = aprioriSample;
     return Success;
   }
@@ -245,8 +248,10 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_sample = sample;
     p_line = line;
+
     SetType(type);
     return Success;
   }
@@ -360,8 +365,13 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
 
+
     bool oldStatus = p_ignore;
     p_ignore = newIgnoreStatus;
+
+    if (Parent()) {
+      Parent()->emitMeasureModified(this, IgnoredModified, oldStatus, p_ignore);
+    }
 
     // only update if there was a change in status
     if (oldStatus != p_ignore) {
@@ -372,6 +382,7 @@ namespace Isis {
         cnet->emitNetworkStructureModified();
       }
     }
+
 
     return Success;
   }
@@ -401,8 +412,9 @@ namespace Isis {
    */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
       double lineResidual) {
-        
+
     MeasureModified();
+
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
     return Success;
@@ -423,6 +435,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_measureType = type;
     return Success;
   }

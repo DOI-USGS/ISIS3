@@ -33,6 +33,10 @@
 #include <QWidgetAction>
 
 #include "ControlHealthMonitorWidget.h"
+#include "ControlPointEditView.h"
+#include "ControlPointEditWidget.h"
+#include "CnetEditorView.h"
+
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Directory.h"
@@ -40,19 +44,28 @@
 
 
 namespace Isis {
+
   /**
    * Constructor.
    */
-  ControlHealthMonitorView::ControlHealthMonitorView(ControlNet *controlNet, QWidget *parent) :
+  ControlHealthMonitorView::ControlHealthMonitorView(Directory *directory, QWidget *parent) :
                         AbstractProjectItemView(parent) {
+    m_directory = directory;
+    ControlNet *net = m_directory->project()->activeControl()->controlNet();
 
-    ControlNetVitals *vitals = new ControlNetVitals(controlNet);
-    m_ControlHealthMonitorWidget = new ControlHealthMonitorWidget(vitals, parent);
+    ControlNetVitals *vitals = new ControlNetVitals(net);
+    m_controlHealthMonitorWidget = new ControlHealthMonitorWidget(vitals, parent);
+
+    connect(m_controlHealthMonitorWidget, SIGNAL(openPointEditor(ControlPoint *)),
+            this, SLOT(openPointEditor(ControlPoint *)));
+
+    connect(m_controlHealthMonitorWidget, SIGNAL(openImageEditor()),
+            this, SLOT(openImageEditor()));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    layout->addWidget(m_ControlHealthMonitorWidget);
+    layout->addWidget(m_controlHealthMonitorWidget);
 
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
@@ -85,12 +98,42 @@ namespace Isis {
 
   }
 
+  /**
+   *  This SLOT is designed to intercept the openPointEditor() signal that's emitted
+   *  Whenever a point is double clicked on inside of the ControlHealthMonitorWidget.
+   *
+   *  It is designed to open the ControlPointEditWidget and edit the point that was
+   *  selected in the health monitor.
+   *
+   *  @param point The Control Point to be editted.
+   */
+  void ControlHealthMonitorView::openPointEditor(ControlPoint *point) {
+    ControlPointEditWidget* widget = m_directory->addControlPointEditView()->controlPointEditWidget();
+
+    if (point && point != widget->editPoint()) {
+      widget->setEditPoint(point);
+    }
+
+    // m_directory->addCnetEditorView(m_directory->project()->activeControl());
+  }
+
+
+  /**
+   *  This SLOT is designed to intercept the openImageEditor() signal that's emitted
+   *  Whenever an image is double clicked on inside of the ControlHealthMonitorWidget.
+   *
+   *  It is designed to open the CubeDnView and populate it with the selected cubes.
+   */
+  void ControlHealthMonitorView::openImageEditor() {
+    m_directory->addCubeDnView();
+  }
+
 
   /**
    * Destructor
    */
   ControlHealthMonitorView::~ControlHealthMonitorView() {
-    delete m_ControlHealthMonitorWidget;
+    delete m_controlHealthMonitorWidget;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
@@ -107,7 +150,7 @@ namespace Isis {
    * @return (ControlHealthMonitorWidget *) The currently active ControlHealthMonitorWidget.
    */
   ControlHealthMonitorWidget *ControlHealthMonitorView::controlHealthMonitorWidget() {
-    return m_ControlHealthMonitorWidget;
+    return m_controlHealthMonitorWidget;
   }
 
 

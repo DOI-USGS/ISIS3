@@ -20,7 +20,7 @@
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
+ *   http://www.usgs.gov/privacy.html
  */
 
 // This is needed for the QVariant macro
@@ -29,12 +29,18 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QMap>
+#include <QVariant>
 #include <QVector>
+#include <QVariant>
+
 
 // Boost includes
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
+
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
 
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
@@ -230,6 +236,15 @@ namespace Isis {
    *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
    *                           Previously this functionality was only available through the
    *                           ControlCubeGraphNode class. References #5434.
+   *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
+   *                           Previously this functionality was only available through the
+   *                           ControlCubeGraphNode class. References #5434.
+   *   @history 2018-06-15 Adam Goins & Jesse Mapel - Added the ModType enum, as well as a series
+   *                           of signals that are emitted whenever a change is made to a
+   *                           Control Point or any of it's measures, or to the network itself.
+   *                           These signals exist for the purpose of communication between the
+   *                           ControlNetVitals class, and the network that it is observing.
+   *                           Fixes #5435.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -238,6 +253,11 @@ namespace Isis {
       friend class ControlPoint;
 
     public:
+
+      enum ModType {
+        Swapped,
+        GraphModified
+      };
 
       ControlNet();
       ControlNet(const ControlNet &other);
@@ -303,6 +323,7 @@ namespace Isis {
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();
 
+
       void SetCreatedDate(const QString &date);
       void SetDescription(const QString &newDescription);
       void SetImages(const QString &imageListFile);
@@ -329,18 +350,30 @@ namespace Isis {
 
     signals:
       void networkStructureModified();
+      void networkModified(ControlNet::ModType type);
+      void pointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
+      void measureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
+      void pointDeleted(ControlPoint *point);
+      void newPoint(ControlPoint *);
+      void newMeasure(ControlMeasure *);
+      void measureRemoved(ControlMeasure *);
+
+
 
     private:
       void nullify();
       bool ValidateSerialNumber(QString serialNumber) const;
       void measureAdded(ControlMeasure *measure);
-      void pointAdded(ControlPoint *point);
       void measureDeleted(ControlMeasure *measure);
       void measureIgnored(ControlMeasure *measure);
       void measureUnIgnored(ControlMeasure *measure);
       void UpdatePointReference(ControlPoint *point, QString oldId);
       void emitNetworkStructureModified();
-
+      void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
+      void emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
+      void emitNewMeasure(ControlMeasure *measure);
+      void emitMeasureRemoved(ControlMeasure *measure);
+      void pointAdded(ControlPoint *point);
 
     private: // graphing functions
       /**
