@@ -24,8 +24,6 @@ if(NOT APPLE)
 endif()
 
 # Dependencies for lapack
-
-
 get_filename_component(CHOLMOD_ROOT_INCLUDE_DIR "${CHOLMOD_INCLUDE_DIR}" DIRECTORY)
 
 message(STATUS "CHOLMOD INCLUDE: "  ${CHOLMOD_INCLUDE_DIR} )
@@ -34,7 +32,6 @@ message(STATUS "CCOLMOD LIB: "  ${CCOLAMD_LIBRARY} )
 message(STATUS "CAMD LIB: "  ${CAMD_LIBRARY} )
 message(STATUS "AMD LIB: "  ${AMD_LIBRARY} )
 message(STATUS "SUITESPARSE LIB: "  ${SUITESPARSE_LIBRARY} )
-message(STATUS "FORTRAN LIB: "  ${FORTRAN_LIBRARY} )
 message(STATUS "BLAS LIB: "  ${BLAS_LIBRARY} )
 
 if(NOT APPLE)
