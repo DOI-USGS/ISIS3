@@ -636,15 +636,11 @@ namespace Isis {
     if (oldStatus != ignore) {
       PointModified();
       if (parentNetwork) {
-        foreach(ControlMeasure * cm, measures->values()) {
-          if (!cm->IsIgnored()) {
-            if (ignore) {
-              parentNetwork->measureIgnored(cm);
-            }
-            else {
-              parentNetwork->measureUnIgnored(cm);
-            }
-          }
+        if (ignore) {
+          parentNetwork->pointIgnored(this);
+        }
+        else {
+          parentNetwork->pointUnIgnored(this);
         }
         parentNetwork->emitNetworkStructureModified();
       }

@@ -338,6 +338,8 @@ namespace Isis {
       void measureDeleted(ControlMeasure *measure);
       void measureIgnored(ControlMeasure *measure);
       void measureUnIgnored(ControlMeasure *measure);
+      void pointIgnored(ControlPoint *point);
+      void pointUnIgnored(ControlPoint *point);
       void UpdatePointReference(ControlPoint *point, QString oldId);
       void emitNetworkStructureModified();
 

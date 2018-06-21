@@ -1,24 +1,32 @@
 UnitTest for ControlNet ....
 
 ******* test cube connection graph ************
+testing ignoring measures..............................
+starting graph
 ALPHA ----[p0]---- BRAVO
 
-ALPHA ----[p0]---- BRAVO
+ignore a measure
 
+un-ignore a measure
 ALPHA ----[p0]---- BRAVO
 
 testing measure addition to point already in network...
+add point with only 1 measure
 ALPHA ----[p0]---- BRAVO
 
+add a measure
 ALPHA ----[p0,p1]---- BRAVO
 
+add another measure
 ALPHA ----[p0,p1]---- BRAVO
 ALPHA ----[p1]---- CHARLIE
 BRAVO ----[p1]---- CHARLIE
 
 testing setting point to ignored.......................
-ALPHA ----[p0,p1]---- BRAVO
+ignore p1
+ALPHA ----[p0]---- BRAVO
 
+un-ignore p1
 ALPHA ----[p0,p1]---- BRAVO
 ALPHA ----[p1]---- CHARLIE
 BRAVO ----[p1]---- CHARLIE

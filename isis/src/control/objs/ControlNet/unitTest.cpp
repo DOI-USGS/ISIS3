@@ -178,9 +178,13 @@ int main() {
   net.AddPoint(p0);
 
   // test ignoring of measures
+  cout << "testing ignoring measures..............................\n";
+  cout << "starting graph\n";
   cout << net.GraphToString() << "\n";
+  cout << "ignore a measure\n";
   p0m1->SetIgnored(true);
   cout << net.GraphToString() << "\n";
+  cout << "un-ignore a measure\n";
   p0m1->SetIgnored(false);
   cout << net.GraphToString() << "\n";
 
@@ -196,16 +200,21 @@ int main() {
   p1m1->SetCubeSerialNumber("BRAVO");
   ControlMeasure *p1m2 = new ControlMeasure;
   p1m2->SetCubeSerialNumber("CHARLIE");
+  cout << "add point with only 1 measure\n";
   cout << net.GraphToString() << "\n";
+  cout << "add a measure\n";
   p1->Add(p1m1);
   cout << net.GraphToString() << "\n";
+  cout << "add another measure\n";
   p1->Add(p1m2);
   cout << net.GraphToString() << "\n";
 
   // test ignoring of point
   cout << "testing setting point to ignored.......................\n";
+  cout << "ignore p1\n";
   p1->SetIgnored(true);
   cout << net.GraphToString() << "\n";
+  cout << "un-ignore p1\n";
   p1->SetIgnored(false);
   cout << net.GraphToString() << "\n";
 

@@ -420,7 +420,9 @@ namespace Isis {
       QList<ControlPoint *> imagePoints = m_controlGraph[m_vertexMap[imageSerial]].measures.keys();
       QStringList pointIds;
       foreach(ControlPoint *point, imagePoints) {
-        pointIds.append(point->GetId());
+        if (!point->IsIgnored()) {
+          pointIds.append(point->GetId());
+        }
       }
       pointIds.sort();
       imagePointIds.insert(imageSerial, pointIds);
@@ -534,6 +536,51 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * Update the ControlNet's internal structure when a ControlPoint is un-ignored.
+   *
+   * @param point A pointer to the un-ignored point.
+   */
+  void ControlNet::pointUnIgnored(ControlPoint *point) {
+    if (!point) {
+      IString msg = "NULL point passed to "
+          "ControlNet::pointUnIgnored!";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    QList< ControlMeasure * > validMeasures = point->getMeasures(true);
+
+    for (int i = 0; i < validMeasures.size(); i++) {
+      ControlMeasure *sourceMeasure = validMeasures[i];
+      QString sourceSerial = sourceMeasure->GetCubeSerialNumber();
+
+      if (!ValidateSerialNumber(sourceSerial)) {
+        QString msg = "Node does not exist for [";
+        msg += sourceSerial + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      for(int j = i+1; j < validMeasures.size(); j++) {
+        ControlMeasure *targetMeasure = validMeasures[j];
+        QString targetSerial = targetMeasure->GetCubeSerialNumber();
+
+        if (!ValidateSerialNumber(targetSerial)) {
+          QString msg = "Node does not exist for [";
+          msg += targetSerial + "]";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+
+        // If the edge doesn't already exist, this adds and returns the edge.
+        // If the edge already exists, this just returns it. (The use of a set
+        // forces the edges to be unique.)
+        ImageConnection connection = boost::add_edge(m_vertexMap[sourceSerial],
+                                                   m_vertexMap[targetSerial],
+                                                   m_controlGraph).first;
+        m_controlGraph[connection].strength++;
+      }
+    }
+  }
 
 
   /**
@@ -649,6 +696,57 @@ namespace Isis {
 //      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
 //      m_vertexMap.remove(serial);
 //    }
+  }
+
+
+  /**
+   * Update the ControlNet's internal structure when a ControlPoint is ignored.
+   *
+   * @param point A pointer to the ignored point.
+   */
+  void ControlNet::pointIgnored(ControlPoint *point) {
+    if (!point) {
+      IString msg = "NULL point passed to "
+          "ControlNet::pointIgnored!";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    QList< ControlMeasure * > validMeasures = point->getMeasures(true);
+
+    for (int i = 0; i < validMeasures.size(); i++) {
+      ControlMeasure *sourceMeasure = validMeasures[i];
+      QString sourceSerial = sourceMeasure->GetCubeSerialNumber();
+
+      if (!ValidateSerialNumber(sourceSerial)) {
+        QString msg = "Node does not exist for [";
+        msg += sourceSerial + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      for(int j = i+1; j < validMeasures.size(); j++) {
+        ControlMeasure *targetMeasure = validMeasures[j];
+        QString targetSerial = targetMeasure->GetCubeSerialNumber();
+
+        if (!ValidateSerialNumber(targetSerial)) {
+          QString msg = "Node does not exist for [";
+          msg += targetSerial + "]";
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+
+        std::pair<ImageConnection, bool> result = boost::edge(m_vertexMap[sourceSerial],
+                                                              m_vertexMap[targetSerial],
+                                                              m_controlGraph);
+        if (result.second) {
+          ImageConnection connection = result.first;
+          m_controlGraph[connection].strength--;
+          if (m_controlGraph[connection].strength <= 0) {
+            boost::remove_edge(m_vertexMap[sourceSerial],
+                               m_vertexMap[targetSerial],
+                               m_controlGraph);
+          }
+        }
+      }
+    }
   }
 
 
