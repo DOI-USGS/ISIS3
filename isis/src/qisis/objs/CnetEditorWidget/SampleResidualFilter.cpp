@@ -2,20 +2,23 @@
 
 #include "SampleResidualFilter.h"
 
-#include "ControlCubeGraphNode.h"
+#include <QPair>
+#include <QString>
+
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 
 namespace Isis {
   SampleResidualFilter::SampleResidualFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) :
-    AbstractNumberFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  SampleResidualFilter::SampleResidualFilter(
-    const SampleResidualFilter &other) : AbstractNumberFilter(other) {
+  SampleResidualFilter::SampleResidualFilter(const SampleResidualFilter &other)
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -23,8 +26,8 @@ namespace Isis {
   }
 
 
-  bool SampleResidualFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool SampleResidualFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -45,10 +48,12 @@ namespace Isis {
 
   QString SampleResidualFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "measure that has a sample residual which is ";
-    else
+    }
+    else {
       description += "measures that have sample residuals which are ";
+    }
 
     description += descriptionSuffix();
     return description;

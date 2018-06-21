@@ -2,11 +2,11 @@
 
 #include "PointJigsawRejectedFilter.h"
 
-#include <iostream>
-
-#include <QHBoxLayout>
+#include <QPair>
+#include <QString>
 
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 
 
@@ -15,13 +15,13 @@ using std::cerr;
 
 namespace Isis {
   PointJigsawRejectedFilter::PointJigsawRejectedFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
   }
 
 
-  PointJigsawRejectedFilter::PointJigsawRejectedFilter(
-    const AbstractFilter &other) : AbstractFilter(other) {
+  PointJigsawRejectedFilter::PointJigsawRejectedFilter(const AbstractFilter &other)
+        : AbstractFilter(other) {
   }
 
 
@@ -30,8 +30,8 @@ namespace Isis {
 
 
   bool PointJigsawRejectedFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return AbstractFilter::evaluateImageFromPointFilter(node);
+        const QPair<QString, ControlNet *> *imageAndNet) const {
+    return AbstractFilter::evaluateImageFromPointFilter(imageAndNet);
   }
 
 
@@ -53,15 +53,19 @@ namespace Isis {
   QString PointJigsawRejectedFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
 
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "point that is ";
-    else
+    }
+    else {
       description += "points that are ";
+    }
 
-    if (inclusive())
+    if (inclusive()) {
       description += "jigsaw rejected";
-    else
+    }
+    else {
       description += "not jigsaw rejected";
+    }
 
     return description;
   }
@@ -70,12 +74,13 @@ namespace Isis {
   QString PointJigsawRejectedFilter::getPointDescription() const {
     QString description = "are ";
 
-    if (inclusive())
+    if (inclusive()) {
       description += "jigsaw rejected";
-    else
+    }
+    else {
       description += "not jigsaw rejected";
+    }
 
     return description;
   }
 }
-

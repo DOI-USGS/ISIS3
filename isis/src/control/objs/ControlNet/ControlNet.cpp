@@ -6,14 +6,13 @@
 #include <cmath>
 #include <sstream>
 
-#include <QtAlgorithms>
 #include <QDebug>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QPair>
-#include <QQueue>
 #include <QScopedPointer>
 #include <QSet>
+#include <QStringList>
 #include <QTime>
 #include <QVector>
 
@@ -25,7 +24,6 @@
 #include "ControlMeasure.h"
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
-#include "ControlCubeGraphNode.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -45,18 +43,16 @@ namespace Isis {
   void ControlNet::nullify() {
 
     points = NULL;
-    cubeGraphNodes = NULL;
     pointIds = NULL;
     m_mutex = NULL;
   }
 
-  //!Creates an empty ControlNet object
+  //! Creates an empty ControlNet object
   ControlNet::ControlNet() {
 
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     m_ownPoints = true;
@@ -70,7 +66,6 @@ namespace Isis {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     for (int cpIndex = 0; cpIndex < other.GetNumPoints(); cpIndex++) {
@@ -103,7 +98,6 @@ namespace Isis {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
-    cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
     m_ownPoints = true;
@@ -128,7 +122,6 @@ namespace Isis {
     clear();
 
     delete points;
-    delete cubeGraphNodes;
     delete pointIds;
 
     nullify();
@@ -160,15 +153,8 @@ namespace Isis {
       points->clear();
     }
 
-    if (cubeGraphNodes) {
-      QHashIterator< QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
-      while (i.hasNext()) {
-        i.next();
-        delete(*cubeGraphNodes)[i.key()];
-        (*cubeGraphNodes)[i.key()] = NULL;
-      }
-      cubeGraphNodes->clear();
-    }
+    m_vertexMap.clear();
+    m_controlGraph.clear();
 
     if (pointIds) {
       pointIds->clear();
@@ -358,15 +344,15 @@ namespace Isis {
  /**
    * Adds a whole point to the control net graph.
    *
-   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "NULL measure passed to ControlNet::pointAdded!"
    * @throws IException::Programmer "Control measure with NULL parent passed to
-   *     ControlNet::AddControlCubeGraphNode!"
+   *     ControlNet::pointAdded"
    * @throws IException::Programmer "ControlNet does not contain the point."
    */
   void ControlNet::pointAdded(ControlPoint *point) {
     if (!point) {
       IString msg = "NULL point passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::pointAdded!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -376,33 +362,40 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // make sure there is a node for every measure
+    // Make sure there is a node for every measure
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn)) {
-        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
+
+      // If the graph doesn't have the sn, add a node for it
+      if (!m_vertexMap.contains(sn)) {
+        Image newImage;
+        newImage.serial = sn;
+        ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph);
+        m_vertexMap.insert(sn, newVertex);
       }
     }
 
-    foreach(ControlMeasure* measure, point->getMeasures()) {
-      // add the measure to the corresponding node
+    QList< ControlMeasure * > measures = point->getMeasures();
+    for(int i = 0; i < measures.size(); i++) {
+      ControlMeasure* measure = measures[i];
+      // Add the measure to the corresponding node
       QString serial = measure->GetCubeSerialNumber();
-      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
-      node->addMeasure(measure);
+      m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
 
-      // in this measure's node add connections to the other nodes reachable from
+      // In this measure's node add connections to the other nodes reachable from
       // its point
       if (!point->IsIgnored() && !measure->IsIgnored()) {
-        for (int i = 0; i < point->GetNumMeasures(); i++) {
-          ControlMeasure *cm = point->GetMeasure(i);
+        for (int j = i + 1; j < measures.size(); j++) {
+          ControlMeasure *cm = measures[j];
           if (!cm->IsIgnored()) {
             QString sn = cm->GetCubeSerialNumber();
-            ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-
-            if (neighborNode != node) {
-              node->addConnection(neighborNode, point);
-              neighborNode->addConnection(node, point);
-            }
+            // If the edge doesn't already exist, this adds and returns the edge.
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                         m_vertexMap[sn],
+                                                         m_controlGraph).first;
+            m_controlGraph[connection].strength++;
           }
         }
       }
@@ -411,29 +404,92 @@ namespace Isis {
 
 
   /**
-   * Updates the ControlCubeGraphNode for the measure's serial number to
-   * reflect the addition.  If there is currently no ControlCubeGraphNode for
-   * this measure's serial, then a new ControlCubeGraphNode is created with
+   * Used for verifying graph intergrity
+   *
+   * @returns A string representation of the ControlNet graph
+   */
+  QString ControlNet::GraphToString() const {
+    QString graphString;
+
+    QStringList images = GetCubeSerials();
+    images.sort();
+
+    QHash<QString, QStringList> imagePointIds;
+
+    foreach(QString imageSerial, images) {
+      QList<ControlPoint *> imagePoints = m_controlGraph[m_vertexMap[imageSerial]].measures.keys();
+      QStringList pointIds;
+      foreach(ControlPoint *point, imagePoints) {
+        pointIds.append(point->GetId());
+      }
+      pointIds.sort();
+      imagePointIds.insert(imageSerial, pointIds);
+    }
+
+    foreach(QString imageSerial, images) {
+      QStringList adjacentImages = getAdjacentImages(imageSerial);
+      adjacentImages.sort();
+      foreach(QString adjacentSerial, adjacentImages) {
+        if (QString::compare(adjacentSerial, imageSerial) < 0) {
+          continue;
+        }
+
+        QStringList commonPoints;
+        QList<QString>::const_iterator imageIt = imagePointIds[imageSerial].cbegin();
+        QList<QString>::const_iterator adjacentIt = imagePointIds[adjacentSerial].cbegin();
+        while (imageIt != imagePointIds[imageSerial].cend() &&
+               adjacentIt != imagePointIds[adjacentSerial].cend()) {
+          int stringDiff = QString::compare(*imageIt, *adjacentIt);
+          if (stringDiff < 0) {
+            imageIt++;
+          }
+          else if(stringDiff == 0) {
+            commonPoints.append(*imageIt);
+            imageIt++;
+            adjacentIt++;
+          }
+          else {
+            adjacentIt++;
+          }
+        }
+
+        graphString.append(imageSerial);
+        graphString.append(" ----[");
+        graphString.append(commonPoints.join(","));
+        graphString.append("]---- ");
+        graphString.append(adjacentSerial);
+        graphString.append("\n");
+      }
+    }
+
+    return graphString;
+   }
+
+
+   /**
+   * Updates the ControlNet graph for the measure's serial number to
+   * reflect the addition.  If there is currently no node for
+   * this measure's serial, then a new node is created with
    * this measure as its first.
    *
    * @param measure The measure added to the network.
    *
-   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "NULL measure passed to ControlNet::measureAdded!"
    * @throws IException::Programmer "Control measure with NULL parent passed to
-   *     ControlNet::AddControlCubeGraphNode!"
+   *     ControlNet::measureAdded!"
    * @throws IException::Programmer "ControlNet does not contain the point."
    */
   void ControlNet::measureAdded(ControlMeasure *measure) {
     if (!measure) {
       IString msg = "NULL measure passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::measureAdded!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     ControlPoint *point = measure->Parent();
     if (!point) {
       IString msg = "Control measure with NULL parent passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::measureAdded!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -442,19 +498,18 @@ namespace Isis {
       msg += point->GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+    // Add the measure to the corresponding node
+    QString serial = measure->GetCubeSerialNumber();
 
-    // make sure there is a node for every measure in this measure's parent
-    for (int i = 0; i < point->GetNumMeasures(); i++) {
-      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn)) {
-        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
-      }
+    // If the graph doesn't have the sn, add a node for it
+    if (!m_vertexMap.contains(serial)) {
+      Image newImage;
+      newImage.serial = serial;
+      ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph);
+      m_vertexMap.insert(serial, newVertex);
     }
 
-    // add the measure to the corresponding node
-    QString serial = measure->GetCubeSerialNumber();
-    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
-    node->addMeasure(measure);
+    m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
 
     // in this measure's node add connections to the other nodes reachable from
     // its point
@@ -463,11 +518,16 @@ namespace Isis {
         ControlMeasure *cm = point->GetMeasure(i);
         if (!cm->IsIgnored()) {
           QString sn = cm->GetCubeSerialNumber();
-          ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
 
-          if (neighborNode != node) {
-            node->addConnection(neighborNode, point);
-            neighborNode->addConnection(node, point);
+
+          if (QString::compare(sn, serial) != 0) {
+            // If the edge doesn't already exist, this adds and returns the edge.
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                       m_vertexMap[sn],
+                                                       m_controlGraph).first;
+            m_controlGraph[connection].strength++;
           }
         }
       }
@@ -475,29 +535,30 @@ namespace Isis {
   }
 
 
+
   /**
-   * Updates the connections for the ControlCubeGraphNode associated with the
+   * Updates the connections for the ControlNet graph associated with the
    * measure's serial number to reflect the unignoration.
    *
    * @param measure The measure unignored from the network.
    *
-   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "NULL measure passed to ControlNet::measureUnIgnored!"
    * @throws IException::Programmer "Control measure with NULL parent passed to
-   *     ControlNet::AddControlCubeGraphNode!"
+   *     ControlNet::measureUnIgnored!"
    * @throws IException::Programmer "ControlNet does not contain the point."
    * @throws IException::Programmer "Node does not exist for the cube serial number."
    */
   void ControlNet::measureUnIgnored(ControlMeasure *measure) {
     if (!measure) {
       IString msg = "NULL measure passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::measureUnIgnored!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     ControlPoint *point = measure->Parent();
     if (!point) {
       IString msg = "Control measure with NULL parent passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::measureUnIgnored!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -507,10 +568,10 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // make sure there is a node for every measure in this measure's parent
+    // Make sure there is a node for every measure in this measure's parent
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!cubeGraphNodes->contains(sn)) {
+      if (!m_vertexMap.contains(sn)) {
         QString msg = "Node does not exist for [";
         msg += measure->GetCubeSerialNumber() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -519,18 +580,22 @@ namespace Isis {
 
     if (!point->IsIgnored()) {
       QString serial = measure->GetCubeSerialNumber();
-      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
 
-      // in this measure's node add connections to the other nodes reachable
+      // In this measure's node add connections to the other nodes reachable
       // from its point
       for (int i = 0; i < point->GetNumMeasures(); i++) {
         ControlMeasure *cm = point->GetMeasure(i);
         if (!cm->IsIgnored()) {
           QString sn = cm->GetCubeSerialNumber();
-          ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-          if (neighborNode != node) {
-            node->addConnection(neighborNode, point);
-            neighborNode->addConnection(node, point);
+
+          if (QString::compare(sn, serial) != 0) {
+            // If the edge doesn't already exist, this adds and returns the edge.
+            // If the edge already exists, this just returns it. (The use of a set
+            // forces the edges to be unique.)
+            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
+                                                       m_vertexMap[sn],
+                                                       m_controlGraph).first;
+            m_controlGraph[connection].strength++;
           }
         }
       }
@@ -554,67 +619,91 @@ namespace Isis {
 
 
   /**
-   * Updates the ControlCubeGraphNode for this measure's serial number to
+   * Updates the node for this measure's serial number to
    * reflect the deletion.  If this is the only measure left in the containing
-   * ControlCubeGraphNode, then the ControlCubeGraphNode is deleted as well.
+   * node, then the node is deleted as well.
    *
    * @param measure The measure removed from the network.
    */
   void ControlNet::measureDeleted(ControlMeasure *measure) {
     ASSERT(measure);
-
     QString serial = measure->GetCubeSerialNumber();
-    ASSERT(cubeGraphNodes->contains(serial));
-    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+    ASSERT(m_vertexMap.contains(serial));
 
-    // remove connections to and from this node
+    // Remove connections to and from this node
     if (!measure->IsIgnored() && !measure->Parent()->IsIgnored()) {
       // Break connections
       measureIgnored(measure);
     }
 
-    // Remove the measure from the node.  If this caused the node to be empty,
-    // then delete the node.
-    node->removeMeasure(measure);
-    if (!node->getMeasureCount()) {
-      delete node;
-      node = NULL;
-      cubeGraphNodes->remove(serial);
-    }
+    // Remove the measure from the associated node.
+    // Conceptually, I think this belongs in measureIgnored, but it isn't done
+    // for the old graph.
+    m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
+
+
+// We decided in a meeting that we do not want to delete the node when all measures are removed.
+    // If this caused the node to be empty, then delete the node.
+//    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
+//      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
+//      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
+//      m_vertexMap.remove(serial);
+//    }
   }
 
 
+  /**
+   * Updates the edges in the ControlNet graph to reflect the ignored
+   * measure. If this was the last measure connecting one node to another,
+   * then the edge is deleted as well.
+   *
+   * @param measure The measure set to ignored from the network.
+   */
   void ControlNet::measureIgnored(ControlMeasure *measure) {
     if (!measure) {
       IString msg = "NULL measure passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::measureIgnored!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     ControlPoint *point = measure->Parent();
     if (!point) {
       IString msg = "Control measure with NULL parent passed to "
-          "ControlNet::AddControlCubeGraphNode!";
+          "ControlNet::measureIgnored!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     QString serial = measure->GetCubeSerialNumber();
-    if (!cubeGraphNodes->contains(serial)) {
+    if (!ValidateSerialNumber(serial)) {
       QString msg = "Node does not exist for [";
       msg += serial + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
-
-    // remove connections to and from this node
+    // Decrement the edge strength for edges from this node
+    // Remove edge if the strength becomes 0.
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (cubeGraphNodes->contains(sn)) {
-        ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
-        if (node != neighborNode) {
-          neighborNode->removeConnection(node, point);
-          node->removeConnection(neighborNode, point);
+      if (m_vertexMap.contains(sn)) {
+        if (QString::compare(serial, sn) !=0) {
+//          std::cout << point->GetId() << ":" << serial << " --- " << sn << std::endl;
+
+          // We need to check if the edge still exists.
+          // boost doesn't add separate edges for A -> B and B -> A like the old graph.
+          // result.first is the ImageConnection, if found
+          // result.second is true if the edge exists; otherwise false.
+          std::pair<ImageConnection, bool> result = boost::edge(m_vertexMap[serial],
+                                                                m_vertexMap[sn],
+                                                                m_controlGraph);
+          if (result.second) {
+            ImageConnection connection = result.first;
+            m_controlGraph[connection].strength--;
+            if (m_controlGraph[connection].strength <= 0) {
+              boost::remove_edge(m_vertexMap[serial],
+                                 m_vertexMap[sn],
+                                 m_controlGraph);
+            }
+          }
         }
       }
     }
@@ -623,113 +712,6 @@ namespace Isis {
 
   void ControlNet::emitNetworkStructureModified() {
     emit networkStructureModified();
-  }
-
-
-  /**
-   * Random breadth-first search.  This meathod starts at a random serial, and
-   * returns a list with the start serial as well as any serial which is
-   * directly or indirectly connected to it.  The list returned will contain
-   * all the serials in the network if and only if the network is completely
-   * connected.  Otherwise, the list returned will be the entire island on
-   * which a random image resides.
-   *
-   * @returns A List of connected graph nodes
-   */
-  QList< ControlCubeGraphNode * > ControlNet::RandomBFS(
-    QList< ControlCubeGraphNode * > nodes) const {
-    qsrand(42);
-    Shuffle(nodes);
-
-    // for keeping track of visited nodes
-    QMap< ControlCubeGraphNode *, bool > searchList;
-    for (int i = 0; i < nodes.size(); i++)
-      searchList.insert(nodes[i], false);
-
-    // for storing nodes as they are found
-    QSet< ControlCubeGraphNode * > results;
-
-    QQueue< ControlCubeGraphNode * > q;
-    q.enqueue(nodes[0]);
-    while (q.size()) {
-      ControlCubeGraphNode *curNode = q.dequeue();
-      if (!results.contains(curNode)) {
-        // add to results
-        results.insert(curNode);
-        searchList[curNode] = true;
-
-        // add all the neighbors to the queue
-        QList< ControlCubeGraphNode * > neighbors = curNode->getAdjacentNodes();
-        Shuffle(neighbors);
-        for (int i = 0; i < neighbors.size(); i++)
-          q.enqueue(neighbors[i]);
-      }
-    } // end of breadth-first search
-
-    return results.values();
-  }
-
-
-  /**
-   * Shuffles the QStrings in a QList< QString >
-   *
-   * @param list The list to be shuffled
-   */
-  void ControlNet::Shuffle(QList< ControlCubeGraphNode * > & list) const {
-    for (int i = list.size() - 1; i > 0; i--) {
-      // standard form is qrand() / (RAND_MAX + 1.0) * (max + 1 - min) + min
-      // min is always zero here so it is simplified to...
-      int j = (int)(qrand() / (RAND_MAX + 1.0) * (i + 1));
-      qSwap(list[j], list[i]);
-    }
-  }
-
-
-  /**
-   * Calculate the band width and critical edges needed by the adjacency matrix
-   * that could store cube connectivity if that matrix used the same ordering
-   * as is in the provided list.  Note that no adjacency matrices are ever used
-   * in this class!
-   *
-   * Critical edges are edges that contribute to band width.
-   *
-   * @param serials A list of cube serial numbers.
-   *
-   * @returns A QPair such that the first element is the needed bandwidth for
-   *          the serials how they are currently ordered in the list, and the
-   *          second element is the number of critical edges.
-   */
-  QPair< int, int > ControlNet::CalcBWAndCE(QList< QString > serials) const {
-
-    for (int i = 0; i < serials.size(); i++)
-      ASSERT(cubeGraphNodes->contains(serials[i]));
-
-    int bw = 0;
-    QList< int > colWidths;
-
-    for (int i = 0; i < serials.size(); i++) {
-      int colWidth = 0;
-      ControlCubeGraphNode *node1 = (*cubeGraphNodes)[serials[i]];
-      for (int j = 0; j < serials.size(); j++) {
-        if (i != j) {
-          ControlCubeGraphNode *node2 = (*cubeGraphNodes)[serials[j]];
-          int colDiff = abs(i - j);
-          if (node1->isConnected(node2) && colDiff > colWidth)
-            colWidth = colDiff;
-        }
-      }
-      colWidths.append(colWidth);
-      if (colWidth > bw)
-        bw = colWidth;
-    }
-
-    int criticalEdges = 0;
-    foreach(int width, colWidths) {
-      if (width == bw)
-        criticalEdges++;
-    }
-
-    return qMakePair(bw, criticalEdges);
   }
 
 
@@ -827,207 +809,38 @@ namespace Isis {
    */
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
     QList< QList< QString > > islandStrings;
-    QList< QList< ControlCubeGraphNode * > > islands = GetNodeConnections();
-    for (int i = 0; i < islands.size(); i++) {
-      QList< QString > newIsland;
-      islandStrings.append(newIsland);
-      for (int j = 0; j < islands[i].size(); j++)
-        islandStrings[i].append(islands[i][j]->getSerialNumber());
+
+    VertexIndexMap indexMap;
+    VertexIndexMapAdaptor indexMapAdaptor(indexMap);
+
+    // Needed to use connected_componenets
+    QList< QString> serials = m_vertexMap.keys();
+    for (int i = 0; i < serials.size(); i++) {
+      boost::put(indexMapAdaptor, m_vertexMap[serials[i]], i);
+    }
+
+    VertexIndexMap componentMap;
+    VertexIndexMapAdaptor componentAdaptor(componentMap);
+    boost::connected_components(m_controlGraph, componentAdaptor,
+                                                      boost::vertex_index_map(indexMapAdaptor));
+
+    std::map<ImageVertex, size_t>::iterator it = componentMap.begin();
+    while(it != componentMap.end())
+    {
+      QString serial = m_controlGraph[it->first].serial;
+      int group = (int) it->second;
+
+      if (group > islandStrings.size() - 1) {
+        QList<QString> tempList;
+        tempList.append(serial);
+        islandStrings.append(tempList);
+      }
+      else {
+        islandStrings[group].append(serial);
+      }
+      ++it;
     }
     return islandStrings;
-  }
-
-
-  /**
-   * This method searches through all the cube serial numbers in the network.
-   * Serials which are connected to other serials through points are grouped
-   * together in the same lists.  The list containing the lists of strings is
-   * nothing more than a list of islands such that each island is a list of
-   * serials which are connected to each other.  If the control network is
-   * completely connected, then this list will only have one element (a list
-   * of all the serials in the network).
-   *
-   * @returns A list of cube islands as graph nodes
-   */
-  QList< QList< ControlCubeGraphNode * > > ControlNet::GetNodeConnections() const {
-    QList< ControlCubeGraphNode * > notYetFound = cubeGraphNodes->values();
-    QList< QList< ControlCubeGraphNode * > > islands;
-
-    do {
-      // extract an island from the nodes which are not yet found
-      QList< ControlCubeGraphNode * > island = RandomBFS(notYetFound);
-
-      // remove newly found nodes from notYetFound
-      for (int i = 0; i < island.size(); i++)
-        notYetFound.removeOne(island[i]);
-
-      // Add island to list of islands
-      islands.append(island);
-    }
-    while (notYetFound.size());
-
-    return islands;
-  }
-
-
-  /**
-   * This method uses Kruskal's Algorithm to construct a minimum spanning tree
-   * of the given island, with control measures acting as the edges between
-   * graph nodes.   Because measures do not directly connect graph nodes, but
-   * rather connect graph nodes to control points, points are considered
-   * "intermediate vertices".  When building the tree, we treat points like
-   * normal graph node vertices, but after the tree is built, we prune away any
-   * measures that, in conjunction with a point, form an "incomplete edge".
-   * Such an edge goes from a graph node to a point, but does not have another
-   * edge going from that point to another node.  Since the primary purpose of
-   * this tree is to evaluate image connectivity, such edges are unnecessary.
-   * A "complete edge" consists of two measures and a point, and connects two
-   * graph nodes, or images.
-   *
-   * The cost of each edge is determined by the provided less-than comparison
-   * function.  If a Control Measure is less-than another, it is said to have a
-   * lower cost, and is thus more likely to appear in the minimum spanning tree.
-   *
-   * Minimum spanning trees are constructed on islands, not networks, so it is
-   * important that the caller first retrieve the list of islands in the network
-   * from the GetNodeConnections() method before invoking this method.  Creating
-   * a minimum spanning tree for an entire network with multiple islands would
-   * be impractical, as this method does not account for the possibility that
-   * some nodes are disconnected in the input.
-   *
-   * A common usage of the minimum spanning tree is to measure the importance of
-   * a given measure or point to the overall connectivity of a network.  If a
-   * measurement is not in the MST, we do not need to worry about creating
-   * additional islands by removing it.
-   *
-   * It is important that the user choose their less-than function carefully.
-   * If a poor less-than function is used, then "bad" measures could end up in
-   * the MST while "good" measures are excluded, thus giving the user the false
-   * impression that a good measure can be safely deleted, while a bad measure
-   * must be preserved.  The application "cnetwinnow", for example, tries to
-   * remove as many measures with high residuals as possible without increasing
-   * the island count of the network, so its less-than function compares the
-   * residual magnitude of the two input measures.
-   *
-   * @param island The list of graph nodes forming the island to be minimized
-   * @param lessThan A comparison function telling us if one measure is better
-   *                 than another
-   *
-   * @return The set of all measures (edges) in the minimum spanning tree
-   */
-  QSet< ControlMeasure * > ControlNet::MinimumSpanningTree(
-      QList< ControlCubeGraphNode *> &island,
-      bool lessThan(const ControlMeasure *, const ControlMeasure *)) const {
-
-    // Kruskal's Algorithm
-    QSet< ControlMeasure * > minimumTree;
-
-    // We start with a map containing all the unconnected vertices (nodes and
-    // points), each its own single-element tree.  Our goal is join them all
-    // together into one tree connecting every vertex.  We map into the forest
-    // with point ID and serial number so the two types of vertices can share a
-    // common, nearly constant-time lookup interface.
-    QMap< QString, ControlVertex * > forest;
-
-    // Get a list of all the candidate edges on the island, and a set of their
-    // associated Control Points (to avoid duplication, as measures share common
-    // points).  Keep a count of how many measures in the MST are connected to
-    // each point, as we'll want to prune off points with only one such
-    // conenction.
-    QList< ControlMeasure * > edges;
-    QMap< ControlPoint *, int > uniquePoints;
-    for (int i = 0; i < island.size(); i++) {
-      // Add each graph node as a tree in the forest
-      ControlCubeGraphNode *node = island[i];
-      forest.insert(node->getSerialNumber(), new ControlVertex(node));
-
-      // Every graph node has a list of measures: these are our edges
-      QList< ControlMeasure * > measures = node->getMeasures();
-      for (int j = 0; j < measures.size(); j++) {
-        edges.append(measures[j]);
-
-        // Every measure has a point: these act as intermediate vertices.  We
-        // keep a count of how many edges in the MST come off this point.
-        // Points with less than 2 edges are considered incomplete, as they do
-        // not form a connection from one graph node to another, or a "complete
-        // edge"
-        uniquePoints.insert(measures[j]->Parent(), 0);
-      }
-    }
-
-    // Sort the edges in increasing cost with the provided less-than function
-    qSort(edges.begin(), edges.end(), lessThan);
-
-    // Add every unique point on the island as a tree in the forest
-    QList< ControlPoint * > pointList = uniquePoints.keys();
-    for (int i = 0; i < pointList.size(); i++) {
-      ControlPoint *point = pointList[i];
-      forest.insert(point->GetId(), new ControlVertex(point));
-    }
-
-    // Every time we join two trees together, we reduce the total number of
-    // trees by one, but our forest data structure is unchanged, so keep a
-    // record of the actual forest size to decrement manually as we go along
-    int trees = forest.size();
-
-    // Keep trying to join trees until there is only one tree remaining or we're
-    // out of edges to try
-    while (trees > 1 && edges.size() > 0) {
-      // Try to add our lowest-cost edge to the minimum spanning tree
-      ControlMeasure *leastEdge = edges.takeFirst();
-
-      // Each edge connects two vertices: a point and a graph node.  So grab the
-      // trees for each node and check that they're disjoint, and thus able to
-      // be joined.
-      QString pointId = leastEdge->Parent()->GetId();
-      ControlVertex *pointVertex = forest[pointId];
-
-      QString serialNum = leastEdge->ControlSN()->getSerialNumber();
-      ControlVertex *nodeVertex = forest[serialNum];
-
-      // When the edge joins two different trees (i.e., they have different
-      // roots), then add the edge to the minimum spanning tree and join the
-      // trees into one.  Otherwise, we have formed a cycle and should thus
-      // discard the edge.
-      if (pointVertex->getRoot() != nodeVertex->getRoot()) {
-        ControlVertex::join(pointVertex, nodeVertex);
-        trees--;
-        minimumTree.insert(leastEdge);
-        uniquePoints[pointVertex->getPoint()]++;
-      }
-    }
-
-    // Prune edges that go from a graph node to a point, but not from that
-    // point to another graph node.  We care about image (graph node)
-    // connectivity, not point connectivity.  A complete edge consists of two
-    // measures and a point, so remove any incomplete edges.
-    QList< ControlMeasure * > unprunedEdges = minimumTree.values();
-    for (int i = 0; i < unprunedEdges.size(); i++) {
-      if (uniquePoints[unprunedEdges[i]->Parent()] < 2)
-        // The point this edge is connected to does not go on to another node,
-        // so prune it
-        minimumTree.remove(unprunedEdges[i]);
-    }
-
-    // Clean up our vertices.  This will not delete any of the points, measures,
-    // or graph nodes.  All of that is owned by the network.
-    QList< ControlVertex * > vertexList = forest.values();
-    for (int i = 0; i < vertexList.size(); i++) delete vertexList[i];
-
-    // Sanity check: an island with n > 1 nodes must, by definition, have an MST
-    // of e edges such that n <= e <= 2n
-    int n = island.size();
-    int e = minimumTree.size();
-    if (n > 1) {
-      if (e < n || e > 2 * n) {
-        IString msg = "An island of n = [" + IString(n) +
-          "] > 1 nodes must have a minimum spanning tree of e edges such that "
-          " n <= e <= 2n, but e = [" + IString(e) + "]";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
-    }
-
-    return minimumTree;
   }
 
 
@@ -1035,36 +848,7 @@ namespace Isis {
    * @returns The total number of edges in the bi-directional graph for images
    */
   int ControlNet::getEdgeCount() const {
-    int total = 0;
-    foreach (ControlCubeGraphNode * node, *cubeGraphNodes) {
-      total += node->getAdjacentNodes().size();
-    }
-
-    return total;
-  }
-
-
-  /**
-   * Used for verifying graph intergrity
-   *
-   * @returns A string representation of the cube graph
-   */
-  QString ControlNet::CubeGraphToString() const {
-    QStringList serials;
-    QHashIterator < QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
-    while (i.hasNext()) {
-      i.next();
-      serials << i.value()->getSerialNumber();
-    }
-    qSort(serials);
-
-    QString str;
-    for (int i = 0; i < serials.size(); i++) {
-      str += "  " + serials[i] + "\n"
-          + (*cubeGraphNodes)[serials[i]]->connectionsToString() + "\n";
-    }
-
-    return str;
+    return boost::num_edges(m_controlGraph);
   }
 
 
@@ -1077,30 +861,46 @@ namespace Isis {
    * @returns A list of the Cube Serial Numbers in the ControlNet.
    */
   QList< QString > ControlNet::GetCubeSerials() const {
-    return cubeGraphNodes->keys();
-  }
-
-
-  /**
-   * @returns A list of all the cube graph nodes in the network
-   */
-  QList< ControlCubeGraphNode * > ControlNet::GetCubeGraphNodes() {
-    return cubeGraphNodes->values();
+    return m_vertexMap.keys();
   }
 
 
   /**
    * Does a check to ensure that the given serial number is contained within
-   * the network.  If it is not, then an exception is thrown
+   * the network.
    *
    * @param serialNumber the cube serial number to validate
+   *
+   * @return @b bool If the serial number is contained in the network.
    */
-  void ControlNet::ValidateSerialNumber(QString serialNumber) const {
-    if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+  bool ControlNet::ValidateSerialNumber(QString serialNumber) const {
+    return m_vertexMap.contains(serialNumber);
+  }
+
+
+  /**
+   * Get all images connected to a given image by common control points.
+   *
+   * @param serialNumber the serial number of the image to find images adjacent to.
+   *
+   * @returns @b QList<QString> The serial numbers of all adjacent images.
+   */
+  QList< QString > ControlNet::getAdjacentImages(QString serialNumber) const {
+    if (!ValidateSerialNumber(serialNumber)) {
+      QString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
+
+    QList< QString > adjacentSerials;
+
+    AdjacencyIterator adjIt, adjEnd;
+    boost::tie(adjIt, adjEnd) = boost::adjacent_vertices(m_vertexMap[serialNumber], m_controlGraph);
+    for( ; adjIt != adjEnd; adjIt++) {
+      adjacentSerials.append(m_controlGraph[*adjIt].serial);
+    }
+
+    return adjacentSerials;
   }
 
 
@@ -1110,8 +910,13 @@ namespace Isis {
    * @returns A list of all measures which are in a given cube
    */
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
-    ValidateSerialNumber(serialNumber);
-    return (*cubeGraphNodes)[serialNumber]->getMeasures();
+    if( !ValidateSerialNumber(serialNumber) ) {
+      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+          "the network";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+
+    }
+    return m_controlGraph[m_vertexMap[serialNumber]].measures.values();
   }
 
 
@@ -1121,8 +926,17 @@ namespace Isis {
    * @returns A list of all valid measures which are in a given cube
    */
   QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
-    ValidateSerialNumber(serialNumber);
-    return (*cubeGraphNodes)[serialNumber]->getValidMeasures();
+    QList< ControlMeasure * > validMeasures;
+
+    // Get measures in cube will validate this for us, so we don't need to re-check
+    QList< ControlMeasure * > measureList = GetMeasuresInCube(serialNumber);
+
+    foreach(ControlMeasure * measure, measureList) {
+      if (!measure->IsIgnored())
+        validMeasures.append(measure);
+    }
+
+    return validMeasures;
   }
 
 
@@ -1175,7 +989,7 @@ namespace Isis {
       ControlPoint *point = this->GetPoint(i);
       if (point->IsIgnored()) continue;  //if the point is ignored then continue
 
-        //get the number of measures
+      // Get the number of measures
       int nObs = point->GetNumMeasures();
       for (int j=0;j<nObs;j++) {  //for every measure
         ControlMeasure *measure = point->GetMeasure(j);
@@ -1186,27 +1000,11 @@ namespace Isis {
       }
     }
 
-    //sort the measures
+    // Sort the measures
     ControlMeasureLessThanFunctor lessThan(statFunc);
     qSort(measures.begin(),measures.end(),lessThan);
 
     return measures;
-  }
-
-
-  /**
-   * Essentially removes a cube from the networkid
-   *
-   * @param serialNumber The cube serial number to be removed from the network
-   */
-  void ControlNet::DeleteMeasuresWithId(QString serialNumber) {
-    ValidateSerialNumber(serialNumber);
-
-    ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
-    QList< ControlMeasure * > measures = csn->getMeasures();
-    foreach(ControlMeasure * measure, measures) {
-      measure->Parent()->Delete(measure);
-    }
   }
 
 
@@ -1319,7 +1117,8 @@ namespace Isis {
    */
   ControlPoint *ControlNet::FindClosest(QString serialNumber,
       double sample, double line) {
-    if (!cubeGraphNodes->contains(serialNumber)) {
+
+    if (!ValidateSerialNumber(serialNumber)) {
       QString msg = "serialNumber [";
       msg += serialNumber;
       msg += "] not found in ControlNet";
@@ -1330,12 +1129,12 @@ namespace Isis {
     double minDist = SEARCH_DISTANCE;
     ControlPoint *closestPoint = NULL;
 
-    ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
-    QList< ControlMeasure * > measures = csn->getMeasures();
+    QList < ControlMeasure * > measures = m_controlGraph[m_vertexMap[serialNumber]].measures.values();
+
     for (int i = 0; i < measures.size(); i++) {
       ControlMeasure *measureToCheck = measures[i];
 
-      //Find closest line sample & return that controlpoint
+      // Find closest line sample & return that controlpoint
       double dx = fabs(sample - measureToCheck->GetSample());
       double dy = fabs(line - measureToCheck->GetLine());
 
@@ -1874,7 +1673,6 @@ namespace Isis {
    */
   void ControlNet::swap(ControlNet &other) {
     std::swap(points, other.points);
-    std::swap(cubeGraphNodes, other.cubeGraphNodes);
     std::swap(pointIds, other.pointIds);
     std::swap(m_mutex, other.m_mutex);
     std::swap(p_targetName, other.p_targetName);
@@ -1960,29 +1758,6 @@ namespace Isis {
     }
 
     return GetPoint(pointIds->at(index));
-  }
-
-
-  const ControlCubeGraphNode *ControlNet::getGraphNode(
-      QString serialNumber) const {
-    if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Serial Number [" + serialNumber + "] does not exist in"
-          " the network.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    return cubeGraphNodes->value(serialNumber);
-  }
-
-  ControlCubeGraphNode *ControlNet::getGraphNode(
-      QString serialNumber) {
-    if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "Serial Number [" + serialNumber + "] does not exist in"
-          " the network.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    return cubeGraphNodes->value(serialNumber);
   }
 
 
