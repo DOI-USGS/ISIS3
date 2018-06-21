@@ -1377,7 +1377,9 @@ namespace Isis {
       m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
   }
 
-  
+
+// Commented out since it contains some unimplemented functions (i.e. pseudo-code)
+#if 0
   void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
 
     // Get the current selected images
@@ -1458,6 +1460,7 @@ namespace Isis {
     }
 
   }
+#endif
 
 
 
