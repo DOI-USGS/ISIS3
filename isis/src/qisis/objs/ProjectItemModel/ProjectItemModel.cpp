@@ -171,11 +171,77 @@ namespace Isis {
     QItemSelection selection = selectionModel()->selection();
     QList<ProjectItem *> items;
 
+
     foreach ( QModelIndex index, selection.indexes() ) {
       items.append( itemFromIndex(index) );
     }
 
     return items;
+  }
+  /**
+   * @brief ProjectItemModel::selectedBOSSImages
+   * @return This is a refinement of the selectedItems function which
+   * was needed to display a subset of Images/ImageLists in the
+   * Bundle Observation Solve Settings (BOSS) tab of the JigsawSetupDialog widget.
+   * The primary consumer of the selected images is going to be the SortFilterProxyModel
+   * class.
+   */
+  QList<ProjectItem *> ProjectItemModel::selectedBOSSImages() {
+
+    QItemSelection selection = selectionModel()->selection();
+    QList<ProjectItem *> items;
+
+    //Query the selected items to see if they have children
+    foreach ( QModelIndex ix, selection.indexes() ) {
+
+      ProjectItem *item = this->itemFromIndex(ix);
+
+      //Anything that is not an image or an image list does
+      //not make sense to display in the BOSS treeview tab,
+      //so we need to exclude these items.
+      if (item->isImageList() || item->isImage() ) {
+        items.append( item );
+      }
+      else {
+        return items;
+      }
+
+      //If the selected ImageList has children, include all of the children.
+      if (this->hasChildren(ix)) {
+
+        //If the node has children, loop through all of them
+        //and add them to selected items.
+        int numChildren = this->rowCount(ix);
+        for (int i = 0; i < numChildren;i++) {
+          QModelIndex ixchild = this->index(i,0,ix);
+          items.append(this->itemFromIndex(ixchild ));
+          }  //end for
+      }//end if
+
+      //Append the parent of any selected child.  This is so
+      //the children aren't hanging on the tree without
+      //a collapsible parent node.
+      if( item->parent() ->hasChildren()) {
+        ProjectItem * parent = item->parent();
+        if (!items.contains(parent)){
+          items.append(parent);
+        }// end inner if
+      }//end outer if
+      //Also include the grandparent.  This handles the event
+      //that we may have multiple image lists selected to the treeview
+      //and we need a grandparent node attached to group them under.
+      if (this->itemFromIndex(ix)->parent()->parent() ){
+        ProjectItem *grandparent = this->itemFromIndex(ix)->parent()->parent();
+        if (!items.contains(grandparent)) {
+          items.append(grandparent);
+        } //end inner if
+
+      } //end outer if
+
+  }// end foreach
+
+    return items;
+
   }
 
 
@@ -697,6 +763,7 @@ namespace Isis {
         item->image()->displayProperties()->setSelected(false);
       }
     }
+
   }
 
 
