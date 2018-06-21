@@ -1355,7 +1355,9 @@ namespace Isis {
 
     //Set the root index to display the subtree we are interested in.  This requires
     //computing the proxy index from the source model.
-     m_ui->treeView->setRootIndex(osspm->mapFromSource(item->index() ));
+    if (selectedItems.count() > 0) {
+      m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
+    }
 
     // Generate observation numbers for the images
     QStringList observationNumbers;
@@ -1371,10 +1373,6 @@ namespace Isis {
     // Add apply button to the tab view
     // set the text to bold?
 
-  }
-
-  if (selectedItems.count() > 0) {
-      m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
   }
 
 
