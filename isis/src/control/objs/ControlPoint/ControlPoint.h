@@ -343,6 +343,8 @@ namespace Isis {
    *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
+   *   @history 2018-06-06 Jesse Mapel - Modified setIgnored to use new pointIgnored and
+   *                           pointUnIgnored methods. References #5434.
    */
   class ControlPoint : public QObject {
 
