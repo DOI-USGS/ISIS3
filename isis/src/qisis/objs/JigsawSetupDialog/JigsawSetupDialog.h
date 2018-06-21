@@ -66,6 +66,10 @@ namespace Isis {
    *   @history 2018-06-21 Ian Humphrey - Added on_applySettingsPushButtonClicked() to listen for when
    *                           the apply button is clicked on the observation solve settings tab.
    *                           References #497.
+   *   @history 2018-06-21 Tyler Wilson - Added support in the Bundle Observations Solve Settings
+   *                           (BOSS) tab for displaying user-selected images from the main Project
+   *                           treeview.  All changes were made in the
+   *                           createObservationSolveSettingsTreeView() function.  References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
