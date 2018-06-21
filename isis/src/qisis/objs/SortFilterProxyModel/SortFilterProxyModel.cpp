@@ -42,99 +42,52 @@ namespace Isis {
 
 
      if (persistentIndex.isValid()) {
-       qDebug() << "persistent index is valid: " << persistentIndex;
-      
+       //qDebug() << "persistent index is valid: " << persistentIndex;
        m_root = persistentIndex;
      }
      else {
-       qDebug() << "persistent index NOT valid.";
+       //qDebug() << "persistent index NOT valid.";
        m_root = QPersistentModelIndex(QModelIndex());
      }
 
-     // // qDebug() << "can convert to qstandarditem: " << data.canConvert<QStandardItem *>();
-     // if (data.canConvert<ProjectItem *>()) {
-     //  m_root = data.value<ProjectItem *>();
-     // }
+     baseModel = newSourceModel;
      QSortFilterProxyModel::setSourceModel(newSourceModel);
    }
 
 
-
-
   bool SortFilterProxyModel::setRoot(const QStandardItem *item) {
 
-    m_root = QPersistentModelIndex(item->index());
-    qDebug() << "Setting m_root to:  " << m_root.data(0).toString();
-    //root = item->index();
+    m_root = QPersistentModelIndex(item->index());   
     return true;
 
-    //qDebug() << "m_root = " << m_root;
 
-    //if (m_root.isValid()) {
-    //  qDebug() <<"m_root is valid";
-    //  return true;
-   // }
-    //else {
-      //qDebug() <<"m_root is not valid";
-
-      //return false;
-    //}
   }
 
 
   bool SortFilterProxyModel::filterAcceptsRow(int sourceRow,
                                                         const QModelIndex &sourceParent) const {
-
-
-
     bool accept(false);
 
+    if (selectedIndices.count() == 0) {
+      accept = true;
+    }
+
     if (this->sourceModel()!=nullptr) {
-
-
        QModelIndex ix = this->sourceModel()->index( sourceRow, 0, sourceParent );
        if (ix.isValid() ) {
-
-        #if 0
-         if (this->sourceModel()->hasChildren(ix) ) {
-           qDebug() << "Has children:  " << ix.data(0).toString();
+        ProjectItem * item = baseModel->itemFromIndex(ix);
+        if (selectedIndices.contains(ix)  ) {
            accept = true;
-         }
+         }         
+        if (item->text() == "Images" ) {
+          accept = true;
+        }
+     }//end if (ix.isValid() )
 
-         if (selectedIndices.contains(ix)  && (this->sourceModel()->hasChildren(ix))) {
-           qDebug() << "Accepted (has children):" << ix.data(0).toString();
-           //int numChildren = this->sourceModel()->rowCount(ix);
-           //for (int i = 0; i < numChildren;i++) {
+  }
+  return accept;
 
-             //QModelIndex ixchild = this->sourceModel()->index(i,0,ix);
-             //accepted.append(ixchild);
-
-             //}
-           }
-
-      #endif
-         qDebug()<< "***************";
-         foreach(QModelIndex ix,selectedIndices)
-           qDebug() << ix.data(0).toString();
-
-         qDebug()<< "***************";
-
-         if (selectedIndices.contains(ix)  ) {
-           qDebug() << "Accepted:  " << ix << ":" << ix.data(0).toString();
-           accept = true;
-         }
-
-         else {
-         qDebug() << "Rejected:  " << ix << ":" << ix.data(0).toString();
-
-         }
-
-       }//end if (ix.isValid() )
-
-    }
- return accept;
-
-    }
+ }
 
 
 

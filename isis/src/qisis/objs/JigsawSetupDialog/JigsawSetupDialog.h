@@ -63,6 +63,10 @@ namespace Isis {
    *                           net name to anything they choose.
    *   @history 2018-06-01 Christopher Combs - Added support for ui changes, exclusive options and 
    *                           input validators.
+   *   @history 2018-06-21 Tyler Wilson - Added support in the Bundle Observations Solve Settings
+   *                           (BOSS) tab for displaying user-selected images from the main Project
+   *                           treeview.  All changes were made in the
+   *                           createObservationSolveSettingsTreeView() function.  References #497.
    */
 
   class JigsawSetupDialog : public QDialog {

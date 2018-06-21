@@ -71,7 +71,7 @@ namespace Isis {
        bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
     private:
-      //QList<ProjectItem *> selectedItems;
+      ProjectItemModel * baseModel;
       QList<QModelIndex> selectedIndices;
       QList<int> selectedIndexRows;
       QPersistentModelIndex m_root;

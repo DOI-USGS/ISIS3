@@ -1327,59 +1327,29 @@ namespace Isis {
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
 
-     QList<ProjectItem *> selectedChildItems = m_project->directory()->model()->selectedChildItems();
-
-    QList<ProjectItem *> selectedItems = m_project->directory()->model()->selectedItems();
-
+    QList<ProjectItem *> selectedBOSSItems = m_project->directory()->model()->selectedBOSSImages();
 
     ProjectItemModel *model = m_project->directory()->model();
 
     SortFilterProxyModel *osspm = new SortFilterProxyModel;
     osspm->setSourceModel(model);
-    //QList<ProjectItem*> selected = model->selectedChildItems();
-
-    //selected.append(selectedItems[0]->parent() );
-
-    qDebug() << "Selected Child items:  ";
-    foreach(ProjectItem * item,selectedChildItems) {
-      qDebug() << item->index().data(0).toString();
-
-    }
-
-    //qDebug() << "Selected items:  ";
-    //foreach(ProjectItem * item,selectedItems) {
-    //  qDebug() << item->index().data(0).toString();
-    //}
-
 
     //osspm->setDynamicSortFilter(true);
-
-
-    osspm->setSelectedItems(selectedChildItems );
+    osspm->setSelectedItems(selectedBOSSItems );
     m_ui->treeView->setModel(osspm);
-    //m_ui->treeView->setRootIsDecorated(false);
-
-
-    //qDebug() << "Parent=" << selectedItems[0]->parent()->index().data(0).toString();
-
-
-    //Set the root index to display the subtree we are interested in.  This requires
-    //computing the proxy index from the source model.
-    if (selectedChildItems.count() > 0) {
-      //qDebug() << "parent = " << selectedItems[0]->parent()->text();
-      //osspm->setRoot(selectedChildItems[0]->parent());
 
 
 
-      //if ( selectedItems[0]->parent()->index().data(0).toString().isEmpty()) {
-          m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedChildItems[0]->parent()->parent()->index()));
+         ProjectItem *imgRoot = model->findItemData(QVariant("Images"),0);
+         if (imgRoot) {
 
-          qDebug() << "Setting parent to:  " << (selectedItems[0]->parent()->parent()->index()).data(0).toString();
-
-
-    }
-
-
+            m_ui->treeView->setRootIndex(osspm->mapFromSource(imgRoot->index()));
+         }
+         else {
+          m_ui->treeView->setRootIndex(QModelIndex());
+         }
 
   }
+
+
 }
