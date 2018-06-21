@@ -1378,88 +1378,94 @@ namespace Isis {
 
 // Commented out since it contains some unimplemented functions (i.e. pseudo-code)
 
-  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {}
-#if 0
+  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
+    qDebug() << "top of on_applySettingsPushButton_clicked";
     // Get the current selected images
-    QAbstractProxyModel *model = m_ui->treeView->model();
+    ProjectItemModel *model = (ProjectItemModel *) m_ui->treeView->model();
     // QItemSelectionModel *selectionModel = m_ui->treeView->selectionModel();
-    QModelIndexList selectedIndexes = m_ui->treeView->selectedIndexes();
+    QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
     foreach (QModelIndex index, selectedIndexes) {
-      QMap<int, QVariant> data = model->index(index);
-      qDebug() << "selected data: " << data;
+      ProjectItem * projItem = (ProjectItem *) model->itemFromIndex(index);
+      if (projItem->isImage()) {
+        qDebug() << projItem->image()->fileName();
+      }
+      else if (projItem->isImageList()) {
+        foreach (Image *image,  *projItem->imageList()) {
+          qDebug() << image->fileName();
+        }
+      }
+    }
       // Cast the data to image (i think ProjectItem shows QVariant conversions)
       // Get the observation number from the image
       // Append the observation number to the selectedObservationNumbers
-    }
+    
 
-    // check to see if all the images are selected
+    // // check to see if all the images are selected
 
-    // If not, 
-    {  
-      // We are going to need to reset the bundle observation solve settings list for bundle settings
-      QList<BundleObservationSolveSettings> solveSettingsList;
+    // // If not, 
+    // {  
+    //   // We are going to need to reset the bundle observation solve settings list for bundle settings
+    //   QList<BundleObservationSolveSettings> solveSettingsList;
 
-      // Grab the bundle settings
-      // (NOTE -- bundleSettings() needs to be changed so it can
-      // give us just a m_bundleSettings member we have for this current run of jigsaw, and the
-      // logic for filling the settings and bundle observation solve settings from the view needs
-      // to be put into two methods, like updateSettings() and updateBundleObservationSolveSettings())
-      BundleSettingsQsp bundleSettings = bundleSettings();
+    //   // Grab the bundle settings
+    //   // (NOTE -- bundleSettings() needs to be changed so it can
+    //   // give us just a m_bundleSettings member we have for this current run of jigsaw, and the
+    //   // logic for filling the settings and bundle observation solve settings from the view needs
+    //   // to be put into two methods, like updateSettings() and updateBundleObservationSolveSettings())
+    //   BundleSettingsQsp bundleSettings = bundleSettings();
 
-      //find the bundle observation solve settings for each of the selected observations and remove
-      // the observation number from them 
-      for (int i = 0; i < bundleSettings->numberSolveSettings(); i++) {
-        foreach (observationNumber, selectedObservationNumbers) {
-          bundleSettings->observationSolveSettings(i).removeObservationNumber(observationNumber);
-        }
-      }
+    //   //find the bundle observation solve settings for each of the selected observations and remove
+    //   // the observation number from them 
+    //   for (int i = 0; i < bundleSettings->numberSolveSettings(); i++) {
+    //     foreach (observationNumber, selectedObservationNumbers) {
+    //       bundleSettings->observationSolveSettings(i).removeObservationNumber(observationNumber);
+    //     }
+    //   }
 
-      // Remove any existing solve settings that no longer have any observation numbers
-      for (int i = 0; i < bundleSettings.numberSolveSettings(); i++) {
-        if (! bundleSettings->observationSolveSettings(i).observationNumbers().isEmpty() ) {
-          solveSettingsList.append(bundleSettings->observationSolveSettings(i));
-        }
-      }
+    //   // Remove any existing solve settings that no longer have any observation numbers
+    //   for (int i = 0; i < bundleSettings.numberSolveSettings(); i++) {
+    //     if (! bundleSettings->observationSolveSettings(i).observationNumbers().isEmpty() ) {
+    //       solveSettingsList.append(bundleSettings->observationSolveSettings(i));
+    //     }
+    //   }
 
 
-      // Create a new bundle observation solve settings
-      BundleObservationSolveSettings solveSettings;
-      // Add the selected observation numbers to the new bundle observation solve settings
-      foreach (observationNumber, selectedObservationNumbers) {
-        solveSettings.addObservationNumber(observationNumber);
-      }
+    //   // Create a new bundle observation solve settings
+    //   BundleObservationSolveSettings solveSettings;
+    //   // Add the selected observation numbers to the new bundle observation solve settings
+    //   foreach (observationNumber, selectedObservationNumbers) {
+    //     solveSettings.addObservationNumber(observationNumber);
+    //   }
 
-      // Grab the data from the right hand side of the observation solve settings tab to set
-      // up the new bundle observation solve settings
-      updateBundleObservationSolveSettings(solveSettings);
+    //   // Grab the data from the right hand side of the observation solve settings tab to set
+    //   // up the new bundle observation solve settings
+    //   updateBundleObservationSolveSettings(solveSettings);
 
-      // Add the new solve settings to the solve settings list
-      solveSettingsList.append(solveSettings);
+    //   // Add the new solve settings to the solve settings list
+    //   solveSettingsList.append(solveSettings);
 
-      // Update bundle settings with the new list of bundle observation solve settings
-      bundleSettings->setObservationSolveOptions(solveSettingsList);
+    //   // Update bundle settings with the new list of bundle observation solve settings
+    //   bundleSettings->setObservationSolveOptions(solveSettingsList);
 
-    } 
+    // } 
  
-    // Otherwise (if all images are selected)
-    {
-      // just create a new observation solve settings
-      BundleObservationSolveSettings boss;
-      // add all the observation numbers to it
-      foreach (observationNumber, selectedObservationNumbers) {
-        boss.addObservationNumber(observationNumber);
-      }
+    // // Otherwise (if all images are selected)
+    // {
+    //   // just create a new observation solve settings
+    //   BundleObservationSolveSettings boss;
+    //   // add all the observation numbers to it
+    //   foreach (observationNumber, selectedObservationNumbers) {
+    //     boss.addObservationNumber(observationNumber);
+    //   }
 
-      // update the solve settings from the observation solve settings tab
-      updateBundleObservationSolveSettings(boss);
+    //   // update the solve settings from the observation solve settings tab
+    //   updateBundleObservationSolveSettings(boss);
 
-      bundleSettings()->setObservationSolveOptions(QList<BundleObservationSolveSettings>{boss});
-    }
+    //   bundleSettings()->setObservationSolveOptions(QList<BundleObservationSolveSettings>{boss});
+    // }
 
   }
-#endif
-
 
 
   // void JigsawSetupDialog::generateObservationNumbers() {
