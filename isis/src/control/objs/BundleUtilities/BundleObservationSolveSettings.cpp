@@ -267,7 +267,7 @@ namespace Isis {
    * @return bool Returns true if the observation number passed was actually removed; otherwise
    *              returns false.
    */
-  bool removeObservationNumber(QString observationNumber) {
+  bool BundleObservationSolveSettings::removeObservationNumber(QString observationNumber) {
     return m_observationNumbers.remove(observationNumber);
   }
 
