@@ -108,6 +108,7 @@ namespace Isis {
     m_ui->pointingComboBox->insertItems(0, pointingOptions);
     m_ui->pointingComboBox->setCurrentIndex(0);
 
+
     QStringList tableHeaders;
     tableHeaders << "coefficients" << "description" << "units" << "a priori sigma";
     m_ui->positionAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
@@ -1353,7 +1354,7 @@ namespace Isis {
     int currentIndex = m_ui->positionComboBox->currentIndex();
     QList<QSpinBox *> spkSpinBoxes{m_ui->spkDegreeSpinBox, m_ui->spkSolveDegreeSpinBox};
     for (auto &spinBox : spkSpinBoxes) {
-      spinBox->setValue(currentIndex);
+      spinBox->setValue(currentIndex - 1);
       if (arg1 == "ALL") {
         spinBox->setEnabled(true);
       }
@@ -1454,7 +1455,7 @@ namespace Isis {
     int currentIndex = m_ui->pointingComboBox->currentIndex();
     QList<QSpinBox *> ckSpinBoxes{m_ui->ckDegreeSpinBox, m_ui->ckSolveDegreeSpinBox};
     for (auto &spinBox : ckSpinBoxes) {
-      spinBox->setValue(currentIndex);
+      spinBox->setValue(currentIndex - 1);
       if (arg1 == "ALL") {
         spinBox->setReadOnly(false);
       }

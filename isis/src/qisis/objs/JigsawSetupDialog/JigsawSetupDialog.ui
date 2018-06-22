@@ -1317,7 +1317,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                  </sizepolicy>
                 </property>
                 <property name="minimum">
-                 <number>0</number>
+                 <number>-1</number>
                 </property>
                 <property name="value">
                  <number>1</number>
@@ -1502,7 +1502,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                  </sizepolicy>
                 </property>
                 <property name="minimum">
-                 <number>0</number>
+                 <number>-1</number>
                 </property>
                 <property name="value">
                  <number>2</number>
