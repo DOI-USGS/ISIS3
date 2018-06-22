@@ -123,6 +123,11 @@ namespace Isis {
 
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
+    connect(m_ui->positionAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
+            this, SLOT(validateSigmaValue(QTableWidgetItem *)));
+    connect(m_ui->pointingAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
+            this, SLOT(validateSigmaValue(QTableWidgetItem *)));
+
     // initializations for target body tab
 
     // fill target combo box from project
@@ -1338,16 +1343,19 @@ namespace Isis {
 
 
   void JigsawSetupDialog::validateSigmaValue(QTableWidgetItem *item) {
+    // Only validate the "a priori sigma" column
     if (item->column() != 3) {
       return;
     }
+
+    // Positive doubles are valid values for the a priori sigma column
     bool convertSuccess = false;
-    item->text().toDouble(&convertSuccess);
-    if (!convertSuccess) {
-      item->setBackground(Qt::red);
+    double sigma = item->text().toDouble(&convertSuccess);
+    if (convertSuccess && sigma >= 0.0) {
+      item->setBackground(Qt::white);
     }
     else {
-      item->setBackground(Qt::white);
+      item->setBackground(Qt::red);
     }
   }
 
@@ -1367,8 +1375,6 @@ namespace Isis {
 
     // @todo @irh better way to do this than hard coded "magic" numbers?
     QTableWidget *table = m_ui->positionAprioriSigmaTable;
-    qDebug() << "current index: " << currentIndex;
-    qDebug() << arg1;
     m_ui->positionAprioriSigmaTable->setRowCount(currentIndex);
 
     // POSITION
@@ -1392,9 +1398,6 @@ namespace Isis {
       sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
       sigma->setText("0.0");
       table->setItem(0, 3, sigma);
-
-      connect(table, SIGNAL(itemChanged(QTableWidgetItem *)),
-              this, SLOT(validateSigmaValue(QTableWidgetItem *)));
     }
 
     // VELOCITY
@@ -1414,13 +1417,10 @@ namespace Isis {
       units->setText("m/s");
       table->setItem(1, 2, units);
 
-      // QTableWidgetItem *sigma = new QTableWidgetItem();
-      // sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-      // sigma->setText("0.0");
-      // table->setItem(1, 3, sigma);
-      QDoubleSpinBox *sigma = new QDoubleSpinBox(table);
-      sigma->setDecimals(3);
-      table->setCellWidget(1, 3, sigma);
+      QTableWidgetItem *sigma = new QTableWidgetItem();
+      sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+      sigma->setText("0.0");
+      table->setItem(1, 3, sigma);
     }
 
     // ACCELERATION
