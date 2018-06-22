@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="generalSettingsTab">
           <attribute name="title">
@@ -1192,7 +1192,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
            <item row="0" column="1">
             <widget class="QGroupBox" name="groupBox">
              <property name="title">
-              <string>Position</string>
+              <string>Instrument Position Solve Options</string>
              </property>
              <property name="flat">
               <bool>false</bool>
@@ -1201,39 +1201,7 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
               <bool>false</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
-              <item row="0" column="0">
-               <widget class="QLabel" name="spkDegreeLabel">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="text">
-                 <string>SPK Initiali&amp;zation Polynomial Degree</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QSpinBox" name="spkDegreeSpinBox">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="value">
-                 <number>2</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
+              <item row="2" column="2">
                <widget class="QCheckBox" name="hermiteSplineCheckBox">
                 <property name="enabled">
                  <bool>false</bool>
@@ -1249,16 +1217,91 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                 </property>
                </widget>
               </item>
+              <item row="4" column="0" colspan="3">
+               <widget class="QTableWidget" name="positionAprioriSigmaTable">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="autoScroll">
+                 <bool>true</bool>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <property name="showGrid">
+                 <bool>true</bool>
+                </property>
+                <property name="columnCount">
+                 <number>4</number>
+                </property>
+                <attribute name="horizontalHeaderCascadingSectionResizes">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="horizontalHeaderDefaultSectionSize">
+                 <number>125</number>
+                </attribute>
+                <attribute name="horizontalHeaderMinimumSectionSize">
+                 <number>130</number>
+                </attribute>
+                <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+                 <bool>false</bool>
+                </attribute>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="verticalHeaderVisible">
+                 <bool>false</bool>
+                </attribute>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
+               </widget>
+              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="spkSolveDegreeLabel">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
                 <property name="text">
-                 <string>SPK Solve Polynomial Degree</string>
+                 <string>SPK Solve Degree</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="spkDegreeSpinBox">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimum">
+                 <number>0</number>
+                </property>
+                <property name="value">
+                 <number>2</number>
                 </property>
                </widget>
               </item>
@@ -1274,82 +1317,101 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                  </sizepolicy>
                 </property>
                 <property name="minimum">
-                 <number>-1</number>
+                 <number>0</number>
                 </property>
                 <property name="value">
-                 <number>-1</number>
+                 <number>1</number>
                 </property>
                </widget>
               </item>
-              <item row="2" column="0" colspan="3">
-               <widget class="QTableWidget" name="positionAprioriSigmaTable">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>390</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="verticalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAsNeeded</enum>
-                </property>
-                <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="showGrid">
-                 <bool>true</bool>
-                </property>
-                <property name="columnCount">
-                 <number>3</number>
-                </property>
-                <attribute name="horizontalHeaderCascadingSectionResizes">
-                 <bool>false</bool>
-                </attribute>
-                <attribute name="horizontalHeaderDefaultSectionSize">
-                 <number>125</number>
-                </attribute>
-                <attribute name="horizontalHeaderMinimumSectionSize">
-                 <number>130</number>
-                </attribute>
-                <attribute name="horizontalHeaderStretchLastSection">
-                 <bool>true</bool>
-                </attribute>
-                <attribute name="verticalHeaderVisible">
-                 <bool>false</bool>
-                </attribute>
-                <column/>
-                <column/>
-                <column/>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QGroupBox" name="groupBox_2">
-             <property name="title">
-              <string>Pointing</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_10">
-              <item row="0" column="0">
-               <widget class="QLabel" name="ckDegreeLabel">
+              <item row="2" column="0">
+               <widget class="QLabel" name="spkDegreeLabel">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
                 <property name="text">
-                 <string>C&amp;K Initialization Polynomial Degree</string>
+                 <string>SPK Degree</string>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
+              <item row="0" column="0" colspan="2">
+               <widget class="QComboBox" name="positionComboBox"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QPushButton" name="applySettingsPushButton">
+             <property name="text">
+              <string>Apply Settings to Selected Images</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" rowspan="4">
+            <widget class="QTreeView" name="treeView">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="headerHidden">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string>Instrument Pointing Solve Options</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_10">
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="twistCheckBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Twist</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="ckSolveDegreeLabel">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>CK Solve Degree</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="ckDegreeLabel">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="text">
+                 <string>CK Degree</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
                <widget class="QSpinBox" name="ckDegreeSpinBox">
                 <property name="enabled">
                  <bool>true</bool>
@@ -1361,14 +1423,14 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                  </sizepolicy>
                 </property>
                 <property name="minimum">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="value">
                  <number>2</number>
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
+              <item row="2" column="2">
                <widget class="QCheckBox" name="fitOverPointingCheckBox">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1387,17 +1449,45 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="ckSolveDegreeLabel">
-                <property name="enabled">
+              <item row="4" column="0" colspan="3">
+               <widget class="QTableWidget" name="pointingAprioriSigmaTable">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="alternatingRowColors">
                  <bool>true</bool>
                 </property>
-                <property name="text">
-                 <string>CK Solve Polyno&amp;mial Degree</string>
-                </property>
-                <property name="wordWrap">
+                <property name="showGrid">
                  <bool>true</bool>
                 </property>
+                <property name="columnCount">
+                 <number>4</number>
+                </property>
+                <attribute name="horizontalHeaderDefaultSectionSize">
+                 <number>125</number>
+                </attribute>
+                <attribute name="horizontalHeaderMinimumSectionSize">
+                 <number>130</number>
+                </attribute>
+                <column/>
+                <column/>
+                <column/>
+                <column/>
                </widget>
               </item>
               <item row="1" column="1">
@@ -1412,85 +1502,25 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
                  </sizepolicy>
                 </property>
                 <property name="minimum">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="value">
                  <number>2</number>
                 </property>
                </widget>
               </item>
-              <item row="1" column="2">
-               <widget class="QCheckBox" name="twistCheckBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Twist</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0" colspan="3">
-               <widget class="QTableWidget" name="pointingAprioriSigmaTable">
-                <property name="maximumSize">
-                 <size>
-                  <width>390</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="verticalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOn</enum>
-                </property>
-                <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="columnCount">
-                 <number>3</number>
-                </property>
-                <attribute name="horizontalHeaderDefaultSectionSize">
-                 <number>125</number>
-                </attribute>
-                <attribute name="horizontalHeaderMinimumSectionSize">
-                 <number>130</number>
-                </attribute>
-                <column/>
-                <column/>
-                <column/>
-               </widget>
+              <item row="0" column="0" colspan="2">
+               <widget class="QComboBox" name="pointingComboBox"/>
               </item>
              </layout>
              <zorder>pointingAprioriSigmaTable</zorder>
-             <zorder>ckSolveDegreeSpinBox</zorder>
              <zorder>ckDegreeLabel</zorder>
              <zorder>ckDegreeSpinBox</zorder>
-             <zorder>ckSolveDegreeLabel</zorder>
              <zorder>fitOverPointingCheckBox</zorder>
+             <zorder>ckSolveDegreeSpinBox</zorder>
+             <zorder>ckSolveDegreeLabel</zorder>
              <zorder>twistCheckBox</zorder>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QPushButton" name="applySettingsPushButton">
-             <property name="text">
-              <string>Apply Settings to Selected Images</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0" rowspan="3">
-            <widget class="QTreeView" name="treeView">
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::ExtendedSelection</enum>
-             </property>
-             <property name="headerHidden">
-              <bool>true</bool>
-             </property>
+             <zorder>pointingComboBox</zorder>
             </widget>
            </item>
           </layout>
