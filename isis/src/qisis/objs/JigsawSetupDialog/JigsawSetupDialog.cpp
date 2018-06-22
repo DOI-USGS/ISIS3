@@ -1374,33 +1374,43 @@ namespace Isis {
 // Commented out since it contains some unimplemented functions (i.e. pseudo-code)
 
   void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
-    qDebug() << "top of on_applySettingsPushButton_clicked";
-    // Get the current selected images
-    ProjectItemModel *model = (ProjectItemModel *) m_ui->treeView->model();
-    // QItemSelectionModel *selectionModel = m_ui->treeView->selectionModel();
+
+    // Get the current selected images and the item models
+    SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model();
+    ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
+
     QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
+
+    // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
-      ProjectItem * projItem = (ProjectItem *) model->itemFromIndex(index);
-      if (projItem->isImage()) {
-        qDebug() << projItem->image()->fileName();
-      }
-      else if (projItem->isImageList()) {
-        foreach (Image *image,  *projItem->imageList()) {
-          qDebug() << image->fileName();
+      QModelIndex sourceIndex = proxyModel->mapToSource(index);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
+
+      if (projItem) {
+        // Tree traversal is top down so we dont need to do this check for imagelists?
+        if (projItem->isImage() && 
+            !selectedObservationNumbers.contains(projItem->image()->serialNumber())) {
+          selectedObservationNumbers.append(projItem->image()->serialNumber());
+        }
+        else if (projItem->isImageList()) {
+          foreach (Image *image,  *projItem->imageList()) {
+            // issue: if we pick an imagelist from treeview, we append all of its sources' chldrens'
+            // serial numbers, even if they arent on the proxy
+            selectedObservationNumbers.append(image->serialNumber());
+          }
         }
       }
     }
-      // Cast the data to image (i think ProjectItem shows QVariant conversions)
-      // Get the observation number from the image
-      // Append the observation number to the selectedObservationNumbers
-    
 
-    // // check to see if all the images are selected
+    qDebug() << "selectedObservationNumbers: " << selectedObservationNumbers;
 
-    // // If not, 
-    // {  
-    //   // We are going to need to reset the bundle observation solve settings list for bundle settings
+    // // // check to see if all the images are selected
+    // //           ---> do we have a way to know this???
+
+    // // // If not, 
+    // // {  
+    // // We are going to need to reset the bundle observation solve settings list for bundle settings
     //   QList<BundleObservationSolveSettings> solveSettingsList;
 
     //   // Grab the bundle settings
@@ -1416,15 +1426,12 @@ namespace Isis {
     //     foreach (observationNumber, selectedObservationNumbers) {
     //       bundleSettings->observationSolveSettings(i).removeObservationNumber(observationNumber);
     //     }
-    //   }
 
-    //   // Remove any existing solve settings that no longer have any observation numbers
-    //   for (int i = 0; i < bundleSettings.numberSolveSettings(); i++) {
+    //     // Remove any existing solve settings that no longer have any observation numbers
     //     if (! bundleSettings->observationSolveSettings(i).observationNumbers().isEmpty() ) {
     //       solveSettingsList.append(bundleSettings->observationSolveSettings(i));
     //     }
     //   }
-
 
     //   // Create a new bundle observation solve settings
     //   BundleObservationSolveSettings solveSettings;
@@ -1433,15 +1440,17 @@ namespace Isis {
     //     solveSettings.addObservationNumber(observationNumber);
     //   }
 
-    //   // Grab the data from the right hand side of the observation solve settings tab to set
-    //   // up the new bundle observation solve settings
-    //   updateBundleObservationSolveSettings(solveSettings);
+    //   // // Grab the data from the right hand side of the observation solve settings tab to set
+    //   // // up the new bundle observation solve settings
+    //   // updateBundleObservationSolveSettings(solveSettings);
 
     //   // Add the new solve settings to the solve settings list
     //   solveSettingsList.append(solveSettings);
 
     //   // Update bundle settings with the new list of bundle observation solve settings
     //   bundleSettings->setObservationSolveOptions(solveSettingsList);
+
+    //   qDebug() << "solveSettingsList: " << solveSettingsList;
 
     // } 
  
