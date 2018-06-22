@@ -103,10 +103,12 @@ namespace Isis {
     const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->positionComboBox->insertItems(0, positionOptions);
     m_ui->positionComboBox->setCurrentIndex(0);
+    m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
 
     const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->pointingComboBox->insertItems(0, pointingOptions);
     m_ui->pointingComboBox->setCurrentIndex(0);
+    m_ui->ckSolveDegreeSpinBox->setSpecialValueText("N/A");
 
 
     QStringList tableHeaders;
