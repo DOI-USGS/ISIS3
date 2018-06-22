@@ -130,6 +130,11 @@ namespace Isis {
    *                           bundleoutput.txt (Summary) file to the BundleSolution Statistics
    *                           node. Also changed the name of the Images node under Statistics to
    *                           Image to prevent Import Images to appear on it's context menu.
+   *   @history 2018-06-21 Tyler Wilson - Added the function selectedBOSSImages().  This is a
+   *                           refinement of selectedItems and is used by the JigsawSetupDialog
+   *                           Bundle Observation Solve Settings (BOSS) tab when displaying a
+   *                           subset of user-selected images.  References #497
+   *
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -155,6 +160,8 @@ namespace Isis {
 
       ProjectItem *currentItem();
       QList<ProjectItem *> selectedItems();
+      QList<ProjectItem *> selectedBOSSImages();
+
 
       void appendRow(ProjectItem *item);
       void clean();

@@ -20,7 +20,7 @@
 #include "ProjectItem.h"
 #include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
-#include "SubTreeProxyModel.h"
+#include "SortFilterProxyModel.h"
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
@@ -1467,38 +1467,30 @@ namespace Isis {
 
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
-    // Proof-of-
 
-    QList<ProjectItem *> selectedItems = m_project->directory()->model()->selectedItems();
+    QList<ProjectItem *> selectedBOSSItems = m_project->directory()->model()->selectedBOSSImages();
 
-    foreach(ProjectItem *item,selectedItems){
-      qDebug() << "Selected Item:  " << item->text();
-    }
-    qDebug() << "JigsawSetupDialog::createObservationSolveSettingsTreeView()";
-
-//    m_ui->treeView->setModel((QAbstractItemModel*)(m_project->directory()->model()));
     ProjectItemModel *model = m_project->directory()->model();
 
-    SubTreeProxyModel *osspm = new SubTreeProxyModel;
+    SortFilterProxyModel *osspm = new SortFilterProxyModel;
     osspm->setSourceModel(model);
 
-
-     //QModelIndex SubTreeProxyModel::mapFromSource(const QModelIndex &sourceIndex)
-    // find the root "Images" and set it in the proxy
-    //QStandardItem *item = model->invisibleRootItem()->child(0)->child(1);
-    //qDebug() << "ITEM: " << item << ", " << item->text();
-    //qDebug() << "PARENT: " << item->parent() << ", " << item->parent()->text();
-
-
-    // i think source model tries to add top root item, which is invalid???
-
+    //osspm->setDynamicSortFilter(true);
+    osspm->setSelectedItems(selectedBOSSItems );
     m_ui->treeView->setModel(osspm);
 
-    //Set the root index to display the subtree we are interested in.  This requires
-    //computing the proxy index from the source model.
-    if (selectedItems.count() > 0) {
-      m_ui->treeView->setRootIndex(osspm->mapFromSource(selectedItems[0]->index() ));
-    }
+
+
+
+         ProjectItem *imgRoot = model->findItemData(QVariant("Images"),0);
+         if (imgRoot) {
+
+            m_ui->treeView->setRootIndex(osspm->mapFromSource(imgRoot->index()));
+         }
+         else {
+          m_ui->treeView->setRootIndex(QModelIndex());
+         }
+    
 
     // Generate observation numbers for the images
     QStringList observationNumbers;
@@ -1514,7 +1506,10 @@ namespace Isis {
     // Add apply button to the tab view
     // set the text to bold?
 
+
   }
+
+
 
 
 // Commented out since it contains some unimplemented functions (i.e. pseudo-code)
@@ -1606,4 +1601,5 @@ namespace Isis {
   // void JigsawSetupDialog::generateObservationNumbers() {
 
   // }
+
 }
