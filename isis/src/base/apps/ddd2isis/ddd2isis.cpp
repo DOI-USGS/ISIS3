@@ -4,6 +4,7 @@
 #include "SpecialPixel.h"
 #include "FileName.h"
 #include "Pvl.h"
+#include <QMap>
 
 using namespace std;
 using namespace Isis;
@@ -89,7 +90,7 @@ void IsisMain() {
 
   // Maps the bit type of the file to the number of bytes of that type
   // Taken directly from a given python program that reads in ddd data
-  map<int, int> dataTypes = {
+  QMap<int, int> dataTypes = {
     {1450901768, 1},
     {1450902032, 2},
     {1450902288, 2},
@@ -109,20 +110,25 @@ void IsisMain() {
   int bitType = (int) readBytes.readLong;
 
   int dataTypeBytes;
-  //Old header format has no bit type
-  if (bitType == 0) {
-    dataTypeBytes = dataTypes.find(totalBandBits) -> second;
+  int nOffset;
+  // Check for new header format. Taken from the python program.
+  if ( (bitType & 0xfffff000) == 0x567b0000 ) {
+    dataTypeBytes = dataTypes.value(bitType);
+
+    // Read bytes 20-23 to get offset
+    // New header format may have different offsets
+    fin.read(readBytes.readChars, 4);
+    readBytes.readFloat = swp.Float(readBytes.readChars);
+    nOffset = (int) readBytes.readLong;
+    if (nOffset < 1024) {
+      nOffset = 1024;
+    }
   }
   else {
-    dataTypeBytes = dataTypes.find(bitType) -> second;
-  }
-
-  // Read bytes 20-23 to get offset
-  fin.read(readBytes.readChars, 4);
-  readBytes.readFloat = swp.Float(readBytes.readChars);
-  int nOffset = (int) readBytes.readLong;
-  if (nOffset < 1024) {
-    nOffset = 1024;
+    // Old header format does not have a bit type
+    // Old header format's offset is always 1024.
+     dataTypeBytes = dataTypes.value(totalBandBits);
+     nOffset = 1024;
   }
 
   fin.close();
