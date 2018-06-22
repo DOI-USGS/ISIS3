@@ -1375,7 +1375,7 @@ namespace Isis {
     if (currentIndex > 0) { 
       QTableWidgetItem *coefficient = new QTableWidgetItem();
       coefficient->setFlags(Qt::ItemIsEnabled);
-      coefficient->setText(QString::number(0));
+      coefficient->setText(QString::number(1));
       table->setItem(0, 0, coefficient);
 
       QTableWidgetItem *description = new QTableWidgetItem();
@@ -1401,7 +1401,7 @@ namespace Isis {
     if (currentIndex > 1) {
       QTableWidgetItem *coefficient = new QTableWidgetItem();
       coefficient->setFlags(Qt::ItemIsEnabled);
-      coefficient->setText(QString::number(1));
+      coefficient->setText(QString::number(2));
       table->setItem(1, 0, coefficient);
 
       QTableWidgetItem *description = new QTableWidgetItem();
@@ -1427,7 +1427,7 @@ namespace Isis {
     if (currentIndex > 2) {
       QTableWidgetItem *coefficient = new QTableWidgetItem();
       coefficient->setFlags(Qt::ItemIsEnabled);
-      coefficient->setText(QString::number(2));
+      coefficient->setText(QString::number(3));
       table->setItem(2, 0, coefficient);
 
       QTableWidgetItem *description = new QTableWidgetItem();
