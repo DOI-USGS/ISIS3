@@ -90,18 +90,17 @@ void IsisMain() {
 
   // Maps the bit type of the file to the number of bytes of that type
   // Taken directly from a given python program that reads in ddd data
-  QMap<int, int> dataTypes = {
-    {1450901768, 1},
-    {1450902032, 2},
-    {1450902288, 2},
-    {1450902560, 4},
-    {1450902816, 4},
-    {1450903072, 4},
-    {1450903360, 8},
-    {8, 1},
-    {16, 2},
-    {48, 2}
-  };
+  QMap<int, int> dataTypes;
+  dataTypes.insert(1450901768, 1);
+  dataTypes.insert(1450902032, 2);
+  dataTypes.insert(1450902288, 2);
+  dataTypes.insert(1450902560, 4);
+  dataTypes.insert(1450902816, 4);
+  dataTypes.insert(1450903072, 4);
+  dataTypes.insert(1450903360, 8);
+  dataTypes.insert(8, 1);
+  dataTypes.insert(16, 2);
+  dataTypes.insert(48, 2);
 
   // Read bytes 16-19 to get the bit type
   // Map the bit type to the number of bytes of that data type
