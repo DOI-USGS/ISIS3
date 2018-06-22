@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QMainWindow>
 #include <QMultiMap>
 #include <QObject>
 #include <QPointer>
@@ -39,6 +40,7 @@
 
 class QAction;
 class QDockWidget;
+class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -237,6 +239,14 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
+   *                           addFootprint2DView() now connects to enableControlNetTool() in
+   *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
+   *                           Removed  saveActiveControl() since users can save the control
+   *                           network with the project save button.
+   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
+   *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
+   *                           to allow for saving of the project at these times. Fixes #5114.
    *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
    *                           Fixes #5435.
    *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
@@ -362,6 +372,7 @@ namespace Isis {
     signals:
       void directoryCleaned();
       void newWarning();
+      void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
 
       void viewClosed(QWidget *widget);
@@ -385,7 +396,6 @@ namespace Isis {
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
-      void saveActiveControl();
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 

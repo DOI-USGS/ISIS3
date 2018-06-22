@@ -40,6 +40,8 @@
 #include <QDateTime>
 #include <QTreeView>
 #include <QVariant>
+#include <QTabWidget>
+
 
 #include "AbstractProjectItemView.h"
 #include "Directory.h"
@@ -76,26 +78,33 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-    QMdiArea *centralWidget = new QMdiArea;
-    centralWidget->setActivationOrder(QMdiArea::StackingOrder);
+//  QMdiArea *centralWidget = new QMdiArea;
+//  centralWidget->setActivationOrder(QMdiArea::StackingOrder);
 
-    connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
-            this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
+//  connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
+//          this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
 
+
+    QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+    //setDockOptions(GroupedDragging | AllowTabbedDocks);
+    //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    //centralWidget->hide();
     setDockNestingEnabled(true);
-
-    m_activeView = NULL;
 
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)), this, SLOT(removeView(QWidget *)));
+      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+              this, SLOT(removeView(QWidget *)));
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
+      connect(m_directory->project(), SIGNAL(projectSaved(Project *)),
+              this, SLOT(writeSettings(Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
               this, SLOT( raiseWarningTab() ) );
     }
@@ -115,6 +124,7 @@ namespace Isis {
     projectTreeView->treeView()->expandAll();
     projectTreeView->installEventFilter(this);
     m_projectDock->setWidget(projectTreeView);
+    m_projectDock->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
@@ -140,20 +150,10 @@ namespace Isis {
     m_directory->setHistoryContainer(historyDock);
     tabifyDockWidget(m_warningsDock, historyDock);
 
-//  QDockWidget *progressDock = new QDockWidget("Progress", this, Qt::SubWindow);
-//  progressDock->setObjectName("progressDock");
-//  progressDock->setFeatures(QDockWidget::DockWidgetClosable |
-//                       QDockWidget::DockWidgetMovable |
-//                       QDockWidget::DockWidgetFloatable);
-//  progressDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-//  //m_directory->setProgressContainer(progressDock);
-//  addDockWidget(Qt::BottomDockWidgetArea, progressDock);
-//  tabifyDockWidget(historyDock, progressDock);
-
     historyDock->raise();
 
-
     setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);
+
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
     setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     setCorner(Qt::BottomLeftCorner, Qt::BottomDockWidgetArea);
@@ -166,32 +166,13 @@ namespace Isis {
       statusBar()->addWidget(progressBar);
     }
 
-    createMenus();
+    // Read default app settings.  NOTE: This must be completed before initializing actions in order
+    // to read the recent projects from the config file.
+    readSettings(m_directory->project() );
+
     initializeActions();
-    updateMenuActions();
-
-    m_permToolBar = new QToolBar(this);
-    m_activeToolBar = new QToolBar(this);
-    m_toolPad = new QToolBar(this);
-
-    QSize iconSize(25, 45);
-
-    m_permToolBar->setIconSize(iconSize);
-    m_activeToolBar->setIconSize(iconSize);
-    m_toolPad->setIconSize(iconSize);
-
-    m_permToolBar->setObjectName("PermanentToolBar");
-    m_activeToolBar->setObjectName("ActiveToolBar");
-    m_toolPad->setObjectName("ToolPad");
-
-    addToolBar(m_permToolBar);
-    addToolBar(m_activeToolBar);
-    addToolBar(m_toolPad);
-    updateToolBarActions();
-
-    setTabbedViewMode();
-    centralWidget->setTabsMovable(true);
-    centralWidget->setTabsClosable(true);
+    createMenus();
+    createToolBars();
 
     QStringList args = QCoreApplication::arguments();
 
@@ -199,68 +180,62 @@ namespace Isis {
       OpenProjectWorkOrder *workorder = new OpenProjectWorkOrder(m_directory->project());
       workorder->execute();
     }
-
-    // ken testing  If this is used, we will not need to call updateMenuActions() or updateToolBar()
-    // above.  They are both called from setActiveView.
-    //  setActiveView(projectTreeView);
-    // ken testing
   }
 
 
   /**
-   * This is connected from Directory's newWidgetAvailable signal and called when re-attaching a
-   * view which was detached from the MDI main window.
+   * This is connected from Directory's newWidgetAvailable signal
    *
    * @param[in] newWidget (QWidget *)
    */
-  void IpceMainWindow::addView(QWidget *newWidget) {
+  void IpceMainWindow::addView(QWidget *newWidget, Qt::DockWidgetArea area,
+                               Qt::Orientation orientation) {
+
+    QDockWidget *dock = new QDockWidget(newWidget->windowTitle(), this);
+    dock->setWidget(newWidget);
+    dock->setObjectName(newWidget->windowTitle());
+    dock->setAttribute(Qt::WA_DeleteOnClose);
+    dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+                      QDockWidget::DockWidgetFloatable);
+
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||
          qobject_cast<TemplateEditorWidget *>(newWidget)) {
-      QDockWidget *dock = new QDockWidget( newWidget->windowTitle() );
-      dock->setAttribute(Qt::WA_DeleteOnClose, true);
-      dock->setWidget(newWidget);
-      dock->setObjectName(newWidget->windowTitle());
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
     }
     else {
-      if ( QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() ) ) {
-        mdiArea->addSubWindow(newWidget);
-        newWidget->show();
-        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(newWidget));
-        setActiveView(qobject_cast<AbstractProjectItemView *>(newWidget));
-      }
+      addDockWidget(area, dock, orientation);
+    }
+
+    // Connections for cleanup in both directions to make sure both views and docks are cleaned up
+    connect(newWidget, SIGNAL(destroyed(QObject *)), dock, SLOT(deleteLater()));
+    connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
+    // The list of dock widgets needs cleanup as each view is destroyed
+    connect(dock, SIGNAL(destroyed(QObject *)),
+            this, SLOT(cleanupViewDockList(QObject *)));
+
+    // Save view docks for cleanup during a project close
+    m_viewDocks.append(dock);
+  }
+
+
+  void IpceMainWindow::cleanupViewDockList(QObject *obj) {
+    QDockWidget *dock = static_cast<QDockWidget *>(obj);
+    if (dock) {
+      m_viewDocks.removeAll(dock);
     }
   }
 
 
   /**
-   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will 
-   * close the given QMdiSubWindow from the QMdiArea.  This will also delete the widget contained 
-   * within the subwindow which is an AbstractProjectItemView. 
-   * 
-   * @param view QWidget* 
+   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
+   * close the given view and delete the view. This was written to handle
    *
+   * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-
-    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-    if (mdiArea){
-      // Get all QMdiSubWindows, then find subwindow that hold widget
-      QList<QMdiSubWindow *> subWindowList = mdiArea->subWindowList();
-      foreach (QMdiSubWindow *sub, subWindowList) {
-        if (sub->widget() == view) {
-          sub->close();
-          break;
-        }
-      }
-//    QMdiSubWindow *window = qobject_cast<QMdiSubWindow *>(view);
-//    qDebug()<<"IpceMainWindow::removeView activewindow = "<<window;
-//    mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(view));
-//    qDebug()<<"IpceMainWindow::removeView";
-//    mdiArea->closeActiveSubWindow();
-      delete view;
-    }
+    view->close();
+    delete view;
   }
 
 
@@ -269,29 +244,14 @@ namespace Isis {
    */
   void IpceMainWindow::removeAllViews() {
     setWindowTitle("ipce");
-    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-    if (mdiArea){
-//    QMdiSubWindow* window = new QMdiSubWindow();
-//    window->show();
-//    window->activateWindow();
-//    mdiArea->addSubWindow(window);
-      mdiArea->closeAllSubWindows();
-//    delete window;
-    }
-    if (!m_detachedViews.isEmpty()) {
-      foreach ( QMainWindow* view, m_detachedViews ) {
-        view->close();
+    foreach (QDockWidget *dock, m_viewDocks) {
+      if (dock) {
+        removeDockWidget(dock);
+        m_viewDocks.removeAll(dock);
+        delete dock;
       }
     }
-
-    QList<QDockWidget *> docks = tabifiedDockWidgets(m_projectDock);
-    if(docks.count() > 1) {
-      foreach ( QDockWidget* widget, docks ) {
-        if(widget != m_projectDock) {
-          delete widget;
-        }
-      }
-    }
+    m_viewDocks.clear();
   }
 
 
@@ -300,178 +260,6 @@ namespace Isis {
    */
   IpceMainWindow::~IpceMainWindow() {
     m_directory->deleteLater();
-  }
-
-
-  /**
-   * Sets the active view and updates the toolbars and menus.
-   *
-   * @param[in] view (AbstractProjectItemView *) The active view.
-   */
-  void IpceMainWindow::setActiveView(AbstractProjectItemView *view) {
-    m_activeView = view;
-    updateMenuActions();
-    updateToolBarActions();
-  }
-
-
-  /**
-   * Clears all the menus, then populates the menus with QActions from
-   * several sources. The QActions come from an internal list of
-   * QActions, the Directory, and the active view.
-   */
-  void IpceMainWindow::updateMenuActions() {
-
-    m_fileMenu->clear();
-    // Get Directory FileMenu actions
-    foreach ( QAction *action, m_directory->fileMenuActions() ) {
-      m_fileMenu->addAction(action);
-    }
-    m_fileMenu->addSeparator();
-    // Get FileMenu actions for the active view (eg. CubeDnView, Footprint2DView)
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->fileMenuActions() ) {
-        m_fileMenu->addAction(action);
-      }
-    }
-    m_fileMenu->addSeparator();
-    // Get FileMenu actions from the ipceMainWindow, Exit is the only action
-    foreach ( QAction *action, m_fileMenuActions ) {
-      m_fileMenu->addAction(action);
-    }
-
-    m_projectMenu->clear();
-    //  Get Project menu actions from Directory
-    foreach ( QAction *action, m_directory->projectMenuActions() ) {
-      m_projectMenu->addAction(action);
-    }
-    m_projectMenu->addSeparator();
-    //  Get Project menu actions from the active view
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->projectMenuActions() ) {
-        m_projectMenu->addAction(action);
-      }
-    }
-    m_projectMenu->addSeparator();
-    //  Get Project menu actions from IpceMainWindow
-    foreach ( QAction *action, m_projectMenuActions ) {
-      m_projectMenu->addAction(action);
-    }
-
-    m_editMenu->clear();
-    // Get Edit menu actions from Directory
-    foreach ( QAction *action, m_directory->editMenuActions() ) {
-      m_editMenu->addAction(action);
-    }
-    m_editMenu->addSeparator();
-    // Get Edit menu actions from active view
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->editMenuActions() ) {
-        m_editMenu->addAction(action);
-      }
-    }
-    m_editMenu->addSeparator();
-    // Get Edit menu actions from IpceMainWindow
-    foreach ( QAction *action, m_editMenuActions ) {
-      m_editMenu->addAction(action);
-    }
-
-    m_viewMenu->clear();
-    // Get View menu actions from Directory
-    foreach ( QAction *action, m_directory->viewMenuActions() ) {
-      m_viewMenu->addAction(action);
-    }
-    m_viewMenu->addSeparator();
-    // Get View menu actions from IpceMainWindow
-    foreach ( QAction *action, m_viewMenuActions ) {
-      m_viewMenu->addAction(action);
-    }
-    m_viewMenu->addSeparator();
-    // Get View menu actions from active view
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->viewMenuActions() ) {
-        m_viewMenu->addAction(action);
-      }
-    }
-
-    m_settingsMenu->clear();
-    // Get Settings menu actions from Directory
-    foreach ( QAction *action, m_directory->settingsMenuActions() ) {
-      m_settingsMenu->addAction(action);
-    }
-    m_settingsMenu->addSeparator();
-    // Get Settings menu actions from active view
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->settingsMenuActions() ) {
-        m_settingsMenu->addAction(action);
-      }
-    }
-    m_settingsMenu->addSeparator();
-    // Get Settings menu actions from IpceMainWindow
-    foreach ( QAction *action, m_settingsMenuActions ) {
-      m_settingsMenu->addAction(action);
-    }
-
-    m_helpMenu->clear();
-    // Get Help menu actions from Directory
-    foreach ( QAction *action, m_directory->helpMenuActions() ) {
-      m_helpMenu->addAction(action);
-    }
-    m_helpMenu->addSeparator();
-    // Get Help menu actions from active view
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->helpMenuActions() ) {
-        m_helpMenu->addAction(action);
-      }
-    }
-    m_helpMenu->addSeparator();
-    // Get Help menu actions from IpceMainWindow
-    foreach ( QAction *action, m_helpMenuActions ) {
-      m_helpMenu->addAction(action);
-    }
-  }
-
-
-  /**
-   * Clears the tool bars and repopulates them with QActions from
-   * several sources. Actions are taken from an internal list of
-   * QActions, the Directory, and the active view.
-   */
-  void IpceMainWindow::updateToolBarActions() {
-
-    m_permToolBar->clear();
-    foreach ( QAction *action, m_directory->permToolBarActions() ) {
-      m_permToolBar->addAction(action);
-    }
-    foreach (QAction *action, m_permToolBarActions) {
-      if (action->text() == "&Save Active Control Network") {
-        m_permToolBar->addSeparator();
-      }
-      m_permToolBar->addAction(action); 
-      if (action->text() == "&Save Active Control Network") {
-        m_permToolBar->addSeparator();
-      }
-    }
-    m_permToolBar->addSeparator();
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->permToolBarActions() ) {
-        m_permToolBar->addAction(action);
-      }
-    }
-
-    m_activeToolBar->clear();
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->activeToolBarActions() ) {
-        m_activeToolBar->addAction(action);
-      }
-    }
-
-    m_toolPad->clear();
-    if (m_activeView) {
-      foreach ( QAction *action, m_activeView->toolPadActions() ) {
-        m_toolPad->addAction(action);
-      }
-    }
   }
 
 
@@ -554,29 +342,9 @@ namespace Isis {
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
 
-    QAction *saveNet = new QAction("&Save Active Control Network", this);
-    saveNet->setIcon( QIcon::fromTheme("document-save") );
-    saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
-    saveNet->setToolTip("Save current active control network");
-    saveNet->setStatusTip("Save current active control network");
-    QString whatsThis = "<b>Function:</b> Saves the current active<i>"
-                        "control network</i>";
-    saveNet->setWhatsThis(whatsThis);
-    connect(saveNet, SIGNAL(triggered()), m_directory, SLOT(saveActiveControl()));
-    m_permToolBarActions.append(saveNet);
-
-//  m_saveAsNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSaveAs.png"),
-//                            "Save Control Network &As...",
-//                            m_matchTool);
-//  m_saveAsNet->setToolTip("Save current control network to chosen file");
-//  m_saveAsNet->setStatusTip("Save current control network to chosen file");
-//  whatsThis = "<b>Function:</b> Saves the current <i>"
-//      "control network</i> under chosen filename";
-//  m_saveAsNet->setWhatsThis(whatsThis);
-//  connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
-
-
-
+    QAction *tabViewsAction = new QAction("Tab Views", this);
+    connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
+    m_viewMenuActions.append(tabViewsAction);
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -587,26 +355,16 @@ namespace Isis {
     m_editMenuActions.append(undoAction);
     m_editMenuActions.append(redoAction);
 
+//  m_cascadeViewsAction = new QAction("Cascade Views", this);
+//  connect(m_cascadeViewsAction, SIGNAL( triggered() ),
+//          centralWidget(), SLOT( cascadeSubWindows() ) );
+//  m_viewMenuActions.append(m_cascadeViewsAction);
+//
+//  m_tileViewsAction = new QAction("Tile Views", this);
+//  connect(m_tileViewsAction, SIGNAL( triggered() ),
+//          centralWidget(), SLOT( tileSubWindows() ) );
+//  m_viewMenuActions.append(m_tileViewsAction);
 
-    QAction *viewModeAction = new QAction("Toggle View Mode", this);
-    connect(viewModeAction, SIGNAL( triggered() ),
-            this, SLOT( toggleViewMode() ) );
-    m_viewMenuActions.append(viewModeAction);
-
-    m_cascadeViewsAction = new QAction("Cascade Views", this);
-    connect(m_cascadeViewsAction, SIGNAL( triggered() ),
-            centralWidget(), SLOT( cascadeSubWindows() ) );
-    m_viewMenuActions.append(m_cascadeViewsAction);
-
-    m_tileViewsAction = new QAction("Tile Views", this);
-    connect(m_tileViewsAction, SIGNAL( triggered() ),
-            centralWidget(), SLOT( tileSubWindows() ) );
-    m_viewMenuActions.append(m_tileViewsAction);
-
-    QAction *detachActiveViewAction = new QAction("Detach Active View", this);
-    connect(detachActiveViewAction, SIGNAL( triggered() ),
-            this, SLOT( detachActiveView() ) );
-    m_viewMenuActions.append(detachActiveViewAction);
 
     QAction *threadLimitAction = new QAction("Set Thread &Limit", this);
     connect(threadLimitAction, SIGNAL(triggered()),
@@ -624,21 +382,32 @@ namespace Isis {
     connect(activateWhatsThisAct, SIGNAL(triggered()), this, SLOT(enterWhatsThisMode()));
 
     m_helpMenuActions.append(activateWhatsThisAct);
-
-    readSettings(m_directory->project() );
   }
 
 
   /**
-   * Creates the main menus of the menu bar.
+   * Creates and fills the application menus of the menu bar.
    */
   void IpceMainWindow::createMenus() {
+
     m_fileMenu = menuBar()->addMenu(tr("&File"));
     m_fileMenu->setObjectName("fileMenu");
+    // Get Directory FileMenu actions
+    foreach ( QAction *action, m_directory->fileMenuActions() ) {
+      m_fileMenu->addAction(action);
+    }
+    m_fileMenu->addSeparator();
+    // Get FileMenu actions from the ipceMainWindow, Exit is the only action
+    foreach ( QAction *action, m_fileMenuActions ) {
+      m_fileMenu->addAction(action);
+    }
 
     m_projectMenu = menuBar()->addMenu(tr("&Project"));
     m_projectMenu->setObjectName("projectMenu");
-
+    //  Get Project menu actions from Directory
+    foreach ( QAction *action, m_directory->projectMenuActions() ) {
+      m_projectMenu->addAction(action);
+    }
     // Allow tool tips to be displayed for the project menu's actions (e.g. "Bundle Adjustment")
     // This is a work around for Qt's what this text not working on disabled actions
     // (even though the Qt documentation says it should work on disabled QAction's).
@@ -646,15 +415,72 @@ namespace Isis {
 
     m_editMenu = menuBar()->addMenu(tr("&Edit"));
     m_editMenu->setObjectName("editMenu");
+    m_editMenu->addSeparator();
+    // Get Edit menu actions from Directory
+    foreach ( QAction *action, m_directory->editMenuActions() ) {
+      m_editMenu->addAction(action);
+    }
+    // Get Edit menu actions from IpceMainWindow
+    foreach ( QAction *action, m_editMenuActions ) {
+      m_editMenu->addAction(action);
+    }
 
     m_viewMenu = menuBar()->addMenu("&View");
     m_viewMenu->setObjectName("viewMenu");
+    // Get View menu actions from Directory
+    foreach ( QAction *action, m_directory->viewMenuActions() ) {
+      m_viewMenu->addAction(action);
+    }
+    m_viewMenu->addSeparator();
+    // Get View menu actions from IpceMainWindow
+    foreach ( QAction *action, m_viewMenuActions ) {
+      m_viewMenu->addAction(action);
+    }
 
     m_settingsMenu = menuBar()->addMenu("&Settings");
     m_settingsMenu->setObjectName("settingsMenu");
+    // Get Settings menu actions from Directory
+    foreach ( QAction *action, m_directory->settingsMenuActions() ) {
+      m_settingsMenu->addAction(action);
+    }
+    m_settingsMenu->addSeparator();
+    // Get Settings menu actions from IpceMainWindow
+    foreach ( QAction *action, m_settingsMenuActions ) {
+      m_settingsMenu->addAction(action);
+    }
 
     m_helpMenu = menuBar()->addMenu("&Help");
     m_helpMenu->setObjectName("helpMenu");
+    // Get Help menu actions from Directory
+    foreach ( QAction *action, m_directory->helpMenuActions() ) {
+      m_helpMenu->addAction(action);
+    }
+    m_helpMenu->addSeparator();
+    // Get Help menu actions from IpceMainWindow
+    foreach ( QAction *action, m_helpMenuActions ) {
+      m_helpMenu->addAction(action);
+    }
+  }
+
+
+  /**
+   * Create the tool bars and populates them with QActions from several sources. Actions are taken
+   * from an internal list of QActions and the Directory.
+   */
+  void IpceMainWindow::createToolBars() {
+    m_permToolBar = new QToolBar(this);
+    QSize iconSize(25, 45);
+    m_permToolBar->setIconSize(iconSize);
+    m_permToolBar->setObjectName("PermanentToolBar");
+    addToolBar(m_permToolBar);
+
+    foreach ( QAction *action, m_directory->permToolBarActions() ) {
+      m_permToolBar->addAction(action);
+    }
+
+    foreach (QAction *action, m_permToolBarActions) {
+      m_permToolBar->addAction(action);
+    }
   }
 
 
@@ -678,7 +504,7 @@ namespace Isis {
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
    */
-  void IpceMainWindow::writeSettings(const Project *project) const {
+  void IpceMainWindow::writeSettings(Project *project) {
 
     // Ensure that we are not using a NULL pointer
     if (!project) {
@@ -696,10 +522,10 @@ namespace Isis {
           .expanded(),
         QSettings::NativeFormat);
 
-    projectSettings.setValue("geometry", saveGeometry());
+    projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
-    projectSettings.setValue("size", size());
-    projectSettings.setValue("pos", pos());
+//  projectSettings.setValue("size", size());
+//  projectSettings.setValue("pos", pos());
 
     projectSettings.setValue("maxThreadCount", m_maxThreadCount);
 
@@ -795,72 +621,73 @@ namespace Isis {
       QString msg = "Cannot read settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    if (project->name() == "Project") {
-      setWindowTitle("ipce");
-    }
-    else {
-      setWindowTitle( project->name() );
-      QString projName = project->name();
-      setWindowTitle(projName );
-    }
+
     QString appName = QApplication::applicationName();
 
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-        .expanded(), QSettings::NativeFormat);
+          .expanded(), QSettings::NativeFormat);
 
-    restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("windowState").toByteArray());
+    // General settings
+    if (project->name() == "Project") {
+      setWindowTitle("ipce");
 
-    QStringList projectNameList;
-    QStringList projectPathList;
-    settings.beginGroup("recent_projects");
-    QStringList keys = settings.allKeys();
+      QStringList projectNameList;
+      QStringList projectPathList;
+      settings.beginGroup("recent_projects");
+      QStringList keys = settings.allKeys();
+      QRegExp underscore("%%%%%");
 
-    QRegExp underscore("%%%%%");
-
-    foreach (QString key, keys) {
-      QString childKey = "recent_projects/"+key;
-      QString projectPath = settings.value(key).toString();
-      QString projectName = projectPath.split("/").last();
-      projectPathList.append(projectPath) ;
-      projectNameList.append(projectName);
-    }
-
-    settings.endGroup();
-
-    QStringList projectPathReverseList;
-
-    for (int i = projectPathList.count()-1;i>=0;i--) {
-      projectPathReverseList.append(projectPathList[i]);
-    }
-
-    QStringList projectPathListTruncated;
-
-    int i =0;
-
-    foreach (QString proj,projectPathReverseList) {
-      if (i <= m_maxRecentProjects) {
-        projectPathListTruncated.append(proj);
-        i++;
+      foreach (QString key, keys) {
+        QString childKey = "recent_projects/"+key;
+        QString projectPath = settings.value(key).toString();
+        QString projectName = projectPath.split("/").last();
+        projectPathList.append(projectPath) ;
+        projectNameList.append(projectName);
       }
-      else
-        break;
-     }
 
+      settings.endGroup();
 
-    m_directory->setRecentProjectsList(projectPathListTruncated);
-    m_directory->updateRecentProjects();
+      QStringList projectPathReverseList;
+      for (int i = projectPathList.count()-1;i>=0;i--) {
+        projectPathReverseList.append(projectPathList[i]);
+      }
 
-    // The geom/state isn't enough for main windows to correctly remember
-    //   their position and size, so let's restore those on top of
-    //   the geom and state.
-    if (!settings.value("pos").toPoint().isNull())
-      move(settings.value("pos").toPoint());
+      QStringList projectPathListTruncated;
 
-    m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
-    applyMaxThreadCount();
+      int i =0;
 
+      foreach (QString proj,projectPathReverseList) {
+        if (i <= m_maxRecentProjects) {
+          projectPathListTruncated.append(proj);
+          i++;
+        }
+        else
+          break;
+       }
+
+      m_directory->setRecentProjectsList(projectPathListTruncated);
+      m_directory->updateRecentProjects();
+      m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
+      applyMaxThreadCount();
+    }
+    //  Project specific settings
+    else {
+      setWindowTitle( project->name() );
+      if (settings.contains("geometry")) {
+        setGeometry(settings.value("geometry").value<QRect>());
+      }
+      if (settings.contains("windowState")) {
+        restoreState(settings.value("windowState").toByteArray());
+      }
+
+      // The geom/state isn't enough for main windows to correctly remember
+      //   their position and size, so let's restore those on top of
+      //   the geom and state.
+      if (!settings.value("pos").toPoint().isNull()) {
+        move(settings.value("pos").toPoint());
+      }
+    }
   }
 
 
@@ -942,220 +769,23 @@ namespace Isis {
 
 
   /**
-   * Slot to connect to the subWindowActivated signal from the central
-   * QMdiArea. Updates the active view to the active sub window, or
-   * sets it to null if the active window is not an AbstractProjectItemView.
-   *
-   * @param[in] window (QMdiSubWindow *) The active sub window.
+   * Tabs all open attached/detached views
    */
-  void IpceMainWindow::onSubWindowActivated(QMdiSubWindow * window) {
-    if (window) {
-      setActiveView( qobject_cast<AbstractProjectItemView *>( window->widget() ) );
-    }
-    else {
-      setActiveView(0);
-    }
-  }
+  void IpceMainWindow::tabViews() {
+    // tabifyDockWidget() takes two widgets and tabs them, so an easy way to do
+    // this is to grab the first view and tab the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
 
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tabbed. If it is attached,
+      // this will have no affect.
+      currentView->setFloating(false);
 
-  /**
-   * Toggles the view mode of the central QMdiArea between tabbed and
-   * sub window mode.
-   */
-  void IpceMainWindow::toggleViewMode() {
-    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-    if (mdiArea->viewMode() == QMdiArea::SubWindowView) {
-      setTabbedViewMode();
-    }
-    else {
-      setSubWindowViewMode();
-    }
-  }
-
-
-  /**
-   * Sets the QMdiArea in the central widget to the tabbed view mode
-   * and updates the appropriate actions.
-   */
-  void IpceMainWindow::setTabbedViewMode() {
-    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-    mdiArea->setViewMode(QMdiArea::TabbedView);
-    m_cascadeViewsAction->setEnabled(false);
-    m_tileViewsAction->setEnabled(false);
-  }
-
-
-  /**
-   * Sets the QMdiArea in the central widget to the sub window view
-   * mode and updates the appropriate actions.
-   */
-  void IpceMainWindow::setSubWindowViewMode() {
-    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-    mdiArea->setViewMode(QMdiArea::SubWindowView);
-    m_cascadeViewsAction->setEnabled(true);
-    m_tileViewsAction->setEnabled(true);
-  }
-
-  /**
-   * Closes the detached window and removes it from the m_detachedViews list
-   */
-  void IpceMainWindow::closeDetachedView() {
-
-    ViewSubWindow *viewWindow = qobject_cast<ViewSubWindow *>( sender() );
-
-    if (!viewWindow) {
-      return;
-    }
-
-    m_detachedViews.removeAt(m_detachedViews.indexOf(viewWindow));
-    viewWindow->close();
-  }
-
-
-  /**
-   * Moves the active view from the mdi area to its own independent
-   * window. The view, its toolbars, and menu actions, are removed
-   * from the main window and placed in an independent
-   * QMainWindow. The new window contains the view as well as its
-   * toolbars and menu actions. A detached view will not be set as the
-   * active view when it is activated.
-   */
-  void IpceMainWindow::detachActiveView() {
-    AbstractProjectItemView *view = m_activeView;
-
-    if (!m_activeView) {
-      return;
-    }
-
-    QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-    if (mdiArea) {
-      mdiArea->removeSubWindow(view);
-      mdiArea->closeActiveSubWindow();
-    }
-
-    ViewSubWindow *newWindow = new ViewSubWindow(this, Qt::Window);
-
-    connect( newWindow, SIGNAL( closeWindow() ),
-             this, SLOT( closeDetachedView() ) );
-
-    connect( newWindow, SIGNAL( closeWindow() ),
-             view, SLOT( deleteLater() ) );
-
-    m_detachedViews.append(newWindow);
-    newWindow->setCentralWidget(view);
-    newWindow->setWindowTitle( view->windowTitle() );
-
-    if ( !view->permToolBarActions().isEmpty() ) {
-      QToolBar *permToolBar = new QToolBar(newWindow);
-      foreach ( QAction *action, view->permToolBarActions() ) {
-        permToolBar->addAction(action);
+      if (currentView == firstView) {
+        continue;
       }
-      newWindow->addToolBar(permToolBar);
+      tabifyDockWidget(firstView, currentView);
     }
-
-    if ( !view->activeToolBarActions().isEmpty() ) {
-      QToolBar *activeToolBar = new QToolBar(newWindow);
-      foreach ( QAction *action, view->activeToolBarActions() ) {
-        activeToolBar->addAction(action);
-      }
-      newWindow->addToolBar(activeToolBar);
-    }
-
-    if ( !view->toolPadActions().isEmpty() ) {
-      QToolBar *toolPad = new QToolBar(newWindow);
-      foreach ( QAction *action, view->toolPadActions() ) {
-        toolPad->addAction(action);
-      }
-      newWindow->addToolBar(Qt::RightToolBarArea, toolPad);
-    }
-
-    QMenuBar *menuBar = new QMenuBar(newWindow);
-    newWindow->setMenuBar(menuBar);
-
-    if ( !view->fileMenuActions().isEmpty() ) {
-      QMenu *fileMenu = new QMenu("&File", newWindow);
-      foreach ( QAction *action, view->fileMenuActions() ) {
-        fileMenu->addAction(action);
-      }
-      menuBar->addMenu(fileMenu);
-    }
-
-    if ( !view->projectMenuActions().isEmpty() ) {
-      QMenu *projectMenu = new QMenu("&Project", newWindow);
-      foreach ( QAction *action, view->projectMenuActions() ) {
-        projectMenu->addAction(action);
-      }
-      menuBar->addMenu(projectMenu);
-    }
-
-    if ( !view->editMenuActions().isEmpty() ) {
-      QMenu *editMenu = new QMenu("&Edit", newWindow);
-      foreach ( QAction *action, view->editMenuActions() ) {
-        editMenu->addAction(action);
-      }
-      menuBar->addMenu(editMenu);
-    }
-
-    QAction *reattachAction = new QAction("Reattach View", newWindow);
-    connect( reattachAction, SIGNAL( triggered() ),
-             this, SLOT( reattachView() ) );
-
-    QMenu *viewMenu = new QMenu("&View", newWindow);
-
-    viewMenu->addAction(reattachAction);
-
-    if ( !view->viewMenuActions().isEmpty() ) {
-      foreach ( QAction *action, view->viewMenuActions() ) {
-        viewMenu->addAction(action);
-      }
-    }
-    menuBar->addMenu(viewMenu);
-
-    if ( !view->settingsMenuActions().isEmpty() ) {
-      QMenu *settingsMenu = new QMenu("S&ettings", newWindow);
-      foreach ( QAction *action, view->settingsMenuActions() ) {
-        settingsMenu->addAction(action);
-      }
-      menuBar->addMenu(settingsMenu);
-    }
-
-    if ( !view->helpMenuActions().isEmpty() ) {
-      QMenu *helpMenu = new QMenu("&Help", newWindow);
-      foreach ( QAction *action, view->helpMenuActions() ) {
-        helpMenu->addAction(action);
-      }
-      menuBar->addMenu(helpMenu);
-    }
-    newWindow->show();
-  }
-
-
-  /**
-   * Reattaches a detached view. This slot can only be called by a QAction
-   * from a QMainWindow that contains the view. The view is added to
-   * the main window and the window that previously contained it is
-   * deleted.
-   */
-  void IpceMainWindow::reattachView() {
-    QAction *reattachAction = qobject_cast<QAction *>( sender() );
-    if (!reattachAction) {
-      return;
-    }
-
-    QMainWindow *viewWindow = qobject_cast<QMainWindow *>( reattachAction->parent() );
-    if (!viewWindow) {
-      return;
-    }
-
-    AbstractProjectItemView *view = qobject_cast<AbstractProjectItemView *>( viewWindow->centralWidget() );
-    if (!view) {
-      return;
-    }
-
-    view->setParent(this);
-    viewWindow->deleteLater();
-
-    addView(view);
   }
 
 
@@ -1165,5 +795,4 @@ namespace Isis {
   void IpceMainWindow::raiseWarningTab() {
     m_warningsDock->raise();
   }
-
 }
