@@ -123,10 +123,23 @@ void IsisMain() {
       bundleSolution->outputResiduals();
     }
     
-    bundleSolution->outputLidarCSV();
+    // write lidar csv output file
+    if (ui.GetBoolean("LIDAR_CSV")) {
+      bundleSolution->outputLidarCSV();
+    }
 
     // write updated control net
     bundleAdjustment->controlNet()->Write(ui.GetFileName("ONET"));
+
+    // write updated lidar data file
+    if (ui.WasEntered("LIDARDATA")) {
+      if (ui.GetString("OLIDARFORMAT") == "JSON") {
+        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Json);
+      }
+      else {
+        bundleAdjustment->lidarData()->write(ui.GetFileName("OLIDARDATA"),LidarData::Format::Binary);
+      }
+    }
 
     PvlGroup gp("JigsawResults");
     

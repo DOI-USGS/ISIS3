@@ -260,6 +260,9 @@
       BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
       ownership from BundleAdjust.
     </change>
+    <change name="Ken Edmundson" date="2018-06-22">
+      Added output of lidar adjusted csv file and output of adjusted lidar data file.
+    </change>
   </history>
 
   <groups>
@@ -314,6 +317,7 @@
           *.net
         </filter>
       </parameter>
+
       <parameter name="ONET">
         <type>filename</type>
         <fileMode>output</fileMode>
@@ -329,6 +333,7 @@
           *.net
         </filter>
       </parameter>
+
       <parameter name="LIDARDATA">
         <type>filename</type>
         <internalDefault>none</internalDefault>
@@ -340,9 +345,54 @@
         This file is a <def>lidar point data</def> generated from <b>lrolola2isis.cpp</b>.
         It contains <def>lidar control point</def>s and associated measures for simultaneous images.
         </description>
+        <exclusions>
+        </exclusions>
         <filter>
           *.dat *.json
         </filter>
+      </parameter>
+
+      <parameter name="OLIDARDATA">
+        <type>filename</type>
+        <internalDefault>none</internalDefault>
+        <fileMode>output</fileMode>
+        <brief>
+          Output lidar data file
+        </brief>
+        <description>
+          This output file contains the adjusted <def>lidar data</def> with
+          the final coordinates of the <def>lidar point</def>s and residuals for each
+          measurement.
+        </description>
+        <filter>
+          *.dat *.json
+        </filter>
+      </parameter>
+
+      <parameter name="OLIDARFORMAT">
+        <type>string</type>
+        <brief> Output lidar data file format</brief>
+        <default>
+          <item>BINARY</item>
+        </default>
+        <description>
+          Output lidar data file format.
+        </description>
+        <list>
+          <option value="BINARY">
+            <brief> Output lidar data in binary format</brief>
+            <description>
+              Output lidar data in binary format.
+            </description>
+          </option>
+
+          <option value="JSON">
+            <brief> Output lidar data in json format </brief>
+            <description>
+              Output lidar data in json format.
+            </description>
+          </option>
+        </list>
       </parameter>
 
  <!-- Turning off USEPVL and SC_PARAMETERS for now. Since we are now using observation numbers
@@ -1246,6 +1296,18 @@
           <type>boolean</type>
           <default>
             <item>yes</item>
+          </default>
+        </parameter>
+
+        <parameter name="LIDAR_CSV">
+          <brief> Outputs lidar data to csv file - lidar.csv</brief>
+          <description>
+            Selection of this parameter flags output of lidar data
+            points to a csv file
+          </description>
+          <type>boolean</type>
+          <default>
+            <item>no</item>
           </default>
         </parameter>
       </group>
