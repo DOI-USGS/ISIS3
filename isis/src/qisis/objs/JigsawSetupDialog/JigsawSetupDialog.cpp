@@ -98,17 +98,25 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
-
     createObservationSolveSettingsTreeView();
-    m_ui->spkSolveDegreeSpinBox->setValue(-1);
+
+    const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
+    m_ui->positionComboBox->insertItems(0, positionOptions);
+    m_ui->positionComboBox->setCurrentIndex(0);
+
+    const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
+    m_ui->pointingComboBox->insertItems(0, pointingOptions);
+    m_ui->pointingComboBox->setCurrentIndex(0);
 
     QStringList tableHeaders;
-    tableHeaders << "coefficients" << "a priori sigma" << "units";
+    tableHeaders << "coefficients" << "description" << "units" << "a priori sigma";
     m_ui->positionAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
-    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)));
-    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)));
-    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)));
+    // @todo @irh figure out how to resize the column headers more appropriately / generically
+    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
 
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
@@ -1064,35 +1072,36 @@ namespace Isis {
 
 
   void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int arg1) {
-    if (arg1 == -1) {
-      m_ui->spkSolveDegreeSpinBox->setSuffix("(NONE)");
-      m_ui->positionAprioriSigmaTable->setRowCount(0);
-    }
-    m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
-    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
 
-    if (arg1 == 0) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("POSITION");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("meters");
-      //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
-    }
-    else if (arg1 == 1) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("VELOCITY");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("m/sec");
-    }
-    else if (arg1 == 2) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("ACCELERATION");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("m/s^2");
-    }
+    // if (arg1 == -1) {
+    //   m_ui->spkSolveDegreeSpinBox->setSuffix("(NONE)");
+    //   m_ui->positionAprioriSigmaTable->setRowCount(0);
+    // }
+    // m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
+    // m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
+
+    // if (arg1 == 0) {
+    //   QTableWidgetItem *twItem = new QTableWidgetItem();
+    //   twItem->setText("POSITION");
+    //   m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+    //   QTableWidgetItem *twItemunits = new QTableWidgetItem();
+    //   twItemunits->setText("meters");
+    //   //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
+    // }
+    // else if (arg1 == 1) {
+    //   QTableWidgetItem *twItem = new QTableWidgetItem();
+    //   twItem->setText("VELOCITY");
+    //   m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+    //   QTableWidgetItem *twItemunits = new QTableWidgetItem();
+    //   twItemunits->setText("m/sec");
+    // }
+    // else if (arg1 == 2) {
+    //   QTableWidgetItem *twItem = new QTableWidgetItem();
+    //   twItem->setText("ACCELERATION");
+    //   m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
+    //   QTableWidgetItem *twItemunits = new QTableWidgetItem();
+    //   twItemunits->setText("m/s^2");
+    // }
   /*
     else if (arg1 == 0) {
       m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
@@ -1323,6 +1332,138 @@ namespace Isis {
     FileName fname = arg1;
     m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
   }
+
+
+  void JigsawSetupDialog::validateSigmaValue(QTableWidgetItem *item) {
+    if (item->column() != 3) {
+      return;
+    }
+    bool convertSuccess = false;
+    item->text().toDouble(&convertSuccess);
+    if (!convertSuccess) {
+      item->setBackground(Qt::red);
+    }
+    else {
+      item->setBackground(Qt::white);
+    }
+  }
+
+
+  void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
+    int currentIndex = m_ui->positionComboBox->currentIndex();
+    QList<QSpinBox *> spkSpinBoxes{m_ui->spkDegreeSpinBox, m_ui->spkSolveDegreeSpinBox};
+    for (auto &spinBox : spkSpinBoxes) {
+      spinBox->setValue(currentIndex);
+      if (arg1 == "ALL") {
+        spinBox->setEnabled(true);
+      }
+      else {
+        spinBox->setEnabled(false);
+      }
+    }
+
+    // @todo @irh better way to do this than hard coded "magic" numbers?
+    QTableWidget *table = m_ui->positionAprioriSigmaTable;
+    qDebug() << "current index: " << currentIndex;
+    qDebug() << arg1;
+    m_ui->positionAprioriSigmaTable->setRowCount(currentIndex);
+
+    // POSITION
+    if (currentIndex > 0) { 
+      QTableWidgetItem *coefficient = new QTableWidgetItem();
+      coefficient->setFlags(Qt::ItemIsEnabled);
+      coefficient->setText(QString::number(0));
+      table->setItem(0, 0, coefficient);
+
+      QTableWidgetItem *description = new QTableWidgetItem();
+      description->setFlags(Qt::ItemIsEnabled);
+      description->setText("POSITION");
+      table->setItem(0, 1, description);
+
+      QTableWidgetItem *units = new QTableWidgetItem();
+      units->setFlags(Qt::ItemIsEnabled);
+      units->setText("meters");
+      table->setItem(0, 2, units);
+
+      QTableWidgetItem *sigma = new QTableWidgetItem();
+      sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+      sigma->setText("0.0");
+      table->setItem(0, 3, sigma);
+
+      connect(table, SIGNAL(itemChanged(QTableWidgetItem *)),
+              this, SLOT(validateSigmaValue(QTableWidgetItem *)));
+    }
+
+    // VELOCITY
+    if (currentIndex > 1) {
+      QTableWidgetItem *coefficient = new QTableWidgetItem();
+      coefficient->setFlags(Qt::ItemIsEnabled);
+      coefficient->setText(QString::number(1));
+      table->setItem(1, 0, coefficient);
+
+      QTableWidgetItem *description = new QTableWidgetItem();
+      description->setFlags(Qt::ItemIsEnabled);
+      description->setText("VELOCITY");
+      table->setItem(1, 1, description);
+
+      QTableWidgetItem *units = new QTableWidgetItem();
+      units->setFlags(Qt::ItemIsEnabled);
+      units->setText("m/s");
+      table->setItem(1, 2, units);
+
+      // QTableWidgetItem *sigma = new QTableWidgetItem();
+      // sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+      // sigma->setText("0.0");
+      // table->setItem(1, 3, sigma);
+      QDoubleSpinBox *sigma = new QDoubleSpinBox(table);
+      sigma->setDecimals(3);
+      table->setCellWidget(1, 3, sigma);
+    }
+
+    // ACCELERATION
+    if (currentIndex > 2) {
+      QTableWidgetItem *coefficient = new QTableWidgetItem();
+      coefficient->setFlags(Qt::ItemIsEnabled);
+      coefficient->setText(QString::number(2));
+      table->setItem(2, 0, coefficient);
+
+      QTableWidgetItem *description = new QTableWidgetItem();
+      description->setFlags(Qt::ItemIsEnabled);
+      description->setText("ACCELERATION");
+      table->setItem(2, 1, description);
+
+      QTableWidgetItem *units = new QTableWidgetItem();
+      units->setFlags(Qt::ItemIsEnabled);
+      units->setText("m/s^2");
+      table->setItem(2, 2, units);
+
+      QTableWidgetItem *sigma = new QTableWidgetItem();
+      sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+      sigma->setText("0.0");
+      table->setItem(2, 3, sigma);
+    }
+
+    // int solveDegree = currentIndex;
+    // if (currentIndex > 3)
+    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
+
+  }
+
+
+ void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
+    int currentIndex = m_ui->pointingComboBox->currentIndex();
+    QList<QSpinBox *> ckSpinBoxes{m_ui->ckDegreeSpinBox, m_ui->ckSolveDegreeSpinBox};
+    for (auto &spinBox : ckSpinBoxes) {
+      spinBox->setValue(currentIndex);
+      if (arg1 == "ALL") {
+        spinBox->setReadOnly(false);
+      }
+      else {
+        spinBox->setReadOnly(true);
+      }
+  }
+  }
+
 
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {

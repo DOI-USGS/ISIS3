@@ -10,7 +10,7 @@ namespace Ui {
 }
 
 class QItemSelection;
-
+class QTableWidgetItem;
 
 namespace Isis {
   class Project;
@@ -136,6 +136,12 @@ namespace Isis {
     void on_primeMeridianOffsetLineEdit_textChanged(const QString &arg1);
     
     void on_applySettingsPushButton_clicked();
+
+    void on_positionComboBox_currentIndexChanged(const QString &arg1);
+    void on_pointingComboBox_currentIndexChanged(const QString &arg1);
+
+    void validateSigmaValue(QTableWidgetItem *);
+    
 
     public slots:
     void slotTextChanged(const QString &text);
