@@ -229,7 +229,6 @@ namespace Isis {
    */
   void IpceMainWindow::removeView(QWidget *view) {
     view->close();
-    qDebug()<<"IpceMainWindow::removeView view = "<<view;
     delete view;
   }
 
