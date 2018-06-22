@@ -2,19 +2,22 @@
 
 #include "LineShiftFilter.h"
 
-#include "ControlCubeGraphNode.h"
+#include <QPair>
+#include <QString>
+
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 
 namespace Isis {
   LineShiftFilter::LineShiftFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  LineShiftFilter::LineShiftFilter(const LineShiftFilter &other)
-    : AbstractNumberFilter(other) {
+  LineShiftFilter::LineShiftFilter(const LineShiftFilter &other) : AbstractNumberFilter(other) {
   }
 
 
@@ -22,8 +25,8 @@ namespace Isis {
   }
 
 
-  bool LineShiftFilter::evaluate(const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+  bool LineShiftFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -63,4 +66,3 @@ namespace Isis {
     return "have line shifts which are " + descriptionSuffix();
   }
 }
-
