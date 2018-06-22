@@ -35,6 +35,7 @@ namespace Isis {
   class ProjectItem;
   class ControlHealthMonitorWidget;
   class ControlNet;
+  class ControlPoint;
   class ToolPad;
 
   /**
@@ -51,7 +52,7 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
   Q_OBJECT
 
   public:
-    ControlHealthMonitorView(ControlNet *controlNet, QWidget *parent = 0);
+    ControlHealthMonitorView(Directory *directory, QWidget *parent = 0);
     ~ControlHealthMonitorView();
 
     virtual QList<QAction *> permToolBarActions();
@@ -65,9 +66,13 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
   public slots:
 
   private slots:
+    void openPointEditor(ControlPoint *point);
+    void openImageEditor();
 
   private:
-    QPointer<ControlHealthMonitorWidget> m_ControlHealthMonitorWidget;
+    Directory *m_directory;
+
+    QPointer<ControlHealthMonitorWidget> m_controlHealthMonitorWidget;
 
     ToolPad *m_toolPad;        //!< The tool pad
     QToolBar *m_permToolBar;   //!< The permanent tool bar

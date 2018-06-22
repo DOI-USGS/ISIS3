@@ -254,6 +254,7 @@ namespace Isis {
     // notify parent network if we have one
     if (parentNetwork) {
       parentNetwork->measureAdded(measure);
+      parentNetwork->emitNewMeasure(measure);
       parentNetwork->emitNetworkStructureModified();
     }
   }
@@ -306,7 +307,7 @@ namespace Isis {
 
     // notify parent network of the change
     if (parentNetwork) {
-      parentNetwork->measureDeleted(cm);
+      parentNetwork->emitMeasureRemoved(cm);
 
       if (!IsIgnored() && !cm->IsIgnored()) {
         parentNetwork->emitNetworkStructureModified();
@@ -319,6 +320,12 @@ namespace Isis {
     PointModified();
 
     return ControlMeasure::Success;
+  }
+
+  void ControlPoint::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue) {
+    if (parentNetwork) {
+      parentNetwork->emitMeasureModified(measure, modType, oldValue, newValue);
+    }
   }
 
 
@@ -497,6 +504,9 @@ namespace Isis {
    *   point to be modified.
    */
   ControlPoint::Status ControlPoint::SetEditLock(bool lock) {
+    if (parentNetwork) {
+      parentNetwork->emitPointModified(this, ControlPoint::EditLockModified, editLock, lock);
+    }
     editLock = lock;
     return Success;
   }
@@ -642,7 +652,7 @@ namespace Isis {
         else {
           parentNetwork->pointUnIgnored(this);
         }
-        parentNetwork->emitNetworkStructureModified();
+        parentNetwork->emitPointModified(this, ControlPoint::IgnoredModified, oldStatus, ignore);
       }
     }
 
@@ -689,6 +699,10 @@ namespace Isis {
     if (editLock) {
       return PointLocked;
     }
+    if (parentNetwork) {
+      parentNetwork->emitPointModified(this, ControlPoint::TypeModified, type, newType);
+    }
+
     PointModified();
     type = newType;
     return Success;

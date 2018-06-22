@@ -62,13 +62,17 @@ namespace Isis {
    * @param parent (QWidget *) Pointer to parent widget
    */
   ControlHealthMonitorWidget::ControlHealthMonitorWidget(ControlNetVitals *vitals, QWidget *parent) : QWidget(parent) {
-
     createGui();
     m_vitals = vitals;
+
     connect (m_vitals, SIGNAL(networkChanged()),
-            this, SLOT(update()));
+            this,      SLOT(update()));
+
+    connect (m_vitals, SIGNAL(historyEntry(QString, QString, QVariant, QVariant, QString)),
+             this,     SLOT  (historyEntry(QString, QString, QVariant, QVariant, QString)));
     update();
   }
+
 
   /**
    *  This SLOT is called whenever the is a change made to the network embedded in the
@@ -78,7 +82,7 @@ namespace Isis {
    *
    */
   void ControlHealthMonitorWidget::update() {
-    m_numImagesLabel->setText("Images:  " + toString(m_vitals->numImages()));
+    m_numImagesLabel->setText("Images: " + toString(m_vitals->numImages()));
     m_numPointsLabel->setText("Points " + toString(m_vitals->numPoints()));
     m_numMeasuresLabel->setText("Measures: " + toString(m_vitals->numMeasures()));
     m_netLabel->setText("Control Network: " + m_vitals->getNetworkId());
@@ -92,6 +96,26 @@ namespace Isis {
     m_pointsConstrainedLabel->setText(toString(m_vitals->numConstrainedPoints()));
     m_pointsEditLockedLabel->setText(toString(m_vitals->numLockedPoints()));
     m_pointsFewMeasuresLabel->setText(toString(m_vitals->numPointsBelowMeasureThreshold()));
+
+    double freePercent = ( (double) m_vitals->numFreePoints() ) / ( (double) m_vitals->numPoints() ) * 100;
+    freePercent = ( (int) (freePercent * 100) ) / 100.0;
+    QString freeFormat = toString(m_vitals->numFreePoints()) + " (" + toString(freePercent) + ")%";
+    m_pointsFreeProgressbar->setValue(freePercent);
+    m_pointsFreeProgressbar->setFormat(freeFormat);
+
+    double constrainedPercent = ( (double) m_vitals->numConstrainedPoints() ) /
+                                ( (double) m_vitals->numPoints() ) * 100;
+    constrainedPercent = ( (int) (constrainedPercent * 100) ) / 100.0;
+    QString constrainedFormat = toString(m_vitals->numConstrainedPoints()) + " (" + toString(constrainedPercent) + ")%";
+    m_pointsConstrainedProgressbar->setValue(constrainedPercent);
+    m_pointsConstrainedProgressbar->setFormat(constrainedFormat);
+
+    double fixedPercent = ( (double) m_vitals->numFixedPoints() ) / ( (double) m_vitals->numPoints() ) * 100;
+    fixedPercent = ( (int) (fixedPercent * 100) ) / 100.0;
+    QString fixedFormat = toString(m_vitals->numFixedPoints()) + " (" + toString(fixedPercent) + ")%";
+    m_pointsFixedProgressbar->setValue(fixedPercent);
+    m_pointsFixedProgressbar->setFormat(fixedFormat);
+
 
     // We should enumerate the network state and do a comparison on enums here, not strings.
     if (m_vitals->getStatus() == "Broken!") updateStatus(0);
@@ -124,6 +148,7 @@ namespace Isis {
     viewPointAll();
   }
 
+
   void ControlHealthMonitorWidget::broken() {
     updateStatus(0);
     m_statusLabel->setText("Broken!");
@@ -142,6 +167,7 @@ namespace Isis {
     m_statusLabel->setText("Healthy!");
     m_statusDetails->setText("This network is healthy.");
   }
+
 
   /*
    *  This SLOT is designed to update the values in the gui to properly represent
@@ -172,6 +198,7 @@ namespace Isis {
     }
     m_statusBar->setPalette(p);
   }
+
 
   /**
    *  This method is responsible for creating all of the components that comprise the GUI.
@@ -216,12 +243,10 @@ namespace Isis {
     QHBoxLayout *netStatsLayout = new QHBoxLayout;
     netStatsLayout->setAlignment(Qt::AlignLeft);
     netStatsLayout->setSpacing(25);
-    m_sizeLabel   = new QLabel("Size: 253M");
     m_numImagesLabel   = new QLabel("Images:");
     m_numPointsLabel   = new QLabel("Points:");
     m_numMeasuresLabel = new QLabel("Measures:");
 
-    netStatsLayout->addWidget(m_sizeLabel);
     netStatsLayout->addWidget(m_numImagesLabel);
     netStatsLayout->addWidget(m_numPointsLabel);
     netStatsLayout->addWidget(m_numMeasuresLabel);
@@ -240,9 +265,8 @@ namespace Isis {
     m_statusBar->setFormat("Loading...");
     gridLayout->addWidget(m_statusBar);
 
-    // We need to connect this properly.
-    QLabel *modificationLabel = new QLabel("Last Modification:");
-    gridLayout->addWidget(modificationLabel);
+    m_lastModLabel = new QLabel("Last Modification:");
+    gridLayout->addWidget(m_lastModLabel);
 
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
@@ -258,15 +282,16 @@ namespace Isis {
     QWidget *overviewTab = createOverviewTab();
     QWidget *imagesTab = createImagesTab();
     QWidget *pointsTab = createPointsTab();
-    QWidget *graphTab = createGraphTab();
+    // QWidget *graphTab = createGraphTab();
 
     tabs->insertTab(0, overviewTab, "Overview");
     tabs->insertTab(1, imagesTab,   "Images");
     tabs->insertTab(2, pointsTab,   "Points");
-    tabs->insertTab(3, graphTab,    "Graph");
+    // tabs->insertTab(3, graphTab,    "Graph");
 
     gridLayout->addWidget(tabs);
   }
+
 
   /**
   *  Initializes all member variables to NULL.
@@ -288,12 +313,12 @@ namespace Isis {
     m_pointsIgnoredLabel     = NULL;
     m_pointsShowingLabel     = NULL;
     m_pointsTable            = NULL;
-    m_sizeLabel              = NULL;
     m_statusBar              = NULL;
     m_statusDetails          = NULL;
     m_statusLabel            = NULL;
     m_vitals                 = NULL;
   }
+
 
   /*
   *  This method creates the Overview tab.
@@ -331,12 +356,15 @@ namespace Isis {
     overviewLayout->addWidget(modLabel);
 
     QStringList headers;
-    headers.append("#");
     headers.append("Action");
+    headers.append("Id");
+    headers.append("Old Value");
+    headers.append("New Value");
     headers.append("Timestamp");
 
+
     m_historyTable = new QTableWidget();
-    m_historyTable->setColumnCount(3);
+    m_historyTable->setColumnCount(5);
     m_historyTable->setHorizontalHeaderLabels(headers);
     m_historyTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_historyTable->horizontalHeader()->setStretchLastSection(true);
@@ -347,7 +375,6 @@ namespace Isis {
     m_historyTable->setGeometry(QApplication::desktop()->screenGeometry());
 
     overviewLayout->addWidget(m_historyTable);
-
 
     QWidget *tempWidget = new QWidget;
     QHBoxLayout *tempLayout = new QHBoxLayout;
@@ -369,11 +396,10 @@ namespace Isis {
     tempWidget->setLayout(tempLayout);
     overviewLayout->addWidget(tempWidget);
 
-
-
     overview->setLayout(overviewLayout);
     return overview;
   }
+
 
   /*
   *  This method creates the Images tab.
@@ -382,7 +408,6 @@ namespace Isis {
   QWidget* ControlHealthMonitorWidget::createImagesTab() {
     QFont fontSmall("Arial", 12);
     QFont fontMedium("Arial", 14);
-
 
     // This is the parent QWidget for the images tab.
     QWidget *imagesTab = new QWidget();
@@ -424,11 +449,13 @@ namespace Isis {
     tempLayout->addWidget(button2, 1, 2);
 
     temp->setLayout(tempLayout);
-
     imagesLayout->addWidget(temp);
 
     // Create the table.
     m_imagesTable = new QTableWidget();
+
+    connect(m_imagesTable, SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+            this, SLOT(emitOpenImageEditor()));
 
     QStringList headers;
     headers.append("#");
@@ -450,12 +477,24 @@ namespace Isis {
     m_imagesShowingLabel = new QLabel("");
     m_imagesShowingLabel->setFont(fontMedium);
 
-    imagesLayout->addWidget(m_imagesShowingLabel);
+    QPushButton *viewAllButton = new QPushButton("View All");
+    connect(viewAllButton, SIGNAL(clicked()),
+            this, SLOT(viewImageAll()));
+
+    QGridLayout *showingLayout = new QGridLayout;
+    QWidget *showingWidget = new QWidget;
+
+    showingLayout->addWidget(m_imagesShowingLabel, 0, 0, 1, 2);
+    showingLayout->addWidget(viewAllButton, 0, 2);
+    showingWidget->setLayout(showingLayout);
+
+    imagesLayout->addWidget(showingWidget);
     imagesLayout->addWidget(m_imagesTable);
 
     imagesTab->setLayout(imagesLayout);
     return imagesTab;
   }
+
 
   /*
   *  This method creates the Points tab.
@@ -465,7 +504,6 @@ namespace Isis {
 
     QFont fontSmall("Arial", 12);
     QFont fontMedium("Arial", 14);
-
     QFont searchFont("Seqoe UI Symbol", 12);
 
     // This is the main parent widget for the points tab.
@@ -482,20 +520,32 @@ namespace Isis {
     QLabel *pointsIgnored = new QLabel("Points Ignored:");
     m_pointsIgnoredLabel = new QLabel("");
 
+    QLabel *freePoints = new QLabel("Points Free:");
+    m_pointsFreeLabel = new QLabel("");
+    m_pointsFreeProgressbar = new QProgressBar();
+    QPalette p = m_pointsFreeProgressbar->palette();
+    p.setColor(QPalette::Highlight, Qt::blue);
+    p.setColor(QPalette::Text, Qt::white);
+    m_pointsFreeProgressbar->setPalette(p);
+    m_pointsFreeProgressbar->setRange(0, 100);
+
+    QLabel *constrainedPoints = new QLabel("Points Constrained:");
+    m_pointsConstrainedLabel = new QLabel("");
+    m_pointsConstrainedProgressbar = new QProgressBar();
+    m_pointsConstrainedProgressbar->setPalette(p);
+    m_pointsConstrainedProgressbar->setRange(0, 100);
+
+    QLabel *fixedPoints = new QLabel("Points Fixed:");
+    m_pointsFixedLabel = new QLabel("");
+    m_pointsFixedProgressbar = new QProgressBar();
+    m_pointsFixedProgressbar->setPalette(p);
+    m_pointsFixedProgressbar->setRange(0, 100);
+
     QLabel *pointsLocked = new QLabel("Points Edit Locked:");
     m_pointsEditLockedLabel = new QLabel("");
 
     QLabel *pointsMeasure = new QLabel("Less than 3 valid Measures:");
     m_pointsFewMeasuresLabel = new QLabel("");
-
-    QLabel *freePoints = new QLabel("Points Free:");
-    m_pointsFreeLabel = new QLabel("");
-
-    QLabel *fixedPoints = new QLabel("Points Fixed:");
-    m_pointsFixedLabel = new QLabel("");
-
-    QLabel *constrainedPoints = new QLabel("Points Constrained:");
-    m_pointsConstrainedLabel = new QLabel("");
 
     // Set the font for the labels.
     pointsLocked->setFont(fontSmall);
@@ -529,15 +579,15 @@ namespace Isis {
 
     // Add the widgets in the proper place.
     viewLayout->addWidget(freePoints, 0, 0);
-    viewLayout->addWidget(m_pointsFreeLabel, 0, 1);
+    viewLayout->addWidget(m_pointsFreeProgressbar, 0, 1);
     viewLayout->addWidget(viewFreePoints, 0, 2);
 
     viewLayout->addWidget(fixedPoints, 1, 0);
-    viewLayout->addWidget(m_pointsFixedLabel, 1, 1);
+    viewLayout->addWidget(m_pointsFixedProgressbar, 1, 1);
     viewLayout->addWidget(viewFixedPoints, 1, 2);
 
     viewLayout->addWidget(constrainedPoints, 2, 0);
-    viewLayout->addWidget(m_pointsConstrainedLabel, 2, 1);
+    viewLayout->addWidget(m_pointsConstrainedProgressbar, 2, 1);
     viewLayout->addWidget(viewConstrainedPoints, 2, 2);
 
     viewLayout->addWidget(pointsIgnored, 3, 0);
@@ -576,17 +626,87 @@ namespace Isis {
     m_pointsTable->setGeometry(QApplication::desktop()->screenGeometry());
     m_pointsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    pointsLayout->addSpacing(30);
+    connect(m_pointsTable, SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
+            this, SLOT(emitOpenPointEditor()));
 
     m_pointsShowingLabel = new QLabel("");
     m_pointsShowingLabel->setFont(fontMedium);
+    QPushButton *showAllButton = new QPushButton("View All");
 
-    pointsLayout->addWidget(m_pointsShowingLabel);
+    QGridLayout *showLayout = new QGridLayout;
+    QWidget *showWidget = new QWidget;
+
+    connect(showAllButton, SIGNAL(clicked()),
+            this, SLOT(viewPointAll()));
+
+    showLayout->addWidget(m_pointsShowingLabel, 0, 0, 1, 2);
+    showLayout->addWidget(showAllButton, 0, 2);
+    showWidget->setLayout(showLayout);
+
+    pointsLayout->addSpacing(30);
+    pointsLayout->addWidget(showWidget);
     pointsLayout->addWidget(m_pointsTable);
 
     pointsTab->setLayout(pointsLayout);
     return pointsTab;
   }
+
+
+  /**
+   *  This method is designed to be called whenever a user double-clicks on an image
+   *  in the image table of the images tab. It will grab the selected images and emit
+   *  the openImageEditor() signal, emitting with it the images that were selected.
+   *
+   *  The openImageEditor() signal is intercepted by the ControlHealthMonitorView
+   *  and opens the CubeDnView with the images selected.
+   */
+  void ControlHealthMonitorWidget::emitOpenImageEditor() {
+    emit openImageEditor();
+  }
+
+
+  /**
+   *  This method is designed to be called whenever a user double-clicks on a point
+   *  in the point table of the points tab. It will grab the selected point and emit
+   *  the openPointEditor() signal, emitting with it the point that was selected.
+   *
+   *  The openPointEditor() signal is intercepted by the ControlHealthMonitorView
+   *  and opens the ControlPointEditWidget with that point selected.
+   */
+  void ControlHealthMonitorWidget::emitOpenPointEditor() {
+    // Get the point
+    QModelIndex pointId = m_pointsTable->selectionModel()->selectedIndexes()[1];
+    ControlPoint *point = m_vitals->getPoint(pointId.data().toString());
+    emit openPointEditor(point);
+  }
+
+
+  /**
+   *  This SLOT is designed to intercept the historyEntry() signal emitted from the
+   *  ControlNetVitals class whenever a modification is made to the network. The
+   *  signal emits several details pertaining to the history entry.
+   *
+   *  @param entry     The history comment to be displayed.
+   *  @param id        The id of the Control Point, Measure, or Network that was modified.
+   *  @param oldValue  The old value before the modification was made.
+   *  @param newValue  The new value after the modification was made.
+   *  @param timeStamp The timestamp of when the modification was made.
+   *
+   */
+  void ControlHealthMonitorWidget::historyEntry(QString entry, QString id,
+                                                QVariant oldValue, QVariant newValue,
+                                                QString timeStamp) {
+
+    m_lastModLabel->setText("Last Modification: " + timeStamp);
+
+    m_historyTable->insertRow(0);
+    m_historyTable->setItem(0, 0, new QTableWidgetItem(entry));
+    m_historyTable->setItem(0, 1, new QTableWidgetItem(id));
+    m_historyTable->setItem(0, 2, new QTableWidgetItem(oldValue.toString()));
+    m_historyTable->setItem(0, 3, new QTableWidgetItem(newValue.toString()));
+    m_historyTable->setItem(0, 4, new QTableWidgetItem(timeStamp));
+  }
+
 
   /*
   *  This method creates the Graph tab.
@@ -615,6 +735,7 @@ namespace Isis {
 
   }
 
+
   /*
   *  This method loads a QList of cube serials into the images table.
   *
@@ -627,6 +748,7 @@ namespace Isis {
        m_imagesTable->setItem(i, 1, new QTableWidgetItem(serials.at(i)));
      }
    }
+
 
   /*
    *  This method loads a QList of ControlPoint* into the points table.
@@ -646,6 +768,7 @@ namespace Isis {
     }
   }
 
+
   /*
    *  This SLOT is designed to view all points in the Control Network.
    *
@@ -656,6 +779,7 @@ namespace Isis {
                                   toString(m_vitals->numPoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view ignored points in the Control Network.
@@ -668,6 +792,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view free points in the Control Network.
    *
@@ -678,6 +803,7 @@ namespace Isis {
                                   toString(m_vitals->numFreePoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view fixed points in the Control Network.
@@ -690,6 +816,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view constrained points in the Control Network.
    *
@@ -700,6 +827,7 @@ namespace Isis {
                                   toString(m_vitals->numConstrainedPoints()) +
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view locked points in the Control Network.
@@ -713,6 +841,7 @@ namespace Isis {
 
   }
 
+
   /*
    *  This SLOT is designed to view points with less than 3 valid measures in the Control Network.
    *
@@ -724,16 +853,18 @@ namespace Isis {
                                   " / " + toString(m_vitals->numPoints()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view all images in the Control Network.
    *
    */
   void ControlHealthMonitorWidget::viewImageAll() {
-    updateImageTable(m_vitals->getAllImageSerials());
+    updateImageTable(m_vitals->getCubeSerials());
     m_imagesShowingLabel->setText("Showing: All Images <sup>" +
                                   toString(m_vitals->numImages()) +
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
+
 
   /*
    *  This SLOT is designed to view images with less than 3 valid measures in the Control Network.
@@ -746,6 +877,7 @@ namespace Isis {
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
 
+
   /*
    *  This SLOT is designed to view images below the Convex Hull Tolerance in the Control Network.
    *
@@ -756,6 +888,7 @@ namespace Isis {
                                   toString(m_vitals->numImagesBelowHullTolerance()) +
                                   " / " + toString(m_vitals->numImages()) + "</sup>");
   }
+
 
   /**
    * Destructor
@@ -777,7 +910,6 @@ namespace Isis {
     delete m_pointsIgnoredLabel;
     delete m_pointsShowingLabel;
     delete m_pointsTable;
-    delete m_sizeLabel;
     delete m_statusBar;
     delete m_statusDetails;
     delete m_statusLabel;
@@ -798,7 +930,6 @@ namespace Isis {
     m_pointsIgnoredLabel     = NULL;
     m_pointsShowingLabel     = NULL;
     m_pointsTable            = NULL;
-    m_sizeLabel              = NULL;
     m_statusBar              = NULL;
     m_statusDetails          = NULL;
     m_statusLabel            = NULL;
