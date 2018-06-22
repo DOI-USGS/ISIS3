@@ -24,6 +24,7 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QEvent>
 #include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
@@ -145,6 +146,12 @@ namespace Isis {
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
+   *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
+   *                           hold.  Extra destroy slots were causing double deletion of memory.
+   *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
+   *                           state can be reset after the IpceMainWindow::show() causes resize and
+   *                           move events which in turn cause the project clean flag to be false
+   *                           even though the project has just opened.
    *  
    */
   class IpceMainWindow : public QMainWindow {
@@ -161,8 +168,10 @@ namespace Isis {
 
       void readSettings(Project *);
       void writeSettings(Project *project);
+      void writeGlobalSettings(Project *project);
 
     protected:
+      void showEvent(QShowEvent *event);
       void closeEvent(QCloseEvent *event);
       bool eventFilter(QObject *watched, QEvent *event);
 
