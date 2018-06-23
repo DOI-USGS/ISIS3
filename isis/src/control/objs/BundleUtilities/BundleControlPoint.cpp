@@ -33,7 +33,7 @@ namespace Isis {
         continue;
       }
 
-      addMeasure(controlMeasure);      
+      addMeasure(controlMeasure);
     }
 
     // initialize to 0.0
