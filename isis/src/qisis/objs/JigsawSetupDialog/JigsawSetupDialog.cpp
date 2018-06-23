@@ -1375,14 +1375,6 @@ namespace Isis {
     QTableWidget *table = m_ui->positionAprioriSigmaTable;
     m_ui->positionAprioriSigmaTable->setRowCount(currentIndex);
 
-    // Fitting over hermite spline only available to user when solve option is not NONE
-    if (currentIndex == 0) {
-      m_ui->hermiteSplineCheckBox->setEnabled(false);
-    }
-    else {
-      m_ui->hermiteSplineCheckBox->setEnabled(true);
-    }
-
     // POSITION
     if (currentIndex > 0) { 
       QTableWidgetItem *coefficient = new QTableWidgetItem();
