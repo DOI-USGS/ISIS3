@@ -13,15 +13,14 @@
 
 namespace Isis {
   AbstractMultipleChoiceFilter::AbstractMultipleChoiceFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+         AbstractFilter::FilterEffectivenessFlag flag,
+         int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
     nullify();
     m_curChoice = new QString;
   }
 
   AbstractMultipleChoiceFilter::AbstractMultipleChoiceFilter(
-    AbstractMultipleChoiceFilter const &other)
-    : AbstractFilter(other) {
+        AbstractMultipleChoiceFilter const &other) : AbstractFilter(other) {
     nullify();
     m_curChoice = new QString;
 

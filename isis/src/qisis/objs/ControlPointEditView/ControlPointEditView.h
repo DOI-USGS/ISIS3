@@ -67,10 +67,6 @@ class ControlPointEditView : public AbstractProjectItemView {
 
   QSize sizeHint() const;
 
-  public slots:
-
-  private slots:
-
   private:
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
