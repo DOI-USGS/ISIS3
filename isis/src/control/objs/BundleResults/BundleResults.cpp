@@ -35,9 +35,8 @@ namespace Isis {
   /**
    * Constructs a BundleSettings object.
    *
-   * @param parent The Qt-relationship parent.
    */
-  BundleResults::BundleResults(QObject *parent) : QObject(parent) {
+  BundleResults::BundleResults() {
 
     initialize();
 
@@ -58,10 +57,8 @@ namespace Isis {
    * @param bundleSettingsFolder Where the settings XML for this bundle adjustment
    *                             resides - /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to a <bundleSettings/> tag.
-   * @param parent The Qt-relationship parent.
    */
-  BundleResults::BundleResults(Project *project, XmlStackedHandlerReader *xmlReader,
-                               QObject *parent) : QObject(parent) {
+  BundleResults::BundleResults(Project *project, XmlStackedHandlerReader *xmlReader) {
                                // TODO: does xml stuff need project???
 
     initialize();
@@ -104,6 +101,7 @@ namespace Isis {
         m_converged(src.m_converged),
         m_bundleControlPoints(src.m_bundleControlPoints),
         m_outNet(src.m_outNet),
+        m_outLidarData(src.m_outLidarData),
         m_iterations(src.m_iterations),
         m_observations(src.m_observations),
         m_rmsImageSampleResiduals(src.m_rmsImageSampleResiduals),
@@ -151,7 +149,6 @@ namespace Isis {
 
     delete m_cumProRes;
     m_cumProRes = NULL;
-
   }
 
 
@@ -192,6 +189,7 @@ namespace Isis {
       m_converged = src.m_converged;
       m_bundleControlPoints = src.m_bundleControlPoints;
       m_outNet = src.m_outNet;
+      m_outLidarData = src.m_outLidarData;
       m_iterations = src.m_iterations;
       m_observations = src.m_observations;
       m_rmsImageSampleResiduals = src.m_rmsImageSampleResiduals;
@@ -324,6 +322,7 @@ namespace Isis {
     m_radiansToMeters = 0;
     m_observations.clear();
     m_outNet.clear();
+    m_outLidarData.clear();
 
   }
 
@@ -876,6 +875,16 @@ namespace Isis {
 
 
   /**
+   * Sets the output LidarData object.
+   *
+   * @param outLidarData A QSharedPointer to the output LidarData object.
+   */
+  void BundleResults::setOutputLidarData(LidarDataQsp outLidarData) {
+    m_outLidarData = outLidarData;
+  }
+
+
+  /**
    * Sets the number of iterations taken by the BundleAdjust.
    *
    * @param iterations The number of iterations.
@@ -1352,6 +1361,23 @@ namespace Isis {
                        _FILEINFO_);
     }
     return m_outNet;
+  }
+
+
+  /**
+   * Returns a shared pointer to the output LidarData object.
+   *
+   * @return LidarDataQsp A shared pointer to the output LidarData object.
+   *
+   * @throws IException::Programmer "Output LidarData object has not been set."
+   */
+  LidarDataQsp BundleResults::outputLidarData() const {
+    if (!m_outLidarData) {
+      throw IException(IException::Programmer,
+                       "Output LidarData object has not been set.",
+                       _FILEINFO_);
+    }
+    return m_outLidarData;
   }
 
 

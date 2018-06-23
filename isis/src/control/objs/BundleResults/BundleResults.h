@@ -25,7 +25,7 @@
  */
 // Qt Library
 #include <QList>
-#include <QObject>
+//#include <QObject>
 #include <QPair>
 #include <QString>
 #include <QVector>
@@ -37,6 +37,7 @@
 #include "BundleSettings.h"
 #include "ControlNet.h"
 #include "Distance.h"
+#include "LidarData.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "PvlObject.h"
 #include "Statistics.h" // ???
@@ -82,22 +83,25 @@ namespace Isis {
    *   @history 2016-08-15 Jesse Mapel - Added iteration count, radians to meters conversion,
    *                           observation vector, bundle control point vector, and output control
    *                           network for write methods in BundleSolutionInfo.  Fixes #4159.
-   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id serialization
-   *                           for save() (causes segfault in unit test for empty xml). Fixes #4797.
+   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() method. Commented out m_id
+   *                           serialization for save() (causes segfault in unit test for empty
+   *                           xml). Fixes #4797.
    *   @history 2017-04-27 J Bonn - Updated serialization code and tests.
-   *   @history 2017-07-14 Ken Edmundson Added support for piecewise polynomials...
+   *   @history 2017-07-14 Ken Edmundson - Added support for piecewise polynomials...
    *                           -members...
    *                               int m_numberContinuityConstraintEquations
    *                           -methods...
    *                               void setNumberContinuityConstraintEquations
    *                               int numberContinuityConstraintEquations
+   *   @history 2018-06-01 Ken Edmundson - removed derivation from QObject; added member variable
+   *                           m_numberLidarRangeConstraintEquations with setter/getter; added
+   *                           member variable m_outLidarData with setter/getter.
    */
-  class BundleResults : public QObject {
-    Q_OBJECT
+  class BundleResults {
     public:
-      BundleResults(QObject *parent = 0);
+      BundleResults();
       // TODO: does xml stuff need project???
-      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
+      BundleResults(Project *project, XmlStackedHandlerReader *xmlReader);
       BundleResults(const BundleResults &src);
       ~BundleResults();
       BundleResults &operator=(const BundleResults &src);
@@ -178,6 +182,7 @@ namespace Isis {
       void setConverged(bool converged); // or initialze method
       void setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints);
       void setOutputControlNet(ControlNetQsp outNet);
+      void setOutputLidarData(LidarDataQsp outLidarData);
       void setIterations(int iterations);
       void setObservations(BundleObservationVector observations);
 
@@ -228,6 +233,7 @@ namespace Isis {
       bool converged() const; // or initialze method
       QVector<BundleControlPointQsp> &bundleControlPoints();
       ControlNetQsp outputControlNet() const;
+      LidarDataQsp outputLidarData() const;
       int iterations() const;
       const BundleObservationVector &observations() const;
 
@@ -276,7 +282,7 @@ namespace Isis {
                                   const QString &qName);
 
         private:
-          Q_DISABLE_COPY(XmlHandler);
+          Q_DISABLE_COPY(XmlHandler)
 
           BundleResults *m_xmlHandlerBundleResults;
           Project *m_xmlHandlerProject;   // TODO: does xml stuff need project???
@@ -340,6 +346,8 @@ namespace Isis {
                                                                  and measures in the output
                                                                  control net.*/
       ControlNetQsp m_outNet;                               /**< The output control net from
+                                                                 BundleAdjust.*/
+      LidarDataQsp m_outLidarData;                          /**< Output lidar data from
                                                                  BundleAdjust.*/
       int m_iterations;                                     /**< The number of iterations taken
                                                                  by BundleAdjust.*/
@@ -425,6 +433,6 @@ namespace Isis {
 
 };
 
-Q_DECLARE_METATYPE(Isis::BundleResults);
+Q_DECLARE_METATYPE(Isis::BundleResults)
 
 #endif // BundleResults_h
