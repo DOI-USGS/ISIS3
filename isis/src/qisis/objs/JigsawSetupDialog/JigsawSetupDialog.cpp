@@ -1334,6 +1334,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Slot that listens for changes to the SPK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Pointing Solve Options table according to the value of the
+   * SPK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the SPK Solve Degree + 1.
+   *
+   * @param int Value the SPK Solve Degree spin box was changed to.
+   */
   void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
     // number of rows == spkSolveDegree value + 1 (i+1)
     QTableWidget *table = m_ui->positionAprioriSigmaTable;
