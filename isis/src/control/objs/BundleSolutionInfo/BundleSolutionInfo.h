@@ -27,6 +27,7 @@
 #include <QString>
 
 #include "BundleSettings.h"
+#include "LidarData.h"
 
 #include "XmlStackedHandler.h"
 
@@ -144,12 +145,15 @@ namespace Isis {
    *                           because BundleSolutionInfo is derived from QObject (see comment
    *                           below). Removed copy constructor and assignment operator from cpp
    *                           file.
+   *   @history 2018-06-01 Ken Edmundson - modifications to add lidar data input, output, and
+   *                          serialization.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
     public:
       BundleSolutionInfo(BundleSettingsQsp inputSettings,
                     FileName controlNetworkFileName,
+                    FileName lidarDataFileName,
                     BundleResults outputStatistics,
                     QList<ImageList *> imgList,
                     QObject *parent = 0);
@@ -174,6 +178,7 @@ namespace Isis {
       QString inputControlNetFileName() const;
       QString outputControlNetFileName() const;
       Control *control() const;
+      QString inputLidarDataFileName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -218,7 +223,7 @@ namespace Isis {
                                     const QString &qName);
 
         private:
-          Q_DISABLE_COPY(XmlHandler);
+          Q_DISABLE_COPY(XmlHandler)
 
           BundleSolutionInfo *m_xmlHandlerBundleSolutionInfo; //!< The bundleSolutionInfo object
           Project *m_xmlHandlerProject;  //TODO does xml stuff need project???
@@ -227,13 +232,13 @@ namespace Isis {
 
     private:
       // NOTE: BundleSolutionInfo is derived from QObject as it has one slot (perhaps more signals
-      //       and slots in the future? As a child of QObject it should have no copy constructor or
+      //       and slots in the future?). As a child of QObject it should have no copy constructor or
       //       assignment operator. See for example...
       //
       //       http://doc.qt.io/qt-5/qobject.html#no-copy-constructor
       //
       //       These methods are declared as private to prevent the developer from calling default
-      //       operators. These will generate a compiler error if the developer attempts to use
+      //       operators. They will generate a compiler error if the developer attempts to use
       //       them.
       BundleSolutionInfo();
       BundleSolutionInfo(const BundleSolutionInfo &src);
@@ -241,18 +246,21 @@ namespace Isis {
 
       //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
       //! object when saving to disk).
-      QUuid              *m_id;
-      QString             m_name;                        //!< Name of the bundle. Defaults to the id
+      QUuid              *m_id;                          //!< Unique uuid
+      QString             m_name;                        //!< Name of bundle, defaults to the id
       QString             m_runTime;                     //!< Run time of the bundle adjustment
       FileName           *m_inputControlNetFileName;     //!< Input control network file name
       Control            *m_outputControl;               //!< Output control
+      FileName           *m_inputLidarDataFileName;      //!< Input lidar data file name
+      LidarData          *m_outputLidarDataSet;          //!< QList of adjusted lidar points
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results
       QList<ImageList *> *m_images;                      //!< Input image list
       QList<ImageList *> *m_adjustedImages;              //!< Adjusted image list
 
-      // In theory the path in the BundleSettings can change while running. So we save the
-      // filenames actually used when the most recent save of the file was done.
+      // In theory the path in the BundleSettings can change while running.
+      // TODO: QUESTION, how can above be? KLE
+      // So we save the filenames actually used when the most recent save of the file was done.
       QString m_txtBundleOutputFilename;
       QString m_csvSavedImagesFilename;
       QString m_csvSavedPointsFilename;
@@ -263,8 +271,8 @@ namespace Isis {
   void setStringAttribute(int locationId, QString locationName,
                           QString attributeName, QString attributeValue);
   QString getStringAttribute(int locationId, QString locationName, QString attributeName);
-}; // end namespace Isis
+} // end namespace Isis
 
-Q_DECLARE_METATYPE(Isis::BundleSolutionInfo *);
+Q_DECLARE_METATYPE(Isis::BundleSolutionInfo *)
 
 #endif // BundleSolutionInfo_h

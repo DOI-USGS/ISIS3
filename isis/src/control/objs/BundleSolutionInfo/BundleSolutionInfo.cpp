@@ -40,6 +40,7 @@ namespace Isis {
    */
   BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
                                          FileName controlNetworkFileName,
+                                         FileName lidarDataFileName,
                                          BundleResults outputStatistics,
                                          QList<ImageList *> imgList,
                                          QObject *parent) : QObject(parent) {
@@ -48,6 +49,8 @@ namespace Isis {
     m_name = m_runTime;
     m_inputControlNetFileName = new FileName(controlNetworkFileName);
     m_outputControl = NULL;
+    m_inputLidarDataFileName = new FileName(lidarDataFileName);
+    m_outputLidarDataSet = NULL;
     m_settings = inputSettings;
     m_statisticsResults = new BundleResults(outputStatistics);
     m_images = new QList<ImageList *>(imgList);
@@ -71,6 +74,8 @@ namespace Isis {
     m_name = m_runTime;
     m_inputControlNetFileName = NULL;
     m_outputControl = NULL;
+    m_inputLidarDataFileName = NULL;
+    m_outputLidarDataSet = NULL;
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -92,6 +97,12 @@ namespace Isis {
 
     delete m_outputControl;
     m_outputControl = NULL;
+
+    delete m_inputLidarDataFileName;
+    m_inputLidarDataFileName = NULL;
+
+    delete m_outputLidarDataSet;
+    m_outputLidarDataSet = NULL;
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
@@ -260,7 +271,7 @@ namespace Isis {
   /**
    * Returns the name of the input control network.
    *
-   * @return @b QString The name of the input control network.
+   * @return QString The name of the input control network.
    */
   QString BundleSolutionInfo::inputControlNetFileName() const {
     return m_inputControlNetFileName->expanded();
@@ -270,7 +281,7 @@ namespace Isis {
   /**
    * Returns the name of the output control network.
    *
-   * @return @b QString The name of the output control network.
+   * @return QString The name of the output control network.
    */
   QString BundleSolutionInfo::outputControlNetFileName() const {
     return m_outputControl->fileName();
@@ -278,9 +289,19 @@ namespace Isis {
 
 
   /**
+   * Returns name of input lidar data file (if any).
+   *
+   * @return QString Name of input lidar data file.
+   */
+  QString BundleSolutionInfo::inputLidarDataFileName() const {
+    return m_inputLidarDataFileName->expanded();
+  }
+
+
+  /**
    * Returns the name of the output control network.
    *
-   * @return @b QString The name of the output control network.
+   * @return QString The name of the output control network.
    */
   void BundleSolutionInfo::setOutputControl(Control *outputControl) {
     m_outputControl = outputControl;
@@ -591,6 +612,11 @@ namespace Isis {
     sprintf(buf, "\n            Network Description: %s",\
                   m_statisticsResults->outputControlNet()->Description().toLatin1().data());
     fpOut << buf;
+    if (m_inputLidarDataFileName) {
+      sprintf(buf, "\n            Lidar Data Filename: %s",
+                    m_inputLidarDataFileName->expanded().toLatin1().data());
+      fpOut << buf;
+    }
     sprintf(buf, "\n                         Target: %s",
                   m_statisticsResults->outputControlNet()->GetTarget().toLatin1().data());
     fpOut << buf;
