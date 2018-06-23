@@ -498,7 +498,6 @@ namespace Isis {
   }
 
 
-<<<<<<< HEAD
   /**
    * Writes the global settings like recent projects and thread count.
    */
@@ -512,22 +511,7 @@ namespace Isis {
     if (project->isTemporaryProject()) {
       globalSettings.setValue("geometry", QVariant(geometry()));
     }
-    
-=======
-  void IpceMainWindow::writeGlobalSettings(Project *project) {
 
-    QString appName = QApplication::applicationName();
-    QSettings globalSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
-          .expanded(),
-        QSettings::NativeFormat);
-
-    //  If temporary project open same geometry of mainwindow
-    if (project->projectRoot().contains("tmpProject")) {
-      globalSettings.setValue("geometry", QVariant(geometry()));
-    }
-
->>>>>>> upstream/ipceDocks
     globalSettings.setValue("maxThreadCount", m_maxThreadCount); 
     globalSettings.setValue("maxRecentProjects",m_maxRecentProjects);
 
@@ -724,7 +708,6 @@ namespace Isis {
       setWindowTitle(projName );
     }
 
-<<<<<<< HEAD
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
     
     if (!isFullScreen) {
@@ -740,13 +723,7 @@ namespace Isis {
     if (project->name() == "Project") {
       QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(), 
                               QSettings::NativeFormat);
-=======
-      //  Read  generic geometry
-      if (settings.contains("geometry")) {
-        setGeometry(settings.value("geometry").value<QRect>()); 
-      }
 
->>>>>>> upstream/ipceDocks
       QStringList projectNameList;
       QStringList projectPathList;
       globalSettings.beginGroup("recent_projects");
