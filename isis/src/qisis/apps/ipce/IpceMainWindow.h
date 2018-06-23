@@ -24,6 +24,7 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QEvent>
 #include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
@@ -132,8 +133,6 @@ namespace Isis {
    *                           Fixes #5412.
    *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
-   *                           widget. Added addDock method. Remove all methods having to do with
-   *                           MDI sub-windows, detached views.
    *                           widget. Remove all methods having to do with MDI sub-windows,
    *                           detached views.  The dock widgets holding the views are saved off
    *                           for cleanup because there is no way to get the dock from the view.
@@ -144,11 +143,6 @@ namespace Isis {
    *                           view has its own toolbar, so having an active toolbar and tool pad is
    *                           not needed. Removed code adding the save active control net button and
    *                           the toolpad, since control nets can be saved with the project save button.
-   *   @history 2018-06-14 Makayla Shepherd - ipce now defaults to full screen if there is not an
-   *                           ipce.config in the project or in ~/.Isis/ipce.
-   *   @history 2018-06-14 Makayla Shepherd - Stopped saving the state of a temporary project.
-   *   @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of 
-   *                           the project. 
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
@@ -159,11 +153,12 @@ namespace Isis {
    *                           type of a view will randomly change and setting its type has no effect.
    *                           Use windowType() to get the type. Also added the toolbar title in the
    *                           permanent toolbar constructor. 
-   *   @history 2018-06-20 Makayla Shepherd - ipce now defaults to full screen if there is not an
-   *                           ipce.config in the project or in ~/.Isis/ipce.
-   *   @history 2018-06-20 Makayla Shepherd - Stopped saving the state of a temporary project.
-   *   @history 2018-06-20 Makayla Shepherd - Save and Save As now save the geometry and state of 
-   *                           the project.
+   *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
+   *                           hold.  Extra destroy slots were causing double deletion of memory.
+   *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
+   *                           state can be reset after the IpceMainWindow::show() causes resize and
+   *                           move events which in turn cause the project clean flag to be false
+   *                           even though the project has just opened.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -178,8 +173,11 @@ namespace Isis {
       void removeAllViews();
 
       void readSettings(Project *);
+      void writeSettings(Project *project);
+      void writeGlobalSettings(Project *project);
 
     protected:
+      void showEvent(QShowEvent *event);
       void closeEvent(QCloseEvent *event);
       bool eventFilter(QObject *watched, QEvent *event);
 
@@ -190,10 +188,8 @@ namespace Isis {
       void tabViews();
 
       void raiseWarningTab();
-      
-      void writeSettings(Project *project);
-
       void cleanupViewDockList(QObject *obj);
+
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 

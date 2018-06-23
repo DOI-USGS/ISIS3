@@ -255,8 +255,17 @@ namespace Isis {
    *                           the wrong place on the project tree. Fixes #5274.
    *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
    *                           button when the active control net is modified, i.e. a point is modified.
-   *  @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of 
-   *                           the project.
+   *  
+   *  !!!!!!!!!!!!!   Delete following history entry when project save/restore geometry/state
+   *                   implemented
+   *  !!!!!!!!!!!!!!!
+   *  @history 2018-06-08 Tracie Sucharski - Quick fix for the project save/restore prototype: The
+   *                          changes made to readSettings, writeSettings cause following problem:
+   *                          save project with view, close view and exit, the project
+   *                          geometry/state is saved on closeEvent instead of project save. Quickly
+   *                          added signal when project is saved, so the writeSettings can happen
+   *                          for project.  This will be cleaned up when save/restore is fully
+   *                          implemented.
    *  
    */
   class Project : public QObject {
@@ -375,8 +384,6 @@ namespace Isis {
       template<typename Data> void warn(QString text, Data relevantData);
 
       void warn(QString text);
-      
-      void loadProjectSettings();
 
     signals:
       /**
@@ -483,7 +490,6 @@ namespace Isis {
        * Emitted when project is saved.
        * receivers: IpceMainWindow
        */
-
       void projectSaved(Project *);
 
       /**
