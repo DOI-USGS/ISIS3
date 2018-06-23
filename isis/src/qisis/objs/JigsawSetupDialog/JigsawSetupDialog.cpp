@@ -1294,6 +1294,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Validates the a priori sigma values for a given QTableWidgetItem.
+   *
+   * This will only validate items in the a priori sigma column. Valid a priori sigma values are
+   * "FREE" or any positive double. Items that are invalid will be marked with a red background
+   * color.
+   *
+   * @param QTableWidgetItem* Pointer to the QTableWidgetItem to be validated.
+   */
   void JigsawSetupDialog::validateSigmaValue(QTableWidgetItem *item) {
     // Only validate the "a priori sigma" column
     if (item->column() != 3) {
