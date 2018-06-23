@@ -1304,7 +1304,14 @@ namespace Isis {
     bool convertSuccess = false;
     double sigma = item->text().toDouble(&convertSuccess);
     if (convertSuccess && sigma >= 0.0) {
-      item->setBackground(Qt::white);
+      const QTableWidget *table = item->tableWidget();
+      // Set background color depending on if the table has alternating row colors and is odd
+      if (table->alternatingRowColors() && item->row() % 2 != 0) {
+        item->setBackground(table->palette().color(QPalette::AlternateBase));
+      }
+      else {
+        item->setBackground(table->palette().color(QPalette::Base));
+      }
     }
     else {
       item->setBackground(Qt::red);
