@@ -1362,15 +1362,13 @@ namespace Isis {
 
   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
     int currentIndex = m_ui->positionComboBox->currentIndex();
-    QList<QSpinBox *> spkSpinBoxes{m_ui->spkDegreeSpinBox, m_ui->spkSolveDegreeSpinBox};
-    for (auto &spinBox : spkSpinBoxes) {
-      spinBox->setValue(currentIndex - 1);
-      if (arg1 == "ALL") {
-        spinBox->setEnabled(true);
-      }
-      else {
-        spinBox->setEnabled(false);
-      }
+    QSpinBox *spinBox = m_ui->spkSolveDegreeSpinBox;
+    spinBox->setValue(currentIndex - 1);
+    if (arg1 == "ALL") {
+      spinBox->setEnabled(true);
+    }
+    else {
+      spinBox->setEnabled(false);
     }
 
     // @todo @irh better way to do this than hard coded "magic" numbers?
