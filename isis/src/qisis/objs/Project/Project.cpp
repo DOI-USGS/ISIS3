@@ -2195,8 +2195,6 @@ namespace Isis {
         // delete the temporary project
         deleteAllProjectFiles();
         relocateProjectRoot(newDestination);
-
-//         emit projectSave((const Project *)this);
         
         // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
         // working properly. For example, when we save a new project and try to view a control net
@@ -2218,7 +2216,6 @@ namespace Isis {
       }
 
       save(m_projectRoot->absolutePath(), false);
-//       emit projectSave((const Project *)this);
     }
 
     return saveDialogCompleted;
