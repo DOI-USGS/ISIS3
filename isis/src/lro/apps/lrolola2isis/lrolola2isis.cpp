@@ -41,9 +41,30 @@ void IsisMain() {
   SerialNumberList cubeList = SerialNumberList(ui.GetFileName("CUBES"));
   double threshold = ui.GetDouble("THRESHOLD");
   double rangeSigma = ui.GetDouble("POINT_RANGE_SIGMA");
-  double latSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
-  double lonSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
-  double radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
+
+  double latSigma = Isis::Null;
+  double lonSigma = Isis::Null;
+  double radiusSigma = Isis::Null;
+
+  if (ui.GetDouble("POINT_LATITUDE_SIGMA")) {
+    latSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
+  }
+  if (ui.GetDouble("POINT_LONGITUDE_SIGMA")) {
+    lonSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
+  }
+  if (ui.GetDouble("POINT_RADIUS_SIGMA")) {
+    radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
+  }
+
+//  if (ui.WasEntered("POINT_LATITUDE_SIGMA")) {
+//    latSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
+//  }
+//  if (ui.WasEntered("POINT_LONGITUDE_SIGMA")) {
+//    lonSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
+//  }
+//  if (ui.WasEntered("POINT_RADIUS_SIGMA")) {
+//    radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
+//  }
 
   QList<LidarCube> images;
   
@@ -86,10 +107,11 @@ void IsisMain() {
     
     LidarControlPoint *lidarPoint = new LidarControlPoint;
     lidarPoint->SetId(pointId.Next());
+
     lidarPoint->setTime(time);
     lidarPoint->setRange(range);
     lidarPoint->setSigmaRange(rangeSigma);
-    
+
     // Just set the point coordinates for now.  We need to wait until we set
     // the target radii to be able to set the coordinate sigmas.  The sigmas
     // will be converted to angles and the target radii are needed to do that.
@@ -106,7 +128,8 @@ void IsisMain() {
         Camera *camera = cube->camera();
           
         if (camera != NULL) {
-          if (camera->SetGround(lat, lon)) {
+//        if (camera->SetGround(lat, lon)) {
+          if (camera->SetGround(spoint)) {
             double samp = camera->Sample();
             double line = camera->Line();
               
@@ -114,6 +137,7 @@ void IsisMain() {
                 && samp < camera->Samples() + .5  &&  line < camera->Lines() + .5) {
         
               ControlMeasure *measure = new ControlMeasure;
+
               measure->SetCoordinate(camera->Sample(), camera->Line()); 
               measure->SetCubeSerialNumber(images[j].sn);
 

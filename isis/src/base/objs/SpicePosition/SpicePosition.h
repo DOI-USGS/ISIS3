@@ -181,6 +181,8 @@ namespace Isis {
    *   @history 2017-08-18 Tyler Wilson, Summer Stapleton, Ian Humphrey -  Added opening/closing brackets
    *                           to SetEphemerisTimePolyFunction() so this class compiles without warnings
    *                           under C++14. References #4809.   
+   *   @history 2018-06-22 Ken Edmundson - Added scaledTime() method to return current scaled time.
+   *                           Also removed some unnecessary semi-colons in this header file.
    */
   class SpicePosition {
     public:
@@ -215,14 +217,17 @@ namespace Isis {
       //! Return the current ephemeris time
       double EphemerisTime() const {
         return p_et;
-      };
+      }
+
+      //! Return scaled time
+      double scaledTime() const;
 
       const std::vector<double> &GetCenterCoordinate();
 
       //! Return the current J2000 position
       const std::vector<double> &Coordinate() {
         return p_coordinate;
-      };
+      }
 
       //! Return the current J2000 velocity
       const std::vector<double> &Velocity();
@@ -230,7 +235,7 @@ namespace Isis {
       //! Return the flag indicating whether the velocity exists
       bool HasVelocity() {
         return p_hasVelocity;
-      };
+      }
 
       void LoadCache(double startTime, double endTime, int size);
       void LoadCache(double time);
@@ -249,7 +254,7 @@ namespace Isis {
       //! Is this position cached
       bool IsCached() const {
         return (p_cache.size() > 0);
-      };
+      }
 
       void SetPolynomial(const Source type = PolyFunction);
 
@@ -282,21 +287,21 @@ namespace Isis {
       //! Return the source of the position
       Source GetSource() {
         return p_source;
-      };
+      }
 
       void ComputeBaseTime();
 
       //! Return the base time for the position
       double GetBaseTime() {
         return p_baseTime;
-      };
+      }
 
       void SetOverrideBaseTime(double baseTime, double timeScale);
 
       //! Return the time scale for the position
       double GetTimeScale() {
         return p_timeScale;
-      };
+      }
 
       double DPolynomial(const int coeffIndex);
 
@@ -387,6 +392,6 @@ namespace Isis {
 
   //! Typdef for SpicePosition QSharedPointer.
   typedef QSharedPointer<SpicePosition> SpicePositionQsp;
-};
+}
 
 #endif

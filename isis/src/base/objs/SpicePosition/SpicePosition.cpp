@@ -1826,6 +1826,16 @@ namespace Isis {
 
 
   /**
+   * Return the scaled time.
+   *
+   * @return Scaled time.
+   */
+  double SpicePosition::scaledTime() const {
+    return (p_et - p_baseTime) / p_timeScale;
+  }
+
+
+  /**
    * Return the index of the polynomial segment that contains a given time.
    * 
    * @param et The time to find the segment index of.

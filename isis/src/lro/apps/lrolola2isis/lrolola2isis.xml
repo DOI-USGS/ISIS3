@@ -32,6 +32,11 @@
       functionality may change to include points without simultaneous
       measures in the bundle adjustment.  References #5343.
     </change>
+    <change name="Ken Edmundson" date="2018-06-20">
+      Changed call to Camera::SetGround to use the SurfacePoint with the input
+      lidar point coordinates. Ensures use of lidar point radius instead of the
+      local radius.
+    </change>
   </history>
 
   <category>
@@ -167,7 +172,7 @@
             for all points.  Units are meters.
           </description>
           <type>double</type>
-          <default><item>10.</item></default>
+          <default><item>10.0</item></default>
           <minimum inclusive="yes">0</minimum>
         </parameter>
   
@@ -179,7 +184,7 @@
             uncertainty for all points. Units are meters. 
           </description>
           <type>double</type>
-          <default><item>10.</item></default>
+          <default><item>10.0</item></default>
           <minimum inclusive="yes">0</minimum>
         </parameter>
 
@@ -191,7 +196,7 @@
             all points.  Units are meters.
           </description>
           <type>double</type>
-          <default><item>10.</item></default>
+          <default><item>10.0</item></default>
           <minimum inclusive="yes">0</minimum>
         </parameter>
     </group>

@@ -132,6 +132,7 @@ namespace Isis {
    * @param bundleSettings A shared pointer to the BundleSettings to be used.
    * @param cnetFile The filename of the control network to be used.
    * @param cubeList The list of filenames of the cubes to be adjusted.
+   * @param lidarDataFile Lidar point dataset filename.
    * @param printSummary If summaries should be printed each iteration.
    */
   BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
@@ -157,13 +158,15 @@ namespace Isis {
 
     // read lidar point data file
     try {
-      m_lidarDataSet.read(lidarDataFile);
+      m_lidarDataSet = LidarDataQsp( new LidarData());
+      m_lidarDataSet->read(lidarDataFile);
     }
     catch (IException &e) {
       throw;
     }
 
     m_bundleResults.setOutputControlNet(m_controlNet);
+    m_bundleResults.setOutputLidarData(m_lidarDataSet);
     m_serialNumberList = new SerialNumberList(cubeList);
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
@@ -433,7 +436,9 @@ namespace Isis {
     // RENAME????????????
     m_controlNet->SetImages(*m_serialNumberList, progress);
 
-    m_lidarDataSet.SetImages(*m_serialNumberList, progress);
+    if (m_lidarDataSet) {
+      m_lidarDataSet->SetImages(*m_serialNumberList, progress);
+    }
 
     // clear JigsawRejected flags
     m_controlNet->ClearJigsawRejected();
@@ -554,9 +559,12 @@ namespace Isis {
     }
 
     // add BundleLidarControlPoints
-    int numLidarPoints = m_lidarDataSet.points().size();
+    int numLidarPoints;
+    if (m_lidarDataSet) {
+      numLidarPoints = m_lidarDataSet->points().size();
+    }
     for (int i = 0; i < numLidarPoints; i++) {
-      LidarControlPointQsp lidarPoint = m_lidarDataSet.points().at(i);
+      LidarControlPointQsp lidarPoint = m_lidarDataSet->points().at(i);
       if (lidarPoint->IsIgnored()) {
         continue;
       }
@@ -717,6 +725,26 @@ namespace Isis {
 
 
   /**
+   * @brief Free CHOLMOD library variables.
+   *
+   * Frees m_cholmodTriplet, m_cholmodNormal, and m_L.
+   * Calls cholmod_finish when complete.
+   *
+   * @return bool If the CHOLMOD library successfully cleaned up.
+   */
+  bool BundleAdjust::freeCHOLMODLibraryVariables() {
+
+    cholmod_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
+    cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
+    cholmod_free_factor(&m_L, &m_cholmodCommon);
+
+    cholmod_finish(&m_cholmodCommon);
+
+    return true;
+  }
+
+
+  /**
    * Initialize Normal Equations matrix (m_sparseNormals).
    *
    * @return bool.
@@ -766,90 +794,6 @@ namespace Isis {
         blockColumn++;
       }
     }
-
-    return true;
-  }
-
-
-  /**
-   * Initialize Normal Equations matrix (m_sparseNormals).
-   *
-   * @return bool.
-   *
-   * @todo Ken We are explicitly setting the start column for each SparseBlockColumn in the normal
-   *           equations matrix below. Is it possible to make the m_sparseNormals matrix smart
-   *           enough to set the start column of a column block automatically when it is added?
-   *
-   */
-/*
-  bool BundleAdjust::initializeNormalEquationsMatrix() {
-
-    int nBlockColumns = m_bundleObservations.numberPolynomialSegments();
-
-    if (m_bundleSettings->solveTargetBody())
-      nBlockColumns += 1;
-
-    m_sparseNormals.setNumberOfColumns(nBlockColumns);
-
-    m_sparseNormals.at(0)->setStartColumn(0);
-
-    int nParameters = 0;
-    if (m_bundleSettings->solveTargetBody()) {
-      nParameters += m_bundleSettings->numberTargetBodyParameters();
-      m_sparseNormals.at(1)->setStartColumn(nParameters);
-
-      int observation = 0;
-      for (int i = 2; i < nBlockColumns; i++) {
-        nParameters += m_bundleObservations.at(observation)->numberParameters();
-        m_sparseNormals.at(i)->setStartColumn(nParameters);
-        observation++;
-      }
-    }
-    else {
-      int blockColumn = 0;
-      for (int i = 0; i < m_bundleObservations.size(); i++) {
-        int positionParameters =
-            m_bundleObservations.at(i)->numberPositionParametersPerSegment();
-
-        int pointingParameters =
-            m_bundleObservations.at(i)->numberPointingParametersPerSegment();
-
-        int positionSegments = m_bundleObservations.at(i)->numberPolynomialPositionSegments();
-        for (int j = 0; j < positionSegments; j++) {
-          m_sparseNormals.at(blockColumn)->setStartColumn(nParameters);
-          m_sparseNormals.at(blockColumn)->setObservationIndex(i);
-          nParameters += positionParameters;
-          blockColumn++;
-        }
-        int pointingSegments = m_bundleObservations.at(i)->numberPolynomialPointingSegments();
-        for (int j = 0; j < pointingSegments; j++) {
-          m_sparseNormals.at(blockColumn)->setStartColumn(nParameters);
-          m_sparseNormals.at(blockColumn)->setObservationIndex(i);
-          nParameters += pointingParameters;
-          blockColumn++;
-        }
-      }
-    }
-
-    return true;
-  }
-*/
-
-  /**
-   * @brief Free CHOLMOD library variables.
-   *
-   * Frees m_cholmodTriplet, m_cholmodNormal, and m_L.
-   * Calls cholmod_finish when complete.
-   *
-   * @return bool If the CHOLMOD library successfully cleaned up.
-   */
-  bool BundleAdjust::freeCHOLMODLibraryVariables() {
-
-    cholmod_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
-    cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
-    cholmod_free_factor(&m_L, &m_cholmodCommon);
-
-    cholmod_finish(&m_cholmodCommon);
 
     return true;
   }
@@ -1157,7 +1101,7 @@ namespace Isis {
           m_bundleResults.initializeResidualsProbabilityDistribution(101);
         }
         // TODO: is this necessary ???
-        // probably all ready initialized to 101 nodes in bundle settings constructor...
+        // probably already initialized to 101 nodes in bundle settings constructor...
 
         // if we're using CHOLMOD and still going, release cholmod_factor
         // (if we don't, memory leaks will occur), otherwise we need it for error propagation
@@ -1222,6 +1166,7 @@ namespace Isis {
   BundleSolutionInfo *BundleAdjust::bundleSolveInformation() {
     BundleSolutionInfo *bundleSolutionInfo = new BundleSolutionInfo(m_bundleSettings,
                                                                     FileName(m_cnetFileName),
+                                                                    FileName(m_lidarFileName),
                                                                     m_bundleResults,
                                                                     imageLists());
     bundleSolutionInfo->setRunTime("");
@@ -1231,8 +1176,9 @@ namespace Isis {
 
   /**
    * Form the least-squares normal equations matrix.
+   *
    * Each BundleControlPoint stores its Q matrix and NIC vector.
-   * The covariance matrix for each point will be stored in its adjusted surface point.
+   * Limiting error portion of each points covariance matrix is stored in its adjusted surface point.
    *
    * @return bool
    *
@@ -1241,7 +1187,6 @@ namespace Isis {
    * @see formWeightedNormals()
    */
 bool BundleAdjust::formNormalEquations() {
-//  bool BundleAdjust::formPhotoNormals() {
     bool status = false;
 
     m_bundleResults.setNumberObservations(0);
@@ -1371,7 +1316,7 @@ bool BundleAdjust::formNormalEquations() {
 //            / (double)CLOCKS_PER_SEC;
 
         m_numLidarConstraints += point->applyLidarRangeConstraint(m_sparseNormals, N22, N12, n1, n2,
-                                                                measure);
+                                                                  measure);
 //        applyLidarRangeConstraint(N22, N12, n1, n2, coeffImagePosition.size2(), measure, point);
 
       } // end loop over this points measures
@@ -1442,7 +1387,7 @@ bool BundleAdjust::formNormalEquations() {
    *
    * @return bool If the matrices were successfully formed.
    *
-   * @see BundleAdjust formNormalEquations
+   * @see formNormalEquations()
    */
   bool BundleAdjust::formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22,
                                         SparseBlockColumnMatrix &N12,
@@ -1609,6 +1554,9 @@ bool BundleAdjust::formNormalEquations() {
                                       vector<double> &nj,
                                       BundleControlPointQsp &bundleControlPoint) {
 
+    if (bundleControlPoint->id().contains("Lidar3304"))
+        int fred=1;
+
     boost::numeric::ublas::bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
     SparseBlockRowMatrix &Q = bundleControlPoint->qMatrix();
 
@@ -1772,35 +1720,6 @@ bool BundleAdjust::formNormalEquations() {
     nj += n1;
 
     return true;
-  }
-
-
-  /**
-   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
-   *
-   * @param alpha A constant multiplier.
-   * @param v2 The output vector.
-   * @param Q A sparse block matrix.
-   * @param v1 A vector.
-   */
-  void BundleAdjust::productAlphaAV(double alpha, bounded_vector<double,3> &v2,
-                                    SparseBlockRowMatrix &Q,
-                                    vector<double> &v1) {
-
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
-
-    int subrangeStart, subrangeEnd;
-
-    while ( Qit.hasNext() ) {
-      Qit.next();
-
-      int columnIndex = Qit.key();
-
-      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
-      subrangeEnd = subrangeStart + Qit.value()->size2();
-
-      v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
-    }
   }
 
 
@@ -2454,12 +2373,12 @@ bool BundleAdjust::formNormalEquations() {
    *
    * @throws IException::User "Unable to map apriori surface point for measure"
    */
-      bool BundleAdjust::computePartials(LinearAlgebra::Matrix &coeffTarget,
-                                         LinearAlgebra::Matrix &coeffImagePosition,
-                                         LinearAlgebra::Matrix &coeffImagePointing,
-                                         LinearAlgebra::Matrix &coeffPoint3D,
-                                         LinearAlgebra::Vector &coeffRHS,
-                                         BundleMeasureQsp measure) {
+  bool BundleAdjust::computePartials(LinearAlgebra::Matrix &coeffTarget,
+                                     LinearAlgebra::Matrix &coeffImagePosition,
+                                     LinearAlgebra::Matrix &coeffImagePointing,
+                                     LinearAlgebra::Matrix &coeffPoint3D,
+                                     LinearAlgebra::Vector &coeffRHS,
+                                     BundleMeasureQsp measure) {
     // additional vectors
     std::vector<double> lookBWRTLat;
     std::vector<double> lookBWRTLon;
@@ -2494,7 +2413,7 @@ bool BundleAdjust::formNormalEquations() {
     // we set the measures polynomial segment indices and position and pointing matrix blocks
     // once only, in the first iteration.
     // NOTE: for time dependent sensors, Camera::SetImage MUST be called prior to
-    // setPolySegementIndices
+    // setPolySegmentIndices
     // TODO: should we do this in initialization? But SetImage would have to be called there for
     // time dependent sensors.
     if (m_iteration == 1) {
@@ -2643,7 +2562,7 @@ bool BundleAdjust::formNormalEquations() {
 
     // TODO: lidar kluge
     if (measure->parentControlPoint()->id().contains("Lidar")) {
-      observationSigma *=10.0;
+      observationSigma *=30.0;
     }
 
     observationWeight = 1.0 / observationSigma;
@@ -2679,7 +2598,7 @@ bool BundleAdjust::formNormalEquations() {
    */
   void BundleAdjust::applyParameterCorrections() {
 
-    qDebug() << m_imageSolution;
+//    qDebug() << m_imageSolution;
 
     int t = 0;
 
@@ -2743,7 +2662,7 @@ bool BundleAdjust::formNormalEquations() {
     // vtpv for image coordinates
     int numObjectPoints = m_bundleControlPoints.size();
 
-    double vtpvTest = m_bundleControlPoints.vtpvMeasureContribution();
+//    double vtpvTest = m_bundleControlPoints.vtpvMeasureContribution();
 //    m_bundleControlPoints.rmsResiduals(rmsx, rmsy, rmsxy);
 
     for (int i = 0; i < numObjectPoints; i++) {
@@ -2758,7 +2677,7 @@ bool BundleAdjust::formNormalEquations() {
 
         // TODO: lidar kluge
         if (measure->parentControlPoint()->id().contains("Lidar")) {
-          weight *=10.0;
+          weight *=30.0;
         }
 
         weight = 1.0 / weight;
@@ -2768,18 +2687,27 @@ bool BundleAdjust::formNormalEquations() {
         vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
 
         // TODO: Testing - correct lidar simultaneous measure by it's residual
-        if ( point->id().contains("Lidar", Qt::CaseInsensitive) ) {
-          double newsample = measure->sample() - measure->sampleResidual();
-          double newline   = measure->line() - measure->lineResidual();
+//        if ( point->id().contains("Lidar", Qt::CaseInsensitive) ) {
 
-          measure->rawMeasure()->SetCoordinate(newsample, newline);
-          Camera* camera = measure->camera();
+//          double sample = measure->sample();
+//          double line = measure->line();
 
-          camera->SetImage(newsample,newline);
-          double newx = camera->DistortionMap()->UndistortedFocalPlaneX();
-          double newy = camera->DistortionMap()->UndistortedFocalPlaneY();
-          measure->rawMeasure()->SetFocalPlaneMeasured(newx,newy);
-        }
+//          // in undistorted space
+//          double sampleResidual = measure->sampleResidual();
+//          double lineResidual = measure->lineResidual();
+
+//          // are measure->sample, measure->line in distorted or undistorted space?
+//          double newsample = measure->sample() - measure->sampleResidual();
+//          double newline   = measure->line() - measure->lineResidual();
+
+//          measure->rawMeasure()->SetCoordinate(newsample, newline);
+//          Camera* camera = measure->camera();
+
+//          camera->SetImage(newsample,newline);
+//          double newx = camera->DistortionMap()->UndistortedFocalPlaneX();
+//          double newy = camera->DistortionMap()->UndistortedFocalPlaneY();
+//          measure->rawMeasure()->SetFocalPlaneMeasured(newx,newy);
+//        }
 
         // if rejected, don't include in statistics
         if (measure->isRejected()) {
@@ -3416,6 +3344,16 @@ bool BundleAdjust::formNormalEquations() {
 
 
   /**
+   * Returns a pointer to the output lidar data file.
+   *
+   * @return LidarDataQsp A shared pointer to the output lidar data file.
+   */
+  LidarDataQsp BundleAdjust::lidarData() {
+    return m_lidarDataSet;
+  }
+
+
+  /**
    * Returns a pointer to the serial number list.
    *
    * @return SerialNumberList* A pointer to the serial number list.
@@ -3580,7 +3518,7 @@ bool BundleAdjust::formNormalEquations() {
    * @param status The bundle status string to output.
    *
    * @internal
-   *   @history 2016-12-01 Ian Humphrey - Added %s as first paramter to prevent a
+   *   @history 2016-12-01 Ian Humphrey - Added %s as first parameter to prevent a
    *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
