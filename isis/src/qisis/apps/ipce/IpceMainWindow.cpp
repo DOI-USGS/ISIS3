@@ -40,6 +40,8 @@
 #include <QDateTime>
 #include <QTreeView>
 #include <QVariant>
+#include <QTabWidget>
+
 
 #include "AbstractProjectItemView.h"
 #include "Directory.h"
@@ -85,6 +87,8 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+    //setDockOptions(GroupedDragging | AllowTabbedDocks);
     //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
     setDockNestingEnabled(true);
@@ -351,6 +355,10 @@ namespace Isis {
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
+
+    QAction *tabViewsAction = new QAction("Tab Views", this);
+    connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
+    m_viewMenuActions.append(tabViewsAction);
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -696,10 +704,10 @@ namespace Isis {
     else {
       setWindowTitle( project->name() );
       if (settings.contains("geometry")) {
-        setGeometry(settings.value("geometry").value<QRect>()); 
+        setGeometry(settings.value("geometry").value<QRect>());
       }
       if (settings.contains("windowState")) {
-        restoreState(settings.value("windowState").toByteArray()); 
+        restoreState(settings.value("windowState").toByteArray());
       }
 
       // The geom/state isn't enough for main windows to correctly remember
@@ -792,13 +800,23 @@ namespace Isis {
 
 
   /**
-   * PlaceHolder for the option to tab all views. (This was setTabbedViewMode in the old code)
+   * Tabs all open attached/detached views
    */
-  void IpceMainWindow::tabAllViews() {
-//  QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-//  mdiArea->setViewMode(QMdiArea::TabbedView);
-//  m_cascadeViewsAction->setEnabled(false);
-//  m_tileViewsAction->setEnabled(false);
+  void IpceMainWindow::tabViews() {
+    // tabifyDockWidget() takes two widgets and tabs them, so an easy way to do
+    // this is to grab the first view and tab the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
+
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tabbed. If it is attached,
+      // this will have no affect.
+      currentView->setFloating(false);
+
+      if (currentView == firstView) {
+        continue;
+      }
+      tabifyDockWidget(firstView, currentView);
+    }
   }
 
 

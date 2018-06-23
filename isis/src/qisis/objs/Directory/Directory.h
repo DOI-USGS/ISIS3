@@ -56,6 +56,7 @@ namespace Isis {
   class Control;
   class ControlNet;
   class ControlPointEditView;
+  class ControlHealthMonitorView;
   class CubeDnView;
   class FileItem;
   class Footprint2DView;
@@ -246,6 +247,11 @@ namespace Isis {
    *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
    *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
    *                           to allow for saving of the project at these times. Fixes #5114.
+   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
+   *                           Fixes #5435.
+   *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
+   *                           directory instance rather than the activeControl. Fixes #5435.
+   *
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -260,6 +266,7 @@ namespace Isis {
       QStringList recentProjectsList();
 
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
+      ControlHealthMonitorView *addControlHealthMonitorView();
       CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
@@ -298,6 +305,7 @@ namespace Isis {
       QList<TemplateEditorWidget *> templateEditorViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
+      ControlHealthMonitorView *controlHealthMonitorView();
       ControlPointEditView *controlPointEditView();
 //      ChipViewportsWidget *controlPointChipViewports();
 
@@ -465,6 +473,8 @@ namespace Isis {
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
+
+      QPointer<ControlHealthMonitorView> m_controlHealthMonitorView;
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
       //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets

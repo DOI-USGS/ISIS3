@@ -2,19 +2,24 @@
 
 #include "APrioriLatitudeSigmaFilter.h"
 
+#include <QPair>
+#include <QString>
+
+#include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Latitude.h"
 
 
 namespace Isis {
   APrioriLatitudeSigmaFilter::APrioriLatitudeSigmaFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  APrioriLatitudeSigmaFilter::APrioriLatitudeSigmaFilter(
-    const APrioriLatitudeSigmaFilter &other) : AbstractNumberFilter(other) {
+  APrioriLatitudeSigmaFilter::APrioriLatitudeSigmaFilter(const APrioriLatitudeSigmaFilter &other)
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -23,19 +28,18 @@ namespace Isis {
 
 
   bool APrioriLatitudeSigmaFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+        const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
   bool APrioriLatitudeSigmaFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-        point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters());
+          point->GetAprioriSurfacePoint().GetLatSigmaDistance().meters());
   }
 
 
-  bool APrioriLatitudeSigmaFilter::evaluate(
-    const ControlMeasure *measure) const {
+  bool APrioriLatitudeSigmaFilter::evaluate(const ControlMeasure *measure) const {
     return true;
   }
 
@@ -61,7 +65,6 @@ namespace Isis {
 
   QString APrioriLatitudeSigmaFilter::getPointDescription() const {
     return "have <i>a priori</i> surface point latitude sigmas which are " +
-        descriptionSuffix();
+          descriptionSuffix();
   }
 }
-
