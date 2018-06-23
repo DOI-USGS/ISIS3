@@ -319,32 +319,32 @@ namespace Isis {
   class BundleAdjust : public QObject {
       Q_OBJECT
     public:
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    const QString &cnetFile,
                    const QString &cubeList,
                    bool printSummary = true);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    const QString &cnetFile,
                    const QString &cubeList,
                    const QString &lidarDataFile,
                    bool printSummary = true);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    QString &cnet,
                    SerialNumberList &snlist,
                    bool printSummary = true);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    Control &cnet,
                    SerialNumberList &snlist,
                    bool bPrintSummary);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    ControlNet &cnet,
                    SerialNumberList &snlist,
                    bool printSummary = true);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    ControlNetQsp cnet,
                    const QString &cubeList,
                    bool printSummary = true);
-      BundleAdjust(BundleSettingsQsp bundleSettings,
+      BundleAdjust(BundleSettingsQsp bundleSettings,            // OK
                    Control &control,
                    QList<ImageList *> imgList,
                    bool printSummary);
@@ -361,6 +361,7 @@ namespace Isis {
       // accessors
 
       ControlNetQsp    controlNet();
+      LidarDataQsp     lidarData();
       SerialNumberList *serialNumberList();
       QString          fileName(int index);
       QString          iterationSummaryGroup() const;
@@ -444,11 +445,6 @@ namespace Isis {
                           SparseBlockColumnMatrix              &N12,
                           SparseBlockRowMatrix                 &Q);
 
-      void productAlphaAV(double alpha,
-                          boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
-                          SparseBlockRowMatrix                                &Q,
-                          LinearAlgebra::Vector                               &v1);
-
       // CHOLMOD library methods
 
       bool initializeCHOLMODLibraryVariables();
@@ -467,7 +463,7 @@ namespace Isis {
       BundleControlPointVector m_bundleControlPoints;        //!< Vector of control points.
 
       QString m_lidarFileName;                               //!< Input lidar point filename.
-      LidarData m_lidarDataSet;                              //!< QList of lidar points.
+      LidarDataQsp m_lidarDataSet;                           //!< Output lidar data.
       int m_numLidarConstraints;                             //!< TODO: temp
 
       BundleObservationVector m_bundleObservations;          /**!< Vector of observations.
