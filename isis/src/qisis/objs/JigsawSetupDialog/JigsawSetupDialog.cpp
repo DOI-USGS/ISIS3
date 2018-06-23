@@ -1300,12 +1300,18 @@ namespace Isis {
       return;
     }
 
+    // FREE is a valid value for the a priori sigma column
+    int free = item->text().compare("FREE", Qt::CaseInsensitive);
+    if (free == 0) {
+      item->setText("FREE");
+    }
+
     // Positive doubles are valid values for the a priori sigma column
     bool convertSuccess = false;
     double sigma = item->text().toDouble(&convertSuccess);
-    if (convertSuccess && sigma >= 0.0) {
+    if ((convertSuccess && sigma >= 0.0) || free == 0) {
       const QTableWidget *table = item->tableWidget();
-      // Set background color depending on if the table has alternating row colors and is odd
+      // Set background color depending on if the table has alternating row colors and row is odd
       if (table->alternatingRowColors() && item->row() % 2 != 0) {
         item->setBackground(table->palette().color(QPalette::AlternateBase));
       }
