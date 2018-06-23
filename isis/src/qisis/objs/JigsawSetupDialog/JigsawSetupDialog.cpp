@@ -100,14 +100,17 @@ namespace Isis {
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
 
+    // Populate the solve option comboboxes
     const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->positionComboBox->insertItems(0, positionOptions);
     m_ui->positionComboBox->setCurrentIndex(0);
-    m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
 
     const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->pointingComboBox->insertItems(0, pointingOptions);
     m_ui->pointingComboBox->setCurrentIndex(0);
+
+    // The degree solve options' minimums are -1 (set in ui file), make the -1's display as N/A
+    m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
     m_ui->ckSolveDegreeSpinBox->setSpecialValueText("N/A");
 
 
@@ -115,7 +118,6 @@ namespace Isis {
     tableHeaders << "coefficients" << "description" << "units" << "a priori sigma";
     m_ui->positionAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
-    // @todo @irh figure out how to resize the column headers more appropriately / generically
     m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
     m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
     m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
@@ -123,6 +125,8 @@ namespace Isis {
 
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
+    // Add validators to the tables in the observation solve settings tab to validate the a priori
+    // sigma items
     connect(m_ui->positionAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
             this, SLOT(validateSigmaValue(QTableWidgetItem *)));
     connect(m_ui->pointingAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
@@ -1349,7 +1353,9 @@ namespace Isis {
     table->setRowCount(i + 1);
 
     const int columnCount = table->columnCount();
-
+    // Headers : coefficient, description, units, a priori sigma
+    // The description and units are related directly to the solve options, so for now do those
+    // generically (columns 1 and 2)
     for (int row = 0; row < i + 1; row++) {
       QTableWidgetItem *coefficient = new QTableWidgetItem();
       coefficient->setFlags(Qt::ItemIsEnabled);
