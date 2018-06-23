@@ -56,7 +56,6 @@ namespace Isis {
           continue;
       }
 
-      BundleObservationQsp observation = measure->parentBundleObservation();
       m_rangeConstraints.append(BundleLidarRangeConstraintQsp
                                 (new BundleLidarRangeConstraint(m_lidarControlPoint, measure)));
     }
@@ -133,7 +132,8 @@ namespace Isis {
 
 
   /**
-   * Apply point parameter corrections for in Bundle Adjustment.
+   * Apply point parameter corrections for Bundle Adjustment and update any range constraints
+   * between image position and lidar point.
    *
    * @param normalsMatrix Normal equations matrix.
    * @param imageSolution Current iteration solution vector for image parameters.
