@@ -46,9 +46,8 @@ namespace Isis {
    */
   class BundleLidarRangeConstraint : public BundleConstraint {
     public:
-      // constructors
-      BundleLidarRangeConstraint(LidarControlPointQsp lidarControlPoint,
-                                 BundleMeasureQsp measure);
+      // constructor
+      BundleLidarRangeConstraint(LidarControlPointQsp lidarControlPoint, BundleMeasureQsp measure);
 
       // copy constructor
       BundleLidarRangeConstraint(const BundleLidarRangeConstraint &src);
@@ -73,12 +72,8 @@ namespace Isis {
       QString formatBundleOutputString(bool errorProp=false);
 
     private:
-      void init();
-
-      LidarControlPointQsp m_parentLidarControlPoint; //!< Parent lidar control point
-      BundleObservationQsp m_bundleObservation;       //!< Associated BundleObservation
-//      SpicePosition *m_instrumentPosition;            //!< Instrument spice position
-//      SpiceRotation *m_bodyRotation;                  //!< Body spice rotation.
+      LidarControlPointQsp m_lidarControlPoint;       //!< Parent lidar control point
+      BundleObservationQsp m_bundleObservation;       //!< BundleObservation associated with measure
 
       BundleMeasureQsp m_simultaneousMeasure;         /**! Point in image acquired simultaneously
                                                            with a lidar observation. NOTE this point
@@ -86,24 +81,27 @@ namespace Isis {
                                                            coordinates are obtained by back
                                                            projection of the lidar 3D point into the
                                                            image using the image's current exterior
-                                                           orientation. The "measure" is corrected
-                                                           in each iteration of the bundle adjustment
-                                                           by it's residuals.*/
-      LinearAlgebra::Matrix m_coeff_range_image;     //! Partials w/respect to image position
-      LinearAlgebra::Matrix m_coeff_range_point3D;   //! Partials w/respect to lidar point
-      LinearAlgebra::Vector m_coeff_range_RHS;       //! Right hand side of normals
+                                                           orientation (SPICE). The "measure" is
+                                                           corrected in each iteration of the bundle
+                                                           adjustement by it's residuals.*/
+      // TODO: should partial matrices be static?
+      // NOTE: they will be different size for different images
+      LinearAlgebra::Matrix m_coeff_range_image;     //!< Partials w/respect to image position
+      LinearAlgebra::Matrix m_coeff_range_point3D;   //!< Partials w/respect to lidar point
+      LinearAlgebra::Vector m_coeff_range_RHS;       //!< Right hand side of normals
 
-      std::vector<double> m_pointBodyFixed;          //! Body fixed coordinates of lidar point
-      std::vector<double> m_cameraJ2K;               //! J2K coordinates of camera
-      std::vector<double> m_cameraBodyFixed;         //! Body fixed coordinates of camera
-      std::vector<double> m_matrixTargetToJ2K;       //! Rotates spacecraft from J2K to body-fixed
+      std::vector<double> m_pointBodyFixed;          //!< Body fixed coordinates of lidar point
+      std::vector<double> m_camPositionJ2K;          //!< J2K coordinates of camera
+      std::vector<double> m_camPositionBodyFixed;    //!< Body fixed coordinates of camera
+      std::vector<double> m_matrixTargetToJ2K;       //!< Rotates spacecraft from J2K to body-fixed
 
-      double m_observedRange;
-      double m_observedRangeSigma;
-      double m_observedRangeWeight;
-      double m_computedRange;
-      double m_adjustedSigma;
-      double m_vtpv;
+      double m_scaledTime;                           //!< Current time for simultaneous measure
+      double m_rangeObserved;                        //!< Observed range from lidar input data
+      double m_rangeComputed;                        //!< Computed range from distance condition
+      double m_rangeObservedSigma;                   //!< Uncertainty of observed range
+      double m_rangeObservedWeightSqrt;              //!< Square-root of observed range weight
+      double m_adjustedSigma;                        //!< Uncertainty of range after adjustment
+      double m_vtpv;                                 //!< weighted sum-of-squares of residual
   };
 
   //! Typdef for BundleLidarRangeConstraint QSharedPointer.
