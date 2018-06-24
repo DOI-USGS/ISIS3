@@ -1483,7 +1483,7 @@ namespace Isis {
    * option is selected. This slot also disables the SPK Solve Degree spin box whenever a solve
    * position that is not ALL is selected.
    *
-   * @param const QString & Reference to the value that the pointing option combobox was changed to.
+   * @param const QString & Reference to the value that the position option combobox was changed to.
    */
   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
     int currentIndex = m_ui->positionComboBox->currentIndex();
@@ -1498,6 +1498,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Slot that listens for when the Instrument Pointing Solve Option combobox changes.
+   *
+   * This slot updates the value of the CK Solve Degree spin box according to which solve pointing
+   * option is selected. This slot also disables the CK Solve Degree spin box whenever a solve
+   * pointing that is not ALL is selected.
+   *
+   * @param const QString & Reference to the value that the pointing option combobox was changed to.
+   */
  void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
     int currentIndex = m_ui->pointingComboBox->currentIndex();
     QSpinBox *spinBox = m_ui->ckSolveDegreeSpinBox;
