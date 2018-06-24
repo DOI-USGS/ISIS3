@@ -1341,7 +1341,7 @@ namespace Isis {
   /**
    * Slot that listens for changes to the SPK Solve Degree spin box.
    *
-   * This slot populates the Instrument Pointing Solve Options table according to the value of the
+   * This slot populates the Instrument Position Solve Options table according to the value of the
    * SPK Solve Degree. Rows are added depending on the degree set, where number of rows added is
    * equal to the SPK Solve Degree + 1.
    *
@@ -1400,6 +1400,75 @@ namespace Isis {
 
       QTableWidgetItem *units = table->item(2, 2);
       units->setText("m/s^2");
+    }
+
+    table->resizeColumnToContents(1);
+    table->resizeColumnToContents(2);
+  }
+
+
+    /**
+   * Slot that listens for changes to the CK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Pointing Solve Options table according to the value of the
+   * CK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the CK Solve Degree + 1.
+   *
+   * @param int Value the CK Solve Degree spin box was changed to.
+   */
+  void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
+    // number of rows == ckSolveDegree value + 1 (i+1)
+    QTableWidget *table = m_ui->pointingAprioriSigmaTable;
+    table->setRowCount(i + 1);
+
+    const int columnCount = table->columnCount();
+    // Headers : coefficient, description, units, a priori sigma
+    // The description and units are related directly to the solve options, so for now do those
+    // generically (columns 1 and 2)
+    for (int row = 0; row < i + 1; row++) {
+      QTableWidgetItem *coefficient = new QTableWidgetItem();
+      coefficient->setFlags(Qt::ItemIsEnabled);
+      coefficient->setText(QString::number(row + 1));
+      table->setItem(row, 0, coefficient);
+
+      for (int column = 1; column < columnCount - 1; column++) {
+        QTableWidgetItem *columnItem = new QTableWidgetItem();
+        columnItem->setFlags(Qt::ItemIsEnabled);
+        table->setItem(row, column, columnItem);
+      }
+
+      QTableWidgetItem *sigma = new QTableWidgetItem();
+      sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+      sigma->setText("0.0");
+      table->setItem(row, columnCount - 1, sigma);
+    }
+
+    // { NONE: N/A, ANGLES: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 3+ }
+    // POSITION
+    if (i + 1 > 0) { 
+      QTableWidgetItem *description = table->item(0, 1);
+      description->setText("ANGLES");
+
+      QTableWidgetItem *units = table->item(0, 2);
+      units->setText("degrees");
+    }
+
+    // VELOCITY
+    if (i + 1 > 1) {
+      QTableWidgetItem *description = table->item(1, 1);
+      description->setText("VELOCITY");
+
+      QTableWidgetItem *units = table->item(1, 2);
+      units->setText("deg/s");
+    }
+
+    // ACCELERATION
+    if (i + 1 > 2) {
+      QTableWidgetItem *description = table->item(2, 1);
+      description->setText("ACCELERATION");
+
+      QTableWidgetItem *units = table->item(2, 2);
+      units->setText("deg/s^2");
     }
 
     table->resizeColumnToContents(1);

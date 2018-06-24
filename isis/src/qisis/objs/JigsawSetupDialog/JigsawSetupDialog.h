@@ -132,6 +132,7 @@ namespace Isis {
     void on_aRadiusLineEdit_textChanged(const QString &arg1);
     void on_targetBodyComboBox_currentIndexChanged(int index);
     void on_spkSolveDegreeSpinBox_valueChanged(int arg1);
+    void on_ckSolveDegreeSpinBox_valueChanged(int arg1);
     void on_rightAscensionLineEdit_textChanged(const QString &arg1);
     void on_declinationLineEdit_textChanged(const QString &arg1);
     void on_rightAscensionVelocityLineEdit_textChanged(const QString &arg1);
