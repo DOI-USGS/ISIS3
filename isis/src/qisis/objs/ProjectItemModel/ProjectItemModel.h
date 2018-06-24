@@ -134,7 +134,11 @@ namespace Isis {
    *                           refinement of selectedItems and is used by the JigsawSetupDialog
    *                           Bundle Observation Solve Settings (BOSS) tab when displaying a
    *                           subset of user-selected images.  References #497
-   *
+   *   @history 2018-06-24 Tyler Wilson - Fixed an edge-case scenario in the selection criteria for
+   *                           selectedBOSSImages().   If a user selected an image list and some
+   *                           (but not all) of the images within that list, the function returned
+   *                           all of the images in the list and not just the selected ones.
+   *                           References #497.
    */
   class ProjectItemModel : public QStandardItemModel {
 
