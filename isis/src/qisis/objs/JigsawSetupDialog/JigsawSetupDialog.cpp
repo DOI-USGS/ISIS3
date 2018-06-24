@@ -1500,16 +1500,14 @@ namespace Isis {
 
  void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
     int currentIndex = m_ui->pointingComboBox->currentIndex();
-    QList<QSpinBox *> ckSpinBoxes{m_ui->ckDegreeSpinBox, m_ui->ckSolveDegreeSpinBox};
-    for (auto &spinBox : ckSpinBoxes) {
-      spinBox->setValue(currentIndex - 1);
-      if (arg1 == "ALL") {
-        spinBox->setReadOnly(false);
-      }
-      else {
-        spinBox->setReadOnly(true);
-      }
-  }
+    QSpinBox *spinBox = m_ui->ckSolveDegreeSpinBox;
+    spinBox->setValue(currentIndex - 1);
+    if (arg1 == "ALL") {
+      spinBox->setReadOnly(false);
+    }
+    else {
+      spinBox->setReadOnly(true);
+    }
   }
 
 
