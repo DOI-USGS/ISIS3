@@ -93,6 +93,8 @@ namespace Isis {
     //centralWidget->hide();
     setDockNestingEnabled(true);
 
+    //activateWindow();
+
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
@@ -197,6 +199,7 @@ namespace Isis {
     dock->setAttribute(Qt::WA_DeleteOnClose);
     dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
                       QDockWidget::DockWidgetFloatable);
+    dock->setFocusPolicy(Qt::ClickFocus);
 
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||
@@ -206,7 +209,6 @@ namespace Isis {
     else {
       addDockWidget(area, dock, orientation);
     }
-
     // Connections for cleanup in both directions to make sure both views and docks are cleaned up
     connect(newWidget, SIGNAL(destroyed(QObject *)), dock, SLOT(deleteLater()));
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));

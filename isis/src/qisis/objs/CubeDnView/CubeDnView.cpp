@@ -136,6 +136,7 @@ namespace Isis {
 
     m_toolPad = new ToolPad("Tool Pad", this);
     m_toolPad->setObjectName("toolPad");
+     m_toolPad->setFocusPolicy(Qt::ClickFocus);
     addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     // Create tools
@@ -235,6 +236,7 @@ namespace Isis {
 
     zoomTool->activate(true);
   }
+
 
   /**
    * A slot function that is called when directory emits a siganl that an active

@@ -109,6 +109,8 @@ namespace Isis {
     action->setIcon(QPixmap(toolIconDir() + "/viewmag.png"));
     action->setToolTip("Zoom (Z)");
     action->setShortcut(Qt::Key_Z);
+    action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+
     QString text  =
       "<b>Function:</b>  Zoom in or out of the current cube. \
       <p><b>Shortcut:</b>  Z</p> ";
