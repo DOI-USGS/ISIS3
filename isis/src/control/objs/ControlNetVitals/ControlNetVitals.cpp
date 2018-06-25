@@ -613,9 +613,10 @@ namespace Isis {
 
     QMap<int, int>::const_iterator i = m_imageMeasureCounts.constBegin();
     while (i != m_imageMeasureCounts.constEnd()) {
-      if (i.key() < num ) {
-        count += i.value();
+      if (i.key() >= num ) {
+        break;
       }
+      count += i.value();
       ++i;
     }
     return count;
