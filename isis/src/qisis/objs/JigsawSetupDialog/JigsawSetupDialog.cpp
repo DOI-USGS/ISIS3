@@ -373,6 +373,7 @@ namespace Isis {
     m_ui->outlierRejectionMultiplierLineEdit->setEnabled(arg1);
 
     // sigma and maxlikelihood options are exclusive
+    m_ui->CQuantileLabel->setEnabled(!arg1);
     m_ui->maxLikelihoodEstimationLabel->setEnabled(!arg1);
     m_ui->maximumLikelihoodModel1ComboBox->setEnabled(!arg1);
     m_ui->maximumLikelihoodModel1Label->setEnabled(!arg1);

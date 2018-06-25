@@ -51,7 +51,7 @@ namespace Isis {
     m_createInverseMatrix  = false;
 
     m_outlierRejection     = false;
-    m_outlierRejectionMultiplier = 1.0;
+    m_outlierRejectionMultiplier = 3.0;
 
     // Parameter Uncertainties (Weighting)
     m_globalLatitudeAprioriSigma  = Isis::Null;
@@ -271,7 +271,7 @@ namespace Isis {
       m_outlierRejectionMultiplier = multiplier;
     }
     else {
-      m_outlierRejectionMultiplier = 1.0;
+      m_outlierRejectionMultiplier = 3.0;
     }
   }
 
@@ -1154,7 +1154,7 @@ namespace Isis {
                 = toDouble(outlierRejectionMultiplierStr);
           }
           else {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0;
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 3.0;
           }
         }
       }
