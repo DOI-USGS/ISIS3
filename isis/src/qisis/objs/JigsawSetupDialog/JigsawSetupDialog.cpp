@@ -1362,11 +1362,15 @@ namespace Isis {
       coefficient->setText(QString::number(row + 1));
       table->setItem(row, 0, coefficient);
 
-      for (int column = 1; column < columnCount - 1; column++) {
-        QTableWidgetItem *columnItem = new QTableWidgetItem();
-        columnItem->setFlags(Qt::ItemIsEnabled);
-        table->setItem(row, column, columnItem);
-      }
+      QTableWidgetItem *description = new QTableWidgetItem();
+      description->setFlags(Qt::ItemIsEnabled);
+      description->setText("N/A");
+      table->setItem(row, 1, description);
+
+      QTableWidgetItem *units = new QTableWidgetItem();
+      units->setFlags(Qt::ItemIsEnabled);
+      units->setText("m/s^" + QString::number(row));
+      table->setItem(row, 2, units);
 
       QTableWidgetItem *sigma = new QTableWidgetItem();
       sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
@@ -1431,11 +1435,15 @@ namespace Isis {
       coefficient->setText(QString::number(row + 1));
       table->setItem(row, 0, coefficient);
 
-      for (int column = 1; column < columnCount - 1; column++) {
-        QTableWidgetItem *columnItem = new QTableWidgetItem();
-        columnItem->setFlags(Qt::ItemIsEnabled);
-        table->setItem(row, column, columnItem);
-      }
+      QTableWidgetItem *description = new QTableWidgetItem();
+      description->setFlags(Qt::ItemIsEnabled);
+      description->setText("N/A");
+      table->setItem(row, 1, description);
+
+      QTableWidgetItem *units = new QTableWidgetItem();
+      units->setFlags(Qt::ItemIsEnabled);
+      units->setText("deg/s^" + QString::number(row));
+      table->setItem(row, 2, units);
 
       QTableWidgetItem *sigma = new QTableWidgetItem();
       sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
