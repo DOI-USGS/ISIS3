@@ -232,7 +232,7 @@ namespace Isis {
         else {
           throw IException(e, 
                            IException::Unknown, 
-                           "BODY_FRAME_CODE not found for this Target.", 
+                           "BODY_CODE not found for this Target.", 
                            _FILEINFO_);
         }
       }
