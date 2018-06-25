@@ -1443,7 +1443,7 @@ namespace Isis {
       table->setItem(row, columnCount - 1, sigma);
     }
 
-    // { NONE: N/A, ANGLES: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 3+ }
+    // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 3+ }
     // POSITION
     if (i + 1 > 0) { 
       QTableWidgetItem *description = table->item(0, 1);
@@ -1456,7 +1456,7 @@ namespace Isis {
     // VELOCITY
     if (i + 1 > 1) {
       QTableWidgetItem *description = table->item(1, 1);
-      description->setText("VELOCITY");
+      description->setText("ANGULAR VELOCITY");
 
       QTableWidgetItem *units = table->item(1, 2);
       units->setText("deg/s");
@@ -1465,7 +1465,7 @@ namespace Isis {
     // ACCELERATION
     if (i + 1 > 2) {
       QTableWidgetItem *description = table->item(2, 1);
-      description->setText("ACCELERATION");
+      description->setText("ANGULAR ACCELERATION");
 
       QTableWidgetItem *units = table->item(2, 2);
       units->setText("deg/s^2");
