@@ -245,7 +245,8 @@ namespace Isis {
    *                           These signals exist for the purpose of communication between the
    *                           ControlNetVitals class, and the network that it is observing.
    *                           Fixes #5435.
-
+   *   @history 2018-06-25 Jesse Mapel - Fixed the incorrect signal being called when adding and
+   *                           removing measures. References #5435.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -374,8 +375,6 @@ namespace Isis {
       void emitNetworkStructureModified();
       void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
       void emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
-      void emitNewMeasure(ControlMeasure *measure);
-      void emitMeasureRemoved(ControlMeasure *measure);
       void pointAdded(ControlPoint *point);
 
     private: // graphing functions
