@@ -254,7 +254,6 @@ namespace Isis {
     // notify parent network if we have one
     if (parentNetwork) {
       parentNetwork->measureAdded(measure);
-      parentNetwork->emitNewMeasure(measure);
       parentNetwork->emitNetworkStructureModified();
     }
   }
@@ -307,7 +306,7 @@ namespace Isis {
 
     // notify parent network of the change
     if (parentNetwork) {
-      parentNetwork->emitMeasureRemoved(cm);
+      parentNetwork->measureDeleted(cm);
 
       if (!IsIgnored() && !cm->IsIgnored()) {
         parentNetwork->emitNetworkStructureModified();
