@@ -86,7 +86,12 @@ namespace Isis {
    *                           the Control Net Tool will be disabled.
    *                           Added enableControlNetTool(bool) so when an active control net is set,
    *                           the tool becomes enabled.
-
+   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
+   *                           ambiguous shortcut errors. To counter this, we need a way to focus on one
+   *                           widget. Giving the views focus did not work completely. Instead,
+   *                           enabling/disabling actions was the best option. Added enableActions(),
+   *                           disableActions(), enterEvent(), and leaveEvent(). On default, a view's
+   *                           actions are disabled. To enable the actions, move the cursor over the view. 
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -124,6 +129,11 @@ namespace Isis {
       void onMosItemRemoved(Image *image);
 
     private:
+      void enterEvent(QEvent *event);
+      void leaveEvent(QEvent *event);
+      void disableActions();
+      void enableActions();
+
       /**
        * @author 2018-05-11 Tracie Sucharski
        *
@@ -156,6 +166,8 @@ namespace Isis {
       ToolPad *m_toolPad; //!< The tool pad
 
       QAction *m_controlNetTool;  //!< The Control Point Editor Tool
+
+      QList<QAction *> m_actions; //!< List of all toolbar and toolpad actions
   };
 }
 

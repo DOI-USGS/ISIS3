@@ -137,6 +137,19 @@ namespace Isis {
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
 
+    // Store the actions for easy enable/disable.
+    foreach (QAction * action, m_toolPad->actions()) {
+      m_actions.append(action);
+    }
+    foreach (QAction * action, m_permToolBar->actions()) {
+      m_actions.append(action);
+    }
+    foreach (QAction * action, m_activeToolBar->actions()) {
+      m_actions.append(action);
+    }
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
+
     // MosaicSceneWidget's default is to have the Control Net Tool enabled.
     // In ipce, we want it to be disabled if an active control is not set.
     foreach (QAction * action, m_toolPad->actions()) {
@@ -327,6 +340,44 @@ namespace Isis {
   void Footprint2DView::enableControlNetTool(bool value) {
     m_controlNetTool->setEnabled(value);
   }
+
+
+  /**
+   * Disables toolbars and toolpad actions
+   */
+  void CubeDnView::disableActions() {
+    foreach (QAction * action, m_actions) {
+      action->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions
+   */
+  void CubeDnView::enableActions() {
+    foreach (QAction * action, m_actions) {
+      action->setEnabled(true);
+    }
+  }
+
+  /**
+   * Enables actions when cursor enters on the view
+   * @param event The enter event
+   */
+  void CubeDnView::enterEvent(QEvent *event) {
+    enableActions();
+  }
+
+
+  /**
+   * Disables actions when cursor leaves the view
+   * @param event The leave event
+   */
+  void CubeDnView::leaveEvent(QEvent *event) {
+    disableActions();
+  }
+
 
   /**
    * @brief Loads the Footprint2DView from an XML file.

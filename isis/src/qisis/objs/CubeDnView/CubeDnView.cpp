@@ -136,7 +136,6 @@ namespace Isis {
 
     m_toolPad = new ToolPad("Tool Pad", this);
     m_toolPad->setObjectName("toolPad");
-     m_toolPad->setFocusPolicy(Qt::ClickFocus);
     addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     // Create tools
@@ -234,7 +233,57 @@ namespace Isis {
       }
     }
 
+    // Store the actions for easy enable/disable.
+    foreach (QAction * action, m_toolPad->actions()) {
+      m_actions.append(action);
+    }
+    foreach (QAction * action, m_permToolBar->actions()) {
+      m_actions.append(action);
+    }
+    foreach (QAction * action, m_activeToolBar->actions()) {
+      m_actions.append(action);
+    }
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
+
     zoomTool->activate(true);
+  }
+
+
+  /**
+   * Disables toolbars and toolpad actions
+   */
+  void CubeDnView::disableActions() {
+    foreach (QAction * action, m_actions) {
+      action->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions
+   */
+  void CubeDnView::enableActions() {
+    foreach (QAction * action, m_actions) {
+      action->setEnabled(true);
+    }
+  }
+
+  /**
+   * Enables actions when cursor etners on the view
+   * @param event The enter event
+   */
+  void CubeDnView::enterEvent(QEvent *event) {
+    enableActions();
+  }
+
+
+  /**
+   * Disables actions when cursor leaves the view
+   * @param event The leave event
+   */
+  void CubeDnView::leaveEvent(QEvent *event) {
+    disableActions();
   }
 
 
@@ -412,7 +461,12 @@ namespace Isis {
     if (m_workspace->cubeToMdiWidget(cube)) {
       return;
     }
-    m_workspace->addCubeViewport(cube);
+    // Set the focus policy of the added cubes so the main view will always have focus
+    MdiCubeViewport *itemAdded = m_workspace->addCubeViewport(cube);
+    //itemAdded->setFocusPolicy(Qt::NoFocus);
+    //ViewportMdiSubWindow *mdiSubWindow = qobject_cast<ViewportMdiSubWindow *>(itemAdded->parent()->parent());
+    //mdiSubWindow->setFocusPolicy(Qt::NoFocus);
+
     m_cubeItemMap.insert(cube, item);
   }
 
