@@ -484,6 +484,11 @@ namespace Isis {
   }
 
 
+  QList<BundleObservationSolveSettings> BundleSettings::observationSolveSettings() const {
+    return m_observationSolveSettings;
+  } 
+
+
   // =============================================================================================//
   // ======================== Convergence Criteria ===============================================//
   // =============================================================================================//

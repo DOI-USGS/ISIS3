@@ -157,6 +157,7 @@ namespace Isis {
   private:
     Ui::JigsawSetupDialog *m_ui;
     Project *m_project;
+    BundleSettingsQsp m_bundleSettings;
   };
 };
 #endif // JigsawSetupDialog_h

@@ -175,6 +175,7 @@ namespace Isis {
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
       BundleObservationSolveSettings observationSolveSettings(int n) const;
+      QList<BundleObservationSolveSettings> observationSolveSettings() const; 
 
 
       //=====================================================================//
