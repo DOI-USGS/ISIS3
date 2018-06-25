@@ -610,11 +610,14 @@ namespace Isis {
    */
   int ControlNetVitals::numImagesBelowMeasureThreshold(int num) {
     int count = 0;
-    foreach(int measureCount, m_imageMeasureCounts) {
-      if (measureCount > num) {
+
+    QMap<int, int>::const_iterator i = m_imageMeasureCounts.constBegin();
+    while (i != m_imageMeasureCounts.constEnd()) {
+      if (i.key() >= num ) {
         break;
       }
-      count += m_imageMeasureCounts[measureCount];
+      count += i.value();
+      ++i;
     }
     return count;
   }
@@ -753,7 +756,9 @@ namespace Isis {
   QList<QString> ControlNetVitals::getImagesBelowMeasureThreshold(int num) {
     QList<QString> imagesBelowThreshold;
     foreach(QString serial, m_controlNet->GetCubeSerials()) {
-      if (m_controlNet->GetMeasuresInCube(serial).size() < num) imagesBelowThreshold.append(serial);
+      if (m_controlNet->GetValidMeasuresInCube(serial).size() < num) {
+        imagesBelowThreshold.append(serial);
+      }
     }
     return imagesBelowThreshold;
   }

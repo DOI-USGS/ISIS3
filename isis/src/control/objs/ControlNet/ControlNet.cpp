@@ -1381,7 +1381,11 @@ namespace Isis {
    *                         returning a count of only valid measures (Ignore=False).
    */
   int ControlNet::GetNumberOfValidMeasuresInImage(const QString &serialNumber) {
-    return p_cameraValidMeasuresMap[serialNumber];
+    // If SetImage was called, use the map that has been populated with valid measures
+    if (p_cameraList.size() > 0) {
+      return p_cameraValidMeasuresMap[serialNumber];
+    }
+    return GetValidMeasuresInCube(serialNumber).size();     
   }
 
 
