@@ -1491,24 +1491,26 @@ namespace Isis {
    * Slot that listens for when the Instrument Position Solve Option combobox changes.
    *
    * This slot updates the value of the SPK Solve Degree spin box according to which solve position
-   * option is selected. This slot also disables the SPK Solve Degree spin box whenever a solve
+   * option is selected. This slot also disables the SPK spin boxes whenever a solve
    * position that is not ALL is selected.
    *
    * @param const QString & Reference to the value that the position option combobox was changed to.
    */
   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
     int solveIndex = m_ui->positionComboBox->currentIndex();
-    QSpinBox *spinBox = m_ui->spkSolveDegreeSpinBox;
-    // ALL enables the solve degree spin box, but does not increase the degree
-    // Below shows the corresponding degree for each of the solve options:
-    //   NONE = -1; ANGLES = 0; VELOCITY = 1; ACCELERATION = 2; ALL = 2
-    if (arg1 == "ALL") {
-      spinBox->setValue(solveIndex - 2);
-      spinBox->setEnabled(true);
-    }
-    else {
-      spinBox->setValue(solveIndex - 1);
-      spinBox->setEnabled(false);
+    QList<QSpinBox *> spinBoxes{m_ui->spkSolveDegreeSpinBox, m_ui->spkDegreeSpinBox};
+    for (auto &spinBox : spinBoxes) {
+      // ALL enables the solve degree spin box, but does not increase the degree
+      // Below shows the corresponding degree for each of the solve options:
+      //   NONE = -1; ANGLES = 0; VELOCITY = 1; ACCELERATION = 2; ALL = 2
+      if (arg1 == "ALL") {
+        spinBox->setValue(solveIndex - 2);
+        spinBox->setEnabled(true);
+      }
+      else {
+        spinBox->setValue(solveIndex - 1);
+        spinBox->setEnabled(false);
+      }
     }
   }
 
@@ -1517,24 +1519,26 @@ namespace Isis {
    * Slot that listens for when the Instrument Pointing Solve Option combobox changes.
    *
    * This slot updates the value of the CK Solve Degree spin box according to which solve pointing
-   * option is selected. This slot also disables the CK Solve Degree spin box whenever a solve
+   * option is selected. This slot also disables the CK spin boxes whenever a solve
    * pointing that is not ALL is selected.
    *
    * @param const QString & Reference to the value that the pointing option combobox was changed to.
    */
  void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
     int solveIndex = m_ui->pointingComboBox->currentIndex();
-    QSpinBox *spinBox = m_ui->ckSolveDegreeSpinBox;
-    // ALL enables the solve degree spin box, but does not increase the degree
-    // Below shows the corresponding degree for each of the solve options:
-    //   NONE = -1; ANGLES = 0; ANGULAR VELOCITY = 1; ANGULAR ACCELERATION = 2; ALL = 2
-    if (arg1 == "ALL") {
-      spinBox->setValue(solveIndex - 2);
-      spinBox->setEnabled(true);
-    }
-    else {
-      spinBox->setValue(solveIndex - 1);
-      spinBox->setEnabled(false);
+    QList<QSpinBox *> spinBoxes{m_ui->ckSolveDegreeSpinBox, m_ui->ckDegreeSpinBox};
+    for (auto &spinBox : spinBoxes) {
+      // ALL enables the solve degree spin box, but does not increase the degree
+      // Below shows the corresponding degree for each of the solve options:
+      //   NONE = -1; ANGLES = 0; ANGULAR VELOCITY = 1; ANGULAR ACCELERATION = 2; ALL = 2
+      if (arg1 == "ALL") {
+        spinBox->setValue(solveIndex - 2);
+        spinBox->setEnabled(true);
+      }
+      else {
+        spinBox->setValue(solveIndex - 1);
+        spinBox->setEnabled(false);
+      }
     }
   }
 
