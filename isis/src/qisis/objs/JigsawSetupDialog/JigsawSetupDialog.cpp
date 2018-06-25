@@ -1512,10 +1512,10 @@ namespace Isis {
     QSpinBox *spinBox = m_ui->ckSolveDegreeSpinBox;
     spinBox->setValue(currentIndex - 1);
     if (arg1 == "ALL") {
-      spinBox->setReadOnly(false);
+      spinBox->setEnabled(true);
     }
     else {
-      spinBox->setReadOnly(true);
+      spinBox->setEnabled(false);
     }
   }
 
