@@ -46,25 +46,15 @@ void IsisMain() {
   double lonSigma = Isis::Null;
   double radiusSigma = Isis::Null;
 
-  if (ui.GetDouble("POINT_LATITUDE_SIGMA")) {
+  if (ui.WasEntered("POINT_LATITUDE_SIGMA")) {
     latSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
   }
-  if (ui.GetDouble("POINT_LONGITUDE_SIGMA")) {
+  if (ui.WasEntered("POINT_LONGITUDE_SIGMA")) {
     lonSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
   }
-  if (ui.GetDouble("POINT_RADIUS_SIGMA")) {
+  if (ui.WasEntered("POINT_RADIUS_SIGMA")) {
     radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
   }
-
-//  if (ui.WasEntered("POINT_LATITUDE_SIGMA")) {
-//    latSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
-//  }
-//  if (ui.WasEntered("POINT_LONGITUDE_SIGMA")) {
-//    lonSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
-//  }
-//  if (ui.WasEntered("POINT_RADIUS_SIGMA")) {
-//    radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
-//  }
 
   QList<LidarCube> images;
   
@@ -128,7 +118,6 @@ void IsisMain() {
         Camera *camera = cube->camera();
           
         if (camera != NULL) {
-//        if (camera->SetGround(lat, lon)) {
           if (camera->SetGround(spoint)) {
             double samp = camera->Sample();
             double line = camera->Line();

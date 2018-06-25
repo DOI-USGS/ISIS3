@@ -37,6 +37,9 @@
       lidar point coordinates. Ensures use of lidar point radius instead of the
       local radius.
     </change>
+    <change name="Ken Edmundson" date="2018-06-25">
+      Changed internal default for lidar coordinate a priori uncertainties to "none", allowing FREE
+      lidar points.
   </history>
 
   <category>
@@ -150,42 +153,37 @@
         </parameter>            
     </group>
     <group name="Point Uncertainties">
-         <parameter name="POINT_RANGE_SIGMA">
-          <type>double</type>
-          <brief> Range uncertainty for all points (meters)
-          </brief>
-          <description> 
-            This value will be used as the range uncertainty 
-            for all points.  Units are meters.
-          </description>
-          <default>
-            <item>10.0</item>
-          </default>
-          <minimum inclusive="yes">0</minimum>
-        </parameter>
-  
-         <parameter name="POINT_LATITUDE_SIGMA">
-          <brief> Latitude uncertainty for all points (meters)
-          </brief>
-          <description> 
-            This value will be used as the latitude uncertainty
+        <parameter name="POINT_RANGE_SIGMA">
+          <brief> Range uncertainty for all points (meters)</brief>
+          <description>
+            This value will be used as the range uncertainty
             for all points.  Units are meters.
           </description>
           <type>double</type>
-          <default><item>10.0</item></default>
+          <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
+
+        <parameter name="POINT_LATITUDE_SIGMA">
+         <brief> Latitude uncertainty for all points (meters)</brief>
+         <description>
+           This value will be used as the latitude uncertainty
+           for all points.  Units are meters.
+         </description>
+         <type>double</type>
+         <internalDefault>none</internalDefault>
+         <minimum inclusive="yes">0</minimum>
+        </parameter>
   
-         <parameter name="POINT_LONGITUDE_SIGMA">
-          <brief> Longitude uncertainty for all points (meters)
-          </brief>
-          <description> 
-            This optional value will be used as the longitude 
-            uncertainty for all points. Units are meters. 
-          </description>
-          <type>double</type>
-          <default><item>10.0</item></default>
-          <minimum inclusive="yes">0</minimum>
+        <parameter name="POINT_LONGITUDE_SIGMA">
+         <brief> Longitude uncertainty for all points (meters)</brief>
+         <description>
+           This optional value will be used as the longitude
+           uncertainty for all points. Units are meters.
+         </description>
+         <type>double</type>
+         <internalDefault>none</internalDefault>
+         <minimum inclusive="yes">0</minimum>
         </parameter>
 
         <parameter name="POINT_RADIUS_SIGMA">
@@ -196,7 +194,7 @@
             all points.  Units are meters.
           </description>
           <type>double</type>
-          <default><item>10.0</item></default>
+          <internalDefault>none</internalDefault>
           <minimum inclusive="yes">0</minimum>
         </parameter>
     </group>
