@@ -1374,7 +1374,7 @@ namespace Isis {
       table->setItem(row, columnCount - 1, sigma);
     }
 
-    // { NONE: N/A, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 3+ }
+    // { NONE: N/A, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
     // POSITION
     if (i + 1 > 0) { 
       QTableWidgetItem *description = table->item(0, 1);
@@ -1443,8 +1443,8 @@ namespace Isis {
       table->setItem(row, columnCount - 1, sigma);
     }
 
-    // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 3+ }
-    // POSITION
+    // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 2 }
+    // ANGLES
     if (i + 1 > 0) { 
       QTableWidgetItem *description = table->item(0, 1);
       description->setText("ANGLES");
@@ -1486,13 +1486,17 @@ namespace Isis {
    * @param const QString & Reference to the value that the position option combobox was changed to.
    */
   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
-    int currentIndex = m_ui->positionComboBox->currentIndex();
+    int solveIndex = m_ui->positionComboBox->currentIndex();
     QSpinBox *spinBox = m_ui->spkSolveDegreeSpinBox;
-    spinBox->setValue(currentIndex - 1);
+    // ALL enables the solve degree spin box, but does not increase the degree
+    // Below shows the corresponding degree for each of the solve options:
+    //   NONE = -1; ANGLES = 0; VELOCITY = 1; ACCELERATION = 2; ALL = 2
     if (arg1 == "ALL") {
+      spinBox->setValue(solveIndex - 2);
       spinBox->setEnabled(true);
     }
     else {
+      spinBox->setValue(solveIndex - 1);
       spinBox->setEnabled(false);
     }
   }
@@ -1508,13 +1512,17 @@ namespace Isis {
    * @param const QString & Reference to the value that the pointing option combobox was changed to.
    */
  void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
-    int currentIndex = m_ui->pointingComboBox->currentIndex();
+    int solveIndex = m_ui->pointingComboBox->currentIndex();
     QSpinBox *spinBox = m_ui->ckSolveDegreeSpinBox;
-    spinBox->setValue(currentIndex - 1);
+    // ALL enables the solve degree spin box, but does not increase the degree
+    // Below shows the corresponding degree for each of the solve options:
+    //   NONE = -1; ANGLES = 0; ANGULAR VELOCITY = 1; ANGULAR ACCELERATION = 2; ALL = 2
     if (arg1 == "ALL") {
+      spinBox->setValue(solveIndex - 2);
       spinBox->setEnabled(true);
     }
     else {
+      spinBox->setValue(solveIndex - 1);
       spinBox->setEnabled(false);
     }
   }
