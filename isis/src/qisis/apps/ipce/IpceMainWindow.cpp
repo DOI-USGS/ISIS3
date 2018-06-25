@@ -199,7 +199,6 @@ namespace Isis {
     dock->setAttribute(Qt::WA_DeleteOnClose);
     dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
                       QDockWidget::DockWidgetFloatable);
-    dock->setFocusPolicy(Qt::ClickFocus);
 
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||

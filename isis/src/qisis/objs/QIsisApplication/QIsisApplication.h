@@ -56,8 +56,6 @@ namespace Isis {
 
     public slots:
       void openUrl(QUrl url);
-      void print(QWidget *old, QWidget *now);
-
   };
 };
 

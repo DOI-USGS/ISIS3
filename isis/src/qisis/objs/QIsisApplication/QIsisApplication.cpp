@@ -35,9 +35,6 @@ namespace Isis {
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
 
-    connect(this, SIGNAL(focusChanged(QWidget *, QWidget *)), this, SLOT(print(QWidget *, QWidget *)));
-
-
     for (int i = 1; i < argc; i++) {
         QString arg(argv[i]);
         if (arg.startsWith("-pref")) {
@@ -61,12 +58,6 @@ namespace Isis {
     QDesktopServices::setUrlHandler("http", this, "openUrl");
   }
 
-  void QIsisApplication::print(QWidget *old, QWidget *now) {
-    // std::cout<<"OLD: " + old->windowTitle() + ", NEW: " + now->windowTitle()<<std::endl;
-    if (old && now) {
-      qDebug()<<"OLD: " + old->windowTitle() + ", NEW: " + now->windowTitle();
-    }
-  }
 
   /**
   * notify - this function overrides the QApplication notify as

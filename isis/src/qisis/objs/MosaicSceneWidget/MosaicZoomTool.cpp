@@ -118,8 +118,6 @@ namespace Isis {
     action->setIcon(getIcon("viewmag.png"));
     action->setToolTip("Zoom (z)");
     action->setShortcut(Qt::Key_Z);
-    action->setShortcutContext(Qt::WidgetShortcut);
-
     QString text  =
       "<b>Function:</b>  Zoom in or out of the current cube.<br><br>"
       "This tool gives you a <b>click</b> to zoom by 2X and center on the "
