@@ -56,6 +56,7 @@ namespace Isis {
   *    @history 2018-05-28 Adam Goins - Initial Creation.
   *    @history 2018-06-14 Adam Goins & Jesse Maple - Refactored method calls and Signal/Slot usage.
   *    @history 2018-06-15 Adam Goins - Added documentation.
+  *    @history 2018-06-25 Kristin Berry - Fixed problem with getImagesBelowMeasureThreshold()
   */
   class ControlNetVitals : public QObject {
     Q_OBJECT
