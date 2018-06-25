@@ -70,6 +70,8 @@ namespace Isis {
    *                           (BOSS) tab for displaying user-selected images from the main Project
    *                           treeview.  All changes were made in the
    *                           createObservationSolveSettingsTreeView() function.  References #497.
+   *   @history 2018-06-25 Ian Humphrey - Implemented the position and pointing a priori sigma
+   *                           tables in the observation solve settings tab. References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
