@@ -145,18 +145,17 @@ if(JP2KFLAG)
  set(JP2KFLAG 1)
 endif()
 
- # Set up the ctest tool which is used to run all of the tests.
- enable_testing()
- include(CTest)
+# Set up the ctest tool which is used to run all of the tests.
+enable_testing()
+include(CTest)
 
 # Specify flags used
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -std=c++11
-                       -fPIC
                        -DISIS_LITTLE_ENDIAN=1
-                       -fPIC -Wno-unused-parameter
+                       -Wno-unused-parameter
                        -Wno-overloaded-virtual
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
@@ -237,11 +236,6 @@ find_package(nanoflann         REQUIRED)
 find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0   REQUIRED)
-
-# Im this case, we specify the version numbers being searched for in the non-traditional installs.
-if(APPLE)
-  find_package(OpenGL            REQUIRED)
-endif(APPLE)
 
 if(pybindings)
  find_package(Python REQUIRED)
@@ -325,7 +319,7 @@ if(pybindings)
  endif()
  string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
  string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
- 
+
  message(STATUS "FLAGS: ${PYQT_SIP_FLAGS}")
  message(STATUS "Generating C++ code from sip files")
  message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
@@ -343,9 +337,7 @@ if(pybindings)
  add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
  target_link_libraries(isispy ${ALLLIBS})
  target_link_libraries(isispy isis3)
- set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3
-                                         INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}
-                                         INSTALL_RPATH ${CMAKE_SOURCE_DIR})
+ set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3 INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
  add_dependencies(isispy sipfiles)
 
  install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})

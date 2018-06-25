@@ -45,8 +45,14 @@ namespace Isis {
 
   /**
    * @brief Container class for BundleAdjustment results.
+   *
    * This class includes the settings used to run the bundle adjustment, the resulting statistics
    * values, and the name of the control network used.
+   *  NOTE: BundleSolutionInfo is derived from QObject as it has one slot (perhaps more signals
+   *       and slots in the future? As a child of QObject it should have no copy constructor or
+   *       assignment operator. See for example...
+   *
+   *       http://doc.qt.io/qt-5/qobject.html#no-copy-constructor
    *
    * @ingroup ControlNetworks
    *
@@ -153,7 +159,7 @@ namespace Isis {
       BundleSolutionInfo(Project *project,
                     XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
-      BundleSolutionInfo();
+      BundleSolutionInfo() = default;
 
       ~BundleSolutionInfo();
 
@@ -224,17 +230,6 @@ namespace Isis {
       };
 
     private:
-      // NOTE: BundleSolutionInfo is derived from QObject as it has one slot (perhaps more signals
-      //       and slots in the future? As a child of QObject it should have no copy constructor or
-      //       assignment operator. See for example...
-      //
-      //       http://doc.qt.io/qt-5/qobject.html#no-copy-constructor
-      //
-      //       These methods are declared as private to prevent the developer from calling default
-      //       operators. These will generate a compiler error if the developer attempts to use
-      //       them.
-      BundleSolutionInfo(const BundleSolutionInfo &src);
-      BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
       //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
       //! object when saving to disk).
