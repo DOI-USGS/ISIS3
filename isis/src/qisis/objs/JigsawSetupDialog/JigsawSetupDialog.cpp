@@ -1350,60 +1350,60 @@ namespace Isis {
   void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
     // number of rows == spkSolveDegree value + 1 (i+1)
     QTableWidget *table = m_ui->positionAprioriSigmaTable;
+    const int oldRowCount = table->rowCount();
     table->setRowCount(i + 1);
+    const int newRowCount = table->rowCount();
 
-    const int columnCount = table->columnCount();
-    // Headers : coefficient, description, units, a priori sigma
-    // The description and units are related directly to the solve options, so for now do those
-    // generically (columns 1 and 2)
-    for (int row = 0; row < i + 1; row++) {
-      QTableWidgetItem *coefficient = new QTableWidgetItem();
-      coefficient->setFlags(Qt::ItemIsEnabled);
-      coefficient->setText(QString::number(row + 1));
-      table->setItem(row, 0, coefficient);
+    if (newRowCount > oldRowCount) {
+      for (int row = oldRowCount; row < newRowCount; row++) {
+        QTableWidgetItem *coefficient = new QTableWidgetItem();
+        coefficient->setFlags(Qt::ItemIsEnabled);
+        coefficient->setText(QString::number(row + 1));
+        table->setItem(row, 0, coefficient);
 
-      QTableWidgetItem *description = new QTableWidgetItem();
-      description->setFlags(Qt::ItemIsEnabled);
-      description->setText("N/A");
-      table->setItem(row, 1, description);
+        QTableWidgetItem *description = new QTableWidgetItem();
+        description->setFlags(Qt::ItemIsEnabled);
+        description->setText("N/A");
+        table->setItem(row, 1, description);
 
-      QTableWidgetItem *units = new QTableWidgetItem();
-      units->setFlags(Qt::ItemIsEnabled);
-      units->setText("m/s^" + QString::number(row));
-      table->setItem(row, 2, units);
+        QTableWidgetItem *units = new QTableWidgetItem();
+        units->setFlags(Qt::ItemIsEnabled);
+        units->setText("m/s^" + QString::number(row));
+        table->setItem(row, 2, units);
 
-      QTableWidgetItem *sigma = new QTableWidgetItem();
-      sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-      sigma->setText("0.0");
-      table->setItem(row, columnCount - 1, sigma);
-    }
+        QTableWidgetItem *sigma = new QTableWidgetItem();
+        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        sigma->setText("0.0");
+        table->setItem(row, 3, sigma);
 
-    // { NONE: N/A, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
-    // POSITION
-    if (i + 1 > 0) { 
-      QTableWidgetItem *description = table->item(0, 1);
-      description->setText("POSITION");
+        // Solve option: spk degree -> { NONE: -1, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
+        // POSITION
+        if (row == 0) { 
+          QTableWidgetItem *description = table->item(0, 1);
+          description->setText("POSITION");
 
-      QTableWidgetItem *units = table->item(0, 2);
-      units->setText("meters");
-    }
+          QTableWidgetItem *units = table->item(0, 2);
+          units->setText("meters");
+        }
 
-    // VELOCITY
-    if (i + 1 > 1) {
-      QTableWidgetItem *description = table->item(1, 1);
-      description->setText("VELOCITY");
+        // VELOCITY
+        else if (row == 1) {
+          QTableWidgetItem *description = table->item(1, 1);
+          description->setText("VELOCITY");
 
-      QTableWidgetItem *units = table->item(1, 2);
-      units->setText("m/s");
-    }
+          QTableWidgetItem *units = table->item(1, 2);
+          units->setText("m/s");
+        }
 
-    // ACCELERATION
-    if (i + 1 > 2) {
-      QTableWidgetItem *description = table->item(2, 1);
-      description->setText("ACCELERATION");
+        // ACCELERATION
+        else if (row == 2) {
+          QTableWidgetItem *description = table->item(2, 1);
+          description->setText("ACCELERATION");
 
-      QTableWidgetItem *units = table->item(2, 2);
-      units->setText("m/s^2");
+          QTableWidgetItem *units = table->item(2, 2);
+          units->setText("m/s^2");
+        }
+      }
     }
 
     table->resizeColumnToContents(1);
