@@ -10,7 +10,7 @@ namespace Ui {
 }
 
 class QItemSelection;
-
+class QTableWidgetItem;
 
 namespace Isis {
   class Project;
@@ -70,6 +70,8 @@ namespace Isis {
    *                           (BOSS) tab for displaying user-selected images from the main Project
    *                           treeview.  All changes were made in the
    *                           createObservationSolveSettingsTreeView() function.  References #497.
+   *   @history 2018-06-25 Ian Humphrey - Implemented the position and pointing a priori sigma
+   *                           tables in the observation solve settings tab. References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -132,6 +134,7 @@ namespace Isis {
     void on_aRadiusLineEdit_textChanged(const QString &arg1);
     void on_targetBodyComboBox_currentIndexChanged(int index);
     void on_spkSolveDegreeSpinBox_valueChanged(int arg1);
+    void on_ckSolveDegreeSpinBox_valueChanged(int arg1);
     void on_rightAscensionLineEdit_textChanged(const QString &arg1);
     void on_declinationLineEdit_textChanged(const QString &arg1);
     void on_rightAscensionVelocityLineEdit_textChanged(const QString &arg1);
@@ -140,6 +143,12 @@ namespace Isis {
     void on_primeMeridianOffsetLineEdit_textChanged(const QString &arg1);
     
     void on_applySettingsPushButton_clicked();
+
+    void on_positionComboBox_currentIndexChanged(const QString &arg1);
+    void on_pointingComboBox_currentIndexChanged(const QString &arg1);
+
+    void validateSigmaValue(QTableWidgetItem *);
+    
 
     public slots:
     void slotTextChanged(const QString &text);
