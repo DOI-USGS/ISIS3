@@ -45,6 +45,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2018-06-07 Adam Goins - Initial Version.
+   *   @history 2018-06-26 Adam Goins - Made the view dockable with setCentralWidget().
    */
 
 class ControlHealthMonitorView : public AbstractProjectItemView {

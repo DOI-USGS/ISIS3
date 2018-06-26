@@ -62,24 +62,18 @@ namespace Isis {
     connect(m_controlHealthMonitorWidget, SIGNAL(openImageEditor()),
             this, SLOT(openImageEditor()));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    layout->addWidget(m_controlHealthMonitorWidget);
+    setCentralWidget(m_controlHealthMonitorWidget);
 
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
 
     m_activeToolBar = new QToolBar("Active Tool", 0);
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
 
 
 //  m_ControlHealthMonitorWidget->addToPermanent(m_permToolBar);
