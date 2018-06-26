@@ -403,10 +403,16 @@ namespace Isis {
             // If the edge doesn't already exist, this adds and returns the edge.
             // If the edge already exists, this just returns it. (The use of a set
             // forces the edges to be unique.)
-            ImageConnection connection = boost::add_edge(m_vertexMap[serial],
-                                                         m_vertexMap[sn],
-                                                         m_controlGraph).first;
+            ImageConnection connection;
+            bool edgeAdded;
+            boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
+                                                       m_vertexMap[sn],
+                                                       m_controlGraph);
             m_controlGraph[connection].strength++;
+
+            if (edgeAdded) {
+              emit networkModified(GraphModified);
+            }
           }
         }
       }
@@ -593,9 +599,11 @@ namespace Isis {
         // If the edge doesn't already exist, this adds and returns the edge.
         // If the edge already exists, this just returns it. (The use of a set
         // forces the edges to be unique.)
-        ImageConnection connection = boost::add_edge(m_vertexMap[sourceSerial],
-                                                   m_vertexMap[targetSerial],
-                                                   m_controlGraph).first;
+        ImageConnection connection;
+        bool edgeAdded;
+        boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
+                                                   m_vertexMap[sn],
+                                                   m_controlGraph);
         m_controlGraph[connection].strength++;
 
         if (edgeAdded) {
