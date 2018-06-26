@@ -40,6 +40,7 @@
     <change name="Ken Edmundson" date="2018-06-25">
       Changed internal default for lidar coordinate a priori uncertainties to "none", allowing FREE
       lidar points.
+      </change>
   </history>
 
   <category>
