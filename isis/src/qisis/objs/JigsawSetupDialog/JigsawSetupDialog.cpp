@@ -1378,6 +1378,7 @@ namespace Isis {
     }
 
     m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
+    m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
   }
 
 
