@@ -361,6 +361,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * Enables actions when cursor enters on the view
    * @param event The enter event
