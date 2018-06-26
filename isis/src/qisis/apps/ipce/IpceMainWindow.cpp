@@ -193,6 +193,7 @@ namespace Isis {
     centralWidget->setTabsMovable(true);
     centralWidget->setTabsClosable(true);
 
+    QCoreApplication::setApplicationName("ipce");
     QStringList args = QCoreApplication::arguments();
 
     if (args.count() == 2) {
