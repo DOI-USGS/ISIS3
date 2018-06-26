@@ -1,9 +1,14 @@
 # QuickStart Guide
 
+## Anaconda and ISIS3 dependencies
+With the cmake, the ISIS3 dependencies are now managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) with the dependencies in it. There are spec files for the linux and mac dependencies at the top level of the repo. To make the required Anaconda environment enter the following command:
+
+`conda create --name <env> --file <spec file>`
+
 ## Building ISIS3
 From the terminal window:
 * Clone the repo locally:  <repo directory>
-* Activate your [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html)
+* Activate your [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment)
 * CD into the clone directory.
 * mkdir build
 * cd into the build directory
