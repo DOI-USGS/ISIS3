@@ -568,15 +568,19 @@ namespace Isis {
    *  @return The number of points with number of measures less than the threshold.
    */
   int ControlNetVitals::numPointsBelowMeasureThreshold(int num) {
-    // int count = 0;
-    // foreach(int measureCount, m_pointMeasureCounts) {
-    //   if (measureCount >= num) {
-    //     continue;
-    //   }
-    //   count += m_pointMeasureCounts[measureCount];
-    // }
-    // return count;
-    return getPointsBelowMeasureThreshold(num).size();
+    int count = 0;
+
+    QMap<int, int>::const_iterator i = m_pointMeasureCounts.constBegin();
+    while (i != m_pointMeasureCounts.constEnd()) {
+      if (i.key() >= num ) {
+        break;
+      }
+      count += i.value();
+      ++i;
+    }
+
+    return count;
+    //return getPointsBelowMeasureThreshold(num).size();
   }
 
 
