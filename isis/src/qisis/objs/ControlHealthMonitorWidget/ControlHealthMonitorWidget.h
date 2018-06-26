@@ -84,7 +84,7 @@ namespace Isis {
 
     signals:
       void openPointEditor(ControlPoint *point);
-      void openImageEditor();
+      void openImageEditor(QList<QString> serials);
 
     private:
         void updateStatus(int code);

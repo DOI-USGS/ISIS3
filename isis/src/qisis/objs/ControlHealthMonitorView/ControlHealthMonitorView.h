@@ -68,7 +68,7 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
 
   private slots:
     void openPointEditor(ControlPoint *point);
-    void openImageEditor();
+    void openImageEditor(QList<QString> serials);
 
   private:
     Directory *m_directory;

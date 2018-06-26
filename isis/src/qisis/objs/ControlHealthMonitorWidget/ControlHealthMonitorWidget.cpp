@@ -453,6 +453,7 @@ namespace Isis {
 
     // Create the table.
     m_imagesTable = new QTableWidget();
+    m_imagesTable->addAction(new QAction("Sup"));
 
     connect(m_imagesTable, SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
             this, SLOT(emitOpenImageEditor()));
@@ -467,7 +468,8 @@ namespace Isis {
     m_imagesTable->verticalHeader()->setVisible(false);
     m_imagesTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_imagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_imagesTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_imagesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
     m_imagesTable->setShowGrid(true);
     m_imagesTable->setGeometry(QApplication::desktop()->screenGeometry());
     m_imagesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -661,7 +663,12 @@ namespace Isis {
    *  and opens the CubeDnView with the images selected.
    */
   void ControlHealthMonitorWidget::emitOpenImageEditor() {
-    emit openImageEditor();
+    QList<QString> serials;
+    QModelIndexList rows = m_imagesTable->selectionModel()->selectedRows(1);
+    foreach (QModelIndex index, rows) {
+      serials.append(index.data().toString());
+    }
+    emit openImageEditor(serials);
   }
 
 
