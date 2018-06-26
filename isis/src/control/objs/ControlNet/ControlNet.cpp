@@ -467,8 +467,18 @@ namespace Isis {
           }
         }
 
+        std::pair<ImageConnection, bool> result = boost::edge(m_vertexMap[imageSerial],
+                                                              m_vertexMap[adjacentSerial],
+                                                              m_controlGraph);
+        QString edgeStrength = "UNKNOWN";
+        if (result.second) {
+          edgeStrength = toString(m_controlGraph[result.first].strength);
+        }
+
         graphString.append(imageSerial);
-        graphString.append(" ----[");
+        graphString.append(" ----(");
+        graphString.append(edgeStrength);
+        graphString.append(") [");
         graphString.append(commonPoints.join(","));
         graphString.append("]---- ");
         graphString.append(adjacentSerial);
@@ -636,8 +646,9 @@ namespace Isis {
 
     // Make sure there is a node for every measure in this measure's parent
     for (int i = 0; i < point->GetNumMeasures(); i++) {
-      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (!m_vertexMap.contains(sn)) {
+      ControlMeasure *adjacentMeasure = point->GetMeasure(i);
+      QString sn = adjacentMeasure->GetCubeSerialNumber();
+      if (!adjacentMeasure->IsIgnored() && !m_vertexMap.contains(sn)) {
         QString msg = "Node does not exist for [";
         msg += measure->GetCubeSerialNumber() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -808,10 +819,10 @@ namespace Isis {
     // Decrement the edge strength for edges from this node
     // Remove edge if the strength becomes 0.
     for (int i = 0; i < point->GetNumMeasures(); i++) {
-      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-      if (m_vertexMap.contains(sn)) {
+      ControlMeasure *adjacentMeasure = point->GetMeasure(i);
+      QString sn = adjacentMeasure->GetCubeSerialNumber();
+      if (!adjacentMeasure->IsIgnored() && m_vertexMap.contains(sn)) {
         if (QString::compare(serial, sn) !=0) {
-//          std::cout << point->GetId() << ":" << serial << " --- " << sn << std::endl;
 
           // We need to check if the edge still exists.
           // boost doesn't add separate edges for A -> B and B -> A like the old graph.
