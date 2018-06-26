@@ -1361,14 +1361,18 @@ namespace Isis {
     bool tablesAreValid = true;
     
     // Evaluate both tables; if any value is invalid, the table is invalid
-    const QTableWidget *positionTable = m_ui->positionAprioriSigmaTable;
-
-    for (int i = 0; i < positionTable->rowCount(); i++) {
-      const QTableWidgetItem *item = positionTable->item(i,3);
-      if (item) { 
-        if (item->data(Qt::UserRole).toBool() == false) {
-          tablesAreValid = false;
-          break;
+    QList<const QTableWidget *> tables{m_ui->positionAprioriSigmaTable,
+                                       m_ui->pointingAprioriSigmaTable};
+                                       
+    for (const auto &table : tables) {
+      for (int i = 0; i < table->rowCount(); i++) {
+        // a priori sigma column is column 3
+        const QTableWidgetItem *item = table->item(i,3);
+        if (item) { 
+          if (item->data(Qt::UserRole).toBool() == false) {
+            tablesAreValid = false;
+            break;
+          }
         }
       }
     }
