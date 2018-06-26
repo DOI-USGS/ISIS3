@@ -154,6 +154,9 @@ namespace Isis {
    *                           permanent toolbar constructor. 
    *
    *
+   *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does 
+   *                           not output text to the command line for ipce. Fixes #4171.
+   *  
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
