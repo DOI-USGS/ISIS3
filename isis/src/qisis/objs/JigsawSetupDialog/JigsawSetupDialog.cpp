@@ -98,19 +98,39 @@ namespace Isis {
     // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
 
     // initializations for observation solve settings tab
-
     createObservationSolveSettingsTreeView();
-    m_ui->spkSolveDegreeSpinBox->setValue(-1);
+
+    // Populate the solve option comboboxes
+    const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
+    m_ui->positionComboBox->insertItems(0, positionOptions);
+    m_ui->positionComboBox->setCurrentIndex(0);
+
+    const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
+    m_ui->pointingComboBox->insertItems(0, pointingOptions);
+    m_ui->pointingComboBox->setCurrentIndex(0);
+
+    // The degree solve options' minimums are -1 (set in ui file), make the -1's display as N/A
+    m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
+    m_ui->ckSolveDegreeSpinBox->setSpecialValueText("N/A");
+
 
     QStringList tableHeaders;
-    tableHeaders << "coefficients" << "a priori sigma" << "units";
+    tableHeaders << "coefficients" << "description" << "units" << "a priori sigma";
     m_ui->positionAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
-    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)));
-    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)));
-    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)));
+    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
 
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
+
+    // Add validators to the tables in the observation solve settings tab to validate the a priori
+    // sigma items
+    connect(m_ui->positionAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
+            this, SLOT(validateSigmaValue(QTableWidgetItem *)));
+    connect(m_ui->pointingAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
+            this, SLOT(validateSigmaValue(QTableWidgetItem *)));
 
     // initializations for target body tab
 
@@ -1063,53 +1083,6 @@ namespace Isis {
   }
 
 
-  void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int arg1) {
-    if (arg1 == -1) {
-      m_ui->spkSolveDegreeSpinBox->setSuffix("(NONE)");
-      m_ui->positionAprioriSigmaTable->setRowCount(0);
-    }
-    m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
-    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
-
-    if (arg1 == 0) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("POSITION");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("meters");
-      //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
-    }
-    else if (arg1 == 1) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("VELOCITY");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("m/sec");
-    }
-    else if (arg1 == 2) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("ACCELERATION");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("m/s^2");
-    }
-  /*
-    else if (arg1 == 0) {
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
-      int nRows = m_ui->positionAprioriSigmaTable->rowCount();
-
-      m_ui->positionAprioriSigmaTable->insertRow(nRows);
-    }
-    else if (arg1 == 1)
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
-    else if (arg1 == 2)
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
-    else
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
-  */
-  }
-
-
   void Isis::JigsawSetupDialog::on_rightAscensionLineEdit_textChanged(const QString &arg1) {
     if (!m_ui->rightAscensionLineEdit->hasAcceptableInput()) {
       m_ui->rightAscensionLineEdit->setStyleSheet("QLineEdit { background-color: red }");
@@ -1323,6 +1296,252 @@ namespace Isis {
     FileName fname = arg1;
     m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
   }
+
+
+  /**
+   * Validates the a priori sigma values for a given QTableWidgetItem.
+   *
+   * This will only validate items in the a priori sigma column. Valid a priori sigma values are
+   * "FREE" or any positive double. Items that are invalid will be marked with a red background
+   * color.
+   *
+   * @param QTableWidgetItem* Pointer to the QTableWidgetItem to be validated.
+   */
+  void JigsawSetupDialog::validateSigmaValue(QTableWidgetItem *item) {
+    // Only validate the "a priori sigma" column
+    if (item->column() != 3) {
+      return;
+    }
+
+    // FREE is a valid value for the a priori sigma column
+    int free = item->text().compare("FREE", Qt::CaseInsensitive);
+    if (free == 0) {
+      item->setText("FREE");
+    }
+
+    // Positive doubles are valid values for the a priori sigma column
+    bool convertSuccess = false;
+    double sigma = item->text().toDouble(&convertSuccess);
+    if ((convertSuccess && sigma >= 0.0) || free == 0) {
+      const QTableWidget *table = item->tableWidget();
+      // Set background color depending on if the table has alternating row colors and row is odd
+      if (table->alternatingRowColors() && item->row() % 2 != 0) {
+        item->setBackground(table->palette().color(QPalette::AlternateBase));
+      }
+      else {
+        item->setBackground(table->palette().color(QPalette::Base));
+      }
+    }
+    else {
+      item->setBackground(Qt::red);
+    }
+  }
+
+
+  /**
+   * Slot that listens for changes to the SPK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Position Solve Options table according to the value of the
+   * SPK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the SPK Solve Degree + 1.
+   *
+   * @param int Value the SPK Solve Degree spin box was changed to.
+   */
+  void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
+    // number of rows == spkSolveDegree value + 1 (i+1)
+    QTableWidget *table = m_ui->positionAprioriSigmaTable;
+    const int oldRowCount = table->rowCount();
+    table->setRowCount(i + 1);
+    const int newRowCount = table->rowCount();
+
+    if (newRowCount > oldRowCount) {
+      for (int row = oldRowCount; row < newRowCount; row++) {
+        // Headers : coefficient, description, units, a priori sigma
+        QTableWidgetItem *coefficient = new QTableWidgetItem();
+        coefficient->setFlags(Qt::ItemIsEnabled);
+        coefficient->setText(QString::number(row + 1));
+        table->setItem(row, 0, coefficient);
+
+        QTableWidgetItem *description = new QTableWidgetItem();
+        description->setFlags(Qt::ItemIsEnabled);
+        description->setText("N/A");
+        table->setItem(row, 1, description);
+
+        QTableWidgetItem *units = new QTableWidgetItem();
+        units->setFlags(Qt::ItemIsEnabled);
+        units->setText("m/s^" + QString::number(row));
+        table->setItem(row, 2, units);
+
+        QTableWidgetItem *sigma = new QTableWidgetItem();
+        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        sigma->setText("0.0");
+        table->setItem(row, 3, sigma);
+
+        // Solve option: spk degree { NONE: -1, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
+        // POSITION
+        if (row == 0) { 
+          QTableWidgetItem *description = table->item(0, 1);
+          description->setText("POSITION");
+
+          QTableWidgetItem *units = table->item(0, 2);
+          units->setText("meters");
+        }
+
+        // VELOCITY
+        else if (row == 1) {
+          QTableWidgetItem *description = table->item(1, 1);
+          description->setText("VELOCITY");
+
+          QTableWidgetItem *units = table->item(1, 2);
+          units->setText("m/s");
+        }
+
+        // ACCELERATION
+        else if (row == 2) {
+          QTableWidgetItem *description = table->item(2, 1);
+          description->setText("ACCELERATION");
+
+          QTableWidgetItem *units = table->item(2, 2);
+          units->setText("m/s^2");
+        }
+      }
+    }
+
+    table->resizeColumnToContents(1);
+    table->resizeColumnToContents(2);
+  }
+
+
+  /**
+   * Slot that listens for changes to the CK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Pointing Solve Options table according to the value of the
+   * CK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the CK Solve Degree + 1.
+   *
+   * @param int Value the CK Solve Degree spin box was changed to.
+   */
+  void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
+    // number of rows == ckSolveDegree value + 1 (i+1)
+    QTableWidget *table = m_ui->pointingAprioriSigmaTable;
+    const int oldRowCount = table->rowCount();
+    table->setRowCount(i + 1);
+    const int newRowCount = table->rowCount();
+
+    if (newRowCount > oldRowCount) {
+
+      for (int row = oldRowCount; row < newRowCount; row++) {
+        // Headers : coefficient, description, units, a priori sigma
+        QTableWidgetItem *coefficient = new QTableWidgetItem();
+        coefficient->setFlags(Qt::ItemIsEnabled);
+        coefficient->setText(QString::number(row + 1));
+        table->setItem(row, 0, coefficient);
+
+        QTableWidgetItem *description = new QTableWidgetItem();
+        description->setFlags(Qt::ItemIsEnabled);
+        description->setText("N/A");
+        table->setItem(row, 1, description);
+
+        QTableWidgetItem *units = new QTableWidgetItem();
+        units->setFlags(Qt::ItemIsEnabled);
+        units->setText("deg/s^" + QString::number(row));
+        table->setItem(row, 2, units);
+
+        QTableWidgetItem *sigma = new QTableWidgetItem();
+        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        sigma->setText("0.0");
+        table->setItem(row, 3, sigma);
+
+        // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 2 }
+        // ANGLES
+        if (row == 0) { 
+          QTableWidgetItem *description = table->item(0, 1);
+          description->setText("ANGLES");
+
+          QTableWidgetItem *units = table->item(0, 2);
+          units->setText("degrees");
+        }
+
+        // VELOCITY
+        if (row == 1) {
+          QTableWidgetItem *description = table->item(1, 1);
+          description->setText("ANGULAR VELOCITY");
+
+          QTableWidgetItem *units = table->item(1, 2);
+          units->setText("deg/s");
+        }
+
+        // ACCELERATION
+        if (row == 2) {
+          QTableWidgetItem *description = table->item(2, 1);
+          description->setText("ANGULAR ACCELERATION");
+
+          QTableWidgetItem *units = table->item(2, 2);
+          units->setText("deg/s^2");
+        }
+      }
+    }
+
+    table->resizeColumnToContents(1);
+    table->resizeColumnToContents(2);
+  }
+
+
+  /**
+   * Slot that listens for when the Instrument Position Solve Option combobox changes.
+   *
+   * This slot updates the value of the SPK Solve Degree spin box according to which solve position
+   * option is selected. This slot also disables the SPK spin boxes whenever a solve
+   * position that is not ALL is selected.
+   *
+   * @param const QString & Reference to the value that the position option combobox was changed to.
+   */
+  void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
+    int solveIndex = m_ui->positionComboBox->currentIndex();
+    QList<QSpinBox *> spinBoxes{m_ui->spkSolveDegreeSpinBox, m_ui->spkDegreeSpinBox};
+    for (auto &spinBox : spinBoxes) {
+      // ALL enables the solve degree spin box, but does not increase the degree
+      // Below shows the corresponding degree for each of the solve options:
+      //   NONE = -1; ANGLES = 0; VELOCITY = 1; ACCELERATION = 2; ALL = 2
+      if (arg1 == "ALL") {
+        spinBox->setValue(solveIndex - 2);
+        spinBox->setEnabled(true);
+      }
+      else {
+        spinBox->setValue(solveIndex - 1);
+        spinBox->setEnabled(false);
+      }
+    }
+  }
+
+
+  /**
+   * Slot that listens for when the Instrument Pointing Solve Option combobox changes.
+   *
+   * This slot updates the value of the CK Solve Degree spin box according to which solve pointing
+   * option is selected. This slot also disables the CK spin boxes whenever a solve
+   * pointing that is not ALL is selected.
+   *
+   * @param const QString & Reference to the value that the pointing option combobox was changed to.
+   */
+ void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
+    int solveIndex = m_ui->pointingComboBox->currentIndex();
+    QList<QSpinBox *> spinBoxes{m_ui->ckSolveDegreeSpinBox, m_ui->ckDegreeSpinBox};
+    for (auto &spinBox : spinBoxes) {
+      // ALL enables the solve degree spin box, but does not increase the degree
+      // Below shows the corresponding degree for each of the solve options:
+      //   NONE = -1; ANGLES = 0; ANGULAR VELOCITY = 1; ANGULAR ACCELERATION = 2; ALL = 2
+      if (arg1 == "ALL") {
+        spinBox->setValue(solveIndex - 2);
+        spinBox->setEnabled(true);
+      }
+      else {
+        spinBox->setValue(solveIndex - 1);
+        spinBox->setEnabled(false);
+      }
+    }
+  }
+
 
 
   void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
