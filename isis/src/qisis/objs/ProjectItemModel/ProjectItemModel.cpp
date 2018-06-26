@@ -190,9 +190,11 @@ namespace Isis {
 
     QItemSelection selection = selectionModel()->selection();
     QList<ProjectItem *> items;
+    QModelIndexList indices = selection.indexes();
+
 
     //Query the selected items to see if they have children
-    foreach ( QModelIndex ix, selection.indexes() ) {
+    foreach ( QModelIndex ix, indices ) {
 
       ProjectItem *item = this->itemFromIndex(ix);
 
@@ -206,16 +208,42 @@ namespace Isis {
         return items;
       }
 
-      //If the selected ImageList has children, include all of the children.
+      //If the selected ImageList has children, we have to handle
+      //the case where some of the children are selected, or
+      //the possibility that the user wants all of the children selected.
       if (this->hasChildren(ix)) {
 
         //If the node has children, loop through all of them
         //and add them to selected items.
+        bool childrenSelected(false);
         int numChildren = this->rowCount(ix);
+
+        //First loop through the children to see if any of them are also selected
         for (int i = 0; i < numChildren;i++) {
           QModelIndex ixchild = this->index(i,0,ix);
-          items.append(this->itemFromIndex(ixchild ));
-          }  //end for
+          if (indices.contains(ixchild) ){
+              childrenSelected=true;
+              break;
+          }
+        }
+          //If they are, then add them to selected items
+          if (childrenSelected) {
+            for (int i =0;i < numChildren;i++) {
+              QModelIndex ixchild = this->index(i,0,ix);
+              if (indices.contains(ixchild))
+                items.append(this->itemFromIndex(ixchild ));
+            }
+          }
+          //No children selected, so we are assuming that the user
+          //wanted to select all of the children under the parent.
+          else {
+            for (int i =0;i < numChildren;i++) {
+               QModelIndex ixchild = this->index(i,0,ix);
+               items.append(this->itemFromIndex(ixchild ));
+            }
+
+          }
+
       }//end if
 
       //Append the parent of any selected child.  This is so
