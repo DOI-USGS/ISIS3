@@ -902,10 +902,12 @@ namespace Isis {
 
 
       boss.setInstrumentPositionSettings(positionSolvingOption,spkDegree,spkSolveDegree,positionOverHermite,
-                                         positionAprioriSigma,velocityAprioriSigma,accelerationAprioriSigma);
+                                         positionAprioriSigma,velocityAprioriSigma,accelerationAprioriSigma,
+                                         &additionalPositionCoefficients);
 
       boss.setInstrumentPointingSettings(pointSolvingOption,solveTwist,ckDegree,ckSolveDegree,solvePolynomialOverExisting,
-                                         anglesAprioriSigma,angularVelocityAprioriSigma,angularAccelerationAprioriSigma);
+                                         anglesAprioriSigma,angularVelocityAprioriSigma,angularAccelerationAprioriSigma,
+                                         &additionalAngularCoefficients);
 
       //What if multiple instrument IDs are represented?
       boss.setInstrumentId("");
@@ -925,7 +927,7 @@ namespace Isis {
           if (projItem->isImage() ) {
             Image * img = projItem->data().value<Image *>();
             boss.addObservationNumber(img->serialNumber() );
-            //qDebug() << "serial num:  " << img->serialNumber();
+
           }
         }
 

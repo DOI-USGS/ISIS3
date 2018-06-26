@@ -381,7 +381,7 @@ namespace Isis {
                                            bool solvePolynomialOverExisting,
                                            double anglesAprioriSigma,
                                            double angularVelocityAprioriSigma,
-                                           double angularAccelerationAprioriSigma) {
+                                           double angularAccelerationAprioriSigma,QList<double> * additionalPointingSigmas) {
 
     // automatically set the solve option and ck degree to the user entered values
     m_instrumentPointingSolveOption = option;
@@ -433,6 +433,16 @@ namespace Isis {
         }
       }
     }
+
+    if (additionalPointingSigmas) {
+      for (int i=0;i < additionalPointingSigmas->count();i++) {         
+          m_anglesAprioriSigma.append(additionalPointingSigmas->value(i));
+      }
+    }
+
+
+
+
 
     m_solveTwist = solveTwist; // dependent on solve option???
 
@@ -622,14 +632,14 @@ namespace Isis {
    * @param velocityAprioriSigma A priori velocity sigma
    * @param accelerationAprioriSigma A priori acceleration sigma
    */
-  void BundleObservationSolveSettings::setInstrumentPositionSettings(
-                                           InstrumentPositionSolveOption option,
+  void BundleObservationSolveSettings::setInstrumentPositionSettings(InstrumentPositionSolveOption option,
                                            int spkDegree,
                                            int spkSolveDegree,
                                            bool positionOverHermite,
                                            double positionAprioriSigma,
                                            double velocityAprioriSigma,
-                                           double accelerationAprioriSigma) {
+                                           double accelerationAprioriSigma,
+                                           QList<double> *additionalPositionSigmas) {
     // automatically set the solve option and spk degree to the user entered values
     m_instrumentPositionSolveOption = option;
 
@@ -677,6 +687,12 @@ namespace Isis {
             m_positionAprioriSigma.append(Isis::Null);
           }
         }
+      }
+    }
+
+    if (additionalPositionSigmas) {
+      for (int i=0;i < additionalPositionSigmas->count();i++) {
+          m_positionAprioriSigma.append(additionalPositionSigmas->value(i));
       }
     }
 
