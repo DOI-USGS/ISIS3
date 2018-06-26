@@ -1353,23 +1353,18 @@ namespace Isis {
    */
   void JigsawSetupDialog::validateSigmaTables() {
     bool tablesAreValid = true;
+    
     // Evaluate both tables; if any value is invalid, the table is invalid
     const QTableWidget *positionTable = m_ui->positionAprioriSigmaTable;
-    qDebug() << "validating the position table...";
-    qDebug() << "\tnumber of rows: " << positionTable->rowCount();
+
     for (int i = 0; i < positionTable->rowCount(); i++) {
-      qDebug() << "\t\trow " << i;
       const QTableWidgetItem *item = positionTable->item(i,3);
-      qDebug() << "\t\titem: " << item;
-      qDebug() << "\t\tdata: ";
       if (item) { 
-        qDebug() << item->data(Qt::UserRole);
         if (item->data(Qt::UserRole).toBool() == false) {
           tablesAreValid = false;
           break;
         }
       }
-      else qDebug() << "(null)";
     }
 
     m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
