@@ -1320,7 +1320,7 @@ namespace Isis {
     }
 
     // FREE is a valid value for the a priori sigma column
-    int free = item->text().compare("FREE", Qt::CaseInsensitive);
+    int free = item->text().simplified().compare("FREE", Qt::CaseInsensitive);
     if (free == 0) {
       item->setText("FREE");
     }
