@@ -76,10 +76,6 @@ namespace Isis {
       void viewImageFewMeasures();
       void viewImageHullTolerance();
 
-      void broken();
-      void weak();
-      void healthy();
-
       void update();
 
     signals:
