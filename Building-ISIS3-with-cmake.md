@@ -3,6 +3,7 @@
 ## Building ISIS3
 From the terminal window:
 * Clone the repo locally:  <repo directory>
+* Activate your [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html)
 * CD into the clone directory.
 * mkdir build
 * cd into the build directory
