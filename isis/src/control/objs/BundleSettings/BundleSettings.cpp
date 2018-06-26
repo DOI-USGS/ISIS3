@@ -484,6 +484,12 @@ namespace Isis {
   }
 
 
+  /**
+   * Retrieves solve settings for the observation corresponding to the given index.
+   *
+   * @return QList<BundleObservationSolveSettings> The QList of BundleObservationSolveSettings
+   *                              objects
+   */
   QList<BundleObservationSolveSettings> BundleSettings::observationSolveSettings() const {
     return m_observationSolveSettings;
   } 

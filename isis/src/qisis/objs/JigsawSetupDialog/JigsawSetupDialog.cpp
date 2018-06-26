@@ -381,8 +381,6 @@ namespace Isis {
 
   void JigsawSetupDialog::fillFromSettings(const BundleSettingsQsp settings) {
 
-    BundleObservationSolveSettings observationSolveSettings = settings->observationSolveSettings(0);
-
     // general tab
     m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
     m_ui->pointRadiusSigmaCheckBox->setChecked(settings->solveRadius());
@@ -392,37 +390,6 @@ namespace Isis {
     m_ui->outlierRejectionMultiplierLineEdit->setText(toString(settings->outlierRejectionMultiplier()));
     m_ui->sigma0ThresholdLineEdit->setText(toString(settings->convergenceCriteriaThreshold()));
     m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
-
-
-    // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
-    m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
-    m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
-    m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
-
-
-    int pointingOption = observationSolveSettings.instrumentPointingSolveOption();
-    if (pointingOption == 0) {
-      pointingOption = 1;
-    }
-    if (pointingOption == 1) {
-      pointingOption = 0;
-    }
-
-    if ( pointingOption > 0 ) {
-      m_ui->twistCheckBox->setEnabled(true);
-    }
-    else {
-      m_ui->twistCheckBox->setEnabled(true);
-    }
-
-    // m_ui->pointingComboBox->setCurrentIndex(pointingOption);
-//    m_ui->pointingComboBox->setCurrentIndex(observationSolveSettings.instrumentPointingSolveOption());
-
-
-    m_ui->twistCheckBox->setChecked(observationSolveSettings.solveTwist());
-    m_ui->fitOverPointingCheckBox->setChecked(observationSolveSettings.solvePolyOverPointing());
-    m_ui->ckDegreeSpinBox->setValue(observationSolveSettings.ckDegree());
-    m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
 
     // weighting tab
     if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
@@ -438,46 +405,6 @@ namespace Isis {
       m_ui->pointRadiusSigmaLineEdit->setModified(true);
 
     }
-
-    QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
-
-    if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
-      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
-      m_ui->positionSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
-      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
-      m_ui->velocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
-      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
-      m_ui->accelerationSigmaLineEdit->setModified(true);
-    }
-
-    QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
-
-    if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
-      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
-      m_ui->pointingAnglesSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
-      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
-      m_ui->pointingAngularVelocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setModified(true);
-    }
-
-    // maximum liklihood tab
-
-    // self-calibration tab
-
-    // target body tab
 
     update();
 
@@ -1365,6 +1292,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Slot for handling the Observation Solve Settings tab's Apply button. Retrieve's the selected
+   * ProjectItems and adds their images' serial numbers to a new BundleObservationSolveSettings
+   * object. Serial numbers will be removed from all other BOSS objects, and empty BOSS objects will
+   * be removed. 
+   */ 
+
   void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
 
     // Get the current selected images and the item models
@@ -1386,10 +1320,12 @@ namespace Isis {
           selectedObservationNumbers.append(projItem->image()->serialNumber());
         }
         else if (projItem->isImageList()) {
-          foreach (Image *image,  *projItem->imageList()) {
-            // issue: if we pick an imagelist from treeview, we append all of its sources' chldrens'
-            // serial numbers, even if they arent on the proxy
-            selectedObservationNumbers.append(image->serialNumber());
+          // Use the proxymodel's children as it might not include all of the sourcemodel's children 
+          for (int i = 0; i < proxyModel->rowCount(index); i++) {
+            QModelIndex childProxyIndex = proxyModel->index(i, 0, index);
+            QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
+            ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
+            selectedObservationNumbers.append(childItem->image()->serialNumber());
           }
         }
       }
