@@ -601,8 +601,8 @@ namespace Isis {
         // forces the edges to be unique.)
         ImageConnection connection;
         bool edgeAdded;
-        boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[serial],
-                                                   m_vertexMap[sn],
+        boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[sourceSerial],
+                                                   m_vertexMap[targetSerial],
                                                    m_controlGraph);
         m_controlGraph[connection].strength++;
 
