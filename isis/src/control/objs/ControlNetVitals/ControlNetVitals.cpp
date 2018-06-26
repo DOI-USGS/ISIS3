@@ -580,7 +580,6 @@ namespace Isis {
     }
 
     return count;
-    //return getPointsBelowMeasureThreshold(num).size();
   }
 
 
