@@ -152,7 +152,7 @@ namespace Isis {
   void ControlHealthMonitorWidget::broken() {
     updateStatus(0);
     m_statusLabel->setText("Broken!");
-    m_statusDetails->setText("This network has more than one island.");
+    m_statusDetails->setText("This network has " + toString(m_vitals->numIslands()) + "islands.");
   }
 
   void ControlHealthMonitorWidget::weak() {
