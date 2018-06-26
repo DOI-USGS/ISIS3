@@ -153,6 +153,7 @@ include(CTest)
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
+                       -fPIC
                        -std=c++11
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
