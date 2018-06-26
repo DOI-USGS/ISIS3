@@ -607,6 +607,10 @@ namespace Isis {
                                                    m_vertexMap[targetSerial],
                                                    m_controlGraph).first;
         m_controlGraph[connection].strength++;
+
+        if (edgeAdded) {
+          emit networkModified(GraphModified);
+        }
       }
     }
   }
@@ -781,6 +785,7 @@ namespace Isis {
             boost::remove_edge(m_vertexMap[sourceSerial],
                                m_vertexMap[targetSerial],
                                m_controlGraph);
+            emit networkModified(GraphModified);
           }
         }
       }
