@@ -151,8 +151,8 @@ namespace Isis {
       //include those that do not need it.
 
       if(workOrder->progressBar() )  {
-        setItemWidget(newItem, 1, new ProgressBar);
-//        this->setItemWidget(newItem, 1, workOrder->progressBar() );
+        //setItemWidget(newItem, 1, new ProgressBar);
+        this->setItemWidget(newItem, 1, workOrder->progressBar() );
       }
       scrollToItem(newItem);
       refit();

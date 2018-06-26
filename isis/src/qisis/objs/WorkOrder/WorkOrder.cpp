@@ -173,7 +173,7 @@ namespace Isis {
     delete m_imageList;
     delete m_shapeList;
     delete m_futureWatcher;
-    delete m_progressBar;
+//     delete m_progressBar;
     delete m_progressBarDeletionTimer;
     delete m_progressBarUpdateTimer;
     delete m_transparentConstMutex;
@@ -1654,13 +1654,13 @@ namespace Isis {
    * @brief Deletes the progress bar.
    */
   void WorkOrder::deleteProgress() {
-    ProgressBar *progress = m_progressBar;
-
-    if (m_progressBar) {
-      m_progressBar = NULL;
-      emit deletingProgress(this);
-      delete progress;
-    }
+//     ProgressBar *progress = m_progressBar;
+// 
+//     if (m_progressBar) {
+//       delete progress;
+//       m_progressBar = NULL;
+//       emit deletingProgress(this);
+//     }
   }
 
 
