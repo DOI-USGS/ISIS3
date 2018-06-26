@@ -13,6 +13,7 @@ class QItemSelection;
 class QTableWidgetItem;
 
 namespace Isis {
+  class BundleObservationSolveSettings;
   class Project;
   class ProjectItem;
   class Control;
@@ -156,10 +157,11 @@ namespace Isis {
 
 
     private:
-    void makeReadOnly()    ;
+    void makeReadOnly();
     void fillFromSettings(const BundleSettingsQsp settings);
     void showTargetParametersGroupBox();
     void hideTargetParametersGroupBox();
+    void updateBundleObservationSolveSettings(BundleObservationSolveSettings &boss);
 
     void createObservationSolveSettingsTreeView();
 

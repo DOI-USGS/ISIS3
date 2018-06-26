@@ -10,10 +10,13 @@
 #include <QStandardItemModel>
 #include <QItemSelection>
 
+#include "BundleObservationSolveSettings.h"
 #include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
 #include "BundleTargetBody.h"
 #include "Control.h"
+#include "Cube.h"
+#include "Image.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
@@ -781,6 +784,144 @@ namespace Isis {
   QString JigsawSetupDialog::selectedControlName() {
     return QString(m_ui->inputControlNetCombo->currentText());
   }
+
+  void JigsawSetupDialog::updateBundleObservationSolveSettings(BundleObservationSolveSettings &boss)
+    {
+
+      int ckSolveDegree = m_ui->ckSolveDegreeSpinBox->value();
+      int spkSolveDegree = m_ui->spkSolveDegreeSpinBox->value();
+      int ckDegree = m_ui->ckDegreeSpinBox->value();
+      int spkDegree = m_ui->spkDegreeSpinBox->value();
+      int instrumentPointingSolveOption=m_ui->pointingComboBox->currentIndex();
+      int instrumentPositionSolveOption=m_ui->positionComboBox->currentIndex();
+
+      BundleObservationSolveSettings::InstrumentPointingSolveOption  pointSolvingOption;
+      BundleObservationSolveSettings::InstrumentPositionSolveOption  positionSolvingOption;
+
+      double anglesAprioriSigma(-1.0);
+      double angularVelocityAprioriSigma(-1.0);
+      double angularAccelerationAprioriSigma(-1.0);
+      QList<double> additionalAngularCoefficients;
+
+      double positionAprioriSigma(-1.0);
+      double velocityAprioriSigma(-1.0);
+      double accelerationAprioriSigma(-1.0);
+      QList<double> additionalPositionCoefficients;
+
+      bool solveTwist(false);
+      bool solvePolynomialOverExisting(false);
+      bool positionOverHermite(false);
+
+      if (m_ui->pointingAprioriSigmaTable->item(0,3))
+        anglesAprioriSigma = m_ui->pointingAprioriSigmaTable->item(0,3)->data(0).toDouble();
+
+      if (m_ui->pointingAprioriSigmaTable->item(1,3))
+        angularVelocityAprioriSigma = m_ui->pointingAprioriSigmaTable->item(1,3)->data(0).toDouble();
+
+      if (m_ui->pointingAprioriSigmaTable->item(2,3) )
+        angularAccelerationAprioriSigma = m_ui->pointingAprioriSigmaTable->item(2,3)->data(0).toDouble();
+
+      if (m_ui->positionAprioriSigmaTable->item(0,3))
+        positionAprioriSigma = m_ui->positionAprioriSigmaTable->item(0,3)->data(0).toDouble();
+
+      if (m_ui->positionAprioriSigmaTable->item(1,3))
+        velocityAprioriSigma = m_ui->positionAprioriSigmaTable->item(1,3)->data(0).toDouble();
+
+      if (m_ui->positionAprioriSigmaTable->item(2,3) )
+        accelerationAprioriSigma = m_ui->positionAprioriSigmaTable->item(2,3)->data(0).toDouble();
+
+
+      //Saving additionalPositional/Angular coefficients (deg >=3) in case they are needed
+      //later.
+      if (spkSolveDegree >2) {
+        for (int i = 3;i <= spkSolveDegree;i++ ) {
+          if (m_ui->positionAprioriSigmaTable->item(i,3))
+            additionalPositionCoefficients.append(m_ui->positionAprioriSigmaTable->item(i,3)->data(0).toDouble() );
+        }
+      }
+
+      if (ckSolveDegree > 2) {
+         for (int i = 3;i <= ckSolveDegree;i++ ) {
+           if (m_ui->pointingAprioriSigmaTable->item(i,3))
+             additionalAngularCoefficients.append(m_ui->pointingAprioriSigmaTable->item(i,3)->data(0).toDouble() );
+         }
+
+      }
+
+
+      if (m_ui->twistCheckBox->checkState() == Qt::Checked)
+        solveTwist = true;
+      if (m_ui-> fitOverPointingCheckBox->checkState() == Qt::Checked)
+        solvePolynomialOverExisting = true;
+
+      switch(instrumentPointingSolveOption) {
+
+      case 0: pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::NoPointingFactors;
+        break;
+      case 1:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AnglesOnly;
+        break;
+      case 2:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AnglesVelocity;
+        break;
+      case 3:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AnglesVelocityAcceleration;
+        break;
+
+      case 4:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AllPointingCoefficients;
+        break;
+      default:  pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::NoPointingFactors;
+        break;
+
+      }
+
+      switch(instrumentPositionSolveOption) {
+
+      case 0: positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::NoPositionFactors;
+        break;
+      case 1:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::PositionOnly;
+        break;
+      case 2:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::PositionVelocity;
+        break;
+      case 3:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::PositionVelocityAcceleration;
+        break;
+
+      case 4:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::AllPositionCoefficients;
+        break;
+      default:  positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::NoPositionFactors;
+        break;
+
+      }
+
+
+      boss.setInstrumentPositionSettings(positionSolvingOption,spkDegree,spkSolveDegree,positionOverHermite,
+                                         positionAprioriSigma,velocityAprioriSigma,accelerationAprioriSigma);
+
+      boss.setInstrumentPointingSettings(pointSolvingOption,solveTwist,ckDegree,ckSolveDegree,solvePolynomialOverExisting,
+                                         anglesAprioriSigma,angularVelocityAprioriSigma,angularAccelerationAprioriSigma);
+
+      //What if multiple instrument IDs are represented?
+      boss.setInstrumentId("");
+
+
+      SortFilterProxyModel* proxyModel = (SortFilterProxyModel *)m_ui->treeView->model();
+      ProjectItemModel* sourceModel = (ProjectItemModel *)proxyModel->sourceModel();
+      QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
+
+      foreach (QModelIndex index, selectedIndexes) {
+
+        QModelIndex sourceix = proxyModel->mapToSource(index);
+        ProjectItem * projItem = sourceModel->itemFromIndex(sourceix);
+
+        if (projItem) {
+
+          if (projItem->isImage() ) {
+            Image * img = projItem->data().value<Image *>();
+            boss.addObservationNumber(img->serialNumber() );
+            //qDebug() << "serial num:  " << img->serialNumber();
+          }
+        }
+
+      }
+
+    }
 
 
   QString JigsawSetupDialog::outputControlName() {
@@ -1592,7 +1733,13 @@ namespace Isis {
 
 // Commented out since it contains some unimplemented functions (i.e. pseudo-code)
 
-  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {}
+  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
+
+    BundleObservationSolveSettings boss;
+
+    updateBundleObservationSolveSettings(boss);
+
+  }
 #if 0
     // Get the current selected images
     QAbstractProxyModel *model = m_ui->treeView->model();
