@@ -1668,7 +1668,6 @@ namespace Isis {
    * object. Serial numbers will be removed from all other BOSS objects, and empty BOSS objects will
    * be removed. 
    */ 
-
   void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
 
     // Get the current selected images and the item models
@@ -1729,9 +1728,9 @@ namespace Isis {
       solveSettings.addObservationNumber(observationNumber);
     }
 
-    // // Grab the data from the right hand side of the observation solve settings tab to set
-    // // up the new bundle observation solve settings
-    // updateBundleObservationSolveSettings(solveSettings);
+    // Grab the data from the right hand side of the observation solve settings tab to set
+    // up the new bundle observation solve settings
+    updateBundleObservationSolveSettings(solveSettings);
 
     // Add the new solve settings to the solve settings list
     solveSettingsList.append(solveSettings);
