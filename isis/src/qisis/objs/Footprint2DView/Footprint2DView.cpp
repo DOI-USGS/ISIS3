@@ -345,7 +345,7 @@ namespace Isis {
   /**
    * Disables toolbars and toolpad actions
    */
-  void CubeDnView::disableActions() {
+  void Footprint2DView::disableActions() {
     foreach (QAction * action, m_actions) {
       action->setDisabled(true);
     }
@@ -355,7 +355,7 @@ namespace Isis {
   /**
    * Enables toolbars and toolpad actions
    */
-  void CubeDnView::enableActions() {
+  void Footprint2DView::enableActions() {
     foreach (QAction * action, m_actions) {
       action->setEnabled(true);
     }
@@ -365,7 +365,7 @@ namespace Isis {
    * Enables actions when cursor enters on the view
    * @param event The enter event
    */
-  void CubeDnView::enterEvent(QEvent *event) {
+  void Footprint2DView::enterEvent(QEvent *event) {
     enableActions();
   }
 
@@ -374,7 +374,7 @@ namespace Isis {
    * Disables actions when cursor leaves the view
    * @param event The leave event
    */
-  void CubeDnView::leaveEvent(QEvent *event) {
+  void Footprint2DView::leaveEvent(QEvent *event) {
     disableActions();
   }
 
