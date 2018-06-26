@@ -236,6 +236,7 @@ find_package(nanoflann         REQUIRED)
 find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0   REQUIRED)
+find_package(OpenGL REQUIRED)
 
 if(pybindings)
  find_package(Python REQUIRED)
