@@ -1324,6 +1324,7 @@ namespace Isis {
     double sigma = item->text().toDouble(&convertSuccess);
     if ((convertSuccess && sigma >= 0.0) || free == 0) {
       const QTableWidget *table = item->tableWidget();
+      item->setData(Qt::UserRole, QVariant(true));
       // Set background color depending on if the table has alternating row colors and row is odd
       if (table->alternatingRowColors() && item->row() % 2 != 0) {
         item->setBackground(table->palette().color(QPalette::AlternateBase));
@@ -1333,8 +1334,45 @@ namespace Isis {
       }
     }
     else {
+      item->setData(Qt::UserRole, QVariant(false));
       item->setBackground(Qt::red);
     }
+
+    validateSigmaTables();
+  }
+
+
+  /**
+   * Validates the tables in the observation solve settings tab and enables/disables the OK
+   * button appropriately.
+   *
+   * This method validates both the position and pointing a priori sigma tables in the observation
+   * solve settings tab. If any of the sigma values are invalid, the JigsawSetupDialog's OK button
+   * is disabled. If all of the sigma values are valid, the JigsawSetupDialog's OK button is
+   * (re)enabled.
+   */
+  void JigsawSetupDialog::validateSigmaTables() {
+    bool tablesAreValid = true;
+    // Evaluate both tables; if any value is invalid, the table is invalid
+    const QTableWidget *positionTable = m_ui->positionAprioriSigmaTable;
+    qDebug() << "validating the position table...";
+    qDebug() << "\tnumber of rows: " << positionTable->rowCount();
+    for (int i = 0; i < positionTable->rowCount(); i++) {
+      qDebug() << "\t\trow " << i;
+      const QTableWidgetItem *item = positionTable->item(i,3);
+      qDebug() << "\t\titem: " << item;
+      qDebug() << "\t\tdata: ";
+      if (item) { 
+        qDebug() << item->data(Qt::UserRole);
+        if (item->data(Qt::UserRole).toBool() == false) {
+          tablesAreValid = false;
+          break;
+        }
+      }
+      else qDebug() << "(null)";
+    }
+
+    m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
   }
 
 
@@ -1354,6 +1392,11 @@ namespace Isis {
     table->setRowCount(i + 1);
     const int newRowCount = table->rowCount();
 
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
+
+    // Rows need to be added
     if (newRowCount > oldRowCount) {
       for (int row = oldRowCount; row < newRowCount; row++) {
         // Headers : coefficient, description, units, a priori sigma
@@ -1375,6 +1418,7 @@ namespace Isis {
         QTableWidgetItem *sigma = new QTableWidgetItem();
         sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
         sigma->setText("0.0");
+        sigma->setData(Qt::UserRole, QVariant(true));
         table->setItem(row, 3, sigma);
 
         // Solve option: spk degree { NONE: -1, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
@@ -1428,8 +1472,11 @@ namespace Isis {
     table->setRowCount(i + 1);
     const int newRowCount = table->rowCount();
 
-    if (newRowCount > oldRowCount) {
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
 
+    if (newRowCount > oldRowCount) {
       for (int row = oldRowCount; row < newRowCount; row++) {
         // Headers : coefficient, description, units, a priori sigma
         QTableWidgetItem *coefficient = new QTableWidgetItem();
