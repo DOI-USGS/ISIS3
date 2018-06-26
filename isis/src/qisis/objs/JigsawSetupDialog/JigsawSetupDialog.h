@@ -73,6 +73,10 @@ namespace Isis {
    *                           createObservationSolveSettingsTreeView() function.  References #497.
    *   @history 2018-06-25 Ian Humphrey - Implemented the position and pointing a priori sigma
    *                           tables in the observation solve settings tab. References #497.
+   *   @history 2018-06-26 Tyler Wilson - Added the function 
+   *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &) 
+   *                           which grabs BOSS settings from the JSD BOSS tab for selected images 
+   *                           in the BOSS QTreeView and saves them in a BOSS object. 
    */
 
   class JigsawSetupDialog : public QDialog {

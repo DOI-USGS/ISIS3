@@ -785,6 +785,16 @@ namespace Isis {
     return QString(m_ui->inputControlNetCombo->currentText());
   }
 
+  
+
+  /**
+   * @brief updateBundleObservationSolveSettings:  This function sets the parameters of
+   * a BundleObservationSolveSettings object by reading user settings from the BOSS
+   * tab, as well as reading in the selected images on the BOSS QTreeView these
+   * BOSS settings are to be applied to.
+   * @param BundleObservationSolveSettings &boss The object which stores user-specified
+   * settings from the BOSS tab.
+   */
   void JigsawSetupDialog::updateBundleObservationSolveSettings(BundleObservationSolveSettings &boss)
     {
 
