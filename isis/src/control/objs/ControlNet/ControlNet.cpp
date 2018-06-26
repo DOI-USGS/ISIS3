@@ -480,11 +480,6 @@ namespace Isis {
    }
 
 
-   void ControlNet::emitNewMeasure(ControlMeasure *measure) {
-     emit newMeasure(measure);
-   }
-
-
    /**
    * Updates the ControlNet graph for the measure's serial number to
    * reflect the addition.  If there is currently no node for
@@ -695,11 +690,6 @@ namespace Isis {
   }
 
 
-  void ControlNet::emitMeasureRemoved(ControlMeasure *measure) {
-    emit measureRemoved(measure);
-  }
-
-
   /**
    * Updates the node for this measure's serial number to
    * reflect the deletion.  If this is the only measure left in the containing
@@ -891,7 +881,7 @@ namespace Isis {
 
     // notify CubeSerialNumbers of the loss of this point
     foreach(ControlMeasure * measure, point->getMeasures()) {
-      emit measureRemoved(measure);
+      measureDeleted(measure);
     }
 
     emit pointDeleted(point);

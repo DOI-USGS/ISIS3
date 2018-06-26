@@ -174,6 +174,7 @@ namespace Isis {
     createMenus();
     createToolBars();
 
+    QCoreApplication::setApplicationName("ipce");
     QStringList args = QCoreApplication::arguments();
 
     if (args.count() == 2) {

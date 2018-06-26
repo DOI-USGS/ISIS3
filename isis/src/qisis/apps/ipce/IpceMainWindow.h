@@ -130,6 +130,7 @@ namespace Isis {
    *                           test to determine whether project needs saving.
    *   @history 2018-05-01 Tracie Sucharski - Code accidently left commented from previous checking.
    *                           Fixes #5412.
+<<<<<<< HEAD
    *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
    *                           widget. Remove all methods having to do with MDI sub-windows,
@@ -154,6 +155,9 @@ namespace Isis {
    *                           permanent toolbar constructor. 
    *
    *
+   *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does 
+   *                           not output text to the command line for ipce. Fixes #4171.
+   *  
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
