@@ -10,9 +10,10 @@ namespace Ui {
 }
 
 class QItemSelection;
-
+class QTableWidgetItem;
 
 namespace Isis {
+  class BundleObservationSolveSettings;
   class Project;
   class ProjectItem;
   class Control;
@@ -63,6 +64,23 @@ namespace Isis {
    *                           net name to anything they choose.
    *   @history 2018-06-01 Christopher Combs - Added support for ui changes, exclusive options and 
    *                           input validators.
+   *   @history 2018-06-21 Ian Humphrey - Added on_applySettingsPushButtonClicked() to listen for when
+   *                           the apply button is clicked on the observation solve settings tab.
+   *                           References #497.
+   *   @history 2018-06-21 Tyler Wilson - Added support in the Bundle Observations Solve Settings
+   *                           (BOSS) tab for displaying user-selected images from the main Project
+   *                           treeview.  All changes were made in the
+   *                           createObservationSolveSettingsTreeView() function.  References #497.
+   *   @history 2018-06-25 Ian Humphrey - Implemented the position and pointing a priori sigma
+   *                           tables in the observation solve settings tab. References #497.
+   *   @history 2018-06-26 Tyler Wilson - Added the function 
+   *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &) 
+   *                           which grabs BOSS settings from the JSD BOSS tab for selected images 
+   *                           in the BOSS QTreeView and saves them in a BOSS object. 
+   *   @history 2018-06-26 Tyler Wilson - Added support in
+   *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &)
+   *                           for the user to set an arbitrary number of position/pointing Apriori
+   *                           Sigma values beyond position/velocity/acceleration.  References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -125,12 +143,21 @@ namespace Isis {
     void on_aRadiusLineEdit_textChanged(const QString &arg1);
     void on_targetBodyComboBox_currentIndexChanged(int index);
     void on_spkSolveDegreeSpinBox_valueChanged(int arg1);
+    void on_ckSolveDegreeSpinBox_valueChanged(int arg1);
     void on_rightAscensionLineEdit_textChanged(const QString &arg1);
     void on_declinationLineEdit_textChanged(const QString &arg1);
     void on_rightAscensionVelocityLineEdit_textChanged(const QString &arg1);
     void on_declinationVelocityLineEdit_textChanged(const QString &arg1);
     void on_spinRateLineEdit_textChanged(const QString &arg1);
     void on_primeMeridianOffsetLineEdit_textChanged(const QString &arg1);
+    
+    void on_applySettingsPushButton_clicked();
+
+    void on_positionComboBox_currentIndexChanged(const QString &arg1);
+    void on_pointingComboBox_currentIndexChanged(const QString &arg1);
+
+    void validateSigmaValue(QTableWidgetItem *);
+    
 
     public slots:
     void slotTextChanged(const QString &text);
@@ -138,10 +165,11 @@ namespace Isis {
 
 
     private:
-    void makeReadOnly()    ;
+    void makeReadOnly();
     void fillFromSettings(const BundleSettingsQsp settings);
     void showTargetParametersGroupBox();
     void hideTargetParametersGroupBox();
+    void updateBundleObservationSolveSettings(BundleObservationSolveSettings &boss);
 
     void createObservationSolveSettingsTreeView();
 
