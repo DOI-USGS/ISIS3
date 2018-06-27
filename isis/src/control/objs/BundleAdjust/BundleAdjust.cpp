@@ -2614,12 +2614,6 @@ bool BundleAdjust::formNormalEquations() {
     // Apply parameter corrections for control points
     // TODO: can we do this faster by threading with QtConcurrent::run?
     m_bundleControlPoints.applyParameterCorrections(m_sparseNormals, m_imageSolution);
-
-//    QFuture<void> f1 =
-//        QtConcurrent::run(&m_bundleControlPoints,
-//                          &BundleControlPointVector::applyParameterCorrections, m_sparseNormals,
-//                                                                                m_imageSolution);
-//    f1.waitForFinished();
   }
 
 
