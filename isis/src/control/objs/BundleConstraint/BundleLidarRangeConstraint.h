@@ -42,7 +42,8 @@ namespace Isis {
    * @author 2018-04-13 Ken Edmundson
    *
    * @internal
-   *   @history 2017-04-13 Ken Edmundson - Original version.
+   *   @history 2018-04-13 Ken Edmundson - Original version.
+   *   @history 2018-06-27 Ken Edmundson - Code clean up.
    */
   class BundleLidarRangeConstraint : public BundleConstraint {
     public:
