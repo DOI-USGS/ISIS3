@@ -1656,6 +1656,7 @@ namespace Isis {
         QTableWidgetItem *sigma = new QTableWidgetItem();
         sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
         sigma->setText("0.0");
+        sigma->setData(Qt::UserRole, QVariant(true));
         table->setItem(row, 3, sigma);
 
         // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 2 }
