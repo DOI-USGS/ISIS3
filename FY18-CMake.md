@@ -5,11 +5,12 @@ Below is a tentative plan for the completion of the CMake work for FY18. If you 
 * CMake is the build system for the ISIS3 package starting with the first release of FY19.
 * All ‘small’ bugs that are currently identified have been squashed.
   - Tests timing out (cam2map related?) - (Jesse to lead)
-  - Update protobuf files to protobuf3 (currently 2) - (Jesse to lead)
+  - ~Update protobuf files to protobuf3 (currently 2) - (Jesse to lead)~
     - Done
-  - Anaconda Qt build is missing PosgreSQL - (Kelvin or Ian, Post GCC update)
-  - Linux has to use GCC 4.8.5 - update to a modern gcc - 7.x (whatever the current folks are using)
-    - Kelvin has demoed doing this in CSM (meta.yaml and build.sh in https://github.com/USGS-Astrogeology/conda-libcsm/tree/master/recipes and documentation: https://github.com/USGS-Astrogeology/conda-libcsm/pull/1)
+  - Anaconda Qt build is missing PosgreSQL - (Kelvin or Ian)
+  - ~Linux has to use GCC 4.8.5 - update to a modern gcc - 7.x (whatever the current folks are using)~
+    - Kelvin has demoed doing this in CSM (meta.yaml and build.sh in https://github.com/USGS-Astrogeology/conda libcsm/tree/master/recipes and documentation: https://github.com/USGS-Astrogeology/conda-libcsm/pull/1)
+    - dependencies updated to support building with GCC 7.x, see https://github.com/USGS-Astrogeology/isis3_dependencies
   - Code coverage support (https://doc.froglogic.com/squish-coco/3.3/integration.html#sec221)
   - Old process for making Isis Dlm (IDL “library”) cannot be easily ported to cmake (low priority...contact k. Becker- do we have users?) 
     - from K Becker: Used largely by the Europeans. ASU and U of A use it sporadically.
