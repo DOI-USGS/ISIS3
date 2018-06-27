@@ -117,10 +117,11 @@ namespace Isis {
     }
     if (m_bundleAdjust) {
       m_bundleAdjust->deleteLater();
-      // m_bundleAdjust = NULL;
+      m_bundleAdjust = NULL;    
     }
     if (m_bundleThread) {
       m_bundleThread->quit();
+      m_bundleThread->deleteLater();
       m_bundleThread = NULL;
     }
     if (m_ui) {
@@ -234,10 +235,6 @@ namespace Isis {
       // project as necessary.
       connect( m_bundleAdjust, SIGNAL( resultsReady(BundleSolutionInfo *) ),
                this, SLOT( bundleFinished(BundleSolutionInfo *) ) );
-
-      // Schedule the bundle thread for deletion when it finishes.
-      connect( m_bundleThread, SIGNAL( finished() ),
-               m_bundleThread, SLOT( deleteLater() ) );
 
       // ken testing
       // Notify the dialog that the bundle thread is finished, and update the gui elements.
@@ -597,6 +594,7 @@ namespace Isis {
     }
 
     if (m_bundleSettings->errorPropagation()) {
+      m_ui->rmsAdjustedPointSigmasGroupBox->setEnabled(true);
       m_ui->latitudeLcdNumber->display(
                               m_bundleSolutionInfo->bundleResults().sigmaLatitudeStatisticsRms());
       m_ui->longitudeLcdNumber->display(
@@ -605,16 +603,17 @@ namespace Isis {
       if (m_bundleSettings->solveRadius()) {
         m_ui->radiusLcdNumber->display(
                               m_bundleSolutionInfo->bundleResults().sigmaRadiusStatisticsRms());
+        m_ui->radiusLcdNumber->setEnabled(true);
+        m_ui->radiusLcdLabel->setEnabled(true);
       }
       else {
         m_ui->radiusLcdNumber->setEnabled(false);
+        m_ui->radiusLcdLabel->setEnabled(false);
       }
       
     }
     else {
-      m_ui->latitudeLcdNumber->setEnabled(false);
-      m_ui->longitudeLcdNumber->setEnabled(false);
-      m_ui->radiusLcdNumber->setEnabled(false);
+      m_ui->rmsAdjustedPointSigmasGroupBox->setEnabled(false);
     }
 
     // Since this slot is invoked when the thread finishes, the bundle adjustment is no longer
@@ -663,9 +662,8 @@ namespace Isis {
         m_bundleAdjust->abortBundle();
         return;
       }
-    } 
+    }
     event->accept();
-
   }
 }
 

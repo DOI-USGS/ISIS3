@@ -234,7 +234,7 @@ namespace Isis {
                                                   new QDoubleValidator(1.0e-10, 1.0, 8, this));
 
     // convergence criteria
-    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-20, 1.0e+10, 8, this));
     m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
 
 
