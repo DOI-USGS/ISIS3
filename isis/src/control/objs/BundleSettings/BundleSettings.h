@@ -106,6 +106,8 @@ namespace Isis {
    *                              is for creating and displaying the correlation matrix, which is
    *                              currently not working.
    *                           2) commented out hdf5 header includes in cpp
+   *   @history 2018-06-26 Christopher Combs - Added observationSolveSettings() method to retrieve
+   *                            m_observationSolveSettings. Fixes #497.
    *
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
@@ -175,6 +177,7 @@ namespace Isis {
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
       BundleObservationSolveSettings observationSolveSettings(int n) const;
+      QList<BundleObservationSolveSettings> observationSolveSettings() const; 
 
 
       //=====================================================================//

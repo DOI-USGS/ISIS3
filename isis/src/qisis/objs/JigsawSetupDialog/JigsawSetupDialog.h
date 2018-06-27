@@ -81,6 +81,8 @@ namespace Isis {
    *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &)
    *                           for the user to set an arbitrary number of position/pointing Apriori
    *                           Sigma values beyond position/velocity/acceleration.  References #497.
+   *   @history 2018-06-26 Christopher Combs - Implemented pseudocode in on_applySettings... method.
+   *                           References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
@@ -176,6 +178,7 @@ namespace Isis {
   private:
     Ui::JigsawSetupDialog *m_ui;
     Project *m_project;
+    BundleSettingsQsp m_bundleSettings; /**< The BundleSettings Object created by this dialog */
   };
 };
 #endif // JigsawSetupDialog_h
