@@ -91,12 +91,15 @@ namespace Isis {
 
 
   QVariant SortFilterProxyModel::data(const QModelIndex &index, int role) const {
-    if (role == Qt::BackgroundRole) {
-      return QVariant(QBrush(Qt::green));
-    }
-    else {
+    // if (role == Qt::BackgroundRole) {
+    //   if (QSortFilterProxyModel::data(index, Qt::UserRole).toBool())
+    //     return QVariant(QBrush(Qt::darkGreen));
+    //   else
+    //   return QVariant(QBrush(Qt::white));
+    // }
+    //else {
       return QSortFilterProxyModel::data(index, role);
-    }
+    //}
   //   return data(index, role);
   //   if (role == Qt::setBackgroundRole())
   //   if (role == Qt::DisplayRole) {
