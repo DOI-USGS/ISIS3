@@ -77,6 +77,10 @@ namespace Isis {
    *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &) 
    *                           which grabs BOSS settings from the JSD BOSS tab for selected images 
    *                           in the BOSS QTreeView and saves them in a BOSS object. 
+   *   @history 2018-06-27 Ian Humphrey - Added validateSigmaTables() that checks if there are any
+   *                           invalid a priori sigma values whenever an a priori sigma values changes.
+   *                           If any value is invalid, the OK and Apply Settings buttons are disabled
+   *                           until all the a priori sigma values are valid again. References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
