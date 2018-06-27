@@ -32,6 +32,7 @@ class QObject;
 class QStandardItem;
 
 class QVariant;
+class QModelIndex;
 
 namespace Isis {
 
@@ -65,6 +66,8 @@ namespace Isis {
       bool setRoot(const QStandardItem *item);
 
       void setSelectedItems(QList<ProjectItem*> selected);
+
+      QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 
      protected:

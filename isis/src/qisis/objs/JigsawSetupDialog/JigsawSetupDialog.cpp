@@ -1664,6 +1664,14 @@ namespace Isis {
   }
 
 
+  // void JigsawSetupDialog::updateGroups(QList<QStandardItem *> &selectedItems) {
+  //   for (auto &item : selectedItems) {
+  //     QBrush newGroup(Qt::blue);
+  //     item->setData(Qt::BackgroundRole, newGroup);
+  //   }
+  // }
+
+
   /**
    * Slot for handling the Observation Solve Settings tab's Apply button. Retrieve's the selected
    * ProjectItems and adds their images' serial numbers to a new BundleObservationSolveSettings
@@ -1678,6 +1686,16 @@ namespace Isis {
 
     QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
+
+    foreach (QModelIndex index, selectedIndexes) {
+      qDebug() << "\nselected image: " << index;
+      qDebug() << "selected image data: " << proxyModel->itemData(index);
+      QVariant q(QBrush(Qt::blue));
+      proxyModel->setData(index, QVariant("test"), Qt::DisplayRole);
+      qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
+      qDebug() << "setting new succes ? " << proxyModel->setData(index, q, Qt::BackgroundRole);
+      qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
+    }
 
     // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {

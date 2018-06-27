@@ -175,6 +175,9 @@ namespace Isis {
 
     void createObservationSolveSettingsTreeView();
 
+    // void updateGroups(QList<QStandardItem *> &selectedItems);
+    QList<QBrush *> m_colors;
+
   private:
     Ui::JigsawSetupDialog *m_ui;
     Project *m_project;
