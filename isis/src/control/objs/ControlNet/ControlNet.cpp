@@ -692,8 +692,7 @@ namespace Isis {
 
   /**
    * Updates the node for this measure's serial number to
-   * reflect the deletion.  If this is the only measure left in the containing
-   * node, then the node is deleted as well.
+   * reflect the deletion.
    *
    * @param measure The measure removed from the network.
    */
@@ -715,14 +714,6 @@ namespace Isis {
     // for the old graph.
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
 
-
-// We decided in a meeting that we do not want to delete the node when all measures are removed.
-    // If this caused the node to be empty, then delete the node.
-//    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
-//      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
-//      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
-//      m_vertexMap.remove(serial);
-//    }
   }
 
 
@@ -1375,7 +1366,7 @@ namespace Isis {
     if (p_cameraList.size() > 0) {
       return p_cameraValidMeasuresMap[serialNumber];
     }
-    return GetValidMeasuresInCube(serialNumber).size();     
+    return GetValidMeasuresInCube(serialNumber).size();
   }
 
 
