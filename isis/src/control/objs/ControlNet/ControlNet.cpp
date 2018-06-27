@@ -129,10 +129,29 @@ namespace Isis {
   }
 
 
+  /**
+   * This method is a wrapper to emit the measureModified() signal and is called whenever a change
+   * is made to a Control Measure.
+   *
+   * @param measure The ControlMeasure* that was modified.
+   * @param type The ControlMeasure::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
   void ControlNet::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
     emit measureModified(measure, type, oldValue, newValue);
   }
 
+
+  /**
+   * This method is a wrapper to emit the pointModified() signal and is called whenever a change
+   * is made to a Control Point.
+   *
+   * @param point The ControlPoint* that was modified.
+   * @param type The ControlPoint::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
   void ControlNet::emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue) {
     emit pointModified(point, type, oldValue, newValue);
   }
@@ -827,6 +846,10 @@ namespace Isis {
   }
 
 
+
+  /**
+   * This method is a wrapper to emit the networkStructureModified() signal.
+   */
   void ControlNet::emitNetworkStructureModified() {
     emit networkStructureModified();
   }
