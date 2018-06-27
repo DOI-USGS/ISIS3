@@ -77,6 +77,10 @@ namespace Isis {
    *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &) 
    *                           which grabs BOSS settings from the JSD BOSS tab for selected images 
    *                           in the BOSS QTreeView and saves them in a BOSS object. 
+   *   @history 2018-06-26 Tyler Wilson - Added support in
+   *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &)
+   *                           for the user to set an arbitrary number of position/pointing Apriori
+   *                           Sigma values beyond position/velocity/acceleration.  References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
