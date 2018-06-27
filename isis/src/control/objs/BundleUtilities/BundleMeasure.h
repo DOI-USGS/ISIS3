@@ -72,9 +72,8 @@ namespace Isis {
    *                           mutators. Also added methods setPolySegmentIndices() and
    *                           setNormalsBlockIndices(). All in support of piecewise polynomial
    *                           implementation.
-   *   @history 2018-06-27 Ken Edmundson - Added members m_measureSigma and
-   *                           m_measureWeightSqrt; and corresponding accessors and
-   *                           mutators.
+   *   @history 2018-06-27 Ken Edmundson - Added members m_measureSigma and m_measureWeightSqrt; and
+   *                           corresponding accessors and mutators.
    */
 
   class BundleMeasure {
