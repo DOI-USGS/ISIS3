@@ -110,7 +110,7 @@ namespace Isis {
 
     const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->pointingComboBox->insertItems(0, pointingOptions);
-    m_ui->pointingComboBox->setCurrentIndex(0);
+    m_ui->pointingComboBox->setCurrentIndex(1);
 
     // The degree solve options' minimums are -1 (set in ui file), make the -1's display as N/A
     m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
@@ -120,13 +120,19 @@ namespace Isis {
     QStringList tableHeaders;
     tableHeaders << "coefficients" << "description" << "units" << "a priori sigma";
     m_ui->positionAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
+    m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
+    // Set the default size of the columns
     m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
     m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
     m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
     m_ui->positionAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
 
-    m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
+
 
     // Add validators to the tables in the observation solve settings tab to validate the a priori
     // sigma items
@@ -1390,7 +1396,7 @@ namespace Isis {
     }
 
     // FREE is a valid value for the a priori sigma column
-    int free = item->text().compare("FREE", Qt::CaseInsensitive);
+    int free = item->text().simplified().compare("FREE", Qt::CaseInsensitive);
     if (free == 0) {
       item->setText("FREE");
     }
@@ -1400,6 +1406,7 @@ namespace Isis {
     double sigma = item->text().toDouble(&convertSuccess);
     if ((convertSuccess && sigma >= 0.0) || free == 0) {
       const QTableWidget *table = item->tableWidget();
+      item->setData(Qt::UserRole, QVariant(true));
       // Set background color depending on if the table has alternating row colors and row is odd
       if (table->alternatingRowColors() && item->row() % 2 != 0) {
         item->setBackground(table->palette().color(QPalette::AlternateBase));
@@ -1409,8 +1416,45 @@ namespace Isis {
       }
     }
     else {
+      item->setData(Qt::UserRole, QVariant(false));
       item->setBackground(Qt::red);
     }
+
+    validateSigmaTables();
+  }
+
+
+  /**
+   * Validates the tables in the observation solve settings tab and enables/disables the OK
+   * button appropriately.
+   *
+   * This method validates both the position and pointing a priori sigma tables in the observation
+   * solve settings tab. If any of the sigma values are invalid, the JigsawSetupDialog's OK button
+   * is disabled. If all of the sigma values are valid, the JigsawSetupDialog's OK button is
+   * (re)enabled.
+   */
+  void JigsawSetupDialog::validateSigmaTables() {
+    bool tablesAreValid = true;
+    
+    // Evaluate both tables; if any value is invalid, the table is invalid
+    QList<const QTableWidget *> tables{m_ui->positionAprioriSigmaTable,
+                                       m_ui->pointingAprioriSigmaTable};
+                                       
+    for (const auto &table : tables) {
+      for (int i = 0; i < table->rowCount(); i++) {
+        // a priori sigma column is column 3
+        const QTableWidgetItem *item = table->item(i,3);
+        if (item) { 
+          if (item->data(Qt::UserRole).toBool() == false) {
+            tablesAreValid = false;
+            break;
+          }
+        }
+      }
+    }
+
+    m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
+    m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
   }
 
 
@@ -1430,6 +1474,11 @@ namespace Isis {
     table->setRowCount(i + 1);
     const int newRowCount = table->rowCount();
 
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
+
+    // Rows need to be added
     if (newRowCount > oldRowCount) {
       for (int row = oldRowCount; row < newRowCount; row++) {
         // Headers : coefficient, description, units, a priori sigma
@@ -1451,6 +1500,7 @@ namespace Isis {
         QTableWidgetItem *sigma = new QTableWidgetItem();
         sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
         sigma->setText("0.0");
+        sigma->setData(Qt::UserRole, QVariant(true));
         table->setItem(row, 3, sigma);
 
         // Solve option: spk degree { NONE: -1, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
@@ -1504,8 +1554,11 @@ namespace Isis {
     table->setRowCount(i + 1);
     const int newRowCount = table->rowCount();
 
-    if (newRowCount > oldRowCount) {
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
 
+    if (newRowCount > oldRowCount) {
       for (int row = oldRowCount; row < newRowCount; row++) {
         // Headers : coefficient, description, units, a priori sigma
         QTableWidgetItem *coefficient = new QTableWidgetItem();
