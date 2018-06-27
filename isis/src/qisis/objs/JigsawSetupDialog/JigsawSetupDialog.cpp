@@ -110,7 +110,7 @@ namespace Isis {
 
     const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->pointingComboBox->insertItems(0, pointingOptions);
-    m_ui->pointingComboBox->setCurrentIndex(0);
+    m_ui->pointingComboBox->setCurrentIndex(1);
 
     // The degree solve options' minimums are -1 (set in ui file), make the -1's display as N/A
     m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
