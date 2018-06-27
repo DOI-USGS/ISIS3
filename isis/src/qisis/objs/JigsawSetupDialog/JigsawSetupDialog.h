@@ -81,6 +81,10 @@ namespace Isis {
    *                           invalid a priori sigma values whenever an a priori sigma values changes.
    *                           If any value is invalid, the OK and Apply Settings buttons are disabled
    *                           until all the a priori sigma values are valid again. References #497.
+   *   @history 2018-06-26 Tyler Wilson - Added support in
+   *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &)
+   *                           for the user to set an arbitrary number of position/pointing Apriori
+   *                           Sigma values beyond position/velocity/acceleration.  References #497.
    */
 
   class JigsawSetupDialog : public QDialog {
