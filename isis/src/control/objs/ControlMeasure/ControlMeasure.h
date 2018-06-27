@@ -231,6 +231,16 @@ namespace Isis {
         MeasureLocked
       };
 
+
+      /**
+       * @brief Control Measure Modification Types
+       *
+       *  This enum is designed to represent the different types of modifications that can be
+       *  made to a ControlMeasure.
+       *
+       * IgnoredModified means that the Control Measure had it's IGNORED flag changed.
+       *
+       */
       enum ModType {
         IgnoredModified
       };
