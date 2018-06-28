@@ -76,8 +76,11 @@ namespace Isis {
  * @internal
  *   @history 2015-09-03 Jeannie Backer - Commented out xml code test until we determine whether
  *                           we will keep this code.
- *   @history 2016-10-13 Ian Humphrey - Changed addnew call to addNew(). References #4293.
- *   @history 2017-04-24 Ian Humphrey - Replaced pvlObject() with XML save(). Fixes #4797.
+ *   @history 2016-10-13 Ian Humphrey -  Changed addnew call to addNew(). References #4293.
+ *   @history 2017-04-24 Ian Humphrey -  Replaced pvlObject() with XML save(). Fixes #4797.
+ *   @history 2018-05-24 Ken Edmundson - Removed testing for copy constructor and assignment
+ *                                       operator because these have been removed from
+ *                                       BundleSolutionInfo.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);

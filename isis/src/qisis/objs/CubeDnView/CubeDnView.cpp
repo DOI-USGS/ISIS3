@@ -115,25 +115,15 @@ namespace Isis {
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
 
-
-    // !!!!!!!   TODO  LOOK AT THIS       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // These connections should be at higher level, directory or project???? ::addCubeDnView().
-    Project *activeProject = directory->project();
-    // These connect signals listen to the active project, and if a control network
-    // or list of control networks is added, then the enableControlNetTool() function is called.
-    connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableControlNetTool()));
-    connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableControlNetTool()));
-
     QSizePolicy policy = sizePolicy();
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
   }
 
-
   void CubeDnView::createActions(Directory *directory) {
 
-    
+
     m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -200,18 +190,17 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-    tools->append(new HelpTool(this));
+    //tools->append(new HelpTool(this));
 
     tools->append(new TrackTool(statusBar()));
 
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_fileMenu = menuBar()->addMenu("&File");
     m_viewMenu = menuBar()->addMenu("&View");
     m_optionsMenu = menuBar()->addMenu("&Options");
     m_windowMenu = menuBar()->addMenu("&Window");
-    m_helpMenu = menuBar()->addMenu("&Help");
+    //m_helpMenu = menuBar()->addMenu("&Help");
 
     for (int i = 0; i < tools->count(); i++) {
       Tool *tool = (*tools)[i];
@@ -225,10 +214,7 @@ namespace Isis {
         if (!tool->menuName().isEmpty()) {
           QString menuName = tool->menuName();
 
-          if (menuName == "&File") {
-            tool->addTo(m_fileMenu);
-          }
-          else if (menuName == "&View") {
+          if (menuName == "&View") {
             tool->addTo(m_viewMenu);
           }
           else if (menuName == "&Options") {
@@ -250,23 +236,22 @@ namespace Isis {
     zoomTool->activate(true);
   }
 
-
   /**
-   * @description enableControlNetTool:  This is a slot function which
-   * is called when the active project emits a signal to the CubeDnView
-   * object after a control network (or a list of control networks)
-   * has been added.  It enables the control network editor tool if it
-   * has been disabled.
+   * A slot function that is called when directory emits a siganl that an active
+   * control network is set. It enables the control network editor tool in the
+   * toolpad and loads the network.
    */
-  void CubeDnView::enableControlNetTool() {
-
-    foreach (QAction * action, m_toolPadActions) {
+  void CubeDnView::enableControlNetTool(bool value) {
+    foreach (QAction * action, m_toolPad->actions()) {
       if (action->objectName() == "ControlNetTool") {
-        action->setDisabled(false);
+        action->setEnabled(value);
+        if (value) {
+          ControlNetTool *cnetTool = static_cast<ControlNetTool *>(action->parent());
+          cnetTool->loadNetwork();
+        }
       }
     }
   }
-
 
   /**
    * Destructor
@@ -296,7 +281,6 @@ namespace Isis {
     AbstractProjectItemView::addItem(item);
   }
 
-
   /**
    * Returns the suggested size
    *
@@ -317,102 +301,6 @@ namespace Isis {
 
     return item->isShape();
   }
-
-
-  /**
-   * Returns a list of actions appropriate for a file menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::fileMenuActions() {
-    return m_fileMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a project menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::projectMenuActions() {
-    return QList<QAction *>();
-  }
-
-  /**
-   * Returns a list of actions appropriate for an edit menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::editMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a view menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::viewMenuActions() {
-    QList<QAction *> result;
-    result.append( m_viewMenu->actions() );
-    result.append(m_separatorAction);
-    result.append( m_windowMenu->actions() );
-    return result;
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a settings menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::settingsMenuActions() {
-    return m_optionsMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a help menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::helpMenuActions() {
-    return m_helpMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the permanent tool bar.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::permToolBarActions() {
-    return m_permToolBar->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
-  }
-
-
-  /**
-   * Returns a list of actions for the tool pad.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::toolPadActions() {
-    return m_toolPad->actions();
-  }
-
 
   /**
    * Slot to connect to the currentChanged() signal from a selection

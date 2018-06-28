@@ -40,6 +40,8 @@
 #include <QDateTime>
 #include <QTreeView>
 #include <QVariant>
+#include <QTabWidget>
+
 
 #include "AbstractProjectItemView.h"
 #include "Directory.h"
@@ -85,21 +87,24 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+    //setDockOptions(GroupedDragging | AllowTabbedDocks);
     //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
     setDockNestingEnabled(true);
-
-    m_activeView = NULL;
 
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)), this, SLOT(removeView(QWidget *)));
+      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+              this, SLOT(removeView(QWidget *)));
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
               this, SLOT(readSettings(Project *)));
+      connect(m_directory->project(), SIGNAL(projectSaved(Project *)),
+              this, SLOT(writeSettings(Project *)));
       connect(m_directory, SIGNAL( newWarning() ),
               this, SLOT( raiseWarningTab() ) );
     }
@@ -161,15 +166,13 @@ namespace Isis {
       statusBar()->addWidget(progressBar);
     }
 
+    // Read default app settings.  NOTE: This must be completed before initializing actions in order
+    // to read the recent projects from the config file.
+    readSettings(m_directory->project() );
+
     initializeActions();
     createMenus();
     createToolBars();
-
-//  setTabbedViewMode();
-//  centralWidget->setTabsMovable(true);
-//  centralWidget->setTabsClosable(true);
-    // Read default app settings
-    readSettings(m_directory->project() );
 
     QStringList args = QCoreApplication::arguments();
 
@@ -204,23 +207,31 @@ namespace Isis {
       addDockWidget(area, dock, orientation);
     }
 
-    // Connections for cleanup in both directions to make sure both views and docks are cleaned up
-    connect(newWidget, SIGNAL(destroyed(QObject *)), dock, SLOT(deleteLater()));
+    // When dock widget is destroyed, make sure the view it holds is also destroyed
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
+    // The list of dock widgets needs cleanup as each view is destroyed
+    connect(dock, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupViewDockList(QObject *)));
+
     // Save view docks for cleanup during a project close
     m_viewDocks.append(dock);
   }
 
 
+  void IpceMainWindow::cleanupViewDockList(QObject *obj) {
+    QDockWidget *dock = static_cast<QDockWidget *>(obj);
+    if (dock) {
+      m_viewDocks.removeAll(dock);
+    }
+  }
+
+
   /**
-   * @description This slot is connected from Directory::viewClosed(QWidget *) signal.  It will 
+   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
    * close the given view and delete the view. This was written to handle
-   * 
-   * @param view QWidget* 
    *
+   * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-
     view->close();
     delete view;
   }
@@ -231,22 +242,13 @@ namespace Isis {
    */
   void IpceMainWindow::removeAllViews() {
     setWindowTitle("ipce");
-//  qDebug()<<"IpceMainWindow::removeAllViews  directory footprint count = "<<m_directory->footprint2DViews().count();
-//  qDebug()<<"                                directory cube disp count = "<<m_directory->cubeDnViews().count();
-
-    // Find all children of IpceMainWindow and close
-    QList<QDockWidget *> dockedWidgets = findChildren<QDockWidget *>();
-//  qDebug()<<"           # docks before removal = "<<dockedWidgets.count();
     foreach (QDockWidget *dock, m_viewDocks) {
-      removeDockWidget(dock);
-      m_viewDocks.removeAll(dock);
-      delete dock;
+      if (dock) {
+        removeDockWidget(dock);
+        m_viewDocks.removeAll(dock);
+        delete dock;
+      }
     }
-
-    QList<QDockWidget *> dockedWidgets2 = findChildren<QDockWidget *>();
-//  qDebug()<<"           any docks left"<<dockedWidgets2.count();
-//  qDebug()<<"IpceMainWindow::removeAllViews  directory footprint count = "<<m_directory->footprint2DViews().count();
-//  qDebug()<<"                                directory cube disp count = "<<m_directory->cubeDnViews().count();
     m_viewDocks.clear();
   }
 
@@ -256,6 +258,22 @@ namespace Isis {
    */
   IpceMainWindow::~IpceMainWindow() {
     m_directory->deleteLater();
+  }
+
+
+  /** 
+   * This is needed so that the project clean flag is not set to false when move and resize events 
+   * are emitted from ipce.cpp when IpceMainWindow::show() is called. 
+   * The non-spontaneous or internal QShowEvent is only emitted once from ipce.cpp, so the project 
+   * clean flag can be reset. 
+   * 
+   * @param event QShowEvent* 
+   *
+   */
+  void IpceMainWindow::showEvent(QShowEvent *event) {
+    if (!event->spontaneous()) {
+      m_directory->project()->setClean(true);
+    }
   }
 
 
@@ -338,29 +356,9 @@ namespace Isis {
     m_fileMenuActions.append(exitAction);
     m_permToolBarActions.append(exitAction);
 
-    QAction *saveNet = new QAction("&Save Active Control Network", this);
-    saveNet->setIcon( QIcon::fromTheme("document-save") );
-    saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
-    saveNet->setToolTip("Save current active control network");
-    saveNet->setStatusTip("Save current active control network");
-    QString whatsThis = "<b>Function:</b> Saves the current active<i>"
-                        "control network</i>";
-    saveNet->setWhatsThis(whatsThis);
-    connect(saveNet, SIGNAL(triggered()), m_directory, SLOT(saveActiveControl()));
-    m_permToolBarActions.append(saveNet);
-
-//  m_saveAsNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSaveAs.png"),
-//                            "Save Control Network &As...",
-//                            m_matchTool);
-//  m_saveAsNet->setToolTip("Save current control network to chosen file");
-//  m_saveAsNet->setStatusTip("Save current control network to chosen file");
-//  whatsThis = "<b>Function:</b> Saves the current <i>"
-//      "control network</i> under chosen filename";
-//  m_saveAsNet->setWhatsThis(whatsThis);
-//  connect(m_saveAsNet, SIGNAL(triggered()), this, SLOT(saveAsNet()));
-
-
-
+    QAction *tabViewsAction = new QAction("Tab Views", this);
+    connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
+    m_viewMenuActions.append(tabViewsAction);
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -481,90 +479,39 @@ namespace Isis {
 
   /**
    * Create the tool bars and populates them with QActions from several sources. Actions are taken
-   * from an internal list of QActions and the Directory. 
+   * from an internal list of QActions and the Directory.
    */
   void IpceMainWindow::createToolBars() {
     m_permToolBar = new QToolBar(this);
-    m_activeToolBar = new QToolBar(this);
-    m_toolPad = new QToolBar(this);
-
     QSize iconSize(25, 45);
-
     m_permToolBar->setIconSize(iconSize);
-    m_activeToolBar->setIconSize(iconSize);
-    m_toolPad->setIconSize(iconSize);
-
     m_permToolBar->setObjectName("PermanentToolBar");
-    m_activeToolBar->setObjectName("ActiveToolBar");
-    m_toolPad->setObjectName("ToolPad");
-
     addToolBar(m_permToolBar);
-    addToolBar(m_activeToolBar);
-    addToolBar(m_toolPad);
 
     foreach ( QAction *action, m_directory->permToolBarActions() ) {
       m_permToolBar->addAction(action);
     }
 
     foreach (QAction *action, m_permToolBarActions) {
-      if (action->text() == "&Save Active Control Network") {
-        m_permToolBar->addSeparator();
-        m_permToolBar->addAction(action); 
-        m_permToolBar->addSeparator();
-      }
-      else {
-        m_permToolBar->addAction(action); 
-      }
+      m_permToolBar->addAction(action);
     }
   }
 
 
-  /**
-   * Write the window positioning and state information out to a
-   * config file. This allows us to restore the settings when we
-   * create another main window (the next time this program is run).
-   *
-   * The state will be saved according to the currently loaded project and its name.
-   *
-   * When no project is loaded (i.e. the default "Project" is open), the config file used is
-   * $HOME/.Isis/$APPNAME/$APPNAME_Project.config.
-   * When a project, ProjectName, is loaded, the config file used is
-   * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config.
-   *
-   * @param[in] project Pointer to the project that is currently loaded (default is "Project")
-   *
-   * @internal
-   *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
-   *                           References #4358.
-   *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
-   *                           restoring of recently opened projects.  References #4492.
-   */
-  void IpceMainWindow::writeSettings(const Project *project) const {
+  void IpceMainWindow::writeGlobalSettings(Project *project) {
 
-    // Ensure that we are not using a NULL pointer
-    if (!project) {
-      QString msg = "Cannot write settings with a NULL Project pointer.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
     QString appName = QApplication::applicationName();
-    QSettings projectSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(),
-        QSettings::NativeFormat);
-
     QSettings globalSettings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
           .expanded(),
         QSettings::NativeFormat);
 
-    projectSettings.setValue("geometry", QVariant(geometry()));
-    projectSettings.setValue("windowState", saveState());
-//  projectSettings.setValue("size", size());
-//  projectSettings.setValue("pos", pos());
+    //  If temporary project open same geometry of mainwindow
+    if (project->projectRoot().contains("tmpProject")) {
+      globalSettings.setValue("geometry", QVariant(geometry()));
+    }
 
-    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
-
-    globalSettings.setValue("maxThreadCount", m_maxThreadCount);
+    globalSettings.setValue("maxThreadCount", m_maxThreadCount); 
     globalSettings.setValue("maxRecentProjects",m_maxRecentProjects);
 
     globalSettings.beginGroup("recent_projects");
@@ -634,6 +581,48 @@ namespace Isis {
 
 
   /**
+   * Write the window positioning and state information out to a
+   * config file. This allows us to restore the settings when we
+   * create another main window (the next time this program is run).
+   *
+   * The state will be saved according to the currently loaded project and its name.
+   *
+   * When no project is loaded (i.e. the default "Project" is open), the config file used is
+   * $HOME/.Isis/$APPNAME/$APPNAME_Project.config.
+   * When a project, ProjectName, is loaded, the config file used is
+   * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config.
+   *
+   * @param[in] project Pointer to the project that is currently loaded (default is "Project")
+   *
+   * @internal
+   *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
+   *                           References #4358.
+   *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
+   *                           restoring of recently opened projects.  References #4492.
+   */
+  void IpceMainWindow::writeSettings(Project *project) {
+
+    // Ensure that we are not using a NULL pointer
+    if (!project) {
+      QString msg = "Cannot write settings with a NULL Project pointer.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    QString appName = QApplication::applicationName();
+    QSettings projectSettings(
+        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
+          .expanded(),
+        QSettings::NativeFormat);
+
+    projectSettings.setValue("geometry", QVariant(geometry()));
+    projectSettings.setValue("windowState", saveState());
+//  projectSettings.setValue("size", size());
+//  projectSettings.setValue("pos", pos());
+
+    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
+  }
+
+
+  /**
    * Read the window positioning and state information from the config file.
    *
    * When running ipce without opening a project, the config file read is
@@ -656,72 +645,79 @@ namespace Isis {
       QString msg = "Cannot read settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    if (project->name() == "Project") {
-      setWindowTitle("ipce");
-    }
-    else {
-      setWindowTitle( project->name() );
-      QString projName = project->name();
-      setWindowTitle(projName );
-    }
+
     QString appName = QApplication::applicationName();
 
     QSettings settings(
         FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-        .expanded(), QSettings::NativeFormat);
+          .expanded(), QSettings::NativeFormat);
 
-    setGeometry(settings.value("geometry").value<QRect>());
-    restoreState(settings.value("windowState").toByteArray());
+    // General settings
+    if (project->name() == "Project") {
+      setWindowTitle("ipce");
 
-    QStringList projectNameList;
-    QStringList projectPathList;
-    settings.beginGroup("recent_projects");
-    QStringList keys = settings.allKeys();
-
-    QRegExp underscore("%%%%%");
-
-    foreach (QString key, keys) {
-      QString childKey = "recent_projects/"+key;
-      QString projectPath = settings.value(key).toString();
-      QString projectName = projectPath.split("/").last();
-      projectPathList.append(projectPath) ;
-      projectNameList.append(projectName);
-    }
-
-    settings.endGroup();
-
-    QStringList projectPathReverseList;
-
-    for (int i = projectPathList.count()-1;i>=0;i--) {
-      projectPathReverseList.append(projectPathList[i]);
-    }
-
-    QStringList projectPathListTruncated;
-
-    int i =0;
-
-    foreach (QString proj,projectPathReverseList) {
-      if (i <= m_maxRecentProjects) {
-        projectPathListTruncated.append(proj);
-        i++;
+      //  Read  generic geometry
+      if (settings.contains("geometry")) {
+        setGeometry(settings.value("geometry").value<QRect>()); 
       }
-      else
-        break;
-     }
 
+      QStringList projectNameList;
+      QStringList projectPathList;
+      settings.beginGroup("recent_projects");
+      QStringList keys = settings.allKeys();
+      QRegExp underscore("%%%%%");
 
-    m_directory->setRecentProjectsList(projectPathListTruncated);
-    m_directory->updateRecentProjects();
+      foreach (QString key, keys) {
+        QString childKey = "recent_projects/"+key;
+        QString projectPath = settings.value(key).toString();
+        QString projectName = projectPath.split("/").last();
+        projectPathList.append(projectPath) ;
+        projectNameList.append(projectName);
+      }
 
-    // The geom/state isn't enough for main windows to correctly remember
-    //   their position and size, so let's restore those on top of
-    //   the geom and state.
-    if (!settings.value("pos").toPoint().isNull())
-      move(settings.value("pos").toPoint());
+      settings.endGroup();
 
-    m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
-    applyMaxThreadCount();
+      QStringList projectPathReverseList;
+      for (int i = projectPathList.count()-1;i>=0;i--) {
+        projectPathReverseList.append(projectPathList[i]);
+      }
 
+      QStringList projectPathListTruncated;
+
+      int i =0;
+
+      foreach (QString proj,projectPathReverseList) {
+        if (i <= m_maxRecentProjects) {
+          projectPathListTruncated.append(proj);
+          i++;
+        }
+        else
+          break;
+       }
+
+      m_directory->setRecentProjectsList(projectPathListTruncated);
+      m_directory->updateRecentProjects();
+      m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
+      applyMaxThreadCount();
+    }
+    //  Project specific settings
+    else {
+      setWindowTitle( project->name() );
+      if (settings.contains("geometry")) {
+        setGeometry(settings.value("geometry").value<QRect>());
+      }
+      if (settings.contains("windowState")) {
+        restoreState(settings.value("windowState").toByteArray());
+      }
+
+      // The geom/state isn't enough for main windows to correctly remember
+      //   their position and size, so let's restore those on top of
+      //   the geom and state.
+      if (!settings.value("pos").toPoint().isNull()) {
+        move(settings.value("pos").toPoint());
+      }
+    }
+//    m_directory->project()->setClean(true);
   }
 
 
@@ -751,7 +747,8 @@ namespace Isis {
         m_directory->project()->save();
       }
     }
-    writeSettings(m_directory->project());
+    //  Write global settings, for now this is for the project "Project"
+    writeGlobalSettings(m_directory->project());
     m_directory->project()->clear();
 
     QMainWindow::closeEvent(event);
@@ -803,13 +800,23 @@ namespace Isis {
 
 
   /**
-   * PlaceHolder for the option to tab all views. (This was setTabbedViewMode in the old code)
+   * Tabs all open attached/detached views
    */
-  void IpceMainWindow::tabAllViews() {
-//  QMdiArea *mdiArea = qobject_cast<QMdiArea *>( centralWidget() );
-//  mdiArea->setViewMode(QMdiArea::TabbedView);
-//  m_cascadeViewsAction->setEnabled(false);
-//  m_tileViewsAction->setEnabled(false);
+  void IpceMainWindow::tabViews() {
+    // tabifyDockWidget() takes two widgets and tabs them, so an easy way to do
+    // this is to grab the first view and tab the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
+
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tabbed. If it is attached,
+      // this will have no affect.
+      currentView->setFloating(false);
+
+      if (currentView == firstView) {
+        continue;
+      }
+      tabifyDockWidget(firstView, currentView);
+    }
   }
 
 
@@ -819,5 +826,4 @@ namespace Isis {
   void IpceMainWindow::raiseWarningTab() {
     m_warningsDock->raise();
   }
-
 }
