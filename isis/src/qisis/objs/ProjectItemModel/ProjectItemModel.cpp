@@ -896,6 +896,23 @@ namespace Isis {
   }
 
 
+  QVariant ProjectItemModel::data(const QModelIndex &index, int role) const {
+    if (index.isValid())
+      if (role == Qt::BackgroundRole || role == Qt::ForegroundRole) return QVariant();
+      else return QStandardItemModel::data(index, role);
+    else
+      return QVariant();
+    // if (index.isValid()) {
+    //   if (role != Qt::BackgroundRole) {
+    //     return QStandardItemModel::data(index, role);
+    //   }
+    // }
+    // else {
+    //   return QVariant();
+    // }
+  }
+
+
   /**
    * This virtual method was added to handle changing the project name by double-clicking the
    * project name on the project tree.  It was required by Qt in order to allow editing

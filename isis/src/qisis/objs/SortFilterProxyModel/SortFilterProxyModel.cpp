@@ -91,21 +91,40 @@ namespace Isis {
 
 
   QVariant SortFilterProxyModel::data(const QModelIndex &index, int role) const {
-    // if (role == Qt::BackgroundRole) {
-    //   if (QSortFilterProxyModel::data(index, Qt::UserRole).toBool())
-    //     return QVariant(QBrush(Qt::darkGreen));
-    //   else
-    //   return QVariant(QBrush(Qt::white));
-    // }
-    //else {
+    if (!index.isValid()) return QVariant();
+    // if (role != Qt::DisplayRole) qDebug() << "index data: " << QSortFilterProxyModel::data(index, Qt::DisplayRole);
+    // if (role != Qt::BackgroundRole) qDebug() << "data bg role: " << QSortFilterProxyModel::data(index, Qt::BackgroundRole);
+    // if (role != Qt::UserRole) qDebug() << "user role: " << QSortFilterProxyModel::data(index, Qt::UserRole);
+    // if (role != Qt::UserRole+1) qDebug() << "user role 1: " <<QSortFilterProxyModel::data(index, Qt::UserRole+1);
+
+    if (role == Qt::DisplayRole) { 
       return QSortFilterProxyModel::data(index, role);
-    //}
-  //   return data(index, role);
-  //   if (role == Qt::setBackgroundRole())
-  //   if (role == Qt::DisplayRole) {
-  //     return QVariant("blah");
-  //   }
-  //   return QVariant();
+    }
+    if (role == Qt::ForegroundRole) {
+      return QSortFilterProxyModel::data(index, role);
+    }
+    if (role == Qt::BackgroundRole) {
+      if (sourceModel()->data(mapToSource(index), Qt::UserRole+10).toBool()) {
+        return QVariant(QBrush(Qt::red));;
+      }
+      else
+      // if (index.data(Qt::UserRole+1).toBool()) {
+        // qDebug() << "returning yellow";
+        return QSortFilterProxyModel::data(index, role);
+      // }
+      // else {
+        // return QSortFilterProxyModel::data(index, role);
+      // }
+      // qDebug() << index;
+      // qDebug() << index.internalPointer();
+      // QStandardItem *item = static_cast<QStandardItem *>(index.internalPointer());
+      // if (item) return item->data(role); 
+      // else return QVariant();
+      // return QVariant(QBrush(Qt::darkGreen));
+    }
+    else {
+      return QVariant(); //QSortFilterProxyModel::data(index, role);
+    }
   }
 
 

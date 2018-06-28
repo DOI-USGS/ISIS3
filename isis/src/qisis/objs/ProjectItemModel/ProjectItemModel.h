@@ -177,6 +177,7 @@ namespace Isis {
       ProjectItem *takeItem(int row);
 
       bool setData(const QModelIndex &index, const QVariant &value, int role);
+      QVariant data(const QModelIndex &index, int role) const;
       Qt::ItemFlags flags(const QModelIndex &index) const;
 
     signals:

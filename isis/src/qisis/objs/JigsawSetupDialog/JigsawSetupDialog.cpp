@@ -1742,13 +1742,31 @@ namespace Isis {
     QStringList selectedObservationNumbers;
 
     foreach (QModelIndex index, selectedIndexes) {
-      qDebug() << "\nselected image: " << index;
-      qDebug() << "selected image data: " << proxyModel->itemData(index);
-      QVariant q(QBrush(Qt::blue));
-      proxyModel->setData(index, QVariant("test"), Qt::DisplayRole);
-      qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
-      qDebug() << "setting new succes ? " << proxyModel->setData(index, q, Qt::BackgroundRole);
-      qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
+      //proxyModel->setData(index, QVariant(true), Qt::UserRole);
+
+      QModelIndex sourceIndex = proxyModel->mapToSource(index);
+      ProjectItem *item = sourceModel->itemFromIndex(sourceIndex);
+      item->setData(QVariant(true), Qt::UserRole+10);
+      qDebug() << item->data(Qt::UserRole+10);
+      qDebug() << sourceModel->itemData(sourceIndex);
+      qDebug() << "\nselected item data: " << sourceModel->itemData(sourceIndex);
+      item->setData(QVariant(QBrush(Qt::green)), Qt::ForegroundRole);
+      qDebug() << "  changed item data : " << sourceModel->itemData(sourceIndex);
+      qDebug() << "";
+
+      // qDebug() << "\nselected image: " << index;
+      // qDebug() << "selected image data: " << proxyModel->itemData(index);
+
+      
+      // qDebug() << "INDEX: " << sourceIndex;
+      // sourceModel->setData(sourceIndex, QVariant(QBrush(Qt::darkBlue)), Qt::BackgroundRole);
+
+      
+
+      // qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
+      // qDebug() << "setting new succes ? " <<
+      //  proxyModel->setData(index, QVariant(QBrush(Qt::yellow)), Qt::BackgroundRole);
+      // qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
     }
 
     // Append selected images' serial numbers to selectedObservationNumbers
