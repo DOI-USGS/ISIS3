@@ -508,6 +508,12 @@ namespace Isis {
    */
   void BundleMeasure::setMeasureSigma(double sigmaMultiplier) {
     m_measureSigma = sigmaMultiplier * m_controlMeasure->Camera()->PixelPitch();
+
+    if (m_measureSigma <= 0.0) {
+      QString msg = "In BundleMeasure::setMeasureSigma(): m_measureSigma must be positive\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     m_measureWeightSqrt = 1.0/m_measureSigma;
   }
 
