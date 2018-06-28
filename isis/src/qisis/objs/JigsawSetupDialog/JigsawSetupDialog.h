@@ -85,7 +85,6 @@ namespace Isis {
    *                           invalid a priori sigma values whenever an a priori sigma values changes.
    *                           If any value is invalid, the OK and Apply Settings buttons are disabled
    *                           until all the a priori sigma values are valid again. References #497.
-   *   @history 2018-06-28 Makayla Shepherd - Removed the weighting tab.
    */
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
