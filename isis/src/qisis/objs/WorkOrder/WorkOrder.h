@@ -314,6 +314,10 @@ namespace Isis {
    *                           a private QString object called m_data.  References #4492.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-06-28 Makayla Shepherd - Removed the ProgressBar cleanup because it was 
+   *                           causing a seg fault when the ProgressBar was added to the 
+   *                           HistoryTreeWidget. The HistoryTreeWidget will now clean up the
+   *                           ProgressBar. Fixes #5228.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
