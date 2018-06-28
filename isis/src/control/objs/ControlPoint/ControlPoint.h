@@ -428,6 +428,16 @@ namespace Isis {
 //      ZConstrained = 5;
       };
 
+      /**
+       *  @brief Control Point Modification Types
+       *
+       *  This enum is designed to represent the different types of modifications that can be
+       *  made to a ControlPoint.
+       *
+       *  EditLockModified means that the Control Point had it's edit lock flag changed.
+       *  IgnoredModified means that the Control Measure had it's ignored flag changed.
+       *  TypeModified means that the ControlPoint::PointType for this control point was modified.
+       */
       enum ModType {
         EditLockModified,
         IgnoredModified,
