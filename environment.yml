@@ -5,6 +5,7 @@ channels:
   - probcomp
   - anaconda
   - defaults
+
 dependencies:
   - pcl==1.8.1
   - geos==3.5.1
@@ -15,6 +16,9 @@ dependencies:
   - sip==4.18
   - mysql==5.7.20
   - ninja==1.7.2=0
+  - xorg-libsm
+  - xorg-libxi
+  - xorg-libice
   - patchelf==0.9
   - pip==9.0.1
   - setuptools=38.5.1
