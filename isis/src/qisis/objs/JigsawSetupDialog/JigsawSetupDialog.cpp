@@ -1753,20 +1753,6 @@ namespace Isis {
       item->setData(QVariant(QBrush(Qt::green)), Qt::ForegroundRole);
       qDebug() << "  changed item data : " << sourceModel->itemData(sourceIndex);
       qDebug() << "";
-
-      // qDebug() << "\nselected image: " << index;
-      // qDebug() << "selected image data: " << proxyModel->itemData(index);
-
-      
-      // qDebug() << "INDEX: " << sourceIndex;
-      // sourceModel->setData(sourceIndex, QVariant(QBrush(Qt::darkBlue)), Qt::BackgroundRole);
-
-      
-
-      // qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
-      // qDebug() << "setting new succes ? " <<
-      //  proxyModel->setData(index, QVariant(QBrush(Qt::yellow)), Qt::BackgroundRole);
-      // qDebug() << "new image data     : " << proxyModel->itemData(index) << "\n";
     }
 
     // Append selected images' serial numbers to selectedObservationNumbers
