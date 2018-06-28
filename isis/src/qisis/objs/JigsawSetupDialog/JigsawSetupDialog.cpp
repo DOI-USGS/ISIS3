@@ -1683,6 +1683,11 @@ namespace Isis {
           m_ui->treeView->setRootIndex(QModelIndex());
          }
   
+    connect(m_ui->treeView->selectionModel(), 
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+            this, 
+            SLOT(treeViewSelectionChanged(const QItemSelection&,const QItemSelection&)));
+
 
     // Try to loop through the view here to add the "groups" so they aren't part of the model
 
@@ -1691,6 +1696,12 @@ namespace Isis {
 
 
   }
+
+
+  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
+  }
+
 
 
   /**

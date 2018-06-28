@@ -160,6 +160,8 @@ namespace Isis {
     public slots:
     void slotTextChanged(const QString &text);
     void checkIsValid();
+    void treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
 
 
     private:

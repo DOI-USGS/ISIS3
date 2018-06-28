@@ -1345,6 +1345,9 @@ Valid Range: 1.0e-10 to 1.0e+10</string>
            </item>
            <item row="3" column="1">
             <widget class="QPushButton" name="applySettingsPushButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Apply Settings to Selected Images</string>
              </property>
