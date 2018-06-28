@@ -100,13 +100,23 @@ namespace Isis {
       return QSortFilterProxyModel::data(index, role);
     }
     if (role == Qt::BackgroundRole) {
-      if (sourceModel()->data(mapToSource(index), Qt::UserRole+10).toBool()) {
-        return QVariant(QBrush(Qt::red));;
-      }
-      else {
-        return QSortFilterProxyModel::data(index, role);
-      }
+      // if (sourceModel()->data(mapToSource(index), Qt::UserRole+10).toBool()) {
+
+        QColor solveOptionColor = sourceModel()->data(mapToSource(index), Qt::UserRole+10).value<QColor>();
+        if (solveOptionColor.isValid()) {
+          return QVariant(solveOptionColor);
+        }
+        else {
+          return QVariant(QColor(Qt::white));
+        }
+      // }
+      // else {
+        // return sourceModel()->data(mapToSource(index), Qt::BackgroundRole);
+      // }
     }
+    // if (role == Qt::UserRole + 10) {
+    //   return sourceModel()->data(mapToSource(index), Qt::UserRole+10).value<QColor>();
+    // }
     else {
       return QVariant(); //QSortFilterProxyModel::data(index, role);
     }

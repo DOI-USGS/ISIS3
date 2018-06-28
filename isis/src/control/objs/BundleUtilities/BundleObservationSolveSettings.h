@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QColor>
 #include <QList>
 #include <QSet>
 #include <QString>
@@ -176,6 +177,9 @@ class BundleObservationSolveSettings {
       // TODO: does xml stuff need project???
       void save(QXmlStreamWriter &stream, const Project *project) const;
 
+      void setColor(const QColor &);
+      QColor color() const;
+
 
     private:
       /**
@@ -206,6 +210,8 @@ class BundleObservationSolveSettings {
           QStringList m_xmlHandlerAprioriSigmas;
       };
 
+    private:
+      QColor m_color;
       /**
        * A unique ID for this object (useful for others to reference this object
        *   when saving to disk).

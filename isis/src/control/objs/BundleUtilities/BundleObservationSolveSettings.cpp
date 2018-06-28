@@ -1055,4 +1055,14 @@ namespace Isis {
     }
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
+
+
+  QColor BundleObservationSolveSettings::color() const {
+    return m_color;
+  }
+
+
+  void BundleObservationSolveSettings::setColor(const QColor &color) {
+    m_color = color;
+  }
 }

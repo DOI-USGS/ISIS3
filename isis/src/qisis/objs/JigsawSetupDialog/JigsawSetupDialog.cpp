@@ -1741,20 +1741,6 @@ namespace Isis {
     QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
 
-    foreach (QModelIndex index, selectedIndexes) {
-      //proxyModel->setData(index, QVariant(true), Qt::UserRole);
-
-      QModelIndex sourceIndex = proxyModel->mapToSource(index);
-      ProjectItem *item = sourceModel->itemFromIndex(sourceIndex);
-      item->setData(QVariant(true), Qt::UserRole+10);
-      qDebug() << item->data(Qt::UserRole+10);
-      qDebug() << sourceModel->itemData(sourceIndex);
-      qDebug() << "\nselected item data: " << sourceModel->itemData(sourceIndex);
-      item->setData(QVariant(QBrush(Qt::green)), Qt::ForegroundRole);
-      qDebug() << "  changed item data : " << sourceModel->itemData(sourceIndex);
-      qDebug() << "";
-    }
-
     // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
       QModelIndex sourceIndex = proxyModel->mapToSource(index);
@@ -1810,15 +1796,55 @@ namespace Isis {
     // up the new bundle observation solve settings
     updateBundleObservationSolveSettings(solveSettings);
 
+    // Loop through the existing solve settings list and determine colors
+    QList<QColor> colors;
+    qDebug() << "# solve settings: " << solveSettingsList.size();
+    for (auto &solveSettings : solveSettingsList) {
+      qDebug() << "    color: " << solveSettings.color();
+      colors.append(solveSettings.color());
+    }
+
+    // Change color for new solve settings
+    QColor newColor(Qt::white);
+    qDebug() << "\n new color : " << newColor << "\n";
+    if (colors.isEmpty()) {
+      newColor.setRgb(100, 0, 0);
+    }
+    else {
+      if (colors.size() == 1) {
+        newColor.setRgb(0, 100, 0);
+      }
+      else if (colors.size() == 2) {
+        newColor.setRgb(0, 0, 100);
+      }
+    }
+    solveSettings.setColor(newColor);
+
+
     // Add the new solve settings to the solve settings list
     solveSettingsList.append(solveSettings);
 
     // Update bundle settings with the new list of bundle observation solve settings
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
-    qDebug()<<"Current BOSS list --------";
-    for (int i = 0; i < solveSettingsList.count(); i++) {
-      qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
+    // qDebug()<<"Current BOSS list --------";
+    // for (int i = 0; i < solveSettingsList.count(); i++) {
+    //   qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
+    // }
+
+    foreach (QModelIndex index, selectedIndexes) {
+      //proxyModel->setData(index, QVariant(true), Qt::UserRole);
+
+      QModelIndex sourceIndex = proxyModel->mapToSource(index);
+      ProjectItem *item = sourceModel->itemFromIndex(sourceIndex);
+      qDebug() << "solve settings color: " << solveSettings.color();
+      item->setData(QVariant(solveSettings.color()), Qt::UserRole+10);
+      qDebug() << "user role color: " << item->data(Qt::UserRole+10);
+      qDebug() << sourceModel->itemData(sourceIndex);
+      // qDebug() << "\nselected item data: " << sourceModel->itemData(sourceIndex);
+      // item->setData(QVariant(QBrush(solveSettings.color())), Qt::UserRole+10);
+      // qDebug() << "  changed item data : " << sourceModel->itemData(sourceIndex);
+      qDebug() << "";
     }
   }
 
