@@ -58,7 +58,7 @@ namespace Isis {
   *    @history 2018-06-15 Adam Goins - Added documentation.
   *    @history 2018-06-25 Kristin Berry - Fixed problem with getImagesBelowMeasureThreshold().size()
   *                           not matching numImagesBelowMeasureThreshold(). Fixed a similar
-  *                           problem with numPointsBelowMeasureThreshold(). 
+  *                           problem with numPointsBelowMeasureThreshold().
   */
   class ControlNetVitals : public QObject {
     Q_OBJECT
@@ -142,8 +142,10 @@ namespace Isis {
       // This map at key ControlPoint::Fixed and it would return how many fixed points there are.
       QMap<ControlPoint::PointType, int> m_pointTypeCounts;
 
+      int m_numPoints;
       int m_numPointsIgnored;
       int m_numPointsLocked;
+      int m_numMeasures;
   };
 };
 
