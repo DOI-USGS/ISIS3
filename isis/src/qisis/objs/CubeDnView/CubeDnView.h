@@ -94,11 +94,10 @@ namespace Isis {
    *                           Removed connections that connected the project and CubeDnView and called
    *                           enableControlNetTool() because Directory now does this.
    *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
-   *                           ambiguous shortcut errors. To counter this, we need a way to focus on one
-   *                           widget. Giving the views focus did not work completely. Instead,
-   *                           enabling/disabling actions was the best option. Added enableActions(),
-   *                           disableActions(), enterEvent(), and leaveEvent(). On default, a view's
+   *                           ambiguous shortcut errors. To counter this, we enable/disable actions. Overrode
+   *                           leaveEvent() to handle open menus causing a leave event. On default, a view's
    *                           actions are disabled. To enable the actions, move the cursor over the view.
+   *                           When a user moves the cursor outside of the view, the actions are disabled.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -137,15 +136,10 @@ namespace Isis {
       void onCubeViewportAdded(MdiCubeViewport *viewport);
       void onCubeViewportDeleted(QObject *obj);
 
-      void disableActions();
-
-
     private:
       Cube *workspaceActiveCube();
       void setWorkspaceActiveCube(Image *image);
-      void enterEvent(QEvent *event);
       void leaveEvent(QEvent *event);
-      void enableActions();
 
     private:
       /**
@@ -178,15 +172,12 @@ namespace Isis {
       QMenu *m_viewMenu; //!< View menu for storing actions
       QMenu *m_optionsMenu; //!< Options menu for storing actions
       QMenu *m_windowMenu; //!< Window menu for storing actions
-      QMenu *m_helpMenu; //!< Help menu for storing actions
 
       QAction *m_separatorAction; //!< A separator action that is reused
 
       QToolBar *m_permToolBar; //!< A tool bar for storing actions
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions
-
-      QList<QAction *> m_actions; //!< List of all toolbar and toolpad actions
   };
 }
 

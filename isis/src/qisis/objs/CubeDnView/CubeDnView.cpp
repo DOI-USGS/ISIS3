@@ -171,7 +171,6 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), controlNetTool, SLOT(paintAllViewports()));
 
     tools->append(new BandTool(this));
-
     ZoomTool *zoomTool = new ZoomTool(this);
     tools->append(zoomTool);
     tools->append(new PanTool(this));
@@ -191,7 +190,6 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-
     tools->append(new TrackTool(statusBar()));
 
     m_separatorAction = new QAction(this);
@@ -238,18 +236,14 @@ namespace Isis {
     }
 
     // Store the actions for easy enable/disable.
-    foreach (QAction *action, actions()) {
-      // disables the record action in the track tool
-      m_actions.append(action);
-    }
     foreach (QAction *action, m_toolPad->actions()) {
-      m_actions.append(action);
+      addAction(action);
     }
     foreach (QAction *action, m_permToolBar->actions()) {
-      m_actions.append(action);
+      addAction(action);
     }
     foreach (QAction *action, m_activeToolBar->actions()) {
-      m_actions.append(action);
+      addAction(action);
     }
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
@@ -259,37 +253,8 @@ namespace Isis {
 
 
   /**
-   * Disables toolbars and toolpad actions
-   */
-  void CubeDnView::disableActions() {
-    foreach (QAction * action, m_actions) {
-      action->setDisabled(true);
-    }
-  }
-
-
-  /**
-   * Enables toolbars and toolpad actions
-   */
-  void CubeDnView::enableActions() {
-    foreach (QAction * action, m_actions) {
-      action->setEnabled(true);
-    }
-  }
-
-  /**
-   * Enables actions when cursor etners on the view
-   *
-   * @param event The enter event
-   */
-  void CubeDnView::enterEvent(QEvent *event) {
-    enableActions();
-  }
-
-
-  /**
-   * Disables actions when cursor leaves the view.
-   * If a menu is visible, i.e. clicked on, this caues a leave event. We want the
+   * Disables actions when cursor leaves the view. Overriden method
+   * If a menu is visible, i.e. clicked on, this causes a leave event. We want the
    * actions to still be enabled when a menu is visible.
    *
    * @param event The leave event

@@ -34,6 +34,7 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemProxyModel.h"
+#include "ToolPad.h"
 
 namespace Isis {
 
@@ -45,9 +46,6 @@ namespace Isis {
   AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QMainWindow(parent) {
 
     setWindowFlags(Qt::Widget);
-
-
-
     m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
   }
@@ -151,18 +149,58 @@ namespace Isis {
 
   void AbstractProjectItemView::moveEvent(QMoveEvent *event) {
     QMainWindow::moveEvent(event);
-    
+
     emit windowChangeEvent(false);
   }
 
 
   void AbstractProjectItemView::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
-    
+
     emit windowChangeEvent(false);
   }
 
-  
+
+  /**
+   * Enables actions when cursor etners on the view
+   *
+   * @param event The enter event
+   */
+  void AbstractProjectItemView::enterEvent(QEvent *event) {
+    enableActions();
+  }
+
+
+  /**
+   * Disables actions when cursor leaves the view.
+   *
+   * @param event The leave event
+   */
+  void AbstractProjectItemView::leaveEvent(QEvent *event) {
+    disableActions();
+  }
+
+
+  /**
+   * Disables toolbars and toolpad actions
+   */
+  void AbstractProjectItemView::disableActions() {
+    foreach (QAction *action, actions()) {
+      action->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions
+   */
+  void AbstractProjectItemView::enableActions() {
+    foreach (QAction *action, actions()) {
+      action->setEnabled(true);
+    }
+  }
+
+
   /**
    * Returns a list of actions appropriate for a context menu.
    *

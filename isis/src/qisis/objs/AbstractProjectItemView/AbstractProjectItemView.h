@@ -34,6 +34,7 @@ namespace Isis {
 
   class ProjectItem;
   class ProjectItemModel;
+
   /**
    * AbstractProjectItemView is a base class for views of a
    * ProjectItemModel in Qt's model-view
@@ -42,11 +43,6 @@ namespace Isis {
    * been added to the view. The views contains an internal
    * ProjectItemProxyModel that represents the items appropriately for
    * the view.
-   *
-   * An AbstractProjectItemView may provide QActions for manipulating
-   * the view. These actions can be accessed in different contexts
-   * through toolBarActions(), menuActions(), and
-   * contextMenuActions().
    *
    * When mime data is dropped on a view the view adds the selected
    * items from the source model to the view.
@@ -71,6 +67,13 @@ namespace Isis {
    *   @History 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
    *                           windowChangeEvent signal to allow project to recognize a new save
    *                           state. Fixes #5114
+   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
+   *                           ambiguous shortcut errors. To counter this, we need a way to focus on one
+   *                           widget. Giving the views focus did not work completely. Instead,
+   *                           enabling/disabling actions was the best option. Added enableActions(),
+   *                           disableActions(), enterEvent(), and leaveEvent(). On default, a view's
+   *                           actions are disabled. To enable the actions, move the cursor over the view.
+   *                           When a user moves the cursor outside of the view, the actions are disabled.
    */
   class AbstractProjectItemView : public QMainWindow {
 
@@ -89,6 +92,10 @@ namespace Isis {
       virtual void moveEvent(QMoveEvent *event);
       virtual void resizeEvent(QResizeEvent *event);
 
+      virtual void enterEvent(QEvent *event);
+      virtual void leaveEvent(QEvent *event);
+      virtual void enableActions();
+
       virtual QList<QAction *> contextMenuActions();
 
       virtual ProjectItem *currentItem();
@@ -96,7 +103,7 @@ namespace Isis {
 
       virtual ProjectItemModel *internalModel();
       virtual void setInternalModel(ProjectItemModel *model);
-      
+
     signals:
       void windowChangeEvent(bool event);
 
@@ -107,10 +114,11 @@ namespace Isis {
       virtual void removeItem(ProjectItem *item);
       virtual void removeItems(QList<ProjectItem *> items);
 
+      virtual void disableActions();
+
     private:
       ProjectItemModel *m_internalModel; //!< The internal model used by the view
   };
-
 }
 
 #endif

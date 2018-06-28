@@ -56,7 +56,7 @@ namespace Isis {
 
     setAcceptDrops(true);
 
-    // Store the actions for easy enable/disable.
+    // Store the buttons (actions) for easy enable/disable.
     m_buttons = m_controlPointEditWidget->findChildren<QPushButton *>();
 
     // On default, actions are disabled until the cursor enters the view.
@@ -66,7 +66,6 @@ namespace Isis {
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
-
   }
 
 
@@ -100,7 +99,7 @@ namespace Isis {
 
 
   /**
-   * Disables toolbars and toolpad actions
+   * Disables buttons/actions. Overriden method.
    */
   void ControlPointEditView::disableActions() {
     foreach (QPushButton *button, m_buttons) {
@@ -110,29 +109,11 @@ namespace Isis {
 
 
   /**
-   * Enables toolbars and toolpad actions
+   * Enables buttons/actions. Overriden method.
    */
   void ControlPointEditView::enableActions() {
     foreach (QPushButton *button, m_buttons) {
       button->setEnabled(true);
     }
   }
-
-  /**
-   * Enables actions when cursor etners on the view
-   * @param event The enter event
-   */
-  void ControlPointEditView::enterEvent(QEvent *event) {
-    enableActions();
-  }
-
-
-  /**
-   * Disables actions when cursor leaves the view
-   * @param event The leave event
-   */
-  void ControlPointEditView::leaveEvent(QEvent *event) {
-    disableActions();
-  }
-
 }

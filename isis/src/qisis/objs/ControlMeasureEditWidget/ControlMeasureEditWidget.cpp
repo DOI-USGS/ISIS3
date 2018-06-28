@@ -598,7 +598,7 @@ namespace Isis {
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
     m_autoReg = new QPushButton("Register");
-    //m_autoReg->setShortcut(Qt::Key_R);
+    m_autoReg->setShortcut(Qt::Key_R);
     m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
                           "<strong>Shortcut: R</strong>");
     m_autoReg->setToolTip("Sub-pixel register the right measure to the left");
@@ -742,10 +742,10 @@ namespace Isis {
       //  Undo Registration
       m_autoRegShown = false;
       m_autoRegExtension->hide();
-      // m_autoReg->setText("Register");
-      // m_autoReg->setToolTip("Sub-pixel register the right measure to the left."
-      //                       "<strong>Shortcut: R</strong>");
-      // m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setText("Register");
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left."
+                            "<strong>Shortcut: R</strong>");
+      m_autoReg->setShortcut(Qt::Key_R);
     }
 
     m_leftMeasure = leftMeasure;
@@ -804,8 +804,8 @@ namespace Isis {
       //  Undo Registration
       m_autoRegShown = false;
       m_autoRegExtension->hide();
-      // m_autoReg->setText("Register");
-      // m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setText("Register");
+      m_autoReg->setShortcut(Qt::Key_R);
     }
     m_autoRegAttempted = false;
 
@@ -907,10 +907,10 @@ namespace Isis {
       //  Undo Registration
       m_autoRegShown = false;
       m_autoRegExtension->hide();
-    //   m_autoReg->setText("Register");
-    //   m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
-    //                         "<strong>Shortcut: R</strong>");
-    //   m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setText("Register");
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
+      m_autoReg->setShortcut(Qt::Key_R);
     }
 
     QString pos = "Sample: " + QString::number(m_rightView->tackSample()) +

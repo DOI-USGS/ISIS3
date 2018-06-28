@@ -144,7 +144,8 @@ namespace Isis {
     *   @history 2017-08-11 Tracie Sucharski - Created a new ControlMeasure when editing points so
     *                           that the edit ControlPoint is no changed until user selects
     *                           "Save Measures", and colorize save buttons.  Fixes #4984.
-    *
+    *   @history 2018-06-28 Kaitlyn Lee - Removed shortcuts from zoom buttons because of ambiguous
+    *                           shortcut errors.
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.

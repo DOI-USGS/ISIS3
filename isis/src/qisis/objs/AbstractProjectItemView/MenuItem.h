@@ -28,7 +28,8 @@
 namespace Isis {
 
   /**
-   * QMenu subclass that overrides the closeEvent.
+   * QMenu subclass that overrides the closeEvent. Used in views to disable
+   * actions when a menu is visible and a user clicks outside of a view. 
    *
    * @author 2018-06-27 Kaitlyn Lee
    *

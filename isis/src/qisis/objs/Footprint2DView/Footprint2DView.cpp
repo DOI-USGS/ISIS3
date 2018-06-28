@@ -139,13 +139,13 @@ namespace Isis {
 
     // Store the actions for easy enable/disable.
     foreach (QAction *action, m_toolPad->actions()) {
-      m_actions.append(action);
+      addAction(action);
     }
     foreach (QAction *action, m_permToolBar->actions()) {
-      m_actions.append(action);
+      addAction(action);
     }
     foreach (QAction *action, m_activeToolBar->actions()) {
-      m_actions.append(action);
+      addAction(action);
     }
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
@@ -329,6 +329,7 @@ namespace Isis {
     }
   }
 
+
   /**
    * A slot function that is called when directory emits a siganl that an active
    * control network is set. It enables the control network editor tool in the
@@ -339,46 +340,6 @@ namespace Isis {
    */
   void Footprint2DView::enableControlNetTool(bool value) {
     m_controlNetTool->setEnabled(value);
-  }
-
-
-  /**
-   * Disables toolbars and toolpad actions
-   */
-  void Footprint2DView::disableActions() {
-    foreach (QAction * action, m_actions) {
-      action->setDisabled(true);
-    }
-  }
-
-
-  /**
-   * Enables toolbars and toolpad actions
-   */
-  void Footprint2DView::enableActions() {
-    foreach (QAction * action, m_actions) {
-      action->setEnabled(true);
-    }
-  }
-
-
-  /**
-   * Enables actions when cursor enters on the view
-   *
-   * @param event The enter event
-   */
-  void Footprint2DView::enterEvent(QEvent *event) {
-    enableActions();
-  }
-
-
-  /**
-   * Disables actions when cursor leaves the view
-   *
-   * @param event The leave event
-   */
-  void Footprint2DView::leaveEvent(QEvent *event) {
-    disableActions();
   }
 
 
