@@ -27,6 +27,14 @@ namespace Isis {
 
     m_scaledTime = 0.0;
     m_rangeObserved = m_lidarControlPoint->range();
+
+    if (m_rangeObserved <= 0) {
+      QString msg ="In BundleLidarRangeConstraint::BundleLidarRangeConstraint():"
+                   "observed range for lidar point must be positive (Point Id: "
+                   + measure->parentControlPoint()->id() + ")\n.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     m_rangeObservedSigma = m_lidarControlPoint->sigmaRange() * 0.001; // converting from m to km
 
     if (m_rangeObservedSigma <= 0) {
@@ -38,10 +46,6 @@ namespace Isis {
 
     m_rangeObservedWeightSqrt = 1.0/m_rangeObservedSigma;
     m_adjustedSigma = 0.0;
-
-    m_coeff_range_image.resize(1, m_bundleObservation->numberPositionParameters());
-    m_coeff_range_point3D.resize(1,3);
-    m_coeff_range_RHS.resize(1);
 
     m_pointBodyFixed.resize(3);
     m_camPositionJ2K.resize(3);
@@ -129,6 +133,11 @@ namespace Isis {
     double dZ = m_camPositionBodyFixed[2] - m_pointBodyFixed[2];
     m_rangeComputed = sqrt(dX*dX+dY*dY+dZ*dZ);
 
+    if (m_rangeComputed <= 0.0) {
+      QString msg = "In BundleLidarRangeConstraint::update(): m_rangeComputed must be positive\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     // compute current contribution to vtpv from spacecraft-to-lidar point constraint equation
     // vtpv is the weight sum of squares of the residuals
     double t = m_rangeObserved - m_rangeComputed;
@@ -150,11 +159,21 @@ namespace Isis {
       return false;
     }
 
+    static LinearAlgebra::Matrix coeff_range_image;          //!< Partials w/r to image position
+    static LinearAlgebra::Matrix coeff_range_point3D(1,3);   //!< Partials w/r to lidar point
+    static LinearAlgebra::Vector coeff_range_RHS(1);         //!< Right hand side of normals
+
     int positionBlockIndex = measure->positionNormalsBlockIndex();
 
-    m_coeff_range_image.clear();
-    m_coeff_range_point3D.clear();
-    m_coeff_range_RHS.clear();
+    // resize coeff_range_image matrix if necessary
+    int numPositionParameters = m_bundleObservation->numberPositionParameters();
+    if ((int) coeff_range_image.size2() != numPositionParameters) {
+      coeff_range_image.resize(1, numPositionParameters, false);
+    }
+
+    coeff_range_image.clear();
+    coeff_range_point3D.clear();
+    coeff_range_RHS.clear();
 
     // compute partial derivatives for camstation-to-range point condition
 
@@ -183,26 +202,26 @@ namespace Isis {
 
     // partials with respect to camera body fixed X polynomial coefficients
     double c = 1.0;
-    int numPositionParameters = m_bundleObservation->numberPositionParameters()/3;
+    int numPositionParametersPerCoordinate = numPositionParameters/3;
     int index = 0;
-    for (int i = 0; i < numPositionParameters; i++) {
-      m_coeff_range_image(0,index) = b1*c;
+    for (int i = 0; i < numPositionParametersPerCoordinate; i++) {
+      coeff_range_image(0,index) = b1*c;
       c *= m_scaledTime;
       index++;
     }
 
     // partials with respect to camera body fixed Y polynomial coefficients
     c = 1.0;
-    for (int i = 0; i < numPositionParameters; i++) {
-      m_coeff_range_image(0,index) = b2*c;
+    for (int i = 0; i < numPositionParametersPerCoordinate; i++) {
+      coeff_range_image(0,index) = b2*c;
       c *= m_scaledTime;
       index++;
     }
 
     // partials with respect to camera body fixed Z polynomial coefficients
     c = 1.0;
-    for (int i = 0; i < numPositionParameters; i++) {
-      m_coeff_range_image(0,index) = b3*c;
+    for (int i = 0; i < numPositionParametersPerCoordinate; i++) {
+      coeff_range_image(0,index) = b3*c;
       c *= m_scaledTime;
       index++;
     }
@@ -219,20 +238,20 @@ namespace Isis {
     double coslon = cos(lon);
 
     // partials with respect to point latitude, longitude, and radius
-    m_coeff_range_point3D(0,0)
+    coeff_range_point3D(0,0)
         = radius*(-sinlat*coslon*a1 - sinlat*sinlon*a2 + coslat*a3)/m_rangeComputed;
-    m_coeff_range_point3D(0,1)
+    coeff_range_point3D(0,1)
         = radius*(-coslat*sinlon*a1 + coslat*coslon*a2)/m_rangeComputed;
-    m_coeff_range_point3D(0,2)
+    coeff_range_point3D(0,2)
         = (coslat*coslon*a1 + coslat*sinlon*a2 + sinlat*a3)/m_rangeComputed;
 
     // right hand side (observed distance - computed distance)
-    m_coeff_range_RHS(0) = m_rangeObserved - m_rangeComputed;
+    coeff_range_RHS(0) = m_rangeObserved - m_rangeComputed;
 
     // multiply coefficients by observation weight
-    m_coeff_range_image   *= m_rangeObservedWeightSqrt;
-    m_coeff_range_point3D *= m_rangeObservedWeightSqrt;
-    m_coeff_range_RHS     *= m_rangeObservedWeightSqrt;
+    coeff_range_image   *= m_rangeObservedWeightSqrt;
+    coeff_range_point3D *= m_rangeObservedWeightSqrt;
+    coeff_range_RHS     *= m_rangeObservedWeightSqrt;
 
     // form matrices to be added to normal equation auxiliaries
     // TODO: be careful about need to resize if if different images have different numbers of
@@ -240,23 +259,23 @@ namespace Isis {
 
     // add range condition contribution to N11 portion of normal equations matrix
     (*(*normalsMatrix[positionBlockIndex])[positionBlockIndex])
-        += prod(trans(m_coeff_range_image), m_coeff_range_image);
+        += prod(trans(coeff_range_image), coeff_range_image);
 
     // add range condition contribution to N12 portion of normal equations matrix
-    *N12[positionBlockIndex] += prod(trans(m_coeff_range_image), m_coeff_range_point3D);
+    *N12[positionBlockIndex] += prod(trans(coeff_range_image), coeff_range_point3D);
 
     // contribution to n1 vector
     int startColumn = normalsMatrix.at(positionBlockIndex)->startColumn();
     vector_range<LinearAlgebra::VectorCompressed >
-        n1_range (n1, range (startColumn, m_coeff_range_image.size2()));
+        n1_range (n1, range (startColumn, coeff_range_image.size2()));
 
-    n1_range += prod(trans(m_coeff_range_image), m_coeff_range_RHS);
+    n1_range += prod(trans(coeff_range_image), coeff_range_RHS);
 
     // form N22
-    N22 += prod(trans(m_coeff_range_point3D), m_coeff_range_point3D);
+    N22 += prod(trans(coeff_range_point3D), coeff_range_point3D);
 
     // contribution to n2 vector
-    n2 += prod(trans(m_coeff_range_point3D), m_coeff_range_RHS);
+    n2 += prod(trans(coeff_range_point3D), coeff_range_RHS);
 
     return true;
   }
