@@ -255,6 +255,8 @@ namespace Isis {
    *                           the wrong place on the project tree. Fixes #5274.
    *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
    *                           button when the active control net is modified, i.e. a point is modified.
+   *  @history 2018-06-28 Summer Stapleton - Added clean-up of unsaved templates at project close
+   *                           in Project::clear(). 
    *
    */
   class Project : public QObject {
@@ -563,7 +565,7 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<TemplateList *> m_templates;
+          QList<TemplateList *> m_templateLists;
           WorkOrder *m_workOrder;
       };
 

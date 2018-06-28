@@ -43,6 +43,15 @@ namespace Isis {
     m_path = path;
     m_type = type;
   }
+  
+  
+  /**
+   * Creates a blank template list.
+   *
+   * @param parent The Qt-relationship parent.
+   */
+  TemplateList::TemplateList(QObject *parent) : QObject(parent) {
+  }
 
 
   /**
@@ -190,13 +199,12 @@ namespace Isis {
     stream.writeAttribute("type", m_type);
     stream.writeAttribute("path", m_path);
 
-    FileName settingsFileName(
-      Project::templateRoot(newProjectRoot.toString()) + "/" + m_type + "/" + m_name + "/templates.xml");
+    FileName settingsFileName(Project::templateRoot(newProjectRoot.toString()) 
+                              + "/" + m_type + "/" + m_name + "/templates.xml");
 
     if (!settingsFileName.dir().mkpath(settingsFileName.path())) {
       throw IException(IException::Io,
-                       QString("Failed to create directory [%1]")
-                         .arg(settingsFileName.path()),
+                       QString("Failed to create directory [%1]").arg(settingsFileName.path()),
                        _FILEINFO_);
     }
 

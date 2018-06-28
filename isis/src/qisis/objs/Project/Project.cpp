@@ -268,6 +268,7 @@ namespace Isis {
       m_images = NULL;
     }
 
+
     if (m_shapes) {
       foreach (ShapeList *shapeList, *m_shapes) {
         foreach (Shape *shape, *shapeList) {
@@ -293,6 +294,21 @@ namespace Isis {
       delete m_controls;
       m_controls = NULL;
     }
+    
+    
+    if (m_templates) {
+      foreach (TemplateList *templateList, *m_templates) {
+        foreach (Template *templateFile, *templateList) {
+          delete templateFile;
+        }
+
+        delete templateList;
+      }
+
+      delete m_templates;
+      m_templates = NULL;
+    }
+
 
     m_activeControl = NULL;
     m_activeImageList = NULL;
@@ -434,6 +450,8 @@ namespace Isis {
     bool images = false;
     QStringList cnetDirList;
     bool controls = false;
+    QStringList templateDirList;
+    bool templates = false;
     QStringList bundleDirList;
     bool bundles = false;
     QFile projectXml(projectRoot() + "/project.xml");
@@ -442,6 +460,7 @@ namespace Isis {
       QTextStream projectXmlInput(&projectXml);
 
       while (!projectXmlInput.atEnd() ) {
+        
         QString line = projectXmlInput.readLine();
 
         if (controls || line.contains("<controlNets>") ) {
@@ -468,7 +487,7 @@ namespace Isis {
           }
         }
 
-        else if (shapes ||line.contains("<shapeLists>")) {
+        else if (shapes || line.contains("<shapeLists>")) {
           shapes = true;
 
           if (line.contains("</shapeLists>") ) {
@@ -479,8 +498,21 @@ namespace Isis {
             shapeDirList.append(line.split('"').at(3));
           }
         }
+        
+        else if (templates || line.contains("<templateLists>") ) {
+          templates = true;
 
-        else if (bundles ||line.contains("<bundleSolutionInfo>") ) {
+          if (line.contains("</templateLists>") ) {
+            templates = false;
+          }
+
+          else if (!line.contains("<templateLists>") ) {
+            QList<QString> components = line.split('"');
+            templateDirList.append(components.at(5));
+          }
+        }
+
+        else if (bundles || line.contains("<bundleSolutionInfo>") ) {
           bundles = true;
 
           if (line.contains("</bundleSolutionInfo>") ) {
@@ -493,56 +525,82 @@ namespace Isis {
         }
       }
 
-        QDir cnetsDir(m_projectRoot->path() + "/cnets/");
-        cnetsDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-        QStringList cnetsList = cnetsDir.entryList();
-        foreach (QString dir, cnetsList) {
-          dir = dir.simplified();
+      QDir cnetsDir(m_projectRoot->path() + "/cnets/");
+      cnetsDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+      QStringList cnetsList = cnetsDir.entryList();
+      foreach (QString dir, cnetsList) {
+        dir = dir.simplified();
 
-          if ( !cnetDirList.contains(dir) ) {
-            QDir tempDir(cnetsDir.path() + "/" + dir);
-            tempDir.removeRecursively();
-          }
+        if ( !cnetDirList.contains(dir) ) {
+          QDir tempDir(cnetsDir.path() + "/" + dir);
+          tempDir.removeRecursively();
         }
-
-        QDir imagesDir(m_projectRoot->path() + "/images/");
-        imagesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-        QStringList imagesList = imagesDir.entryList();
-        foreach (QString dir, imagesList) {
-          dir = dir.simplified();
-
-          if ( !imageDirList.contains(dir) ) {
-            QDir tempDir(imagesDir.path() + "/" + dir);
-            tempDir.removeRecursively();
-          }
-        }
-
-        QDir shapesDir(m_projectRoot->path() + "/shapes/");
-        shapesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-        QStringList shapesList = shapesDir.entryList();
-        foreach (QString dir, shapesList) {
-          dir = dir.simplified();
-
-          if ( !shapeDirList.contains(dir) ) {
-            QDir tempDir(shapesDir.path() + "/" + dir);
-            tempDir.removeRecursively();
-          }
-        }
-
-        QDir bundlesDir(m_projectRoot->path() + "/results/bundle/");
-        bundlesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
-        QStringList bundleList = bundlesDir.entryList();
-        foreach (QString dir, bundleList) {
-          dir = dir.simplified();
-
-          if ( !bundleDirList.contains(dir) ) {
-            QDir tempDir(bundlesDir.path() + "/" + dir);
-            tempDir.removeRecursively();
-          }
-        }
-
-        projectXml.close();
       }
+
+      QDir imagesDir(m_projectRoot->path() + "/images/");
+      imagesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+      QStringList imagesList = imagesDir.entryList();
+      foreach (QString dir, imagesList) {
+        dir = dir.simplified();
+
+        if ( !imageDirList.contains(dir) ) {
+          QDir tempDir(imagesDir.path() + "/" + dir);
+          tempDir.removeRecursively();
+        }
+      }
+
+      QDir shapesDir(m_projectRoot->path() + "/shapes/");
+      shapesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+      QStringList shapesList = shapesDir.entryList();
+      foreach (QString dir, shapesList) {
+        dir = dir.simplified();
+
+        if ( !shapeDirList.contains(dir) ) {
+          QDir tempDir(shapesDir.path() + "/" + dir);
+          tempDir.removeRecursively();
+        }
+      }
+      
+      QDir mapTemplatesDir(m_projectRoot->path() + "/templates/maps");
+      mapTemplatesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+      QStringList mapTemplatesList = mapTemplatesDir.entryList();
+      foreach (QString dir, mapTemplatesList) {
+        dir = dir.simplified();
+
+        if ( !templateDirList.contains("maps/" + dir) 
+             && !templateDirList.contains("registrations/" + dir)) {
+          QDir tempDir(mapTemplatesDir.path() + "/" + dir);
+          tempDir.removeRecursively();
+        }
+      }
+      
+      QDir regTemplatesDir(m_projectRoot->path() + "/templates/registrations");
+      regTemplatesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+      QStringList regTemplatesList = regTemplatesDir.entryList();
+      foreach (QString dir, regTemplatesList) {
+        dir = dir.simplified();
+
+        if ( !templateDirList.contains("maps/" + dir) 
+             && !templateDirList.contains("registrations/" + dir)) {
+          QDir tempDir(regTemplatesDir.path() + "/" + dir);
+          tempDir.removeRecursively();
+        }
+      }
+
+      QDir bundlesDir(m_projectRoot->path() + "/results/bundle/");
+      bundlesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+      QStringList bundleList = bundlesDir.entryList();
+      foreach (QString dir, bundleList) {
+        dir = dir.simplified();
+
+        if ( !bundleDirList.contains(dir) ) {
+          QDir tempDir(bundlesDir.path() + "/" + dir);
+          tempDir.removeRecursively();
+        }
+      }
+
+      projectXml.close();
+    }
 
     try {
       QString tmpFolder = QDir::temp().absolutePath() + "/"
@@ -1027,7 +1085,6 @@ namespace Isis {
    * @param prefix The name of the director under templates/ to store the template file.
    */
   QDir Project::addTemplateFolder(QString prefix) {
-
     QDir templateFolder = templateRoot();
     prefix += "%1";
     int prefixCounter = 0;
@@ -1320,8 +1377,8 @@ namespace Isis {
     QXmlInputSource xmlHistoryInputSource(&historyFile);
 
     try {
-        reader.parse(xmlHistoryInputSource);
-        }
+      reader.parse(xmlHistoryInputSource);
+      }
 
     catch (IException &e) {
       directory()->showWarning(QString("Failed to read history from project[%1]")
@@ -2862,7 +2919,7 @@ namespace Isis {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
       else if (localName == "templateList") {
-        m_templates.append( new TemplateList(m_project, reader()));
+        m_templateLists.append( new TemplateList(m_project, reader()));
       }
       //  workOrders are stored in history.xml, using same reader as project.xml
       else if (localName == "workOrder") {
@@ -2933,6 +2990,11 @@ namespace Isis {
         m_project->shapesReady(*shapeList);
       }
     }
+    else if (localName == "templateLists") {
+      foreach (TemplateList *templateList, m_templateLists) {
+        m_project->addTemplates(templateList);
+      }
+    }
     else if (localName == "workOrder") {
       m_project->m_workOrderHistory->append(m_workOrder);
       m_workOrder = NULL;
@@ -2958,12 +3020,6 @@ namespace Isis {
         }
       }
     }
-    else if (localName == "templateLists") {
-      foreach (TemplateList *list, m_templates) {
-        m_project->addTemplates(list);
-      }
-    }
-
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
   }
 }

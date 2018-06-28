@@ -45,9 +45,10 @@
 
      public:
        TemplateList(QString name, QString type, QString path, QObject *parent = NULL);
-       TemplateList(const TemplateList &);
-       TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
+       explicit TemplateList(QObject *parent = NULL);
+       explicit TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
                             QObject *parent = NULL);
+       TemplateList(const TemplateList &);
        ~TemplateList();
 
        QString name() const;

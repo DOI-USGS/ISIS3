@@ -36,12 +36,14 @@ namespace Isis {
 
      public slots:
        void saveText();
+       void saveAsText();
 
      private:
        Ui::TemplateEditorWidget *m_ui;
 
-       Directory *m_directory;
-       Template *m_template;
+       Directory *m_directory;  // The directory of the open project
+       Template *m_template;    // The template being modified
+       QString m_fileType;        // The file type of the template ("Maps" or "Registrations")
    };
 }
 
