@@ -453,55 +453,6 @@ namespace Isis {
     m_ui->ckDegreeSpinBox->setValue(observationSolveSettings.ckDegree());
     m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
 
-    // weighting tab
-    if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
-      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
-      m_ui->pointLatitudeSigmaLineEdit->setModified(true);
-    }
-    if ( !IsNullPixel(settings->globalLongitudeAprioriSigma()) ) {
-      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
-      m_ui->pointLongitudeSigmaLineEdit->setModified(true);
-    }
-    if ( !IsNullPixel(settings->globalRadiusAprioriSigma()) ) {
-      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
-      m_ui->pointRadiusSigmaLineEdit->setModified(true);
-
-    }
-
-    QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
-
-    if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
-      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
-      m_ui->positionSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
-      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
-      m_ui->velocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
-      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
-      m_ui->accelerationSigmaLineEdit->setModified(true);
-    }
-
-    QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
-
-    if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
-      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
-      m_ui->pointingAnglesSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
-      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
-      m_ui->pointingAngularVelocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setModified(true);
-    }
-
     // maximum liklihood tab
 
     // self-calibration tab
@@ -553,15 +504,6 @@ namespace Isis {
     double angularVelocitySigma     = -1.0;
     double angularAccelerationSigma = -1.0;
 
-    if (m_ui->pointingAnglesSigmaLineEdit->isModified()) {
-      anglesSigma = m_ui->pointingAnglesSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularVelocitySigmaLineEdit->isModified()) {
-      angularVelocitySigma = m_ui->pointingAngularVelocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularAccelerationSigmaLineEdit->isModified()) {
-      angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
-    }
     observationSolveSettings.setInstrumentPointingSettings(
         BundleObservationSolveSettings::stringToInstrumentPointingSolveOption("ANGLES"),
         // BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
@@ -575,15 +517,7 @@ namespace Isis {
     double positionSigma     = -1.0;
     double velocitySigma     = -1.0;
     double accelerationSigma = -1.0;
-    if (m_ui->positionSigmaLineEdit->isModified()) {
-      positionSigma = m_ui->positionSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->velocitySigmaLineEdit->isModified()) {
-      velocitySigma = m_ui->velocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->accelerationSigmaLineEdit->isModified()) {
-      accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
-    }
+    
     observationSolveSettings.setInstrumentPositionSettings(
         BundleObservationSolveSettings::stringToInstrumentPositionSolveOption("NONE"),
         // BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
@@ -966,17 +900,6 @@ namespace Isis {
     m_ui->fitOverPointingCheckBox->setEnabled(false);
     m_ui->ckDegreeSpinBox->setEnabled(false);
     m_ui->ckSolveDegreeSpinBox->setEnabled(false);
-
-    // weighting tab
-    m_ui->pointLatitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointLongitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointRadiusSigmaLineEdit->setEnabled(false);
-    m_ui->positionSigmaLineEdit->setEnabled(false);
-    m_ui->velocitySigmaLineEdit->setEnabled(false);
-    m_ui->accelerationSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAnglesSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(false);
 
     // maximum liklihood tab
 
