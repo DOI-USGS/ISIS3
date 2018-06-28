@@ -29,7 +29,6 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QToolBar>
-#include <QVBoxLayout>
 #include <QWidgetAction>
 
 #include "ControlNet.h"
@@ -53,14 +52,15 @@ namespace Isis {
     //       net, while the editors might be using a different net.  Will Directory keep track?
     //
 
-    QWidget *centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
-    QVBoxLayout *layout = new QVBoxLayout;
-    centralWidget->setLayout(layout);
-
-    layout->addWidget(m_controlPointEditWidget);
+    setCentralWidget(m_controlPointEditWidget);
 
     setAcceptDrops(true);
+
+    // Store the actions for easy enable/disable.
+    m_buttons = m_controlPointEditWidget->findChildren<QPushButton *>();
+
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
 
     QSizePolicy policy = sizePolicy();
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -97,4 +97,42 @@ namespace Isis {
   QSize ControlPointEditView::sizeHint() const {
     return QSize(800, 600);
   }
+
+
+  /**
+   * Disables toolbars and toolpad actions
+   */
+  void ControlPointEditView::disableActions() {
+    foreach (QPushButton *button, m_buttons) {
+      button->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions
+   */
+  void ControlPointEditView::enableActions() {
+    foreach (QPushButton *button, m_buttons) {
+      button->setEnabled(true);
+    }
+  }
+
+  /**
+   * Enables actions when cursor etners on the view
+   * @param event The enter event
+   */
+  void ControlPointEditView::enterEvent(QEvent *event) {
+    enableActions();
+  }
+
+
+  /**
+   * Disables actions when cursor leaves the view
+   * @param event The leave event
+   */
+  void ControlPointEditView::leaveEvent(QEvent *event) {
+    disableActions();
+  }
+
 }

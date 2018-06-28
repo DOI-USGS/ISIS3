@@ -138,13 +138,13 @@ namespace Isis {
     m_sceneWidget->addTo(m_toolPad);
 
     // Store the actions for easy enable/disable.
-    foreach (QAction * action, m_toolPad->actions()) {
+    foreach (QAction *action, m_toolPad->actions()) {
       m_actions.append(action);
     }
-    foreach (QAction * action, m_permToolBar->actions()) {
+    foreach (QAction *action, m_permToolBar->actions()) {
       m_actions.append(action);
     }
-    foreach (QAction * action, m_activeToolBar->actions()) {
+    foreach (QAction *action, m_activeToolBar->actions()) {
       m_actions.append(action);
     }
     // On default, actions are disabled until the cursor enters the view.
@@ -152,7 +152,7 @@ namespace Isis {
 
     // MosaicSceneWidget's default is to have the Control Net Tool enabled.
     // In ipce, we want it to be disabled if an active control is not set.
-    foreach (QAction * action, m_toolPad->actions()) {
+    foreach (QAction *action, m_toolPad->actions()) {
       if (action->toolTip() == "Control Net (c)") {
         m_controlNetTool = action;
       }
@@ -364,6 +364,7 @@ namespace Isis {
 
   /**
    * Enables actions when cursor enters on the view
+   *
    * @param event The enter event
    */
   void Footprint2DView::enterEvent(QEvent *event) {
@@ -373,6 +374,7 @@ namespace Isis {
 
   /**
    * Disables actions when cursor leaves the view
+   *
    * @param event The leave event
    */
   void Footprint2DView::leaveEvent(QEvent *event) {

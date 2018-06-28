@@ -26,6 +26,7 @@
 #include <QPointer>
 #include <QToolBar>
 #include <QWidgetAction>
+#include <QPushButton>
 
 #include "AbstractProjectItemView.h"
 
@@ -68,8 +69,14 @@ class ControlPointEditView : public AbstractProjectItemView {
   QSize sizeHint() const;
 
   private:
+    void enterEvent(QEvent *event);
+    void leaveEvent(QEvent *event);
+    void disableActions();
+    void enableActions();
+
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
+    QList<QPushButton *> m_buttons;
   };
 }
 

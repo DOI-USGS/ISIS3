@@ -50,7 +50,6 @@
 #include "FileName.h"
 #include "FileTool.h"
 #include "FindTool.h"
-#include "HelpTool.h"
 #include "HistogramTool.h"
 #include "Image.h"
 #include "ImageList.h"
@@ -83,6 +82,8 @@
 #include "WindowTool.h"
 #include "XmlStackedHandlerReader.h"
 #include "ZoomTool.h"
+
+#include "MenuItem.h"
 
 namespace Isis {
   /**
@@ -190,17 +191,23 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-    //tools->append(new HelpTool(this));
 
     tools->append(new TrackTool(statusBar()));
 
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_viewMenu = menuBar()->addMenu("&View");
-    m_optionsMenu = menuBar()->addMenu("&Options");
-    m_windowMenu = menuBar()->addMenu("&Window");
-    //m_helpMenu = menuBar()->addMenu("&Help");
+    m_viewMenu = new MenuItem("&View");
+    connect(m_viewMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_viewMenu);
+
+    m_optionsMenu = new MenuItem("&Options");
+    connect(m_optionsMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_optionsMenu);
+
+    m_windowMenu = new MenuItem("&Window");
+    connect(m_windowMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_windowMenu);
 
     for (int i = 0; i < tools->count(); i++) {
       Tool *tool = (*tools)[i];
@@ -223,9 +230,6 @@ namespace Isis {
           else if (menuName == "&Window") {
             tool->addTo(m_windowMenu);
           }
-          else if (menuName == "&Help") {
-            tool->addTo(m_helpMenu);
-          }
         }
       }
       else {
@@ -234,13 +238,17 @@ namespace Isis {
     }
 
     // Store the actions for easy enable/disable.
-    foreach (QAction * action, m_toolPad->actions()) {
+    foreach (QAction *action, actions()) {
+      // disables the record action in the track tool
       m_actions.append(action);
     }
-    foreach (QAction * action, m_permToolBar->actions()) {
+    foreach (QAction *action, m_toolPad->actions()) {
       m_actions.append(action);
     }
-    foreach (QAction * action, m_activeToolBar->actions()) {
+    foreach (QAction *action, m_permToolBar->actions()) {
+      m_actions.append(action);
+    }
+    foreach (QAction *action, m_activeToolBar->actions()) {
       m_actions.append(action);
     }
     // On default, actions are disabled until the cursor enters the view.
@@ -271,6 +279,7 @@ namespace Isis {
 
   /**
    * Enables actions when cursor etners on the view
+   *
    * @param event The enter event
    */
   void CubeDnView::enterEvent(QEvent *event) {
@@ -279,11 +288,16 @@ namespace Isis {
 
 
   /**
-   * Disables actions when cursor leaves the view
+   * Disables actions when cursor leaves the view.
+   * If a menu is visible, i.e. clicked on, this caues a leave event. We want the
+   * actions to still be enabled when a menu is visible.
+   *
    * @param event The leave event
    */
   void CubeDnView::leaveEvent(QEvent *event) {
-    disableActions();
+    if ( !(m_optionsMenu->isVisible() | m_viewMenu->isVisible() | m_windowMenu->isVisible()) ) {
+      disableActions();
+    }
   }
 
 
@@ -293,7 +307,7 @@ namespace Isis {
    * toolpad and loads the network.
    */
   void CubeDnView::enableControlNetTool(bool value) {
-    foreach (QAction * action, m_toolPad->actions()) {
+    foreach (QAction *action, m_toolPad->actions()) {
       if (action->objectName() == "ControlNetTool") {
         action->setEnabled(value);
         if (value) {
@@ -461,12 +475,7 @@ namespace Isis {
     if (m_workspace->cubeToMdiWidget(cube)) {
       return;
     }
-    // Set the focus policy of the added cubes so the main view will always have focus
-    MdiCubeViewport *itemAdded = m_workspace->addCubeViewport(cube);
-    //itemAdded->setFocusPolicy(Qt::NoFocus);
-    //ViewportMdiSubWindow *mdiSubWindow = qobject_cast<ViewportMdiSubWindow *>(itemAdded->parent()->parent());
-    //mdiSubWindow->setFocusPolicy(Qt::NoFocus);
-
+    m_workspace->addCubeViewport(cube);
     m_cubeItemMap.insert(cube, item);
   }
 

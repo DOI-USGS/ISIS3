@@ -93,7 +93,7 @@ namespace Isis {
    *                           Removed methods that returned menu and toolbar actions.
    *                           Removed connections that connected the project and CubeDnView and called
    *                           enableControlNetTool() because Directory now does this.
-   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting 
+   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
    *                           ambiguous shortcut errors. To counter this, we need a way to focus on one
    *                           widget. Giving the views focus did not work completely. Instead,
    *                           enabling/disabling actions was the best option. Added enableActions(),
@@ -137,12 +137,14 @@ namespace Isis {
       void onCubeViewportAdded(MdiCubeViewport *viewport);
       void onCubeViewportDeleted(QObject *obj);
 
+      void disableActions();
+
+
     private:
       Cube *workspaceActiveCube();
       void setWorkspaceActiveCube(Image *image);
       void enterEvent(QEvent *event);
       void leaveEvent(QEvent *event);
-      void disableActions();
       void enableActions();
 
     private:
