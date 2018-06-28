@@ -506,8 +506,7 @@ namespace Isis {
 
 
   /**
-   *  This method is designed to return the number of points in the observed Control Network.
-   *  It is a wrapper for the ControlNet::GetNumPoints() call of the observed Control Network.
+   *  This method is designed to return the number of points in the Control Network.
    *
    *  @return The number of points in the Control Network.
    */
