@@ -8,10 +8,8 @@
 #include "CameraGroundMap.h"
 #include "SpicePosition.h"
 
-// boost lib
-#include <boost/numeric/ublas/matrix_sparse.hpp>
+// Boost Library
 #include <boost/numeric/ublas/vector_proxy.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
 
 using namespace boost::numeric::ublas;
 
@@ -135,7 +133,6 @@ namespace Isis {
     // vtpv is the weight sum of squares of the residuals
     double t = m_rangeObserved - m_rangeComputed;
     m_vtpv = t * t * m_rangeObservedWeightSqrt * m_rangeObservedWeightSqrt;
-    int fred=1;
   }
 
 
@@ -258,13 +255,8 @@ namespace Isis {
     // form N22
     N22 += prod(trans(m_coeff_range_point3D), m_coeff_range_point3D);
 
-//  std::cout << "N22" << std::endl << N22 << std::endl;
-//  std::cout << "n2" << std::endl << n2 << std::endl;
-
     // contribution to n2 vector
     n2 += prod(trans(m_coeff_range_point3D), m_coeff_range_RHS);
-
-//  std::cout << "n2" << std::endl << n2 << std::endl;
 
     return true;
   }

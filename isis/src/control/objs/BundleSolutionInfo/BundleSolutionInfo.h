@@ -147,6 +147,8 @@ namespace Isis {
    *                           file.
    *   @history 2018-06-01 Ken Edmundson - modifications to add lidar data input, output, and
    *                          serialization.
+   *   @history 2018-06-27 Ken Edmundson - Changed method "outputHeader" to get numDegreesOfFreedom
+   *                          directly from m_statisticsResults object.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

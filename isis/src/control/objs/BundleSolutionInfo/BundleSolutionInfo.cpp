@@ -589,12 +589,7 @@ namespace Isis {
     int numValidPoints = m_statisticsResults->outputControlNet()->GetNumValidPoints();
     int numInnerConstraints = 0;
     int numDistanceConstraints = 0;
-    int numDegreesOfFreedom = m_statisticsResults->numberObservations()
-                            + m_statisticsResults->numberConstrainedPointParameters()
-                            + m_statisticsResults->numberConstrainedImageParameters()
-                            + m_statisticsResults->numberConstrainedTargetParameters()
-                            + m_statisticsResults->numberContinuityConstraintEquations()
-                            - m_statisticsResults->numberUnknownParameters();
+    int numDegreesOfFreedom = m_statisticsResults->degreesOfFreedom();
 
     int convergenceCriteria = 1;
 

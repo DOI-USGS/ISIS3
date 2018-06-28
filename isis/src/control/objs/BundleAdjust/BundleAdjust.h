@@ -315,6 +315,9 @@ namespace Isis {
    *                           constructor in the BundleSolutionInfo class because it is derived
    *                           from QObject. Note that we ultimately want to return a QSharedPointer
    *                           instead of a raw pointer.
+   *   @history 2018-06-27 Ken Edmundson - Now setting measure sigmas in BundleMeasure in init()
+   *                           method; retrieving sigma and sqrt of weight in computePartials and
+   *                           computeVtpv methods.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

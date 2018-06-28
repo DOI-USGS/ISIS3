@@ -394,6 +394,26 @@ namespace Isis {
 
 
   /**
+   * Accesses the measure sigma
+   *
+   * @return double measure sigma
+   */
+  double BundleMeasure::measureSigma() const {
+    return m_measureSigma;
+  }
+
+
+  /**
+   * Accesses sqrt of measure weight for bundle
+   *
+   * @return double sqrt of measure weight
+   */
+  double BundleMeasure::measureWeightSqrt() const {
+    return m_measureWeightSqrt;
+  }
+
+
+  /**
    * Accesses the residual magnitude for this control measure
    *
    * @see ControlMeasure::GetResidualMagnitude()
@@ -475,6 +495,26 @@ namespace Isis {
 
     m_yFocalPlaneResidual = m_controlMeasure->GetFocalPlaneMeasuredY() -
                             m_controlMeasure->GetFocalPlaneComputedY();
+  }
+
+
+  /**
+   * Sets sigma (uncertainty) of raw measure in mm and sqrt of weight for bundle
+   *
+   * @param double sigma
+   *
+   * TODO: what if camera has been subsampled, is pixel pitch computation still valid?
+   *
+   */
+  void BundleMeasure::setMeasureSigma(double sigmaMultiplier) {
+    m_measureSigma = sigmaMultiplier * m_controlMeasure->Camera()->PixelPitch();
+
+    if (m_measureSigma <= 0.0) {
+      QString msg = "In BundleMeasure::setMeasureSigma(): m_measureSigma must be positive\n";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    m_measureWeightSqrt = 1.0/m_measureSigma;
   }
 
 

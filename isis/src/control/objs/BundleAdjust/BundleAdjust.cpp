@@ -1,4 +1,4 @@
-#include "BundleAdjust.h"
+ #include "BundleAdjust.h"
 
 // std lib
 #include <iomanip>
@@ -553,13 +553,14 @@ namespace Isis {
 
         measure->setParentObservation(observation);
         measure->setParentImage(image);
+        measure->setMeasureSigma(1.4);
       }
 
       point->ComputeApriori();
     }
 
     // add BundleLidarControlPoints
-    int numLidarPoints;
+    int numLidarPoints = 0;
     if (m_lidarDataSet) {
       numLidarPoints = m_lidarDataSet->points().size();
     }
@@ -586,6 +587,7 @@ namespace Isis {
 
         measure->setParentObservation(observation);
         measure->setParentImage(image);
+        measure->setMeasureSigma(30.0*1.4);
 
         lidarPoint->ComputeApriori();
       }
@@ -1262,10 +1264,6 @@ bool BundleAdjust::formNormalEquations() {
       for (int j = 0; j < numMeasures; j++) {
         BundleMeasureQsp measure = point->at(j);
 
-        if (measure->parentControlPoint()->id() == "Lidar3768") {
-          int fred=1;
-        }
-
         // flagged as "JigsawFail" implies this measure has been rejected
         // TODO  IsRejected is obsolete -- replace code or add to ControlMeasure
         if (measure->isRejected()) {
@@ -1553,9 +1551,6 @@ bool BundleAdjust::formNormalEquations() {
                                       vector<double> &n2,
                                       vector<double> &nj,
                                       BundleControlPointQsp &bundleControlPoint) {
-
-    if (bundleControlPoint->id().contains("Lidar3304"))
-        int fred=1;
 
     boost::numeric::ublas::bounded_vector<double, 3> &NIC = bundleControlPoint->nicVector();
     SparseBlockRowMatrix &Q = bundleControlPoint->qMatrix();
@@ -2388,8 +2383,6 @@ bool BundleAdjust::formNormalEquations() {
 
     double measuredX, computedX, measuredY, computedY;
     double deltaX, deltaY;
-    double observationSigma;
-    double observationWeight;
 
     measureCamera = measure->camera();
 
@@ -2557,15 +2550,8 @@ bool BundleAdjust::formNormalEquations() {
     obsValue = deltaY / measureCamera->PixelPitch();
     m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
 
-    // TODO: what if camera has been subsampled, is pixel pitch computation still valid?
-    observationSigma = 1.4 * measureCamera->PixelPitch();
-
-    // TODO: lidar kluge
-    if (measure->parentControlPoint()->id().contains("Lidar")) {
-      observationSigma *=30.0;
-    }
-
-    observationWeight = 1.0 / observationSigma;
+    double observationSigma = measure->measureSigma();
+    double observationWeightSqrt = measure->measureWeightSqrt();
 
     if (m_bundleResults.numberMaximumLikelihoodModels()
           > m_bundleResults.maximumLikelihoodModelIndex()) {
@@ -2575,18 +2561,18 @@ bool BundleAdjust::formNormalEquations() {
       //dynamically build the cumulative probability distribution of the R^2 residual Z Scores
       m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);
       int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
-      observationWeight *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
+      observationWeightSqrt *= m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
                             .sqrtWeightScaler(residualR2ZScore);
     }
 
     // multiply coefficients by observation weight
-    coeffImagePosition *= observationWeight;
-    coeffImagePointing *= observationWeight;
-    coeffPoint3D *= observationWeight;
-    coeffRHS *= observationWeight;
+    coeffImagePosition *= observationWeightSqrt;
+    coeffImagePointing *= observationWeightSqrt;
+    coeffPoint3D *= observationWeightSqrt;
+    coeffRHS *= observationWeightSqrt;
 
     if (m_bundleSettings->solveTargetBody()) {
-      coeffTarget *= observationWeight;
+      coeffTarget *= observationWeightSqrt;
     }
 
     return true;
@@ -2597,8 +2583,6 @@ bool BundleAdjust::formNormalEquations() {
    * Apply parameter corrections for current iteration.
    */
   void BundleAdjust::applyParameterCorrections() {
-
-//    qDebug() << m_imageSolution;
 
     int t = 0;
 
@@ -2630,12 +2614,6 @@ bool BundleAdjust::formNormalEquations() {
     // Apply parameter corrections for control points
     // TODO: can we do this faster by threading with QtConcurrent::run?
     m_bundleControlPoints.applyParameterCorrections(m_sparseNormals, m_imageSolution);
-
-//    QFuture<void> f1 =
-//        QtConcurrent::run(&m_bundleControlPoints,
-//                          &BundleControlPointVector::applyParameterCorrections, m_sparseNormals,
-//                                                                                m_imageSolution);
-//    f1.waitForFinished();
   }
 
 
@@ -2652,7 +2630,6 @@ bool BundleAdjust::formNormalEquations() {
     double vtpvRange = 0.0;
     double weight;
     double vx, vy;
-    double rmsx, rmsy, rmsxy;
 
     // x, y, and xy residual stats vectors
     Statistics xResiduals;
@@ -2662,9 +2639,6 @@ bool BundleAdjust::formNormalEquations() {
     // vtpv for image coordinates
     int numObjectPoints = m_bundleControlPoints.size();
 
-//    double vtpvTest = m_bundleControlPoints.vtpvMeasureContribution();
-//    m_bundleControlPoints.rmsResiduals(rmsx, rmsy, rmsxy);
-
     for (int i = 0; i < numObjectPoints; i++) {
 
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -2673,41 +2647,39 @@ bool BundleAdjust::formNormalEquations() {
       for (int j = 0; j < numMeasures; j++) {
         const BundleMeasureQsp measure = point->at(j);
 
-        weight = 1.4 * (measure->camera())->PixelPitch();
-
-        // TODO: lidar kluge
-        if (measure->parentControlPoint()->id().contains("Lidar")) {
-          weight *=30.0;
-        }
-
-        weight = 1.0 / weight;
+        weight = measure->measureWeightSqrt();
         weight *= weight;
 
         vx = measure->focalPlaneMeasuredX() - measure->focalPlaneComputedX();
         vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
 
         // TODO: Testing - correct lidar simultaneous measure by it's residual
-//        if ( point->id().contains("Lidar", Qt::CaseInsensitive) ) {
-
+        if ( point->id().contains("Lidar", Qt::CaseInsensitive) ) {
 //          double sample = measure->sample();
 //          double line = measure->line();
-
-//          // in undistorted space
 //          double sampleResidual = measure->sampleResidual();
 //          double lineResidual = measure->lineResidual();
 
-//          // are measure->sample, measure->line in distorted or undistorted space?
-//          double newsample = measure->sample() - measure->sampleResidual();
-//          double newline   = measure->line() - measure->lineResidual();
+          //testing re-backprojection of point
 
-//          measure->rawMeasure()->SetCoordinate(newsample, newline);
-//          Camera* camera = measure->camera();
+          // get a priori surface point
+          SurfacePoint surfacepoint = point->adjustedSurfacePoint();
 
-//          camera->SetImage(newsample,newline);
-//          double newx = camera->DistortionMap()->UndistortedFocalPlaneX();
-//          double newy = camera->DistortionMap()->UndistortedFocalPlaneY();
-//          measure->rawMeasure()->SetFocalPlaneMeasured(newx,newy);
-//        }
+          double newsamp = 0.0;
+          double newline = 0.0;
+
+          if (measure->camera()->SetGround(surfacepoint)) {
+            newsamp = measure->camera()->Sample();
+            newline = measure->camera()->Line();
+          }
+
+          measure->rawMeasure()->SetCoordinate(newsamp, newline);
+          Camera* camera = measure->camera();
+          camera->SetImage(newsamp,newline);
+          double newx = camera->DistortionMap()->UndistortedFocalPlaneX();
+          double newy = camera->DistortionMap()->UndistortedFocalPlaneY();
+          measure->rawMeasure()->SetFocalPlaneMeasured(newx,newy);
+        }
 
         // if rejected, don't include in statistics
         if (measure->isRejected()) {
