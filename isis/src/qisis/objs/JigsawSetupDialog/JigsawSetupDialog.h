@@ -76,11 +76,18 @@ namespace Isis {
    *   @history 2018-06-26 Tyler Wilson - Added the function 
    *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &) 
    *                           which grabs BOSS settings from the JSD BOSS tab for selected images 
-   *                           in the BOSS QTreeView and saves them in a BOSS object. 
-   *   @history 2018-06-26 Christopher Combs - Implemented pseudocode in on_applySettings... method.
-   *                           References #497.
+   *                           in the BOSS QTreeView and saves them in a BOSS object.
+   *   @history 2018-06-26 Tyler Wilson - Added support in
+   *                           updateBundleObservationSolveSettings(BundleObservationSolveSettings &)
+   *                           for the user to set an arbitrary number of position/pointing Apriori
+   *                           Sigma values beyond position/velocity/acceleration.  References #497.
+   *   @history 2018-06-27 Ian Humphrey - Added validateSigmaTables() that checks if there are any
+   *                           invalid a priori sigma values whenever an a priori sigma values changes.
+   *                           If any value is invalid, the OK and Apply Settings buttons are disabled
+   *                           until all the a priori sigma values are valid again. References #497.
+   *   @history 2018-06-28 Christopher Combs - Implemented pseudocode in on_applySettings... method.
+   *                           Added selected images to default BOSS object. References #497.
    */
-
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
 
@@ -155,6 +162,7 @@ namespace Isis {
     void on_pointingComboBox_currentIndexChanged(const QString &arg1);
 
     void validateSigmaValue(QTableWidgetItem *);
+    void validateSigmaTables();
     
 
     public slots:
