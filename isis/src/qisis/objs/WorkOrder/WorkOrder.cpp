@@ -173,7 +173,6 @@ namespace Isis {
     delete m_imageList;
     delete m_shapeList;
     delete m_futureWatcher;
-//     delete m_progressBar;
     delete m_progressBarDeletionTimer;
     delete m_progressBarUpdateTimer;
     delete m_transparentConstMutex;
@@ -1576,8 +1575,6 @@ namespace Isis {
       delete m_progressBarDeletionTimer;
       m_progressBarDeletionTimer = new QTimer;
       m_progressBarDeletionTimer->setSingleShot(true);
-      connect(m_progressBarDeletionTimer, SIGNAL(timeout()),
-              this, SLOT(deleteProgress()));
 
       m_progressBarDeletionTimer->start(5 * 1000); // 5 seconds
 
@@ -1647,20 +1644,6 @@ namespace Isis {
    */
   void WorkOrder::clearShapeList() {
     delete m_shapeList;
-  }
-
-
-  /**
-   * @brief Deletes the progress bar.
-   */
-  void WorkOrder::deleteProgress() {
-//     ProgressBar *progress = m_progressBar;
-// 
-//     if (m_progressBar) {
-//       delete progress;
-//       m_progressBar = NULL;
-//       emit deletingProgress(this);
-//     }
   }
 
 

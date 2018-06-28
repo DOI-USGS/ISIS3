@@ -484,7 +484,6 @@ namespace Isis {
       void executionFinished();
       void clearImageList();
       void clearShapeList();
-      void deleteProgress();
       void updateProgress();
       void startRedo();
 
