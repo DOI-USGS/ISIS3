@@ -49,6 +49,7 @@ namespace Isis {
   class ToolPad;
   class Workspace;
   class XmlStackedHandlerReader;
+  class MenuItem;
 
   /**
    * View that displays cubes in a QView-like way.
@@ -169,9 +170,9 @@ namespace Isis {
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items
       Workspace *m_workspace; //!< The workspace
 
-      QMenu *m_viewMenu; //!< View menu for storing actions
-      QMenu *m_optionsMenu; //!< Options menu for storing actions
-      QMenu *m_windowMenu; //!< Window menu for storing actions
+      MenuItem *m_viewMenu; //!< View menu for storing actions
+      MenuItem *m_optionsMenu; //!< Options menu for storing actions
+      MenuItem *m_windowMenu; //!< Window menu for storing actions
 
       QAction *m_separatorAction; //!< A separator action that is reused
 

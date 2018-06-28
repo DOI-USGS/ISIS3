@@ -45,6 +45,7 @@
 #include "FileName.h"
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
+#include "MenuItem.h"
 
 namespace Isis {
   /**
@@ -81,6 +82,13 @@ namespace Isis {
 
     createMenus();
     createToolBars();
+
+    // Store the actions for easy enable/disable.
+    foreach (QAction *action, m_permToolBar->actions()) {
+      addAction(action);
+    }
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
   }
 
   /**
@@ -90,60 +98,36 @@ namespace Isis {
 
     delete m_cnetEditorWidget;
     delete m_permToolBar;
+    delete m_tablesMenu;
 
+    m_tablesMenu = 0;
     m_permToolBar = 0;
   }
 
   /**
    * Uses the actions created by CnetEditorWidget, tries to find the menus to put
-   * the actions under, and creates the menus if said menus do not exist. Currently,
-   * the menus added are Table and Help.
+   * the actions under, and creates the menus if said menus do not exist.
    */
   void CnetEditorView::createMenus() {
     QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
     QMapIterator< QAction *, QList< QString > > actionMapIter(actionMap);
-    QMap<QString, QMenu *> topLevelMenus;
+
+    m_tablesMenu = new MenuItem("&Tables");
+    connect(m_tablesMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_tablesMenu);
 
     while ( actionMapIter.hasNext() ) {
       actionMapIter.next();
       QAction *actionToAdd = actionMapIter.key();
-      QList< QString > location = actionMapIter.value();
 
-      // Skip the Help menu for now because we do not want to add the "What's This?"
-      // action (it is in the main help menu of IPCE)
-      if (location.first() == "&Help") {
+      // Skip the "What's This?" action because it is in the main help menu of IPCE
+      if (actionToAdd->text() == "What's This?") {
         continue;
       }
-
-      QMenu *menuToPutActionInto = NULL;
-
-      if ( location.count() ) {
-        QString topLevelMenuTitle = location.takeFirst();
-        if (!topLevelMenus[topLevelMenuTitle]) {
-          topLevelMenus[topLevelMenuTitle] = menuBar()->addMenu(topLevelMenuTitle);
-        }
-
-        menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
-      }
-
-      foreach (QString menuName, location) {
-        bool foundSubMenu = false;
-        foreach ( QAction *possibleSubMenu, menuToPutActionInto->actions() ) {
-          if (!foundSubMenu &&
-              possibleSubMenu->menu() && possibleSubMenu->menu()->title() == menuName) {
-            foundSubMenu = true;
-            menuToPutActionInto = possibleSubMenu->menu();
-          }
-        }
-
-        if (!foundSubMenu) {
-          menuToPutActionInto = menuToPutActionInto->addMenu(menuName);
-        }
-      }
-
-      menuToPutActionInto->addAction(actionToAdd);
+      m_tablesMenu->addAction(actionToAdd);
     }
   }
+
 
   /**
    * Uses and adds the actions created by CnetEditorWidget to the view's toolbars
@@ -168,6 +152,21 @@ namespace Isis {
       }
     }
   }
+
+
+  /**
+   * Disables actions when cursor leaves the view. Overriden method
+   * If a menu is visible, i.e. clicked on, this causes a leave event. We want the
+   * actions to still be enabled when a menu is visible.
+   *
+   * @param event The leave event
+   */
+  void CnetEditorView::leaveEvent(QEvent *event) {
+    if (!m_tablesMenu->isVisible()) {
+      disableActions();
+    }
+  }
+
 
   /**
    * Returns the cnetEditorWidget.
