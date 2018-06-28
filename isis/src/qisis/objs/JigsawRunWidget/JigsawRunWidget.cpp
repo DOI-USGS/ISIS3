@@ -167,6 +167,7 @@ namespace Isis {
   void JigsawRunWidget::on_JigsawRunButton_clicked() {
     // Once a bundle is run, the previous results cannot be accepted or rejected.
     m_ui->JigsawAcceptButton->setEnabled(false);
+    m_ui->statusOutputLabel->setText("Initialization");
 
     if (!m_bRunning) {
       // ??? warning dialogs ???

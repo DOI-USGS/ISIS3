@@ -34,7 +34,7 @@
    </property>
    <property name="windowIcon">
     <iconset>
-     <normaloff>../../../../../../isisdev_oops/isis/src/qisis/objs/JigsawRunWidget/icons/jigsaw.png</normaloff>../../../../../../isisdev_oops/isis/src/qisis/objs/JigsawRunWidget/icons/jigsaw.png</iconset>
+     <normaloff>icons/jigsaw.png</normaloff>icons/jigsaw.png</iconset>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_5">
     <item>
@@ -199,6 +199,9 @@
                <property name="autoFillBackground">
                 <bool>true</bool>
                </property>
+               <property name="segmentStyle">
+                <enum>QLCDNumber::Flat</enum>
+               </property>
               </widget>
              </item>
              <item row="0" column="3">
@@ -211,6 +214,9 @@
                </property>
                <property name="autoFillBackground">
                 <bool>true</bool>
+               </property>
+               <property name="segmentStyle">
+                <enum>QLCDNumber::Flat</enum>
                </property>
               </widget>
              </item>
