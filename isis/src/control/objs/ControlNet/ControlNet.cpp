@@ -129,10 +129,29 @@ namespace Isis {
   }
 
 
+  /**
+   * This method is a wrapper to emit the measureModified() signal and is called whenever a change
+   * is made to a Control Measure.
+   *
+   * @param measure The ControlMeasure* that was modified.
+   * @param type The ControlMeasure::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
   void ControlNet::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue) {
     emit measureModified(measure, type, oldValue, newValue);
   }
 
+
+  /**
+   * This method is a wrapper to emit the pointModified() signal and is called whenever a change
+   * is made to a Control Point.
+   *
+   * @param point The ControlPoint* that was modified.
+   * @param type The ControlPoint::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
   void ControlNet::emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue) {
     emit pointModified(point, type, oldValue, newValue);
   }
@@ -715,8 +734,7 @@ namespace Isis {
 
   /**
    * Updates the node for this measure's serial number to
-   * reflect the deletion.  If this is the only measure left in the containing
-   * node, then the node is deleted as well.
+   * reflect the deletion.
    *
    * @param measure The measure removed from the network.
    */
@@ -738,14 +756,6 @@ namespace Isis {
     // for the old graph.
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
 
-
-// We decided in a meeting that we do not want to delete the node when all measures are removed.
-    // If this caused the node to be empty, then delete the node.
-//    if (m_controlGraph[m_vertexMap[serial]].measures.size() <= 0) {
-//      boost::clear_vertex(m_vertexMap[serial], m_controlGraph);
-//      boost::remove_vertex(m_vertexMap[serial], m_controlGraph);
-//      m_vertexMap.remove(serial);
-//    }
   }
 
 
@@ -860,6 +870,10 @@ namespace Isis {
   }
 
 
+
+  /**
+   * This method is a wrapper to emit the networkStructureModified() signal.
+   */
   void ControlNet::emitNetworkStructureModified() {
     emit networkStructureModified();
   }
@@ -1395,7 +1409,11 @@ namespace Isis {
    *                         returning a count of only valid measures (Ignore=False).
    */
   int ControlNet::GetNumberOfValidMeasuresInImage(const QString &serialNumber) {
-    return p_cameraValidMeasuresMap[serialNumber];
+    // If SetImage was called, use the map that has been populated with valid measures
+    if (p_cameraList.size() > 0) {
+      return p_cameraValidMeasuresMap[serialNumber];
+    }
+    return GetValidMeasuresInCube(serialNumber).size();
   }
 
 

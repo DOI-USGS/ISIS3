@@ -351,6 +351,9 @@ namespace Isis {
    *                           to allow for communication between the ControlNetVitals class
    *                           and changes made to the Control Network that it is observing.
    *                           Fixes #5435.
+   *  @history 2018-06-29 Adam Goins - Modified to operator= method to use setters when copying
+   *                           one Control Point to another so that the proper signals get called.
+   *                           Fixes #5435.
    */
   class ControlPoint : public QObject {
 
@@ -428,6 +431,16 @@ namespace Isis {
 //      ZConstrained = 5;
       };
 
+      /**
+       *  @brief Control Point Modification Types
+       *
+       *  This enum is designed to represent the different types of modifications that can be
+       *  made to a ControlPoint.
+       *
+       *  EditLockModified means that the Control Point had it's edit lock flag changed.
+       *  IgnoredModified means that the Control Measure had it's ignored flag changed.
+       *  TypeModified means that the ControlPoint::PointType for this control point was modified.
+       */
       enum ModType {
         EditLockModified,
         IgnoredModified,

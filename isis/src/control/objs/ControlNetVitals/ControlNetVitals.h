@@ -56,6 +56,9 @@ namespace Isis {
   *    @history 2018-05-28 Adam Goins - Initial Creation.
   *    @history 2018-06-14 Adam Goins & Jesse Maple - Refactored method calls and Signal/Slot usage.
   *    @history 2018-06-15 Adam Goins - Added documentation.
+  *    @history 2018-06-25 Kristin Berry - Fixed problem with getImagesBelowMeasureThreshold().size()
+  *                           not matching numImagesBelowMeasureThreshold(). Fixed a similar
+  *                           problem with numPointsBelowMeasureThreshold().
   */
   class ControlNetVitals : public QObject {
     Q_OBJECT
@@ -119,28 +122,40 @@ namespace Isis {
 
 
     private:
+      //! The Control Network that the vitals class is observing.
       ControlNet *m_controlNet;
 
+      //! The string representing the status of the net. Healthy, Weak, or Broken.
       QString m_status;
+      //! The string providing details into the status of the network.
       QString m_statusDetails;
 
+      //! A QList containing every island in the net. Each island consists of a QList containing
+      //! All cube serials for that island.
       QList< QList< QString > > m_islandList;
 
-      // The measureCount maps track how many points/images have how many measures.
-      // For instance, if I wanted to know how many points have 3 measures I would query
-      // the m_pointMeasureCounts with a key of 3 and it would return how many points
-      // have 3 measures. The same is true for imageMeasureCounts, except for images.
+      //! The measureCount maps track how many points/images have how many measures.
+      //! For instance, if I wanted to know how many points have 3 measures I would query
+      //! the m_pointMeasureCounts with a key of 3 and it would return how many points
+      //! have 3 measures.
       QMap<int, int> m_pointMeasureCounts;
+      //! The same is true for imageMeasureCounts, except for images.
       QMap<int, int> m_imageMeasureCounts;
 
-      // The pointTypeCounts operates in the same fashion as the above two, except
-      // that the key would be the ControlPoint::PointType you're searching for.
-      // For instance, if I wanted to know how many points were fixed I would query
-      // This map at key ControlPoint::Fixed and it would return how many fixed points there are.
+      //! The pointTypeCounts operates in the same fashion as the above two, except
+      //! that the key would be the ControlPoint::PointType you're searching for.
+      //! For instance, if I wanted to know how many points were fixed I would query
+      //! This map at key ControlPoint::Fixed and it would return how many fixed points there are.
       QMap<ControlPoint::PointType, int> m_pointTypeCounts;
 
+      //! The number of points in the network.
+      int m_numPoints;
+      //! The number of ignored points in the network.
       int m_numPointsIgnored;
+      //! The number of edit locked points in the network.
       int m_numPointsLocked;
+      //! The number of measures in the network.
+      int m_numMeasures;
   };
 };
 

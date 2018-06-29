@@ -224,10 +224,10 @@ namespace Isis {
    *                           image. Previously, this had to be done throug the graph.
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
    *                           adds to the control network.
-   *   @history 2018-01-26 Kristin Berry - Removed unused methods and associated code:
+   *   @history 2018-06-10 Kristin Berry - Removed unused methods and associated code:
    *                           MinimumSpanningTree(), GetNodeConnections(), RandomBFS(), Shuffle(),
    *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode(). References #5434
-   *  @history 2018-01-26 Kristin Berry - Updated to use the boost graph library instead of our
+   *   @history 2018-06-10 Kristin Berry - Updated to use the boost graph library instead of our
    *                           custom graph structure ControlCubeGraphNode.
    *   @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
    *                           group to set radii values to those ingested from the versioner
@@ -245,6 +245,9 @@ namespace Isis {
    *                           These signals exist for the purpose of communication between the
    *                           ControlNetVitals class, and the network that it is observing.
    *                           Fixes #5435.
+   *  @history 2018-06-25 Kristin Berry - Updated GetNumberOfValidMeasuresInImage() to use
+   *                           GetValidMeasuresInCube() if SetImage has not yet been called to populate
+   *                           the p_cameraValidMeasuresMap.
    *   @history 2018-06-25 Jesse Mapel - Fixed the incorrect signal being called when adding and
    *                           removing measures. References #5435.
    *   @history 2018-06-25 Jesse Mapel - Fixed ignoring measures with ignored adjacent measures
@@ -258,6 +261,15 @@ namespace Isis {
 
     public:
 
+      /**
+       *  @brief Control Point Modification Types
+       *
+       *  This enum is designed to represent the different types of modifications that can be
+       *  made to a ControlNet.
+       *
+       *  Swapped means the network was swapped with another network (ControlNet::Swap(ControlNet &other)).
+       *  GraphModified means that a vertice or edge was added/removed from the graph..
+       */
       enum ModType {
         Swapped,
         GraphModified

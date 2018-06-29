@@ -76,15 +76,11 @@ namespace Isis {
       void viewImageFewMeasures();
       void viewImageHullTolerance();
 
-      void broken();
-      void weak();
-      void healthy();
-
       void update();
 
     signals:
       void openPointEditor(ControlPoint *point);
-      void openImageEditor();
+      void openImageEditor(QList<QString> serials);
 
     private:
         void updateStatus(int code);
