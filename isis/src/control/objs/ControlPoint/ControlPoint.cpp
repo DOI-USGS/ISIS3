@@ -1936,6 +1936,7 @@ namespace Isis {
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
     if (this != &other) {
+      bool oldLock = editLock;
       editLock = false;
       for (int i = cubeSerials->size() - 1; i >= 0; i--) {
         (*measures)[cubeSerials->at(i)]->SetEditLock(false);
@@ -1974,6 +1975,7 @@ namespace Isis {
       SetAdjustedSurfacePoint(other.adjustedSurfacePoint);
 
       // Set edit lock last so the it doesn't interfere with copying the other fields over.
+      editLock = oldLock;
       SetEditLock(other.editLock);
     }
 
