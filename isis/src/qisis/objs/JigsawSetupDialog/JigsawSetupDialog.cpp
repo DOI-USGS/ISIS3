@@ -1758,13 +1758,29 @@ namespace Isis {
 
   void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
+    QModelIndexList indexList = selected.indexes();
 
-    // QModelIndex displayIndex = selected.indexes()[0];
+    if (!indexList.isEmpty()) {
+      QModelIndex displayIndex = indexList[0];
 
-    // if (displayIndex) {
-    //   QModelIndex sourceIndex = m_ui->treeView->model()->mapToSource(displayIndex);
+      SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model(); 
+      ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
 
-    // } 
+      QModelIndex sourceIndex = proxyModel->mapToSource(displayIndex);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
+
+      // TODO - CASE : projitem is an imagelist
+      BundleObservationSolveSettings settings = m_bundleSettings->observationSolveSettings(
+                                                                projItem->image()->serialNumber());
+
+      // Populate RHS of Observation Solve Settings tab with selected image's BOSS
+      // Instrument Position Solve Options
+      m_ui->positionComboBox->setValue(settings.instrumentPositionSolveOption());
+      m_ui->spkSolveDegreeSpinBox->setValue(settings.spkSolveDegree());
+      m_ui->spkDegreeSpinBox->setValue(settings.spkDegree());
+      m_ui->hermiteSplineCheckBox->setChecked(settings.solvePositionOverHermite());
+
+    } 
   }
 
 
@@ -1787,7 +1803,7 @@ namespace Isis {
     // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
       QModelIndex sourceIndex = proxyModel->mapToSource(index);
-      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex); summer is so awesome
 
       if (projItem) {
         // Tree traversal is top down so we dont need to do this check for imagelists?
