@@ -34,6 +34,8 @@ namespace Isis {
    *                           deletion caused an error message to pop up when selecting multiple 
    *                           Free or Fixed points after closing the Set Apriori dialog. Fixes 
    *                           #4490.
+   *   @history 2018-06-28 Debbie A. Cook - Removed calls to SurfacePoint::SetRadii
+   *                           which is now obsolete.
    */
   class QnetSetAprioriDialog : public QDialog {
       Q_OBJECT

@@ -300,7 +300,6 @@ namespace Isis {
       }
 
       SurfacePoint aprioriPoint;
-      aprioriPoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
       aprioriPoint.SetRectangular( Displacement(m_pointData->apriorix(), Displacement::Meters),
                                    Displacement(m_pointData->aprioriy(), Displacement::Meters),
                                    Displacement(m_pointData->aprioriz(), Displacement::Meters) );
@@ -360,7 +359,6 @@ namespace Isis {
       }
 
       SurfacePoint adjustedPoint;
-      adjustedPoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
       adjustedPoint.SetRectangular( Displacement(m_pointData->adjustedx(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedy(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedz(), Displacement::Meters) );

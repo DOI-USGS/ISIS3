@@ -366,10 +366,6 @@ namespace Isis {
 
           if ( !m_header.targetRadii.empty() ) {
 
-            aprioriSurfacePoint.SetRadii( m_header.targetRadii[0],
-                                          m_header.targetRadii[1],
-                                          m_header.targetRadii[2] );
-
             if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                  && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
                  && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
@@ -448,10 +444,6 @@ namespace Isis {
           matrix += toString(adjustedCovarianceMatrix(2, 2));
 
           if ( !m_header.targetRadii.empty() ) {
-
-            adjustedSurfacePoint.SetRadii( m_header.targetRadii[0],
-                                           m_header.targetRadii[1],
-                                           m_header.targetRadii[2] );
 
             if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                  && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
@@ -1573,12 +1565,6 @@ namespace Isis {
 
       SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
       SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
-      aprioriSurfacePoint.SetRadii(m_header.targetRadii[0],
-                                   m_header.targetRadii[1],
-                                   m_header.targetRadii[2]);
-      adjustedSurfacePoint.SetRadii(m_header.targetRadii[0],
-                                    m_header.targetRadii[1],
-                                    m_header.targetRadii[2]);
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
       controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
     }

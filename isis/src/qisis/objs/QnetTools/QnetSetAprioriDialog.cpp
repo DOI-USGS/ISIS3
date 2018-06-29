@@ -356,9 +356,6 @@ namespace Isis {
       SurfacePoint sPt = pt->GetAprioriSurfacePoint();
       vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
       
-      sPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
       if (sPt.GetLatitude().degrees() != Null) {
         m_latLineEdit->setText(
           QString::number(sPt.GetLatitude().degrees()));
@@ -415,9 +412,6 @@ namespace Isis {
       Camera *cam = m_qnetTool->controlNet()->Camera(camIndex);
       cam->SetImage(m->GetSample(),m->GetLine());
       SurfacePoint refSPt = cam->GetSurfacePoint();
-      refSPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
       if (refSPt.GetLatitude().degrees() != Null) {
          m_latLineEdit->setText(
           QString::number(refSPt.GetLatitude().degrees()));
@@ -568,9 +562,6 @@ namespace Isis {
       SurfacePoint sPt = aprioriSurfacePoint;
       vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
   
-      sPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
       if (sPt.GetLatitude().degrees() != Null) {
         m_latLineEdit->setText(
           QString::number(sPt.GetLatitude().degrees()));
@@ -650,9 +641,6 @@ namespace Isis {
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       SurfacePoint sPt = pt->GetAprioriSurfacePoint();
       vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-      sPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
       if (sPt.GetLatSigmaDistance().meters() != Null) {
         m_latSigmaLineEdit->setText(
           QString::number(sPt.GetLatSigmaDistance().meters()));
@@ -969,9 +957,6 @@ namespace Isis {
         //  first set the target radii
         SurfacePoint spt = pt->GetAprioriSurfacePoint();
         vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-        spt.SetRadii(Distance(targetRadii[0]),
-                     Distance(targetRadii[1]),
-                     Distance(targetRadii[2]));
 
         spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
                                         Distance(lonSigma,Distance::Meters),

@@ -65,6 +65,8 @@ namespace Isis {
    *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to take PvlObject.
    *   @history 2017-12-21 Jesse Mapel - Improved documentation.
    *   @history 2017-01-27 Jesse Mapel - More documentation improvements.
+   *   @history 2018-06-28 Debbie A Cook - Removed all calls to obsolete method
+   *                                                   SurfacePoint::SetRadii
    */
   class ControlPointV0001 {
     public:

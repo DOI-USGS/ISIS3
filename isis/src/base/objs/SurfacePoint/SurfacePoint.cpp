@@ -17,9 +17,9 @@ namespace Isis {
    *
    */
   SurfacePoint::SurfacePoint() {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
   }
 
   /**
@@ -27,25 +27,11 @@ namespace Isis {
    *
    */
   SurfacePoint::SurfacePoint(const SurfacePoint &other) {
-    if(other.p_majorAxis) {
-      p_majorAxis = new Distance(*other.p_majorAxis);
+    if(other.p_localRadius) {
+      p_localRadius = new Distance(*other.p_localRadius);
     }
     else {
-      p_majorAxis = NULL;
-    }
-
-    if(other.p_minorAxis) {
-      p_minorAxis = new Distance(*other.p_minorAxis);
-    }
-    else {
-      p_minorAxis = NULL;
-    }
-
-    if(other.p_polarAxis) {
-      p_polarAxis = new Distance(*other.p_polarAxis);
-    }
-    else {
-      p_polarAxis = NULL;
+      p_localRadius = NULL;
     }
 
     if(other.p_x) {
@@ -94,9 +80,9 @@ namespace Isis {
    */
   SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
       const Distance &radius) {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
     SetSphericalPoint(lat, lon, radius);
   }
 
@@ -119,9 +105,9 @@ namespace Isis {
   SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
       const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
       const Distance &radiusSigma) {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
     SetSpherical(lat, lon, radius, latSigma, lonSigma, radiusSigma);
   }
 
@@ -133,9 +119,9 @@ namespace Isis {
    */
   SurfacePoint::SurfacePoint(const Latitude &lat, const Longitude &lon,
       const Distance &radius, const symmetric_matrix<double, upper> &covar) {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
     SetSpherical(lat, lon, radius, covar);
   }
 
@@ -149,9 +135,9 @@ namespace Isis {
    */
   SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
       const Displacement &z) {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
     SetRectangular(x, y, z);
   }
 
@@ -173,9 +159,9 @@ namespace Isis {
   SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
       const Displacement &z, const Distance &xSigma, const Distance &ySigma,
       const Distance &zSigma) {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
     SetRectangular(x, y, z, xSigma, ySigma, zSigma);
   }
 
@@ -191,9 +177,9 @@ namespace Isis {
    */
   SurfacePoint::SurfacePoint(const Displacement &x, const Displacement &y,
       const Displacement &z, const symmetric_matrix<double, upper> &covar) {
+    p_localRadius = NULL;
     InitCovariance();
     InitPoint();
-    InitRadii();
     SetRectangular(x, y, z, covar);
   }
 
@@ -227,17 +213,7 @@ namespace Isis {
     p_z = NULL;
   }
 
-  /**
-   * Initialize the target surface radii
-   *
-   */
-  void SurfacePoint::InitRadii() {
-    p_majorAxis = NULL;
-    p_minorAxis = NULL;
-    p_polarAxis = NULL;
-  }
-
-
+  
   /**
    * This is a private method to set a surface point in rectangular, body-fixed
    *   coordinates.  This method isolates the procedure for setting a
@@ -450,6 +426,12 @@ namespace Isis {
     SetRectangularPoint(Displacement(rect[0], Displacement::Kilometers),
                         Displacement(rect[1], Displacement::Kilometers),
                         Displacement(rect[2], Displacement::Kilometers));
+    if(p_localRadius) {
+      *p_localRadius = radius;
+    }
+    else {
+      p_localRadius = new Distance(radius);
+    }
   }
 
 
@@ -551,35 +533,46 @@ namespace Isis {
    *                  in meters
    * @param radiusSigma Radius sigma of body-fixed coordinate of surface point
    *                  in meters
+   * @internal
+   *   @history  2018-06-28 Debbie A. Cook  Revised to use the local radius of
+   *                 the SurfacePoint to convert distance to angle instead of the
+   *                 major equatorial axis.  Also corrected longitude conversion.
+   *                 See note in SurfacePoint.h.
    */
   void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
     const Distance &lonSigma, const Distance &radiusSigma) {
-
-    if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->isValid() ||
-        !p_minorAxis->isValid() || !p_polarAxis->isValid()) {
-      IString msg = "In order to use sigmas in meter units, the equitorial "
-        "radius must be set with a call to SetRadii or an appropriate "
-        "constructor";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
 
     if (!Valid()) {
       IString msg = "Cannot set spherical sigmas on an invalid surface point";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    double scaledLatSig = latSigma / *p_majorAxis;
-    double scaledLonSig = lonSigma * cos((double)GetLatitude().radians())
-                                   / *p_majorAxis;
-    SetSphericalSigmas( Angle(scaledLatSig, Angle::Radians),
-                        Angle(scaledLonSig, Angle::Radians), radiusSigma);
+    // Convert Latitude sigma to radians
+    Distance scalingRadius = GetLocalRadius();
+    double latSigRadians = latSigma / scalingRadius;
+
+    // Convert Longitude sigma to radians
+    double convFactor = cos((double)GetLatitude().radians());
+    double lonSigRadians;
+    
+    if (convFactor > 0.0000000000000001) {             
+      scalingRadius *= convFactor;
+      lonSigRadians = lonSigma / scalingRadius;
+    }
+    else {
+      //  Brent Archinal suggested setting sigma to pi in the case of a point near the pole
+      lonSigRadians = PI;
+    }
+
+    SetSphericalSigmas( Angle(latSigRadians, Angle::Radians),
+                        Angle(lonSigRadians, Angle::Radians), radiusSigma);
   }
 
 
   /**
    * Set spherical covariance matrix
    *
-   * @param covar Spherical variance/covariance matrix (radians**2)
+   * @param covar Spherical variance/covariance matrix (radians**2 for lat and lon)
    *
    * @return void
    */
@@ -696,48 +689,6 @@ namespace Isis {
       p_x = new Displacement(naifValues[0], Displacement::Kilometers);
       p_y = new Displacement(naifValues[1], Displacement::Kilometers);
       p_z = new Displacement(naifValues[2], Displacement::Kilometers);
-    }
-  }
-
-
-  /**
-   * Reset the radii of the surface body of the surface point
-   *
-   * @param majorAxis  The semi-major axis of the surface model
-   * @param minorAxis  The semi-minor axis of the surface model
-   * @param polarAxis  The polar axis of the surface model
-   */
-  void SurfacePoint::SetRadii(const Distance &majorRadius,
-                              const Distance &minorRadius,
-                              const Distance &polarRadius) {
-
-    if (!majorRadius.isValid()  ||
-        !minorRadius.isValid()  ||
-        !polarRadius.isValid()) {
-      IString msg = "Radii must be set to valid distances.  One or more radii "
-        "have been set to an invalid distance.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    if(p_majorAxis) {
-      *p_majorAxis = majorRadius;
-    }
-    else {
-      p_majorAxis = new Distance(majorRadius);
-    }
-
-    if(p_minorAxis) {
-      *p_minorAxis = minorRadius;
-    }
-    else {
-      p_minorAxis = new Distance(minorRadius);
-    }
-
-    if(p_polarAxis) {
-      *p_polarAxis = polarRadius;
-    }
-    else {
-      p_polarAxis = new Distance(polarRadius);
     }
   }
 
@@ -905,11 +856,16 @@ namespace Isis {
       if (!Valid())
         return Distance();
 
-      double x = p_x->meters();
-      double y = p_y->meters();
-      double z = p_z->meters();
+      if (p_localRadius) {
+        return *p_localRadius;
+      }
+      else {
+        double x = p_x->meters();
+        double y = p_y->meters();
+        double z = p_z->meters();
 
-      return Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
+        return Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
+      }
     }
 
 
@@ -924,14 +880,10 @@ namespace Isis {
         Angle latSigma = GetLatSigma();
 
         if (latSigma.isValid()) {
-          if (!p_majorAxis || !p_majorAxis->isValid()) {
-            IString msg = "In order to calculate sigmas in meter units, the "
-              "equitorial radius must be set with a call to SetRadii.";
-            throw IException(IException::Programmer, msg, _FILEINFO_);
-          }
+          Distance scalingRadius = GetLocalRadius();
 
           // Convert from radians to meters
-          latSigmaDistance = latSigma.radians() * *p_majorAxis;
+          latSigmaDistance = latSigma.radians() * scalingRadius;
         }
       }
 
@@ -940,7 +892,7 @@ namespace Isis {
 
 
   /**
-   * Return the longiitude sigma in meters
+   * Return the longitude sigma in meters
    *
    */
   Distance SurfacePoint::GetLonSigmaDistance() const {
@@ -950,18 +902,12 @@ namespace Isis {
       Angle lonSigma = GetLonSigma();
 
       if (lonSigma.isValid()) {
-        if (!p_majorAxis || !p_majorAxis->isValid()) {
-          IString msg = "In order to calculate sigmas in meter units, the "
-            "equitorial radius must be set with a call to SetRadii.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-
-        Latitude lat = GetLatitude();
-        double scaler = cos(lat.radians());
+        Distance scalingRadius = cos(GetLatitude().radians()) * GetLocalRadius();
 
         // Convert from radians to meters and return
-        if (scaler != 0.)
-          lonSigmaDistance = lonSigma.radians() * *p_majorAxis / scaler;
+        // TODO What do we do when the scaling radius is 0 (at the pole)?
+        if (scalingRadius.meters() != 0.)
+          lonSigmaDistance = lonSigma.radians() * scalingRadius;
       }
     }
 
@@ -1038,18 +984,18 @@ namespace Isis {
       }
 
   /**
-   * Computes and returns the distance between two surface points. This does
-   *   not currently support ellipsoids and so any attempt with points with
-   *   planetary radii will fail. The average of the local radii will be
-   *   used.
+   * Computes and returns the distance between two surface points.  The average of 
+   * the local radii will be used.
    */
   Distance SurfacePoint::GetDistanceToPoint(const SurfacePoint &other) const {
-    if(p_majorAxis || p_minorAxis || p_polarAxis ||
-       other.p_majorAxis || other.p_minorAxis || other.p_polarAxis) {
-      IString msg = "SurfacePoint::GetDistanceToPoint not yet implemented for "
-          "ellipsoids";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
+    // TODO What do we do for the check? We no longer have the ability to check.
+    
+    // if(p_majorAxis || p_minorAxis || p_polarAxis ||
+    //    other.p_majorAxis || other.p_minorAxis || other.p_polarAxis) {
+    //   IString msg = "SurfacePoint::GetDistanceToPoint not yet implemented for "
+    //       "ellipsoids";
+    //   throw IException(IException::Programmer, msg, _FILEINFO_);
+    // }
 
     if(!Valid() || !other.Valid())
       return Distance();
@@ -1112,17 +1058,6 @@ namespace Isis {
       equal = equal && p_z == NULL && other.p_z == NULL;
     }
 
-    if(equal && p_majorAxis && p_minorAxis && p_polarAxis) {
-      equal = equal && *p_majorAxis == *other.p_majorAxis;
-      equal = equal && *p_minorAxis == *other.p_minorAxis;
-      equal = equal && *p_polarAxis == *other.p_polarAxis;
-    }
-    else if(equal) {
-      equal = equal && p_majorAxis == NULL && other.p_majorAxis == NULL;
-      equal = equal && p_minorAxis == NULL && other.p_minorAxis == NULL;
-      equal = equal && p_polarAxis == NULL && other.p_polarAxis == NULL;
-    }
-
     if(equal && p_rectCovar) {
       equal = equal && (*p_rectCovar)(0, 0) == (*other.p_rectCovar)(0, 0);
       equal = equal && (*p_rectCovar)(0, 1) == (*other.p_rectCovar)(0, 1);
@@ -1156,9 +1091,6 @@ namespace Isis {
     if(p_x && other.p_x &&
        p_y && other.p_y &&
        p_z && other.p_z &&
-       !p_majorAxis && !other.p_majorAxis &&
-       !p_minorAxis && !other.p_minorAxis &&
-       !p_polarAxis && !other.p_polarAxis &&
        !p_rectCovar && !other.p_rectCovar &&
        !p_sphereCovar && !other.p_sphereCovar) {
       *p_x = *other.p_x;
@@ -1167,17 +1099,6 @@ namespace Isis {
     }
     else {
       FreeAllocatedMemory();
-      if(other.p_majorAxis) {
-        p_majorAxis = new Distance(*other.p_majorAxis);
-      }
-
-      if(other.p_minorAxis) {
-        p_minorAxis = new Distance(*other.p_minorAxis);
-      }
-
-      if(other.p_polarAxis) {
-        p_polarAxis = new Distance(*other.p_polarAxis);
-      }
 
       if(other.p_x) {
         p_x = new Displacement(*other.p_x);
@@ -1219,19 +1140,9 @@ namespace Isis {
       p_z = NULL;
     }
 
-    if(p_majorAxis) {
-      delete p_majorAxis;
-      p_majorAxis = NULL;
-    }
-
-    if(p_minorAxis) {
-      delete p_minorAxis;
-      p_minorAxis = NULL;
-    }
-
-    if(p_polarAxis) {
-      delete p_polarAxis;
-      p_polarAxis = NULL;
+    if(p_localRadius) {
+      delete p_localRadius;
+      p_localRadius = NULL;
     }
 
     if(p_rectCovar) {

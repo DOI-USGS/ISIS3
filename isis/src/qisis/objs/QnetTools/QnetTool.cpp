@@ -1011,9 +1011,6 @@ namespace Isis {
       vector<Distance> targetRadii = m_controlNet->GetTargetRadii();
       if (m_editPoint->HasAprioriCoordinates()) {
         SurfacePoint aprioriPt = m_editPoint->GetAprioriSurfacePoint();
-        aprioriPt.SetRadii(Distance(targetRadii[0]),
-                           Distance(targetRadii[1]),
-                           Distance(targetRadii[2]));
         Distance latSigma = aprioriPt.GetLatSigmaDistance();
         Distance lonSigma = aprioriPt.GetLonSigmaDistance();
         Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
@@ -2649,7 +2646,6 @@ namespace Isis {
 
     if (aprioriPoint.Valid()) {
       vector<Distance> targRadii = m_controlNet->GetTargetRadii();
-      aprioriPoint.SetRadii(targRadii[0],targRadii[1],targRadii[2]);
 
       if (aprioriPoint.GetLatSigmaDistance().meters() == Null) {
         s = "Apriori Latitude Sigma:  Null";

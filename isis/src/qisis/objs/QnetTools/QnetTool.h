@@ -249,6 +249,8 @@ namespace Isis {
    *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
    *                           SerialNumberList.remove()
    *                           
+   *   @history 2018-06-28 Debbie A Cook - Removed all calls to obsolete method 
+   *                           SurfacePoint::SetRadii.
    */
   class QnetTool : public Tool {
     Q_OBJECT
