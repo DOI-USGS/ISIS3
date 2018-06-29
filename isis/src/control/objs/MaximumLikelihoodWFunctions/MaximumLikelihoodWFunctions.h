@@ -58,6 +58,8 @@ namespace Isis {
    *                           methods.
    *   @history 2014-09-19 Jeannie Backer - Removed bugs. Added documentation. Cleaned
    *                           duplicate code.
+   *   @history 2018-06-29 Christopher Combs - Added extra HuberModified case to stringToModel(). 
+   *                           Fixes #5446.
    */
   class MaximumLikelihoodWFunctions {
   public:
