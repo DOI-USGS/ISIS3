@@ -56,7 +56,7 @@ namespace Isis {
       makeReadOnly();
     }
 
-
+    m_bundleSettings = BundleSettingsQsp(new BundleSettings());
 
     //connect( m_project->directory()->model(), SIGNAL(selectionChanged(QList<ProjectItem *> &)),
     //         this, SLOT(on_projectItemSelectionChanged(const QList<ProjectItem *> &) ) );
@@ -102,6 +102,46 @@ namespace Isis {
 
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
+
+
+    // Create default settings for all of the observations
+    BundleObservationSolveSettings defaultObservationSettings;
+    QList<BundleObservationSolveSettings> solveSettingsList;
+
+    // If we have selected any project items, add them to the default obs solve settings object
+    if (!m_project->directory()->model()->selectedItems().isEmpty()) {
+      foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
+        if (projItem->isImage()) {
+          defaultObservationSettings.addObservationNumber(projItem->image()->serialNumber());  
+        }
+        else if (projItem->isImageList()) {
+          for (int i = 0; i < projItem->rowCount(); i++) {
+            ProjectItem * childItem = projItem->child(i);
+            defaultObservationSettings.addObservationNumber(childItem->image()->serialNumber());  
+          }
+        }
+      }
+    }
+    // if we didnt have any images selected in the previous case, or no proj items were selected,
+    // take all images from the project tree
+    if (defaultObservationSettings.observationNumbers().isEmpty()) {
+      ProjectItem *imgRoot = m_project->directory()->model()->findItemData(QVariant("Images"),0);
+      if (imgRoot) {
+        for (int i = 0; i < imgRoot->rowCount(); i++) {
+          ProjectItem * imglistItem = imgRoot->child(i);
+          for (int j = 0; j < imglistItem->rowCount(); j++) {
+            ProjectItem * imgItem = imglistItem->child(j);
+            if (imgItem->isImage()) {
+              defaultObservationSettings.addObservationNumber(imgItem->image()->serialNumber());  
+            }
+          }
+        } 
+      }
+    }
+    solveSettingsList.append(defaultObservationSettings);
+    m_bundleSettings->setObservationSolveOptions(solveSettingsList);
+
+
 
     // Populate the solve option comboboxes
     const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
@@ -410,8 +450,6 @@ namespace Isis {
 
   void JigsawSetupDialog::fillFromSettings(const BundleSettingsQsp settings) {
 
-    BundleObservationSolveSettings observationSolveSettings = settings->observationSolveSettings(0);
-
     // general tab
     m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
     m_ui->pointRadiusSigmaCheckBox->setChecked(settings->solveRadius());
@@ -421,37 +459,6 @@ namespace Isis {
     m_ui->outlierRejectionMultiplierLineEdit->setText(toString(settings->outlierRejectionMultiplier()));
     m_ui->sigma0ThresholdLineEdit->setText(toString(settings->convergenceCriteriaThreshold()));
     m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
-
-
-    // m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
-    m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
-    m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
-    m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
-
-
-    int pointingOption = observationSolveSettings.instrumentPointingSolveOption();
-    if (pointingOption == 0) {
-      pointingOption = 1;
-    }
-    if (pointingOption == 1) {
-      pointingOption = 0;
-    }
-
-    if ( pointingOption > 0 ) {
-      m_ui->twistCheckBox->setEnabled(true);
-    }
-    else {
-      m_ui->twistCheckBox->setEnabled(true);
-    }
-
-    // m_ui->pointingComboBox->setCurrentIndex(pointingOption);
-//    m_ui->pointingComboBox->setCurrentIndex(observationSolveSettings.instrumentPointingSolveOption());
-
-
-    m_ui->twistCheckBox->setChecked(observationSolveSettings.solveTwist());
-    m_ui->fitOverPointingCheckBox->setChecked(observationSolveSettings.solvePolyOverPointing());
-    m_ui->ckDegreeSpinBox->setValue(observationSolveSettings.ckDegree());
-    m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
 
     // weighting tab
     if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
@@ -468,46 +475,6 @@ namespace Isis {
 
     }
 
-    QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
-
-    if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
-      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
-      m_ui->positionSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
-      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
-      m_ui->velocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
-      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
-      m_ui->accelerationSigmaLineEdit->setModified(true);
-    }
-
-    QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
-
-    if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
-      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
-      m_ui->pointingAnglesSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
-      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
-      m_ui->pointingAngularVelocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setModified(true);
-    }
-
-    // maximum liklihood tab
-
-    // self-calibration tab
-
-    // target body tab
-
     update();
 
   }
@@ -515,7 +482,7 @@ namespace Isis {
 
   BundleSettingsQsp JigsawSetupDialog::bundleSettings() {
 
-    BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+    BundleSettingsQsp settings = m_bundleSettings;
     settings->setValidateNetwork(true);
 
     // solve options
@@ -729,10 +696,6 @@ namespace Isis {
 
       settings->setBundleTargetBody(bundleTargetBody);
     }
-
-     // output options
-//???     settings->setOutputFilePrefix("");
-
     return settings;
   }
 
@@ -1531,7 +1494,9 @@ namespace Isis {
     }
 
     m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
-    m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    if (!m_ui->treeView->selectionModel()->selectedRows().isEmpty()) {
+      m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    }
   }
 
 
@@ -1775,16 +1740,12 @@ namespace Isis {
          else {
           m_ui->treeView->setRootIndex(QModelIndex());
          }
-    
+  
+    connect(m_ui->treeView->selectionModel(), 
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+            this, 
+            SLOT(treeViewSelectionChanged(const QItemSelection&,const QItemSelection&)));
 
-    // Generate observation numbers for the images
-    QStringList observationNumbers;
-
-    // Create default settings for all of the observations
-    BundleObservationSolveSettings defaultObservationSettings;
-    foreach (const QString &observationNumber, observationNumbers) {
-      defaultObservationSettings.addObservationNumber(observationNumber); 
-    }
 
     // Try to loop through the view here to add the "groups" so they aren't part of the model
 
@@ -1795,102 +1756,92 @@ namespace Isis {
   }
 
 
+  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
+  }
 
 
-// Commented out since it contains some unimplemented functions (i.e. pseudo-code)
 
+  /**
+   * Slot for handling the Observation Solve Settings tab's Apply button. Retrieve's the selected
+   * ProjectItems and adds their images' serial numbers to a new BundleObservationSolveSettings
+   * object. Serial numbers will be removed from all other BOSS objects, and empty BOSS objects will
+   * be removed. 
+   */ 
   void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
 
-    BundleObservationSolveSettings boss;
+    // Get the current selected images and the item models
+    SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model();
+    ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
 
-    updateBundleObservationSolveSettings(boss);
-
-  }
-#if 0
-    // Get the current selected images
-    QAbstractProxyModel *model = m_ui->treeView->model();
-    // QItemSelectionModel *selectionModel = m_ui->treeView->selectionModel();
-    QModelIndexList selectedIndexes = m_ui->treeView->selectedIndexes();
+    QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
+
+    // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
-      QMap<int, QVariant> data = model->index(index);
-      qDebug() << "selected data: " << data;
-      // Cast the data to image (i think ProjectItem shows QVariant conversions)
-      // Get the observation number from the image
-      // Append the observation number to the selectedObservationNumbers
-    }
+      QModelIndex sourceIndex = proxyModel->mapToSource(index);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
 
-    // check to see if all the images are selected
-
-    // If not, 
-    {  
-      // We are going to need to reset the bundle observation solve settings list for bundle settings
-      QList<BundleObservationSolveSettings> solveSettingsList;
-
-      // Grab the bundle settings
-      // (NOTE -- bundleSettings() needs to be changed so it can
-      // give us just a m_bundleSettings member we have for this current run of jigsaw, and the
-      // logic for filling the settings and bundle observation solve settings from the view needs
-      // to be put into two methods, like updateSettings() and updateBundleObservationSolveSettings())
-      BundleSettingsQsp bundleSettings = bundleSettings();
-
-      //find the bundle observation solve settings for each of the selected observations and remove
-      // the observation number from them 
-      for (int i = 0; i < bundleSettings->numberSolveSettings(); i++) {
-        foreach (observationNumber, selectedObservationNumbers) {
-          bundleSettings->observationSolveSettings(i).removeObservationNumber(observationNumber);
+      if (projItem) {
+        // Tree traversal is top down so we dont need to do this check for imagelists?
+        if (projItem->isImage() && 
+            !selectedObservationNumbers.contains(projItem->image()->serialNumber())) {
+          selectedObservationNumbers.append(projItem->image()->serialNumber());
+        }
+        else if (projItem->isImageList()) {
+          // Use the proxymodel's children as it might not include all of the sourcemodel's children 
+          for (int i = 0; i < proxyModel->rowCount(index); i++) {
+            QModelIndex childProxyIndex = proxyModel->index(i, 0, index);
+            QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
+            ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
+            selectedObservationNumbers.append(childItem->image()->serialNumber());
+          }
         }
       }
-
-      // Remove any existing solve settings that no longer have any observation numbers
-      for (int i = 0; i < bundleSettings.numberSolveSettings(); i++) {
-        if (! bundleSettings->observationSolveSettings(i).observationNumbers().isEmpty() ) {
-          solveSettingsList.append(bundleSettings->observationSolveSettings(i));
-        }
-      }
-
-
-      // Create a new bundle observation solve settings
-      BundleObservationSolveSettings solveSettings;
-      // Add the selected observation numbers to the new bundle observation solve settings
-      foreach (observationNumber, selectedObservationNumbers) {
-        solveSettings.addObservationNumber(observationNumber);
-      }
-
-      // Grab the data from the right hand side of the observation solve settings tab to set
-      // up the new bundle observation solve settings
-      updateBundleObservationSolveSettings(solveSettings);
-
-      // Add the new solve settings to the solve settings list
-      solveSettingsList.append(solveSettings);
-
-      // Update bundle settings with the new list of bundle observation solve settings
-      bundleSettings->setObservationSolveOptions(solveSettingsList);
-
-    } 
- 
-    // Otherwise (if all images are selected)
-    {
-      // just create a new observation solve settings
-      BundleObservationSolveSettings boss;
-      // add all the observation numbers to it
-      foreach (observationNumber, selectedObservationNumbers) {
-        boss.addObservationNumber(observationNumber);
-      }
-
-      // update the solve settings from the observation solve settings tab
-      updateBundleObservationSolveSettings(boss);
-
-      bundleSettings()->setObservationSolveOptions(QList<BundleObservationSolveSettings>{boss});
     }
 
+    QList<BundleObservationSolveSettings> solveSettingsList = m_bundleSettings->observationSolveSettings();
+
+    //find the bundle observation solve settings for each of the selected observations and remove
+    // the observation number from them 
+    for (auto &solveSettings : solveSettingsList) {      
+      foreach (QString observationNumber, selectedObservationNumbers) {
+        solveSettings.removeObservationNumber(observationNumber);
+      }
+    }
+
+
+    // Remove any existing solve settings that no longer have any observation numbers
+    int iter = 0;
+    while (iter < solveSettingsList.count()) {
+      if (solveSettingsList[iter].observationNumbers().isEmpty() ) {
+        solveSettingsList.removeAt(iter);
+      }
+      else {
+        iter++; // This list shrinks as we remove, so we dont need to iterate every time
+      }
+    }
+
+    // Create a new bundle observation solve settings
+    BundleObservationSolveSettings solveSettings;
+    foreach (QString observationNumber, selectedObservationNumbers) {
+      solveSettings.addObservationNumber(observationNumber);
+    }
+
+    // Grab the data from the right hand side of the observation solve settings tab to set
+    // up the new bundle observation solve settings
+    updateBundleObservationSolveSettings(solveSettings);
+
+    // Add the new solve settings to the solve settings list
+    solveSettingsList.append(solveSettings);
+
+    // Update bundle settings with the new list of bundle observation solve settings
+    m_bundleSettings->setObservationSolveOptions(solveSettingsList);
+
+    qDebug()<<"Current BOSS list --------";
+    for (int i = 0; i < solveSettingsList.count(); i++) {
+      qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
+    }
   }
-#endif
-
-
-
-  // void JigsawSetupDialog::generateObservationNumbers() {
-
-  // }
 
 }
