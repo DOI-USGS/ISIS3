@@ -259,6 +259,15 @@ namespace Isis {
 
     public:
 
+      /**
+       *  @brief Control Point Modification Types
+       *
+       *  This enum is designed to represent the different types of modifications that can be
+       *  made to a ControlNet.
+       *
+       *  Swapped means the network was swapped with another network (ControlNet::Swap(ControlNet &other)).
+       *  GraphModified means that a vertice or edge was added/removed from the graph..
+       */
       enum ModType {
         Swapped,
         GraphModified

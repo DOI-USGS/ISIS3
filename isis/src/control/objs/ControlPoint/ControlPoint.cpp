@@ -321,6 +321,16 @@ namespace Isis {
     return ControlMeasure::Success;
   }
 
+
+  /**
+   * This method is a wrapper to emit the measureModified() signal in the parent network
+   * is called whenever a change is made to a Control Measure.
+   *
+   * @param measure The ControlMeasure* that was modified.
+   * @param type The ControlMeasure::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
   void ControlPoint::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue) {
     if (parentNetwork) {
       parentNetwork->emitMeasureModified(measure, modType, oldValue, newValue);
