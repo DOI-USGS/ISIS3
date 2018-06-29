@@ -1756,9 +1756,14 @@ namespace Isis {
   }
 
 
-  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
-    m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
-    QModelIndexList indexList = selected.indexes();
+  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, 
+                                                   const QItemSelection &deselected) {
+    QModelIndexList indexList = m_ui->treeView->selectionModel()->selectedRows();
+
+    // qDebug() << "\n\nselected: " << selected.indexes();
+    // qDebug() << "deselected: " << deselected.indexes();
+    // qDebug() << "selectedRows: " << m_ui->treeView->selectionModel()->selectedRows();
+
 
     if (!indexList.isEmpty()) {
       QModelIndex displayIndex = indexList[0];
@@ -1769,18 +1774,41 @@ namespace Isis {
       QModelIndex sourceIndex = proxyModel->mapToSource(displayIndex);
       ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
 
-      // TODO - CASE : projitem is an imagelist
+      if (projItem->isImageList()) {
+        projItem = projItem->child(0);  
+      }
       BundleObservationSolveSettings settings = m_bundleSettings->observationSolveSettings(
                                                                 projItem->image()->serialNumber());
 
       // Populate RHS of Observation Solve Settings tab with selected image's BOSS
       // Instrument Position Solve Options
-      m_ui->positionComboBox->setValue(settings.instrumentPositionSolveOption());
+      m_ui->positionComboBox->setCurrentIndex(settings.instrumentPositionSolveOption());
       m_ui->spkSolveDegreeSpinBox->setValue(settings.spkSolveDegree());
       m_ui->spkDegreeSpinBox->setValue(settings.spkDegree());
       m_ui->hermiteSplineCheckBox->setChecked(settings.solvePositionOverHermite());
 
+      for (int row = 0; row < settings.aprioriPositionSigmas().count(); row++) {
+        QTableWidgetItem * sigmaItem = m_ui->positionAprioriSigmaTable->item(row, 3);
+        double sigma = settings.aprioriPositionSigmas()[row];
+        sigmaItem->setText(QString::number(sigma));
+      }
+
+      // Instrument Pointing Solve Options
+      m_ui->pointingComboBox->setCurrentIndex(settings.instrumentPointingSolveOption());
+      m_ui->ckSolveDegreeSpinBox->setValue(settings.ckSolveDegree());
+      m_ui->ckDegreeSpinBox->setValue(settings.ckDegree());
+      m_ui->twistCheckBox->setChecked(settings.solveTwist());
+      m_ui->fitOverPointingCheckBox->setChecked(settings.solvePolyOverPointing());
+
+      for (int row = 0; row < settings.aprioriPointingSigmas().count(); row++) {
+        QTableWidgetItem * sigmaItem = m_ui->pointingAprioriSigmaTable->item(row, 3);
+        double sigma = settings.aprioriPointingSigmas()[row];
+        sigmaItem->setText(QString::number(sigma));
+      }      
+
     } 
+
+    m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
   }
 
 
@@ -1803,7 +1831,7 @@ namespace Isis {
     // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
       QModelIndex sourceIndex = proxyModel->mapToSource(index);
-      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex); summer is so awesome
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
 
       if (projItem) {
         // Tree traversal is top down so we dont need to do this check for imagelists?
