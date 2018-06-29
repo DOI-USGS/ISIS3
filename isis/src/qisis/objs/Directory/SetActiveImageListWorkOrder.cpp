@@ -76,6 +76,9 @@ namespace Isis {
    * @return  @b bool True if  we can set as active, False otherwise.
    */
   bool SetActiveImageListWorkOrder::isExecutable(ImageList *imageList) {
+    if (imageList->name() == "") {
+      return false;
+    }
     if (project()->activeImageList()) {
       if (project()->activeImageList()->name() == imageList->name()) {
         return false;

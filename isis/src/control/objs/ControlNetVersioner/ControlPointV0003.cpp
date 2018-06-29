@@ -19,18 +19,18 @@ namespace Isis {
    * @param pointData The protobuf message from a control net file.
    */
   ControlPointV0003::ControlPointV0003(QSharedPointer<ControlPointFileEntryV0002> pointData)
-   : m_pointData(pointData) {
+      : m_pointData(pointData) {
 
-   }
+  }
 
 
   /**
-   * Create a ControlPointV0003 object from a version 4 control point Pvl object
+   * Create a ControlPointV0003 object from a version 3 or 4 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
    */
   ControlPointV0003::ControlPointV0003(PvlObject &pointObject)
-   : m_pointData(new ControlPointFileEntryV0002) {
+      : m_pointData(new ControlPointFileEntryV0002) {
 
     // Copy over strings, doubles, and bools
     copy(pointObject, "PointId",
@@ -75,15 +75,15 @@ namespace Isis {
     // In version 4, these were changed to fixed, free, and constrained respectively.
     // The protobuf file version was not changed, fixed and free were simply added to the
     // enumeration and the old names were flagged as obsolete.
-    if (pointObject["PointType"][0] == "Fixed" ||
-        pointObject["PointType"][0] == "Ground") {
+    if (pointObject["PointType"][0] == "Fixed"
+        || pointObject["PointType"][0] == "Ground") {
       m_pointData->set_type(ControlPointFileEntryV0002::Fixed);
     }
     else if (pointObject["PointType"][0] == "Constrained") {
       m_pointData->set_type(ControlPointFileEntryV0002::Constrained);
     }
-    else if (pointObject["PointType"][0] == "Free" ||
-             pointObject["PointType"][0] == "Tie") {
+    else if (pointObject["PointType"][0] == "Free"
+             || pointObject["PointType"][0] == "Tie") {
       m_pointData->set_type(ControlPointFileEntryV0002::Free);
     }
     else {
@@ -240,7 +240,6 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
-
           ControlPointFileEntryV0002_Measure_MeasureLogData protoBufDataEntry;
 
           protoBufDataEntry.set_doubledatatype(interpreter.GetDataType());
@@ -262,12 +261,12 @@ namespace Isis {
 
 
   /**
-   * Create a ControlPointV0003 object from a PvlControlPointV0002 object
+   * Create a ControlPointV0003 object from a ControlPointV0002 object
    *
    * @param oldPoint The PvlControlPointV0002 that will be upgraded to V0003.
    */
   ControlPointV0003::ControlPointV0003(ControlPointV0002 &oldPoint)
-   : m_pointData(new ControlPointFileEntryV0002) {
+      : m_pointData(new ControlPointFileEntryV0002) {
     QSharedPointer<ControlNetFileProtoV0001_PBControlPoint> oldPointData = oldPoint.pointData();
     if (!oldPointData) {
       QString msg = "Version 2 control point is missing point data.";
@@ -513,11 +512,15 @@ namespace Isis {
         // Copy over any log data
         ControlNetLogDataProtoV0001_Point_Measure measureLogData = oldLogData->measures(i);
         for (int j = 0; j < measureLogData.loggedmeasuredata_size(); j++) {
+
           ControlNetLogDataProtoV0001_Point_Measure_DataEntry oldData =
-                measureLogData.loggedmeasuredata(j);
+              measureLogData.loggedmeasuredata(j);
+
           ControlPointFileEntryV0002_Measure_MeasureLogData newData;
+
           newData.set_doubledatatype( oldData.datatype() );
           newData.set_doubledatavalue( oldData.datavalue() );
+
           *newMeasure->add_log() = newData;
         }
 
@@ -530,7 +533,7 @@ namespace Isis {
       }
     }
 
-    // Check that all fo the required fields in the point are filled
+    // Check that all of the required fields in the point are filled
     if ( !m_pointData->IsInitialized() ) {
       QString msg = "Control point file entry is missing required fields.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -558,14 +561,14 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -583,21 +586,22 @@ namespace Isis {
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (point.data()->*setter)(true);
+    }
   }
 
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -619,14 +623,14 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
    * @param container The PvlContainer representation of the control point that contains the
    *                  PvlKeyword.
    * @param keyName The name of the keyword to be copied.
-   * @param point[out] The version 2 protobuf representation of the control point that the value
+   * @param[out] point The version 2 protobuf representation of the control point that the value
    *                   will be copied into.
    * @param setter The protobuf mutator method that sets the value of the field in the protobuf
    *               representation.
@@ -636,8 +640,9 @@ namespace Isis {
                                QSharedPointer<ControlPointFileEntryV0002> point,
                                void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
@@ -647,7 +652,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a boolean value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -664,21 +669,23 @@ namespace Isis {
                                ControlPointFileEntryV0002_Measure &measure,
                                void (ControlPointFileEntryV0002_Measure::*setter)(bool)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     QString value = container[keyName][0];
     container.deleteKeyword(keyName);
     value = value.toLower();
 
-    if (value == "true" || value == "yes")
+    if (value == "true" || value == "yes") {
       (measure.*setter)(true);
+    }
   }
 
 
   /**
    * This convenience method takes a double value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *
@@ -695,8 +702,9 @@ namespace Isis {
                                ControlPointFileEntryV0002_Measure &measure,
                                void (ControlPointFileEntryV0002_Measure::*setter)(double)) {
 
-    if (!container.hasKeyword(keyName))
+    if (!container.hasKeyword(keyName)) {
       return;
+    }
 
     double value = toDouble(container[keyName][0]);
     container.deleteKeyword(keyName);
@@ -706,7 +714,7 @@ namespace Isis {
 
   /**
    * This convenience method takes a string value from a PvlKeyword and copies it into a version 2
-   * protobuf field.
+   * protobuf field. Once copied, the PvlKeyword is deleted.
    *
    * If the keyword doesn't exist, this does nothing.
    *

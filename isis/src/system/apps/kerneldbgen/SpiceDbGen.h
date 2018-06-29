@@ -45,6 +45,13 @@
  *   @history 2010-04-27 Stuart Sides - Modified Direct member to use a vector
  *                           of filters instead of a single QString
  *   @history 2013-02-15 Steven Lambright - Added support for extra kernel dependencies
+ *   @history 2018-01-10 Christopher Combs - Added passing startOffset and endOffset to allow
+ *                           the passing of time offsets to to FormatIntervals. Fixes #5272.
+ *   @history 2018-05-09 Kristin Berry - Added information about the Spice time coverage level
+ *                            to this class: m_coverageLevel, setCoverageLevel, and this class will
+ *                            now select spice "time intervals" at the level specified. This is
+ *                            either a SPICE Segment (coarse) or a SPICE interval (fine.)
+ *                            Fixes #5410. 
  *
  */
 class SpiceDbGen {
@@ -52,17 +59,19 @@ class SpiceDbGen {
   public:
     SpiceDbGen(QString type);
     Isis::PvlObject Direct(QString quality, QString location,
-                           std::vector<QString> & filter);
+                           std::vector<QString> & filter, double startOffset, double endOffset);
     void FurnishDependencies(QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
                              QList<Isis::FileName> extras);
+    void setCoverageLevel(QString level); 
 
   private:
     QStringList GetFiles(Isis::FileName location, QString filter);
-    Isis::PvlGroup AddSelection(Isis::FileName fileIn);
-    Isis::PvlGroup FormatIntervals(SpiceCell &coverage, QString type);
+    Isis::PvlGroup AddSelection(Isis::FileName fileIn, double startOffset, double endOffset);
+    Isis::PvlGroup FormatIntervals(SpiceCell &coverage, QString type, double startOffset, double endOffset);
     Isis::PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables
     QString p_type;
+    QString m_coverageLevel; //! The time coverage level of the database: INTERVAL or SEGMENT
     static const char *calForm;
 };
 

@@ -69,6 +69,10 @@ unittest: Exporting
 unittest: Exporting
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 
+Testing xml input
+unittest: Exporting
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
 Testing export pixel types
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>

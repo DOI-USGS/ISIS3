@@ -46,7 +46,6 @@ void setFilter(int size, double stdDev) {
   //Iterate through the input kernel's data values to fill the coefs array
   const double PI = 3.141592653589793;
   int i = 0;
-  cout << exp((double)1.0) << endl;
   for(double y = -(size / 2) ; y <= (size / 2) ; y++) {
     for(double x = -(size / 2) ; x <= (size / 2) ; x++) {
       /*

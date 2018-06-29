@@ -40,7 +40,8 @@ const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.###### TDB ::TDB";
 */
 SpiceDbGen::SpiceDbGen(QString type) {
   p_type = type;
-//  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
+  m_coverageLevel = "SEGMENT"; // default
+  //  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
 }
 
 
@@ -71,7 +72,7 @@ SpiceDbGen::SpiceDbGen(QString type) {
  * @throws Isis::iException::Message
 */
 PvlObject SpiceDbGen::Direct(QString quality, QString location,
-                             std::vector<QString> &filter) {
+                             std::vector<QString> &filter, double startOffset, double endOffset) {
   PvlObject result;
   QString type = "none";
 
@@ -90,7 +91,7 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
 
     for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
       FileName currFile((QString) location + "/" + files[fileNum]);
-      PvlGroup selection = AddSelection(currFile);
+      PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
       selection += PvlKeyword("Type", quality);
       result.addGroup(selection);
     }
@@ -156,6 +157,17 @@ QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
 
 
 /**
+ * Sets the desired time coverage level of the Spice database. 
+ * 
+ * @param level The desired time coverage level. May be either Segment or 
+ *              Interval.  
+ */
+void SpiceDbGen::setCoverageLevel(QString level) {
+  m_coverageLevel = level; 
+}
+
+
+/**
   * Format a single kernel file to include the file.
   *
   * @param fileIn   The file name being added
@@ -164,7 +176,7 @@ QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
   *
   * @throws Isis::iException::Message
   */
-PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
+PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double endOffset) {
   NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
@@ -220,18 +232,24 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 
         NaifStatus::CheckErrors();
 
-        result = FormatIntervals(cover, currFile);
+        result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
       else if (currFile == "CK") {
         //  200,000 is the max coverage window size for a CK kernel
         SPICEDOUBLE_CELL(cover, 200000);
         ssize_c(0, &cover);
         ssize_c(200000, &cover);
-        ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
+
+        // A SPICE SEGMENT is composed of SPICE INTERVALS
+        if (QString::compare(m_coverageLevel, "SEGMENT", Qt::CaseInsensitive) == 0 ) {
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover); 
+        }
+        else {
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "INTERVAL", 0.0, "TDB", &cover);
+        }
 
         NaifStatus::CheckErrors();
-
-        result = FormatIntervals(cover, currFile);
+        result = FormatIntervals(cover, currFile, startOffset, endOffset);
       }
     }
   }
@@ -248,7 +266,8 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 }
 
 
-PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
+PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
+                                     double startOffset, double endOffset) {
   NaifStatus::CheckErrors();
 
   PvlGroup result(type);
@@ -261,8 +280,11 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
     //Get the endpoints of the jth interval.
     wnfetd_c(&coverage, j, &begin, &end);
     //Convert the endpoints to TDB calendar
+    begin -= startOffset;
+    end += endOffset;
     timout_c(begin, calForm, 35, begStr);
     timout_c(end, calForm, 35, endStr);
+    
     result += PvlKeyword("Time", "(\"" + (QString)begStr +
                          "\", \"" + (QString)endStr + "\")");
   }

@@ -123,6 +123,9 @@ namespace Isis {
    *  @history 2017-01-18 Jesse Mapel - Updated documentation and error messages. Fixes #4584.
    *  @history 2017-01-25 Jesse Mapel - Created unit test. Fixes #4584.
    *  @history 2017-05-26 Makayla Shepherd - Renamed XmlToPvlTranslationManager.
+   *  @history 2018-02-15 Kristin Berry and Summer Stapleton - Updated translate() method to search
+   *                          for multiple values for InputPosition keyword. Fixes #5332
+   *  @history 2018-04-16 Jeannie Backer - Improved error message for keyword dependencies.
    */
   class XmlToPvlTranslationManager : public LabelTranslationManager {
     public:
@@ -140,7 +143,7 @@ namespace Isis {
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      virtual QString Translate(QString nName, int findex = 0);
+      virtual QString Translate(QString translationGroupName, int findex = 0);
 
       // Translate all translation table groups which contain "Auto"
       using LabelTranslationManager::Auto;

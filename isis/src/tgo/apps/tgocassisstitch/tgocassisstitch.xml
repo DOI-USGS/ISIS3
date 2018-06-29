@@ -26,6 +26,9 @@
       Backward Compatibility Issue: Changed name from stitch to tgocassisstitch and
       changed output parameter name "TO" to "OUTPUTPREFIX."
     </change>
+    <change name="Adam Goins" date="2018-02-15">
+      Modified stitchFrame to store the Archive group for ingested framelets. Fixes #5333.
+    </change>
   </history>
 
   <category>

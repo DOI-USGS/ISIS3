@@ -3,13 +3,13 @@
 #include <iostream>
 
 #include <QAction>
-#include <QStatusBar>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
+#include <QStatusBar>
 #include <QTableWidget>
 #include <QToolBar>
 
@@ -586,20 +586,16 @@ namespace Isis {
     QHeaderView *header = p_table->horizontalHeader();
     QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
-    for(int columnIndex = 0; columnIndex < p_table->model()->columnCount(); columnIndex++)
-    {
+    for (int columnIndex = 0; columnIndex < p_table->model()->columnCount(); columnIndex++) {
+
        QString headerName = p_table->model()->headerData(columnIndex, Qt::Horizontal).toString();
-
        QString settingName = "column-" + headerName;
-
        QString value = settings.value(settingName, "auto").toString();
 
-       if (value == "auto" || value == "0")
-       {
+       if (value == "auto" || value == "0") {
           header->setSectionResizeMode(columnIndex, QHeaderView::ResizeToContents);
        }
-       else
-       {
+       else {
          int width = value.toInt();
 
          header->setSectionResizeMode(columnIndex, QHeaderView::Interactive);

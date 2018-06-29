@@ -152,6 +152,10 @@
       Added STARTOFFSET and ENDOFFSET parameters to allow for slight editing to start and end times.
       Fixes #5272.
     </change>
+    <change name="Kristin Berry" date="2018-05-09">
+      Added the LEVEL=(SEGMENT*, INTERVAL) option to specify the time coverage level to be used for the generated database. SPICE segements are made up of SPICE intervals. 
+      Segments (the only option in the past) are now the default, but interval can be selected if needed. Fixes #5410. 
+    </change>
   </history>
 
   <groups>
@@ -217,6 +221,37 @@
               <item>NADIRDIR</item>
               -->
             </exclusions>
+          </option>
+        </list>
+      </parameter>
+    </group>
+    <group name="Coverage Level">
+      <parameter name="LEVEL">
+        <type>string</type>
+        <default>
+          <item>SEGMENT</item>
+        </default>
+        <brief>
+           The level of time-granularity for the time-coverage interval to be output to the SPICE database. 
+        </brief>
+        <description>
+        </description>
+        <list>
+          <option value="SEGMENT">
+            <brief>
+              SPICE Segment             
+            </brief>
+            <description>
+              The coarsest level of time granularity, a SPICE segment is composed of SPICE intervals.              
+            </description>
+          </option>
+          <option value="INTERVAL">
+            <brief>
+              SPICE Interval 
+            </brief>
+            <description>
+              A finer level of time granularity. 
+            </description>
           </option>
         </list>
       </parameter>
@@ -339,7 +374,7 @@
         <description>
           This parameter is used to specify the amount of offset (in seconds) to apply to the 
           StartTime value for each kernel that is used to populate the db file. This value will be
-          subtracted the value found in the kernel. If left as 0.0, no offset will be applied, and 
+          subtracted from the value found in the kernel. If left as 0.0, no offset will be applied, and 
           the Time will be copied over as written in the kernel.
         </description>
         <default>
@@ -649,10 +684,5 @@
         </dataFile>
       </dataFiles>
     </example>
-
-
-
-
-
   </examples>
 </application>

@@ -275,9 +275,8 @@ namespace Isis {
     m_bundleSettings = bundleSettings;
 
     m_abort = false;
-    Progress progress;
     try {
-      m_controlNet = ControlNetQsp( new ControlNet(control.fileName(), &progress) );
+      m_controlNet = ControlNetQsp( new ControlNet(control.fileName()) );
     }
     catch (IException &e) {
       throw;
@@ -551,8 +550,9 @@ namespace Isis {
    *                           printed to stdout. References #4313.
    */
   bool BundleAdjust::validateNetwork() {
+     
     outputBundleStatus("\nValidating network...");
-
+    
     int imagesWithInsufficientMeasures = 0;
     QString msg = "Images with one or less measures:\n";
     int numObservations = m_bundleObservations.size();
@@ -576,8 +576,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    outputBundleStatus("Validation complete!...");
-
+    outputBundleStatus("\nValidation complete!...\n");
+    
     return true;
   }
 
@@ -680,7 +680,7 @@ namespace Isis {
    *
    * @TODO make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
    */
-  BundleSolutionInfo BundleAdjust::solveCholeskyBR() {
+  BundleSolutionInfo* BundleAdjust::solveCholeskyBR() {
     solveCholesky();
     return bundleSolveInformation();
   }
@@ -803,7 +803,7 @@ namespace Isis {
 
         // solve the system
         if (!solveSystem()) {
-          printf("solve failed!\n");
+          outputBundleStatus("\nsolve failed!");
           m_bundleResults.setConverged(false);
           break;
         }
@@ -855,20 +855,20 @@ namespace Isis {
         char format = 'f';
         int precision = 10;
 
-        emit statusUpdate(QString("Iteration: %1")
+        emit statusUpdate(QString("Iteration: %1 \n")
                                   .arg(m_iteration));
-        emit statusUpdate(QString("Sigma0: %1")
+        emit statusUpdate(QString("Sigma0: %1 \n")
                                   .arg(m_bundleResults.sigma0(),
                                        fieldWidth,
                                        format,
                                        precision));
-        emit statusUpdate(QString("Observations: %1")
+        emit statusUpdate(QString("Observations: %1 \n")
                                   .arg(m_bundleResults.numberObservations()));
-        emit statusUpdate(QString("Constrained Parameters:%1")
+        emit statusUpdate(QString("Constrained Parameters:%1 \n")
                                   .arg(m_bundleResults.numberConstrainedPointParameters()));
-        emit statusUpdate(QString("Unknowns: %1")
+        emit statusUpdate(QString("Unknowns: %1 \n")
                                   .arg(m_bundleResults.numberUnknownParameters()));
-        emit statusUpdate(QString("Degrees of Freedom: %1")
+        emit statusUpdate(QString("Degrees of Freedom: %1 \n")
                                   .arg(m_bundleResults.degreesOfFreedom()));
         emit iterationUpdate(m_iteration, m_bundleResults.sigma0());
 
@@ -914,7 +914,7 @@ namespace Isis {
 
           if ( numConvergedParams == numImgParams ) {
             m_bundleResults.setConverged(true);
-            emit statusUpdate("Bundle has converged");
+            emit statusUpdate("Bundle has converged\n");
             break;
           }
         }
@@ -923,8 +923,8 @@ namespace Isis {
         clock_t iterationStopClock = clock();
         double iterationTime = (iterationStopClock - iterationStartClock)
                                 / (double)CLOCKS_PER_SEC;
-        emit statusUpdate( QString("End of Iteration %1").arg(m_iteration) );
-        emit statusUpdate( QString("Elapsed Time: %1").arg(iterationTime,
+        emit statusUpdate( QString("End of Iteration %1 \n").arg(m_iteration) );
+        emit statusUpdate( QString("Elapsed Time: %1 \n").arg(iterationTime,
                                                            fieldWidth,
                                                            format,
                                                            precision) );
@@ -958,9 +958,11 @@ namespace Isis {
 
       if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
         clock_t errorPropStartClock = clock();
-        printf("Starting Error Propagation");
+        
+        outputBundleStatus("\nStarting Error Propagation");
+        
         errorPropagation();
-        emit statusUpdate("\n\nError Propagation Complete");
+        emit statusUpdate("\n\nError Propagation Complete\n");
         clock_t errorPropStopClock = clock();
         m_bundleResults.setElapsedTimeErrorProp((errorPropStopClock - errorPropStartClock)
                                                 / (double)CLOCKS_PER_SEC);
@@ -976,10 +978,9 @@ namespace Isis {
       m_bundleResults.setObservations(m_bundleObservations);
       m_bundleResults.setBundleControlPoints(m_bundleControlPoints);
 
-      BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
-      emit resultsReady(results);
+      emit resultsReady(bundleSolveInformation());
 
-      emit statusUpdate("\nBundle Complete");
+      emit statusUpdate("\nBundle Complete\n");
 
       iterationSummary();
     }
@@ -999,12 +1000,18 @@ namespace Isis {
   /**
    * Create a BundleSolutionInfo containing the settings and results from the bundle adjustment.
    *
-   * @return @b BundleSolutionInfo A container with solve information from the adjustment.
+   * @return @b BundleSolutionInfo A container with solve information from the adjustment. NOTE:
+   *            Caller takes ownership and is responsible for memory management of returned
+   *            BundleSolutionInfo raw pointer.
+   *
    */
-  BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
-    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults, imageLists());
-    results.setRunTime("");
-    return results;
+  BundleSolutionInfo *BundleAdjust::bundleSolveInformation() {
+    BundleSolutionInfo *bundleSolutionInfo = new BundleSolutionInfo(m_bundleSettings,
+                                                                    FileName(m_cnetFileName),
+                                                                    m_bundleResults,
+                                                                    imageLists());
+    bundleSolutionInfo->setRunTime("");
+    return bundleSolutionInfo;
   }
 
 
@@ -1062,8 +1069,8 @@ namespace Isis {
     int pointIndex = 0;
     int num3DPoints = m_bundleControlPoints.size();
 
-    printf("\n");
-
+    outputBundleStatus("\n\n");
+    
     for (int i = 0; i < num3DPoints; i++) {
 
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -1647,7 +1654,7 @@ namespace Isis {
                                                   -1, CHOLMOD_REAL, &m_cholmodCommon);
 
       if ( !m_cholmodTriplet ) {
-        printf("Triplet allocation failure");
+        outputBundleStatus("\nTriplet allocation failure\n");
         return false;
       }
 
@@ -1668,7 +1675,9 @@ namespace Isis {
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
 
       if ( !normalsColumn ) {
-        printf("SparseBlockColumnMatrix retrieval failure at column %d", columnIndex);
+        QString status = "\nSparseBlockColumnMatrix retrieval failure at column " + 
+                         QString::number(columnIndex);
+        outputBundleStatus(status);
         return false;
       }
 
@@ -1687,9 +1696,15 @@ namespace Isis {
 
         LinearAlgebra::Matrix *normalsBlock = it.value();
         if ( !normalsBlock ) {
-          printf("matrix block retrieval failure at column %d, row %d", columnIndex, rowIndex);
-          printf("Total # of block columns: %d", numBlockcolumns);
-          printf("Total # of blocks: %d", m_sparseNormals.numberOfBlocks());
+          QString status = "\nmatrix block retrieval failure at column ";
+          status.append(columnIndex);
+          status.append(", row ");
+          status.append(rowIndex);
+          outputBundleStatus(status);
+          status = "Total # of block columns: " + QString::number(numBlockcolumns);
+          outputBundleStatus(status);
+          status = "Total # of blocks: " + QString::number(m_sparseNormals.numberOfBlocks());
+          outputBundleStatus(status);
           return false;
         }
 
@@ -2460,17 +2475,26 @@ namespace Isis {
         medianDev = residuals[midpointIndex];
       }
 
-      std::cout << "median deviation: " << medianDev << std::endl;
-
+      QString status = "\nmedian deviation: ";
+      status.append(QString("%1").arg(medianDev));
+      status.append("\n");
+      outputBundleStatus(status);
+      
       mad = 1.4826 * medianDev;
 
-      std::cout << "mad: " << mad << "\n";
-
+      status = "\nmad: ";
+      status.append(QString("%1").arg(mad));
+      status.append("\n");
+      outputBundleStatus(status);
+      
       m_bundleResults.setRejectionLimit(median
                                         + m_bundleSettings->outlierRejectionMultiplier() * mad);
 
-      std::cout << "Rejection Limit: " << m_bundleResults.rejectionLimit() << std::endl;
-
+      status = "\nRejection Limit: ";
+      status.append(QString("%1").arg(m_bundleResults.rejectionLimit()));
+      status.append("\n");
+      outputBundleStatus(status);
+      
       return true;
   }
 
@@ -2497,6 +2521,8 @@ namespace Isis {
     int numComingBack = 0;
 
     int numObjectPoints = m_bundleControlPoints.size();
+    
+    outputBundleStatus("\n");
     for (int i = 0; i < numObjectPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
@@ -2521,7 +2547,10 @@ namespace Isis {
 
           // was it previously rejected?
           if ( measure->isRejected() ) {
-            printf("Coming back in: %s\r",point->id().toLatin1().data());
+            QString status = "Coming back in: ";
+            status.append(QString("%1").arg(point->id().toLatin1().data()));
+            status.append("\r");
+            outputBundleStatus(status);
             numComingBack++;
             m_controlNet->DecrementNumberOfRejectedMeasuresInImage(measure->cubeSerialNumber());
           }
@@ -2570,7 +2599,10 @@ namespace Isis {
       // do we still have sufficient remaining observations for this 3D point?
       if ( ( numMeasures-numRejected ) < 2 ) {
           point->setRejected(true);
-          printf("Rejecting Entire Point: %s\r",point->id().toLatin1().data());
+          QString status = "Rejecting Entire Point: ";
+          status.append(QString("%1").arg(point->id().toLatin1().data()));
+          status.append("\r");
+          outputBundleStatus(status);
       }
       else
           point->setRejected(false);
@@ -2579,12 +2611,20 @@ namespace Isis {
 
     int numberRejectedObservations = 2*totalNumRejected;
 
-    printf("\nRejected Observations:%10d (Rejection Limit:%12.5lf)\n",
-            numberRejectedObservations, usedRejectionLimit);
+    QString status = "\nRejected Observations:";
+    status.append(QString("%1").arg(numberRejectedObservations));
+    status.append(" (Rejection Limit:");
+    status.append(QString("%1").arg(usedRejectionLimit));
+    status.append(")\n");
+    outputBundleStatus(status);
+    
     m_bundleResults.setNumberRejectedObservations(numberRejectedObservations);
 
-    std::cout << "Measures that came back: " << numComingBack << "\n" << std::endl;
-
+    status = "\nMeasures that came back: ";
+    status.append(QString("%1").arg(numComingBack));
+    status.append("\n");
+    outputBundleStatus(status);
+         
     return true;
   }
 
@@ -2654,8 +2694,12 @@ namespace Isis {
     int numObjectPoints = m_bundleControlPoints.size();
 
     std::string currentTime = iTime::CurrentLocalTime().toLatin1().data();
-    printf("     Time: %s\n\n", currentTime.c_str());
-
+    
+    QString status = "     Time: ";
+    status.append(currentTime.c_str());
+    status.append("\n\n");
+    outputBundleStatus(status); 
+    
     // create and initialize array of 3x3 matrices for all object points
     std::vector< symmetric_matrix<double> > pointCovariances(numObjectPoints,
                                                              symmetric_matrix<double>(3));
@@ -2794,10 +2838,16 @@ namespace Isis {
 
         // only update point every 100 points
         if (j%100 == 0) {
-            printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", i+1,
-                   numBlockColumns,  j+1, numObjectPoints);
-
-            emit iterationUpdate(i+1, j+1);
+          QString status = "\rError Propagation: Inverse Block ";
+          status.append(QString::number(i+1));
+          status.append(" of ");
+          status.append(QString::number(numBlockColumns));
+          status.append("; Point ");
+          status.append(QString::number(j+1));
+          status.append(" of ");
+          status.append(QString::number(numObjectPoints));
+          outputBundleStatus(status);
+          emit iterationUpdate(i+1, j+1);
         }
 
         // get corresponding Q matrix
@@ -2853,7 +2903,7 @@ namespace Isis {
           }
 
           catch (std::exception &e) {
-            printf("\n\n");
+            outputBundleStatus("\n\n");
             QString msg = "Input data and settings are not sufficiently stable "
                           "for error propagation.";
             throw IException(IException::User, msg, _FILEINFO_);
@@ -2876,10 +2926,14 @@ namespace Isis {
     // free b (right-hand side vector
     cholmod_free_dense(&b,&m_cholmodCommon);
 
-    printf("\n\n");
+    outputBundleStatus("\n\n");
+     
     currentTime = Isis::iTime::CurrentLocalTime().toLatin1().data();
-    printf("\rFilling point covariance matrices: Time %s", currentTime.c_str());
-    printf("\n\n");
+    
+    status = "\rFilling point covariance matrices: Time ";
+    status.append(currentTime.c_str());
+    outputBundleStatus(status);
+    outputBundleStatus("\n\n");
 
     // now loop over points again and set final covariance stuff
     int pointIndex = 0;
@@ -2892,8 +2946,12 @@ namespace Isis {
       }
 
       if (j%100 == 0) {
-        printf("\rError Propagation: Filling point covariance matrices %8d of %8d\r",j+1,
-               numObjectPoints);
+        status = "\rError Propagation: Filling point covariance matrices ";
+        status.append(QString("%1").arg(j+1));
+        status.append(" of ");
+        status.append(QString("%1").arg(numObjectPoints));
+        status.append("\r");
+        outputBundleStatus(status);
       }
 
       // get corresponding point covariance matrix
@@ -3108,8 +3166,9 @@ namespace Isis {
    *                           -Wformat-security warning during the build.
    */
   void BundleAdjust::outputBundleStatus(QString status) {
-    status += "\n";
-    printf("%s", status.toStdString().c_str());
+    if (QCoreApplication::applicationName() != "ipce") { 
+      printf("%s", status.toStdString().c_str());
+    }
   }
 
 

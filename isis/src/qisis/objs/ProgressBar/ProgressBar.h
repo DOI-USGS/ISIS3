@@ -8,8 +8,7 @@ namespace Isis {
    * @brief QProgressBar with customizable text
    *
    * @author ????-??-?? Steven Lambright
-   *
-   * @internal
+   *                            
    */
 
   class ProgressBar : public QProgressBar {

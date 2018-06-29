@@ -218,15 +218,6 @@ namespace Isis {
   }
 
   /**
-   * This method pushes a new XmlHandler into the parser stack.
-   *
-   * @param xmlReader This is the parser stack.
-   */
-  void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
-  }
-
-  /**
    * This method calls ImageTreeWidget::actions() which sets up a QAction
    * that sets a default for the file list columns and returns a QList of
    * QPointers that point to the QAction.
@@ -611,6 +602,17 @@ namespace Isis {
     return result;
   }
 
+
+  /**
+   * This method pushes a new XmlHandler into the parser stack.
+   *
+   * @param xmlReader This is the parser stack.
+   */
+  void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
+    xmlReader->pushContentHandler(new XmlHandler(this));
+  }
+
+
   /**
    * This method saves the FootprintColumns in the project and the settings associated
    * with every column.
@@ -621,10 +623,11 @@ namespace Isis {
    */
   void ImageFileListWidget::save(QXmlStreamWriter &stream, Project *project,
                                  FileName newProjectRoot) const {
+
     stream.writeStartElement("imageFileList");
 
     // Write QSettings
-    stream.writeStartElement("widgetGeometry");
+//  stream.writeStartElement("widgetGeometry");
 //  QString geom = saveGeometry();
 //  //qDebug()<<"ImageFileListWidget::save   geometry = "<<geom;
 //  stream.writeAttribute("value", saveGeometry());
@@ -671,6 +674,7 @@ namespace Isis {
 
     stream.writeEndElement();
   }
+
 
   /**
    * This method saves the QTreeWidgetItem and the settings associated with the QTreeWidgetItem
@@ -758,7 +762,7 @@ namespace Isis {
   bool ImageFileListWidget::XmlHandler::startElement(const QString &namespaceURI,
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-  /*  //tjw
+
     if (result) {
 
 //    if (localName == "geometry") {
@@ -826,7 +830,6 @@ namespace Isis {
       }
 
     }
-    */
 
     return result;
   }
@@ -905,6 +908,4 @@ namespace Isis {
       }
     }
   }
-
-
 }

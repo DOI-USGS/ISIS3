@@ -237,14 +237,24 @@ namespace Isis {
    *                           parent prematurely to be able to set the radii
    *                           in ControlPoint.
    * @history 2017-12-21 Jesse Mapel - Modified to use the ControlNetVersioner.
-   *
+   * @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
+   *                         group to set radii values to those ingested from the versioner
+   *                         if they exist. Otherwise, we call SetTarget with the targetname.
    */
   void ControlNet::ReadControl(const QString &filename, Progress *progress) {
 
     FileName cnetFileName(filename);
     ControlNetVersioner versionedReader(cnetFileName, progress);
-
-    SetTarget( versionedReader.targetName() );
+    if ( versionedReader.hasTargetRadii() ) {
+      p_targetName = versionedReader.targetName();
+      p_targetRadii.clear();
+      foreach (Distance distance, versionedReader.targetRadii()) {
+        p_targetRadii.push_back(distance);
+      }
+    }
+    else {
+      SetTarget( versionedReader.targetName() );
+    }
     p_networkId   = versionedReader.netId();
     p_userName    = versionedReader.userName();
     p_created     = versionedReader.creationDate();
@@ -338,11 +348,65 @@ namespace Isis {
 
     point->parentNetwork = this;
 
-    // notify control network of new (non-ignored) measures
-    foreach(ControlMeasure * measure, point->getMeasures()) {
-      measureAdded(measure);
-    }
+    // notify control network of new point
+    pointAdded(point);
+
     emit networkStructureModified();
+  }
+
+
+ /**
+   * Adds a whole point to the control net graph.
+   *
+   * @throws IException::Programmer "NULL measure passed to ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "Control measure with NULL parent passed to
+   *     ControlNet::AddControlCubeGraphNode!"
+   * @throws IException::Programmer "ControlNet does not contain the point."
+   */
+  void ControlNet::pointAdded(ControlPoint *point) {
+    if (!point) {
+      IString msg = "NULL point passed to "
+          "ControlNet::AddControlCubeGraphNode!";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    if (!ContainsPoint(point->GetId())) {
+      QString msg = "ControlNet does not contain the point [";
+      msg += point->GetId() + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // make sure there is a node for every measure
+    for (int i = 0; i < point->GetNumMeasures(); i++) {
+      QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
+      if (!cubeGraphNodes->contains(sn)) {
+        cubeGraphNodes->insert(sn, new ControlCubeGraphNode(sn));
+      }
+    }
+
+    foreach(ControlMeasure* measure, point->getMeasures()) {
+      // add the measure to the corresponding node
+      QString serial = measure->GetCubeSerialNumber();
+      ControlCubeGraphNode *node = (*cubeGraphNodes)[serial];
+      node->addMeasure(measure);
+
+      // in this measure's node add connections to the other nodes reachable from
+      // its point
+      if (!point->IsIgnored() && !measure->IsIgnored()) {
+        for (int i = 0; i < point->GetNumMeasures(); i++) {
+          ControlMeasure *cm = point->GetMeasure(i);
+          if (!cm->IsIgnored()) {
+            QString sn = cm->GetCubeSerialNumber();
+            ControlCubeGraphNode *neighborNode = (*cubeGraphNodes)[sn];
+
+            if (neighborNode != node) {
+              node->addConnection(neighborNode, point);
+              neighborNode->addConnection(node, point);
+            }
+          }
+        }
+      }
+    }
   }
 
 
@@ -1048,6 +1112,17 @@ namespace Isis {
   QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
     return (*cubeGraphNodes)[serialNumber]->getMeasures();
+  }
+
+
+  /**
+   * Get all the valid measures pertaining to a given cube serial number
+   *
+   * @returns A list of all valid measures which are in a given cube
+   */
+  QList< ControlMeasure * > ControlNet::GetValidMeasuresInCube(QString serialNumber) {
+    ValidateSerialNumber(serialNumber);
+    return (*cubeGraphNodes)[serialNumber]->getValidMeasures();
   }
 
 

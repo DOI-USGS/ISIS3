@@ -81,11 +81,11 @@ Deborah Lee Soltesz
     </div>
 
 
-    <hr/>
-        <h2>Search</h2>
+    <!-- <hr/>
+        <h2>Search</h2> -->
 
         <!-- search -->
-        <form name="seek1" method="get" action="http://search.usgs.gov/query.html" target="_top" style="padding-top:0px;margin-top:0px;">
+        <!-- <form name="seek1" method="get" action="http://search.usgs.gov/query.html" target="_top" style="padding-top:0px;margin-top:0px;">
           <table  style="width:150px;" align="center">
           <tr valign="top">
           <td>
@@ -118,9 +118,8 @@ Deborah Lee Soltesz
           </td>
           </tr>
           </table>
-        </form>
+        </form> -->
 
   </xsl:template>
 
 </xsl:stylesheet>
-

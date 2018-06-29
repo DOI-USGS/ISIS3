@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
 
   double DoubleValue;
   float FloatValue;
+  uint32_t UIntValue;
   short int ShortIntValue;
   unsigned short int UShortIntValue;
   int IntValue;
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]) {
 
   DoubleValue = 0x12345678;
   FloatValue = 0x1234;
+  UIntValue = 0x1234;
   ShortIntValue = 0x1234;
   UShortIntValue = 0x1234;
   IntValue = 0x12345678;
@@ -30,6 +32,8 @@ int main(int argc, char *argv[]) {
     cout << "   Double 0x12345678 to HOST:  " << lsb.Double(&DoubleValue) << endl;
     cout << "Size of Float:  " << sizeof(float);
     cout << "   Float 0x1234 to HOST:  " << lsb.Float(&FloatValue) << endl;
+    cout << "Size of Uint32_t:  " << sizeof(uint32_t);
+    cout << "   Uint32_t 0x1234 to HOST:  " << lsb.Uint32_t(&UIntValue) << endl;
     cout << "Size of Short Int:  " << sizeof(short int);
     cout << "   Short Int 0x1234 to HOST:  " << lsb.ShortInt(&ShortIntValue) << endl;
     cout << "Size of Unsigned Short Int:  " << sizeof(unsigned short int);
@@ -74,6 +78,8 @@ int main(int argc, char *argv[]) {
     cout << "   Double 0x12345678 to HOST:  " << msb.Double(&DoubleValue) << endl;
     cout << "Size of Float:  " << sizeof(float);
     cout << "   Float 0x1234 to HOST:  " << msb.Float(&FloatValue) << endl;
+    cout << "Size of Uint32_t:  " << sizeof(uint32_t);
+    cout << "   Uint32_t 0x1234 to HOST:  " << msb.Uint32_t(&UIntValue) << endl;
     cout << "Size of Short Int:  " << sizeof(short int);
     cout << "   Short Int 0x1234 to HOST:  " << msb.ShortInt(&ShortIntValue) << endl;
     cout << "Size of Unsigned Short Int:  " << sizeof(unsigned short int);

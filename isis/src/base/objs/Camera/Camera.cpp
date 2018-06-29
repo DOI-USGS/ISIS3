@@ -2353,7 +2353,7 @@ namespace Isis {
    }
 
    p_distortionMap = map;
-   }
+ }
 
 
   /**
