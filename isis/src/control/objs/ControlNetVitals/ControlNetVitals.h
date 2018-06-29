@@ -145,13 +145,17 @@ namespace Isis {
       //! The pointTypeCounts operates in the same fashion as the above two, except
       //! that the key would be the ControlPoint::PointType you're searching for.
       //! For instance, if I wanted to know how many points were fixed I would query
-      //!  This map at key ControlPoint::Fixed and it would return how many fixed points there are.
+      //! This map at key ControlPoint::Fixed and it would return how many fixed points there are.
       QMap<ControlPoint::PointType, int> m_pointTypeCounts;
 
+      //! The number of points in the network.
+      int m_numPoints;
       //! The number of ignored points in the network.
       int m_numPointsIgnored;
       //! The number of edit locked points in the network.
       int m_numPointsLocked;
+      //! The number of measures in the network.
+      int m_numMeasures;
   };
 };
 
