@@ -1494,7 +1494,9 @@ namespace Isis {
     }
 
     m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
-    m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    if (!m_ui->treeView->selectionModel()->selectedRows().isEmpty()) {
+      m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    }
   }
 
 
