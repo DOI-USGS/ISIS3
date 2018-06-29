@@ -1971,10 +1971,9 @@ namespace Isis {
       SetAprioriRadiusSource(other.aprioriRadiusSource);
       SetAprioriRadiusSourceFile(other.aprioriRadiusSourceFile);
       SetAprioriSurfacePoint(other.aprioriSurfacePoint);
-
       SetAdjustedSurfacePoint(other.adjustedSurfacePoint);
-      
-      // Set edit lock last so the it doesn't intefere with copying the other fields over.
+
+      // Set edit lock last so the it doesn't interfere with copying the other fields over.
       SetEditLock(other.editLock);
     }
 
