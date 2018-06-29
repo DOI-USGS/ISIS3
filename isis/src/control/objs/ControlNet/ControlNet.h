@@ -415,7 +415,8 @@ namespace Isis {
       };
 
       struct Connection {
-        int strength = 0;
+        int strength;
+        Connection() : strength(0) {}
       };
 
       typedef boost::adjacency_list<boost::setS,
