@@ -1955,23 +1955,27 @@ namespace Isis {
         }
       }
 
-      id             = other.id;
-      chooserName    = other.chooserName;
-      dateTime       = other.dateTime;
-      type           = other.type;
-      invalid        = other.invalid;
-      editLock       = other.editLock;
-      jigsawRejected = other.jigsawRejected;
-      referenceExplicitlySet = other.referenceExplicitlySet;
-      ignore         = other.ignore;
-      aprioriSurfacePointSource      = other.aprioriSurfacePointSource;
-      aprioriSurfacePointSourceFile  = other.aprioriSurfacePointSourceFile;
-      aprioriRadiusSource            = other.aprioriRadiusSource;
-      aprioriRadiusSourceFile        = other.aprioriRadiusSourceFile;
-      aprioriSurfacePoint            = other.aprioriSurfacePoint;
-      adjustedSurfacePoint = other.adjustedSurfacePoint;
+      invalid = other.invalid;
+      referenceExplicitlySet   = other.referenceExplicitlySet;
       numberOfRejectedMeasures = other.numberOfRejectedMeasures;
-      constraintStatus = other.constraintStatus;
+      constraintStatus         = other.constraintStatus;
+
+      SetId(other.id);
+      SetChooserName(other.chooserName);
+      SetDateTime(other.dateTime);
+      SetType(other.type);
+      SetRejected(other.jigsawRejected);
+      SetIgnored(other.ignore);
+      SetAprioriSurfacePointSource(other.aprioriSurfacePointSource);
+      SetAprioriSurfacePointSourceFile(other.aprioriSurfacePointSourceFile);
+      SetAprioriRadiusSource(other.aprioriRadiusSource);
+      SetAprioriRadiusSourceFile(other.aprioriRadiusSourceFile);
+      SetAprioriSurfacePoint(other.aprioriSurfacePoint);
+
+      SetAdjustedSurfacePoint(other.adjustedSurfacePoint);
+      
+      // Set edit lock last so the it doesn't intefere with copying the other fields over.
+      SetEditLock(other.editLock);
     }
 
     return *this;
