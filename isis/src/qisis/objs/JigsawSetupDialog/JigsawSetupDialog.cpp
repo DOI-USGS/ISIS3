@@ -1797,32 +1797,67 @@ namespace Isis {
     updateBundleObservationSolveSettings(solveSettings);
 
     // Loop through the existing solve settings list and determine colors
-    QList<QColor> colors;
+    QSet<QString> existingColorNames;
     qDebug() << "# solve settings: " << solveSettingsList.size();
     for (auto &solveSettings : solveSettingsList) {
       qDebug() << "    color: " << solveSettings.color();
-      colors.append(solveSettings.color());
+      qDebug() << "    colorName: " << solveSettings.color().name();
+      existingColorNames.insert(solveSettings.color().name());
+    }
+
+    QSet<QString> badColorSet {
+      "#FFB300", // Vivid Yellow
+      "#803E75", // Strong Purple
+      "#FF6800", // Vivid Orange
+      "#A6BDD7", // Very Light Blue
+      "#C10020", // Vivid Red
+      "#CEA262", // Grayish Yellow
+      "#817066", // Medium Gray
+    };
+    QSet<QString> colorSet;
+    for (auto &color : badColorSet) {
+      colorSet.insert(color.toLower());
     }
 
     // Change color for new solve settings
     QColor newColor(Qt::white);
-    qDebug() << "\n new color : " << newColor << "\n";
-    if (colors.isEmpty()) {
-      newColor.setRgb(100, 0, 0);
-    }
-    else {
-      if (colors.size() == 1) {
-        newColor.setRgb(0, 100, 0);
-      }
-      else if (colors.size() == 2) {
-        newColor.setRgb(0, 0, 100);
-      }
-    }
-    solveSettings.setColor(newColor);
 
+    QColor red(Qt::red);
+    qDebug() << "red hex: " << red.name();
+    red.setNamedColor("#CCCCCC");
+    qDebug() << "red hex2: " << red.name();
+
+    QSet<QString> availableColors = colorSet.subtract(existingColorNames);
+    qDebug() << "\navailable colors: " << availableColors << "\n";
+    newColor.setNamedColor(availableColors.values()[0]);
+    qDebug() << "\nnew color: " << newColor;
+    qDebug() << "new color hex: " << newColor.name();
+    // if (colors.isEmpty()) {
+    //   newColor.setRgb(100, 0, 0);
+    // }
+    // else {
+    //   switch (colors.size()) {
+    //   case 1:
+    //     newColor.setRgb(0, 100, 0);
+    //     break;
+    //   case 2:
+    //     newColor.setRgb(0, 0, 100);
+    //     break;
+    //   default:
+    //     newColor.setRgb(255, 255, 255);
+    //     break;
+    //   }
+    // }
+    solveSettings.setColor(newColor);
+    qDebug() << solveSettings.color();
 
     // Add the new solve settings to the solve settings list
     solveSettingsList.append(solveSettings);
+
+    for (int i = 0; i < solveSettingsList.size(); i++) {
+      qDebug() << "list color " << i << ": " << solveSettingsList[i].color()
+      << "; " << solveSettingsList[i].color().name();
+    }
 
     // Update bundle settings with the new list of bundle observation solve settings
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
