@@ -803,13 +803,13 @@ namespace Isis {
     //  to m_editPoint, otherwise create copy.  It will not be saved to net until "Save Point"
     //  is selected
     if (controlPoint->Parent() == NULL) {
-
       m_editPoint = controlPoint;
       // New point in editor, so colorize all save buttons
       colorizeAllSaveButtons("red");
     }
     else {
-      m_editPoint = controlPoint;
+      m_editPoint = new ControlPoint;
+      *m_editPoint = *controlPoint;
       // New point loaded, make sure all save button's text is default black color
       colorizeAllSaveButtons("black");
 
@@ -1992,8 +1992,9 @@ namespace Isis {
       delete m_leftMeasure;
       m_leftMeasure = NULL;
     }
+    m_leftMeasure = new ControlMeasure;
 
-    m_leftMeasure = ((*m_editPoint)[serial]);
+    *m_leftMeasure = *((*m_editPoint)[serial]);
 
     //  If m_leftCube is not null, delete before creating new one
     m_leftCube.reset(new Cube(file, "r"));
@@ -2040,7 +2041,9 @@ namespace Isis {
       delete m_rightMeasure;
       m_rightMeasure = NULL;
     }
-    m_rightMeasure = ((*m_editPoint)[serial]);
+    m_rightMeasure = new ControlMeasure;
+
+    *m_rightMeasure = *((*m_editPoint)[serial]);
 
     //  If m_rightCube is not null, delete before creating new one
     m_rightCube.reset(new Cube(file, "r"));
