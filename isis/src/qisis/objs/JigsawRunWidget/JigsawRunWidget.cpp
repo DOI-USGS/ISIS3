@@ -645,6 +645,13 @@ namespace Isis {
   }
 
 
+  /**
+   * This method is called whenever the widget recieves a close request. If a bundle is running, the
+   * user will be asked if they want to abort the bundle. In this case, the bundle thread must be
+   * scheduled to delete when it has finished aborting. Otherwise, the event will accept. 
+   *
+   * @param event The close event being handled.
+   */
   void JigsawRunWidget::closeEvent(QCloseEvent *event) {
     if( m_bRunning ) {
       QMessageBox::StandardButton resBtn = 
