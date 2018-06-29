@@ -56,8 +56,10 @@ namespace Isis {
 
     m_islandList = m_controlNet->GetSerialConnections();
 
+    m_numPoints = 0;
     m_numPointsIgnored = 0;
     m_numPointsLocked = 0;
+    m_numMeasures = m_controlNet->GetNumMeasures();
 
     m_pointMeasureCounts.clear();
     m_imageMeasureCounts.clear();
@@ -117,7 +119,9 @@ namespace Isis {
    *  @param point The ControlPoint being added to the network.
    */
   void ControlNetVitals::addPoint(ControlPoint *point) {
+
     emitHistoryEntry("Control Point Added", point->GetId(), "", "");
+    m_numPoints++;
 
     if (point->IsIgnored()) {
       m_numPointsIgnored++;
@@ -271,6 +275,7 @@ namespace Isis {
   void ControlNetVitals::deletePoint(ControlPoint *point) {
 
     emitHistoryEntry("Control Point Deleted", point->GetId(), "", "");
+    m_numPoints--;
 
     if (point->IsIgnored()) {
       m_numPointsIgnored--;
@@ -305,6 +310,8 @@ namespace Isis {
    */
   void ControlNetVitals::addMeasure(ControlMeasure *measure) {
     emitHistoryEntry("Control Measure Added", measure->GetCubeSerialNumber(), "", "");
+    m_numMeasures++;
+
 
     ControlPoint *point = measure->Parent();
     if (point) {
@@ -390,7 +397,7 @@ namespace Isis {
   void ControlNetVitals::deleteMeasure(ControlMeasure *measure) {
 
     emitHistoryEntry("Control Measure Deleted", measure->GetCubeSerialNumber(), "", "");
-
+    m_numMeasures--;
 
     ControlPoint *point = measure->Parent();
     if (point) {
@@ -499,13 +506,12 @@ namespace Isis {
 
 
   /**
-   *  This method is designed to return the number of points in the observed Control Network.
-   *  It is a wrapper for the ControlNet::GetNumPoints() call of the observed Control Network.
+   *  This method is designed to return the number of points in the Control Network.
    *
    *  @return The number of points in the Control Network.
    */
   int ControlNetVitals::numPoints() {
-    return m_controlNet->GetNumPoints();
+    return m_numPoints;
   }
 
 
@@ -599,7 +605,7 @@ namespace Isis {
    *  @return The number of measures in the Control Network.
    */
   int ControlNetVitals::numMeasures() {
-    return m_controlNet->GetNumMeasures();
+    return m_numMeasures;
   }
 
 

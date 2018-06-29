@@ -24,7 +24,6 @@
 
 #include <QList>
 #include <QStringList>
-#include <QPoint>
 
 #include "Application.h"
 #include "Camera.h"
