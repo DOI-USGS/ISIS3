@@ -129,6 +129,7 @@ namespace Isis {
     m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
     m_positionAprioriSigma = other.m_positionAprioriSigma;
     m_positionInterpolationType = other.m_positionInterpolationType;
+    m_color = other.m_color;
   }
 
 
@@ -179,6 +180,8 @@ namespace Isis {
       m_solvePositionOverHermiteSpline = other.m_solvePositionOverHermiteSpline;
       m_positionInterpolationType = other.m_positionInterpolationType;
       m_positionAprioriSigma = other.m_positionAprioriSigma;
+
+      m_color = other.m_color;
 
     }
 
