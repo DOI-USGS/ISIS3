@@ -44,6 +44,13 @@ namespace Isis {
    * @internal
    *   @history 2018-04-13 Ken Edmundson - Original version.
    *   @history 2018-06-27 Ken Edmundson - Code clean up.
+   *   @history 2018-06-28 Ken Edmundson - Removed partial derivative matrices as member variables
+   *                                       and now declare them as static in the applyConstraint
+   *                                       method. Now coeff_range_image matrix is resized if number
+   *                                       of image parameters changes. This is consistent with
+   *                                       BundleAdjust::computePartials. Added IExceptions to
+   *                                       verify m_rangeObserved and m_rangeComputed are positive.
+   *
    */
   class BundleLidarRangeConstraint : public BundleConstraint {
     public:
@@ -84,12 +91,7 @@ namespace Isis {
                                                            image using the image's current exterior
                                                            orientation (SPICE). The "measure" is
                                                            corrected in each iteration of the bundle
-                                                           adjustement by it's residuals.*/
-      // TODO: should partial matrices be static?
-      // NOTE: they will be different size for different images
-      LinearAlgebra::Matrix m_coeff_range_image;     //!< Partials w/respect to image position
-      LinearAlgebra::Matrix m_coeff_range_point3D;   //!< Partials w/respect to lidar point
-      LinearAlgebra::Vector m_coeff_range_RHS;       //!< Right hand side of normals
+                                                           adjustment by it's residuals.*/
 
       std::vector<double> m_pointBodyFixed;          //!< Body fixed coordinates of lidar point
       std::vector<double> m_camPositionJ2K;          //!< J2K coordinates of camera
@@ -107,6 +109,6 @@ namespace Isis {
 
   //! Typdef for BundleLidarRangeConstraint QSharedPointer.
   typedef QSharedPointer<BundleLidarRangeConstraint> BundleLidarRangeConstraintQsp;
-};
+}
 
 #endif
