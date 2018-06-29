@@ -412,7 +412,6 @@ namespace Isis {
 
     // Create the table.
     m_imagesTable = new QTableWidget();
-    m_imagesTable->addAction(new QAction("Sup"));
 
     connect(m_imagesTable, SIGNAL(itemDoubleClicked(QTableWidgetItem *)),
             this, SLOT(emitOpenImageEditor()));
