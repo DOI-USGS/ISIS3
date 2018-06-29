@@ -103,6 +103,46 @@ namespace Isis {
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
 
+
+    // Create default settings for all of the observations
+    BundleObservationSolveSettings defaultObservationSettings;
+    QList<BundleObservationSolveSettings> solveSettingsList;
+
+    // If we have selected any project items, add them to the default obs solve settings object
+    if (!m_project->directory()->model()->selectedItems().isEmpty()) {
+      foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
+        if (projItem->isImage()) {
+          defaultObservationSettings.addObservationNumber(projItem->image()->serialNumber());  
+        }
+        else if (projItem->isImageList()) {
+          for (int i = 0; i < projItem->rowCount(); i++) {
+            ProjectItem * childItem = projItem->child(i);
+            defaultObservationSettings.addObservationNumber(childItem->image()->serialNumber());  
+          }
+        }
+      }
+    }
+    // if we didnt have any images selected in the previous case, or no proj items were selected,
+    // take all images from the project tree
+    if (defaultObservationSettings.observationNumbers().isEmpty()) {
+      ProjectItem *imgRoot = m_project->directory()->model()->findItemData(QVariant("Images"),0);
+      if (imgRoot) {
+        for (int i = 0; i < imgRoot->rowCount(); i++) {
+          ProjectItem * imglistItem = imgRoot->child(i);
+          for (int j = 0; j < imglistItem->rowCount(); j++) {
+            ProjectItem * imgItem = imglistItem->child(j);
+            if (imgItem->isImage()) {
+              defaultObservationSettings.addObservationNumber(imgItem->image()->serialNumber());  
+            }
+          }
+        } 
+      }
+    }
+    solveSettingsList.append(defaultObservationSettings);
+    m_bundleSettings->setObservationSolveOptions(solveSettingsList);
+
+
+
     // Populate the solve option comboboxes
     const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->positionComboBox->insertItems(0, positionOptions);
@@ -1454,7 +1494,9 @@ namespace Isis {
     }
 
     m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
-    m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    if (!m_ui->treeView->selectionModel()->selectedRows().isEmpty()) {
+      m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    }
   }
 
 
@@ -1698,16 +1740,12 @@ namespace Isis {
          else {
           m_ui->treeView->setRootIndex(QModelIndex());
          }
-    
+  
+    connect(m_ui->treeView->selectionModel(), 
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+            this, 
+            SLOT(treeViewSelectionChanged(const QItemSelection&,const QItemSelection&)));
 
-    // Generate observation numbers for the images
-    QStringList observationNumbers;
-
-    // Create default settings for all of the observations
-    BundleObservationSolveSettings defaultObservationSettings;
-    foreach (const QString &observationNumber, observationNumbers) {
-      defaultObservationSettings.addObservationNumber(observationNumber); 
-    }
 
     // Try to loop through the view here to add the "groups" so they aren't part of the model
 
@@ -1718,12 +1756,9 @@ namespace Isis {
   }
 
 
-  // void JigsawSetupDialog::updateGroups(QList<QStandardItem *> &selectedItems) {
-  //   for (auto &item : selectedItems) {
-  //     QBrush newGroup(Qt::blue);
-  //     item->setData(Qt::BackgroundRole, newGroup);
-  //   }
-  // }
+  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
+  }
 
 
   /**

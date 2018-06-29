@@ -87,6 +87,8 @@ namespace Isis {
    *                           invalid a priori sigma values whenever an a priori sigma values changes.
    *                           If any value is invalid, the OK and Apply Settings buttons are disabled
    *                           until all the a priori sigma values are valid again. References #497.
+   *   @history 2018-06-28 Christopher Combs - Implemented pseudocode in on_applySettings... method.
+   *                           Added selected images to default BOSS object. References #497.
    */
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
@@ -168,6 +170,8 @@ namespace Isis {
     public slots:
     void slotTextChanged(const QString &text);
     void checkIsValid();
+    void treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
 
 
     private:
