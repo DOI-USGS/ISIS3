@@ -1494,7 +1494,9 @@ namespace Isis {
     }
 
     m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
-    m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    if (!m_ui->treeView->selectionModel()->selectedRows().isEmpty()) {
+      m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    }
   }
 
 
@@ -1756,6 +1758,13 @@ namespace Isis {
 
   void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
+
+    // QModelIndex displayIndex = selected.indexes()[0];
+
+    // if (displayIndex) {
+    //   QModelIndex sourceIndex = m_ui->treeView->model()->mapToSource(displayIndex);
+
+    // } 
   }
 
 
