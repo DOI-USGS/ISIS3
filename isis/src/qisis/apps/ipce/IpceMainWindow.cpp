@@ -587,37 +587,6 @@ namespace Isis {
    * config file. This allows us to restore the settings when we
    * create another main window (the next time this program is run).
    *
-   * The state will be saved in the currently loaded project's root.
-   *
-   * @param[in] project Pointer to the project that is currently loaded (default is "Project")
-   *
-   * @internal
-   *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
-   *                           References #4358.
-   *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
-   *                           restoring of recently opened projects.  References #4492.
-   */
-  void IpceMainWindow::writeSettings(Project *project) {
-
-    // Ensure that we are not using a NULL pointer
-    if (!project) {
-      QString msg = "Cannot write settings with a NULL Project pointer.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    QSettings projectSettings(FileName(project->newProjectRoot() + "/ipce.config").expanded(),
-        QSettings::NativeFormat);
-
-    projectSettings.setValue("geometry", QVariant(geometry()));
-    projectSettings.setValue("windowState", saveState());
-    projectSettings.sync();
-  }
-
-
-  /**
-   * Write the window positioning and state information out to a
-   * config file. This allows us to restore the settings when we
-   * create another main window (the next time this program is run).
-   *
    * The state will be saved according to the currently loaded project and its name.
    *
    * When no project is loaded (i.e. the default "Project" is open), the config file used is
@@ -640,18 +609,12 @@ namespace Isis {
       QString msg = "Cannot write settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    QString appName = QApplication::applicationName();
-    QSettings projectSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(),
+    QSettings projectSettings(FileName(project->newProjectRoot() + "/ipce.config").expanded(),
         QSettings::NativeFormat);
 
     projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
-//  projectSettings.setValue("size", size());
-//  projectSettings.setValue("pos", pos());
-
-    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
+    projectSettings.sync();
   }
 
 
