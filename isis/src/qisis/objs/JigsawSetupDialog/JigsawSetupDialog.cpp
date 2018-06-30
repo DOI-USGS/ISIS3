@@ -88,21 +88,8 @@ namespace Isis {
     FileName fname = m_ui->inputControlNetCombo->currentText();
     m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
 
-    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
-    if (useLastSettings && bundleSolutionInfo.size() > 0) {
-     BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
-     // Retrieve the control net name used in the last bundle adjustment.
-     // Note that this returns a fully specified path and filename, while the cnet combo box
-     // only stores file names.
-     selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
-     fillFromSettings(lastBundleSettings);
-    }
-
-    // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
-
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
-
 
     // Create default settings for all of the observations
     BundleObservationSolveSettings defaultObservationSettings;
@@ -141,6 +128,17 @@ namespace Isis {
     solveSettingsList.append(defaultObservationSettings);
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
+
+    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+    if (useLastSettings && bundleSolutionInfo.size() > 0) {
+      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+      // Retrieve the control net name used in the last bundle adjustment.
+      // Note that this returns a fully specified path and filename, while the cnet combo box
+      // only stores file names.
+      selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
+      fillFromSettings(lastBundleSettings);
+      m_bundleSettings->setObservationSolveOptions(lastBundleSettings->observationSolveSettings());
+    }
 
 
     // Populate the solve option comboboxes
@@ -509,58 +507,6 @@ namespace Isis {
     settings->setOutlierRejection(m_ui->outlierRejectionCheckBox->isChecked(),
                                   m_ui->outlierRejectionMultiplierLineEdit->text().toDouble());
 
-
-
-
-    QList<BundleObservationSolveSettings> observationSolveSettingsList;
-    BundleObservationSolveSettings observationSolveSettings;
-
-    // pointing settings
-    double anglesSigma              = -1.0;
-    double angularVelocitySigma     = -1.0;
-    double angularAccelerationSigma = -1.0;
-
-    if (m_ui->pointingAnglesSigmaLineEdit->isModified()) {
-      anglesSigma = m_ui->pointingAnglesSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularVelocitySigmaLineEdit->isModified()) {
-      angularVelocitySigma = m_ui->pointingAngularVelocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularAccelerationSigmaLineEdit->isModified()) {
-      angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
-    }
-    observationSolveSettings.setInstrumentPointingSettings(
-        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption("ANGLES"),
-        // BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
-        m_ui->twistCheckBox->isChecked(),
-        m_ui->ckDegreeSpinBox->text().toInt(),
-        m_ui->ckSolveDegreeSpinBox->text().toInt(),
-        m_ui->fitOverPointingCheckBox->isChecked(),
-        anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-
-    // position option
-    double positionSigma     = -1.0;
-    double velocitySigma     = -1.0;
-    double accelerationSigma = -1.0;
-    if (m_ui->positionSigmaLineEdit->isModified()) {
-      positionSigma = m_ui->positionSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->velocitySigmaLineEdit->isModified()) {
-      velocitySigma = m_ui->velocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->accelerationSigmaLineEdit->isModified()) {
-      accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
-    }
-    observationSolveSettings.setInstrumentPositionSettings(
-        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption("NONE"),
-        // BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
-        m_ui->spkDegreeSpinBox->text().toInt(),
-        m_ui->spkSolveDegreeSpinBox->text().toInt(),
-        m_ui->hermiteSplineCheckBox->isChecked(),
-        positionSigma, velocitySigma, accelerationSigma);
-
-    observationSolveSettingsList.append(observationSolveSettings);
-    settings->setObservationSolveOptions(observationSolveSettingsList);
     // convergence criteria
     settings->setConvergenceCriteria(BundleSettings::Sigma0,
                                      m_ui->sigma0ThresholdLineEdit->text().toDouble(),
@@ -830,8 +776,10 @@ namespace Isis {
 
       if (m_ui->twistCheckBox->checkState() == Qt::Checked)
         solveTwist = true;
-      if (m_ui-> fitOverPointingCheckBox->checkState() == Qt::Checked)
+      if (m_ui->fitOverPointingCheckBox->checkState() == Qt::Checked)
         solvePolynomialOverExisting = true;
+      if (m_ui->hermiteSplineCheckBox->checkState() == Qt::Checked)
+        positionOverHermite = true;
 
       switch(instrumentPointingSolveOption) {
 
