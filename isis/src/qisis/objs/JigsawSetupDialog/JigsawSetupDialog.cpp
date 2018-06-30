@@ -1785,9 +1785,13 @@ namespace Isis {
 
       if (projItem) {
         // Tree traversal is top down so we dont need to do this check for imagelists?
-        if (projItem->isImage() && 
-            !selectedObservationNumbers.contains(projItem->image()->observationNumber())) {
-          selectedObservationNumbers.append(projItem->image()->observationNumber());
+        if (projItem->isImage()) {
+          // Grab the observation up front so we don't need to re-compose the observation number
+          // more than once (@todo: this should not be necessary when 5026 is integrated)
+          const QString observationNumber = projItem->image()->observationNumber();
+          if (!selectedObservationNumbers.contains(observationNumber)) {
+            selectedObservationNumbers.append(observationNumber);
+          }
         }
         else if (projItem->isImageList()) {
           // Use the proxymodel's children as it might not include all of the sourcemodel's children 
