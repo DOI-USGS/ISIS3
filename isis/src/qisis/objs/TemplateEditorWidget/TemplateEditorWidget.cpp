@@ -4,8 +4,10 @@
 #include "Directory.h"
 #include "Template.h"
 
+#include <QCloseEvent>
 #include <QDir>
 #include <QFileDialog>
+#include <QMessageBox>
 
 namespace Isis {
 
@@ -16,6 +18,7 @@ namespace Isis {
     m_template = currentTemplate;
     m_directory = directory;
     m_fileType = m_template->templateType();
+    // m_textChanged = false;
 
     QFile templateFile(m_template->fileName());
     templateFile.open(QFile::ReadOnly | QFile::Text);
@@ -23,13 +26,35 @@ namespace Isis {
     m_ui->templateTextEdit->setText(textStream.readAll());
     templateFile.close();
 
+    // connect(m_ui->templateTextEdit, SIGNAL(textChanged()), this, SLOT(setStateUnclean()));
     connect(m_ui->templateTextSave, SIGNAL (released()),this, SLOT (saveText()));
     connect(m_ui->templateTextSaveAs, SIGNAL (released()),this, SLOT (saveAsText()));
+    connect(this, SIGNAL(destroyed(QObject *)), this, SLOT(saveOption()));
 
   }
 
 
   TemplateEditorWidget::~TemplateEditorWidget() {
+    
+    // if (m_textChanged) {
+    //   qDebug() << "IN LOOP";
+    //   QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
+    //                          QString("Would you like to save your current template?"),
+    //                          NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+    //   QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+    //   box->addButton("Don't Save", QMessageBox::RejectRole);
+    //   QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+    //   box->exec();
+    // 
+    //   if (box->clickedButton() == (QAbstractButton*)cancel) {
+    //     // event->ignore();
+    //     return;
+    //   }
+    //   else if (box->clickedButton() == (QAbstractButton*)save) {
+    //     saveAsText();
+    //   }
+    // }
+    
     delete m_ui;
   }
 
@@ -43,6 +68,8 @@ namespace Isis {
       templateFile.write(m_ui->templateTextEdit->toPlainText().toUtf8());
       templateFile.close();
     }
+    
+    // m_textChanged = false;
   }
 
   // Future plans to include Save As button
@@ -70,7 +97,6 @@ namespace Isis {
     
     // Write the file out
     QFile templateFile(templateFileName);
-    qDebug() << "Template file name right after selection: " << templateFileName;
     if (templateFile.open(QFile::WriteOnly | QFile::Text)) {
       templateFile.resize(0);
       templateFile.write(m_ui->templateTextEdit->toPlainText().toUtf8());
@@ -79,7 +105,6 @@ namespace Isis {
     
     // Import the newly created template file to the project
     if (templateFile.exists()) {
-      qDebug() << "File Type in SaveAs method: " << m_fileType;
       QDir templateFolder = m_directory->project()->addTemplateFolder(m_fileType + "/import");
       
       TemplateList *templateList = new TemplateList(templateFolder.dirName(), m_fileType, m_fileType 
@@ -101,8 +126,46 @@ namespace Isis {
       m_directory->project()->setClean(false);
     }
     else {
-      
+      // Throw()
     }
 
+    // m_textChanged = false;
   }
+  
+  
+  // void TemplateEditorWidget::setStateUnclean() {
+  //   qDebug() << "CHANGED";
+  //   m_textChanged = true;
+  // }
+  // 
+  // 
+  // bool TemplateEditorWidget::textChanged() {
+  //   return m_textChanged;
+  // }
+  // 
+  // 
+  // void TemplateEditorWidget::saveOption() {
+  //   qDebug() << "CLOSE";
+  // 
+  //   // The active control is checked here for modification because this was the simplest solution
+  //   // vs changing the project clean state every time the control is modified or saved.
+  //   if (m_textChanged) {
+  //     qDebug() << "IN LOOP";
+  //     QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
+  //                            QString("Would you like to save your current template?"),
+  //                            NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+  //     QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+  //     box->addButton("Don't Save", QMessageBox::RejectRole);
+  //     QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+  //     box->exec();
+  // 
+  //     if (box->clickedButton() == (QAbstractButton*)cancel) {
+  //       // event->ignore();
+  //       return;
+  //     }
+  //     else if (box->clickedButton() == (QAbstractButton*)save) {
+  //       saveAsText();
+  //     }
+  //   }
+  // }
 }

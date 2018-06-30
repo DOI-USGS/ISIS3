@@ -103,6 +103,7 @@ namespace Isis {
     m_shapeReader = NULL;
     m_shapes = NULL;
     m_templates = NULL;
+    m_regTemplates = NULL;
     m_warnings = NULL;
     m_workOrderHistory = NULL;
     m_isTemporaryProject = true;
@@ -226,6 +227,8 @@ namespace Isis {
 
     m_templates = new QList<TemplateList *>;
 
+    m_regTemplates = new QList<TemplateList *>;
+
     m_guiCameras = new GuiCameraList;
 
     m_bundleSolutionInfo = new QList<BundleSolutionInfo *>;
@@ -307,6 +310,20 @@ namespace Isis {
 
       delete m_templates;
       m_templates = NULL;
+    }
+    
+    
+    if (m_regTemplates) {
+      foreach (TemplateList *templateList, *m_regTemplates) {
+        foreach (Template *templateFile, *templateList) {
+          delete templateFile;
+        }
+
+        delete templateList;
+      }
+
+      delete m_regTemplates;
+      m_regTemplates = NULL;
     }
 
 
@@ -623,6 +640,7 @@ namespace Isis {
     m_shapes->clear();
     m_controls->clear();
     m_templates->clear();
+    m_regTemplates->clear();
     m_targets->clear();
     m_guiCameras->clear();
     m_bundleSolutionInfo->clear();
@@ -729,6 +747,7 @@ namespace Isis {
 
     if ( !m_templates->isEmpty() ) {
       stream.writeStartElement("templateLists");
+      
 
       for (int i = 0; i < m_templates->count(); i++) {
         m_templates->at(i)->save(stream, this, newProjectRoot);
@@ -1076,6 +1095,9 @@ namespace Isis {
                templateFile, SLOT( updateFileName(Project *) ) );
     }
     m_templates->append(templateList);
+    if(templateList->type() == "registrations") {
+      m_regTemplates->append(templateList);
+    }
     emit templatesAdded(templateList);
   }
 
@@ -2081,6 +2103,16 @@ namespace Isis {
    */
   QList<TemplateList *> Project::templates() {
     return *m_templates;
+  }
+  
+  
+  /**
+   * Return registration template FileNames
+   *
+   * @return QList of FileName
+   */
+  QList<TemplateList *> Project::registrationTemplates() {
+    return *m_regTemplates;
   }
 
 

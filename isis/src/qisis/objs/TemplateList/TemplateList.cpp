@@ -272,6 +272,7 @@ namespace Isis {
       if (localName == "templateList") {
         QString name = atts.value("name");
         QString type = atts.value("type");
+        QString path = atts.value("path");
 
         if (!name.isEmpty()) {
           m_templateList->setName(name);
@@ -279,6 +280,10 @@ namespace Isis {
 
         if (!type.isEmpty()) {
           m_templateList->setType(type);
+        }
+        
+        if (!path.isEmpty()) {
+          m_templateList->setPath(path);
         }
       }
       else if (localName == "template") {
@@ -312,8 +317,10 @@ namespace Isis {
       reader.pushContentHandler(&handler);
       reader.setErrorHandler(&handler);
 
-      QString templateListXmlPath = m_project->templateRoot() +"/"+ m_templateList->type() + "/" +m_templateList->name() +
-                                       "/templates.xml";
+      QString templateListXmlPath = m_project->templateRoot() + "/" + m_templateList->type() + "/" 
+                                    + m_templateList->name() + "/templates.xml";
+      templateListXmlPath = QDir::cleanPath(templateListXmlPath);
+      
       QFile file(templateListXmlPath);
 
       if (!file.open(QFile::ReadOnly)) {

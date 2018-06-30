@@ -165,11 +165,15 @@ namespace Isis {
     QDir templateFolder = project()->addTemplateFolder(m_fileType + "/import");
     QStringList templateFileNames = internalData();
 
-    m_list = new TemplateList(templateFolder.dirName(), m_fileType, m_fileType + "/" +templateFolder.dirName() );
+    m_list = new TemplateList(templateFolder.dirName(), 
+                              m_fileType, 
+                              m_fileType + "/" + templateFolder.dirName() );
 
     foreach (FileName filename, templateFileNames) {
       QFile::copy(filename.expanded(), templateFolder.path() + "/" + filename.name());
-      m_list->append(new Template(templateFolder.path() + "/" + filename.name(), m_fileType, templateFolder.dirName()));
+      m_list->append(new Template(templateFolder.path() + "/" + filename.name(), 
+                                  m_fileType, 
+                                  templateFolder.dirName()));
     }
 
     if (!m_list->isEmpty()) {

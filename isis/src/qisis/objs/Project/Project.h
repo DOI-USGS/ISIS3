@@ -357,6 +357,7 @@ namespace Isis {
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
       QList<TemplateList *> templates();
+      QList<TemplateList *> registrationTemplates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -593,6 +594,7 @@ namespace Isis {
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
       QList<TemplateList *> *m_templates;
+      QList<TemplateList *> *m_regTemplates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 

@@ -4,6 +4,7 @@
 
 #include "ControlPoint.h"
 #include "FileName.h"
+#include "TemplateList.h"
 
 #include <QCloseEvent>
 #include <QDir>
@@ -135,6 +136,8 @@ namespace Isis {
       // of active control is re-factored. Also added reset parameter, defaulting to false so button
       // is red. This default was used so that current calls did not need to be changed.
       void colorizeSaveNetButton(bool reset = false);
+      
+      void addTemplates(TemplateList *templateList);
 
     protected:
       bool eventFilter(QObject *o,QEvent *e);
@@ -174,6 +177,7 @@ namespace Isis {
       void saveTemplateFileAs();
       void setTemplateModified();
       void writeTemplateFile(QString);
+      void resetTemplateComboBox(QString fileName);
       void clearEditPoint();
 
     private:
@@ -230,7 +234,7 @@ namespace Isis {
       QPointer<QWidget> m_templateEditorWidget; //!< Template editor widget
       bool m_templateModified; //!< Indicates if the registration template was edited
 
-      QPointer<QLabel> m_templateFileNameLabel; //!< Label for the template filename
+      QPointer<QComboBox> m_templateComboBox; //!< ComboBox of importd registration templates
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;
