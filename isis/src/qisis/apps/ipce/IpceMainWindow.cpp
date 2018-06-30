@@ -610,9 +610,6 @@ namespace Isis {
     projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
     projectSettings.sync();
-
-    //TODO Do we really need this? Isn't this a global setting? Can the user even change this?
-    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
   }
 
 
@@ -624,9 +621,9 @@ namespace Isis {
    * The state will be saved according to the currently loaded project and its name.
    *
    * When no project is loaded (i.e. the default "Project" is open), the config file used is
-   * $HOME/.Isis/$APPNAME/$APPNAME_Project.config.
+   * $HOME/.Isis/$APPNAME/ipce.config.
    * When a project, ProjectName, is loaded, the config file used is
-   * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config.
+   * project->projectRoot()/ipce.config.
    *
    * @param[in] project Pointer to the project that is currently loaded (default is "Project")
    *
@@ -704,8 +701,6 @@ namespace Isis {
     }
     else {
       setWindowTitle( project->name() );
-      QString projName = project->name();
-      setWindowTitle(projName );
     }
 
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
