@@ -144,7 +144,9 @@ namespace Isis {
     appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
     appendRow( new ProjectItem(bundleSolutionInfo->control()) );
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
-    appendRow( new ProjectItem( bundleSolutionInfo->adjustedImages() ) );
+    if (!bundleSolutionInfo->adjustedImages().isEmpty()) {
+      appendRow( new ProjectItem( bundleSolutionInfo->adjustedImages() ) );
+    }
   }
 
 

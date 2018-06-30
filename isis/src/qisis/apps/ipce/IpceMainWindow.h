@@ -131,6 +131,8 @@ namespace Isis {
    *                           Fixes #5412.
    *   @history 2018-05-31 Christopher Combs - Added support for JigsawRunWidget to be created as a 
    *                           dockable widget in addView(). Fixes #5428.
+   *   @history 2018-06-14 Christopher Combs - Changed addView method to take in JigsawRunWidget as
+   *                           a QDockWidget object instead of wrapping it in one.
    *  
    */
   class IpceMainWindow : public QMainWindow {

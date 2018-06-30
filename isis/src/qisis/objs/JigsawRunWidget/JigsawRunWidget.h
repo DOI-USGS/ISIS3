@@ -3,7 +3,9 @@
 
 #include <QDialog>
 #include <QDir>
+#include <QDockWidget>
 #include <QFrame>
+#include <QMessageBox>
 #include <QPointer>
 #include <QWidget>
 
@@ -15,6 +17,7 @@ namespace Ui {
 }
 
 class QString;
+class QThread;
 
 namespace Isis {
   class BundleAdjust;
@@ -88,8 +91,14 @@ namespace Isis {
    *                           Now inherits from QFrame instead of QDialog. Added support for new
    *                           workflow in which JigsawSetupDialog is only ever called from a
    *                           button on this widget. Fixes #5428. 
+   *   @history 2018-06-14 Christopher Combs - Made changes according to new design mockup. Added 
+   *                           status bar, control net info, and rms adj point sigmas sections. 
+   *                           Removed buttons for close and reject. Now inherits from QDockWidget
+   *                           instead of QFrame, and handles close event if a bundle is running. 
+   *   @history 2018-06-15 Christopher Combs - Implemented "Write detached labels" checkbox. 
+   *                           made changes to on_JigsawAcceptButton_clicked to reflect this.
    */
-  class JigsawRunWidget : public QFrame {
+  class JigsawRunWidget : public QDockWidget {
     Q_OBJECT
 
   public:
@@ -101,12 +110,16 @@ namespace Isis {
                           QWidget *parent = 0);
 
     ~JigsawRunWidget();
+    void closeEvent(QCloseEvent *event);
+
 
   public slots:
     void outputBundleStatus(QString status);
     void errorString(QString error);
     void reportException(QString exception);
-    void updateIterationSigma0(int iteration, double sigma0);
+    void updateIteration(int iteration);
+    void updatePoint(int point);
+    void updateStatus(QString status);
     void bundleFinished(BundleSolutionInfo *bundleSolutionInfo);
     void notifyThreadFinished();
 
@@ -121,8 +134,7 @@ namespace Isis {
 
   private:
     bool m_bRunning; /**< Indicates whether or not the bundle adjust is running. */
-    QPushButton *m_accept; /**< widget's accept button that is used to save the bundle results. */
-    QPushButton *m_reject; /**< widget's reject button that is used to discard the results. */
+    QThread *m_bundleThread; /**< separate thread for running bundle adjust calculations in. */
 
     /**
      * Functor used to copy images to a specified destination directory. This is used by
@@ -144,10 +156,9 @@ namespace Isis {
     };
 
   private slots:
-    void on_JigsawSetupButton_pressed();
+    void on_JigsawSetupButton_clicked();
     void on_JigsawRunButton_clicked();
-    void acceptBundleResults();
-    void rejectBundleResults();
+    void on_JigsawAcceptButton_clicked();
     void clearDialog();
     void updateScrollBar();
 
