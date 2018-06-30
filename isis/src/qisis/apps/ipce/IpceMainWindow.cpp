@@ -622,9 +622,9 @@ namespace Isis {
    * Read the window positioning and state information from the config file.
    *
    * When running ipce without opening a project, the config file read is
-   * $HOME/.Isis/$APPNAME/$APPNAME_Project.config
-   * Otherwise, when running ipce and opening a project (ProjectName), the config file read is
-   * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config
+   * $HOME/.Isis/$APPNAME/ipce.config
+   * When running ipce and opening a project (ProjectName), the config file read is
+   * project->projectRoot()/ipce.config
    *
    * @param[in] project (Project *) The project that was loaded.
    *
