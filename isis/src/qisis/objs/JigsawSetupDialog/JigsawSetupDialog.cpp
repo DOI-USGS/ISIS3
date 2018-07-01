@@ -1506,11 +1506,13 @@ namespace Isis {
    *
    * This slot populates the Instrument Position Solve Options table according to the value of the
    * SPK Solve Degree. Rows are added depending on the degree set, where number of rows added is
-   * equal to the SPK Solve Degree + 1.
+   * equal to the SPK Solve Degree + 1. Note that this relies on the updateSolveSettingsSigmaTables
+   * slot, which uses the SPK Solve Degree if the ALL position option is selected.
    *
    * @param int Value the SPK Solve Degree spin box was changed to.
    */
   void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
+    // Update the position apriori sigma table and use the position combo box solve option
     updateSolveSettingsSigmaTables(m_ui->positionComboBox, m_ui->positionAprioriSigmaTable);
   }
 
@@ -1520,11 +1522,13 @@ namespace Isis {
    *
    * This slot populates the Instrument Pointing Solve Options table according to the value of the
    * CK Solve Degree. Rows are added depending on the degree set, where number of rows added is
-   * equal to the CK Solve Degree + 1.
+   * equal to the CK Solve Degree + 1. Note that this relies on the updateSolveSettingsSigmaTables
+   * slot, which uses the CK Solve Degree if the ALL pointing option is selected.
    *
    * @param int Value the CK Solve Degree spin box was changed to.
    */
   void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
+    // Update the pointing apriori sigma table and use the pointing combo box solve option
     updateSolveSettingsSigmaTables(m_ui->pointingComboBox, m_ui->pointingAprioriSigmaTable);
   }
 
@@ -1542,7 +1546,11 @@ namespace Isis {
                                                          QTableWidget *table) {
     int rowCount = solveOptionComboBox->currentIndex();
 
-    // When solve option is ALL, use the spk/ck solve degree value + 1 for number of rows
+    // Position: { NONE, POSITION, VELOCITY, ACCELERATION, ALL }
+    // Pointing: { NONE, ANGLES, ANGULAR VELOCITY, ANGULAR ACCELERATION, ALL }
+    // Need to add to the solve degree value since number of rows == number of solve coefficients,
+    // and for our polynomials the number of solve coefficients == solve degree + 1
+    // When solve option is ALL (index 4), use the spk/ck solve degree value + 1 for number of rows
     if (rowCount == 4) {
       if (solveOptionComboBox == m_ui->positionComboBox) {
         rowCount = m_ui->spkSolveDegreeSpinBox->value() + 1;
@@ -1562,7 +1570,7 @@ namespace Isis {
     // the setRowCount() is called when newRowCount < oldRowCount
     validateSigmaTables();
 
-    // Determine the units for either positions or angles
+    // Determine the units for either position or pointing
     QStringList solveOptions;
     QString longUnits("N/A");
     QString shortUnits("N/A");
@@ -1658,6 +1666,8 @@ namespace Isis {
         spinBox->setEnabled(true);
       }
       else {
+        // The default value for the spk solve degree and spk degree spinboxes is 2. This is
+        // emulating jigsaw's defaults for position solve options that are not ALL.
         spinBox->setValue(2);
         spinBox->setEnabled(false);
       }
@@ -1688,6 +1698,8 @@ namespace Isis {
         spinBox->setEnabled(true);
       }
       else {
+        // The default value for the ck solve degree and spk degree spinboxes is 2. This is
+        // emulating jigsaw's defaults for pointing solve options that are not ALL.
         spinBox->setValue(2);
         spinBox->setEnabled(false);
       }
