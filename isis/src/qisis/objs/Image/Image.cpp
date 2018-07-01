@@ -24,6 +24,7 @@
 #include "ImageDisplayProperties.h"
 #include "ImagePolygon.h"
 #include "IString.h"
+#include "ObservationNumber.h"
 #include "PolygonTools.h"
 #include "Project.h"
 #include "SerialNumber.h"
@@ -308,6 +309,15 @@ namespace Isis {
    */
   QString Image::fileName() const {
     return m_fileName;
+  }
+
+
+  /**
+   * @brief Returns the observation number of the Cube
+   * @return QString A string representation of the observation number of the cube.
+   */
+  QString Image::observationNumber() {
+    return ObservationNumber::Compose(*(cube()));
   }
 
 

@@ -112,12 +112,12 @@ namespace Isis {
     if (!m_project->directory()->model()->selectedItems().isEmpty()) {
       foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
         if (projItem->isImage()) {
-          defaultObservationSettings.addObservationNumber(projItem->image()->serialNumber());  
+          defaultObservationSettings.addObservationNumber(projItem->image()->observationNumber());  
         }
         else if (projItem->isImageList()) {
           for (int i = 0; i < projItem->rowCount(); i++) {
             ProjectItem * childItem = projItem->child(i);
-            defaultObservationSettings.addObservationNumber(childItem->image()->serialNumber());  
+            defaultObservationSettings.addObservationNumber(childItem->image()->observationNumber());  
           }
         }
       }
@@ -132,7 +132,7 @@ namespace Isis {
           for (int j = 0; j < imglistItem->rowCount(); j++) {
             ProjectItem * imgItem = imglistItem->child(j);
             if (imgItem->isImage()) {
-              defaultObservationSettings.addObservationNumber(imgItem->image()->serialNumber());  
+              defaultObservationSettings.addObservationNumber(imgItem->image()->observationNumber());  
             }
           }
         } 
@@ -896,7 +896,7 @@ namespace Isis {
 
           if (projItem->isImage() ) {
             Image * img = projItem->data().value<Image *>();
-            boss.addObservationNumber(img->serialNumber() );
+            boss.addObservationNumber(img->observationNumber() );
 
           }
         }
@@ -1785,9 +1785,13 @@ namespace Isis {
 
       if (projItem) {
         // Tree traversal is top down so we dont need to do this check for imagelists?
-        if (projItem->isImage() && 
-            !selectedObservationNumbers.contains(projItem->image()->serialNumber())) {
-          selectedObservationNumbers.append(projItem->image()->serialNumber());
+        if (projItem->isImage()) {
+          // Grab the observation up front so we don't need to re-compose the observation number
+          // more than once (@todo: this should not be necessary when 5026 is integrated)
+          const QString observationNumber = projItem->image()->observationNumber();
+          if (!selectedObservationNumbers.contains(observationNumber)) {
+            selectedObservationNumbers.append(observationNumber);
+          }
         }
         else if (projItem->isImageList()) {
           // Use the proxymodel's children as it might not include all of the sourcemodel's children 
@@ -1795,7 +1799,7 @@ namespace Isis {
             QModelIndex childProxyIndex = proxyModel->index(i, 0, index);
             QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
             ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
-            selectedObservationNumbers.append(childItem->image()->serialNumber());
+            selectedObservationNumbers.append(childItem->image()->observationNumber());
           }
         }
       }
