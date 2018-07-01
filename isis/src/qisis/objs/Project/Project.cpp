@@ -1388,6 +1388,7 @@ namespace Isis {
     m_isOpen = true;
     // TODO: TLS 2018-06-07  Why writeSettings here?
     //writeSettings();
+    setClean(true);
     emit projectLoaded(this);
   }
 
