@@ -1511,6 +1511,9 @@ namespace Isis {
    * @param int Value the SPK Solve Degree spin box was changed to.
    */
   void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
+    if (m_ui->positionComboBox->currentIndex() != 4) {
+      return;
+    }
     // number of rows == spkSolveDegree value + 1 (i+1)
     QTableWidget *table = m_ui->positionAprioriSigmaTable;
     const int oldRowCount = table->rowCount();
@@ -1591,6 +1594,10 @@ namespace Isis {
    * @param int Value the CK Solve Degree spin box was changed to.
    */
   void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
+    if (m_ui->pointingComboBox->currentIndex() != 4) {
+      return;
+    }
+
     // number of rows == ckSolveDegree value + 1 (i+1)
     QTableWidget *table = m_ui->pointingAprioriSigmaTable;
     const int oldRowCount = table->rowCount();
@@ -1681,10 +1688,84 @@ namespace Isis {
         spinBox->setEnabled(true);
       }
       else {
-        spinBox->setValue(solveIndex - 1);
+        spinBox->setValue(2);
         spinBox->setEnabled(false);
       }
     }
+
+    // number of rows == position solve option == spkSolveDegree value + 1 (i+1)
+    QTableWidget *table = m_ui->positionAprioriSigmaTable;
+    const int oldRowCount = table->rowCount();
+    // if solving ALL, don't add extra row
+    if (solveIndex == 4) {
+      solveIndex--;
+    }
+    table->setRowCount(solveIndex);
+    const int newRowCount = table->rowCount();
+
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
+
+    // Rows need to be added
+    if (newRowCount > oldRowCount) {
+      for (int row = oldRowCount; row < newRowCount; row++) {
+        // Headers : coefficient, description, units, a priori sigma
+        QTableWidgetItem *coefficient = new QTableWidgetItem();
+        coefficient->setFlags(Qt::ItemIsEnabled);
+        coefficient->setText(QString::number(row + 1));
+        table->setItem(row, 0, coefficient);
+
+        QTableWidgetItem *description = new QTableWidgetItem();
+        description->setFlags(Qt::ItemIsEnabled);
+        description->setText("N/A");
+        table->setItem(row, 1, description);
+
+        QTableWidgetItem *units = new QTableWidgetItem();
+        units->setFlags(Qt::ItemIsEnabled);
+        units->setText("m/s^" + QString::number(row));
+        table->setItem(row, 2, units);
+
+        QTableWidgetItem *sigma = new QTableWidgetItem();
+        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        sigma->setText("0.0");
+        sigma->setData(Qt::UserRole, QVariant(true));
+        table->setItem(row, 3, sigma);
+
+        // Solve option: spk degree { NONE: -1, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
+        // POSITION
+        if (row == 0) { 
+          QTableWidgetItem *description = table->item(0, 1);
+          description->setText("POSITION");
+
+          QTableWidgetItem *units = table->item(0, 2);
+          units->setText("meters");
+        }
+
+        // VELOCITY
+        else if (row == 1) {
+          QTableWidgetItem *description = table->item(1, 1);
+          description->setText("VELOCITY");
+
+          QTableWidgetItem *units = table->item(1, 2);
+          units->setText("m/s");
+        }
+
+        // ACCELERATION
+        else if (row == 2) {
+          QTableWidgetItem *description = table->item(2, 1);
+          description->setText("ACCELERATION");
+
+          QTableWidgetItem *units = table->item(2, 2);
+          units->setText("m/s^2");
+        }
+      }
+    }
+
+    table->resizeColumnToContents(1);
+    table->resizeColumnToContents(2);
+
+
   }
 
 
@@ -1709,10 +1790,81 @@ namespace Isis {
         spinBox->setEnabled(true);
       }
       else {
-        spinBox->setValue(solveIndex - 1);
+        spinBox->setValue(2);
         spinBox->setEnabled(false);
       }
     }
+
+    // number of rows == pointing solve option index == ckSolveDegree value + 1 (i+1)
+    QTableWidget *table = m_ui->pointingAprioriSigmaTable;
+    const int oldRowCount = table->rowCount();
+    // if solving ALL, don't add an extra row
+    if (solveIndex == 4) {
+      solveIndex--;
+    }
+    table->setRowCount(solveIndex);
+    const int newRowCount = table->rowCount();
+
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
+
+    if (newRowCount > oldRowCount) {
+      for (int row = oldRowCount; row < newRowCount; row++) {
+        // Headers : coefficient, description, units, a priori sigma
+        QTableWidgetItem *coefficient = new QTableWidgetItem();
+        coefficient->setFlags(Qt::ItemIsEnabled);
+        coefficient->setText(QString::number(row + 1));
+        table->setItem(row, 0, coefficient);
+
+        QTableWidgetItem *description = new QTableWidgetItem();
+        description->setFlags(Qt::ItemIsEnabled);
+        description->setText("N/A");
+        table->setItem(row, 1, description);
+
+        QTableWidgetItem *units = new QTableWidgetItem();
+        units->setFlags(Qt::ItemIsEnabled);
+        units->setText("deg/s^" + QString::number(row));
+        table->setItem(row, 2, units);
+
+        QTableWidgetItem *sigma = new QTableWidgetItem();
+        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        sigma->setText("0.0");
+        sigma->setData(Qt::UserRole, QVariant(true));
+        table->setItem(row, 3, sigma);
+
+        // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 2 }
+        // ANGLES
+        if (row == 0) { 
+          QTableWidgetItem *description = table->item(0, 1);
+          description->setText("ANGLES");
+
+          QTableWidgetItem *units = table->item(0, 2);
+          units->setText("degrees");
+        }
+
+        // VELOCITY
+        if (row == 1) {
+          QTableWidgetItem *description = table->item(1, 1);
+          description->setText("ANGULAR VELOCITY");
+
+          QTableWidgetItem *units = table->item(1, 2);
+          units->setText("deg/s");
+        }
+
+        // ACCELERATION
+        if (row == 2) {
+          QTableWidgetItem *description = table->item(2, 1);
+          description->setText("ANGULAR ACCELERATION");
+
+          QTableWidgetItem *units = table->item(2, 2);
+          units->setText("deg/s^2");
+        }
+      }
+    }
+
+    table->resizeColumnToContents(1);
+    table->resizeColumnToContents(2);
   }
 
 
