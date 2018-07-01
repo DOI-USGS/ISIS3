@@ -2,19 +2,20 @@
 #define MeasureCountFilter_H
 
 
+// parent
 #include "AbstractFilter.h"
+
 
 class QButtonGroup;
 class QLineEdit;
-template< typename U, typename V > class QPair;
 class QSpinBox;
 class QString;
 
 
 namespace Isis {
-  class ControlMeasure;
-  class ControlNet;
+  class AbstractFilterSelector;
   class ControlPoint;
+  class ControlMeasure;
 
   /**
    * @brief Allows filtering by the number of measures in a control point
@@ -28,19 +29,17 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
-   *                           References #5434.
    */
   class MeasureCountFilter : public AbstractFilter {
       Q_OBJECT
 
     public:
       MeasureCountFilter(AbstractFilter::FilterEffectivenessFlag,
-            int minimumForSuccess = -1);
+          int minimumForSuccess = -1);
       MeasureCountFilter(const MeasureCountFilter &other);
       virtual ~MeasureCountFilter();
 
-      bool evaluate(const QPair<QString, ControlNet *> *) const;
+      bool evaluate(const ControlCubeGraphNode *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 

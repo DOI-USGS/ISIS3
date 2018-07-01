@@ -4,35 +4,35 @@
 
 #include <iostream>
 
-#include <QPair>
 #include <QString>
 #include <QVariant>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlNet.h"
 
 
 namespace Isis {
-  AbstractImageItem::AbstractImageItem(QString imageSerial, ControlNet *net,
-                                       int avgCharWidth, AbstractTreeItem *parent)
-        : AbstractTreeItem(parent) {
-    m_imageAndNet = new QPair<QString, ControlNet *>(imageSerial, net);
+  AbstractImageItem::AbstractImageItem(ControlCubeGraphNode *cubeGraphNode,
+      int avgCharWidth, AbstractTreeItem *parent)
+    : AbstractTreeItem(parent) {
+    ASSERT(cubeGraphNode);
+    m_ccgn = cubeGraphNode;
     calcDataWidth(avgCharWidth);
+
+    connect(m_ccgn, SIGNAL(destroyed(QObject *)), this, SLOT(sourceDeleted()));
   }
 
 
   AbstractImageItem::~AbstractImageItem() {
-    if (m_imageAndNet) {
-      delete m_imageAndNet;
-    }
-    m_imageAndNet = NULL;
+    m_ccgn = NULL;
   }
 
 
   QVariant AbstractImageItem::getData() const {
-    if (m_imageAndNet) {
-      return QVariant(m_imageAndNet->first);
-    }
-    return QVariant();
+    if (m_ccgn)
+      return QVariant((QString)m_ccgn->getSerialNumber());
+    else
+      return QVariant();
   }
 
 
@@ -51,31 +51,28 @@ namespace Isis {
   }
 
 
-  void AbstractImageItem::deleteSource() { }
+  void AbstractImageItem::deleteSource() {
+    // Shouldn't be deleting ControlCubeGraphNode's!
+    ASSERT(0);
+  }
 
 
   AbstractTreeItem::InternalPointerType AbstractImageItem::getPointerType() const {
-    return AbstractTreeItem::ImageAndNet;
+    return AbstractTreeItem::CubeGraphNode;
   }
 
 
   void *AbstractImageItem::getPointer() const {
-    return m_imageAndNet;
+    return m_ccgn;
   }
 
 
-  bool AbstractImageItem::hasImage(QString imageSerial) const {
-    if(!m_imageAndNet) {
-      return false;
-    }
-    return (QString::compare(m_imageAndNet->first, imageSerial) == 0) ||
-            AbstractTreeItem::hasImage(imageSerial);
+  bool AbstractImageItem::hasNode(ControlCubeGraphNode *node) const {
+    return m_ccgn == node || AbstractTreeItem::hasNode(node);
   }
 
 
-  /**
-   * This method is required to be implemented by the parent AbstractTreeItem class,
-   * but for this it's a NOP.
-   */
-  void AbstractImageItem::sourceDeleted() { }
+  void AbstractImageItem::sourceDeleted() {
+    m_ccgn = NULL;
+  }
 }

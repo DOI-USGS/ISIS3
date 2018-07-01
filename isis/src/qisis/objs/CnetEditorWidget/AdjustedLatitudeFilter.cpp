@@ -2,23 +2,19 @@
 
 #include "AdjustedLatitudeFilter.h"
 
-#include <QPair>
-#include <QString>
-
 #include "ControlPoint.h"
-#include "ControlNet.h"
 #include "Latitude.h"
 
 
 namespace Isis {
   AdjustedLatitudeFilter::AdjustedLatitudeFilter(
-        AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
   AdjustedLatitudeFilter::AdjustedLatitudeFilter(
-        const AdjustedLatitudeFilter &other) : AbstractNumberFilter(other) {
+    const AdjustedLatitudeFilter &other) : AbstractNumberFilter(other) {
   }
 
 
@@ -26,18 +22,20 @@ namespace Isis {
   }
 
 
-  bool AdjustedLatitudeFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluateImageFromPointFilter(imageAndNet);
+  bool AdjustedLatitudeFilter::evaluate(
+    const ControlCubeGraphNode *node) const {
+    return evaluateImageFromPointFilter(node);
   }
 
 
   bool AdjustedLatitudeFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-          point->GetAdjustedSurfacePoint().GetLatitude().degrees());
+        point->GetAdjustedSurfacePoint().GetLatitude().degrees());
   }
 
 
-  bool AdjustedLatitudeFilter::evaluate(const ControlMeasure *measure) const {
+  bool AdjustedLatitudeFilter::evaluate(
+    const ControlMeasure *measure) const {
     return true;
   }
 
@@ -66,3 +64,4 @@ namespace Isis {
         descriptionSuffix();
   }
 }
+

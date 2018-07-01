@@ -95,12 +95,11 @@ namespace Isis {
   }
 
 
-  bool AbstractTreeItem::hasImage(QString imageSerial) const {
+  bool AbstractTreeItem::hasNode(ControlCubeGraphNode *cube) const {
     bool found = false;
 
-    for (int i = 0; !found && i < childCount(); i++) {
-      found = childAt(i)->hasImage(imageSerial);
-    }
+    for (int i = 0; !found && i < childCount(); i++)
+      found = childAt(i)->hasNode(cube);
 
     return found;
   }
@@ -223,3 +222,4 @@ namespace Isis {
     return d;
   }
 }
+

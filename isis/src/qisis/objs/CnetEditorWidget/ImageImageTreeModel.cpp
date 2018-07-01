@@ -10,6 +10,7 @@
 #include <QString>
 #include <QtConcurrentMap>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 
@@ -38,9 +39,8 @@ namespace Isis {
 
 
   ImageImageTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
-    AbstractTreeModel *tm, ControlNet *net, QThread *tt) {
+    AbstractTreeModel *tm, QThread *tt) {
     m_treeModel = tm;
-    m_controlNet = net;
     m_targetThread = tt;
     m_avgCharWidth = QFontMetrics(
         m_treeModel->getView()->getContentFont()).averageCharWidth();
@@ -50,7 +50,6 @@ namespace Isis {
   ImageImageTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
     const CreateRootItemFunctor &other) {
     m_treeModel = other.m_treeModel;
-    m_controlNet = other.m_controlNet;
     m_targetThread = other.m_targetThread;
     m_avgCharWidth = other.m_avgCharWidth;
   }
@@ -58,28 +57,27 @@ namespace Isis {
 
   ImageImageTreeModel::CreateRootItemFunctor::~CreateRootItemFunctor() {
     m_treeModel = NULL;
-    m_controlNet = NULL;
     m_targetThread = NULL;
   }
 
 
   ImageParentItem *ImageImageTreeModel::CreateRootItemFunctor::operator()(
-    const QString imageSerial) const {
-
+    ControlCubeGraphNode *const &node) const {
     ImageParentItem *parentItem =
-          new ImageParentItem(imageSerial, m_controlNet, m_avgCharWidth);
+      new ImageParentItem(node, m_avgCharWidth);
     parentItem->setSelectable(false);
     parentItem->moveToThread(m_targetThread);
 
-    QList< QString > connectedImages = m_controlNet->getAdjacentImages(imageSerial);
+    QList< ControlCubeGraphNode * > connectedNodes = node->getAdjacentNodes();
 
-    for (int j = 0; j < connectedImages.size(); j++) {
-      ImageLeafItem *childItem =
-            new ImageLeafItem(connectedImages[j], m_controlNet, m_avgCharWidth, parentItem);
-      childItem->setSelectable(false);
-      childItem->moveToThread(m_targetThread);
+    for (int j = 0; j < connectedNodes.size(); j++) {
+      ControlCubeGraphNode *connectedNode = connectedNodes[j];
+      ImageLeafItem *serialItem =
+        new ImageLeafItem(connectedNode, m_avgCharWidth, parentItem);
+      serialItem->setSelectable(false);
+      serialItem->moveToThread(m_targetThread);
 
-      parentItem->addChild(childItem);
+      parentItem->addChild(serialItem);
     }
 
     return parentItem;
@@ -128,8 +126,8 @@ namespace Isis {
       }
 
       futureRoot = QtConcurrent::mappedReduced(
-          getControlNetwork()->GetCubeSerials(),
-          CreateRootItemFunctor(this, getControlNetwork(), QThread::currentThread()),
+          getControlNetwork()->GetCubeGraphNodes(),
+          CreateRootItemFunctor(this, QThread::currentThread()),
           &CreateRootItemFunctor::addToRootItem,
           QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 

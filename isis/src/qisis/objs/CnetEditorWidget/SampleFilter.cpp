@@ -2,22 +2,20 @@
 
 #include "SampleFilter.h"
 
-#include <QPair>
-#include <QString>
-
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
 
 
 namespace Isis {
   SampleFilter::SampleFilter(
-        AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) :
+    AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  SampleFilter::SampleFilter(const SampleFilter &other) : AbstractNumberFilter(other) {
+  SampleFilter::SampleFilter(
+    const SampleFilter &other) : AbstractNumberFilter(other) {
   }
 
 
@@ -25,8 +23,8 @@ namespace Isis {
   }
 
 
-  bool SampleFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluateImageFromMeasureFilter(imageAndNet);
+  bool SampleFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return evaluateImageFromMeasureFilter(node);
   }
 
 
@@ -47,12 +45,10 @@ namespace Isis {
 
   QString SampleFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1) {
+    if (getMinForSuccess() == 1)
       description += "measure that has a sample which is ";
-    }
-    else {
+    else
       description += "measures that have samples which are ";
-    }
 
     description += descriptionSuffix();
     return description;
@@ -68,3 +64,4 @@ namespace Isis {
     return "have samples which are " + descriptionSuffix();
   }
 }
+

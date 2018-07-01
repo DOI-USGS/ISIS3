@@ -15,15 +15,14 @@
 #include <QMargins>
 #include <QMenu>
 #include <QMenuBar>
-#include <QPair>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QString>
 #include <QVBoxLayout>
 #include <QWriteLocker>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
-#include "ControlNet.h"
 #include "ControlPoint.h"
 
 #include "AbstractFilterSelector.h"
@@ -31,7 +30,7 @@
 
 namespace Isis {
   AbstractFilter::AbstractFilter(FilterEffectivenessFlag effectiveness,
-                                 int minimumForSuccess) {
+      int minimumForSuccess) {
     nullify();
 
     m_minForSuccess = minimumForSuccess;
@@ -285,26 +284,26 @@ namespace Isis {
 
 
   bool AbstractFilter::evaluateImageFromPointFilter(
-        const QPair<QString, ControlNet *> *imageAndNet) const {
+    const ControlCubeGraphNode *node) const {
+    ASSERT(node);
+
     bool evaluation = true;
 
-    if (canFilterImages()) {
-      evaluation = evaluateFromCount(imageAndNet->second->GetMeasuresInCube(imageAndNet->first),
-                                     true);
-    }
+    if (canFilterImages())
+      evaluation = evaluateFromCount(node->getMeasures(), true);
 
     return evaluation;
   }
 
 
   bool AbstractFilter::evaluateImageFromMeasureFilter(
-        const QPair<QString, ControlNet *> *imageAndNet) const {
+    const ControlCubeGraphNode *node) const {
+    ASSERT(node);
+
     bool evaluation = true;
 
-    if (canFilterImages()) {
-      evaluation = evaluateFromCount(imageAndNet->second->GetMeasuresInCube(imageAndNet->first),
-                                     false);
-    }
+    if (canFilterImages())
+      evaluation = evaluateFromCount(node->getMeasures(), false);
 
     return evaluation;
   }

@@ -43,7 +43,6 @@
 #include <QWidgetAction>
 #include <QXmlStreamWriter>
 
-#include "ControlNetTool.h"
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "Directory.h"
@@ -51,7 +50,6 @@
 #include "ImageFileListWidget.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
-#include "MosaicControlNetTool.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -63,7 +61,7 @@ namespace Isis {
   /**
    * Constructor.
    *
-   * @param parent (QMainWindow *) Pointer to parent QMainWindow
+   * @param parent Pointer to parent QWidget
    */
   Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) :
                       AbstractProjectItemView(parent) {
@@ -94,15 +92,18 @@ namespace Isis {
 
     connect(m_sceneWidget, SIGNAL(createControlPoint(double, double)),
             this, SIGNAL(createControlPoint(double, double)));
-
-    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)),
+    
+    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)), 
             this, SLOT(onMosItemRemoved(Image *)));
 
     //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
     //  the footprints.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
-    setStatusBar(statusBar);
+    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
+    QHBoxLayout *viewlayout = new QHBoxLayout();
+
+    layout->addWidget(statusBar);
 
     m_fileListWidget = new ImageFileListWidget(directory);
 
@@ -118,44 +119,51 @@ namespace Isis {
 
     imageFileListdock->setWidget(m_fileListWidget);
 
-    addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
-    setCentralWidget(m_sceneWidget);
+    m_window = new QMainWindow();
+    m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
+    m_window->setCentralWidget(m_sceneWidget);
+    viewlayout->addWidget(m_window);
+    layout->addLayout(viewlayout);
 
-    m_permToolBar = addToolBar("Standard Tools");
+    setLayout(layout);
+
+    m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
+    //toolBarLayout->addWidget(m_permToolBar);
 
-    m_activeToolBar = addToolBar("Active Tool");
+    m_activeToolBar = new QToolBar("Active Tool", 0);
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
+    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    addToolBar(Qt::RightToolBarArea, m_toolPad);
+    //toolBarLayout->addWidget(m_toolPad);
+
 
     m_sceneWidget->addToPermanent(m_permToolBar);
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
 
-    // MosaicSceneWidget's default is to have the Control Net Tool enabled.
-    // In ipce, we want it to be disabled if an active control is not set.
-    foreach (QAction * action, m_toolPad->actions()) {
-      if (action->toolTip() == "Control Net (c)") {
-        m_controlNetTool = action;
-      }
-    }
-    if (!directory->project()->activeControl()) {
-      m_controlNetTool->setEnabled(false);
-    }
+    m_activeToolBarAction = new QWidgetAction(this);
+    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
 
     setAcceptDrops(true);
+
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
   }
+
 
   /**
    * Destructor
    */
   Footprint2DView::~Footprint2DView() {
     delete m_fileListWidget;
+    delete m_window;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
@@ -241,11 +249,11 @@ namespace Isis {
     }
   }
 
-
+  
   /**
-   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed
+   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed 
    * using the Close Cube context menu.
-   *
+   * 
    * @param image The image that was closed and needs to be removed
    */
   void Footprint2DView::onMosItemRemoved(Image *image) {
@@ -261,7 +269,7 @@ namespace Isis {
       }
     }
   }
-
+  
 
   /**
    * Slot to connect to the itemRemoved signal from the model. If the item is an image it removes it
@@ -316,17 +324,38 @@ namespace Isis {
     }
   }
 
+
   /**
-   * A slot function that is called when directory emits a siganl that an active
-   * control network is set. It enables the control network editor tool in the
-   * toolpad and loads the network.
-   * We do not load the network here because the network does not open until
-   * the tool is enabled. This is done in MosaicControlNetTool::updateTool() and
-   * is connected in MosaicTool.
+   * Returns a list of actions for the permanent tool bar.
+   *
+   * @return @b QList<QAction*> The actions
    */
-  void Footprint2DView::enableControlNetTool(bool value) {
-    m_controlNetTool->setEnabled(value);
+  QList<QAction *> Footprint2DView::permToolBarActions() {
+    return m_permToolBar->actions();
   }
+
+
+  /**
+   * Returns a list of actions for the active tool bar.
+   *
+   * @return @b QList<QAction*> The actions
+   */
+  QList<QAction *> Footprint2DView::activeToolBarActions() {
+    QList<QAction *> actions;
+    actions.append(m_activeToolBarAction);
+    return actions;
+  }
+
+
+  /**
+   * Returns a list of actions for the tool pad.
+   *
+   * @return @b QList<QAction*> The actions
+   */
+  QList<QAction *> Footprint2DView::toolPadActions() {
+    return m_toolPad->actions();
+  }
+
 
   /**
    * @brief Loads the Footprint2DView from an XML file.
@@ -338,7 +367,7 @@ namespace Isis {
 
 
   /**
-   * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML
+   * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML 
    *        file.
    * @param stream  The XML stream writer
    * @param newProjectRoot The FileName of the project this Directory is attached to.
@@ -414,3 +443,4 @@ namespace Isis {
     return result;
   }
 }
+

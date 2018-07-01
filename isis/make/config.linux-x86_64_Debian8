@@ -115,6 +115,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXml
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt5.7.1/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
 QTLIB    = -lQt5Core -lQt5Concurrent -lQt5XmlPatterns -lQt5Xml -lQt5Network -lQt5Sql -lQt5Gui -lQt5PrintSupport -lQt5Positioning -lQt5Qml -lQt5Quick -lQt5Sensors -lQt5Svg -lQt5Test -lQt5OpenGL -lQt5Widgets -lQt5Multimedia -lQt5MultimediaWidgets -lQt5WebChannel -lQt5WebEngine -lQt5WebEngineWidgets -lQt5DBus
+
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc
 RCC      = $(ISIS3LOCAL)/bin/rcc
@@ -297,7 +298,7 @@ FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
 QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
 
 #---------------------------------------------------------------------------
-# Set up for Embree libraries
+# Set up for Embree libraries 
 #---------------------------------------------------------------------------
 EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
 EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
@@ -345,7 +346,7 @@ NNLIB = -lnn
 BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
                 -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
                 -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
-                -lLinearMath
+                -lLinearMath 
 BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
 
 #---------------------------------------------------------------------------
@@ -358,7 +359,6 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #---------------------------------------------------------------------------
 
 # Qt Libraries
-
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5.7.*[^g]"

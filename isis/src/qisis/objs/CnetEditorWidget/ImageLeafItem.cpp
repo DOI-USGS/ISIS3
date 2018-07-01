@@ -4,9 +4,9 @@
 
 
 namespace Isis {
-  ImageLeafItem::ImageLeafItem(QString imageSerial, ControlNet *net,
-                               int avgCharWidth, AbstractTreeItem *parent)
-        : AbstractTreeItem(parent), AbstractImageItem(imageSerial, net, avgCharWidth) {
+  ImageLeafItem::ImageLeafItem(ControlCubeGraphNode *node,
+      int avgCharWidth, AbstractTreeItem *parent)
+    : AbstractTreeItem(parent), AbstractImageItem(node, avgCharWidth) {
   }
 
 

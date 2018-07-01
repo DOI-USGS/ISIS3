@@ -13,6 +13,7 @@ class QString;
 
 
 namespace Isis {
+  class ControlCubeGraphNode;
   class ControlNet;
   class ImageParentItem;
   class TreeView;
@@ -34,8 +35,6 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
-   *                           References #5434.
    */
   class ImagePointTreeModel : public AbstractTreeModel {
       Q_OBJECT
@@ -59,12 +58,12 @@ namespace Isis {
        * @internal
        */
       class CreateRootItemFunctor : public std::unary_function <
-          const QString, ImageParentItem * > {
+          ControlCubeGraphNode *const &, ImageParentItem * > {
         public:
-          CreateRootItemFunctor(AbstractTreeModel *tm, ControlNet *net, QThread *tt);
+          CreateRootItemFunctor(AbstractTreeModel *tm, QThread *tt);
           CreateRootItemFunctor(const CreateRootItemFunctor &);
           ~CreateRootItemFunctor();
-          ImageParentItem *operator()(const QString imageSerial) const;
+          ImageParentItem *operator()(ControlCubeGraphNode *const &) const;
           CreateRootItemFunctor &operator=(const CreateRootItemFunctor &);
 
           static void addToRootItem(QAtomicPointer< RootItem > &,
@@ -74,7 +73,6 @@ namespace Isis {
           int m_avgCharWidth;
           AbstractTreeModel *m_treeModel;
           QThread *m_targetThread;
-          ControlNet *m_controlNet;
       };
   };
 }

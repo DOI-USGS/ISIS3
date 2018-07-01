@@ -1,0 +1,26 @@
+Test adding first measure ...
+Key = Point1
+Value = measure with cube serial number Image1
+Successfully added measure
+
+Test adding second measure ...
+Key = Point1
+Value = measure with cube serial number Image2
+**USER ERROR** Attempted to add Control Measure with Cube Serial Number [Image2] does not match Serial Number [Image1].
+
+Test adding third measure ...
+Key = Point2
+Value = measure with cube serial number Image1
+Successfully added measure
+
+Test adding fourth measure ...
+Key = Point2
+Value = measure with cube serial number Image2
+**USER ERROR** Attempted to add Control Measure with Cube Serial Number [Image2] does not match Serial Number [Image1].
+
+Testing getMeasures method...
+   (Image1)
+   (Image1)
+
+Testing getValidMeasures method...
+   (Image1)

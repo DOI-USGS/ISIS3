@@ -51,7 +51,6 @@ namespace Isis {
     m_isSynchronous = false;
     m_list = NULL;
     m_watcher = NULL;
-    m_isUndoable = false;
 
     QAction::setText(tr("Import &Control Networks..."));
 
@@ -207,12 +206,31 @@ namespace Isis {
     }
     m_status = WorkOrderFinished;
     m_readProgresses.clear();
-
-    // If one control network was imported, no active control has been set, and no
-    // other control networks exist in the project, then activeControl() will set
-    // the active control to the newly imported control network.
-    project()->activeControl();
   }
+
+
+  /**
+   * @brief Deletes the control network
+   *
+   * This method deletes the control network from the project. This method is was
+   * renamed from undoSyncRedo() to undoExecution().
+   */
+  void ImportControlNetWorkOrder::undoExecution() {
+    if (m_list && project()->controls().size() > 0 && m_watcher->isFinished()) {
+      // Remove the controls from disk.
+      m_list->deleteFromDisk( project() );
+      // Remove the controls from the model, which updates the tree view.
+      ProjectItem *currentItem =
+          project()->directory()->model()->findItemData( QVariant::fromValue(m_list) );
+      project()->directory()->model()->removeItem(currentItem);
+
+      foreach (Control *control, *m_list) {
+        delete control;
+      }
+      delete m_list;
+    }
+  }
+
 
   /**
    * CreateControlsFunctor constructor

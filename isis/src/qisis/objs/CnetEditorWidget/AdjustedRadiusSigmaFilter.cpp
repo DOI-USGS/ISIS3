@@ -2,23 +2,19 @@
 
 #include "AdjustedRadiusSigmaFilter.h"
 
-#include <QPair>
-#include <QString>
-
-#include "ControlMeasure.h"
-#include "ControlNet.h"
 #include "ControlPoint.h"
 
 
 namespace Isis {
   AdjustedRadiusSigmaFilter::AdjustedRadiusSigmaFilter(
-        AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  AdjustedRadiusSigmaFilter::AdjustedRadiusSigmaFilter(const AdjustedRadiusSigmaFilter &other)
-        : AbstractNumberFilter(other) {
+  AdjustedRadiusSigmaFilter::AdjustedRadiusSigmaFilter(
+    const AdjustedRadiusSigmaFilter &other) :
+    AbstractNumberFilter(other) {
   }
 
 
@@ -27,18 +23,20 @@ namespace Isis {
 
 
   bool AdjustedRadiusSigmaFilter::evaluate(
-        const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluateImageFromPointFilter(imageAndNet);
+    const ControlCubeGraphNode *node) const {
+    return evaluateImageFromPointFilter(node);
   }
 
 
-  bool AdjustedRadiusSigmaFilter::evaluate(const ControlPoint *point) const {
+  bool AdjustedRadiusSigmaFilter::evaluate(
+    const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-          point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters());
+        point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters());
   }
 
 
-  bool AdjustedRadiusSigmaFilter::evaluate(const ControlMeasure *measure) const {
+  bool AdjustedRadiusSigmaFilter::evaluate(
+    const ControlMeasure *measure) const {
     return true;
   }
 
@@ -67,3 +65,4 @@ namespace Isis {
         descriptionSuffix();
   }
 }
+

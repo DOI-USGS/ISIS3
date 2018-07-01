@@ -23,8 +23,6 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
-   *   @history 2018-06-12 Kaitlyn Lee - Set the window title to "Table Sorting"
-   *                           with setWindowTitle().
    */
   class CnetEditorSortConfigDialog : public QDialog {
       Q_OBJECT
@@ -66,3 +64,4 @@ namespace Isis {
 }
 
 #endif
+

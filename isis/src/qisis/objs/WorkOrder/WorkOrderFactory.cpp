@@ -2,7 +2,6 @@
 
 #include "BundleObservationViewWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
-#include "ControlHealthMonitorWorkOrder.h"
 #include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
@@ -51,7 +50,6 @@ namespace Isis {
 
     tryType<BundleObservationViewWorkOrder>(type, project, result);
     tryType<CnetEditorViewWorkOrder>(type, project, result);
-    tryType<ControlHealthMonitorWorkOrder>(type, project, result);
     tryType<CubeDnViewWorkOrder>(type, project, result);
     tryType<ExportImagesWorkOrder>(type, project, result);
     tryType<ExportControlNetWorkOrder>(type, project, result);

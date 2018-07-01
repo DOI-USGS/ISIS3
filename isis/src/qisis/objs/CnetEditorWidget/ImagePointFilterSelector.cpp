@@ -50,12 +50,12 @@ namespace Isis {
   }
 
 
-  ImagePointFilterSelector::ImagePointFilterSelector(const ImagePointFilterSelector &other) {
+  ImagePointFilterSelector::ImagePointFilterSelector(
+    const ImagePointFilterSelector &other) {
     createSelector();
     getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
-    if (other.getFilter()) {
+    if (other.getFilter())
       setFilter(other.getFilter()->clone());
-    }
   }
 
 
@@ -64,7 +64,7 @@ namespace Isis {
 
 
   ImagePointFilterSelector &ImagePointFilterSelector::operator=(
-        const ImagePointFilterSelector &other) {
+    const ImagePointFilterSelector &other) {
     *((AbstractFilterSelector *) this) = other;
     return *this;
   }
@@ -229,3 +229,4 @@ namespace Isis {
     emit filterChanged();
   }
 }
+

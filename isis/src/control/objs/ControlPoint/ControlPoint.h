@@ -29,7 +29,6 @@
 #include <QObject>
 #include <QString>
 
-#include "ControlMeasure.h"
 #include "SurfacePoint.h"
 
 template< typename A, typename B > class QHash;
@@ -37,6 +36,7 @@ template< typename A, typename B > class QHash;
 class QStringList;
 
 namespace Isis {
+  class ControlMeasure;
   class ControlNet;
   class ControlPointFileEntryV0002;
   class Latitude;
@@ -343,14 +343,6 @@ namespace Isis {
    *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
-   *   @history 2018-06-06 Jesse Mapel - Modified setIgnored to use new pointIgnored and
-   *                           pointUnIgnored methods. References #5434.
-   *   @history 2018-06-15 Adam Goins & Jesse Mapel - Added the ModType enum, as well as a series
-   *                           of calls to parentNetwork()->emitPointModified() whenever a change
-   *                           is made to a Control Point or any of it's measures. This is done
-   *                           to allow for communication between the ControlNetVitals class
-   *                           and changes made to the Control Network that it is observing.
-   *                           Fixes #5435.
    */
   class ControlPoint : public QObject {
 
@@ -426,22 +418,6 @@ namespace Isis {
 //      XConstrained = 3,
 //      YConstrained = 4,
 //      ZConstrained = 5;
-      };
-
-      /**
-       *  @brief Control Point Modification Types
-       *
-       *  This enum is designed to represent the different types of modifications that can be
-       *  made to a ControlPoint.
-       *
-       *  EditLockModified means that the Control Point had it's edit lock flag changed.
-       *  IgnoredModified means that the Control Measure had it's ignored flag changed.
-       *  TypeModified means that the ControlPoint::PointType for this control point was modified.
-       */
-      enum ModType {
-        EditLockModified,
-        IgnoredModified,
-        TypeModified
       };
 
       // This stuff input to jigsaw
@@ -570,9 +546,6 @@ namespace Isis {
       int IndexOfRefMeasure() const;
       bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
-      void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue);
-
-
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
       Statistics GetStatistic(long dataType) const;

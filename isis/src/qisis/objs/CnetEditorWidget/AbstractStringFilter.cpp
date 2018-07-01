@@ -7,20 +7,21 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 
 
 namespace Isis {
   AbstractStringFilter::AbstractStringFilter(
-        AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
     nullify();
     createWidget();
   }
 
   AbstractStringFilter::AbstractStringFilter(
-        const AbstractStringFilter &other) : AbstractFilter(other) {
+    const AbstractStringFilter &other) : AbstractFilter(other) {
     nullify();
     createWidget();
 

@@ -322,6 +322,23 @@ void IsisMain() {
     if (net.GetSerialConnections().size() > numInitialIslands) islandFlag = false; //test failed
     else islandFlag = true; //test passed
 
+    //Check to see if the network has split
+      //this simplifies to making sure that all cubes observing the ControlPoint that had some or
+      //all of it's measures ignored are still connected
+    /* //Travis Addair informed me that this method only checks 1 step conections
+    // thus it was effectively only enforcing that the last tie between pairs
+    // of images not be ingorned
+    QList<ControlMeasure *> ptMeas = suspectMeasures[i]->Parent()->getMeasures();
+    const ControlCubeGraphNode *node0 = net.getGraphNode(ptMeas[0]->GetCubeSerialNumber());
+    islandFlag = true;  //assuming the best, and then verify
+    for (int j=1; j<ptMeas.size(); j++) {
+      //check each subsequent node for conection to the first
+      if ( !node0->isConnected(net.getGraphNode(ptMeas[j]->GetCubeSerialNumber()))) {
+        islandFlag = false; //test failed
+        break;
+      }
+    }*/
+
     //again we will temporarily be setting the measure back to unignored
       //this will change when the expected ControlNet::isCriticalMeasure(...) method is written
     for (int j=0;j<measGroup.size();j++) {

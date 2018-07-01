@@ -38,9 +38,9 @@
 
 namespace Isis {
 
-  /**
+  /** 
    * Creates a view showing the CSV or text files from BundleSolutionInfo.
-   *
+   * 
    * @param FileItemQsp fileItem QSharedPointer to the fileItem from the ProjectItemModel
    */
   BundleObservationView::BundleObservationView(FileItemQsp fileItem, QWidget *parent):
@@ -156,7 +156,9 @@ namespace Isis {
     // NOTE: QHeaderView::ResizeToContents does not allow user to resize by dragging column divider
     qtable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    setCentralWidget(qtable);
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    layout->addWidget(qtable);
 
     QSizePolicy policy = sizePolicy();
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -196,7 +198,10 @@ namespace Isis {
 
     file.close();
 
-    setCentralWidget(qText);
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    layout->addWidget(qText);
+
     qText->moveCursor(QTextCursor::Start);
 
     QSizePolicy policy = sizePolicy();
@@ -212,3 +217,6 @@ namespace Isis {
   BundleObservationView::~BundleObservationView() {
   }
 }
+
+
+

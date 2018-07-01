@@ -11,6 +11,7 @@
 #include <QString>
 #include <QtConcurrentMap>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -40,9 +41,8 @@ namespace Isis {
 
 
   ImagePointTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
-    AbstractTreeModel *tm, ControlNet *net, QThread *tt) {
+    AbstractTreeModel *tm, QThread *tt) {
     m_treeModel = tm;
-    m_controlNet = net;
     m_targetThread = tt;
     m_avgCharWidth = QFontMetrics(
         m_treeModel->getView()->getContentFont()).averageCharWidth();
@@ -52,7 +52,6 @@ namespace Isis {
   ImagePointTreeModel::CreateRootItemFunctor::CreateRootItemFunctor(
     const CreateRootItemFunctor &other) {
     m_treeModel = other.m_treeModel;
-    m_controlNet = other.m_controlNet;
     m_targetThread = other.m_targetThread;
     m_avgCharWidth = other.m_avgCharWidth;
   }
@@ -60,21 +59,18 @@ namespace Isis {
 
   ImagePointTreeModel::CreateRootItemFunctor::~CreateRootItemFunctor() {
     m_targetThread = NULL;
-    m_controlNet = NULL;
     m_treeModel = NULL;
   }
 
 
   ImageParentItem *ImagePointTreeModel::CreateRootItemFunctor::operator()(
-    QString imageSerial) const {
+    ControlCubeGraphNode *const &node) const {
     ImageParentItem *imageItem = NULL;
 
-    // TODO connect parent item destroy to image removed from network
-
-    imageItem = new ImageParentItem(imageSerial, m_controlNet, m_avgCharWidth);
+    imageItem = new ImageParentItem(node, m_avgCharWidth);
     imageItem->setSelectable(false);
     imageItem->moveToThread(m_targetThread);
-    QList< ControlMeasure * > measures = m_controlNet->GetMeasuresInCube(imageSerial);
+    QList< ControlMeasure * > measures = node->getMeasures();
     for (int j = 0; j < measures.size(); j++) {
       ASSERT(measures[j]);
       ControlPoint *point = measures[j]->Parent();
@@ -133,8 +129,8 @@ namespace Isis {
       }
 
       futureRoot = QtConcurrent::mappedReduced(
-          getControlNetwork()->GetCubeSerials(),
-          CreateRootItemFunctor(this, getControlNetwork(), QThread::currentThread()),
+          getControlNetwork()->GetCubeGraphNodes(),
+          CreateRootItemFunctor(this, QThread::currentThread()),
           &CreateRootItemFunctor::addToRootItem,
           QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
 

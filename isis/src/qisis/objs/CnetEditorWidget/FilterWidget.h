@@ -11,7 +11,6 @@
 
 class QLabel;
 template< class T > class QList;
-template< typename U, typename V > class QPair;
 class QPushButton;
 class QString;
 class QTextEdit;
@@ -19,7 +18,7 @@ class QVBoxLayout;
 
 
 namespace Isis {
-  class ControlNet;
+  class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
   class FilterGroup;
@@ -43,8 +42,6 @@ namespace Isis {
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2015-11-16 Ian Humphrey - Removed embedded icons. References #1041.
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
-   *                           References #5434.
    */
   class FilterWidget : public QWidget {
       Q_OBJECT
@@ -66,7 +63,7 @@ namespace Isis {
         for (int i = 0; looking && i < m_filterGroups->size(); i++) {
           if (m_filterGroups->at(i)->hasFilter(meth))
             looking = !(m_filterGroups->at(i)->evaluate(t, meth) ^
-                      m_andGroupsTogether);
+                m_andGroupsTogether);
         }
 
         // It is good that we are still looking for failures if we were
@@ -76,7 +73,7 @@ namespace Isis {
         return !(looking ^ m_andGroupsTogether) || !hasFilter(meth);
       }
 
-      bool evaluate(const QPair<QString, ControlNet *> *) const;
+      bool evaluate(const ControlCubeGraphNode *node) const;
       bool evaluate(const ControlPoint *point) const;
       bool evaluate(const ControlMeasure *measure) const;
 

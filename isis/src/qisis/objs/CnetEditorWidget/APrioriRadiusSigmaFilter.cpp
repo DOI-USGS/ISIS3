@@ -2,23 +2,19 @@
 
 #include "APrioriRadiusSigmaFilter.h"
 
-#include <QPair>
-#include <QString>
-
-#include "ControlMeasure.h"
-#include "ControlNet.h"
 #include "ControlPoint.h"
+#include "Longitude.h"
 
 
 namespace Isis {
   APrioriRadiusSigmaFilter::APrioriRadiusSigmaFilter(
-        AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  APrioriRadiusSigmaFilter::APrioriRadiusSigmaFilter(const APrioriRadiusSigmaFilter &other)
-        : AbstractNumberFilter(other) {
+  APrioriRadiusSigmaFilter::APrioriRadiusSigmaFilter(
+    const APrioriRadiusSigmaFilter &other) : AbstractNumberFilter(other) {
   }
 
 
@@ -27,18 +23,19 @@ namespace Isis {
 
 
   bool APrioriRadiusSigmaFilter::evaluate(
-        const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluateImageFromPointFilter(imageAndNet);
+    const ControlCubeGraphNode *node) const {
+    return evaluateImageFromPointFilter(node);
   }
 
 
   bool APrioriRadiusSigmaFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-          point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters());
+        point->GetAprioriSurfacePoint().GetLocalRadiusSigma().meters());
   }
 
 
-  bool APrioriRadiusSigmaFilter::evaluate(const ControlMeasure *measure) const {
+  bool APrioriRadiusSigmaFilter::evaluate(
+    const ControlMeasure *measure) const {
     return true;
   }
 
@@ -67,3 +64,4 @@ namespace Isis {
         descriptionSuffix();
   }
 }
+

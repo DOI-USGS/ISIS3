@@ -36,26 +36,27 @@ namespace Isis {
   }
 
 
-  bool AbstractFilterSelector::hasFilter(bool (AbstractFilter::*meth)() const) const {
+  bool AbstractFilterSelector::hasFilter(
+    bool (AbstractFilter::*meth)() const) const {
     return m_filter && (m_filter->*meth)();
   }
 
 
-  QString AbstractFilterSelector::getDescription(QString(AbstractFilter::*meth)() const) const {
+  QString AbstractFilterSelector::getDescription(
+    QString(AbstractFilter::*meth)() const) const {
     QString description;
-    if (m_filter) {
+    if (m_filter)
       description = (m_filter->*meth)();
-    }
 
     return description;
   }
 
 
-  AbstractFilterSelector &AbstractFilterSelector::operator=(const AbstractFilterSelector &other) {
+  AbstractFilterSelector &AbstractFilterSelector::operator=(
+    const AbstractFilterSelector &other) {
     getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
-    if (m_filter && other.m_filter) {
+    if (m_filter && other.m_filter)
       setFilter(other.m_filter->clone());
-    }
 
     return *this;
   }
@@ -78,7 +79,7 @@ namespace Isis {
     m_selector->addItem("---- select ----");
     m_selector->insertSeparator(m_selector->count());
     connect(m_selector, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(changeFilter(int)));
+        this, SLOT(changeFilter(int)));
 
     m_mainLayout = new QHBoxLayout;
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -116,13 +117,15 @@ namespace Isis {
 
     m_filter = someFilter;
     connect(getFilter(), SIGNAL(filterChanged()),
-            this, SIGNAL(filterChanged()));
+        this, SIGNAL(filterChanged()));
     getMainLayout()->insertWidget(2, getFilter());
   }
 
 
   void AbstractFilterSelector::deleteFilter() {
     if (m_filter) {
+      //       QWidget * widget = m_mainLayout->takeAt(2)->widget();
+      //       ASSERT(widget && widget == m_filter);
       delete m_filter;
       m_filter = NULL;
     }

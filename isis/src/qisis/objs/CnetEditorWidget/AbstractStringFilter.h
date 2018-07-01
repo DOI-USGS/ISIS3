@@ -1,7 +1,10 @@
 #ifndef AbstractStringFilter_H
 #define AbstractStringFilter_H
 
+
+// parent
 #include "AbstractFilter.h"
+
 
 class QLineEdit;
 class QString;
@@ -22,15 +25,13 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
-   *                           References #5434.
    */
   class AbstractStringFilter : public AbstractFilter {
       Q_OBJECT
 
     public:
       AbstractStringFilter(AbstractFilter::FilterEffectivenessFlag,
-                           int minimumForSuccess = -1);
+          int minimumForSuccess = -1);
       AbstractStringFilter(const AbstractStringFilter &other);
       virtual ~AbstractStringFilter();
 

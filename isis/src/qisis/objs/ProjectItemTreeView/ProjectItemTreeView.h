@@ -55,9 +55,6 @@ namespace Isis {
    *                           Resolves [-Wheader-guard] warnings for prog17 (clang).
    *   @history 2017-04-12 Tracie Sucharski - Turn off dragging on the treeView for now since it is
    *                           does not work and is causing errors.
-   *   @history 2018-05-29 Summer Stapleton - updated the view to include a central widget and to
-   *                           remove layout capacity. This change was made to adjust to parent 
-   *                           class now inheriting from QMainWindow instead of QWidget.
    */
   class ProjectItemTreeView : public AbstractProjectItemView {
 

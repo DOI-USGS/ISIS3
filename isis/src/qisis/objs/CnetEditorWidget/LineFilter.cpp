@@ -2,22 +2,19 @@
 
 #include "LineFilter.h"
 
-#include <QPair>
-#include <QString>
-
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
 
 
 namespace Isis {
   LineFilter::LineFilter(
-        AbstractFilter::FilterEffectivenessFlag flag,
-        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag,
+    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  LineFilter::LineFilter(const LineFilter &other) : AbstractNumberFilter(other) {
+  LineFilter::LineFilter(const LineFilter &other)
+    : AbstractNumberFilter(other) {
   }
 
 
@@ -25,8 +22,8 @@ namespace Isis {
   }
 
 
-  bool LineFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluateImageFromMeasureFilter(imageAndNet);
+  bool LineFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return evaluateImageFromMeasureFilter(node);
   }
 
 
@@ -47,12 +44,10 @@ namespace Isis {
 
   QString LineFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1) {
+    if (getMinForSuccess() == 1)
       description += "measure that has a line which is ";
-    }
-    else {
+    else
       description += "measures that have lines which are ";
-    }
 
     description += descriptionSuffix();
     return description;

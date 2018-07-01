@@ -1,14 +1,13 @@
 #ifndef ImageLeafItem_H
 #define ImageLeafItem_H
 
-#include <QString>
 
 #include "AbstractImageItem.h"
 #include "AbstractLeafItem.h"
 
 
 namespace Isis {
-  class ControlNet;
+  class ControlCubeGraphNode;
 
   /**
    * @brief Tree item that is a leaf and represents an image
@@ -18,15 +17,13 @@ namespace Isis {
    *
    * @author ????-??-?? Eric Hyer
    *
-   * @internal
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
-   *                           References #5434.
+   * @internal 
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
    */
   class ImageLeafItem : public AbstractImageItem, public AbstractLeafItem {
     public:
-      ImageLeafItem(QString imageSerial, ControlNet *net,
-                    int avgCharWidth, AbstractTreeItem *parent = 0);
+      ImageLeafItem(ControlCubeGraphNode *node,
+          int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~ImageLeafItem();
 
 

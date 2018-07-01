@@ -37,6 +37,8 @@
 #include <QTabWidget>
 #include <QToolBar>
 #include <QtXml>
+#include <QVBoxLayout>
+#include <QWidgetAction>
 
 #include "Control.h"
 #include "ControlNet.h"
@@ -44,7 +46,9 @@
 #include "Directory.h"
 #include "FileName.h"
 #include "Project.h"
+#include "ToolPad.h"
 #include "XmlStackedHandlerReader.h"
+
 
 namespace Isis {
   /**
@@ -56,71 +60,38 @@ namespace Isis {
     // TODO: This layout should be inside of the cnet editor widget, but I put it here to not
     //     conflict with current work in the cnet editor widget code.
     //QWidget *result = new QWidget;
-
-    QWidget *centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
     QGridLayout *resultLayout = new QGridLayout;
-    centralWidget->setLayout(resultLayout);
+    setLayout(resultLayout);
+
+    int row = 0;
+
+    QMenuBar *menuBar = new QMenuBar;
+    resultLayout->addWidget(menuBar, row, 0, 1, 2);
+    row++;
 
     m_cnetEditorWidget = new CnetEditorWidget(control, configFile.expanded());
     m_control = control;
 
-    resultLayout->addWidget(m_cnetEditorWidget, 0, 0, 1, 2);
+    resultLayout->addWidget(m_cnetEditorWidget, row, 0, 1, 2);
+    row++;
 
-    QTabWidget *treeViews = new QTabWidget;
-    treeViews->addTab( m_cnetEditorWidget->pointTreeView(), tr("Point View") );
-    treeViews->addTab( m_cnetEditorWidget->serialTreeView(), tr("Serial View") );
-    treeViews->addTab( m_cnetEditorWidget->connectionTreeView(), tr("Connection View") );
-    resultLayout->addWidget(treeViews, 1, 0, 1, 1);
-
-    QTabWidget *filterViews = new QTabWidget;
-    filterViews->addTab( m_cnetEditorWidget->pointFilterWidget(), tr("Filter Points and Measures") );
-    filterViews->addTab( m_cnetEditorWidget->serialFilterWidget(), tr("Filter Images and Points") );
-    filterViews->addTab( m_cnetEditorWidget->connectionFilterWidget(), tr("Filter Connections") );
-    resultLayout->addWidget(filterViews, 1, 1, 1, 1);
-
-    createMenus();
-    createToolBars();
-  }
-
-  /**
-   * Destructor
-   */
-  CnetEditorView::~CnetEditorView() {
-
-    delete m_cnetEditorWidget;
-    delete m_permToolBar;
-
-    m_permToolBar = 0;
-  }
-
-  /**
-   * Uses the actions created by CnetEditorWidget, tries to find the menus to put
-   * the actions under, and creates the menus if said menus do not exist. Currently,
-   * the menus added are Table and Help.
-   */
-  void CnetEditorView::createMenus() {
+    // Populate the menu...
     QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
-    QMapIterator< QAction *, QList< QString > > actionMapIter(actionMap);
+    QMapIterator< QAction *, QList< QString > > actionMapIterator(actionMap);
+
     QMap<QString, QMenu *> topLevelMenus;
 
-    while ( actionMapIter.hasNext() ) {
-      actionMapIter.next();
-      QAction *actionToAdd = actionMapIter.key();
-      QList< QString > location = actionMapIter.value();
-
-      // Skip the Help menu for now because we do not want to add the "What's This?"
-      // action (it is in the main help menu of IPCE)
-      if (location.first() == "&Help") {
-        continue;
-      }
+    while ( actionMapIterator.hasNext() ) {
+      actionMapIterator.next();
+      QAction *actionToAdd = actionMapIterator.key();
+      QList< QString > location = actionMapIterator.value();
 
       QMenu *menuToPutActionInto = NULL;
 
       if ( location.count() ) {
         QString topLevelMenuTitle = location.takeFirst();
         if (!topLevelMenus[topLevelMenuTitle]) {
-          topLevelMenus[topLevelMenuTitle] = menuBar()->addMenu(topLevelMenuTitle);
+          topLevelMenus[topLevelMenuTitle] = menuBar->addMenu(topLevelMenuTitle);
         }
 
         menuToPutActionInto = topLevelMenus[topLevelMenuTitle];
@@ -143,31 +114,71 @@ namespace Isis {
 
       menuToPutActionInto->addAction(actionToAdd);
     }
-  }
 
-  /**
-   * Uses and adds the actions created by CnetEditorWidget to the view's toolbars
-   * Right now, all actions created in CnetEditorWidget are added to the toolpad.
-   * This was copied from CnetEditorWindow
-   */
-  void CnetEditorView::createToolBars() {
-    m_permToolBar = addToolBar("Standard Tools");
+    QTabWidget *treeViews = new QTabWidget;
+    treeViews->addTab( m_cnetEditorWidget->pointTreeView(), tr("Point View") );
+    treeViews->addTab( m_cnetEditorWidget->serialTreeView(), tr("Serial View") );
+    treeViews->addTab( m_cnetEditorWidget->connectionTreeView(), tr("Connection View") );
+    resultLayout->addWidget(treeViews, row, 0, 1, 1);
+
+    QTabWidget *filterViews = new QTabWidget;
+    filterViews->addTab( m_cnetEditorWidget->pointFilterWidget(), tr("Filter Points and Measures") );
+    filterViews->addTab( m_cnetEditorWidget->serialFilterWidget(), tr("Filter Images and Points") );
+    filterViews->addTab( m_cnetEditorWidget->connectionFilterWidget(), tr("Filter Connections") );
+    resultLayout->addWidget(filterViews, row, 1, 1, 1);
+    row++;
+
+
+
+
+
+    m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
+    //toolBarLayout->addWidget(m_permToolBar);
 
-    QMap< QString, QList< QAction * > > actionMap;
-    actionMap = m_cnetEditorWidget->toolBarActions();
-    QMapIterator< QString, QList< QAction * > > actionIter(actionMap);
+    m_activeToolBar = new QToolBar("Active Tool", 0);
+    m_activeToolBar->setObjectName("activeToolBar");
+    m_activeToolBar->setIconSize(QSize(22, 22));
+    //toolBarLayout->addWidget(m_activeToolBar);
 
-    while (actionIter.hasNext()) {
-      actionIter.next();
-      QString objName = actionIter.key();
-      QList< QAction * > actionList = actionIter.value();
-      foreach (QAction *action, actionList) {
-        m_permToolBar->addAction(action);
-      }
-    }
+    m_toolPad = new ToolPad("Tool Pad", 0);
+    m_toolPad->setObjectName("toolPad");
+    //toolBarLayout->addWidget(m_toolPad);
+
+
+//  m_cnetEditorWidget->addToPermanent(m_permToolBar);
+//  m_cnetEditorWidget->addTo(m_activeToolBar);
+//  m_cnetEditorWidget->addTo(m_toolPad);
+
+    m_activeToolBarAction = new QWidgetAction(this);
+    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
+
+    setAcceptDrops(true);
+
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
+
   }
+
+
+  /**
+   * Destructor
+   */
+  CnetEditorView::~CnetEditorView() {
+    
+    delete m_cnetEditorWidget;
+    delete m_permToolBar;
+    delete m_activeToolBar;
+    delete m_toolPad;
+
+    m_permToolBar = 0;
+    m_activeToolBar = 0;
+    m_toolPad = 0;
+  }
+
 
   /**
    * Returns the cnetEditorWidget.
@@ -181,9 +192,9 @@ namespace Isis {
 
 
   /**
-   * @description Returns the Control displayed in the CnetEditorWidget
-   *
-   * @return (Control *) The Control displayed in the CnetEditorWidget
+   * @description Returns the Control displayed in the CnetEditorWidget 
+   *  
+   * @return (Control *) The Control displayed in the CnetEditorWidget 
    */
   Control *CnetEditorView::control() {
     return m_control;
@@ -198,6 +209,41 @@ namespace Isis {
   QSize CnetEditorView::sizeHint() const {
     return QSize(800, 600);
   }
+
+
+  /**
+   * Returns a list of actions for the permanent tool bar.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> CnetEditorView::permToolBarActions() {
+    return m_permToolBar->actions();
+  }
+
+
+  /**
+   * Returns a list of actions for the active tool bar.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> CnetEditorView::activeToolBarActions() {
+    QList<QAction *> actions;
+    actions.append(m_activeToolBarAction);
+    return actions;
+  }
+
+
+  /**
+   * Returns a list of actions for the tool pad.
+   *
+   * @return (QList<QAction *>) The actions
+   */
+  QList<QAction *> CnetEditorView::toolPadActions() {
+    return m_toolPad->actions();
+  }
+
+
+
 
   /**
    * This method pushes a new XmlHandler into the parser stack.
@@ -279,3 +325,4 @@ namespace Isis {
     return result;
   }
 }
+

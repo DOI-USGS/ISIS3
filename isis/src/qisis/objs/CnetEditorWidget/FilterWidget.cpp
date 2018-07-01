@@ -8,7 +8,6 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
-#include <QPair>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QString>
@@ -72,8 +71,8 @@ namespace Isis {
   }
 
 
-  bool FilterWidget::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluate(imageAndNet, &AbstractFilter::canFilterImages);
+  bool FilterWidget::evaluate(const ControlCubeGraphNode *node) const {
+    return evaluate(node, &AbstractFilter::canFilterImages);
   }
 
 

@@ -2,20 +2,18 @@
 
 #include "MeasureTypeFilter.h"
 
-#include <QPair>
 #include <QString>
 #include <QStringList>
 
+#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
 #include "IString.h"
 
 
 namespace Isis {
   MeasureTypeFilter::MeasureTypeFilter(
-        AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
-        AbstractMultipleChoiceFilter(flag, minimumForSuccess) {
+    AbstractFilter::FilterEffectivenessFlag flag, int minimumForSuccess) :
+    AbstractMultipleChoiceFilter(flag, minimumForSuccess) {
     QStringList options;
     options << "Candidate" << "Manual" << "RegisteredPixel" <<
         "RegisteredSubPixel";
@@ -24,7 +22,7 @@ namespace Isis {
 
 
   MeasureTypeFilter::MeasureTypeFilter(const MeasureTypeFilter &other)
-        : AbstractMultipleChoiceFilter(other) {
+    : AbstractMultipleChoiceFilter(other) {
   }
 
 
@@ -32,8 +30,8 @@ namespace Isis {
   }
 
 
-  bool MeasureTypeFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
-    return evaluateImageFromMeasureFilter(imageAndNet);
+  bool MeasureTypeFilter::evaluate(const ControlCubeGraphNode *node) const {
+    return evaluateImageFromMeasureFilter(node);
   }
 
 
@@ -44,7 +42,7 @@ namespace Isis {
 
   bool MeasureTypeFilter::evaluate(const ControlMeasure *measure) const {
     return ((QString) measure->GetMeasureTypeString() == getCurrentChoice()) ^
-           !inclusive();
+        !inclusive();
   }
 
 
@@ -56,25 +54,20 @@ namespace Isis {
   QString MeasureTypeFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription() + "measure";
 
-    if (getMinForSuccess() != 1) {
+    if (getMinForSuccess() != 1)
       description += "s ";
-    }
-    else {
+    else
       description += " ";
-    }
 
     description += "that ";
 
-    if (getMinForSuccess() == 1) {
+    if (getMinForSuccess() == 1)
       description += "is ";
-    }
-    else {
+    else
       description += "are ";
-    }
 
-    if (!inclusive()) {
+    if (!inclusive())
       description += "not ";
-    }
 
     description += " of type " + getCurrentChoice();
 
@@ -85,9 +78,8 @@ namespace Isis {
   QString MeasureTypeFilter::getMeasureDescription() const {
     QString description = "are ";
 
-    if (!inclusive()) {
+    if (!inclusive())
       description += "not ";
-    }
 
     description += "of type " + getCurrentChoice();
 
@@ -99,3 +91,4 @@ namespace Isis {
     return getImageDescription();
   }
 }
+

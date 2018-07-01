@@ -3,11 +3,10 @@
 
 #include <QWidget>
 
+
 class QBoxLayout;
 class QButtonGroup;
 class QCheckBox;
-template< typename U, typename V > class QPair;
-class QString;
 template< typename T > class QFlags;
 
 
@@ -15,7 +14,7 @@ namespace Isis {
   class AbstractFilterSelector;
   class ControlPoint;
   class ControlMeasure;
-  class ControlNet;
+  class ControlCubeGraphNode;
 
   /**
    * @brief Base class for control net filters
@@ -30,8 +29,6 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
-   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
-   *                           References #5434.
    */
   class AbstractFilter : public QWidget {
       Q_OBJECT
@@ -54,7 +51,7 @@ namespace Isis {
       virtual bool canFilterPoints() const;
       virtual bool canFilterMeasures() const;
 
-      virtual bool evaluate(const QPair<QString, ControlNet *> *) const = 0;
+      virtual bool evaluate(const ControlCubeGraphNode *) const = 0;
       virtual bool evaluate(const ControlPoint *) const = 0;
       virtual bool evaluate(const ControlMeasure *) const = 0;
 
@@ -78,8 +75,8 @@ namespace Isis {
       QBoxLayout *getMainLayout() const;
       QBoxLayout *getInclusiveExclusiveLayout() const;
 
-      bool evaluateImageFromPointFilter(const QPair<QString, ControlNet *> *) const;
-      bool evaluateImageFromMeasureFilter(const QPair<QString, ControlNet *> *) const;
+      bool evaluateImageFromPointFilter(const ControlCubeGraphNode *) const;
+      bool evaluateImageFromMeasureFilter(const ControlCubeGraphNode *) const;
       bool evaluatePointFromMeasureFilter(const ControlPoint *) const;
 
       virtual bool evaluate(const ControlPoint *,

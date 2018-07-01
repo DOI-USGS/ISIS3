@@ -47,9 +47,6 @@ namespace Isis{
    *   @history 2018-04-16 Ken Edmundson - Modified display of residuals.csv to properly show the
    *                           rejected column if there are rejected measures. Also displays
    *                           rejected measure row in red.
-   *   @history 2018-06-06 Kaitlyn Lee - Set a central widget and removed layout (it is not needed
-   *                           after setting a central widget) because AbstractProjectItemView was
-   *                           updated to inherit from QMainWindow.
    */
 
   class BundleObservationView : public AbstractProjectItemView

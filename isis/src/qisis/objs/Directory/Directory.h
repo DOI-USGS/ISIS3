@@ -23,7 +23,6 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QMainWindow>
 #include <QMultiMap>
 #include <QObject>
 #include <QPointer>
@@ -40,7 +39,6 @@
 
 class QAction;
 class QDockWidget;
-class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -56,7 +54,6 @@ namespace Isis {
   class Control;
   class ControlNet;
   class ControlPointEditView;
-  class ControlHealthMonitorView;
   class CubeDnView;
   class FileItem;
   class Footprint2DView;
@@ -203,10 +200,10 @@ namespace Isis {
    *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
    *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
-   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created.
+   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
    *                           Fixes #5224
    *   @history 2017-12-01 Adam Goins Modified updateRecentProjects() to update the recent projects
-   *                           menu it display a chronologically ordered list of recently loaded
+   *                           menu it display a chronologically ordered list of recently loaded 
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
@@ -239,19 +236,6 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
-   *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
-   *                           addFootprint2DView() now connects to enableControlNetTool() in
-   *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
-   *                           Removed  saveActiveControl() since users can save the control
-   *                           network with the project save button.
-   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
-   *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
-   *                           to allow for saving of the project at these times. Fixes #5114.
-   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
-   *                           Fixes #5435.
-   *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
-   *                           directory instance rather than the activeControl. Fixes #5435.
-   *
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -266,7 +250,6 @@ namespace Isis {
       QStringList recentProjectsList();
 
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
-      ControlHealthMonitorView *addControlHealthMonitorView();
       CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
@@ -305,7 +288,6 @@ namespace Isis {
       QList<TemplateEditorWidget *> templateEditorViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
-      ControlHealthMonitorView *controlHealthMonitorView();
       ControlPointEditView *controlPointEditView();
 //      ChipViewportsWidget *controlPointChipViewports();
 
@@ -372,7 +354,6 @@ namespace Isis {
     signals:
       void directoryCleaned();
       void newWarning();
-      void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
 
       void viewClosed(QWidget *widget);
@@ -396,6 +377,7 @@ namespace Isis {
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
+      void saveActiveControl();
       // TODO temporary slot until autosave is implemented
       void makeBackupActiveControl();
 
@@ -473,8 +455,6 @@ namespace Isis {
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
-
-      QPointer<ControlHealthMonitorView> m_controlHealthMonitorView;
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
       //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
