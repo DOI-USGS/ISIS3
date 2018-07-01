@@ -253,6 +253,19 @@ namespace Isis {
    *  @history 2018-04-25 Tracie Sucharski - Fixed typo in XmlHandler::startElement reading
    *                           imported shapes from a project which caused the shapes to be put in
    *                           the wrong place on the project tree. Fixes #5274.
+   *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
+   *                           button when the active control net is modified, i.e. a point is modified.
+   *  
+   *  !!!!!!!!!!!!!   Delete following history entry when project save/restore geometry/state
+   *                   implemented
+   *  !!!!!!!!!!!!!!!
+   *  @history 2018-06-08 Tracie Sucharski - Quick fix for the project save/restore prototype: The
+   *                          changes made to readSettings, writeSettings cause following problem:
+   *                          save project with view, close view and exit, the project
+   *                          geometry/state is saved on closeEvent instead of project save. Quickly
+   *                          added signal when project is saved, so the writeSettings can happen
+   *                          for project.  This will be cleaned up when save/restore is fully
+   *                          implemented.
    *  
    */
   class Project : public QObject {
@@ -477,7 +490,7 @@ namespace Isis {
        * Emitted when project is saved.
        *
        */
-      void projectSave(FileName projectName);
+      void projectSaved(Project *);
 
       /**
        * Emitted when project location moved

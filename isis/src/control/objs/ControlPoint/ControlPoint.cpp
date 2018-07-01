@@ -323,6 +323,22 @@ namespace Isis {
 
 
   /**
+   * This method is a wrapper to emit the measureModified() signal in the parent network
+   * is called whenever a change is made to a Control Measure.
+   *
+   * @param measure The ControlMeasure* that was modified.
+   * @param type The ControlMeasure::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
+  void ControlPoint::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue) {
+    if (parentNetwork) {
+      parentNetwork->emitMeasureModified(measure, modType, oldValue, newValue);
+    }
+  }
+
+
+  /**
    * Remove a measurement from the control point, deleting reference measure
    * is allowed.
    *
@@ -497,6 +513,9 @@ namespace Isis {
    *   point to be modified.
    */
   ControlPoint::Status ControlPoint::SetEditLock(bool lock) {
+    if (parentNetwork) {
+      parentNetwork->emitPointModified(this, ControlPoint::EditLockModified, editLock, lock);
+    }
     editLock = lock;
     return Success;
   }
@@ -636,17 +655,13 @@ namespace Isis {
     if (oldStatus != ignore) {
       PointModified();
       if (parentNetwork) {
-        foreach(ControlMeasure * cm, measures->values()) {
-          if (!cm->IsIgnored()) {
-            if (ignore) {
-              parentNetwork->measureIgnored(cm);
-            }
-            else {
-              parentNetwork->measureUnIgnored(cm);
-            }
-          }
+        if (ignore) {
+          parentNetwork->pointIgnored(this);
         }
-        parentNetwork->emitNetworkStructureModified();
+        else {
+          parentNetwork->pointUnIgnored(this);
+        }
+        parentNetwork->emitPointModified(this, ControlPoint::IgnoredModified, oldStatus, ignore);
       }
     }
 
@@ -693,6 +708,10 @@ namespace Isis {
     if (editLock) {
       return PointLocked;
     }
+    if (parentNetwork) {
+      parentNetwork->emitPointModified(this, ControlPoint::TypeModified, type, newType);
+    }
+
     PointModified();
     type = newType;
     return Success;

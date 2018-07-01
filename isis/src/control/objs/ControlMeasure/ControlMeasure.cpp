@@ -30,7 +30,6 @@
 #include "ControlMeasureLogData.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
-#include "ControlCubeGraphNode.h"
 #include "IString.h"
 #include "iTime.h"
 #include "SpecialPixel.h"
@@ -84,13 +83,11 @@ namespace Isis {
     p_sampleResidual = other.p_sampleResidual;
     p_lineResidual = other.p_lineResidual;
     p_camera = other.p_camera;
-    associatedCSN = other.associatedCSN;
   }
 
 
   //! initialize pointers and other data to NULL
   void ControlMeasure::InitializeToNull() {
-
     // Previously these were initialized to 0.0 in the constructor.
     p_sample = Null;
     p_line = Null;
@@ -117,7 +114,6 @@ namespace Isis {
     p_measuredEphemerisTime = Null;
 
     parentPoint = NULL;
-    associatedCSN = NULL;
   }
 
 
@@ -145,7 +141,6 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    associatedCSN = NULL;
   }
 
 
@@ -153,6 +148,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_aprioriLine = aprioriLine;
     return Success;
   }
@@ -163,6 +159,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_aprioriSample = aprioriSample;
     return Success;
   }
@@ -250,8 +247,10 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_sample = sample;
     p_line = line;
+
     SetType(type);
     return Success;
   }
@@ -365,8 +364,13 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
 
+
     bool oldStatus = p_ignore;
     p_ignore = newIgnoreStatus;
+
+    if (Parent()) {
+      Parent()->emitMeasureModified(this, IgnoredModified, oldStatus, p_ignore);
+    }
 
     // only update if there was a change in status
     if (oldStatus != p_ignore) {
@@ -377,6 +381,7 @@ namespace Isis {
         cnet->emitNetworkStructureModified();
       }
     }
+
 
     return Success;
   }
@@ -406,8 +411,9 @@ namespace Isis {
    */
   ControlMeasure::Status ControlMeasure::SetResidual(double sampResidual,
       double lineResidual) {
-        
+
     MeasureModified();
+
     p_sampleResidual = sampResidual;
     p_lineResidual   = lineResidual;
     return Success;
@@ -428,6 +434,7 @@ namespace Isis {
     if (IsEditLocked())
       return MeasureLocked;
     MeasureModified();
+
     p_measureType = type;
     return Success;
   }
@@ -1055,7 +1062,6 @@ namespace Isis {
     p_focalPlaneMeasuredY = other.p_focalPlaneMeasuredY;
     p_focalPlaneComputedX = other.p_focalPlaneComputedX;
     p_focalPlaneComputedY = other.p_focalPlaneComputedY;
-    associatedCSN = other.associatedCSN;
 
     return *this;
   }
