@@ -9,7 +9,9 @@ namespace Ui {
   class JigsawSetupDialog;
 }
 
+class QComboBox;
 class QItemSelection;
+class QTableWidget;
 class QTableWidgetItem;
 
 namespace Isis {
@@ -87,6 +89,10 @@ namespace Isis {
    *                           until all the a priori sigma values are valid again. References #497.
    *   @history 2018-06-28 Christopher Combs - Implemented pseudocode in on_applySettings... method.
    *                           Added selected images to default BOSS object. References #497.
+   *   @history 2018-07-01 Ian Humphrey - Added updateSolveSettingsSigmaTables() to try to
+   *                           generalize how the sigma tables are updated. Solve options have
+   *                           their respective solve degree and degree combo boxes set to 2 unless
+   *                           the solve option is ALL. References #497.
    */
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
@@ -161,6 +167,8 @@ namespace Isis {
     void on_positionComboBox_currentIndexChanged(const QString &arg1);
     void on_pointingComboBox_currentIndexChanged(const QString &arg1);
 
+    void updateSolveSettingsSigmaTables(const QComboBox *solveOptionComboBox, 
+                                        QTableWidget *table);
     void validateSigmaValue(QTableWidgetItem *);
     void validateSigmaTables();
     
