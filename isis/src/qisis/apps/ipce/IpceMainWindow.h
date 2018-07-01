@@ -159,9 +159,6 @@ namespace Isis {
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
-   *  
-   *
-   *
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -192,6 +189,7 @@ namespace Isis {
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
+
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
@@ -200,7 +198,6 @@ namespace Isis {
       void initializeActions();
       void createMenus();
       void createToolBars();
-
 
     private:
       /**
