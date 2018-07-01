@@ -450,9 +450,9 @@ namespace Isis {
   }
 
 
-  void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
+  void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
-    translationFile += "pds4ExportBandBinSpectrumUniform.trn";
+    translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
     FileName translationFileName(translationFile);
     PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
@@ -589,9 +589,9 @@ namespace Isis {
   }
 
 
-  void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
+  void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
-    translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
+    translationFile += "pds4ExportBandBinSpectrumUniform.trn";
     FileName translationFileName(translationFile);
     PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
