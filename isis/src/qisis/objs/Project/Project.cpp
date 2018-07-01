@@ -1387,6 +1387,7 @@ namespace Isis {
     }
     m_isOpen = true;
 
+    setClean(true);
     emit projectLoaded(this);
   }
 
