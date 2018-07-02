@@ -601,7 +601,6 @@ namespace Isis {
     m_autoReg->setShortcut(Qt::Key_R);
     m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
                           "<strong>Shortcut: R</strong>");
-    m_autoReg->setToolTip("Sub-pixel register the right measure to the left");
     m_autoReg->setWhatsThis("Sub-pixel register the right measure to the left "
                        "and move the result under the crosshair.  After "
                        "viewing the results, the option exists to move the "
@@ -806,6 +805,8 @@ namespace Isis {
       m_autoRegExtension->hide();
       m_autoReg->setText("Register");
       m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
     }
     m_autoRegAttempted = false;
 
@@ -1020,6 +1021,9 @@ namespace Isis {
       m_autoRegShown = false;
       m_autoRegExtension->hide();
       m_autoReg->setText("Register");
+      m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
 
       //  Reload chip with original measure
       emit updateRightView(m_rightMeasure->GetSample(),
