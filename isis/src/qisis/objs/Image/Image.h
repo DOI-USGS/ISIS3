@@ -91,6 +91,9 @@ namespace Isis {
    *                           located outside of the import image directories such as the updated
    *                           Images from a bundle run.  To improve efficiency, return from method
    *                           if the project root has not changed. Fixes #4849.
+   *   @history 2018-06-30 Ian Humphrey - Added observationNumber() method so anything that grabs
+   *                           an Image ProjectItem can easily get both the serial number and
+   *                           observation number now. References #497.
    */
 
   class Image : public QObject {
@@ -110,6 +113,7 @@ namespace Isis {
       ImageDisplayProperties *displayProperties();
       const ImageDisplayProperties *displayProperties() const;
       QString fileName() const;
+      QString observationNumber();
       QString serialNumber();
       geos::geom::MultiPolygon *footprint();
       const geos::geom::MultiPolygon *footprint() const;
