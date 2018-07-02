@@ -360,7 +360,7 @@ namespace Isis {
    *   @todo answer comments with questions, TODO, ???, and !!!
    */
   void BundleAdjust::init(Progress *progress) {
-
+    emit(statusUpdate("Initialization"));
     m_previousNumberImagePartials = 0;
 
     // initialize
@@ -710,6 +710,7 @@ namespace Isis {
    *                           mode. Fixes #4483.
    */
   bool BundleAdjust::solveCholesky() {
+    emit(statusBarUpdate("Solving"));
     try {
 
       // throw error if a frame camera is included AND
@@ -766,7 +767,7 @@ namespace Isis {
 
       for (;;) {
 
-        emit iterationUpdate(m_iteration, m_bundleResults.sigma0());
+        emit iterationUpdate(m_iteration);
 
         // testing
         if (m_abort) {
@@ -870,7 +871,7 @@ namespace Isis {
                                   .arg(m_bundleResults.numberUnknownParameters()));
         emit statusUpdate(QString("Degrees of Freedom: %1")
                                   .arg(m_bundleResults.degreesOfFreedom()));
-        emit iterationUpdate(m_iteration, m_bundleResults.sigma0());
+        emit iterationUpdate(m_iteration);
 
         // check for convergence
         if (m_bundleSettings->convergenceCriteria() == BundleSettings::Sigma0) {
@@ -896,6 +897,7 @@ namespace Isis {
             else { // otherwise iterations are complete
               m_bundleResults.setConverged(true);
               emit statusUpdate("Bundle has converged\n");
+              emit statusBarUpdate("Converged");
               break;
             }
           }
@@ -915,6 +917,7 @@ namespace Isis {
           if ( numConvergedParams == numImgParams ) {
             m_bundleResults.setConverged(true);
             emit statusUpdate("Bundle has converged");
+            emit statusBarUpdate("Converged");
             break;
           }
         }
@@ -931,6 +934,7 @@ namespace Isis {
 
         // check for maximum iterations
         if (m_iteration >= m_bundleSettings->convergenceCriteriaMaximumIterations()) {
+          emit(statusBarUpdate("Max Iterations Reached"));
           break;
         }
 
@@ -986,6 +990,7 @@ namespace Isis {
     catch (IException &e) {
       m_bundleResults.setConverged(false);
       emit statusUpdate("\n aborting...");
+      emit statusBarUpdate("Failed to Converge");
       emit finished();
       QString msg = "Could not solve bundle adjust.";
       throw IException(e, e.errorType(), msg, _FILEINFO_);
@@ -1020,6 +1025,7 @@ namespace Isis {
    * @see BundleAdjust::formWeightedNormals
    */
   bool BundleAdjust::formNormalEquations() {
+    emit(statusBarUpdate("Forming Normal Equations"));
     bool status = false;
 
     m_bundleResults.setNumberObservations(0);// ???
@@ -1065,7 +1071,7 @@ namespace Isis {
     printf("\n");
 
     for (int i = 0; i < num3DPoints; i++) {
-
+      emit(pointUpdate(i+1));
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
       if (point->isRejected()) {
@@ -2122,7 +2128,7 @@ namespace Isis {
    * apply parameter corrections for solution.
    */
   void BundleAdjust::applyParameterCorrections() {
-
+    emit(statusBarUpdate("Updating Parameters"));
     int t = 0;
 
     // TODO - update target body parameters if in solution
@@ -2257,6 +2263,7 @@ namespace Isis {
    *                           image sample and line residuals.
    */
   double BundleAdjust::computeResiduals() {
+    emit(statusBarUpdate("Computing Residuals"));
     double vtpv = 0.0;
     double vtpvControl = 0.0;
     double vtpvImage = 0.0;
@@ -2640,7 +2647,7 @@ namespace Isis {
    *                           Blocking and Filling point covariance messages. References #4463.
    */
   bool BundleAdjust::errorPropagation() {
-
+    emit(statusBarUpdate("Error Propagation"));
     // free unneeded memory
     cholmod_free_triplet(&m_cholmodTriplet, &m_cholmodCommon);
     cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
@@ -2786,7 +2793,7 @@ namespace Isis {
       // now loop over all object points to sum contributions into 3x3 point covariance matrix
       int pointIndex = 0;
       for (j = 0; j < numObjectPoints; j++) {
-
+        emit(pointUpdate(j+1));
         BundleControlPointQsp point = m_bundleControlPoints.at(pointIndex);
         if ( point->isRejected() ) {
           continue;
@@ -2796,8 +2803,6 @@ namespace Isis {
         if (j%100 == 0) {
             printf("\rError Propagation: Inverse Block %8d of %8d; Point %8d of %8d", i+1,
                    numBlockColumns,  j+1, numObjectPoints);
-
-            emit iterationUpdate(i+1, j+1);
         }
 
         // get corresponding Q matrix
@@ -3083,6 +3088,16 @@ namespace Isis {
    */
   bool BundleAdjust::isConverged() {
     return m_bundleResults.converged();
+  }
+
+
+    /**
+   * Returns if the BundleAdjust has been aborted.
+   *
+   * @return @b bool If the BundleAdjust was aborted.
+   */
+  bool BundleAdjust::isAborted() {
+    return m_abort;
   }
 
 

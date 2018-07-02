@@ -112,12 +112,12 @@ namespace Isis {
     if (!m_project->directory()->model()->selectedItems().isEmpty()) {
       foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
         if (projItem->isImage()) {
-          defaultObservationSettings.addObservationNumber(projItem->image()->serialNumber());  
+          defaultObservationSettings.addObservationNumber(projItem->image()->observationNumber());  
         }
         else if (projItem->isImageList()) {
           for (int i = 0; i < projItem->rowCount(); i++) {
             ProjectItem * childItem = projItem->child(i);
-            defaultObservationSettings.addObservationNumber(childItem->image()->serialNumber());  
+            defaultObservationSettings.addObservationNumber(childItem->image()->observationNumber());  
           }
         }
       }
@@ -132,7 +132,7 @@ namespace Isis {
           for (int j = 0; j < imglistItem->rowCount(); j++) {
             ProjectItem * imgItem = imglistItem->child(j);
             if (imgItem->isImage()) {
-              defaultObservationSettings.addObservationNumber(imgItem->image()->serialNumber());  
+              defaultObservationSettings.addObservationNumber(imgItem->image()->observationNumber());  
             }
           }
         } 
@@ -280,7 +280,7 @@ namespace Isis {
                                                   new QDoubleValidator(1.0e-10, 1.0, 8, this));
 
     // convergence criteria
-    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-20, 1.0e+10, 8, this));
     m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
 
 
@@ -442,6 +442,7 @@ namespace Isis {
     m_ui->outlierRejectionMultiplierLineEdit->setEnabled(arg1);
 
     // sigma and maxlikelihood options are exclusive
+    m_ui->CQuantileLabel->setEnabled(!arg1);
     m_ui->maxLikelihoodEstimationLabel->setEnabled(!arg1);
     m_ui->maximumLikelihoodModel1ComboBox->setEnabled(!arg1);
     m_ui->maximumLikelihoodModel1Label->setEnabled(!arg1);
@@ -895,7 +896,7 @@ namespace Isis {
 
           if (projItem->isImage() ) {
             Image * img = projItem->data().value<Image *>();
-            boss.addObservationNumber(img->serialNumber() );
+            boss.addObservationNumber(img->observationNumber() );
 
           }
         }
@@ -1505,20 +1506,84 @@ namespace Isis {
    *
    * This slot populates the Instrument Position Solve Options table according to the value of the
    * SPK Solve Degree. Rows are added depending on the degree set, where number of rows added is
-   * equal to the SPK Solve Degree + 1.
+   * equal to the SPK Solve Degree + 1. Note that this relies on the updateSolveSettingsSigmaTables
+   * slot, which uses the SPK Solve Degree if the ALL position option is selected.
    *
    * @param int Value the SPK Solve Degree spin box was changed to.
    */
   void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
-    // number of rows == spkSolveDegree value + 1 (i+1)
-    QTableWidget *table = m_ui->positionAprioriSigmaTable;
+    // Update the position apriori sigma table and use the position combo box solve option
+    updateSolveSettingsSigmaTables(m_ui->positionComboBox, m_ui->positionAprioriSigmaTable);
+  }
+
+
+  /**
+   * Slot that listens for changes to the CK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Pointing Solve Options table according to the value of the
+   * CK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the CK Solve Degree + 1. Note that this relies on the updateSolveSettingsSigmaTables
+   * slot, which uses the CK Solve Degree if the ALL pointing option is selected.
+   *
+   * @param int Value the CK Solve Degree spin box was changed to.
+   */
+  void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
+    // Update the pointing apriori sigma table and use the pointing combo box solve option
+    updateSolveSettingsSigmaTables(m_ui->pointingComboBox, m_ui->pointingAprioriSigmaTable);
+  }
+
+
+  /**
+   * Slot that updates the sigma tables based on the current solve option selection.
+   *
+   * This will add/remove rows based on the solve option selected, and if ALL, the current
+   * solve degree value.
+   *
+   * @param const QComboBox * The solve option combo box to read the solve option from
+   * @param QTableWidget * The a priori sigma table we are going to update rows for
+   */
+  void JigsawSetupDialog::updateSolveSettingsSigmaTables(const QComboBox *solveOptionComboBox,
+                                                         QTableWidget *table) {
+    int rowCount = solveOptionComboBox->currentIndex();
+
+    // Position: { NONE, POSITION, VELOCITY, ACCELERATION, ALL }
+    // Pointing: { NONE, ANGLES, ANGULAR VELOCITY, ANGULAR ACCELERATION, ALL }
+    // Need to add to the solve degree value since number of rows == number of solve coefficients,
+    // and for our polynomials the number of solve coefficients == solve degree + 1
+    // When solve option is ALL (index 4), use the spk/ck solve degree value + 1 for number of rows
+    if (rowCount == 4) {
+      if (solveOptionComboBox == m_ui->positionComboBox) {
+        rowCount = m_ui->spkSolveDegreeSpinBox->value() + 1;
+      }
+      else { // if (solveOptionComboBox == m_ui->pointingComboBox)
+        rowCount = m_ui->ckSolveDegreeSpinBox->value() + 1;
+      }
+    }
+
+    // number of rows == position solve option == SolveDegree value + 1 (i+1)
     const int oldRowCount = table->rowCount();
-    table->setRowCount(i + 1);
+    // if solving ALL, don't add extra row
+    table->setRowCount(rowCount);
     const int newRowCount = table->rowCount();
 
     // Need to check if table is valid in case a row is removed (a row is removed implicitly when
     // the setRowCount() is called when newRowCount < oldRowCount
     validateSigmaTables();
+
+    // Determine the units for either position or pointing
+    QStringList solveOptions;
+    QString longUnits("N/A");
+    QString shortUnits("N/A");
+    if (solveOptionComboBox == m_ui->positionComboBox) {
+      longUnits = "meters";
+      shortUnits = "m";
+      solveOptions += {"POSITION", "VELOCITY", "ACCELERATION"};
+    }
+    else { // if (solveOptionComboBox == m_ui->pointingComboBox) {
+      longUnits = "degrees";
+      shortUnits = "deg";
+      solveOptions += {"ANGLES", "ANGULAR VELOCITY", "ANGULAR ACCELERATION"};
+    }
 
     // Rows need to be added
     if (newRowCount > oldRowCount) {
@@ -1536,7 +1601,7 @@ namespace Isis {
 
         QTableWidgetItem *units = new QTableWidgetItem();
         units->setFlags(Qt::ItemIsEnabled);
-        units->setText("m/s^" + QString::number(row));
+        units->setText(shortUnits + "/s^" + QString::number(row));
         table->setItem(row, 2, units);
 
         QTableWidgetItem *sigma = new QTableWidgetItem();
@@ -1549,107 +1614,28 @@ namespace Isis {
         // POSITION
         if (row == 0) { 
           QTableWidgetItem *description = table->item(0, 1);
-          description->setText("POSITION");
+          description->setText(solveOptions.at(row));
 
           QTableWidgetItem *units = table->item(0, 2);
-          units->setText("meters");
+          units->setText(longUnits);
         }
 
         // VELOCITY
         else if (row == 1) {
           QTableWidgetItem *description = table->item(1, 1);
-          description->setText("VELOCITY");
+          description->setText(solveOptions.at(row));
 
           QTableWidgetItem *units = table->item(1, 2);
-          units->setText("m/s");
+          units->setText(shortUnits + "/s");
         }
 
         // ACCELERATION
         else if (row == 2) {
           QTableWidgetItem *description = table->item(2, 1);
-          description->setText("ACCELERATION");
+          description->setText(solveOptions.at(row));
 
           QTableWidgetItem *units = table->item(2, 2);
-          units->setText("m/s^2");
-        }
-      }
-    }
-
-    table->resizeColumnToContents(1);
-    table->resizeColumnToContents(2);
-  }
-
-
-  /**
-   * Slot that listens for changes to the CK Solve Degree spin box.
-   *
-   * This slot populates the Instrument Pointing Solve Options table according to the value of the
-   * CK Solve Degree. Rows are added depending on the degree set, where number of rows added is
-   * equal to the CK Solve Degree + 1.
-   *
-   * @param int Value the CK Solve Degree spin box was changed to.
-   */
-  void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
-    // number of rows == ckSolveDegree value + 1 (i+1)
-    QTableWidget *table = m_ui->pointingAprioriSigmaTable;
-    const int oldRowCount = table->rowCount();
-    table->setRowCount(i + 1);
-    const int newRowCount = table->rowCount();
-
-    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
-    // the setRowCount() is called when newRowCount < oldRowCount
-    validateSigmaTables();
-
-    if (newRowCount > oldRowCount) {
-      for (int row = oldRowCount; row < newRowCount; row++) {
-        // Headers : coefficient, description, units, a priori sigma
-        QTableWidgetItem *coefficient = new QTableWidgetItem();
-        coefficient->setFlags(Qt::ItemIsEnabled);
-        coefficient->setText(QString::number(row + 1));
-        table->setItem(row, 0, coefficient);
-
-        QTableWidgetItem *description = new QTableWidgetItem();
-        description->setFlags(Qt::ItemIsEnabled);
-        description->setText("N/A");
-        table->setItem(row, 1, description);
-
-        QTableWidgetItem *units = new QTableWidgetItem();
-        units->setFlags(Qt::ItemIsEnabled);
-        units->setText("deg/s^" + QString::number(row));
-        table->setItem(row, 2, units);
-
-        QTableWidgetItem *sigma = new QTableWidgetItem();
-        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-        sigma->setText("0.0");
-        sigma->setData(Qt::UserRole, QVariant(true));
-        table->setItem(row, 3, sigma);
-
-        // { NONE: N/A, ANGLES: 0, ANGULAR VELOCITY: 1, ANGULAR ACCELERATION: 2, ALL: 2 }
-        // ANGLES
-        if (row == 0) { 
-          QTableWidgetItem *description = table->item(0, 1);
-          description->setText("ANGLES");
-
-          QTableWidgetItem *units = table->item(0, 2);
-          units->setText("degrees");
-        }
-
-        // VELOCITY
-        if (row == 1) {
-          QTableWidgetItem *description = table->item(1, 1);
-          description->setText("ANGULAR VELOCITY");
-
-          QTableWidgetItem *units = table->item(1, 2);
-          units->setText("deg/s");
-        }
-
-        // ACCELERATION
-        if (row == 2) {
-          QTableWidgetItem *description = table->item(2, 1);
-          description->setText("ANGULAR ACCELERATION");
-
-          QTableWidgetItem *units = table->item(2, 2);
-          units->setText("deg/s^2");
+          units->setText(shortUnits + "/s^2");
         }
       }
     }
@@ -1680,10 +1666,14 @@ namespace Isis {
         spinBox->setEnabled(true);
       }
       else {
-        spinBox->setValue(solveIndex - 1);
+        // The default value for the spk solve degree and spk degree spinboxes is 2. This is
+        // emulating jigsaw's defaults for position solve options that are not ALL.
+        spinBox->setValue(2);
         spinBox->setEnabled(false);
       }
     }
+
+    updateSolveSettingsSigmaTables(m_ui->positionComboBox, m_ui->positionAprioriSigmaTable);
   }
 
 
@@ -1708,10 +1698,14 @@ namespace Isis {
         spinBox->setEnabled(true);
       }
       else {
-        spinBox->setValue(solveIndex - 1);
+        // The default value for the ck solve degree and spk degree spinboxes is 2. This is
+        // emulating jigsaw's defaults for pointing solve options that are not ALL.
+        spinBox->setValue(2);
         spinBox->setEnabled(false);
       }
     }
+
+    updateSolveSettingsSigmaTables(m_ui->pointingComboBox, m_ui->pointingAprioriSigmaTable);
   }
 
 
@@ -1783,9 +1777,13 @@ namespace Isis {
 
       if (projItem) {
         // Tree traversal is top down so we dont need to do this check for imagelists?
-        if (projItem->isImage() && 
-            !selectedObservationNumbers.contains(projItem->image()->serialNumber())) {
-          selectedObservationNumbers.append(projItem->image()->serialNumber());
+        if (projItem->isImage()) {
+          // Grab the observation up front so we don't need to re-compose the observation number
+          // more than once (@todo: this should not be necessary when 5026 is integrated)
+          const QString observationNumber = projItem->image()->observationNumber();
+          if (!selectedObservationNumbers.contains(observationNumber)) {
+            selectedObservationNumbers.append(observationNumber);
+          }
         }
         else if (projItem->isImageList()) {
           // Use the proxymodel's children as it might not include all of the sourcemodel's children 
@@ -1793,7 +1791,7 @@ namespace Isis {
             QModelIndex childProxyIndex = proxyModel->index(i, 0, index);
             QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
             ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
-            selectedObservationNumbers.append(childItem->image()->serialNumber());
+            selectedObservationNumbers.append(childItem->image()->observationNumber());
           }
         }
       }
