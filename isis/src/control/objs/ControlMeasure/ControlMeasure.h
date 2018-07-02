@@ -183,6 +183,8 @@ namespace Isis {
    *                           to allow for communication between the ControlNetVitals class
    *                           and changes made to the Control Network that it is observing.
    *                           Fixes #5435.
+   *  @history 2018-06-29 Adam Goins - Modified operator= to use setters when setting values
+   *                           so that the proper signals/slots are called. Fixes #5435.
    */
   class ControlMeasure : public QObject {
 

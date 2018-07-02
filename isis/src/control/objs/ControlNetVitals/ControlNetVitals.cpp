@@ -688,7 +688,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getLockedPoints() {
     QList<ControlPoint*> lockedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->IsEditLocked()) lockedPoints.append(point);
+      if (!point->IsIgnored() && point->IsEditLocked()) lockedPoints.append(point);
     }
     return lockedPoints;
   }
@@ -702,7 +702,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getFixedPoints() {
     QList<ControlPoint*> fixedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Fixed) fixedPoints.append(point);
+      if (!point->IsIgnored() && point->GetType() == ControlPoint::Fixed) fixedPoints.append(point);
     }
     return fixedPoints;
   }
@@ -716,7 +716,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getConstrainedPoints() {
     QList<ControlPoint*> constrainedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Constrained) constrainedPoints.append(point);
+      if (!point->IsIgnored() && point->GetType() == ControlPoint::Constrained) constrainedPoints.append(point);
     }
     return constrainedPoints;
   }
@@ -730,7 +730,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getFreePoints() {
     QList<ControlPoint*> freePoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Free) freePoints.append(point);
+      if (!point->IsIgnored() && point->GetType() == ControlPoint::Free) freePoints.append(point);
     }
     return freePoints;
   }
@@ -747,7 +747,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getPointsBelowMeasureThreshold(int num) {
     QList<ControlPoint*> belowThreshold;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetNumMeasures() < num) belowThreshold.append(point);
+      if (!point->IsIgnored() && point->GetNumMeasures() < num) belowThreshold.append(point);
     }
     return belowThreshold;
   }
