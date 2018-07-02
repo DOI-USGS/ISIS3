@@ -94,6 +94,11 @@ namespace Isis {
    *   @history 2018-06-30 Ian Humphrey - Added observationNumber() method so anything that grabs
    *                           an Image ProjectItem can easily get both the serial number and
    *                           observation number now. References #497.
+   *   @history 2018-07-02 Ian Humphrey - Changed serialNumber() implementation to follow how
+   *                           observationNumber() is implemented. This ensures that any calls
+   *                           after the first call to these methods are O(1) and are not
+   *                           bottlenecekd by any file I/O that occurs in the Compose()
+   *                           methods. References #497.
    */
 
   class Image : public QObject {
@@ -214,6 +219,11 @@ namespace Isis {
        * The observation number for this image.
        */
       QString m_observationNumber; 
+
+      /**
+       * The serial number for this image.
+       */
+      QString m_serialNumber;
 
       /**
        * Spacecraft name associated with this Image.
