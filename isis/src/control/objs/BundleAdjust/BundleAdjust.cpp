@@ -1675,7 +1675,8 @@ namespace Isis {
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals[columnIndex];
 
       if ( !normalsColumn ) {
-        QString status = "\nSparseBlockColumnMatrix retrieval failure at column " + columnIndex;
+        QString status = "\nSparseBlockColumnMatrix retrieval failure at column " + 
+                         QString::number(columnIndex);
         outputBundleStatus(status);
         return false;
       }
@@ -1700,9 +1701,9 @@ namespace Isis {
           status.append(", row ");
           status.append(rowIndex);
           outputBundleStatus(status);
-          status = "Total # of block columns: " + numBlockcolumns;
+          status = "Total # of block columns: " + QString::number(numBlockcolumns);
           outputBundleStatus(status);
-          status = "Total # of blocks: " + m_sparseNormals.numberOfBlocks();
+          status = "Total # of blocks: " + QString::number(m_sparseNormals.numberOfBlocks());
           outputBundleStatus(status);
           return false;
         }
