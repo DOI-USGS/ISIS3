@@ -756,7 +756,6 @@ namespace Isis {
       if (m_ui->positionAprioriSigmaTable->item(2,3) )
         accelerationAprioriSigma = m_ui->positionAprioriSigmaTable->item(2,3)->data(0).toDouble();
 
-
       //Saving additionalPositional/Angular coefficients (deg >=3) in case they are needed
       //later.
       if (spkSolveDegree >2) {
@@ -1383,12 +1382,8 @@ namespace Isis {
     if (item->column() != 3) {
       return;
     }
-
     // FREE is a valid value for the a priori sigma column
     int free = item->text().simplified().compare("FREE", Qt::CaseInsensitive);
-    if (free == 0) {
-      item->setText("FREE");
-    }
 
     // Positive doubles are valid values for the a priori sigma column
     bool convertSuccess = false;
@@ -1402,6 +1397,10 @@ namespace Isis {
       }
       else {
         item->setBackground(table->palette().color(QPalette::Base));
+      }
+
+      if (sigma == 0.0) {
+        item->setText("FREE");
       }
     }
     else {
@@ -1732,7 +1731,12 @@ namespace Isis {
       for (int row = 0; row < settings.aprioriPositionSigmas().count(); row++) {
         QTableWidgetItem * sigmaItem = m_ui->positionAprioriSigmaTable->item(row, 3);
         double sigma = settings.aprioriPositionSigmas()[row];
-        sigmaItem->setText(QString::number(sigma));
+        if (sigma == Isis::Null) {
+          sigmaItem->setText("FREE");
+        }
+        else {
+          sigmaItem->setText(QString::number(sigma));
+        }
       }
 
       // Instrument Pointing Solve Options
@@ -1745,7 +1749,12 @@ namespace Isis {
       for (int row = 0; row < settings.aprioriPointingSigmas().count(); row++) {
         QTableWidgetItem * sigmaItem = m_ui->pointingAprioriSigmaTable->item(row, 3);
         double sigma = settings.aprioriPointingSigmas()[row];
-        sigmaItem->setText(QString::number(sigma));
+        if (sigma == Isis::Null) {
+          sigmaItem->setText("FREE");
+        }
+        else {
+          sigmaItem->setText(QString::number(sigma));
+        }
       }      
 
     } 
