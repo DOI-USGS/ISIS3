@@ -250,6 +250,8 @@ namespace Isis {
    *                           the p_cameraValidMeasuresMap.
    *   @history 2018-06-25 Jesse Mapel - Fixed the incorrect signal being called when adding and
    *                           removing measures. References #5435.
+   *   @history 2018-06-25 Jesse Mapel - Fixed ignoring measures with ignored adjacent measures
+   *                           incorrectly modifying the edge between the two image vertices.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -425,7 +427,8 @@ namespace Isis {
       };
 
       struct Connection {
-        int strength = 0;
+        int strength;
+        Connection() : strength(0) {}
       };
 
       typedef boost::adjacency_list<boost::setS,

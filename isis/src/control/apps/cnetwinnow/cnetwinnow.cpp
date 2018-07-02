@@ -311,7 +311,6 @@ void IsisMain() {
         measFlag[j] = true;  //test passed
     }
 
-
     //for now it is necessary to set measures to ignor before testing to see if they would split the network
       //this will change when the expected ControlNet::isCriticalMeasure(...) method is written
     for (int j=0; j<measGroup.size(); j++) {
@@ -319,8 +318,12 @@ void IsisMain() {
     }
 
     //if the number of islands has increased the network has split
-    if (net.GetSerialConnections().size() > numInitialIslands) islandFlag = false; //test failed
-    else islandFlag = true; //test passed
+    if (net.GetSerialConnections().size() > numInitialIslands) {
+      islandFlag = false; //test failed
+    }
+    else {
+      islandFlag = true; //test passed
+    }
 
     //again we will temporarily be setting the measure back to unignored
       //this will change when the expected ControlNet::isCriticalMeasure(...) method is written
@@ -375,7 +378,6 @@ void IsisMain() {
   //close the report file
   fclose(guiltyFile);
   fclose(ignoredReport);
-
 
   //save out the winnowed ControlNet
   net.Write(ui.GetFileName("ONET"));

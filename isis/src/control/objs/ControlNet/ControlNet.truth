@@ -3,43 +3,43 @@ UnitTest for ControlNet ....
 ******* test cube connection graph ************
 testing ignoring measures..............................
 starting graph
-ALPHA ----[p0]---- BRAVO
+ALPHA ----(1) [p0]---- BRAVO
 
 ignore a measure
 
 un-ignore a measure
-ALPHA ----[p0]---- BRAVO
+ALPHA ----(1) [p0]---- BRAVO
 
 testing measure addition to point already in network...
 add point with only 1 measure
-ALPHA ----[p0]---- BRAVO
+ALPHA ----(1) [p0]---- BRAVO
 
 add a measure
-ALPHA ----[p0,p1]---- BRAVO
+ALPHA ----(2) [p0,p1]---- BRAVO
 
 add another measure
-ALPHA ----[p0,p1]---- BRAVO
-ALPHA ----[p1]---- CHARLIE
-BRAVO ----[p1]---- CHARLIE
+ALPHA ----(2) [p0,p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+BRAVO ----(1) [p1]---- CHARLIE
 
 testing setting point to ignored.......................
 ignore p1
-ALPHA ----[p0]---- BRAVO
+ALPHA ----(1) [p0]---- BRAVO
 
 un-ignore p1
-ALPHA ----[p0,p1]---- BRAVO
-ALPHA ----[p1]---- CHARLIE
-BRAVO ----[p1]---- CHARLIE
+ALPHA ----(2) [p0,p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+BRAVO ----(1) [p1]---- CHARLIE
 
 testing measure deletion & addition....................
-ALPHA ----[p1]---- BRAVO
-ALPHA ----[p1]---- CHARLIE
-BRAVO ----[p1]---- CHARLIE
+ALPHA ----(1) [p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+BRAVO ----(1) [p1]---- CHARLIE
 
-ALPHA ----[p1]---- BRAVO
-ALPHA ----[p1]---- CHARLIE
-ALPHA ----[p0]---- DELTA
-BRAVO ----[p1]---- CHARLIE
+ALPHA ----(1) [p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+ALPHA ----(1) [p0]---- DELTA
+BRAVO ----(1) [p1]---- CHARLIE
 
 testing FindClosest....................
 Closest Point ID: p1
@@ -51,7 +51,7 @@ Adjacent Images:
   DELTA
 
 testing point deletion.................................
-ALPHA ----[p0]---- DELTA
+ALPHA ----(1) [p0]---- DELTA
 
 ******* Done testing cube graph ***************
 
@@ -349,7 +349,7 @@ Read/Write of binary files OK.
     BRAVO
     CHARLIE
     DELTA
-ALPHA ----[p0]---- DELTA
+ALPHA ----(1) [p0]---- DELTA
 
 
 Testing getEdgeCount: 1
