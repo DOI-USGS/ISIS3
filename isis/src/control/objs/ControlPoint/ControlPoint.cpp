@@ -285,6 +285,15 @@ namespace Isis {
     ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
 
+    // notify parent network of the change
+    if (parentNetwork) {
+      parentNetwork->measureDeleted(cm);
+
+      if (!IsIgnored() && !cm->IsIgnored()) {
+        parentNetwork->emitNetworkStructureModified();
+      }
+    }
+
     if (cm->IsEditLocked()) {
       return ControlMeasure::MeasureLocked;
     }
@@ -302,15 +311,6 @@ namespace Isis {
     }
     else {
       referenceMeasure = NULL;
-    }
-
-    // notify parent network of the change
-    if (parentNetwork) {
-      parentNetwork->measureDeleted(cm);
-
-      if (!IsIgnored() && !cm->IsIgnored()) {
-        parentNetwork->emitNetworkStructureModified();
-      }
     }
 
     delete cm;
