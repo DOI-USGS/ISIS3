@@ -211,6 +211,11 @@ namespace Isis {
       QString m_instrumentId;
 
       /**
+       * The observation number for this image.
+       */
+      QString m_observationNumber; 
+
+      /**
        * Spacecraft name associated with this Image.
        */
       QString m_spacecraftName;
