@@ -20,20 +20,9 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "MenuItem.h"
+#include "ProjectItemViewMenu.h"
 
 namespace Isis {
-
-  /**
-   * Constructs a MenuItem with the QMenu constructor
-   *
-   * @param title  Title of the menu
-   *
-   * @param parent Parent widget
-   */
-  //  MenuItem::MenuItem(const QString &title, QWidget *parent = 0) {
-  //   QMenu(title, parent);
-  // }
 
 
   /**
@@ -42,7 +31,7 @@ namespace Isis {
    *
    * @param event The close event
    */
-  void MenuItem::closeEvent(QCloseEvent *event) {
+  void ProjectItemViewMenu::closeEvent(QCloseEvent *event) {
     emit menuClosed();
   }
 }

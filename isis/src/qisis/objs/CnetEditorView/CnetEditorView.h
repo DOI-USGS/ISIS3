@@ -44,7 +44,7 @@ namespace Isis {
   class Project;
   class ToolPad;
   class XmlStackedHandlerReader;
-  class MenuItem;
+  class ProjectItemViewMenu;
 
   /**
    * Ipce view containing the CnetEditorWidget
@@ -120,7 +120,7 @@ class CnetEditorView : public AbstractProjectItemView {
     QPointer<Control> m_control;
 
     QToolBar *m_permToolBar; //!< The permanent tool bar
-    MenuItem *m_tablesMenu; //!< View menu for storing actions
+    ProjectItemViewMenu *m_tablesMenu; //!< View menu for storing actions
 
   };
 }

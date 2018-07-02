@@ -45,7 +45,7 @@
 #include "FileName.h"
 #include "Project.h"
 #include "XmlStackedHandlerReader.h"
-#include "MenuItem.h"
+#include "ProjectItemViewMenu.h"
 
 namespace Isis {
   /**
@@ -112,7 +112,7 @@ namespace Isis {
     QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
     QMapIterator< QAction *, QList< QString > > actionMapIter(actionMap);
 
-    m_tablesMenu = new MenuItem("&Tables");
+    m_tablesMenu = new ProjectItemViewMenu("&Tables");
     connect(m_tablesMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
     menuBar()->addMenu(m_tablesMenu);
 

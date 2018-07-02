@@ -83,7 +83,7 @@
 #include "XmlStackedHandlerReader.h"
 #include "ZoomTool.h"
 
-#include "MenuItem.h"
+#include "ProjectItemViewMenu.h"
 
 namespace Isis {
   /**
@@ -195,15 +195,15 @@ namespace Isis {
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_viewMenu = new MenuItem("&View");
+    m_viewMenu = new ProjectItemViewMenu("&View");
     connect(m_viewMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
     menuBar()->addMenu(m_viewMenu);
 
-    m_optionsMenu = new MenuItem("&Options");
+    m_optionsMenu = new ProjectItemViewMenu("&Options");
     connect(m_optionsMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
     menuBar()->addMenu(m_optionsMenu);
 
-    m_windowMenu = new MenuItem("&Window");
+    m_windowMenu = new ProjectItemViewMenu("&Window");
     connect(m_windowMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
     menuBar()->addMenu(m_windowMenu);
 

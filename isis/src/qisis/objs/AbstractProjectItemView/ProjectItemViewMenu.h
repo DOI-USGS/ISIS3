@@ -1,5 +1,5 @@
-#ifndef MenuItem_h
-#define MenuItem_h
+#ifndef ProjectItemViewMenu_h
+#define ProjectItemViewMenu_h
 /**
  * @file
  * $Date$
@@ -29,7 +29,7 @@ namespace Isis {
 
   /**
    * QMenu subclass that overrides the closeEvent. Used in views to disable
-   * actions when a menu is visible and a user clicks outside of a view. 
+   * actions when a menu is visible and a user clicks outside of a view.
    *
    * @author 2018-06-27 Kaitlyn Lee
    *
@@ -37,11 +37,11 @@ namespace Isis {
    *   @history 2018-06-27 Kaitlyn Lee - Original version.
    */
 
-  class MenuItem : public QMenu {
+  class ProjectItemViewMenu : public QMenu {
     Q_OBJECT
 
     public:
-      MenuItem(const QString &title, QWidget *parent = 0) : QMenu(title, parent){};
+      ProjectItemViewMenu(const QString &title, QWidget *parent = 0) : QMenu(title, parent){};
 
     signals:
       void menuClosed();
