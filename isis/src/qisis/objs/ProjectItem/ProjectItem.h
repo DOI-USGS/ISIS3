@@ -139,6 +139,8 @@ namespace Isis {
    *     @history 2018-03-22 Ken Edmundson - Modified constructor taking a BundleSolutionInfo to
    *                             append a row for a Control object containing the output control
    *                             net from the bundle adjustment.
+   *     @history 2018-07-02 Tracie Sucharski - Added tooltip containing project path to the project
+   *                             root item.
    *
    */
   class ProjectItem : public QStandardItem {
