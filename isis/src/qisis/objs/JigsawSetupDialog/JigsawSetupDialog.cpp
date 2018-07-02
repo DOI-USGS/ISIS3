@@ -88,21 +88,8 @@ namespace Isis {
     FileName fname = m_ui->inputControlNetCombo->currentText();
     m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
 
-    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
-    if (useLastSettings && bundleSolutionInfo.size() > 0) {
-     BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
-     // Retrieve the control net name used in the last bundle adjustment.
-     // Note that this returns a fully specified path and filename, while the cnet combo box
-     // only stores file names.
-     selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
-     fillFromSettings(lastBundleSettings);
-    }
-
-    // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
-
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
-
 
     // Create default settings for all of the observations
     BundleObservationSolveSettings defaultObservationSettings;
@@ -141,6 +128,17 @@ namespace Isis {
     solveSettingsList.append(defaultObservationSettings);
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
+
+    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+    if (useLastSettings && bundleSolutionInfo.size() > 0) {
+      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+      // Retrieve the control net name used in the last bundle adjustment.
+      // Note that this returns a fully specified path and filename, while the cnet combo box
+      // only stores file names.
+      selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
+      fillFromSettings(lastBundleSettings);
+      m_bundleSettings->setObservationSolveOptions(lastBundleSettings->observationSolveSettings());
+    }
 
 
     // Populate the solve option comboboxes
@@ -510,58 +508,6 @@ namespace Isis {
     settings->setOutlierRejection(m_ui->outlierRejectionCheckBox->isChecked(),
                                   m_ui->outlierRejectionMultiplierLineEdit->text().toDouble());
 
-
-
-
-    QList<BundleObservationSolveSettings> observationSolveSettingsList;
-    BundleObservationSolveSettings observationSolveSettings;
-
-    // pointing settings
-    double anglesSigma              = -1.0;
-    double angularVelocitySigma     = -1.0;
-    double angularAccelerationSigma = -1.0;
-
-    if (m_ui->pointingAnglesSigmaLineEdit->isModified()) {
-      anglesSigma = m_ui->pointingAnglesSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularVelocitySigmaLineEdit->isModified()) {
-      angularVelocitySigma = m_ui->pointingAngularVelocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularAccelerationSigmaLineEdit->isModified()) {
-      angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
-    }
-    observationSolveSettings.setInstrumentPointingSettings(
-        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption("ANGLES"),
-        // BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
-        m_ui->twistCheckBox->isChecked(),
-        m_ui->ckDegreeSpinBox->text().toInt(),
-        m_ui->ckSolveDegreeSpinBox->text().toInt(),
-        m_ui->fitOverPointingCheckBox->isChecked(),
-        anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-
-    // position option
-    double positionSigma     = -1.0;
-    double velocitySigma     = -1.0;
-    double accelerationSigma = -1.0;
-    if (m_ui->positionSigmaLineEdit->isModified()) {
-      positionSigma = m_ui->positionSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->velocitySigmaLineEdit->isModified()) {
-      velocitySigma = m_ui->velocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->accelerationSigmaLineEdit->isModified()) {
-      accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
-    }
-    observationSolveSettings.setInstrumentPositionSettings(
-        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption("NONE"),
-        // BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
-        m_ui->spkDegreeSpinBox->text().toInt(),
-        m_ui->spkSolveDegreeSpinBox->text().toInt(),
-        m_ui->hermiteSplineCheckBox->isChecked(),
-        positionSigma, velocitySigma, accelerationSigma);
-
-    observationSolveSettingsList.append(observationSolveSettings);
-    settings->setObservationSolveOptions(observationSolveSettingsList);
     // convergence criteria
     settings->setConvergenceCriteria(BundleSettings::Sigma0,
                                      m_ui->sigma0ThresholdLineEdit->text().toDouble(),
@@ -810,7 +756,6 @@ namespace Isis {
       if (m_ui->positionAprioriSigmaTable->item(2,3) )
         accelerationAprioriSigma = m_ui->positionAprioriSigmaTable->item(2,3)->data(0).toDouble();
 
-
       //Saving additionalPositional/Angular coefficients (deg >=3) in case they are needed
       //later.
       if (spkSolveDegree >2) {
@@ -831,8 +776,10 @@ namespace Isis {
 
       if (m_ui->twistCheckBox->checkState() == Qt::Checked)
         solveTwist = true;
-      if (m_ui-> fitOverPointingCheckBox->checkState() == Qt::Checked)
+      if (m_ui->fitOverPointingCheckBox->checkState() == Qt::Checked)
         solvePolynomialOverExisting = true;
+      if (m_ui->hermiteSplineCheckBox->checkState() == Qt::Checked)
+        positionOverHermite = true;
 
       switch(instrumentPointingSolveOption) {
 
@@ -1435,12 +1382,8 @@ namespace Isis {
     if (item->column() != 3) {
       return;
     }
-
     // FREE is a valid value for the a priori sigma column
     int free = item->text().simplified().compare("FREE", Qt::CaseInsensitive);
-    if (free == 0) {
-      item->setText("FREE");
-    }
 
     // Positive doubles are valid values for the a priori sigma column
     bool convertSuccess = false;
@@ -1454,6 +1397,10 @@ namespace Isis {
       }
       else {
         item->setBackground(table->palette().color(QPalette::Base));
+      }
+
+      if (sigma == 0.0) {
+        item->setText("FREE");
       }
     }
     else {
@@ -1750,7 +1697,68 @@ namespace Isis {
   }
 
 
-  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, 
+                                                   const QItemSelection &deselected) {
+    QModelIndexList indexList = m_ui->treeView->selectionModel()->selectedRows();
+
+    // qDebug() << "\n\nselected: " << selected.indexes();
+    // qDebug() << "deselected: " << deselected.indexes();
+    // qDebug() << "selectedRows: " << m_ui->treeView->selectionModel()->selectedRows();
+
+
+    if (!indexList.isEmpty()) {
+      QModelIndex displayIndex = indexList[0];
+
+      SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model(); 
+      ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
+
+      QModelIndex sourceIndex = proxyModel->mapToSource(displayIndex);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
+
+      if (projItem->isImageList()) {
+        projItem = projItem->child(0);  
+      }
+      BundleObservationSolveSettings settings = m_bundleSettings->observationSolveSettings(
+                                                                projItem->image()->observationNumber());
+
+      // Populate RHS of Observation Solve Settings tab with selected image's BOSS
+      // Instrument Position Solve Options
+      m_ui->positionComboBox->setCurrentIndex(settings.instrumentPositionSolveOption());
+      m_ui->spkSolveDegreeSpinBox->setValue(settings.spkSolveDegree());
+      m_ui->spkDegreeSpinBox->setValue(settings.spkDegree());
+      m_ui->hermiteSplineCheckBox->setChecked(settings.solvePositionOverHermite());
+
+      for (int row = 0; row < settings.aprioriPositionSigmas().count(); row++) {
+        QTableWidgetItem * sigmaItem = m_ui->positionAprioriSigmaTable->item(row, 3);
+        double sigma = settings.aprioriPositionSigmas()[row];
+        if (sigma == Isis::Null) {
+          sigmaItem->setText("FREE");
+        }
+        else {
+          sigmaItem->setText(QString::number(sigma));
+        }
+      }
+
+      // Instrument Pointing Solve Options
+      m_ui->pointingComboBox->setCurrentIndex(settings.instrumentPointingSolveOption());
+      m_ui->ckSolveDegreeSpinBox->setValue(settings.ckSolveDegree());
+      m_ui->ckDegreeSpinBox->setValue(settings.ckDegree());
+      m_ui->twistCheckBox->setChecked(settings.solveTwist());
+      m_ui->fitOverPointingCheckBox->setChecked(settings.solvePolyOverPointing());
+
+      for (int row = 0; row < settings.aprioriPointingSigmas().count(); row++) {
+        QTableWidgetItem * sigmaItem = m_ui->pointingAprioriSigmaTable->item(row, 3);
+        double sigma = settings.aprioriPointingSigmas()[row];
+        if (sigma == Isis::Null) {
+          sigmaItem->setText("FREE");
+        }
+        else {
+          sigmaItem->setText(QString::number(sigma));
+        }
+      }      
+
+    } 
+
     m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
   }
 
