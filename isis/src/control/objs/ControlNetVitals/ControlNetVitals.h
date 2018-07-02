@@ -122,6 +122,12 @@ namespace Isis {
 
 
     private:
+      void addMeasureToCounts(ControlMeasure *measure);
+      void removeMeasureFromCounts(ControlMeasure *measure);
+      // TESTING JAM
+      QString countersToString();
+      // TESTING JAM
+
       //! The Control Network that the vitals class is observing.
       ControlNet *m_controlNet;
 

@@ -310,33 +310,10 @@ namespace Isis {
    */
   void ControlNetVitals::addMeasure(ControlMeasure *measure) {
     emitHistoryEntry("Control Measure Added", measure->GetCubeSerialNumber(), "", "");
+
     m_numMeasures++;
 
-
-    ControlPoint *point = measure->Parent();
-    if (point) {
-      // By this time, the measure has been added to its parent point, so the
-      // old count is the current count minus one.
-      int numValidMeasures = point->GetNumValidMeasures();
-      if ( --m_pointMeasureCounts[numValidMeasures - 1] < 1 ) {
-        m_pointMeasureCounts.remove(numValidMeasures - 1);
-      }
-      if ( !m_pointMeasureCounts.contains(numValidMeasures) ) {
-        m_pointMeasureCounts.insert(numValidMeasures, 1);
-      }
-      else {
-        m_pointMeasureCounts[numValidMeasures]++;
-      }
-    }
-
-    QString serial = measure->GetCubeSerialNumber();
-    int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
-    if ( !m_imageMeasureCounts.contains(numValidMeasures) ) {
-      m_imageMeasureCounts.insert(numValidMeasures, 1);
-    }
-    else {
-      m_imageMeasureCounts[numValidMeasures]++;
-    }
+    addMeasureToCounts(measure);
 
     validate();
   }
@@ -367,10 +344,10 @@ namespace Isis {
         historyEntry = "Measure Ignored Modified";
 
         if ( !oldValue.toBool() && newValue.toBool() ) {
-          return addMeasure(measure);
+          return removeMeasureFromCounts(measure);
         }
         else if ( oldValue.toBool() && !newValue.toBool() ) {
-          return deleteMeasure(measure);
+          return addMeasureToCounts(measure);
         }
         break;
 
@@ -379,7 +356,7 @@ namespace Isis {
         break;
     }
 
-    emitHistoryEntry(historyEntry, measure->GetCubeSerialNumber(), "", "");
+    ControlNetVitals::emitHistoryEntry(historyEntry, measure->GetCubeSerialNumber(), "", "");
     validate();
   }
 
@@ -397,39 +374,87 @@ namespace Isis {
   void ControlNetVitals::deleteMeasure(ControlMeasure *measure) {
 
     emitHistoryEntry("Control Measure Deleted", measure->GetCubeSerialNumber(), "", "");
+
     m_numMeasures--;
 
-    ControlPoint *point = measure->Parent();
-    if (point) {
-      // By this time, the measure is still a valid measure in the parent control point.
-      int numValidMeasures = point->GetNumValidMeasures();
+    removeMeasureFromCounts(measure);
 
-      if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
-        m_pointMeasureCounts.remove(numValidMeasures);
-      }
-      if ( !m_pointMeasureCounts.contains(numValidMeasures - 1) ) {
-        m_pointMeasureCounts.insert(numValidMeasures - 1, 1);
-      }
-      else {
-        m_pointMeasureCounts[numValidMeasures - 1]++;
-      }
-    }
-
-    QString serial = measure->GetCubeSerialNumber();
-    int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
-
-    if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
-      m_pointMeasureCounts.remove(numValidMeasures);
-    }
-
-    if ( !m_imageMeasureCounts.contains(numValidMeasures - 1) ) {
-      m_imageMeasureCounts.insert(numValidMeasures - 1, 1);
-    }
-    else {
-      m_imageMeasureCounts[numValidMeasures - 1]++;
-    }
     validate();
   }
+
+
+  /**
+   * Add a measure to the internal counters
+   *
+   * @param measure The measure to add
+   */
+   void ControlNetVitals::addMeasureToCounts(ControlMeasure *measure) {
+     ControlPoint *point = measure->Parent();
+     if (point) {
+       // By this time, the measure has been added to its parent point, so the
+       // old count is the current count minus one.
+       int numValidMeasures = point->GetNumValidMeasures();
+       if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
+         m_pointMeasureCounts.remove(numValidMeasures);
+       }
+       if ( !m_pointMeasureCounts.contains(numValidMeasures + 1) ) {
+         m_pointMeasureCounts.insert(numValidMeasures + 1, 1);
+       }
+       else {
+         m_pointMeasureCounts[numValidMeasures + 1]++;
+       }
+     }
+
+     QString serial = measure->GetCubeSerialNumber();
+     int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
+     if ( --m_imageMeasureCounts[numValidMeasures - 1] < 1 ) {
+       m_imageMeasureCounts.remove(numValidMeasures);
+     }
+     if ( !m_imageMeasureCounts.contains(numValidMeasures) ) {
+       m_imageMeasureCounts.insert(numValidMeasures, 1);
+     }
+     else {
+       m_imageMeasureCounts[numValidMeasures]++;
+     }
+   }
+
+
+   /**
+    * Remove a measure from the internal counters
+    *
+    * @param measure The measure to remove
+    */
+    void ControlNetVitals::removeMeasureFromCounts(ControlMeasure *measure) {
+      ControlPoint *point = measure->Parent();
+      if (point) {
+        // By this time, the measure is still a valid measure in the parent control point.
+        int numValidMeasures = point->GetNumValidMeasures();
+
+        if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
+          m_pointMeasureCounts.remove(numValidMeasures);
+        }
+        if ( !m_pointMeasureCounts.contains(numValidMeasures - 1) ) {
+          m_pointMeasureCounts.insert(numValidMeasures - 1, 1);
+        }
+        else {
+          m_pointMeasureCounts[numValidMeasures - 1]++;
+        }
+      }
+
+      QString serial = measure->GetCubeSerialNumber();
+      int numValidMeasures = m_controlNet->GetNumberOfValidMeasuresInImage(serial);
+
+      if ( --m_imageMeasureCounts[numValidMeasures] < 1 ) {
+        m_imageMeasureCounts.remove(numValidMeasures);
+      }
+
+      if ( !m_imageMeasureCounts.contains(numValidMeasures - 1) ) {
+        m_imageMeasureCounts.insert(numValidMeasures - 1, 1);
+      }
+      else {
+        m_imageMeasureCounts[numValidMeasures - 1]++;
+      }
+    }
 
 
   /**
@@ -688,7 +713,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getLockedPoints() {
     QList<ControlPoint*> lockedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->IsEditLocked()) lockedPoints.append(point);
+      if (!point->IsIgnored() && point->IsEditLocked()) lockedPoints.append(point);
     }
     return lockedPoints;
   }
@@ -702,7 +727,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getFixedPoints() {
     QList<ControlPoint*> fixedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Fixed) fixedPoints.append(point);
+      if (!point->IsIgnored() && point->GetType() == ControlPoint::Fixed) fixedPoints.append(point);
     }
     return fixedPoints;
   }
@@ -716,7 +741,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getConstrainedPoints() {
     QList<ControlPoint*> constrainedPoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Constrained) constrainedPoints.append(point);
+      if (!point->IsIgnored() && point->GetType() == ControlPoint::Constrained) constrainedPoints.append(point);
     }
     return constrainedPoints;
   }
@@ -730,7 +755,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getFreePoints() {
     QList<ControlPoint*> freePoints;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetType() == ControlPoint::Free) freePoints.append(point);
+      if (!point->IsIgnored() && point->GetType() == ControlPoint::Free) freePoints.append(point);
     }
     return freePoints;
   }
@@ -747,7 +772,7 @@ namespace Isis {
   QList<ControlPoint*> ControlNetVitals::getPointsBelowMeasureThreshold(int num) {
     QList<ControlPoint*> belowThreshold;
     foreach(ControlPoint* point, m_controlNet->GetPoints()) {
-      if (point->GetNumMeasures() < num) belowThreshold.append(point);
+      if (!point->IsIgnored() && point->GetNumMeasures() < num) belowThreshold.append(point);
     }
     return belowThreshold;
   }

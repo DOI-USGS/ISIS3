@@ -485,7 +485,7 @@ namespace Isis {
     m_pointsFreeProgressbar = new QProgressBar();
     QPalette p = m_pointsFreeProgressbar->palette();
     p.setColor(QPalette::Highlight, Qt::blue);
-    p.setColor(QPalette::Text, Qt::white);
+    p.setColor(QPalette::Text, Qt::black);
     m_pointsFreeProgressbar->setPalette(p);
     m_pointsFreeProgressbar->setRange(0, 100);
 
