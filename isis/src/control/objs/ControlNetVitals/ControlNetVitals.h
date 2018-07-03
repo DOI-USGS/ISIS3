@@ -57,8 +57,10 @@ namespace Isis {
   *    @history 2018-06-14 Adam Goins & Jesse Maple - Refactored method calls and Signal/Slot usage.
   *    @history 2018-06-15 Adam Goins - Added documentation.
   *    @history 2018-06-25 Kristin Berry - Fixed problem with getImagesBelowMeasureThreshold().size()
-  *                           not matching numImagesBelowMeasureThreshold(). Fixed a similar
-  *                           problem with numPointsBelowMeasureThreshold().
+  *                            not matching numImagesBelowMeasureThreshold(). Fixed a similar
+  *                            problem with numPointsBelowMeasureThreshold().
+  *    @history 2018-07-03 Jesse Mapel - Fixed deleting control points not properly updating the
+  *                            point counters.
   */
   class ControlNetVitals : public QObject {
     Q_OBJECT
@@ -124,9 +126,6 @@ namespace Isis {
     private:
       void addMeasureToCounts(ControlMeasure *measure);
       void removeMeasureFromCounts(ControlMeasure *measure);
-      // TESTING JAM
-      QString countersToString();
-      // TESTING JAM
 
       //! The Control Network that the vitals class is observing.
       ControlNet *m_controlNet;
