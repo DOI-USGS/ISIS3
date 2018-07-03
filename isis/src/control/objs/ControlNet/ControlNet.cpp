@@ -1753,15 +1753,6 @@ namespace Isis {
          || label.hasGroup("Mapping") ) {
       mapping = label.findGroup("Mapping", Pvl::Traverse);
     }
-    // If radii values don't exist in the labels
-    // or if they are set to null,
-    // try to get target radii using the TargetName or NaifKeywords object values
-    if (!mapping.hasKeyword("EquatorialRadius")
-        || !mapping.hasKeyword("PolarRadius")) {
-
-      mapping = Target::radiiGroup(label, mapping);
-
-    }
 
     if (mapping.hasKeyword("TargetName")) {
       p_targetName = mapping["TargetName"][0];
