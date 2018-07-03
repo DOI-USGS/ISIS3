@@ -81,7 +81,6 @@ namespace Isis {
     m_ownPoints = true;
 
     p_targetName = other.p_targetName;
-    p_targetRadii = other.p_targetRadii;
     p_networkId = other.p_networkId;
     p_created = other.p_created;
     p_modified = other.p_modified;
@@ -245,16 +244,7 @@ namespace Isis {
 
     FileName cnetFileName(filename);
     ControlNetVersioner versionedReader(cnetFileName, progress);
-    if ( versionedReader.hasTargetRadii() ) {
-      p_targetName = versionedReader.targetName();
-      p_targetRadii.clear();
-      foreach (Distance distance, versionedReader.targetRadii()) {
-        p_targetRadii.push_back(distance);
-      }
-    }
-    else {
-      SetTarget( versionedReader.targetName() );
-    }
+    SetTarget( versionedReader.targetName() );
     p_networkId   = versionedReader.netId();
     p_userName    = versionedReader.userName();
     p_created     = versionedReader.creationDate();
@@ -1741,24 +1731,6 @@ namespace Isis {
     }
 
     p_targetName = target;
-
-    p_targetRadii.clear();
-    try {
-      PvlGroup pvlRadii = Target::radiiGroup(target);
-      p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-                                       Distance::Meters));
-      // The method Projection::Radii does not provide the B radius
-      p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-                                       Distance::Meters));
-      p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"],
-                                       Distance::Meters));
-    }
-    catch (IException &e) {
-      // Fill target radii vector will Null-valued distances
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
-    }
   }
 
 
@@ -1777,35 +1749,18 @@ namespace Isis {
     }
 
     PvlGroup mapping;
-    p_targetRadii.clear();
-    try {
-      if ( (label.hasObject("IsisCube") && label.findObject("IsisCube").hasGroup("Mapping"))
-           || label.hasGroup("Mapping") ) {
-        mapping = label.findGroup("Mapping", Pvl::Traverse);
-      }
-      // If radii values don't exist in the labels
-      // or if they are set to null,
-      // try to get target radii using the TargetName or NaifKeywords object values
-      Distance equatorialRadius, polarRadius;
-      if (!mapping.hasKeyword("EquatorialRadius")
-          || !mapping.hasKeyword("PolarRadius")) {
-
-        mapping = Target::radiiGroup(label, mapping);
-
-      }
-
-      equatorialRadius = Distance(mapping["EquatorialRadius"], Distance::Meters);
-      polarRadius      = Distance(mapping["PolarRadius"],      Distance::Meters);
-
-      p_targetRadii.push_back(equatorialRadius);
-      p_targetRadii.push_back(equatorialRadius);
-      p_targetRadii.push_back(polarRadius);
+    if ( (label.hasObject("IsisCube") && label.findObject("IsisCube").hasGroup("Mapping"))
+         || label.hasGroup("Mapping") ) {
+      mapping = label.findGroup("Mapping", Pvl::Traverse);
     }
-    catch (IException &e) {
-      // leave equatorialRadius and polarRadius as Null-valued distances if this fails
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
+    // If radii values don't exist in the labels
+    // or if they are set to null,
+    // try to get target radii using the TargetName or NaifKeywords object values
+    if (!mapping.hasKeyword("EquatorialRadius")
+        || !mapping.hasKeyword("PolarRadius")) {
+
+      mapping = Target::radiiGroup(label, mapping);
+
     }
 
     if (mapping.hasKeyword("TargetName")) {
@@ -1843,7 +1798,6 @@ namespace Isis {
     }
 
     p_targetName = target;
-    p_targetRadii = radii;
 
   }
 
@@ -1887,7 +1841,6 @@ namespace Isis {
     std::swap(p_cameraValidMeasuresMap, other.p_cameraValidMeasuresMap);
     std::swap(p_cameraRejectedMeasuresMap, other.p_cameraRejectedMeasuresMap);
     std::swap(p_cameraList, other.p_cameraList);
-    std::swap(p_targetRadii, other.p_targetRadii);
 
     // points have parent pointers that need updated too...
     QHashIterator< QString, ControlPoint * > i(*points);
@@ -1992,7 +1945,7 @@ namespace Isis {
    * @returns the radii of the target body
    */
   std::vector<Distance> ControlNet::GetTargetRadii() {
-    return p_targetRadii.toStdVector();
+    return std::vector<Distance>();
   }
 
 

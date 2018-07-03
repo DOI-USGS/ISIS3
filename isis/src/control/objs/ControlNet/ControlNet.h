@@ -453,7 +453,6 @@ namespace Isis {
       QMap<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
       //!  #rejected measures
       QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
-      QVector<Distance> p_targetRadii;        //!< Radii of target body
 
       bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
   };
