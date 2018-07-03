@@ -16,6 +16,14 @@ pipeline {
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
     }
     stages {
+        stage('Conda') {
+            steps {
+                sh """
+                    conda env create -n isis -f environment.yml
+                    conda activate isis
+                   """
+            }
+        }
         stage('Config') { 
             steps { 
                 sh """
