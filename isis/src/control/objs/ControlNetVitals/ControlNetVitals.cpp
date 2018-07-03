@@ -287,6 +287,12 @@ namespace Isis {
     }
 
     m_pointTypeCounts[point->GetType()]--;
+
+    int numValidMeasures= point->GetNumValidMeasures();
+    if ( --m_pointMeasureCounts[numValidMeasures] < 1 ) {
+      m_pointMeasureCounts.remove(numValidMeasures);
+    }
+
     validate();
   }
 
