@@ -14,6 +14,7 @@
 #include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
 #include "BundleTargetBody.h"
+#include "Camera.h"
 #include "Control.h"
 #include "Cube.h"
 #include "Image.h"
@@ -91,27 +92,25 @@ namespace Isis {
     // initializations for observation solve settings tab
     createObservationSolveSettingsTreeView();
 
-    // Create default settings for all of the observations
-    BundleObservationSolveSettings defaultObservationSettings;
-    QList<BundleObservationSolveSettings> solveSettingsList;
 
-    // If we have selected any project items, add them to the default obs solve settings object
+    // Create default settings for all of the observations
+    QList<Image *> imagesToAdd;
+    // If we have selected any project items, find the images and add them to imagesToAdd
     if (!m_project->directory()->model()->selectedItems().isEmpty()) {
       foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
         if (projItem->isImage()) {
-          defaultObservationSettings.addObservationNumber(projItem->image()->observationNumber());  
+          imagesToAdd.append(projItem->image());  
         }
         else if (projItem->isImageList()) {
           for (int i = 0; i < projItem->rowCount(); i++) {
-            ProjectItem * childItem = projItem->child(i);
-            defaultObservationSettings.addObservationNumber(childItem->image()->observationNumber());  
+            imagesToAdd.append(projItem->child(i)->image());  
           }
         }
       }
     }
     // if we didnt have any images selected in the previous case, or no proj items were selected,
     // take all images from the project tree
-    if (defaultObservationSettings.observationNumbers().isEmpty()) {
+    if (imagesToAdd.isEmpty()) {
       ProjectItem *imgRoot = m_project->directory()->model()->findItemData(QVariant("Images"),0);
       if (imgRoot) {
         for (int i = 0; i < imgRoot->rowCount(); i++) {
@@ -119,13 +118,38 @@ namespace Isis {
           for (int j = 0; j < imglistItem->rowCount(); j++) {
             ProjectItem * imgItem = imglistItem->child(j);
             if (imgItem->isImage()) {
-              defaultObservationSettings.addObservationNumber(imgItem->image()->observationNumber());  
+              imagesToAdd.append(imgItem->image());     
             }
           }
         } 
       }
     }
-    solveSettingsList.append(defaultObservationSettings);
+    
+    // create default  solve settings for supported camera types
+    BundleObservationSolveSettings defaultFramingSettings;
+    BundleObservationSolveSettings defaultLineScanSettings;
+    defaultLineScanSettings.setInstrumentPointingSettings(
+                      BundleObservationSolveSettings::AnglesVelocityAcceleration, true, 2, 2, true);
+
+
+    // sort each chosen image into its camera type 
+    foreach (Image * image, imagesToAdd) {
+      int cameraType = image->cube()->camera()->GetCameraType();
+      if (cameraType == Camera::LineScan) {
+        defaultLineScanSettings.addObservationNumber(image->observationNumber());
+      }
+      else { // assume cameraType == Camera::Framing
+        defaultFramingSettings.addObservationNumber(image->observationNumber());  
+      }
+    }
+
+    // only add defaults that have been applied
+    QList<BundleObservationSolveSettings> solveSettingsList;
+    if (defaultFramingSettings.observationNumbers().count()) 
+      solveSettingsList.append(defaultFramingSettings);
+    if (defaultLineScanSettings.observationNumbers().count())
+      solveSettingsList.append(defaultLineScanSettings);
+
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
 
@@ -1844,10 +1868,10 @@ namespace Isis {
     // Update bundle settings with the new list of bundle observation solve settings
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
-    qDebug()<<"Current BOSS list --------";
-    for (int i = 0; i < solveSettingsList.count(); i++) {
-      qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
-    }
+    // qDebug()<<"Current BOSS list --------";
+    // for (int i = 0; i < solveSettingsList.count(); i++) {
+    //   qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
+    // }
   }
 
 }
