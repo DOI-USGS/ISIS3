@@ -422,6 +422,7 @@ namespace Isis {
           }
         }
       }
+      emit newMeasure(measure);
     }
     emit newPoint(point);
   }
@@ -957,7 +958,6 @@ namespace Isis {
    * @returns A list of cube islands as serial numbers
    */
   QList< QList< QString > > ControlNet::GetSerialConnections() const {
-    QList< QList< QString > > islandStrings;
 
     VertexIndexMap indexMap;
     VertexIndexMapAdaptor indexMapAdaptor(indexMap);
@@ -970,23 +970,20 @@ namespace Isis {
 
     VertexIndexMap componentMap;
     VertexIndexMapAdaptor componentAdaptor(componentMap);
-    boost::connected_components(m_controlGraph, componentAdaptor,
+    int numComponents = boost::connected_components(m_controlGraph, componentAdaptor,
                                                       boost::vertex_index_map(indexMapAdaptor));
 
+    QList< QList< QString > > islandStrings;
+    for (int i = 0; i < numComponents; i++) {
+      QList<QString> tempList;
+      islandStrings.append(tempList);
+    }
     std::map<ImageVertex, size_t>::iterator it = componentMap.begin();
     while(it != componentMap.end())
     {
       QString serial = m_controlGraph[it->first].serial;
       int group = (int) it->second;
-
-      if (group > islandStrings.size() - 1) {
-        QList<QString> tempList;
-        tempList.append(serial);
-        islandStrings.append(tempList);
-      }
-      else {
-        islandStrings[group].append(serial);
-      }
+      islandStrings[group].append(serial);
       ++it;
     }
     return islandStrings;
