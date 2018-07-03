@@ -1743,7 +1743,7 @@ namespace Isis {
         projItem = projItem->child(0);  
       }
       BundleObservationSolveSettings settings = m_bundleSettings->observationSolveSettings(
-                                                                projItem->image()->serialNumber());
+                                                                projItem->image()->observationNumber());
 
       // Populate RHS of Observation Solve Settings tab with selected image's BOSS
       // Instrument Position Solve Options
