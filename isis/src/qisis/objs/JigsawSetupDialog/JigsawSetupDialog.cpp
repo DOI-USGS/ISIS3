@@ -152,19 +152,6 @@ namespace Isis {
 
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
-
-    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
-    if (useLastSettings && bundleSolutionInfo.size() > 0) {
-      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
-      // Retrieve the control net name used in the last bundle adjustment.
-      // Note that this returns a fully specified path and filename, while the cnet combo box
-      // only stores file names.
-      selectControl(bundleSolutionInfo.last()->inputControlNetFileName());
-      fillFromSettings(lastBundleSettings);
-      m_bundleSettings->setObservationSolveOptions(lastBundleSettings->observationSolveSettings());
-    }
-
-
     // Populate the solve option comboboxes
     const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
     m_ui->positionComboBox->insertItems(0, positionOptions);
@@ -497,6 +484,8 @@ namespace Isis {
       m_ui->pointRadiusSigmaLineEdit->setModified(true);
 
     }
+
+    m_bundleSettings->setObservationSolveOptions(settings->observationSolveSettings());
 
     update();
 

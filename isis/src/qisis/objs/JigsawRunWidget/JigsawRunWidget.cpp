@@ -146,7 +146,14 @@ namespace Isis {
     // We want to use the current settings if not use the most recently accepted bundle settings.
     // This allows user to click "Setup", make changes, "OK", then click "Setup", and those changes
     // are present in the setup dialog.
-    if (m_bundleSettings && !m_ui->useLastSettings->isChecked()) {
+    if (m_ui->useLastSettings->isChecked() && m_project->bundleSolutionInfo().size() > 0) {
+      QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+      setupdlg.loadSettings(lastBundleSettings);
+      // We also tell the setup dialog what the last selected control is.
+      setupdlg.selectControl(m_selectedControlName);
+    }
+    else if (m_bundleSettings) {
       setupdlg.loadSettings(m_bundleSettings);
       // We also tell the setup dialog what the last selected control is.
       setupdlg.selectControl(m_selectedControlName);
