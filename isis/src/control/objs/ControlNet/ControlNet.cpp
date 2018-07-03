@@ -919,7 +919,7 @@ namespace Isis {
 
     // notify CubeSerialNumbers of the loss of this point
     foreach(ControlMeasure * measure, point->getMeasures()) {
-      measureDeleted(measure);
+      point->Delete(measure);
     }
 
     emit pointDeleted(point);
