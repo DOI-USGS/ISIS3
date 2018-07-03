@@ -479,7 +479,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuitesparseconfig.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas*.so*"
-THIRDPARTYLIBS    += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeotiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
@@ -532,6 +531,10 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.so*"
 
 # Add the Boost libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libboost*.so*"
+
+# Add and patch the gfortran's rpath to $ORIGIN (so it can find its quadmath dependency) -- #4610
+PATCHLIBS         += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
+THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libquadmath*.so*"
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

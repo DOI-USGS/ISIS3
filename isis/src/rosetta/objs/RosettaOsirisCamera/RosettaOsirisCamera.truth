@@ -10,6 +10,7 @@ Set undistorted coordinates
   Undistorted coordinates: (0.25, 0.1)
 
 Modify the coefficient matrices
+
 Set distorted coordinates
   Distorted coordinates: (1.0, 1.0)
   Undistorted coordinates: (10.0, -10.0)
@@ -49,7 +50,7 @@ Spacecraft Name Short: Rosetta
 Instrument Name Long: Optical, Spectroscopic, and Infrared Remote Imaging System
 Instrument Name Short: OSIRIS
 
-For upper left of asteroid ...
+For upper left corner of asteroid ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
@@ -68,3 +69,22 @@ DeltaLine = 0.000000000
 For center pixel position ...
 Latitude OK
 Longitude OK
+
+Test WAC with subwindowing...
+
+For upper left corner of asteroid ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner of asteriod ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner of asteriod...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner of asteroid...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+

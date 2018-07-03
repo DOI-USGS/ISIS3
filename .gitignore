@@ -27,10 +27,11 @@ object_script.*.Debug
 *_plugin_import.cpp
 *.moc
 ui_*.h
-*.html
+*html
 
 # ignore all files created by squish coco
 *csmes
+*csexe
 
 print.prt
 

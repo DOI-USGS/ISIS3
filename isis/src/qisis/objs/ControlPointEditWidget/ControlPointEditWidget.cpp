@@ -579,18 +579,41 @@ namespace Isis {
   /**
    * New control network being edited
    *
-   * @param cnet (ControlNet *) The control network to edit
-   * @param filename (Qstring) Need filename to write to widget label.  ControlNet doesn't
-   *                       contain a filename.
+   * @param cnet (Control *) The control network to edit
+   *  
    * @internal
   */
   void ControlPointEditWidget::setControl(Control *control) {
     //  TODO  more error checking
+    m_control = control;
     m_controlNet = control->controlNet();
     m_cnetFileName = control->fileName();
+
+    m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
     setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
 
     emit newControlNetwork(m_controlNet);
+  }
+
+
+  /**
+   * New active control was set from ipce 
+   *  
+   * TODO:  This will need to be redesigned with the ::setControl method to better handle editing 
+   * points from different cnets. 
+   */
+  void ControlPointEditWidget::setControlFromActive() {
+
+    if (m_directory->project()->activeControl()) {
+      m_control = m_directory->project()->activeControl();
+      m_controlNet = m_control->controlNet();
+      m_cnetFileName = m_control->fileName();
+
+      m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
+      setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
+
+      emit newControlNetwork(m_controlNet);    
+    }
   }
 
 
@@ -687,7 +710,6 @@ namespace Isis {
   FileName ControlPointEditWidget::findGroundFile() {
 
     FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
-
     if (m_changeAllGroundLocation) {
       QFileInfo oldFile(groundFile.expanded());
       QFileInfo newFile(m_newGroundDir, oldFile.fileName());
@@ -782,17 +804,35 @@ namespace Isis {
     //  is selected
     if (controlPoint->Parent() == NULL) {
       m_editPoint = controlPoint;
+      // New point in editor, so colorize all save buttons
+      colorizeAllSaveButtons("red");
     }
     else {
       m_editPoint = new ControlPoint;
       *m_editPoint = *controlPoint;
+
+      // New point loaded, make sure all save button's text is default black color
+      colorizeAllSaveButtons("black");
     }
 
     loadPoint(serialNumber);
     loadTemplateFile(m_measureEditor->templateFileName());
+  }
 
-    // New point loaded, make sure Save Measure Button text is default
+
+  void ControlPointEditWidget::colorizeAllSaveButtons(QString color) {
+
+    if (color == "black") {
+      // Don't need to colorize save measure button, when loading new measure, the measure editor
+      // will set back to default palette.
     m_savePoint->setPalette(m_saveDefaultPalette);
+      m_saveNet->setPalette(m_saveDefaultPalette);
+    }
+    else if (color == "red") {
+      m_measureEditor->colorizeSaveButton(); 
+      colorizeSavePointButton();
+      colorizeSaveNetButton();
+    }
   }
 
 
@@ -1005,7 +1045,7 @@ namespace Isis {
 
     Camera *cam;
     for (int i = 0; i < m_serialNumberList->size(); i++) {
-//    if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
+      if (m_serialNumberList->serialNumber(i) == m_groundSN) continue;
       cam = m_controlNet->Camera(i);
       if (cam->SetUniversalGround(latitude, longitude)) {
         //  Make sure point is within image boundary
@@ -1159,7 +1199,7 @@ namespace Isis {
           }
         }
 
-        this->setVisible(false);
+        //this->setVisible(false);
         // remove this point from the control network
         if (m_controlNet->DeletePoint(m_editPoint->GetId()) ==
                                           ControlPoint::PointLocked) {
@@ -1168,8 +1208,8 @@ namespace Isis {
           return;
         }
         if (m_editPoint != NULL && m_editPoint->Parent() == NULL) {
-          delete m_editPoint;
-          m_editPoint = NULL;
+//        delete m_editPoint;
+//        m_editPoint = NULL;
         }
       }
 
@@ -1224,6 +1264,7 @@ namespace Isis {
 
       // emit a signal to alert user to save when exiting
       emit cnetModified();
+      emit saveControlNet();
 
       if (m_editPoint != NULL) {
         //  Change Save Point button text to red
@@ -2443,12 +2484,18 @@ namespace Isis {
    *
    * @author 2014-07-11 Tracie Sucharski
    */
-  void ControlPointEditWidget::colorizeSaveNetButton() {
+  void ControlPointEditWidget::colorizeSaveNetButton(bool reset) {
 
+    if (reset) {
+      //  Change Save Net button text back to default black
+      m_saveNet->setPalette(m_saveDefaultPalette);
+    }
+    else {
     QColor qc = Qt::red;
     QPalette p = m_savePoint->palette();
     p.setColor(QPalette::ButtonText,qc);
     m_saveNet->setPalette(p);
+    }
 
   }
 
@@ -2490,7 +2537,7 @@ namespace Isis {
   */
   void ControlPointEditWidget::saveNet() {
 
-    m_controlNet->Write(m_cnetFileName);
+    m_control->write();
 
     //  Change Save Measure button text back to default
     m_saveNet->setPalette(m_saveDefaultPalette);
@@ -2499,7 +2546,8 @@ namespace Isis {
   }
 
 
-  /**
+  /** 
+   * This was used when ipce used docked widgets. 
    * This method is called from the constructor so that when the
    * Main window is created, it know's it's size and location.
    *
