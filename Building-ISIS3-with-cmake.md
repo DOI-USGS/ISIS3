@@ -8,7 +8,10 @@ With the cmake, the ISIS3 dependencies are now managed through Anaconda. The cma
 ## Building ISIS3
 From the terminal window:
 * Clone the repo locally:  <repo directory>
-* Activate your [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment)
+* Activate your [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment). In bash run
+
+`source activate <environment-name>`
+
 * CD into the clone directory.
 * mkdir build
 * cd into the build directory
