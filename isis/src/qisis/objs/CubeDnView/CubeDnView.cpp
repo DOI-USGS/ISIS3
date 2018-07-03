@@ -35,6 +35,7 @@
 #include <QSizePolicy>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidgetAction>
 #include <QXmlStreamWriter>
@@ -124,7 +125,6 @@ namespace Isis {
 
   void CubeDnView::createActions(Directory *directory) {
 
-
     m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -143,7 +143,9 @@ namespace Isis {
     ToolList *tools = new ToolList;
 
     tools->append(new RubberBandTool(this));
-    tools->append(NULL);
+
+    // 2018-07-02 Kaitlyn Lee - Commented this out; not sure why it was here
+    //tools->append(NULL);
 
     ControlNetTool *controlNetTool = new ControlNetTool(directory, this);
     tools->append(controlNetTool);
@@ -234,15 +236,8 @@ namespace Isis {
         m_permToolBar->addSeparator();
       }
     }
-
     // Store the actions for easy enable/disable.
-    foreach (QAction *action, m_toolPad->actions()) {
-      addAction(action);
-    }
-    foreach (QAction *action, m_permToolBar->actions()) {
-      addAction(action);
-    }
-    foreach (QAction *action, m_activeToolBar->actions()) {
+    foreach (QAction *action, findChildren<QAction *>()) {
       addAction(action);
     }
     // On default, actions are disabled until the cursor enters the view.
@@ -253,16 +248,39 @@ namespace Isis {
 
 
   /**
-   * Disables actions when cursor leaves the view. Overriden method
-   * If a menu is visible, i.e. clicked on, this causes a leave event. We want the
-   * actions to still be enabled when a menu is visible.
+   * Disables actions when the cursor leaves the view. Overriden method
+   * If a project item view menu or toolpad action menu is visible, i.e. clicked on,
+   * this causes a leave event. We want the actions to still be enabled when a
+   * menu is visible.
    *
    * @param event The leave event
    */
+  // void CubeDnView::leaveEvent(QEvent *event) {
+  //   bool menuVisible = false;
+  //   // Find the toolpad actions (buttons) with menus and check if they are visible
+  //   foreach (QToolButton *button, findChildren<QToolButton *>()) {
+  //     if (button->menu() && button->menu()->isVisible()) {
+  //       menuVisible = true;
+  //       break;
+  //     }
+  //   }
+  //   if ( !(menuVisible | m_optionsMenu->isVisible() | m_viewMenu->isVisible()
+  //          | m_windowMenu->isVisible()) ) {
+  //     disableActions();
+  //   }
+  // }
+
   void CubeDnView::leaveEvent(QEvent *event) {
-    if ( !(m_optionsMenu->isVisible() | m_viewMenu->isVisible() | m_windowMenu->isVisible()) ) {
-      disableActions();
+    if (m_optionsMenu->isVisible() | m_viewMenu->isVisible() | m_windowMenu->isVisible()) {
+      return;
     }
+    // Find the toolpad actions (buttons) with menus and check if they are visible
+    foreach (QToolButton *button, findChildren<QToolButton *>()) {
+      if (button->menu() && button->menu()->isVisible()) {
+        return;
+      }
+    }
+    disableActions();
   }
 
 
@@ -270,6 +288,8 @@ namespace Isis {
    * A slot function that is called when directory emits a siganl that an active
    * control network is set. It enables the control network editor tool in the
    * toolpad and loads the network.
+   *
+   * @param value The boolean that holds if a control network has been set.
    */
   void CubeDnView::enableControlNetTool(bool value) {
     foreach (QAction *action, m_toolPad->actions()) {
@@ -290,10 +310,17 @@ namespace Isis {
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
+    delete m_viewMenu;
+    delete m_optionsMenu;
+    delete m_windowMenu;
+
 
     m_permToolBar = 0;
     m_activeToolBar = 0;
     m_toolPad = 0;
+    m_viewMenu = 0;
+    m_optionsMenu = 0;
+    m_windowMenu = 0;
   }
 
 
