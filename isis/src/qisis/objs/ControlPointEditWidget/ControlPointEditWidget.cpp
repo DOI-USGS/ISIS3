@@ -231,17 +231,18 @@ namespace Isis {
                   "PatternMatch/PatternMatch.html for a description of the "
                   "contents of this file.");
     m_templateComboBox->addItem(m_measureEditor->templateFileName());
-    QList <TemplateList *> regTemplates = m_directory->project()->registrationTemplates();
+    QList <TemplateList *> regTemplates = m_directory->project()->regTemplates();
     foreach(TemplateList *templateList, regTemplates) {
       foreach(Template *templateFile, *templateList){
-        m_templateComboBox->addItem(templateFile->fileName());
+        m_templateComboBox->addItem(templateFile->importName() 
+                                    + "/" + FileName(templateFile->fileName()).name());
       }
     }
     QFormLayout *templateFileLayout = new QFormLayout();
     templateFileLayout->addRow("Template File:", m_templateComboBox);
 
     connect(m_templateComboBox, SIGNAL(activated(QString)), 
-            m_measureEditor, SLOT(setTemplateFile(QString)));
+            this, SLOT(setTemplateFile(QString)));
     connect(m_measureEditor, SIGNAL(setTemplateFailed(QString)), 
             this, SLOT(resetTemplateComboBox(QString)));
 
@@ -2415,20 +2416,45 @@ namespace Isis {
   void ControlPointEditWidget::addTemplates(TemplateList *templateList) {
     if(templateList->type() == "registrations") {
       for(int i = 0; i < templateList->size(); i++) {
-        m_templateComboBox->addItem(templateList->at(i)->fileName());
+        m_templateComboBox->addItem(templateList->at(i)->importName()
+                                    + "/" + FileName(templateList->at(i)->fileName()).name());
       }
     }
   }
   
   
   /**
-  * Reset the selected template in teh template combobox if the template selected by the user does 
+  * Appends the filename to the registrations path (unless this is the default template) and calls 
+  * setTemplateFile for the control measure
+  *
+  * @param filename This is the import directory and the filename of the template file selected from
+  *                 the QComboBox.
+  */
+  void ControlPointEditWidget::setTemplateFile(QString filename) {
+    QString expandedFileName = filename;
+    if(!filename.startsWith("$base")){
+      expandedFileName = m_directory->project()->templateRoot() 
+                                 + "/registrations/" + filename;
+    }
+    if (m_measureEditor->setTemplateFile(expandedFileName)) {
+      loadTemplateFile(expandedFileName);
+    }
+  }
+  
+  
+  /**
+  * Reset the selected template in the template combobox if the template selected by the user does 
   * not satisfy requirements for the control measure.
   *
   * @param fielName The filename that was previously selected in the template combo box
   */
   void ControlPointEditWidget::resetTemplateComboBox(QString fileName) {
-    int index = m_templateComboBox->findText(fileName);
+    if(fileName.startsWith("$base")) {
+      m_templateComboBox->setCurrentIndex(0);
+    }
+    QList<QString> components = fileName.split("/");
+    int size = components.size();
+    int index = m_templateComboBox->findText(components[size - 2] + "/" + components[size - 1]);
     if (index != -1) {
       m_templateComboBox->setCurrentIndex(index);
     }

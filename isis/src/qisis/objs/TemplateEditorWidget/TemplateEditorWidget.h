@@ -33,14 +33,12 @@ namespace Isis {
        explicit TemplateEditorWidget(Template * currentTemplate, Directory *directory, QWidget *parent = 0);
 
        ~TemplateEditorWidget();
-       
-       bool textChanged();
 
      public slots:
        void saveText();
        void saveAsText();
-      //  void setStateUnclean();
-      //  void saveOption();
+       void saveOption();
+       void textChanged();
 
      private:
        Ui::TemplateEditorWidget *m_ui;
@@ -48,7 +46,7 @@ namespace Isis {
        Directory *m_directory;  // The directory of the open project
        Template *m_template;    // The template being modified
        QString m_fileType;      // The file type of the template ("Maps" or "Registrations")
-      //  bool m_textChanged;      // Whether the text in the widget has been changed since last save
+       bool m_textChanged;      // Whether the text in the widget has been changed since last save
    };
 }
 

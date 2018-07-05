@@ -18,7 +18,7 @@ namespace Isis {
     m_template = currentTemplate;
     m_directory = directory;
     m_fileType = m_template->templateType();
-    // m_textChanged = false;
+    m_textChanged = false;
 
     QFile templateFile(m_template->fileName());
     templateFile.open(QFile::ReadOnly | QFile::Text);
@@ -26,34 +26,16 @@ namespace Isis {
     m_ui->templateTextEdit->setText(textStream.readAll());
     templateFile.close();
 
-    // connect(m_ui->templateTextEdit, SIGNAL(textChanged()), this, SLOT(setStateUnclean()));
+    connect(m_ui->templateTextEdit, SIGNAL(textChanged()), this, SLOT(textChanged()));
     connect(m_ui->templateTextSave, SIGNAL (released()),this, SLOT (saveText()));
     connect(m_ui->templateTextSaveAs, SIGNAL (released()),this, SLOT (saveAsText()));
-    connect(this, SIGNAL(destroyed(QObject *)), this, SLOT(saveOption()));
 
   }
 
 
   TemplateEditorWidget::~TemplateEditorWidget() {
     
-    // if (m_textChanged) {
-    //   qDebug() << "IN LOOP";
-    //   QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
-    //                          QString("Would you like to save your current template?"),
-    //                          NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
-    //   QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
-    //   box->addButton("Don't Save", QMessageBox::RejectRole);
-    //   QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
-    //   box->exec();
-    // 
-    //   if (box->clickedButton() == (QAbstractButton*)cancel) {
-    //     // event->ignore();
-    //     return;
-    //   }
-    //   else if (box->clickedButton() == (QAbstractButton*)save) {
-    //     saveAsText();
-    //   }
-    // }
+    saveOption();
     
     delete m_ui;
   }
@@ -69,7 +51,7 @@ namespace Isis {
       templateFile.close();
     }
     
-    // m_textChanged = false;
+    m_textChanged = false;
   }
 
   // Future plans to include Save As button
@@ -116,56 +98,47 @@ namespace Isis {
                            m_fileType, 
                            templateFolder.dirName()));
 
-      // if (compare(m_fileType, "maps") == 0) {
-      //   project->addMapTemplates(templateList);
-      // }
-      // else if (compare(m_fileType, "registrations") == 0) {
-      //   project->addRegistrationTemplates(templateList);
-      // }
-      m_directory->project()->addTemplates(templateList);
+      if (m_fileType == "maps") {
+        m_directory->project()->addMapTemplates(templateList);
+      }
+      else if (m_fileType == "registrations") {
+        m_directory->project()->addRegTemplates(templateList);
+      }
       m_directory->project()->setClean(false);
     }
     else {
       // Throw()
     }
 
-    // m_textChanged = false;
+    m_textChanged = false;
   }
   
   
-  // void TemplateEditorWidget::setStateUnclean() {
-  //   qDebug() << "CHANGED";
-  //   m_textChanged = true;
-  // }
-  // 
-  // 
-  // bool TemplateEditorWidget::textChanged() {
-  //   return m_textChanged;
-  // }
-  // 
-  // 
-  // void TemplateEditorWidget::saveOption() {
-  //   qDebug() << "CLOSE";
-  // 
-  //   // The active control is checked here for modification because this was the simplest solution
-  //   // vs changing the project clean state every time the control is modified or saved.
-  //   if (m_textChanged) {
-  //     qDebug() << "IN LOOP";
-  //     QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
-  //                            QString("Would you like to save your current template?"),
-  //                            NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
-  //     QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
-  //     box->addButton("Don't Save", QMessageBox::RejectRole);
-  //     QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
-  //     box->exec();
-  // 
-  //     if (box->clickedButton() == (QAbstractButton*)cancel) {
-  //       // event->ignore();
-  //       return;
-  //     }
-  //     else if (box->clickedButton() == (QAbstractButton*)save) {
-  //       saveAsText();
-  //     }
-  //   }
-  // }
+  void TemplateEditorWidget::textChanged() {
+    m_textChanged = true;
+  }
+
+  
+  void TemplateEditorWidget::saveOption() {
+    // The active control is checked here for modification because this was the simplest solution
+    // vs changing the project clean state every time the control is modified or saved.
+    if (m_textChanged) {
+      QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
+                             QString("Would you like to save your current template?"),
+                             NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
+      QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
+      box->addButton("Don't Save", QMessageBox::RejectRole);
+      QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
+      box->exec();
+  
+      if (box->clickedButton() == (QAbstractButton*)cancel) {
+        // event->ignore();
+        return;
+      }
+      else if (box->clickedButton() == (QAbstractButton*)save) {
+        saveAsText();
+      }
+    }
+    m_textChanged = false;
+  }
 }

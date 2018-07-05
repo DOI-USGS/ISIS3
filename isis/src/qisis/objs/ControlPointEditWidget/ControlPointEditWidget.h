@@ -175,6 +175,7 @@ namespace Isis {
       void showHideTemplateEditor();
       void saveTemplateFile();
       void saveTemplateFileAs();
+      void setTemplateFile(QString);
       void setTemplateModified();
       void writeTemplateFile(QString);
       void resetTemplateComboBox(QString fileName);
