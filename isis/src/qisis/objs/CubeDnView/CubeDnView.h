@@ -36,6 +36,7 @@ class QMenu;
 class QModelIndex;
 class QToolBar;
 class QXmlStreamWriter;
+class QWidget;
 
 namespace Isis {
 
@@ -95,10 +96,12 @@ namespace Isis {
    *                           Removed connections that connected the project and CubeDnView and called
    *                           enableControlNetTool() because Directory now does this.
    *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
-   *                           ambiguous shortcut errors. To counter this, we enable/disable actions. Overrode
-   *                           leaveEvent() to handle open menus causing a leave event. On default, a view's
-   *                           actions are disabled. To enable the actions, move the cursor over the view.
-   *                           When a user moves the cursor outside of the view, the actions are disabled.
+   *                           ambiguous shortcut errors. To counter this, we enable/disable actions.
+   *                           Overrode leaveEvent() to handle open menus causing a leave event. Overrode
+   *                           enable/disableActions() because we need to disable the active toolbar's widgets.
+   *                           On default, a view's actions are disabled. To enable the actions, move the
+   *                           cursor over the view. When a user moves the cursor outside of the view, the
+   *                           actions are disabled.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -136,11 +139,13 @@ namespace Isis {
       void onItemAdded(ProjectItem *item);
       void onCubeViewportAdded(MdiCubeViewport *viewport);
       void onCubeViewportDeleted(QObject *obj);
+      void disableActions();
 
     private:
       Cube *workspaceActiveCube();
       void setWorkspaceActiveCube(Image *image);
       void leaveEvent(QEvent *event);
+      void enableActions();
 
     private:
       /**
@@ -179,6 +184,7 @@ namespace Isis {
       QToolBar *m_permToolBar; //!< A tool bar for storing actions
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions
+      QList<QWidget *> m_childWidgets;  //!< Child widgets of the active toolbar
   };
 }
 

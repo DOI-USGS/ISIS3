@@ -138,13 +138,7 @@ namespace Isis {
     m_sceneWidget->addTo(m_toolPad);
 
     // Store the actions for easy enable/disable.
-    foreach (QAction *action, m_toolPad->actions()) {
-      addAction(action);
-    }
-    foreach (QAction *action, m_permToolBar->actions()) {
-      addAction(action);
-    }
-    foreach (QAction *action, m_activeToolBar->actions()) {
+    foreach (QAction *action, findChildren<QAction *>()) {
       addAction(action);
     }
     // On default, actions are disabled until the cursor enters the view.

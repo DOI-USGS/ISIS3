@@ -25,6 +25,7 @@
 #include <QAction>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QKeySequence>
 #include <QMap>
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -236,10 +237,34 @@ namespace Isis {
         m_permToolBar->addSeparator();
       }
     }
-    // Store the actions for easy enable/disable.
+
+    // Store the actions and widgets for easy enable/disable.
     foreach (QAction *action, findChildren<QAction *>()) {
+      // Remove the edit tool's save button shortcut because the ipce main window
+      // already has one and this causes an ambiquous shortcut error.
+      if (action->toolTip() == "Save") {
+        action->setShortcut(QKeySequence());
+      }
+      // The active toolbar's actions are inside of a container that is a QWidgetAction.
+      // We want to skip adding this because we want to disable the active toolbar's
+      // actions separately.
+      if ( QString::fromLatin1(action->metaObject()->className()) == "QWidgetAction") {
+        continue;
+      }
       addAction(action);
     }
+
+    // There was a problem with disabling/enabling the combo boxes. The only way to
+    // get this to work was to skip disabling the combo boxes. We also skip QWidgets
+    // because the combo boxes are contained inside of a QWidget.
+    foreach (QWidget *child, m_activeToolBar->findChildren<QWidget *>()) {
+      if (QString::fromLatin1(child->metaObject()->className()).contains("ComboBox") |
+          QString::fromLatin1(child->metaObject()->className()).contains("Widget")) {
+        continue;
+      }
+      m_childWidgets.append(child);
+    }
+
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
 
@@ -285,7 +310,33 @@ namespace Isis {
 
 
   /**
-   * A slot function that is called when directory emits a siganl that an active
+   * Disables toolbars and toolpad actions/widgets. Overriden method.
+   */
+  void CubeDnView::disableActions() {
+    foreach (QAction *action, actions()) {
+      action->setDisabled(true);
+    }
+    foreach (QWidget *widget, m_childWidgets) {
+      widget->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Disables toolbars and toolpad actions/widgets. Overriden method.
+   */
+  void CubeDnView::enableActions() {
+    foreach (QAction *action, actions()) {
+      action->setEnabled(true);
+    }
+    foreach (QWidget *widget, m_childWidgets) {
+      widget->setEnabled(true);
+    }
+  }
+
+
+  /**
+   * A slot function that is called when directory emits a signal that an active
    * control network is set. It enables the control network editor tool in the
    * toolpad and loads the network.
    *
