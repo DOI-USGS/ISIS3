@@ -259,7 +259,7 @@ namespace Isis {
       }
 
       if ( controlPoint->GetId().isEmpty() ) {
-        QString msg = "Unbable to write control net to PVL file. "
+        QString msg = "Unable to write control net to PVL file. "
                       "Invalid control point has no point ID value.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -364,21 +364,18 @@ namespace Isis {
           matrix += toString(aprioriCovarianceMatrix(1, 2));
           matrix += toString(aprioriCovarianceMatrix(2, 2));
 
-          if ( !m_header.targetRadii.empty() ) {
+          if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
+               && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
+               && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
 
-            if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
-                 && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
-                 && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
-
-              QString sigmas = "AprioriLatitudeSigma = "
+            QString sigmas = "AprioriLatitudeSigma = "
               + toString(aprioriSurfacePoint.GetLatSigmaDistance().meters())
               + " <meters>  AprioriLongitudeSigma = "
               + toString(aprioriSurfacePoint.GetLonSigmaDistance().meters())
               + " <meters>  AprioriRadiusSigma = "
               + toString(aprioriSurfacePoint.GetLocalRadiusSigma().meters())
               + " <meters>";
-              matrix.addComment(sigmas);
-            }
+            matrix.addComment(sigmas);
           }
 
           // If the covariance matrix has a value, add it to the PVL point.
@@ -443,22 +440,19 @@ namespace Isis {
           matrix += toString(adjustedCovarianceMatrix(1, 2));
           matrix += toString(adjustedCovarianceMatrix(2, 2));
 
-          if ( !m_header.targetRadii.empty() ) {
-
-            if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
-                 && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
-                 && adjustedSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
+          if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
+               && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
+               && adjustedSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
 
             QString sigmas = "AdjustedLatitudeSigma = "
-                             + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
-                             + " <meters>  AdjustedLongitudeSigma = "
-                             + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
-                             + " <meters>  AdjustedRadiusSigma = "
-                             + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
-                             + " <meters>";
+              + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
+              + " <meters>  AdjustedLongitudeSigma = "
+              + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
+              + " <meters>  AdjustedRadiusSigma = "
+              + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
+              + " <meters>";
 
             matrix.addComment(sigmas);
-            }
           }
           // If the covariance matrix has a value, add it to the PVL point.
           if ( adjustedCovarianceMatrix(0, 0) != 0.0
