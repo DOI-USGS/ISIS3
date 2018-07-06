@@ -34,6 +34,7 @@ namespace Isis {
     QApplication(argc, argv) {
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
+
     for (int i = 1; i < argc; i++) {
         QString arg(argv[i]);
         if (arg.startsWith("-pref")) {
