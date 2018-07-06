@@ -34,7 +34,6 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "ProjectItemProxyModel.h"
-#include "ToolPad.h"
 
 namespace Isis {
 
@@ -162,7 +161,7 @@ namespace Isis {
 
 
   /**
-   * Enables actions when cursor etners on the view
+   * Enables actions when cursor enters the view
    *
    * @param event The enter event
    */

@@ -78,13 +78,6 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-//  QMdiArea *centralWidget = new QMdiArea;
-//  centralWidget->setActivationOrder(QMdiArea::StackingOrder);
-
-//  connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
-//          this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
-
-
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -92,8 +85,6 @@ namespace Isis {
     //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
     setDockNestingEnabled(true);
-
-    //activateWindow();
 
     try {
       m_directory = new Directory(this);
@@ -355,17 +346,6 @@ namespace Isis {
 
     m_editMenuActions.append(undoAction);
     m_editMenuActions.append(redoAction);
-
-//  m_cascadeViewsAction = new QAction("Cascade Views", this);
-//  connect(m_cascadeViewsAction, SIGNAL( triggered() ),
-//          centralWidget(), SLOT( cascadeSubWindows() ) );
-//  m_viewMenuActions.append(m_cascadeViewsAction);
-//
-//  m_tileViewsAction = new QAction("Tile Views", this);
-//  connect(m_tileViewsAction, SIGNAL( triggered() ),
-//          centralWidget(), SLOT( tileSubWindows() ) );
-//  m_viewMenuActions.append(m_tileViewsAction);
-
 
     QAction *threadLimitAction = new QAction("Set Thread &Limit", this);
     connect(threadLimitAction, SIGNAL(triggered()),
