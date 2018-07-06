@@ -105,8 +105,8 @@ namespace Isis {
   }
 
   /**
-   * Uses the actions created by CnetEditorWidget, tries to find the menus to put
-   * the actions under, and creates the menus if said menus do not exist.
+   * Uses the actions created by CnetEditorWidget, creates the tables menu,
+   * and puts the actions into the tables menu.
    */
   void CnetEditorView::createMenus() {
     QMap< QAction *, QList< QString > > actionMap = m_cnetEditorWidget->menuActions();
