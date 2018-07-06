@@ -247,8 +247,8 @@ namespace Isis {
       }
       // The active toolbar's actions are inside of a container that is a QWidgetAction.
       // We want to skip adding this because we want to disable the active toolbar's
-      // actions separately.
-      if ( QString::fromLatin1(action->metaObject()->className()) == "QWidgetAction") {
+      // actions separately to skip the combo boxes.
+      if (QString(action->metaObject()->className()) == "QWidgetAction") {
         continue;
       }
       addAction(action);
@@ -258,8 +258,8 @@ namespace Isis {
     // get this to work was to skip disabling the combo boxes. We also skip QWidgets
     // because the combo boxes are contained inside of a QWidget.
     foreach (QWidget *child, m_activeToolBar->findChildren<QWidget *>()) {
-      if (QString::fromLatin1(child->metaObject()->className()).contains("ComboBox") |
-          QString::fromLatin1(child->metaObject()->className()).contains("Widget")) {
+      if (QString(child->metaObject()->className()).contains("ComboBox") ||
+          QString(child->metaObject()->className()).contains("Widget")) {
         continue;
       }
       m_childWidgets.append(child);
@@ -280,23 +280,8 @@ namespace Isis {
    *
    * @param event The leave event
    */
-  // void CubeDnView::leaveEvent(QEvent *event) {
-  //   bool menuVisible = false;
-  //   // Find the toolpad actions (buttons) with menus and check if they are visible
-  //   foreach (QToolButton *button, findChildren<QToolButton *>()) {
-  //     if (button->menu() && button->menu()->isVisible()) {
-  //       menuVisible = true;
-  //       break;
-  //     }
-  //   }
-  //   if ( !(menuVisible | m_optionsMenu->isVisible() | m_viewMenu->isVisible()
-  //          | m_windowMenu->isVisible()) ) {
-  //     disableActions();
-  //   }
-  // }
-
   void CubeDnView::leaveEvent(QEvent *event) {
-    if (m_optionsMenu->isVisible() | m_viewMenu->isVisible() | m_windowMenu->isVisible()) {
+    if (m_optionsMenu->isVisible() || m_viewMenu->isVisible() || m_windowMenu->isVisible()) {
       return;
     }
     // Find the toolpad actions (buttons) with menus and check if they are visible
