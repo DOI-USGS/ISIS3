@@ -31,7 +31,7 @@ Get the METHANE filter layout
 METHANE filter ID: -61504
 METHANE filter name: "METHANE"
 METHANE filter start sample: 1
-METHANE filter start line: 291
+METHANE filter start line: 285
 METHANE filter samples: 1648
 METHANE filter lines: 128
 
@@ -39,7 +39,7 @@ Get the METHANE filter layout but give it a different name
 METHANE filter ID: -61504
 METHANE filter name: "methane"
 METHANE filter start sample: 1
-METHANE filter start line: 291
+METHANE filter start line: 285
 METHANE filter samples: 1648
 METHANE filter lines: 128
 

@@ -488,7 +488,7 @@ namespace Isis {
 
       /**
        * Emitted when project is saved.
-       *
+       * receivers: IpceMainWindow
        */
       void projectSaved(Project *);
 

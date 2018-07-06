@@ -803,18 +803,17 @@ namespace Isis {
     //  to m_editPoint, otherwise create copy.  It will not be saved to net until "Save Point"
     //  is selected
     if (controlPoint->Parent() == NULL) {
+
       m_editPoint = controlPoint;
       // New point in editor, so colorize all save buttons
       colorizeAllSaveButtons("red");
     }
     else {
-      m_editPoint = new ControlPoint;
-      *m_editPoint = *controlPoint;
-
+      m_editPoint = controlPoint;
       // New point loaded, make sure all save button's text is default black color
       colorizeAllSaveButtons("black");
-    }
 
+    }
     loadPoint(serialNumber);
     loadTemplateFile(m_measureEditor->templateFileName());
   }
@@ -860,6 +859,7 @@ namespace Isis {
 
     //  Write pointId
     QString CPId = m_editPoint->GetId();
+
     QString ptId("Point ID:  ");
     ptId += (QString) CPId;
     m_ptIdValue->setText(ptId);
@@ -901,6 +901,7 @@ namespace Isis {
     else {
       rad = "Apriori Radius:  " + QString::number(surfPoint.GetLocalRadius().meters(), 'f', 2);
     }
+
     m_aprioriRadius->setText(rad);
 
     //  Set EditLock box correctly
@@ -1019,12 +1020,13 @@ namespace Isis {
         rightIndex = 0;
       }
     }
-
     //  Handle pts with a single measure, for now simply put measure on left/right
     //  Evenutally put on left with black on right??
     if (rightIndex > m_editPoint->GetNumMeasures()-1) rightIndex = 0;
+
     m_rightCombo->setCurrentIndex(rightIndex);
     m_leftCombo->setCurrentIndex(leftIndex);
+
     //  Initialize pointEditor with measures
     selectLeftMeasure(leftIndex);
     selectRightMeasure(rightIndex);
@@ -1968,7 +1970,6 @@ namespace Isis {
   void ControlPointEditWidget::selectLeftMeasure(int index) {
 
     QString file = m_pointFiles[index];
-
     QString serial;
     try {
       serial = m_serialNumberList->serialNumber(file);
@@ -1991,9 +1992,8 @@ namespace Isis {
       delete m_leftMeasure;
       m_leftMeasure = NULL;
     }
-    m_leftMeasure = new ControlMeasure();
-    //  Find measure for each file
-    *m_leftMeasure = *((*m_editPoint)[serial]);
+
+    m_leftMeasure = ((*m_editPoint)[serial]);
 
     //  If m_leftCube is not null, delete before creating new one
     m_leftCube.reset(new Cube(file, "r"));
@@ -2001,7 +2001,6 @@ namespace Isis {
     //  Update left measure of pointEditor
     m_measureEditor->setLeftMeasure (m_leftMeasure, m_leftCube.data(), m_editPoint->GetId());
     updateLeftMeasureInfo ();
-
   }
 
 
@@ -2041,10 +2040,7 @@ namespace Isis {
       delete m_rightMeasure;
       m_rightMeasure = NULL;
     }
-    m_rightMeasure = new ControlMeasure();
-
-    //  Find measure for each file
-    *m_rightMeasure = *((*m_editPoint)[serial]);
+    m_rightMeasure = ((*m_editPoint)[serial]);
 
     //  If m_rightCube is not null, delete before creating new one
     m_rightCube.reset(new Cube(file, "r"));

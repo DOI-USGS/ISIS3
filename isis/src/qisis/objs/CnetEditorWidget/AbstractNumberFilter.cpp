@@ -12,22 +12,21 @@
 #include <QMargins>
 #include <QRadioButton>
 
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 
 
 namespace Isis {
   AbstractNumberFilter::AbstractNumberFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractFilter(flag, minimumForSuccess) {
     nullify();
     createWidget();
   }
 
 
   AbstractNumberFilter::AbstractNumberFilter(const AbstractNumberFilter &other)
-    : AbstractFilter(other) {
+        : AbstractFilter(other) {
     nullify();
     createWidget();
 
@@ -141,4 +140,3 @@ namespace Isis {
     *m_lineEditText = newText;
   }
 }
-

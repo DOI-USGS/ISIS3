@@ -24,6 +24,7 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QEvent>
 #include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
@@ -152,8 +153,12 @@ namespace Isis {
    *                           type of a view will randomly change and setting its type has no effect.
    *                           Use windowType() to get the type. Also added the toolbar title in the
    *                           permanent toolbar constructor. 
-   *
-   *
+   *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
+   *                           hold.  Extra destroy slots were causing double deletion of memory.
+   *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
+   *                           state can be reset after the IpceMainWindow::show() causes resize and
+   *                           move events which in turn cause the project clean flag to be false
+   *                           even though the project has just opened.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -169,8 +174,10 @@ namespace Isis {
 
       void readSettings(Project *);
       void writeSettings(Project *project);
+      void writeGlobalSettings(Project *project);
 
     protected:
+      void showEvent(QShowEvent *event);
       void closeEvent(QCloseEvent *event);
       bool eventFilter(QObject *watched, QEvent *event);
 
@@ -182,6 +189,7 @@ namespace Isis {
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
+
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
@@ -190,7 +198,6 @@ namespace Isis {
       void initializeActions();
       void createMenus();
       void createToolBars();
-
 
     private:
       /**
