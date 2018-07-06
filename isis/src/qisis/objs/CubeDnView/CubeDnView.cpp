@@ -308,7 +308,7 @@ namespace Isis {
 
 
   /**
-   * Disables toolbars and toolpad actions/widgets. Overriden method.
+   * Enables toolbars and toolpad actions/widgets. Overriden method.
    */
   void CubeDnView::enableActions() {
     foreach (QAction *action, actions()) {
