@@ -152,7 +152,7 @@ namespace Isis {
    *                           views does not always work with this enabled. With this option enabled, the
    *                           type of a view will randomly change and setting its type has no effect.
    *                           Use windowType() to get the type. Also added the toolbar title in the
-   *                           permanent toolbar constructor. 
+   *                           permanent toolbar constructor.
    *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
    *                           hold.  Extra destroy slots were causing double deletion of memory.
    *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
@@ -186,6 +186,7 @@ namespace Isis {
       void enterWhatsThisMode();
 
       void tabViews();
+      void tileViews();
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
