@@ -251,10 +251,12 @@ namespace Isis {
    *   @history 2018-06-25 Jesse Mapel - Fixed the incorrect signal being called when adding and
    *                           removing measures. References #5435.
    *   @history 2018-06-29 Kristin Berry - Added addEdge() and removeEdge() functions to make
-   *                           code cleaner. 
+   *                           code cleaner.
    *   @history 2018-06-25 Jesse Mapel - Fixed ignoring measures with ignored adjacent measures
    *                           incorrectly modifying the edge between the two image vertices.
-
+   *   @history 2018-07-06 Jesse Mapel - Modified addEdge and removeEdge to always emit a graph
+   *                           modified signal if an edge is added or removed. Added graph
+   *                           modified signal when a vertex is added.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -393,8 +395,8 @@ namespace Isis {
       void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
       void emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
       void pointAdded(ControlPoint *point);
-      bool addEdge(QString sourceSerial, QString targetSerial); 
-      bool removeEdge(QString sourceSerial, QString targetSerial); 
+      bool addEdge(QString sourceSerial, QString targetSerial);
+      bool removeEdge(QString sourceSerial, QString targetSerial);
 
     private: // graphing functions
       /**
@@ -427,41 +429,41 @@ namespace Isis {
 
       //! Used to define the verticies of the graph
       struct Image {
-        QString serial; //! The serial number associated with the image 
+        QString serial; //! The serial number associated with the image
         //! The measures on the image, hashed by pointers to their parent ControlPoints
-        QHash< ControlPoint *, ControlMeasure * > measures; 
+        QHash< ControlPoint *, ControlMeasure * > measures;
       };
 
-      //! Used to define the edges of the graph. 
+      //! Used to define the edges of the graph.
       struct Connection {
         int strength;
         Connection() : strength(0) {}
       };
 
-      //! Defines the graph type as an undirected graph that uses Images for verticies, 
-      //! and Connections for edges. It is defined as an adjacency list with the edge list 
-      //! represented by a set, the and vertex list represented by a list. 
+      //! Defines the graph type as an undirected graph that uses Images for verticies,
+      //! and Connections for edges. It is defined as an adjacency list with the edge list
+      //! represented by a set, the and vertex list represented by a list.
       typedef boost::adjacency_list<boost::setS,
                                     boost::listS,
                                     boost::undirectedS,
                                     Image,
-                                    Connection> Network; 
+                                    Connection> Network;
 
       typedef Network::vertex_descriptor ImageVertex; //! Reprents the verticies of the graph
       typedef Network::edge_descriptor ImageConnection; //! Represents the edges of the graph
 
       //! A map between an ImageVertex and its index
-      typedef std::map<ImageVertex, size_t> VertexIndexMap; 
+      typedef std::map<ImageVertex, size_t> VertexIndexMap;
 
       //! Converts VertexIndexMap into the appropriate form to be used by boost
-      typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor; 
+      typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor;
 
       //! Iterates over adjacent verticies
-      typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator; 
+      typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator;
 
       QHash<QString, ImageVertex> m_vertexMap; //! The serial number -> vertex hash used by the graph
       Network m_controlGraph; //! The ControlNet graph
-      QStringList *pointIds; 
+      QStringList *pointIds;
       QMutex *m_mutex;
 
       QString p_targetName;            //!< Name of the target
