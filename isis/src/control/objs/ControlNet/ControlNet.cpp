@@ -401,6 +401,7 @@ namespace Isis {
         newImage.serial = sn;
         ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph);
         m_vertexMap.insert(sn, newVertex);
+        emit networkModified(GraphModified);
       }
     }
 
@@ -422,20 +423,19 @@ namespace Isis {
           }
         }
       }
-      emit newMeasure(measure);
     }
     emit newPoint(point);
   }
 
 
   /**
-   * In the ControlNet graph: adds an edge between the verticies associated with the two serial 
-   * numbers provided. Or, if the edge already exists, increments the strength of the edge.  
-   * 
+   * In the ControlNet graph: adds an edge between the verticies associated with the two serial
+   * numbers provided. Or, if the edge already exists, increments the strength of the edge.
+   *
    * @param sourceSerial The first serial to be connected by the edge
    * @param targetSerial The second serial number to be connected by the edge
-   *  
-   * @return bool true if a new edge was added, false otherwise.  
+   *
+   * @return bool true if a new edge was added, false otherwise.
   */
   bool ControlNet::addEdge(QString sourceSerial, QString targetSerial) {
     // If the edge doesn't already exist, this adds and returns the edge.
@@ -446,20 +446,23 @@ namespace Isis {
 
     boost::tie(connection, edgeAdded) = boost::add_edge(m_vertexMap[sourceSerial],
                                                         m_vertexMap[targetSerial],
-                                                        m_controlGraph); 
+                                                        m_controlGraph);
     m_controlGraph[connection].strength++;
-    return edgeAdded; 
+    if (edgeAdded) {
+      emit networkModified(GraphModified);
+    }
+    return edgeAdded;
   }
 
 
   /**
-   * In the ControlNet graph, decrements the strength on the edge between the two serial numbers. 
-   * This is called when the ControlMeasures that connect these images are deleted or ignored. 
-   * If it is the last measure connecting two verticies (serial numbers) the edge is removed.  
-   * 
-   * @param sourceSerial The first serial number defining the end of the edge to have its strength 
+   * In the ControlNet graph, decrements the strength on the edge between the two serial numbers.
+   * This is called when the ControlMeasures that connect these images are deleted or ignored.
+   * If it is the last measure connecting two verticies (serial numbers) the edge is removed.
+   *
+   * @param sourceSerial The first serial number defining the end of the edge to have its strength
    *                     decremented or be removed.
-   * @param targetSerial The second serial number defining the other end of the edge to have its 
+   * @param targetSerial The second serial number defining the other end of the edge to have its
    *                     strength decremented or be removed.
    * @return bool true if the edge is removed, otherwise false
    */
@@ -475,6 +478,7 @@ namespace Isis {
         boost::remove_edge(m_vertexMap[sourceSerial],
                            m_vertexMap[targetSerial],
                            m_controlGraph);
+        emit networkModified(GraphModified);
 
         return true;
       }
@@ -599,6 +603,7 @@ namespace Isis {
       newImage.serial = serial;
       ImageVertex newVertex = boost::add_vertex(newImage, m_controlGraph);
       m_vertexMap.insert(serial, newVertex);
+      emit networkModified(GraphModified);
     }
 
     m_controlGraph[m_vertexMap[serial]].measures[measure->Parent()] = measure;
@@ -613,10 +618,7 @@ namespace Isis {
 
 
           if (QString::compare(sn, serial) != 0) {
-            bool edgeAdded = addEdge(serial, sn);
-            if (edgeAdded) {
-              emit networkModified(GraphModified);
-            }
+            addEdge(serial, sn);
           }
         }
       }
@@ -658,7 +660,7 @@ namespace Isis {
           msg += targetSerial + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
-        addEdge(sourceSerial, targetSerial); 
+        addEdge(sourceSerial, targetSerial);
       }
     }
   }
@@ -718,11 +720,7 @@ namespace Isis {
           QString sn = cm->GetCubeSerialNumber();
 
           if (QString::compare(sn, serial) != 0) {
-            bool edgeAdded = addEdge(serial, sn); 
-
-            if (edgeAdded) {
-              emit networkModified(GraphModified);
-            }
+            addEdge(serial, sn);
           }
         }
       }
@@ -847,9 +845,7 @@ namespace Isis {
       QString sn = adjacentMeasure->GetCubeSerialNumber();
       if (!adjacentMeasure->IsIgnored() && m_vertexMap.contains(sn)) {
         if (QString::compare(serial, sn) !=0) {
-          if( removeEdge(serial, sn) ) {
-            emit networkModified(GraphModified);
-          }
+          removeEdge(serial, sn);
         }
       }
     }
