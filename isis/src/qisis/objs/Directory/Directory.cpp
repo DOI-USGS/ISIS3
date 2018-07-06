@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QGridLayout>
+#include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -290,6 +291,8 @@ namespace Isis {
    * to allow for a new project to be opened in IPCE.
    */
   void Directory::clean() {
+    emit directoryCleaned();
+
     m_historyTreeWidget->clear();
     m_warningTreeWidget->clear();
     m_bundleObservationViews.clear();
@@ -304,7 +307,6 @@ namespace Isis {
     m_templateEditorWidgets.clear();
 
     m_projectItemModel->clean();
-    emit directoryCleaned();
   }
 
 
@@ -316,7 +318,7 @@ namespace Isis {
    *   @history Adam Goins 2017-11-27 - Updated this function to add the most recent
    *                project to the recent projects menu. References #5216.
    */
-  void Directory::updateRecentProjects(){
+  void Directory::updateRecentProjects() {
 
     if (m_recentProjectsLoaded)  {
       QMenu *recentProjectsMenu = new QMenu("&Recent Projects");
@@ -393,6 +395,7 @@ namespace Isis {
         m_recentProjectsLoaded = true;
       }
   }
+
 
   /**
    * @brief Initializes the actions that the Directory can provide to a main window.
@@ -598,6 +601,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupBundleObservationViews(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_bundleObservationViews.append(result);
 
@@ -659,6 +665,9 @@ namespace Isis {
     // connect destroyed signal to cleanupCnetEditorViewWidgets slot
     connect(result, SIGNAL( destroyed(QObject *) ),
             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
+            
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+            m_project, SLOT(setClean(bool)));
 
     //  Connections for control point editing between views
     connect(result->cnetEditorWidget(), SIGNAL(editControlPoint(ControlPoint *, QString)),
@@ -697,6 +706,9 @@ namespace Isis {
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets(QObject *) ) );
+   
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
@@ -719,24 +731,11 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
     connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
 
-    // Note:  This assumes the Control Net tool is the 1st in the toolpad.
-    QList<QAction *> toolbar = result->toolPadActions();
-    QAction* cnetAction = toolbar[0];
-    ControlNetTool *cnetTool = static_cast<ControlNetTool *>(cnetAction->parent());
-
     connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetAction, SLOT(setEnabled(bool)));
-    connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetTool, SLOT(loadNetwork()));
-
-    //  If an active control has not been set, make the control net tool inactive
-    if (!project()->activeControl()) {
-      cnetAction->setEnabled(false);
-    }
+             result, SLOT(enableControlNetTool(bool)));
 
     return result;
   }
-
 
   /**
    * @brief Add the qmos view widget to the window.
@@ -752,7 +751,10 @@ namespace Isis {
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
-
+            
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+            m_project, SLOT(setClean(bool)));
+                    
     emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
@@ -775,20 +777,8 @@ namespace Isis {
     //  to be drawn with different color/shape.
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
 
-    // Note:  This assumes the Control Net tool is the 4th in the toolpad.
-    QList<QAction *> toolbar = result->toolPadActions();
-    QAction* cnetAction = toolbar[3];
-    MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(cnetAction->parent());
-
     connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetAction, SLOT(setEnabled(bool)));
-    connect (project(), SIGNAL(activeControlSet(bool)),
-             cnetTool, SLOT(loadNetwork()));
-
-    //  Control Net tool will only be active if the project has an active Control.
-    if (!project()->activeControl()) {
-      cnetAction->setEnabled(false);
-    }
+             result, SLOT(enableControlNetTool(bool)));
 
     return result;
   }
@@ -876,7 +866,10 @@ namespace Isis {
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
       connect (project(), SIGNAL(activeControlSet(bool)),
-               result->controlPointEditWidget(), SLOT(setControlFromActive()));
+              result->controlPointEditWidget(), SLOT(setControlFromActive()));
+               
+      connect(result, SIGNAL(windowChangeEvent(bool)),
+              m_project, SLOT(setClean(bool)));
     }
 
     return controlPointEditView();
@@ -909,6 +902,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_matrixViewWidgets.append(result);
 
@@ -930,6 +926,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_targetInfoWidgets.append(result);
 
@@ -951,6 +950,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_templateEditorWidgets.append(result);
 
@@ -973,6 +975,9 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupSensorInfoWidgets(QObject *) ) );
 
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
+
     m_sensorInfoWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg(camera->displayProperties()->displayName() ) );
@@ -994,6 +999,9 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
+             
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+             m_project, SLOT(setClean(bool)));
 
     m_fileListWidgets.append(result);
 
@@ -1016,6 +1024,9 @@ namespace Isis {
     //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
+            
+    connect(result, SIGNAL(windowChangeEvent(bool)),
+            m_project, SLOT(setClean(bool)));
 
     return result;
   }
@@ -1830,22 +1841,6 @@ namespace Isis {
         latitude, longitude, cube, isGroundSource);
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
-  }
-
-
-  /**
-   * Save the current active control.
-   *
-   */
-  void Directory::saveActiveControl() {
-
-    if (project()->activeControl()) {
-      project()->activeControl()->write();
-      // add to HistoryTreeWidget
-      QString saveCnetHistoryEntry = project()->activeControl()->fileName() +
-        "has been saved.";
-      m_historyTreeWidget->addToHistory(saveCnetHistoryEntry);
-    }
   }
 
 

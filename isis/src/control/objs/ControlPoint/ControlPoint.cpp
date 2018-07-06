@@ -285,6 +285,15 @@ namespace Isis {
     ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
 
+    // notify parent network of the change
+    if (parentNetwork) {
+      parentNetwork->measureDeleted(cm);
+
+      if (!IsIgnored() && !cm->IsIgnored()) {
+        parentNetwork->emitNetworkStructureModified();
+      }
+    }
+
     if (cm->IsEditLocked()) {
       return ControlMeasure::MeasureLocked;
     }
@@ -304,15 +313,6 @@ namespace Isis {
       referenceMeasure = NULL;
     }
 
-    // notify parent network of the change
-    if (parentNetwork) {
-      parentNetwork->measureDeleted(cm);
-
-      if (!IsIgnored() && !cm->IsIgnored()) {
-        parentNetwork->emitNetworkStructureModified();
-      }
-    }
-
     delete cm;
     cm = NULL;
 
@@ -321,6 +321,16 @@ namespace Isis {
     return ControlMeasure::Success;
   }
 
+
+  /**
+   * This method is a wrapper to emit the measureModified() signal in the parent network
+   * is called whenever a change is made to a Control Measure.
+   *
+   * @param measure The ControlMeasure* that was modified.
+   * @param type The ControlMeasure::ModType indicating which modification occured.
+   * @param oldValue The oldValue before the change.
+   * @param newValue The new value that the change incorporated.
+   */
   void ControlPoint::emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue) {
     if (parentNetwork) {
       parentNetwork->emitMeasureModified(measure, modType, oldValue, newValue);
@@ -1926,6 +1936,7 @@ namespace Isis {
   const ControlPoint &ControlPoint::operator=(const ControlPoint &other) {
 
     if (this != &other) {
+      bool oldLock = editLock;
       editLock = false;
       for (int i = cubeSerials->size() - 1; i >= 0; i--) {
         (*measures)[cubeSerials->at(i)]->SetEditLock(false);
@@ -1945,23 +1956,27 @@ namespace Isis {
         }
       }
 
-      id             = other.id;
-      chooserName    = other.chooserName;
-      dateTime       = other.dateTime;
-      type           = other.type;
-      invalid        = other.invalid;
-      editLock       = other.editLock;
-      jigsawRejected = other.jigsawRejected;
-      referenceExplicitlySet = other.referenceExplicitlySet;
-      ignore         = other.ignore;
-      aprioriSurfacePointSource      = other.aprioriSurfacePointSource;
-      aprioriSurfacePointSourceFile  = other.aprioriSurfacePointSourceFile;
-      aprioriRadiusSource            = other.aprioriRadiusSource;
-      aprioriRadiusSourceFile        = other.aprioriRadiusSourceFile;
-      aprioriSurfacePoint            = other.aprioriSurfacePoint;
-      adjustedSurfacePoint = other.adjustedSurfacePoint;
+      invalid = other.invalid;
+      referenceExplicitlySet   = other.referenceExplicitlySet;
       numberOfRejectedMeasures = other.numberOfRejectedMeasures;
-      constraintStatus = other.constraintStatus;
+      constraintStatus         = other.constraintStatus;
+
+      SetId(other.id);
+      SetChooserName(other.chooserName);
+      SetDateTime(other.dateTime);
+      SetType(other.type);
+      SetRejected(other.jigsawRejected);
+      SetIgnored(other.ignore);
+      SetAprioriSurfacePointSource(other.aprioriSurfacePointSource);
+      SetAprioriSurfacePointSourceFile(other.aprioriSurfacePointSourceFile);
+      SetAprioriRadiusSource(other.aprioriRadiusSource);
+      SetAprioriRadiusSourceFile(other.aprioriRadiusSourceFile);
+      SetAprioriSurfacePoint(other.aprioriSurfacePoint);
+      SetAdjustedSurfacePoint(other.adjustedSurfacePoint);
+
+      // Set edit lock last so the it doesn't interfere with copying the other fields over.
+      editLock = oldLock;
+      SetEditLock(other.editLock);
     }
 
     return *this;
