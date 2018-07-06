@@ -26,8 +26,8 @@ using namespace std;
 using namespace Isis;
 
 /**
- * Unit test for ControlNet class 
- *  
+ * Unit test for ControlNet class
+ *
  * @author ????-??-?? Unknown
  * @internal
  *   @history 2016-05-11 Jeannie Backer - Added tests for setTarget methods.
@@ -280,8 +280,8 @@ int main() {
 
   cout << "testing GetCubeSerials... (NOTE: unittest sorts the results)\n";
   QList< QString > serials = net.GetCubeSerials();
-  
-  // Let's sort the data since GetCubeSerials relies on a QHash 
+
+  // Let's sort the data since GetCubeSerials relies on a QHash
   QStringList sortedSerials(serials);
   sortedSerials.sort();
 
@@ -308,22 +308,14 @@ int main() {
   targetRadii += Distance(Isis::HALFPI, Distance::Meters);
   targetRadii += Distance(Isis::E, Distance::Meters);
   cn1.SetTarget("SomethingStrange", targetRadii);
-  vector<Distance> targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
   cout << "Set target/radii using empty PVL." << endl;
   Pvl label;
   // no mapping group, (i.e. target name empty, no equatorial radius)
   // catch exception and set radii to nulls
   cn1.SetTarget(label);
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
   cout << "Set target/radii using PVL with no PolarRadius." << endl;
   label += PvlGroup("Mapping");
@@ -332,38 +324,21 @@ int main() {
   mapping += PvlKeyword("EquatorialRadius", "");
   cout << label << endl;
   cn1.SetTarget(label);
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
   cout << "Set target/radii using PVL containing both radii." << endl;
   mapping.addKeyword(PvlKeyword("EquatorialRadius", "6.0"), PvlContainer::Replace);
   mapping.addKeyword(PvlKeyword("PolarRadius", "1.0"), PvlContainer::Replace);
   cout << label << endl;
   cn1.SetTarget(label);
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
   cout << "Set empty target." << endl;
   cn1.SetTarget("");
-  targRad = cn1.GetTargetRadii();
-  cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
   cout << "Set Mars target." << endl;
   cn1.SetTarget("Mars");
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", " 
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
 
   cn1.SetTarget("Mars");
@@ -543,30 +518,30 @@ int main() {
   foreach ( QString sn, sortedSNs ) {
     cout << "    " << sn << "\n";
   }
-  
+
   cout << "\nTesting getGraphNode: "
        << net.getGraphNode("ALPHA")->getSerialNumber() << "\n";
-       
+
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";
 
   testConnectivity();
 
   cout << "\nTesting take() functionality to take owernship of the points in a ControlNet:" << endl;
 
-  cout << "Original control net number of points: " << QString::number(net.GetNumPoints()) << endl; 
+  cout << "Original control net number of points: " << QString::number(net.GetNumPoints()) << endl;
 
-  QList<ControlPoint*> points = net.take(); 
-  
-  cout << "Number of points taken out: " << QString::number(points.length()) << endl; 
-  
-  cout << "Now there should be zero points in the original control net. There are: " 
-       << QString::number(net.GetNumPoints()) << endl; 
+  QList<ControlPoint*> points = net.take();
 
-  cout << "And zero pointIDs in the original control net. There are: " 
-       << QString::number(net.GetPointIds().length()) << endl; 
+  cout << "Number of points taken out: " << QString::number(points.length()) << endl;
 
-  cout << "And zero cubeGraphNodes in the original control net. There are: " 
-       << QString::number(net.GetCubeGraphNodes().length()) << endl; 
+  cout << "Now there should be zero points in the original control net. There are: "
+       << QString::number(net.GetNumPoints()) << endl;
+
+  cout << "And zero pointIDs in the original control net. There are: "
+       << QString::number(net.GetPointIds().length()) << endl;
+
+  cout << "And zero cubeGraphNodes in the original control net. There are: "
+       << QString::number(net.GetCubeGraphNodes().length()) << endl;
 
   //system("cat unitTest.output | grep -v DateTime > temp.output; mv temp.output unitTest.output");
   //system("cat unitTest.output | sed -r s/`date +%Y-%m-%dT`\\[0-9:\\]\\{8\\}/2010-08-27T17:10:06/g > temp.output; mv temp.output unitTest.output");

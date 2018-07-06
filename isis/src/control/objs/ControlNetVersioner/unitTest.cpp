@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", testProgress); // Binary V1
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_BadNetwork_ProtoV0001.net", testProgress);    // Corrupted (based off of oldNetwork2.net)
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork2_ProtoV0002.net", testProgress, false);  // Binary V2
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", testProgress, true, true); // Network with rejected jigsaw points
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl", testProgress, true, true); // Network with rejected jigsaw points
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl", testProgress, false, false); // Network full of weird test cases (based on PvlNetwork4)
   TestNetwork("$control/testData/PvlNet_TestNetwork1_V2.net", testProgress, false, false); // Test Network 1 created for code coverage.
   TestNetwork("$control/testData/PvlNet_TestNetwork2_V3.net", testProgress, false, false); // Test Network 2 created for code coverage.
