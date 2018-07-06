@@ -55,27 +55,23 @@ void IsisMain() {
 
   // Use the target name to create the control net to store the points in.
   ControlNet cnet;
-  cnet.SetTarget(target); 
+  cnet.SetTarget(target);
 
-  // The cnet.SetTarget(target) call above will call Target::radiiGroup(target) to
-  // attempt to find the target radii values using the target name.
-  // Add those values, if not already in the mapping group.
-  double equatorialRadius = 0.0;
-  vector<Distance> targetRadii = cnet.GetTargetRadii();
-  if (mapGroup.hasKeyword("EquatorialRadius")) {
-    equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
+  // If the mapping group doesn't have the target radii, try to get them from the Target class.
+  if (!mapGroup.hasKeyword("EquatorialRadius")) {
+    try {
+      PvlGroup pvlRadii = Target::radiiGroup(target);
+      mapGroup += PvlKeyword("EquatorialRadius", pvlRadii["EquatorialRadius"], "Meters");
+      // if we successfully found equatorial radius, then polar should have worked too.
+      mapGroup += PvlKeyword("PolarRadius", pvlRadii["PolarRadius"], "Meters");
+    }
+    catch (IException &e) {
+      QString msg = "Unable to get target radii values from the given target [" + target + "]. "
+                    "User must add EquatorialRadius and PolarRadius values to the input MAP file.";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
   }
-  else if (targetRadii[0].isValid()) {
-    equatorialRadius = targetRadii[0].meters();
-    mapGroup += PvlKeyword("EquatorialRadius", toString(equatorialRadius), "Meters");
-    // if we successfully found equatorial radius, then polar should have worked too.
-    mapGroup += PvlKeyword("PolarRadius", toString(targetRadii[2].meters()), "Meters");
-  }
-  else {
-    QString msg = "Unable to get target radii values from the given target [" + target + "]. "
-                  "User must add EquatorialRadius and PolarRadius values to the input MAP file.";
-    throw IException(IException::Unknown, msg, _FILEINFO_);
-  }
+  double equatorialRadius = toDouble(mapGroup.findKeyword("EquatorialRadius")[0]);
 
   QString networkId;
   if (ui.WasEntered("NETWORKID")) {
@@ -96,7 +92,7 @@ void IsisMain() {
   double minLon = ui.GetDouble("MINLON");
   double maxLon = ui.GetDouble("MAXLON");
   checkLatitude(minLat, maxLat);
-  int lonDomain = 
+  int lonDomain =
       (mapGroup.hasKeyword("LongitudeDomain") ?
           toInt(mapGroup.findKeyword("LongitudeDomain")[0]) :
           360);

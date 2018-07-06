@@ -1724,12 +1724,6 @@ namespace Isis {
    * @param target The name of the target of this Control Network
    */
   void ControlNet::SetTarget(const QString &target) {
-    QScopedPointer <QMutexLocker> locker;
-
-    if (m_mutex) {
-      locker.reset(new QMutexLocker(m_mutex));
-    }
-
     p_targetName = target;
   }
 
@@ -1927,16 +1921,6 @@ namespace Isis {
     }
 
     return cubeGraphNodes->value(serialNumber);
-  }
-
-
-  /**
-   * Get the target radii
-   *
-   * @returns the radii of the target body
-   */
-  std::vector<Distance> ControlNet::GetTargetRadii() {
-    return std::vector<Distance>();
   }
 
 

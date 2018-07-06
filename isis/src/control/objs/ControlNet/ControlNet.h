@@ -217,6 +217,10 @@ namespace Isis {
    *                           group to set radii values to those ingested from the versioner
    *                           if they exist. Otherwise, we call SetTarget with the targetname.
    *                           Fixes #5361.
+   *   @history 2018-07-06 Jesse Mapel - Removed target radii from ControlNet objects because
+   *                           SurfacePoints now use their local radii to do sigma distance
+   *                           conversions instead of the target equatorial and polar radii.
+   *                           Fixes #5457.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -295,7 +299,6 @@ namespace Isis {
       QString GetLastModified() const;
       QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
-      std::vector<Distance> GetTargetRadii();
 
       void SetCreatedDate(const QString &date);
       void SetDescription(const QString &newDescription);
