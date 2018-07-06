@@ -317,7 +317,10 @@ namespace Isis {
    * @return QString A string representation of the observation number of the cube.
    */
   QString Image::observationNumber() {
-    return ObservationNumber::Compose(*(cube()));
+    if (m_observationNumber.isEmpty()) {
+      m_observationNumber = ObservationNumber::Compose(*(cube()));
+    }
+    return m_observationNumber;
   }
 
 
@@ -326,7 +329,10 @@ namespace Isis {
    * @return @b QString  A string representation of the serial number of the cube.
    */
   QString Image::serialNumber() {
-    return SerialNumber::Compose(*(cube()));
+    if (m_serialNumber.isEmpty()) {
+      m_serialNumber = SerialNumber::Compose(*(cube()));
+    } 
+    return m_serialNumber;
   }
 
 
