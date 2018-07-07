@@ -23,6 +23,12 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-12-05 Christopher Combs - Original version.
+   *   @history 2018-07-07 Summer Stapleton - Implemented the SaveAs option in the widget. This 
+   *                          allows a user to save the file externally to the project as well as
+   *                          to immediately import the template with a simple checkbox in the
+   *                          filedialog. Users are also prompted to save if there have been 
+   *                          changes made to the template file since saving if the widget or the 
+   *                          ipce main window is closed.
    *
    */
 

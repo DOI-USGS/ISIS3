@@ -266,8 +266,11 @@ namespace Isis {
    *                          added signal when project is saved, so the writeSettings can happen
    *                          for project.  This will be cleaned up when save/restore is fully
    *                          implemented.
-   *  @history 2018-06-28 Summer Stapleton - Added clean-up of unsaved templates at project close
-   *                           in Project::clear(). 
+   *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and 
+   *                          m_regTemplates to keep track of the two template types as well as 
+   *                          adjusted logic to save these serparately into the .xml files in the 
+   *                          project directory. Also added clean-up of unsaved templates at project
+   *                          close in Project::clear(). 
    *  
    */
   class Project : public QObject {

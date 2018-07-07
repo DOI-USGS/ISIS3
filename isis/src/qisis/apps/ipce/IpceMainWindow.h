@@ -159,6 +159,9 @@ namespace Isis {
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
+   *   @history 2018-07-07 Summer Stapleton - Added check in the closeEvent() for changes to any 
+   *                           TemplateEditorWidget currently open to create a pop-up warning/
+   *                           option to save.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
