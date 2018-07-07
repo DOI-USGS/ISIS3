@@ -24,7 +24,6 @@
 
 #include <QList>
 #include <QStringList>
-#include <QPoint>
 
 #include "Application.h"
 #include "Camera.h"
@@ -1038,31 +1037,31 @@ namespace Isis {
     p_dateTime = new QString;
     p_loggedData = new QVector<ControlMeasureLogData>();
 
-    *p_serialNumber = *other.p_serialNumber;
-    *p_chooserName = *other.p_chooserName;
-    *p_dateTime = *other.p_dateTime;
-    *p_loggedData = *other.p_loggedData;
-
-    p_measureType = other.p_measureType;
-    //  Call SetIgnored to update the ControlGraphNode.  However, SetIgnored
-    //  will return if EditLock is true, so set to false temporarily.
+    bool oldLock = p_editLock;
     p_editLock = false;
-    SetIgnored(other.p_ignore);
-    p_editLock = other.p_editLock;
+
     p_sample = other.p_sample;
     p_line = other.p_line;
-    p_diameter = other.p_diameter;
-    p_aprioriSample = other.p_aprioriSample;
-    p_aprioriLine = other.p_aprioriLine;
-    p_sampleSigma = other.p_sampleSigma;
-    p_lineSigma = other.p_lineSigma;
-    p_sampleResidual = other.p_sampleResidual;
-    p_lineResidual = other.p_lineResidual;
-    p_camera = other.p_camera;
-    p_focalPlaneMeasuredX = other.p_focalPlaneMeasuredX;
-    p_focalPlaneMeasuredY = other.p_focalPlaneMeasuredY;
-    p_focalPlaneComputedX = other.p_focalPlaneComputedX;
-    p_focalPlaneComputedY = other.p_focalPlaneComputedY;
+    *p_loggedData = *other.p_loggedData;
+
+    SetCubeSerialNumber(*other.p_serialNumber);
+    SetChooserName(*other.p_chooserName);
+    SetDateTime(*other.p_dateTime);
+    SetType(other.p_measureType);
+    //  Call SetIgnored to update the ControlGraphNode.  However, SetIgnored
+    //  will return if EditLock is true, so set to false temporarily.
+    SetIgnored(other.p_ignore);
+    SetDiameter(other.p_diameter);
+    SetAprioriSample(other.p_aprioriSample);
+    SetAprioriLine(other.p_aprioriLine);
+    SetSampleSigma(other.p_sampleSigma);
+    SetLineSigma(other.p_lineSigma);
+    SetResidual(other.p_sampleResidual, other.p_lineResidual);
+    SetCamera(other.p_camera);
+    SetFocalPlaneMeasured(other.p_focalPlaneMeasuredX, other.p_focalPlaneMeasuredY);
+    SetFocalPlaneComputed(other.p_focalPlaneComputedX, other.p_focalPlaneComputedY);
+    p_editLock = oldLock;
+    SetEditLock(other.p_editLock);
 
     return *this;
   }
