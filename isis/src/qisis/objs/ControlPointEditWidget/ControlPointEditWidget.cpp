@@ -182,11 +182,9 @@ namespace Isis {
     }
 
     m_reloadPoint = new QPushButton("Reload Point");
-    m_reloadPoint->setShortcut(Qt::Key_R);
     m_reloadPoint->setToolTip("Reload the control point.");
     m_reloadPoint->setWhatsThis("Reload the measures for the control point"
-                            " in the Chip Viewports to its saved values. "
-                            "<strong>Shortcut: R</strong>");
+                            " in the Chip Viewports to its saved values. ");
     connect(m_reloadPoint, SIGNAL(clicked()), this, SLOT(reloadPoint()));
 
     m_savePoint = new QPushButton ("Save Point");
