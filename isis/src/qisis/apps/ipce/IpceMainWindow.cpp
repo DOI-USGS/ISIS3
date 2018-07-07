@@ -78,13 +78,6 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-//  QMdiArea *centralWidget = new QMdiArea;
-//  centralWidget->setActivationOrder(QMdiArea::StackingOrder);
-
-//  connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
-//          this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
-
-
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -173,7 +166,7 @@ namespace Isis {
     initializeActions();
     createMenus();
     createToolBars();
-    
+
     QStringList args = QCoreApplication::arguments();
 
     if (args.count() == 2) {
@@ -261,13 +254,13 @@ namespace Isis {
   }
 
 
-  /** 
-   * This is needed so that the project clean flag is not set to false when move and resize events 
-   * are emitted from ipce.cpp when IpceMainWindow::show() is called. 
-   * The non-spontaneous or internal QShowEvent is only emitted once from ipce.cpp, so the project 
-   * clean flag can be reset. 
-   * 
-   * @param event QShowEvent* 
+  /**
+   * This is needed so that the project clean flag is not set to false when move and resize events
+   * are emitted from ipce.cpp when IpceMainWindow::show() is called.
+   * The non-spontaneous or internal QShowEvent is only emitted once from ipce.cpp, so the project
+   * clean flag can be reset.
+   *
+   * @param event QShowEvent*
    *
    */
   void IpceMainWindow::showEvent(QShowEvent *event) {
@@ -368,17 +361,6 @@ namespace Isis {
 
     m_editMenuActions.append(undoAction);
     m_editMenuActions.append(redoAction);
-
-//  m_cascadeViewsAction = new QAction("Cascade Views", this);
-//  connect(m_cascadeViewsAction, SIGNAL( triggered() ),
-//          centralWidget(), SLOT( cascadeSubWindows() ) );
-//  m_viewMenuActions.append(m_cascadeViewsAction);
-//
-//  m_tileViewsAction = new QAction("Tile Views", this);
-//  connect(m_tileViewsAction, SIGNAL( triggered() ),
-//          centralWidget(), SLOT( tileSubWindows() ) );
-//  m_viewMenuActions.append(m_tileViewsAction);
-
 
     QAction *threadLimitAction = new QAction("Set Thread &Limit", this);
     connect(threadLimitAction, SIGNAL(triggered()),
@@ -512,7 +494,7 @@ namespace Isis {
       globalSettings.setValue("geometry", QVariant(geometry()));
     }
 
-    globalSettings.setValue("maxThreadCount", m_maxThreadCount); 
+    globalSettings.setValue("maxThreadCount", m_maxThreadCount);
     globalSettings.setValue("maxRecentProjects",m_maxRecentProjects);
 
     globalSettings.beginGroup("recent_projects");
@@ -632,7 +614,7 @@ namespace Isis {
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
    *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it
-   *                was messing with the positions of widgets after a project was loaded.  
+   *                was messing with the positions of widgets after a project was loaded.
    *                Fixes #5075.
    *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
    *                If that does not exist then we read from .Isis/ipce/ipce.config.
@@ -643,7 +625,7 @@ namespace Isis {
       QString msg = "Cannot read settings with a NULL Project pointer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
+
     // Set the path of the settings file
     // The default is to assume that the project has an ipce.config in it
     // If the file does not exist then we read settings from .Isis/ipce/ipce.config
@@ -652,13 +634,13 @@ namespace Isis {
     bool isFullScreen = false;
     if (!FileName(filePath).fileExists()) {
       filePath = "$HOME/.Isis/" + appName + "/ipce.config";
-      // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in 
+      // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in
       // in full screen. In other words the default geometry is full screen
       if (!FileName(filePath).fileExists()) {
         isFullScreen = true;
       }
     }
-    
+
     if (project->name() == "Project") {
       setWindowTitle("ipce");
     }
@@ -667,7 +649,7 @@ namespace Isis {
     }
 
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
-    
+
     if (!isFullScreen) {
       setGeometry(projectSettings.value("geometry").value<QRect>());
       if (!project->isTemporaryProject()) {
@@ -679,7 +661,7 @@ namespace Isis {
     }
 
     if (project->name() == "Project") {
-      QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(), 
+      QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(),
                               QSettings::NativeFormat);
 
       QStringList projectNameList;
