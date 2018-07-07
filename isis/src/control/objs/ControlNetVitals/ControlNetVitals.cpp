@@ -142,6 +142,8 @@ namespace Isis {
     else {
       m_pointMeasureCounts[numValidMeasures]++;
     }
+
+    m_numMeasures = m_controlNet->GetNumMeasures();
     validate();
   }
 
