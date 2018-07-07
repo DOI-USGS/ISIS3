@@ -498,7 +498,8 @@ namespace Isis {
       QPointer<WorkOrder> m_saveProjectAsWorkOrder; //!< The Save Project As WorkOrder.
       QPointer<WorkOrder> m_openRecentProjectWorkOrder; //!< The Open Recent Project WorkOrder.
       QPointer<WorkOrder> m_closeProjectWorkOrder; //!< The Close Project WorkOrder
-      QPointer<WorkOrder> m_importTemplateWorkOrder; //!< The Import Template WorkOrder
+      QPointer<WorkOrder> m_importMapTemplateWorkOrder; //!< The Import Map Template WorkOrder
+      QPointer<WorkOrder> m_importRegistrationTemplateWorkOrder; //!< The Import Registration Template WorkOrder
 
       QPointer<WorkOrder> m_runJigsawWorkOrder; //!< The Run Jigsaw WorkOrder
       QPointer<WorkOrder> m_renameProjectWorkOrder; //!< The Rename Project WorkOrder

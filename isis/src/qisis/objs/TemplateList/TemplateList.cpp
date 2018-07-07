@@ -194,7 +194,18 @@ namespace Isis {
    */
   void TemplateList::save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot)
       const {
-    stream.writeStartElement("templateList");
+    
+    if (m_type == "maps") {
+      stream.writeStartElement("mapTemplateList");
+    }
+    else if (m_type == "registrations") {
+      stream.writeStartElement("regTemplateList");
+    }
+    else {
+      throw IException(IException::Io,
+                       QString("Attempting to save unsupported template file type: [%1]").arg(m_type),
+                       _FILEINFO_);
+    }
     stream.writeAttribute("name", m_name);
     stream.writeAttribute("type", m_type);
     stream.writeAttribute("path", m_path);
@@ -269,7 +280,7 @@ namespace Isis {
   bool TemplateList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "templateList") {
+      if (localName == "mapTemplateList" || localName == "regTemplateList") {
         QString name = atts.value("name");
         QString type = atts.value("type");
         QString path = atts.value("path");
@@ -310,7 +321,7 @@ namespace Isis {
    */
   bool TemplateList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName) {
-    if (localName == "templateList") {
+    if (localName == "mapTemplateList" || localName == "regTemplateList") {
       XmlHandler handler(m_templateList, m_project);
 
       XmlStackedHandlerReader reader;

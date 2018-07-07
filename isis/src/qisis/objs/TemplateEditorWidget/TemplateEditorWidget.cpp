@@ -2,8 +2,10 @@
 #include "ui_TemplateEditorWidget.h"
 
 #include "Directory.h"
+#include "IException.h"
 #include "Template.h"
 
+#include <QCheckBox>
 #include <QCloseEvent>
 #include <QDir>
 #include <QFileDialog>
@@ -60,7 +62,14 @@ namespace Isis {
     //We create a new QFile just in case the template's file name has changed
   
     // First need to get the filename to save to via a QFileDialog
-    QFileDialog *fileDialog = new QFileDialog(qobject_cast<QWidget *>(parent()), "Save Template File");
+    QFileDialog *fileDialog = new QFileDialog(qobject_cast<QWidget *>(parent()), 
+                                                            "Save Template File");
+    QGridLayout *layout = static_cast<QGridLayout*>(fileDialog->layout());
+    QCheckBox *checkbox = new QCheckBox(this);
+    checkbox->setText("Automatically Import Template File on Save");
+    checkbox->setCheckState(Qt::Checked);
+    layout->addWidget( checkbox );
+    
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     fileDialog->setDirectory(QDir::currentPath());
     fileDialog->setNameFilter("DEF (*.def);;MAP (*.map);;All (*)"); // Need .pvl?
@@ -85,29 +94,32 @@ namespace Isis {
       templateFile.close();
     } 
     
-    // Import the newly created template file to the project
-    if (templateFile.exists()) {
-      QDir templateFolder = m_directory->project()->addTemplateFolder(m_fileType + "/import");
-      
-      TemplateList *templateList = new TemplateList(templateFolder.dirName(), m_fileType, m_fileType 
-                                                    + "/" + templateFolder.dirName() );
-          
-      QFile::copy(templateFileName, templateFolder.path() + "/" + templateFileName.split("/").last());
-      templateList->append(new Template(templateFolder.path() + "/" 
-                           + templateFileName.split("/").last(), 
-                           m_fileType, 
-                           templateFolder.dirName()));
+    // Import the newly created template file to the project if user checked the box.
+    if (checkbox->checkState()) {
+      if (templateFile.exists()) {
+        QDir templateFolder = m_directory->project()->addTemplateFolder(m_fileType + "/import");
+        
+        TemplateList *templateList = new TemplateList(templateFolder.dirName(), m_fileType, m_fileType 
+                                                      + "/" + templateFolder.dirName() );
+            
+        QFile::copy(templateFileName, templateFolder.path() + "/" + templateFileName.split("/").last());
+        templateList->append(new Template(templateFolder.path() + "/" 
+                             + templateFileName.split("/").last(), 
+                             m_fileType, 
+                             templateFolder.dirName()));
 
-      if (m_fileType == "maps") {
-        m_directory->project()->addMapTemplates(templateList);
+        if (m_fileType == "maps") {
+          m_directory->project()->addMapTemplates(templateList);
+        }
+        else if (m_fileType == "registrations") {
+          m_directory->project()->addRegTemplates(templateList);
+        }
+        m_directory->project()->setClean(false);
       }
-      else if (m_fileType == "registrations") {
-        m_directory->project()->addRegTemplates(templateList);
-      }
-      m_directory->project()->setClean(false);
-    }
-    else {
-      // Throw()
+      else {
+        throw IException(IException::Io,
+                         QString("Could not import file [%1]").arg(templateFileName),
+                         _FILEINFO_);      }
     }
 
     m_textChanged = false;
@@ -132,7 +144,6 @@ namespace Isis {
       box->exec();
   
       if (box->clickedButton() == (QAbstractButton*)cancel) {
-        // event->ignore();
         return;
       }
       else if (box->clickedButton() == (QAbstractButton*)save) {

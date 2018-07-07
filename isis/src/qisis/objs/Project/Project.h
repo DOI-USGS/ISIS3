@@ -292,7 +292,8 @@ namespace Isis {
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
-      void addTemplates(TemplateList *templateFiles);
+      void addMapTemplates(TemplateList *templateFiles);
+      void addRegTemplates(TemplateList *templateFiles);
       QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void addTarget(Target *target);
@@ -357,7 +358,8 @@ namespace Isis {
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
       QList<TemplateList *> templates();
-      QList<TemplateList *> registrationTemplates();
+      QList<TemplateList *> mapTemplates();
+      QList<TemplateList *> regTemplates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -577,7 +579,8 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<TemplateList *> m_templateLists;
+          QList<TemplateList *> m_mapTemplateLists;
+          QList<TemplateList *> m_regTemplateLists;
           WorkOrder *m_workOrder;
       };
 
@@ -593,7 +596,7 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
-      QList<TemplateList *> *m_templates;
+      QList<TemplateList *> *m_mapTemplates;
       QList<TemplateList *> *m_regTemplates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
