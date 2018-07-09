@@ -40,10 +40,16 @@ namespace Isis {
    * View for editing a single ControlPoint
    *
    * @author 2016-04-06 Tracie Sucharski
-   *    
-   * @internal 
+   *
+   * @internal
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
-   *                           query for shapes and other data from the project. 
+   *                           query for shapes and other data from the project.
+   *   @history 2018-05-28 Kaitlyn Lee - Since AbstractProjectItemView now inherits
+   *                           from QMainWindow, I added a dummy central widget
+   *                           and set its layout to QVBoxLayout. We used to set
+   *                           the whole CnetEditorView widget's layout, now we only
+   *                           set the central widget's layout.
+   *   @history 2018-06-13 Kaitlyn Lee - Removed toolbars, since they are not needed.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
@@ -54,30 +60,16 @@ class ControlPointEditView : public AbstractProjectItemView {
     ControlPointEditView(Directory *directory, QWidget *parent = 0);
     ~ControlPointEditView();
 
-    virtual QList<QAction *> permToolBarActions();
-    virtual QList<QAction *> activeToolBarActions();
-    virtual QList<QAction *> toolPadActions();
-
     ControlPointEditWidget *controlPointEditWidget();
 
 //  setEditPoint(ControlPoint *editPoint);
 //  createNewPoint(QString serialNumber, Latitude lat, Longitude lon);
 
-    QSize sizeHint() const;
-
-  public slots:
-
-  private slots:
+  QSize sizeHint() const;
 
   private:
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
-
-    QToolBar *m_permToolBar; //!< The permanent tool bar
-    QToolBar *m_activeToolBar; //!< The active tool bar
-    ToolPad *m_toolPad; //!< The tool pad
-
-    QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
   };
 }
 

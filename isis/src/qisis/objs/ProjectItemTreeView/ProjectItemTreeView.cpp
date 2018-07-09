@@ -49,17 +49,20 @@ namespace Isis {
     m_treeView->setDragEnabled(false);
     m_treeView->setAcceptDrops(false);
     m_treeView->setHeaderHidden(true);
+    
+    setCentralWidget(m_treeView);
 
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 //  setAcceptDrops(true);
     
-    QBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(m_treeView);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    setLayout(layout);
+    // TODO Commented-out by Summer for new inheritence for parent class. Will clean up when confirmed that not needed.
+    // QBoxLayout *layout = new QVBoxLayout;
+    // layout->addWidget(m_treeView);
+    // layout->setContentsMargins(0, 0, 0, 0);
+    // 
+    // setLayout(layout);
   }
 
   
