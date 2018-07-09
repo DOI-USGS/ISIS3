@@ -79,13 +79,6 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-//  QMdiArea *centralWidget = new QMdiArea;
-//  centralWidget->setActivationOrder(QMdiArea::StackingOrder);
-
-//  connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
-//          this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
-
-
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -214,12 +207,10 @@ namespace Isis {
       addDockWidget(area, dock, orientation);
     }
 
-    // Connections for cleanup in both directions to make sure both views and docks are cleaned up
-    connect(newWidget, SIGNAL(destroyed(QObject *)), dock, SLOT(deleteLater()));
+    // When dock widget is destroyed, make sure the view it holds is also destroyed
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
     // The list of dock widgets needs cleanup as each view is destroyed
-    connect(dock, SIGNAL(destroyed(QObject *)),
-            this, SLOT(cleanupViewDockList(QObject *)));
+    connect(dock, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupViewDockList(QObject *)));
 
     // Save view docks for cleanup during a project close
     m_viewDocks.append(dock);
@@ -267,6 +258,22 @@ namespace Isis {
    */
   IpceMainWindow::~IpceMainWindow() {
     m_directory->deleteLater();
+  }
+
+
+  /**
+   * This is needed so that the project clean flag is not set to false when move and resize events
+   * are emitted from ipce.cpp when IpceMainWindow::show() is called.
+   * The non-spontaneous or internal QShowEvent is only emitted once from ipce.cpp, so the project
+   * clean flag can be reset.
+   *
+   * @param event QShowEvent*
+   *
+   */
+  void IpceMainWindow::showEvent(QShowEvent *event) {
+    if (!event->spontaneous()) {
+      m_directory->project()->setClean(true);
+    }
   }
 
 
@@ -361,17 +368,6 @@ namespace Isis {
 
     m_editMenuActions.append(undoAction);
     m_editMenuActions.append(redoAction);
-
-//  m_cascadeViewsAction = new QAction("Cascade Views", this);
-//  connect(m_cascadeViewsAction, SIGNAL( triggered() ),
-//          centralWidget(), SLOT( cascadeSubWindows() ) );
-//  m_viewMenuActions.append(m_cascadeViewsAction);
-//
-//  m_tileViewsAction = new QAction("Tile Views", this);
-//  connect(m_tileViewsAction, SIGNAL( triggered() ),
-//          centralWidget(), SLOT( tileSubWindows() ) );
-//  m_viewMenuActions.append(m_tileViewsAction);
-
 
     QAction *threadLimitAction = new QAction("Set Thread &Limit", this);
     connect(threadLimitAction, SIGNAL(triggered()),
@@ -492,49 +488,18 @@ namespace Isis {
 
 
   /**
-   * Write the window positioning and state information out to a
-   * config file. This allows us to restore the settings when we
-   * create another main window (the next time this program is run).
-   *
-   * The state will be saved according to the currently loaded project and its name.
-   *
-   * When no project is loaded (i.e. the default "Project" is open), the config file used is
-   * $HOME/.Isis/$APPNAME/$APPNAME_Project.config.
-   * When a project, ProjectName, is loaded, the config file used is
-   * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config.
-   *
-   * @param[in] project Pointer to the project that is currently loaded (default is "Project")
-   *
-   * @internal
-   *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
-   *                           References #4358.
-   *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
-   *                           restoring of recently opened projects.  References #4492.
+   * Writes the global settings like recent projects and thread count.
    */
-  void IpceMainWindow::writeSettings(Project *project) {
+  void IpceMainWindow::writeGlobalSettings(Project *project) {
 
-    // Ensure that we are not using a NULL pointer
-    if (!project) {
-      QString msg = "Cannot write settings with a NULL Project pointer.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
     QString appName = QApplication::applicationName();
-    QSettings projectSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(),
+
+    QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(),
         QSettings::NativeFormat);
 
-    QSettings globalSettings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + "Project.config")
-          .expanded(),
-        QSettings::NativeFormat);
-
-    projectSettings.setValue("geometry", QVariant(geometry()));
-    projectSettings.setValue("windowState", saveState());
-//  projectSettings.setValue("size", size());
-//  projectSettings.setValue("pos", pos());
-
-    projectSettings.setValue("maxThreadCount", m_maxThreadCount);
+    if (project->isTemporaryProject()) {
+      globalSettings.setValue("geometry", QVariant(geometry()));
+    }
 
     globalSettings.setValue("maxThreadCount", m_maxThreadCount);
     globalSettings.setValue("maxRecentProjects",m_maxRecentProjects);
@@ -596,12 +561,49 @@ namespace Isis {
       QString projName = project->name();
       QString t0String=QString::number(t0);
 
-      if (!project->projectRoot().contains("tmpProject") &&
+      if (!project->isTemporaryProject() &&
           !projectPaths.contains( project->projectRoot())) {
         globalSettings.setValue(t0String+"%%%%%"+projName,project->projectRoot());
       }
     }
     globalSettings.endGroup();
+    globalSettings.sync();
+  }
+
+
+  /**
+   * Write the window positioning and state information out to a
+   * config file. This allows us to restore the settings when we
+   * create another main window (the next time this program is run).
+   *
+   * The state will be saved according to the currently loaded project and its name.
+   *
+   * When no project is loaded (i.e. the default "Project" is open), the config file used is
+   * $HOME/.Isis/$APPNAME/ipce.config.
+   * When a project, ProjectName, is loaded, the config file used is
+   * project->projectRoot()/ipce.config.
+   *
+   * @param[in] project Pointer to the project that is currently loaded (default is "Project")
+   *
+   * @internal
+   *   @history 2016-11-09 Ian Humphrey - Settings are now written according to the loaded project.
+   *                           References #4358.
+   *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
+   *                           restoring of recently opened projects.  References #4492.
+   */
+  void IpceMainWindow::writeSettings(Project *project) {
+
+    // Ensure that we are not using a NULL pointer
+    if (!project) {
+      QString msg = "Cannot write settings with a NULL Project pointer.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    QSettings projectSettings(FileName(project->newProjectRoot() + "/ipce.config").expanded(),
+        QSettings::NativeFormat);
+
+    projectSettings.setValue("geometry", QVariant(geometry()));
+    projectSettings.setValue("windowState", saveState());
+    projectSettings.sync();
   }
 
 
@@ -609,9 +611,9 @@ namespace Isis {
    * Read the window positioning and state information from the config file.
    *
    * When running ipce without opening a project, the config file read is
-   * $HOME/.Isis/$APPNAME/$APPNAME_Project.config
-   * Otherwise, when running ipce and opening a project (ProjectName), the config file read is
-   * $HOME/.Isis/$APPNAME/$APPNAME_ProjectName.config
+   * $HOME/.Isis/$APPNAME/ipce.config
+   * When running ipce and opening a project (ProjectName), the config file read is
+   * project->projectRoot()/ipce.config
    *
    * @param[in] project (Project *) The project that was loaded.
    *
@@ -619,8 +621,10 @@ namespace Isis {
    *   @history Ian Humphrey - Settings are now read on a project name basis. References #4358.
    *   @history Tyler Wilson 2017-11-02 - Settings now read recent projects.  References #4492.
    *   @history Tyler Wilson 2017-11-13 - Commented out a resize call near the end because it
-   *                                      was messing with the positions of widgets after a
-   *                                      project was loaded.  Fixes #5075.
+   *                was messing with the positions of widgets after a project was loaded.
+   *                Fixes #5075.
+   *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
+   *                If that does not exist then we read from .Isis/ipce/ipce.config.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -629,34 +633,62 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
+    // Set the path of the settings file
+    // The default is to assume that the project has an ipce.config in it
+    // If the file does not exist then we read settings from .Isis/ipce/ipce.config
     QString appName = QApplication::applicationName();
+    QString filePath = project->projectRoot() + "/ipce.config";
+    bool isFullScreen = false;
+    if (!FileName(filePath).fileExists()) {
+      filePath = "$HOME/.Isis/" + appName + "/ipce.config";
+      // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in
+      // in full screen. In other words the default geometry is full screen
+      if (!FileName(filePath).fileExists()) {
+        isFullScreen = true;
+      }
+    }
 
-    QSettings settings(
-        FileName("$HOME/.Isis/" + appName + "/" + appName + "_" + project->name() + ".config")
-          .expanded(), QSettings::NativeFormat);
-
-    // General settings
     if (project->name() == "Project") {
       setWindowTitle("ipce");
+    }
+    else {
+      setWindowTitle( project->name() );
+    }
+
+    QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
+
+    if (!isFullScreen) {
+      setGeometry(projectSettings.value("geometry").value<QRect>());
+      if (!project->isTemporaryProject()) {
+        restoreState(projectSettings.value("windowState").toByteArray());
+      }
+    }
+    else {
+      this->showMaximized();
+    }
+
+    if (project->name() == "Project") {
+      QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(),
+                              QSettings::NativeFormat);
 
       QStringList projectNameList;
       QStringList projectPathList;
-      settings.beginGroup("recent_projects");
-      QStringList keys = settings.allKeys();
+      globalSettings.beginGroup("recent_projects");
+      QStringList keys = globalSettings.allKeys();
       QRegExp underscore("%%%%%");
 
       foreach (QString key, keys) {
         QString childKey = "recent_projects/"+key;
-        QString projectPath = settings.value(key).toString();
+        QString projectPath = globalSettings.value(key).toString();
         QString projectName = projectPath.split("/").last();
         projectPathList.append(projectPath) ;
         projectNameList.append(projectName);
       }
 
-      settings.endGroup();
+      globalSettings.endGroup();
 
       QStringList projectPathReverseList;
-      for (int i = projectPathList.count()-1;i>=0;i--) {
+      for (int i = projectPathList.count() - 1; i >= 0; i--) {
         projectPathReverseList.append(projectPathList[i]);
       }
 
@@ -671,30 +703,21 @@ namespace Isis {
         }
         else
           break;
-       }
+        }
 
       m_directory->setRecentProjectsList(projectPathListTruncated);
       m_directory->updateRecentProjects();
-      m_maxThreadCount = settings.value("maxThreadCount", m_maxThreadCount).toInt();
+      m_maxThreadCount = globalSettings.value("maxThreadCount", m_maxThreadCount).toInt();
       applyMaxThreadCount();
     }
-    //  Project specific settings
-    else {
-      setWindowTitle( project->name() );
-      if (settings.contains("geometry")) {
-        setGeometry(settings.value("geometry").value<QRect>());
-      }
-      if (settings.contains("windowState")) {
-        restoreState(settings.value("windowState").toByteArray());
-      }
 
-      // The geom/state isn't enough for main windows to correctly remember
-      //   their position and size, so let's restore those on top of
-      //   the geom and state.
-      if (!settings.value("pos").toPoint().isNull()) {
-        move(settings.value("pos").toPoint());
-      }
+    // The geom/state isn't enough for main windows to correctly remember
+    //   their position and size, so let's restore those on top of
+    //   the geom and state.
+    if (!projectSettings.value("pos").toPoint().isNull()) {
+      move(projectSettings.value("pos").toPoint());
     }
+//    m_directory->project()->setClean(true);
   }
 
 
@@ -724,7 +747,8 @@ namespace Isis {
         m_directory->project()->save();
       }
     }
-    writeSettings(m_directory->project());
+    //  Write global settings, for now this is for the project "Project"
+    writeGlobalSettings(m_directory->project());
     m_directory->project()->clear();
 
     QMainWindow::closeEvent(event);

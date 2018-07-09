@@ -142,21 +142,18 @@ namespace Isis {
     leftZoomIn->setIconSize(isize);
     leftZoomIn->setToolTip("Zoom In 2x");
     leftZoomIn->setWhatsThis("Zoom In 2x on left measure.");
-    leftZoomIn->setShortcut(Qt::Key_Plus);
 
     QToolButton *leftZoomOut = new QToolButton();
     leftZoomOut->setIcon(QPixmap(toolIconDir + "/viewmag-.png"));
     leftZoomOut->setIconSize(isize);
     leftZoomOut->setToolTip("Zoom Out 2x");
     leftZoomOut->setWhatsThis("Zoom Out 2x on left measure.");
-    leftZoomOut->setShortcut(Qt::Key_Minus);
 
     QToolButton *leftZoom1 = new QToolButton();
     leftZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
     leftZoom1->setIconSize(isize);
     leftZoom1->setToolTip("Zoom 1:1");
     leftZoom1->setWhatsThis("Show left measure at full resolution.");
-    leftZoom1->setShortcut(Qt::Key_Slash);
 
     QHBoxLayout *leftZoomPan = new QHBoxLayout;
     leftZoomPan->addWidget(leftZoomIn);
@@ -216,7 +213,6 @@ namespace Isis {
     m_rightZoomIn->setIconSize(isize);
     m_rightZoomIn->setToolTip("Zoom In 2x");
     m_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
-    m_rightZoomIn->setShortcut(Qt::Key_Plus);
 
     m_rightZoomOut = new QToolButton();
     m_rightZoomOut->setIcon(QIcon(FileName("$base/icons/viewmag-.png").
@@ -224,14 +220,12 @@ namespace Isis {
     m_rightZoomOut->setIconSize(isize);
     m_rightZoomOut->setToolTip("Zoom Out 2x");
     m_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
-    m_rightZoomOut->setShortcut(Qt::Key_Minus);
 
     m_rightZoom1 = new QToolButton();
     m_rightZoom1->setIcon(QPixmap(toolIconDir + "/viewmag1.png"));
     m_rightZoom1->setIconSize(isize);
     m_rightZoom1->setToolTip("Zoom 1:1");
     m_rightZoom1->setWhatsThis("Show right measure at full resolution.");
-    m_rightZoom1->setShortcut(Qt::Key_Slash);
 
     QHBoxLayout *rightZoomPan = new QHBoxLayout;
     rightZoomPan->addWidget(m_rightZoomIn);
@@ -607,7 +601,6 @@ namespace Isis {
     m_autoReg->setShortcut(Qt::Key_R);
     m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
                           "<strong>Shortcut: R</strong>");
-    m_autoReg->setToolTip("Sub-pixel register the right measure to the left");
     m_autoReg->setWhatsThis("Sub-pixel register the right measure to the left "
                        "and move the result under the crosshair.  After "
                        "viewing the results, the option exists to move the "
@@ -812,6 +805,8 @@ namespace Isis {
       m_autoRegExtension->hide();
       m_autoReg->setText("Register");
       m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
     }
     m_autoRegAttempted = false;
 
@@ -1026,6 +1021,9 @@ namespace Isis {
       m_autoRegShown = false;
       m_autoRegExtension->hide();
       m_autoReg->setText("Register");
+      m_autoReg->setShortcut(Qt::Key_R);
+      m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                            "<strong>Shortcut: R</strong>");
 
       //  Reload chip with original measure
       emit updateRightView(m_rightMeasure->GetSample(),

@@ -1386,8 +1386,8 @@ namespace Isis {
       }
     }
     m_isOpen = true;
-    // TODO: TLS 2018-06-07  Why writeSettings here?
-    //writeSettings();
+
+    setClean(true);
     emit projectLoaded(this);
   }
 
@@ -2190,13 +2190,13 @@ namespace Isis {
                                                             QString("."));
 
       if ( !newDestination.isEmpty() ) {
+        m_isTemporaryProject = false;
         save( QFileInfo(newDestination + "/").absolutePath() );
-
+        
         // delete the temporary project
         deleteAllProjectFiles();
         relocateProjectRoot(newDestination);
-        m_isTemporaryProject = false;
-
+        
         // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
         // working properly. For example, when we save a new project and try to view a control net
         // the it thinks it's still in the /tmp area
@@ -2217,7 +2217,6 @@ namespace Isis {
       }
 
       save(m_projectRoot->absolutePath(), false);
-      // if (newDestination != )
     }
 
     return saveDialogCompleted;
@@ -2431,6 +2430,7 @@ namespace Isis {
     m_isOpen = true;
 
     emit projectSaved(this);
+
   }
 
 
