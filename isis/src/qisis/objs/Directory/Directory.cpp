@@ -561,12 +561,10 @@ namespace Isis {
 
   void Directory::newActiveControl(bool newControl) {
 
-//  if (newControl && m_controlPointEditViewWidget) {
-//    bool closed = m_controlPointEditViewWidget->close();
-//    qDebug()<<"Directory::newActiveControl  CPEditor closed = "<<closed;
-//    emit viewClosed(m_controlPointEditViewWidget);
-//    delete m_controlPointEditViewWidget;
-//  }
+    if (newControl && m_controlPointEditViewWidget) {
+     emit viewClosed(m_controlPointEditViewWidget);
+     delete m_controlPointEditViewWidget;
+    }
 
     // If the new active control is the same as what is showing in the cnetEditorWidget, allow
     // editing of control points from the widget, otherwise turnoff from context menu
@@ -601,7 +599,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupBundleObservationViews(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -665,7 +663,7 @@ namespace Isis {
     // connect destroyed signal to cleanupCnetEditorViewWidgets slot
     connect(result, SIGNAL( destroyed(QObject *) ),
             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
 
@@ -706,7 +704,7 @@ namespace Isis {
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets(QObject *) ) );
-   
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -751,10 +749,10 @@ namespace Isis {
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
-                    
+
     emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
@@ -867,7 +865,7 @@ namespace Isis {
               this, SLOT(makeBackupActiveControl()));
       connect (project(), SIGNAL(activeControlSet(bool)),
               result->controlPointEditWidget(), SLOT(setControlFromActive()));
-               
+
       connect(result, SIGNAL(windowChangeEvent(bool)),
               m_project, SLOT(setClean(bool)));
     }
@@ -902,7 +900,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -926,7 +924,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -950,7 +948,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -999,7 +997,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -1024,7 +1022,7 @@ namespace Isis {
     //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
 
