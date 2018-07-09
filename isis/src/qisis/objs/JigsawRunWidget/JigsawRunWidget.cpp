@@ -38,7 +38,7 @@ namespace Isis {
   JigsawRunWidget::JigsawRunWidget(Project *project, QWidget *parent) : m_ui(new Ui::JigsawRunWidget) {
     m_project = project;
     m_selectedControl = NULL;
-    // m_bundleThread = NULL;
+    m_bundleThread = NULL;
     init();
   }
 
