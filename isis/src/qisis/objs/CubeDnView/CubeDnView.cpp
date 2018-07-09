@@ -29,6 +29,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenu>
+#include <QMenuBar>
 #include <QModelIndex>
 #include <QSize>
 #include <QSizePolicy>
@@ -76,6 +77,7 @@
 #include "TrackTool.h"
 #include "ToolList.h"
 #include "ToolPad.h"
+
 #include "ViewportMdiSubWindow.h"
 #include "Workspace.h"
 #include "WindowTool.h"
@@ -102,59 +104,48 @@ namespace Isis {
     m_workspace = new Workspace(false, this);
     m_workspace->mdiArea()->setActivationOrder(QMdiArea::StackingOrder);
 
+    // Since this is a QMainWindow, set the workspace as the central widget.
+    setCentralWidget(m_workspace);
+
+    createActions(directory);
+
     connect(m_workspace, SIGNAL( cubeViewportActivated(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportActivated(MdiCubeViewport *) ) );
 
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
 
-    Project *activeProject = directory->project();
-    // These connect signals listen to the active project, and if a control network
-    // or list of control networks is added, then the enableControlNetTool() function is called.
-    connect(activeProject, SIGNAL(controlListAdded(ControlList *)), this, SLOT(enableControlNetTool()));
-    connect(activeProject, SIGNAL(controlAdded(Control *)), this, SLOT(enableControlNetTool()));
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
+  }
+
+  void CubeDnView::createActions(Directory *directory) {
 
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    //m_toolBar = new QWidget(this);
-
-    //QHBoxLayout *toolBarLayout = new QHBoxLayout;
-
-    m_permToolBar = new QToolBar("Standard Tools", 0);
+    m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
+    addToolBar(m_permToolBar);
 
-    m_activeToolBar = new QToolBar("Active Tool", 0);
+    m_activeToolBar = new QToolBar("Active Tool", this);
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
+    addToolBar(m_activeToolBar);
 
-    m_toolPad = new ToolPad("Tool Pad", 0);
+    m_toolPad = new ToolPad("Tool Pad", this);
     m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
-
-    //m_toolBar->setLayout(toolBarLayout);
-
-    //layout->addWidget(m_toolBar);
-    layout->addWidget(m_workspace);
+    addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     // Create tools
     ToolList *tools = new ToolList;
 
-    Tool *defaultActiveTool = NULL;
-
     tools->append(new RubberBandTool(this));
-//  QnetTool *qnetTool = new QnetTool(m_workspace);
-    //tools->append(new FileTool(this));
-    //tools->append(new QnetFileTool(qnetTool, this));
     tools->append(NULL);
 
     ControlNetTool *controlNetTool = new ControlNetTool(directory, this);
-    defaultActiveTool = controlNetTool;
-    tools->append(defaultActiveTool);
+    tools->append(controlNetTool);
 
     if (directory->project()->activeControl()) {
       controlNetTool->setControlNet(directory->project()->activeControl()->controlNet());
@@ -179,7 +170,9 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), controlNetTool, SLOT(paintAllViewports()));
 
     tools->append(new BandTool(this));
-    tools->append(new ZoomTool(this));
+
+    ZoomTool *zoomTool = new ZoomTool(this);
+    tools->append(zoomTool);
     tools->append(new PanTool(this));
     tools->append(new StretchTool(this));
     tools->append(new FindTool(this));
@@ -197,20 +190,17 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-    tools->append(new HelpTool(this));
+    //tools->append(new HelpTool(this));
 
-    QStatusBar *statusBar = new QStatusBar(this);
-    layout->addWidget(statusBar);
-    tools->append(new TrackTool(statusBar));
+    tools->append(new TrackTool(statusBar()));
 
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_fileMenu = new QMenu;
-    m_viewMenu = new QMenu;
-    m_optionsMenu = new QMenu;
-    m_windowMenu = new QMenu;
-    m_helpMenu = new QMenu;
+    m_viewMenu = menuBar()->addMenu("&View");
+    m_optionsMenu = menuBar()->addMenu("&Options");
+    m_windowMenu = menuBar()->addMenu("&Window");
+    //m_helpMenu = menuBar()->addMenu("&Help");
 
     for (int i = 0; i < tools->count(); i++) {
       Tool *tool = (*tools)[i];
@@ -224,10 +214,7 @@ namespace Isis {
         if (!tool->menuName().isEmpty()) {
           QString menuName = tool->menuName();
 
-          if (menuName == "&File") {
-            tool->addTo(m_fileMenu);
-          }
-          else if (menuName == "&View") {
+          if (menuName == "&View") {
             tool->addTo(m_viewMenu);
           }
           else if (menuName == "&Options") {
@@ -246,36 +233,25 @@ namespace Isis {
       }
     }
 
-    m_permToolBarActions.append( m_permToolBar->actions() );
-
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
-    m_toolPadActions.append( m_toolPad->actions() );
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
+    zoomTool->activate(true);
   }
 
-
   /**
-   * @description enableControlNetTool:  This is a slot function which
-   * is called when the active project emits a signal to the CubeDnView
-   * object after a control network (or a list of control networks)
-   * has been added.  It enables the control network editor tool if it
-   * has been disabled.
+   * A slot function that is called when directory emits a siganl that an active
+   * control network is set. It enables the control network editor tool in the
+   * toolpad and loads the network.
    */
-  void CubeDnView::enableControlNetTool() {
-
-    foreach (QAction * action, m_toolPadActions) {
+  void CubeDnView::enableControlNetTool(bool value) {
+    foreach (QAction * action, m_toolPad->actions()) {
       if (action->objectName() == "ControlNetTool") {
-        action->setDisabled(false);
+        action->setEnabled(value);
+        if (value) {
+          ControlNetTool *cnetTool = static_cast<ControlNetTool *>(action->parent());
+          cnetTool->loadNetwork();
+        }
       }
     }
   }
-
 
   /**
    * Destructor
@@ -305,7 +281,6 @@ namespace Isis {
     AbstractProjectItemView::addItem(item);
   }
 
-
   /**
    * Returns the suggested size
    *
@@ -326,102 +301,6 @@ namespace Isis {
 
     return item->isShape();
   }
-
-
-  /**
-   * Returns a list of actions appropriate for a file menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::fileMenuActions() {
-    return m_fileMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a project menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::projectMenuActions() {
-    return QList<QAction *>();
-  }
-
-  /**
-   * Returns a list of actions appropriate for an edit menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::editMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a view menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::viewMenuActions() {
-    QList<QAction *> result;
-    result.append( m_viewMenu->actions() );
-    result.append(m_separatorAction);
-    result.append( m_windowMenu->actions() );
-    return result;
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a settings menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::settingsMenuActions() {
-    return m_optionsMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a help menu.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::helpMenuActions() {
-    return m_helpMenu->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the permanent tool bar.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::permToolBarActions() {
-    return m_permToolBar->actions();
-  }
-
-
-  /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
-  }
-
-
-  /**
-   * Returns a list of actions for the tool pad.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> CubeDnView::toolPadActions() {
-    return m_toolPad->actions();
-  }
-
 
   /**
    * Slot to connect to the currentChanged() signal from a selection

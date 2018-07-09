@@ -38,7 +38,7 @@ namespace Isis {
   JigsawRunWidget::JigsawRunWidget(Project *project, QWidget *parent) : m_ui(new Ui::JigsawRunWidget) {
     m_project = project;
     m_selectedControl = NULL;
-    m_bundleThread = NULL;
+    // m_bundleThread = NULL;
     init();
   }
 
@@ -86,7 +86,7 @@ namespace Isis {
     m_ui->JigsawRunButton->setEnabled(false);
 
     m_bundleAdjust = NULL;
-    m_bundleSolutionInfo = NULL;
+//    m_bundleSolutionInfo = NULL;
 
     m_bRunning = false;
 
@@ -111,10 +111,10 @@ namespace Isis {
    * Destructor.
    */
   JigsawRunWidget::~JigsawRunWidget() {
-    if (m_bundleSolutionInfo) {
-      delete m_bundleSolutionInfo;
-      m_bundleSolutionInfo = NULL;
-    }
+//    if (m_bundleSolutionInfo) {
+//      delete m_bundleSolutionInfo;
+//      m_bundleSolutionInfo = NULL;
+//    }
     if (m_bundleAdjust) {
       m_bundleAdjust->deleteLater();
       m_bundleAdjust = NULL;    
@@ -379,7 +379,8 @@ namespace Isis {
     }
 
     // Tell the project about the BundleSolutionInfo
-    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+    // m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+    m_project->addBundleSolutionInfo(m_bundleSolutionInfo);
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);

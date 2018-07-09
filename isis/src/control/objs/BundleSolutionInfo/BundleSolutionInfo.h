@@ -136,6 +136,11 @@ namespace Isis {
    *                              bundlesolutioninfo's output control is serialized properly.
    *   @history 2018-03-26 Ken Edmundson - modified save method to properly save output control
    *                           network file.
+   *   @history 2018-05-22 Ken Edmundson - changed default and copy constructors and assignment
+   *                           operator to private to prevent developer from calling them. Done
+   *                           because BundleSolutionInfo is derived from QObject (see comment
+   *                           below). Removed copy constructor and assignment operator from cpp
+   *                           file.
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -148,9 +153,7 @@ namespace Isis {
       BundleSolutionInfo(Project *project,
                     XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
-      BundleSolutionInfo(const BundleSolutionInfo &src);
       ~BundleSolutionInfo();
-      BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
       QString savedBundleOutputFilename();
       QString savedImagesFilename();
@@ -219,7 +222,18 @@ namespace Isis {
       };
 
     private:
+      // NOTE: BundleSolutionInfo is derived from QObject as it has one slot (perhaps more signals
+      //       and slots in the future? As a child of QObject it should have no copy constructor or
+      //       assignment operator. See for example...
+      //
+      //       http://doc.qt.io/qt-5/qobject.html#no-copy-constructor
+      //
+      //       These methods are declared as private to prevent the developer from calling default
+      //       operators. These will generate a compiler error if the developer attempts to use
+      //       them.
       BundleSolutionInfo();
+      BundleSolutionInfo(const BundleSolutionInfo &src);
+      BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
 
       //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
       //! object when saving to disk).
@@ -241,7 +255,6 @@ namespace Isis {
       QString m_csvSavedResidualsFilename;
 
   }; // end BundleSolutionInfo class
-
 
   void setStringAttribute(int locationId, QString locationName,
                           QString attributeName, QString attributeValue);

@@ -47,6 +47,8 @@ void printXml(const T &);
   *                           most likely going to move to HDF5. Fixes #4327.
   *   @history 2017-04-24 Ian Humphrey - Removed pvlObject() and replaced with the XML save().
   *                           Fixes #4797.
+  *   @history 2018-05-24 Ken Edmundson - Updated truth data to indicate default value for
+  *                                       m_createInverseMatrix was changed from true to false.
   *
   *   @todo Truth updated so that the name of the BundleObservationSolveSettings object is Null,
   *         this should be fixed as part of #4292.
