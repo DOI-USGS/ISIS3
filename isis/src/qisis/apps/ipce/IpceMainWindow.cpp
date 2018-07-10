@@ -80,7 +80,7 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
-    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
     //setDockOptions(GroupedDragging | AllowTabbedDocks);
     //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
@@ -596,6 +596,7 @@ namespace Isis {
 
     projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
+    projectSettings.setValue("maximized", isMaximized());
     projectSettings.sync();
   }
 
@@ -636,9 +637,9 @@ namespace Isis {
       filePath = "$HOME/.Isis/" + appName + "/ipce.config";
       // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in
       // in full screen. In other words the default geometry is full screen
-      if (!FileName(filePath).fileExists()) {
+      // if (!FileName(filePath).fileExists()) {
         isFullScreen = true;
-      }
+      // }
     }
 
     if (project->name() == "Project") {
@@ -651,12 +652,25 @@ namespace Isis {
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     if (!isFullScreen) {
+      qDebug()<<"GOT TO !isFullScreen";
+      if (!projectSettings.value("maximized").toBool()) {
+        showNormal();
+      }
       setGeometry(projectSettings.value("geometry").value<QRect>());
+
+      // Always load in fullscreen regardless of project
+      // if (isMaximized()) {
+      //     setGeometry(QApplication::desktop()->availableGeometry(this));
+      // }
+      // else {
+      //   setGeometry(projectSettings.value("geometry").value<QRect>());
+      // }
       if (!project->isTemporaryProject()) {
         restoreState(projectSettings.value("windowState").toByteArray());
       }
     }
     else {
+      qDebug()<<"GOT TO isFullScreen";
       this->showMaximized();
     }
 
