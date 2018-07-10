@@ -24,8 +24,10 @@
 
 #include <QDomDocument>
 #include <QMap>
+#include <QRegularExpression>
 #include <QString>
 
+#include "Application.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Projection.h"
@@ -43,6 +45,10 @@ namespace Isis {
    *
    */
   ProcessExportPds4::ProcessExportPds4() {
+
+    m_lid = "";
+    m_imageType = StandardImage;
+
     qSetGlobalQHashSeed(1031); // hash seed to force consistent output
 
     m_domDoc = new QDomDocument("");
@@ -58,11 +64,12 @@ namespace Isis {
     m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd"; 
 
     QString xmlModel;
-    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch\" ";
-    xmlModel += "schemetypens=\"http://purl.oclc.org/dsdl/schematron\"";
+    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1A00.sch\" ";
+    xmlModel += "schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
     m_domDoc->appendChild(header);
+
   }
 
 
@@ -82,34 +89,48 @@ namespace Isis {
    * @return @b QDomDocument The output PDS4 label.
    */
   QDomDocument &ProcessExportPds4::StandardPds4Label() {
-    if (InputCubes.size() == 0) {
-      QString msg("Must set an input cube before creating a PDS4 label.");
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    else {
-      if (m_domDoc->documentElement().isNull()) {
-        QDomElement root = m_domDoc->createElement("Product_Observational");
-        root.setAttribute("xmlns", "http://pds.nasa.gov/pds4/pds/v1");
-        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        root.setAttribute("xsi:schemaLocation",
-                          "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1");
-        m_domDoc->appendChild(root);
-      }
+    CreateImageLabel();
+    translateUnits(*m_domDoc);
+    return *m_domDoc;
+  }
 
-      CreateImageLabel();
-      translateUnits(*m_domDoc);
-      return *m_domDoc;
-    }
+
+    /**
+   * Create a standard PDS4 image label from the input cube.
+   * 
+   * @return @b QDomDocument The output PDS4 label.
+   */
+  void ProcessExportPds4::setImageType(ImageType imageType) {
+    m_imageType = imageType;
   }
 
 
   /**
-   * Create a standard PDS label for type IMAGE. The image label will be
-   * stored internally in the class.
+   * Creates a PDS4 label. The image label will be
+   * stored internally in the class. 
+   *  
+   * This method has a similar function to 
+   * ProcessExportPds::CreateImageLabel. However, it will create 
+   * images of object type Array_3D_Image, Array_2D_Image, or 
+   * Array_3D_Spectrum. 
    */
   void ProcessExportPds4::CreateImageLabel() {
+    if (InputCubes.size() == 0) {
+      QString msg("Must set an input cube before creating a PDS4 label.");
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    if (m_domDoc->documentElement().isNull()) {
+      QDomElement root = m_domDoc->createElement("Product_Observational");
+      root.setAttribute("xmlns", "http://pds.nasa.gov/pds4/pds/v1");
+      root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+      root.setAttribute("xsi:schemaLocation",
+                        "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1");
+      m_domDoc->appendChild(root);
+    }
 
     try {
+      // <Product_Observational>
+      //   <Identification_Area>
       identificationArea();
     }
     catch (IException &e) {
@@ -117,6 +138,8 @@ namespace Isis {
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
+      // <Product_Observational>
+      //   <Observation_Area>
       standardInstrument();
     }
     catch (IException &e) {
@@ -124,25 +147,34 @@ namespace Isis {
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
+      // <Product_Observational>
+      //   <Observation_Area>
+      //     <Discipline_Area>
+      //       <disp:Display_Settings>
       displaySettings();
     }
     catch (IException &e) {
       QString msg = "Unable to translate and export display settings.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
-// Temporarily removed spectral processing because it needs further work. 
-// 
-//    try {
-//      standardBandBin();
-//    } 
-//    catch (IException &e) {
-//      QString msg = "Unable to translate and export spectral information.";
-//      throw IException(e, IException::Programmer, msg, _FILEINFO_);
-//    }
+
+    try {
+      // <Product_Observational>
+      //   <Observation_Area>
+      //     <Discipline_Area>
+      //       <sp:Spectral_Characteristics> OR <img:Imaging>
+      standardBandBin();
+    } 
+    catch (IException &e) {
+      QString msg = "Unable to translate and export spectral information.";
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+    }
 
     try { 
-      // <Discipline_Area>
-      // display settings, and cartography handled in this method:
+      // <Product_Observational>
+      //   <Observation_Area>
+      //     <Discipline_Area>
+      //       <card:Cartography>
       StandardAllMapping();
     }
     catch (IException &e) {
@@ -150,8 +182,9 @@ namespace Isis {
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     try {
-      // file observation area
-      StandardImageImage();
+      // <Product_Observational>
+      //   <File_Area_Observational>
+      fileAreaObservational();
     }
     catch (IException &e) {
       QString msg = "Unable to translate and export standard image information.";
@@ -165,91 +198,137 @@ namespace Isis {
    * Instrument group to the PDS4 labels. 
    */
   void ProcessExportPds4::standardInstrument() {
-    Pvl *inputLabel = InputCubes[0]->label(); 
-    FileName transfile;
+    Pvl *inputLabel = InputCubes[0]->label();
+    FileName translationFileName;
 
-    // Translate the Instrument group
-    transfile = "$base/translations/pds4ExportInstrument.trn";
-    PvlToXmlTranslationManager instXlator(*inputLabel, transfile.expanded());
-    instXlator.Auto(*m_domDoc);
-
-    // If instrument and spacecraft values were translated, create the combined name
-    QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
-
-    if ( !obsAreaNode.isNull() ) {
-
-      // fix start/stop times, if needed
-      QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
-      if (!timeNode.isNull()) {
-        QDomElement startTime = timeNode.firstChildElement("start_date_time");
-        if (startTime.text() == "") {
-          startTime.setAttribute("xsi:nil", "true");
-        }
-        else {
-          QString timeValue = startTime.text();
-          PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
-        }
-        QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
-        if (stopTime.text() == "") {
-          stopTime.setAttribute("xsi:nil", "true");
-        }
-        else {
-          QString timeValue = stopTime.text();
-          PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
-        }
-
-      }
-
-      QDomElement obsSysNode = obsAreaNode.firstChildElement("Observing_System");
-      if ( !obsSysNode.isNull() ) {
-        QString instrumentName;
-        QString spacecraftName;
-        QDomElement obsSysCompNode = obsSysNode.firstChildElement("Observing_System_Component");
-        while ( !obsSysCompNode.isNull()) {
-          QDomElement compTypeNode = obsSysCompNode.firstChildElement("type");
-          if ( compTypeNode.text().compare("Spacecraft") == 0 ) {
-            QString componentName = obsSysCompNode.firstChildElement("name").text();
-            if (QString::compare(componentName, "TBD", Qt::CaseInsensitive) != 0) {
-              spacecraftName = componentName; 
-            }
+    if (inputLabel->findObject("IsisCube").hasGroup("Instrument")) {
+      
+      // Translate the Instrument group
+      translationFileName = "$base/translations/pds4ExportInstrument.trn";
+      PvlToXmlTranslationManager instXlator(*inputLabel, translationFileName.expanded());
+      instXlator.Auto(*m_domDoc);
+      
+      // If instrument and spacecraft values were translated, create the combined name
+      QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
+      
+      if ( !obsAreaNode.isNull() ) {
+      
+        // fix start/stop times, if needed
+        QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
+        if (!timeNode.isNull()) {
+          QDomElement startTime = timeNode.firstChildElement("start_date_time");
+          if (startTime.text() == "") {
+            startTime.setAttribute("xsi:nil", "true");
           }
-          else if ( compTypeNode.text().compare("Instrument") == 0 ) {
-            QString componentName = obsSysCompNode.firstChildElement("name").text();
-            if (QString::compare(componentName, "TBD", Qt::CaseInsensitive) != 0) {
-              instrumentName = componentName;
-            }
+          else {
+            QString timeValue = startTime.text();
+            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
           }
-          obsSysCompNode = obsSysCompNode.nextSiblingElement("Observing_System_Component");
+          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
+          if (stopTime.text() == "") {
+            stopTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = stopTime.text();
+            PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
+          }
+      
         }
-        QDomElement combinedNode = m_domDoc->createElement("name");
-        QString combinedValue = "TBD";
-        if ( !instrumentName.isEmpty() && !spacecraftName.isEmpty() ) {
-          combinedValue = spacecraftName + " " + instrumentName;
+      
+        QDomElement obsSysNode = obsAreaNode.firstChildElement("Observing_System");
+        if ( !obsSysNode.isNull() ) {
+          QString instrumentName;
+          QString spacecraftName;
+          QDomElement obsSysCompNode = obsSysNode.firstChildElement("Observing_System_Component");
+          while ( !obsSysCompNode.isNull()) {
+            QDomElement compTypeNode = obsSysCompNode.firstChildElement("type");
+            if ( compTypeNode.text().compare("Spacecraft") == 0 ) {
+              QString componentName = obsSysCompNode.firstChildElement("name").text();
+              if (QString::compare(componentName, "TBD", Qt::CaseInsensitive) != 0) {
+                spacecraftName = componentName; 
+              }
+            }
+            else if ( compTypeNode.text().compare("Instrument") == 0 ) {
+              QString componentName = obsSysCompNode.firstChildElement("name").text();
+              if (QString::compare(componentName, "TBD", Qt::CaseInsensitive) != 0) {
+                instrumentName = componentName;
+              }
+            }
+            obsSysCompNode = obsSysCompNode.nextSiblingElement("Observing_System_Component");
+          }
+          QDomElement combinedNode = m_domDoc->createElement("name");
+          QString combinedValue = "TBD";
+          if ( !instrumentName.isEmpty() && !spacecraftName.isEmpty() ) {
+            combinedValue = spacecraftName + " " + instrumentName;
+          }
+          combinedNode.appendChild( m_domDoc->createTextNode(combinedValue) );
+          obsSysNode.insertBefore( combinedNode, obsSysNode.firstChild() );
         }
-        combinedNode.appendChild( m_domDoc->createTextNode(combinedValue) );
-        obsSysNode.insertBefore( combinedNode, obsSysNode.firstChild() );
       }
-    }
-
-    // Translate the Target name
-    try {
-      transfile = "$base/translations/pds4ExportTargetFromInstrument.trn"; 
-      PvlToXmlTranslationManager targXlator(*inputLabel, transfile.expanded());
+      
+      // Translate the Target name
+      translationFileName = "$base/translations/pds4ExportTargetFromInstrument.trn"; 
+      PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
-    } 
-    catch (IException &e1) {
-      try {
-        transfile = "$base/translations/pds4ExportTargetFromMapping.trn"; 
-        PvlToXmlTranslationManager targXlator(*inputLabel, transfile.expanded());
-        targXlator.Auto(*m_domDoc);
-      }
-      catch (IException &e2) {
-        IException finalError(IException::Unknown, "Unable to find a target in input cube.", _FILEINFO_);
-        finalError.append(e1);
-        finalError.append(e2);
-        throw finalError;
-      }
+
+      // move target to just below Observing_System. 
+      QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
+      obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
+
     }
+    else if (inputLabel->findObject("IsisCube").hasGroup("Mapping")) {
+
+      translationFileName = "$base/translations/pds4ExportTargetFromMapping.trn"; 
+      PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
+      targXlator.Auto(*m_domDoc);
+
+    }
+    else {
+      throw IException(IException::Unknown, "Unable to find a target in input cube.", _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * Allows mission specific programs to set logical_identifier 
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * The input string should be colon separated string with 6 
+   * identifiers: 
+   *  
+   * <ol> 
+   *   <li> urn </li>
+   *   <li> space_agency (ususally nasa) </li>
+   *   <li> archiving_organization (usually pds) </li>
+   *   <li> bundle_id </li>
+   *   <li> collection_id </li>
+   *   <li> product_id </li>
+   * </ol> 
+   *  
+   * Example: 
+   * urn:esa:psa:em16_tgo_frd:data_raw:frd_raw_sc_d_20150625T133700-20150625T135700 
+   * 
+   * @author 2018-05-21 Jeannie Backer
+   * 
+   * @param lid The logical identifier value required for PDS4 
+   *            compliant labels.
+   */
+  void ProcessExportPds4::setLogicalId(QString lid) {
+    m_lid = lid;
+  }
+
+
+  /**
+   * Allows mission specific programs to use specified 
+   * versions of dictionaries. 
+   * 
+   * @author 2018-05-21 Jeannie Backer
+   *  
+   * @param schema The string of schema to be set.
+   */
+  void ProcessExportPds4::setSchemaLocation(QString schema) {
+    m_schemaLocation = schema;
   }
 
 
@@ -259,10 +338,46 @@ namespace Isis {
    */
   void ProcessExportPds4::identificationArea() {
     Pvl *inputLabel = InputCubes[0]->label(); 
-    FileName transfile;
-    transfile = "$base/translations/pds4ExportIdentificationArea.trn";
-    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+    FileName translationFileName;
+    translationFileName = "$base/translations/pds4ExportIdentificationArea.trn";
+    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
+
+    if (m_lid.isEmpty()) {
+      m_lid = "urn:nasa:pds:TBD:TBD:TBD";
+    }
+
+    QDomElement identificationElement;
+    QStringList identificationPath;
+    identificationPath.append("Product_Observational");
+    identificationPath.append("Identification_Area");
+    try {
+      identificationElement = getElement(identificationPath);
+      if( identificationElement.isNull() ) {
+        throw IException(IException::Unknown, "", _FILEINFO_);
+      }
+    }
+    catch(IException &e) {
+      QString msg = "Could not find Identification_Area element "
+                    "to add modification history under.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    QDomElement lidElement = identificationElement.firstChildElement("logical_identifier");
+    PvlToXmlTranslationManager::resetElementValue(lidElement, m_lid);
+
+    // Get export history and add <Modification_History> element.
+    // These regular expressions match the pipe followed by the date from
+    // the Application::Version() return value.
+    QRegularExpression versionRegex(" \\| \\d{4}\\-\\d{2}\\-\\d{2}");
+    QString historyDescription = "Created PDS4 output product from ISIS cube with the "
+                                 + FileName(Application::Name()).baseName()
+                                 + " application from ISIS version "
+                                 + Application::Version().remove(versionRegex) + ".";
+    // This regular expression matches the time from the Application::DateTime return value.
+    QRegularExpression dateRegex("T\\d{2}:\\d{2}:\\d{2}");
+    QString historyDate = Application::DateTime().remove(dateRegex);
+    addHistory(historyDescription, historyDate);
   }
 
   
@@ -273,9 +388,16 @@ namespace Isis {
   void ProcessExportPds4::displaySettings() {
 
     Pvl *inputLabel = InputCubes[0]->label(); 
-    FileName transfile;
-    transfile = "$base/translations/pds4ExportDisplaySettings.trn";
-    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+    FileName translationFileName;
+
+    if (m_imageType == StandardImage) {
+      translationFileName = "$base/translations/pds4ExportDisplaySettings.trn"; 
+    }
+    else {
+      translationFileName = "$base/translations/pds4ExportDisplaySettingsSpectrum.trn";
+    }
+
+    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
     // Add header info
@@ -291,35 +413,281 @@ namespace Isis {
   * 
   */
   void ProcessExportPds4::standardBandBin() {
-    // Spectra
+    Pvl *inputLabel = InputCubes[0]->label(); 
+    if ( !inputLabel->findObject("IsisCube").hasGroup("BandBin") ) return;
+    // Add header info
+    addSchema("PDS4_IMG_1900.sch", 
+              "PDS4_IMG_1900.xsd",
+              "xmlns:img", 
+              "http://pds.nasa.gov/pds4/img/v1"); 
+    
     // Get the input Isis cube label and find the BandBin group if it has one
-    Pvl *inputLabel = InputCubes[0]->label();
-    if(inputLabel->hasObject("IsisCube") &&
-        !(inputLabel->findObject("IsisCube").hasGroup("BandBin"))) return;
+    if (m_imageType == StandardImage) {
+      translateBandBinImage(*inputLabel);
+    }
+    else {
+      // Add header info
+      addSchema("PDS4_SP_1100.sch", 
+                "PDS4_SP_1100.xsd",
+                "xmlns:sp", 
+                "http://pds.nasa.gov/pds4/sp/v1");
+      if (m_imageType == UniformlySampledSpectrum) {
+        translateBandBinSpectrumUniform(*inputLabel);
+      }
+      else if (m_imageType == BinSetSpectrum) {
+        translateBandBinSpectrumBinSet(*inputLabel);
+      }
+    }
+  }
 
-    FileName transfile;
-    transfile = "$base/translations/pds4ExportBandBin.trn";
-    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+
+  void ProcessExportPds4::translateBandBinImage(Pvl &inputLabel) {
+    QString translationFile = "$base/translations/";
+    translationFile += "pds4ExportBandBinImage.trn";
+    FileName translationFileName(translationFile);
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
+    xlator.Auto(*m_domDoc);
+  }
+
+
+  void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
+    QString translationFile = "$base/translations/";
+    translationFile += "pds4ExportBandBinSpectrumUniform.trn";
+    FileName translationFileName(translationFile);
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
-    // Add header info
-    addSchema("PDS4_SP_1100.sch", 
-              "PDS4_SP_1100.xsd",
-              "xmlns:sp", 
-              "http://pds.nasa.gov/pds4/sp/v1"); 
+    PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
+    // fix multi-valued bandbin info
+    QStringList xmlPath;
+    xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "sp:Spectral_Characteristics";
+    QDomElement baseElement = m_domDoc->documentElement();
+    QDomElement spectralCharElement = getElement(xmlPath, baseElement);
+
+    // Axis_Bin_Set for variable bin widths
+    // required - bin_sequence_number, center_value, bin_width
+    // optional - detector_number, grating_position, original_bin_number, scaling_factor, value_offset, Filter
+    // ... see schema for more...
+    PvlKeyword center;
+    if (bandBinGroup.hasKeyword("Center")) {
+      center = bandBinGroup["Center"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterCenter")) {
+      center = bandBinGroup["FilterCenter"];
+    }
+    else {
+      QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+                    "Translation for PDS4 required value [center_value] not found.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    PvlKeyword width;
+    if (bandBinGroup.hasKeyword("Width")) {
+      width = bandBinGroup["Width"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterWidth")) {
+      width = bandBinGroup["FilterWidth"];
+    }
+    else {
+      QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+                    "Translation for PDS4 required value [bin_width] not found.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    QString units = center.unit();
+
+    if (!width.unit().isEmpty() ) {
+      if (units.isEmpty()) {
+        units = width.unit();
+      }
+      if (units.compare(width.unit(), Qt::CaseInsensitive) != 0) {
+        QString msg = "Unable to translate BandBin info for BinSetSpectrum. "
+                      "Unknown or unmatching units for [center_value] and [bin_width].";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
+
+    PvlKeyword originalBand;
+    if (bandBinGroup.hasKeyword("OriginalBand")) {
+      originalBand = bandBinGroup["OriginalBand"];
+    }
+    PvlKeyword name;
+    if (bandBinGroup.hasKeyword("Name")) {
+      name = bandBinGroup["Name"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterName")) {
+      name = bandBinGroup["FilterName"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterId")) {
+      name = bandBinGroup["FilterId"];
+    }
+    PvlKeyword number;
+    if (bandBinGroup.hasKeyword("Number")) {
+      number = bandBinGroup["Number"];
+    }
+    else if (bandBinGroup.hasKeyword("FilterNumber")) {
+      number = bandBinGroup["FilterNumber"];
+    }
+
+    QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Bin_Set");
+    if (axisBinSetElement.isNull()) {
+      axisBinSetElement = m_domDoc->createElement("sp:Axis_Bin_Set");
+      spectralCharElement.appendChild(axisBinSetElement);
+    }
+    int bands = (int)inputLabel.findObject("IsisCube")
+                                .findObject("Core")
+                                .findGroup("Dimensions")
+                                .findKeyword("Bands");
+
+    for (int i = 0; i < bands; i++) {
+
+      QDomElement bin = m_domDoc->createElement("sp:Bin");
+      axisBinSetElement.appendChild(bin);
+
+      QDomElement binSequenceNumber = m_domDoc->createElement("sp:bin_sequence_number");
+      PvlToXmlTranslationManager::setElementValue(binSequenceNumber, toString(i+1));
+      bin.appendChild(binSequenceNumber);
+
+
+      QDomElement centerValue = m_domDoc->createElement("sp:center_value");
+      PvlToXmlTranslationManager::setElementValue(centerValue, center[i], units);
+      bin.appendChild(centerValue);
+
+      QDomElement binWidth = m_domDoc->createElement("sp:bin_width");
+      if (width.size() == bands) {
+        PvlToXmlTranslationManager::setElementValue(binWidth, width[i] , units);
+      }
+      else {
+        PvlToXmlTranslationManager::setElementValue(binWidth, width[0] , units);
+      }
+      bin.appendChild(binWidth);
+
+      QDomElement originalBinNumber = m_domDoc->createElement("sp:original_bin_number");
+      if (originalBand.size() > 0) {
+        PvlToXmlTranslationManager::setElementValue(originalBinNumber, originalBand[i]);
+        bin.appendChild(originalBinNumber);
+      }
+
+      if (name.size() > 0 || number.size() > 0) {
+        QDomElement filter = m_domDoc->createElement("sp:Filter");
+        bin.appendChild(filter);
+        if (name.size() > 0) {
+          QDomElement filterName = m_domDoc->createElement("sp:filter_name");
+          PvlToXmlTranslationManager::setElementValue(filterName, name[i]);
+          filter.appendChild(filterName);
+        }
+        if (number.size() > 0) {
+          QDomElement filterNumber= m_domDoc->createElement("sp:filter_number");
+          PvlToXmlTranslationManager::setElementValue(filterNumber, number[i]);
+          filter.appendChild(filterNumber);
+        }
+      }
+    }
+    
+  }
+
+
+  void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
+    QString translationFile = "$base/translations/";
+    translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
+    FileName translationFileName(translationFile);
+    PvlToXmlTranslationManager xlator(inputLabel, translationFileName.expanded());
+    xlator.Auto(*m_domDoc);
+
+    PvlGroup bandBinGroup = inputLabel.findObject("IsisCube").findGroup("BandBin");
+    // fix multi-valued bandbin info
+    QStringList xmlPath;
+    xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "sp:Spectral_Characteristics";
+    QDomElement baseElement = m_domDoc->documentElement();
+    QDomElement spectralCharElement = getElement(xmlPath, baseElement);
+
+    // Axis_Uniformly_Sampled
+    // required - sampling_parameter_type (frequency, wavelength, wavenumber)
+    //            sampling_interval (units Hz, Angstrom, cm**-1, respectively)
+    //            bin_width  (units Hz, Angstrom, cm**-1, respectively)
+    //            first_center_value  (units Hz, Angstrom, cm**-1, respectively)
+    //            last_center_value  (units Hz, Angstrom, cm**-1, respectively) 
+    //            Local_Internal_Reference 
+    //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
+    //            Local_Internal_Reference:local_identifier_reference, 
+    //                1. At least one Axis_Array:axis_name must match the 
+    //                   value of the local_identifier_reference in the 
+    //                   Axis_Uniformly_Sampled.
+    //                   Set Axis_Uniformly_Sampled:local_identifier_reference = Axis_Array:axis_name = Band
+    //                2. At least one Array_3D_Spectrum:local_identifier must match 
+    //                   the value of the local_identifier_reference in the
+    //                   Spectral_Characteristics.
+    //                   Set Spectral_Characteristics:local_identifier_reference = Array_3D_Spectrum:local_identifier = Spectral_Array_Object
+    //            Local_Internal_Reference:local_reference_type = spectral_characteristics_to_array_axis
+    PvlKeyword center("Center");
+    if (bandBinGroup.hasKeyword("FilterCenter")) {
+      center = bandBinGroup["FilterCenter"];
+    }
+    else if (bandBinGroup.hasKeyword("Center")) {
+      center = bandBinGroup["Center"];
+    }
+    else {
+      QString msg = "Unable to translate BandBin info for UniformlySpacedSpectrum. "
+                    "Translation for PDS4 required value [last_center_value] not found.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    QString lastCenter = center[center.size() - 1];
+
+    QDomElement axisBinSetElement = spectralCharElement.firstChildElement("sp:Axis_Uniformly_Sampled");
+    if (axisBinSetElement.isNull()) {
+      axisBinSetElement = m_domDoc->createElement("sp:Axis_Uniformly_Sampled");
+      spectralCharElement.appendChild(axisBinSetElement);
+    }
+
+    QDomElement lastCenterElement = m_domDoc->createElement("sp:last_center_value");
+    PvlToXmlTranslationManager::setElementValue(lastCenterElement, lastCenter);
+    spectralCharElement.appendChild(lastCenterElement);
+    
   }
 
 
   /**
-   * Create and internalize a standard image output label from the input image. 
-   * @todo determine whether to treat single band as 2d array
+   * Create and internalize an image output label from the input 
+   * image. This method has a similar function to 
+   * ProcessExportPds::StandardImageImage. 
    */
-  void ProcessExportPds4::StandardImageImage() {
+  void ProcessExportPds4::fileAreaObservational() {
     Pvl *inputLabel = InputCubes[0]->label(); 
-    FileName transfile;
+    QString imageObject = "";
 
-    transfile = "$base/translations/pds4ExportArray3DImage.trn"; 
-    PvlToXmlTranslationManager xlator(*inputLabel, transfile.expanded());
+    QString translationFile = "$base/translations/pds4Export";
+    if (m_imageType == StandardImage) {
+      int bands = (int)inputLabel->findObject("IsisCube")
+                                  .findObject("Core")
+                                  .findGroup("Dimensions")
+                                  .findKeyword("Bands");
+      if (bands > 1) {
+        imageObject = "Array_3D_Image";
+      }
+      else {
+        imageObject = "Array_2D_Image";
+      }
+      translationFile += QString(imageObject).remove('_');
+    }
+    else {
+      imageObject = "Array_3D_Spectrum";
+      translationFile += QString(imageObject).remove('_');
+      if (m_imageType == UniformlySampledSpectrum) {
+        translationFile += "Uniform";
+      }
+      else if (m_imageType == BinSetSpectrum) {
+        translationFile += "BinSet";
+      }
+    }
+    translationFile += ".trn";
+    FileName translationFileName(translationFile);
+
+    PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
 
     QDomElement rootElement = m_domDoc->documentElement();
@@ -350,15 +718,14 @@ namespace Isis {
     }
 
     if (!fileAreaObservationalElement.isNull()) {
-      QDomElement array3DImageElement =
-                      fileAreaObservationalElement.firstChildElement("Array_3D_Image");
-
-      if (!array3DImageElement.isNull()) {
+      QDomElement arrayImageElement =
+                      fileAreaObservationalElement.firstChildElement(imageObject);
+      if (!arrayImageElement.isNull()) {
 
         // reorder axis elements. 
         // Translation order:  elements, axis_name, sequence_number
         // Correct order:      axis_name, elements, sequence_number
-        QDomElement axisArrayElement = array3DImageElement.firstChildElement("Axis_Array");
+        QDomElement axisArrayElement = arrayImageElement.firstChildElement("Axis_Array");
         while( !axisArrayElement.isNull() ) {
           QDomElement axisNameElement = axisArrayElement.firstChildElement("axis_name");
           axisArrayElement.insertBefore(axisNameElement, 
@@ -367,8 +734,8 @@ namespace Isis {
         }
 
         QDomElement elementArrayElement = m_domDoc->createElement("Element_Array");
-        array3DImageElement.insertBefore(elementArrayElement,
-                                         array3DImageElement.firstChildElement("Axis_Array"));
+        arrayImageElement.insertBefore(elementArrayElement,
+                                         arrayImageElement.firstChildElement("Axis_Array"));
 
         QDomElement dataTypeElement = m_domDoc->createElement("data_type");
         PvlToXmlTranslationManager::setElementValue(dataTypeElement,
@@ -391,6 +758,8 @@ namespace Isis {
 
   /**
    * Adds necessary information to the xml header for a pds4 class. 
+   *  
+   * This must be called after StandardPds4Label() to work correctly.  
    * 
    * @param sch Schematron filename without path
    * @param xsd Schema filename without path
@@ -404,7 +773,7 @@ namespace Isis {
     xmlModel +=  xmlnsURI;
     xmlModel +=  "/";
     xmlModel +=  sch;
-    xmlModel += "\" schemetypens=\"http://purl.oclc.org/dsdl/schematron\"";
+    xmlModel += "\" schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
     m_domDoc->insertAfter(header, m_domDoc->firstChild());
@@ -507,13 +876,13 @@ namespace Isis {
 //    PvlToXmlTranslationManager::setElementValue(creationElement, );
 //    fileElement.appendChild(creationElement);
 
-    ofstream oLabel(labelName.toLatin1().data());
-    OutputLabel(oLabel);
-    oLabel.close();
+    ofstream outputLabel(labelName.toLatin1().data());
+    OutputLabel(outputLabel);
+    outputLabel.close();
     
-    ofstream oCube(imageName.toLatin1().data());
-    StartProcess(oCube);
-    oCube.close();
+    ofstream outputImageFile(imageName.toLatin1().data());
+    StartProcess(outputImageFile);
+    outputImageFile.close();
 
     EndProcess();
   }
@@ -753,9 +1122,18 @@ namespace Isis {
     // Create the "Modification_Detail" element and add it to the end of the
     // "Modification_History" element.
     QDomElement detailElement = m_domDoc->createElement("Modification_Detail");
-    detailElement.setAttribute("description", description);
-    detailElement.setAttribute("modification_date", date);
-    detailElement.setAttribute("version_id", version);
+
+    QDomElement modDateElement = m_domDoc->createElement("modification_date");
+    PvlToXmlTranslationManager::setElementValue(modDateElement, date);
+    detailElement.appendChild(modDateElement);
+
+    QDomElement versionIdElement = m_domDoc->createElement("version_id");
+    PvlToXmlTranslationManager::setElementValue(versionIdElement, version);
+    detailElement.appendChild(versionIdElement);
+
+    QDomElement descriptionElement = m_domDoc->createElement("description");
+    PvlToXmlTranslationManager::setElementValue(descriptionElement, description);
+    detailElement.appendChild(descriptionElement);
 
     historyElement.insertAfter( detailElement,
                                 historyElement.lastChildElement() );

@@ -1,14 +1,26 @@
 #include <sstream>
-#include "XmlToPvlTranslationManager.h"
+
+#include <QDebug>
+
 #include "FileName.h"
-#include "Preference.h"
 #include "IException.h"
 #include "IString.h"
 #include "Preference.h"
+#include "XmlToPvlTranslationManager.h"
 
 using namespace Isis;
 using namespace std;
 
+/** 
+ * Unit test for XmlToPvlTranslationManager class
+ *  
+ * @author ????-??-?? Unknown 
+ *  
+ *  @internal
+ *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
+ *                           test output.
+ *  
+ */
 int main(void) {
   Preference::Preferences(true);
 
@@ -372,7 +384,9 @@ int main(void) {
       XmlToPvlTranslationManager pvlTransFileManager(pvlFile, simpleTrans);
     }
     catch(IException &e) {
-      e.print();
+      QString message = e.toString();
+      cout << message.replace(QRegExp("in file.*base/translations"), "in file [base/translations");
+      cout << endl;
       cout << endl;
     }
 

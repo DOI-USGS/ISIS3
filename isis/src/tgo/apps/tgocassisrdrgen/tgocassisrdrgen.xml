@@ -23,11 +23,26 @@
       Changed the order that the elements appear in the output label.
     </change>
     <change name="Marjorie Hahn" date="2017-06-05">
-      Added a default test to ensure that if the exported PDS4 data is reingested, 
+      Added a default test to ensure that if the exported PDS4 data is reingested,
       then it is the same as the original cube.
     </change>
     <change name="Marjorie Hahn" date="2017-06-08">
       Moved code to write out .img and .xml PDS4 data to WritePds4 in ProcessExportPds4.
+    </change>
+    <change name="Kaitlyn Lee" date="2018-05-16">
+      Added parameter PRODUCTID to set the ProductId keyword. If the product id is
+      not specified by the user, set the ProductId keyword to the observation id.
+    </change>
+    <change name="Kaitlyn Lee" date="2018-05-21">
+      Added the check to see if the input cube is a mosaic. If it is, instead of
+      the Instrument group, the cube will have a Mosaic group. So, the ProductId
+      will now be written to the Mosaic group.
+    </change>
+    <change name="Kristin Berry" date="2018-06-12">
+      Updated to use the tgoCassisExportMosaic.trn translation file when the input cube is a mosaic.
+    </change>
+  <change name="Kristin Berry" date="2018-06-18">
+      Updated to look in the Archive group for the ObservationId when setting a default ProductId. 
     </change>
   </history>
 
@@ -65,5 +80,19 @@
         <filter>*.img</filter>
       </parameter>
     </group>
+
+    <group name="Keywords">
+      <parameter name="PRODUCTID">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Product ID value
+        </brief>
+        <description>
+          Update the default Product ID value. This value will be the last section of the PDS4 logical_identifier value.
+        </description>
+      </parameter>
+    </group>
+
   </groups>
 </application>
