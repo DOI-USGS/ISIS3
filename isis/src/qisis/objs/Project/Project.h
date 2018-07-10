@@ -295,8 +295,7 @@ namespace Isis {
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
-      void addMapTemplates(TemplateList *templateFiles);
-      void addRegTemplates(TemplateList *templateFiles);
+      void addTemplates(TemplateList *templateFiles);
       QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void addTarget(Target *target);

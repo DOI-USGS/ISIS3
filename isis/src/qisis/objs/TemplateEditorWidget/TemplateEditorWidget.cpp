@@ -131,12 +131,7 @@ namespace Isis {
                              m_fileType, 
                              templateFolder.dirName()));
 
-        if (m_fileType == "maps") {
-          m_directory->project()->addMapTemplates(templateList);
-        }
-        else if (m_fileType == "registrations") {
-          m_directory->project()->addRegTemplates(templateList);
-        }
+        m_directory->project()->addTemplates(templateList);
         m_directory->project()->setClean(false);
       }
       else {

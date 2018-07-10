@@ -1233,24 +1233,7 @@ namespace Isis {
     if (!templateEditorWidget) {
       return;
     }
-    
-    // if (templateEditorWidget->textChanged()) {
-    //   QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
-    //                          QString("Would you like to save your current template?"),
-    //                          NULL, qobject_cast<QWidget *>(parent()), Qt::Dialog);
-    //   QPushButton *save = box->addButton("Save", QMessageBox::AcceptRole);
-    //   box->addButton("Don't Save", QMessageBox::RejectRole);
-    //   QPushButton *cancel = box->addButton("Cancel", QMessageBox::NoRole);
-    //   box->exec();
-    // 
-    //   if (box->clickedButton() == (QAbstractButton*)cancel) {
-    //     return;
-    //   }
-    //   else if (box->clickedButton() == (QAbstractButton*)save) {
-    //     templateEditorWidget->saveAsText();
-    //   }
-    // }
-    
+
     m_templateEditorWidgets.removeAll(templateEditorWidget);
     m_project->setClean(false);
   }

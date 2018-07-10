@@ -43,7 +43,7 @@
     * @internal
     *   @history 2018-07-07 Summer Stapleton - Fixed a few errors in how the xmlhandling was 
     *                           occuring and added additional handling of separating map templates
-    *                           from registration templates to reflects chagnes in Project.cpp.
+    *                           from registration templates to reflect chagnes in Project.cpp.
     */
    class TemplateList : public QObject, public QList<Template *> {
      Q_OBJECT

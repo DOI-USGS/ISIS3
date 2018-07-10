@@ -89,7 +89,7 @@ namespace Isis {
 
     connect(m_directory->project(), SIGNAL(templatesAdded(TemplateList *)),
             this, SLOT(addTemplates(TemplateList *)));
-}
+  }
 
 
   ControlPointEditWidget::~ControlPointEditWidget () {
@@ -222,6 +222,8 @@ namespace Isis {
 
     m_cnetFileNameLabel = new QLabel("Control Network: " + m_cnetFileName);
 
+    // Create a combobox to allow user to select either the default registration file or one of the
+    // imported registration files.
     m_templateComboBox = new QComboBox();
     m_templateComboBox->setToolTip("Choose a template file");
     m_templateComboBox->setWhatsThis("FileName of the sub-pixel "
@@ -239,6 +241,7 @@ namespace Isis {
     QFormLayout *templateFileLayout = new QFormLayout();
     templateFileLayout->addRow("Template File:", m_templateComboBox);
 
+    // Set-up connections to give registration combobox functionality
     connect(m_templateComboBox, SIGNAL(activated(QString)), 
             this, SLOT(setTemplateFile(QString)));
     connect(m_measureEditor, SIGNAL(setTemplateFailed(QString)), 

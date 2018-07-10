@@ -154,7 +154,7 @@ namespace Isis {
     }
 
     if (!m_list->isEmpty()) {
-      project()->addMapTemplates(m_list);
+      project()->addTemplates(m_list);
       project()->setClean(false);
     }
 

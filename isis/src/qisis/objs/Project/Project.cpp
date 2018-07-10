@@ -1106,36 +1106,25 @@ namespace Isis {
 
 
   /**
-   * Add new templates to m_mapTemplates and update project item model
+   * Add new templates to m_mapTemplates or m_regTemplates and update project item model
    *
    * @param newFileList QList of FileNames for each new imported template
    */
-  void Project::addMapTemplates(TemplateList *templateList) {
+  void Project::addTemplates(TemplateList *templateList) {
     foreach (Template *templateFile, *templateList) {
       connect( this, SIGNAL( projectRelocated(Project *) ),
                templateFile, SLOT( updateFileName(Project *) ) );
     }
-    m_mapTemplates->append(templateList);
-
-    emit templatesAdded(templateList);
-  }
-  
-  
-  /**
-   * Add new templates to m_regTemplates and update project item model
-   *
-   * @param newFileList QList of FileNames for each new imported template
-   */
-  void Project::addRegTemplates(TemplateList *templateList) {
-    foreach (Template *templateFile, *templateList) {
-      connect( this, SIGNAL( projectRelocated(Project *) ),
-               templateFile, SLOT( updateFileName(Project *) ) );
+    if (templateList->type() == "maps") {
+      m_mapTemplates->append(templateList);
     }
-    m_regTemplates->append(templateList);
+    else if (templateList->type() == "registrations") {
+      m_regTemplates->append(templateList);
+    }
 
     emit templatesAdded(templateList);
   }
-  
+
 
   /**
    * Create and navigate to the appropriate template type folder in the project directory.
@@ -3076,12 +3065,12 @@ namespace Isis {
     }
     else if (localName == "mapTemplateLists") {
       foreach (TemplateList *templateList, m_mapTemplateLists) {
-        m_project->addMapTemplates(templateList);
+        m_project->addTemplates(templateList);
       }
     }
     else if (localName == "regTemplateLists") {
       foreach (TemplateList *templateList, m_regTemplateLists) {
-        m_project->addRegTemplates(templateList);
+        m_project->addTemplates(templateList);
       }
     }
     else if (localName == "workOrder") {
