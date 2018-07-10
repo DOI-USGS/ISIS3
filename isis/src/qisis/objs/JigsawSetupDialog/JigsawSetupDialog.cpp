@@ -910,20 +910,20 @@ namespace Isis {
     m_ui->ckDegreeSpinBox->setEnabled(false);
     m_ui->ckSolveDegreeSpinBox->setEnabled(false);
 
-    // weighting tab
-    m_ui->pointLatitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointLongitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointRadiusSigmaLineEdit->setEnabled(false);
-    m_ui->positionSigmaLineEdit->setEnabled(false);
-    m_ui->velocitySigmaLineEdit->setEnabled(false);
-    m_ui->accelerationSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAnglesSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(false);
-
-    // maximum liklihood tab
-
-    // self-calibration tab
+    // observation solve settings tab
+    m_ui->treeView->setEnabled(false);
+    m_ui->positionComboBox->setEnabled(false);
+    m_ui->spkSolveDegreeSpinBox->setEnabled(false);
+    m_ui->spkDegreeSpinBox->setEnabled(false);
+    m_ui->hermiteSplineCheckBox->setEnabled(false);
+    m_ui->positionAprioriSigmaTable->setEnabled(false);
+    m_ui->pointingComboBox->setEnabled(false);
+    m_ui->ckSolveDegreeSpinBox->setEnabled(false);
+    m_ui->ckDegreeSpinBox->setEnabled(false);
+    m_ui->twistCheckBox->setEnabled(false);
+    m_ui->fitOverPointingCheckBox->setEnabled(false);
+    m_ui->pointingAprioriSigmaTable->setEnabled(false);
+    m_ui->applySettingsPushButton->setEnabled(false);
 
     // target body tab
     m_ui->targetBodyComboBox->setEnabled(false);
