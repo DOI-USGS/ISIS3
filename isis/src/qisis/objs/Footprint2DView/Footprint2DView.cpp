@@ -137,9 +137,16 @@ namespace Isis {
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
 
+    // Store the actions for easy enable/disable.
+    foreach (QAction *action, findChildren<QAction *>()) {
+      addAction(action);
+    }
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
+
     // MosaicSceneWidget's default is to have the Control Net Tool enabled.
     // In ipce, we want it to be disabled if an active control is not set.
-    foreach (QAction * action, m_toolPad->actions()) {
+    foreach (QAction *action, m_toolPad->actions()) {
       if (action->toolTip() == "Control Net (c)") {
         m_controlNetTool = action;
       }
@@ -316,17 +323,21 @@ namespace Isis {
     }
   }
 
+
   /**
    * A slot function that is called when directory emits a siganl that an active
    * control network is set. It enables the control network editor tool in the
-   * toolpad and loads the network.
+   * toolpad.
    * We do not load the network here because the network does not open until
-   * the tool is enabled. This is done in MosaicControlNetTool::updateTool() and
+   * the tool is beng used. This is done in MosaicControlNetTool::updateTool() and
    * is connected in MosaicTool.
+   *
+   * @param value The boolean that holds if a control network has been set.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
     m_controlNetTool->setEnabled(value);
   }
+
 
   /**
    * @brief Loads the Footprint2DView from an XML file.
