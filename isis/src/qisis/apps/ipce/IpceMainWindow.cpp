@@ -48,6 +48,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "JigsawRunWidget.h"
 #include "MosaicSceneWidget.h"
 #include "ProgressWidget.h"
 #include "Project.h"
@@ -184,6 +185,11 @@ namespace Isis {
    */
   void IpceMainWindow::addView(QWidget *newWidget, Qt::DockWidgetArea area,
                                Qt::Orientation orientation) {
+    // JigsawRunWidget is already a QDockWidget, and no modifications need to be made to it
+    if (qobject_cast<JigsawRunWidget *>(newWidget)) {
+      splitDockWidget(m_projectDock, (QDockWidget*)newWidget, Qt::Vertical);
+      return;
+    }
 
     QDockWidget *dock = new QDockWidget(newWidget->windowTitle(), this);
     dock->setWidget(newWidget);

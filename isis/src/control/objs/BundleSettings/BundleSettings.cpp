@@ -51,7 +51,7 @@ namespace Isis {
     m_createInverseMatrix  = false;
 
     m_outlierRejection     = false;
-    m_outlierRejectionMultiplier = 1.0;
+    m_outlierRejectionMultiplier = 3.0;
 
     // Parameter Uncertainties (Weighting)
     m_globalLatitudeAprioriSigma  = Isis::Null;
@@ -271,7 +271,7 @@ namespace Isis {
       m_outlierRejectionMultiplier = multiplier;
     }
     else {
-      m_outlierRejectionMultiplier = 1.0;
+      m_outlierRejectionMultiplier = 3.0;
     }
   }
 
@@ -450,14 +450,17 @@ namespace Isis {
   BundleObservationSolveSettings
       BundleSettings::observationSolveSettings(QString observationNumber) const {
 
+    BundleObservationSolveSettings defaultSolveSettings;
+
     for (int i = 0; i < numberSolveSettings(); i++) {
       if (m_observationSolveSettings[i].observationNumbers().contains(observationNumber)) {
         return m_observationSolveSettings[i];
       }
     }
-    QString msg = "Unable to find BundleObservationSolveSettings for observation number ["
-                  + observationNumber + "].";
-    throw IException(IException::Unknown, msg, _FILEINFO_);
+    return defaultSolveSettings;
+    //QString msg = "Unable to find BundleObservationSolveSettings for observation number ["
+    //              + observationNumber + "].";
+   // throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
@@ -482,6 +485,17 @@ namespace Isis {
                   + toString(n) + "].";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
+
+
+  /**
+   * Retrieves solve settings for the observation corresponding to the given index.
+   *
+   * @return QList<BundleObservationSolveSettings> The QList of BundleObservationSolveSettings
+   *                              objects
+   */
+  QList<BundleObservationSolveSettings> BundleSettings::observationSolveSettings() const {
+    return m_observationSolveSettings;
+  } 
 
 
   // =============================================================================================//
@@ -1154,7 +1168,7 @@ namespace Isis {
                 = toDouble(outlierRejectionMultiplierStr);
           }
           else {
-            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 1.0;
+            m_xmlHandlerBundleSettings->m_outlierRejectionMultiplier = 3.0;
           }
         }
       }
