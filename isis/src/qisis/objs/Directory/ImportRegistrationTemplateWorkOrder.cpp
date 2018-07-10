@@ -45,8 +45,8 @@ namespace Isis {
     m_isUndoable = true;
     m_list = NULL;
 
-    QAction::setText(tr("Import Registration Templates"));
-    QUndoCommand::setText(tr("Import Registration Templates"));
+    QAction::setText(tr("Import Registration Templates..."));
+    QUndoCommand::setText(tr("Import Registration Templates..."));
     setModifiesDiskState(true);
 
   }
@@ -117,7 +117,7 @@ namespace Isis {
         qobject_cast<QWidget *>(parent()),
         "Import Registration Templates",
         QString(),
-        "Registrations (*.def *.pvl);; All Files (*)");
+        "Registrations (*.def);; All Files (*)");
 
     if (!templateFileNames.isEmpty()) {
       QUndoCommand::setText(tr("Import %1 Template(s)").arg(templateFileNames.count()));

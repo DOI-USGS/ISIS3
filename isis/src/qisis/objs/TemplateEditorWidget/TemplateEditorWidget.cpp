@@ -43,6 +43,10 @@ namespace Isis {
   }
 
 
+  /**
+  * @brief Called when a user clicks the "Save" button
+  *
+  */
   void TemplateEditorWidget::saveText() {
     //We create a new QFile just in case the template's file name has changed
     QFile templateFile(m_template->fileName());
@@ -56,12 +60,15 @@ namespace Isis {
     m_textChanged = false;
   }
 
-  // Future plans to include Save As button
-
-  void TemplateEditorWidget::saveAsText() {
-    //We create a new QFile just in case the template's file name has changed
   
-    // First need to get the filename to save to via a QFileDialog
+  /**
+  * @brief Called when a user clicks the "Save As" button
+  *
+  */
+  void TemplateEditorWidget::saveAsText() {
+
+    // Create a filedialog for the user to choose a save location and name as well as whether they 
+    // would like to import the saved template file into the project.
     QFileDialog *fileDialog = new QFileDialog(qobject_cast<QWidget *>(parent()), 
                                                             "Save Template File");
     QGridLayout *layout = static_cast<QGridLayout*>(fileDialog->layout());
@@ -72,20 +79,36 @@ namespace Isis {
     
     fileDialog->setAcceptMode(QFileDialog::AcceptSave);
     fileDialog->setDirectory(QDir::currentPath());
-    fileDialog->setNameFilter("DEF (*.def);;MAP (*.map);;All (*)"); // Need .pvl?
+    if (m_fileType == "maps") {
+      fileDialog->setNameFilter("Maps (*.map);;All Files (*)");
+    }
+    else if (m_fileType == "registrations") {
+      fileDialog->setNameFilter("Registrations (*.def);;All Files (*)");
+    }
     fileDialog->exec();
-    
+
+    // Simply return if the user cancelled the save
+    if (!fileDialog->result()){
+      return;
+    }
+
     // Add file extension based on selected filter if extension not provided, defaulting to ".def"
+    // or ".map", respectively.
     QString extension = fileDialog->selectedNameFilter().split("(")[1].mid(1, 4);
     
     if (QString::compare(extension, ".def") == 0 || QString::compare(extension, ".map") == 0) {
       fileDialog->setDefaultSuffix(extension);
     }
     else {
-      fileDialog->setDefaultSuffix(".def");
+      if (m_fileType == "maps") {
+        fileDialog->setDefaultSuffix(".map");
+      }
+      else if (m_fileType == "registrations") {
+        fileDialog->setDefaultSuffix(".def");
+      }
     }
     QString templateFileName = fileDialog->selectedFiles().first();
-    
+
     // Write the file out
     QFile templateFile(templateFileName);
     if (templateFile.open(QFile::WriteOnly | QFile::Text)) {
@@ -94,7 +117,7 @@ namespace Isis {
       templateFile.close();
     } 
     
-    // Import the newly created template file to the project if user checked the box.
+    // Import the newly created template file to the project if user checked the optional checkbox.
     if (checkbox->checkState()) {
       if (templateFile.exists()) {
         QDir templateFolder = m_directory->project()->addTemplateFolder(m_fileType + "/import");
@@ -126,14 +149,22 @@ namespace Isis {
   }
   
   
+  /**
+  * @brief Slot called when text within widget has been changed
+  *
+  */
   void TemplateEditorWidget::textChanged() {
     m_textChanged = true;
   }
 
   
+  /**
+  * @brief This slot is called when the widget is closed (either via the widget itself or on 
+  *        project close).
+  *
+  */
   void TemplateEditorWidget::saveOption() {
-    // The active control is checked here for modification because this was the simplest solution
-    // vs changing the project clean state every time the control is modified or saved.
+
     if (m_textChanged) {
       QMessageBox *box = new QMessageBox(QMessageBox::NoIcon, QString("Current Template Has Unsaved Changes"),
                              QString("Would you like to save your current template?"),

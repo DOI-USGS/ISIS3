@@ -45,8 +45,8 @@ namespace Isis {
     m_isUndoable = true;
     m_list = NULL;
 
-    QAction::setText(tr("Import Map Templates"));
-    QUndoCommand::setText(tr("Import Map Templates"));
+    QAction::setText(tr("Import Map Templates..."));
+    QUndoCommand::setText(tr("Import Map Templates..."));
     setModifiesDiskState(true);
 
   }
@@ -117,7 +117,7 @@ namespace Isis {
         qobject_cast<QWidget *>(parent()),
         "Import Map Templates",
         QString(),
-        "Maps (*.def *.map *.pvl);; All Files (*)");
+        "Maps (*.map);; All Files (*)");
 
     if (!templateFileNames.isEmpty()) {
       QUndoCommand::setText(tr("Import %1 Template(s)").arg(templateFileNames.count()));
