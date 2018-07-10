@@ -159,8 +159,9 @@ namespace Isis {
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
-   *   @history 2018-07-09 Kaitlyn Lee - Changed removeView() to delete the parent dock widget. If we do
-   *                           not delete the dock widget, an empty dock widget will remain where the
+   *   @history 2018-07-09 Kaitlyn Lee - Added tilViews() and the menu option to tile all docked/undocked
+   *                           and tabbed/untabbed views. Changed removeView() to delete the parent dock widget. 
+                               If we do not delete the dock widget, an empty dock widget will remain where the
    *                           view used to be.
    */
   class IpceMainWindow : public QMainWindow {
@@ -189,6 +190,7 @@ namespace Isis {
       void enterWhatsThisMode();
 
       void tabViews();
+      void tileViews();
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
