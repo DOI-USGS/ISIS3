@@ -485,8 +485,27 @@ namespace Isis {
 
     }
 
-    m_bundleSettings->setObservationSolveOptions(settings->observationSolveSettings());
+    // If we click setup after changing image selection in the project tree, not all images will
+    // have solve settings. Here we add those images and their default settings to the list
+    QList<BundleObservationSolveSettings> defaultSettings = m_bundleSettings->observationSolveSettings();
+    QList<BundleObservationSolveSettings> fillSettings = settings->observationSolveSettings();
 
+    for (auto &solveSettings : defaultSettings) {      
+      // Remove any images from defaultSettings that exist in fillSettings
+      foreach (QString observationNumber, solveSettings.observationNumbers()) {
+        // The method will return a default with no obs numbers if none are found
+        if (settings->observationSolveSettings(observationNumber).observationNumbers().isEmpty()) {
+          solveSettings.removeObservationNumber(observationNumber);
+        }
+      }
+      // Append leftover defaultSettings
+      if (!solveSettings.observationNumbers().isEmpty()) {
+        fillSettings.append(solveSettings);
+      }
+    }
+
+    m_bundleSettings->setObservationSolveOptions(fillSettings);
+    
     update();
 
   }

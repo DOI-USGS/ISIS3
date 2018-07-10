@@ -450,14 +450,17 @@ namespace Isis {
   BundleObservationSolveSettings
       BundleSettings::observationSolveSettings(QString observationNumber) const {
 
+    BundleObservationSolveSettings defaultSolveSettings;
+
     for (int i = 0; i < numberSolveSettings(); i++) {
       if (m_observationSolveSettings[i].observationNumbers().contains(observationNumber)) {
         return m_observationSolveSettings[i];
       }
     }
-    QString msg = "Unable to find BundleObservationSolveSettings for observation number ["
-                  + observationNumber + "].";
-    throw IException(IException::Unknown, msg, _FILEINFO_);
+    return defaultSolveSettings;
+    //QString msg = "Unable to find BundleObservationSolveSettings for observation number ["
+    //              + observationNumber + "].";
+   // throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
 
