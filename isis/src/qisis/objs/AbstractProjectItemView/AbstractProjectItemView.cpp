@@ -170,18 +170,58 @@ namespace Isis {
 
   void AbstractProjectItemView::moveEvent(QMoveEvent *event) {
     QMainWindow::moveEvent(event);
-    
+
     emit windowChangeEvent(false);
   }
 
 
   void AbstractProjectItemView::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
-    //qDebug()<<objectName()<<"  new size = "<<geometry();
+
     emit windowChangeEvent(false);
   }
 
-  
+
+  /**
+   * Enables actions when cursor enters the view
+   *
+   * @param event The enter event
+   */
+  void AbstractProjectItemView::enterEvent(QEvent *event) {
+    enableActions();
+  }
+
+
+  /**
+   * Disables actions when cursor leaves the view.
+   *
+   * @param event The leave event
+   */
+  void AbstractProjectItemView::leaveEvent(QEvent *event) {
+    disableActions();
+  }
+
+
+  /**
+   * Disables toolbars and toolpad actions
+   */
+  void AbstractProjectItemView::disableActions() {
+    foreach (QAction *action, actions()) {
+      action->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions
+   */
+  void AbstractProjectItemView::enableActions() {
+    foreach (QAction *action, actions()) {
+      action->setEnabled(true);
+    }
+  }
+
+
   /**
    * Returns a list of actions appropriate for a context menu.
    *

@@ -36,6 +36,7 @@ class QMenu;
 class QModelIndex;
 class QToolBar;
 class QXmlStreamWriter;
+class QWidget;
 
 namespace Isis {
 
@@ -49,6 +50,7 @@ namespace Isis {
   class ToolPad;
   class Workspace;
   class XmlStackedHandlerReader;
+  class ProjectItemViewMenu;
 
   /**
    * View that displays cubes in a QView-like way.
@@ -93,6 +95,13 @@ namespace Isis {
    *                           Removed methods that returned menu and toolbar actions.
    *                           Removed connections that connected the project and CubeDnView and called
    *                           enableControlNetTool() because Directory now does this.
+   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
+   *                           ambiguous shortcut errors. To counter this, we enable/disable actions.
+   *                           Overrode leaveEvent() to handle open menus causing a leave event. Overrode
+   *                           enable/disableActions() because we need to disable the active toolbar's widgets.
+   *                           On default, a view's actions are disabled. To enable the actions, move the
+   *                           cursor over the view. When a user moves the cursor outside of the view, the
+   *                           actions are disabled.
    *   @history 2018-07-05 Tracie Sucharski - Moved sizeHint and sizePolicy to
    *                           AbstractProjectItemView. References #5433.
    *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
@@ -106,8 +115,6 @@ namespace Isis {
     public:
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
-
-      //QSize sizeHint() const;
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 
@@ -135,10 +142,13 @@ namespace Isis {
       void onItemAdded(ProjectItem *item);
       void onCubeViewportAdded(MdiCubeViewport *viewport);
       void onCubeViewportDeleted(QObject *obj);
+      void disableActions();
 
     private:
       Cube *workspaceActiveCube();
       void setWorkspaceActiveCube(Image *image);
+      void leaveEvent(QEvent *event);
+      void enableActions();
 
     private:
       /**
@@ -168,16 +178,16 @@ namespace Isis {
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items
       Workspace *m_workspace; //!< The workspace
 
-      QMenu *m_viewMenu; //!< View menu for storing actions
-      QMenu *m_optionsMenu; //!< Options menu for storing actions
-      QMenu *m_windowMenu; //!< Window menu for storing actions
-      QMenu *m_helpMenu; //!< Help menu for storing actions
+      ProjectItemViewMenu *m_viewMenu; //!< View menu for storing actions
+      ProjectItemViewMenu *m_optionsMenu; //!< Options menu for storing actions
+      ProjectItemViewMenu *m_windowMenu; //!< Window menu for storing actions
 
       QAction *m_separatorAction; //!< A separator action that is reused
 
       QToolBar *m_permToolBar; //!< A tool bar for storing actions
       QToolBar *m_activeToolBar; //!< A tool bar for storing actions
       ToolPad *m_toolPad; //!< A tool bar for storing actions
+      QList<QWidget *> m_childWidgets;  //!< Child widgets of the active toolbar
   };
 }
 

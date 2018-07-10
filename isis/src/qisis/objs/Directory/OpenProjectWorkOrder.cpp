@@ -152,20 +152,17 @@ namespace Isis {
         if (!m_projectPath.isEmpty()) {
           QUndoCommand::setText(tr("Open Project [%1]").arg(m_projectPath));
         }
-      }
         else {
-
-           m_projectPath =toolTip();
-
-          //We are dealing with a recent project
-
-            }
-
+          success = false;
+        }
       }
       else {
-        success = false;
+        m_projectPath = toolTip();
       }
-
+    }
+    else {
+      success = false;
+    }
 
     return success;
   }

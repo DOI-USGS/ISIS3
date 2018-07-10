@@ -44,6 +44,7 @@ namespace Isis {
   class Project;
   class ToolPad;
   class XmlStackedHandlerReader;
+  class ProjectItemViewMenu;
 
   /**
    * Ipce view containing the CnetEditorWidget
@@ -62,6 +63,11 @@ namespace Isis {
    *                            view has its own toolbar, so having getters that return toolbar
    *                            actions to fill the toolbar of the IpceMainWindow are unnecessary.
    *                            Removed methods that returned menu and toolbar actions.
+   *    @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
+   *                            ambiguous shortcut errors. To counter this, we enable/disable actions. Overrode
+   *                            leaveEvent() to handle open menus causing a leave event. On default, a view's
+   *                            actions are disabled. To enable the actions, move the cursor over the view.
+   *                            When a user moves the cursor outside of the view, the actions are disabled.
    *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
    *                            view can be re-created with the same objectName for restoring the
    *                            project state. Qt's save/restoreState use the objectName. Remove
@@ -87,6 +93,8 @@ class CnetEditorView : public AbstractProjectItemView {
   private:
     void createToolBars();
     void createMenus();
+    void leaveEvent(QEvent *event);
+
 
       /**
        * @author 2012-09-?? Steven Lambright
@@ -115,6 +123,8 @@ class CnetEditorView : public AbstractProjectItemView {
     QPointer<Control> m_control;
 
     QToolBar *m_permToolBar; //!< The permanent tool bar
+    ProjectItemViewMenu *m_tablesMenu; //!< View menu for storing actions
+
   };
 }
 

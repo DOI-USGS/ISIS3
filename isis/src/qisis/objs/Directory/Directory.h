@@ -56,6 +56,7 @@ namespace Isis {
   class Control;
   class ControlNet;
   class ControlPointEditView;
+  class ControlHealthMonitorView;
   class CubeDnView;
   class FileItem;
   class Footprint2DView;
@@ -238,6 +239,8 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
+   *                           Fixes #5435.
    *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
    *                           addFootprint2DView() now connects to enableControlNetTool() in
    *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
@@ -246,10 +249,13 @@ namespace Isis {
    *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
    *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
    *                           to allow for saving of the project at these times. Fixes #5114.
+   *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
+   *                           directory instance rather than the activeControl. Fixes #5435.
    *   @history 2018-07-09 Tracie Sucharski - When adding views, check if the objectName is set
    *                           which it should be when creating a view from a project serialization.
    *                           If the objectName has not been set, this is a new view and the unique
    *                           objectName needs to be created.
+   *
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -268,14 +274,15 @@ namespace Isis {
       // make sure the objectName is serialized to the project. For more info, see ::addCubeDnView,
       // ::XmlHandler::startElement and CubeDnView::save.
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
-      CnetEditorView *addCnetEditorView(Control *control, QString objectName="");
-      CubeDnView *addCubeDnView(QString objectName="");
-      Footprint2DView *addFootprint2DView(QString objectName="");
+      ControlHealthMonitorView *addControlHealthMonitorView();
+      CnetEditorView *addCnetEditorView(Control *control, QString objectName = "");
+      CubeDnView *addCubeDnView(QString objectName = "");
+      Footprint2DView *addFootprint2DView(QString objectName = "");
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
-      ImageFileListWidget *addImageFileListView(QString objectName="");
+      ImageFileListWidget *addImageFileListView(QString objectName = "");
       ControlPointEditView *addControlPointEditView();
 
 
@@ -306,6 +313,7 @@ namespace Isis {
       QList<TemplateEditorWidget *> templateEditorViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
+      ControlHealthMonitorView *controlHealthMonitorView();
       ControlPointEditView *controlPointEditView();
 //      ChipViewportsWidget *controlPointChipViewports();
 
@@ -473,6 +481,8 @@ namespace Isis {
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
+
+      QPointer<ControlHealthMonitorView> m_controlHealthMonitorView;
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
       //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets

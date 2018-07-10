@@ -50,6 +50,8 @@ namespace Isis {
    *   @history 2017-11-09 Tyler Wilson - Made changes to isExecutable() to import functionality
    *                           needed in OpenRecentProjectWorkOrder into OpenProjectWorkOrder
    *                           since OpenRecentProjectWorker is being deleted.  Fixes #5220.
+   *   @history 2018-06-14 Makayla Shepherd - Added an else so that when someone cancels the dialog
+   *                           it will cancel properly.
    */
   class OpenProjectWorkOrder : public WorkOrder {
       Q_OBJECT

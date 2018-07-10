@@ -48,6 +48,8 @@
 #include "CloseProjectWorkOrder.h"
 #include "CnetEditorView.h"
 #include "CnetEditorViewWorkOrder.h"
+#include "ControlHealthMonitorView.h"
+#include "ControlHealthMonitorWorkOrder.h"
 #include "CnetEditorWidget.h"
 #include "Control.h"
 #include "ControlDisplayProperties.h"
@@ -159,6 +161,7 @@ namespace Isis {
       createWorkOrder<TargetGetInfoWorkOrder>();
       createWorkOrder<BundleObservationViewWorkOrder>();
       createWorkOrder<TemplateEditViewWorkOrder>();
+      createWorkOrder<ControlHealthMonitorWorkOrder>();
 
       //  Main menu actions
       m_exportControlNetWorkOrder = createWorkOrder<ExportControlNetWorkOrder>();
@@ -804,6 +807,33 @@ namespace Isis {
     return result;
   }
 
+  ControlHealthMonitorView *Directory::controlHealthMonitorView() {
+    return m_controlHealthMonitorView;
+  }
+
+
+  ControlHealthMonitorView *Directory::addControlHealthMonitorView() {
+
+    if (!controlHealthMonitorView()) {
+
+      Control *activeControl = project()->activeControl();
+      if (activeControl == NULL) {
+        QString message = "No active control network chosen.  Choose active control network on "
+                          "project tree.\n";
+        QMessageBox::critical(qobject_cast<QWidget *>(parent()), "Error", message);
+        return NULL;
+      }
+
+      ControlHealthMonitorView *result = new ControlHealthMonitorView(this);
+      result->setWindowTitle(tr("Control NetHealth Monitor"));
+      result->setObjectName(result->windowTitle());
+
+      m_controlHealthMonitorView = result;
+      emit newWidgetAvailable(result);
+    }
+    return controlHealthMonitorView();
+  }
+
 
   ControlPointEditView *Directory::addControlPointEditView() {
 
@@ -1068,6 +1098,19 @@ namespace Isis {
     m_bundleObservationViews.removeAll(bundleObservationView);
     m_project->setClean(false);
   }
+
+  // /**
+  //  * @brief Removes pointers to deleted Control Health Monitor objects.
+  //  */
+  // void Directory::cleanupControlHealthMonitorView(QObject *obj) {
+  //
+  //   ControlHealthMonitorView *healthMonitorView = static_cast<ControlHealthMonitorView *>(obj);
+  //   if (!healthMonitorView) {
+  //     return;
+  //   }
+  //
+  //   m_project->setClean(false);
+  // }
 
 
   /**

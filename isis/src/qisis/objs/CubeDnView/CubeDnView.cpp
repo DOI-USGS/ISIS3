@@ -25,6 +25,7 @@
 #include <QAction>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QKeySequence>
 #include <QMap>
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -32,9 +33,9 @@
 #include <QMenuBar>
 #include <QModelIndex>
 #include <QSize>
-#include <QSizePolicy>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidgetAction>
 #include <QXmlStreamWriter>
@@ -50,7 +51,6 @@
 #include "FileName.h"
 #include "FileTool.h"
 #include "FindTool.h"
-#include "HelpTool.h"
 #include "HistogramTool.h"
 #include "Image.h"
 #include "ImageList.h"
@@ -83,6 +83,8 @@
 #include "WindowTool.h"
 #include "XmlStackedHandlerReader.h"
 #include "ZoomTool.h"
+
+#include "ProjectItemViewMenu.h"
 
 namespace Isis {
   /**
@@ -119,7 +121,6 @@ namespace Isis {
 
   void CubeDnView::createActions(Directory *directory) {
 
-
     m_permToolBar = new QToolBar("Standard Tools", this);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
@@ -138,7 +139,9 @@ namespace Isis {
     ToolList *tools = new ToolList;
 
     tools->append(new RubberBandTool(this));
-    tools->append(NULL);
+
+    // 2018-07-02 Kaitlyn Lee - Commented this out; not sure why it was here
+    //tools->append(NULL);
 
     ControlNetTool *controlNetTool = new ControlNetTool(directory, this);
     tools->append(controlNetTool);
@@ -166,7 +169,6 @@ namespace Isis {
     connect(this, SIGNAL(redrawMeasures()), controlNetTool, SLOT(paintAllViewports()));
 
     tools->append(new BandTool(this));
-
     ZoomTool *zoomTool = new ZoomTool(this);
     tools->append(zoomTool);
     tools->append(new PanTool(this));
@@ -186,17 +188,22 @@ namespace Isis {
     tools->append(new HistogramTool(this));
     tools->append(new StatisticsTool(this));
     tools->append(new StereoTool(this));
-    //tools->append(new HelpTool(this));
-
     tools->append(new TrackTool(statusBar()));
 
     m_separatorAction = new QAction(this);
     m_separatorAction->setSeparator(true);
 
-    m_viewMenu = menuBar()->addMenu("&View");
-    m_optionsMenu = menuBar()->addMenu("&Options");
-    m_windowMenu = menuBar()->addMenu("&Window");
-    //m_helpMenu = menuBar()->addMenu("&Help");
+    m_viewMenu = new ProjectItemViewMenu("&View");
+    connect(m_viewMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_viewMenu);
+
+    m_optionsMenu = new ProjectItemViewMenu("&Options");
+    connect(m_optionsMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_optionsMenu);
+
+    m_windowMenu = new ProjectItemViewMenu("&Window");
+    connect(m_windowMenu, SIGNAL(menuClosed()), this, SLOT(disableActions()));
+    menuBar()->addMenu(m_windowMenu);
 
     for (int i = 0; i < tools->count(); i++) {
       Tool *tool = (*tools)[i];
@@ -219,9 +226,6 @@ namespace Isis {
           else if (menuName == "&Window") {
             tool->addTo(m_windowMenu);
           }
-          else if (menuName == "&Help") {
-            tool->addTo(m_helpMenu);
-          }
         }
       }
       else {
@@ -229,16 +233,97 @@ namespace Isis {
       }
     }
 
+    // Store the actions and widgets for easy enable/disable.
+    foreach (QAction *action, findChildren<QAction *>()) {
+      // Remove the edit tool's save button shortcut because the ipce main window
+      // already has one and this causes an ambiquous shortcut error.
+      if (action->toolTip() == "Save") {
+        action->setShortcut(QKeySequence());
+      }
+      // The active toolbar's actions are inside of a container that is a QWidgetAction.
+      // We want to skip adding this because we want to disable the active toolbar's
+      // actions separately to skip the combo boxes.
+      if (QString(action->metaObject()->className()) == "QWidgetAction") {
+        continue;
+      }
+      addAction(action);
+    }
+
+    // There was a problem with disabling/enabling the combo boxes. The only way to
+    // get this to work was to skip disabling the combo boxes. We also skip QWidgets
+    // because the combo boxes are contained inside of a QWidget.
+    foreach (QWidget *child, m_activeToolBar->findChildren<QWidget *>()) {
+      if (QString(child->metaObject()->className()).contains("ComboBox") ||
+          QString(child->metaObject()->className()).contains("Widget")) {
+        continue;
+      }
+      m_childWidgets.append(child);
+    }
+
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
+
     zoomTool->activate(true);
   }
 
+
   /**
-   * A slot function that is called when directory emits a siganl that an active
+   * Disables actions when the cursor leaves the view. Overriden method
+   * If a project item view menu or toolpad action menu is visible, i.e. clicked on,
+   * this causes a leave event. We want the actions to still be enabled when a
+   * menu is visible.
+   *
+   * @param event The leave event
+   */
+  void CubeDnView::leaveEvent(QEvent *event) {
+    if (m_optionsMenu->isVisible() || m_viewMenu->isVisible() || m_windowMenu->isVisible()) {
+      return;
+    }
+    // Find the toolpad actions (buttons) with menus and check if they are visible
+    foreach (QToolButton *button, findChildren<QToolButton *>()) {
+      if (button->menu() && button->menu()->isVisible()) {
+        return;
+      }
+    }
+    disableActions();
+  }
+
+
+  /**
+   * Disables toolbars and toolpad actions/widgets. Overriden method.
+   */
+  void CubeDnView::disableActions() {
+    foreach (QAction *action, actions()) {
+      action->setDisabled(true);
+    }
+    foreach (QWidget *widget, m_childWidgets) {
+      widget->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions/widgets. Overriden method.
+   */
+  void CubeDnView::enableActions() {
+    foreach (QAction *action, actions()) {
+      action->setEnabled(true);
+    }
+    foreach (QWidget *widget, m_childWidgets) {
+      widget->setEnabled(true);
+    }
+  }
+
+
+  /**
+   * A slot function that is called when directory emits a signal that an active
    * control network is set. It enables the control network editor tool in the
    * toolpad and loads the network.
+   *
+   * @param value The boolean that holds if a control network has been set.
    */
   void CubeDnView::enableControlNetTool(bool value) {
-    foreach (QAction * action, m_toolPad->actions()) {
+    foreach (QAction *action, m_toolPad->actions()) {
       if (action->objectName() == "ControlNetTool") {
         action->setEnabled(value);
         if (value) {
@@ -256,10 +341,17 @@ namespace Isis {
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
+    delete m_viewMenu;
+    delete m_optionsMenu;
+    delete m_windowMenu;
+
 
     m_permToolBar = 0;
     m_activeToolBar = 0;
     m_toolPad = 0;
+    m_viewMenu = 0;
+    m_optionsMenu = 0;
+    m_windowMenu = 0;
   }
 
 

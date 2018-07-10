@@ -20,7 +20,7 @@
  *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
+ *   http://www.usgs.gov/privacy.html
  */
 
 // This is needed for the QVariant macro
@@ -29,12 +29,24 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QMap>
+#include <QVariant>
 #include <QVector>
+#include <QVariant>
+
+
+// Boost includes
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
+
+#include "ControlMeasure.h"
+#include "ControlPoint.h"
 
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
 template< typename A, typename B > struct QPair;
 template< typename T > class QSet;
+
 class QMutex;
 class QString;
 
@@ -42,7 +54,6 @@ namespace Isis {
   class Camera;
   class ControlMeasure;
   class ControlPoint;
-  class ControlCubeGraphNode;
   class Distance;
   class Progress;
   class Pvl;
@@ -212,7 +223,29 @@ namespace Isis {
    *   @history 2017-01-19 Jesse Mapel - Added a method to get all of the valid measures in an
    *                           image. Previously, this had to be done throug the graph.
    *   @history 2018-01-26 Kristin Berry - Added pointAdded() function to eliminate redundant measure
-   *                           adds to the control network. 
+   *                           adds to the control network.
+   *   @history 2018-01-26 Kristin Berry - Removed unused methods and associated code:
+   *                           MinimumSpanningTree(), GetNodeConnections(), RandomBFS(), Shuffle(),
+   *                           CalcBWAndCE(), CubeGraphToString(), getGraphNode(). References #5434
+   *  @history 2018-01-26 Kristin Berry - Updated to use the boost graph library instead of our
+   *                           custom graph structure ControlCubeGraphNode.
+   *   @history 2018-04-05 Adam Goins - Added a check to the versionedReader targetRadii
+   *                           group to set radii values to those ingested from the versioner
+   *                           if they exist. Otherwise, we call SetTarget with the targetname.
+   *                           Fixes #5361.
+   *   @history 2018-06-06 Jesse Mapel - Added a method to get all adjacent images to ControlNet.
+   *                           Previously this functionality was only available through the
+   *                           ControlCubeGraphNode class. References #5434.
+   *   @history 2018-06-06 Jesse Mapel - Added a point ignored and un-ignored methods. This will
+   *                           prevent edge strengths getting incremented or decremented twice.
+   *                           References #5434.
+   *   @history 2018-06-15 Adam Goins & Jesse Mapel - Added the ModType enum, as well as a series
+   *                           of signals that are emitted whenever a change is made to a
+   *                           Control Point or any of it's measures, or to the network itself.
+   *                           These signals exist for the purpose of communication between the
+   *                           ControlNetVitals class, and the network that it is observing.
+   *                           Fixes #5435.
+
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -221,6 +254,12 @@ namespace Isis {
       friend class ControlPoint;
 
     public:
+
+      enum ModType {
+        Swapped,
+        GraphModified
+      };
+
       ControlNet();
       ControlNet(const ControlNet &other);
       ControlNet(const QString &filename, Progress *progress = 0);
@@ -240,19 +279,14 @@ namespace Isis {
       bool ContainsPoint(QString pointId) const;
 
       QList< QString > GetCubeSerials() const;
-      QList< ControlCubeGraphNode * > GetCubeGraphNodes();
+      QString GraphToString() const;
       QList< QList< QString > > GetSerialConnections() const;
-      QList< QList< ControlCubeGraphNode * > > GetNodeConnections() const;
-      QSet< ControlMeasure * > MinimumSpanningTree(
-          QList< ControlCubeGraphNode *> &island,
-          bool lessThan(const ControlMeasure *, const ControlMeasure *)) const;
       int getEdgeCount() const;
-      QString CubeGraphToString() const;
+      QList< QString > getAdjacentImages(QString serialNumber) const;
       QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
                                                   double min,double max);
-      void DeleteMeasuresWithId(QString serialNumber);
 
       void ComputeResiduals();
       void ComputeApriori();
@@ -261,9 +295,6 @@ namespace Isis {
       ControlPoint *GetPoint(QString pointId);
       const ControlPoint *GetPoint(int index) const;
       ControlPoint *GetPoint(int index);
-
-      const ControlCubeGraphNode *getGraphNode(QString serialNumber) const;
-      ControlCubeGraphNode *getGraphNode(QString serialNumber);
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
@@ -293,6 +324,7 @@ namespace Isis {
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();
 
+
       void SetCreatedDate(const QString &date);
       void SetDescription(const QString &newDescription);
       void SetImages(const QString &imageListFile);
@@ -319,25 +351,34 @@ namespace Isis {
 
     signals:
       void networkStructureModified();
+      void networkModified(ControlNet::ModType type);
+      void pointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
+      void measureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
+      void pointDeleted(ControlPoint *point);
+      void newPoint(ControlPoint *);
+      void newMeasure(ControlMeasure *);
+      void measureRemoved(ControlMeasure *);
+
+
 
     private:
       void nullify();
-      void ValidateSerialNumber(QString serialNumber) const;
+      bool ValidateSerialNumber(QString serialNumber) const;
       void measureAdded(ControlMeasure *measure);
-      void pointAdded(ControlPoint *point);
       void measureDeleted(ControlMeasure *measure);
       void measureIgnored(ControlMeasure *measure);
       void measureUnIgnored(ControlMeasure *measure);
+      void pointIgnored(ControlPoint *point);
+      void pointUnIgnored(ControlPoint *point);
       void UpdatePointReference(ControlPoint *point, QString oldId);
       void emitNetworkStructureModified();
-
+      void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType type, QVariant oldValue, QVariant newValue);
+      void emitPointModified(ControlPoint *point, ControlPoint::ModType type, QVariant oldValue, QVariant newValue);
+      void emitNewMeasure(ControlMeasure *measure);
+      void emitMeasureRemoved(ControlMeasure *measure);
+      void pointAdded(ControlPoint *point);
 
     private: // graphing functions
-      QList< ControlCubeGraphNode * > RandomBFS(QList <
-          ControlCubeGraphNode * > list) const;
-      void Shuffle(QList< ControlCubeGraphNode * > & list) const;
-      QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
-
       /**
        * @author 2012-04-13 Orrin Thomas
        *
@@ -362,79 +403,34 @@ namespace Isis {
           double(ControlMeasure::*m_accessor)() const;
       };
 
-
-      /**
-       * Encapsulation of a vertex in a minimum spanning tree.  Can be either a
-       * Control Point or a Graph Node.  Each vertex is connected to another by
-       * a measure.  A vertex without a parent vertex is considered a root node,
-       * or the base of its own tree.
-       *
-       * @author ????-??-?? Unknown
-       *
-       * @internal
-       */
-      class ControlVertex {
-        public:
-          //! Construct a vertex from a Graph Node
-          ControlVertex(ControlCubeGraphNode *node) {
-            m_node = node;
-            m_point = NULL;
-            m_parent = NULL;
-          }
-
-          //! Construct a vertex from a Control Point
-          ControlVertex(ControlPoint *point) {
-            m_point = point;
-            m_node = NULL;
-            m_parent = NULL;
-          }
-
-          //! Does not own any of its private data
-          ~ControlVertex() {}
-
-          //! Set the parent vertex, removing the root node status.
-          void setParent(ControlVertex *v) { m_parent = v; }
-
-          //! Get the root node, or greatest ancestor
-          ControlVertex * getRoot() {
-            ControlVertex *current = this;
-            while (current->getParent() != NULL)
-              current = current->getParent();
-            return current;
-          }
-
-          //! Get the parent node.  A root node has no parent.
-          ControlVertex * getParent() { return m_parent; }
-
-          //! Get the node representation of this vertex
-          ControlCubeGraphNode * getNode() { return m_node; }
-
-          //! Get the point representation of this vertex
-          ControlPoint * getPoint() { return m_point; }
-
-          //! Join two nodes by setting one root to be the other's parent
-          static void join(ControlVertex *v1, ControlVertex *v2) {
-            v1->getRoot()->setParent(v2->getRoot());
-          }
-
-        private:
-          //! The possibly non-existant graph node
-          ControlCubeGraphNode *m_node;
-
-          //! The possibly non-existant control point
-          ControlPoint *m_point;
-
-          //! The possibly non-existant parent vertex
-          ControlVertex *m_parent;
-      };
-
-
     private: // data
       //! hash ControlPoints by ControlPoint Id
       QHash< QString, ControlPoint * > * points;
 
-      //! hash ControlCubeGraphNodes by CubeSerialNumber
-      QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes;
+      // structs and typedefs for the boost graph
+      struct Image {
+        QString serial;
+        QHash< ControlPoint *, ControlMeasure * > measures;
+      };
+
+      struct Connection {
+        int strength = 0;
+      };
+
+      typedef boost::adjacency_list<boost::setS,
+                                    boost::listS,
+                                    boost::undirectedS,
+                                    Image,
+                                    Connection> Network;
+      typedef Network::vertex_descriptor ImageVertex;
+      typedef Network::edge_descriptor ImageConnection;
+      typedef std::map<ImageVertex, size_t> VertexIndexMap;
+      typedef boost::associative_property_map<VertexIndexMap> VertexIndexMapAdaptor;
+      typedef Network::out_edge_iterator ConnectionIterator;
+      typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator;
+
+      QHash<QString, ImageVertex> m_vertexMap; //!< The SN -> vertex hash for the boost graph
+      Network m_controlGraph; //!< The boost graph
       QStringList *pointIds;
       QMutex *m_mutex;
 
