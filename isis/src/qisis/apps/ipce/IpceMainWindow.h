@@ -159,6 +159,9 @@ namespace Isis {
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
+   *   @history 2018-07-05 Kaitlyn Lee - Added tilViews() and the menu option to tile all docked/undocked
+   *                           and tabbed/untabbed views.
+
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
