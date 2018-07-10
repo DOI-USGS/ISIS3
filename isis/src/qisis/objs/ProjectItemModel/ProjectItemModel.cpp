@@ -206,6 +206,7 @@ namespace Isis {
           }
         }
       }
+      return items;
     }
 
     //Query the selected items to see if they have children
