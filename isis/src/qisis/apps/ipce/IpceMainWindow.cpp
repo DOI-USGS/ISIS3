@@ -25,11 +25,13 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QMap>
 #include <QMapIterator>
 #include <QMdiArea>
 #include <QObject>
+#include <QRect>
 #include <QRegExp>
 #include <QStringList>
 #include <QtWidgets>
@@ -77,6 +79,17 @@ namespace Isis {
   IpceMainWindow::IpceMainWindow(QWidget *parent) :
       QMainWindow(parent) {
     m_maxThreadCount = -1;
+
+    //  Set the initialize size of the mainwindow to fullscreen so that created views do not
+    //  get squished.  Saved projects with view had the internal widgets squished because the
+    //  initial size of this mainwindow was small and it does not get restored to the saved project
+    //  size until after views are created.  For instance, the viewports within a CubeDnView were
+    //  restored to a small size based on the original mainwindow size.  If the internal state
+    //  of the views such as the viewport sizes, zooms, etc get serialized, this code will not be
+    //  needed.
+    QDesktopWidget deskTop;
+    QRect mainScreenSize = deskTop.availableGeometry(deskTop.primaryScreen());
+    resize(mainScreenSize.width(), mainScreenSize.height());
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
@@ -583,6 +596,9 @@ namespace Isis {
    *                           References #4358.
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the value "maximized" in the project settings
+   *                           so that a project remembers if it was in fullscreen when saved.
+   *                           Fixes #5175.
    */
   void IpceMainWindow::writeSettings(Project *project) {
 
@@ -619,6 +635,10 @@ namespace Isis {
    *                Fixes #5075.
    *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
    *                If that does not exist then we read from .Isis/ipce/ipce.config.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the call showNormal() so when a project is
+   *                not saved in fullscreen, the window will resize to the project's
+   *                window size. This also fixes the history/warning tabs being misplaced
+   *                when opening a project. Fixes #5175.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -637,9 +657,9 @@ namespace Isis {
       filePath = "$HOME/.Isis/" + appName + "/ipce.config";
       // If the $HOME/.Isis/ipce/ipce.config does not exist then we want ipce to show up in
       // in full screen. In other words the default geometry is full screen
-      // if (!FileName(filePath).fileExists()) {
+      if (!FileName(filePath).fileExists()) {
         isFullScreen = true;
-      // }
+      }
     }
 
     if (project->name() == "Project") {
@@ -652,25 +672,17 @@ namespace Isis {
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     if (!isFullScreen) {
-      qDebug()<<"GOT TO !isFullScreen";
+      // If a project was not in fullscreen when saved, restore the project's window size.
       if (!projectSettings.value("maximized").toBool()) {
         showNormal();
       }
       setGeometry(projectSettings.value("geometry").value<QRect>());
 
-      // Always load in fullscreen regardless of project
-      // if (isMaximized()) {
-      //     setGeometry(QApplication::desktop()->availableGeometry(this));
-      // }
-      // else {
-      //   setGeometry(projectSettings.value("geometry").value<QRect>());
-      // }
       if (!project->isTemporaryProject()) {
         restoreState(projectSettings.value("windowState").toByteArray());
       }
     }
     else {
-      qDebug()<<"GOT TO isFullScreen";
       this->showMaximized();
     }
 
