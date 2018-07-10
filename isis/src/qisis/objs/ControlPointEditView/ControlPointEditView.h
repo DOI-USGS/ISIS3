@@ -50,6 +50,8 @@ namespace Isis {
    *                           the whole CnetEditorView widget's layout, now we only
    *                           set the central widget's layout.
    *   @history 2018-06-13 Kaitlyn Lee - Removed toolbars, since they are not needed.
+   *   @history 2018-07-09 Tracie Sucharski -  Remove setSizePolicy and sizeHint method which is now
+   *                           taken care of in the parent class, AbstractProjectItemView.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
@@ -61,11 +63,6 @@ class ControlPointEditView : public AbstractProjectItemView {
     ~ControlPointEditView();
 
     ControlPointEditWidget *controlPointEditWidget();
-
-//  setEditPoint(ControlPoint *editPoint);
-//  createNewPoint(QString serialNumber, Latitude lat, Longitude lon);
-
-  QSize sizeHint() const;
 
   public slots:
 

@@ -62,6 +62,11 @@ namespace Isis {
    *                            view has its own toolbar, so having getters that return toolbar
    *                            actions to fill the toolbar of the IpceMainWindow are unnecessary.
    *                            Removed methods that returned menu and toolbar actions.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                            view can be re-created with the same objectName for restoring the
+   *                            project state. Qt's save/restoreState use the objectName. Remove
+   *                            sizeHint method which is now taken care of in the parent class,
+   *                            AbstractProjectItemView.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -75,8 +80,6 @@ class CnetEditorView : public AbstractProjectItemView {
 
     CnetEditorWidget *cnetEditorWidget();
     Control *control();
-
-    QSize sizeHint() const;
 
     void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;

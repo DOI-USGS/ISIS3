@@ -61,12 +61,6 @@ namespace Isis {
     layout->addWidget(m_controlPointEditWidget);
 
     setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
   }
 
 
@@ -86,15 +80,5 @@ namespace Isis {
    */
   ControlPointEditWidget *ControlPointEditView::controlPointEditWidget() {
     return m_controlPointEditWidget;
-  }
-
-
-  /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
-   */
-  QSize ControlPointEditView::sizeHint() const {
-    return QSize(800, 600);
   }
 }

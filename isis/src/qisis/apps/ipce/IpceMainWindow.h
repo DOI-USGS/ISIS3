@@ -182,6 +182,7 @@ namespace Isis {
       void tabAllViews();
 
       void raiseWarningTab();
+
       void cleanupViewDockList(QObject *obj);
     private:
       Q_DISABLE_COPY(IpceMainWindow);

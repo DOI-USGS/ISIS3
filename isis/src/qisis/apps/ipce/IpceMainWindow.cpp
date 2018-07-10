@@ -25,11 +25,13 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QMap>
 #include <QMapIterator>
 #include <QMdiArea>
 #include <QObject>
+#include <QRect>
 #include <QRegExp>
 #include <QStringList>
 #include <QtWidgets>
@@ -76,25 +78,39 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-//  QMdiArea *centralWidget = new QMdiArea;
-//  centralWidget->setActivationOrder(QMdiArea::StackingOrder);
 
-//  connect(centralWidget, SIGNAL( subWindowActivated(QMdiSubWindow *) ),
-//          this, SLOT( onSubWindowActivated(QMdiSubWindow *) ) );
-
+    //  Set the initialize size of the mainwindow to fullscreen so that created views do not
+    //  get squished.  Saved projects with view had the internal widgets squished because the
+    //  initial size of this mainwindow was small and it does not get restored to the saved project
+    //  size until after views are created.  For instance, the viewports within a CubeDnView were
+    //  restored to a small size based on the original mainwindow size.  If the internal state
+    //  of the views such as the viewport sizes, zooms, etc get serialized, this code will not be
+    //  needed.
+    QDesktopWidget deskTop;
+    QRect mainScreenSize = deskTop.availableGeometry(deskTop.primaryScreen());
+    resize(mainScreenSize.width(), mainScreenSize.height());
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
-    //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
     setDockNestingEnabled(true);
+
+    //  Set the splitter frames to a reasonable color/size for resizing the docks.
+    setStyleSheet("QMainWindow::separator {background: gray; width: 10; height: 10px;}");
 
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
+
+      // Currently this connection is only used by Directory when a new active is chosen & user
+      // chooses to discard any edits in the old active control which is in a CnetEditorWidget.
+      // The only view which will not be updated with the new control are any CnetEditorViews
+      // showing the old active control.  CnetEditorWidget classes do not have the ability to reload
+      // a control net, so the CnetEditor view displaying the old control is removed, then recreated.
       connect(m_directory, SIGNAL(viewClosed(QWidget *)),
               this, SLOT(removeView(QWidget *)));
+
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
@@ -119,9 +135,9 @@ namespace Isis {
     projectTreeView->setInternalModel( m_directory->model() );
     projectTreeView->treeView()->expandAll();
     projectTreeView->installEventFilter(this);
-    m_projectDock->setWidget(projectTreeView);
-    m_projectDock->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    //projectTreeView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
+    m_projectDock->setWidget(projectTreeView);
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
     m_warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
@@ -189,7 +205,7 @@ namespace Isis {
 
     QDockWidget *dock = new QDockWidget(newWidget->windowTitle(), this);
     dock->setWidget(newWidget);
-    dock->setObjectName(newWidget->windowTitle());
+    dock->setObjectName(newWidget->objectName());
     dock->setAttribute(Qt::WA_DeleteOnClose);
     dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
                       QDockWidget::DockWidgetFloatable);
@@ -200,7 +216,18 @@ namespace Isis {
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
     }
     else {
-      addDockWidget(area, dock, orientation);
+      if (m_viewDocks.count() == 0) {
+        splitDockWidget(m_projectDock, dock, Qt::Horizontal); 
+      }
+      else {
+        tabifyDockWidget(m_viewDocks.last(), dock);
+        dock->show();
+        dock->raise();
+        //  Keeps expanding IpceMainWindow to fit new dock
+        //  Below causes problems if the last dock has been tabbed, then a new view is created. All
+        // views except for first disappear.
+        //splitDockWidget(m_viewDocks.last(), dock, Qt::Horizontal);
+      }
     }
 
     // When dock widget is destroyed, make sure the view it holds is also destroyed
@@ -214,6 +241,7 @@ namespace Isis {
 
 
   void IpceMainWindow::cleanupViewDockList(QObject *obj) {
+
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
     if (dock) {
       m_viewDocks.removeAll(dock);
@@ -228,6 +256,7 @@ namespace Isis {
    * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
+
     view->close();
     delete view;
   }

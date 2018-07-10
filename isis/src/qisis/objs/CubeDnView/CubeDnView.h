@@ -93,6 +93,11 @@ namespace Isis {
    *                           Removed methods that returned menu and toolbar actions.
    *                           Removed connections that connected the project and CubeDnView and called
    *                           enableControlNetTool() because Directory now does this.
+   *   @history 2018-07-05 Tracie Sucharski - Moved sizeHint and sizePolicy to
+   *                           AbstractProjectItemView. References #5433.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                           view can be re-created with the same objectName for restoring the
+   *                           project state. Qt's save/restoreState use the objectName.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -102,7 +107,7 @@ namespace Isis {
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
 
-      QSize sizeHint() const;
+      //QSize sizeHint() const;
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 

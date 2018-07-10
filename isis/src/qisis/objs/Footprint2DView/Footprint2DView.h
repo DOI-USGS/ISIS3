@@ -86,7 +86,11 @@ namespace Isis {
    *                           the Control Net Tool will be disabled.
    *                           Added enableControlNetTool(bool) so when an active control net is set,
    *                           the tool becomes enabled.
-
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                           view can be re-created with the same objectName for restoring the
+   *                           project state. Qt's save/restoreState use the objectName. Remove
+   *                            sizeHint method which is now taken care of in the parent class,
+   *                            AbstractProjectItemView.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -97,8 +101,6 @@ namespace Isis {
       ~Footprint2DView();
 
       MosaicSceneWidget *mosaicSceneWidget();
-
-      QSize sizeHint() const;
 
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;

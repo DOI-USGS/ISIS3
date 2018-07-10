@@ -29,6 +29,7 @@
 #include <QDropEvent>
 #include <QList>
 #include <QMainWindow>
+#include <QSizePolicy>
 #include <QWidget>
 
 #include "ProjectItem.h"
@@ -46,10 +47,28 @@ namespace Isis {
 
     setWindowFlags(Qt::Widget);
 
-
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
 
     m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
+  }
+
+
+  /**
+   * Returns the suggested size
+   *
+   * @return @b QSize The size hint
+   */
+  QSize AbstractProjectItemView::sizeHint() const {
+
+    //  Size hint is make ridiculously large as a hack to have the views fill the available dock
+    //  space.  SizePolicy alone did not work.
+    // TODO:  There should be a better way to do this.
+    //return QSize(800, 600);
+    return QSize(3000, 1500);
   }
 
 
@@ -158,7 +177,7 @@ namespace Isis {
 
   void AbstractProjectItemView::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
-    
+    //qDebug()<<objectName()<<"  new size = "<<geometry();
     emit windowChangeEvent(false);
   }
 

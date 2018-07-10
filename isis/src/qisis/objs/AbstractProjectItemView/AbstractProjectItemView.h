@@ -68,9 +68,13 @@ namespace Isis {
    *   @history 2018-05-30 Tracie Sucharski - Added the WindowFlag to set this as a Widget.
    *   @history 2018-06-15 Kaitlyn Lee - Removed methods returing toolbar and menu actions because each
    *                            individual has its own toolbar. These methods are not needed anymore.
-   *   @History 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
+   *   @history 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
    *                           windowChangeEvent signal to allow project to recognize a new save
    *                           state. Fixes #5114
+   *   @history 2018-07-05 Tracie Sucharski - Added SizePolicy and a large sizeHint.  The large
+   *                           sizeHint() is because using sizePolicy with a reasonable sizeHint did
+   *                           not work to have views fill the available space in the dock area.
+   *                           References #5433.
    */
   class AbstractProjectItemView : public QMainWindow {
 
@@ -78,6 +82,8 @@ namespace Isis {
 
     public:
       AbstractProjectItemView(QWidget *parent=0);
+
+      virtual QSize sizeHint() const;
 
       virtual void setModel(ProjectItemModel *model);
       virtual ProjectItemModel *model();
