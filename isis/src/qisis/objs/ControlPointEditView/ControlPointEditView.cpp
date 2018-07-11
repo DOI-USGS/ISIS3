@@ -29,7 +29,6 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QToolBar>
-#include <QVBoxLayout>
 #include <QWidgetAction>
 
 #include "ControlNet.h"
@@ -53,20 +52,20 @@ namespace Isis {
     //       net, while the editors might be using a different net.  Will Directory keep track?
     //
 
-    QWidget *centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
-    QVBoxLayout *layout = new QVBoxLayout;
-    centralWidget->setLayout(layout);
-
-    layout->addWidget(m_controlPointEditWidget);
+    setCentralWidget(m_controlPointEditWidget);
 
     setAcceptDrops(true);
+
+    // Store the buttons (actions) for easy enable/disable.
+    m_buttons = m_controlPointEditWidget->findChildren<QPushButton *>();
+
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
 
     QSizePolicy policy = sizePolicy();
     policy.setHorizontalPolicy(QSizePolicy::Expanding);
     policy.setVerticalPolicy(QSizePolicy::Expanding);
     setSizePolicy(policy);
-
   }
 
 
@@ -96,5 +95,25 @@ namespace Isis {
    */
   QSize ControlPointEditView::sizeHint() const {
     return QSize(800, 600);
+  }
+
+
+  /**
+   * Disables buttons/actions. Overriden method.
+   */
+  void ControlPointEditView::disableActions() {
+    foreach (QPushButton *button, m_buttons) {
+      button->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables buttons/actions. Overriden method.
+   */
+  void ControlPointEditView::enableActions() {
+    foreach (QPushButton *button, m_buttons) {
+      button->setEnabled(true);
+    }
   }
 }

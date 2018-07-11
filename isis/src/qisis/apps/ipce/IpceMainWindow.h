@@ -190,6 +190,7 @@ namespace Isis {
       void enterWhatsThisMode();
 
       void tabViews();
+      void tileViews();
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
