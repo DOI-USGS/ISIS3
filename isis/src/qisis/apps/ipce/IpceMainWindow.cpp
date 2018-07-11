@@ -80,7 +80,7 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
-    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
     //setDockOptions(GroupedDragging | AllowTabbedDocks);
     //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     //centralWidget->hide();
@@ -590,6 +590,9 @@ namespace Isis {
    *                           References #4358.
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the value "maximized" in the project settings
+   *                           so that a project remembers if it was in fullscreen when saved.
+   *                           Fixes #5175.
    */
   void IpceMainWindow::writeSettings(Project *project) {
 
@@ -603,6 +606,7 @@ namespace Isis {
 
     projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
+    projectSettings.setValue("maximized", isMaximized());
     projectSettings.sync();
   }
 
@@ -625,6 +629,10 @@ namespace Isis {
    *                Fixes #5075.
    *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
    *                If that does not exist then we read from .Isis/ipce/ipce.config.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the call showNormal() so when a project is
+   *                not saved in fullscreen, the window will resize to the project's
+   *                window size. This also fixes the history/warning tabs being misplaced
+   *                when opening a project. Fixes #5175.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -658,7 +666,12 @@ namespace Isis {
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     if (!isFullScreen) {
+      // If a project was not in fullscreen when saved, restore the project's window size.
+      if (!projectSettings.value("maximized").toBool()) {
+        showNormal();
+      }
       setGeometry(projectSettings.value("geometry").value<QRect>());
+
       if (!project->isTemporaryProject()) {
         restoreState(projectSettings.value("windowState").toByteArray());
       }
