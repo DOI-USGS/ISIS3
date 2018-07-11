@@ -531,10 +531,12 @@ namespace Isis {
 
           if (cube) {
 
-            Camera *camera = cube->camera();
-            project()->addCamera(camera);
-            Target *target = camera->target();
-            project()->addTarget(target);
+            // Commenting these out as a quick and dirty fix to segfault related to threading on
+            // astrovm4 until it can be handled properly. -Summer
+            //Camera *camera = cube->camera();
+            //project()->addCamera(camera);
+            //Target *target = camera->target();
+            //project()->addTarget(target);
 
             // Create a new image from the result in the thread spawned in WorkOrder::redo().
             Image *newImage = new Image(cube);

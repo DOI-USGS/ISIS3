@@ -167,7 +167,6 @@ namespace Isis {
       QString templateFileName() {
         return m_templateFileName;
       };
-      bool setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
 
     signals:
@@ -175,9 +174,11 @@ namespace Isis {
       void updateRightView(double sample, double line);
       void measureSaved();
       void newControlNetwork(ControlNet *);
+      void setTemplateFailed(QString);
       void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
+      bool setTemplateFile(QString);
       void setPoint(ControlPoint *editPoint, SerialNumberList *snList);
       void setLeftMeasure(ControlMeasure *leftMeasure,
                           Cube *leftCube, QString pointId);

@@ -20,7 +20,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "ImportTemplateWorkOrder.h"
+#include "ImportMapTemplateWorkOrder.h"
 
 #include <QFile>
 #include <QFileDialog>
@@ -35,29 +35,29 @@
 
 namespace Isis {
   /**
-   * Creates a work order to import a template.
+   * Creates a work order to import map templates.
    *
    * @param *project Pointer to the project this work order belongs to
    */
-  ImportTemplateWorkOrder::ImportTemplateWorkOrder(Project *project) :
+  ImportMapTemplateWorkOrder::ImportMapTemplateWorkOrder(Project *project) :
       WorkOrder(project) {
 
     m_isUndoable = true;
     m_list = NULL;
 
-    QAction::setText(tr("Import Template"));
-    QUndoCommand::setText(tr("Import Template"));
+    QAction::setText(tr("Import Map Templates..."));
+    QUndoCommand::setText(tr("Import Map Templates..."));
     setModifiesDiskState(true);
 
   }
 
 
   /**
-   * Creates a copy of the other ImportTemplateWorkOrder
+   * Creates a copy of the other ImportMapTemplateWorkOrder
    *
-   * @param &other ImportTemplateWorkOrder to copy the state from
+   * @param &other ImportMapTemplateWorkOrder to copy the state from
    */
-  ImportTemplateWorkOrder::ImportTemplateWorkOrder(const ImportTemplateWorkOrder &other) :
+  ImportMapTemplateWorkOrder::ImportMapTemplateWorkOrder(const ImportMapTemplateWorkOrder &other) :
       WorkOrder(other) {
   }
 
@@ -65,36 +65,36 @@ namespace Isis {
   /**
    * Destructor
    */
-  ImportTemplateWorkOrder::~ImportTemplateWorkOrder() {
+  ImportMapTemplateWorkOrder::~ImportMapTemplateWorkOrder() {
     m_list = NULL;
   }
 
 
   /**
-   * This method clones the current ImportTemplateWorkOrder and returns it.
+   * This method clones the current ImportMapTemplateWorkOrder and returns it.
    *
-   * @return ImportTemplateWorkOrder Clone
+   * @return ImportMapTemplateWorkOrder Clone
    */
-  ImportTemplateWorkOrder *ImportTemplateWorkOrder::clone() const {
-    return new ImportTemplateWorkOrder(*this);
+  ImportMapTemplateWorkOrder *ImportMapTemplateWorkOrder::clone() const {
+    return new ImportMapTemplateWorkOrder(*this);
   }
 
 
   /**
    * This method returns true if the user clicked on a project tree node with the text
-   * "Templates".
+   * "Maps".
    * This is used by Directory::supportedActions(DataType data) to determine what actions are
    * appended to context menus.
    *
    * @param item The ProjectItem that was clicked
    *
-   * @return bool True if the user clicked on a project tree node named "Templates"
+   * @return bool True if the user clicked on a project tree node named "Maps"
    */
-  bool ImportTemplateWorkOrder::isExecutable(ProjectItem *item) {
+  bool ImportMapTemplateWorkOrder::isExecutable(ProjectItem *item) {
     QString itemType = item->text();
     setInternalData(QStringList(itemType));
 
-    return (itemType == "Maps" || itemType == "Registrations" || itemType == "Templates");
+    return (itemType == "Maps");
   }
 
 
@@ -107,47 +107,25 @@ namespace Isis {
    *
    * @return bool Returns true if we have at least one template file name.
    */
-  bool ImportTemplateWorkOrder::setupExecution() {
+  bool ImportMapTemplateWorkOrder::setupExecution() {
+
     WorkOrder::setupExecution();
 
-    QString itemType;
-    QString filterText =
-        "Please select a file type;; Maps (*.def *.map *.pvl);; Registrations (*.def *.pvl)";
-
-    // If clicked "File"->"Import"->"Import Templates"
-    if (internalData().isEmpty()) {
-      itemType = "Templates";
-    }
-    // If clicked "Import Templates" from under "Maps" or "Registrations" ProjectItems rightclicks
-    else {
-      itemType = internalData().at(0);
-
-      if (itemType == "Maps") { filterText = "Maps (*.def *.map *.pvl)"; }
-      else if (itemType == "Registrations") { filterText = "Registrations (*.def *.pvl)"; }
-
-      internalData().clear();
-    }
-
-    QString selectedFilter;
     QStringList templateFileNames;
 
     templateFileNames = QFileDialog::getOpenFileNames(
         qobject_cast<QWidget *>(parent()),
-        "Import " + itemType,
+        "Import Map Templates",
         QString(),
-        filterText,
-        &selectedFilter);
+        "Maps (*.map);; All Files (*)");
 
-    if (!templateFileNames.isEmpty() && !selectedFilter.isEmpty()) {
+    if (!templateFileNames.isEmpty()) {
       QUndoCommand::setText(tr("Import %1 Template(s)").arg(templateFileNames.count()));
     }
     else {
       return false;
     }
 
-    // The user must choose a filter to import any file. The type is saved in m_fileType
-    // Currently, the only options for this will be "maps" and "registrations"
-    m_fileType = selectedFilter.remove(QRegularExpression(" \\(.*\\)")).toLower();
     setInternalData(templateFileNames);
 
     return true;
@@ -157,26 +135,28 @@ namespace Isis {
   /**
    * @brief Imports the templates
    *
-   * This method copies the template files into the appropriate directory according to the
-   * chosen filter from setupExecution's QFileDialog. If the file already exists in the chosen
-   * directory, it will not be copied over.
+   * This method copies the template files into the appropriate directory. If the file already 
+   * exists in the chosen directory, it will not be copied over.
    */
-  void ImportTemplateWorkOrder::execute() {
-    QDir templateFolder = project()->addTemplateFolder(m_fileType + "/import");
+  void ImportMapTemplateWorkOrder::execute() {
+    QDir templateFolder = project()->addTemplateFolder("maps/import");
     QStringList templateFileNames = internalData();
 
-    m_list = new TemplateList(templateFolder.dirName(), m_fileType, m_fileType + "/" +templateFolder.dirName() );
+    m_list = new TemplateList(templateFolder.dirName(), 
+                              "maps", 
+                              "maps/" + templateFolder.dirName() );
 
     foreach (FileName filename, templateFileNames) {
       QFile::copy(filename.expanded(), templateFolder.path() + "/" + filename.name());
-      m_list->append(new Template(templateFolder.path() + "/" + filename.name(), m_fileType, templateFolder.dirName()));
+      m_list->append(new Template(templateFolder.path() + "/" + filename.name(), 
+                                  "maps", 
+                                  templateFolder.dirName()));
     }
 
     if (!m_list->isEmpty()) {
-     project()->addTemplates(m_list);
-     project()->setClean(false);
+      project()->addTemplates(m_list);
+      project()->setClean(false);
     }
-
 
   }
 
@@ -187,7 +167,7 @@ namespace Isis {
    * This method deletes the templates from both the directory they were copied to
    * and the ProjectItemModel
    */
-  void ImportTemplateWorkOrder::undoExecution() {
+  void ImportMapTemplateWorkOrder::undoExecution() {
     if (m_list && project()->templates().size() > 0) {
       m_list->deleteFromDisk( project() );
       ProjectItem *currentItem =

@@ -387,6 +387,10 @@ namespace Isis {
     connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
     m_viewMenuActions.append(tabViewsAction);
 
+    QAction *tileViewsAction = new QAction("Tile Views", this);
+    connect( tileViewsAction, SIGNAL(triggered()), this, SLOT(tileViews()) );
+    m_viewMenuActions.append(tileViewsAction);
+
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
 
@@ -617,6 +621,9 @@ namespace Isis {
    *                           References #4358.
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the value "maximized" in the project settings
+   *                           so that a project remembers if it was in fullscreen when saved.
+   *                           Fixes #5175.
    */
   void IpceMainWindow::writeSettings(Project *project) {
 
@@ -630,6 +637,7 @@ namespace Isis {
 
     projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
+    projectSettings.setValue("maximized", isMaximized());
     projectSettings.sync();
   }
 
@@ -652,6 +660,10 @@ namespace Isis {
    *                Fixes #5075.
    *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
    *                If that does not exist then we read from .Isis/ipce/ipce.config.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the call showNormal() so when a project is
+   *                not saved in fullscreen, the window will resize to the project's
+   *                window size. This also fixes the history/warning tabs being misplaced
+   *                when opening a project. Fixes #5175.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -685,7 +697,12 @@ namespace Isis {
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     if (!isFullScreen) {
+      // If a project was not in fullscreen when saved, restore the project's window size.
+      if (!projectSettings.value("maximized").toBool()) {
+        showNormal();
+      }
       setGeometry(projectSettings.value("geometry").value<QRect>());
+
       if (!project->isTemporaryProject()) {
         restoreState(projectSettings.value("windowState").toByteArray());
       }
@@ -754,6 +771,9 @@ namespace Isis {
    */
   void IpceMainWindow::closeEvent(QCloseEvent *event) {
 
+    foreach(TemplateEditorWidget *templateEditor, m_directory->templateEditorViews()) {
+      templateEditor->saveOption();
+    }
     // The active control is checked here for modification because this was the simplest solution
     // vs changing the project clean state every time the control is modified or saved.
     if (!m_directory->project()->isClean() || (m_directory->project()->activeControl() &&
@@ -843,6 +863,28 @@ namespace Isis {
         continue;
       }
       tabifyDockWidget(firstView, currentView);
+    }
+  }
+
+
+  /**
+   * Tile all open attached/detached views
+   */
+  void IpceMainWindow::tileViews() {
+    // splitDockWidget() takes two widgets and tiles them, so an easy way to do
+    // this is to grab the first view and tile the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
+
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tiled. If it is attached,
+      // this will have no affect. We have to call addDockWidget() to untab any views.
+      currentView->setFloating(false);
+      addDockWidget(Qt::LeftDockWidgetArea, currentView, Qt::Horizontal);
+
+      if (currentView == firstView) {
+        continue;
+      }
+      splitDockWidget(firstView, currentView, Qt::Horizontal);
     }
   }
 
