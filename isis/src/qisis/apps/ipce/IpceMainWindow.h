@@ -162,7 +162,7 @@ namespace Isis {
    *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
    *                           project was in fullscreen or not when saved. If not, we call showNormal()
    *                           to restore the poject's window size. This also fixes the warning/history tabs
-   *                           being misplaced when opening a project. Fixes #5175.                     
+   *                           being misplaced when opening a project. Fixes #5175.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -190,6 +190,7 @@ namespace Isis {
       void enterWhatsThisMode();
 
       void tabViews();
+      void tileViews();
 
       void raiseWarningTab();
       void cleanupViewDockList(QObject *obj);
