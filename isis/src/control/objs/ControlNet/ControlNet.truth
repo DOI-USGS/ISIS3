@@ -88,11 +88,9 @@ Set target/radii directly. Invalid radii.
 
 Set target/radii directly. Valid radii.
         TargetName = SomethingStrange
-        TargetRadii = (3.14159, 1.5708, 2.71828)
 
 Set target/radii using empty PVL.
         TargetName = 
-        TargetRadii = (-1.79769e+308, -1.79769e+308, -1.79769e+308)
 
 Set target/radii using PVL with no PolarRadius.
 Group = Mapping
@@ -101,7 +99,6 @@ Group = Mapping
 End_Group
 End
         TargetName = Mars
-        TargetRadii = (3.39619e+06, 3.39619e+06, 3.3762e+06)
 
 Set target/radii using PVL containing both radii.
 Group = Mapping
@@ -111,15 +108,11 @@ Group = Mapping
 End_Group
 End
         TargetName = Mars
-        TargetRadii = (6, 6, 1)
 
 Set empty target.
-        TargetName = 
-        TargetRadii = (-1.79769e+308, -1.79769e+308, -1.79769e+308)
 
 Set Mars target.
         TargetName = Mars
-        TargetRadii = (3.39619e+06, 3.39619e+06, 3.3762e+06)
 
 Test adding control points with identical id numbers ...
 **PROGRAMMER ERROR** ControlPoint must have unique Id.
@@ -147,7 +140,6 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
-  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -170,7 +162,7 @@ Object = ControlNetwork
     # AprioriRadius = 999.99999984142 <meters>
     AprioriZ                 = 529.919264 <meters>
 
-    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 124939.57715415 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
+    # AprioriLatitudeSigma = 28.65696494252 <meters>  AprioriLongitudeSigma = 26.457513107566 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
     AprioriCovarianceMatrix  = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
     LatitudeConstrained      = True
     LongitudeConstrained     = True
@@ -185,7 +177,7 @@ Object = ControlNetwork
     # AdjustedRadius = 999.99999984142 <meters>
     AdjustedZ                = 529.919264 <meters>
 
-    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 124939.57715415 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
+    # AdjustedLatitudeSigma = 28.65696494252 <meters>  AdjustedLongitudeSigma = 26.457513107566 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
     AdjustedCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
 
     Group = ControlMeasure

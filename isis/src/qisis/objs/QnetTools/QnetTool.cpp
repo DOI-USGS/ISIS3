@@ -1008,7 +1008,6 @@ namespace Isis {
       //  Read apriori surface point if it exists so that point is
       //  replaced, but sigmas are retained.  Save sigmas because the
       //  SurfacePoint class will change them if the coordinates change.
-      vector<Distance> targetRadii = m_controlNet->GetTargetRadii();
       if (m_editPoint->HasAprioriCoordinates()) {
         SurfacePoint aprioriPt = m_editPoint->GetAprioriSurfacePoint();
         Distance latSigma = aprioriPt.GetLatSigmaDistance();
@@ -2645,8 +2644,6 @@ namespace Isis {
     m_pointAprioriRadius->setText(s);
 
     if (aprioriPoint.Valid()) {
-      vector<Distance> targRadii = m_controlNet->GetTargetRadii();
-
       if (aprioriPoint.GetLatSigmaDistance().meters() == Null) {
         s = "Apriori Latitude Sigma:  Null";
       }
