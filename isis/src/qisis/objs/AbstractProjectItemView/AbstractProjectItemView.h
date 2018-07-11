@@ -78,6 +78,9 @@ namespace Isis {
    *                           sizeHint() is because using sizePolicy with a reasonable sizeHint did
    *                           not work to have views fill the available space in the dock area.
    *                           References #5433.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed the sizeHint to be calculated based on the deskTop size,
+   *                           instead of being hard-coded. The percentages chosen allow for 2 CubeDnViews
+   *                           to be opened at once, since CubeDnView has an internal size policy. References #5433
    */
   class AbstractProjectItemView : public QMainWindow {
 

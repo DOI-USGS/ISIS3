@@ -80,17 +80,6 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-    //  Set the initialize size of the mainwindow to fullscreen so that created views do not
-    //  get squished.  Saved projects with view had the internal widgets squished because the
-    //  initial size of this mainwindow was small and it does not get restored to the saved project
-    //  size until after views are created.  For instance, the viewports within a CubeDnView were
-    //  restored to a small size based on the original mainwindow size.  If the internal state
-    //  of the views such as the viewport sizes, zooms, etc get serialized, this code will not be
-    //  needed.
-    QDesktopWidget deskTop;
-    QRect mainScreenSize = deskTop.availableGeometry(deskTop.primaryScreen());
-    resize(mainScreenSize.width(), mainScreenSize.height());
-
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
@@ -99,7 +88,7 @@ namespace Isis {
     setDockNestingEnabled(true);
 
     //  Set the splitter frames to a reasonable color/size for resizing the docks.
-    setStyleSheet("QMainWindow::separator {background: gray; width: 10; height: 10px;}");
+    setStyleSheet("QMainWindow::separator {background: black; width: 3; height: 3px;}");
 
     try {
       m_directory = new Directory(this);
@@ -529,7 +518,12 @@ namespace Isis {
     QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(),
         QSettings::NativeFormat);
 
-    if (project->isTemporaryProject()) {
+    // If no config file exists and a user immediately opens a project,
+    // the project's geometry will be saved as a default for when ipce is
+    // opened again. Previously, the ipce's default size was small,
+    // until a user opened ipce (but not a project) and resized to how they
+    // wanted it to be sized, then closed ipce.
+    if (project->isTemporaryProject() || !globalSettings.contains("geometry")) {
       globalSettings.setValue("geometry", QVariant(geometry()));
     }
 

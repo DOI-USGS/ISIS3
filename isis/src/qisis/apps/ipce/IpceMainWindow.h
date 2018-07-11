@@ -166,7 +166,14 @@ namespace Isis {
    *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
    *                           project was in fullscreen or not when saved. If not, we call showNormal()
    *                           to restore the poject's window size. This also fixes the warning/history tabs
-   *                           being misplaced when opening a project. Fixes #5175.                     
+   *                           being misplaced when opening a project. Fixes #5175.
+   *   @history 2018-07-12 Kaitlyn Lee - Removed code that makes the window fullscreen in memory, since this
+   *                           was causing a project's window size to not be restored when opening from the
+   *                           command line. Decreased the size and changed the color of the splitter.
+   *                           In writeGlobalSettings(), check to see if the geometry value does not exist
+   *                           in the config file. This allows the geometry to be saved if the config file
+   *                           does not exist and a user opens a project. Before, it would not save the
+   *                           geometry because the opened project was not temporary. References #5433
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
