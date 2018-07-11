@@ -53,7 +53,7 @@ namespace Isis {
     setCentralWidget(m_treeView);
 
     //This works so that it cannot be shrunk, only grown
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
 
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
