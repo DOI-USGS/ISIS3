@@ -25,13 +25,11 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QMap>
 #include <QMapIterator>
 #include <QMdiArea>
 #include <QObject>
-#include <QRect>
 #include <QRegExp>
 #include <QStringList>
 #include <QtWidgets>
@@ -79,17 +77,6 @@ namespace Isis {
   IpceMainWindow::IpceMainWindow(QWidget *parent) :
       QMainWindow(parent) {
     m_maxThreadCount = -1;
-
-    //  Set the initialize size of the mainwindow to fullscreen so that created views do not
-    //  get squished.  Saved projects with view had the internal widgets squished because the
-    //  initial size of this mainwindow was small and it does not get restored to the saved project
-    //  size until after views are created.  For instance, the viewports within a CubeDnView were
-    //  restored to a small size based on the original mainwindow size.  If the internal state
-    //  of the views such as the viewport sizes, zooms, etc get serialized, this code will not be
-    //  needed.
-    QDesktopWidget deskTop;
-    QRect mainScreenSize = deskTop.availableGeometry(deskTop.primaryScreen());
-    resize(mainScreenSize.width(), mainScreenSize.height());
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);

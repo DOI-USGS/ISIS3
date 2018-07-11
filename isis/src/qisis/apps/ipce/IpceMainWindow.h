@@ -152,13 +152,17 @@ namespace Isis {
    *                           views does not always work with this enabled. With this option enabled, the
    *                           type of a view will randomly change and setting its type has no effect.
    *                           Use windowType() to get the type. Also added the toolbar title in the
-   *                           permanent toolbar constructor. 
+   *                           permanent toolbar constructor.
    *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
    *                           hold.  Extra destroy slots were causing double deletion of memory.
    *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
+   *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
+   *                           project was in fullscreen or not when saved. If not, we call showNormal()
+   *                           to restore the poject's window size. This also fixes the warning/history tabs
+   *                           being misplaced when opening a project. Fixes #5175.                     
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
