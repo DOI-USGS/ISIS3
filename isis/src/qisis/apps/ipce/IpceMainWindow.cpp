@@ -225,8 +225,11 @@ namespace Isis {
    * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-    view->close();
+    QDockWidget *parentDock = qobject_cast<QDockWidget *>(view->parent());
+    removeDockWidget(parentDock);
+    m_viewDocks.removeAll(parentDock);
     delete view;
+    delete parentDock;
   }
 
 
@@ -737,6 +740,9 @@ namespace Isis {
    */
   void IpceMainWindow::closeEvent(QCloseEvent *event) {
 
+    foreach(TemplateEditorWidget *templateEditor, m_directory->templateEditorViews()) {
+      templateEditor->saveOption();
+    }
     // The active control is checked here for modification because this was the simplest solution
     // vs changing the project clean state every time the control is modified or saved.
     if (!m_directory->project()->isClean() || (m_directory->project()->activeControl() &&
