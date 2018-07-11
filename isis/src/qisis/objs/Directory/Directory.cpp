@@ -650,7 +650,7 @@ namespace Isis {
    * @param Control to edit.
    * @return @b (CnetEditorView *) The view to add to the window.
    */
-  CnetEditorView *Directory::addCnetEditorView(Control *control) {
+  CnetEditorView *Directory::addCnetEditorView(Control *control, QString objectName) {
 
     QString title = tr("Cnet Editor View %1").arg( control->displayProperties()->displayName() );
     FileName configFile("$HOME/.Isis/" + QApplication::applicationName() + "/" + title + ".config");
@@ -688,7 +688,14 @@ namespace Isis {
     m_controlMap.insertMulti(control, result);
 
     result->setWindowTitle(title);
-    result->setObjectName(title);
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     emit newWidgetAvailable(result);
 
@@ -700,8 +707,8 @@ namespace Isis {
    * @brief Add the qview workspace to the window.
    * @return @b (CubeDnView*) The work space to display.
    */
-  CubeDnView *Directory::addCubeDnView() {
-    CubeDnView *result = new CubeDnView(this);
+  CubeDnView *Directory::addCubeDnView(QString objectName) {
+    CubeDnView *result = new CubeDnView(this, qobject_cast<QMainWindow *>(parent()));
     result->setModel(m_projectItemModel);
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
@@ -710,8 +717,16 @@ namespace Isis {
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
-    result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
+    //  Unique objectNames are needed for the save/restoreState
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     emit newWidgetAvailable(result);
 
@@ -741,13 +756,22 @@ namespace Isis {
    * @brief Add the qmos view widget to the window.
    * @return @b (Footprint2DView*) A pointer to the Footprint2DView to display.
    */
-  Footprint2DView *Directory::addFootprint2DView() {
+  Footprint2DView *Directory::addFootprint2DView(QString objectName) {
     Footprint2DView *result = new Footprint2DView(this);
 
     //  Set source model on Proxy
     result->setModel(m_projectItemModel);
     m_footprint2DViewWidgets.append(result);
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
+    //  Unique objectNames are needed for the save/restoreState
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
@@ -809,6 +833,7 @@ namespace Isis {
     }
     return controlHealthMonitorView();
   }
+
 
   ControlPointEditView *Directory::addControlPointEditView() {
 
@@ -903,9 +928,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
              
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_matrixViewWidgets.append(result);
 
     result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
@@ -927,9 +949,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
              
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_targetInfoWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg(target->displayProperties()->displayName() ) );
@@ -951,9 +970,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
              
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_templateEditorWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg( FileName(currentTemplate->fileName()).name() ) );
@@ -975,9 +991,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupSensorInfoWidgets(QObject *) ) );
 
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_sensorInfoWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg(camera->displayProperties()->displayName() ) );
@@ -994,19 +1007,24 @@ namespace Isis {
    * @return @b (ImageFileListWidget *) A pointer to the widget to add to the window.
    */
 
-  ImageFileListWidget *Directory::addImageFileListView() {
+  ImageFileListWidget *Directory::addImageFileListView(QString objectName) {
     ImageFileListWidget *result = new ImageFileListWidget(this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
              
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_fileListWidgets.append(result);
 
     result->setWindowTitle( tr("File List %1").arg( m_fileListWidgets.count() ) );
-    result->setObjectName( result->windowTitle() );
+    //  Unique objectNames are needed for the save/restoreState
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     return result;
   }
@@ -1019,6 +1037,8 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
+    result->setWindowTitle( tr("Project"));
+    result->setObjectName( result->windowTitle() );
 
     //  The model emits this signal when the user double-clicks on the project name, the parent
     //  node located on the ProjectTreeView.
@@ -1552,20 +1572,24 @@ namespace Isis {
   bool Directory::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-
     if (result) {
+      QString viewObjectName;
       if (localName == "footprint2DView") {
-        m_directory->addFootprint2DView()->load(reader());
+        viewObjectName = atts.value("objectName");
+        m_directory->addFootprint2DView(viewObjectName)->load(reader());
       }
       else if (localName == "imageFileList") {
-        m_directory->addImageFileListView()->load(reader());
+        viewObjectName = atts.value("objectName");
+        m_directory->addImageFileListView(viewObjectName)->load(reader());
       }
       else if (localName == "cubeDnView") {
-        m_directory->addCubeDnView()->load(reader(), m_directory->project());
+        viewObjectName = atts.value("objectName");
+        m_directory->addCubeDnView(viewObjectName)->load(reader(), m_directory->project());
       }
-      else if (localName == "control") {
+      else if (localName == "cnetEditorView") {
+        viewObjectName = atts.value("objectName");
         QString id = atts.value("id");
-        m_directory->addCnetEditorView(m_directory->project()->control(id));
+        m_directory->addCnetEditorView(m_directory->project()->control(id), viewObjectName);
       }
     }
 

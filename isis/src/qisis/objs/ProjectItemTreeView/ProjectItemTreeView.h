@@ -67,6 +67,8 @@ namespace Isis {
       ProjectItemTreeView(QWidget *parent=0);
       ~ProjectItemTreeView();
       
+      virtual QSize sizeHint() const;
+
       virtual void setInternalModel(ProjectItemModel *model);
 
       QTreeView *treeView();

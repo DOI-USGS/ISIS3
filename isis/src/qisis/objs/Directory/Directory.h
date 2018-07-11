@@ -239,6 +239,8 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
+   *                           Fixes #5435.
    *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
    *                           addFootprint2DView() now connects to enableControlNetTool() in
    *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
@@ -247,10 +249,12 @@ namespace Isis {
    *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
    *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
    *                           to allow for saving of the project at these times. Fixes #5114.
-   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
-   *                           Fixes #5435.
    *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
    *                           directory instance rather than the activeControl. Fixes #5435.
+   *   @history 2018-07-09 Tracie Sucharski - When adding views, check if the objectName is set
+   *                           which it should be when creating a view from a project serialization.
+   *                           If the objectName has not been set, this is a new view and the unique
+   *                           objectName needs to be created.
    *
    */
   class Directory : public QObject {
@@ -265,16 +269,20 @@ namespace Isis {
       void setRecentProjectsList(QStringList recentProjects);
       QStringList recentProjectsList();
 
+      // When adding a new view if the possibility exists for more than 1 of the view make sure
+      // to use a QUuid for the objectName so that save/restoreState will work for the view. Also,
+      // make sure the objectName is serialized to the project. For more info, see ::addCubeDnView,
+      // ::XmlHandler::startElement and CubeDnView::save.
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
       ControlHealthMonitorView *addControlHealthMonitorView();
-      CnetEditorView *addCnetEditorView(Control *control);
-      CubeDnView *addCubeDnView();
-      Footprint2DView *addFootprint2DView();
+      CnetEditorView *addCnetEditorView(Control *control, QString objectName = "");
+      CubeDnView *addCubeDnView(QString objectName = "");
+      Footprint2DView *addFootprint2DView(QString objectName = "");
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
-      ImageFileListWidget *addImageFileListView();
+      ImageFileListWidget *addImageFileListView(QString objectName = "");
       ControlPointEditView *addControlPointEditView();
 
 

@@ -174,15 +174,6 @@ namespace Isis {
 
 
   /**
-   * Returns the suggested size for the widget.
-   *
-   * @return @b QSize The size
-   */
-  QSize Footprint2DView::sizeHint() const {
-    return QSize(800, 600);
-  }
-
-  /**
    * Accessor for the MosaicSceneWidget
    */
   MosaicSceneWidget *Footprint2DView::mosaicSceneWidget() {
@@ -362,6 +353,7 @@ namespace Isis {
                              FileName newProjectRoot) const {
 
     stream.writeStartElement("footprint2DView");
+    stream.writeAttribute("objectName", objectName());
 
     m_fileListWidget->save(stream, project, newProjectRoot);
     m_sceneWidget->save(stream, project, newProjectRoot);

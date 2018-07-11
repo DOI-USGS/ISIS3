@@ -159,10 +159,14 @@ namespace Isis {
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
+   *   @history 2018-07-10 Tracie Sucharski - Change initial interface of views to tabbed view.
+   *                           Changed the QMainWindow separator to a different color and wider size
+   *                           for ease of use.  Create the QMainWindow initial size to prevent the
+   *                           Viewports in CubeDnView from being created as a small size.
    *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
    *                           project was in fullscreen or not when saved. If not, we call showNormal()
    *                           to restore the poject's window size. This also fixes the warning/history tabs
-   *                           being misplaced when opening a project. Fixes #5175.
+   *                           being misplaced when opening a project. Fixes #5175.                     
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -193,6 +197,7 @@ namespace Isis {
       void tileViews();
 
       void raiseWarningTab();
+
       void cleanupViewDockList(QObject *obj);
 
     private:

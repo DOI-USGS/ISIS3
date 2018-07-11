@@ -52,17 +52,18 @@ namespace Isis {
     
     setCentralWidget(m_treeView);
 
+    //This works so that it cannot be shrunk, only grown
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-//  setAcceptDrops(true);
-    
-    // TODO Commented-out by Summer for new inheritence for parent class. Will clean up when confirmed that not needed.
-    // QBoxLayout *layout = new QVBoxLayout;
-    // layout->addWidget(m_treeView);
-    // layout->setContentsMargins(0, 0, 0, 0);
-    // 
-    // setLayout(layout);
+//  setAcceptDrops(true);    
+  }
+
+
+  QSize ProjectItemTreeView::sizeHint() const {
+    return QSize(350,1200);
   }
 
   
