@@ -253,12 +253,12 @@ namespace Isis {
    *                           directory instance rather than the activeControl. Fixes #5435.
    *   @history 2018-07-07 Summer Stapleton - Implemented changes to handle implementation of
    *                           separate import work orders for both map and registration templates.
-   *   @history 2018-07-09 Kaitlyn Lee - Uncommented code that closes a ControlPointEditView when a new
-   *                           active control is set.
    *   @history 2018-07-09 Tracie Sucharski - When adding views, check if the objectName is set
    *                           which it should be when creating a view from a project serialization.
    *                           If the objectName has not been set, this is a new view and the unique
    *                           objectName needs to be created.
+   *   @history 2018-07-09 Kaitlyn Lee - Uncommented code that closes a ControlPointEditView when a new
+   *                           active control is set.
    */
   class Directory : public QObject {
     Q_OBJECT
