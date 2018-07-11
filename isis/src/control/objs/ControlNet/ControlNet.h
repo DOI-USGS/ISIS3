@@ -311,8 +311,6 @@ namespace Isis {
       void SetTarget(const QString &target);
       void SetTarget(Pvl label);
       void SetTarget(const ControlNet &other);
-      void SetTarget(const QString &target,
-                     const QVector<Distance> &radii);
       void SetUserName(const QString &name);
 
       void swap(ControlNet &other);
