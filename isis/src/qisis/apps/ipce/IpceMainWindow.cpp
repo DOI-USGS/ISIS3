@@ -353,6 +353,10 @@ namespace Isis {
     connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
     m_viewMenuActions.append(tabViewsAction);
 
+    QAction *tileViewsAction = new QAction("Tile Views", this);
+    connect( tileViewsAction, SIGNAL(triggered()), this, SLOT(tileViews()) );
+    m_viewMenuActions.append(tileViewsAction);
+
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
 
@@ -812,6 +816,28 @@ namespace Isis {
         continue;
       }
       tabifyDockWidget(firstView, currentView);
+    }
+  }
+
+
+  /**
+   * Tile all open attached/detached views
+   */
+  void IpceMainWindow::tileViews() {
+    // splitDockWidget() takes two widgets and tiles them, so an easy way to do
+    // this is to grab the first view and tile the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
+
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tiled. If it is attached,
+      // this will have no affect. We have to call addDockWidget() to untab any views.
+      currentView->setFloating(false);
+      addDockWidget(Qt::LeftDockWidgetArea, currentView, Qt::Horizontal);
+
+      if (currentView == firstView) {
+        continue;
+      }
+      splitDockWidget(firstView, currentView, Qt::Horizontal);
     }
   }
 
