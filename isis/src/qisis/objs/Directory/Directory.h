@@ -244,7 +244,7 @@ namespace Isis {
    *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
    *                           Removed  saveActiveControl() since users can save the control
    *                           network with the project save button.
-   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
+   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to
    *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
    *                           to allow for saving of the project at these times. Fixes #5114.
    *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
@@ -254,6 +254,8 @@ namespace Isis {
    *   @history 2018-07-07 Summer Stapleton - Implemented changes to handle implementation of 
    *                           separate import work orders for both map and registration templates.
    *
+   *   @history 2018-07-09 Kaitlyn Lee - Uncommented code that closes a ControlPointEditView when a new
+   *                           active control is set.
    */
   class Directory : public QObject {
     Q_OBJECT

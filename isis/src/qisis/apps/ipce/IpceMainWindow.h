@@ -164,6 +164,10 @@ namespace Isis {
    *   @history 2018-07-07 Summer Stapleton - Added check in the closeEvent() for changes to any 
    *                           TemplateEditorWidget currently open to create a pop-up warning/
    *                           option to save.
+   *   @history 2018-07-09 Kaitlyn Lee - Added tileViews() and the menu option to tile all docked/undocked
+   *                           and tabbed/untabbed views. Changed removeView() to delete the parent dock widget.
+   *                           If we do not delete the dock widget, an empty dock widget will remain where the
+   *                           view used to be.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

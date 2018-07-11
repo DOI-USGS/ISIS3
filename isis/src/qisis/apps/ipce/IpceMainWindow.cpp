@@ -225,8 +225,11 @@ namespace Isis {
    * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-    view->close();
+    QDockWidget *parentDock = qobject_cast<QDockWidget *>(view->parent());
+    removeDockWidget(parentDock);
+    m_viewDocks.removeAll(parentDock);
     delete view;
+    delete parentDock;
   }
 
 
