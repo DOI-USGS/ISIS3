@@ -74,7 +74,8 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
-#include "ImportTemplateWorkOrder.h"
+#include "ImportMapTemplateWorkOrder.h"
+#include "ImportRegistrationTemplateWorkOrder.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
@@ -169,7 +170,8 @@ namespace Isis {
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
       m_importImagesWorkOrder = createWorkOrder<ImportImagesWorkOrder>();
       m_importShapesWorkOrder = createWorkOrder<ImportShapesWorkOrder>();
-      m_importTemplateWorkOrder = createWorkOrder<ImportTemplateWorkOrder>();
+      m_importMapTemplateWorkOrder = createWorkOrder<ImportMapTemplateWorkOrder>();
+      m_importRegistrationTemplateWorkOrder = createWorkOrder<ImportRegistrationTemplateWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
@@ -444,7 +446,10 @@ namespace Isis {
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
     importMenu->addAction(m_importImagesWorkOrder->clone() );
     importMenu->addAction(m_importShapesWorkOrder->clone() );
-    importMenu->addAction(m_importTemplateWorkOrder->clone() );
+    
+    QMenu *importTemplateMenu = importMenu->addMenu("&Import Templates");
+    importTemplateMenu->addAction(m_importMapTemplateWorkOrder->clone() );
+    importTemplateMenu->addAction(m_importRegistrationTemplateWorkOrder->clone() );
 
     QMenu *exportMenu = fileMenu->addMenu("&Export");
 
@@ -901,9 +906,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
 
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_matrixViewWidgets.append(result);
 
     result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
@@ -924,9 +926,6 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
-
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_targetInfoWidgets.append(result);
 
@@ -949,9 +948,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
 
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_templateEditorWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg( FileName(currentTemplate->fileName()).name() ) );
@@ -972,9 +968,6 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupSensorInfoWidgets(QObject *) ) );
-
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_sensorInfoWidgets.append(result);
 
@@ -997,9 +990,6 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
-
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_fileListWidgets.append(result);
 
@@ -1241,6 +1231,7 @@ namespace Isis {
     if (!templateEditorWidget) {
       return;
     }
+
     m_templateEditorWidgets.removeAll(templateEditorWidget);
     m_project->setClean(false);
   }

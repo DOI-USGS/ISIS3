@@ -266,6 +266,11 @@ namespace Isis {
    *                          added signal when project is saved, so the writeSettings can happen
    *                          for project.  This will be cleaned up when save/restore is fully
    *                          implemented.
+   *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and 
+   *                          m_regTemplates to keep track of the two template types as well as 
+   *                          adjusted logic to save these serparately into the .xml files in the 
+   *                          project directory. Also added clean-up of unsaved templates at project
+   *                          close in Project::clear(). 
    *  
    */
   class Project : public QObject {
@@ -355,6 +360,8 @@ namespace Isis {
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
       QList<TemplateList *> templates();
+      QList<TemplateList *> mapTemplates();
+      QList<TemplateList *> regTemplates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -574,7 +581,8 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<TemplateList *> m_templates;
+          QList<TemplateList *> m_mapTemplateLists;
+          QList<TemplateList *> m_regTemplateLists;
           WorkOrder *m_workOrder;
       };
 
@@ -590,7 +598,8 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
-      QList<TemplateList *> *m_templates;
+      QList<TemplateList *> *m_mapTemplates;
+      QList<TemplateList *> *m_regTemplates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 

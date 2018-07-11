@@ -727,6 +727,9 @@ namespace Isis {
    */
   void IpceMainWindow::closeEvent(QCloseEvent *event) {
 
+    foreach(TemplateEditorWidget *templateEditor, m_directory->templateEditorViews()) {
+      templateEditor->saveOption();
+    }
     // The active control is checked here for modification because this was the simplest solution
     // vs changing the project clean state every time the control is modified or saved.
     if (!m_directory->project()->isClean() || (m_directory->project()->activeControl() &&
