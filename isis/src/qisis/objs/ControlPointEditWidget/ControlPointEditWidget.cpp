@@ -2447,7 +2447,7 @@ namespace Isis {
   * Reset the selected template in the template combobox if the template selected by the user does 
   * not satisfy requirements for the control measure.
   *
-  * @param fielName The filename that was previously selected in the template combo box
+  * @param fileName The filename that was previously selected in the template combo box
   */
   void ControlPointEditWidget::resetTemplateComboBox(QString fileName) {
     if(fileName.startsWith("$base")) {

@@ -237,7 +237,7 @@ namespace Isis {
       QPointer<QWidget> m_templateEditorWidget; //!< Template editor widget
       bool m_templateModified; //!< Indicates if the registration template was edited
 
-      QPointer<QComboBox> m_templateComboBox; //!< ComboBox of importd registration templates
+      QPointer<QComboBox> m_templateComboBox; //!< ComboBox of imported registration templates
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;
