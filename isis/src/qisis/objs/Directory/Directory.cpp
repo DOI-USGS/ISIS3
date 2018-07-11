@@ -74,7 +74,8 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
-#include "ImportTemplateWorkOrder.h"
+#include "ImportMapTemplateWorkOrder.h"
+#include "ImportRegistrationTemplateWorkOrder.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
@@ -169,7 +170,8 @@ namespace Isis {
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
       m_importImagesWorkOrder = createWorkOrder<ImportImagesWorkOrder>();
       m_importShapesWorkOrder = createWorkOrder<ImportShapesWorkOrder>();
-      m_importTemplateWorkOrder = createWorkOrder<ImportTemplateWorkOrder>();
+      m_importMapTemplateWorkOrder = createWorkOrder<ImportMapTemplateWorkOrder>();
+      m_importRegistrationTemplateWorkOrder = createWorkOrder<ImportRegistrationTemplateWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
@@ -444,7 +446,10 @@ namespace Isis {
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
     importMenu->addAction(m_importImagesWorkOrder->clone() );
     importMenu->addAction(m_importShapesWorkOrder->clone() );
-    importMenu->addAction(m_importTemplateWorkOrder->clone() );
+
+    QMenu *importTemplateMenu = importMenu->addMenu("&Import Templates");
+    importTemplateMenu->addAction(m_importMapTemplateWorkOrder->clone() );
+    importTemplateMenu->addAction(m_importRegistrationTemplateWorkOrder->clone() );
 
     QMenu *exportMenu = fileMenu->addMenu("&Export");
 
@@ -561,12 +566,10 @@ namespace Isis {
 
   void Directory::newActiveControl(bool newControl) {
 
-//  if (newControl && m_controlPointEditViewWidget) {
-//    bool closed = m_controlPointEditViewWidget->close();
-//    qDebug()<<"Directory::newActiveControl  CPEditor closed = "<<closed;
-//    emit viewClosed(m_controlPointEditViewWidget);
-//    delete m_controlPointEditViewWidget;
-//  }
+    if (newControl && m_controlPointEditViewWidget) {
+     emit viewClosed(m_controlPointEditViewWidget);
+     delete m_controlPointEditViewWidget;
+    }
 
     // If the new active control is the same as what is showing in the cnetEditorWidget, allow
     // editing of control points from the widget, otherwise turnoff from context menu
@@ -601,7 +604,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupBundleObservationViews(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -665,7 +668,7 @@ namespace Isis {
     // connect destroyed signal to cleanupCnetEditorViewWidgets slot
     connect(result, SIGNAL( destroyed(QObject *) ),
             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
 
@@ -713,7 +716,7 @@ namespace Isis {
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets(QObject *) ) );
-   
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -775,10 +778,10 @@ namespace Isis {
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
-                    
+
     emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
@@ -892,7 +895,7 @@ namespace Isis {
               this, SLOT(makeBackupActiveControl()));
       connect (project(), SIGNAL(activeControlSet(bool)),
               result->controlPointEditWidget(), SLOT(setControlFromActive()));
-               
+
       connect(result, SIGNAL(windowChangeEvent(bool)),
               m_project, SLOT(setClean(bool)));
     }
@@ -927,7 +930,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
-             
+
     m_matrixViewWidgets.append(result);
 
     result->setWindowTitle( tr("Matrix View %1").arg( m_matrixViewWidgets.count() ) );
@@ -948,7 +951,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
-             
+
     m_targetInfoWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg(target->displayProperties()->displayName() ) );
@@ -969,7 +972,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
-             
+
     m_templateEditorWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg( FileName(currentTemplate->fileName()).name() ) );
@@ -1012,7 +1015,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
-             
+
     m_fileListWidgets.append(result);
 
     result->setWindowTitle( tr("File List %1").arg( m_fileListWidgets.count() ) );
@@ -1044,7 +1047,7 @@ namespace Isis {
     //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
 
@@ -1263,6 +1266,7 @@ namespace Isis {
     if (!templateEditorWidget) {
       return;
     }
+
     m_templateEditorWidgets.removeAll(templateEditorWidget);
     m_project->setClean(false);
   }

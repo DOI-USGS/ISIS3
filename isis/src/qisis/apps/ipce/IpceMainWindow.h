@@ -159,6 +159,13 @@ namespace Isis {
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
+   *   @history 2018-07-07 Summer Stapleton - Added check in the closeEvent() for changes to any
+   *                           TemplateEditorWidget currently open to create a pop-up warning/
+   *                           option to save.
+   *   @history 2018-07-09 Kaitlyn Lee - Added tileViews() and the menu option to tile all docked/undocked
+   *                           and tabbed/untabbed views. Changed removeView() to delete the parent dock widget.
+   *                           If we do not delete the dock widget, an empty dock widget will remain where the
+   *                           view used to be.
    *   @history 2018-07-10 Tracie Sucharski - Change initial interface of views to tabbed view.
    *                           Changed the QMainWindow separator to a different color and wider size
    *                           for ease of use.  Create the QMainWindow initial size to prevent the
