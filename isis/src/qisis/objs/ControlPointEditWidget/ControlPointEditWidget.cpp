@@ -804,6 +804,7 @@ namespace Isis {
     //  is selected
     if (controlPoint->Parent() == NULL) {
       m_editPoint = controlPoint;
+
       // New point in editor, so colorize all save buttons
       colorizeAllSaveButtons("red");
     }
@@ -1994,7 +1995,7 @@ namespace Isis {
       m_leftMeasure = NULL;
     }
 
-    m_leftMeasure = new ControlMeasure();
+    m_leftMeasure = new ControlMeasure;
     //  Find measure for each file    
     *m_leftMeasure = *((*m_editPoint)[serial]);
 
@@ -2044,7 +2045,7 @@ namespace Isis {
       m_rightMeasure = NULL;
     }
 
-    m_rightMeasure = new ControlMeasure();
+    m_rightMeasure = new ControlMeasure;
     //  Find measure for each file
     *m_rightMeasure = *((*m_editPoint)[serial]);
 

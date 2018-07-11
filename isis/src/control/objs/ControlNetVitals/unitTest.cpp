@@ -13,6 +13,13 @@
 using namespace Isis;
 using namespace std;
 
+/**
+ * Unit test for ControlNetVitals class 
+ *  
+ * @author 2018-06-18 Adam Goins
+ * @internal
+ *   @history 2018-06-22 Kristin Berry - Upated after fix to numImagesBelowMeasureThreshold()
+ */
 int main() {
   try {
     Preference::Preferences(true);
@@ -84,11 +91,8 @@ int main() {
     assert(pointsWithoutMeasures == netVitals.getPointsBelowMeasureThreshold(1).size());
     assert(pointsBelowMeasures == netVitals.getPointsBelowMeasureThreshold(3).size());
     assert(imagesWithoutMeasures == netVitals.getImagesBelowMeasureThreshold(1).size());
-    // fix this
-    // std::cout << imagesBelowMeasures << "    " << netVitals.getImagesBelowMeasureThreshold(2).size() << std::endl;
-    // assert(imagesBelowMeasures == netVitals.getImagesBelowMeasureThreshold(2).size());
+    assert(imagesBelowMeasures == netVitals.getImagesBelowMeasureThreshold(2).size());
     assert(numImagesBelowHull == netVitals.getImagesBelowHullTolerance().size());
-
 
     qDebug() << "\nTesting signal/slots...";
     ControlPoint *testPoint = new ControlPoint;

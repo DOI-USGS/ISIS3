@@ -3,8 +3,8 @@ Testing Control Net Vitals
 Loading Network
 Calculating Network Vitals
 Network ID: "LROC_NAC_LRPAIR_AUTO"
-Network Status: "Healthy!"
-Status Details: "This network is healthy."
+Network Status: "Weak!"
+Status Details: "This network has 4 image(s) with less than 3 measures\n"
 Network has additional islands? no
 Number of islands in network: 1
 Serials in island  0
@@ -54,7 +54,7 @@ Number of free points in network: 75
 Number of points without measures: 0
 Number of points with less than 3 measures: 0
 Number of images without measures: 0
-Number of images with less than 2 measures: 0
+Number of images with less than 2 measures: 1
 Number of images with less 75 percent hull coverage: 0
 Testing getters...
 
