@@ -176,17 +176,13 @@ namespace Isis {
    *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
    *                           project was in fullscreen or not when saved. If not, we call showNormal()
    *                           to restore the poject's window size. This also fixes the warning/history tabs
-   *                           being misplaced when opening a project. Fixes #5175.
+   *                           being misplaced when opening a project. Fixes #5175. References #5436.
    *   @history 2018-07-12 Tracie Sucharski - Renamed the signal Directory::viewClosed to
    *                           Directory::closeView since Directory does not close the view but
    *                           indicate that the view needs closing.  This signal is now used by
    *                           more than the cnetEditorView, so updated documentation.  Did a little
    *                           cleanup on the removeView  method by removing some code that
    *                           automatically happens due to connection made on destroyed signal.
-   *                           project was in fullscreen or not when saved. If not, we call
-   *                           showNormal() to restore the poject's window size. This also fixes the
-   *                           warning/history tabs being misplaced when opening a project.
-   *                           Fixes #5175. References #5436.
    *   @history 2018-07-12 Kaitlyn Lee - Removed code that makes the window fullscreen in memory,
    *                           since this was causing a project's window size to not be restored
    *                           when opening from the command line. Decreased the size and changed
