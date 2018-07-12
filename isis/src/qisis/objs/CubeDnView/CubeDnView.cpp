@@ -33,7 +33,6 @@
 #include <QMenuBar>
 #include <QModelIndex>
 #include <QSize>
-#include <QSizePolicy>
 #include <QStatusBar>
 #include <QToolBar>
 #include <QToolButton>
@@ -117,12 +116,8 @@ namespace Isis {
 
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
   }
+
 
   void CubeDnView::createActions(Directory *directory) {
 
@@ -374,15 +369,6 @@ namespace Isis {
     AbstractProjectItemView::addItem(item);
   }
 
-  /**
-   * Returns the suggested size
-   *
-   * @return @b QSize The size hint
-   */
-  QSize CubeDnView::sizeHint() const {
-    return QSize(800, 600);
-  }
-
 
   bool CubeDnView::viewportContainsShape(MdiCubeViewport *viewport) {
 
@@ -559,6 +545,7 @@ namespace Isis {
 
   void CubeDnView::save(QXmlStreamWriter &stream, Project *, FileName) const {
     stream.writeStartElement("cubeDnView");
+    stream.writeAttribute("objectName", objectName());
 
     foreach (MdiCubeViewport *cvp, *(m_workspace->cubeViewportList())) {
       ProjectItem *item = m_cubeItemMap.value(cvp->cube());

@@ -625,6 +625,7 @@ namespace Isis {
                                  FileName newProjectRoot) const {
 
     stream.writeStartElement("imageFileList");
+    stream.writeAttribute("objectName", objectName());
 
     // Write QSettings
 //  stream.writeStartElement("widgetGeometry");

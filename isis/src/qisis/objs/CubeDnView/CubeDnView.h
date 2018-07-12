@@ -102,6 +102,11 @@ namespace Isis {
    *                           On default, a view's actions are disabled. To enable the actions, move the
    *                           cursor over the view. When a user moves the cursor outside of the view, the
    *                           actions are disabled.
+   *   @history 2018-07-05 Tracie Sucharski - Moved sizeHint and sizePolicy to
+   *                           AbstractProjectItemView. References #5433.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                           view can be re-created with the same objectName for restoring the
+   *                           project state. Qt's save/restoreState use the objectName.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -110,8 +115,6 @@ namespace Isis {
     public:
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
-
-      QSize sizeHint() const;
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 

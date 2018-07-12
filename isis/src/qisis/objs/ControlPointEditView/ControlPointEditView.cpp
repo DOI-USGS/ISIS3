@@ -54,18 +54,11 @@ namespace Isis {
 
     setCentralWidget(m_controlPointEditWidget);
 
-    setAcceptDrops(true);
-
     // Store the buttons (actions) for easy enable/disable.
     m_buttons = m_controlPointEditWidget->findChildren<QPushButton *>();
 
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
   }
 
 
@@ -85,16 +78,6 @@ namespace Isis {
    */
   ControlPointEditWidget *ControlPointEditView::controlPointEditWidget() {
     return m_controlPointEditWidget;
-  }
-
-
-  /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
-   */
-  QSize ControlPointEditView::sizeHint() const {
-    return QSize(800, 600);
   }
 
 

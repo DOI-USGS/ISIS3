@@ -146,6 +146,8 @@ namespace Isis {
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
+   *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does 
+   *                           not output text to the command line for ipce. Fixes #4171.
    *   @history 2018-06-19 Kaitlyn Lee - Added tabViews() and the menu option under the View menu to
    *                           tab the views. Currently, this can tab all attached/detached views. I
    *                           left the line setting dock options to allow grouped dragging, but tabbing
@@ -166,6 +168,10 @@ namespace Isis {
    *                           and tabbed/untabbed views. Changed removeView() to delete the parent dock widget.
    *                           If we do not delete the dock widget, an empty dock widget will remain where the
    *                           view used to be.
+   *   @history 2018-07-10 Tracie Sucharski - Change initial interface of views to tabbed view.
+   *                           Changed the QMainWindow separator to a different color and wider size
+   *                           for ease of use.  Create the QMainWindow initial size to prevent the
+   *                           Viewports in CubeDnView from being created as a small size.
    *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
    *                           project was in fullscreen or not when saved. If not, we call showNormal()
    *                           to restore the poject's window size. This also fixes the warning/history tabs
@@ -200,6 +206,7 @@ namespace Isis {
       void tileViews();
 
       void raiseWarningTab();
+
       void cleanupViewDockList(QObject *obj);
 
     private:

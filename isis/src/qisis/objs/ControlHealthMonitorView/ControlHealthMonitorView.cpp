@@ -36,10 +36,14 @@
 #include "ControlPointEditView.h"
 #include "ControlPointEditWidget.h"
 #include "CnetEditorView.h"
+#include "CubeDnView.h"
 
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Directory.h"
+#include "ProjectItem.h"
+#include "ProjectItemModel.h"
+
 #include "ToolPad.h"
 
 
@@ -59,27 +63,21 @@ namespace Isis {
     connect(m_controlHealthMonitorWidget, SIGNAL(openPointEditor(ControlPoint *)),
             this, SLOT(openPointEditor(ControlPoint *)));
 
-    connect(m_controlHealthMonitorWidget, SIGNAL(openImageEditor()),
-            this, SLOT(openImageEditor()));
+    connect(m_controlHealthMonitorWidget, SIGNAL(openImageEditor(QList<QString>)),
+            this, SLOT(openImageEditor(QList<QString>)));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    layout->addWidget(m_controlHealthMonitorWidget);
+    setCentralWidget(m_controlHealthMonitorWidget);
 
     m_permToolBar = new QToolBar("Standard Tools", 0);
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
 
     m_activeToolBar = new QToolBar("Active Tool", 0);
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
 
 
 //  m_ControlHealthMonitorWidget->addToPermanent(m_permToolBar);
@@ -90,12 +88,6 @@ namespace Isis {
     m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
 
     setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
   }
 
   /**
@@ -124,8 +116,22 @@ namespace Isis {
    *
    *  It is designed to open the CubeDnView and populate it with the selected cubes.
    */
-  void ControlHealthMonitorView::openImageEditor() {
-    m_directory->addCubeDnView();
+  void ControlHealthMonitorView::openImageEditor(QList<QString> serials) {
+    CubeDnView *cubeView = m_directory->addCubeDnView();
+    foreach (QString serial, serials) {
+      QList<ImageList*> imageLists = m_directory->project()->images();
+      foreach(ImageList *list, imageLists) {
+        foreach(Image *image, *list) {
+          QString imageSerial = image->serialNumber();
+          if (imageSerial == serial) {
+            ProjectItem *item = m_directory->model()->findItemData(QVariant::fromValue(image));
+            if (item) {
+              cubeView->addItem(item);
+            }
+          }
+        }
+      }
+    }
   }
 
 
@@ -151,16 +157,6 @@ namespace Isis {
    */
   ControlHealthMonitorWidget *ControlHealthMonitorView::controlHealthMonitorWidget() {
     return m_controlHealthMonitorWidget;
-  }
-
-
-  /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
-   */
-  QSize ControlHealthMonitorView::sizeHint() const {
-    return QSize(800, 600);
   }
 
 
