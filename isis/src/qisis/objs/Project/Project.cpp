@@ -2689,6 +2689,8 @@ namespace Isis {
   /**
   * @brief This method checks for the existence of a target based on TargetName
   *
+  * @param id The target string to be compared.
+  * @return bool Returns true if targetBody already exists in project
   */
   bool Project::hasTarget(QString id) {
     foreach (TargetBodyQsp targetBody, *m_targets) {
@@ -2700,6 +2702,11 @@ namespace Isis {
   }
 
 
+  /**
+  * Adds a new target to the project.
+  *
+  * @param target The target to be added.
+  */
   void Project::addTarget(Target *target) {
 
     TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
@@ -2712,6 +2719,8 @@ namespace Isis {
   /**
   * @brief This method checks for the existence of a camera based on InstrumentId
   *
+  * @param id The instrument string to be compared.
+  * @return bool Returns true if GuiCamera already exists in project
   */
   bool Project::hasCamera(QString id) {
     foreach (GuiCameraQsp camera, *m_guiCameras) {
@@ -2724,6 +2733,11 @@ namespace Isis {
   }
 
 
+  /**
+  * Adds a new camera to the project.
+  *
+  * @param camera The camera to be added.
+  */
   void Project::addCamera(Camera *camera) {
         
     GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));

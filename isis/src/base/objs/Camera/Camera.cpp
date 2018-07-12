@@ -2883,7 +2883,7 @@ namespace Isis {
   /**
    * This method returns the InstrumentId as it appears in the cube.
    *
-   * @return QString
+   * @return QString Returns m_instrumentId
    */
   QString Camera::instrumentId() {
     return m_instrumentId;

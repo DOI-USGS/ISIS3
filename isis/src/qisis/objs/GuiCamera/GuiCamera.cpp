@@ -301,8 +301,8 @@ namespace Isis {
   
   
   /**
-   * @brief Retrieves an abbreviated version for the name of the instrument.
-   * @return @b QString Returns m_instrumentNameShort.
+   * @brief Retrieve the InstrumentId as appears in the original cube label.
+   * @return @b QString Returns m_instrumentId
    */
   QString GuiCamera::instrumentId() {
     return m_instrumentId;

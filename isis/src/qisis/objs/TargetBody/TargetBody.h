@@ -173,7 +173,7 @@ namespace Isis {
       QUuid *m_id;
       
       /**
-       * The target body.
+       * The TargetName as it appears in the original cube.
        */
       QString m_targetName;
 
