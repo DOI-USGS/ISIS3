@@ -285,8 +285,17 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
    *                           in each of the constructors to verify valid control net input.
    *                           Fixes #5068.
+   *   @history 2018-05-22 Ken Edmundson - Modified methods bundleSolveInformation() and
+   *                           solveCholeskyBR() to return raw pointers to a BundleSolutionInfo object.
+   *                           Also modified resultsReady signal to take a raw pointer to a
+   *                           BundleSolutionInfo object. This was done to avoid using a copy
+   *                           constructor in the BundleSolutionInfo class because it is derived
+   *                           from QObject. Note that we ultimately want to return a QSharedPointer
+   *                           instead of a raw pointer.
    *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
    *                           aborted. Added emits for status updates to the run widget.
+   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust. 
+   *                           Fixes #4171.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -316,7 +325,7 @@ namespace Isis {
                    QList<ImageList *> imgList,
                    bool printSummary);
       ~BundleAdjust();
-      BundleSolutionInfo    solveCholeskyBR();
+      BundleSolutionInfo*    solveCholeskyBR();
 
       QList<ImageList *> imageLists();
       bool isAborted();
@@ -355,7 +364,7 @@ namespace Isis {
       bool validateNetwork();
       bool solveSystem();
       void iterationSummary();
-      BundleSolutionInfo bundleSolveInformation();
+      BundleSolutionInfo* bundleSolveInformation();
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();

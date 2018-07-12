@@ -86,7 +86,7 @@ namespace Isis {
     m_ui->JigsawRunButton->setEnabled(false);
 
     m_bundleAdjust = NULL;
-    m_bundleSolutionInfo = NULL;
+//    m_bundleSolutionInfo = NULL;
 
     m_bRunning = false;
 
@@ -111,10 +111,10 @@ namespace Isis {
    * Destructor.
    */
   JigsawRunWidget::~JigsawRunWidget() {
-    if (m_bundleSolutionInfo) {
-      delete m_bundleSolutionInfo;
-      m_bundleSolutionInfo = NULL;
-    }
+//    if (m_bundleSolutionInfo) {
+//      delete m_bundleSolutionInfo;
+//      m_bundleSolutionInfo = NULL;
+//    }
     if (m_bundleAdjust) {
       m_bundleAdjust->deleteLater();
       m_bundleAdjust = NULL;    
@@ -146,7 +146,14 @@ namespace Isis {
     // We want to use the current settings if not use the most recently accepted bundle settings.
     // This allows user to click "Setup", make changes, "OK", then click "Setup", and those changes
     // are present in the setup dialog.
-    if (m_bundleSettings && !m_ui->useLastSettings->isChecked()) {
+    if (m_ui->useLastSettings->isChecked() && m_project->bundleSolutionInfo().size() > 0) {
+      QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
+      BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
+      setupdlg.loadSettings(lastBundleSettings);
+      // We also tell the setup dialog what the last selected control is.
+      setupdlg.selectControl(m_selectedControlName);
+    }
+    else if (m_bundleSettings) {
       setupdlg.loadSettings(m_bundleSettings);
       // We also tell the setup dialog what the last selected control is.
       setupdlg.selectControl(m_selectedControlName);
@@ -372,7 +379,8 @@ namespace Isis {
     }
 
     // Tell the project about the BundleSolutionInfo
-    m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+    // m_project->addBundleSolutionInfo( new BundleSolutionInfo(*m_bundleSolutionInfo) );
+    m_project->addBundleSolutionInfo(m_bundleSolutionInfo);
 
     // Make sure that when we add our results, we let the use last settings box be checkable.
     m_ui->useLastSettings->setEnabled(true);

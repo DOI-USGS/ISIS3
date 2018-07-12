@@ -107,6 +107,14 @@ void InterruptSignal(int);
  * @return int
  */
 int main(int argc, char *argv[]) {
+  // Verify ISISROOT was set
+  // Note: as printing and logging IExceptions requires ISISROOT to be set (for preferences),
+  //       The case below cannot be handled with IExceptions
+  if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
+    std::cerr << "Please set ISISROOT before running any Isis applications" << std::endl;
+    exit(1);
+  }
+
 #ifdef CWDEBUG
   startMonitoringMemory();
   signal(SIGSEGV, SegmentationFault);
@@ -119,7 +127,7 @@ int main(int argc, char *argv[]) {
 #ifdef USE_GUI_QAPP
   Isis::Application::p_applicationForceGuiApp = true;
 #endif
-
+    
   // Add the plugin directory so QT looks at the Isis plugin dir
   Isis::FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
   QCoreApplication::addLibraryPath(qtpluginpath.expanded());
