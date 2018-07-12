@@ -192,6 +192,22 @@ namespace Isis {
     QList<ProjectItem *> items;
     QModelIndexList indices = selection.indexes();
 
+    // If nothing is selected, fill items with all image lists and images.
+    if (indices.size() == 0) {
+      ProjectItem *imageRoot = findItemData(QVariant("Images"), 0);
+      items.append(imageRoot);
+      for (int i = 0; i < imageRoot->rowCount(); i++) {
+        ProjectItem *imglistItem = imageRoot->child(i);
+        items.append(imglistItem);
+        for (int j = 0; j < imglistItem->rowCount(); j++) {
+          ProjectItem *imgItem = imglistItem->child(j);
+          if (imgItem->isImage()) {
+            items.append(imgItem);
+          }
+        }
+      }
+      return items;
+    }
 
     //Query the selected items to see if they have children
     foreach ( QModelIndex ix, indices ) {

@@ -487,8 +487,27 @@ namespace Isis {
 
     }
 
-    m_bundleSettings->setObservationSolveOptions(settings->observationSolveSettings());
+    // If we click setup after changing image selection in the project tree, not all images will
+    // have solve settings. Here we add those images and their default settings to the list
+    QList<BundleObservationSolveSettings> defaultSettings = m_bundleSettings->observationSolveSettings();
+    QList<BundleObservationSolveSettings> fillSettings = settings->observationSolveSettings();
 
+    for (auto &solveSettings : defaultSettings) {      
+      // Remove any images from defaultSettings that exist in fillSettings
+      foreach (QString observationNumber, solveSettings.observationNumbers()) {
+        // The method will return a default with no obs numbers if none are found
+        if (settings->observationSolveSettings(observationNumber).observationNumbers().isEmpty()) {
+          solveSettings.removeObservationNumber(observationNumber);
+        }
+      }
+      // Append leftover defaultSettings
+      if (!solveSettings.observationNumbers().isEmpty()) {
+        fillSettings.append(solveSettings);
+      }
+    }
+
+    m_bundleSettings->setObservationSolveOptions(fillSettings);
+    
     update();
 
   }
@@ -893,20 +912,20 @@ namespace Isis {
     m_ui->ckDegreeSpinBox->setEnabled(false);
     m_ui->ckSolveDegreeSpinBox->setEnabled(false);
 
-    // weighting tab
-    m_ui->pointLatitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointLongitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointRadiusSigmaLineEdit->setEnabled(false);
-    m_ui->positionSigmaLineEdit->setEnabled(false);
-    m_ui->velocitySigmaLineEdit->setEnabled(false);
-    m_ui->accelerationSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAnglesSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(false);
-
-    // maximum liklihood tab
-
-    // self-calibration tab
+    // observation solve settings tab
+    m_ui->treeView->setEnabled(false);
+    m_ui->positionComboBox->setEnabled(false);
+    m_ui->spkSolveDegreeSpinBox->setEnabled(false);
+    m_ui->spkDegreeSpinBox->setEnabled(false);
+    m_ui->hermiteSplineCheckBox->setEnabled(false);
+    m_ui->positionAprioriSigmaTable->setEnabled(false);
+    m_ui->pointingComboBox->setEnabled(false);
+    m_ui->ckSolveDegreeSpinBox->setEnabled(false);
+    m_ui->ckDegreeSpinBox->setEnabled(false);
+    m_ui->twistCheckBox->setEnabled(false);
+    m_ui->fitOverPointingCheckBox->setEnabled(false);
+    m_ui->pointingAprioriSigmaTable->setEnabled(false);
+    m_ui->applySettingsPushButton->setEnabled(false);
 
     // target body tab
     m_ui->targetBodyComboBox->setEnabled(false);
