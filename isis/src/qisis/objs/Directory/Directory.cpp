@@ -446,7 +446,7 @@ namespace Isis {
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
     importMenu->addAction(m_importImagesWorkOrder->clone() );
     importMenu->addAction(m_importShapesWorkOrder->clone() );
-    
+
     QMenu *importTemplateMenu = importMenu->addMenu("&Import Templates");
     importTemplateMenu->addAction(m_importMapTemplateWorkOrder->clone() );
     importTemplateMenu->addAction(m_importRegistrationTemplateWorkOrder->clone() );
