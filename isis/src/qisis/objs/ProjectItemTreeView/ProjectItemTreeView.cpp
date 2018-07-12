@@ -23,8 +23,10 @@
 #include "ProjectItemTreeView.h"
 
 #include <QAbstractItemView>
+#include <QDesktopWidget>
 #include <QEvent>
 #include <QObject>
+#include <QRect>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -39,7 +41,7 @@ namespace Isis {
    * @param[in] parent (QWidget *) The parent widget.
    */
   ProjectItemTreeView::ProjectItemTreeView(QWidget *parent) : AbstractProjectItemView(parent) {
-        
+
     m_treeView = new QTreeView(this);
     m_treeView->installEventFilter(this);
     setInternalModel( internalModel() );
@@ -49,24 +51,31 @@ namespace Isis {
     m_treeView->setDragEnabled(false);
     m_treeView->setAcceptDrops(false);
     m_treeView->setHeaderHidden(true);
-    
+
     setCentralWidget(m_treeView);
 
     //This works so that it cannot be shrunk, only grown
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-//  setAcceptDrops(true);    
+//  setAcceptDrops(true);
   }
 
 
+  /**
+   * Returns the suggested size
+   *
+   * @return @b QSize The size hint
+   */
   QSize ProjectItemTreeView::sizeHint() const {
-    return QSize(350,1200);
+    QDesktopWidget deskTop;
+    QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
+    return QSize(.11 * availableSpace.width(), .5 * availableSpace.height());
   }
 
-  
+
   /**
    * Default destructor.
    */
@@ -82,7 +91,7 @@ namespace Isis {
     return m_treeView;
   }
 
-  
+
   /**
    * Sets the model so that the internal proxy model exactly matches the
    * source model.
@@ -119,8 +128,8 @@ namespace Isis {
       m_treeView->expand( parent->index() );
     }
   }
-  
-  
+
+
   /**
    * Filters out drag and drop events so that they are handled by the
    * ProjectItemTreeView.
@@ -140,5 +149,5 @@ namespace Isis {
 
     return AbstractProjectItemView::eventFilter(watched, event);
   }
-  
+
 }
