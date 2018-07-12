@@ -537,7 +537,7 @@ namespace Isis {
    *   @history  2018-06-28 Debbie A. Cook  Revised to use the local radius of
    *                 the SurfacePoint to convert distance to angle instead of the
    *                 major equatorial axis.  Also corrected longitude conversion.
-   *                 See note in SurfacePoint.h.
+   *                 See note in SurfacePoint.h.  References #5457.
    */
   void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
     const Distance &lonSigma, const Distance &radiusSigma) {

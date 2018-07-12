@@ -94,6 +94,7 @@ namespace Isis {
    *                           member p_localRadius to avoid recalculating when coordinates
    *                           have not changed.  Also corrected the longitude conversion equation
    *                           in SetSphericalSigmasDistance and GetLonSigmaDistance.
+   *                           References #5457.
    */
 
   class SurfacePoint {

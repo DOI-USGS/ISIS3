@@ -66,7 +66,7 @@ namespace Isis {
    *   @history 2017-12-21 Jesse Mapel - Improved documentation.
    *   @history 2017-01-27 Jesse Mapel - More documentation improvements.
    *   @history 2018-06-28 Debbie A Cook - Removed all calls to obsolete method
-   *                                                   SurfacePoint::SetRadii
+   *                                                   SurfacePoint::SetRadii.  References #5457.
    */
   class ControlPointV0001 {
     public:

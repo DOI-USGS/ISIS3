@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
           "sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m" << endl << endl;
     Isis::SurfacePoint spRec;
 
-    symmetric_matrix<double,upper> covar;
+    symmetric_matrix<double,upper> covar; // Units are m**2
     covar.resize(3);
     covar.clear();
     covar(0,0) = 100.;

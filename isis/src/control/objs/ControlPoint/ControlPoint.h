@@ -344,7 +344,7 @@ namespace Isis {
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
    *   @history 2018-06-28 Debbie A. Cook Removed all calls to obsolete method
-   *                           SurfacePoint::SetRadii.
+   *                           SurfacePoint::SetRadii.  References #5457.
    */
   class ControlPoint : public QObject {
 
