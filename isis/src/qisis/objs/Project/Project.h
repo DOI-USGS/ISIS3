@@ -270,7 +270,14 @@ namespace Isis {
    *                          m_regTemplates to keep track of the two template types as well as 
    *                          adjusted logic to save these serparately into the .xml files in the 
    *                          project directory. Also added clean-up of unsaved templates at project
-   *                          close in Project::clear(). 
+   *                          close in Project::clear().
+   *  @hitsory 2018-07-12 Summer Stapleton - Added hasTemplate() and hasCamera() and modified 
+   *                          addCamera() and addTarget logic in order to determine if a targetBody
+   *                          or a guiCamera already exist in a project. This allows cameras and 
+   *                          targets to be created in ImportImagesWorkOrder only when needed 
+   *                          rather than creating them for every image imported and then removing
+   *                          them if not needed. Fixed segfault occuring on astrovm4 with larger 
+   *                          imports. References #5460.
    *  
    */
   class Project : public QObject {
@@ -284,6 +291,9 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+      
+      bool hasTarget(QString id);
+      bool hasCamera(QString id);
 
       QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
