@@ -555,19 +555,24 @@ namespace Isis {
 
     foreach(CnetEditorView *cnetEditorView, m_cnetEditorViewWidgets) {
       if (cnetEditorView->control() == project()->activeControl()) {
-        emit viewClosed(cnetEditorView);
-        project()->activeControl()->closeControlNet();
-        project()->activeControl()->openControlNet();
+        emit closeView(cnetEditorView);
         addCnetEditorView(project()->activeControl());
       }
     }
   }
 
 
+/**
+ * @description This slot is connected from the signal activeControlSet(bool) emitted from Project. 
+ *  
+ * 
+ * @param newControl bool
+ *
+ */
   void Directory::newActiveControl(bool newControl) {
 
     if (newControl && m_controlPointEditViewWidget) {
-     emit viewClosed(m_controlPointEditViewWidget);
+     emit closeView(m_controlPointEditViewWidget);
      delete m_controlPointEditViewWidget;
     }
 

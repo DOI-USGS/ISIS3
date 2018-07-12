@@ -82,10 +82,8 @@ namespace Isis {
    *                           view has its own toolbar, so having getters that return toolbar
    *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
    *                           Removed methods that returned menu and toolbar actions.
-   *                           Made it so that on default and if there is no active control net,
-   *                           the Control Net Tool will be disabled.
-   *                           Added enableControlNetTool(bool) so when an active control net is
-   *                           set, the tool becomes enabled.
+   *                           Added enableControlNetTool(bool) so when an active control net is set,
+   *                           the tool becomes enabled.
    *  @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of
    *                           getting ambiguous shortcut errors. To counter this, we enable/disable
    *                           actions. On default, actions are disabled until a user moves the
@@ -96,6 +94,9 @@ namespace Isis {
    *                           project state. Qt's save/restoreState use the objectName. Remove
    *                           sizeHint method which is now taken care of in the parent class,
    *                           AbstractProjectItemView.
+   *   @history 2018-07-12 Tracie Sucharski - Renamed m_controlNetTool to m_controlNetToolAction
+   *                           to be clear it is not a pointer to the tool.  Add a call to
+   *                           the MosaicControlNetTool::loadNetwork in enableControlNetTool.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -164,8 +165,6 @@ namespace Isis {
       QToolBar *m_permToolBar; //!< The permanent tool bar
       QToolBar *m_activeToolBar; //!< The active tool bar
       ToolPad *m_toolPad; //!< The tool pad
-
-      QAction *m_controlNetTool;  //!< The Control Point Editor Tool
   };
 }
 

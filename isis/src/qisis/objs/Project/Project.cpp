@@ -1810,6 +1810,10 @@ namespace Isis {
    *                           Fixes #4567
    *  @history 2018-03-30 Tracie Sucharski - If current activeControl has been modified, prompt for
    *                           saving. Emit signal to discardActiveControlEdits.
+   *  @history 2018-07-12 Tracie Sucharski - Moved the close/open control net from
+   *                           Directory::reloadActiveControlInCnetEditorView to this method to
+   *                           prevent seg fault when there are multiple cnetEditorViews with same
+   *                           cnet.
    *
    */
   void Project::setActiveControl(QString displayName) {
@@ -1833,6 +1837,9 @@ namespace Isis {
             break;
           // Discard any changes made to cnet
           case QMessageBox::Discard:
+            // Close, then re-open effectively discarding edits
+            m_activeControl->closeControlNet();
+            m_activeControl->openControlNet();
             emit discardActiveControlEdits();
             break;
           // Cancel operation

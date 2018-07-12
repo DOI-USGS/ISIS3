@@ -100,12 +100,7 @@ namespace Isis {
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
 
-      // Currently this connection is only used by Directory when a new active is chosen & user
-      // chooses to discard any edits in the old active control which is in a CnetEditorWidget.
-      // The only view which will not be updated with the new control are any CnetEditorViews
-      // showing the old active control.  CnetEditorWidget classes do not have the ability to reload
-      // a control net, so the CnetEditor view displaying the old control is removed, then recreated.
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+      connect(m_directory, SIGNAL(closeView(QWidget *)),
               this, SLOT(removeView(QWidget *)));
 
       connect(m_directory, SIGNAL( directoryCleaned() ),
@@ -248,15 +243,16 @@ namespace Isis {
 
 
   /**
-   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
-   * close the given view and delete the view. This was written to handle
+   * This slot is connected from Directory::closeView(QWidget *) signal.  It will close the given 
+   * view and delete the view. 
    *
    * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
 
-    view->close();
-    delete view;
+    QDockWidget *parentDock = qobject_cast<QDockWidget *>(view->parent());
+    removeDockWidget(parentDock);
+    delete parentDock;
   }
 
 

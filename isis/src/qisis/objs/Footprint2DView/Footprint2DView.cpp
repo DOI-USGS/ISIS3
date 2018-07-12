@@ -145,8 +145,6 @@ namespace Isis {
     }
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
-
-    setAcceptDrops(true);
   }
 
   /**
@@ -320,6 +318,9 @@ namespace Isis {
     foreach (QAction *action, m_toolPad->actions()) {
       if (action->toolTip() == "Control Net (c)") {
         action->setEnabled(value);
+        MosaicControlNetTool *cnetTool =
+              static_cast<MosaicControlNetTool *>(m_controlNetToolAction->parent());
+        cnetTool->loadNetwork();
       }
     }
   }
