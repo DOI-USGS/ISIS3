@@ -499,7 +499,7 @@ namespace Isis {
       // Remove any images from defaultSettings that exist in fillSettings
       foreach (QString observationNumber, solveSettings.observationNumbers()) {
         // The method will return a default with no obs numbers if none are found
-        if (settings->observationSolveSettings(observationNumber).observationNumbers().isEmpty()) {
+        if (!settings->observationSolveSettings(observationNumber).observationNumbers().isEmpty()) {
           solveSettings.removeObservationNumber(observationNumber);
         }
       }
