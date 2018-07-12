@@ -55,8 +55,6 @@ namespace Isis {
 
     m_observationNumber = ObservationNumber::Compose(*(cube()));
     m_serialNumber = SerialNumber::Compose(*(cube()));
-    qDebug() << "ob# " << m_observationNumber;
-    qDebug() << "sn# " << m_serialNumber;
     
     cube();
 
@@ -95,8 +93,6 @@ namespace Isis {
 
     m_observationNumber = ObservationNumber::Compose(*(cube()));
     m_serialNumber = SerialNumber::Compose(*(cube()));
-    qDebug() << "ob# " << m_observationNumber;
-    qDebug() << "sn# " << m_serialNumber;
 
     initCamStats();
 
