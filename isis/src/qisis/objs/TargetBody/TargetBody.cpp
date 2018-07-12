@@ -209,7 +209,7 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
   
   /**
    * @brief Returns the value stored at TargetName in the original pvl label.
-   * @return @b
+   * @return QString Returns m_targetName
    */
   QString TargetBody::targetName() {
     return m_targetName;

@@ -332,7 +332,7 @@ namespace Isis {
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
       
-      QString instrumentId(); // The "InstrumentId" as it appears on the cube
+      QString instrumentId();
 
       QString instrumentNameLong() const;
       QString instrumentNameShort() const;

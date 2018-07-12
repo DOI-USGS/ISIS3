@@ -84,7 +84,7 @@ namespace Isis {
 
       QString id() const;
 
-      QString instrumentId(); // The "InstrumentId" as it appears on the cube
+      QString instrumentId();
 
       QString instrumentNameShort();
       QString instrumentNameLong();
