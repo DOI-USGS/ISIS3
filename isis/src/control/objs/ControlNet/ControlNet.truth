@@ -83,28 +83,11 @@ testing GetCubeSerials... (NOTE: unittest sorts the results)
   DELTA
 
 testing set target.................................
-Set target/radii directly. Invalid radii.
-**ERROR** Unable to set target radii. The given list must have length 3.
-
-Set target/radii directly. Valid radii.
-        TargetName = SomethingStrange
-
-Set target/radii using empty PVL.
+Set target using empty PVL.
         TargetName = 
-
-Set target/radii using PVL with no PolarRadius.
+Set target using actual PVL.
 Group = Mapping
-  TargetName       = Mars
-  EquatorialRadius = Null
-End_Group
-End
-        TargetName = Mars
-
-Set target/radii using PVL containing both radii.
-Group = Mapping
-  TargetName       = Mars
-  EquatorialRadius = 6.0
-  PolarRadius      = 1.0
+  TargetName = Mars
 End_Group
 End
         TargetName = Mars

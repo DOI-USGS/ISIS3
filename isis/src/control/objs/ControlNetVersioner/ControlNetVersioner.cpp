@@ -332,12 +332,12 @@ namespace Isis {
                && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
 
             QString sigmas = "AprioriLatitudeSigma = "
-              + toString(aprioriSurfacePoint.GetLatSigmaDistance().meters())
-              + " <meters>  AprioriLongitudeSigma = "
-              + toString(aprioriSurfacePoint.GetLonSigmaDistance().meters())
-              + " <meters>  AprioriRadiusSigma = "
-              + toString(aprioriSurfacePoint.GetLocalRadiusSigma().meters())
-              + " <meters>";
+            + toString(aprioriSurfacePoint.GetLatSigmaDistance().meters())
+            + " <meters>  AprioriLongitudeSigma = "
+            + toString(aprioriSurfacePoint.GetLonSigmaDistance().meters())
+            + " <meters>  AprioriRadiusSigma = "
+            + toString(aprioriSurfacePoint.GetLocalRadiusSigma().meters())
+            + " <meters>";
             matrix.addComment(sigmas);
           }
 
@@ -408,12 +408,12 @@ namespace Isis {
                && adjustedSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
 
             QString sigmas = "AdjustedLatitudeSigma = "
-              + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
-              + " <meters>  AdjustedLongitudeSigma = "
-              + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
-              + " <meters>  AdjustedRadiusSigma = "
-              + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
-              + " <meters>";
+                           + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
+                           + " <meters>  AdjustedLongitudeSigma = "
+                           + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
+                           + " <meters>  AdjustedRadiusSigma = "
+                           + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
+                           + " <meters>";
 
             matrix.addComment(sigmas);
           }

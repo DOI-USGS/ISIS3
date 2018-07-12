@@ -1736,12 +1736,6 @@ namespace Isis {
    *              group or NaifKeywords object).
    */
   void ControlNet::SetTarget(Pvl label) {
-    QScopedPointer <QMutexLocker> locker;
-
-    if (m_mutex) {
-      locker.reset(new QMutexLocker(m_mutex));
-    }
-
     PvlGroup mapping;
     if ( (label.hasObject("IsisCube") && label.findObject("IsisCube").hasGroup("Mapping"))
          || label.hasGroup("Mapping") ) {
@@ -1751,39 +1745,14 @@ namespace Isis {
     if (mapping.hasKeyword("TargetName")) {
       p_targetName = mapping["TargetName"][0];
     }
+    else if (label.hasObject("IsisCube")
+             && label.findObject("IsisCube").hasGroup("Instrument")
+             && label.findObject("IsisCube").findGroup("Instrument").hasKeyword("TargetName")) {
+      p_targetName = label.findObject("IsisCube").findGroup("Instrument").findKeyword("TargetName")[0];
+    }
     else {
       p_targetName = "";
     }
-  }
-
-
-  /**
-   * Directly sets the target name and radii using the given information.
-   *
-   * @see Target::radiiGroup(Pvl, PvlGroup)
-   *
-   * @param target The name of the target for this Control Network
-   * @param target A 3-dimensional vector containing the A (equatorial major), B
-   *               (equatorial minor), and C (polar) triaxial radii values of
-   *               the target for this Control Network
-   *
-   */
-  void ControlNet::SetTarget(const QString &target,
-                             const QVector<Distance> &radii) {
-    QScopedPointer <QMutexLocker> locker;
-
-    if (m_mutex) {
-      locker.reset(new QMutexLocker(m_mutex));
-    }
-
-    if (radii.size() != 3) {
-      throw IException(IException::Unknown,
-                       "Unable to set target radii. The given list must have length 3.",
-                       _FILEINFO_);
-    }
-
-    p_targetName = target;
-
   }
 
 
