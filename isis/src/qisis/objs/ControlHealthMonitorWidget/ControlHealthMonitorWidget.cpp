@@ -149,26 +149,6 @@ namespace Isis {
   }
 
 
-  void ControlHealthMonitorWidget::broken() {
-    updateStatus(0);
-    m_statusLabel->setText("Broken!");
-    m_statusDetails->setText("This network has 2 islands.");
-  }
-
-  void ControlHealthMonitorWidget::weak() {
-    updateStatus(1);
-    m_statusLabel->setText("Weak!");
-    m_statusDetails->setText("This network has " + toString(m_vitals->numPointsBelowMeasureThreshold()) + " points "
-                             + "with less than 3 measures.");
-  }
-
-  void ControlHealthMonitorWidget::healthy() {
-    updateStatus(2);
-    m_statusLabel->setText("Healthy!");
-    m_statusDetails->setText("This network is healthy.");
-  }
-
-
   /*
    *  This SLOT is designed to update the values in the gui to properly represent
    *  The current state of the Control Network. This SLOT is triggered whenever the
@@ -362,7 +342,6 @@ namespace Isis {
     headers.append("New Value");
     headers.append("Timestamp");
 
-
     m_historyTable = new QTableWidget();
     m_historyTable->setColumnCount(5);
     m_historyTable->setHorizontalHeaderLabels(headers);
@@ -375,28 +354,8 @@ namespace Isis {
     m_historyTable->setGeometry(QApplication::desktop()->screenGeometry());
 
     overviewLayout->addWidget(m_historyTable);
-
-    QWidget *tempWidget = new QWidget;
-    QHBoxLayout *tempLayout = new QHBoxLayout;
-
-    tempLayout->setSpacing(15);
-
-    QPushButton *broken = new QPushButton("Broken");
-    QPushButton *weak = new QPushButton("Weak");
-    QPushButton *healthy = new QPushButton("Healthy");
-
-    connect (broken,  SIGNAL(clicked()), this, SLOT(broken()));
-    connect (weak,    SIGNAL(clicked()), this, SLOT(weak()));
-    connect (healthy, SIGNAL(clicked()), this, SLOT(healthy()));
-
-    tempLayout->addWidget(broken);
-    tempLayout->addWidget(weak);
-    tempLayout->addWidget(healthy);
-
-    tempWidget->setLayout(tempLayout);
-    overviewLayout->addWidget(tempWidget);
-
     overview->setLayout(overviewLayout);
+
     return overview;
   }
 
@@ -467,7 +426,8 @@ namespace Isis {
     m_imagesTable->verticalHeader()->setVisible(false);
     m_imagesTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_imagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_imagesTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_imagesTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
     m_imagesTable->setShowGrid(true);
     m_imagesTable->setGeometry(QApplication::desktop()->screenGeometry());
     m_imagesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -525,7 +485,7 @@ namespace Isis {
     m_pointsFreeProgressbar = new QProgressBar();
     QPalette p = m_pointsFreeProgressbar->palette();
     p.setColor(QPalette::Highlight, Qt::blue);
-    p.setColor(QPalette::Text, Qt::white);
+    p.setColor(QPalette::Text, Qt::black);
     m_pointsFreeProgressbar->setPalette(p);
     m_pointsFreeProgressbar->setRange(0, 100);
 
@@ -661,7 +621,12 @@ namespace Isis {
    *  and opens the CubeDnView with the images selected.
    */
   void ControlHealthMonitorWidget::emitOpenImageEditor() {
-    emit openImageEditor();
+    QList<QString> serials;
+    QModelIndexList rows = m_imagesTable->selectionModel()->selectedRows(1);
+    foreach (QModelIndex index, rows) {
+      serials.append(index.data().toString());
+    }
+    emit openImageEditor(serials);
   }
 
 

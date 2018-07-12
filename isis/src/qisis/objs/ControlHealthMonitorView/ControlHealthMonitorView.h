@@ -45,9 +45,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2018-06-07 Adam Goins - Initial Version.
+   *   @history 2018-06-26 Adam Goins - Made the view dockable with setCentralWidget().
    *   @history 2018-07-10 Tracie Sucharski - Remove sizePolicy and sizeHint. These are set in the
    *                           parent class, AbsttracProjectItemView.
-   *  
    */
 
 class ControlHealthMonitorView : public AbstractProjectItemView {
@@ -68,7 +68,7 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
 
   private slots:
     void openPointEditor(ControlPoint *point);
-    void openImageEditor();
+    void openImageEditor(QList<QString> serials);
 
   private:
     Directory *m_directory;

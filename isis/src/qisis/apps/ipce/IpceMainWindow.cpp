@@ -82,9 +82,11 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
     //setDockOptions(GroupedDragging | AllowTabbedDocks);
 
+    //centralWidget->hide();
     setDockNestingEnabled(true);
 
     //  Set the splitter frames to a reasonable color/size for resizing the docks.
@@ -178,6 +180,7 @@ namespace Isis {
     createMenus();
     createToolBars();
 
+    QCoreApplication::setApplicationName("ipce");
     QStringList args = QCoreApplication::arguments();
 
     if (args.count() == 2) {
@@ -251,7 +254,6 @@ namespace Isis {
 
     view->close();
     delete view;
-    delete parentDock;
   }
 
 

@@ -146,6 +146,8 @@ namespace Isis {
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.
+   *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does
+   *                           not output text to the command line for ipce. Fixes #4171.
    *   @history 2018-06-19 Kaitlyn Lee - Added tabViews() and the menu option under the View menu to
    *                           tab the views. Currently, this can tab all attached/detached views. I
    *                           left the line setting dock options to allow grouped dragging, but tabbing
