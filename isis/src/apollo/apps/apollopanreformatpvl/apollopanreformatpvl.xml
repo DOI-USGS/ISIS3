@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apollopanreformatpvl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Match the tiles in an Apollo panoramic camera image together, compute an affine transform
+    for each tile based on the fiducial marks, and flag any outlier fiducial marks.
+  </brief>
+
+  <description>
+    Match the tiles in an Apollo panoramic camera image together, compute an affine transform
+    for each tile based on the fiducial marks, and flag any outlier fiducial marks.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Ken Edmundson" date="2017-08-16">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input pvl prefix
+        </brief>
+        <description>
+          Input pvl prefix
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output pvl prefix
+        </brief>
+        <description>
+          Output pvl prefix
+        </description>
+        <filter>
+          *.pvl
+        </filter>
+      </parameter>
+    </group>   
+  </groups>
+
+  <examples>
+  </examples>
+
+</application>

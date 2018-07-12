@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apolloPanPVL2Net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert a pvl from apollopanprocess to two control networks.
+  </brief>
+
+  <description>
+    This program takes a pvl file from apollopanprocess and produces two control network files,
+    a fiducial net named TO_fid.net and a timing net named TO_timing.net.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2016-09-05">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMPVL">
+        <type>string</type>
+        <brief>
+          The input PVL
+        </brief>
+        <description>
+          The input PVL
+        </description>
+      </parameter>
+
+      <parameter name="ONET">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output file prefix
+        </brief>
+        <description>
+          The prefix for the output net files
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+  </examples>
+
+</application>

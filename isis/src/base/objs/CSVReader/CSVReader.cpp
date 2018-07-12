@@ -85,6 +85,7 @@ namespace Isis {
     _keepParts(keepEmptyParts), _lines(),
     _ignoreComments(ignoreComments) {
 
+    m_csvFile = csvfile;
     read(csvfile);
   }
 
@@ -159,7 +160,8 @@ namespace Isis {
       QString mess = "Unable to open file " + csvfile;
       throw IException(IException::User, mess, _FILEINFO_);
     }
-
+    
+    m_csvFile = csvfile;
     _lines.clear();
     load(ifile);
     ifile.close();
@@ -181,14 +183,50 @@ namespace Isis {
    * @see haveHeader()
    * @see setHeader()
    */
-  CSVReader::CSVAxis CSVReader::getHeader() const {
+  CSVReader::CSVAxis CSVReader::getHeader() const{
     //  Return an empty header if we don't have one
     if((!_header) || (_skip >= rows())) {
       return (CSVAxis(0));
     }
     return (Parser(_lines[_skip], _delimiter, _keepParts).result());
   }
-
+  
+  /**
+   * @brief This method will return the index at which name occurs.
+   * 
+   * @param name The column name we are trying to find.
+   * 
+   * @throws IException::Programmer This file does not have a header set.
+   *
+   * @return @b int The index at which the column name occurs, -1 is returned if it does not exist
+   */
+  int CSVReader::getHeaderColumn(QString name) {
+    if (!haveHeader()) {
+      QString mess = "This file does not have a header set.";
+      throw IException(IException::Programmer, mess, _FILEINFO_);
+      return -1;
+    }
+    QString columnName = QString(name).trimmed();
+    
+    const CSVReader::CSVAxis header = getHeader();
+    
+    if(header.dim() <= 0) {
+      QString mess = "Could not get a valid header.";
+      throw IException(IException::Programmer, mess, _FILEINFO_);
+      return -1;
+    }
+    
+    for (int i = 0; i < header.dim(); i++) {
+      if (columnName.toLower() == QString(header[i]).toLower().trimmed()) {
+        return i;
+      }
+    }
+    QString mess = "Could not find that column header.";
+    throw IException(IException::Programmer, mess, _FILEINFO_);
+    return -1;    
+      
+  }
+    
   /**
    * @brief Parse and return the requested row by index
    *
@@ -201,13 +239,111 @@ namespace Isis {
    *
    * @return CSVReader::CSVAxis  Array of tokens after parsing rules are applied
    */
-  CSVReader::CSVAxis CSVReader::getRow(int index) const {
+  CSVReader::CSVAxis CSVReader::getRow(int index) const{
     //  Return an empty header if we don't have one
     if((index < 0) || (index >= rows())) {
       return (CSVAxis(0));
     }
     return (Parser(_lines[index+firstRowIndex()], _delimiter, _keepParts).result());
   }
+  
+  /**
+   * @brief Find and return the row based upon the QPairs in the QList
+   *
+   * This method will parse and return the requested row from the input source as
+   * an array.  If the requested row is determined to be an invalid index, then a
+   * zero-length array is returned and an exception is thrown.  
+   * 
+   * IF there is repeating matching values that match all of the information in imageDataList, this 
+   * will return the first row that matches. If you want a unique row then add more search pairs to 
+   * imageDataList.
+   *
+   * @param imageDataList A QList of QPairs that contain first, the name of the column, and second, 
+   * the value of the column we are trying to match.
+   * 
+   * @throws IException::Programmer Cannot search with empty search parameters.
+   * @throws IException::Programmer Could not get a valid header index.
+   * @throws IException::User Row not found in CSV file.
+   *
+   * @return @b CSVReader::CSVAxis  Array of tokens after parsing rules are applied, in this
+   * case it will be the row that we are trying to find, it will return an empty array if it isn't 
+   * found. 
+   *         
+   */
+  CSVReader::CSVAxis CSVReader::getRow(QList< QPair<QString, QString> > imageDataList) {
+      
+    if (imageDataList.size() <= 0) {
+      QString mess = "Cannot search with empty search parameters.";
+      throw IException(IException::Programmer, mess, _FILEINFO_);
+      return (CSVAxis(0));
+    }
+      
+    QPair<QString, QString> imageNumPair = imageDataList[0];
+    
+    //Grab the primary pair. The primary pair is the first pair of imageDataList and will be the
+    //first column and value compared to the row column/value. To make the search faster, try to 
+    //make your first pair the column/value that will eliminate the most rows.
+    //
+    //For example, when searching for an image based on the image number and the tile number
+    //(as in the case of Apollo 15) there are at most 8 rows that match the image number but there
+    //are many more rows that match the tile number. So I would use the image number as the primary
+    //pair.
+    int primaryColumnNum = getHeaderColumn(imageNumPair.first);
+    if (primaryColumnNum == -1) {
+      QString mess = "Could not get a valid header index.";
+      throw IException(IException::Programmer, mess, _FILEINFO_);
+      return (CSVAxis(0));
+    }
+      
+    QString primaryValue = imageNumPair.second;
+    
+    ifstream ifile(m_csvFile.toLatin1().data(), ifstream::in);
+    
+    //This loops through the file until the row we want is found, or it's the end of file
+    //and there are no matching rows
+    int j = 0;
+    while (!ifile.eof()) {
+      const CSVReader::CSVAxis row = getRow(j);
+      
+      if (row.dim() <= 0) {
+        QString mess = "There is no matching data not found in CSV.";
+        throw IException(IException::User, mess, _FILEINFO_);
+        return (CSVAxis(0));
+      }
+      
+      //Check if the primary pair's value matches the rows value
+      if (primaryValue.toLower().trimmed() == QString(row[primaryColumnNum]).toLower().trimmed()) {
+        
+        //Loops through the rest of imageDataList's pairs and checks the row for column/row 
+        //matches
+        for (int i = 1; i < imageDataList.size(); i++) {
+          QPair<QString, QString> columnPair = imageDataList[i];
+          int columnCheckNum = getHeaderColumn(columnPair.first);
+          QString columnValue = columnPair.second;
+          
+          //Check that the columnValue matches the row's column value, if it does and it is the 
+          //end of imageDataList then that is the correct row 
+          if (columnValue.toLower().trimmed() == QString(row[columnCheckNum]).toLower().trimmed()) {
+            if (i == imageDataList.size() - 1) {
+              return row;
+            }
+          }
+          //If it doesn't match, break out of this loop because the row doesn't match
+          else {
+            break;
+          }
+        }
+      }
+      j++;
+    }
+    
+    //If we've gotten here then there is no matching row. Tell the user and return an empty token 
+    //array.
+    QString mess = "Row not found in CSV file.";
+    throw IException(IException::User, mess, _FILEINFO_);
+    return (CSVAxis(0));
+  }
+  
 
 
   /**

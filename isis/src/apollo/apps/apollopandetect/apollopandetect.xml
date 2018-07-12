@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apolloPanDetect" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Detect the timing marks, fiducial marks, and edges of an Apollo panoramic camera image.
+  </brief>
+
+  <description>
+    Detect the timing marks, fiducial marks, and edges of an Apollo panoramic camera image.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2016-09-05">
+      Original version
+    </change>
+    <change name="Jesse Mapel" date="2016-09-26">
+      Removed MODIFIEDINPUT parameter
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="IMAGENUMBER">
+        <type>string</type>
+        <brief>
+          The four-digit input image number.
+        </brief>
+        <description>
+          The four-digit input image number.
+        </description>
+      </parameter>
+
+      <parameter name="TILENUMBER">
+        <type>integer</type>
+        <brief>
+          Which tile in the image to detect.  This is for correcting a single tile
+          or detecting images with fewer than 8 tiles.
+        </brief>
+        <description>
+          Which tile in the image to detect.  This will result in only running detection
+          on a single tile.
+        </description>
+        <internalDefault>
+          -1
+        </internalDefault>
+      </parameter>
+
+      <parameter name="TILETIF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The tif file to use if detecting a single tile.
+        </brief>
+        <description>
+          The tif file to use if detecting a single tile.  If not entered,
+          the image files will be taken from /work/projects/as15pan/AS15-P-####.
+        </description>
+        <internalDefault>
+          Use standard image file.
+        </internalDefault>
+      </parameter>
+
+      <parameter name="TIFLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          A list of tif image files for overriding the standard image files.
+        </brief>
+        <description>
+          A list of tif image files ordered from tile 1 to tile 8
+          that will override the standard image files.  If not entered,
+          image files will be taken from /work/projects/as15pan/.
+        </description>
+        <internalDefault>
+          Use standard image files.
+        </internalDefault>
+      </parameter>
+
+      <parameter name="PREFIX">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output file prefix that will be appended with AS15-P-####_000#.pvl.
+        </brief>
+        <description>
+          The prefix for the output pvl files that will be appended with AS15-P-####_000#.pvl.
+          This can include a path to a directory, but must end with /.
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+  </examples>
+
+</application>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apolloPanTransform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Match the tiles in an Apollo panoramic camera image together, compute an affine transform
+    for each tile based on the fiducial marks, and flag any outlier fiducial marks.
+  </brief>
+
+  <description>
+    Match the tiles in an Apollo panoramic camera image together, compute an affine transform
+    for each tile based on the fiducial marks, and flag any outlier fiducial marks.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2016-09-09">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <brief>
+          The input pvl prefix from apolloPanDetect
+        </brief>
+        <description>
+          The input pvl prefix from apolloPanDetect
+        </description>
+        <default>
+          <item>invalid</item>
+        </default>
+      </parameter>
+
+      <parameter name="LASTTILE">
+        <type>integer</type>
+        <brief>
+          The last tile in the image.  This is for images with less than 8 tiles.
+        </brief>
+        <description>
+          The last tile in the image.  This is for images with less than 8 tiles.
+        </description>
+        <internalDefault>
+          8
+        </internalDefault>
+      </parameter>
+
+      <parameter name="FIRSTFIDINDEX">
+        <type>integer</type>
+        <brief>
+          The index of the first fiducial mark on the image.
+        </brief>
+        <description>
+          The index of the first fiducial mark on the image.
+        </description>
+        <internalDefault>
+          0
+        </internalDefault>
+      </parameter>
+      
+      <parameter name="PVLLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The list of input pvl files
+        </brief>
+        <description>
+          The list of input pvl files.  These must be ordered from tile 1 to 8.
+        </description>
+        <internalDefault>
+          Use standard raw detection pvl files.
+        </internalDefault>
+      </parameter>
+
+      <parameter name="CALIBRATED">
+        <type>filename</type>
+        <brief>
+          The input csv containing calibrated fiducial mark coordiantes.
+        </brief>
+        <description>
+          The input csv containing calibrated fiducial mark coordiantes.
+        </description>
+        <default>
+          <item>/archive/missions/apollo_pan/AS15/CriticalData/PanData/SupportData/CalibratedFiducials/CalibratedFiducials.csv</item>
+        </default>
+      </parameter>
+
+      <parameter name="PREFIX">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output file prefix
+        </brief>
+        <description>
+          The prefix for the output pvl files
+        </description>
+      </parameter>
+    </group>
+    
+    <group name="ErrorDetection">
+     <parameter name="TOLERANCE">
+        <type>double</type>
+        <brief>
+          The threshold for flagging fiducial marks as outliers
+        </brief>
+        <description>
+          The threshold for flagging fiducial marks as outliers.
+          The residual, in mm, is measured for each fiducial and if it exceeds the threshold
+          then it will flag that fisucial mark as an outlier.
+        </description>
+        <default>
+          <item>0.5</item>
+        </default>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+  </examples>
+
+</application>

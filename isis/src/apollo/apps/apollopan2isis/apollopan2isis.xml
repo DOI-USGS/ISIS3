@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application name="apollopan2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import Apollo Image
+  </brief>
+
+  <description>
+    This program will put cube labels onto an Apollo Panoramic cube, or it will produced a 
+    detached label file. If an output label file is not entered then the 
+  </description>
+
+  <history>
+    <change name="Makayla Shepherd" date="2016-06-28">
+      Original version
+    </change>
+    <change name="Makayla Shepherd" date="2016-09-07">
+      Added an option to create a detached label file rather than attaching the labels to the cube.
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Apollo</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+     <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input file 
+        </brief>
+        <description>
+          Use this parameter to specify the name of the input cube.
+        </description>
+        <filter>
+           *.cub
+         </filter>
+      </parameter>
+
+      <parameter name="TOPVL">
+         <type>filename</type>
+         <fileMode>output</fileMode>
+         <brief>
+           Output detached label pvl.
+         </brief>
+         <internalDefault>
+           None
+         </internalDefault>
+         <description>
+           Use this parameter to specify the name of the detached label file.
+         </description>
+         <filter>
+           *.pvl
+         </filter>
+       </parameter>
+    </group>
+  </groups>
+</application>

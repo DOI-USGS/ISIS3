@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apolloPanPVL2Net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert a pvl from apollopanprocess to two control networks.
+  </brief>
+
+  <description>
+    This program takes a pvl file from apollopanprocess and produces two control network files,
+    a fiducial net named TO_fid.net and a timing net named TO_timing.net.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2016-09-05">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FIDUCIALNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input fiducial mark control network
+        </brief>
+        <description>
+          The input fiducial mark control network
+        </description>
+      </parameter>
+
+      <parameter name="TIMINGNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The input timing mark control network
+        </brief>
+        <description>
+          The input timing mark control network
+        </description>
+      </parameter>
+
+      <parameter name="ORIGINALPVL">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The original pvl file for the image
+        </brief>
+        <description>
+          The original pvl file for the image
+        </description>
+      </parameter>
+
+      <parameter name="TOPVL">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output pvl filename
+        </brief>
+        <description>
+          The output pvl filename
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+  </examples>
+
+</application>

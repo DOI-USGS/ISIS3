@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apolloPanTime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Determine the exposure time and duration for an Apollo panoramic camera image.
+  </brief>
+
+  <description>
+    Determine the exposure time and duration for an Apollo panoramic camera image.
+  </description>
+
+  <category>
+    <categoryItem>Geometry</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jesse Mapel" date="2016-09-23">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <brief>
+          The input pvl prefix from apolloPanTransform
+        </brief>
+        <description>
+          The input pvl prefix from apolloPanTransform
+        </description>
+        <default>
+          <item>invalid</item>
+        </default>
+      </parameter>
+
+      <parameter name="LASTTILE">
+        <type>integer</type>
+        <brief>
+          The last tile in the image.  This is for images with less than 8 tiles.
+        </brief>
+        <description>
+          The last tile in the image.  This is for images with less than 8 tiles.
+        </description>
+        <internalDefault>
+          8
+        </internalDefault>
+      </parameter>
+      
+      <parameter name="PVLLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          The list of input pvl files
+        </brief>
+        <description>
+          The list of input pvl files.  These must be ordered from tile 1 to 8.
+        </description>
+        <internalDefault>
+          Use standard transform detection pvl files.
+        </internalDefault>
+      </parameter>
+
+      <parameter name="PREFIX">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          The output file prefix
+        </brief>
+        <description>
+          The prefix for the output pvl files
+        </description>
+      </parameter>
+    </group>
+  </groups>
+
+  <examples>
+  </examples>
+
+</application>

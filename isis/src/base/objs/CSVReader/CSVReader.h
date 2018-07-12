@@ -23,6 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QList>
+#include <QPair>
 #include <QString>
 #include <vector>
 #include <fstream>
@@ -76,7 +78,11 @@ namespace Isis {
    *   @history 2007-06-05 Brendan George - Modified to work with
    *                           QString/StringTools merge
    *   @history 2008-06-18 Christopher Austin - Fixed documentation
-   *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
+   *   @history 2016-10-07 Makayla Shepherd - Added getHeaderColumn, and
+   *                           getRow(QList <QPair<QString, QString>>) in order to get a column
+   *                           based on a column header name, and search for a row based on a QPair
+   *                           of QStrings. These were created to support the metadata CSV for 
+   *                           Apollo Pan.
    */
   template <typename TokenStore = QString>
   class CSVParser {
@@ -98,7 +104,7 @@ namespace Isis {
        *
        * @param str  QString to parse
        * @param delimiter Character that separates individual tokens in the string
-       * @param keepEmptyParts Specifies the occurance of successive tokens is to
+       * @param keepEmptyParts Specifies the occurance of successive tokens is 
        *                       treated as one token (false) or each delimiter
        *                       indicates an empty token (true)
        */
@@ -107,10 +113,7 @@ namespace Isis {
         parse(str, delimiter, keepEmptyParts);
       }
 
-      /**
-       * Returns the number of tokens in the parsed string
-       * @return int
-       */
+      /** Returns the number of tokens in the parsed string */
       int size() const {
         return (_elements.dim());
       }
@@ -162,7 +165,7 @@ namespace Isis {
       /**
        *  @brief Returns the list of tokens
        *
-       *  @return This method returns the complete list of tokens.  Note that it utilizes
+       *  This method returns the complete list of tokens.  Note that it utilizes
        *  the most efficient method of storing and exporting tokens, namely a
        *  reference counted array.
        */
@@ -266,10 +269,6 @@ namespace Isis {
 
       // Constructors and Destructor
       CSVReader();
-      /**
-       * @brief constructor
-       * @param ignoreComments boolean whether to ignore comments or not
-       */
       CSVReader(const QString &csvfile, bool header = false, int skip = 0,
                 const char &delimiter = ',', const bool keepEmptyParts = true,
                 const bool ignoreComments = true);
@@ -367,7 +366,6 @@ namespace Isis {
        * The existance of a header line is always determined by the user of this
        * class.  See the setHeader() method for additional information on header
        * maintainence.
-       * @return bool whether has CSV has header
        */
       bool haveHeader() const {
         return (_header);
@@ -453,7 +451,6 @@ namespace Isis {
        *  treated as one token.
        *  @see setKeepEmptyParts()
        *  @see setSkipEmptyParts()
-       * @return bool
        */
       bool keepEmptyParts() const {
         return (_keepParts);
@@ -462,7 +459,9 @@ namespace Isis {
       void read(const QString &fname);
 
       CSVAxis getHeader() const;
+      int getHeaderColumn(QString name);
       CSVAxis getRow(int index) const;
+      CSVAxis getRow(QList< QPair<QString, QString> > imageDataList);
       CSVAxis getColumn(int index) const;
       CSVAxis getColumn(const QString &hname) const;
       CSVTable   getTable() const;
@@ -490,6 +489,8 @@ namespace Isis {
       bool          _keepParts;  //!<  Keep empty parts between delimiter
       CSVList       _lines;      //!<  List of lines from file
       bool          _ignoreComments; //!<  Ignore comments on read
+      
+      QString m_csvFile; //!< The name of the csv we're reading
 
       /**
        * @brief Computes the index of the first data
@@ -554,3 +555,4 @@ namespace Isis {
 
 
 #endif
+
