@@ -16,6 +16,7 @@
 #include <geos/io/WKTWriter.h>
 
 #include "Angle.h"
+#include "Camera.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "DisplayProperties.h"
@@ -57,6 +58,7 @@ namespace Isis {
     m_serialNumber = SerialNumber::Compose(*(cube()));
     
     cube();
+    m_cameraType = m_cube->camera()->GetCameraType();
 
     initCamStats();
 
@@ -91,6 +93,7 @@ namespace Isis {
     m_lineResolution = Null;
     m_sampleResolution = Null;
 
+    m_cameraType = m_cube->camera()->GetCameraType();
     m_observationNumber = ObservationNumber::Compose(*(cube()));
     m_serialNumber = SerialNumber::Compose(*(cube()));
 
@@ -285,6 +288,16 @@ namespace Isis {
       delete m_cube;
       m_cube = NULL;
     }
+  }
+
+
+  /**
+   * @brief Get the camera type for this Image.
+   * 
+   * @return Camera::CameraType Returns the camera type for this Image.
+   */
+  Camera::CameraType Image::cameraType() const {
+    return m_cameraType;
   }
 
 
