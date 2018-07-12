@@ -177,6 +177,7 @@ namespace Isis {
     private:
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items
       Workspace *m_workspace; //!< The workspace
+      Directory *m_directory; //!< The directory
 
       ProjectItemViewMenu *m_viewMenu; //!< View menu for storing actions
       ProjectItemViewMenu *m_optionsMenu; //!< Options menu for storing actions

@@ -130,6 +130,8 @@ namespace Isis {
       void onMosItemRemoved(Image *image);
 
     private:
+      void enableActions();
+
       /**
        * @author 2018-05-11 Tracie Sucharski
        *
@@ -156,6 +158,7 @@ namespace Isis {
       ImageFileListWidget *m_fileListWidget; //!< The file list widget
       QMainWindow *m_window; //!< Main window
       QMap<Image *, ProjectItem *> m_imageItemMap; //!< Maps images to their items
+      Directory *m_directory; //!< The directory
 
       QToolBar *m_permToolBar; //!< The permanent tool bar
       QToolBar *m_activeToolBar; //!< The active tool bar
