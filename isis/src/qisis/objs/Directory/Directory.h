@@ -259,6 +259,10 @@ namespace Isis {
    *                           objectName needs to be created.
    *   @history 2018-07-09 Kaitlyn Lee - Uncommented code that closes a ControlPointEditView when a new
    *                           active control is set.
+   *   @history 2018-07-12 Tracie Sucharski - Renamed viewClosed signal to closeView. Moved
+   *                           the close/open control net from reloadActiveControlInCnetEditorView
+   *                           to Project::setActiveControl to prevent seg fault when there are
+   *                           multiple cnetEditorViews with same cnet.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -386,7 +390,7 @@ namespace Isis {
       void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
 
-      void viewClosed(QWidget *widget);
+      void closeView(QWidget *widget);
 
       void cnetModified();
       void redrawMeasures();

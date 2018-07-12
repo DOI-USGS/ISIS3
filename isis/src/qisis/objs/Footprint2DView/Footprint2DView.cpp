@@ -148,11 +148,12 @@ namespace Isis {
     // In ipce, we want it to be disabled if an active control is not set.
     foreach (QAction *action, m_toolPad->actions()) {
       if (action->toolTip() == "Control Net (c)") {
-        m_controlNetTool = action;
+        m_controlNetToolAction = action;
       }
     }
     if (!directory->project()->activeControl()) {
-      m_controlNetTool->setEnabled(false);
+      qDebug()<<"Footprint2DView constructor  set controlNetTool disabled";
+      m_controlNetToolAction->setEnabled(false);
     }
 
     setAcceptDrops(true);
@@ -326,7 +327,12 @@ namespace Isis {
    * @param value The boolean that holds if a control network has been set.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
-    m_controlNetTool->setEnabled(value);
+    m_controlNetToolAction->setEnabled(value);
+    if (value) {
+      MosaicControlNetTool *cnetTool =
+              static_cast<MosaicControlNetTool *>(m_controlNetToolAction->parent());
+      cnetTool->loadNetwork();
+    }
   }
 
 
