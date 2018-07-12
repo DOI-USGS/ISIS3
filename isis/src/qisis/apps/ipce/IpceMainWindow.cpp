@@ -84,6 +84,9 @@ namespace Isis {
     setCentralWidget(centralWidget);
 
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
+
+    // This was causing some buggy behavior, but this is what we would ultimately like.
+    // Allows a user to undock a group of tabs.
     //setDockOptions(GroupedDragging | AllowTabbedDocks);
 
     //centralWidget->hide();
