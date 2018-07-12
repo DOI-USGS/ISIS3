@@ -87,6 +87,9 @@ namespace Isis {
    *                           Added enableControlNetTool(bool) so when an active control net is set,
    *                           the tool becomes enabled.
    *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of
+   *                           Added enableControlNetTool(bool) so when an active control net is
+   *                           set, the tool becomes enabled.
+   *  @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of
    *                           getting ambiguous shortcut errors. To counter this, we enable/disable
    *                           actions. On default, actions are disabled until a user moves the
    *                           cursor over the view. When a user moves the cursor outside of the
@@ -134,6 +137,8 @@ namespace Isis {
       void onMosItemRemoved(Image *image);
 
     private:
+      void enableActions();
+
       /**
        * @author 2018-05-11 Tracie Sucharski
        *
@@ -160,6 +165,7 @@ namespace Isis {
       ImageFileListWidget *m_fileListWidget; //!< The file list widget
       QMainWindow *m_window; //!< Main window
       QMap<Image *, ProjectItem *> m_imageItemMap; //!< Maps images to their items
+      Directory *m_directory; //!< The directory
 
       QToolBar *m_permToolBar; //!< The permanent tool bar
       QToolBar *m_activeToolBar; //!< The active tool bar

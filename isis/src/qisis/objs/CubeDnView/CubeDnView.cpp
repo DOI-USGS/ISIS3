@@ -106,6 +106,8 @@ namespace Isis {
     m_workspace = new Workspace(false, this);
     m_workspace->mdiArea()->setActivationOrder(QMdiArea::StackingOrder);
 
+    m_directory = directory;
+
     // Since this is a QMainWindow, set the workspace as the central widget.
     setCentralWidget(m_workspace);
 
@@ -304,9 +306,13 @@ namespace Isis {
 
   /**
    * Enables toolbars and toolpad actions/widgets. Overriden method.
+   * If an active control network has not been set, do not enable the cnet tool.
    */
   void CubeDnView::enableActions() {
     foreach (QAction *action, actions()) {
+      if (action->objectName() == "ControlNetTool" && !m_directory->project()->activeControl()) {
+        continue;
+      }
       action->setEnabled(true);
     }
     foreach (QWidget *widget, m_childWidgets) {
