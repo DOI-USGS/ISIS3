@@ -24,11 +24,13 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QList>
 #include <QMainWindow>
+#include <QRect>
 #include <QSizePolicy>
 #include <QWidget>
 
@@ -64,11 +66,11 @@ namespace Isis {
    */
   QSize AbstractProjectItemView::sizeHint() const {
 
-    //  Size hint is make ridiculously large as a hack to have the views fill the available dock
-    //  space.  SizePolicy alone did not work.
-    // TODO:  There should be a better way to do this.
-    //return QSize(800, 600);
-    return QSize(3000, 1500);
+    //  Size hint is made ridiculously large as a hack to have the views fill the available dock
+    //  space. SizePolicy alone did not work.
+    QDesktopWidget deskTop;
+    QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
+    return QSize( .89 * availableSpace.width(), .5 * availableSpace.height() );
   }
 
 

@@ -109,6 +109,8 @@ namespace Isis {
     m_fileListWidget->setWindowTitle( tr("File List")  );
     m_fileListWidget->setObjectName( m_fileListWidget->windowTitle() );
 
+    m_directory = directory;
+
     QDockWidget *imageFileListdock = new QDockWidget( m_fileListWidget->windowTitle() );
     imageFileListdock->setObjectName(imageFileListdock->windowTitle());
     imageFileListdock->setFeatures( QDockWidget::DockWidgetFloatable |
@@ -143,17 +145,6 @@ namespace Isis {
     }
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
-
-    // MosaicSceneWidget's default is to have the Control Net Tool enabled.
-    // In ipce, we want it to be disabled if an active control is not set.
-    foreach (QAction *action, m_toolPad->actions()) {
-      if (action->toolTip() == "Control Net (c)") {
-        m_controlNetTool = action;
-      }
-    }
-    if (!directory->project()->activeControl()) {
-      m_controlNetTool->setEnabled(false);
-    }
 
     setAcceptDrops(true);
   }
@@ -326,7 +317,25 @@ namespace Isis {
    * @param value The boolean that holds if a control network has been set.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
-    m_controlNetTool->setEnabled(value);
+    foreach (QAction *action, m_toolPad->actions()) {
+      if (action->toolTip() == "Control Net (c)") {
+        action->setEnabled(value);
+      }
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions. Overriden method.
+   * If an active control network has not been set, do not enable the cnet tool.
+   */
+  void Footprint2DView::enableActions() {
+    foreach (QAction *action, actions()) {
+      if (action->toolTip() == "Control Net (c)" && !m_directory->project()->activeControl()) {
+        continue;
+      }
+      action->setEnabled(true);
+    }
   }
 
 
