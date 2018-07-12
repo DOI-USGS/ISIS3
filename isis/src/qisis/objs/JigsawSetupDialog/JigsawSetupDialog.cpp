@@ -56,6 +56,8 @@ namespace Isis {
       makeReadOnly();
     }
 
+    m_colorIter = 0;
+
     m_bundleSettings = BundleSettingsQsp(new BundleSettings());
 
     //connect( m_project->directory()->model(), SIGNAL(selectionChanged(QList<ProjectItem *> &)),
@@ -1697,6 +1699,30 @@ namespace Isis {
   }
 
 
+  QColor JigsawSetupDialog::generateBOSSColor() {
+
+    QColor base = m_baseColors[m_colorIter % m_baseColors.count()];
+    m_colorIter++;
+
+    if (m_colorIter >= m_baseColors.count()) {
+      // Apply a random offset in the range of -50 to +50
+      float baseValue = (base.red() + base.green() + base.blue()) / 3;
+      float offsetValue = baseValue + ((double) rand() / (RAND_MAX) * 100) - 50;
+      float ratio = offsetValue / baseValue;
+
+      // m_baseColors has some RGB values that can go past 255 with the offset
+      int newRed =    std::min((int)(base.red() * ratio), 255);
+      int newGreen =  std::min((int)(base.green() * ratio), 255);
+      int newBlue =   std::min((int)(base.blue() * ratio), 255);
+
+      QColor newColor(newRed, newGreen, newBlue);
+      return newColor;
+      
+    }
+    return base;
+  }
+
+
   void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, 
                                                    const QItemSelection &deselected) {
     QModelIndexList indexList = m_ui->treeView->selectionModel()->selectedRows();
@@ -1778,6 +1804,8 @@ namespace Isis {
     QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
 
+    QColor newColor = generateBOSSColor();
+
     // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
       QModelIndex sourceIndex = proxyModel->mapToSource(index);
@@ -1791,6 +1819,7 @@ namespace Isis {
           const QString observationNumber = projItem->image()->observationNumber();
           if (!selectedObservationNumbers.contains(observationNumber)) {
             selectedObservationNumbers.append(observationNumber);
+            projItem->setData(QVariant(newColor), Qt::UserRole+10);
           }
         }
         else if (projItem->isImageList()) {
@@ -1800,6 +1829,7 @@ namespace Isis {
             QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
             ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
             selectedObservationNumbers.append(childItem->image()->observationNumber());
+            childItem->setData(QVariant(newColor), Qt::UserRole+10);
           }
         }
       }
@@ -1836,69 +1866,10 @@ namespace Isis {
     // Grab the data from the right hand side of the observation solve settings tab to set
     // up the new bundle observation solve settings
     updateBundleObservationSolveSettings(solveSettings);
-
-    // Loop through the existing solve settings list and determine colors
-    QSet<QString> existingColorNames;
-    qDebug() << "# solve settings: " << solveSettingsList.size();
-    for (auto &solveSettings : solveSettingsList) {
-      qDebug() << "    color: " << solveSettings.color();
-      qDebug() << "    colorName: " << solveSettings.color().name();
-      existingColorNames.insert(solveSettings.color().name());
-    }
-
-    QSet<QString> badColorSet {
-      "#FFB300", // Vivid Yellow
-      "#803E75", // Strong Purple
-      "#FF6800", // Vivid Orange
-      "#A6BDD7", // Very Light Blue
-      "#C10020", // Vivid Red
-      "#CEA262", // Grayish Yellow
-      "#817066", // Medium Gray
-    };
-    QSet<QString> colorSet;
-    for (auto &color : badColorSet) {
-      colorSet.insert(color.toLower());
-    }
-
-    // Change color for new solve settings
-    QColor newColor(Qt::white);
-
-    QColor red(Qt::red);
-    qDebug() << "red hex: " << red.name();
-    red.setNamedColor("#CCCCCC");
-    qDebug() << "red hex2: " << red.name();
-
-    QSet<QString> availableColors = colorSet.subtract(existingColorNames);
-    qDebug() << "\navailable colors: " << availableColors << "\n";
-    newColor.setNamedColor(availableColors.values()[0]);
-    qDebug() << "\nnew color: " << newColor;
-    qDebug() << "new color hex: " << newColor.name();
-    // if (colors.isEmpty()) {
-    //   newColor.setRgb(100, 0, 0);
-    // }
-    // else {
-    //   switch (colors.size()) {
-    //   case 1:
-    //     newColor.setRgb(0, 100, 0);
-    //     break;
-    //   case 2:
-    //     newColor.setRgb(0, 0, 100);
-    //     break;
-    //   default:
-    //     newColor.setRgb(255, 255, 255);
-    //     break;
-    //   }
-    // }
     solveSettings.setColor(newColor);
-    qDebug() << solveSettings.color();
 
     // Add the new solve settings to the solve settings list
     solveSettingsList.append(solveSettings);
-
-    for (int i = 0; i < solveSettingsList.size(); i++) {
-      qDebug() << "list color " << i << ": " << solveSettingsList[i].color()
-      << "; " << solveSettingsList[i].color().name();
-    }
 
     // Update bundle settings with the new list of bundle observation solve settings
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
@@ -1907,21 +1878,6 @@ namespace Isis {
     // for (int i = 0; i < solveSettingsList.count(); i++) {
     //   qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
     // }
-
-    foreach (QModelIndex index, selectedIndexes) {
-      //proxyModel->setData(index, QVariant(true), Qt::UserRole);
-
-      QModelIndex sourceIndex = proxyModel->mapToSource(index);
-      ProjectItem *item = sourceModel->itemFromIndex(sourceIndex);
-      qDebug() << "solve settings color: " << solveSettings.color();
-      item->setData(QVariant(solveSettings.color()), Qt::UserRole+10);
-      qDebug() << "user role color: " << item->data(Qt::UserRole+10);
-      qDebug() << sourceModel->itemData(sourceIndex);
-      // qDebug() << "\nselected item data: " << sourceModel->itemData(sourceIndex);
-      // item->setData(QVariant(QBrush(solveSettings.color())), Qt::UserRole+10);
-      // qDebug() << "  changed item data : " << sourceModel->itemData(sourceIndex);
-      qDebug() << "";
-    }
   }
 
 }
