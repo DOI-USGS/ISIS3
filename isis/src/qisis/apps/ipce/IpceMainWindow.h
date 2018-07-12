@@ -177,7 +177,7 @@ namespace Isis {
    *                           project was in fullscreen or not when saved. If not, we call
    *                           showNormal() to restore the poject's window size. This also fixes the
    *                           warning/history tabs being misplaced when opening a project.
-   *                           Fixes #5175.
+   *                           Fixes #5175. References #5436.
    *   @history 2018-07-12 Kaitlyn Lee - Removed code that makes the window fullscreen in memory,
    *                           since this was causing a project's window size to not be restored
    *                           when opening from the command line. Decreased the size and changed
