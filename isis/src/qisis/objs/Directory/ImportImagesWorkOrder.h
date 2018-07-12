@@ -98,6 +98,11 @@ namespace Isis {
    *                           checking in functor operator method. Fixes #4955.
    *   @history 2018-01-18 Tracie Sucharski - Add the targets and gui cameras to the project.
    *                           Fixes #5181.
+   *   @history 2018-07-12 Summer Stapleton - Updated how adding the targets and the gui cameras to
+   *                           the project is handled to address segfault. Instead of creating a 
+   *                           camera and a target with every new image imported and adding them if
+   *                           needed, they are now no longer created in the first place except 
+   *                           when needed. Fixes #5460.
    *            
    */
   class ImportImagesWorkOrder : public WorkOrder {

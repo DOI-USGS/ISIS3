@@ -2686,65 +2686,50 @@ namespace Isis {
   }
 
 
-  void Project::addTarget(Target *target) {
-
-    bool found = false;
-
-    // construct TargetBody QSharedPointer from this images cameras Target
-    TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
-
-    foreach (TargetBodyQsp tb, *m_targets) {
-      if (*tb == *targetBody) {
-        found = true;
-        break;
+  /**
+  * @brief This method checks for the existence of a target based on TargetName
+  *
+  */
+  bool Project::hasTarget(QString id) {
+    foreach (TargetBodyQsp targetBody, *m_targets) {
+      if (QString::compare(targetBody->targetName(), id, Qt::CaseInsensitive) == 0) {
+        return true;
       }
     }
+    return false;
+  }
 
-    // if this TargetBody is not already in the project, add it
-    // below is how it probably should work, would have to I think
-    // override the ::contains() method in the TargetBodyList class
-//      if (!m_targets->contains(targetBody))
-//        m_targets->append(targetBody);
-    if (!found) {
-      m_targets->append(targetBody);
-      connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
-               this, SLOT( targetBodyClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               targetBody.data(), SLOT( updateFileName(Project *) ) );
 
-      (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
+  void Project::addTarget(Target *target) {
+
+    TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
+
+    m_targets->append(targetBody);
+
+  }
+
+
+  /**
+  * @brief This method checks for the existence of a camera based on InstrumentId
+  *
+  */
+  bool Project::hasCamera(QString id) {
+    foreach (GuiCameraQsp camera, *m_guiCameras) {
+
+      if (QString::compare(camera->instrumentId(), id, Qt::CaseInsensitive) == 0) {
+        return true;
+      }
     }
+    return false;
   }
 
 
   void Project::addCamera(Camera *camera) {
-    bool found = false;
-
-    // construct guiCamera QSharedPointer from this images cameras Target
+        
     GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
 
-    foreach (GuiCameraQsp gc, *m_guiCameras) {
-      if (*gc == *guiCamera) {
-        found = true;
-        break;
-      }
-    }
-
-    // if this guiCamera is not already in the project, add it
-    // below is how it probably should work, would have to I think
-    // override the ::contains() method in the GuiCameraList class
-//      if (!m_guiCameras->contains(guiCamera))
-//        m_guiCameras->append(guiCamera);
-
-    if (!found) {
-      m_guiCameras->append(guiCamera);
-//      connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
-//               this, SLOT( guiCameraClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               guiCamera.data(), SLOT( updateFileName(Project *) ) );
-
-      (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
-    }
+    m_guiCameras->append(guiCamera);
+    
   }
 
 
