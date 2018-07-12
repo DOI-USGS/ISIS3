@@ -86,7 +86,10 @@ namespace Isis {
    *                           the Control Net Tool will be disabled.
    *                           Added enableControlNetTool(bool) so when an active control net is set,
    *                           the tool becomes enabled.
-
+   *  @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
+   *                           ambiguous shortcut errors. To counter this, we enable/disable actions.
+   *                           On default, actions are disabled until a user moves the cursor over the view.
+   *                           When a user moves the cursor outside of the view, the actions are disabled.
    */
   class Footprint2DView : public AbstractProjectItemView {
 

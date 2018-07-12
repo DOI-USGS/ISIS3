@@ -26,6 +26,7 @@
 #include <QPointer>
 #include <QToolBar>
 #include <QWidgetAction>
+#include <QPushButton>
 
 #include "AbstractProjectItemView.h"
 
@@ -49,7 +50,14 @@ namespace Isis {
    *                           and set its layout to QVBoxLayout. We used to set
    *                           the whole CnetEditorView widget's layout, now we only
    *                           set the central widget's layout.
-   *   @history 2018-06-13 Kaitlyn Lee - Removed toolbars, since they are not needed.
+   *   @history 2018-06-28 Kaitlyn Lee - Removed toolbars. When multiple views are open,
+   *                           there is a possibility of getting ambiguous shortcut errors.
+   *                           To counter this, we enable/disable actions. On default, a
+   *                           view's actions are disabled. To enable the actions, move the
+   *                           cursor over the view. When a user moves the cursor outside of
+   *                           the view, the actions are disabled. Because this view uses
+   *                           buttons instead of actions, overrode enableActions() and
+   *                           disableActions() and added m_buttons to enable/disable buttons.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
@@ -68,8 +76,12 @@ class ControlPointEditView : public AbstractProjectItemView {
   QSize sizeHint() const;
 
   private:
+    void disableActions();
+    void enableActions();
+
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
+    QList<QPushButton *> m_buttons;
   };
 }
 
