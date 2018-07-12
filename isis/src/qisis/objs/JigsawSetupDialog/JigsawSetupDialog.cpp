@@ -101,10 +101,12 @@ namespace Isis {
     if (!m_project->directory()->model()->selectedItems().isEmpty()) {
       foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
         if (projItem->isImage()) {
+          projItem->setData(QVariant(QColor(Qt::transparent)), Qt::UserRole+10);
           imagesToAdd.append(projItem->image());  
         }
         else if (projItem->isImageList()) {
           for (int i = 0; i < projItem->rowCount(); i++) {
+            projItem->child(i)->setData(QVariant(QColor(Qt::transparent)), Qt::UserRole+10);
             imagesToAdd.append(projItem->child(i)->image());  
           }
         }
@@ -120,6 +122,7 @@ namespace Isis {
           for (int j = 0; j < imglistItem->rowCount(); j++) {
             ProjectItem * imgItem = imglistItem->child(j);
             if (imgItem->isImage()) {
+              imgItem->setData(QVariant(QColor(Qt::transparent)), Qt::UserRole+10);
               imagesToAdd.append(imgItem->image());     
             }
           }
