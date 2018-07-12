@@ -1818,7 +1818,6 @@ namespace Isis {
    */
   void Project::setActiveControl(QString displayName) {
     Control *previousControl = m_activeControl;
-    qDebug()<<"Project::setActiveControl m_activeControl = "<<m_activeControl;
     if (m_activeControl) {
 
       // If the current active control has been modified, ask user if they want to save or discard

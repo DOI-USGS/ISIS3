@@ -152,7 +152,6 @@ namespace Isis {
       }
     }
     if (!directory->project()->activeControl()) {
-      qDebug()<<"Footprint2DView constructor  set controlNetTool disabled";
       m_controlNetToolAction->setEnabled(false);
     }
 
