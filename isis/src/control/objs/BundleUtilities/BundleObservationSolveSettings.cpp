@@ -851,6 +851,12 @@ namespace Isis {
     stream.writeEndElement();// end aprioriPositionSigmas
     stream.writeEndElement(); // end instrumentPositionOptions
 
+    stream.writeStartElement("color");
+    stream.writeAttribute("red",   toString(m_color.red()));
+    stream.writeAttribute("green", toString(m_color.green()));
+    stream.writeAttribute("blue",  toString(m_color.blue()));
+    stream.writeEndElement(); // end color
+
     stream.writeEndElement(); // end bundleObservationSolveSettings
 
   }
@@ -982,6 +988,16 @@ namespace Isis {
       }
       else if (localName == "aprioriPositionSigmas") {
         m_xmlHandlerAprioriSigmas.clear();
+      }
+      else if (localName == "color") {
+        QString redValue = atts.value("red");
+        QString greenValue = atts.value("green");
+        QString blueValue = atts.value("blue");
+
+        if (!redValue.isEmpty() && !greenValue.isEmpty() && !blueValue.isEmpty()) {
+          m_xmlHandlerObservationSettings->m_color = 
+                                      QColor(toInt(redValue), toInt(greenValue), toInt(blueValue));
+        }
       }
     }
     return true;
