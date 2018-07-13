@@ -25,8 +25,6 @@
 
 #include <string>
 
-#include <QMutex>
-
 #include "SerialNumberList.h"
 
 namespace Isis {
@@ -83,19 +81,6 @@ namespace Isis {
    *  @history 2008-05-09 Steven Lambright Optimized the FindSerialTranslation
    *           method
    *  @history 2008-05-18 Steven Lambright Fixed documentation
-   *  @history 2018-07-11 Ian Humphrey - Made FindSerialTranslation() thread-safe. Added a static
-   *                          mutex for the FindSerialTranslation() method. This facilitates adding
-   *                          a QString serialNumber member to the Image class and calling
-   *                          SerialNumber::Compose() within the Image constructors. When qmos or
-   *                          ipce opens a list of images, it uses an ImageReader, which uses a
-   *                          QtConcurrent mapped function call to load its images with multiple
-   *                          threads. Since the FindSerialTranslation() method declares static
-   *                          local variables within it, this would cause thread collisions on the
-   *                          static variables when SerialNumbers are being composed for the Images
-   *                          being conurrently opened by the ImageReader. Added a QMutexLocker to
-   *                          the FindSerialTranslation() method to auto-lock and unlock the mutex,
-   *                          which prevents multiple threads from colliding on the static
-   *                          variables. Fixes #5206.
    */
   class SerialNumber {
     public:
@@ -118,12 +103,6 @@ namespace Isis {
     private:
 
       static PvlGroup FindSerialTranslation(Pvl &label);
-
-      /**
-       * Static mutex for preventing threads from colliding on the static variables in
-       * SerialNumber::FindSerialTranslation().
-       */
-      static QMutex m_mutex;
 
   }; // End of Class
 }; // End of namespace

@@ -28,7 +28,6 @@
 #include <QString>
 
 #include "Angle.h"
-#include "Camera.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "XmlStackedHandler.h"
@@ -100,22 +99,6 @@ namespace Isis {
    *                           after the first call to these methods are O(1) and are not
    *                           bottlenecekd by any file I/O that occurs in the Compose()
    *                           methods. References #497.
-   *   @history 2018-07-11 Ian Humphrey - Constructor now stores the CameraType of the cube,
-   *                           accessible via Image::cameraType(). The two previous changes
-   *                           regarding observationNumber() and serialNumber() do speed up
-   *                           access regarding Compose() (see above history entries).
-   *                           JigsawSetupDialog's constructor uses the Image::cube() to get the
-   *                           camera type (via camera()->GetCameraType()) in order to create
-   *                           default observation solve settings. This was slow because the image
-   *                           importer (ImportImagesWorkOrder::importConfirmedImages()) is closing
-   *                           the imported Image's cube once it is successfully imported (when
-   *                           the QFuture is ready). So, the JigsawSetupDialog was having to
-   *                           load cubes into memory upon its first construction (when you first
-   *                           click the "Setup" button in the JigsawRunWidget). The newly added
-   *                           Image::cameraType() allows a way to get O(1) access to the type
-   *                           without having the cube in memory. In brief, the JigsawSetupDialog
-   *                           should not have to wait to have all of it's Images's cubes loaded
-   *                           into memory before it shows up. Refences #497.
    */
 
   class Image : public QObject {
@@ -132,7 +115,6 @@ namespace Isis {
       bool isFootprintable() const;
       Cube *cube();
       void closeCube();
-      Camera::CameraType cameraType() const;
       ImageDisplayProperties *displayProperties();
       const ImageDisplayProperties *displayProperties() const;
       QString fileName() const;
@@ -211,16 +193,6 @@ namespace Isis {
                                     calculated by the NaifBodyCode() method.*/
       //    QString *m_name;   //!< Name of the target
 
-      /**
-       * Stores the camera type of the Image. 
-       *
-       * This allows O(1) querying for the camera type whether
-       * or not the Image's Cube is loaded into memory. Before, if the Cube was not loaded into
-       * memory and you want to know the cameraType via cube()->camera()->GetCameraType(), it would 
-       * have to construct the Cube to get this information. JigsawSetupDialog needs quick access
-       * during its construction to create default observation solve settings based on camera type.
-       */
-      Camera::CameraType m_cameraType;
 
       /**
        * The cube associated with this Image. This is usually NULL once the image is done

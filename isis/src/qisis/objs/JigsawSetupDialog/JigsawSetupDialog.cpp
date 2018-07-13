@@ -134,7 +134,7 @@ namespace Isis {
 
     // sort each chosen image into its camera type 
     foreach (Image * image, imagesToAdd) {
-      int cameraType = image->cameraType();
+      int cameraType = image->cube()->camera()->GetCameraType();
       if (cameraType == Camera::LineScan) {
         defaultLineScanSettings.addObservationNumber(image->observationNumber());
       }

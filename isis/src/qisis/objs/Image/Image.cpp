@@ -16,7 +16,6 @@
 #include <geos/io/WKTWriter.h>
 
 #include "Angle.h"
-#include "Camera.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "DisplayProperties.h"
@@ -54,11 +53,7 @@ namespace Isis {
 
     m_fileName = imageFileName;
 
-    m_observationNumber = ObservationNumber::Compose(*(cube()));
-    m_serialNumber = SerialNumber::Compose(*(cube()));
-    
     cube();
-    m_cameraType = m_cube->camera()->GetCameraType();
 
     initCamStats();
 
@@ -92,10 +87,6 @@ namespace Isis {
     m_resolution = Null;
     m_lineResolution = Null;
     m_sampleResolution = Null;
-
-    m_cameraType = m_cube->camera()->GetCameraType();
-    m_observationNumber = ObservationNumber::Compose(*(cube()));
-    m_serialNumber = SerialNumber::Compose(*(cube()));
 
     initCamStats();
 
@@ -292,16 +283,6 @@ namespace Isis {
 
 
   /**
-   * @brief Get the camera type for this Image.
-   * 
-   * @return Camera::CameraType Returns the camera type for this Image.
-   */
-  Camera::CameraType Image::cameraType() const {
-    return m_cameraType;
-  }
-
-
-  /**
    * @brief Get the display (GUI) properties (information) associated with this image.
    * @return @b (ImageDisplayProperties *) Returns a poniter to an ImageDisplayProperties
    * that describes how to view this image.
@@ -336,6 +317,9 @@ namespace Isis {
    * @return QString A string representation of the observation number of the cube.
    */
   QString Image::observationNumber() {
+    if (m_observationNumber.isEmpty()) {
+      m_observationNumber = ObservationNumber::Compose(*(cube()));
+    }
     return m_observationNumber;
   }
 
@@ -345,6 +329,9 @@ namespace Isis {
    * @return @b QString  A string representation of the serial number of the cube.
    */
   QString Image::serialNumber() {
+    if (m_serialNumber.isEmpty()) {
+      m_serialNumber = SerialNumber::Compose(*(cube()));
+    } 
     return m_serialNumber;
   }
 

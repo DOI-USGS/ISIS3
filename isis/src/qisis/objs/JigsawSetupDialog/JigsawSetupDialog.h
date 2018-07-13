@@ -93,14 +93,6 @@ namespace Isis {
    *                           generalize how the sigma tables are updated. Solve options have
    *                           their respective solve degree and degree combo boxes set to 2 unless
    *                           the solve option is ALL. References #497.
-   *   @history 2018-07-11 Ian Humphrey - Changed call in constructor relying on Image::cube() to
-   *                           use Image::cameraType() in order to get the Image's camera type. This
-   *                           prevents the JigsawSetupDialog from taking a long time to show up the
-   *                           first time a user clicks "Setup" in the JigsawRunWidget. This was
-   *                           happening because the Image's cube member was not allocated (it gets
-   *                           closed after successfully importing). So, the JigsawSetupDialog would
-   *                           have to allocate cube memory for all the selected images before it
-   *                           would be displayed. References #497.
    */
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
