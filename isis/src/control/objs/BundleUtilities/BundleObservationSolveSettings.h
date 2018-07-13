@@ -101,6 +101,7 @@ class BundleObservationSolveSettings {
       BundleObservationSolveSettings(const BundleObservationSolveSettings &src);
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
+      bool operator==(const BundleObservationSolveSettings &src);
       void initialize();
 
       void setInstrumentId(QString instrumentId);

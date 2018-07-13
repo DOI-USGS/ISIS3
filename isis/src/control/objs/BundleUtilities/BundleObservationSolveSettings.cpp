@@ -189,6 +189,27 @@ namespace Isis {
 
   }
 
+  /**
+   * Returns true if the BOSS object has the same settings. Does not check for differences in 
+   * the m_observationNumbers or the m_id.
+   *
+   * @param other The other BundleObservationSolveSettings to compare with
+   *
+   */
+  bool BundleObservationSolveSettings::operator==(const BundleObservationSolveSettings &other) {
+    return (m_instrumentPositionSolveOption ==          other.instrumentPositionSolveOption() &&
+            m_spkSolveDegree ==                         other.spkSolveDegree() &&
+            m_spkDegree ==                              other.spkDegree() && 
+            m_solvePositionOverHermiteSpline ==         other.solvePositionOverHermite() &&
+            m_positionAprioriSigma ==                   other.aprioriPositionSigmas() &&
+            m_instrumentPointingSolveOption ==          other.instrumentPointingSolveOption() &&
+            m_ckSolveDegree ==                          other.ckSolveDegree() && 
+            m_ckDegree ==                               other.ckDegree() &&
+            m_solveTwist ==                             other.solveTwist() &&
+            m_solvePointingPolynomialOverExisting ==    other.solvePolyOverPointing() &&
+            m_anglesAprioriSigma ==                     other.aprioriPointingSigmas());
+  }
+
 
   /**
    * Initializes the default state of this BundleObservationSolveSettings.
@@ -196,6 +217,7 @@ namespace Isis {
   void BundleObservationSolveSettings::initialize() {
     m_id = NULL;
     m_id = new QUuid(QUuid::createUuid());
+    m_color = QColor();
 
     m_instrumentId = "";
 

@@ -96,18 +96,16 @@ namespace Isis {
 
 
     // Create default settings for all of the observations
-    QList<Image *> imagesToAdd;
+    QList<ProjectItem *> imagesToAdd;
     // If we have selected any project items, find the images and add them to imagesToAdd
     if (!m_project->directory()->model()->selectedItems().isEmpty()) {
       foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
         if (projItem->isImage()) {
-          projItem->setData(QVariant(QColor(Qt::transparent)), Qt::UserRole+10);
-          imagesToAdd.append(projItem->image());  
+          imagesToAdd.append(projItem);  
         }
         else if (projItem->isImageList()) {
           for (int i = 0; i < projItem->rowCount(); i++) {
-            projItem->child(i)->setData(QVariant(QColor(Qt::transparent)), Qt::UserRole+10);
-            imagesToAdd.append(projItem->child(i)->image());  
+            imagesToAdd.append(projItem->child(i));  
           }
         }
       }
@@ -122,8 +120,7 @@ namespace Isis {
           for (int j = 0; j < imglistItem->rowCount(); j++) {
             ProjectItem * imgItem = imglistItem->child(j);
             if (imgItem->isImage()) {
-              imgItem->setData(QVariant(QColor(Qt::transparent)), Qt::UserRole+10);
-              imagesToAdd.append(imgItem->image());     
+              imagesToAdd.append(imgItem);     
             }
           }
         } 
@@ -132,19 +129,25 @@ namespace Isis {
     
     // create default  solve settings for supported camera types
     BundleObservationSolveSettings defaultFramingSettings;
+    defaultFramingSettings.setColor(QColor(173, 237, 255));
+
     BundleObservationSolveSettings defaultLineScanSettings;
+    defaultLineScanSettings.setColor(QColor(194, 242, 193));
     defaultLineScanSettings.setInstrumentPointingSettings(
                       BundleObservationSolveSettings::AnglesVelocityAcceleration, true, 2, 2, true);
 
 
     // sort each chosen image into its camera type 
-    foreach (Image * image, imagesToAdd) {
+    foreach (ProjectItem * projItem, imagesToAdd) {
+      Image* image = projItem->image();
       int cameraType = image->cube()->camera()->GetCameraType();
       if (cameraType == Camera::LineScan) {
         defaultLineScanSettings.addObservationNumber(image->observationNumber());
+        projItem->setData(QVariant(defaultLineScanSettings.color()), Qt::UserRole+10);
       }
       else { // assume cameraType == Camera::Framing
         defaultFramingSettings.addObservationNumber(image->observationNumber());  
+        projItem->setData(QVariant(defaultFramingSettings.color()), Qt::UserRole+10);
       }
     }
 
@@ -298,14 +301,14 @@ namespace Isis {
     m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
 
     m_baseColors = { 
-      QColor(220, 75,  75),  // Red
-      QColor(220, 150, 75),  // Orange
-      QColor(220, 220, 75),  // Yellow
-      QColor(110, 220, 110), // Green
-      QColor(75,  220, 220), // Blue
-      QColor(120, 120, 220), // Indigo
-      QColor(180, 120, 250), // Violet
       QColor(220, 100, 200), // Magenta
+      QColor(180, 120, 250), // Violet
+      QColor(120, 120, 220), // Indigo
+      QColor(75,  220, 220), // Blue
+      QColor(110, 220, 110), // Green
+      QColor(220, 220, 75),  // Yellow
+      QColor(220, 150, 75),  // Orange
+      QColor(220, 75,  75),  // Red
     };
 
 
@@ -474,6 +477,9 @@ namespace Isis {
 
 
   void JigsawSetupDialog::fillFromSettings(const BundleSettingsQsp settings) {
+    // TODO: This method should be replaced in the future with a JigsawSetupDialog constructot
+    // that takes in a previous BundleSettings object. Maybe in combination with an init method for
+    // the validators.
 
     // general tab
     m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
@@ -1764,25 +1770,38 @@ namespace Isis {
 
   QColor JigsawSetupDialog::generateBOSSColor() {
 
-    QColor base = m_baseColors[m_colorIter % m_baseColors.count()];
-    m_colorIter++;
+    QColor newColor;
+    bool uniqueColor = false;
 
-    if (m_colorIter >= m_baseColors.count()) {
-      // Apply a random offset in the range of -50 to +50
-      float baseValue = (base.red() + base.green() + base.blue()) / 3;
-      float offsetValue = baseValue + ((double) rand() / (RAND_MAX) * 100) - 50;
-      float ratio = offsetValue / baseValue;
+    while (!uniqueColor) {
+      QColor base = m_baseColors[m_colorIter % m_baseColors.count()];
+      m_colorIter++;
 
-      // m_baseColors has some RGB values that can go past 255 with the offset
-      int newRed =    std::min((int)(base.red() * ratio), 255);
-      int newGreen =  std::min((int)(base.green() * ratio), 255);
-      int newBlue =   std::min((int)(base.blue() * ratio), 255);
+      if (m_colorIter >= m_baseColors.count()) {
+        // Apply a random offset in the range of -50 to +50
+        float baseValue = (base.red() + base.green() + base.blue()) / 3;
+        float offsetValue = baseValue + ((double) rand() / (RAND_MAX) * 100) - 50;
+        float ratio = offsetValue / baseValue;
 
-      QColor newColor(newRed, newGreen, newBlue);
-      return newColor;
-      
+        // m_baseColors has some RGB values that can go past 255 with the offset
+        int newRed =    std::min((int)(base.red() * ratio), 255);
+        int newGreen =  std::min((int)(base.green() * ratio), 255);
+        int newBlue =   std::min((int)(base.blue() * ratio), 255);
+
+        newColor = QColor(newRed, newGreen, newBlue);
+      }
+      else {
+        newColor = base;
+      }
+
+      // check if this color is already in use
+      uniqueColor = true;
+      foreach (BundleObservationSolveSettings settings, m_bundleSettings->observationSolveSettings()) {
+        if (newColor == settings.color()) uniqueColor = false;
+      }
     }
-    return base;
+
+    return newColor;
   }
 
 
@@ -1860,6 +1879,24 @@ namespace Isis {
    */ 
   void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
 
+    // Create a new bundle observation solve settings
+    BundleObservationSolveSettings solveSettings;
+    updateBundleObservationSolveSettings(solveSettings);
+
+    QList<BundleObservationSolveSettings> solveSettingsList = m_bundleSettings->observationSolveSettings();
+
+    for (auto &settings : solveSettingsList) {      
+      if (solveSettings == settings) {
+        solveSettings.setColor(settings.color());
+        foreach (QString observationNumber, settings.observationNumbers()) {
+          solveSettings.addObservationNumber(observationNumber);
+          settings.removeObservationNumber(observationNumber);
+        }
+      }
+    }
+
+    if (solveSettings.color() == QColor()) solveSettings.setColor(generateBOSSColor());
+    
     // Get the current selected images and the item models
     SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model();
     ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
@@ -1867,9 +1904,6 @@ namespace Isis {
     QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
     QStringList selectedObservationNumbers;
 
-    QColor newColor = generateBOSSColor();
-
-    // Append selected images' serial numbers to selectedObservationNumbers
     foreach (QModelIndex index, selectedIndexes) {
       QModelIndex sourceIndex = proxyModel->mapToSource(index);
       ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
@@ -1882,7 +1916,7 @@ namespace Isis {
           const QString observationNumber = projItem->image()->observationNumber();
           if (!selectedObservationNumbers.contains(observationNumber)) {
             selectedObservationNumbers.append(observationNumber);
-            projItem->setData(QVariant(newColor), Qt::UserRole+10);
+            projItem->setData(QVariant(solveSettings.color()), Qt::UserRole+10);
           }
         }
         else if (projItem->isImageList()) {
@@ -1892,44 +1926,32 @@ namespace Isis {
             QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
             ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
             selectedObservationNumbers.append(childItem->image()->observationNumber());
-            childItem->setData(QVariant(newColor), Qt::UserRole+10);
+            childItem->setData(QVariant(solveSettings.color()), Qt::UserRole+10);
           }
         }
       }
     }
 
-    QList<BundleObservationSolveSettings> solveSettingsList = m_bundleSettings->observationSolveSettings();
 
     //find the bundle observation solve settings for each of the selected observations and remove
     // the observation number from them 
-    for (auto &solveSettings : solveSettingsList) {      
+    for (auto &settings : solveSettingsList) {      
       foreach (QString observationNumber, selectedObservationNumbers) {
-        solveSettings.removeObservationNumber(observationNumber);
+        settings.removeObservationNumber(observationNumber);
       }
     }
 
-
-    // Remove any existing solve settings that no longer have any observation numbers
-    int iter = 0;
-    while (iter < solveSettingsList.count()) {
-      if (solveSettingsList[iter].observationNumbers().isEmpty() ) {
-        solveSettingsList.removeAt(iter);
-      }
-      else {
-        iter++; // This list shrinks as we remove, so we dont need to iterate every time
-      }
-    }
-
-    // Create a new bundle observation solve settings
-    BundleObservationSolveSettings solveSettings;
     foreach (QString observationNumber, selectedObservationNumbers) {
       solveSettings.addObservationNumber(observationNumber);
     }
 
-    // Grab the data from the right hand side of the observation solve settings tab to set
-    // up the new bundle observation solve settings
-    updateBundleObservationSolveSettings(solveSettings);
-    solveSettings.setColor(newColor);
+    // Remove any existing solve settings that no longer have any observation numbers
+    int i = 0;
+    while (i < solveSettingsList.count()) {
+      if (solveSettingsList[i].observationNumbers().isEmpty()) { solveSettingsList.removeAt(i); }
+      else { i++; }
+    }
+
 
     // Add the new solve settings to the solve settings list
     solveSettingsList.append(solveSettings);
@@ -1937,10 +1959,10 @@ namespace Isis {
     // Update bundle settings with the new list of bundle observation solve settings
     m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
-    // qDebug()<<"Current BOSS list --------";
-    // for (int i = 0; i < solveSettingsList.count(); i++) {
-    //   qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
-    // }
+    qDebug()<<"Current BOSS list --------";
+    for (int i = 0; i < solveSettingsList.count(); i++) {
+      qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
+    }
   }
 
 }
