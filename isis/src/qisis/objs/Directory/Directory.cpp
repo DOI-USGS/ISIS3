@@ -138,7 +138,7 @@ namespace Isis {
     connect( m_project, SIGNAL(projectLoaded(Project *) ),
               this, SLOT(updateRecentProjects(Project *) ) );
 
-    connect(this, SIGNAL(cnetModified()), m_project, SLOT(activeControlModified()));
+    connect(this, SIGNAL(cnetModified()), m_project, SLOT(cnetModified()));
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
     connect(m_project, SIGNAL(discardActiveControlEdits()),
@@ -446,7 +446,7 @@ namespace Isis {
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
     importMenu->addAction(m_importImagesWorkOrder->clone() );
     importMenu->addAction(m_importShapesWorkOrder->clone() );
-    
+
     QMenu *importTemplateMenu = importMenu->addMenu("&Import Templates");
     importTemplateMenu->addAction(m_importMapTemplateWorkOrder->clone() );
     importTemplateMenu->addAction(m_importRegistrationTemplateWorkOrder->clone() );

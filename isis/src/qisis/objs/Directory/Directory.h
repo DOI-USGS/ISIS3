@@ -251,7 +251,7 @@ namespace Isis {
    *                           to allow for saving of the project at these times. Fixes #5114.
    *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
    *                           directory instance rather than the activeControl. Fixes #5435.
-   *   @history 2018-07-07 Summer Stapleton - Implemented changes to handle implementation of 
+   *   @history 2018-07-07 Summer Stapleton - Implemented changes to handle implementation of
    *                           separate import work orders for both map and registration templates.
    *   @history 2018-07-09 Tracie Sucharski - When adding views, check if the objectName is set
    *                           which it should be when creating a view from a project serialization.
@@ -259,6 +259,9 @@ namespace Isis {
    *                           objectName needs to be created.
    *   @history 2018-07-09 Kaitlyn Lee - Uncommented code that closes a ControlPointEditView when a new
    *                           active control is set.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed connection between cnetModified() and project's
+   *                           activeControlModified() to cnetModified() and project's renamed
+   *                           method cnetModified(). Fixes #5414.
    */
   class Directory : public QObject {
     Q_OBJECT

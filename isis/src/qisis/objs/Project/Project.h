@@ -255,7 +255,7 @@ namespace Isis {
    *                           the wrong place on the project tree. Fixes #5274.
    *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
    *                           button when the active control net is modified, i.e. a point is modified.
-   *  
+   *
    *  !!!!!!!!!!!!!   Delete following history entry when project save/restore geometry/state
    *                   implemented
    *  !!!!!!!!!!!!!!!
@@ -266,12 +266,20 @@ namespace Isis {
    *                          added signal when project is saved, so the writeSettings can happen
    *                          for project.  This will be cleaned up when save/restore is fully
    *                          implemented.
-   *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and 
-   *                          m_regTemplates to keep track of the two template types as well as 
-   *                          adjusted logic to save these serparately into the .xml files in the 
+   *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and
+   *                          m_regTemplates to keep track of the two template types as well as
+   *                          adjusted logic to save these serparately into the .xml files in the
    *                          project directory. Also added clean-up of unsaved templates at project
-   *                          close in Project::clear(). 
-   *  
+   *                          close in Project::clear().
+   *   @history 2018-07-12 Kaitlyn Lee - Changed activeControlModified() to cnetModified() and
+   *                          removed the line m_activeControl->setModified(true) in cnetModified()
+   *                          since this is now done in the CnetEditorWidget and it caused a seg
+   *                          fault when no images were imported and a user tried to edit a cnet. I
+   *                          changed this because when a user made changes to a cnet, even if it
+   *                          was not the active, the active was the only one that was recognized as
+   *                          being modified. This stopped any changes made to a nonactive cnet from
+   *                          being saved and caused the active to be saved if a nonactive was
+   *                          edited, even if it was not. Fixes #5414.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -520,7 +528,7 @@ namespace Isis {
     public slots:
       void open(QString);
       void setClean(bool value);
-      void activeControlModified();
+      void cnetModified();
 
     private slots:
       void controlClosed(QObject *control);
