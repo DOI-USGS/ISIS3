@@ -511,6 +511,24 @@ namespace Isis {
 
     m_bundleSettings->setObservationSolveOptions(fillSettings);
     
+    // Apply fillSettings' colors to their treeView items
+    ProjectItem *imgRoot = m_project->directory()->model()->findItemData(QVariant("Images"),0);
+    if (imgRoot) {
+      for (int i = 0; i < imgRoot->rowCount(); i++) {
+        ProjectItem * imglistItem = imgRoot->child(i);
+        for (int j = 0; j < imglistItem->rowCount(); j++) {
+          ProjectItem * imgItem = imglistItem->child(j);
+          if (imgItem->isImage()) {
+            BundleObservationSolveSettings imgSettings = 
+                m_bundleSettings->observationSolveSettings(imgItem->image()->observationNumber());
+            if (!imgSettings.observationNumbers().isEmpty()){
+              imgItem->setData(QVariant(imgSettings.color()), Qt::UserRole+10);
+            }
+          }
+        }
+      } 
+    }
+
     update();
 
   }
