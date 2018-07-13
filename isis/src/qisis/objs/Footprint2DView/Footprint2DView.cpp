@@ -306,11 +306,7 @@ namespace Isis {
 
   /**
    * A slot function that is called when directory emits a siganl that an active
-   * control network is set. It enables the control network editor tool in the
-   * toolpad.
-   * We do not load the network here because the network does not open until
-   * the tool is beng used. This is done in MosaicControlNetTool::updateTool() and
-   * is connected in MosaicTool.
+   * control network is set. It enables the control network editor tool in the toolpad.
    *
    * @param value The boolean that holds if a control network has been set.
    */
@@ -318,9 +314,10 @@ namespace Isis {
     foreach (QAction *action, m_toolPad->actions()) {
       if (action->toolTip() == "Control Net (c)") {
         action->setEnabled(value);
-        MosaicControlNetTool *cnetTool =
-              static_cast<MosaicControlNetTool *>(m_controlNetToolAction->parent());
-        cnetTool->loadNetwork();
+        if (value) {
+          MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(action->parent());
+          cnetTool->loadNetwork();
+        }
       }
     }
   }
