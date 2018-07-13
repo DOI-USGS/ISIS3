@@ -138,9 +138,10 @@ namespace Isis {
 
 
     // sort each chosen image into its camera type 
+
     foreach (ProjectItem * projItem, imagesToAdd) {
       Image* image = projItem->image();
-      int cameraType = image->cube()->camera()->GetCameraType();
+      int cameraType = image->cameraType();
       if (cameraType == Camera::LineScan) {
         defaultLineScanSettings.addObservationNumber(image->observationNumber());
         projItem->setData(QVariant(defaultLineScanSettings.color()), Qt::UserRole+10);
