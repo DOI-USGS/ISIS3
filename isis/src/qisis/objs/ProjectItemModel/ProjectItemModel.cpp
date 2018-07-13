@@ -912,20 +912,22 @@ namespace Isis {
   }
 
 
+
+  /**
+   * Returns data for an index on the proxy model. BackgroundRole has been overridden
+   * to only return blank backgrounds in order to ignore the proxymodel's colors.
+   *
+   * @param QModelIndex &index The index to check on the model
+   * @param int role The type of attribute to take from the index ()
+   *
+   * @return QVariant The requested data type.
+   */
   QVariant ProjectItemModel::data(const QModelIndex &index, int role) const {
     if (index.isValid())
-      if (role == Qt::BackgroundRole || role == Qt::ForegroundRole) return QVariant();
+      if (role == Qt::BackgroundRole) return QVariant();
       else return QStandardItemModel::data(index, role);
     else
       return QVariant();
-    // if (index.isValid()) {
-    //   if (role != Qt::BackgroundRole) {
-    //     return QStandardItemModel::data(index, role);
-    //   }
-    // }
-    // else {
-    //   return QVariant();
-    // }
   }
 
 

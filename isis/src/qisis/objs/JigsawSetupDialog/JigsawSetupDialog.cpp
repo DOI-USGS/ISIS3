@@ -1769,7 +1769,14 @@ namespace Isis {
 
   }
 
-
+  /**
+   * Method to generate a uniqe color for each image set in the BOSS tab
+   *
+   * This method iterates over a set of colors defined in the constructor, a randomly generated
+   * offset is applied once we have looped over the set at least once.
+   *
+   * @return QColor A randomly generated color based on a color from the predefined set.
+   */
   QColor JigsawSetupDialog::generateBOSSColor() {
 
     QColor newColor;

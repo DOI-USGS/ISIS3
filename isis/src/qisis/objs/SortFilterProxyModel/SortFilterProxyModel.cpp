@@ -89,7 +89,15 @@ namespace Isis {
 
  }
 
-
+  /**
+   * Returns data for an index on the proxy model. Retrieving backgroundRole will
+   * redirect to Qt::UserRole+10, which is the chosen  role for background colors on the proxy.
+   *
+   * @param QModelIndex &index The index to check on the model
+   * @param int role The type of attribute to take from the index ()
+   *
+   * @return QVariant the requested data type.
+   */
   QVariant SortFilterProxyModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid()) return QVariant();
 
@@ -100,23 +108,14 @@ namespace Isis {
       return QSortFilterProxyModel::data(index, role);
     }
     if (role == Qt::BackgroundRole) {
-      // if (sourceModel()->data(mapToSource(index), Qt::UserRole+10).toBool()) {
-
-        QColor solveOptionColor = sourceModel()->data(mapToSource(index), Qt::UserRole+10).value<QColor>();
-        if (solveOptionColor.isValid()) {
-          return QVariant(solveOptionColor);
-        }
-        else {
-          return QVariant(QColor(Qt::white));
-        }
-      // }
-      // else {
-        // return sourceModel()->data(mapToSource(index), Qt::BackgroundRole);
-      // }
+      QColor solveOptionColor = sourceModel()->data(mapToSource(index), Qt::UserRole+10).value<QColor>();
+      if (solveOptionColor.isValid()) {
+        return QVariant(solveOptionColor);
+      }
+      else {
+        return QVariant(QColor(Qt::white));
+      }
     }
-    // if (role == Qt::UserRole + 10) {
-    //   return sourceModel()->data(mapToSource(index), Qt::UserRole+10).value<QColor>();
-    // }
     else {
       return QVariant(); //QSortFilterProxyModel::data(index, role);
     }

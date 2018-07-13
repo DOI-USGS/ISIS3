@@ -212,7 +212,8 @@ class BundleObservationSolveSettings {
       };
 
     private:
-      QColor m_color;
+      QColor m_color; /**< The color associated with this solve settings object on the 
+                           JigsawSetupDialog BOSS tab*/
       /**
        * A unique ID for this object (useful for others to reference this object
        *   when saving to disk).

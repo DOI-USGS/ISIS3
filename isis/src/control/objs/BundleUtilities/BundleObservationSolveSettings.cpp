@@ -1098,11 +1098,19 @@ namespace Isis {
   }
 
 
+  /**
+   * @return QColor The color associate with this settings object on the JigsawSetupDialog BOSS tab.
+   */
   QColor BundleObservationSolveSettings::color() const {
     return m_color;
   }
 
 
+  /**
+   * Sets a color to be associated with this solve settings object.
+   *
+   * @param QColor &color The color to set 
+   */
   void BundleObservationSolveSettings::setColor(const QColor &color) {
     m_color = color;
   }

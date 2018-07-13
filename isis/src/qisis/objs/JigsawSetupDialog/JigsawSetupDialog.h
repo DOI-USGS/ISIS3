@@ -202,15 +202,13 @@ namespace Isis {
     QColor generateBOSSColor();
 
     // void updateGroups(QList<QStandardItem *> &selectedItems);
-    QList<QBrush *> m_colors;
 
   private:
     Ui::JigsawSetupDialog *m_ui;
     Project *m_project;
     BundleSettingsQsp m_bundleSettings; /**< The BundleSettings Object created by this dialog */
-    int m_colorIter;
-
-    QList<QColor> m_baseColors;
+    int m_colorIter; /**< The iterator used by generateBOSScolor to choose unique colors*/
+    QList<QColor> m_baseColors; /**< The Color used by the BOSS tab to differentiate between sets */
   };
 };
 #endif // JigsawSetupDialog_h
