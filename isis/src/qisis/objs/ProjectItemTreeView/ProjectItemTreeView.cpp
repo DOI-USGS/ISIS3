@@ -23,8 +23,10 @@
 #include "ProjectItemTreeView.h"
 
 #include <QAbstractItemView>
+#include <QDesktopWidget>
 #include <QEvent>
 #include <QObject>
+#include <QRect>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -39,7 +41,7 @@ namespace Isis {
    * @param[in] parent (QWidget *) The parent widget.
    */
   ProjectItemTreeView::ProjectItemTreeView(QWidget *parent) : AbstractProjectItemView(parent) {
-        
+
     m_treeView = new QTreeView(this);
     m_treeView->installEventFilter(this);
     setInternalModel( internalModel() );
@@ -49,23 +51,31 @@ namespace Isis {
     m_treeView->setDragEnabled(false);
     m_treeView->setAcceptDrops(false);
     m_treeView->setHeaderHidden(true);
-    
+
     setCentralWidget(m_treeView);
+
+    //This works so that it cannot be shrunk, only grown
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 //  setAcceptDrops(true);
-    
-    // TODO Commented-out by Summer for new inheritence for parent class. Will clean up when confirmed that not needed.
-    // QBoxLayout *layout = new QVBoxLayout;
-    // layout->addWidget(m_treeView);
-    // layout->setContentsMargins(0, 0, 0, 0);
-    // 
-    // setLayout(layout);
   }
 
-  
+
+  /**
+   * Returns the suggested size
+   *
+   * @return @b QSize The size hint
+   */
+  QSize ProjectItemTreeView::sizeHint() const {
+    QDesktopWidget deskTop;
+    QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
+    return QSize(.11 * availableSpace.width(), .5 * availableSpace.height());
+  }
+
+
   /**
    * Default destructor.
    */
@@ -81,7 +91,7 @@ namespace Isis {
     return m_treeView;
   }
 
-  
+
   /**
    * Sets the model so that the internal proxy model exactly matches the
    * source model.
@@ -118,8 +128,8 @@ namespace Isis {
       m_treeView->expand( parent->index() );
     }
   }
-  
-  
+
+
   /**
    * Filters out drag and drop events so that they are handled by the
    * ProjectItemTreeView.
@@ -139,5 +149,5 @@ namespace Isis {
 
     return AbstractProjectItemView::eventFilter(watched, event);
   }
-  
+
 }

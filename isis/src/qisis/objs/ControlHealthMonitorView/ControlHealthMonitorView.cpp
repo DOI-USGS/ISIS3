@@ -88,12 +88,6 @@ namespace Isis {
     m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
 
     setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
   }
 
   /**
@@ -163,16 +157,6 @@ namespace Isis {
    */
   ControlHealthMonitorWidget *ControlHealthMonitorView::controlHealthMonitorWidget() {
     return m_controlHealthMonitorWidget;
-  }
-
-
-  /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
-   */
-  QSize ControlHealthMonitorView::sizeHint() const {
-    return QSize(800, 600);
   }
 
 

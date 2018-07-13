@@ -13,7 +13,8 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
-#include "ImportTemplateWorkOrder.h"
+#include "ImportMapTemplateWorkOrder.h"
+#include "ImportRegistrationTemplateWorkOrder.h"
 #include "IString.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixViewWorkOrder.h"
@@ -61,7 +62,8 @@ namespace Isis {
     tryType<ImportControlNetWorkOrder>(type, project, result);
     tryType<ImportImagesWorkOrder>(type, project, result);
     tryType<ImportShapesWorkOrder>(type, project, result);
-    tryType<ImportTemplateWorkOrder>(type, project, result);
+    tryType<ImportMapTemplateWorkOrder>(type, project, result);
+    tryType<ImportRegistrationTemplateWorkOrder>(type, project, result);
     tryType<JigsawWorkOrder>(type, project, result);
     tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);

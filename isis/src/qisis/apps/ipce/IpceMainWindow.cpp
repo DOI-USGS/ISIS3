@@ -25,11 +25,13 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDockWidget>
 #include <QMap>
 #include <QMapIterator>
 #include <QMdiArea>
 #include <QObject>
+#include <QRect>
 #include <QRegExp>
 #include <QStringList>
 #include <QtWidgets>
@@ -81,18 +83,27 @@ namespace Isis {
 
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
-    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
+
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
+
+    // This was causing some buggy behavior, but this is what we would ultimately like.
+    // Allows a user to undock a group of tabs.
     //setDockOptions(GroupedDragging | AllowTabbedDocks);
-    //centralWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
     //centralWidget->hide();
     setDockNestingEnabled(true);
+
+    //  Set the splitter frames to a reasonable color/size for resizing the docks.
+    setStyleSheet("QMainWindow::separator {background: black; width: 3; height: 3px;}");
 
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+
+      connect(m_directory, SIGNAL(closeView(QWidget *)),
               this, SLOT(removeView(QWidget *)));
+
       connect(m_directory, SIGNAL( directoryCleaned() ),
               this, SLOT( removeAllViews() ) );
       connect(m_directory->project(), SIGNAL(projectLoaded(Project *)),
@@ -117,9 +128,9 @@ namespace Isis {
     projectTreeView->setInternalModel( m_directory->model() );
     projectTreeView->treeView()->expandAll();
     projectTreeView->installEventFilter(this);
-    m_projectDock->setWidget(projectTreeView);
-    m_projectDock->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    //projectTreeView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
+    m_projectDock->setWidget(projectTreeView);
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
 
     m_warningsDock = new QDockWidget("Warnings", this, Qt::SubWindow);
@@ -193,7 +204,7 @@ namespace Isis {
 
     QDockWidget *dock = new QDockWidget(newWidget->windowTitle(), this);
     dock->setWidget(newWidget);
-    dock->setObjectName(newWidget->windowTitle());
+    dock->setObjectName(newWidget->objectName());
     dock->setAttribute(Qt::WA_DeleteOnClose);
     dock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
                       QDockWidget::DockWidgetFloatable);
@@ -204,7 +215,18 @@ namespace Isis {
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
     }
     else {
-      addDockWidget(area, dock, orientation);
+      if (m_viewDocks.count() == 0) {
+        splitDockWidget(m_projectDock, dock, Qt::Horizontal);
+      }
+      else {
+        tabifyDockWidget(m_viewDocks.last(), dock);
+        dock->show();
+        dock->raise();
+        //  Keeps expanding IpceMainWindow to fit new dock
+        //  Below causes problems if the last dock has been tabbed, then a new view is created. All
+        // views except for first disappear.
+        //splitDockWidget(m_viewDocks.last(), dock, Qt::Horizontal);
+      }
     }
 
     // When dock widget is destroyed, make sure the view it holds is also destroyed
@@ -218,6 +240,7 @@ namespace Isis {
 
 
   void IpceMainWindow::cleanupViewDockList(QObject *obj) {
+
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
     if (dock) {
       m_viewDocks.removeAll(dock);
@@ -226,14 +249,16 @@ namespace Isis {
 
 
   /**
-   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
-   * close the given view and delete the view. This was written to handle
+   * This slot is connected from Directory::closeView(QWidget *) signal.  It will close the given 
+   * view and delete the view. 
    *
    * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
-    view->close();
-    delete view;
+
+    QDockWidget *parentDock = qobject_cast<QDockWidget *>(view->parent());
+    removeDockWidget(parentDock);
+    delete parentDock;
   }
 
 
@@ -359,6 +384,10 @@ namespace Isis {
     QAction *tabViewsAction = new QAction("Tab Views", this);
     connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
     m_viewMenuActions.append(tabViewsAction);
+
+    QAction *tileViewsAction = new QAction("Tile Views", this);
+    connect( tileViewsAction, SIGNAL(triggered()), this, SLOT(tileViews()) );
+    m_viewMenuActions.append(tileViewsAction);
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -497,7 +526,12 @@ namespace Isis {
     QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(),
         QSettings::NativeFormat);
 
-    if (project->isTemporaryProject()) {
+    // If no config file exists and a user immediately opens a project,
+    // the project's geometry will be saved as a default for when ipce is
+    // opened again. Previously, the ipce's default size was small,
+    // until a user opened ipce (but not a project) and resized to how they
+    // wanted it to be sized, then closed ipce.
+    if (project->isTemporaryProject() || !globalSettings.contains("geometry")) {
       globalSettings.setValue("geometry", QVariant(geometry()));
     }
 
@@ -590,6 +624,9 @@ namespace Isis {
    *                           References #4358.
    *   @history 2017-10-17 Tyler Wilson Added a [recent projects] group for the saving and
    *                           restoring of recently opened projects.  References #4492.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the value "maximized" in the project settings
+   *                           so that a project remembers if it was in fullscreen when saved.
+   *                           Fixes #5175.
    */
   void IpceMainWindow::writeSettings(Project *project) {
 
@@ -603,6 +640,7 @@ namespace Isis {
 
     projectSettings.setValue("geometry", QVariant(geometry()));
     projectSettings.setValue("windowState", saveState());
+    projectSettings.setValue("maximized", isMaximized());
     projectSettings.sync();
   }
 
@@ -625,6 +663,10 @@ namespace Isis {
    *                Fixes #5075.
    *   @history Makayla Shepherd 2018-06-10 - Settings are read from the project root ipce.config.
    *                If that does not exist then we read from .Isis/ipce/ipce.config.
+   *   @history Kaitlyn Lee 2018-07-09 - Added the call showNormal() so when a project is
+   *                not saved in fullscreen, the window will resize to the project's
+   *                window size. This also fixes the history/warning tabs being misplaced
+   *                when opening a project. Fixes #5175.
    */
   void IpceMainWindow::readSettings(Project *project) {
     // Ensure that the Project pointer is not NULL
@@ -658,7 +700,12 @@ namespace Isis {
     QSettings projectSettings(FileName(filePath).expanded(), QSettings::NativeFormat);
 
     if (!isFullScreen) {
+      // If a project was not in fullscreen when saved, restore the project's window size.
+      if (!projectSettings.value("maximized").toBool()) {
+        showNormal();
+      }
       setGeometry(projectSettings.value("geometry").value<QRect>());
+
       if (!project->isTemporaryProject()) {
         restoreState(projectSettings.value("windowState").toByteArray());
       }
@@ -727,6 +774,9 @@ namespace Isis {
    */
   void IpceMainWindow::closeEvent(QCloseEvent *event) {
 
+    foreach(TemplateEditorWidget *templateEditor, m_directory->templateEditorViews()) {
+      templateEditor->saveOption();
+    }
     // The active control is checked here for modification because this was the simplest solution
     // vs changing the project clean state every time the control is modified or saved.
     if (!m_directory->project()->isClean() || (m_directory->project()->activeControl() &&
@@ -816,6 +866,28 @@ namespace Isis {
         continue;
       }
       tabifyDockWidget(firstView, currentView);
+    }
+  }
+
+
+  /**
+   * Tile all open attached/detached views
+   */
+  void IpceMainWindow::tileViews() {
+    // splitDockWidget() takes two widgets and tiles them, so an easy way to do
+    // this is to grab the first view and tile the rest with the first.
+    QDockWidget *firstView = m_viewDocks.first();
+
+    foreach (QDockWidget *currentView, m_viewDocks) {
+      // We have to reattach a view before it can be tiled. If it is attached,
+      // this will have no affect. We have to call addDockWidget() to untab any views.
+      currentView->setFloating(false);
+      addDockWidget(Qt::LeftDockWidgetArea, currentView, Qt::Horizontal);
+
+      if (currentView == firstView) {
+        continue;
+      }
+      splitDockWidget(firstView, currentView, Qt::Horizontal);
     }
   }
 
