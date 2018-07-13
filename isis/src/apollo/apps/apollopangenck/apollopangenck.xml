@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="apollopangenck" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Generate files to be used as input to NAIF utility msopck.
+  </brief>
+
+  <description>
+    Generate files to be used as input to NAIF utility msopck. Location of Apollo Pan metadata csv
+    is /archive/missions/apollo_pan/AS15/CriticalData/PanData/MetadataCSVVersions/.
+  </description>
+
+  <history>
+    <change name="Ken Edmundson" date="2018-07-06">
+      TODO
+    </change>
+  </history>
+
+  <category>
+    <missionItem>Apollo</missionItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>isis2std</item>
+    </applications>
+  </seeAlso>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input Apollo Pan metadata csv file.
+        </brief>
+        <description>
+          Use this parameter to select the filename to import.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Time">
+      <parameter name="GMT">
+        <type>string</type>
+        <brief>GMT format: YYYY-MM-DD HH:MM:SS.SSS</brief>
+        <description>GMT is space deliniated Year Month Day Hour Minute Seconds</description>
+      </parameter>
+    </group>    
+  </groups>
+</application>
