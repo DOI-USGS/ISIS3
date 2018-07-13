@@ -297,6 +297,16 @@ namespace Isis {
     m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-20, 1.0e+10, 8, this));
     m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
 
+    m_baseColors = { 
+      QColor(220, 75,  75),  // Red
+      QColor(220, 150, 75),  // Orange
+      QColor(220, 220, 75),  // Yellow
+      QColor(110, 220, 110), // Green
+      QColor(75,  220, 220), // Blue
+      QColor(120, 120, 220), // Indigo
+      QColor(180, 120, 250), // Violet
+      QColor(220, 100, 200), // Magenta
+    };
 
 
     // signals for target body tab

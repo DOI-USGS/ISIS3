@@ -202,16 +202,7 @@ namespace Isis {
     BundleSettingsQsp m_bundleSettings; /**< The BundleSettings Object created by this dialog */
     int m_colorIter;
 
-    QList<QColor> m_baseColors { 
-      QColor(220, 75,  75),  // Red
-      QColor(220, 150, 75),  // Orange
-      QColor(220, 220, 75),  // Yellow
-      QColor(110, 220, 110), // Green
-      QColor(75,  220, 220), // Blue
-      QColor(120, 120, 220), // Indigo
-      QColor(180, 120, 250), // Violet
-      QColor(220, 100, 200), // Magenta
-    };
+    QList<QColor> m_baseColors;
   };
 };
 #endif // JigsawSetupDialog_h
