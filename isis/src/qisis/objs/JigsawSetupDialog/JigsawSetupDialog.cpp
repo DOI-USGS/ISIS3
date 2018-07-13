@@ -141,6 +141,7 @@ namespace Isis {
 
     foreach (ProjectItem * projItem, imagesToAdd) {
       Image* image = projItem->image();
+      // qDebug() << "obs num: " << image->observationNumber();
       int cameraType = image->cameraType();
       if (cameraType == Camera::LineScan) {
         defaultLineScanSettings.addObservationNumber(image->observationNumber());
@@ -1886,6 +1887,7 @@ namespace Isis {
 
     QList<BundleObservationSolveSettings> solveSettingsList = m_bundleSettings->observationSolveSettings();
 
+    // If a matching BOSS already exists, steal its color and obs numbers
     for (auto &settings : solveSettingsList) {      
       if (solveSettings == settings) {
         solveSettings.setColor(settings.color());
@@ -1910,15 +1912,14 @@ namespace Isis {
       ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
 
       if (projItem) {
-        // Tree traversal is top down so we dont need to do this check for imagelists?
         if (projItem->isImage()) {
           // Grab the observation up front so we don't need to re-compose the observation number
           // more than once (@todo: this should not be necessary when 5026 is integrated)
           const QString observationNumber = projItem->image()->observationNumber();
           if (!selectedObservationNumbers.contains(observationNumber)) {
             selectedObservationNumbers.append(observationNumber);
-            projItem->setData(QVariant(solveSettings.color()), Qt::UserRole+10);
           }
+          projItem->setData(QVariant(solveSettings.color()), Qt::UserRole+10);
         }
         else if (projItem->isImageList()) {
           // Use the proxymodel's children as it might not include all of the sourcemodel's children 
