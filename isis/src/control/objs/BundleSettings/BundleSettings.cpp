@@ -435,17 +435,15 @@ namespace Isis {
 
 
   /**
-   * Retrieves solve settings for the observation corresponding to the given
-   * observation number.
+   * Retrieves solve settings for the observation corresponding to the given observation number. 
+   * If no corresponding settings object exists, return a new solve settings with no related 
+   * observation numbers.
    *
    * @param observationNumber The observation number associated with the
    *                          BundleObservationSolveSettings object to be accessed.
    *
    * @return @b BundleObservationSolveSettings The observation settings object that contains
    *                                           the observation number passed.
-   *
-   * @throw IException::Unknown "Unable to find BundleObservationSolveSettings
-   *                             for given observation number"
    */
   BundleObservationSolveSettings
       BundleSettings::observationSolveSettings(QString observationNumber) const {
