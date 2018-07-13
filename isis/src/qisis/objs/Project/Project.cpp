@@ -1909,8 +1909,15 @@ namespace Isis {
 
   /**
    * When a cnet is modified, set the project state to not clean.
+   * If the active control was modified, send a signal back to Directory
+   * so that other views know that the active was modified. This allows
+   * for CubeDnView and Footprint2DView to be redrawn.
+   * Currently, this was the easiest place to emit this signal.
    */
   void Project::cnetModified() {
+    if (m_activeControl->isModified()) {
+      emit activeControlModified();
+    }
     setClean(false);
   }
 

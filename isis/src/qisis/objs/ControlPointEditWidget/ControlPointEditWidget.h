@@ -98,6 +98,8 @@ namespace Isis {
    *   @history 2018-06-28 Kaitlyn Lee - Removed shortcut from reload point button.
    *   @history 2018-07-07 Summer Stapleton - Added a QComboBox to the widget to allow for changing
    *                           the active registration template from the widget itself.
+   *   @history 2018-07-13 Kaitlyn Lee - Added calls to setModified(true) when a cnet is modified.
+   *                           References #5396.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -138,7 +140,7 @@ namespace Isis {
       // of active control is re-factored. Also added reset parameter, defaulting to false so button
       // is red. This default was used so that current calls did not need to be changed.
       void colorizeSaveNetButton(bool reset = false);
-      
+
       void addTemplates(TemplateList *templateList);
 
     protected:

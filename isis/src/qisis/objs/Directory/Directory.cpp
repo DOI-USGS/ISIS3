@@ -138,7 +138,14 @@ namespace Isis {
     connect( m_project, SIGNAL(projectLoaded(Project *) ),
               this, SLOT(updateRecentProjects(Project *) ) );
 
+    // Send cnetModified() to project, so that we can set the project's clean state.
+    // In the slot cnetModified(), it checks if the active was modified and then emits
+    // activeControlModified(). This signal is connected below to this activeControlModified(),
+    // which connects to views that use the active cnet to redraw themselves.
+    // Ultimately, cnetModified() allows us to save changes made to any cnet, and
+    // activeControlModified() allows other views to be redrawn. 
     connect(this, SIGNAL(cnetModified()), m_project, SLOT(cnetModified()));
+    connect(project(), SIGNAL(activeControlModified()), this, SIGNAL(activeControlModified()));
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
     connect(m_project, SIGNAL(discardActiveControlEdits()),
@@ -676,15 +683,8 @@ namespace Isis {
     connect(result->cnetEditorWidget(), SIGNAL(editControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // IMPORTANT TODO::  The following connections seem recursive
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //
-    // Connection between cneteditor view & other views
+    // If a cnet is modified, we have to set the clean state in project and redraw measures.
     connect(result->cnetEditorWidget(), SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
-
-    // ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
-    // deleted or saved
     connect(this, SIGNAL(cnetModified()), result->cnetEditorWidget(), SLOT(rebuildModels()));
 
     m_cnetEditorViewWidgets.append(result);
@@ -747,7 +747,9 @@ namespace Isis {
     //  ControlNetTool::paintAllViewports().  ControlNetTool always redraws all control points, so
     //  both signals go to the same slot.
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
-    connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
+
+    // If the active cnet is modified, redraw the measures
+    connect(this, SIGNAL(activeControlModified()), result, SIGNAL(redrawMeasures()));
 
     connect (project(), SIGNAL(activeControlSet(bool)),
              result, SLOT(enableControlNetTool(bool)));
@@ -795,8 +797,9 @@ namespace Isis {
             this, SLOT(createControlPoint(double, double)));
 
     // The ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
-    // deleted or saved.  This requires the footprint view ControlNetGraphicsItems to be re-built.
-    connect(this, SIGNAL(cnetModified()), result->mosaicSceneWidget(), SIGNAL(cnetModified()));
+    // deleted or saved.  This requires the footprint view ControlNetGraphicsItems to be re-built
+    // when the active cnet is modified.
+    connect(this, SIGNAL(activeControlModified()), result->mosaicSceneWidget(), SIGNAL(cnetModified()));
 
     //  This signal is connected to the MosaicGraphicsScene::update(), which eventually calls
     //  ControlNetGraphicsItem::paint(), then ControlPointGraphicsItem::paint().  This should only
@@ -882,14 +885,12 @@ namespace Isis {
 // 2017-06-09 Ken commented out for Data Workshop demo
 
 
-      //  Create connections between signals from control point edit view and equivalent directory
-      //  signals that can then be connected to other views that display control nets.
-//      connect(mainWidget, SIGNAL(cnetModified()),
-//              this, SIGNAL(cnetModified()));
+      // Create connections between signals from control point edit view and equivalent directory
+      // signals that can then be connected to other views that display control nets.
+      // If the active was modified, this will be signaled in project's cnetModified() and
+      // connected to other views to redraw themselves.
       connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
               this, SIGNAL(cnetModified()));
-      connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
-              m_project, SLOT(activeControlModified()));
 
       connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
               this, SLOT(makeBackupActiveControl()));
