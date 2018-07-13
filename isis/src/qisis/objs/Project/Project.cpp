@@ -2336,9 +2336,9 @@ namespace Isis {
       }
     }
     else {
-      //  Save current active control if it has been modified. If "Save As" is being processed,
-      //  the active control is written in the Control::copyToNewProjectRoot so the control in
-      //  current project is not modified.
+      // Save all modified controls. If "Save As" is being processed,
+      // the controls are written in the Control::copyToNewProjectRoot, so the controls in
+      // current project are not modified.
       foreach (ControlList *controlList, *m_controls) {
         foreach (Control *control, *controlList) {
           if (control->isModified()) {
@@ -2346,10 +2346,6 @@ namespace Isis {
           }
         }
       }
-      if (activeControl() && activeControl()->isModified()) {
-        activeControl()->write();
-      }
-
       save(m_projectRoot->absolutePath(), false);
     }
 
