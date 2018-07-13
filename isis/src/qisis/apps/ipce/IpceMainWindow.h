@@ -131,6 +131,8 @@ namespace Isis {
    *                           test to determine whether project needs saving.
    *   @history 2018-05-01 Tracie Sucharski - Code accidently left commented from previous checking.
    *                           Fixes #5412.
+   *   @history 2018-05-31 Christopher Combs - Added support for JigsawRunWidget to be created as a 
+   *                           dockable widget in addView(). Fixes #5428.
    *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
    *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
    *                           widget. Remove all methods having to do with MDI sub-windows,
@@ -144,6 +146,8 @@ namespace Isis {
    *                           not needed. Removed code adding the save active control net button
    *                           and the toolpad, since control nets can be saved with the project
    *                           save button.
+   *   @history 2018-06-14 Christopher Combs - Changed addView method to take in JigsawRunWidget as
+   *                           a QDockWidget object instead of wrapping it in one.
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
    *                           must be called before initializeActions to get the recent projects
    *                           from the config file.

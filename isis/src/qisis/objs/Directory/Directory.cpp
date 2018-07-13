@@ -76,6 +76,7 @@
 #include "ImportShapesWorkOrder.h"
 #include "ImportMapTemplateWorkOrder.h"
 #include "ImportRegistrationTemplateWorkOrder.h"
+#include "JigsawRunWidget.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
 #include "MatrixViewWorkOrder.h"
@@ -307,6 +308,7 @@ namespace Isis {
     m_sensorInfoWidgets.clear();
     m_targetInfoWidgets.clear();
     m_templateEditorWidgets.clear();
+    m_jigsawRunWidget.clear();
 
     m_projectItemModel->clean();
   }
@@ -988,6 +990,23 @@ namespace Isis {
     return result;
   }
 
+  JigsawRunWidget *Directory::addJigsawRunWidget() {
+    if (jigsawRunWidget()) {
+      return m_jigsawRunWidget;
+    }
+    JigsawRunWidget *result = new JigsawRunWidget(m_project);
+
+    connect( result, SIGNAL( destroyed(QObject *) ),
+             this, SLOT( cleanupJigsawRunWidget(QObject *) ) );
+    m_jigsawRunWidget = result;
+
+    result->setAttribute(Qt::WA_DeleteOnClose);
+    result->show();
+
+    emit newWidgetAvailable(result);
+    return result;
+  }
+
 
   /**
    * @brief Add sensor data view widget to the window.
@@ -1277,6 +1296,15 @@ namespace Isis {
   }
 
 
+  void Directory::cleanupJigsawRunWidget(QObject *obj) {
+     JigsawRunWidget *jigsawRunWidget = static_cast<JigsawRunWidget *>(obj);
+     if (!jigsawRunWidget) {
+       return;
+     }
+     m_jigsawRunWidget = NULL;
+  }
+
+
   /**
    * @brief  Adds a new Project object to the list of recent projects if it has not
    * already been added.
@@ -1423,6 +1451,13 @@ namespace Isis {
 
     return m_controlPointEditViewWidget;
   }
+
+
+  JigsawRunWidget *Directory::jigsawRunWidget() {
+
+    return m_jigsawRunWidget;
+  }
+
 
 /*
   ChipViewportsWidget *Directory::controlPointChipViewports() {
