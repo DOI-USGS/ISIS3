@@ -309,11 +309,13 @@ namespace Isis {
 
   JigsawSetupDialog::~JigsawSetupDialog() {
     // delete/null m_ui since we did "new" this pointers in the constructor
+#if 0
     if (m_ui) {
       delete m_ui;
     }
     m_ui = NULL;
     // do not delete/null m_project since we didn't "new" this pointer
+#endif
   }
 
 
@@ -1699,7 +1701,7 @@ namespace Isis {
     osspm->setSourceModel(model);
 
     //osspm->setDynamicSortFilter(true);
-    osspm->setSelectedItems(selectedBOSSItems );
+    osspm->setSelectedItems(selectedBOSSItems,m_bundleSettings );
     m_ui->treeView->setModel(osspm);
 
 
