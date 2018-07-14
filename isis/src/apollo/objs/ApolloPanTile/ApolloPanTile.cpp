@@ -502,8 +502,7 @@ namespace Isis {
     generalGroup += exposureSample;
     
     // Create trimming group
-    str = "Trimming";
-    PvlGroup trimmingGroup(str);
+    PvlGroup trimmingGroup("Trimming");
     trimmingGroup += PvlKeyword("Top_Trim", QString::number(m_topTrim));
     trimmingGroup += PvlKeyword("Bottom_Trim", QString::number(m_bottomTrim));
     trimmingGroup += PvlKeyword("Left_Trim", QString::number(m_leftTrim));
