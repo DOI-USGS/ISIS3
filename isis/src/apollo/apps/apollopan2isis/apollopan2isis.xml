@@ -29,7 +29,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input file 
+          Input cube
         </brief>
         <description>
           Use this parameter to specify the name of the input cube.
@@ -38,6 +38,20 @@
            *.cub
          </filter>
       </parameter>
+      <parameter name="METADATAPVL">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input metadata pvl
+        </brief>
+        <description>
+          Use this parameter to specify the metadata pvl.
+        </description>
+        <filter>
+           *.csv
+         </filter>
+      </parameter>
+      
 
       <parameter name="TOPVL">
          <type>filename</type>

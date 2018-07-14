@@ -686,29 +686,30 @@ namespace Isis {
     m_imageNumber = tileName.mid(7,4);
     m_tileNumber = tileName.mid(15,1).toInt();
 
-    m_rows = tilePvl.findKeyword("Rows")[0].toInt();
-    m_columns = tilePvl.findKeyword("Columns")[0].toInt();
-
-    m_topTrim = tilePvl.findKeyword("Top_Trim")[0].toInt();
-    m_bottomTrim = tilePvl.findKeyword("Bottom_Trim")[0].toInt();
-    m_leftTrim = tilePvl.findKeyword("Left_Trim")[0].toInt();
-    m_rightTrim = tilePvl.findKeyword("Right_Trim")[0].toInt();
-
-    m_timingOffset = tilePvl.findKeyword("Timing_Offset")[0].toInt();
-    m_sampleOffset = tilePvl.findKeyword("Sample_Offset")[0].toInt();
+    PvlGroup generalGroup = tilePvl.findGroup("General");
+    m_rows = generalGroup.findKeyword("Rows")[0].toInt();
+    m_columns = generalGroup.findKeyword("Columns")[0].toInt();
+    m_timingOffset = generalGroup.findKeyword("Timing_Offset")[0].toInt();
+    m_sampleOffset = generalGroup.findKeyword("Sample_Offset")[0].toInt();
 
     m_transX.clear();
     m_transY.clear();
-    if (tilePvl.findKeyword("Affine_X")[0] != "Null") {
-      for (int i = 0; i < tilePvl.findKeyword("Affine_X").size(); i++) {
-        m_transX.push_back(tilePvl.findKeyword("Affine_X")[i].toDouble());
+    if (generalGroup.findKeyword("Affine_X")[0] != "Null") {
+      for (int i = 0; i < generalGroup.findKeyword("Affine_X").size(); i++) {
+        m_transX.push_back(generalGroup.findKeyword("Affine_X")[i].toDouble());
       }
     }
-    if (tilePvl.findKeyword("Affine_Y")[0] != "Null") {
-      for (int i = 0; i < tilePvl.findKeyword("Affine_Y").size(); i++) {
-        m_transY.push_back(tilePvl.findKeyword("Affine_Y")[i].toDouble());
+    if (generalGroup.findKeyword("Affine_Y")[0] != "Null") {
+      for (int i = 0; i < generalGroup.findKeyword("Affine_Y").size(); i++) {
+        m_transY.push_back(generalGroup.findKeyword("Affine_Y")[i].toDouble());
       }
     }
+    
+    PvlGroup trimmingGroup = tilePvl.findGroup("Trimming");
+    m_topTrim = trimmingGroup.findKeyword("Top_Trim")[0].toInt();
+    m_bottomTrim = trimmingGroup.findKeyword("Bottom_Trim")[0].toInt();
+    m_leftTrim = trimmingGroup.findKeyword("Left_Trim")[0].toInt();
+    m_rightTrim = trimmingGroup.findKeyword("Right_Trim")[0].toInt();
 
     m_fiducialMarks.clear();
     PvlGroup fiducialGroup = tilePvl.findGroup("Fiducial Marks");
@@ -791,129 +792,35 @@ namespace Isis {
    */
   void ApolloPanTile::fromPvlNew(QString filename) {
 
-    // Load the file and get the tile object
+    fromPvl(filename);
+    
     Pvl pvlFile(filename);
     PvlObject tilePvl = pvlFile.object(0);
 
-    QString tileName = tilePvl.name();
-    m_imageNumber = tileName.mid(7,4);
-    m_tileNumber = tileName.mid(15,1).toInt();
-
-    m_rows = tilePvl.findKeyword("Rows")[0].toInt();
-    m_columns = tilePvl.findKeyword("Columns")[0].toInt();
-
-    m_topTrim = tilePvl.findKeyword("Top_Trim")[0].toInt();
-    m_bottomTrim = tilePvl.findKeyword("Bottom_Trim")[0].toInt();
-    m_leftTrim = tilePvl.findKeyword("Left_Trim")[0].toInt();
-    m_rightTrim = tilePvl.findKeyword("Right_Trim")[0].toInt();
-
-    m_timingOffset = tilePvl.findKeyword("Timing_Offset")[0].toInt();
-    m_sampleOffset = tilePvl.findKeyword("Sample_Offset")[0].toInt();
-
-    m_transX.clear();
-    m_transY.clear();
-    if (tilePvl.findKeyword("Affine_X")[0] != "Null") {
-      for (int i = 0; i < tilePvl.findKeyword("Affine_X").size(); i++) {
-        m_transX.push_back(tilePvl.findKeyword("Affine_X")[i].toDouble());
-      }
-    }
-    if (tilePvl.findKeyword("Affine_Y")[0] != "Null") {
-      for (int i = 0; i < tilePvl.findKeyword("Affine_Y").size(); i++) {
-        m_transY.push_back(tilePvl.findKeyword("Affine_Y")[i].toDouble());
-      }
-    }
-
-    m_fiducialMarks.clear();
-    PvlGroup fiducialGroup = tilePvl.findGroup("Fiducial Marks");
-    PvlKeyword fiducialNumber = fiducialGroup.findKeyword("Number");
-    PvlKeyword fiducialLine = fiducialGroup.findKeyword("Line");
-    PvlKeyword fiducialSample = fiducialGroup.findKeyword("Sample");
-    PvlKeyword fiducialValid = fiducialGroup.findKeyword("Valid");
-    PvlKeyword fiducialLength = fiducialGroup.findKeyword("Length");
-    PvlKeyword fiducialHeight = fiducialGroup.findKeyword("Height");
-
-    // This is a hacky answer to old detection pvls not having these.
-    PvlKeyword fiducialCalibratedX;
-    PvlKeyword fiducialCalibratedY;
-    PvlKeyword fiducialResidualX;
-    PvlKeyword fiducialResidualY;
-    if (fiducialGroup.hasKeyword("Calibrated_X")) {
-      fiducialCalibratedX = fiducialGroup.findKeyword("Calibrated_X");
-      fiducialCalibratedY = fiducialGroup.findKeyword("Calibrated_Y");
-      fiducialResidualX = fiducialGroup.findKeyword("Residual_X");
-      fiducialResidualY = fiducialGroup.findKeyword("Residual_Y");
-    }
-    for (int i = 0; i < fiducialNumber.size(); i++) {
-      float matLine = fiducialLine[i].toFloat();
-      int offset = 24300;
-      if (matLine < 20000) {
-        matLine -= 1000;
-        offset = 1000;
-      }
-      else {
-        matLine -= 24300;
-      }
-      Point2f massCenter(fiducialSample[i].toFloat(), matLine);
-      Rect boundingRect((int)fiducialSample[i].toDouble() - fiducialLength[i].toInt()/2,
-                        (int)matLine - fiducialHeight[i].toInt()/2,
-                        fiducialLength[i].toInt(), fiducialHeight[i].toInt());
-      FiducialMark mark(massCenter, boundingRect);
-      mark.setLineOffset(offset);
-      mark.setValid((bool)fiducialValid[i].toInt());
-      mark.setNumber(fiducialNumber[i].toInt());
-      if (fiducialGroup.hasKeyword("Calibrated_X")) {
-        mark.setCalibratedX(fiducialCalibratedX[i].toDouble());
-        mark.setCalibratedY(fiducialCalibratedY[i].toDouble());
-        mark.setResidualX(fiducialResidualX[i].toDouble());
-        mark.setResidualY(fiducialResidualY[i].toDouble());
-        mark.computeResidualMagnitude();
-      }
-      m_fiducialMarks.push_back(mark);
-    }
-
-    PvlKeyword ephemerisTime = tilePvl.findKeyword("Ephemeris_Time");
+    PvlGroup generalGroup = tilePvl.findGroup("General");
+    
+    PvlKeyword ephemerisTime = generalGroup.findKeyword("Ephemeris_Time");
     for (int i = 0; i < ephemerisTime.size(); i++) {
       double et = ephemerisTime[i].toDouble();
       m_etimes.push_back(et);
     }
 
-    PvlKeyword exposureTime = tilePvl.findKeyword("Exposure_Time");
+    PvlKeyword exposureTime = generalGroup.findKeyword("Exposure_Time");
     for (int i = 0; i < exposureTime.size(); i++) {
       double et = exposureTime[i].toDouble();
       m_exptimes.push_back(et);
     }
 
-    PvlKeyword expSamples = tilePvl.findKeyword("Exposure_Sample");
+    PvlKeyword expSamples = generalGroup.findKeyword("Exposure_Sample");
     for (int i = 0; i < expSamples.size(); i++) {
       double es = expSamples[i].toInt();
       m_expSampleTimes.push_back(es);
     }
 
-    m_leftClockCount = tilePvl.findKeyword("Left_Clock_Count");
-    m_rightClockCount = tilePvl.findKeyword("Right_Clock_Count");
-    m_leftTime = tilePvl.findKeyword("Left_Time");
-    m_rightTime = tilePvl.findKeyword("Right_Time");
-
-    m_timingMarks.clear();
-    PvlGroup timingGroup = tilePvl.findGroup("Timing Marks");
-    PvlKeyword timingNumber = timingGroup.findKeyword("Number");
-    PvlKeyword timingLine = timingGroup.findKeyword("Line");
-    PvlKeyword timingSample = timingGroup.findKeyword("Sample");
-    PvlKeyword timingLength = timingGroup.findKeyword("Length");
-    PvlKeyword timingHeight = timingGroup.findKeyword("Height");
-    PvlKeyword timingValid = timingGroup.findKeyword("Valid");
-    PvlKeyword timingValue = timingGroup.findKeyword("Value");
-    for (int i = 0; i < timingNumber.size(); i++) {
-      float matLine = timingLine[i].toFloat() - 24900;
-      Point2f massCenter(timingSample[i].toFloat() + timingLength[i].toFloat()/2, matLine);
-      Rect boundingRect(timingSample[i].toInt(), (int)matLine - timingHeight[i].toInt()/2,
-                        timingLength[i].toInt(), timingHeight[i].toInt());
-      TimingMark mark(massCenter, boundingRect);
-      mark.setValid((bool)timingValid[i].toInt());
-      mark.setNumber(timingNumber[i].toInt());
-      mark.setValue(timingValue[i].toInt());
-      m_timingMarks.push_back(mark);
-    }
+    m_leftClockCount = generalGroup.findKeyword("Left_Clock_Count");
+    m_rightClockCount = generalGroup.findKeyword("Right_Clock_Count");
+    m_leftTime = generalGroup.findKeyword("Left_Time");
+    m_rightTime = generalGroup.findKeyword("Right_Time");
   }  
 
 

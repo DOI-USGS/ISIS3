@@ -49,7 +49,7 @@ void IsisMain() {
   
   //QString detachedLabelFile = FileName(ui.GetFileName("TOPVL")).name();
   
-  const QString fileName = "/archive/missions/apollo_pan/AS15/CriticalData/PanData/MetadataCSVVersions/Apollo15PanMetadata.csv";
+  QString fileName = FileName(ui.GetFileName("METADATAPVL")).expanded();
   CSVReader reader(fileName, true, 0, ',', true, true);
 
   //Find the correct row for the image, this needs to be parsed from the input file name
