@@ -125,6 +125,14 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the spacecraft distance
+   * 
+   * @param sample The sample of the image
+   * @param &surfacePoint The surface point we want to find the distance from
+   * 
+   * @return double The spacecraft distance
+   */
   double SampleScanCameraGroundMap::FindSpacecraftDistance(int sample,
       const SurfacePoint &surfacePoint) {
 
