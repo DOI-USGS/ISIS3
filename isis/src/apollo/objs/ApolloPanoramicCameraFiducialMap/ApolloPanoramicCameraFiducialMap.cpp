@@ -20,14 +20,17 @@ namespace Isis {
     p_naifIkCode = naifIkCode;
     ReadFiducials(fiducials);
 
-    // Set the x-axis direction.
-    int xdir;
-    if(naifIkCode % 2 == 0) {
-      xdir = -1;
-    }
-    else {
-      xdir = 1;
-    }
+//     // Set the x-axis direction.
+//     int xdir;
+//     if(naifIkCode % 2 == 0) {
+//       xdir = -1;
+//     }
+//     else {
+//       xdir = 1;
+//     }
+    
+    //TODO Why is this commented out? I commented out the code above so we wouldn't get a compiler
+    //warning. 2018-07-14 mshepherd
 //    CreateTrans(xdir);
   }
 

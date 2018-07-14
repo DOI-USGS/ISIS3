@@ -42,6 +42,7 @@ namespace Isis {
    * @internal
    *
    *   @history 2012-09-12 Ken Edmundson - Original version
+   *   @history 2018-07-14 Makayla Shepherd - Updated documentation
    *
    */
   class SampleScanCameraGroundMap : public CameraGroundMap {
@@ -70,7 +71,46 @@ namespace Isis {
       FindFocalPlaneStatus FindFocalPlane(const int &approxSample,
                                           const SurfacePoint &surfacePoint);
       double FindSpacecraftDistance(int sample, const SurfacePoint &surfacePoint);
-
+      
+    private:
+      /**
+      * @author 2012-05-09 Orrin Thomas
+      *
+      * @internal
+      */
+      class SampleOffsetFunctor : public std::unary_function<double, double > {
+      public:
+        
+        SampleOffsetFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt);
+        ~SampleOffsetFunctor();
+        
+        double operator()(double et);
+        
+      private:
+        SurfacePoint m_surfacePoint;
+        Camera *m_camera;
+      };
+      
+      
+      /**
+      * @author 2012-05-09 Orrin Thomas
+      *
+      * @internal
+      */
+      class SensorSurfacePointDistanceFunctor : public std::unary_function<double, double > {
+        public:
+          
+          SensorSurfacePointDistanceFunctor(Isis::Camera *camera, const Isis::SurfacePoint &surPt);
+          ~SensorSurfacePointDistanceFunctor();
+          
+          double operator()(double et);
+          
+        private:
+          SurfacePoint m_surfacePoint;
+          Camera* m_camera;
+      };
   };
+  
+  
 };
 #endif
