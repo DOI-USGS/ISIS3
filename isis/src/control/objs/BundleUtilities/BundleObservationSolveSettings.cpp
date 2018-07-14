@@ -236,6 +236,8 @@ namespace Isis {
     m_instrumentId = instrumentId;
   }
 
+  QUuid * BundleObservationSolveSettings::uuid() {
+      return m_id; };
 
   /**
    * Accesses the instrument id for this observation.

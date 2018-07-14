@@ -101,6 +101,7 @@ class BundleObservationSolveSettings {
       ~BundleObservationSolveSettings();
       BundleObservationSolveSettings &operator=(const BundleObservationSolveSettings &src);
       void initialize();
+      QUuid * uuid();
 
       void setInstrumentId(QString instrumentId);
       QString instrumentId() const;

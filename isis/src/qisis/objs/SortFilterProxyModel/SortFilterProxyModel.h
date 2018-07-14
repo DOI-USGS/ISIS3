@@ -25,11 +25,16 @@
 #include <QIdentityProxyModel>
 #include <QModelIndex>
 #include <QPersistentModelIndex>
+#include <QSharedPointer>
 #include <QSortFilterProxyModel>
+#include <QUuid>
+
+#include "BundleObservationSolveSettings.h"
 
 class QAbstractProxyModel;
 class QObject;
 class QStandardItem;
+
 
 class QVariant;
 
@@ -47,7 +52,10 @@ namespace Isis {
    *   @history 2018-06-18 Tyler Wilson - Original version.
    */
   
-   class ProjectItem;
+
+   class BundleSettings;
+   class Image;
+   class ProjectItem;   
    class ProjectItemModel;
  
     class SortFilterProxyModel : public QSortFilterProxyModel  {
@@ -57,23 +65,38 @@ namespace Isis {
       explicit SortFilterProxyModel(QObject *parent = 0);
 
       //QModelIndex mapFromSource(const QModelIndex &sourceIndex) const Q_DECL_OVERRIDE;
-      //QModelIndex mapToSource(const QModelIndex &proxyIndex) const Q_DECL_OVERRIDE;
 
-      //void setSourceModel(ProjectItemModel *newSourceModel) Q_DECL_OVERRIDE;
+      bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const Q_DECL_OVERRIDE;
+      QModelIndex mapToSource(const QModelIndex &proxyIndex) const Q_DECL_OVERRIDE;
+      QVariant headerData(int section, Qt::Orientation orientation, int role) const Q_DECL_OVERRIDE;
+      QModelIndex parent(const QModelIndex & child) const Q_DECL_OVERRIDE;
+      QModelIndex index(int row, int column,const QModelIndex &parent=QModelIndex() ) const Q_DECL_OVERRIDE;
+      int columnCount(const QModelIndex & parent = QModelIndex()) const Q_DECL_OVERRIDE;
+      QVariant data(const QModelIndex & ix, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+      bool setData(const QModelIndex & ix, const QVariant & value, int role = Qt::EditRole) const;
       void setSourceModel(ProjectItemModel *newSourceModel);
 
       bool setRoot(const QStandardItem *item);
 
-      void setSelectedItems(QList<ProjectItem*> selected);
+      void setSelectedItems(QList<ProjectItem*> selected, QSharedPointer<BundleSettings> bundleQSP);
 
 
      protected:
-       bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+       bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const Q_DECL_OVERRIDE;
 
     private:
+      QMap<QModelIndex,QPair<QString,int> > images;
+      QMap<int,Image *> imagePointers;
       ProjectItemModel * baseModel;
       QList<QModelIndex> selectedIndices;
-      QList<int> selectedIndexRows;
+
+
+
+
+
+      QList<BundleObservationSolveSettings> m_bossList;
+
+      QMap<QUuid *,QSet<QString> > m_bossMap;
       QPersistentModelIndex m_root;
       QModelIndex root;
 
