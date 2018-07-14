@@ -45,11 +45,10 @@ namespace Isis {
    */
   class SampleScanCameraSkyMap : public CameraSkyMap {
     public:
-      //! Constructor
-      SampleScanCameraSkyMap(Camera *parent) : CameraSkyMap(parent) {};
 
-      //! Destructor
-      virtual ~SampleScanCameraSkyMap() {};
+      SampleScanCameraSkyMap(Camera *parent) : CameraSkyMap(parent);
+
+      virtual ~SampleScanCameraSkyMap();
 
       virtual bool SetSky(const double ra, const double dec);
   };

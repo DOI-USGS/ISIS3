@@ -49,47 +49,14 @@ namespace Isis {
     public:
       SampleScanCamera(Isis::Cube &cube);
 
-      /** 
-       * Returns the SampleScan type of camera, as enumerated in the Camera
-       * class. 
-       * @return @b CameraType SampleScan camera type.
-       */
-      virtual CameraType GetCameraType() const {
-        return SampleScan;
-      }
-
-      /**
-       * Returns a pointer to the SampleScanCameraGroundMap object
-       *
-       * @return SampleScanCameraGroundMap*
-       */
-      SampleScanCameraGroundMap *GroundMap() {
-        return (SampleScanCameraGroundMap *)Camera::GroundMap();
-      };
-
-      /**
-       * Returns a pointer to the SampleScanCameraSkyMap object
-       *
-       * @return SampleScanCameraSkyMap*
-       */
-      SampleScanCameraSkyMap *SkyMap() {
-        return (SampleScanCameraSkyMap *)Camera::SkyMap();
-      };
-
-      /**
-       * Returns a pointer to the SampleScanCameraDetectorMap object
-       *
-       * @return SampleScanCameraDetectorMap*
-       */
-      SampleScanCameraDetectorMap *DetectorMap() {
-        return (SampleScanCameraDetectorMap *)Camera::DetectorMap();
-      };
+      virtual CameraType GetCameraType();
+      SampleScanCameraGroundMap *GroundMap();
+      SampleScanCameraSkyMap *SkyMap();
+      SampleScanCameraDetectorMap *DetectorMap();
 
     private:
-      //! Copying cameras is not allowed
-      SampleScanCamera(const SampleScanCamera &);
-      //! Assigning cameras is not allowed
-      SampleScanCamera &operator=(const SampleScanCamera &);
+      SampleScanCamera(const SampleScanCamera &); //!< Copying cameras is not allowed
+      SampleScanCamera &operator=(const SampleScanCamera &); //!< Assigning cameras is not allowed
   };
 };
 

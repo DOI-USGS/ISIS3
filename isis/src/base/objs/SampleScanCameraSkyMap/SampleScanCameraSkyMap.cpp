@@ -28,6 +28,19 @@
 #include "SampleScanCameraDetectorMap.h"
 
 namespace Isis {
+  
+  /**
+   * Constructor
+   * 
+   * @param parent The parent camera
+   */
+  SampleScanCameraSkyMap(Camera *parent) : CameraSkyMap(parent) {};
+
+  /**
+   * Destructor
+   */
+  ~SampleScanCameraSkyMap() {};
+      
   /** Compute undistorted focal plane coordinate from ra/dec
    *
    * @param ra    right ascension in degrees
