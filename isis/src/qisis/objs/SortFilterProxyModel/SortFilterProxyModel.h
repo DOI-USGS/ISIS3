@@ -46,6 +46,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2018-06-18 Tyler Wilson - Original version.
+   *   @history 2018-07-13 Christopher Combs - Added data method to override BackgroundRole case
+   *                           in order to let source model ignore colors set in JigsawSetupDialog.
    */
   
    class ProjectItem;

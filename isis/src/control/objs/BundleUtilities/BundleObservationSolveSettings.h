@@ -83,6 +83,7 @@ namespace Isis {
    *                           additional apriori sigma values in setInstrumentPositionSettings/
    *                           setInstrumentPointingSettings beyond position/velocity/acceleration.
    *                           References #497.
+   *   @history 2018-07-13 Christopher Combs - Added m_color variable and support for serialization.
    *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.

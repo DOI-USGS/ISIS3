@@ -103,6 +103,8 @@ namespace Isis {
    *                           closed after successfully importing). So, the JigsawSetupDialog would
    *                           have to allocate cube memory for all the selected images before it
    *                           would be displayed. References #497.
+   *   @history 2018-07-13 Christopher Combs - Added support for displaying background colors on 
+   *                           BOSS tab images corresponding to their solve settings sets.
    */
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT

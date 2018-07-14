@@ -142,6 +142,8 @@ namespace Isis {
    *   @history 2018-07-10 Kaitlyn Lee - If a user does not select any images in the project tree,
    *                           all image lists and images will be returned in selectedBOSSImages().
    *                           References #497.
+   *   @history 2018-07-13 Christopher Combs - Added data method to override BackgroundRole case
+   *                           in order to ignore colors set in JigsawSetupDialog.
    */
   class ProjectItemModel : public QStandardItemModel {
 
