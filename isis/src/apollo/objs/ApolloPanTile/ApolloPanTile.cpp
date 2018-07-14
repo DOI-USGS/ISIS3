@@ -463,32 +463,31 @@ namespace Isis {
     timingGroup += timingValid;
     timingGroup += timingValue;
 
-    // Create output object
-    PvlObject results("AS15-P-" + m_imageNumber + "_000" + QString::number(m_tileNumber));
-    results += PvlKeyword("Rows", QString::number(m_rows));
-    results += PvlKeyword("Columns", QString::number(m_columns));
-    results += PvlKeyword("Top_Trim", QString::number(m_topTrim));
-    results += PvlKeyword("Bottom_Trim", QString::number(m_bottomTrim));
-    results += PvlKeyword("Left_Trim", QString::number(m_leftTrim));
-    results += PvlKeyword("Right_Trim", QString::number(m_rightTrim));
-    results += PvlKeyword("Timing_Offset", QString::number(m_timingOffset));
-    results += PvlKeyword("Sample_Offset", QString::number(m_sampleOffset));
+    PvlGroup generalGroup("General");
+    generalGroup += PvlKeyword("Rows", QString::number(m_rows));
+    generalGroup += PvlKeyword("Columns", QString::number(m_columns));
+    generalGroup += PvlKeyword("Top_Trim", QString::number(m_topTrim));
+    generalGroup += PvlKeyword("Bottom_Trim", QString::number(m_bottomTrim));
+    generalGroup += PvlKeyword("Left_Trim", QString::number(m_leftTrim));
+    generalGroup += PvlKeyword("Right_Trim", QString::number(m_rightTrim));
+    generalGroup += PvlKeyword("Timing_Offset", QString::number(m_timingOffset));
+    generalGroup += PvlKeyword("Sample_Offset", QString::number(m_sampleOffset));
     PvlKeyword affineX("Affine_X");
     for (size_t i = 0; i < m_transX.size(); i++) {
       affineX += QString::number(m_transX[i]);
     }
-    results += affineX;
+    generalGroup += affineX;
     PvlKeyword affineY("Affine_Y");
     for (size_t i = 0; i < m_transY.size(); i++) {
       affineY += QString::number(m_transY[i]);
     }
-    results += affineY;
-    results += PvlKeyword("Left_Clock_Count",
+    generalGroup += affineY;
+    generalGroup += PvlKeyword("Left_Clock_Count",
                           toString(m_stopTime - iTime("1971/7/26 13:34:00.795").EtString().toDouble()));
-    results += PvlKeyword("Right_Clock_Count",
+    generalGroup += PvlKeyword("Right_Clock_Count",
                           toString(m_startTime - iTime("1971/7/26 13:34:00.795").EtString().toDouble()));
-    results += PvlKeyword("Left_Time", iTime(m_stopTime).UTC());
-    results += PvlKeyword("Right_Time", iTime(m_startTime).UTC());
+    generalGroup += PvlKeyword("Left_Time", iTime(m_stopTime).UTC());
+    generalGroup += PvlKeyword("Right_Time", iTime(m_startTime).UTC());
     PvlKeyword ephemerisTime("Ephemeris_Time", toString(m_stopTime));
     PvlKeyword exposureTime("Exposure_Time", toString(m_timingMarks[0].exposureTime()));
     PvlKeyword exposureSample("Exposure_Sample", "1");
@@ -497,9 +496,13 @@ namespace Isis {
       exposureTime += toString(m_timingMarks[i+1].exposureTime());
       exposureSample += QString::number(m_timingMarks[i].rightSample());
     }
+    
+    // Create output object
+    PvlObject results("AS15-P-" + m_imageNumber + "_000" + QString::number(m_tileNumber));
     results += ephemerisTime;
     results += exposureTime;
     results += exposureSample;
+    results += generalGroup;
     results += fiducialGroup;
     results += timingGroup;
 
