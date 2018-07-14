@@ -146,6 +146,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Finds where the surface point hits the image. If successful it sets the forcal plane 
+   * corrdinates
+   * 
+   * TODO Ken document this
+   * 
+   * @param &approxLine 
+   * @param &surfacePoint
+   */
   SampleScanCameraGroundMap::FindFocalPlaneStatus
       SampleScanCameraGroundMap::FindFocalPlane(const int &approxLine,
                                               const SurfacePoint &surfacePoint) {
@@ -349,13 +358,18 @@ namespace Isis {
   }
 
 
+  /**
+   * TODO Ken document this
+   */
   SampleScanCameraGroundMap::SensorSurfacePointDistanceFunctor::SensorSurfacePointDistanceFunctor
       (Isis::Camera *camera, const Isis::SurfacePoint &surPt) {
     m_camera = camera;
     m_surfacePoint = surPt;
   }
 
-  
+  /**
+   * TODO Ken document this
+   */
   double SampleScanCameraGroundMap::SensorSurfacePointDistanceFunctor::operator()(double et) {
     double s[3], p[3];
 
