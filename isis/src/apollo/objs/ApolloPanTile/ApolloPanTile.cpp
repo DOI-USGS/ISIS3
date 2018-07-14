@@ -497,12 +497,22 @@ namespace Isis {
       exposureSample += QString::number(m_timingMarks[i].rightSample());
     }
     
+    generalGroup += ephemerisTime;
+    generalGroup += exposureTime;
+    generalGroup += exposureSample;
+    
+    // Create trimming group
+    str = "Trimming";
+    PvlGroup trimmingGroup(str);
+    trimmingGroup += PvlKeyword("Top_Trim", QString::number(m_topTrim));
+    trimmingGroup += PvlKeyword("Bottom_Trim", QString::number(m_bottomTrim));
+    trimmingGroup += PvlKeyword("Left_Trim", QString::number(m_leftTrim));
+    trimmingGroup += PvlKeyword("Right_Trim", QString::number(m_rightTrim));
+    
     // Create output object
     PvlObject results("AS15-P-" + m_imageNumber + "_000" + QString::number(m_tileNumber));
-    results += ephemerisTime;
-    results += exposureTime;
-    results += exposureSample;
     results += generalGroup;
+    results += trimmingGroup;
     results += fiducialGroup;
     results += timingGroup;
 
