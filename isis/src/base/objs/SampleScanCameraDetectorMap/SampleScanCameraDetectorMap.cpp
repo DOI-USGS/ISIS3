@@ -28,6 +28,61 @@
 
 namespace Isis {
 
+  /** Construct a detector map for sample scan cameras
+   *
+   * @param parent    The parent camera model for the detector map
+   * @param etStart   starting ephemeris time in seconds
+   *                  at the left of the first sample
+   * @param sampleRate  the time in seconds between samples
+   *
+   */
+  SampleScanCameraDetectorMap(Camera *parent, const double etStart, const double sampleRate) :
+    CameraDetectorMap(parent) {
+    p_etStart = etStart;
+    p_sampleRate = sampleRate;
+  }
+
+
+  //! Destructor
+  virtual ~SampleScanCameraDetectorMap() {};
+
+  /** Reset the starting ephemeris time
+   *
+   * Use this method to reset the starting time of the left edge of
+   * the first sample in the parent image. That is the time, prior
+   * to cropping, scaling, or padding. Usually this will not need
+   * to be done unless the time changes between bands.
+   *
+   * @param etStart starting ephemeris time in seconds
+   *
+   */
+  void SetStartTime(const double etStart) {
+    p_etStart = etStart;
+  };
+
+
+  /** Reset the sample rate
+   *
+   * Use this method to reset the time between samples. Usually this
+   * will not need to be done unless the rate changes between bands.
+   *
+   * @param sampleRate the time in seconds between samples
+   *
+   */
+  void SetSampleRate(const double sampleRate) {
+    p_sampleRate = sampleRate;
+  };
+
+
+  /**
+   * Returns the time in seconds between scan columns
+   * 
+   * @return double The time in seconds between scan columns
+   */
+  double SampleRate() const {
+    return p_sampleRate;
+  };
+      
   /** Compute parent position from a detector coordinate
    *
    * This method will compute a parent sample given a
@@ -70,7 +125,11 @@ namespace Isis {
     return true;
   }
 
-  //! Return the starting time at the right edge of the last sample in the parent image
+  /**
+   * Returns the starting time at the right edge of the last sample in the parent image
+   * 
+   * @return double The starting time at the right edge of the last sample in the parent image
+   */
   double SampleScanCameraDetectorMap::StartTime() const {
     return p_etStart;
   }

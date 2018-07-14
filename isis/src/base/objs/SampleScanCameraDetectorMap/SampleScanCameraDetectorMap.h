@@ -45,60 +45,13 @@ namespace Isis {
   class SampleScanCameraDetectorMap : public CameraDetectorMap {
     public:
 
-      /** Construct a detector map for sample scan cameras
-       *
-       * @param parent    The parent camera model for the detector map
-       * @param etStart   starting ephemeris time in seconds
-       *                  at the left of the first sample
-       * @param sampleRate  the time in seconds between samples
-       *
-       */
-      SampleScanCameraDetectorMap(Camera *parent, const double etStart,
-                                const double sampleRate) :
-        CameraDetectorMap(parent) {
-        p_etStart = etStart;
-        p_sampleRate = sampleRate;
+      SampleScanCameraDetectorMap(Camera *parent, const double etStart, const double sampleRate);
 
-//        p_detectorSample = 0.0;
-      }
-
-
-      //! Destructor
       virtual ~SampleScanCameraDetectorMap() {};
 
-      /** Reset the starting ephemeris time
-       *
-       * Use this method to reset the starting time of the left edge of
-       * the first sample in the parent image. That is the time, prior
-       * to cropping, scaling, or padding. Usually this will not need
-       * to be done unless the time changes between bands.
-       *
-       * @param etStart starting ephemeris time in seconds
-       *
-       */
-      void SetStartTime(const double etStart) {
-        p_etStart = etStart;
-      };
-
-
-      /** Reset the sample rate
-       *
-       * Use this method to reset the time between samples. Usually this
-       * will not need to be done unless the rate changes between bands.
-       *
-       * @param sampleRate the time in seconds between samples
-       *
-       */
-      void SetSampleRate(const double sampleRate) {
-        p_sampleRate = sampleRate;
-      };
-
-
-      //! Return the time in seconds between scan columns
-      double SampleRate() const {
-        return p_sampleRate;
-      };
-
+      void SetStartTime(const double etStart);
+      void SetSampleRate(const double sampleRate);
+      double SampleRate() const;
 
       virtual bool SetParent(const double sample, const double line);
       virtual bool SetDetector(const double sample, const double line);
