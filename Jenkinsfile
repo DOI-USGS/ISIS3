@@ -28,7 +28,7 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
-                    source activate isis
+                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
                     set +e
                     cd build
                     ninja -j8 && ninja install
@@ -38,8 +38,7 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
-                    source activate isis
-                    export PATH="${PATH}:${ISISROOT}/bin"
+                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
                     set +e
                     cd build
                     ctest -j8 -R _unit_ 
