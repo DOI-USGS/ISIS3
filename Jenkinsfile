@@ -29,6 +29,7 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
+                    source activate isis
                     set +e
                     cd build
                     ninja -j8 && ninja install
@@ -38,6 +39,7 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
+                    source activate isis
                     export PATH="${PATH}:${ISISROOT}/bin"
                     set +e
                     cd build
