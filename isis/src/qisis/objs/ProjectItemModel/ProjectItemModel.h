@@ -121,8 +121,8 @@ namespace Isis {
    *                           in the project tree if there is no valid currentIndex. This would
    *                           happen if the user was interacting with a cubeDN or footprint view
    *                           and then tried right clicking on the project tree. Fixes #5111.
-   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
-   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                           classes. Fixes #5117.
@@ -138,6 +138,9 @@ namespace Isis {
    *                           selectedBOSSImages().   If a user selected an image list and some
    *                           (but not all) of the images within that list, the function returned
    *                           all of the images in the list and not just the selected ones.
+   *                           References #497.
+   *   @history 2018-07-10 Kaitlyn Lee - If a user does not select any images in the project tree,
+   *                           all image lists and images will be returned in selectedBOSSImages().
    *                           References #497.
    */
   class ProjectItemModel : public QStandardItemModel {
@@ -190,7 +193,7 @@ namespace Isis {
        * This signal is emitted when a ProjectItem is removed to the model.
        */
       void itemRemoved(ProjectItem *);
-      
+
       /**
        * This signal is emitted whrn a ProjectItem's name is changed.
        */
