@@ -58,7 +58,7 @@ namespace Isis {
    *                            set the central widget's layout.
    *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
    *                            was moved from the constructor. createToolBars() was copied and edited
-   *                            from CnetEditorWindow. Fixes #5416
+   *                            from CnetEditorWindow. Fixes #5416. Fixes #4988
    *    @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                            view has its own toolbar, so having getters that return toolbar
    *                            actions to fill the toolbar of the IpceMainWindow are unnecessary.
