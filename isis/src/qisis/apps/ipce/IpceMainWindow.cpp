@@ -50,6 +50,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "JigsawRunWidget.h"
 #include "MosaicSceneWidget.h"
 #include "ProgressWidget.h"
 #include "Project.h"
@@ -80,36 +81,27 @@ namespace Isis {
       QMainWindow(parent) {
     m_maxThreadCount = -1;
 
-    //  Set the initialize size of the mainwindow to fullscreen so that created views do not
-    //  get squished.  Saved projects with view had the internal widgets squished because the
-    //  initial size of this mainwindow was small and it does not get restored to the saved project
-    //  size until after views are created.  For instance, the viewports within a CubeDnView were
-    //  restored to a small size based on the original mainwindow size.  If the internal state
-    //  of the views such as the viewport sizes, zooms, etc get serialized, this code will not be
-    //  needed.
-    QDesktopWidget deskTop;
-    QRect mainScreenSize = deskTop.availableGeometry(deskTop.primaryScreen());
-    resize(mainScreenSize.width(), mainScreenSize.height());
-
     QWidget *centralWidget = new QWidget;
     setCentralWidget(centralWidget);
+
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
+
+    // This was causing some buggy behavior, but this is what we would ultimately like.
+    // Allows a user to undock a group of tabs.
+    //setDockOptions(GroupedDragging | AllowTabbedDocks);
+
     //centralWidget->hide();
     setDockNestingEnabled(true);
 
     //  Set the splitter frames to a reasonable color/size for resizing the docks.
-    setStyleSheet("QMainWindow::separator {background: gray; width: 10; height: 10px;}");
+    setStyleSheet("QMainWindow::separator {background: black; width: 3; height: 3px;}");
 
     try {
       m_directory = new Directory(this);
       connect(m_directory, SIGNAL( newWidgetAvailable(QWidget *) ),
               this, SLOT( addView(QWidget *) ) );
 
-      // Currently this connection is only used by Directory when a new active is chosen & user
-      // chooses to discard any edits in the old active control which is in a CnetEditorWidget.
-      // The only view which will not be updated with the new control are any CnetEditorViews
-      // showing the old active control.  CnetEditorWidget classes do not have the ability to reload
-      // a control net, so the CnetEditor view displaying the old control is removed, then recreated.
-      connect(m_directory, SIGNAL(viewClosed(QWidget *)),
+      connect(m_directory, SIGNAL(closeView(QWidget *)),
               this, SLOT(removeView(QWidget *)));
 
       connect(m_directory, SIGNAL( directoryCleaned() ),
@@ -194,6 +186,14 @@ namespace Isis {
       OpenProjectWorkOrder *workorder = new OpenProjectWorkOrder(m_directory->project());
       workorder->execute();
     }
+
+    // QTimer *timer = new QTimer(this);
+    // connect(timer, SIGNAL(timeout()), this, SLOT(setProjectClean()));
+    // connect(timer, SIGNAL(timeout()), timer, SLOT(stop()));
+    // timer->start(1000);
+  }
+  void IpceMainWindow::setProjectClean() {
+    m_directory->project()->setClean(true);
   }
 
 
@@ -204,6 +204,11 @@ namespace Isis {
    */
   void IpceMainWindow::addView(QWidget *newWidget, Qt::DockWidgetArea area,
                                Qt::Orientation orientation) {
+    // JigsawRunWidget is already a QDockWidget, and no modifications need to be made to it
+    if (qobject_cast<JigsawRunWidget *>(newWidget)) {
+      splitDockWidget(m_projectDock, (QDockWidget*)newWidget, Qt::Vertical);
+      return;
+    }
 
     QDockWidget *dock = new QDockWidget(newWidget->windowTitle(), this);
     dock->setWidget(newWidget);
@@ -219,7 +224,7 @@ namespace Isis {
     }
     else {
       if (m_viewDocks.count() == 0) {
-        splitDockWidget(m_projectDock, dock, Qt::Horizontal); 
+        splitDockWidget(m_projectDock, dock, Qt::Horizontal);
       }
       else {
         tabifyDockWidget(m_viewDocks.last(), dock);
@@ -239,6 +244,10 @@ namespace Isis {
 
     // Save view docks for cleanup during a project close
     m_viewDocks.append(dock);
+
+    if (m_viewDocks.size == 1) {
+      emit enableViewActions(true);
+    }
   }
 
 
@@ -248,19 +257,27 @@ namespace Isis {
     if (dock) {
       m_viewDocks.removeAll(dock);
     }
+
+    if (m_viewDocks.size == 0) {
+      emit enableViewActions(false);
+    }
   }
 
 
   /**
-   * This slot is connected from Directory::viewClosed(QWidget *) signal.  It will
-   * close the given view and delete the view. This was written to handle
+   * This slot is connected from Directory::closeView(QWidget *) signal.  It will close the given
+   * view and delete the view.
    *
    * @param view QWidget* The view to close.
    */
   void IpceMainWindow::removeView(QWidget *view) {
 
-    view->close();
-    delete view;
+    QDockWidget *parentDock = qobject_cast<QDockWidget *>(view->parent());
+    removeDockWidget(parentDock);
+    delete parentDock;
+    if (m_viewDocks.size == 0) {
+      emit enableViewActions(false);
+    }
   }
 
 
@@ -277,6 +294,9 @@ namespace Isis {
       }
     }
     m_viewDocks.clear();
+    if (m_viewDocks.size == 0) {
+      emit enableViewActions(false);
+    }
   }
 
 
@@ -385,11 +405,19 @@ namespace Isis {
 
     QAction *tabViewsAction = new QAction("Tab Views", this);
     connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
+    connect( this, SIGNAL(enableViewActions(bool)), tabViewsAction, SLOT(setEnabled(bool)) );
     m_viewMenuActions.append(tabViewsAction);
+    if (m_viewDocks.size() == 0) {
+      tabViewsAction.setDisabled(true);
+    }
 
     QAction *tileViewsAction = new QAction("Tile Views", this);
     connect( tileViewsAction, SIGNAL(triggered()), this, SLOT(tileViews()) );
+    connect( this, SIGNAL(enableViewActions(bool)), tileViewsAction, SLOT(setEnabled(bool)) );
     m_viewMenuActions.append(tileViewsAction);
+    if (m_viewDocks.size() == 0) {
+      tileViewsAction.setDisabled(true);
+    }
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -528,7 +556,12 @@ namespace Isis {
     QSettings globalSettings(FileName("$HOME/.Isis/" + appName + "/ipce.config").expanded(),
         QSettings::NativeFormat);
 
-    if (project->isTemporaryProject()) {
+    // If no config file exists and a user immediately opens a project,
+    // the project's geometry will be saved as a default for when ipce is
+    // opened again. Previously, the ipce's default size was small,
+    // until a user opened ipce (but not a project) and resized to how they
+    // wanted it to be sized, then closed ipce.
+    if (project->isTemporaryProject() || !globalSettings.contains("geometry")) {
       globalSettings.setValue("geometry", QVariant(geometry()));
     }
 
@@ -754,14 +787,7 @@ namespace Isis {
       m_maxThreadCount = globalSettings.value("maxThreadCount", m_maxThreadCount).toInt();
       applyMaxThreadCount();
     }
-
-    // The geom/state isn't enough for main windows to correctly remember
-    //   their position and size, so let's restore those on top of
-    //   the geom and state.
-    if (!projectSettings.value("pos").toPoint().isNull()) {
-      move(projectSettings.value("pos").toPoint());
-    }
-//    m_directory->project()->setClean(true);
+  //  m_directory->project()->setClean(true);
   }
 
 
