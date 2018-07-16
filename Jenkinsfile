@@ -16,17 +16,11 @@ pipeline {
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
     }
     stages {
-        stage('Conda') {
-            steps {
-                sh """
-                    conda env create -n isis -f environment.yml
-                    source activate isis
-                   """
-            }
-        }
         stage('Config') { 
             steps { 
                 sh """
+                    conda env create -n isis -f environment.yml
+                    source activate isis
                     mkdir -p ./install ./build && cd build
                     cmake -GNinja -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis \
                    """
