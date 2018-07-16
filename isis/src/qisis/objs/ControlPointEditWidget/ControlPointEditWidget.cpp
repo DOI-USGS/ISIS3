@@ -2019,7 +2019,6 @@ namespace Isis {
     }
 
     m_leftMeasure = new ControlMeasure;
-    //  Find measure for each file
     *m_leftMeasure = *((*m_editPoint)[serial]);
 
     //  If m_leftCube is not null, delete before creating new one
@@ -2069,11 +2068,6 @@ namespace Isis {
     }
 
     m_rightMeasure = new ControlMeasure;
-    //  Find measure for each file
-    *m_rightMeasure = *((*m_editPoint)[serial]);
-
-    m_rightMeasure = new ControlMeasure();
-    //  Find measure for each file
     *m_rightMeasure = *((*m_editPoint)[serial]);
 
     //  If m_rightCube is not null, delete before creating new one

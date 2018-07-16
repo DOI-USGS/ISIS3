@@ -68,6 +68,10 @@ namespace Isis {
    * @param cube The Pvl label from the cube is used to create the Camera object.
    */
   Camera::Camera(Cube &cube) : Sensor(cube) {
+    
+    m_instrumentId = cube.label()->findGroup("Instrument", 
+                        PvlObject::FindOptions::Traverse).findKeyword("InstrumentId")[0];
+    
     m_instrumentNameLong = "Unknown";
     m_instrumentNameShort = "Unknown";
     m_spacecraftNameLong = "Unknown";
@@ -2873,6 +2877,16 @@ namespace Isis {
    */
   CameraSkyMap *Camera::SkyMap() {
     return p_skyMap;
+  }
+  
+  
+  /**
+   * This method returns the InstrumentId as it appears in the cube.
+   *
+   * @return QString Returns m_instrumentId
+   */
+  QString Camera::instrumentId() {
+    return m_instrumentId;
   }
 
 

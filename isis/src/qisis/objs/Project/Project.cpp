@@ -1812,6 +1812,10 @@ namespace Isis {
    *                           Fixes #4567
    *  @history 2018-03-30 Tracie Sucharski - If current activeControl has been modified, prompt for
    *                           saving. Emit signal to discardActiveControlEdits.
+   *  @history 2018-07-12 Tracie Sucharski - Moved the close/open control net from
+   *                           Directory::reloadActiveControlInCnetEditorView to this method to
+   *                           prevent seg fault when there are multiple cnetEditorViews with same
+   *                           cnet.
    *
    */
   void Project::setActiveControl(QString displayName) {
@@ -1835,6 +1839,9 @@ namespace Isis {
             break;
           // Discard any changes made to cnet
           case QMessageBox::Discard:
+            // Close, then re-open effectively discarding edits
+            m_activeControl->closeControlNet();
+            m_activeControl->openControlNet();
             emit discardActiveControlEdits();
             break;
           // Cancel operation
@@ -2703,65 +2710,64 @@ namespace Isis {
   }
 
 
-  void Project::addTarget(Target *target) {
-
-    bool found = false;
-
-    // construct TargetBody QSharedPointer from this images cameras Target
-    TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
-
-    foreach (TargetBodyQsp tb, *m_targets) {
-      if (*tb == *targetBody) {
-        found = true;
-        break;
+  /**
+  * @brief This method checks for the existence of a target based on TargetName
+  *
+  * @param id The target string to be compared.
+  * @return bool Returns true if targetBody already exists in project
+  */
+  bool Project::hasTarget(QString id) {
+    foreach (TargetBodyQsp targetBody, *m_targets) {
+      if (QString::compare(targetBody->targetName(), id, Qt::CaseInsensitive) == 0) {
+        return true;
       }
     }
-
-    // if this TargetBody is not already in the project, add it
-    // below is how it probably should work, would have to I think
-    // override the ::contains() method in the TargetBodyList class
-//      if (!m_targets->contains(targetBody))
-//        m_targets->append(targetBody);
-    if (!found) {
-      m_targets->append(targetBody);
-      connect( targetBody.data(), SIGNAL( destroyed(QObject *) ),
-               this, SLOT( targetBodyClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               targetBody.data(), SLOT( updateFileName(Project *) ) );
-
-      (*m_idToTargetBodyMap)[targetBody->id()] = targetBody.data();
-    }
+    return false;
   }
 
 
-  void Project::addCamera(Camera *camera) {
-    bool found = false;
+  /**
+  * Adds a new target to the project.
+  *
+  * @param target The target to be added.
+  */
+  void Project::addTarget(Target *target) {
 
-    // construct guiCamera QSharedPointer from this images cameras Target
-    GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
+    TargetBodyQsp targetBody = TargetBodyQsp(new TargetBody(target));
 
-    foreach (GuiCameraQsp gc, *m_guiCameras) {
-      if (*gc == *guiCamera) {
-        found = true;
-        break;
+    m_targets->append(targetBody);
+
+  }
+
+
+  /**
+  * @brief This method checks for the existence of a camera based on InstrumentId
+  *
+  * @param id The instrument string to be compared.
+  * @return bool Returns true if GuiCamera already exists in project
+  */
+  bool Project::hasCamera(QString id) {
+    foreach (GuiCameraQsp camera, *m_guiCameras) {
+
+      if (QString::compare(camera->instrumentId(), id, Qt::CaseInsensitive) == 0) {
+        return true;
       }
     }
+    return false;
+  }
 
-    // if this guiCamera is not already in the project, add it
-    // below is how it probably should work, would have to I think
-    // override the ::contains() method in the GuiCameraList class
-//      if (!m_guiCameras->contains(guiCamera))
-//        m_guiCameras->append(guiCamera);
 
-    if (!found) {
-      m_guiCameras->append(guiCamera);
-//      connect( guiCamera.data(), SIGNAL( destroyed(QObject *) ),
-//               this, SLOT( guiCameraClosed(QObject *) ) );
-//      connect( this, SIGNAL( projectRelocated(Project *) ),
-//               guiCamera.data(), SLOT( updateFileName(Project *) ) );
+  /**
+  * Adds a new camera to the project.
+  *
+  * @param camera The camera to be added.
+  */
+  void Project::addCamera(Camera *camera) {
+        
+    GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
 
-      (*m_idToGuiCameraMap)[guiCamera->id()] = guiCamera.data();
-    }
+    m_guiCameras->append(guiCamera);
+    
   }
 
 
