@@ -1915,7 +1915,7 @@ namespace Isis {
    * Currently, this was the easiest place to emit this signal.
    */
   void Project::cnetModified() {
-    if (m_activeControl->isModified()) {
+    if (m_activeControl && m_activeControl->isModified()) {
       emit activeControlModified();
     }
     setClean(false);
