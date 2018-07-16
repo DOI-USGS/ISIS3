@@ -13,6 +13,14 @@ class QVariant;
 
 namespace Isis {
   
+/**
+ *
+ * @author ????-??-?? Ian Humphrey
+ * @internal ????-??-?? Ian Humphrey
+ *
+ *
+ */
+
   class SubTreeProxyModel : public QIdentityProxyModel {
     Q_OBJECT
 
