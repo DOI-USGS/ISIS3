@@ -72,6 +72,31 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-30 Summer Stapleton - updated the view to remove QMainWindow constructor,
+   *                           include a central widget and to remove layout capacity. This change
+   *                           was made to adjust to parent class now inheriting from QMainWindow
+   *                           instead of QWidget. References #5433.
+   *   @history 2018-06-08 Tracie Sucharski - Remove deletion of m_window from destructor. This
+   *                           member variable no longer exists.
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having getters that return toolbar
+   *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                           Removed methods that returned menu and toolbar actions.
+   *                           Added enableControlNetTool(bool) so when an active control net is set,
+   *                           the tool becomes enabled.
+   *  @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of
+   *                           getting ambiguous shortcut errors. To counter this, we enable/disable
+   *                           actions. On default, actions are disabled until a user moves the
+   *                           cursor over the view. When a user moves the cursor outside of the
+   *                           view, the actions are disabled.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                           view can be re-created with the same objectName for restoring the
+   *                           project state. Qt's save/restoreState use the objectName. Remove
+   *                           sizeHint method which is now taken care of in the parent class,
+   *                           AbstractProjectItemView.
+   *   @history 2018-07-12 Tracie Sucharski - Renamed m_controlNetTool to m_controlNetToolAction
+   *                           to be clear it is not a pointer to the tool.  Add a call to
+   *                           the MosaicControlNetTool::loadNetwork in enableControlNetTool.
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -82,11 +107,6 @@ namespace Isis {
       ~Footprint2DView();
 
       MosaicSceneWidget *mosaicSceneWidget();
-      virtual QList<QAction *> permToolBarActions();
-      virtual QList<QAction *> activeToolBarActions();
-      virtual QList<QAction *> toolPadActions();
-
-      QSize sizeHint() const;
 
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
@@ -99,6 +119,9 @@ namespace Isis {
       void redrawMeasures();
       void controlPointAdded(QString newPointId);
 
+    public slots:
+      void enableControlNetTool(bool value);
+
     protected:
       bool eventFilter(QObject *watched, QEvent *event);
 
@@ -109,6 +132,8 @@ namespace Isis {
       void onMosItemRemoved(Image *image);
 
     private:
+      void enableActions();
+
       /**
        * @author 2018-05-11 Tracie Sucharski
        *
@@ -135,12 +160,11 @@ namespace Isis {
       ImageFileListWidget *m_fileListWidget; //!< The file list widget
       QMainWindow *m_window; //!< Main window
       QMap<Image *, ProjectItem *> m_imageItemMap; //!< Maps images to their items
+      Directory *m_directory; //!< The directory
 
       QToolBar *m_permToolBar; //!< The permanent tool bar
       QToolBar *m_activeToolBar; //!< The active tool bar
       ToolPad *m_toolPad; //!< The tool pad
-
-      QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
   };
 }
 

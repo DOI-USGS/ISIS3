@@ -4,6 +4,7 @@
 
 #include "ControlPoint.h"
 #include "FileName.h"
+#include "TemplateList.h"
 
 #include <QCloseEvent>
 #include <QDir>
@@ -89,7 +90,14 @@ namespace Isis {
    *                           or FootprintView if a ground source exists in the serial number list.
    *                           Fixes #5399.
    *   @history 2018-05-02 Tracie Sucharski - Colorize save buttons properly when creating new
-   *                           control point and loading a different control point. 
+   *                           control point and loading a different control point.
+   *   @history 2018-06-11 Summer Stapleton - Stripped path from displayed filename of Control
+   *                           Network and set the tooltip to the full path for easier access.
+   *   @history 2018-06-19 Adam Goins - Fixed updating references in selectLeftMeasure and
+   *                           selectRightMeasure to fix a segfault that was occuring. #Fixes #5435
+   *   @history 2018-06-28 Kaitlyn Lee - Removed shortcut from reload point button.
+   *   @history 2018-07-07 Summer Stapleton - Added a QComboBox to the widget to allow for changing
+   *                           the active registration template from the widget itself.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -130,6 +138,8 @@ namespace Isis {
       // of active control is re-factored. Also added reset parameter, defaulting to false so button
       // is red. This default was used so that current calls did not need to be changed.
       void colorizeSaveNetButton(bool reset = false);
+      
+      void addTemplates(TemplateList *templateList);
 
     protected:
       bool eventFilter(QObject *o,QEvent *e);
@@ -167,8 +177,10 @@ namespace Isis {
       void showHideTemplateEditor();
       void saveTemplateFile();
       void saveTemplateFileAs();
+      void setTemplateFile(QString);
       void setTemplateModified();
       void writeTemplateFile(QString);
+      void resetTemplateComboBox(QString fileName);
       void clearEditPoint();
 
     private:
@@ -225,7 +237,7 @@ namespace Isis {
       QPointer<QWidget> m_templateEditorWidget; //!< Template editor widget
       bool m_templateModified; //!< Indicates if the registration template was edited
 
-      QPointer<QLabel> m_templateFileNameLabel; //!< Label for the template filename
+      QPointer<QComboBox> m_templateComboBox; //!< ComboBox of imported registration templates
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
       QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;

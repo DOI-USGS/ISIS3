@@ -6,9 +6,9 @@
 
 
 namespace Isis {
-  ConnectionParentItem::ConnectionParentItem(ControlCubeGraphNode *node,
-      int avgCharWidth, AbstractTreeItem *parent)
-    : AbstractTreeItem(parent), AbstractImageItem(node, avgCharWidth) {
+  ConnectionParentItem::ConnectionParentItem(QString imageSerial, ControlNet *net,
+                                             int avgCharWidth, AbstractTreeItem *parent)
+        : AbstractTreeItem(parent), AbstractImageItem(imageSerial, net, avgCharWidth) {
   }
 
 

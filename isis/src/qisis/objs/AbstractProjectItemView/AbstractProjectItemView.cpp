@@ -24,10 +24,14 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QList>
+#include <QMainWindow>
+#include <QRect>
+#include <QSizePolicy>
 #include <QWidget>
 
 #include "ProjectItem.h"
@@ -39,11 +43,34 @@ namespace Isis {
   /**
    * Constructs the AbstractProjectItemView.
    *
-   * @param[in] parent (QWidget *) The parent widget
+   * @param[in] parent (QMainWindow *) The parent widget
    */
-  AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QWidget(parent) {
+  AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QMainWindow(parent) {
+
+    setWindowFlags(Qt::Widget);
+
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
+
     m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
+  }
+
+
+  /**
+   * Returns the suggested size
+   *
+   * @return @b QSize The size hint
+   */
+  QSize AbstractProjectItemView::sizeHint() const {
+
+    //  Size hint is made ridiculously large as a hack to have the views fill the available dock
+    //  space. SizePolicy alone did not work.
+    QDesktopWidget deskTop;
+    QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
+    return QSize( .89 * availableSpace.width(), .5 * availableSpace.height() );
   }
 
 
@@ -54,7 +81,7 @@ namespace Isis {
    * @param[in] model (ProjectItemModel *) The new model
    */
   void AbstractProjectItemView::setModel(ProjectItemModel *model) {
-    if (ProjectItemProxyModel *proxyModel = 
+    if (ProjectItemProxyModel *proxyModel =
         qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
       proxyModel->setSourceModel(model);
     }
@@ -68,7 +95,7 @@ namespace Isis {
    * @return @b ProjectItemModel * The model.
    */
   ProjectItemModel *AbstractProjectItemView::model() {
-    if (ProjectItemProxyModel *proxyModel = 
+    if (ProjectItemProxyModel *proxyModel =
         qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
       return proxyModel->sourceModel();
     }
@@ -126,7 +153,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Drops the data into the internal model if it can accept the data.
    *
@@ -142,34 +169,58 @@ namespace Isis {
     }
   }
 
-  
-  /**
-   * Returns a list of actions appropriate for the permanent tool bar.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::permToolBarActions() {
-    return QList<QAction *>();
+
+  void AbstractProjectItemView::moveEvent(QMoveEvent *event) {
+    QMainWindow::moveEvent(event);
+
+    emit windowChangeEvent(false);
+  }
+
+
+  void AbstractProjectItemView::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+
+    emit windowChangeEvent(false);
   }
 
 
   /**
-   * Returns a list of actions appropriate for the active tool bar.
+   * Enables actions when cursor enters the view
    *
-   * @return @b QList<QAction *> The actions
+   * @param event The enter event
    */
-  QList<QAction *> AbstractProjectItemView::activeToolBarActions() {
-    return QList<QAction *>();
+  void AbstractProjectItemView::enterEvent(QEvent *event) {
+    enableActions();
   }
 
 
   /**
-   * Returns a list of actions appropriate for the tool pad.
+   * Disables actions when cursor leaves the view.
    *
-   * @return @b QList<QAction *> The actions
+   * @param event The leave event
    */
-  QList<QAction *> AbstractProjectItemView::toolPadActions() {
-    return QList<QAction *>();
+  void AbstractProjectItemView::leaveEvent(QEvent *event) {
+    disableActions();
+  }
+
+
+  /**
+   * Disables toolbars and toolpad actions
+   */
+  void AbstractProjectItemView::disableActions() {
+    foreach (QAction *action, actions()) {
+      action->setDisabled(true);
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions
+   */
+  void AbstractProjectItemView::enableActions() {
+    foreach (QAction *action, actions()) {
+      action->setEnabled(true);
+    }
   }
 
 
@@ -184,68 +235,8 @@ namespace Isis {
 
 
   /**
-   * Returns a list of actions appropriate for a file menu.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::fileMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a project menu.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::projectMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for an edit menu.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::editMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a view menu.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::viewMenuActions() {
-    return QList<QAction *>();
-  }
-
-  
-  /**
-   * Returns a list of actions appropriate for a settings menu.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::settingsMenuActions() {
-    return QList<QAction *>();
-  }
-
-
-  /**
-   * Returns a list of actions appropriate for a help menu.
-   *
-   * @return @b QList<QAction *> The actions
-   */
-  QList<QAction *> AbstractProjectItemView::helpMenuActions() {
-    return QList<QAction *>();
-  }
-
-  
-  /**
    * Returns the current item of the model.
-   * 
+   *
    * @return @b ProjectItem * The item
    */
   ProjectItem *AbstractProjectItemView::currentItem() {
@@ -262,7 +253,7 @@ namespace Isis {
     return model()->selectedItems();
   }
 
-  
+
   /**
    * Adds an item to the view. The item must be part of the view's
    * model. This method can be overriden in a subclass to filter out
@@ -299,7 +290,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to remove.
    */
   void AbstractProjectItemView::removeItem(ProjectItem *item) {
-    if (ProjectItemProxyModel *proxyModel = 
+    if (ProjectItemProxyModel *proxyModel =
             qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
       proxyModel->removeItem(item);
     }

@@ -39,15 +39,21 @@
     * another, saved to disk, or deleted from disk. Adapted from ControlList.
     *
     * @author 2017-11-01 Christopher Combs
+    *
+    * @internal
+    *   @history 2018-07-07 Summer Stapleton - Fixed a few errors in how the xmlhandling was 
+    *                           occuring and added additional handling of separating map templates
+    *                           from registration templates to reflect chagnes in Project.cpp.
     */
    class TemplateList : public QObject, public QList<Template *> {
      Q_OBJECT
 
      public:
        TemplateList(QString name, QString type, QString path, QObject *parent = NULL);
-       TemplateList(const TemplateList &);
-       TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
+       explicit TemplateList(QObject *parent = NULL);
+       explicit TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
                             QObject *parent = NULL);
+       TemplateList(const TemplateList &);
        ~TemplateList();
 
        QString name() const;

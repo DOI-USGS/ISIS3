@@ -43,6 +43,7 @@
 #include <QWidgetAction>
 #include <QXmlStreamWriter>
 
+#include "ControlNetTool.h"
 #include "ControlPoint.h"
 #include "Cube.h"
 #include "Directory.h"
@@ -50,6 +51,7 @@
 #include "ImageFileListWidget.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
+#include "MosaicControlNetTool.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -61,7 +63,7 @@ namespace Isis {
   /**
    * Constructor.
    *
-   * @param parent Pointer to parent QWidget
+   * @param parent (QMainWindow *) Pointer to parent QMainWindow
    */
   Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) :
                       AbstractProjectItemView(parent) {
@@ -92,23 +94,22 @@ namespace Isis {
 
     connect(m_sceneWidget, SIGNAL(createControlPoint(double, double)),
             this, SIGNAL(createControlPoint(double, double)));
-    
-    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)), 
+
+    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)),
             this, SLOT(onMosItemRemoved(Image *)));
 
     //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
     //  the footprints.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
-    QHBoxLayout *viewlayout = new QHBoxLayout();
-
-    layout->addWidget(statusBar);
+    setStatusBar(statusBar);
 
     m_fileListWidget = new ImageFileListWidget(directory);
 
     m_fileListWidget->setWindowTitle( tr("File List")  );
     m_fileListWidget->setObjectName( m_fileListWidget->windowTitle() );
+
+    m_directory = directory;
 
     QDockWidget *imageFileListdock = new QDockWidget( m_fileListWidget->windowTitle() );
     imageFileListdock->setObjectName(imageFileListdock->windowTitle());
@@ -119,51 +120,38 @@ namespace Isis {
 
     imageFileListdock->setWidget(m_fileListWidget);
 
-    m_window = new QMainWindow();
-    m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
-    m_window->setCentralWidget(m_sceneWidget);
-    viewlayout->addWidget(m_window);
-    layout->addLayout(viewlayout);
+    addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
+    setCentralWidget(m_sceneWidget);
 
-    setLayout(layout);
-
-    m_permToolBar = new QToolBar("Standard Tools", 0);
+    m_permToolBar = addToolBar("Standard Tools");
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
 
-    m_activeToolBar = new QToolBar("Active Tool", 0);
+    m_activeToolBar = addToolBar("Active Tool");
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
-
+    addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     m_sceneWidget->addToPermanent(m_permToolBar);
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
 
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
-    setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
+    // Store the actions for easy enable/disable.
+    foreach (QAction *action, findChildren<QAction *>()) {
+      addAction(action);
+    }
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
   }
-
 
   /**
    * Destructor
    */
   Footprint2DView::~Footprint2DView() {
     delete m_fileListWidget;
-    delete m_window;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
@@ -173,15 +161,6 @@ namespace Isis {
     m_toolPad = 0;
   }
 
-
-  /**
-   * Returns the suggested size for the widget.
-   *
-   * @return @b QSize The size
-   */
-  QSize Footprint2DView::sizeHint() const {
-    return QSize(800, 600);
-  }
 
   /**
    * Accessor for the MosaicSceneWidget
@@ -249,11 +228,11 @@ namespace Isis {
     }
   }
 
-  
+
   /**
-   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed 
+   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed
    * using the Close Cube context menu.
-   * 
+   *
    * @param image The image that was closed and needs to be removed
    */
   void Footprint2DView::onMosItemRemoved(Image *image) {
@@ -269,7 +248,7 @@ namespace Isis {
       }
     }
   }
-  
+
 
   /**
    * Slot to connect to the itemRemoved signal from the model. If the item is an image it removes it
@@ -326,34 +305,35 @@ namespace Isis {
 
 
   /**
-   * Returns a list of actions for the permanent tool bar.
+   * A slot function that is called when directory emits a siganl that an active
+   * control network is set. It enables the control network editor tool in the toolpad.
    *
-   * @return @b QList<QAction*> The actions
+   * @param value The boolean that holds if a control network has been set.
    */
-  QList<QAction *> Footprint2DView::permToolBarActions() {
-    return m_permToolBar->actions();
+  void Footprint2DView::enableControlNetTool(bool value) {
+    foreach (QAction *action, m_toolPad->actions()) {
+      if (action->toolTip() == "Control Net (c)") {
+        action->setEnabled(value);
+        if (value) {
+          MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(action->parent());
+          cnetTool->loadNetwork();
+        }
+      }
+    }
   }
 
 
   /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return @b QList<QAction*> The actions
+   * Enables toolbars and toolpad actions. Overriden method.
+   * If an active control network has not been set, do not enable the cnet tool.
    */
-  QList<QAction *> Footprint2DView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
-  }
-
-
-  /**
-   * Returns a list of actions for the tool pad.
-   *
-   * @return @b QList<QAction*> The actions
-   */
-  QList<QAction *> Footprint2DView::toolPadActions() {
-    return m_toolPad->actions();
+  void Footprint2DView::enableActions() {
+    foreach (QAction *action, actions()) {
+      if (action->toolTip() == "Control Net (c)" && !m_directory->project()->activeControl()) {
+        continue;
+      }
+      action->setEnabled(true);
+    }
   }
 
 
@@ -367,7 +347,7 @@ namespace Isis {
 
 
   /**
-   * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML 
+   * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML
    *        file.
    * @param stream  The XML stream writer
    * @param newProjectRoot The FileName of the project this Directory is attached to.
@@ -380,6 +360,7 @@ namespace Isis {
                              FileName newProjectRoot) const {
 
     stream.writeStartElement("footprint2DView");
+    stream.writeAttribute("objectName", objectName());
 
     m_fileListWidget->save(stream, project, newProjectRoot);
     m_sceneWidget->save(stream, project, newProjectRoot);
@@ -443,4 +424,3 @@ namespace Isis {
     return result;
   }
 }
-
