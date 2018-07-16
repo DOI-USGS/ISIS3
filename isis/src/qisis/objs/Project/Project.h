@@ -280,10 +280,11 @@ namespace Isis {
    *                          being modified. This stopped any changes made to a nonactive cnet from
    *                          being saved and caused the active to be saved if a nonactive was
    *                          edited, even if it was not. Fixes #5414.
-   *   @history 2018-07-13 Kaitlyn Lee - Added signal activeControlModified() that is emitted in
-   *                          cnetModified() and is connected to Directory. This stops views from
-   *                          being redrawn when any cnet is modified. Only the active should cause
-   *                          this. Fixes #5396.
+   *   @history 2018-07-13 Kaitlyn Lee - Added a call to colorizeSaveNetButton() in save() so that
+   *                          the save net button goes back to black after the cnet is saved. Added
+   *                          signal activeControlModified() that is emitted in cnetModified() and
+   *                          is connected to Directory. This stops views from being redrawn when
+   *                          any cnet is modified. Only the active should cause this. Fixes #5396.
    */
   class Project : public QObject {
     Q_OBJECT

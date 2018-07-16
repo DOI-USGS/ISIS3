@@ -48,6 +48,8 @@
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
 #include "Camera.h"
+#include "ControlPointEditView.h"
+#include "ControlPointEditWidget.h"
 #include "Control.h"
 #include "ControlList.h"
 #include "ControlNet.h"
@@ -2354,6 +2356,9 @@ namespace Isis {
         }
       }
       save(m_projectRoot->absolutePath(), false);
+
+      // Recolors the save net button in controlPointEditView to black after the cnets are saved.
+      m_directory->controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
     }
 
     return saveDialogCompleted;
