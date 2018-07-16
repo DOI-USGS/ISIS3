@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh """
                     conda env create -n isis -f environment.yml
-                    conda activate isis
+                    source activate isis
                    """
             }
         }
