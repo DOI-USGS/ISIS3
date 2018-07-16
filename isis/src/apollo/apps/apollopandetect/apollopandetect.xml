@@ -80,15 +80,14 @@
         </internalDefault>
       </parameter>
 
-      <parameter name="PREFIX">
+      <parameter name="OUTPUTDIRECTORY">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          The output file prefix that will be appended with AS15-P-####_000#.pvl.
+          The output file directory.
         </brief>
         <description>
-          The prefix for the output pvl files that will be appended with AS15-P-####_000#.pvl.
-          This can include a path to a directory, but must end with /.
+          The output directory where the PVLs will be written.
         </description>
       </parameter>
     </group>

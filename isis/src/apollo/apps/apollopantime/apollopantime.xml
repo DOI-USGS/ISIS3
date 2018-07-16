@@ -24,51 +24,22 @@
       <parameter name="FROM">
         <type>filename</type>
         <brief>
-          The input pvl prefix from apolloPanTransform
+          The input pvl prefix from apolloPanTransform. Do NOT include a / at the end of the path!
         </brief>
         <description>
-          The input pvl prefix from apolloPanTransform
+          The input pvl prefix from apolloPanTransform. Do NOT include a / at the end of the path!
+          Example: Example: /archive/missions/apollo_pan/AS15/REVS04-16/REV16/AS15-P-9372
         </description>
-        <default>
-          <item>invalid</item>
-        </default>
       </parameter>
 
-      <parameter name="LASTTILE">
-        <type>integer</type>
-        <brief>
-          The last tile in the image.  This is for images with less than 8 tiles.
-        </brief>
-        <description>
-          The last tile in the image.  This is for images with less than 8 tiles.
-        </description>
-        <internalDefault>
-          8
-        </internalDefault>
-      </parameter>
-      
-      <parameter name="PVLLIST">
-        <type>filename</type>
-        <fileMode>input</fileMode>
-        <brief>
-          The list of input pvl files
-        </brief>
-        <description>
-          The list of input pvl files.  These must be ordered from tile 1 to 8.
-        </description>
-        <internalDefault>
-          Use standard transform detection pvl files.
-        </internalDefault>
-      </parameter>
-
-      <parameter name="PREFIX">
+      <parameter name="OUTPUTDIRECTORY">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          The output file prefix
+          The output file directory.
         </brief>
         <description>
-          The prefix for the output pvl files
+          The output directory where the PVLs will be written.
         </description>
       </parameter>
     </group>

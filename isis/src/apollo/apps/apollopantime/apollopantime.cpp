@@ -1,5 +1,8 @@
 #include "Isis.h"
 
+#include <QDir>
+#include <QStringList>
+
 #include "Application.h"
 #include "ApolloPanImage.h"
 #include "FileList.h"
@@ -14,29 +17,12 @@ void IsisMain() {
 
   // Construct the image object
   ApolloPanImage image;
-
-  // Create the tiles from the input Pvl files
-  if (ui.WasEntered("LASTTILE")) {
-    int lastTile = ui.GetInteger("LASTTILE");
-
-    // Create the tiles from the input Pvl files
-    if (ui.WasEntered("PVLLIST")) {
-      FileList pvlList(ui.GetFileName("PVLLIST"));
-      image.readFromPvl(pvlList, lastTile);
-    }
-    else {
-      image.readFromPvl(ui.GetFileName("FROM"), lastTile);
-    }
-  }
-  else {
-    if (ui.WasEntered("PVLLIST")) {
-      FileList pvlList(ui.GetFileName("PVLLIST"));
-      image.readFromPvl(pvlList);
-    }
-    else {
-      image.readFromPvl(ui.GetFileName("FROM"));
-    }
-  }
+  
+  QStringList nameFilter("*_000*.pvl");
+  QDir pvlDirectory(FileName(ui.GetFileName("FROM")).expanded());
+  
+  int tileCount = QStringList(pvlDirectory.entryList(nameFilter)).count();
+  image.readFromPvl(ui.GetFileName("FROM"), tileCount);
 
   // Compute timing mark times
   image.readTimeCode();
@@ -48,5 +34,5 @@ void IsisMain() {
   image.computeStartStop();
 
   // Output new Pvl files
-  image.writeToPvl(ui.GetFileName("PREFIX"));
+  image.writeToPvl(ui.GetFileName("OUTPUTDIRECTORY"));
 }

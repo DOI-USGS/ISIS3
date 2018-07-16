@@ -26,77 +26,35 @@
       <parameter name="FROM">
         <type>filename</type>
         <brief>
-          The input pvl prefix from apolloPanDetect
+          The input pvl directory from apolloPanDetect. Do NOT include a / at the end of the path!
         </brief>
         <description>
-          The input pvl prefix from apolloPanDetect
+          The input pvl directory from apolloPanDetect. Do NOT include a / at the end of the path!
+          Example: /archive/missions/apollo_pan/AS15/REVS04-16/REV16/AS15-P-9372
         </description>
-        <default>
-          <item>invalid</item>
-        </default>
-      </parameter>
-
-      <parameter name="LASTTILE">
-        <type>integer</type>
-        <brief>
-          The last tile in the image.  This is for images with less than 8 tiles.
-        </brief>
-        <description>
-          The last tile in the image.  This is for images with less than 8 tiles.
-        </description>
-        <internalDefault>
-          8
-        </internalDefault>
-      </parameter>
-
-      <parameter name="FIRSTFIDINDEX">
-        <type>integer</type>
-        <brief>
-          The index of the first fiducial mark on the image.
-        </brief>
-        <description>
-          The index of the first fiducial mark on the image.
-        </description>
-        <internalDefault>
-          0
-        </internalDefault>
-      </parameter>
-      
-      <parameter name="PVLLIST">
-        <type>filename</type>
-        <fileMode>input</fileMode>
-        <brief>
-          The list of input pvl files
-        </brief>
-        <description>
-          The list of input pvl files.  These must be ordered from tile 1 to 8.
-        </description>
-        <internalDefault>
-          Use standard raw detection pvl files.
-        </internalDefault>
       </parameter>
 
       <parameter name="CALIBRATED">
         <type>filename</type>
         <brief>
-          The input csv containing calibrated fiducial mark coordiantes.
+          The input csv containing calibrated fiducial mark coordinates.
         </brief>
         <description>
-          The input csv containing calibrated fiducial mark coordiantes.
+          The input csv containing calibrated fiducial mark coordinates.
         </description>
         <default>
           <item>/archive/missions/apollo_pan/AS15/CriticalData/PanData/SupportData/CalibratedFiducials/CalibratedFiducials.csv</item>
         </default>
       </parameter>
 
-      <parameter name="PREFIX">
+      <parameter name="OUTPUTDIRECTORY">
         <type>filename</type>
         <fileMode>output</fileMode>
         <brief>
-          The output file prefix
+          The directory where the output PVLs will be written.
         </brief>
         <description>
-          The prefix for the output pvl files
+          The directory where the output PVLs will be written.
         </description>
       </parameter>
     </group>

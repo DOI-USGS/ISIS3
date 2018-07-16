@@ -1,5 +1,8 @@
 #include "Isis.h"
 
+#include <QDir>
+#include <QStringList>
+
 #include "Application.h"
 #include "ApolloPanImage.h"
 #include "FileList.h"
@@ -15,51 +18,21 @@ void IsisMain() {
   // Construct the image object
   ApolloPanImage image;
 
-  // Process for images with less than 8 tiles
-  if (ui.WasEntered("LASTTILE")) {
-    int lastTile = ui.GetInteger("LASTTILE");
-
-    // Create the tiles from the input Pvl files
-    if (ui.WasEntered("PVLLIST")) {
-      FileList pvlList(ui.GetFileName("PVLLIST"));
-      image.readFromPvl(pvlList, lastTile);
-    }
-    else {
-      image.readFromPvl(ui.GetFileName("FROM"), lastTile);
-    }
-
-    // Decode the tiles
-    image.decodeTimingMarks();
-
-    // Match the tiles
-    image.matchTiles();
-
-    // Number the fiducial and timing marks
-    image.numberFiducialMarks(ui.GetInteger("FIRSTFIDINDEX"));
-    image.numberTimingMarks();
-  }
+  QStringList nameFilter("*_000*.pvl");
+  QDir pvlDirectory(FileName(ui.GetFileName("FROM")).expanded());
   
-  // Standard 8 tile image process
-  else {
-    // Create the tiles from the input Pvl files
-    if (ui.WasEntered("PVLLIST")) {
-      FileList pvlList(ui.GetFileName("PVLLIST"));
-      image.readFromPvl(pvlList);
-    }
-    else {
-      image.readFromPvl(ui.GetFileName("FROM"));
-    }
+  int tileCount = QStringList(pvlDirectory.entryList(nameFilter)).count();
+  cout << tileCount << endl;
+  image.readFromPvl(ui.GetFileName("FROM"), tileCount);
+  
+  image.decodeTimingMarks();
 
-    // Decode the tiles
-    image.decodeTimingMarks();
+  // Match the tiles
+  image.matchTiles();
 
-    // Match the tiles
-    image.matchTiles();
-
-    // Number the fiducial and timing marks
-    image.numberFiducialMarks();
-    image.numberTimingMarks();
-  }
+  // Number the fiducial and timing marks
+  image.numberFiducialMarks();
+  image.numberTimingMarks();
 
   // Compute affines
   image.computeAffines(ui.GetFileName("CALIBRATED"));
@@ -71,5 +44,5 @@ void IsisMain() {
   image.checkTimeCode();
 
   // Output new Pvl files
-  image.writeToPvl(ui.GetFileName("PREFIX"));
+  image.writeToPvl(ui.GetString("OUTPUTDIRECTORY"));
 }

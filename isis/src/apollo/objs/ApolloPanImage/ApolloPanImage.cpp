@@ -184,12 +184,12 @@ namespace Isis {
   /**
    * Write the image information out to Pvl files.
    * 
-   * @param filePrefix The prefix for the output files.
+   * @param filePrefix The directory where the pvls will be written to
    *                   Files we be output as filePrefix + AS15-P-####_000#.pvl.
    */
   void ApolloPanImage::writeToPvl(QString filePrefix) {
     for (size_t i = 0; i < m_tiles.size(); i++) {
-      QString filename = filePrefix + "AS15-P-" + m_imageNumber
+      QString filename = filePrefix + "/AS15-P-" + m_imageNumber
                          + "_000" + QString::number(i + 1) + ".pvl";
       Pvl tilePvl;
       tilePvl += m_tiles[i].toPvl();
@@ -201,14 +201,15 @@ namespace Isis {
   /**
    * Read the tile information from a Pvl file.
    * 
-   * @param filePrefix The file prefix "AS15-P-####"
+   * @param filePrefix The file prefix "/archive/missions/apollo_pan/AS15/REVS###/REV##/AS15-P-####"
    * @param lastTile The last tile in the image. Defaults to 8.
    */
   void ApolloPanImage::readFromPvl(QString filePrefix, int lastTile) {
     m_imageNumber = filePrefix.right(4);
     m_tiles.clear();
-    for (int i = 1; i < lastTile + 1; i++) {
-      QString tileFile = filePrefix + "_000" + QString::number(i) +".pvl";
+    for (int i = 1; i <= lastTile; i++) {
+      QString tileFile = filePrefix + "/AS15-P-" + m_imageNumber 
+                         + "_000" + QString::number(i) +".pvl";
       ApolloPanTile tile(m_imageNumber, i);
       m_tiles.push_back(tile);
       m_tiles.back().fromPvl(tileFile);
