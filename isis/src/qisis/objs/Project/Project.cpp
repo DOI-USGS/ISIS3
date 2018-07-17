@@ -2365,7 +2365,9 @@ namespace Isis {
       save(m_projectRoot->absolutePath(), false);
 
       // Recolors the save net button in controlPointEditView to black after the cnets are saved.
-      m_directory->controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
+      if (m_directory->controlPointEditView()) {
+        m_directory->controlPointEditView()->controlPointEditWidget()->colorizeSaveNetButton(true);
+      }
     }
 
     return saveDialogCompleted;
@@ -2763,11 +2765,11 @@ namespace Isis {
   * @param camera The camera to be added.
   */
   void Project::addCamera(Camera *camera) {
-        
+
     GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
 
     m_guiCameras->append(guiCamera);
-    
+
   }
 
 
