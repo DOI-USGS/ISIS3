@@ -245,12 +245,19 @@ namespace Isis {
     // Save view docks for cleanup during a project close
     m_viewDocks.append(dock);
 
-    if (m_viewDocks.size == 1) {
+    // Only emit the signal when one view is added just for simplicity; behavior would not change
+    // if this was emitted after every addition.
+    if (m_viewDocks.size() == 1) {
       emit enableViewActions(true);
     }
   }
 
 
+  /**
+   * Cleans up m_viewDocks when a view is closed (object is destroyed).
+   *
+   * @param view QObject* The dock widget to remove from the m_viewDocks
+   */
   void IpceMainWindow::cleanupViewDockList(QObject *obj) {
 
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
@@ -258,7 +265,7 @@ namespace Isis {
       m_viewDocks.removeAll(dock);
     }
 
-    if (m_viewDocks.size == 0) {
+    if (m_viewDocks.size() == 0) {
       emit enableViewActions(false);
     }
   }
@@ -275,9 +282,6 @@ namespace Isis {
     QDockWidget *parentDock = qobject_cast<QDockWidget *>(view->parent());
     removeDockWidget(parentDock);
     delete parentDock;
-    if (m_viewDocks.size == 0) {
-      emit enableViewActions(false);
-    }
   }
 
 
@@ -294,9 +298,7 @@ namespace Isis {
       }
     }
     m_viewDocks.clear();
-    if (m_viewDocks.size == 0) {
-      emit enableViewActions(false);
-    }
+    // emit enableViewActions(false);
   }
 
 
@@ -407,17 +409,13 @@ namespace Isis {
     connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
     connect( this, SIGNAL(enableViewActions(bool)), tabViewsAction, SLOT(setEnabled(bool)) );
     m_viewMenuActions.append(tabViewsAction);
-    if (m_viewDocks.size() == 0) {
-      tabViewsAction.setDisabled(true);
-    }
+    tabViewsAction->setDisabled(true);  // Disabled on default, until a view is added
 
     QAction *tileViewsAction = new QAction("Tile Views", this);
     connect( tileViewsAction, SIGNAL(triggered()), this, SLOT(tileViews()) );
     connect( this, SIGNAL(enableViewActions(bool)), tileViewsAction, SLOT(setEnabled(bool)) );
     m_viewMenuActions.append(tileViewsAction);
-    if (m_viewDocks.size() == 0) {
-      tileViewsAction.setDisabled(true);
-    }
+    tileViewsAction->setDisabled(true); // Disabled on default, until a view is added
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);

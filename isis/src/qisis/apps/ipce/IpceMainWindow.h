@@ -203,7 +203,7 @@ namespace Isis {
       ~IpceMainWindow();
 
     signals:
-      void enableViewActions();
+      void enableViewActions(bool value);
 
     public slots:
       void addView(QWidget *newWidget, Qt::DockWidgetArea area = Qt::LeftDockWidgetArea,

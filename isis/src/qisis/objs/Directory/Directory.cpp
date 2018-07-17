@@ -144,7 +144,7 @@ namespace Isis {
     // activeControlModified(). This signal is connected below to this activeControlModified(),
     // which connects to views that use the active cnet to redraw themselves.
     // Ultimately, cnetModified() allows us to save changes made to any cnet, and
-    // activeControlModified() allows other views to be redrawn. 
+    // activeControlModified() allows other views to be redrawn.
     connect(this, SIGNAL(cnetModified()), m_project, SLOT(cnetModified()));
     connect(project(), SIGNAL(activeControlModified()), this, SIGNAL(activeControlModified()));
 
@@ -297,7 +297,7 @@ namespace Isis {
   /**
    * @brief Cleans directory of everything to do with the current project.
    *
-   * This function was implemented to be called from the Project::Open function
+   * This function was implemented to be called from the Project::clear function
    * to allow for a new project to be opened in IPCE.
    */
   void Directory::clean() {
@@ -572,9 +572,9 @@ namespace Isis {
 
 
 /**
- * @description This slot is connected from the signal activeControlSet(bool) emitted from Project. 
- *  
- * 
+ * @description This slot is connected from the signal activeControlSet(bool) emitted from Project.
+ *
+ *
  * @param newControl bool
  *
  */
