@@ -906,6 +906,10 @@ namespace Isis {
 
       connect(result, SIGNAL(windowChangeEvent(bool)),
               m_project, SLOT(setClean(bool)));
+
+      // Recolors the save net button in controlPointEditView to black after the cnets are saved.
+      connect(m_project, SIGNAL(cnetSaved(bool)),
+              result->controlPointEditWidget(), SLOT(colorizeSaveNetButton(bool)));
     }
 
     return controlPointEditView();

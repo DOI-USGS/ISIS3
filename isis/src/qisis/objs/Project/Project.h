@@ -287,10 +287,10 @@ namespace Isis {
    *                          being modified. This stopped any changes made to a nonactive cnet from
    *                          being saved and caused the active to be saved if a nonactive was
    *                          edited, even if it was not. Fixes #5414.
-   *   @history 2018-07-13 Kaitlyn Lee - Added a call to colorizeSaveNetButton() in save() so that
-   *                          the save net button goes back to black after the cnet is saved. Added
-   *                          signal activeControlModified() that is emitted in cnetModified() and
-   *                          is connected to Directory. This stops views from being redrawn when
+   *   @history 2018-07-13 Kaitlyn Lee - Added singal cnetSaved() so that the save net button goes
+   *                          back to black after the cnet is saved. Added signal
+   *                          activeControlModified() that is emitted in cnetModified() and is
+   *                          connected to Directory. This stops views from being redrawn when
    *                          any cnet is modified. Only the active should cause this. Fixes #5396.
    */
   class Project : public QObject {
@@ -527,10 +527,12 @@ namespace Isis {
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
       void projectRelocated(Project *);
+
       /**
        * Emitted when work order starts
        */
       void workOrderStarting(WorkOrder *);
+
       /**
        * Emitted when work order ends
        */
@@ -545,6 +547,12 @@ namespace Isis {
        * Connected to Directory so that other views can redraw measures.
        */
       void activeControlModified();
+
+      /**
+       * Emmited in save() when the project is being saved
+       * Connected to Directory so that ControlPointEditWidget can recolor the save net button.
+       */
+      void cnetSaved(bool value);
 
     public slots:
       void open(QString);
