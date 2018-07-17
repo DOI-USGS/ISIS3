@@ -194,7 +194,10 @@ namespace Isis {
    *                           the geometry value does not exist in the config file. This allows the
    *                           geometry to be saved if the config file does not exist and a user
    *                           opens a project. Before, it would not save the geometry because the
-   *                           opened project was not temporary. References #5433
+   *                           opened project was not temporary. References #5433.
+   *   @history 2018-07-17 Kaitlyn Lee - Added signal enableViewActions(bool) to enable/disable
+   *                           tab/tile views when views are opened/closed.
+
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

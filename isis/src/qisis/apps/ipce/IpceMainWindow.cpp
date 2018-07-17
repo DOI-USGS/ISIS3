@@ -186,11 +186,6 @@ namespace Isis {
       OpenProjectWorkOrder *workorder = new OpenProjectWorkOrder(m_directory->project());
       workorder->execute();
     }
-
-    // QTimer *timer = new QTimer(this);
-    // connect(timer, SIGNAL(timeout()), this, SLOT(setProjectClean()));
-    // connect(timer, SIGNAL(timeout()), timer, SLOT(stop()));
-    // timer->start(1000);
   }
   void IpceMainWindow::setProjectClean() {
     m_directory->project()->setClean(true);
@@ -293,12 +288,9 @@ namespace Isis {
     foreach (QDockWidget *dock, m_viewDocks) {
       if (dock) {
         removeDockWidget(dock);
-        m_viewDocks.removeAll(dock);
         delete dock;
       }
     }
-    m_viewDocks.clear();
-    // emit enableViewActions(false);
   }
 
 
