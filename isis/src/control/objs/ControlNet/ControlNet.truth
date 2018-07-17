@@ -85,7 +85,6 @@ testing GetCubeSerials... (NOTE: unittest sorts the results)
 testing set target.................................
 Set target using empty PVL.
         TargetName = 
-
 Set target using actual PVL.
 Group = Mapping
   TargetName = Mars
