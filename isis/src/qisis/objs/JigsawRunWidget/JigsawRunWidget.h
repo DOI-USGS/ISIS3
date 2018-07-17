@@ -1,8 +1,11 @@
-#ifndef JigsawDialog_h
-#define JigsawDialog_h
+#ifndef JigsawRunWidget_h
+#define JigsawRunWidget_h
 
 #include <QDialog>
 #include <QDir>
+#include <QDockWidget>
+#include <QFrame>
+#include <QMessageBox>
 #include <QPointer>
 #include <QWidget>
 
@@ -10,10 +13,11 @@
 #include "IException.h"
 
 namespace Ui {
-  class JigsawDialog;
+  class JigsawRunWidget;
 }
 
 class QString;
+class QThread;
 
 namespace Isis {
   class BundleAdjust;
@@ -88,25 +92,39 @@ namespace Isis {
    *                           not delete m_BundleSolutionInfo or set it to NULL. Note this is NOT
    *                           ideal, m_BundleSolutionInfo should be a QSharedPointer, not a raw
    *                           pointer.
+   *   @history 2018-05-31 Christopher Combs - Name changed from JigsawDialog to JigsawRunWidget.
+   *                           Now inherits from QFrame instead of QDialog. Added support for new
+   *                           workflow in which JigsawSetupDialog is only ever called from a
+   *                           button on this widget. Fixes #5428. 
+   *   @history 2018-06-14 Christopher Combs - Made changes according to new design mockup. Added 
+   *                           status bar, control net info, and rms adj point sigmas sections. 
+   *                           Removed buttons for close and reject. Now inherits from QDockWidget
+   *                           instead of QFrame, and handles close event if a bundle is running. 
+   *   @history 2018-06-15 Christopher Combs - Implemented "Write detached labels" checkbox. 
+   *                           made changes to on_JigsawAcceptButton_clicked to reflect this.
    */
-  class JigsawDialog : public QDialog {
+  class JigsawRunWidget : public QDockWidget {
     Q_OBJECT
 
   public:
-    explicit JigsawDialog(Project *project, QWidget *parent = 0);
-    explicit JigsawDialog(Project *project,
+    explicit JigsawRunWidget(Project *project, QWidget *parent = 0);
+    explicit JigsawRunWidget(Project *project,
                           BundleSettingsQsp bundleSettings,
                           Control *selectedControl,
                           QString outputControlFileName,
                           QWidget *parent = 0);
 
-    ~JigsawDialog();
+    ~JigsawRunWidget();
+    void closeEvent(QCloseEvent *event);
+
 
   public slots:
     void outputBundleStatus(QString status);
     void errorString(QString error);
     void reportException(QString exception);
-    void updateIterationSigma0(int iteration, double sigma0);
+    void updateIteration(int iteration);
+    void updatePoint(int point);
+    void updateStatus(QString status);
     void bundleFinished(BundleSolutionInfo *bundleSolutionInfo);
     void notifyThreadFinished();
 
@@ -121,9 +139,7 @@ namespace Isis {
 
   private:
     bool m_bRunning; /**< Indicates whether or not the bundle adjust is running. */
-    QPushButton *m_accept; /**< Dialog's accept button that is used to save the bundle results. */
-    QPushButton *m_close; /**< Dialog's close button that is used to close the dialog. */
-    QPushButton *m_reject; /**< Dialog's reject button that is used to discard the results. */
+    QThread *m_bundleThread; /**< separate thread for running bundle adjust calculations in. */
 
     /**
      * Functor used to copy images to a specified destination directory. This is used by
@@ -145,18 +161,17 @@ namespace Isis {
     };
 
   private slots:
-    void on_JigsawSetupButton_pressed();
+    void on_JigsawSetupButton_clicked();
     void on_JigsawRunButton_clicked();
-    void acceptBundleResults();
-    void rejectBundleResults();
+    void on_JigsawAcceptButton_clicked();
     void clearDialog();
     void updateScrollBar();
 
   private:
-    /** Captures the most recent results of a bundle. JigsawDialog owns this pointer. */
+    /** Captures the most recent results of a bundle. JigsawRunWidget owns this pointer. */
     BundleSolutionInfo *m_bundleSolutionInfo;
     /** Reference to self's UI generated with QtDesigner. */
-    Ui::JigsawDialog *m_ui;
+    Ui::JigsawRunWidget *m_ui;
   };
 };
 #endif

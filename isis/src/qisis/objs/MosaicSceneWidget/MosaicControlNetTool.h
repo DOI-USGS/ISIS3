@@ -17,7 +17,7 @@ namespace Isis {
 
   /**
    * //TODO: Remove debug printout & comment
-   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal. 
+   * //         2016-08-25 Tracie Sucharski - Checking Directory pointer for IPCE code not ideal.
    *                           Is there a better design?  This might go away if we emit signals,
    *                           which only IPCE classes would connect to.
    * @brief Handles Control Net displays
@@ -169,4 +169,3 @@ namespace Isis {
 };
 
 #endif
-
