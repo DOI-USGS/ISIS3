@@ -57,7 +57,7 @@ The following is a set of guidelines for contributing to ISIS3.
 * You must provide test data for any new or modified tests.
 * You must have a Redmine issue assigned to you before submitting a pull request.
 * You must complete the Developer Checklist before submitting your pull request.
-* When submitting a pull request, you must include the Redmine issue number in the title of the pull request. Use the "Fixes #0000" format.
+* When submitting a pull request, you must include the Redmine issue number in the title of the pull request. Use the "Fixes #0000" format (#0000 being the Redmine ticket number).
 
 ## What can I expect from the ISIS3 development team?
 ### Response Time
