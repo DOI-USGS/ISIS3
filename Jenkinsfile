@@ -13,6 +13,7 @@ pipeline {
         ISISROOT="${workspace}" + "/build/"
         ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
+        PATH="${PATH}:testtest"
     }
     stages {
         stage('Config') { 
