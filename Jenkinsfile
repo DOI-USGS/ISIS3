@@ -19,12 +19,6 @@ pipeline {
         stage('Config') { 
             steps { 
                 sh """
-                    echo $PATH
-                    export PATH="${PATH}:test"
-                    echo $PATH
-                    set PATH="${PATH}:test2"
-                    echo $PATH
-                    echo $ISISROOT
                     conda env create -n isis -f environment.yml
                     source activate isis
                     mkdir -p ./install ./build && cd build
@@ -35,7 +29,7 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
-                    export PATH="${PATH}:/opt/conda/envs/isis/bin"
+
                     set +e
                     cd build
                     ninja -j8 && ninja install
@@ -45,10 +39,6 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
-                    echo $PATH
-                    export PATH="${PATH}:${ISISROOT}/bin"
-                    echo $PATH
-                    export PATH="${PATH}:/opt/conda/envs/isis/bin"
                     echo $PATH
                     set +e
                     cd build
