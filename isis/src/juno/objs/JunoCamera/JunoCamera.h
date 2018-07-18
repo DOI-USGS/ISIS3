@@ -34,20 +34,22 @@ namespace Isis {
    * framing instrument. This is
    * also a more flexible camera model since it will make controlling the
    * individual framelets alot easier.
-   * 
+   *
    * @ingroup SpiceInstrumentsAndCameras
    * @ingroup Juno
    * @author 2017-07-22 Jeannie Backer
    *
    * @internal
-   *   @history 2017-07-22 Jeannie Backer - Original version. 
+   *   @history 2017-07-22 Jeannie Backer - Original version.
+   *   @history 2018-04-25 Jesse Mapel - Modified frame start calculation to not
+   *                           use exposure duration. Fixes #5236.
    */
   class JunoCamera : public FramingCamera {
     public:
       JunoCamera(Cube &cube);
       ~JunoCamera();
 
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time, 
+      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
       virtual int CkFrameId() const;
       virtual int CkReferenceId() const;

@@ -190,7 +190,11 @@
       method to apply. The default is METHOD=BUNDLE which chooses pre-existing 
       behavor. Updated documentation to reflect these new changes. Fixes #4868. 
     </change>
-    
+    <change name="Ken Edmundson" date="2018-05-23">
+      Modifed call to bundleAdjustment->solveCholeskyBR() to return a raw pointer to a
+      BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
+      ownership from BundleAdjust.
+    </change>    
   </history>
 
   <groups>

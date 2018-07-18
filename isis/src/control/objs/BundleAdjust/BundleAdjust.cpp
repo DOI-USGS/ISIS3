@@ -680,7 +680,7 @@ namespace Isis {
    *
    * @TODO make solveCholesky return a BundleSolutionInfo object and delete this placeholder ???
    */
-  BundleSolutionInfo BundleAdjust::solveCholeskyBR() {
+  BundleSolutionInfo* BundleAdjust::solveCholeskyBR() {
     solveCholesky();
     return bundleSolveInformation();
   }
@@ -976,8 +976,7 @@ namespace Isis {
       m_bundleResults.setObservations(m_bundleObservations);
       m_bundleResults.setBundleControlPoints(m_bundleControlPoints);
 
-      BundleSolutionInfo *results = new BundleSolutionInfo(bundleSolveInformation());
-      emit resultsReady(results);
+      emit resultsReady(bundleSolveInformation());
 
       emit statusUpdate("\nBundle Complete");
 
@@ -999,12 +998,18 @@ namespace Isis {
   /**
    * Create a BundleSolutionInfo containing the settings and results from the bundle adjustment.
    *
-   * @return @b BundleSolutionInfo A container with solve information from the adjustment.
+   * @return @b BundleSolutionInfo A container with solve information from the adjustment. NOTE:
+   *            Caller takes ownership and is responsible for memory management of returned
+   *            BundleSolutionInfo raw pointer.
+   *
    */
-  BundleSolutionInfo BundleAdjust::bundleSolveInformation() {
-    BundleSolutionInfo results(m_bundleSettings, FileName(m_cnetFileName), m_bundleResults, imageLists());
-    results.setRunTime("");
-    return results;
+  BundleSolutionInfo *BundleAdjust::bundleSolveInformation() {
+    BundleSolutionInfo *bundleSolutionInfo = new BundleSolutionInfo(m_bundleSettings,
+                                                                    FileName(m_cnetFileName),
+                                                                    m_bundleResults,
+                                                                    imageLists());
+    bundleSolutionInfo->setRunTime("");
+    return bundleSolutionInfo;
   }
 
 

@@ -384,7 +384,13 @@ namespace Isis {
             ProjectItem *pItem = new ProjectItem(bundleSolutionInfo);
             resultsItem->appendRow( pItem );
 
-            // Append the CSV files to the Statistics in the project
+            // Append text bundle summary and CSV files to the Statistics in the project
+            ProjectItem *bundleSummaryItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedBundleOutputFilename())),
+                            "Summary", bundleSolutionInfo->savedBundleOutputFilename(),
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
+            pItem->child(2)->appendRow(bundleSummaryItem);
             ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedResidualsFilename())),
                             "Measure Residuals", bundleSolutionInfo->savedResidualsFilename(),
@@ -393,7 +399,7 @@ namespace Isis {
             pItem->child(2)->appendRow(residualsItem);
             ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedImagesFilename())),
-                            "Images", bundleSolutionInfo->savedImagesFilename(),
+                            "Image", bundleSolutionInfo->savedImagesFilename(),
                             QIcon(FileName("$base/icons/office-chart-pie.png")
                             .expanded()));
             pItem->child(2)->appendRow(imagesItem);
