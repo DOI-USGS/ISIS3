@@ -39,7 +39,10 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
-                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
+                    echo $PATH
+                    export PATH="${PATH}:${ISISROOT}/bin"
+                    echo $PATH
+                    export PATH="${PATH}:/opt/conda/envs/isis/bin"
                     echo $PATH
                     set +e
                     cd build
