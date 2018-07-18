@@ -76,7 +76,10 @@ namespace Isis {
    *   @history 2018-06-12 Kristin Berry - Added schema associated with the img class when it is
    *                           used.
    *   @history 2018-06-19 Kristin Berry - Updated to use PDS schema version 1.10.0.0 and use
-   *                           different display settings for Standard and Spectral images. 
+   *                           different display settings for Standard and Spectral images.
+   *   @history 2018-06-26 Kristin Berry - Swapped function names translateBandBinSpectrumUniform()
+   *                           translateBandBinSpectrumBinSet()
+   *                           
    *                           
    */
 
