@@ -5,7 +5,6 @@
 [I have a question or a problem!](#i-have-a-question-or-a-problem)
 
 [How can I contribute?](#how-can-i-contribute)
-  * [Report an issue](#redmine-issues)
   * [Suggesting enhancements](#redmine-issues)
   * [Working on an existing issue or enhancement](#working-on-an-existing-issue-or-enhancement)
   * [Working on a new issue or enhancement](#working-on-a-new-issue)
@@ -23,7 +22,7 @@
 ## I have a question or a problem!
 If you have a question about or a problem with ISIS3, please see the [Redmine Issues](#redmine-issues) section.
 
-If you have a question or a problem with contributing to our software please contact ## REGENT EMAIL HERE ##.
+If you have a question or a problem with contributing to our software please contact mshepherd@usgs.gov
 
 ## How can I contribute?
 
