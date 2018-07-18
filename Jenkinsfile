@@ -18,6 +18,11 @@ pipeline {
         stage('Config') { 
             steps { 
                 sh """
+                    echo $PATH
+                    export PATH="${PATH}:test"
+                    echo $PATH
+                    set PATH="${PATH}:test2"
+                    echo $PATH
                     echo $ISISROOT
                     conda env create -n isis -f environment.yml
                     source activate isis
