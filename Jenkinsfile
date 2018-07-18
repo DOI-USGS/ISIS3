@@ -20,6 +20,7 @@ pipeline {
                 sh """
                     echo $PATH
                     export PATH=/opt/conda/envs/isis/bin:\$ISISROOT/bin:\$PATH
+                    echo $PATH
                     conda env create -n isis -f environment.yml
                     source activate isis
                     mkdir -p ./install ./build && cd build
