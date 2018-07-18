@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   Progress *testProgress = new Progress();
   std::cout << "Test ControlNetVersioner";
 
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", testProgress);     // No target
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", testProgress, false);     // No target
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", testProgress);     // Really odd keywords with target
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork1_PvlV0001.net", testProgress);     // Another set of odd keywords
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_ProtoNetwork1_ProtoV0001.net", testProgress); // Binary V1

@@ -1,90 +1,71 @@
 UnitTest for ControlNet ....
 
 ******* test cube connection graph ************
-  ALPHA
-    BRAVO :  p0
-  BRAVO
-    ALPHA :  p0
+testing ignoring measures..............................
+starting graph
+ALPHA ----(1) [p0]---- BRAVO
 
-  ALPHA
+ignore a measure
 
-  BRAVO
-
-
-  ALPHA
-    BRAVO :  p0
-  BRAVO
-    ALPHA :  p0
+un-ignore a measure
+ALPHA ----(1) [p0]---- BRAVO
 
 testing measure addition to point already in network...
-  ALPHA
-    BRAVO :  p0, p1
-    CHARLIE :  p1
-  BRAVO
-    ALPHA :  p0, p1
-    CHARLIE :  p1
-  CHARLIE
-    ALPHA :  p1
-    BRAVO :  p1
+add point with only 1 measure
+ALPHA ----(1) [p0]---- BRAVO
+
+add a measure
+ALPHA ----(2) [p0,p1]---- BRAVO
+
+add another measure
+ALPHA ----(2) [p0,p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+BRAVO ----(1) [p1]---- CHARLIE
 
 testing setting point to ignored.......................
-  ALPHA
-    BRAVO :  p0
-  BRAVO
-    ALPHA :  p0
-  CHARLIE
+ignore p1
+ALPHA ----(1) [p0]---- BRAVO
 
-
-  ALPHA
-    BRAVO :  p0, p1
-    CHARLIE :  p1
-  BRAVO
-    ALPHA :  p0, p1
-    CHARLIE :  p1
-  CHARLIE
-    ALPHA :  p1
-    BRAVO :  p1
+un-ignore p1
+ALPHA ----(2) [p0,p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+BRAVO ----(1) [p1]---- CHARLIE
 
 testing measure deletion & addition....................
-  ALPHA
-    BRAVO :  p1
-    CHARLIE :  p1
-  BRAVO
-    ALPHA :  p1
-    CHARLIE :  p1
-  CHARLIE
-    ALPHA :  p1
-    BRAVO :  p1
+ALPHA ----(1) [p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+BRAVO ----(1) [p1]---- CHARLIE
 
-  ALPHA
-    BRAVO :  p1
-    CHARLIE :  p1
-    DELTA :  p0
+ALPHA ----(1) [p1]---- BRAVO
+ALPHA ----(1) [p1]---- CHARLIE
+ALPHA ----(1) [p0]---- DELTA
+BRAVO ----(1) [p1]---- CHARLIE
+
+testing FindClosest....................
+Closest Point ID: p1
+
+testing getAdjacentImages....................
+Adjacent Images: 
   BRAVO
-    ALPHA :  p1
-    CHARLIE :  p1
   CHARLIE
-    ALPHA :  p1
-    BRAVO :  p1
   DELTA
-    ALPHA :  p0
 
 testing point deletion.................................
-  ALPHA
-    DELTA :  p0
-  DELTA
-    ALPHA :  p0
+ALPHA ----(1) [p0]---- DELTA
 
 ******* Done testing cube graph ***************
 
 
 testing GetCubeSerials... (NOTE: unittest sorts the results)
   ALPHA
+  BRAVO
+  CHARLIE
   DELTA
 
 testing set target.................................
 Set target using empty PVL.
         TargetName = 
+
 Set target using actual PVL.
 Group = Mapping
   TargetName = Mars
@@ -93,6 +74,7 @@ End
         TargetName = Mars
 
 Set empty target.
+        TargetName = 
 
 Set Mars target.
         TargetName = Mars
@@ -340,45 +322,23 @@ Writing ControlNet to temp2.bin in binary format
 Reading ControlNet from temp2.bin
 Diffing temp.bin and temp2.bin
 Read/Write of binary files OK.
-Testing GetCubeGraphNodes
     ALPHA
+    BRAVO
+    CHARLIE
     DELTA
+ALPHA ----(1) [p0]---- DELTA
 
-Testing getGraphNode: ALPHA
 
-Testing getEdgeCount: 2
+Testing getEdgeCount: 1
+Getting measures in cube with SN: ALPHA: 
+Serial Number: ALPHA
+Testing GetSerialConnections
 
-Testing GetNodeConnections()
+Testing GetSerialConnections()
   Island Count = 2
-
-Testing MinimumSpanningTree()
-  Tree Count = 2
-  Graph Node Count = 5
-  Measure Count = 9
-  Island Count == 2 == MST Count
-
-  Minimum Spanning Tree 0
-    Nodes = 4
-    Included Measures = 5
-      m1 (ALPHA -> p1, residual = 1.41421)
-      m2 (BETA -> p1, residual = 2.82843)
-      m3 (GAMMA -> p1, residual = 4.24264)
-      m6 (DELTA -> p3, residual = 4.24264)
-      m7 (ALPHA -> p3, residual = 5.65685)
-    Excluded Measures = 3
-      m4 (GAMMA -> p2, residual = 1.41421)
-      m5 (DELTA -> p2, residual = 11.3137)
-      m8 (ALPHA -> p4, residual = 1.41421)
-
-  Minimum Spanning Tree 1
-    Nodes = 1
-    Included Measures = 0
-    Excluded Measures = 1
-      m9 (EPSILON -> p5, residual = 1.41421)
 
 Testing take() functionality to take owernship of the points in a ControlNet:
 Original control net number of points: 1
 Number of points taken out: 1
 Now there should be zero points in the original control net. There are: 0
 And zero pointIDs in the original control net. There are: 0
-And zero cubeGraphNodes in the original control net. There are: 0

@@ -49,6 +49,7 @@ void printXml(const BundleObservationSolveSettings &);
  *
  * @internal
  *   @history 2014-12-11 - Original version.
+   * @history 2018-07-03 Debbie A Cook - Removed target radii. References #5457.
  */
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {

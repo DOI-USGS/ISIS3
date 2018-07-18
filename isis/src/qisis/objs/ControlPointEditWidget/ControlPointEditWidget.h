@@ -89,7 +89,13 @@ namespace Isis {
    *                           or FootprintView if a ground source exists in the serial number list.
    *                           Fixes #5399.
    *   @history 2018-05-02 Tracie Sucharski - Colorize save buttons properly when creating new
-   *                           control point and loading a different control point. 
+   *                           control point and loading a different control point.
+   *   @history 2018-06-11 Summer Stapleton - Stripped path from displayed filename of Control
+   *                           Network and set the tooltip to the full path for easier access.
+   *                           control point and loading a different control point.
+   *   @history 2018-06-19 Adam Goins - Fixed updating references in selectLeftMeasure and
+   *                           selectRightMeasure to fix a segfault that was occuring. #Fixes #5435
+   *   @history 2018-06-28 Kaitlyn Lee - Removed shortcut from reload point button.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT

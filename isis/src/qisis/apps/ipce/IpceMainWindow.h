@@ -24,6 +24,8 @@
  */
 
 #include "ViewSubWindow.h"
+#include <QEvent>
+#include <QMainWindow>
 #include <QPointer>
 #include <QProgressBar>
 #include <QMdiSubWindow>
@@ -111,7 +113,7 @@ namespace Isis {
    *                           detached views from the m_detachedViews list appropriately.
    *                           This fixes an issue where a detached view would appear to be
    *                           open even after it has been closed. Fixes #5109.
-   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it 
+   *   @history 2017-11-12  Tyler Wilson - Removed a resize call in readSettings because it
    *                           was screwing up the display of widgets when a project is loaded.
    *                           Also switched the order in which a project is saved.  A project is
    *                           cleared after it is saved, and not before (which had been the previous
@@ -129,9 +131,40 @@ namespace Isis {
    *                           test to determine whether project needs saving.
    *   @history 2018-05-01 Tracie Sucharski - Code accidently left commented from previous checking.
    *                           Fixes #5412.
-   *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does 
+   *   @history 2018-05-31 Christopher Combs - Added support for JigsawRunWidget to be created as a
+   *                           dockable widget in addView(). Fixes #5428.
+   *   @history 2018-05-30 Tracie Sucharski - Fix to handle the re-factored docked views.
+   *                           Changed from MDI to SDI, changing the centralWidget to a dumy, unused
+   *                           widget. Remove all methods having to do with MDI sub-windows,
+   *                           detached views.  The dock widgets holding the views are saved off
+   *                           for cleanup because there is no way to get the dock from the view.
+   *                           Cleanup connections are made for the views and the docks to ensure
+   *                           that cleanup happens for both.  Fixes #5433.
+   *   @history 2018-06-13 Tracie Sucharski - Fixed cleanup of views and QDockWidgets.
+   *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                           view has its own toolbar, so having an active toolbar and tool pad is
+   *                           not needed. Removed code adding the save active control net button and
+   *                           the toolpad, since control nets can be saved with the project save button.
+   *   @history 2018-06-14 Christopher Combs - Changed addView method to take in JigsawRunWidget as
+   *                           a QDockWidget object instead of wrapping it in one.
+   *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
+   *                           must be called before initializeActions to get the recent projects
+   *                           from the config file.
+   *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does
    *                           not output text to the command line for ipce. Fixes #4171.
-   *  
+   *   @history 2018-06-19 Kaitlyn Lee - Added tabViews() and the menu option under the View menu to
+   *                           tab the views. Currently, this can tab all attached/detached views. I
+   *                           left the line setting dock options to allow grouped dragging, but tabbing
+   *                           views does not always work with this enabled. With this option enabled, the
+   *                           type of a view will randomly change and setting its type has no effect.
+   *                           Use windowType() to get the type. Also added the toolbar title in the
+   *                           permanent toolbar constructor.
+   *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
+   *                           hold.  Extra destroy slots were causing double deletion of memory.
+   *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
+   *                           state can be reset after the IpceMainWindow::show() causes resize and
+   *                           move events which in turn cause the project clean flag to be false
+   *                           even though the project has just opened.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -140,41 +173,37 @@ namespace Isis {
       ~IpceMainWindow();
 
     public slots:
-      void addView(QWidget *newWidget);
+      void addView(QWidget *newWidget, Qt::DockWidgetArea area = Qt::LeftDockWidgetArea,
+                   Qt::Orientation orientation = Qt::Horizontal);
       void removeView(QWidget *view);
       void removeAllViews();
 
-      void setActiveView(AbstractProjectItemView *view);
-      void updateMenuActions();
-      void updateToolBarActions();
       void readSettings(Project *);
+      void writeSettings(Project *project);
+      void writeGlobalSettings(Project *project);
 
     protected:
+      void showEvent(QShowEvent *event);
       void closeEvent(QCloseEvent *event);
       bool eventFilter(QObject *watched, QEvent *event);
 
     private slots:
       void configureThreadLimit();
       void enterWhatsThisMode();
-      void onSubWindowActivated(QMdiSubWindow *);
 
-      void toggleViewMode();
-      void setTabbedViewMode();
-      void setSubWindowViewMode();
-
-      void closeDetachedView();
-      void detachActiveView();
-      void reattachView();
+      void tabViews();
 
       void raiseWarningTab();
+      void cleanupViewDockList(QObject *obj);
+
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 
       void applyMaxThreadCount();
-      void createMenus();
-      void writeSettings(const Project *project) const;
 
       void initializeActions();
+      void createMenus();
+      void createToolBars();
 
     private:
       /**
@@ -184,8 +213,10 @@ namespace Isis {
       QPointer<Directory> m_directory;
 
       QDockWidget *m_projectDock;
-      QList<ViewSubWindow *> m_detachedViews; //!< List to keep track of any detached main windows
       QDockWidget *m_warningsDock;
+
+      QList<QDockWidget *> m_viewDocks; //!< QDockWidgets holding the views
+
       /**
        * This is the "goal" or "estimated" maximum number of active threads running in this program
        *   at once. For now, the GUI consumes 1 thread and QtConcurrent
@@ -196,8 +227,6 @@ namespace Isis {
       static const int m_maxRecentProjects = 5;
 
       QToolBar *m_permToolBar; //!< The toolbar for actions that rarely need to be changed.
-      QToolBar *m_activeToolBar; //<! The toolbar for the actions of the current tool.
-      QToolBar *m_toolPad; //<! The toolbar for the actions that activate tools.
 
       QMenu *m_fileMenu; //!< Menu for the file actions
       QMenu *m_projectMenu; //!< Menu for the project actions
@@ -214,13 +243,9 @@ namespace Isis {
       QList<QAction *> m_helpMenuActions;//!< Internal list of help actions
 
       QList<QAction *> m_permToolBarActions;//!< Internal list of permanent toolbar actions
-      QList<QAction *> m_activeToolBarActions;//!< Internal list of active toolbar actions
-      QList<QAction *> m_toolPadActions;//!< Internal list of toolpad actions
 
       QAction *m_cascadeViewsAction; //!< Action that cascades the mdi area
       QAction *m_tileViewsAction; //!< Action that tiles the mdi area
-
-      AbstractProjectItemView *m_activeView; //!< The active view
   };
 }
 

@@ -211,6 +211,7 @@ namespace Isis {
     p_x = NULL;
     p_y = NULL;
     p_z = NULL;
+    p_localRadius = NULL;
   }
 
   
@@ -255,6 +256,8 @@ namespace Isis {
     else {
       p_z = new Displacement(z);
     }
+    
+    p_localRadius = NULL;
   }
 
 
@@ -537,7 +540,7 @@ namespace Isis {
    *   @history  2018-06-28 Debbie A. Cook  Revised to use the local radius of
    *                 the SurfacePoint to convert distance to angle instead of the
    *                 major equatorial axis.  Also corrected longitude conversion.
-   *                 See note in SurfacePoint.h.
+   *                 See note in SurfacePoint.h.  References #5457.
    */
   void SurfacePoint::SetSphericalSigmasDistance(const Distance &latSigma,
     const Distance &lonSigma, const Distance &radiusSigma) {
@@ -690,6 +693,8 @@ namespace Isis {
       p_y = new Displacement(naifValues[1], Displacement::Kilometers);
       p_z = new Displacement(naifValues[2], Displacement::Kilometers);
     }
+    
+    p_localRadius = NULL;
   }
 
 
@@ -713,8 +718,18 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
+    // Set latitudinal coordinates
     SpiceDouble lat = (double) GetLatitude().radians();
     SpiceDouble lon = (double) GetLongitude().radians();
+    
+    if (p_localRadius) {
+      *p_localRadius = radius;
+    }
+    else {
+      p_localRadius = new Distance(radius);
+    }
+    
+    // Set rectangular coordinates
     SpiceDouble rect[3];
     latrec_c ((SpiceDouble) radius.kilometers(), lon, lat, rect);
     p_x->setKilometers(rect[0]);
@@ -1096,6 +1111,8 @@ namespace Isis {
       *p_x = *other.p_x;
       *p_y = *other.p_y;
       *p_z = *other.p_z;
+        // Finally initialize local radius to avoid r
+       p_localRadius = NULL;
     }
     else {
       FreeAllocatedMemory();

@@ -47,7 +47,7 @@ namespace Isis {
    *                           active cnet and image list have been set. Fixes #4749.
    *   @history 2017-04-25 Ian Humphrey - Modified tool tip text. Fixes #4819.
    *   @history 2017-07-25 Cole Neubauer - Added project()->setClean call #4969
-   *   @history 2017-07-25 Cole Neubauer - Moved project()->setClean call to JigsawDialog because
+   *   @history 2017-07-25 Cole Neubauer - Moved project()->setClean call to JigsawRunWidget because
    *                           the workorder does not actually execute the bundle adjustment #4960
    *   @history 2018-03-22 Ken Edmundson - Modified setupExecution method to append output control
    *                           network filename to internalData. Modified execute method to look for
@@ -56,6 +56,8 @@ namespace Isis {
    *   @history 2018-03-23 Ken Edmundson - In execute method, removed search for input control
    *                           network in BundleSolutionInfos. No longer needed as control is now
    *                           properly saved in projects m_idToControlMap.
+   *   @history 2018-05-31 Christopher Combs - Updated to reflect change from JigsawDialog to 
+   *                           JigsawRunWidget. Removed setupExecution() method. Fixes #5428.
    */
   class JigsawWorkOrder : public WorkOrder {
       Q_OBJECT
@@ -67,7 +69,6 @@ namespace Isis {
       virtual JigsawWorkOrder *clone() const;
 
       virtual bool isExecutable();
-      virtual bool setupExecution();
       virtual void execute();
 
     protected:
