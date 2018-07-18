@@ -41,9 +41,9 @@ pipeline {
                     export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
                     set +e
                     cd build
-                    ctest -j8 -R _unit_ 
-                    ctest -j8 -R _app_ 
-                    ctest -j8 -R _module_ 
+                    ctest -j8 -V -R _unit_ 
+                    ctest -j8 -V -R _app_ 
+                    ctest -j8 -V -R _module_ 
                    """
             }
         }
