@@ -28,7 +28,7 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
-                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
+                    export PATH="${PATH}:/opt/conda/envs/isis/bin"
                     set +e
                     cd build
                     ninja -j8 && ninja install
