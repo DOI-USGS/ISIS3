@@ -144,8 +144,10 @@ Your config step should find its third party dependencies in the conda environme
 
 If you get the following error message when trying to set up your environment:
 
+```
 conda env create -n cmake -f environment.yml
 Using Anaconda Cloud api site https://api.anaconda.org
 Error: invalid package specification: ninja==1.7.2=0
+```
 
 Update your conda installation using `conda update` and then try again. 
