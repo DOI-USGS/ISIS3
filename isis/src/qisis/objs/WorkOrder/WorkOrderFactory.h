@@ -53,10 +53,12 @@ namespace Isis {
    *   @history 2017-05-04 Tracie Sucharski - Added BundleObservationViewWorkOrder.  Fixes #4840.
    *   @history 2017-08-11 Christopher Combs - Added ImportTemplateWorkOrder. Fixes #5086.
    *   @history 2017-11-02 Tyler Wilson - Added the OpenRecentProjectsWorkOrder. Fixes #4492.
-   *   @history 2017-11-09 Tyler Wilson - Merged the functionality of OpenRecentProjectsWorkOrder 
+   *   @history 2017-11-09 Tyler Wilson - Merged the functionality of OpenRecentProjectsWorkOrder
    *                              into OpenProjectWorkOrder to reduce unnecessary code duplication,
    *                              and removed references to OpenRecentProjectWorkOrder in this
    *                              class.  Fixes #5220.
+   *   @history 2018-06-18 Adam Goins - Added ControlHealthMonitorWorkOrder to WorkOrderFactory.
+   *                           Fixes #5435.
    */
   class WorkOrderFactory {
     public:

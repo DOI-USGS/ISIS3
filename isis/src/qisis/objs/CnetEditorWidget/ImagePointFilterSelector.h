@@ -6,7 +6,6 @@
 
 
 namespace Isis {
-  class AbstractFilter;
 
   /**
    * @brief Allows users to choose filters for filtering images and points
@@ -16,8 +15,8 @@ namespace Isis {
    *
    * @author ????-??-?? Eric Hyer
    *
-   * @internal 
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   * @internal
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
    */
   class ImagePointFilterSelector : public AbstractFilterSelector {
       Q_OBJECT
@@ -26,8 +25,7 @@ namespace Isis {
       ImagePointFilterSelector();
       ImagePointFilterSelector(const ImagePointFilterSelector &other);
       virtual ~ImagePointFilterSelector();
-      ImagePointFilterSelector &operator=(
-        const ImagePointFilterSelector &other);
+      ImagePointFilterSelector &operator=(const ImagePointFilterSelector &other);
 
 
     protected:
@@ -40,4 +38,3 @@ namespace Isis {
 }
 
 #endif
-
