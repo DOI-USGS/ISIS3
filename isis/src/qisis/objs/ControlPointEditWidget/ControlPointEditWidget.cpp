@@ -178,11 +178,9 @@ namespace Isis {
     }
 
     m_reloadPoint = new QPushButton("Reload Point");
-    m_reloadPoint->setShortcut(Qt::Key_R);
     m_reloadPoint->setToolTip("Reload the control point.");
     m_reloadPoint->setWhatsThis("Reload the measures for the control point"
-                            " in the Chip Viewports to its saved values. "
-                            "<strong>Shortcut: R</strong>");
+                            " in the Chip Viewports to its saved values. ");
     connect(m_reloadPoint, SIGNAL(clicked()), this, SLOT(reloadPoint()));
 
     m_savePoint = new QPushButton ("Save Point");
@@ -219,8 +217,6 @@ namespace Isis {
     saveMeasureLayout->insertStretch(-1);
 
     m_cnetFileNameLabel = new QLabel("Control Network: " + m_cnetFileName);
-    m_cnetFileNameLabel->setToolTip("Name of opened control network file.");
-    m_cnetFileNameLabel->setWhatsThis("Name of opened control network file.");
 
     m_templateFileNameLabel = new QLabel("Template File: " +
         m_measureEditor->templateFileName());
@@ -580,7 +576,7 @@ namespace Isis {
    * New control network being edited
    *
    * @param cnet (Control *) The control network to edit
-   *  
+   *
    * @internal
   */
   void ControlPointEditWidget::setControl(Control *control) {
@@ -589,7 +585,11 @@ namespace Isis {
     m_controlNet = control->controlNet();
     m_cnetFileName = control->fileName();
 
-    m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
+    QStringList cnetDirs = m_cnetFileName.split('/');
+    QString strippedCnetFilename = cnetDirs.value(cnetDirs.length() -1);
+    m_cnetFileNameLabel->setText("Control Network: " + strippedCnetFilename);
+    m_cnetFileNameLabel->setToolTip(m_cnetFileName);
+    m_cnetFileNameLabel->setWhatsThis(m_cnetFileName);
     setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
 
     emit newControlNetwork(m_controlNet);
@@ -597,10 +597,10 @@ namespace Isis {
 
 
   /**
-   * New active control was set from ipce 
-   *  
-   * TODO:  This will need to be redesigned with the ::setControl method to better handle editing 
-   * points from different cnets. 
+   * New active control was set from ipce
+   *
+   * TODO:  This will need to be redesigned with the ::setControl method to better handle editing
+   * points from different cnets.
    */
   void ControlPointEditWidget::setControlFromActive() {
 
@@ -612,7 +612,7 @@ namespace Isis {
       m_cnetFileNameLabel->setText("Control Network: " + m_cnetFileName);
       setWindowTitle("Control Point Editor- Control Network File: " + m_cnetFileName);
 
-      emit newControlNetwork(m_controlNet);    
+      emit newControlNetwork(m_controlNet);
     }
   }
 
@@ -703,9 +703,9 @@ namespace Isis {
    *  Find the ground source location from ControlPoint parameter, AprioriXYZSourceFile.  If file
    *  does not exist, give option to look in another location and change location in the ControlNet
    *  for either this point and/or all points in net.
-   * 
+   *
    * @return FileName The filename including full path of the ground source
-   *  
+   *
    */
   FileName ControlPointEditWidget::findGroundFile() {
 
@@ -787,9 +787,9 @@ namespace Isis {
   /**
    * Slot called by Directory to set the control point for editing
    *
-   * @param controlPoint (ControlPoint *) ControlPoint that will be loaded into editor 
-   * @param serialNumber (QString) Optional parameter indicating the serial number of the cube that 
-   *                                 the point was chosen from 
+   * @param controlPoint (ControlPoint *) ControlPoint that will be loaded into editor
+   * @param serialNumber (QString) Optional parameter indicating the serial number of the cube that
+   *                                 the point was chosen from
    */
   void ControlPointEditWidget::setEditPoint(ControlPoint *controlPoint, QString serialNumber) {
 
@@ -810,11 +810,10 @@ namespace Isis {
     else {
       m_editPoint = new ControlPoint;
       *m_editPoint = *controlPoint;
-
       // New point loaded, make sure all save button's text is default black color
       colorizeAllSaveButtons("black");
-    }
 
+    }
     loadPoint(serialNumber);
     loadTemplateFile(m_measureEditor->templateFileName());
   }
@@ -829,7 +828,7 @@ namespace Isis {
       m_saveNet->setPalette(m_saveDefaultPalette);
     }
     else if (color == "red") {
-      m_measureEditor->colorizeSaveButton(); 
+      m_measureEditor->colorizeSaveButton();
       colorizeSavePointButton();
       colorizeSaveNetButton();
     }
@@ -838,9 +837,9 @@ namespace Isis {
 
   /**
    * Load point into ControlPointEditWidget.
-   *  
+   *
    * @param serialNumber (QString) The serial number of cube point was chosen from.  This will
-   *  
+   *
    * @internal
    *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
    *                           ControlPointEditWidget point information.
@@ -860,6 +859,7 @@ namespace Isis {
 
     //  Write pointId
     QString CPId = m_editPoint->GetId();
+
     QString ptId("Point ID:  ");
     ptId += (QString) CPId;
     m_ptIdValue->setText(ptId);
@@ -901,6 +901,7 @@ namespace Isis {
     else {
       rad = "Apriori Radius:  " + QString::number(surfPoint.GetLocalRadius().meters(), 'f', 2);
     }
+
     m_aprioriRadius->setText(rad);
 
     //  Set EditLock box correctly
@@ -1019,12 +1020,13 @@ namespace Isis {
         rightIndex = 0;
       }
     }
-
     //  Handle pts with a single measure, for now simply put measure on left/right
     //  Evenutally put on left with black on right??
     if (rightIndex > m_editPoint->GetNumMeasures()-1) rightIndex = 0;
+
     m_rightCombo->setCurrentIndex(rightIndex);
     m_leftCombo->setCurrentIndex(leftIndex);
+
     //  Initialize pointEditor with measures
     selectLeftMeasure(leftIndex);
     selectRightMeasure(rightIndex);
@@ -1968,7 +1970,6 @@ namespace Isis {
   void ControlPointEditWidget::selectLeftMeasure(int index) {
 
     QString file = m_pointFiles[index];
-
     QString serial;
     try {
       serial = m_serialNumberList->serialNumber(file);
@@ -1991,8 +1992,8 @@ namespace Isis {
       delete m_leftMeasure;
       m_leftMeasure = NULL;
     }
-    m_leftMeasure = new ControlMeasure();
-    //  Find measure for each file    
+    m_leftMeasure = new ControlMeasure;
+
     *m_leftMeasure = *((*m_editPoint)[serial]);
 
     //  If m_leftCube is not null, delete before creating new one
@@ -2001,7 +2002,6 @@ namespace Isis {
     //  Update left measure of pointEditor
     m_measureEditor->setLeftMeasure (m_leftMeasure, m_leftCube.data(), m_editPoint->GetId());
     updateLeftMeasureInfo ();
-
   }
 
 
@@ -2041,9 +2041,8 @@ namespace Isis {
       delete m_rightMeasure;
       m_rightMeasure = NULL;
     }
-    m_rightMeasure = new ControlMeasure();
+    m_rightMeasure = new ControlMeasure;
 
-    //  Find measure for each file
     *m_rightMeasure = *((*m_editPoint)[serial]);
 
     //  If m_rightCube is not null, delete before creating new one
@@ -2546,8 +2545,8 @@ namespace Isis {
   }
 
 
-  /** 
-   * This was used when ipce used docked widgets. 
+  /**
+   * This was used when ipce used docked widgets.
    * This method is called from the constructor so that when the
    * Main window is created, it know's it's size and location.
    *
