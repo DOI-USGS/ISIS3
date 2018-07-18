@@ -40,6 +40,7 @@ pipeline {
             steps {
                 sh """
                     export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
+                    echo $PATH
                     set +e
                     cd build
                     ctest -j8 -V -R _unit_ 
