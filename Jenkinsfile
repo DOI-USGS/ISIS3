@@ -19,6 +19,7 @@ pipeline {
         stage('Config') { 
             steps { 
                 sh """
+                    echo $PATH
                     conda env create -n isis -f environment.yml
                     source activate isis
                     mkdir -p ./install ./build && cd build
@@ -29,7 +30,7 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
-
+                    echo $PATH
                     set +e
                     cd build
                     ninja -j8 && ninja install
