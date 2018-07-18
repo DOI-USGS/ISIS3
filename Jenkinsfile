@@ -18,6 +18,7 @@ pipeline {
         stage('Config') { 
             steps { 
                 sh """
+                    echo $ISISROOT
                     conda env create -n isis -f environment.yml
                     source activate isis
                     mkdir -p ./install ./build && cd build
