@@ -26,8 +26,11 @@
 #include <QString>
 
 #include "FileName.h"
+#include "IException.h"
 #include "Pvl.h"
 #include "Table.h"
+#include "TableField.h"
+#include "TableRecord.h"
 
 using namespace std;
 namespace Isis {
@@ -42,13 +45,13 @@ namespace Isis {
     
     for (int i=0; i < table.Records(); i++) {
       TableRecord record = table[i];
-      QString nameField = QString(record["FileName"]).toLatin1().data());
+      QString nameField = QString(record["FileName"]).toLatin1().data();
       int found = nameField.lastIndexOf(".cub");
       if (found != -1) {
         // clear the packing characters - get only the file name
         nameField.remove(found + 4);
       }
-      FileName fileName = new FileName(nameField);
+      FileName fileName(nameField);
       QString serialNumber = QString(record["SerialNumber"]);
       m_fileList.append(QPair<FileName, QString>(fileName, serialNumber));
     }
@@ -65,11 +68,11 @@ namespace Isis {
     int fieldLength = 0;
     
     for (int i=0; i < m_fileList.size(); i++) {
-      if (m_fileList[i].first().name().length() > fieldLength) {
-        fieldLength = m_fileList[i].first().name().length();
+      if (m_fileList[i].first.name().length() > fieldLength) {
+        fieldLength = m_fileList[i].first.name().length();
       }
-      if (m_fileList[i].second().length() > fieldLength) {
-        fieldLength = m_fileList[i].second().length();
+      if (m_fileList[i].second.length() > fieldLength) {
+        fieldLength = m_fileList[i].second.length();
       }
     }
     
@@ -77,9 +80,9 @@ namespace Isis {
     
     for (int i=0; i < m_fileList.size(); i++) {
       TableField fileNameField("FileName", TableField::Text, fieldLength);
-      fileNameField = m_fileList[i].first().name();
+      fileNameField = m_fileList[i].first.name();
       TableField serialNumberField("SerialNumber", TableField::Text, fieldLength);
-      serialNumberField = fieldLength = m_fileList[i].second();
+      serialNumberField = QString(fieldLength) = m_fileList[i].second.toInt();
         TableField indexField("Index", TableField::Integer);
         indexField = i;
       
@@ -96,19 +99,19 @@ namespace Isis {
   
   
   FileName TrackingTable::indexToFileName(unsigned int index) {
-    if (index > m_fileList.size()) {
+    if (index > (unsigned int)m_fileList.size()) {
       QString msg = "Cannot convert index [" + toString(index)
                   + "] to a filename, index is out of bounds.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
-    return m_fileList[index].first();
+    return m_fileList[index].first;
   }
   
   
-  unsigned int fileNameToIndex(FileName file, QString serialNumber) {
+  unsigned int TrackingTable::fileNameToIndex(FileName file, QString serialNumber) {
     for (int i = 0; i < m_fileList.size(); i++) {
-      if (m_fileList[i].first() == file) {
+      if (m_fileList[i].first == file) {
         return i;
       }
     }

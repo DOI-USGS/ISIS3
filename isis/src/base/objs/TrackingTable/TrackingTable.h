@@ -42,7 +42,7 @@ namespace Isis {
     
     public:
       
-      static QString tableName = "InputImages";
+      const QString tableName = "InputImages";
       
       TrackingTable();
       
