@@ -13,13 +13,12 @@ pipeline {
         ISISROOT="${workspace}" + "/build/"
         ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
+        PATH="/opt/conda/envs/isis/bin:${ISISROOT}/bin:${PATH}"
     }
     stages {
         stage('Config') { 
             steps { 
                 sh """
-                    echo $PATH
-                    export PATH=/opt/conda/envs/isis/bin:\$ISISROOT/bin:\$PATH
                     echo $PATH
                     conda env create -n isis -f environment.yml
                     source activate isis
