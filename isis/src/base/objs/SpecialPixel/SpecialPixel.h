@@ -76,7 +76,7 @@ namespace Isis {
    *   @history 2016-04-20 Jeannie Backer - Added Janet Barret's changes
    *                           IVALID_MAX4 definition to handle SignedInteger
    *                           imports.
-   *   @history 2018-07-18 Tyler Wilson - Added 4-byte unsigned NULL value. (UINULL4)
+   *   @history 2018-07-18 Tyler Wilson - Added 4-byte unsigned int special pixel values.
    *
    *  @todo 2005-02-15 Kris Becker - finish class documentation
    *
@@ -144,8 +144,8 @@ namespace Isis {
   const int  IVALID_MIN4 = 0xFF7FFFFA;
   const float VALID_MIN4 = (*((const float *) &IVALID_MIN4));
 
+  //const int UINULL4 = 0xFF7FFFFB;
   const int  INULL4 = 0xFF7FFFFB;
-  const unsigned int UINULL4 = (unsigned int)INULL4;
   const float NULL4 = (*((const float *) &INULL4));
 
   const int  ILOW_REPR_SAT4 = 0xFF7FFFFC;
@@ -159,6 +159,7 @@ namespace Isis {
 
   const int  IHIGH_REPR_SAT4 = 0xFF7FFFFF;
   const float HIGH_REPR_SAT4 = (*((const float *) &IHIGH_REPR_SAT4));
+
 
   const float VALID_MAX4 = FLT_MAX;
   const int IVALID_MAX4  = (*((const int *) &VALID_MAX4));
@@ -180,6 +181,16 @@ namespace Isis {
   const unsigned short HIGH_INSTR_SATU2 = ((unsigned short)   65534);
   const unsigned short HIGH_REPR_SATU2  = ((unsigned short)   65535);
   const unsigned short VALID_MAXU2      = ((unsigned short)   65522);
+
+  // 4-byte unsigned special pixel values
+  const unsigned int VALID_MINUI4      = ((unsigned int)       3);
+  const unsigned int NULLUI4           = ((unsigned int)       0);
+  const unsigned int LOW_REPR_SATUI4   = ((unsigned int)       1);
+  const unsigned int LOW_INSTR_SATUI4  = ((unsigned int)       2);
+  const unsigned int HIGH_INSTR_SATUI4 = ((unsigned int)   4294967294);
+  const unsigned int HIGH_REPR_SATUI4  = ((unsigned int)   4294967295);
+  const unsigned int VALID_MAXUI4      = ((unsigned int)   4294967282);
+
 
   // 1-byte special pixel values
   const unsigned char VALID_MIN1      = ((unsigned char) 1);
