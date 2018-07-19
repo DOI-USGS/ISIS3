@@ -269,7 +269,8 @@ namespace Isis {
    *                           multiple cnetEditorViews with same cnet.
    *   @history 2018-07-12 Kaitlyn Lee - Changed connection between cnetModified() and project's
    *                           activeControlModified() to cnetModified() and project's renamed
-   *                           method cnetModified(). Fixes #5414.
+   *                           method cnetModified(). This will allow users to save a nonactive
+   *                           cnet, since changes to multiple cnets will be connected. Fixes #5414.
    *   @history 2018-07-13 Kaitlyn Lee - Added connection to color the save net button to black when
    *                           a cnet is saved. Added signal activeControlModified() and changed
    *                           connections that alerted views to redraw themselves when a cnet was

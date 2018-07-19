@@ -234,8 +234,6 @@ namespace Isis {
 
       void cleanupViewDockList(QObject *obj);
 
-      void setProjectClean();
-
     private:
       Q_DISABLE_COPY(IpceMainWindow);
 

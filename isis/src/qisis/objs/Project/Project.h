@@ -286,7 +286,7 @@ namespace Isis {
    *                          was not the active, the active was the only one that was recognized as
    *                          being modified. This stopped any changes made to a nonactive cnet from
    *                          being saved and caused the active to be saved if a nonactive was
-   *                          edited, even if it was not. Fixes #5414.
+   *                          edited. Fixes #5414.
    *   @history 2018-07-13 Kaitlyn Lee - Added singal cnetSaved() so that the save net button goes
    *                          back to black after the cnet is saved. Added signal
    *                          activeControlModified() that is emitted in cnetModified() and is

@@ -187,10 +187,7 @@ namespace Isis {
       workorder->execute();
     }
   }
-  void IpceMainWindow::setProjectClean() {
-    m_directory->project()->setClean(true);
-  }
-
+  
 
   /**
    * This is connected from Directory's newWidgetAvailable signal
