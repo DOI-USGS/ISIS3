@@ -13,6 +13,7 @@ pipeline {
         ISISROOT="${workspace}" + "/build/"
         ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
+        CONAD_DIR="/opt/conda"
         PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
     }
     stages {
