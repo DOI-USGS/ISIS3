@@ -5,6 +5,8 @@
 #include "SpecialPixel.h"
 #include "Preference.h"
 
+#include <climits>
+
 using namespace Isis;
 using namespace std;
 
@@ -33,6 +35,8 @@ int main(int argc, char *argv[]) {
 
   cout << "Valid minimum (4 byte):           " << Isis::VALID_MIN4 << endl;
   cout << "Null (4 byte):                    " << Isis::NULL4 << endl;
+  cout << "INull (4 byte signed int):        " << hex << Isis::INULL4 << endl;
+  cout << "UINULL (4 byte unsigned int):     " << hex << Isis::UINULL4 << endl;
   cout << "Low Representation (4 byte):      " << Isis::LOW_REPR_SAT4 << endl;
   cout << "Low Instrument (4 byte):          " << Isis::LOW_INSTR_SAT4 << endl;
   cout << "High Representation (4 byte):     " << Isis::HIGH_REPR_SAT4 << endl;
@@ -277,5 +281,14 @@ int main(int argc, char *argv[]) {
     e.print();
   }
   cout << endl;
+
+
+
+
+
+
+
+
+
 }
 

@@ -17,6 +17,8 @@ Valid maximum (2 byte):           32767
 
 Valid minimum (4 byte):           -3.40282e+38
 Null (4 byte):                    -3.40282e+38
+INull (4 byte signed int):        ff7ffffb
+UINULL (4 byte unsigned int):     ff7ffffb
 Low Representation (4 byte):      -3.40282e+38
 Low Instrument (4 byte):          -3.40282e+38
 High Representation (4 byte):     -3.40282e+38
