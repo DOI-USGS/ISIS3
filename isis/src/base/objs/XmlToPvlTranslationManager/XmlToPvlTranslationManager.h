@@ -143,7 +143,7 @@ namespace Isis {
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      virtual QString Translate(QString nName, int findex = 0);
+      virtual QString Translate(QString translationGroupName, int findex = 0);
 
       // Translate all translation table groups which contain "Auto"
       using LabelTranslationManager::Auto;

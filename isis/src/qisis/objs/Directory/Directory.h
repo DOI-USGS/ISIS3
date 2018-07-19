@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QMainWindow>
 #include <QMultiMap>
 #include <QObject>
 #include <QPointer>
@@ -39,6 +40,7 @@
 
 class QAction;
 class QDockWidget;
+class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -49,15 +51,18 @@ namespace Isis {
   class BundleObservation;
   class BundleObservationView;
   class ChipViewportsWidget;
+  class CnetEditorView;
   class CnetEditorWidget;
   class Control;
   class ControlNet;
   class ControlPointEditView;
+  class ControlHealthMonitorView;
   class CubeDnView;
   class FileItem;
   class Footprint2DView;
   class HistoryTreeWidget;
   class ImageFileListWidget;
+  class JigsawRunWidget;
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
@@ -199,13 +204,58 @@ namespace Isis {
    *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
    *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
-   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
+   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created.
    *                           Fixes #5224
    *   @history 2017-12-01 Adam Goins Modified updateRecentProjects() to update the recent projects
-   *                           menu it display a chronologically ordered list of recently loaded 
+   *                           menu it display a chronologically ordered list of recently loaded
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-03-14 Ken Edmundson - Modified m_controlMap value from QWidget to
+   *                           CnetEditorWidget and changed connection  to take signal from
+   *                           a CnetEditorWidget instead of a QWidget for destruction of
+   *                           CnetEditorWidgets. Added ability to view bundleout.txt file in method
+   *                           addBundleObservationView.
+   *   @history 2018-03-14 Tracie Sucharski - Changed MosaicControlNetTool to ControlNetTool in
+   *                           addCubeDnView. Added method controlUsedInCnetEditorWidget so Project
+   *                           knows whether it is safe to close a control net when a new active is
+   *                           set. References #5026.
+   *   @history 2018-03-30 Tracie Sucharski - Use the Control::write to write the control net to
+   *                           disk instead of directly calling ControlNet::Write, so that the
+   *                           Control can keep track of the modified status of the control net.
+   *                           Connect cnetModified signal to Project::activeControlModified so
+   *                           modified state of the active control can be set so project knows
+   *                           that control has unsaved changes.
+   *   @history 2018-04-02 Tracie Sucharski - Cleanup m_controlPointEditViewWidget pointer when
+   *                           the ControlPointEditView is deleted. Added slot to reload the active
+   *                           control net in cneteditor view, effectively discarding any edits.
+   *                           This was done because there is no way to re-load a control net in the
+   *                           CnetEditor widget classes.
+   *   @history 2018-04-04 Tracie Sucharski - Created CnetEditorView class to use to add to QMdiArea
+   *                           instead of a CnetEditorWidget. This way there is no longer a
+   *                           disconnect between what has been added to the QMdiArea and what is
+   *                           stored in m_cnetEditorViewWidgets.
+   *   @history 2018-05-08 Tracie Sucharski - When saving active control, reset the "Save Net"
+   *                           button to black in the ControlPointEditorWidget.
+   *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
+   *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
+   *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-25 Christopher Combs - Made changes to reflect updates to JigsawRunWidget.
+   *                           Added addJigsawView method and m_jigsawRunWidget member variable.
+   *                           Fixes #5428.
+   *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
+   *                           addFootprint2DView() now connects to enableControlNetTool() in
+   *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
+   *                           Removed  saveActiveControl() since users can save the control
+   *                           network with the project save button.
+   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to 
+   *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
+   *                           to allow for saving of the project at these times. Fixes #5114.
+   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
+   *                           Fixes #5435.
+   *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
+   *                           directory instance rather than the activeControl. Fixes #5435.
+   *
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -220,9 +270,11 @@ namespace Isis {
       QStringList recentProjectsList();
 
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
-      CnetEditorWidget *addCnetEditorView(Control *network);
+      ControlHealthMonitorView *addControlHealthMonitorView();
+      CnetEditorView *addCnetEditorView(Control *control);
       CubeDnView *addCubeDnView();
       Footprint2DView *addFootprint2DView();
+      JigsawRunWidget *addJigsawRunWidget();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
@@ -249,7 +301,7 @@ namespace Isis {
       QList<QAction *> toolPadActions();
 
       QList<BundleObservationView *> bundleObservationViews();
-      QList<CnetEditorWidget *> cnetEditorViews();
+      QList<CnetEditorView *> cnetEditorViews();
       QList<CubeDnView *> cubeDnViews();
       QList<Footprint2DView *> footprint2DViews();
       QList<MatrixSceneWidget *> matrixViews();
@@ -258,8 +310,12 @@ namespace Isis {
       QList<TemplateEditorWidget *> templateEditorViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
+      ControlHealthMonitorView *controlHealthMonitorView();
       ControlPointEditView *controlPointEditView();
+      JigsawRunWidget *jigsawRunWidget();
 //      ChipViewportsWidget *controlPointChipViewports();
+
+      bool controlUsedInCnetEditorWidget(Control *control);
 
       // Return the control point Id currently in the ControlPointEditWidget, if it exists
       QString editPointId();
@@ -322,7 +378,10 @@ namespace Isis {
     signals:
       void directoryCleaned();
       void newWarning();
+      void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
+
+      void viewClosed(QWidget *widget);
 
       void cnetModified();
       void redrawMeasures();
@@ -340,6 +399,7 @@ namespace Isis {
       void cleanupSensorInfoWidgets(QObject *);
       void cleanupTargetInfoWidgets(QObject *);
       void cleanupTemplateEditorWidgets(QObject *);
+      void cleanupJigsawRunWidget(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
 
@@ -360,6 +420,7 @@ namespace Isis {
     private slots:
       void initiateRenameProjectWorkOrder(QString projectName);
       void newActiveControl(bool newControl);
+      void reloadActiveControlInCnetEditorView();
 
     private:
       /**
@@ -412,13 +473,17 @@ namespace Isis {
       QPointer<HistoryTreeWidget> m_historyTreeWidget;  //!< Pointer to the HistoryTreeWidget.
       QPointer<Project> m_project;                      //!< Pointer to the Project.
       QPointer<WarningTreeWidget> m_warningTreeWidget;  //!< Pointer to the WarningTreeWidget.
+      QPointer<JigsawRunWidget> m_jigsawRunWidget;         //!< Pointer to the JigsawRunWidget.
+
 
       //!< List of BundleObservationView
       QList< QPointer<BundleObservationView> > m_bundleObservationViews;
-      QList< QPointer<CnetEditorWidget> > m_cnetEditorViewWidgets;  //!< List of CnetEditorWidgets
+      QList< QPointer<CnetEditorView> > m_cnetEditorViewWidgets;  //!< List of CnetEditorViews
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
+
+      QPointer<ControlHealthMonitorView> m_controlHealthMonitorView;
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
       //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
@@ -458,7 +523,7 @@ namespace Isis {
       QList<QAction *> m_activeToolBarActions; //!< List of active ToolBar actions
       QList<QAction *> m_toolPadActions; //!< List of ToolPad actions
 
-      QMultiMap<Control*, QWidget*> m_controlMap; //!< Map to hold every view with an open Control
+      QMultiMap<Control*, CnetEditorView *> m_controlMap; //!< Map to hold every view with an open Control
 
       QString m_editPointId; //!< Current control point that is in the ControlPointEditWidget
 

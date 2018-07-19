@@ -41,23 +41,29 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QWidgetAction>
+#include <QXmlStreamWriter>
 
+#include "ControlNetTool.h"
 #include "ControlPoint.h"
 #include "Cube.h"
+#include "Directory.h"
 #include "Image.h"
 #include "ImageFileListWidget.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
+#include "MosaicControlNetTool.h"
+#include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "Shape.h"
 #include "ToolPad.h"
+#include "XmlStackedHandlerReader.h"
 
 namespace Isis {
   /**
    * Constructor.
    *
-   * @param parent Pointer to parent QWidget
+   * @param parent (QMainWindow *) Pointer to parent QMainWindow
    */
   Footprint2DView::Footprint2DView(Directory *directory, QWidget *parent) :
                       AbstractProjectItemView(parent) {
@@ -88,18 +94,15 @@ namespace Isis {
 
     connect(m_sceneWidget, SIGNAL(createControlPoint(double, double)),
             this, SIGNAL(createControlPoint(double, double)));
-    
-    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)), 
+
+    connect(m_sceneWidget, SIGNAL(mosCubeClosed(Image *)),
             this, SLOT(onMosItemRemoved(Image *)));
 
     //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
     //  the footprints.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
-    QHBoxLayout *viewlayout = new QHBoxLayout();
-
-    layout->addWidget(statusBar);
+    setStatusBar(statusBar);
 
     m_fileListWidget = new ImageFileListWidget(directory);
 
@@ -115,51 +118,51 @@ namespace Isis {
 
     imageFileListdock->setWidget(m_fileListWidget);
 
-    m_window = new QMainWindow();
-    m_window->addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
-    m_window->setCentralWidget(m_sceneWidget);
-    viewlayout->addWidget(m_window);
-    layout->addLayout(viewlayout);
+    addDockWidget(Qt::LeftDockWidgetArea, imageFileListdock, Qt::Vertical);
+    setCentralWidget(m_sceneWidget);
 
-    setLayout(layout);
-
-    m_permToolBar = new QToolBar("Standard Tools", 0);
+    m_permToolBar = addToolBar("Standard Tools");
     m_permToolBar->setObjectName("permToolBar");
     m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
 
-    m_activeToolBar = new QToolBar("Active Tool", 0);
+    m_activeToolBar = addToolBar("Active Tool");
     m_activeToolBar->setObjectName("activeToolBar");
     m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
 
     m_toolPad = new ToolPad("Tool Pad", 0);
     m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
-
+    addToolBar(Qt::RightToolBarArea, m_toolPad);
 
     m_sceneWidget->addToPermanent(m_permToolBar);
     m_sceneWidget->addTo(m_activeToolBar);
     m_sceneWidget->addTo(m_toolPad);
 
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
+    // Store the actions for easy enable/disable.
+    foreach (QAction *action, findChildren<QAction *>()) {
+      addAction(action);
+    }
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
+
+    // MosaicSceneWidget's default is to have the Control Net Tool enabled.
+    // In ipce, we want it to be disabled if an active control is not set.
+    foreach (QAction *action, m_toolPad->actions()) {
+      if (action->toolTip() == "Control Net (c)") {
+        m_controlNetTool = action;
+      }
+    }
+    if (!directory->project()->activeControl()) {
+      m_controlNetTool->setEnabled(false);
+    }
 
     setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
   }
-
 
   /**
    * Destructor
    */
   Footprint2DView::~Footprint2DView() {
     delete m_fileListWidget;
-    delete m_window;
     delete m_permToolBar;
     delete m_activeToolBar;
     delete m_toolPad;
@@ -245,11 +248,11 @@ namespace Isis {
     }
   }
 
-  
+
   /**
-   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed 
+   * Slot at removes the mosaic item and corresponding image file list item when a cube is closed
    * using the Close Cube context menu.
-   * 
+   *
    * @param image The image that was closed and needs to be removed
    */
   void Footprint2DView::onMosItemRemoved(Image *image) {
@@ -265,7 +268,7 @@ namespace Isis {
       }
     }
   }
-  
+
 
   /**
    * Slot to connect to the itemRemoved signal from the model. If the item is an image it removes it
@@ -322,33 +325,103 @@ namespace Isis {
 
 
   /**
-   * Returns a list of actions for the permanent tool bar.
+   * A slot function that is called when directory emits a siganl that an active
+   * control network is set. It enables the control network editor tool in the
+   * toolpad.
+   * We do not load the network here because the network does not open until
+   * the tool is beng used. This is done in MosaicControlNetTool::updateTool() and
+   * is connected in MosaicTool.
    *
-   * @return @b QList<QAction*> The actions
+   * @param value The boolean that holds if a control network has been set.
    */
-  QList<QAction *> Footprint2DView::permToolBarActions() {
-    return m_permToolBar->actions();
+  void Footprint2DView::enableControlNetTool(bool value) {
+    m_controlNetTool->setEnabled(value);
   }
 
 
   /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return @b QList<QAction*> The actions
+   * @brief Loads the Footprint2DView from an XML file.
+   * @param xmlReader  The reader that takes in and parses the XML file.
    */
-  QList<QAction *> Footprint2DView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
+  void Footprint2DView::load(XmlStackedHandlerReader *xmlReader) {
+    xmlReader->pushContentHandler( new XmlHandler(this) );
   }
 
 
   /**
-   * Returns a list of actions for the tool pad.
+   * @brief Save the footprint view widgets (ImageFileListWidget and MosaicSceneWidget to an XML
+   *        file.
+   * @param stream  The XML stream writer
+   * @param newProjectRoot The FileName of the project this Directory is attached to.
    *
-   * @return @b QList<QAction*> The actions
+   * @internal
+   *   @history 2016-11-07 Ian Humphrey - Restored saving of footprints (footprint2view).
+   *                           References #4486.
    */
-  QList<QAction *> Footprint2DView::toolPadActions() {
-    return m_toolPad->actions();
+  void Footprint2DView::save(QXmlStreamWriter &stream, Project *project,
+                             FileName newProjectRoot) const {
+
+    stream.writeStartElement("footprint2DView");
+
+    m_fileListWidget->save(stream, project, newProjectRoot);
+    m_sceneWidget->save(stream, project, newProjectRoot);
+
+    stream.writeEndElement();
+  }
+
+
+  /**
+   * @brief This function sets the Directory pointer for the Directory::XmlHandler class
+   * @param directory The new directory we are setting XmlHandler's member variable to.
+   */
+  Footprint2DView::XmlHandler::XmlHandler(Footprint2DView *footprintView) {
+
+    m_footprintView = footprintView;
+  }
+
+
+  /**
+   * @brief The Destructor for Directory::XmlHandler
+   */
+  Footprint2DView::XmlHandler::~XmlHandler() {
+  }
+
+
+  /**
+   * @brief The XML reader invokes this method at the start of every element in the
+   * XML document.  This method expects <footprint2DView/> and <imageFileList/>
+   * elements.
+   * A quick example using this function:
+   *     startElement("xsl","stylesheet","xsl:stylesheet",attributes)
+   *
+   * @param namespaceURI The Uniform Resource Identifier of the element's namespace
+   * @param localName The local name string
+   * @param qName The XML qualified string (or empty, if QNames are not available).
+   * @param atts The XML attributes attached to each element
+   * @return @b bool  Returns True signalling to the reader the start of a valid XML element.  If
+   * False is returned, something bad happened.
+   *
+   */
+  bool Footprint2DView::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
+                                           const QString &qName, const QXmlAttributes &atts) {
+    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
+
+    if (result) {
+      if (localName == "mosaicScene") {
+        m_footprintView->mosaicSceneWidget()->load(reader());
+      }
+      if (localName == "imageFileList") {
+        m_footprintView->m_fileListWidget->load(reader());
+      }
+    }
+    return result;
+  }
+
+
+  bool Footprint2DView::XmlHandler::endElement(const QString &namespaceURI,
+      const QString &localName, const QString &qName) {
+    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
+
+    return result;
   }
 }

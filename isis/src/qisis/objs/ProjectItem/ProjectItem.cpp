@@ -142,12 +142,11 @@ namespace Isis {
     setBundleSolutionInfo(bundleSolutionInfo);
 
     appendRow( new ProjectItem( bundleSolutionInfo->bundleSettings() ) );
-    QString cNetFileName = bundleSolutionInfo->controlNetworkFileName();
-    Control *control = new Control(cNetFileName);
-    appendRow( new ProjectItem(control) );
-
+    appendRow( new ProjectItem(bundleSolutionInfo->control()) );
     appendRow( new ProjectItem( bundleSolutionInfo->bundleResults() ) );
-    appendRow( new ProjectItem( bundleSolutionInfo->adjustedImages() ) );
+    if (!bundleSolutionInfo->adjustedImages().isEmpty()) {
+      appendRow( new ProjectItem( bundleSolutionInfo->adjustedImages() ) );
+    }
   }
 
 

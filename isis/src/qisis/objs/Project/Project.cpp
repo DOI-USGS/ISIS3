@@ -66,6 +66,8 @@
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
 #include "SerialNumberList.h"
+#include "SetActiveControlWorkOrder.h"
+#include "SetActiveImageListWorkOrder.h"
 #include "Shape.h"
 #include "ShapeList.h"
 #include "ShapeReader.h"
@@ -109,7 +111,6 @@ namespace Isis {
     m_activeControl = NULL;
     m_activeImageList = NULL;
 
-
     m_numImagesCurrentlyReading = 0;
 
     m_mutex = NULL;
@@ -128,7 +129,6 @@ namespace Isis {
     m_idToBundleSolutionInfoMap = new QMap<QString, BundleSolutionInfo *>;
 
     m_name = "Project";
-
 
     // Look for old projects
     QDir tempDir = QDir::temp();
@@ -948,7 +948,7 @@ namespace Isis {
   void Project::addImages(ImageList newImages) {
     imagesReady(newImages);
 
-    //  The each 
+    //  The each
     emit guiCamerasAdded(m_guiCameras);
     emit targetsAdded(m_targets);
   }
@@ -1100,12 +1100,17 @@ namespace Isis {
 
   /**
    * Loads bundle solution info into project
+   *
    * @param BundleSolutionInfo
    */
   void Project::loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo) {
     m_bundleSolutionInfo->append(bundleSolutionInfo);
 
+    // add BundleSolutionInfo to project's m_idToBundleSolutionInfoMap
     (*m_idToBundleSolutionInfoMap)[bundleSolutionInfo->id()] = bundleSolutionInfo;
+
+    // add BundleSolutionInfo's control to project's m_idToControlMap
+    (*m_idToControlMap)[bundleSolutionInfo->control()->id()] = bundleSolutionInfo->control();
 
     emit bundleSolutionInfoAdded(bundleSolutionInfo);
   }
@@ -1381,7 +1386,8 @@ namespace Isis {
       }
     }
     m_isOpen = true;
-    writeSettings();
+
+    setClean(true);
     emit projectLoaded(this);
   }
 
@@ -1559,8 +1565,8 @@ namespace Isis {
 
 
   /**
-   * Get the top-level folder of the new project. This is where the project is opened from/saved to. 
-   * This is set when a Save As operation is in progress. 
+   * Get the top-level folder of the new project. This is where the project is opened from/saved to.
+   * This is set when a Save As operation is in progress.
    */
   QString Project::newProjectRoot() const {
     return m_newProjectRoot;
@@ -1570,6 +1576,7 @@ namespace Isis {
   /**
    * Change the project's name (GUI only, doesn't affect location on disk).
    */
+
   void Project::setName(QString newName) {
     m_name = newName;
     emit nameChanged(m_name);
@@ -1697,16 +1704,46 @@ namespace Isis {
    *                           being chosen Fixes #4969
    *  @history 2017-08-02 Cole Neubauer - Added functionality to switch between active controls
    *                           Fixes #4567
+   *  @history 2018-03-30 Tracie Sucharski - If current activeControl has been modified, prompt for
+   *                           saving. Emit signal to discardActiveControlEdits.
    *
    */
   void Project::setActiveControl(QString displayName) {
     Control *previousControl = m_activeControl;
     if (m_activeControl) {
+
+      // If the current active control has been modified, ask user if they want to save or discard
+      // changes.
+      if (m_activeControl->isModified()) {
+        QMessageBox msgBox;
+        msgBox.setText("Save current active control");
+        msgBox.setInformativeText("The current active control has been modified.  Do you want "
+                                  "to save before setting a new active control?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ret = msgBox.exec();
+        switch (ret) {
+          // Save current active control
+          case QMessageBox::Save:
+            m_activeControl->write();
+            break;
+          // Discard any changes made to cnet
+          case QMessageBox::Discard:
+            emit discardActiveControlEdits();
+            break;
+          // Cancel operation
+          case QMessageBox::Cancel:
+            return;
+        }
+      }
       emit activeControlSet(false);
       ProjectItem *item = directory()->model()->findItemData(m_activeControl->
                           displayProperties()->displayName(), Qt::DisplayRole);
       item->setTextColor(Qt::black);
-      m_activeControl->closeControlNet();
+      // Make sure active not used in a CnetEditorWidget before closing
+      if (!directory()->controlUsedInCnetEditorWidget(m_activeControl)) {
+        m_activeControl->closeControlNet();
+      }
     }
 
     ProjectItem *item = directory()->model()->findItemData(displayName, Qt::DisplayRole);
@@ -1714,23 +1751,23 @@ namespace Isis {
       m_activeControl = item->control();
 
       try {
-        activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
-        item->setTextColor(Qt::darkGreen);
+          m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          item->setTextColor(Qt::darkGreen);
       }
       catch(IException e){
-        if (previousControl) {
-          m_activeControl = previousControl;
-          item = directory()->model()->findItemData(m_activeControl->
-                              displayProperties()->displayName(), Qt::DisplayRole);
-          item->setTextColor(Qt::darkGreen);
-          activeControl()->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          if (previousControl) {
+            m_activeControl = previousControl;
+            item = directory()->model()->findItemData(m_activeControl->
+                                displayProperties()->displayName(), Qt::DisplayRole);
+            item->setTextColor(Qt::darkGreen);
+            m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
+          }
+          else {
+            m_activeControl = NULL;
+          }
+          throw IException(e);
         }
-        else {
-          m_activeControl = NULL;
-        }
-        throw IException(e);
       }
-    }
     emit activeControlSet(true);
   }
 
@@ -1738,8 +1775,11 @@ namespace Isis {
   /**
    * @brief Return the Active Control (control network)
    *
-   * Returns the active control (control network) for views which need to operate on
+   * @description Returns the active control (control network) for views which need to operate on
    * the same control, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   * IMPORTANT:  Returns NULL if no active Control.
+   *
+   * @return @b Control * Returns the active Control if set, otherwise returns NULL
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
@@ -1751,13 +1791,21 @@ namespace Isis {
    */
   Control *Project::activeControl() {
 
-    if (!m_activeControl && m_controls->count() == 1) {
-      if (m_controls->at(0)->count() == 1 && m_images->count() > 1) {
+    if (!m_activeControl && (m_controls->count() == 1 && m_controls->at(0)->count() ==1)) {
+      //  Can only set a default control if an active imageList exists or if a default can be set
+      if (activeImageList()) {
         QString controlName = m_controls->at(0)->at(0)->displayProperties()->displayName();
         setActiveControl(controlName);
       }
     }
+
     return m_activeControl;
+  }
+
+
+  void Project::activeControlModified() {
+    m_activeControl->setModified(true);
+    setClean(false);
   }
 
 
@@ -1824,6 +1872,8 @@ namespace Isis {
    *
    * Returns the active ImageList for views which need to operate on the
    * same list of images, ie. Footprint2dView, CubeDnView, ControlPointEditView.
+   * IMPORTANT:  Returns NULL if active ImageList is not set and a default cannot be set if there
+   *             are multiple image lists in the project.
    *
    * @internal
    *   @history 2016-06-23 Tracie Sucharski - Original version.
@@ -1834,6 +1884,7 @@ namespace Isis {
 
     if (!m_activeImageList && m_images->count() == 1) {
       QString imageList = m_images->at(0)->name();
+
       setActiveImageList(imageList);
     }
     return m_activeImageList;
@@ -2139,12 +2190,18 @@ namespace Isis {
                                                             QString("."));
 
       if ( !newDestination.isEmpty() ) {
+        m_isTemporaryProject = false;
         save( QFileInfo(newDestination + "/").absolutePath() );
-
+        
         // delete the temporary project
         deleteAllProjectFiles();
         relocateProjectRoot(newDestination);
-        m_isTemporaryProject = false;
+        
+        // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
+        // working properly. For example, when we save a new project and try to view a control net
+        // the it thinks it's still in the /tmp area
+        // see ticket #5292
+        open(newDestination);
       }
       // Dialog was cancelled
       else {
@@ -2152,8 +2209,14 @@ namespace Isis {
       }
     }
     else {
+      //  Save current active control if it has been modified. If "Save As" is being processed,
+      //  the active control is written in the Control::copyToNewProjectRoot so the control in
+      //  current project is not modified.
+      if (activeControl() && activeControl()->isModified()) {
+        activeControl()->write();
+      }
+
       save(m_projectRoot->absolutePath(), false);
-      // if (newDestination != )
     }
 
     return saveDialogCompleted;
@@ -2282,12 +2345,12 @@ namespace Isis {
     //  TODO Set newpath member variable.  This is used for some of the data copy methods and is not
     //  the ideal way to handle this.  Maybe change the data copy methods to either take the new
     //  project root in addition to the data root or put the data root in the dataList (ImageList,
-    //  etc.).
+    //  etc.). If performing a "Save", m_newProjectRoot == m_projectRoot
     m_newProjectRoot = newPath.toString();
 
     //  For now set the member variable rather than calling setName which emits signal and updates
     //  ProjectItemModel & the project name on the tree.  This will be updated when the new project
-    //  is opened.  
+    //  is opened.
     m_name = newPath.name();
 
     QFile projectSettingsFile(newPath.toString() + "/project.xml");
@@ -2365,6 +2428,9 @@ namespace Isis {
 
     directoryStateWriter.writeEndDocument();
     m_isOpen = true;
+
+    emit projectSaved(this);
+
   }
 
 
@@ -2558,12 +2624,12 @@ namespace Isis {
 
 
   /**
-   * Add images to the id map which are not under the projects main data area, the Images node on 
-   * the project tree, such as the images under bundle results.  This is an interim solution since 
-   * the Project and model/view does not seem to be properly handling data which is not on the main 
-   * data part of the project tree. 
-   *  
-   * @param ImagesList of images 
+   * Add images to the id map which are not under the projects main data area, the Images node on
+   * the project tree, such as the images under bundle results.  This is an interim solution since
+   * the Project and model/view does not seem to be properly handling data which is not on the main
+   * data part of the project tree.
+   *
+   * @param ImagesList of images
    */
   void Project::addImagesToIdMap(ImageList images) {
 
@@ -2794,7 +2860,7 @@ namespace Isis {
       else if (localName == "imageList") {
         m_imageLists.append(new ImageList(m_project, reader()));
       }
-      else if (localName == "shapeLists") {
+      else if (localName == "shapeList") {
         m_shapeLists.append(new ShapeList(m_project, reader()));
       }
       else if (localName == "templateList") {
@@ -2885,6 +2951,7 @@ namespace Isis {
     else if (localName == "results") {
       foreach (BundleSolutionInfo *bundleInfo, m_bundleSolutionInfos) {
         m_project->addBundleSolutionInfo(bundleInfo);
+
         // If BundleSolutionInfo contains adjusted images, add to the project id map.
         if (bundleInfo->adjustedImages().count()) {
           foreach (ImageList *adjustedImageList, bundleInfo->adjustedImages()) {

@@ -136,6 +136,9 @@ namespace Isis {
    *                             taking a BundleSolutionInfo.  Fixes #4849.
    *     @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                             classes. Fixes #5117.
+   *     @history 2018-03-22 Ken Edmundson - Modified constructor taking a BundleSolutionInfo to
+   *                             append a row for a Control object containing the output control
+   *                             net from the bundle adjustment.
    *
    */
   class ProjectItem : public QStandardItem {

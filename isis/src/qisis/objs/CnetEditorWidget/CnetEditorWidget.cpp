@@ -75,6 +75,8 @@ namespace Isis {
 
     m_updatingSelection = false;
 
+    m_sortDialog = NULL;
+
     m_control = control;
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
         this, SLOT(rebuildModels()));
@@ -98,6 +100,7 @@ namespace Isis {
    * Destructor
    */
   CnetEditorWidget::~CnetEditorWidget() {
+
     writeSettings();
 
     delete m_workingVersion;
@@ -150,6 +153,9 @@ namespace Isis {
 
     delete m_connectionModel;
     m_connectionModel = NULL;
+
+    delete m_sortDialog;
+    m_sortDialog = NULL;
   }
 
 
@@ -188,6 +194,8 @@ namespace Isis {
     m_control = NULL;
     m_settingsPath = NULL;
     m_workingVersion = NULL;
+
+    m_sortDialog = NULL;
   }
 
 
@@ -1014,12 +1022,14 @@ namespace Isis {
 
 
   /**
-   * Configures the sorting dialog
+   * Configures the sorting dialog.
+   * If one does not already exist, create it, then show the dialog
    */
   void CnetEditorWidget::configSorting() {
-    CnetEditorSortConfigDialog *dialog = new CnetEditorSortConfigDialog(this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
+    if (!m_sortDialog) {
+      m_sortDialog = new CnetEditorSortConfigDialog(this);
+    }
+    m_sortDialog->show();
   }
 
 
@@ -1039,83 +1049,5 @@ namespace Isis {
       m_imageModel->setFrozen(false);
       m_connectionModel->setFrozen(false);
     }
-  }
-
-
-  /**
-   * This method pushes a new XmlHandler into the parser stack.
-   *
-   * @param xmlReader This is the parser stack.
-   */
-  void CnetEditorWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
-  }
-
-
-  /**
-   * This method saves the Controls object ids to the stream.
-   *
-   * @param stream The stream that will output to directory.xml
-   * @param project The project to save the users settings to
-   * @param newProjectRoot New project's root directory
-   */
-  void CnetEditorWidget::save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) {
-    stream.writeStartElement("control");
-    stream.writeAttribute("id", m_control->id());
-    stream.writeEndElement();
-  }
-
-
-  /**
-   * Creates an XmlHandler for cnetEditor
-   *
-   * @param cnetEditor The widget to be serialized
-   */
-  CnetEditorWidget::XmlHandler::XmlHandler(CnetEditorWidget *cnetEditor) {
-    m_cnetEditor = cnetEditor;
-  }
-
-
-  /**
-   * Destructor
-   */
-  CnetEditorWidget::XmlHandler::~XmlHandler() {
-    delete m_cnetEditor;
-    m_cnetEditor = NULL;
-  }
-
-
-  /**
-   * Placeholder for later serialization of CnetEditorWidgets
-   *
-   * @param cnetEditor The widget to be serialized
-   * @param namespaceURI ???
-   * @param localName Determines what attributes to retrieve from atts.
-   * @param qName ???
-   * @param atts Stores the attributes.
-   *
-   * @return @b bool The result of XmlStackedHandler's startElement() method.
-   */
-  bool CnetEditorWidget::XmlHandler::startElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName, const QXmlAttributes &atts) {
-    bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-    return result;
-  }
-
-
-  /**
-   * This method calls XmlStackedHandler's endElement() and dereferences pointers according to
-   * the value of localName.
-   *
-   * @param namespaceURI ???
-   * @param localName Determines which pointers to dereference.
-   * @param qName ???
-   *
-   * @return @b bool The result of XmlStackedHandler's endElement() method.
-   */
-  bool CnetEditorWidget::XmlHandler::endElement(const QString &namespaceURI,
-      const QString &localName, const QString &qName) {
-    bool result = XmlStackedHandler::endElement(namespaceURI, localName, qName);
-    return result;
   }
 }
