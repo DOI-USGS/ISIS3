@@ -31,6 +31,9 @@ pipeline {
             steps {
                 sh """
                     echo $PATH
+                    ls -la /opt/conda/envs/isis/bin
+                    echo $HOME
+                    ls -la $HOME/conda/envs/isis/bin
                     set +e
                     cd build
                     ninja -j8 && ninja install
