@@ -114,11 +114,6 @@ void IsisMain() {
           NaifVertex observer(3);
           point.ToNaifArray(&observer[0]);
 
-          // Start debug
-          std::cout << "observer = " << observer[0] << ", " << observer[1]
-                    <<  ", " << observer[2] <<  std::endl;
-          // end debug
-          
           NaifStatus::CheckErrors();
           vscl_c(1.5, &observer[0], &observer[0]);
           NaifStatus::CheckErrors();
@@ -133,9 +128,6 @@ void IsisMain() {
           if ( dsk.isPlateIdValid(dsk.plateIdOfIntercept(observer, raydir, xpt)) ) { 
             point.FromNaifArray(&xpt[0]);
             pixels[i] = point.GetLocalRadius().meters();
-          // Start debug
-            std::cout << "Local radius = " << pixels[i];
-          // end debug
           }
         }
       }
