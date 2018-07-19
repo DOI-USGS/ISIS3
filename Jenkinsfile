@@ -21,7 +21,7 @@ pipeline {
             steps { 
                 sh """
                     echo $PATH
-                    conda env update -f=environment.yml
+                    conda env update -n base -f environment.yml
                     mkdir -p ./install ./build && cd build
                     cmake -GNinja -DJP2KFLAG=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis \
                    """
