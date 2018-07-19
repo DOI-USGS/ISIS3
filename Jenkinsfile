@@ -13,7 +13,6 @@ pipeline {
         ISISROOT="${workspace}" + "/build/"
         ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
-        PATH="/opt/conda/envs/isis/bin:${ISISROOT}/bin:${PATH}"
     }
     stages {
         stage('Config') { 
@@ -31,9 +30,8 @@ pipeline {
             steps {
                 sh """
                     echo $PATH
-                    ls -la /opt/conda/envs/isis/bin
-                    echo $HOME
-                    ls -la $HOME/conda/envs/isis/bin
+                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
+                    echo $PATH
                     set +e
                     cd build
                     ninja -j8 && ninja install
