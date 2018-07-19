@@ -163,6 +163,8 @@ namespace Isis {
    *                           was made to accomodate Rosetta VIRTIS-m calibrated data files and
    *                           has no impact on other supported BIP files.
    *                           Fixes #5398.
+   *   @history 208-07-19 Tyler Wilson - Added support for 4-byte UnsignedInteger special pixel
+   *                            values.
    *
    */
   class ProcessImport : public Isis::Process {
