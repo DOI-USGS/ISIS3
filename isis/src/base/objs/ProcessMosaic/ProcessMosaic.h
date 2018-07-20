@@ -326,6 +326,8 @@ namespace Isis {
 
       // Match DEM between Input & Mosaic if MatchDEM Flag is enabled
       void MatchDEMShapeModel();
+      
+      Isis::Cube *m_trackingCube;      //!< The separate tracking information cube
 
       bool m_trackingEnabled;         //!<
       bool m_createOutputMosaic;      //!<

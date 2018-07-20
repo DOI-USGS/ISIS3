@@ -30,6 +30,7 @@
 #include "SerialNumber.h"
 #include "SpecialPixel.h"
 #include "Table.h"
+#include "TrackingTable.h"
 
 using namespace std;
 
@@ -82,6 +83,7 @@ namespace Isis {
 
   //!  Destroys the Mosaic object. It will close all opened cubes.
   ProcessMosaic::~ProcessMosaic() {
+    delete m_trackingCube;
   }
 
 
@@ -264,8 +266,26 @@ namespace Isis {
     // Image name into the table & Get the index for this input file
     int iIndex = GetIndexOffsetByPixelType();
 
-    // Set the Mosaic Origin is Tracking is enabled
+    // Set the Mosaic Origin if Tracking is enabled
     if (m_trackingEnabled) {
+      // Initialize the output tracking cube
+      QString trackingFile = FileName(OutputCubes[0]->fileName()).name();
+      int found = trackingFile.lastIndexOf(".cub");
+      if (found == -1) {
+        trackingFile.remove(found).append("_tracking.cub");
+        m_trackingCube = new Cube(trackingFile, "rw");
+      }
+      else {
+        QString msg = "Output cube does not appear to be a valid cube file";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      
+      // Add tracking group to mosaic cube
+      Pvl *outLab = OutputCubes[0]->label();
+      PvlGroup trackingGroup("Tracking");
+      PvlKeyword trackingFileKeyword("FileName", trackingFile);
+      trackingGroup.addKeyword(trackingFileKeyword);
+      outLab->addGroup(trackingGroup);
       SetMosaicOrigin(iIndex);
     }
     else if (m_imageOverlay == AverageImageWithMosaic && m_createOutputMosaic) {
@@ -275,9 +295,9 @@ namespace Isis {
     m_onb = OutputCubes[0]->bandCount();
 
     if (m_trackingEnabled) {
-      //Get the last band set aside for "Origin" 1 based
-      iOriginBand = OutputCubes[0]->bandCount();
-      iChanged = 0;
+      // //Get the last band set aside for "Origin" 1 based
+      // iOriginBand = OutputCubes[0]->bandCount();
+      // iChanged = 0;
 
       // For mosaic creation, the input is copied onto mosaic by default
       if (m_imageOverlay == UseBandPlacementCriteria && !m_createOutputMosaic) {
@@ -303,7 +323,7 @@ namespace Isis {
       // Create portal buffers for the input and output files
       Portal iPortal(ins, 1, InputCubes[0]->pixelType());
       Portal oPortal(ins, 1, OutputCubes[0]->pixelType());
-      Portal origPortal(ins, 1, OutputCubes[0]->pixelType());
+      Portal origPortal(ins, 1, m_trackingCube->pixelType());
 
       for (int ib = isb, ob = m_osb; ib < (isb + inb) && ob <= m_onb; ib++, ob++) {
         for (int il = isl, ol = m_osl; il < isl + inl; il++, ol++) {
@@ -316,7 +336,7 @@ namespace Isis {
 
           if (m_trackingEnabled) {
             origPortal.SetPosition(m_oss, ol, iOriginBand);
-            OutputCubes[0]->read(origPortal);
+            m_trackingCube->read(origPortal);
           }
           else if (m_imageOverlay == AverageImageWithMosaic) {
             origPortal.SetPosition(m_oss, ol, (ob+m_onb));
@@ -670,10 +690,11 @@ namespace Isis {
       fieldLength = inputFileNameLength;
     }
 
-    // Get output file name
-    QString sOutputFile = FileName(OutputCubes[0]->fileName()).name();
+    // Get output file names for mosaic file and tracking file
+    // QString sOutputFile = FileName(OutputCubes[0]->fileName()).name();
 
-    Pvl *cPvlOut = OutputCubes[0]->label();
+    // Pvl *cPvlOut = OutputCubes[0]->label();
+    Pvl *cPvlOut = m_trackingCube->label();
 
     // Create a table record with the new image file name and serial number info
     TableRecord cFileRecord;
@@ -818,9 +839,11 @@ namespace Isis {
     if (m_createOutputMosaic && m_trackingEnabled) {
       Table cFileTable(tableName, cFileRecord);
       cFileTable += cFileRecord;
-      OutputCubes[0]->write(cFileTable);
+      TrackingTable tTable(cFileTable);
+      Table table = tTable.toTable();
+      m_trackingCube->write(table);
       //reset the origin band based on pixel type
-      ResetOriginBand();
+      // ResetOriginBand();
     }
   }
 
