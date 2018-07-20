@@ -23,9 +23,12 @@
  */
 #include <vector>
 #include <cmath>
+#include <climits>
 #include <cfloat>
 #include <QString>
 #include <QStringList>
+
+
 
 #include "IException.h"
 #include "IString.h"
@@ -76,6 +79,7 @@ namespace Isis {
    *   @history 2016-04-20 Jeannie Backer - Added Janet Barret's changes
    *                           IVALID_MAX4 definition to handle SignedInteger
    *                           imports.
+   *   @history 2018-07-18 Tyler Wilson - Added 4-byte unsigned NULL.
    *
    *  @todo 2005-02-15 Kris Becker - finish class documentation
    *
@@ -144,7 +148,11 @@ namespace Isis {
   const float VALID_MIN4 = (*((const float *) &IVALID_MIN4));
 
   const int  INULL4 = 0xFF7FFFFB;
+  const unsigned int  UINULL4 = (unsigned int)INULL4;
+
   const float NULL4 = (*((const float *) &INULL4));
+
+
 
   const int  ILOW_REPR_SAT4 = 0xFF7FFFFC;
   const float LOW_REPR_SAT4 = (*((const float *) &ILOW_REPR_SAT4));
