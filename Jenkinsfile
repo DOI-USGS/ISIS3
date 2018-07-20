@@ -28,7 +28,6 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
-                    echo $PATH
                     export PATH="${PATH}:/opt/conda/envs/isis3/bin"
                     set +e
                     cd build
@@ -39,7 +38,7 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
-                    echo $PATH
+                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/build/bin"
                     set +e
                     cd build
                     ctest -j8 -V -R _unit_ 
