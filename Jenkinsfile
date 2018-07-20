@@ -19,9 +19,7 @@ pipeline {
             steps { 
                 sh """
                     ls ${workspace}/install/bin
-                    dnf install which
-                    export PATH="${PATH}:${workspace}/install/bin"
-                    which catlab
+                    ls ${ISISROOT}/bin
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
