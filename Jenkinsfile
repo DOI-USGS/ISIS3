@@ -10,7 +10,7 @@ pipeline {
         }
     }
     environment {
-        ISISROOT="${workspace}" + "build/"
+        ISISROOT="${workspace}" + "/build/"
         ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
         ISIS3DATA="/usgs/cpkgs/isis3/data/"
     }
