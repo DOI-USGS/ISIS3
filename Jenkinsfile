@@ -29,7 +29,7 @@ pipeline {
             steps {
                 sh """
                     echo $PATH
-                    export PATH="/opt/conda/envs/isis/bin:${PATH}"
+                    export PATH="${PATH}:/opt/conda/envs/isis3/bin"
                     set +e
                     cd build
                     ninja -j8 && ninja install
