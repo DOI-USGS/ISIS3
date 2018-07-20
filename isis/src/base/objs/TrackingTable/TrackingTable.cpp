@@ -76,22 +76,30 @@ namespace Isis {
       }
     }
     
-    Table table(tableName);
+    // This record is never being used. It is simply to construct the Table.
+    TableRecord dummyRecord;
+    TableField fileNameField("FileName", TableField::Text, fieldLength);
+    TableField serialNumberField("SerialNumber", TableField::Text, fieldLength);
+    TableField indexField("Index", TableField::Integer);
+    dummyRecord += fileNameField;
+    dummyRecord += serialNumberField;
+    dummyRecord += indexField;
+    Table table(tableName, dummyRecord);
     
     for (int i=0; i < m_fileList.size(); i++) {
-      TableField fileNameField("FileName", TableField::Text, fieldLength);
-      fileNameField = m_fileList[i].first.name();
-      TableField serialNumberField("SerialNumber", TableField::Text, fieldLength);
-      serialNumberField = QString(fieldLength) = m_fileList[i].second.toInt();
-        TableField indexField("Index", TableField::Integer);
-        indexField = i;
       
+      fileNameField = m_fileList[i].first.name();
+      // serialNumberField = QString(fieldLength) = m_fileList[i].second.toInt();
+      serialNumberField = m_fileList[i].second;
+      indexField = i;
+        
       TableRecord record;
       record += fileNameField;
       record += serialNumberField;
       record += indexField;
       
       table += record;
+      
     }
     
     return table;
@@ -99,7 +107,7 @@ namespace Isis {
   
   
   FileName TrackingTable::indexToFileName(unsigned int index) {
-    if (index > (unsigned int)m_fileList.size()) {
+    if (index >= (unsigned int)m_fileList.size()) {
       QString msg = "Cannot convert index [" + toString(index)
                   + "] to a filename, index is out of bounds.";
       throw IException(IException::Programmer, msg, _FILEINFO_);

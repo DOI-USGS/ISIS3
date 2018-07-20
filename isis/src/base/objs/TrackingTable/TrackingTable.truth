@@ -1,0 +1,7 @@
+Unit test for TrackingTable
+
+Testing constructor with a Table object ...
+Constructing Table ...
+SHAPOOPY
+terminate called after throwing an instance of 'Isis::IException'
+  what():  **ERROR** Unable to add records to Isis Table [TestingTable]. Bytes per record = [0 bytes].
