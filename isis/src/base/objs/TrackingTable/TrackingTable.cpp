@@ -36,11 +36,20 @@ using namespace std;
 namespace Isis {
 
 
+  /**
+  * @brief Default constructor
+  */
   TrackingTable::TrackingTable() {
     
   }
   
   
+  /**
+  * @ brief Constructs a TrackingTable given a Table object. The Table is used to populate 
+  *         m_fileList.
+  *
+  * @param table The Table object to pull the filenames and serial numbers from
+  */
   TrackingTable::TrackingTable(Table table) {
     
     for (int i=0; i < table.Records(); i++) {
@@ -58,13 +67,23 @@ namespace Isis {
   }
   
   
+  /**
+  * @brief Destroys the TrackingTable object
+  */
   TrackingTable::~TrackingTable() {
     
   }
   
   
+  /**
+  * @brief Constrcts and returns a Table object based on values in m_fileList.
+  *
+  * @return Table The constructed table to be returned
+  */
   Table TrackingTable::toTable() {
     
+    // Begin by establishing the length of the fields within the table. This would be the longest 
+    // length that is needed to be stored.
     int fieldLength = 0;
     
     for (int i=0; i < m_fileList.size(); i++) {
@@ -76,7 +95,7 @@ namespace Isis {
       }
     }
     
-    // This record is never being used. It is simply to construct the Table.
+    // This record is never being used. It is simply to construct the Table object.
     TableRecord dummyRecord;
     TableField fileNameField("FileName", TableField::Text, fieldLength);
     TableField serialNumberField("SerialNumber", TableField::Text, fieldLength);
@@ -86,10 +105,10 @@ namespace Isis {
     dummyRecord += indexField;
     Table table(tableName, dummyRecord);
     
+    // Loop through m_fileList and add records to the table with the proper information.
     for (int i=0; i < m_fileList.size(); i++) {
       
       fileNameField = m_fileList[i].first.name();
-      // serialNumberField = QString(fieldLength) = m_fileList[i].second.toInt();
       serialNumberField = m_fileList[i].second;
       indexField = i;
         
@@ -106,6 +125,12 @@ namespace Isis {
   }
   
   
+  /**
+  * @brief Returns the FileName at the given index within m_fileList.
+  *
+  * @param index The index to find the filename for
+  * @returns FileName The FileName at the index specified
+  */
   FileName TrackingTable::indexToFileName(unsigned int index) {
     if (index >= (unsigned int)m_fileList.size()) {
       QString msg = "Cannot convert index [" + toString(index)
@@ -117,6 +142,13 @@ namespace Isis {
   }
   
   
+  /**
+  * @brief Returns the index of the filename/serialnumber combination.
+  *
+  * @param file The FileName within m_fileList to find the index of
+  * @param serialNumber The QString of the serial number within m_fileList to find the index of
+  * @return unsighned int The index of the filename/serialnumber combination
+  */
   unsigned int TrackingTable::fileNameToIndex(FileName file, QString serialNumber) {
     for (int i = 0; i < m_fileList.size(); i++) {
       if (m_fileList[i].first == file) {

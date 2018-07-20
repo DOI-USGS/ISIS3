@@ -52,7 +52,7 @@ namespace Isis {
       
       Table toTable();
       
-      // oldDnToNewDn(); TODO
+      // oldDnToNewDn(); TODO (maybe?)
       
       FileName indexToFileName(unsigned int index);
       
@@ -60,7 +60,7 @@ namespace Isis {
       
     private:
       
-      QList< QPair< FileName, QString > > m_fileList;
+      QList< QPair< FileName, QString > > m_fileList;   //!< The list to keep track of images
   };
 };
 
