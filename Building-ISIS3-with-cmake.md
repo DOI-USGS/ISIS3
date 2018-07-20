@@ -1,42 +1,39 @@
 # QuickStart Guide
 
 ## Anaconda and ISIS3 dependencies
-With the cmake, the ISIS3 dependencies are now managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) with the dependencies in it. There is an environment.yml spec file  at the top level of the repo. To make the required Anaconda environment enter the following command:
+ISIS3 dependencies are managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file  at the top level of the ISIS3 repo. To create the required Anaconda environment, enter the following command:
 
 `conda env create -n <environment-name> -f environment.yml`
 
-## Building ISIS3
-From the terminal window:
-* Clone the repo locally:  <repo directory>
-* Activate your [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment). In bash run
+Building ISIS requires that the anaconda environment be activated. Activate your anaconda environment with:
 
 `source activate <environment-name>`
 
-* CD into the clone directory.
-* mkdir build
-* cd into the build directory
-* Enter the following commands:
+## Building ISIS3
+**At the top-level directory of an ISIS3 clone**:
+* Create a `build` directory and an `install` directory at this level:
+  * `mkdir build install`
 
-`cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
+* Set your ISISROOT to `/the/path/to/your/build`:
+  * `export ISISROOT=/scratch/this_is_an_example/ISIS3/build`
 
-If using the -GNinja flag:  `ninja` -OR- `ninja install`
+* cd into the build directory and configure your build:
+  * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
 
-Otherwise: `make -j#` -OR- `make install -j#`
+* Build ISIS inside of your build directory and install it to your install directory:
+  * `ninja install`
 
+**Notes**
+* The -GNinja flag specifies creating Google [Ninja](https://ninja-build.org/manual.html) Makefile (an alternative Make system to the traditional GNU make system). If you instead want to use make, dont set this flag, and replace the ninja commands with their make counterparts.
 
-* The -GNinja flag specifies creating Google ninja Makefile (an alternative Make system to the traditional GNU make system). Ninja is faster and allows for partial rebuilds, but you can remove this flag if you don't want to use ninja.
+* To build with debug flags add `-DCMAKE_BUILD_TYPE=Debug` to the cmake configuration step.
 
-* The -DJP2KFLAG=OFF disables JP2000 support.  This is temporary.
+* -DJP2KFLAG=OFF disables JP2000 support.  This is temporary.
 
-* The -Dpybindings=OFF disables the bundle adjust python bindings.  This is temporary.
+* -Dpybindings=OFF disables the bundle adjust python bindings.  This is temporary.
 
-* \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `path/to/isis` 
+* \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
-* ``` make -OR- ninja ``` will make ISIS inside of your current working directory
-
-* ``` make install -OR- ninja install ``` will install the binaries for user use inside of the \<install directory\>
-
-* When using ``` ninja install ``` the ISIS3 apps are placed in \<install directory\>/bin. 
  
 
 
@@ -52,36 +49,28 @@ Custom data and test data directories now have to be relative to the new $ISISRO
 Therefore your data or testdata directories must be at the same hierarchical level as your build or install directories.
 
 ## Cleaning builds
-Cleaning all of ISIS
-```
-rm -rf build install
-```
-Cleaning an individual app
-```
-cd build
-rm bin/appname
-```
+**Manual Cleans**
+
+Cleaning all of ISIS: 
+`rm -rf build install`
+
+Cleaning an individual app:
+`cd build && rm bin/<app_name>`
+
 Cleaning an individual object
-```
-cd build
-rm `find -name ObjectName.cpp.o`
-```
-Using the Ninja build system:
+ ``cd build && rm `find -name ObjectName.cpp.o` ``
+
+**Using the Ninja build system:**
 
 `ninja -t clean` Removes all built objects except for those built by the build generator.
 
 `ninja -t clean -r rules` Removes all built files specified in rules.ninja (a file which exists in the same directory as build.ninja)
 
-`ninja -t clean \<targetname\>` Just removes all built objects for the specific target.
+`ninja -t clean \<targetname\>` Removes all built objects for the specific target.
 
 Getting a list of targets using Ninja is very easy:
 
 `ninja -t targets`
-
-
-## Building with Debug Flags
-
-To build with debug flags add `-DCMAKE_BUILD_TYPE=Debug` to the cmake configuration step. Then, build ISIS and everything will be built with debug flags. If ISIS is already built without debug flags, this will result in a complete re-build of ISIS.
 
 ## Building Individual ISIS3 Applications/Objects
 
@@ -126,19 +115,6 @@ If CMake is being used to produce GNU Makefiles, the process is the same, but th
 
 The documentation is placed in install/docs (after being copied over from build/docs).
 
-## Building with conda
-
-If you don't have access to v007, you can still build ISIS using a conda environment. This step should be done before the config.
- 
-Create the environment using the spec file:
-
-`conda create --name myenv --file linux-spec.txt`
-
-Activate the environment:
-
-`source activate myenv`
-
-Your config step should find its third party dependencies in the conda environment by default
 
 ## Problems
 
