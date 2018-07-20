@@ -44,13 +44,30 @@ namespace Isis {
   class Project;
   class ToolPad;
   class XmlStackedHandlerReader;
+  class ProjectItemViewMenu;
 
   /**
    * Ipce view containing the CnetEditorWidget
    *
    * @author 2018-04-04 Tracie Sucharski
-   *    
-   * @internal 
+   *
+   * @internal
+   *    @history 2018-06-01 Kaitlyn Lee - Because AbstractProjectItemView now inherits from QMainWindow,
+   *                            I added a dummy central widget and set its layout to the grid layout.
+   *                            We used to set the whole CnetEditorView widget's layout, now we only
+   *                            set the central widget's layout.
+   *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
+   *                            was moved from the constructor. createToolBars() was copied and edited
+   *                            from CnetEditorWindow. Fixes #5416
+   *    @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
+   *                            view has its own toolbar, so having getters that return toolbar
+   *                            actions to fill the toolbar of the IpceMainWindow are unnecessary.
+   *                            Removed methods that returned menu and toolbar actions.
+   *    @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
+   *                            ambiguous shortcut errors. To counter this, we enable/disable actions. Overrode
+   *                            leaveEvent() to handle open menus causing a leave event. On default, a view's
+   *                            actions are disabled. To enable the actions, move the cursor over the view.
+   *                            When a user moves the cursor outside of the view, the actions are disabled.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -58,13 +75,9 @@ class CnetEditorView : public AbstractProjectItemView {
   Q_OBJECT
 
   public:
-    CnetEditorView(Directory *directory, Control *control, FileName configFile, 
+    CnetEditorView(Directory *directory, Control *control, FileName configFile,
                    QWidget *parent = 0);
     ~CnetEditorView();
-
-    virtual QList<QAction *> permToolBarActions();
-    virtual QList<QAction *> activeToolBarActions();
-    virtual QList<QAction *> toolPadActions();
 
     CnetEditorWidget *cnetEditorWidget();
     Control *control();
@@ -74,8 +87,12 @@ class CnetEditorView : public AbstractProjectItemView {
     void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
 
+  private:
+    void createToolBars();
+    void createMenus();
+    void leaveEvent(QEvent *event);
 
-    private:
+
       /**
        * @author 2012-09-?? Steven Lambright
        *
@@ -103,10 +120,8 @@ class CnetEditorView : public AbstractProjectItemView {
     QPointer<Control> m_control;
 
     QToolBar *m_permToolBar; //!< The permanent tool bar
-    QToolBar *m_activeToolBar; //!< The active tool bar
-    ToolPad *m_toolPad; //!< The tool pad
+    ProjectItemViewMenu *m_tablesMenu; //!< View menu for storing actions
 
-    QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
   };
 }
 

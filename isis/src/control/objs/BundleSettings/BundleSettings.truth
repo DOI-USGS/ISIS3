@@ -434,7 +434,6 @@ Testing XML: Object deserialized as (should match object above):
 
 
 Testing error throws...
-**ERROR** Unable to find BundleObservationSolveSettings for observation number [UnassociatedObservationNumber].
 **ERROR** Unable to find BundleObservationSolveSettings with index = [32].
 **ERROR** Unable to find BundleObservationSolveSettings with index = [-1].
 **PROGRAMMER ERROR** Unknown bundle convergence criteria [Pickles].

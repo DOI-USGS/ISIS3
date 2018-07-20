@@ -34,11 +34,12 @@
    class FileName;
    class Project;
 
-   /**
-    * This represents an ISIS template in a project-based GUI interface.
-    * This encapsulates ideas about a template such as it's filename and import name.
-    *
+   /**   
     * @author 2017-11-01 Christopher Combs
+    * @internal
+    *   @history - 2017-11-01 Christopher Combs -  This represents an ISIS template in a
+    *                         project-based GUI interface.  This encapsulates ideas about a
+    *                         template such as it's filename and import name.
     */
    class Template : public QObject {
      Q_OBJECT
@@ -59,13 +60,13 @@
      void updateFileName(Project * project);
 
    private:
-     /**
-      * Nested class used to write the Template object information to an XML file for the
-      * purpose of saving and restoring the state of the project.
-      *
-      * @author 2012-??-?? Steven Lambright
+     /**     
+      * @author ????-??-?? Steven Lambright
       *
       * @internal
+      *   @history ????-??-?? Steven Lambright -  Nested class used to write the Template object
+      *                             information to an XML file for the purpose of saving and
+      *                             restoring the state of the project.
       */
      class XmlHandler : public XmlStackedHandler {
        public:
