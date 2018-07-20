@@ -38,7 +38,7 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
-                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install"
+                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
                     pwd
                     set +e
                     cd build
