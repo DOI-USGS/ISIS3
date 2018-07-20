@@ -45,7 +45,7 @@ namespace Isis {
    *                            saving a control is turned into a WorkOrder.  This was done for the
    *                            alpha release simply to notify the user that the control was saved.
    *                            However, this history entry is not saved/restored to a project.
-   *
+   *   @history 2018-06-28 Makayla Shepherd - Restored the ProgressBar. Fixes #5228.
    */
   class HistoryTreeWidget : public QTreeWidget {
       Q_OBJECT

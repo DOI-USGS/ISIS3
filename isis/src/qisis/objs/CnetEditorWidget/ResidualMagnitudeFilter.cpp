@@ -2,19 +2,23 @@
 
 #include "ResidualMagnitudeFilter.h"
 
-#include "ControlCubeGraphNode.h"
+#include <QPair>
+#include <QString>
+
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlPoint.h"
 
 
 namespace Isis {
   ResidualMagnitudeFilter::ResidualMagnitudeFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  ResidualMagnitudeFilter::ResidualMagnitudeFilter(
-    const ResidualMagnitudeFilter &other) : AbstractNumberFilter(other) {
+  ResidualMagnitudeFilter::ResidualMagnitudeFilter(const ResidualMagnitudeFilter &other)
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -23,8 +27,8 @@ namespace Isis {
 
 
   bool ResidualMagnitudeFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return evaluateImageFromMeasureFilter(node);
+        const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromMeasureFilter(imageAndNet);
   }
 
 
@@ -45,10 +49,12 @@ namespace Isis {
 
   QString ResidualMagnitudeFilter::getImageDescription() const {
     QString description = AbstractFilter::getImageDescription();
-    if (getMinForSuccess() == 1)
+    if (getMinForSuccess() == 1) {
       description += "measure that has a residual magnitude which is ";
-    else
+    }
+    else {
       description += "measures that have residual magnitudes which are ";
+    }
 
     description += descriptionSuffix();
     return description;
