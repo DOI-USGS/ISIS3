@@ -18,8 +18,8 @@ pipeline {
         stage('Config') { 
             steps { 
                 sh """
-                    conda env create -n isis -f environment.yml
-                    source activate isis
+                    conda env create -n isis3 -f environment.yml
+                    source activate isis3
                     mkdir -p ./install ./build && cd build
                     cmake -GNinja -DJP2KFLAG=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis \
                    """
@@ -28,7 +28,8 @@ pipeline {
         stage('Build') { 
             steps {
                 sh """
-                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
+                    echo $PATH
+                    export PATH="/opt/conda/envs/isis/bin:${PATH}"
                     set +e
                     cd build
                     ninja -j8 && ninja install
@@ -38,12 +39,12 @@ pipeline {
         stage('Test'){
             steps {
                 sh """
-                    export PATH="${PATH}:${ISISROOT}/bin:/opt/conda/envs/isis/bin"
+                    echo $PATH
                     set +e
                     cd build
-                    ctest -j8 -R _unit_ 
-                    ctest -j8 -R _app_ 
-                    ctest -j8 -R _module_ 
+                    ctest -j8 -V -R _unit_ 
+                    ctest -j8 -V -R _app_ 
+                    ctest -j8 -V -R _module_ 
                    """
             }
         }
