@@ -42,6 +42,9 @@ pipeline {
                     export ISISROOT="${workspace}/install"
                     set +e
                     cd build
+                    cd /scratch/workspace/ISIS3_cmake/isis/src/base/apps/catlab/tsts/case01
+                    make test
+                    cd /scratch/workspace/ISIS3_cmake/build
                     ctest -j8 -V -R _unit_ 
                     ctest -j8 -V -R _app_ 
                     ctest -j8 -V -R _module_ 
