@@ -116,6 +116,9 @@ namespace Isis {
    *                           implementation causing warnings in clang. Part of OS X 10.11 porting.
    *                           QPair forward declaration now properly claims it as a struct.
    *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
+   *   @history 2018-07-20 Tyler Wilson - Added support for unsigned integer special pixel values.
+   *                            in functions writeIntoRaw(...) and writeIntoDouble(...)
+   *                            References #971.
    */
   class CubeIoHandler {
     public:

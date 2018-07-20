@@ -77,7 +77,7 @@ namespace Isis {
    *                           IVALID_MAX4 definition to handle SignedInteger
    *                           imports.
    *   @history 2018-07-18 Tyler Wilson - Added 4-byte unsigned int special pixel values.
-   *
+   *                           References #971.
    *  @todo 2005-02-15 Kris Becker - finish class documentation
    *
    */
@@ -144,7 +144,7 @@ namespace Isis {
   const int  IVALID_MIN4 = 0xFF7FFFFA;
   const float VALID_MIN4 = (*((const float *) &IVALID_MIN4));
 
-  //const int UINULL4 = 0xFF7FFFFB;
+
   const int  INULL4 = 0xFF7FFFFB;
   const float NULL4 = (*((const float *) &INULL4));
 
