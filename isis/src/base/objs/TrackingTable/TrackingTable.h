@@ -33,17 +33,17 @@
 namespace Isis {
   /**
    * @brief 
-   * @author 2004-09-01 Jeff Anderson
+   * @author 2018-07-19 Jesse Mapel & Summer Stapleton
    *
    * @internal
-   *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to class
    */
+   
+  const QString tableName = "InputImages";
+
   class TrackingTable{
     
     public:
-      
-      const QString tableName = "InputImages";
-      
+            
       TrackingTable();
       
       TrackingTable(Table table);
