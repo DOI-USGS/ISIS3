@@ -61,10 +61,10 @@
 
    private:
      /**     
-      * @author 2012-??-?? Steven Lambright
+      * @author ????-??-?? Steven Lambright
       *
       * @internal
-      *   @history 2012-??-?? Steven Lambright -  Nested class used to write the Template object
+      *   @history ????-??-?? Steven Lambright -  Nested class used to write the Template object
       *                             information to an XML file for the purpose of saving and
       *                             restoring the state of the project.
       */
