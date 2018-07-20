@@ -18,6 +18,8 @@ pipeline {
         stage('Config') { 
             steps { 
                 sh """
+                    ls ${workspace}/install/bin
+                    dnf install which
                     export PATH="${PATH}:${workspace}/install/bin"
                     which catlab
                     conda env create -n isis3 -f environment.yml
