@@ -2,6 +2,26 @@ Unit test for TrackingTable
 
 Testing constructor with a Table object ...
 Constructing Table ...
-SHAPOOPY
-terminate called after throwing an instance of 'Isis::IException'
-  what():  **ERROR** Unable to add records to Isis Table [TestingTable]. Bytes per record = [0 bytes].
+First table record: fileName1.cub, 1234567890
+Second table record: fileName2.cub, 123
+Third table record: fileName3.cub, 456789
+TrackingTable object created
+
+Testing the indexToFileName method ...
+FileName at index 0: fileName1.cub
+FileName at index 1: fileName2.cub
+FileName at index 2: fileName3.cub
+FileName at index 3 does not exist and an exception is thrown.
+**PROGRAMMER ERROR** Cannot convert index [3] to a filename, index is out of bounds.
+
+Testing the fileNameToIndex method ...
+Index of FileName fileName1.cub: 0
+Index of FileName fileName2.cub: 1
+Index of FileName fileName3.cub: 2
+Index of the non-existent FileName fileName4.cub (demonstrating its addition): 3
+
+Testing the toTable method ...
+First record: fileName1.cub, 1234567890
+Second record: fileName2.cub, 123
+Third record: fileName3.cub, 456789
+Fourth record: fileName4.cub, 2
