@@ -49,6 +49,21 @@ Custom data and test data directories now have to be relative to the new $ISISRO
 Therefore your data or testdata directories must be at the same hierarchical level as your build or install directories.
 
 ## Cleaning builds
+
+**Using the Ninja build system:**
+
+Removes all built objects except for those built by the build generator:
+`ninja -t clean` 
+
+Remove all built files specified in rules.ninja:
+`ninja -t clean -r rules` 
+
+Remove all built objects for a specific target:
+`ninja -t clean \<target_name\>` 
+
+Get a list of Ninja's targets:
+`ninja -t targets`
+
 **Manual Cleans**
 
 Cleaning all of ISIS: 
@@ -57,20 +72,8 @@ Cleaning all of ISIS:
 Cleaning an individual app:
 `cd build && rm bin/<app_name>`
 
-Cleaning an individual object
+Cleaning an individual object:
  ``cd build && rm `find -name ObjectName.cpp.o` ``
-
-**Using the Ninja build system:**
-
-`ninja -t clean` Removes all built objects except for those built by the build generator.
-
-`ninja -t clean -r rules` Removes all built files specified in rules.ninja (a file which exists in the same directory as build.ninja)
-
-`ninja -t clean \<targetname\>` Removes all built objects for the specific target.
-
-Getting a list of targets using Ninja is very easy:
-
-`ninja -t targets`
 
 ## Building Individual ISIS3 Applications/Objects
 
