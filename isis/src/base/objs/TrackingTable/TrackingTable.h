@@ -32,7 +32,14 @@
 
 namespace Isis {
   /**
-   * @brief 
+   * @brief Table to store tracking information for a mosaic.
+   *
+   * This table will currently be stored in the label of a separate cube. This tracking cube will
+   * also contain a single tracking band. The DN values stored in this band will correlate to the
+   * indices in this table. Each record within this table will contain the filename of an
+   * associated cube, that cube's serial number, and the DN value associated with this cube within
+   * the tracking band (which should also be its index in tha table).
+   *
    * @author 2018-07-19 Jesse Mapel & Summer Stapleton
    *
    * @internal
