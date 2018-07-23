@@ -1508,6 +1508,40 @@ namespace Isis {
               ((unsigned short *)buffersRawBuf)[bufferIndex] = raw;
             }
 
+            else if(m_pixelType == UnsignedInteger) {
+
+              unsigned int raw = ((unsigned int *)chunkBuf)[chunkIndex];
+              if(m_byteSwapper)
+                raw = m_byteSwapper->Uint32_t(&raw);
+
+              if(raw >= VALID_MINUI4) {
+                bufferVal = (double) raw * m_multiplier + m_base;
+              }
+              else if (raw > VALID_MAXUI4) {
+                if(raw == HIGH_INSTR_SATUI4)
+                  bufferVal = HIGH_INSTR_SAT8;
+                else if(raw == HIGH_REPR_SATUI4)
+                  bufferVal = HIGH_REPR_SAT8;
+                else
+                  bufferVal = LOW_REPR_SAT8;
+              }
+              else {
+                if(raw == NULLUI4)
+                  bufferVal = NULL8;
+                else if(raw == LOW_INSTR_SATUI4)
+                  bufferVal = LOW_INSTR_SAT8;
+                else if(raw == LOW_REPR_SATUI4)
+                  bufferVal = LOW_REPR_SAT8;
+                else
+                  bufferVal = LOW_REPR_SAT8;
+              }
+
+              ((unsigned int *)buffersRawBuf)[bufferIndex] = raw;
+
+
+
+            }
+
             else if(m_pixelType == UnsignedByte) {
               unsigned char raw = ((unsigned char *)chunkBuf)[chunkIndex];
 
@@ -1626,6 +1660,7 @@ namespace Isis {
               ((float *)chunkBuf)[chunkIndex] =
                   m_byteSwapper ? m_byteSwapper->Float(&raw) : raw;
             }
+
             else if(m_pixelType == SignedWord) {
               short raw;
 
@@ -1670,6 +1705,55 @@ namespace Isis {
               ((short *)chunkBuf)[chunkIndex] =
                   m_byteSwapper ? m_byteSwapper->ShortInt(&raw) : raw;
             }
+
+            else if(m_pixelType == UnsignedInteger) {
+
+              unsigned int raw;
+
+              if(bufferVal >= VALID_MINUI4) {
+                double filePixelValueDbl = (bufferVal - m_base) /
+                    m_multiplier;
+                if(filePixelValueDbl < VALID_MINUI4 - 0.5) {
+                  raw = LOW_REPR_SATUI4;
+                }
+                if(filePixelValueDbl > VALID_MAXUI4) {
+                  raw = HIGH_REPR_SATUI4;
+                }
+                else {
+                  unsigned int filePixelValue = (unsigned int)round(filePixelValueDbl);
+
+                  if(filePixelValue < VALID_MINUI4) {
+                    raw = LOW_REPR_SATUI4;
+                  }
+                  else if(filePixelValue > VALID_MAXUI4) {
+                    raw = HIGH_REPR_SATUI4;
+                  }
+                  else {
+                    raw = filePixelValue;
+                  }
+                }
+              }
+              else {
+                if(bufferVal == NULLUI4)
+                  raw = NULLUI4;
+                else if(bufferVal == LOW_INSTR_SATUI4)
+                  raw = LOW_INSTR_SATUI4;
+                else if(bufferVal == LOW_REPR_SATUI4)
+                  raw = LOW_REPR_SATUI4;
+                else if(bufferVal == HIGH_INSTR_SATUI4)
+                  raw = HIGH_INSTR_SATUI4;
+                else if(bufferVal == HIGH_REPR_SATUI4)
+                  raw = HIGH_REPR_SATUI4;
+                else
+                  raw = LOW_REPR_SATUI4;
+              }
+
+              ((unsigned int *)chunkBuf)[chunkIndex] =
+                  m_byteSwapper ? m_byteSwapper->Uint32_t(&raw) : raw;
+
+            }
+
+
             else if(m_pixelType == UnsignedWord) {
               unsigned short raw;
 
