@@ -257,6 +257,7 @@ namespace Isis {
    *   @history 2018-07-06 Jesse Mapel - Modified addEdge and removeEdge to always emit a graph
    *                           modified signal if an edge is added or removed. Added graph
    *                           modified signal when a vertex is added.
+   *   @history 2018-07-22 Kristin Berry - Updated swap to include the graph and vertex map.
    */
   class ControlNet : public QObject {
       Q_OBJECT

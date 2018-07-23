@@ -61,7 +61,6 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
-
   ControlNet::ControlNet(const ControlNet &other) {
 
     nullify();
@@ -394,7 +393,6 @@ namespace Isis {
     // Make sure there is a node for every measure
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-
       // If the graph doesn't have the sn, add a node for it
       if (!m_vertexMap.contains(sn)) {
         Image newImage;
@@ -1820,6 +1818,8 @@ namespace Isis {
   void ControlNet::swap(ControlNet &other) {
     std::swap(points, other.points);
     std::swap(pointIds, other.pointIds);
+    m_controlGraph.swap(other.m_controlGraph);
+    std::swap(m_vertexMap, other.m_vertexMap);
     std::swap(m_mutex, other.m_mutex);
     std::swap(p_targetName, other.p_targetName);
     std::swap(p_networkId, other.p_networkId);
@@ -1843,9 +1843,7 @@ namespace Isis {
     while (i2.hasNext()) {
       i2.next().value()->parentNetwork = &other;
     }
-
     emit networkModified(ControlNet::Swapped);
-
   }
 
 
