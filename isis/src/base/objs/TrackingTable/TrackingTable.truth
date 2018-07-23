@@ -25,3 +25,12 @@ First record: fileName1.cub, 1234567890
 Second record: fileName2.cub, 123
 Third record: fileName3.cub, 456789
 Fourth record: fileName4.cub, 2
+
+Creating a new TrackingTable object with the table returned from toTable method ...
+New TrackingTable object created
+
+Testing that the Table returned from toTable on new TrackingTable matches ...
+First record: fileName1.cub, 1234567890
+Second record: fileName2.cub, 123
+Third record: fileName3.cub, 456789
+Fourth record: fileName4.cub, 2

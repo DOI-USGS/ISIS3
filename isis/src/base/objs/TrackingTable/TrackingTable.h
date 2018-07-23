@@ -31,22 +31,22 @@
 
 
 namespace Isis {
+  
+  const QString trackingTableName = "InputImages";
+
   /**
-   * @brief Table to store tracking information for a mosaic.
+   * Table to store tracking information for a mosaic.
    *
    * This table will currently be stored in the label of a separate cube. This tracking cube will
    * also contain a single tracking band. The DN values stored in this band will correlate to the
    * indices in this table. Each record within this table will contain the filename of an
    * associated cube, that cube's serial number, and the DN value associated with this cube within
-   * the tracking band (which should also be its index in tha table).
+   * the tracking band (which should also be its index in the table).
    *
    * @author 2018-07-19 Jesse Mapel & Summer Stapleton
    *
    * @internal
    */
-   
-  const QString tableName = "InputImages";
-
   class TrackingTable{
     
     public:
@@ -58,9 +58,7 @@ namespace Isis {
       ~TrackingTable();
       
       Table toTable();
-      
-      // oldDnToNewDn(); TODO (maybe?)
-      
+            
       FileName indexToFileName(unsigned int index);
       
       unsigned int fileNameToIndex(FileName file, QString serialNumber);

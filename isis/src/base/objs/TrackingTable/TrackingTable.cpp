@@ -37,7 +37,7 @@ namespace Isis {
 
 
   /**
-  * @brief Default constructor
+  * Default constructor
   */
   TrackingTable::TrackingTable() {
     
@@ -45,7 +45,7 @@ namespace Isis {
   
   
   /**
-  * @ brief Constructs a TrackingTable given a Table object. The Table is used to populate 
+  * Constructs a TrackingTable given a Table object. The Table is used to populate 
   *         m_fileList.
   *
   * @param table The Table object to pull the filenames and serial numbers from
@@ -54,7 +54,7 @@ namespace Isis {
     
     for (int i=0; i < table.Records(); i++) {
       TableRecord record = table[i];
-      QString nameField = QString(record["FileName"]).toLatin1().data();
+      QString nameField = QString(record["FileName"]);
       int found = nameField.lastIndexOf(".cub");
       if (found != -1) {
         // clear the packing characters - get only the file name
@@ -68,7 +68,7 @@ namespace Isis {
   
   
   /**
-  * @brief Destroys the TrackingTable object
+  * Destroys the TrackingTable object
   */
   TrackingTable::~TrackingTable() {
     
@@ -76,7 +76,7 @@ namespace Isis {
   
   
   /**
-  * @brief Constrcts and returns a Table object based on values in m_fileList.
+  * Constrcts and returns a Table object based on values in m_fileList.
   *
   * @return Table The constructed table to be returned
   */
@@ -103,7 +103,7 @@ namespace Isis {
     dummyRecord += fileNameField;
     dummyRecord += serialNumberField;
     dummyRecord += indexField;
-    Table table(tableName, dummyRecord);
+    Table table(trackingTableName, dummyRecord);
     
     // Loop through m_fileList and add records to the table with the proper information.
     for (int i=0; i < m_fileList.size(); i++) {
@@ -126,7 +126,7 @@ namespace Isis {
   
   
   /**
-  * @brief Returns the FileName at the given index within m_fileList.
+  * Returns the FileName at the given index within m_fileList.
   *
   * @param index The index to find the filename for
   * @returns FileName The FileName at the index specified
@@ -143,7 +143,7 @@ namespace Isis {
   
   
   /**
-  * @brief Returns the index of the filename/serialnumber combination.
+  * Returns the index of the filename/serialnumber combination.
   *
   * @param file The FileName within m_fileList to find the index of
   * @param serialNumber The QString of the serial number within m_fileList to find the index of
