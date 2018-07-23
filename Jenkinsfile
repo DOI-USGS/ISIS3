@@ -42,9 +42,9 @@ pipeline {
                     export ISISROOT="${workspace}/install"
                     set +e
                     cd build
-                    ctest -j8 -R _unit_ 
-                    ctest -j8 -R _app_ 
-                    ctest -j8 -R _module_ 
+                    ctest -j8 -R _unit_ --timeout 500
+                    ctest -j8 -R _app_ --timeout 500
+                    ctest -j8 -R _module_ --timeout 500 
                    """
             }
         }
