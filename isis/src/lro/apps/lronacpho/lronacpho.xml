@@ -104,6 +104,7 @@
       incidence angle greater than 90 degrees is set to the ISIS special Null 
       pixel value.  And, of course, any ISIS special pixel encountered on input 
       is propagated to the output TO file without modification.
+     <b>Function is only valid for phase angles between 15 and 65 degrees.</b>
     </p>
   </description>
 
