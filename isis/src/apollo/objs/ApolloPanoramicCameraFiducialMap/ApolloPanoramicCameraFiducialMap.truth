@@ -1,0 +1,25 @@
+Unit Test for ApolloPanoramicCameraFiducialMap...
+Testing fiducial fit on full Apollo 15 Panoramic AS15-P-0116 tile 5 (39795 x 25448)
+FileName: AS15-P-0116_0005_TRIM.cub
+CK Frame: -915230
+
+testing four corners...
+
+Upper Left
+  (1 , 1) => (Xfp, Yfp) = (63.0117796745100520 , 148.8404313509815324)
+Upper Left OK
+
+Upper Right
+  (1, 39795) => (Xfp, Yfp) = (62.7868969997623338 , -51.2210664535820328)
+Upper Right OK
+
+Lower Left
+  (1, 1) => (Xfp, Yfp) = (-61.5404808995972417 , 148.8119557628731684)
+Lower Left OK
+
+Lower Right
+  (1, 39795) => (Xfp, Yfp) = (-61.7653635743449598 , -51.2495420416903897)
+Lower Right OK
+
+
+-------------------------------------

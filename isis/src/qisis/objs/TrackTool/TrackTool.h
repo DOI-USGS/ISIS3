@@ -72,6 +72,8 @@ namespace Isis {
       QLabel *p_redLabel;           //!< Red label
       QLabel *p_grnLabel;           //!< Green label
       QLabel *p_bluLabel;           //!< Blue label
+      QLabel *p_xLabel;             //!< x image coordinate label
+      QLabel *p_yLabel;             //!< y image coordinate label
       WarningWidget *mWarningWidget;  //!< Warning Widget
   };
 };

@@ -14,9 +14,9 @@ namespace Isis {
    * This method sets cube sample line coordinates from given Dector coordinates
    *
    * @param sample dector sample coordinate
+   *
    * @param line detector line coordinate
    *
-   * @return bool Always returns true
    */
     bool ApolloPanoramicDetectorMap::SetDetector(const double sample, const double line) {
       //given a detector coordinate and a time (read from the 'parent' camera class) 
@@ -28,11 +28,11 @@ namespace Isis {
       p_detectorSample = -sample;
 
       //convert from detector to fiducial coordinants
-      double fidL = (p_camera->time().Et() - m_etMiddle)/m_lineRate;
+//      double fidL = (p_camera->time().Et() - m_etMiddle)/m_lineRate;
       //double fidS = sample;  //conversion is identity so it is skiped
 
       //convert from fiducial coordinates to parent image coordinates
-      p_intOri.image2Machine(p_detectorSample, fidL, &p_parentSample, &p_parentLine);
+//      p_intOri.image2Machine(p_detectorSample, fidL, &p_parentSample, &p_parentLine);
 
       //cout << "fiducial values sent to IO: " << p_detectorSample << " " << fidL << endl; //debug
       //cout << "cube coordinates returned from IO: " << p_parentSample << " " << p_parentLine << endl;
@@ -43,9 +43,9 @@ namespace Isis {
    * This method sets dector sample line coordinates from given cube coordinates
    *
    * @param sample cube sample coordinate
+   *
    * @param line cube line coordinate
    *
-   * @return bool Always returns true
    */
     bool ApolloPanoramicDetectorMap::SetParent(const double sample, const double line) {
       //Given an image (aka 'Parent', aka encoder, aka machine) coordinate set the detector 
@@ -56,7 +56,7 @@ namespace Isis {
       //convert from machine to fiducial coordinates
       //cout << "cube coordinates sent to IO: " << sample << " " << line << endl; //debug
     
-      p_intOri.machine2Image(sample,line,&p_detectorSample, &p_detectorLine);
+//      p_intOri.machine2Image(sample,line,&p_detectorSample, &p_detectorLine);
 
       //cout << "fiducial coordinate return from IO: " << p_detectorSample << " " << p_detectorLine << endl;
       //convert from fiducial coordinates to detector/time coordinates
@@ -76,14 +76,18 @@ namespace Isis {
     /**
      * This method uses the ApolloPanIO class to compute transforamtion from cube to image 
      * (aka fiducial cooraintes)
+     *
+     * @return -1 failure
+     *
+     * @return  1 sucess
      * 
-     * @throws  IException::User "No FID_MEASURES table found in cube blobs."
-     * @throws  IException::User "Less than four FID_MEASURES found in cube blobs."
-     * @throws  IException::User "Insufficient Fiducial Observations for computation of the interior
-     *                            orientation. At least one vertical pair must be measured, many 
-     *                            more is recomented."
-     * 
-     * @returns int Returns 1 on success and -1 on failure.
+     * @throws  No FID_MEASURES table found in cube blobs.
+     *
+     * @throws  Less than four FID_MEASURES found in cube blobs.
+     *
+     * @throws  Insufficient Fiducial Observations for computation of 
+     *          the interior orientation.\nAt least one vertical pair 
+     *          must be measured, many more is recomented.
      */
     int ApolloPanoramicDetectorMap::initializeInteriorOrientation() {
       int i,nrec;
@@ -104,13 +108,13 @@ namespace Isis {
                          _FILEINFO_);
         return -1;
       }
-      p_intOri.initialize();
+//      p_intOri.initialize();
 
-      for(i=0;i<nrec;i++)  //input all the observations to the the Interior Orientation Class
-        p_intOri.fiducialObservation(tableFid[i][0], tableFid[i][1], tableFid[i][2]);
+//      for(i=0;i<nrec;i++)  //input all the observations to the the Interior Orientation Class
+//        p_intOri.fiducialObservation(tableFid[i][0], tableFid[i][1], tableFid[i][2]);
 
-      i = p_intOri.computeInteriorOrienation();
-      
+//      i = p_intOri.computeInteriorOrienation();
+      i = 1;
       if( i != 1) { //unsuccessful computation of the interior orienation
         throw IException(IException::User,"Insufficient Fiducial Observations for computation of "
                                           "the interior orientation.\nAt least one vertical pair "

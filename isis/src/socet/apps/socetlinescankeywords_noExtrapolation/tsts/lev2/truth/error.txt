@@ -1,0 +1,1 @@
+**USER ERROR** Input images is a map projected cube ... not a level 1 image.

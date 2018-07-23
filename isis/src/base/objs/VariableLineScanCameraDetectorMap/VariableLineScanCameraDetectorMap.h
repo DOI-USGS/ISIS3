@@ -61,6 +61,11 @@ namespace Isis {
    *                           #4476.
    *   @history 2016-10-27 Jeannie Backer - Moved constructor documentation and destructor to
    *                           cpp file. References #4476.
+   *   @history 2017-01-09 Ken Edmundson - In SetDetector method, in loop over line rates, 0.5 lines was
+   *                           being subtracted from the line rate starting ephemeris time. This is wrong
+   *                           and was probably copy/pasted from the SetParent method below. Supposedly
+   *                           this had been addressed by #4435 which was closed, but the correction was
+   *                           not in the code. References #4435.
    *
    */
   class VariableLineScanCameraDetectorMap : public LineScanCameraDetectorMap {

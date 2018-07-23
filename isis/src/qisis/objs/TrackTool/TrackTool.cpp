@@ -6,6 +6,7 @@
 
 #include "Camera.h"
 #include "Distance.h"
+#include "CameraFocalPlaneMap.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"
 #include "RingPlaneProjection.h"
@@ -25,6 +26,18 @@ namespace Isis {
    */
   TrackTool::TrackTool(QStatusBar *parent) : Tool(parent) {
     p_sbar = parent;
+
+    p_xLabel = new QLabel(p_sbar);
+    p_xLabel->setText("W 999999");
+    p_xLabel->setMinimumSize(p_xLabel->sizeHint());
+    p_xLabel->setToolTip("x Image Coordinate");
+    p_sbar->addPermanentWidget(p_xLabel);
+    
+    p_yLabel = new QLabel(p_sbar);
+    p_yLabel->setText("W 999999");
+    p_yLabel->setMinimumSize(p_yLabel->sizeHint());
+    p_yLabel->setToolTip("y Image Coordinate");
+    p_sbar->addPermanentWidget(p_yLabel);
 
     p_sampLabel = new QLabel(p_sbar);
     p_sampLabel->setText("W 999999");
@@ -208,6 +221,10 @@ namespace Isis {
           double lon = cvp->camera()->UniversalLongitude();
           p_latLabel->setText(QString("Lat %1").arg(lat));
           p_lonLabel->setText(QString("Lon %1").arg(lon));
+          double x = cvp->camera()->FocalPlaneMap()->FocalPlaneX();
+          double y = cvp->camera()->FocalPlaneMap()->FocalPlaneY();;
+          p_xLabel->setText(QString("x %1").arg(x));
+          p_yLabel->setText(QString("y %1").arg(y));
         }
         else {
           double rad = cvp->camera()->LocalRadius().meters();
@@ -215,6 +232,8 @@ namespace Isis {
           //??? p_latLabel->setToolTip("Radius Position");
           p_latLabel->setText(QString("Rad %1").arg(rad));
           p_lonLabel->setText(QString("Lon %1").arg(lon));
+          p_xLabel->setText("x n/a");
+          p_yLabel->setText("y n/a");
         }
       }
       else {
@@ -331,6 +350,8 @@ namespace Isis {
     p_redLabel->setText("R N/A");
     p_grnLabel->setText("G N/A");
     p_bluLabel->setText("B N/A");
+    p_xLabel->setText("x n/a");
+    p_yLabel->setText("y n/a");
   }
 
 
