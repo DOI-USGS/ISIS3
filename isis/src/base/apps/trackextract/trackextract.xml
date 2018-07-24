@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="trackextract" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Removes the tracking band from a mosaic and places it into a new tracking cube.
+  </brief>
+
+  <description>
+    Updates an older mosaic cube with a tracking band by removing the tracking band and table and
+    placing them into a separate tracking cube. A reference to the tracking cube is added to the
+    mosaic label.
+  </description>
+
+  <category>
+    <categoryItem>Mosaicking</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kaitlyn Lee" date="2018-07-20">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube with tracking band
+        </brief>
+        <description>
+          The mosaic that contains the tracking band to be extracted.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output mosaic and tracking cube
+        </brief>
+        <description>
+          There will be two output cubes: the mosaic cube and the tracking cube, both named
+          by the user, but the tracking cube will have "_tracking" appended onto the name.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>
