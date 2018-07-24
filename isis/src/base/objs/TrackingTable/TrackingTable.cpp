@@ -56,8 +56,6 @@ namespace Isis {
       TableRecord record = table[i];
       QString nameField = QString(record["FileName"]);
       QString extension(FileName(nameField).extension());
-      // std::cout << nameField << std::endl;
-      // std::cout << name.extension() << std::endl;
       int found = nameField.lastIndexOf(extension);
       if (found != -1) {
         // clear the packing characters - get only the file name
