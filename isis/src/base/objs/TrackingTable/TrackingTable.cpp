@@ -55,10 +55,13 @@ namespace Isis {
     for (int i=0; i < table.Records(); i++) {
       TableRecord record = table[i];
       QString nameField = QString(record["FileName"]);
-      int found = nameField.lastIndexOf(".cub");
+      QString extension(FileName(nameField).extension());
+      // std::cout << nameField << std::endl;
+      // std::cout << name.extension() << std::endl;
+      int found = nameField.lastIndexOf(extension);
       if (found != -1) {
         // clear the packing characters - get only the file name
-        nameField.remove(found + 4);
+        nameField.remove(found + 3);
       }
       FileName fileName(nameField);
       QString serialNumber = QString(record["SerialNumber"]);

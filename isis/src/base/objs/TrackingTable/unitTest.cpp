@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
     record[1] = "123";
     tableIn += record;
     
-    record[0] = "fileName3.cub";
+    record[0] = "fileName3.dat";
     record[1] = "456789";
     tableIn += record;
     
-    cout << "First table record: fileName1.cub, 1234567890" << endl;
-    cout << "Second table record: fileName2.cub, 123" << endl;
-    cout << "Third table record: fileName3.cub, 456789" << endl;
+    cout << "First record : " << QString(tableIn[0][0]) << ", " << QString(tableIn[0][1]) << endl;
+    cout << "Second record: " << QString(tableIn[1][0]) << ", " << QString(tableIn[1][1]) << endl;
+    cout << "Third record : " << QString(tableIn[2][0]) << ", " << QString(tableIn[2][1]) << endl;
     
     TrackingTable trackingTable(tableIn);
     
@@ -73,9 +73,9 @@ int main(int argc, char *argv[]) {
     cout << "Index of FileName fileName2.cub: " 
            << trackingTable.fileNameToIndex("fileName2.cub", "123") << endl;
     cout << "Index of FileName fileName3.cub: " 
-           << trackingTable.fileNameToIndex("fileName3.cub", "456789") << endl;
+           << trackingTable.fileNameToIndex("fileName3.dat", "456789") << endl;
     cout << "Index of the non-existent FileName fileName4.cub (demonstrating its addition): " 
-           << trackingTable.fileNameToIndex("fileName4.cub", "2") << endl;
+           << trackingTable.fileNameToIndex("fileName4.cub", "12345678901234567890") << endl;
            
     cout << endl;
 
@@ -83,9 +83,9 @@ int main(int argc, char *argv[]) {
     
     Table tableOut = trackingTable.toTable();
     
-    cout << "First record: " << QString(tableOut[0][0]) << ", " << QString(tableOut[0][1]) << endl;
+    cout << "First record : " << QString(tableOut[0][0]) << ", " << QString(tableOut[0][1]) << endl;
     cout << "Second record: " << QString(tableOut[1][0]) << ", " << QString(tableOut[1][1]) << endl;
-    cout << "Third record: " << QString(tableOut[2][0]) << ", " << QString(tableOut[2][1]) << endl;
+    cout << "Third record : " << QString(tableOut[2][0]) << ", " << QString(tableOut[2][1]) << endl;
     cout << "Fourth record: " << QString(tableOut[3][0]) << ", " << QString(tableOut[3][1]) << endl;
     
     cout << endl;
@@ -102,9 +102,9 @@ int main(int argc, char *argv[]) {
              
     Table tableOut2 = trackingTable2.toTable();
              
-    cout << "First record: " << QString(tableOut2[0][0]) << ", " << QString(tableOut2[0][1]) << endl;
+    cout << "First record : " << QString(tableOut2[0][0]) << ", " << QString(tableOut2[0][1]) << endl;
     cout << "Second record: " << QString(tableOut2[1][0]) << ", " << QString(tableOut2[1][1]) << endl;
-    cout << "Third record: " << QString(tableOut2[2][0]) << ", " << QString(tableOut2[2][1]) << endl;
+    cout << "Third record : " << QString(tableOut2[2][0]) << ", " << QString(tableOut2[2][1]) << endl;
     cout << "Fourth record: " << QString(tableOut2[3][0]) << ", " << QString(tableOut2[3][1]) << endl;
     
   }
