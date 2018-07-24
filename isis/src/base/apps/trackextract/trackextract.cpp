@@ -102,7 +102,7 @@ void createMosaicCube(UserInterface ui, QString bands) {
   // Add Tracking Group to the mosaic cube
   PvlGroup trackingGroup = PvlGroup("Tracking");
   PvlKeyword trackingName = PvlKeyword("Filename");
-  trackingName.setValue(ui.GetFileName("FROM") + ".cub");
+  trackingName.setValue(ui.GetFileName("TO"));
   trackingGroup.addKeyword(trackingName);
   mosaicLabel->addGroup(trackingGroup);
 
