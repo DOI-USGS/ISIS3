@@ -99,6 +99,8 @@ namespace Isis {
    *                           after the first call to these methods are O(1) and are not
    *                           bottlenecekd by any file I/O that occurs in the Compose()
    *                           methods. References #497.
+   *   @history 2018-07-25 Tyler Wilson - Added serializtion for m_observationNumber.
+   *                           References #497.
    */
 
   class Image : public QObject {

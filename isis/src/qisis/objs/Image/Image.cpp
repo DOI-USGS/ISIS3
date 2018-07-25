@@ -16,6 +16,7 @@
 #include <geos/io/WKTWriter.h>
 
 #include "Angle.h"
+#include "Camera.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "DisplayProperties.h"
@@ -53,6 +54,10 @@ namespace Isis {
 
     m_fileName = imageFileName;
 
+    m_observationNumber = ObservationNumber::Compose(*(cube()));
+
+    m_serialNumber = SerialNumber::Compose(*(cube()));
+    
     cube();
 
     initCamStats();
@@ -88,6 +93,8 @@ namespace Isis {
     m_lineResolution = Null;
     m_sampleResolution = Null;
 
+    m_observationNumber = ObservationNumber::Compose(*(cube()));
+
     initCamStats();
 
     try {
@@ -115,6 +122,7 @@ namespace Isis {
     m_displayProperties = NULL;
     m_footprint = NULL;
     m_id = NULL;
+
 
     m_aspectRatio = Null;
     m_resolution = Null;
@@ -280,6 +288,7 @@ namespace Isis {
       m_cube = NULL;
     }
   }
+
 
 
   /**
@@ -600,6 +609,7 @@ namespace Isis {
     stream.writeAttribute("id", m_id->toString());
     stream.writeAttribute("fileName", FileName(m_fileName).name());
     stream.writeAttribute("instrumentId", m_instrumentId);
+    stream.writeAttribute("observationNumber",m_observationNumber);
     stream.writeAttribute("spacecraftName", m_spacecraftName);
 
     if (!IsSpecial(m_aspectRatio) ) {
@@ -825,9 +835,10 @@ namespace Isis {
 
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
       if (localName == "image") {
-        QString id = atts.value("id");
+        QString id = atts.value("id");     
         QString fileName = atts.value("fileName");
         QString instrumentId = atts.value("instrumentId");
+        QString observationNumber = atts.value("observationNumber");
         QString spacecraftName = atts.value("spacecraftName");
 
         QString aspectRatioStr = atts.value("aspectRatio");
@@ -852,6 +863,10 @@ namespace Isis {
 
         if (!instrumentId.isEmpty()) {
           m_image->m_instrumentId = instrumentId;
+        }
+
+        if (!observationNumber.isEmpty()) {
+          m_image->m_observationNumber = observationNumber;
         }
 
         if (!spacecraftName.isEmpty()) {
