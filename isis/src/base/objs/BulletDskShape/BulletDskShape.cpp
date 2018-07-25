@@ -48,7 +48,7 @@ namespace Isis {
   /**
    * Default empty constructor.
    */
-  BulletDskShape::BulletDskShape() :  m_mesh() { }
+  BulletDskShape::BulletDskShape() :  m_dskfile(), m_mesh() { }
 
 
   /**
@@ -56,7 +56,7 @@ namespace Isis {
    * 
    * @param dskfile The DSK file to load into a Bullet target shape.
    */
-  BulletDskShape::BulletDskShape(const QString &dskfile) : m_mesh()  {
+  BulletDskShape::BulletDskShape(const QString &dskfile) : m_dskfile(dskfile), m_mesh()  {
     loadFromDsk(dskfile);
     setMaximumDistance();
   }
@@ -66,6 +66,15 @@ namespace Isis {
    * Desctructor
    */
   BulletDskShape::~BulletDskShape() { }
+
+/**
+ * Returns the name of the DSK file
+ * 
+ * @return QString Name of input file
+ */
+  QString BulletDskShape::filename() const {
+      return (m_dskfile);
+  }
 
 
   /**

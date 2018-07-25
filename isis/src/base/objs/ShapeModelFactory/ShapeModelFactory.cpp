@@ -27,6 +27,7 @@
 
 #include "BulletShapeModel.h"
 #include "BulletTargetShape.h"
+#include "BulletShapeFactory.h"
 #include "Cube.h"
 #include "DemShape.h"
 #include "EllipsoidShape.h"
@@ -74,7 +75,8 @@ namespace Isis {
    * 
    * @return ShapeModel* Pointer to the created ShapeModel object.
    * 
-   * @author 2017-03-17 Kris Becker
+   * @author 2017-03-17 Kris Becker 
+   * @history 2018-07-21 Kris Becker - Modified to use new Bullet interface 
    */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
 
@@ -177,34 +179,19 @@ namespace Isis {
         // Cubes are not supported at this time. 
 
         try {
-          BulletTargetShape *bullet = BulletTargetShape::load(shapeModelFilenames);
-          if ( 0 == bullet ) {
+          BulletShapeFactory *blt = BulletShapeFactory::getInstance();
+          BulletWorldManager *bullet = blt->create(shapeModelFilenames);
+          BulletShapeModel *b_model = new BulletShapeModel(bullet, target, pvl);
+          b_model->setTolerance(tolerance);
 
-            // Bullet failed to load the kernel...test failure conditions
-            if ("cub" == ext) {
-              onerror = "fail";   // This is fatal no matter the condition
-              QString mess = "Bullet could not initialize ISIS Cube DEM";
-              throw IException(IException::Unknown, mess, _FILEINFO_);
-            }
+          // Do this here, otherwise default behavior will ensue from here on out
+          kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
+          kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
+                                                PvlContainer::Replace);
 
-            // Always throw an error in this case 
-            QString b_msg = "Bullet could not initialize DEM!";
-            throw IException(IException::Unknown, b_msg, _FILEINFO_);            
-          }
-          else {
+          return ( b_model );
 
-            // Allocate the real shape model
-            BulletShapeModel *b_model = new BulletShapeModel(bullet, target, pvl);
-            b_model->setTolerance(tolerance);
-
-            // Do this here, otherwise default behavior will ensue from here on out
-            kernelsPvlGroup.addKeyword(PvlKeyword("RayTraceEngine", preferred), PvlContainer::Replace);
-            kernelsPvlGroup.addKeyword(PvlKeyword("OnError", onerror), PvlContainer::Replace);
-            kernelsPvlGroup.addKeyword(PvlKeyword("Tolerance", toString(tolerance)),
-                                                  PvlContainer::Replace);
-
-            return ( b_model );
-          }
         } catch (IException &ie) {
           fileError.append(ie);
           QString mess = "Unable to create preferred BulletShapeModel";

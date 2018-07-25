@@ -1,0 +1,43 @@
+Testing EmbreeTargetManager
+
+
+Get an instance of the target manager
+Maximum cache size:  10
+Current cache size:  0
+
+Change the maximum cache size: 
+New maximum cache size:  5
+
+Create a target shape for  "$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds"
+Target shape status:
+  Number of polygons:  49152
+  Number of vertices:  25350
+  Maximum distance:    0.683956
+Current cache size:  1
+
+Create a new target shape for the same file
+Target shape status:
+  Number of polygons:  49152
+  Number of vertices:  25350
+  Maximum distance:    0.683956
+Current cache size:  1
+
+Shape file is in the cache?  true
+
+Both instances point to the same object?  true
+
+Free one of them
+Current cache size:  1
+
+Free the other
+Current cache size:  0
+Shape file is in the cache?  false
+
+Set the maximum number of target shapes to 0
+New maximum cache size:  0
+
+Attempt to create a new target shape
+**PROGRAMMER ERROR** Failed creating EmbreeTargetShape for [/usgs/cpkgs/isis3/data/base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds] Too many EmbreeTargetShapes are already open.
+
+Attempt to free a shape that doesn't exist
+**PROGRAMMER ERROR** Cannot free EmbreeTargetShape for file [Not a DSK file] because it is not stored in the cache.

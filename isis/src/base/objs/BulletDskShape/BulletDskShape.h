@@ -45,6 +45,7 @@ namespace Isis {
       BulletDskShape(const QString &dskfile);
       virtual ~BulletDskShape();
 
+      QString filename() const;
       int getNumTriangles() const;
       int getNumVertices() const;
 
@@ -52,6 +53,7 @@ namespace Isis {
       virtual btMatrix3x3 getTriangle(const int index) const;
 
     private:
+      QString                                    m_dskfile; /**! Name of DSK file */
       QSharedPointer<btTriangleIndexVertexArray> m_mesh; /**! Triangular mesh representation of
                                                               the target shape. The vertex ordering
                                                               is the same as in the DSK file,

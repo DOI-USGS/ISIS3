@@ -58,6 +58,19 @@ namespace Isis {
     initWorld();  
   }
 
+  /**
+   * Construct a world from an existing world. This creates a shared instance. To 
+   * build a custom world you use the default constructor and add shapes. 
+   */
+  BulletWorldManager::BulletWorldManager(const BulletWorldManager &world) : 
+                                         m_name(world.m_name),
+                                         m_collision(world.m_collision),
+                                         m_dispatcher(world.m_dispatcher),
+                                         m_broadphase(world.m_broadphase),
+                                         m_world(world.m_world),
+                                         m_mutex(world.m_mutex) {
+  }
+
 
   /**
    * Destroys the BulletWorldManager.
@@ -132,13 +145,21 @@ namespace Isis {
     // May need to retain the target in a list for world destruction!!??
     // CollisionBody is expected to contain a UserPointer that links back to 
     // target (BulletTargetShape or some other type). 
+    QMutexLocker locker(m_mutex.data());
     m_world->addCollisionObject( target->body() );
-
+    m_world->updateAabbs();
+    return;
   }
 
 
 /**
- * @brief Perform ray casting from a position and a look direction
+ * @brief Perform ray casting from a position and a look direction 
+ *  
+ * Its not clear if mutex locking is needed here for several reasons. Bullet is 
+ * thread safe but only if it was compiled with BULLET2_USE_THREAD_LOCKS=ON. The 
+ * default is to no turn on thread locking so invoke thread locking here. 
+ * However, if its is built with it no, it is not clear if thread locking is 
+ * needed and needs to be tested. 
  * 
  * @author 2017-03-17 Kris Becker 
  * 
@@ -155,6 +176,7 @@ namespace Isis {
  */
   bool BulletWorldManager::raycast(const btVector3 &rayStart, const btVector3 &rayEnd, 
                                    btCollisionWorld::RayResultCallback &results ) const {
+    QMutexLocker locker(m_mutex.data());
     m_world->rayTest(rayStart, rayEnd, results);
     return ( results.hasHit() );
   }
@@ -180,7 +202,7 @@ namespace Isis {
     m_dispatcher.reset(new btCollisionDispatcher(m_collision.data()) );
     m_broadphase.reset( new btDbvtBroadphase() );  // Could also be an AxisSweep
     m_world.reset( new btCollisionWorld( m_dispatcher.data(), m_broadphase.data(), m_collision.data() ) );
-
+    m_mutex.reset( new QMutex() );
   }
 
 }  // namespace Isis

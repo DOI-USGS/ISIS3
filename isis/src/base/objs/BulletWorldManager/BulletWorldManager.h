@@ -25,12 +25,12 @@
 
 #include <QCache>
 #include <QMutex>
-#include <QScopedPointer>
+#include <QSharedPointer>
 #include <QString>
 #include <QtGlobal>
 
 #include "IsisBullet.h"
-#include "BulletTargetShape.h"\
+#include "BulletTargetShape.h"
 
 namespace Isis {
 
@@ -53,11 +53,14 @@ namespace Isis {
  *  
  * @internal 
  *   @history 2017-03-17  Kris Becker  Original Version
+ *   @history 2018-07-21 Kris Becker - Made this a completely shareable object
+ *                         with thread safe implementation
  */
   class BulletWorldManager {
     public:
       BulletWorldManager();
       BulletWorldManager(const QString &name);
+      BulletWorldManager(const BulletWorldManager &world);
       virtual ~BulletWorldManager();
 
       QString name() const;
@@ -74,23 +77,21 @@ namespace Isis {
 
 
     private:
-      Q_DISABLE_COPY(BulletWorldManager)
-
       QString                                         m_name; /**! The name of the Bullet
                                                                    world. */
-      QScopedPointer<btDefaultCollisionConfiguration> m_collision; /**! The collision
+      QSharedPointer<btDefaultCollisionConfiguration> m_collision; /**! The collision
                                                                         configuration for
                                                                         the world. */
-      QScopedPointer<btCollisionDispatcher>           m_dispatcher; /**! The dispatcher for the
+      QSharedPointer<btCollisionDispatcher>           m_dispatcher; /**! The dispatcher for the
                                                                          world. */
-      QScopedPointer<btBroadphaseInterface>           m_broadphase; /**! The interface for overlaps
+      QSharedPointer<btBroadphaseInterface>           m_broadphase; /**! The interface for overlaps
                                                                          in the world's aabb
                                                                          acceleration tree. */
-      QScopedPointer<btCollisionWorld>                m_world; /**! The Bullet collision world that
+      QSharedPointer<btCollisionWorld>                m_world; /**! The Bullet collision world that
                                                                     contains the representation of
                                                                     the body. */
 
-      mutable QMutex m_mutex;       //!< Mutex for thread safety
+      mutable QSharedPointer<QMutex>                  m_mutex;       //!< Mutex for thread safety
 
       void initWorld();
 
