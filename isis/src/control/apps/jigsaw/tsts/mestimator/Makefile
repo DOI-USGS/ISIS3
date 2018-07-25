@@ -11,6 +11,9 @@ APPNAME = jigsaw
 # 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
 #                Removed default parameters.
 # 2016-08-11 Jeannie Backer - Updated documentation
+# 2018-07-24 Debbie A. Cook - Now removing digits beyond the fourth decimal place of
+#                        decimal numbers to make the mac test work.  Also changed
+#                        "-0.0000" to "0.0000" after truncating.
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
