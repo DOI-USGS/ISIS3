@@ -29,6 +29,7 @@ void IsisMain() {
   createTrackCube(ui, trackBand);
 }
 
+
 /**
  * Finds the index of the tracking band in the BandBin group and stores the index
  * in trackBand. The other bands' indices are stored in copyBands.
@@ -60,6 +61,7 @@ void findTrackBand(UserInterface ui, QString &copyBands, QString &trackBand) {
     }
   }
 }
+
 
 /**
  * Creates the mosaic cube by copying the input cube without the tracking band.
@@ -108,6 +110,7 @@ void createMosaicCube(UserInterface ui, QString bands) {
 
   mosaicCube.close();
 }
+
 
 /**
  * Creates the tracking cube by copying the input cube with only the tracking band.
@@ -185,6 +188,7 @@ void createTrackCube(UserInterface ui, QString trackBand) {
   trackCube.close();
 }
 
+
 /**
  * Copies DN's from the input cube to the output cube.
  *
@@ -192,7 +196,7 @@ void createTrackCube(UserInterface ui, QString trackBand) {
  * @param out Output cube
  */
 void processCube(Buffer &in, Buffer &out) {
-  for(int i = 0; i < in.size(); i++) {
+  for (int i = 0; i < in.size(); i++) {
     out[i] = in[i];
   }
 }
