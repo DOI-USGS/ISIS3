@@ -14,9 +14,6 @@ On Fedora 25, you need to manually start/stop the docker daemon:
 
 **Pulling Containers**
 
-The image that we use in combination with v007:
-`sudo docker pull chrisryancombs/docker_isis`
-
 The image that uses a conda environment:
 `sudo docker pull usgsastro/docker_linux_isisdeps`
 
