@@ -3,9 +3,11 @@
 #include "Application.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "Portal.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
+#include "SpecialPixel.h"
 #include "UserInterface.h"
 
 #include <QString>
@@ -104,7 +106,8 @@ void createMosaicCube(UserInterface ui, QString bands) {
   // Add Tracking Group to the mosaic cube
   PvlGroup trackingGroup = PvlGroup("Tracking");
   PvlKeyword trackingName = PvlKeyword("Filename");
-  trackingName.setValue(ui.GetFileName("TO"));
+  FileName cubeName = FileName(ui.GetFileName("TO"));
+  trackingName.setValue(cubeName.baseName() + "_tracking.cub"); //Strip off path and add _tracking
   trackingGroup.addKeyword(trackingName);
   mosaicLabel->addGroup(trackingGroup);
 
@@ -127,11 +130,10 @@ void createTrackCube(UserInterface ui, QString trackBand) {
   p.SetInputCube(ui.GetFileName("FROM"), inAtt);
 
   QString cubeName = ui.GetFileName("TO") + "_tracking";
-  // CubeAttributeOutput outAtt = CubeAttributeOutput("+Real");
   Cube inputCube = Cube(ui.GetFileName("FROM"));
   int numSample = inputCube.sampleCount();
   int numLine = inputCube.lineCount();
-  CubeAttributeOutput outAtt = CubeAttributeOutput();
+  CubeAttributeOutput outAtt = CubeAttributeOutput("+UnsignedInteger");
   p.SetOutputCube(cubeName, outAtt, numSample, numLine);
 
   p.StartProcess(processCube);
@@ -176,8 +178,8 @@ void createTrackCube(UserInterface ui, QString trackBand) {
     trackPortal.SetPosition(1, lineCount, 1); //Cube has only 1 band
     trackCube.read(trackPortal);
     for (int pixel = 0; pixel < trackPortal.size(); pixel++) {
-      if (trackPortal[pixel] == (float) defaultVal) { // Skip if it is not part of the mosaic.
-          trackPortal[pixel] = defaultVal;
+      if (trackPortal[pixel] == (float) defaultVal) {
+          trackPortal[pixel] = Null;  // Set to Null if it is not part of the mosaic.
       }
       else {
         trackPortal[pixel] = (int) trackPortal[pixel] - offset;
