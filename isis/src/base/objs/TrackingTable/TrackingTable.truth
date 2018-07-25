@@ -1,5 +1,9 @@
 Unit test for TrackingTable
 
+
+Testing default constructor ...
+Record added: fileName1.cub, 1
+
 Testing constructor with a Table object ...
 Constructing Table ...
 First record : fileName1.cub, 1234567890
