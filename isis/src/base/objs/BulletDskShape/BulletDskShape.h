@@ -38,6 +38,8 @@ namespace Isis {
  * @author 2017-03-17 Kris Becker 
  * @internal 
  *   @history 2017-03-17  Kris Becker  Original Version
+ *   @history 2018-07-21 Kris Becker - Add filename() method to return name of
+ *                          DSK file associated with this object
  */
   class BulletDskShape : public BulletTargetShape {
     public:
