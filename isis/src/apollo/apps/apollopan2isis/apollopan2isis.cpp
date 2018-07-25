@@ -94,6 +94,7 @@ void IsisMain() {
   pvl->addGroup(QString("Kernels"));
   pvl->addGroup(QString("Fiducials"));
   pvl->addGroup(QString("TimingMarks"));
+  pvl->addGroup(QString("Archive"));
   
   
   //Grab all of the data for the instrument group and write it to the cube
@@ -110,6 +111,11 @@ void IsisMain() {
   
   PvlGroup &kernelsGrp = pvl->findGroup("Kernels", PvlObject::Traverse);
   kernelsGrp.addKeyword(makeKeyword("NAIFIkCode", row, reader));
+  
+  PvlGroup &archiveGroup = pvl->findGroup("Archive", PvlObject::Traverse);
+  archiveGroup.addKeyword(makeKeyword("Phi", row, reader));
+  archiveGroup.addKeyword(makeKeyword("Omega", row, reader));
+  archiveGroup.addKeyword(makeKeyword("Kappa", row, reader));
   
   PvlGroup &fiducialsGrp = pvl->findGroup("Fiducials", PvlObject::Traverse);
 
