@@ -88,7 +88,19 @@ namespace Isis {
     m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
 
     setAcceptDrops(true);
+
+    //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   }
+
+
+///**
+// * Return a reasonable size
+// */
+//QSize ControlHealthMonitorView::sizeHint() const {
+//
+//  return QSize(500, 700);
+//}
+
 
   /**
    *  This SLOT is designed to intercept the openPointEditor() signal that's emitted

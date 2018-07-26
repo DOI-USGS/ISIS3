@@ -255,30 +255,22 @@ namespace Isis {
    *                           the wrong place on the project tree. Fixes #5274.
    *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
    *                           button when the active control net is modified, i.e. a point is modified.
-   *  
-   *  !!!!!!!!!!!!!   Delete following history entry when project save/restore geometry/state
-   *                   implemented
-   *  !!!!!!!!!!!!!!!
-   *  @history 2018-06-08 Tracie Sucharski - Quick fix for the project save/restore prototype: The
-   *                          changes made to readSettings, writeSettings cause following problem:
-   *                          save project with view, close view and exit, the project
-   *                          geometry/state is saved on closeEvent instead of project save. Quickly
-   *                          added signal when project is saved, so the writeSettings can happen
-   *                          for project.  This will be cleaned up when save/restore is fully
-   *                          implemented.
+   *  @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of
+   *                           the project.
    *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and 
-   *                          m_regTemplates to keep track of the two template types as well as 
-   *                          adjusted logic to save these serparately into the .xml files in the 
-   *                          project directory. Also added clean-up of unsaved templates at project
-   *                          close in Project::clear().
+   *                           m_regTemplates to keep track of the two template types as well as 
+   *                           adjusted logic to save these serparately into the .xml files in the 
+   *                           project directory. Also added clean-up of unsaved templates at
+   *                           project close in Project::clear().
    *  @hitsory 2018-07-12 Summer Stapleton - Added hasTemplate() and hasCamera() and modified 
-   *                          addCamera() and addTarget logic in order to determine if a targetBody
-   *                          or a guiCamera already exist in a project. This allows cameras and 
-   *                          targets to be created in ImportImagesWorkOrder only when needed 
-   *                          rather than creating them for every image imported and then removing
-   *                          them if not needed. Fixed segfault occuring on astrovm4 with larger 
-   *                          imports. References #5460.
-   *  
+   *                           addCamera() and addTarget logic in order to determine if a targetBody
+   *                           or a guiCamera already exist in a project. This allows cameras and 
+   *                           targets to be created in ImportImagesWorkOrder only when needed 
+   *                           rather than creating them for every image imported and then removing
+   *                           them if not needed. Fixed segfault occuring on astrovm4 with larger 
+   *                           imports. References #5460.
+   *  @history 2018-07-26 Tracie Sucharski - Fixed history entry errors introduced during
+   *                           the merge conflict resolution for PR #255.
    */
   class Project : public QObject {
     Q_OBJECT
