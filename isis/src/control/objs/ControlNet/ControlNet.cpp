@@ -764,7 +764,6 @@ namespace Isis {
     // Conceptually, I think this belongs in measureIgnored, but it isn't done
     // for the old graph.
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
-
   }
 
 
@@ -1819,7 +1818,6 @@ namespace Isis {
     std::swap(points, other.points);
     std::swap(pointIds, other.pointIds);
     m_controlGraph.swap(other.m_controlGraph);
-    std::swap(m_vertexMap, other.m_vertexMap);
     std::swap(m_mutex, other.m_mutex);
     std::swap(p_targetName, other.p_targetName);
     std::swap(p_networkId, other.p_networkId);
@@ -1833,7 +1831,7 @@ namespace Isis {
     std::swap(p_cameraList, other.p_cameraList);
     std::swap(p_targetRadii, other.p_targetRadii);
 
-    // points have parent pointers that need updated too...
+    // points have parent pointers that need to be updated too...
     QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
       i.next().value()->parentNetwork = this;
@@ -1860,6 +1858,14 @@ namespace Isis {
       // copy & swap
       ControlNet copy(other);
       swap(copy);
+    }
+
+    m_vertexMap.clear();
+    VertexIterator v, vend;
+    for (boost::tie(v, vend) = vertices(m_controlGraph); v != vend; ++v) {
+      ImageVertex imVertex = *v;
+      QString serialNum = m_controlGraph[*v].serial;
+      m_vertexMap[serialNum] = imVertex;
     }
 
     return *this;
