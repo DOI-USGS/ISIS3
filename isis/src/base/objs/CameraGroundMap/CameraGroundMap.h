@@ -82,6 +82,9 @@ namespace Isis {
    *                          p_pB. References Mantis ticket TBD.
    *  @history 2016-06-27 Ian Humphrey - Updated documentation and coding standards. Fixes #3971.
    *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   *  @history 2018-07-26 Kris Becker - Move all local variables  and methods to
+   *                         protected scope so derived objects can be developed
+   *                         properly
    */
   class CameraGroundMap {
     public:
@@ -147,7 +150,6 @@ namespace Isis {
       double p_focalPlaneX; //!< Camera's x focal plane coordinate
       double p_focalPlaneY; //!< Camera's y focal plane coordinate
 
-    private:
       void LookCtoFocalPlaneXY();  //!< Calculate focalplane x/y from lookvector in camera
       /** Surface point calculated from ground coordinates in GetXY and used for partials*/
       std::vector<double> m_pB;
