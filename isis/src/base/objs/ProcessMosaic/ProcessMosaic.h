@@ -226,6 +226,9 @@ namespace Isis {
       // Line Processing method for one input and output cube
       virtual void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
+      // Finish with tracking cube
+      virtual void EndProcess();
+
       // Accessor for the placed images.
       PvlObject imagePositions();
 
@@ -288,7 +291,7 @@ namespace Isis {
 
       //Compare the input and mosaic for the specified band based on the criteria and update the
       //  mosaic origin band.
-      void BandComparison(int iss, int isl, int isb, int ins, int inl, int inb,
+      void BandComparison(int iss, int isl, int ins, int inl,
                           int bandPriorityInputBandNumber, int bandPriorityOutputBandNumber,
                           int index);
 
@@ -328,6 +331,7 @@ namespace Isis {
       void MatchDEMShapeModel();
 
       bool m_trackingEnabled;         //!<
+      Cube *m_trackingCube;           //!< Output tracking cube. NULL unless tracking is enabled.
       bool m_createOutputMosaic;      //!<
       int  m_bandPriorityBandNumber;  //!<
       QString m_bandPriorityKeyName;  //!<
