@@ -30,6 +30,7 @@
 #include "SerialNumber.h"
 #include "SpecialPixel.h"
 #include "Table.h"
+#include "TrackingTable.h"
 
 using namespace std;
 
@@ -266,12 +267,15 @@ namespace Isis {
     }
 
     // Image name into the table & Get the index for this input file
-    int iIndex = GetIndexOffsetByPixelType();
-
+    // int iIndex = GetIndexOffsetByPixelType();
+    int iIndex = 3;
+    
     // Set the Mosaic Origin if Tracking is enabled
     if (m_trackingEnabled) {
       if (!m_trackingCube) {
         m_trackingCube = new Cube;
+        
+        TrackingTable *trackingTable;
 
         if (m_createOutputMosaic) {
 
@@ -287,7 +291,9 @@ namespace Isis {
           QString trackingBase = FileName(OutputCubes[0]->fileName()).removeExtension().toString();
           m_trackingCube->create(trackingBase + "_tracking.cub");
 
-          // TODO INITIALIZE EMPTY TRACKING TABLE
+          // Initialize an empty TrackingTable object to add to the tracking cube
+          trackingTable = new TrackingTable();
+
         }
 
         else {
@@ -296,7 +302,17 @@ namespace Isis {
             QString trackingFile = OutputCubes[0]->group("Tracking").findKeyword("FileName")[0];
             m_trackingCube->create(trackingPath + trackingFile);
 
-            // TODO INITIALIZE TRACKING TABLE FROM TRACKING CUBE
+            Table *table;
+            
+            try {
+              table = new Table(TRACKING_TABLE_NAME, m_trackingCube->fileName());
+              trackingTable = new TrackingTable(*table);
+            }
+            catch (IException e) {
+              QString msg = "Unable to find Tracking Table in " + m_trackingCube->fileName() + ".";
+              throw IException(IException::User, msg, _FILEINFO_);
+            }
+            
           }
           else {
             QString msg = "Tracking cannot be enabled when adding to an existing mosaic "
@@ -305,8 +321,14 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
+        
+        trackingTable->fileNameToIndex(InputCubes[0]->fileName(), 
+                                       SerialNumber::Compose(*(InputCubes[0])));
+        Table table = trackingTable->toTable();
+        m_trackingCube->write(table);
+        ResetOriginBand();
       }
-      SetMosaicOrigin(iIndex);
+      // SetMosaicOrigin(iIndex);
     }
     else if (m_imageOverlay == AverageImageWithMosaic && m_createOutputMosaic) {
       ResetCountBands();
@@ -1659,6 +1681,7 @@ void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int in
         iOffset = 1;
         break;
     }
+    qDebug() << iOffset;
     return iOffset;
   }
 
