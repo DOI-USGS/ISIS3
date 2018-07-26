@@ -89,17 +89,17 @@ namespace Isis {
 
     setAcceptDrops(true);
 
-    //setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   }
 
 
-///**
-// * Return a reasonable size
-// */
-//QSize ControlHealthMonitorView::sizeHint() const {
-//
-//  return QSize(500, 700);
-//}
+  /**
+   * Return a reasonable size
+   */
+  QSize ControlHealthMonitorView::sizeHint() const {
+
+    return QSize(500, 700);
+  }
 
 
   /**
