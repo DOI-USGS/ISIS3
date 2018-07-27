@@ -31,7 +31,7 @@
 
 
 namespace Isis {
-  
+
   const QString trackingTableName = "InputImages";
 
   /**
@@ -46,25 +46,26 @@ namespace Isis {
    * @author 2018-07-19 Jesse Mapel & Summer Stapleton
    *
    * @internal
+   *   @history 2018-07-26 Jesse Mapel - Added offset based on minimum unsigned integer value.
    */
   class TrackingTable{
-    
+
     public:
-            
+
       TrackingTable();
-      
+
       TrackingTable(Table table);
-      
+
       ~TrackingTable();
-      
+
       Table toTable();
-            
+
       FileName indexToFileName(unsigned int index);
-      
+
       unsigned int fileNameToIndex(FileName file, QString serialNumber);
-      
+
     private:
-      
+
       QList< QPair< FileName, QString > > m_fileList;   //!< The list to keep track of images
   };
 };

@@ -28,6 +28,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Pvl.h"
+#include "SpecialPixel.h"
 #include "Table.h"
 #include "TableField.h"
 #include "TableRecord.h"
@@ -40,18 +41,18 @@ namespace Isis {
   * Default constructor
   */
   TrackingTable::TrackingTable() {
-    
+
   }
-  
-  
+
+
   /**
-  * Constructs a TrackingTable given a Table object. The Table is used to populate 
+  * Constructs a TrackingTable given a Table object. The Table is used to populate
   *         m_fileList.
   *
   * @param table The Table object to pull the filenames and serial numbers from
   */
   TrackingTable::TrackingTable(Table table) {
-    
+
     for (int i=0; i < table.Records(); i++) {
       TableRecord record = table[i];
       QString nameField = QString(record["FileName"]);
@@ -66,27 +67,27 @@ namespace Isis {
       m_fileList.append(QPair<FileName, QString>(fileName, serialNumber));
     }
   }
-  
-  
+
+
   /**
   * Destroys the TrackingTable object
   */
   TrackingTable::~TrackingTable() {
-    
+
   }
-  
-  
+
+
   /**
   * Constrcts and returns a Table object based on values in m_fileList.
   *
   * @return Table The constructed table to be returned
   */
   Table TrackingTable::toTable() {
-    
-    // Begin by establishing the length of the fields within the table. This would be the longest 
+
+    // Begin by establishing the length of the fields within the table. This would be the longest
     // length that is needed to be stored.
     int fieldLength = 0;
-    
+
     for (int i=0; i < m_fileList.size(); i++) {
       if (m_fileList[i].first.name().length() > fieldLength) {
         fieldLength = m_fileList[i].first.name().length();
@@ -95,7 +96,7 @@ namespace Isis {
         fieldLength = m_fileList[i].second.length();
       }
     }
-    
+
     // This record is never being used. It is simply to construct the Table object.
     TableRecord dummyRecord;
     TableField fileNameField("FileName", TableField::Text, fieldLength);
@@ -105,27 +106,27 @@ namespace Isis {
     dummyRecord += serialNumberField;
     dummyRecord += indexField;
     Table table(trackingTableName, dummyRecord);
-    
+
     // Loop through m_fileList and add records to the table with the proper information.
     for (int i=0; i < m_fileList.size(); i++) {
-      
+
       fileNameField = m_fileList[i].first.name();
       serialNumberField = m_fileList[i].second;
-      indexField = i;
-        
+      indexField = (int) (i + VALID_MINUI4);
+
       TableRecord record;
       record += fileNameField;
       record += serialNumberField;
       record += indexField;
-      
+
       table += record;
-      
+
     }
-    
+
     return table;
   }
-  
-  
+
+
   /**
   * Returns the FileName at the given index within m_fileList.
   *
@@ -133,16 +134,24 @@ namespace Isis {
   * @returns FileName The FileName at the index specified
   */
   FileName TrackingTable::indexToFileName(unsigned int index) {
-    if (index >= (unsigned int)m_fileList.size()) {
+    if (index < VALID_MINUI4) {
+      QString msg = "Cannot convert index [" + toString(index)
+                  + "] to a filename, index is below valid minimum ["
+                  + toString(VALID_MINUI4) + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    unsigned int shiftedIndex = index - VALID_MINUI4;
+    if (shiftedIndex >= (unsigned int)m_fileList.size()) {
       QString msg = "Cannot convert index [" + toString(index)
                   + "] to a filename, index is out of bounds.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
-    return m_fileList[index].first;
+
+    return m_fileList[shiftedIndex].first;
   }
-  
-  
+
+
   /**
   * Returns the index of the filename/serialnumber combination.
   *
@@ -153,14 +162,14 @@ namespace Isis {
   unsigned int TrackingTable::fileNameToIndex(FileName file, QString serialNumber) {
     for (int i = 0; i < m_fileList.size(); i++) {
       if (m_fileList[i].first == file) {
-        return i;
+        return i + VALID_MINUI4;
       }
     }
-    
+
     // At this point, the file is not in the internal file list so append it
     // and return its new index.
     m_fileList.append(QPair<FileName, QString>(file, serialNumber));
-    return m_fileList.size() - 1;
+    return m_fileList.size() - 1 + VALID_MINUI4;
   }
 
 }
