@@ -263,8 +263,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    // Isis::FileName cubeFile("$base/testData/isisTruth.cub");
-    Isis::FileName cubeFile("isisTruth_Signed16Bit.cub");
+    Isis::FileName cubeFile("$base/testData/isisTruth_Signed16Bit.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
@@ -305,8 +304,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    // Isis::FileName cubeFile("$base/testData/isisTruth.cub");
-    Isis::FileName cubeFile("isisTruth_Unsigned16Bit.cub");
+    Isis::FileName cubeFile("$base/testData/isisTruth_Unsigned16Bit.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
@@ -347,8 +345,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-    // Isis::FileName cubeFile("$base/testData/isisTruth.cub");
-    Isis::FileName cubeFile("isisTruth_8Bit.cub");
+    Isis::FileName cubeFile("$base/testData/isisTruth_8Bit.cub");
     Isis::Cube icube;
     icube.open(cubeFile.expanded());
     Isis::Histogram *histcube;
