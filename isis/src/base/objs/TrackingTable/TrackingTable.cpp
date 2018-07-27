@@ -101,7 +101,7 @@ namespace Isis {
     TableRecord dummyRecord;
     TableField fileNameField("FileName", TableField::Text, fieldLength);
     TableField serialNumberField("SerialNumber", TableField::Text, fieldLength);
-    TableField indexField("Index", TableField::Integer);
+    TableField indexField("PixelValue", TableField::Integer);
     dummyRecord += fileNameField;
     dummyRecord += serialNumberField;
     dummyRecord += indexField;
@@ -128,38 +128,42 @@ namespace Isis {
 
 
   /**
-  * Returns the FileName at the given index within m_fileList.
+  * Returns the FileName that corresponds to a pixel value.
   *
-  * @param index The index to find the filename for
-  * @returns FileName The FileName at the index specified
+  * @param pixel The pixel value to find the filename for
+  * @returns @b FileName The FileName represented by the pixel value
   */
-  FileName TrackingTable::indexToFileName(unsigned int index) {
-    if (index < VALID_MINUI4) {
-      QString msg = "Cannot convert index [" + toString(index)
-                  + "] to a filename, index is below valid minimum ["
+  FileName TrackingTable::pixelToFileName(unsigned int pixel) {
+    if (pixel < VALID_MINUI4) {
+      QString msg = "Cannot convert pixel [" + toString(pixel)
+                  + "] to a filename, pixel is below valid minimum ["
                   + toString(VALID_MINUI4) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    unsigned int shiftedIndex = index - VALID_MINUI4;
-    if (shiftedIndex >= (unsigned int)m_fileList.size()) {
-      QString msg = "Cannot convert index [" + toString(index)
-                  + "] to a filename, index is out of bounds.";
+    unsigned int index = pixel - VALID_MINUI4;
+    if (index >= (unsigned int)m_fileList.size()) {
+      QString msg = "Cannot convert pixel [" + toString(pixel)
+                  + "] to a filename, pixel is above valid maximum ["
+                  + toString(VALID_MINUI4 + m_fileList.size()) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    return m_fileList[shiftedIndex].first;
+    return m_fileList[index].first;
   }
 
 
   /**
-  * Returns the index of the filename/serialnumber combination.
+  * Returns the pixel value of the filename/serialnumber combination.
   *
-  * @param file The FileName within m_fileList to find the index of
-  * @param serialNumber The QString of the serial number within m_fileList to find the index of
-  * @return unsighned int The index of the filename/serialnumber combination
+  * @param file The FileName within m_fileList to find the pixel value of
+  * @param serialNumber The QString of the serial number within m_fileList
+  *                     to find the pixel value of
+  *
+  * @return  @b unsigned  @b int The pixel value corresponding to the
+  *                              filename/serialnumber combination
   */
-  unsigned int TrackingTable::fileNameToIndex(FileName file, QString serialNumber) {
+  unsigned int TrackingTable::fileNameToPixel(FileName file, QString serialNumber) {
     for (int i = 0; i < m_fileList.size(); i++) {
       if (m_fileList[i].first == file) {
         return i + VALID_MINUI4;

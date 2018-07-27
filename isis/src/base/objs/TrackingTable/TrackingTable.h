@@ -47,6 +47,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2018-07-26 Jesse Mapel - Added offset based on minimum unsigned integer value.
+   *                           Renamed methods to better convey output/input meaning.
    */
   class TrackingTable{
 
@@ -60,9 +61,9 @@ namespace Isis {
 
       Table toTable();
 
-      FileName indexToFileName(unsigned int index);
+      FileName pixelToFileName(unsigned int pixel);
 
-      unsigned int fileNameToIndex(FileName file, QString serialNumber);
+      unsigned int fileNameToPixel(FileName file, QString serialNumber);
 
     private:
 

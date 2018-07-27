@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
     TrackingTable trackingTable1;
 
-    trackingTable1.fileNameToIndex("fileName1.cub", "1");
+    trackingTable1.fileNameToPixel("fileName1.cub", "1");
 
     Table tableOut1 = trackingTable1.toTable();
 
@@ -68,14 +68,16 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
 
-    cout << "Testing the indexToFileName method ..." << endl;
+    cout << "Testing the pixelToFileName method ..." << endl;
 
-    for (int i = 3; i < 7; i++) {
+    for (int i = 2; i < 7; i++) {
       try {
-        cout << "FileName at index " << i << ": " << trackingTable2.indexToFileName(i).name() << endl;
+        cout << "FileName with pixel value " << i << ": "
+             << trackingTable2.pixelToFileName(i).name() << endl;
       }
       catch (IException e) {
-        cout << "FileName at index " << i << " does not exist and an exception is thrown." << endl;
+        cout << "FileName with pixel value " << i
+             << " does not exist and an exception is thrown." << endl;
         e.print();
       }
     }
@@ -83,16 +85,16 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
 
-    cout << "Testing the fileNameToIndex method ..." << endl;
+    cout << "Testing the fileNameToPixel method ..." << endl;
 
-    cout << "Index of FileName fileName1.cub: "
-           << trackingTable2.fileNameToIndex("fileName1.cub", "1234567890") << endl;
-    cout << "Index of FileName fileName2.cub: "
-           << trackingTable2.fileNameToIndex("fileName2.cub", "123") << endl;
-    cout << "Index of FileName fileName3.cub: "
-           << trackingTable2.fileNameToIndex("fileName3.dat", "456789") << endl;
-    cout << "Index of the non-existent FileName fileName4.cub (demonstrating its addition): "
-           << trackingTable2.fileNameToIndex("fileName4.cub", "12345678901234567890") << endl;
+    cout << "Pixel value of FileName fileName1.cub: "
+           << trackingTable2.fileNameToPixel("fileName1.cub", "1234567890") << endl;
+    cout << "Pixel value of FileName fileName2.cub: "
+           << trackingTable2.fileNameToPixel("fileName2.cub", "123") << endl;
+    cout << "Pixel value of FileName fileName3.cub: "
+           << trackingTable2.fileNameToPixel("fileName3.dat", "456789") << endl;
+    cout << "Pixel value of the non-existent FileName fileName4.cub (demonstrating its addition): "
+           << trackingTable2.fileNameToPixel("fileName4.cub", "12345678901234567890") << endl;
 
     cout << endl;
 
@@ -122,6 +124,19 @@ int main(int argc, char *argv[]) {
     TrackingTable trackingTable3(tableOut2);
 
     cout << "New TrackingTable object created" << endl;
+
+    cout << endl;
+
+    cout << "Verifying that the pixel values are the same ..." << endl;
+
+    cout << "Pixel value of FileName fileName1.cub: "
+         << trackingTable3.fileNameToPixel("fileName1.cub", "1234567890") << endl;
+    cout << "Pixel value of FileName fileName2.cub: "
+         << trackingTable3.fileNameToPixel("fileName2.cub", "123") << endl;
+    cout << "Pixel value of FileName fileName3.cub: "
+         << trackingTable3.fileNameToPixel("fileName3.dat", "456789") << endl;
+    cout << "Pixel value of FileName fileName4.cub: "
+         << trackingTable3.fileNameToPixel("fileName4.cub", "12345678901234567890") << endl;
 
     cout << endl;
 
