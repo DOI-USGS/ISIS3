@@ -6,9 +6,12 @@
   </brief>
 
   <description>
-    Updates an older mosaic cube with a tracking band by removing the tracking band and table and
+    Updates an old mosaic cube with a tracking band by removing the tracking band and table and
     placing them into a separate tracking cube. A reference to the tracking cube is added to the
-    mosaic label.
+    mosaic label. We also have to update the tracking cube's pixels by subtracting the offsett
+    ProcessMosaic adds to each pixel and adding the new offset, the minimum value of an unsigned
+    integer. ProcessMosaic also sets pixels that are not from any cube to a default value. If a
+    pixel has this value, we set it to Null.
   </description>
 
   <category>
