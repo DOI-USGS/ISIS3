@@ -481,6 +481,8 @@ namespace Isis {
    *                           CubeAttribute parent class now. Updated to match current
    *                           coding standards. Added the "+External+ attribute. Added safety
    *                           checks for unrecognized attributes. References #961.
+   *   @history 2018-07-27 Kaitlyn Lee - Added unsigned/signed integer handling.
+
    */
   class CubeAttributeOutput : public CubeAttribute<CubeAttributeOutput> {
 

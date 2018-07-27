@@ -15,12 +15,15 @@
 using namespace std;
 using namespace Isis;
 
-#define FLOAT_MIN -16777215
+// Taken from ProcessMosaic
+const int FLOAT_MIN = -16777215;
+const int FLOAT_MAX = 16777216;
 
 void findTrackBand(UserInterface ui, QString &copyBands, QString &trackBand);
 void createMosaicCube(UserInterface ui, QString bands);
 void createTrackCube(UserInterface ui, QString trackingBand);
-void processCube(Buffer &in, Buffer &out);
+void copyPixels(Buffer &in, Buffer &out);
+void copyTrackPixels(Buffer &in, Buffer &out);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -44,10 +47,10 @@ void IsisMain() {
  */
 void findTrackBand(UserInterface ui, QString &copyBands, QString &trackBand) {
   Cube inputCube = Cube(ui.GetFileName("FROM"));
-  Pvl *originalLabel = inputCube.label();
+  Pvl *inputLabel = inputCube.label();
 
-  if (originalLabel->hasObject("IsisCube")) {
-    PvlObject &cubeObject = originalLabel->findObject("IsisCube");
+  if (inputLabel->hasObject("IsisCube")) {
+    PvlObject &cubeObject = inputLabel->findObject("IsisCube");
     if (cubeObject.hasGroup("BandBin")) {
       PvlGroup &bandBinGroup = cubeObject.findGroup("BandBin");
       PvlKeyword &currentKeyword = bandBinGroup[0];
@@ -61,6 +64,11 @@ void findTrackBand(UserInterface ui, QString &copyBands, QString &trackBand) {
         }
       }
     }
+  }
+  if (trackBand == "") {
+    QString msg = "The input cube [" + ui.GetFileName("FROM") + "] does not have a tracking band.";
+    msg += " If you want to create a tracking cube, run a mosaic program.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 }
 
@@ -78,7 +86,7 @@ void createMosaicCube(UserInterface ui, QString bands) {
   CubeAttributeInput inAtt = CubeAttributeInput("+" + bands);
   p.SetInputCube(ui.GetFileName("FROM"), inAtt);
   p.SetOutputCube("TO");
-  p.StartProcess(processCube);
+  p.StartProcess(copyPixels);
   p.EndProcess();
 
   Cube mosaicCube;
@@ -92,7 +100,6 @@ void createMosaicCube(UserInterface ui, QString bands) {
   }
   Pvl *mosaicLabel = mosaicCube.label();
 
-  // Find the Table object and remove it from the mosaic cube
   if (mosaicLabel->hasObject("Table")) {
     PvlObject &tableObject = mosaicLabel->findObject("Table");
     if (tableObject.hasKeyword("Name")) {
@@ -129,30 +136,52 @@ void createTrackCube(UserInterface ui, QString trackBand) {
   CubeAttributeInput inAtt = CubeAttributeInput("+" + trackBand);
   p.SetInputCube(ui.GetFileName("FROM"), inAtt);
 
-  QString cubeName = ui.GetFileName("TO") + "_tracking";
+  FileName cubeName = FileName(ui.GetFileName("TO"));
+  // Strip off any extensions and add _tracking
+  QString trackingName = cubeName.path() + "/" + cubeName.baseName() + "_tracking.cub";
   Cube inputCube = Cube(ui.GetFileName("FROM"));
   int numSample = inputCube.sampleCount();
   int numLine = inputCube.lineCount();
-  CubeAttributeOutput outAtt = CubeAttributeOutput("+UnsignedInteger");
-  p.SetOutputCube(cubeName, outAtt, numSample, numLine);
 
-  p.StartProcess(processCube);
+  QString outAttString = "+UNSIGNEDINTEGER+" + QString::number(VALID_MINUI4) + ":";
+  outAttString += QString::number(VALID_MAXUI4);
+  CubeAttributeOutput outAtt = CubeAttributeOutput(outAttString);
+
+  p.SetOutputCube(trackingName, outAtt, numSample, numLine);
+
+  p.StartProcess(copyTrackPixels);
   p.EndProcess();
+}
 
-  Cube trackCube;
-  try {
-    trackCube.open(cubeName,"rw");
-  }
-  catch (IException &e) {
-    throw IException(IException::User,
-                     "Unable to open the file [" + cubeName + "] as a cube.",
-                     _FILEINFO_);
-  }
 
-  // Convert the old DN to the new DN by subtracting the minimum value of the pixel type
+/**
+ * Copies DN's from the input cube to the mosaic cube.
+ *
+ * @param in  Input cube
+ * @param out Mosaic cube
+ */
+void copyPixels(Buffer &in, Buffer &out) {
+  for (int i = 0; i < in.size(); i++) {
+    out[i] = in[i];
+  }
+}
+
+
+/**
+ * Copies DN's from the input cube to the tracking cube.
+ * Because each pixel is offsetted by the min value of the input cube's pixel type,
+ * we have to get that min value and subtract it from each pixel. Then, we add the min
+ * of an unsigned int to each pixel for the new offset.
+ * The default value is set in ProcessMosaic for pixels who are not from a cube.
+ * If a pixel's value is the default value, we set it to Null.
+ *
+ * @param in  Input cube
+ * @param out Tracking cube
+ */
+void copyTrackPixels(Buffer &in, Buffer &out) {
   int offset = 0;
   int defaultVal = 0;
-  switch (SizeOf(inputCube.pixelType())) {
+  switch (SizeOf(in.PixelType())) {
     case 1:
       offset = VALID_MIN1;
       defaultVal = NULL1;
@@ -169,36 +198,16 @@ void createTrackCube(UserInterface ui, QString trackBand) {
       break;
 
     default:
-    QString msg = "Invalid Pixel Type [" + QString(trackCube.pixelType()) + "]";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
+      QString msg = "Invalid Pixel Type [" + QString(in.PixelType()) + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-  Portal trackPortal(trackCube.sampleCount(), 1, trackCube.pixelType());
-  for (int lineCount = 1; lineCount <= trackCube.lineCount(); lineCount++) {
-    trackPortal.SetPosition(1, lineCount, 1); //Cube has only 1 band
-    trackCube.read(trackPortal);
-    for (int pixel = 0; pixel < trackPortal.size(); pixel++) {
-      if (trackPortal[pixel] == (float) defaultVal) {
-          trackPortal[pixel] = Null;  // Set to Null if it is not part of the mosaic.
-      }
-      else {
-        trackPortal[pixel] = (int) trackPortal[pixel] - offset;
-      }
-    }
-    trackCube.write(trackPortal);
-  }
-  trackCube.close();
-}
-
-
-/**
- * Copies DN's from the input cube to the output cube.
- *
- * @param in  Input cube
- * @param out Output cube
- */
-void processCube(Buffer &in, Buffer &out) {
   for (int i = 0; i < in.size(); i++) {
-    out[i] = in[i];
+    if (in[i] == (float) defaultVal) {
+      out[i] = NULLUI4;  // Set to the unsigned 4 byte Null value
+    }
+    else {
+      out[i] = ((int) in[i]) - offset + VALID_MINUI4;
+    }
   }
 }
