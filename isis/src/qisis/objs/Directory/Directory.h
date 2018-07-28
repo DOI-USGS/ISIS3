@@ -267,7 +267,6 @@ namespace Isis {
    *                           the close/open control net from reloadActiveControlInCnetEditorView
    *                           to Project::setActiveControl to prevent seg fault when there are
    *                           multiple cnetEditorViews with same cnet.
-   *   @history 2018-07-26 Tracie Sucharski - Added some documentation. 
    */
   class Directory : public QObject {
     Q_OBJECT

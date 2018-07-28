@@ -518,15 +518,6 @@ namespace Isis {
   void Directory::setHistoryContainer(QDockWidget *historyContainer) {
     if (!m_historyTreeWidget) {
       m_historyTreeWidget = new HistoryTreeWidget( project() );
-
-      // Redmine #5471 TODO: The sizePolicy calls were an attempt to remove the centralWidget from
-      // IpceMainWindow to get rid of some odd behaviors with docking widgets.
-      // 2 following sizePolicy: warning/history looks good until view added, then too large vertically - can't make smaller, just larger
-      //m_historyTreeWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-      //m_historyTreeWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-      // This keeps small after adding view, but it cannot be made larger , so keeps at sizeHint which is good
-      //m_historyTreeWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
-      //m_historyTreeWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     }
     historyContainer->setWidget(m_historyTreeWidget);
   }
@@ -539,10 +530,6 @@ namespace Isis {
   void Directory::setWarningContainer(QDockWidget *warningContainer) {
     if (!m_warningTreeWidget) {
       m_warningTreeWidget = new WarningTreeWidget;
-
-      // Redmine #5471 TODO: The sizePolicy calls were an attempt to remove the centralWidget from
-      // IpceMainWindow to get rid of some odd behaviors with docking widgets.
-      //m_warningTreeWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     }
     warningContainer->setWidget(m_warningTreeWidget);
   }

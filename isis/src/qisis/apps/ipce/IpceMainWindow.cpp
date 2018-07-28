@@ -150,7 +150,6 @@ namespace Isis {
                          QDockWidget::DockWidgetFloatable);
     historyDock->setWhatsThis(tr("This shows all operations performed on the current project."));
     historyDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    addDockWidget(Qt::BottomDockWidgetArea, historyDock);
     m_directory->setHistoryContainer(historyDock);
     tabifyDockWidget(m_warningsDock, historyDock);
 
@@ -221,14 +220,18 @@ namespace Isis {
       m_specialDocks.append(dock);
     }
     else {
-      // The following logic not guaranteed to work as intented. If user moves one of the "special"
-      // views such as sensor from below the project dock to the right side of project, the following
+      // Desired behavior of docking views:
+      // First regular view (footprint,cubeDisplay) is added to the right of the "special" views
+      // (project, sensor, jigsaw, controlHealth).  Adding additional "regular" views are tabbed
+      // with the last "regular" view which was added.
+      // The following logic not guaranteed to work as intended. If user moves one of the "special"
+      // views such as sensor from below the project dock to the right of the project, the following
       // will put the new dock to the right of the moved "special" dock instead of tabbing.  The only
-      // way to possibly insure the intended functionality would be to check for the position of the
+      // way to possibly ensure the intended functionality would be to check for the position of the
       // last added dock and either add or tabify depending on location.  This might also allow the
       // docks to be kept in a single list instead of m_specialDocks & m_viewDocks.
       if (m_viewDocks.count() == 0) {
-        addDockWidget(Qt::RightDockWidgetArea, dock, Qt::Horizontal);
+        addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
       }
       else {
         tabifyDockWidget(m_viewDocks.last(), dock);
@@ -244,15 +247,6 @@ namespace Isis {
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
     // The list of dock widgets needs cleanup as each view is destroyed
     connect(dock, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupViewDockList(QObject *)));
-
-    // Redmine #5471 TODO Hiding the centralWidget in this constructor gets rid of the space which
-    // is a place holder for the dumy centralWidget, which causes the project view to fill the space
-    // horizontally and the history/warning widgets are show much larger vertically and user is not
-    // able to make smaller. Attempts to change the sizePolicy on the history/warning widgets did
-    // not fix this (see Directory::setHistoryContainer, Directory::setWarningContainer.  Calling
-    // hide here keeps the project tree view smaller until a view is shown, however, the history/
-    // warning widgets are still too large vertically.
-    // centralWidget()->hide();
   }
 
 
