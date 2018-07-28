@@ -903,7 +903,7 @@ namespace Isis {
       // We have to reattach a view before it can be tiled. If it is attached,
       // this will have no affect. We have to call addDockWidget() to untab any views.
       currentView->setFloating(false);
-      addDockWidget(Qt::LeftDockWidgetArea, currentView, Qt::Horizontal);
+      addDockWidget(Qt::RightDockWidgetArea, currentView, Qt::Horizontal);
 
       if (currentView == firstView) {
         continue;
