@@ -1841,6 +1841,15 @@ namespace Isis {
     while (i2.hasNext()) {
       i2.next().value()->parentNetwork = &other;
     }
+
+    m_vertexMap.clear();
+    VertexIterator v, vend;
+    for (boost::tie(v, vend) = vertices(m_controlGraph); v != vend; ++v) {
+      ImageVertex imVertex = *v;
+      QString serialNum = m_controlGraph[*v].serial;
+      m_vertexMap[serialNum] = imVertex;
+    }
+
     emit networkModified(ControlNet::Swapped);
   }
 
@@ -1858,14 +1867,6 @@ namespace Isis {
       // copy & swap
       ControlNet copy(other);
       swap(copy);
-    }
-
-    m_vertexMap.clear();
-    VertexIterator v, vend;
-    for (boost::tie(v, vend) = vertices(m_controlGraph); v != vend; ++v) {
-      ImageVertex imVertex = *v;
-      QString serialNum = m_controlGraph[*v].serial;
-      m_vertexMap[serialNum] = imVertex;
     }
 
     return *this;
