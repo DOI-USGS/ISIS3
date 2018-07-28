@@ -231,7 +231,7 @@ namespace Isis {
       // last added dock and either add or tabify depending on location.  This might also allow the
       // docks to be kept in a single list instead of m_specialDocks & m_viewDocks.
       if (m_viewDocks.count() == 0) {
-        addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
+        addDockWidget(Qt::RightDockWidgetArea, dock, Qt::Horizontal);
       }
       else {
         tabifyDockWidget(m_viewDocks.last(), dock);
