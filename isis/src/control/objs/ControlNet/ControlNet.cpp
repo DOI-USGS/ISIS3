@@ -1850,6 +1850,14 @@ namespace Isis {
       m_vertexMap[serialNum] = imVertex;
     }
 
+    other.m_vertexMap.clear();
+    VertexIterator v2, vend2;
+    for (boost::tie(v2, vend2) = vertices(other.m_controlGraph); v2 != vend2; ++v2) {
+      ImageVertex imVertex = *v2;
+      QString serialNum = other.m_controlGraph[*v2].serial;
+      other.m_vertexMap[serialNum] = imVertex;
+    }
+
     emit networkModified(ControlNet::Swapped);
   }
 
