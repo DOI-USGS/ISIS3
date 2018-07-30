@@ -63,6 +63,9 @@ namespace Isis {
    *                           2 CubeDnViews to be opened at once, since CubeDnView has an internal
    *                           size policy and cannot be made smaller. Changed the setSizePolicy to
    *                           minimum so that the tree does not expand when a view is closed. References #5433
+   *   @history 2018-07-25 Tracie Sucharski - Changed vertical sizePolicy so that other widgets such
+   *                           as JigsawRunWidget, ControlHealthMonitor can be split with the
+   *                           Project view.
    */
   class ProjectItemTreeView : public AbstractProjectItemView {
 

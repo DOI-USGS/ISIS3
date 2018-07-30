@@ -195,6 +195,13 @@ namespace Isis {
    *                           geometry to be saved if the config file does not exist and a user
    *                           opens a project. Before, it would not save the geometry because the
    *                           opened project was not temporary. References #5433
+   *   @history 2018-07-19 Tracie Sucharski - Keep separate dock lists for the view docks and
+   *                           "special" docks such as sensor, target and jigsaw. The
+   *                           ControlHealthView is now added under the Project instead of in
+   *                           workspace area. Removed unnecessary call to addDock for the History
+   *                           widget. It is added with the call to tabifyDockWidget.
+   *   @history 2018-07-29 Tracie Sucharski - Set background of centralWidget to a pattern to
+   *                           distinguish it from dockable areas.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
@@ -247,6 +254,7 @@ namespace Isis {
       QDockWidget *m_projectDock;
       QDockWidget *m_warningsDock;
 
+      QList<QDockWidget *> m_specialDocks;  //!< Non-view dock widgets such as jigsawRun
       QList<QDockWidget *> m_viewDocks; //!< QDockWidgets holding the views
 
       /**

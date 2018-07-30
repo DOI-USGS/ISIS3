@@ -23,6 +23,7 @@
 #include "IpceMainWindow.h"
 
 #include <QApplication>
+#include <QBrush>
 #include <QColor>
 #include <QDebug>
 #include <QDesktopWidget>
@@ -46,6 +47,7 @@
 
 
 #include "AbstractProjectItemView.h"
+#include "ControlHealthMonitorView.h"
 #include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
@@ -82,6 +84,10 @@ namespace Isis {
     m_maxThreadCount = -1;
 
     QWidget *centralWidget = new QWidget;
+    centralWidget->setAutoFillBackground(true);
+    QPalette p = centralWidget->palette();
+    p.setBrush(QPalette::Window, QBrush(Qt::Dense6Pattern));
+    centralWidget->setPalette(p);
     setCentralWidget(centralWidget);
 
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
@@ -90,7 +96,6 @@ namespace Isis {
     // Allows a user to undock a group of tabs.
     //setDockOptions(GroupedDragging | AllowTabbedDocks);
 
-    //centralWidget->hide();
     setDockNestingEnabled(true);
 
     //  Set the splitter frames to a reasonable color/size for resizing the docks.
@@ -128,7 +133,6 @@ namespace Isis {
     projectTreeView->setInternalModel( m_directory->model() );
     projectTreeView->treeView()->expandAll();
     projectTreeView->installEventFilter(this);
-    //projectTreeView->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     m_projectDock->setWidget(projectTreeView);
     addDockWidget(Qt::LeftDockWidgetArea, m_projectDock, Qt::Horizontal);
@@ -151,13 +155,10 @@ namespace Isis {
                          QDockWidget::DockWidgetFloatable);
     historyDock->setWhatsThis(tr("This shows all operations performed on the current project."));
     historyDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-    addDockWidget(Qt::BottomDockWidgetArea, historyDock);
     m_directory->setHistoryContainer(historyDock);
     tabifyDockWidget(m_warningsDock, historyDock);
 
     historyDock->raise();
-
-    setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);
 
     setCorner(Qt::TopLeftCorner, Qt::LeftDockWidgetArea);
     setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -196,9 +197,13 @@ namespace Isis {
    */
   void IpceMainWindow::addView(QWidget *newWidget, Qt::DockWidgetArea area,
                                Qt::Orientation orientation) {
+
     // JigsawRunWidget is already a QDockWidget, and no modifications need to be made to it
     if (qobject_cast<JigsawRunWidget *>(newWidget)) {
       splitDockWidget(m_projectDock, (QDockWidget*)newWidget, Qt::Vertical);
+
+      // Save view docks for cleanup during a project close
+      m_specialDocks.append((QDockWidget *)newWidget);
       return;
     }
 
@@ -211,31 +216,42 @@ namespace Isis {
 
     if ( qobject_cast<SensorInfoWidget *>(newWidget) ||
          qobject_cast<TargetInfoWidget *>(newWidget) ||
+         qobject_cast<ControlHealthMonitorView *>(newWidget) ||
          qobject_cast<TemplateEditorWidget *>(newWidget)) {
+      dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
       splitDockWidget(m_projectDock, dock, Qt::Vertical);
+
+      // Save view docks for cleanup during a project close
+      m_specialDocks.append(dock);
     }
     else {
+      // Desired behavior of docking views:
+      // First regular view (footprint,cubeDisplay) is added to the right of the "special" views
+      // (project, sensor, jigsaw, controlHealth).  Adding additional "regular" views are tabbed
+      // with the last "regular" view which was added.
+      // The following logic not guaranteed to work as intended. If user moves one of the "special"
+      // views such as sensor from below the project dock to the right of the project, the following
+      // will put the new dock to the right of the moved "special" dock instead of tabbing.  The only
+      // way to possibly ensure the intended functionality would be to check for the position of the
+      // last added dock and either add or tabify depending on location.  This might also allow the
+      // docks to be kept in a single list instead of m_specialDocks & m_viewDocks.
       if (m_viewDocks.count() == 0) {
-        splitDockWidget(m_projectDock, dock, Qt::Horizontal);
+        addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
       }
       else {
         tabifyDockWidget(m_viewDocks.last(), dock);
         dock->show();
         dock->raise();
-        //  Keeps expanding IpceMainWindow to fit new dock
-        //  Below causes problems if the last dock has been tabbed, then a new view is created. All
-        // views except for first disappear.
-        //splitDockWidget(m_viewDocks.last(), dock, Qt::Horizontal);
       }
+
+      // Save view docks for cleanup during a project close
+      m_viewDocks.append(dock);
     }
 
     // When dock widget is destroyed, make sure the view it holds is also destroyed
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
     // The list of dock widgets needs cleanup as each view is destroyed
     connect(dock, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupViewDockList(QObject *)));
-
-    // Save view docks for cleanup during a project close
-    m_viewDocks.append(dock);
   }
 
 
@@ -244,6 +260,7 @@ namespace Isis {
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
     if (dock) {
       m_viewDocks.removeAll(dock);
+      m_specialDocks.removeAll(dock);
     }
   }
 
@@ -274,7 +291,16 @@ namespace Isis {
         delete dock;
       }
     }
+
+    foreach (QDockWidget *dock, m_specialDocks) {
+      if (dock) {
+        removeDockWidget(dock);
+        m_specialDocks.removeAll(dock);
+        delete dock;
+      }
+    }
     m_viewDocks.clear();
+    m_specialDocks.clear();
   }
 
 
