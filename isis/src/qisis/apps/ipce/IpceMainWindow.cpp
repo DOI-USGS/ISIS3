@@ -236,7 +236,7 @@ namespace Isis {
       // last added dock and either add or tabify depending on location.  This might also allow the
       // docks to be kept in a single list instead of m_specialDocks & m_viewDocks.
       if (m_viewDocks.count() == 0) {
-        addDockWidget(Qt::RightDockWidgetArea, dock, Qt::Horizontal);
+        addDockWidget(Qt::LeftDockWidgetArea, dock, Qt::Horizontal);
       }
       else {
         tabifyDockWidget(m_viewDocks.last(), dock);
@@ -908,7 +908,7 @@ namespace Isis {
       // We have to reattach a view before it can be tiled. If it is attached,
       // this will have no affect. We have to call addDockWidget() to untab any views.
       currentView->setFloating(false);
-      addDockWidget(Qt::RightDockWidgetArea, currentView, Qt::Horizontal);
+      addDockWidget(Qt::LeftDockWidgetArea, currentView, Qt::Horizontal);
 
       if (currentView == firstView) {
         continue;
