@@ -9,6 +9,7 @@
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
+#include "TrackingTable.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -165,8 +166,8 @@ void createMosaicCube(QString inputName, QString outputName, QVector<QString> ba
 
 /**
  * Creates the tracking cube by copying the input cube with only the tracking band.
- * Then, goes through each pixel and subtracts the input cube's pixel type's min value
- * because ProcesMosaic used to add the min value to each pixel.
+ * Then, goes through each pixel and subtracts the input cube's pixel type's min value or sets
+ * the value to Null, deletes the old tracking table, and creates a new table with updated data.
  *
  * @param inputName    The name of the input cube
  * @param ouputName    The name of the output cube
@@ -218,6 +219,29 @@ void createTrackCube(QString inputName, QString ouputName, int trackBand) {
 
   p.ProcessCube(copyTrackPixels);
   p.EndProcess();
+
+  Cube trackCube;
+  try {
+    trackCube.open(trackingName,"rw");
+  }
+  catch (IException &e) {
+    throw IException(IException::User,
+                     "Unable to open the file [" + trackingName + "] as a cube.",
+                     _FILEINFO_);
+  }
+
+  // Create new tracking table with updated data and delete the old table
+  if (trackCube.hasTable("InputImages")) {
+    Table oldTable("InputImages");
+    trackCube->read(oldTable);
+    trackCube.deleteBlob("Table", "InputImages")
+    TrackingTable newTrackTable(oldTable);
+    trackCube.write(newTrackTable.toTable());
+  }
+  else {
+    QString msg = "The tracking cube [" + trackingName + "] does not have a tracking table.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
 }
 
 
