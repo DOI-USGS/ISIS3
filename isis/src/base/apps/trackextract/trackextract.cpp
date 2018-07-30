@@ -38,8 +38,8 @@ void copyTrackPixels(Buffer &in, Buffer &out);
  */
 class CopyPixelsFunctor {
   private:
-    int m_offset = 0;
-    int m_defaultValue = 0;
+    int m_offset;
+    int m_defaultValue;
 
   public:
     CopyPixelsFunctor(int offset, int defaultValue) {
