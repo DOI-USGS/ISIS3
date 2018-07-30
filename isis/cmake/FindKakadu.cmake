@@ -9,8 +9,7 @@
 if(JP2KFLAG)
   find_path(KAKADU_INCLUDE_DIR
     NAME kdu_kernels.h
-    PATH_SUFFIXES
-    kakadu/v7_9_1-01762L/
+    PATHS /usgs/apps/kakadu/v7_9_1-01762L/managed/all_includes/
   )
 
   find_library(KAKADU_A_LIBRARY

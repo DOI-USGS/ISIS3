@@ -5,7 +5,7 @@ Testing default object
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational/>
 
-Testing defaulte CaSSIS export
+Testing default CaSSIS export
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schemetypens="http://purl.oclc.org/dsdl/schematron"?>

@@ -68,4 +68,5 @@ dependencies:
   - xalan-c==1.11
   - x264==20131218
   - make
+  - kakadu==1
 prefix: /scratch/anaconda3/envs/isis
