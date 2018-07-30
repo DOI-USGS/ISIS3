@@ -22,7 +22,7 @@ const int FLOAT_MAX = 16777216;
 void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBand);
 void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector);
 void createTrackCube(QString inputName, QString ouputName, int trackBand);
-void copyTrackPixels(Buffer &in, Buffer &out);
+void copyPixels(Buffer &in, Buffer &out);
 
 
 /**
@@ -233,10 +233,12 @@ void createTrackCube(QString inputName, QString ouputName, int trackBand) {
   // Create new tracking table with updated data and delete the old table
   if (trackCube.hasTable("InputImages")) {
     Table oldTable("InputImages");
-    trackCube->read(oldTable);
-    trackCube.deleteBlob("Table", "InputImages")
+    trackCube.read(oldTable);
+    trackCube.deleteBlob("Table", "InputImages");
+
     TrackingTable newTrackTable(oldTable);
-    trackCube.write(newTrackTable.toTable());
+    Table newTable = newTrackTable.toTable();
+    trackCube.write(newTable);
   }
   else {
     QString msg = "The tracking cube [" + trackingName + "] does not have a tracking table.";
