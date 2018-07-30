@@ -1754,7 +1754,7 @@ namespace Isis {
           m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
           item->setTextColor(Qt::darkGreen);
       }
-      catch(IException e){
+      catch(IException &e){
           if (previousControl) {
             m_activeControl = previousControl;
             item = directory()->model()->findItemData(m_activeControl->
@@ -1847,7 +1847,7 @@ namespace Isis {
         try {
           activeControl()->controlNet()->SetImages(*(m_activeImageList->serialNumberList()));
         }
-        catch(IException e){
+        catch(IException &e){
           if (previousImageList) {
             m_activeImageList = previousImageList;
             item = directory()->model()->findItemData(m_activeImageList->
@@ -2192,11 +2192,11 @@ namespace Isis {
       if ( !newDestination.isEmpty() ) {
         m_isTemporaryProject = false;
         save( QFileInfo(newDestination + "/").absolutePath() );
-        
+
         // delete the temporary project
         deleteAllProjectFiles();
         relocateProjectRoot(newDestination);
-        
+
         // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
         // working properly. For example, when we save a new project and try to view a control net
         // the it thinks it's still in the /tmp area

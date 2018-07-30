@@ -411,19 +411,19 @@ int main() {
   try {
     AtmosModel::Ei(0.0); // require x > 0
   }
-  catch(IException e) {
+  catch(IException &e) {
     e.print();
   }
   try {
     AtmosModel::En(1, 0.0); // require (n>=0 & x>0) or (n>1 & x>=0)
   }
-  catch(IException e) {
+  catch(IException &e) {
     e.print();
   }
   try {
     AtmosModel::En(0, -1.0); // require (n>=0 & x>0) or (n>1 & x>=0)
   }
-  catch(IException e) {
+  catch(IException &e) {
     e.print();
   }
 
