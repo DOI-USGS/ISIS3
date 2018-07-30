@@ -43,11 +43,23 @@ class CopyPixelsFunctor {
     int m_defaultValue;
 
   public:
+    /**
+     * Default Constructor
+     * @param offset       The minimum value of the input cube's pixel type
+     * @param defaultValue Value used for pixels that are not taken from a cube
+     */
     CopyPixelsFunctor(int offset, int defaultValue) {
       m_offset = offset;
       m_defaultValue = defaultValue;
     }
 
+    /**
+     * Copies DN's from the input cube to the tracking cube, subtracts the old offset, and adds
+     * the new offset to each pixel.
+     *
+     * @param in  Input cube
+     * @param out Mosaic cube
+     */
     void operator()(Buffer &in, Buffer &out) const {
       for (int i = 0; i < in.size(); i++) {
         if (in[i] == (float) m_defaultValue) {
