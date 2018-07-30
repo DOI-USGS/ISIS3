@@ -65,6 +65,10 @@ namespace Isis {
 
       unsigned int fileNameToPixel(FileName file, QString serialNumber);
 
+      int fileNameToIndex(FileName file, QString serialNumber);
+
+      QString pixelToSN(unsigned int pixel);
+
     private:
 
       QList< QPair< FileName, QString > > m_fileList;   //!< The list to keep track of images

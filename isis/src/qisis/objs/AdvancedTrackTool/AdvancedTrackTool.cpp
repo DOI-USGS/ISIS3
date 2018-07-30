@@ -29,6 +29,7 @@
 #include "TableMainWindow.h"
 #include "Target.h"
 #include "TProjection.h"
+#include "TrackingTable.h"
 
 namespace Isis {
 
@@ -569,30 +570,25 @@ namespace Isis {
         Cube *cCube = cvp->cube();
         int iTrackBand = -1;
 
-        if(cCube->hasGroup("Tracking")) {
-          PvlGroup trackingGroup = cCube->group("Tracking");
-          trackingGroup.findKeyword("FileName")[0];
-          FileName trackingCubeFileName(trackingGroup.findKeyword("FileName")[0]);
-          Cube trackingCube(trackingCubeFileName);
+        if(cCube->fileName().contains("_tracking")) {
 
-          // // Read the cube DN value from TRACKING cube at location (piLine, piSample)
-          Portal trackingPortal(trackingCube.sampleCount(), 1, trackingCube.pixelType());
+          // Read the cube DN value from TRACKING cube at location (piLine, piSample)
+          Portal trackingPortal(cCube->sampleCount(), 1, cCube->pixelType());
           trackingPortal.SetPosition(piSample, piLine, 1);
-          trackingCube.read(trackingPortal);
-          // // FIXME: will need to be changed for whatever base + index DN value we end up using.
-          // int trackingTableIndex = (unsigned int)trackingPortal[0] - VALID_MINUI4;
+          cCube->read(trackingPortal);
+          int currentPixel = trackingPortal[0];
 
-          // Get the input file name and serial number
-          Table table(m_tableMosaicSrc);
-          trackingCube.read(table);
-          TrackingTable trackingTable(table);
-          psSrcFileName = trackingTable.pixelToFileName(trackingPortal[0])
+          if (currentPixel != NULLUI4) {
+            // Get the input file name and serial number
+            Table table(m_tableMosaicSrc);
+            cCube->read(table);
+            TrackingTable trackingTable(table);
 
-          // int numRecs = trackingTable.Records();
-          // if(trackingTableIndex >= 0 && trackingTableIndex < numRecs) {
-          //   psSrcFileName = QString(trackingTable[trackingTableIndex][0]);
-          //   psSrcSerialNum = QString(trackingTable[trackingTableIndex][1]);
-          // }
+            FileName trackingFileName = trackingTable.pixelToFileName(currentPixel);
+            psSrcFileName = trackingFileName.name();
+            psSrcSerialNum = trackingTable.pixelToSN(currentPixel);
+            piOrigin = trackingTable.fileNameToIndex(trackingFileName, psSrcSerialNum);
+          }
         }
         // Backwards compatability. Have this tool work with attached TRACKING bands
         else if(cCube->hasTable(m_tableMosaicSrc)) {
