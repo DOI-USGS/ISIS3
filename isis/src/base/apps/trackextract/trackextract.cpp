@@ -19,9 +19,9 @@ using namespace Isis;
 const int FLOAT_MIN = -16777215;
 const int FLOAT_MAX = 16777216;
 
-void findTrackBand(QString inputName, QString &copyBands, QString &trackBand);
-void createMosaicCube(QString inputName, QString outputName, QString bands);
-void createTrackCube(QString inputName, QString ouputName, QString trackBand);
+void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBand);
+void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector);
+void createTrackCube(QString inputName, QString ouputName, int trackBand);
 void copyPixels(Buffer &in, Buffer &out);
 void copyTrackPixels(Buffer &in, Buffer &out);
 
@@ -29,8 +29,8 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString inputName = ui.GetFileName("FROM");
   QString outputName = ui.GetFileName("TO");
-  QString copyBands;
-  QString trackBand;
+  QVector<QString> copyBands;
+  int trackBand;
   findTrackBand(inputName, copyBands, trackBand);
   createMosaicCube(inputName, outputName, copyBands);
   createTrackCube(inputName, outputName, trackBand);
@@ -47,19 +47,19 @@ void IsisMain() {
  * @param copyBands Indices of the bands to copy over to the mosaic cube
  * @param trackBand Index of the tracking band
  */
-void findTrackBand(QString inputName, QString &copyBands, QString &trackBand) {
+void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBand) {
   Cube inputCube = Cube(inputName);
   if (inputCube.hasGroup("BandBin")) {
     PvlGroup &bandBinGroup = inputCube.group("BandBin");
     try {
       PvlKeyword &currentKeyword = bandBinGroup[0];
+      trackBand = -1;
       for (int i = 0; i < currentKeyword.size(); i++) {
         if (currentKeyword[i] != "TRACKING") {
-          copyBands += QString::number(i + 1); // Make it 1 based
-          copyBands += ",";
+          copyBands.append(QString::number(i + 1)); // Make it 1 based
         }
         else {
-          trackBand = QString::number(i + 1);
+          trackBand = i + 1;
         }
       }
     }
@@ -73,7 +73,7 @@ void findTrackBand(QString inputName, QString &copyBands, QString &trackBand) {
     QString msg = "The input cube [" + inputName + "] does not have a BandBin group.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
-  if (trackBand == "") {
+  if (trackBand == -1) {
     QString msg = "The input cube [" + inputName + "] does not have a tracking band.";
     msg += " If you want to create a tracking cube, run a mosaic program.";
     throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -86,13 +86,16 @@ void findTrackBand(QString inputName, QString &copyBands, QString &trackBand) {
  * Then, removes the tracking table from the mosaic label and adds a group pointing
  * to the tracking cube.
  *
- * @param inputName The name of the input cube
- * @param ouputName The name of the output cube
- * @param bands     The indices of the bands that are not the tracking band
+ * @param inputName   The name of the input cube
+ * @param ouputName   The name of the output cube
+ * @param bandsVector The indices of the bands that are not the tracking band
  */
-void createMosaicCube(QString inputName, QString outputName, QString bands) {
+void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector) {
   ProcessByLine p;
-  CubeAttributeInput inAtt = CubeAttributeInput("+" + bands);
+
+  CubeAttributeInput inAtt = CubeAttributeInput();
+  inAtt.setBands(bandsVector.toStdVector());
+  
   p.SetInputCube(inputName, inAtt);
   p.SetOutputCube("TO");
   p.StartProcess(copyPixels);
@@ -134,10 +137,10 @@ void createMosaicCube(QString inputName, QString outputName, QString bands) {
  * @param ouputName    The name of the output cube
  * @param trackingBand The index of the tracking band
  */
-void createTrackCube(QString inputName, QString ouputName, QString trackBand) {
+void createTrackCube(QString inputName, QString ouputName, int trackBand) {
   ProcessByLine p;
 
-  CubeAttributeInput inAtt = CubeAttributeInput("+" + trackBand);
+  CubeAttributeInput inAtt = CubeAttributeInput("+" + QString::number(trackBand));
   p.SetInputCube(inputName, inAtt);
 
   FileName cubeName = FileName(ouputName);

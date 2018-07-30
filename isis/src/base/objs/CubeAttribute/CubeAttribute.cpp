@@ -131,7 +131,7 @@ namespace Isis {
 
 
   void CubeAttributeInput::setBands(const vector<QString> &bands) {
-    setAttributes(toString(bands));
+    setAttributes("+" + toString(bands));
   }
 
 
