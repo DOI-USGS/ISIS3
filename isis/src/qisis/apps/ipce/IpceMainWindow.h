@@ -196,11 +196,12 @@ namespace Isis {
    *                           opens a project. Before, it would not save the geometry because the
    *                           opened project was not temporary. References #5433
    *   @history 2018-07-19 Tracie Sucharski - Keep separate dock lists for the view docks and
-   *                           "special" docks such as sensor, target and jigsaw. Changed the
-   *                           addDocks to the right dock area which fixes some of the odd behavior
-   *                           with docking, but does show the empty centralWidget between the
-   *                           project view and the newly added view if the ipce mainWindow is not
-   *                           fullscreen.
+   *                           "special" docks such as sensor, target and jigsaw. The
+   *                           ControlHealthView is now added under the Project instead of in
+   *                           workspace area. Removed unnecessary call to addDock for the History
+   *                           widget. It is added with the call to tabifyDockWidget.
+   *   @history 2018-07-29 Tracie Sucharski - Set background of centralWidget to a pattern to
+   *                           distinguish it from dockable areas.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT

@@ -23,6 +23,7 @@
 #include "IpceMainWindow.h"
 
 #include <QApplication>
+#include <QBrush>
 #include <QColor>
 #include <QDebug>
 #include <QDesktopWidget>
@@ -83,6 +84,10 @@ namespace Isis {
     m_maxThreadCount = -1;
 
     QWidget *centralWidget = new QWidget;
+    centralWidget->setAutoFillBackground(true);
+    QPalette p = centralWidget->palette();
+    p.setBrush(QPalette::Window, QBrush(Qt::Dense6Pattern));
+    centralWidget->setPalette(p);
     setCentralWidget(centralWidget);
 
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::South);
