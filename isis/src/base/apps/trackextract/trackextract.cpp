@@ -1,16 +1,15 @@
 #include "Isis.h"
 
+#include <QString>
+
 #include "Application.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
-#include "Portal.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "UserInterface.h"
-
-#include <QString>
 
 using namespace std;
 using namespace Isis;
@@ -22,8 +21,44 @@ const int FLOAT_MAX = 16777216;
 void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBand);
 void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector);
 void createTrackCube(QString inputName, QString ouputName, int trackBand);
-void copyPixels(Buffer &in, Buffer &out);
 void copyTrackPixels(Buffer &in, Buffer &out);
+
+
+/**
+ * Functor that copies DN's from the input cube to the tracking cube.
+ * Because each pixel is offsetted by the min value of the input cube's pixel type,
+ * we have to subtract the offset from each pixel. Then, we add the min
+ * of an unsigned int to each pixel for the new offset.
+ * The default value is set in ProcessMosaic for pixels who are not taken from a cube.
+ * If a pixel's value is the default value, we set it to Null.
+ *
+ * @author 2018-07-30 Kaitlyn Lee
+ * @internal
+ *   @history 2018-07-30 Kaitlyn Lee - Original Version.
+ */
+class CopyPixelsFunctor {
+  private:
+    int m_offset = 0;
+    int m_defaultValue = 0;
+
+  public:
+    CopyPixelsFunctor(int offset, int defaultValue) {
+      m_offset = offset;
+      m_defaultValue = defaultValue;
+    }
+
+    void operator()(Buffer &in, Buffer &out) const {
+      for (int i = 0; i < in.size(); i++) {
+        if (in[i] == (float) m_defaultValue) {
+          out[i] = NULLUI4;  // Set to the unsigned 4 byte Null value
+        }
+        else {
+          out[i] = ((int) in[i]) - m_offset + VALID_MINUI4;
+        }
+      }
+    }
+};
+
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -95,7 +130,7 @@ void createMosaicCube(QString inputName, QString outputName, QVector<QString> ba
 
   CubeAttributeInput inAtt = CubeAttributeInput();
   inAtt.setBands(bandsVector.toStdVector());
-  
+
   p.SetInputCube(inputName, inAtt);
   p.SetOutputCube("TO");
   p.StartProcess(copyPixels);
@@ -157,39 +192,9 @@ void createTrackCube(QString inputName, QString ouputName, int trackBand) {
 
   p.SetOutputCube(trackingName, outAtt, numSample, numLine);
 
-  p.StartProcess(copyTrackPixels);
-  p.EndProcess();
-}
-
-
-/**
- * Copies DN's from the input cube to the mosaic cube.
- *
- * @param in  Input cube
- * @param out Mosaic cube
- */
-void copyPixels(Buffer &in, Buffer &out) {
-  for (int i = 0; i < in.size(); i++) {
-    out[i] = in[i];
-  }
-}
-
-
-/**
- * Copies DN's from the input cube to the tracking cube.
- * Because each pixel is offsetted by the min value of the input cube's pixel type,
- * we have to get that min value and subtract it from each pixel. Then, we add the min
- * of an unsigned int to each pixel for the new offset.
- * The default value is set in ProcessMosaic for pixels who are not from a cube.
- * If a pixel's value is the default value, we set it to Null.
- *
- * @param in  Input cube
- * @param out Tracking cube
- */
-void copyTrackPixels(Buffer &in, Buffer &out) {
   int offset = 0;
   int defaultVal = 0;
-  switch (SizeOf(in.PixelType())) {
+  switch (SizeOf(inputCube.pixelType())) {
     case 1:
       offset = VALID_MIN1;
       defaultVal = NULL1;
@@ -206,16 +211,24 @@ void copyTrackPixels(Buffer &in, Buffer &out) {
       break;
 
     default:
-      QString msg = "Invalid Pixel Type [" + QString(in.PixelType()) + "]";
+      QString msg = "Invalid Pixel Type [" + QString(inputCube.pixelType()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
   }
+  CopyPixelsFunctor copyTrackPixels(offset, defaultVal);
 
+  p.ProcessCube(copyTrackPixels);
+  p.EndProcess();
+}
+
+
+/**
+ * Copies DN's from the input cube to the mosaic cube.
+ *
+ * @param in  Input cube
+ * @param out Mosaic cube
+ */
+void copyPixels(Buffer &in, Buffer &out) {
   for (int i = 0; i < in.size(); i++) {
-    if (in[i] == (float) defaultVal) {
-      out[i] = NULLUI4;  // Set to the unsigned 4 byte Null value
-    }
-    else {
-      out[i] = ((int) in[i]) - offset + VALID_MINUI4;
-    }
+    out[i] = in[i];
   }
 }
