@@ -578,7 +578,7 @@ namespace Isis {
 
           unsigned int currentPixel = trackingPortal[0];
           if (currentPixel != NULLUI4) {  // If from an image
-            Table table(TRACKINGTABLENAME);
+            Table table(trackingTableName); // trackingTableName from TrackingTable
             trackingCube->read(table);
             TrackingTable trackingTable(table);
 
@@ -589,7 +589,7 @@ namespace Isis {
           }
         }
         // Backwards compatability. Have this tool work with attached TRACKING bands
-        else if(cCube->hasTable(TRACKINGTABLENAME)) {
+        else if(cCube->hasTable(trackingTableName)) {
           Pvl *cPvl = cCube->label();
           PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
           PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
@@ -624,7 +624,7 @@ namespace Isis {
             }
 
             // Get the input file name and serial number
-            Table cFileTable(TRACKINGTABLENAME);
+            Table cFileTable(trackingTableName);
             cCube->read(cFileTable);
             int iRecs =   cFileTable.Records();
             if(piOrigin >= 0 && piOrigin < iRecs) {

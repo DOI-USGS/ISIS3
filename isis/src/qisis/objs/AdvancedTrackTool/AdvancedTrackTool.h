@@ -28,7 +28,6 @@
 class QAction;
 
 namespace Isis {
-  const QString TRACKINGTABLENAME = "InputImages";
 
   class TableMainWindow;
   class MdiCubeViewport;
