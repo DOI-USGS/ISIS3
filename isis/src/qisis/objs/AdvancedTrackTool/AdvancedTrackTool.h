@@ -82,6 +82,8 @@ namespace Isis {
    *                          before it attempts to record a point so that a table is created
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
+   *  @history 2018-07-18 Kristin Berry and Kaitlyn Lee - Updated TrackMosaicOrigin to work with
+   *                          an external tracking band.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -181,6 +183,7 @@ namespace Isis {
       int p_id;                            //!< The record id
       TableMainWindow *p_tableWin;  //!< The table window
       bool m_showHelpOnStart;              //!< True to show dialog When tool is started
+      QString m_tableMosaicSrc;  //! < Stores the name of the mosaic table 
 
   };
 

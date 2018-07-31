@@ -34,7 +34,6 @@ namespace Isis {
 
   // For mosaic tracking
 #define FLOAT_MIN         -16777215
-#define TABLE_MOSAIC_SRC  "InputImages"
 
   /**
    * Constructs an AdvancedTrackTool object
@@ -139,6 +138,7 @@ namespace Isis {
     installEventFilter(p_tableWin);
 
     m_showHelpOnStart = true;
+    m_tableMosaicSrc = "InputImages"; 
     readSettings();
   }
 
@@ -569,7 +569,30 @@ namespace Isis {
         Cube *cCube = cvp->cube();
         int iTrackBand = -1;
 
-        if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
+        if(cCube->hasGroup("Tracking")) {
+          PvlGroup trackingGroup = cCube->group("Tracking");
+          trackingGroup.findKeyword("FileName")[0];
+          FileName trackingCubeFileName(trackingGroup.findKeyword("FileName")[0]); 
+          Cube trackingCube(trackingCubeFileName);
+
+          // Read the cube DN value from TRACKING cube at location (piLine, piSample) 
+          Portal trackingPortal(trackingCube.sampleCount(), 1, trackingCube.pixelType()); 
+          trackingPortal.SetPosition(piSample, piLine, 1);
+          trackingCube.read(trackingPortal);
+          // FIXME: will need to be changed for whatever base + index DN value we end up using. 
+          int trackingTableIndex = (unsigned int)trackingPortal[0]; 
+
+          // Get the input file name and serial number
+          Table trackingTable(m_tableMosaicSrc);
+          trackingCube.read(trackingTable);
+          int numRecs = trackingTable.Records();
+          if(trackingTableIndex >= 0 && trackingTableIndex < numRecs) {
+            psSrcFileName = QString(trackingTable[trackingTableIndex][0]);
+            psSrcSerialNum = QString(trackingTable[trackingTableIndex][1]);
+          }
+        }
+        // Backwards compatability. Have this tool work with attached TRACKING bands
+        else if(cCube->hasTable(m_tableMosaicSrc)) {
           Pvl *cPvl = cCube->label();
           PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
           PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
@@ -604,7 +627,7 @@ namespace Isis {
             }
 
             // Get the input file name and serial number
-            Table cFileTable(TABLE_MOSAIC_SRC);
+            Table cFileTable(m_tableMosaicSrc);
             cCube->read(cFileTable);
             int iRecs =   cFileTable.Records();
             if(piOrigin >= 0 && piOrigin < iRecs) {
