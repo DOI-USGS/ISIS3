@@ -83,7 +83,10 @@ namespace Isis {
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
    *  @history 2018-07-18 Kristin Berry and Kaitlyn Lee - Updated TrackMosaicOrigin to work with
-   *                          TrackingTable and an external tracking cube.
+   *                          an external tracking cube.
+   *  @history 2018-07-31 Kaitlyn Lee - Updated TrackMosaicOrigin to use a TrackingTable object
+   *                          to get the file name, serial number, and index of the image associated
+   *                          with the current pixel.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
