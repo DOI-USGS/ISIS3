@@ -48,6 +48,7 @@ namespace Isis {
    * @internal
    *   @history 2018-07-26 Jesse Mapel - Added offset based on minimum unsigned integer value.
    *                           Renamed methods to better convey output/input meaning.
+   *   @history 2018-07-30 Kaitlyn Lee - Added pixelToSN() and fileNameToIndex().
    */
   class TrackingTable{
 

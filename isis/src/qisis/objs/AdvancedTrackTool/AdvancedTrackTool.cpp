@@ -31,6 +31,7 @@
 #include "TProjection.h"
 #include "TrackingTable.h"
 
+#include <iostream>
 namespace Isis {
 
   // For mosaic tracking
@@ -571,15 +572,13 @@ namespace Isis {
         int iTrackBand = -1;
 
         if(cCube->fileName().contains("_tracking")) {
-
           // Read the cube DN value from TRACKING cube at location (piLine, piSample)
           Portal trackingPortal(cCube->sampleCount(), 1, cCube->pixelType());
           trackingPortal.SetPosition(piSample, piLine, 1);
           cCube->read(trackingPortal);
-          int currentPixel = trackingPortal[0];
 
-          if (currentPixel != NULLUI4) {
-            // Get the input file name and serial number
+          unsigned int currentPixel = trackingPortal[0];
+          if (currentPixel != NULLUI4) {  // If not from an image
             Table table(m_tableMosaicSrc);
             cCube->read(table);
             TrackingTable trackingTable(table);
@@ -634,6 +633,11 @@ namespace Isis {
               psSrcSerialNum = QString(cFileTable[piOrigin][1]);
             }
           }
+        }
+
+        if (piOrigin == -1) { // If not from an image, display N/A
+          psSrcFileName = "N/A";
+          psSrcSerialNum = "N/A";
         }
       }
       catch (IException &e) {
