@@ -257,53 +257,69 @@ namespace Isis {
       m_trackingEnabled = true;
     }
 
-    // Do this before SetMosaicOrigin as we don't want to set the filename
-    // in the table unless the band info is valid
+    // We don't want to set the filename in the table unless the band info is valid
     int bandPriorityInputBandNumber = -1;
     int bandPriorityOutputBandNumber = -1;
     if (m_imageOverlay == UseBandPlacementCriteria ) {
       bandPriorityInputBandNumber = GetBandIndex(true);
       bandPriorityOutputBandNumber = GetBandIndex(false);
     }
-
-    // Image name into the table & Get the index for this input file
-    // int iIndex = GetIndexOffsetByPixelType();
+    
+    // Set index of tracking image to the default offset of the Isis::UnsignedByte
     int iIndex = 3;
     
-    // Set the Mosaic Origin if Tracking is enabled
+    // Create tracking cube if need-be and update tracking table and bandbin in label
     if (m_trackingEnabled) {
+      TrackingTable *trackingTable;
+
       if (!m_trackingCube) {
         m_trackingCube = new Cube;
-        
-        TrackingTable *trackingTable;
 
+        // A new mosaic cube is being created
         if (m_createOutputMosaic) {
 
           // Tracking cubes are always unsigned 4 byte integer
           m_trackingCube->setPixelType(PixelType::UnsignedInteger);
 
-          // Tracking cube have the same number of lines and samples as the mosaic and 1 band
+          // Tracking cube has the same number of lines and samples as the mosaic and 1 band
           m_trackingCube->setDimensions(OutputCubes[0]->sampleCount(),
                                         OutputCubes[0]->lineCount(),
                                         1);
 
           // The tracking cube file name convention is "output_cube_file_name" + "_tracking.cub"
-          QString trackingBase = FileName(OutputCubes[0]->fileName()).removeExtension().toString();
+          QString trackingBase = FileName(OutputCubes[0]->fileName()).removeExtension().expanded().split("/").last();//toString();
           m_trackingCube->create(trackingBase + "_tracking.cub");
+          
+          // Add the tracking group to the mosaic cube label
+          Pvl *mosaicLabel = OutputCubes[0]->label();
+          PvlGroup trackingFileGroup("Tracking");
+          PvlKeyword trackingFileName("FileName");
+          trackingFileName.setValue(m_trackingCube->fileName());
+          trackingFileGroup.addKeyword(trackingFileName);
+          mosaicLabel->findObject("IsisCube").addGroup(trackingFileGroup);
+          
+          // Write the bandbin group to the tracking cube label
+          Pvl *trackingLabel = m_trackingCube->label();
+          PvlGroup bandBin("BandBin");
+          PvlKeyword trackBand("FilterName");
+          trackBand += "TRACKING";
+          bandBin.addKeyword(trackBand);
+          trackingLabel->findObject("IsisCube").addGroup(bandBin);
 
-          // Initialize an empty TrackingTable object to add to the tracking cube
+          // Initialize an empty TrackingTable object to manage tracking table in tracking cube
           trackingTable = new TrackingTable();
-
         }
-
+        
+        // An existing mosaic cube is being added to
         else {
+          // Confirm tracking group exists in mosaic cube to address backwards compatibility
           if ( OutputCubes[0]->hasGroup("Tracking") ) {
             QString trackingPath = FileName(OutputCubes[0]->fileName()).path();
             QString trackingFile = OutputCubes[0]->group("Tracking").findKeyword("FileName")[0];
-            m_trackingCube->create(trackingPath + trackingFile);
+            m_trackingCube->open(trackingPath + "/" + trackingFile, "rw");
 
+            // Initialize a TrackingTable object from current mosaic
             Table *table;
-            
             try {
               table = new Table(TRACKING_TABLE_NAME, m_trackingCube->fileName());
               trackingTable = new TrackingTable(*table);
@@ -312,23 +328,29 @@ namespace Isis {
               QString msg = "Unable to find Tracking Table in " + m_trackingCube->fileName() + ".";
               throw IException(IException::User, msg, _FILEINFO_);
             }
-            
           }
+          // If no tracking table exists in mosaic cube, warn user to run utility application to
+          // add it and create a separate tracking cube
           else {
             QString msg = "Tracking cannot be enabled when adding to an existing mosaic "
             "that does not already have a tracking cube. Mosaics with a tracking band must "
-            "be have the tracking band extracted into an external tracking cube.";
+            "have the tracking band extracted into an external tracking cube.";
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
-        
-        trackingTable->fileNameToIndex(InputCubes[0]->fileName(), 
-                                       SerialNumber::Compose(*(InputCubes[0])));
-        Table table = trackingTable->toTable();
-        m_trackingCube->write(table);
-        ResetOriginBand();
       }
-      // SetMosaicOrigin(iIndex);
+      
+      // Add current file to the TrackingTable object
+      iIndex = trackingTable->fileNameToPixel(InputCubes[0]->fileName(), 
+                                     SerialNumber::Compose(*(InputCubes[0])));
+      
+      //  Write the tracking table to the tracking cube, overwriting if need-be
+      if (m_trackingCube->hasTable(Isis::trackingTableName)) {
+       m_trackingCube->deleteBlob("Table", Isis::trackingTableName);
+      }
+      Table table = trackingTable->toTable();
+      m_trackingCube->write(table);
+
     }
     else if (m_imageOverlay == AverageImageWithMosaic && m_createOutputMosaic) {
       ResetCountBands();
@@ -351,7 +373,6 @@ namespace Isis {
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
-
 
     // Process Band Priority with no tracking
     if (m_imageOverlay == UseBandPlacementCriteria && !m_trackingEnabled ) {
@@ -482,6 +503,11 @@ namespace Isis {
           p_progress->CheckStatus();
         } // End line loop
       }   // End band loop
+    }
+    if (m_trackingCube) {
+      m_trackingCube->close();
+      delete m_trackingCube;
+      m_trackingCube = NULL;
     }
   } // End StartProcess
 
@@ -702,197 +728,6 @@ namespace Isis {
    */
   void ProcessMosaic::SetBandBinMatch(bool enforceBandBinMatch) {
     m_enforceBandBinMatch = enforceBandBinMatch;
-  }
-
-
-  /**
-   * This method creates a table if not already created to hold
-   * the image file names if the track flag is true. If table
-   * exists, checks if the image already exists and if it does
-   * not, then adds the new image file name. If the field size is
-   * smaller than the new image name, then it resizes all the
-   * records to new file size. When the table is newly created,it
-   * resets the origin band to default based on pixel type.
-   *
-   * @param index - the input file index
-   *
-   * @returns none
-   *
-   * @throws an exception if the number of images exceeds the
-   *            pixel size.
-   *
-   * @throws iException::Message
-   *
-   * @author Sharmila Prasad (8/28/2009)
-   */
-  void ProcessMosaic::SetMosaicOrigin(int &index) {
-    // Get the name of the file to be added
-    QString inputFileName   = FileName(InputCubes[0]->fileName()).name();
-    QString tableName       = TRACKING_TABLE_NAME;
-    int inputFileNameLength = inputFileName.length();
-
-    // Get the serial number
-    QString inputFileSerialNumber   = SerialNumber::Compose(*(InputCubes[0]));
-    int inputFileSerialNumberLength = inputFileSerialNumber.length();
-
-    // the fields will be equal length, so choose the larger value
-    int fieldLength = inputFileSerialNumberLength;
-    if (inputFileNameLength > inputFileSerialNumberLength) {
-      fieldLength = inputFileNameLength;
-    }
-
-    // Get output file name
-    QString sOutputFile = FileName(OutputCubes[0]->fileName()).name();
-
-    Pvl *cPvlOut = OutputCubes[0]->label();
-
-    // Create a table record with the new image file name and serial number info
-    TableRecord cFileRecord;
-
-    // Populate with File Name
-    TableField cFileField("FileName", TableField::Text, fieldLength);
-    cFileField = inputFileName;
-    cFileRecord += cFileField;
-
-    // Populate with Serial Number
-    TableField cSNField("SerialNumber", TableField::Text, fieldLength);
-    cSNField = inputFileSerialNumber;
-    cFileRecord += cSNField;
-
-    int iNumObjs = cPvlOut->objects();
-    PvlObject cPvlObj;
-
-    // Check if a Table exists in the mosaic cube
-    if (cPvlOut->hasObject("Table")) {
-      for (int i = 0; i < iNumObjs; i++) {
-        cPvlObj = cPvlOut->object(i);
-        if (cPvlObj.hasKeyword("Name", Pvl::Traverse)) {
-          PvlKeyword cNameKey = cPvlObj.findKeyword("Name", Pvl::Traverse);
-          if (cNameKey[0] == tableName) {
-            int existingTableFieldLength = toInt(QString(cPvlObj.findGroup("Field")
-                                                         .findKeyword("Size")));
-
-            //set the tracker flag to true as the tracking table exists
-            m_trackingEnabled = true;
-
-            // Create a new blank table
-            Table cFileTable(tableName);
-
-            // Read and make a copy of the existing tracking table
-            Table cFileTable_Copy = Table(tableName);
-            OutputCubes[0]->read(cFileTable_Copy);
-            // Records count
-            int existingTableRecords = cFileTable_Copy.Records();
-
-            // Check if the image index can be accomadated in the pixel size
-            bool bFull = false;
-            switch (sizeof(OutputCubes[0]->pixelType())) {
-              case 1:
-                // Index is 1 based as 0=Null invalid value
-                if (existingTableRecords >= (VALID_MAX1 - 1)) bFull = true;
-                break;
-              case 2:
-                // Signed 16bits with some special pixels
-                if (existingTableRecords > (VALID_MAX2 - VALID_MIN2 + 1)) bFull = true;
-                break;
-
-              case 4:
-                // Max float mantissa
-                if (existingTableRecords > (FLOAT_STORE_INT_PRECISELY_MAX_VALUE -
-                                            FLOAT_STORE_INT_PRECISELY_MIN_VALUE + 1)) bFull = true;
-                break;
-            }
-
-            if (bFull) {
-              QString msg = "The number of images in the Mosaic exceeds the pixel size";
-              throw IException(IException::Programmer, msg, _FILEINFO_);
-            }
-
-            for (int i = 0;i < existingTableRecords;i++) {
-              // Get the file name and trim out the characters filled due to resizing
-              QString sTableFile = QString(QString(cFileTable_Copy[i][0]).toLatin1().data());
-              int found = sTableFile.lastIndexOf(".cub");
-              if (found != -1) {
-                // clear the packing characters - get only the file name
-                sTableFile.remove(found + 4);
-              }
-
-              if (sTableFile == inputFileName) {
-                index += i;
-                return;
-              }
-
-
-              // compare the length of the fields in the current table to the length of the fields
-              // in the record to be added to the table, then create the new record to be added
-              TableRecord record;
-              if (existingTableFieldLength < fieldLength) {
-                // if the new field length is larger, create the new record to be added
-                // from the updated field size (i.e. resize each record in the exisiting
-                // table)
-                TableField  cFileFieldUpdate("FileName", TableField::Text, fieldLength);
-                cFileFieldUpdate  = (QString)cFileTable_Copy[i][0];
-                record += cFileFieldUpdate;
-
-                // Populate with Serial Number
-                TableField cSNFieldUpdate("SerialNumber", TableField::Text, fieldLength);
-                cSNFieldUpdate = (QString)cFileTable_Copy[i][1];
-                record += cSNFieldUpdate;
-              }
-              else {
-                // otherwise, keep the original record size
-                record = cFileTable_Copy[i];
-              }
-
-              // if this is the first record, initialize the new table with by adding the record
-              // created above (this will also set the appropriate record size)
-              if (i == 0) {
-                cFileTable = Table(tableName, record);
-                cFileTable += record;
-              }
-              else {
-                // Add all other records from the existing table into the new table
-                cFileTable += record;
-              }
-            }
-            // Get the current image file index
-            index += existingTableRecords;
-
-            // if we kept the original table record size and this record is smaller, then we
-            // need to resize
-            if (cFileRecord.RecordSize() < cFileTable.RecordSize()) { // fieldLength < existingTableFieldLength
-              TableRecord updateNewRecord;
-              TableField  cFileFieldUpdate("FileName", TableField::Text, existingTableFieldLength);
-              cFileFieldUpdate = (QString)cFileRecord[0];
-              updateNewRecord += cFileFieldUpdate;
-
-              // Populate with Serial Number
-              TableField cSNFieldUpdate("SerialNumber", TableField::Text, existingTableFieldLength);
-              cSNFieldUpdate = (QString)cFileRecord[1];
-              updateNewRecord += cSNFieldUpdate;
-              cFileTable +=  updateNewRecord;
-            }
-            else {
-              // Add the current input image record to the new table
-              cFileTable +=  cFileRecord;
-            }
-
-            // Copy the new table to the output Mosaic
-            OutputCubes[0]->write(cFileTable);
-            break;   //break while loop
-          }
-        }
-      } //end for loop
-    }
-
-    //creating new table if track flag is true
-    if (m_createOutputMosaic && m_trackingEnabled) {
-      Table cFileTable(tableName, cFileRecord);
-      cFileTable += cFileRecord;
-      OutputCubes[0]->write(cFileTable);
-      //reset the origin band based on pixel type
-      ResetOriginBand();
-    }
   }
 
 
@@ -1312,10 +1147,11 @@ namespace Isis {
 
     int iOutBands = OutputCubes[0]->bandCount();
 
-    if (m_trackingEnabled) {
-      iOutBands -= 1;     // leave tracking band
-    }
-    else if (m_imageOverlay == AverageImageWithMosaic) {
+    // if (m_trackingEnabled) {
+    //   iOutBands -= 1;     // leave tracking band
+    // }
+    // else if (m_imageOverlay == AverageImageWithMosaic) {
+    if (m_imageOverlay == AverageImageWithMosaic) {
       iOutBands /= 2;
     }
 
@@ -1346,12 +1182,14 @@ namespace Isis {
 
       // Add the "TRACKING" band to the Keyword if the flag is set and also if the number of
       // input cube bands is same as the the keysize of the keyword in the BandBin group.
-      if (m_trackingEnabled && iInBands == iInKeySize) {
-        cOutKey += "TRACKING"; // for the origin band
-      }
+      // if (m_trackingEnabled && iInBands == iInKeySize) {
+      //   cOutKey += "TRACKING"; // for the origin band
+      // }
 
       // Tag the Count Bands if priority is AverageImageWithMosaic.
-      else if (m_imageOverlay == AverageImageWithMosaic) {
+      if (m_imageOverlay == AverageImageWithMosaic) {
+      // else if (m_imageOverlay == AverageImageWithMosaic) {
+
         int iTotalOutBands = OutputCubes[0]->bandCount();
         isb = origIsb - 1; // reset the input starting band
         int iOutStartBand = iOutBands + osb;
@@ -1500,8 +1338,6 @@ namespace Isis {
         }
       }
     }
-//     qDebug() << "Band Index:" << iBandIndex;
-// qDebug();
     if (!bFound) {
       QString msg = "Invalid Band / Key Name, Value ";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -1544,7 +1380,7 @@ namespace Isis {
       OutputCubes[0]->read(cOportal);
 
       trackingPortal.SetPosition(m_oss, iOL, 1);
-      OutputCubes[0]->read(trackingPortal);
+      m_trackingCube->read(trackingPortal);
 
       // Move the input data to the output
       for (int iPixel = 0; iPixel < cOportal.size(); iPixel++) {
@@ -1724,38 +1560,6 @@ void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int in
 
 
   /**
-   * This method sets the origin band to defaults(unassigned value)
-   * depending on the pixel type.
-   *
-   * @No parameters and no return value
-   *
-   * @author Sharmila Prasad (8/28/2009)
-   */
-  void ProcessMosaic::ResetOriginBand() {
-    if (!m_trackingCube) {
-      QString msg = "Cannot reset the tracking cube because it has not been initialized.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    int iLines  = m_trackingCube->lineCount();
-    int iSample = m_trackingCube->sampleCount();
-
-    int iDefault = GetOriginDefaultByPixelType();
-
-    Portal trackingPortal(iSample, 1, m_trackingCube->pixelType());
-
-    for (int i = 1; i <= iLines; i++) {
-      trackingPortal.SetPosition(1, i, 1);
-      m_trackingCube->read(trackingPortal);
-      for (int iPixel = 0; iPixel < trackingPortal.size(); iPixel++) {
-        trackingPortal[iPixel] = (float)(iDefault);
-      }
-      m_trackingCube->write(trackingPortal);
-    }
-  }
-
-
-  /**
    * This method searchs the mosaic label for a table with name
    * "InputFile". If found return true else false. Checks for the
    * existence of the origin table
@@ -1789,3 +1593,4 @@ void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int in
   }
 
 }
+   

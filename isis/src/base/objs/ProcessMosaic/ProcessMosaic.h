@@ -192,6 +192,16 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp to truncate paths before date
    *                           directory. Allows test to pass when not using the default data area.
    *                           Fixes #4738.
+   *   @history 2018-07-30 Jesse Mapel & Summer Stapleton - Refactoring of class to create a 
+   *                           separate tracking cube to keep track of input images for a mosaic 
+   *                           instead of storing this information within the mosaic cube itself. 
+   *                           The mosaic cube no longer contains a tracking band or a tracking 
+   *                           table; it now contains a tracking group containing the name of the 
+   *                           tracking file. The tracking file is named 
+   *                           <baseMosaicFileName>_tracking.cub. This tracking cube will contain 
+   *                           the tracking table as well as the tracking band; it will always be 
+   *                           of PixelType::UnsignedInteger regardless of the pixel type of the 
+   *                           mosaic cube or of the input images.
    */
 
   class ProcessMosaic : public Process {
