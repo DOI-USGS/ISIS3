@@ -139,7 +139,6 @@ namespace Isis {
     installEventFilter(p_tableWin);
 
     m_showHelpOnStart = true;
-    m_tableMosaicSrc = "InputImages";
     readSettings();
   }
 
@@ -579,7 +578,7 @@ namespace Isis {
 
           unsigned int currentPixel = trackingPortal[0];
           if (currentPixel != NULLUI4) {  // If from an image
-            Table table(m_tableMosaicSrc);
+            Table table(TRACKINGTABLENAME);
             trackingCube->read(table);
             TrackingTable trackingTable(table);
 
@@ -590,7 +589,7 @@ namespace Isis {
           }
         }
         // Backwards compatability. Have this tool work with attached TRACKING bands
-        else if(cCube->hasTable(m_tableMosaicSrc)) {
+        else if(cCube->hasTable(TRACKINGTABLENAME)) {
           Pvl *cPvl = cCube->label();
           PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
           PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
@@ -625,7 +624,7 @@ namespace Isis {
             }
 
             // Get the input file name and serial number
-            Table cFileTable(m_tableMosaicSrc);
+            Table cFileTable(TRACKINGTABLENAME);
             cCube->read(cFileTable);
             int iRecs =   cFileTable.Records();
             if(piOrigin >= 0 && piOrigin < iRecs) {

@@ -28,6 +28,8 @@
 class QAction;
 
 namespace Isis {
+  const QString TRACKINGTABLENAME = "InputImages";
+
   class TableMainWindow;
   class MdiCubeViewport;
 
@@ -186,12 +188,9 @@ namespace Isis {
       QAction *p_action;                   //!< Action to bring up the track tool
       int p_numRows;                       //!< The number of rows in the table
       int p_id;                            //!< The record id
-      TableMainWindow *p_tableWin;  //!< The table window
+      TableMainWindow *p_tableWin;         //!< The table window
       bool m_showHelpOnStart;              //!< True to show dialog When tool is started
-      QString m_tableMosaicSrc;  //! < Stores the name of the mosaic table
-
   };
-
 };
 
 #endif
