@@ -87,7 +87,8 @@ namespace Isis {
    *  @history 2018-07-31 Kaitlyn Lee - Updated TrackMosaicOrigin to use a TrackingTable object
    *                          to get the file name, serial number, and index of the image associated
    *                          with the current pixel. Moved code opening the tracking cube to
-   *                          CubeViewport.
+   *                          CubeViewport. If the cursor is over a pixel with no tracking info,
+   *                          file name and serial number display N/A now.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
