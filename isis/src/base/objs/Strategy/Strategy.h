@@ -15,6 +15,7 @@ find files of those names at the top level of this repository. **/
 #include <QString>
 
 // SharedResource and ResourceList typedefs
+#include "GisGeometry.h"
 #include "Resource.h"
 #include "PvlObject.h"
 
@@ -80,6 +81,12 @@ namespace Isis {
    *                          replacements in reverse order fixes this issue.
    * @history 2016-03-07  Tyler Wilson - Corrected documentation, and created a
    *                          unit test to test most of this classe's methods.
+   * @history 2018-07-29 Kris Becker - Fixed errors in importGeometry() where an 
+   *                          exception was being thrown when checking for valid
+   *                          Geometry. It now checks for this case and runs
+   *                          buffer(0) to attempt to fix the geometry. This is
+   *                          typically a self-intersection error that can be
+   *                          repaired with a buffer(0) operator.
    */
 
   class Strategy {

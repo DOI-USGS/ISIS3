@@ -46,6 +46,11 @@ namespace Isis {
    *                           ISIS. Fixes #2398.
    *   @history 2016-03-04 Kris Becker - Completed the documentation and implmented the equals()
    *                           method.
+   *   @history 2018-07-29 Kris Becker - Added buffer() method; isValid() was
+   *                           throwing an exception if the geometry was invalid
+   *                           (e.g., self-intersecting geometry), which is now
+   *                           trapped and a false condition is properly returned.
+   * 
    */   
   class GisGeometry {
   
@@ -99,6 +104,7 @@ namespace Isis {
   
       double intersectRatio(const GisGeometry &geom) const;
   
+      GisGeometry *buffer(const double width=0.0, const int quadsegs=16) const;
       GisGeometry *envelope( ) const;
       GisGeometry *convexHull( ) const;
       GisGeometry *simplify(const double &tolerance) const;
