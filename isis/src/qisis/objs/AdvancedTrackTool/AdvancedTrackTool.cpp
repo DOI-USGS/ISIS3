@@ -571,22 +571,16 @@ namespace Isis {
         int iTrackBand = -1;
 
         if(cCube->hasGroup("Tracking")) {
-          PvlGroup trackingGroup = cCube->group("Tracking");
-          //Because the tracking group does not have a path, get the path from the main cube
-          FileName cCubeName(cCube->fileName());
-          QString trackingCubeName = trackingGroup.findKeyword("Filename")[0];
-          FileName trackingCubeFileName(cCubeName.path() + "/" + trackingCubeName);
-          Cube trackingCube(trackingCubeFileName);
-
+          Cube *trackingCube = cvp->trackingCube();
           // Read the cube DN value from TRACKING cube at location (piLine, piSample)
-          Portal trackingPortal(trackingCube.sampleCount(), 1, trackingCube.pixelType());
+          Portal trackingPortal(trackingCube->sampleCount(), 1, trackingCube->pixelType());
           trackingPortal.SetPosition(piSample, piLine, 1);
-          trackingCube.read(trackingPortal);
+          trackingCube->read(trackingPortal);
 
           unsigned int currentPixel = trackingPortal[0];
           if (currentPixel != NULLUI4) {  // If from an image
             Table table(m_tableMosaicSrc);
-            trackingCube.read(table);
+            trackingCube->read(table);
             TrackingTable trackingTable(table);
 
             FileName trackingFileName = trackingTable.pixelToFileName(currentPixel);

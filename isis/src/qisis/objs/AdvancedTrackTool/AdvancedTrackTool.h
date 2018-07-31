@@ -86,7 +86,8 @@ namespace Isis {
    *                          an external tracking cube.
    *  @history 2018-07-31 Kaitlyn Lee - Updated TrackMosaicOrigin to use a TrackingTable object
    *                          to get the file name, serial number, and index of the image associated
-   *                          with the current pixel.
+   *                          with the current pixel. Moved code opening the tracking cube to
+   *                          CubeViewport.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
