@@ -84,6 +84,7 @@ namespace Isis {
    *                           size, instead of being hard-coded. The percentages chosen allow for 2
    *                           CubeDnViews to be opened at once, since CubeDnView has an internal
    *                           size policy. References #5433
+   *   @history 2018-07-26 Tracie Sucharski - Cleaned up some documentation. 
    */
   class AbstractProjectItemView : public QMainWindow {
 

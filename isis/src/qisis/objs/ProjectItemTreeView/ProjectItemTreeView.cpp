@@ -44,6 +44,7 @@ namespace Isis {
 
     m_treeView = new QTreeView(this);
     m_treeView->installEventFilter(this);
+
     setInternalModel( internalModel() );
     // 2017-04-12 TSucharski Turn off for now, since not accepting drops, not point in allowing
     // drags
@@ -52,10 +53,12 @@ namespace Isis {
     m_treeView->setAcceptDrops(false);
     m_treeView->setHeaderHidden(true);
 
+    //  Simply doing this creates scrollbar when the dock widget within the main window is made too
+    //  small- looks like QMainWindow and/or QDockWidget handles the scrollbars for us.
     setCentralWidget(m_treeView);
 
-    //This works so that it cannot be shrunk, only grown
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    //This works so that it cannot be shrunk in width, only grown
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     //  Currently set all items on view to un-editable
     //m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -72,7 +75,7 @@ namespace Isis {
   QSize ProjectItemTreeView::sizeHint() const {
     QDesktopWidget deskTop;
     QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
-    return QSize(.11 * availableSpace.width(), .5 * availableSpace.height());
+    return QSize(.15 * availableSpace.width(), .5 * availableSpace.height());
   }
 
 

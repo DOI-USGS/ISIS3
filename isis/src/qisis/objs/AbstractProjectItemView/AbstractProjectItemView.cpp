@@ -66,7 +66,7 @@ namespace Isis {
    */
   QSize AbstractProjectItemView::sizeHint() const {
 
-    //  Size hint is made ridiculously large as a hack to have the views fill the available dock
+    //  Size hint is made large as a hack to have the views fill the available dock
     //  space. SizePolicy alone did not work.
     QDesktopWidget deskTop;
     QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
