@@ -262,13 +262,27 @@ namespace Isis {
    *                           adjusted logic to save these serparately into the .xml files in the 
    *                           project directory. Also added clean-up of unsaved templates at
    *                           project close in Project::clear().
-   *  @hitsory 2018-07-12 Summer Stapleton - Added hasTemplate() and hasCamera() and modified 
+   *  @history 2018-07-12 Summer Stapleton - Added hasTemplate() and hasCamera() and modified 
    *                           addCamera() and addTarget logic in order to determine if a targetBody
    *                           or a guiCamera already exist in a project. This allows cameras and 
    *                           targets to be created in ImportImagesWorkOrder only when needed 
    *                           rather than creating them for every image imported and then removing
    *                           them if not needed. Fixed segfault occuring on astrovm4 with larger 
    *                           imports. References #5460.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed activeControlModified() to cnetModified() and
+   *                          removed the line m_activeControl->setModified(true) in cnetModified()
+   *                          since this is now done in the CnetEditorWidget and it caused a seg
+   *                          fault when no images were imported and a user tried to edit a cnet. I
+   *                          changed this because when a user made changes to a cnet, even if it
+   *                          was not the active, the active was the only one that was recognized as
+   *                          being modified. This stopped any changes made to a nonactive cnet from
+   *                          being saved and caused the active to be saved if a nonactive was
+   *                          edited. Fixes #5414.
+   *   @history 2018-07-13 Kaitlyn Lee - Added singal cnetSaved() so that the save net button goes
+   *                          back to black after the cnet is saved. Added signal
+   *                          activeControlModified() that is emitted in cnetModified() and is
+   *                          connected to Directory. This stops views from being redrawn when
+   *                          any cnet is modified. Only the active should cause this. Fixes #5396.
    *  @history 2018-07-26 Tracie Sucharski - Fixed history entry errors introduced during
    *                           the merge conflict resolution for PR #255.
    */
@@ -283,7 +297,7 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
-      
+
       bool hasTarget(QString id);
       bool hasCamera(QString id);
 
@@ -506,10 +520,12 @@ namespace Isis {
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
       void projectRelocated(Project *);
+
       /**
        * Emitted when work order starts
        */
       void workOrderStarting(WorkOrder *);
+
       /**
        * Emitted when work order ends
        */
@@ -519,10 +535,22 @@ namespace Isis {
 
       void discardActiveControlEdits();
 
+      /**
+       * Emmited in cnetModified() when the actice control is modified.
+       * Connected to Directory so that other views can redraw measures.
+       */
+      void activeControlModified();
+
+      /**
+       * Emmited in save() when the project is being saved
+       * Connected to Directory so that ControlPointEditWidget can recolor the save net button.
+       */
+      void cnetSaved(bool value);
+
     public slots:
       void open(QString);
       void setClean(bool value);
-      void activeControlModified();
+      void cnetModified();
 
     private slots:
       void controlClosed(QObject *control);

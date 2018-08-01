@@ -194,6 +194,9 @@ namespace Isis {
    *                           the geometry value does not exist in the config file. This allows the
    *                           geometry to be saved if the config file does not exist and a user
    *                           opens a project. Before, it would not save the geometry because the
+   *                           opened project was not temporary. References #5433.
+   *   @history 2018-07-17 Kaitlyn Lee - Added signal enableViewActions(bool) to enable/disable
+   *                           tab/tile views when views are opened/closed.
    *                           opened project was not temporary. References #5433
    *   @history 2018-07-19 Tracie Sucharski - Keep separate dock lists for the view docks and
    *                           "special" docks such as sensor, target and jigsaw. The
@@ -208,6 +211,9 @@ namespace Isis {
     public:
       explicit IpceMainWindow(QWidget *parent = 0);
       ~IpceMainWindow();
+
+    signals:
+      void enableViewActions(bool value);
 
     public slots:
       void addView(QWidget *newWidget, Qt::DockWidgetArea area = Qt::LeftDockWidgetArea,
@@ -283,9 +289,6 @@ namespace Isis {
       QList<QAction *> m_helpMenuActions;//!< Internal list of help actions
 
       QList<QAction *> m_permToolBarActions;//!< Internal list of permanent toolbar actions
-
-      QAction *m_cascadeViewsAction; //!< Action that cascades the mdi area
-      QAction *m_tileViewsAction; //!< Action that tiles the mdi area
   };
 }
 

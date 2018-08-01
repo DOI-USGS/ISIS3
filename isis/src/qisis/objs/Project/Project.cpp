@@ -297,7 +297,7 @@ namespace Isis {
       m_controls = NULL;
     }
 
-    
+
     if (m_mapTemplates) {
       foreach (TemplateList *templateList, *m_mapTemplates) {
         foreach (Template *templateFile, *templateList) {
@@ -310,8 +310,8 @@ namespace Isis {
       delete m_mapTemplates;
       m_mapTemplates = NULL;
     }
-    
-    
+
+
     if (m_regTemplates) {
       foreach (TemplateList *templateList, *m_regTemplates) {
         foreach (Template *templateFile, *templateList) {
@@ -324,7 +324,7 @@ namespace Isis {
       delete m_regTemplates;
       m_regTemplates = NULL;
     }
-    
+
 
     m_activeControl = NULL;
     m_activeImageList = NULL;
@@ -478,7 +478,7 @@ namespace Isis {
       QTextStream projectXmlInput(&projectXml);
 
       while (!projectXmlInput.atEnd() ) {
-        
+
         QString line = projectXmlInput.readLine();
 
         if (controls || line.contains("<controlNets>") ) {
@@ -516,7 +516,7 @@ namespace Isis {
             shapeDirList.append(line.split('"').at(3));
           }
         }
-        
+
         else if (mapTemplates || line.contains("<mapTemplateLists>") ) {
           mapTemplates = true;
 
@@ -529,7 +529,7 @@ namespace Isis {
             mapTemplateDirList.append(components.at(5));
           }
         }
-        
+
         else if (regTemplates || line.contains("<regTemplateLists>") ) {
           regTemplates = true;
 
@@ -591,7 +591,7 @@ namespace Isis {
           tempDir.removeRecursively();
         }
       }
-      
+
       QDir mapTemplatesDir(m_projectRoot->path() + "/templates/maps");
       mapTemplatesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
       QStringList mapTemplatesList = mapTemplatesDir.entryList();
@@ -603,7 +603,7 @@ namespace Isis {
           tempDir.removeRecursively();
         }
       }
-      
+
       QDir regTemplatesDir(m_projectRoot->path() + "/templates/registrations");
       regTemplatesDir.setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
       QStringList regTemplatesList = regTemplatesDir.entryList();
@@ -756,20 +756,20 @@ namespace Isis {
 
       stream.writeEndElement();
     }
-    
+
     if ( !m_mapTemplates->isEmpty() ) {
       stream.writeStartElement("mapTemplateLists");
-      
+
       for (int i = 0; i < m_mapTemplates->count(); i++) {
         m_mapTemplates->at(i)->save(stream, this, newProjectRoot);
       }
 
       stream.writeEndElement();
     }
-    
+
     if ( !m_regTemplates->isEmpty() ) {
       stream.writeStartElement("regTemplateLists");
-      
+
       for (int i = 0; i < m_regTemplates->count(); i++) {
         m_regTemplates->at(i)->save(stream, this, newProjectRoot);
       }
@@ -1914,8 +1914,17 @@ namespace Isis {
   }
 
 
-  void Project::activeControlModified() {
-    m_activeControl->setModified(true);
+  /**
+   * When a cnet is modified, set the project state to not clean.
+   * If the active control was modified, send a signal back to Directory
+   * so that other views know that the active was modified. This allows
+   * for CubeDnView and Footprint2DView to be redrawn.
+   * Currently, this was the easiest place to emit this signal.
+   */
+  void Project::cnetModified() {
+    if (m_activeControl && m_activeControl->isModified()) {
+      emit activeControlModified();
+    }
     setClean(false);
   }
 
@@ -2137,8 +2146,8 @@ namespace Isis {
     QList<TemplateList *> allTemplates = *m_mapTemplates + *m_regTemplates;
     return allTemplates;
   }
-  
-  
+
+
   /**
    * Return map template FileNames
    *
@@ -2147,8 +2156,8 @@ namespace Isis {
   QList<TemplateList *> Project::mapTemplates() {
     return *m_mapTemplates;
   }
-  
-  
+
+
   /**
    * Return registration template FileNames
    *
@@ -2324,11 +2333,11 @@ namespace Isis {
       if ( !newDestination.isEmpty() ) {
         m_isTemporaryProject = false;
         save( QFileInfo(newDestination + "/").absolutePath() );
-        
+
         // delete the temporary project
         deleteAllProjectFiles();
         relocateProjectRoot(newDestination);
-        
+
         // 2014-03-14 kle This is a lame kludge because we think that relocateProjectRoot is not
         // working properly. For example, when we save a new project and try to view a control net
         // the it thinks it's still in the /tmp area
@@ -2341,14 +2350,18 @@ namespace Isis {
       }
     }
     else {
-      //  Save current active control if it has been modified. If "Save As" is being processed,
-      //  the active control is written in the Control::copyToNewProjectRoot so the control in
-      //  current project is not modified.
-      if (activeControl() && activeControl()->isModified()) {
-        activeControl()->write();
+      // Save all modified controls. If "Save As" is being processed,
+      // the controls are written in the Control::copyToNewProjectRoot, so the controls in
+      // current project are not modified.
+      foreach (ControlList *controlList, *m_controls) {
+        foreach (Control *control, *controlList) {
+          if (control->isModified()) {
+            control->write();
+          }
+        }
       }
-
       save(m_projectRoot->absolutePath(), false);
+      emit cnetSaved(true);
     }
 
     return saveDialogCompleted;
@@ -2746,11 +2759,11 @@ namespace Isis {
   * @param camera The camera to be added.
   */
   void Project::addCamera(Camera *camera) {
-        
+
     GuiCameraQsp guiCamera = GuiCameraQsp(new GuiCamera(camera));
 
     m_guiCameras->append(guiCamera);
-    
+
   }
 
 

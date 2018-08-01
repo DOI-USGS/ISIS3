@@ -234,7 +234,7 @@ namespace Isis {
     QList <TemplateList *> regTemplates = m_directory->project()->regTemplates();
     foreach(TemplateList *templateList, regTemplates) {
       foreach(Template *templateFile, *templateList){
-        m_templateComboBox->addItem(templateFile->importName() 
+        m_templateComboBox->addItem(templateFile->importName()
                                     + "/" + FileName(templateFile->fileName()).name());
       }
     }
@@ -242,9 +242,9 @@ namespace Isis {
     templateFileLayout->addRow("Template File:", m_templateComboBox);
 
     // Set-up connections to give registration combobox functionality
-    connect(m_templateComboBox, SIGNAL(activated(QString)), 
+    connect(m_templateComboBox, SIGNAL(activated(QString)),
             this, SLOT(setTemplateFile(QString)));
-    connect(m_measureEditor, SIGNAL(setTemplateFailed(QString)), 
+    connect(m_measureEditor, SIGNAL(setTemplateFailed(QString)),
             this, SLOT(resetTemplateComboBox(QString)));
 
     QVBoxLayout * centralLayout = new QVBoxLayout;
@@ -1288,6 +1288,7 @@ namespace Isis {
       }
 
       // emit a signal to alert user to save when exiting
+      m_control->setModified(true);
       emit cnetModified();
       emit saveControlNet();
 
@@ -1682,6 +1683,7 @@ namespace Isis {
 
     // At exit, or when opening new net, use for prompting user for a save
     m_cnetModified = true;
+    m_control->setModified(true);
     emit cnetModified();
     //   Refresh chipViewports to show new positions of controlPoints
     m_measureEditor->refreshChips();
@@ -2423,10 +2425,10 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   /**
-  * Appends the filename to the registrations path (unless this is the default template) and calls 
+  * Appends the filename to the registrations path (unless this is the default template) and calls
   * setTemplateFile for the control measure
   *
   * @param filename This is the import directory and the filename of the template file selected from
@@ -2435,17 +2437,17 @@ namespace Isis {
   void ControlPointEditWidget::setTemplateFile(QString filename) {
     QString expandedFileName = filename;
     if(!filename.startsWith("$base")){
-      expandedFileName = m_directory->project()->templateRoot() 
+      expandedFileName = m_directory->project()->templateRoot()
                                  + "/registrations/" + filename;
     }
     if (m_measureEditor->setTemplateFile(expandedFileName)) {
       loadTemplateFile(expandedFileName);
     }
   }
-  
-  
+
+
   /**
-  * Reset the selected template in the template combobox if the template selected by the user does 
+  * Reset the selected template in the template combobox if the template selected by the user does
   * not satisfy requirements for the control measure.
   *
   * @param fileName The filename that was previously selected in the template combo box

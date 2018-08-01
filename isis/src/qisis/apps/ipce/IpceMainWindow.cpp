@@ -188,7 +188,7 @@ namespace Isis {
       workorder->execute();
     }
   }
-
+  
 
   /**
    * This is connected from Directory's newWidgetAvailable signal
@@ -252,9 +252,20 @@ namespace Isis {
     connect(dock, SIGNAL(destroyed(QObject *)), newWidget, SLOT(deleteLater()));
     // The list of dock widgets needs cleanup as each view is destroyed
     connect(dock, SIGNAL(destroyed(QObject *)), this, SLOT(cleanupViewDockList(QObject *)));
+
+    // Only emit the signal when one view is added just for simplicity; behavior would not change
+    // if this was emitted after every addition.
+    if (m_viewDocks.size() == 1) {
+      emit enableViewActions(true);
+    }
   }
 
 
+  /**
+   * Cleans up m_viewDocks when a view is closed (object is destroyed).
+   *
+   * @param view QObject* The dock widget to remove from the m_viewDocks
+   */
   void IpceMainWindow::cleanupViewDockList(QObject *obj) {
 
     QDockWidget *dock = static_cast<QDockWidget *>(obj);
@@ -262,12 +273,16 @@ namespace Isis {
       m_viewDocks.removeAll(dock);
       m_specialDocks.removeAll(dock);
     }
+
+    if (m_viewDocks.size() == 0) {
+      emit enableViewActions(false);
+    }
   }
 
 
   /**
-   * This slot is connected from Directory::closeView(QWidget *) signal.  It will close the given 
-   * view and delete the view. 
+   * This slot is connected from Directory::closeView(QWidget *) signal.  It will close the given
+   * view and delete the view.
    *
    * @param view QWidget* The view to close.
    */
@@ -287,7 +302,6 @@ namespace Isis {
     foreach (QDockWidget *dock, m_viewDocks) {
       if (dock) {
         removeDockWidget(dock);
-        m_viewDocks.removeAll(dock);
         delete dock;
       }
     }
@@ -301,7 +315,8 @@ namespace Isis {
     }
     m_viewDocks.clear();
     m_specialDocks.clear();
-  }
+    emit enableViewActions(false);
+}
 
 
   /**
@@ -409,11 +424,15 @@ namespace Isis {
 
     QAction *tabViewsAction = new QAction("Tab Views", this);
     connect( tabViewsAction, SIGNAL(triggered()), this, SLOT(tabViews()) );
+    connect( this, SIGNAL(enableViewActions(bool)), tabViewsAction, SLOT(setEnabled(bool)) );
     m_viewMenuActions.append(tabViewsAction);
+    tabViewsAction->setDisabled(true);  // Disabled on default, until a view is added
 
     QAction *tileViewsAction = new QAction("Tile Views", this);
     connect( tileViewsAction, SIGNAL(triggered()), this, SLOT(tileViews()) );
+    connect( this, SIGNAL(enableViewActions(bool)), tileViewsAction, SLOT(setEnabled(bool)) );
     m_viewMenuActions.append(tileViewsAction);
+    tileViewsAction->setDisabled(true); // Disabled on default, until a view is added
 
     QAction *undoAction = m_directory->undoAction();
     undoAction->setShortcut(Qt::Key_Z | Qt::CTRL);
@@ -783,14 +802,7 @@ namespace Isis {
       m_maxThreadCount = globalSettings.value("maxThreadCount", m_maxThreadCount).toInt();
       applyMaxThreadCount();
     }
-
-    // The geom/state isn't enough for main windows to correctly remember
-    //   their position and size, so let's restore those on top of
-    //   the geom and state.
-    if (!projectSettings.value("pos").toPoint().isNull()) {
-      move(projectSettings.value("pos").toPoint());
-    }
-//    m_directory->project()->setClean(true);
+  //  m_directory->project()->setClean(true);
   }
 
 
