@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             label 'cmake'
-            image 'chrisryancombs/docker_isis_centos'
+            image 'chrisryancombs/docker_isis'
             args  '''\
                     -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
                     -v /usgs/cpkgs/isis3/testData:/usgs/cpkgs/isis3/testData\
