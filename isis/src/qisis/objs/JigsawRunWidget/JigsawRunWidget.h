@@ -102,6 +102,9 @@ namespace Isis {
    *                           instead of QFrame, and handles close event if a bundle is running. 
    *   @history 2018-06-15 Christopher Combs - Implemented "Write detached labels" checkbox. 
    *                           made changes to on_JigsawAcceptButton_clicked to reflect this.
+   *   @history 2018-07-26 Tracie Sucharski - Reformated the widget to get rid of fixed sizes and
+   *                           use layouts to handle sizing instead.  Also put entire widget in
+   *                           a scrolled area.
    */
   class JigsawRunWidget : public QDockWidget {
     Q_OBJECT

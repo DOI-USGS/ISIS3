@@ -27,7 +27,9 @@ namespace Isis {
    *                           target info.  Fixes #4954.
    *   @history 2017-08-14 Summer Stapleton - Updated icons/images to properly licensed or open 
    *                           source images. Fixes #5105.
-   *
+   *   @history 2018-07-26 Tracie Sucharski - Reformated the widget to get rid of fixed sizes and
+   *                           use layouts to handle sizing instead.  Also put entire widget in
+   *                           a scrolled area.
    */
 
   class TargetInfoWidget : public QFrame {

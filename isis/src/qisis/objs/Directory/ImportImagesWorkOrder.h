@@ -103,6 +103,7 @@ namespace Isis {
    *                           camera and a target with every new image imported and adding them if
    *                           needed, they are now no longer created in the first place except 
    *                           when needed. Fixes #5460.
+   *   @history 2018-07-19 Tracie Sucharski - Changed default button for importing DN data to "No". 
    *            
    */
   class ImportImagesWorkOrder : public WorkOrder {

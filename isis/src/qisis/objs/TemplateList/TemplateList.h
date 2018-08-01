@@ -34,13 +34,14 @@
 
  namespace Isis {
 
-   /**
-    * Maintains a list of Templates so that templates can easily be copied from one Project to
-    * another, saved to disk, or deleted from disk. Adapted from ControlList.
+   /**    
     *
     * @author 2017-11-01 Christopher Combs
     *
     * @internal
+    *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
+    *                           can easily be copied from one Project to another, saved to disk, or
+    *                           deleted from disk. Adapted from ControlList.
     *   @history 2018-07-07 Summer Stapleton - Fixed a few errors in how the xmlhandling was 
     *                           occuring and added additional handling of separating map templates
     *                           from registration templates to reflect chagnes in Project.cpp.
@@ -73,6 +74,14 @@
        QString m_type;
 
        class XmlHandler : public XmlStackedHandler {
+         /**
+          *
+          * @author 2017-11-01 Christopher Combs
+          * @internal
+          *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
+          *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
+          *     Adapted from ControlList.
+          */
          public:
            XmlHandler(TemplateList *templateList, Project *project);
 

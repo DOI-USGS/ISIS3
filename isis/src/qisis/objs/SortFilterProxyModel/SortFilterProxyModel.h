@@ -35,16 +35,13 @@ class QVariant;
 
 namespace Isis {
 
-  /**
-   * @brief A proxy class for filtering data within the JigsawSetupDialog
-   *    Bundle Observation Solve Settings (BOSS) tab.
-   *   
-   * @ingroup
+  /**  
    *
    * @author 2018-06-18 Tyler Wilson
    *
    * @internal
-   *   @history 2018-06-18 Tyler Wilson - Original version.
+   *   @history 2018-06-18 Tyler Wilson - Original version. A proxy class for filtering data
+   *   within the JigsawSetupDialog Bundle Observation Solve Settings (BOSS) tab.
    */
   
    class ProjectItem;
