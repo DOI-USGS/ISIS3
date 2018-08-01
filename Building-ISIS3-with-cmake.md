@@ -14,14 +14,14 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 * Create a `build` directory and an `install` directory at this level:
   * `mkdir build install`
 
-* Set your ISISROOT to `/the/path/to/your/build`:
-  * `export ISISROOT=/scratch/this_is_an_example/ISIS3/build`
-
 * cd into the build directory and configure your build:
   * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
 
 * Build ISIS inside of your build directory and install it to your install directory:
   * `ninja install`
+
+* Set your ISISROOT to `/the/path/to/your/build`:
+  * `setisis .`
 
 **Notes**
 * The -GNinja flag specifies creating Google [Ninja](https://ninja-build.org/manual.html) Makefile (an alternative Make system to the traditional GNU make system). If you instead want to use make, dont set this flag, and replace the ninja commands with their make counterparts.
