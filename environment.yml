@@ -66,4 +66,7 @@ dependencies:
   - qwt
   - tnt==126=0
   - xalan-c==1.11
+  - x264==20131218
+  - make
+  - kakadu==1
 prefix: /scratch/anaconda3/envs/isis
