@@ -301,7 +301,9 @@ namespace Isis {
       }
       // Let PCL try to handle other formats (obj, ply, etc.)
       else {
-        mesh = readPC(file);
+	      std::cout << "1     Read here" << std::endl;
+	      mesh = readPC(file);
+	      std::cout << "2     finished reading" << std::endl;
       }
     }
     catch (IException &e) {
@@ -404,6 +406,8 @@ namespace Isis {
     for (int plateIndex = 0; plateIndex < numPlates; ++plateIndex) {
       pcl::Vertices vertexIndices;
       // NAIF uses 1 based indexing for the vertices, so subtract 1
+      
+      
       vertexIndices.vertices.push_back(polygonsArray[plateIndex * 3] - 1);
       vertexIndices.vertices.push_back(polygonsArray[plateIndex * 3 + 1] - 1);
       vertexIndices.vertices.push_back(polygonsArray[plateIndex * 3 + 2] - 1);
@@ -437,6 +441,9 @@ namespace Isis {
   pcl::PolygonMesh::Ptr EmbreeTargetShape::readPC(FileName file) {
     pcl::PolygonMesh::Ptr mesh( new pcl::PolygonMesh );
 
+    std::cout << "Preparing for pcl::io::load" << std::endl;
+    std::cout << "Loading file " << file.expanded().toStdString() << std::endl;
+    std::cout << "Loading Mesh " << mesh << std::endl;
     int loadStatus = pcl::io::load(file.expanded().toStdString(), *mesh);
     if (loadStatus == -1) {
       QString msg = "Failed loading target shape file [" + file.expanded() + "]";
