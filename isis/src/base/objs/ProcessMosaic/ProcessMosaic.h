@@ -268,8 +268,6 @@ namespace Isis {
       Isis::Cube *SetOutputCube(const QString &psParameter);
 
       void SetBandBinMatch(bool enforceBandBinMatch);
-      void SetMosaicOrigin(int &piIndex);
-
 
       void SetBandKeyword(QString bandPriorityKeyName, QString bandPriorityKeyValue);
       void SetBandNumber(int bandPriorityBandNumber);
@@ -296,8 +294,6 @@ namespace Isis {
       static ImageOverlay StringToOverlay(QString);
 
     private:
-      // Get the file index offset to be saved in the band by pixel type
-      int GetIndexOffsetByPixelType();
 
       //Compare the input and mosaic for the specified band based on the criteria and update the
       //  mosaic origin band.
@@ -319,9 +315,6 @@ namespace Isis {
 
       // Checks for the table with name "InputImage"
       bool GetTrackStatus();
-
-      // Reset the origin band
-      void ResetOriginBand();
 
       // New mosaic, add the Band Bin group specific to the mosaic
       void AddBandBinGroup(int origIsb);

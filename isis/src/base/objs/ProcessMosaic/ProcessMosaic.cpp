@@ -338,18 +338,18 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
+        
+        // Add current file to the TrackingTable object
+        iIndex = trackingTable->fileNameToPixel(InputCubes[0]->fileName(), 
+                                       SerialNumber::Compose(*(InputCubes[0])));
+        
+        //  Write the tracking table to the tracking cube, overwriting if need-be
+        if (m_trackingCube->hasTable(Isis::trackingTableName)) {
+         m_trackingCube->deleteBlob("Table", Isis::trackingTableName);
+        }
+        Table table = trackingTable->toTable();
+        m_trackingCube->write(table);
       }
-      
-      // Add current file to the TrackingTable object
-      iIndex = trackingTable->fileNameToPixel(InputCubes[0]->fileName(), 
-                                     SerialNumber::Compose(*(InputCubes[0])));
-      
-      //  Write the tracking table to the tracking cube, overwriting if need-be
-      if (m_trackingCube->hasTable(Isis::trackingTableName)) {
-       m_trackingCube->deleteBlob("Table", Isis::trackingTableName);
-      }
-      Table table = trackingTable->toTable();
-      m_trackingCube->write(table);
 
     }
     else if (m_imageOverlay == AverageImageWithMosaic && m_createOutputMosaic) {
@@ -1161,8 +1161,6 @@ namespace Isis {
     PvlGroup &cInBin  = inLab->findGroup("BandBin", Pvl::Traverse);
     PvlGroup cOutBin("BandBin");
 
-    int iInBands = InputCubes[0]->bandCount();
-
     for (int i = 0; i < cInBin.keywords(); i++) {
       PvlKeyword &cInKey = cInBin[i];
       int iInKeySize = cInKey.size();
@@ -1180,15 +1178,8 @@ namespace Isis {
         }
       }
 
-      // Add the "TRACKING" band to the Keyword if the flag is set and also if the number of
-      // input cube bands is same as the the keysize of the keyword in the BandBin group.
-      // if (m_trackingEnabled && iInBands == iInKeySize) {
-      //   cOutKey += "TRACKING"; // for the origin band
-      // }
-
       // Tag the Count Bands if priority is AverageImageWithMosaic.
       if (m_imageOverlay == AverageImageWithMosaic) {
-      // else if (m_imageOverlay == AverageImageWithMosaic) {
 
         int iTotalOutBands = OutputCubes[0]->bandCount();
         isb = origIsb - 1; // reset the input starting band
@@ -1487,38 +1478,6 @@ void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int in
         }
       }
     }
-  }
-
-
-
-  /**
-   * This method returns the start value depending on the pixel
-   * type 8,16,32 bit.
-   *
-   * @returns the start/offset value
-   *
-   * @throws iException::Message
-   *
-   * @author Sharmila Prasad (8/28/2009)
-   */
-  int ProcessMosaic::GetIndexOffsetByPixelType() {
-    int iOffset = 0;
-
-    switch (SizeOf(OutputCubes[0]->pixelType())) {
-      case 1:
-        iOffset = VALID_MIN1;
-        break;
-
-      case 2:
-        iOffset = VALID_MIN2;
-        break;
-
-      case 4:
-        iOffset = 1;
-        break;
-    }
-    qDebug() << iOffset;
-    return iOffset;
   }
 
 
