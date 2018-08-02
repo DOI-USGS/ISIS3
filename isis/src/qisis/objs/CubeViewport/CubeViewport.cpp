@@ -1121,7 +1121,7 @@ namespace Isis {
     if(p_blueBuffer && p_blueBuffer->working()){
       return;
     }
-    
+
     viewport()->repaint(rect);
   }
 
@@ -1776,7 +1776,7 @@ namespace Isis {
       e->accept();
     }
     else if ((e->key() == Qt::Key_C) &&
-             QApplication::keyboardModifiers() &&
+             QApplication::keyboardModifiers() &
              Qt::ControlModifier) {
 
       //QString fileName = p_cube->fileName();
@@ -1961,7 +1961,7 @@ namespace Isis {
     viewport()->repaint();
   }
 
-  
+
   void CubeViewport::forgetStretches() {
     for(int stretch = 0; stretch < p_knownStretches->size(); stretch++) {
       if((*p_knownStretches)[stretch]) {
