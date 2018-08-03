@@ -83,9 +83,10 @@ command:    python3 ../isis/scripts/makeOutput.py apollo_unit_test_Apollo -t
 output:     Checked In Truth Data To /scratch/cmake/isis3_cmake/isis/src/apollo/objs/Apollo/Apollo.truth
 ```
 
-# Building Test In Debug
+# Building and Running in Debug Mode
 1. reconfigure cmake with flag (-DCMAKE_BUILD_TYPE=DEBUG)
 2. rebuild
+3. executables are in build/bin and install/bin
 
 # Further Reading
 
