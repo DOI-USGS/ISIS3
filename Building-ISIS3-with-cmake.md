@@ -34,8 +34,10 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 
 * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
- 
+* Executables are no longer in an application's directory. When running in debug mode, it is important to give the correct path to an application's executable. Executables are located in build/bin and install/bin. Example using ddt with $ISISROOT set to the build directory:
+  * `ddt $ISISROOT/bin/<application_name>`
 
+ 
 
 ## New Environmental Variable meanings
 `$ISISROOT` is no longer the ISIS3 source directory. `$ISISROOT` is now either the CMake build directory for development or the install directory for running a deployed copy of ISIS. 
