@@ -55,7 +55,7 @@ namespace Isis {
 
     for (int i=0; i < table.Records(); i++) {
       TableRecord record = table[i];
-      QString nameField = QString(record["FileName"]);
+      QString nameField = QString(record["FileName"]).split("/").last();
       QString extension(FileName(nameField).extension());
       int found = nameField.lastIndexOf(extension);
       if (found != -1) {

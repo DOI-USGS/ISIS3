@@ -203,7 +203,7 @@ namespace Isis {
       if (!(m_imageOverlay == UseBandPlacementCriteria ||
           ((m_imageOverlay == PlaceImagesOnTop || m_imageOverlay == PlaceImagesBeneath) &&
            // tracking band was already created for Tracking=true
-           (OutputCubes[0]->bandCount()-1) == 1) ||
+           (OutputCubes[0]->bandCount()) == 1) ||
           (m_imageOverlay == PlaceImagesOnTop && m_placeHighSatPixels && m_placeLowSatPixels &&
            m_placeNullPixels)) ){
         QString m = "Tracking cannot be True for multi-band Mosaic with ontop or beneath priority";
@@ -288,13 +288,14 @@ namespace Isis {
 
           // The tracking cube file name convention is "output_cube_file_name" + "_tracking.cub"
           QString trackingBase = FileName(OutputCubes[0]->fileName()).removeExtension().expanded().split("/").last();//toString();
-          m_trackingCube->create(trackingBase + "_tracking.cub");
-          
+          m_trackingCube->create(FileName(OutputCubes[0]->fileName()).path() 
+                                  + "/" + trackingBase + "_tracking.cub");
+
           // Add the tracking group to the mosaic cube label
           Pvl *mosaicLabel = OutputCubes[0]->label();
           PvlGroup trackingFileGroup("Tracking");
           PvlKeyword trackingFileName("FileName");
-          trackingFileName.setValue(m_trackingCube->fileName());
+          trackingFileName.setValue(trackingBase + "_tracking.cub");
           trackingFileGroup.addKeyword(trackingFileName);
           mosaicLabel->findObject("IsisCube").addGroup(trackingFileGroup);
           
