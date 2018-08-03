@@ -802,7 +802,8 @@ namespace Isis {
       m_maxThreadCount = globalSettings.value("maxThreadCount", m_maxThreadCount).toInt();
       applyMaxThreadCount();
     }
-  //  m_directory->project()->setClean(true);
+
+    m_directory->project()->setClean(true);
   }
 
 
