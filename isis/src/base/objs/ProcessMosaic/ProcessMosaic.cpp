@@ -268,7 +268,8 @@ namespace Isis {
     // Set index of tracking image to the default offset of the Isis::UnsignedByte
     int iIndex = 3;
     
-    // Create tracking cube if need-be and update tracking table and bandbin in label
+    // Create tracking cube if need-be, add bandbin group, and update tracking table. Add tracking
+    // group to mosaic cube. 
     if (m_trackingEnabled) {
       TrackingTable *trackingTable;
 
@@ -1292,29 +1293,7 @@ namespace Isis {
           bFound = true;
       }
     }
-// qDebug() << "Band Index:" << iBandIndex;
-// qDebug() << "Priority Band:" << m_bandPriorityBandNumber;
-// qDebug() << "Input Bands:" << InputCubes[0]->bandCount();
-// qDebug() << "output Bands:" << OutputCubes[0]->bandCount();
-// qDebug();
-
-    //if non-zero integer, must be original band #, 1 based
-//     if (m_bandPriorityBandNumber <= InputCubes[0]->bandCount() &&
-//         m_bandPriorityBandNumber > 0) {
-//       PvlKeyword cKeyOrigBand;
-//       if (cPvlLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("OriginalBand")) {
-//         cKeyOrigBand = cPvlLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("OriginalBand");
-//       }
-//       int iSize = cKeyOrigBand.size();
-//       QString buff = toString(m_bandPriorityBandNumber);
-//       for (int i = 0; i < iSize; i++) {
-//         if (buff == cKeyOrigBand[i]) {
-//           iBandIndex = m_bandPriorityBandNumber;//i + 1; //1 based get band index
-//           bFound = true;
-//           break;
-//         }
-//       }
-//     }
+    
     //key name
     if (!m_bandPriorityBandNumber) {
       PvlKeyword cKeyName;
@@ -1376,8 +1355,7 @@ namespace Isis {
 
       // Move the input data to the output
       for (int iPixel = 0; iPixel < cOportal.size(); iPixel++) {
-        if (IsNullPixel(trackingPortal[iPixel]) ||
-            (m_placeHighSatPixels && IsHighPixel(cIportal[iPixel])) ||
+        if ((m_placeHighSatPixels && IsHighPixel(cIportal[iPixel])) ||
             (m_placeLowSatPixels  && IsLowPixel(cIportal[iPixel])) ||
             (m_placeNullPixels    && IsNullPixel(cIportal[iPixel]))) {
           trackingPortal[iPixel] = index;
