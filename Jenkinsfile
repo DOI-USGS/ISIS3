@@ -46,17 +46,16 @@ pipeline {
                 }
             }
             steps {
-                """
-                ls
-                pwd
-                conda env create -n isis3 -f environment.yml
-                source activate isis3
-                export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
-                export ISISROOT="${workspace}/install"
-                ctest -j8 -R _unit_ --timeout 500
-                ctest -j8 -R _app_ --timeout 500
-                ctest -j8 -R _module_ --timeout 500
-                
+                sh """
+                    ls
+                    pwd
+                    conda env create -n isis3 -f environment.yml
+                    source activate isis3
+                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
+                    export ISISROOT="${workspace}/install"
+                    ctest -j8 -R _unit_ --timeout 500
+                    ctest -j8 -R _app_ --timeout 500
+                    ctest -j8 -R _module_ --timeout 500
                 """
             }
         }
