@@ -54,6 +54,7 @@ pipeline {
                     export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
                     export ISISROOT="${workspace}/install"
                     cd build
+                    set +e
                     ctest -j8 -R _unit_ --timeout 500
                     ctest -j8 -R _app_ --timeout 500
                     ctest -j8 -R _module_ --timeout 500
