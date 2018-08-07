@@ -53,8 +53,8 @@ pipeline {
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     cd build
-                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     set +e
+                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     ctest -V -R _unit_ --timeout 500
                     ctest -V -R _app_ --timeout 500
                     ctest -V -R _module_ --timeout 500
