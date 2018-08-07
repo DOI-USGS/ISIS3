@@ -14,6 +14,7 @@ pipeline {
                     args  '''\
                             -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
                             -v /usgs/cpkgs/isis3/testData:/usgs/cpkgs/isis3/testData\
+                            -v /usgs/cpkgs/isis3/isis3mgr_scripts:/usgs/cpkgs/isis3/isis3mgr_scripts
                           '''  
                 }
             }
@@ -25,6 +26,7 @@ pipeline {
                     cmake -GNinja -DJP2KFLAG=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
                     set +e
                     cd build
+                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     ninja -j8 && ninja install
                     """
 //                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
@@ -42,18 +44,16 @@ pipeline {
                     args  '''\
                             -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
                             -v /usgs/cpkgs/isis3/testData:/usgs/cpkgs/isis3/testData\
+                            -v /usgs/cpkgs/isis3/isis3mgr_scripts:/usgs/cpkgs/isis3/isis3mgr_scripts
                           '''  
                 }
             }
             steps {
                 sh """
-                    ls
-                    pwd
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
-                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
-                    export ISISROOT="${workspace}/install"
                     cd build
+                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     set +e
                     ctest -V -R _unit_ --timeout 500
                     ctest -V -R _app_ --timeout 500
