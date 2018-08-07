@@ -203,7 +203,7 @@ namespace Isis {
       if (!(m_imageOverlay == UseBandPlacementCriteria ||
           ((m_imageOverlay == PlaceImagesOnTop || m_imageOverlay == PlaceImagesBeneath) &&
            // tracking band was already created for Tracking=true
-           (OutputCubes[0]->bandCount()) == 1) ||
+           (OutputCubes[0]->bandCount() - 1) <= 1) ||
           (m_imageOverlay == PlaceImagesOnTop && m_placeHighSatPixels && m_placeLowSatPixels &&
            m_placeNullPixels)) ){
         QString m = "Tracking cannot be True for multi-band Mosaic with ontop or beneath priority";
@@ -252,7 +252,8 @@ namespace Isis {
       }
     }
 
-    // Even if the track flag is off, if the track table exists continue tracking
+    // Even if the track flag is off, if the track table exists and "TRACKING" exists in bandbin
+    // group continue tracking
     if (bTrackExists) {
       m_trackingEnabled = true;
     }
@@ -267,7 +268,11 @@ namespace Isis {
     
     // Set index of tracking image to the default offset of the Isis::UnsignedByte
     int iIndex = 3;
-    
+    // Propogate tracking if adding to mosaic that was previouly tracked.
+    if (OutputCubes[0]->hasGroup("Tracking") && !m_createOutputMosaic) {
+      m_trackingEnabled = true;
+    }
+
     // Create tracking cube if need-be, add bandbin group, and update tracking table. Add tracking
     // group to mosaic cube. 
     if (m_trackingEnabled) {
@@ -331,7 +336,7 @@ namespace Isis {
               throw IException(IException::User, msg, _FILEINFO_);
             }
           }
-          // If no tracking table exists in mosaic cube, warn user to run utility application to
+          // If no tracking group exists in mosaic cube, warn user to run utility application to
           // add it and create a separate tracking cube
           else {
             QString msg = "Tracking cannot be enabled when adding to an existing mosaic "
@@ -1510,24 +1515,15 @@ void ProcessMosaic::BandPriorityWithNoTracking(int iss, int isl, int isb, int in
     //get the output label
     Pvl *cPvlOut = OutputCubes[0]->label();
 
-    bool bTableExists = false;
-    int iNumObjs = cPvlOut->objects();
+    bool bGroupExists = false;
     PvlObject cPvlObj;
 
     //Check if table already exists
-    if (cPvlOut->hasObject("Table")) {
-      for (int i = 0; i < iNumObjs; i++) {
-        cPvlObj = cPvlOut->object(i);
-        if (cPvlObj.hasKeyword("Name", Pvl::Traverse)) {
-          PvlKeyword cNameKey = cPvlObj.findKeyword("Name", Pvl::Traverse);
-          if (cNameKey[0] == TRACKING_TABLE_NAME) {
-            bTableExists = true;
-          }
-        }
-      }
+    if (cPvlOut->hasGroup("Tracking")) {
+      bGroupExists = true;
     }
 
-    return bTableExists;
+    return bGroupExists;
   }
 
 }
