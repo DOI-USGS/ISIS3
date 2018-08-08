@@ -301,9 +301,7 @@ namespace Isis {
       }
       // Let PCL try to handle other formats (obj, ply, etc.)
       else {
-	      std::cout << "1     Read here" << std::endl;
-	      mesh = readPC(file);
-	      std::cout << "2     finished reading" << std::endl;
+	mesh = readPC(file);
       }
     }
     catch (IException &e) {
