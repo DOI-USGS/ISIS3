@@ -278,6 +278,9 @@ namespace Isis {
    *                           activeControlModified() is signaled, instead of cnetModified(). This
    *                           stops views from being redrawn when any cnet is modified, but still
    *                           occurs when the active is modified. Fixes #5396.
+   *   @history 2018-08-08 Tracie Sucharski - Removed makeBackupActive slot which was a temporary
+   *                           autosave of active control, most likely causing problems with large
+   *                           networks.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -430,9 +433,6 @@ namespace Isis {
       void cleanupJigsawRunWidget(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
-
-      // TODO temporary slot until autosave is implemented
-      void makeBackupActiveControl();
 
       //  Slots in response to mouse clicks on CubeDnView (ControlNetTool) and
       //    Footprint2DView (MosaicControlNetTool)

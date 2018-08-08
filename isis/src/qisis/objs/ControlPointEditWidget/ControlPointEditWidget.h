@@ -100,6 +100,8 @@ namespace Isis {
    *                           the active registration template from the widget itself.
    *   @history 2018-07-13 Kaitlyn Lee - Added calls to setModified(true) when a cnet is modified.
    *                           References #5396.
+   *   @history 2018-08-08 Tracie Sucharski - Removed temporary autosave of active control, most
+   *                           likely causing problems with large networks.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT

@@ -899,8 +899,6 @@ namespace Isis {
       connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
               this, SIGNAL(cnetModified()));
 
-      connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
-              this, SLOT(makeBackupActiveControl()));
       connect (project(), SIGNAL(activeControlSet(bool)),
               result->controlPointEditWidget(), SLOT(setControlFromActive()));
 
@@ -1914,17 +1912,6 @@ namespace Isis {
         latitude, longitude, cube, isGroundSource);
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
-  }
-
-
-  /**
-   * Autosave for control net.  The control net is auto saved to the same directory as the input
-   * net.  It is saved to controlNetFilename.net.bak.
-   *
-   */
-  void Directory::makeBackupActiveControl() {
-
-    project()->activeControl()->controlNet()->Write(project()->activeControl()->fileName()+".bak");
   }
 
 
