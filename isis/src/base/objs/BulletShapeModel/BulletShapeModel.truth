@@ -1,6 +1,4 @@
 Unit test for BulletShapeModel
-  MaxTriangles:  134217728
-  MaxBodyParts:  16
 
 
 ----====        Construct default shape model        ====----
@@ -358,5 +356,3 @@ Model has normal?  true
   Local Normal: ( -0.316769 ,  -0.222496 ,  0.922037 )
   Ellipsoid Normal: ( -0.405294 ,  -0.455081 ,  0.792867 )
   Recalculated Local Normal: ( -0.316769 ,  -0.222496 ,  0.922037 )
-
-
