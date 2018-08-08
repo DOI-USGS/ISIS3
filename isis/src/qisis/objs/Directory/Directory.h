@@ -278,7 +278,7 @@ namespace Isis {
    *                           activeControlModified() is signaled, instead of cnetModified(). This
    *                           stops views from being redrawn when any cnet is modified, but still
    *                           occurs when the active is modified. Fixes #5396.
-   *   @history 2018-08-08 Tracie Sucharski - Removed makeBackupActive slot which was atemporary
+   *   @history 2018-08-08 Tracie Sucharski - Removed makeBackupActive slot which was a temporary
    *                           autosave of active control, most likely causing problems with large
    *                           networks.
    */
