@@ -81,6 +81,7 @@ namespace Isis {
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
         this, SLOT(rebuildModels()));
 
+    connect(this, SIGNAL(cnetModified()), this, SLOT(setCnetModified()));
     m_settingsPath = new QString(pathForSettings);
 
     QBoxLayout *mainLayout = createMainLayout();
@@ -1049,5 +1050,13 @@ namespace Isis {
       m_imageModel->setFrozen(false);
       m_connectionModel->setFrozen(false);
     }
+  }
+
+
+  /**
+   * Connected to cnetModified(). Sets the modification of m_control when the cnet is modified.
+   */
+  void CnetEditorWidget::setCnetModified() {
+    m_control->setModified(true);
   }
 }

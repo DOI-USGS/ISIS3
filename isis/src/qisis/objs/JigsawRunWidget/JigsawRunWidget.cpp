@@ -101,9 +101,6 @@ namespace Isis {
                              "used for running the next bundle adjust when \"Run\" is clicked.");
     m_ui->useLastSettings->setToolTip(lastSettingsToolTip);
     m_ui->useLastSettings->setWhatsThis(lastSettingsWhat);
-
-    // setWindowFlags(Qt::WindowStaysOnTopHint);
-
   }
 
 

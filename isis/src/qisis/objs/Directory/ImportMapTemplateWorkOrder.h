@@ -1,5 +1,5 @@
-#ifndef ImportTemplateWorkOrder_H
-#define ImportTemplateWorkOrder_H
+#ifndef ImportMapTemplateWorkOrder_H
+#define ImportMapTemplateWorkOrder_H
 /**
  * @file
  * $Revision: 1.19 $
@@ -29,26 +29,21 @@
 
  namespace Isis {
    /**
-    * @brief Add templates to a project
+    * @brief Add map templates to a project
     *
-    * Asks the user for a template and its type and copies it into the project.
+    * Asks the user for a map template and copies it into the project.
     *
-    * @author 2017-07-31 Christopher Combs
+    * @author 2018-07-05 Summer Stapleton
     *
-    * @internal
-    *   @history 2017-08-23 Tracie Sucharski - Fixed assignment to itemType in setupExecution to use
-    *                          assignment operator rather than comparison operator.
-    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
-    *                          classes. Fixes #5117.
     */
-    class ImportTemplateWorkOrder : public WorkOrder {
+    class ImportMapTemplateWorkOrder : public WorkOrder {
         Q_OBJECT
       public:
-        ImportTemplateWorkOrder(Project *project);
-        ImportTemplateWorkOrder(const ImportTemplateWorkOrder &other);
-        ~ImportTemplateWorkOrder();
+        ImportMapTemplateWorkOrder(Project *project);
+        ImportMapTemplateWorkOrder(const ImportMapTemplateWorkOrder &other);
+        ~ImportMapTemplateWorkOrder();
 
-        virtual ImportTemplateWorkOrder *clone() const;
+        virtual ImportMapTemplateWorkOrder *clone() const;
 
         virtual bool isExecutable(ProjectItem *item);
         bool setupExecution();
@@ -56,10 +51,9 @@
         void undoExecution();
 
       private:
-        ImportTemplateWorkOrder &operator=(const ImportTemplateWorkOrder &rhs);
+        ImportMapTemplateWorkOrder &operator=(const ImportMapTemplateWorkOrder &rhs);
 
         TemplateList *m_list;
-        QString m_fileType; //!< The file type filter chosen in the QFileDialog
     };
  }
 
