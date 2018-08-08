@@ -800,8 +800,6 @@ namespace Isis {
       groundFile = newFile.absoluteFilePath();
       m_controlNet->GetPoint(i)->SetAprioriSurfacePointSourceFile(groundFile.expanded());
     }
-    //  TODO:  Temporary until autosave is implemented Save control net to Backup file
-    emit saveControlNet();
   }
 
 
@@ -1290,7 +1288,6 @@ namespace Isis {
       // emit a signal to alert user to save when exiting
       m_control->setModified(true);
       emit cnetModified();
-      emit saveControlNet();
 
       if (m_editPoint != NULL) {
         //  Change Save Point button text to red
@@ -1687,8 +1684,6 @@ namespace Isis {
     emit cnetModified();
     //   Refresh chipViewports to show new positions of controlPoints
     m_measureEditor->refreshChips();
-
-    emit saveControlNet();
   }
 
 
@@ -2616,8 +2611,6 @@ namespace Isis {
 
     //  Change Save Measure button text back to default
     m_saveNet->setPalette(m_saveDefaultPalette);
-
-    emit saveControlNet();
   }
 
 
