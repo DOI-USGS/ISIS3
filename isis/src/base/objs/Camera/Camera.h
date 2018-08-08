@@ -241,7 +241,7 @@ namespace Isis {
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to 
    *                           prevent a segfault when the distortion map is incomplete. Fixes $5163.
-   *   @hitsory 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
+   *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
    *                           collect the InstrumentId from the original cube label for 
    *                           comparisons related to image imports in ipce. References #5460.
    */
