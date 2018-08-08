@@ -64,7 +64,7 @@ void IsisMain() {
                        + in.name() + "].", _FILEINFO_);
     }
   }
-  
+
   // Convert the pds file to a cube
   Pvl *pdsLabel = new Pvl();
 
@@ -104,14 +104,14 @@ void IsisMain() {
   try  {
     TranslateVoyagerLabels(*pdsLabel, ocube);
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
   ocube->write(*hist);
 
   p.EndProcess();
-  
+
   delete pdsLabel;
   if (tempFile) QFile::remove(temp.expanded());
 }
@@ -448,7 +448,7 @@ void TranslateVoyagerLabels(Pvl &inputLab, Cube *ocube) {
                     + ".template.cub");
   res += PvlKeyword("Status", "Nominal");
   ocube->putGroup(res);
-  NaifStatus::CheckErrors();   
+  NaifStatus::CheckErrors();
 }
 
 
