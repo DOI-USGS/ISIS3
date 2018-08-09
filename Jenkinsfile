@@ -23,17 +23,15 @@ pipeline {
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
-                    cmake -GNinja -DJP2KFLAG=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
+                    cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
                     set +e
                     cd build
-                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     ninja -j8 && ninja install
+                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                    ctest -V -R _unit_ --timeout 500
+                    ctest -V -R _app_ --timeout 500
+                    ctest -V -R _module_ --timeout 500
                     """
-//                    export PATH="${PATH}:/opt/conda/envs/isis3/bin/:${workspace}/install/bin"
-//                    export ISISROOT="${workspace}/install"
-//                    ctest -j8 -R _unit_ --timeout 500
-//                    ctest -j8 -R _app_ --timeout 500
-//                   ctest -j8 -R _module_ --timeout 500
             }
         }
         stage('CentOS7') {
@@ -53,8 +51,8 @@ pipeline {
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     cd build
-                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     set +e
+                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                     ctest -V -R _unit_ --timeout 500
                     ctest -V -R _app_ --timeout 500
                     ctest -V -R _module_ --timeout 500
