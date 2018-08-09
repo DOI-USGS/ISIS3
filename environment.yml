@@ -48,12 +48,12 @@ dependencies:
   - nn==1.86.0=2
   # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
-  - opencv==3.3.0
+  - opencv==3.3.1
   - nanoflann==1.2.2
   - gmm==5.0
   - jama==125
   - openssl==1.0.2n=0
-  # - python==3.6
+  - python==3.6
   - sqlite==3.13.0=1
   - suitesparse==4.5.4=blas_openblas_200
   - superlu==5.2.1=blas_openblas_201
