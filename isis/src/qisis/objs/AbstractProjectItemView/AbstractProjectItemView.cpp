@@ -270,7 +270,7 @@ namespace Isis {
 
   /**
    * Adds several items to the view. The items must be a part of the
-   * view's model. This method can be overriden in a subclass to filter out
+   * view's model. This method can be overridden in a subclass to filter out
    * unneeded items.
    *
    * @param[in] items (QList<ProjectItem *>) The items to add.
