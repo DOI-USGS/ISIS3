@@ -73,15 +73,16 @@
        QString m_name;
        QString m_type;
 
+       /**
+        *
+        * @author 2017-11-01 Christopher Combs
+        * @internal
+        *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
+        *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
+        *     Adapted from ControlList.
+        */
        class XmlHandler : public XmlStackedHandler {
-         /**
-          *
-          * @author 2017-11-01 Christopher Combs
-          * @internal
-          *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
-          *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
-          *     Adapted from ControlList.
-          */
+
          public:
            XmlHandler(TemplateList *templateList, Project *project);
 
