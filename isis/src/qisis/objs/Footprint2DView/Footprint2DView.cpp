@@ -78,11 +78,13 @@ namespace Isis {
 
     connect( internalModel(), SIGNAL( itemAdded(ProjectItem *) ),
              this, SLOT( onItemAdded(ProjectItem *) ) );
+    connect( internalModel(), SIGNAL( itemsAdded() ),
+             this, SLOT( onItemsAdded() ) );
     connect( internalModel(), SIGNAL( itemRemoved(ProjectItem *) ),
              this, SLOT( onItemRemoved(ProjectItem *) ) );
 
-    connect(m_sceneWidget, SIGNAL(queueSelectionChanged() ),
-            this, SLOT(onQueueSelectionChanged() ) );
+    connect(m_sceneWidget, SIGNAL(queueSelectionChanged()),
+            this, SLOT(onQueueSelectionChanged()), Qt::QueuedConnection);
 
     //  Pass on Signals emitted from ControlNetTool, through the MosaicSceneWidget
     //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
@@ -99,7 +101,8 @@ namespace Isis {
             this, SLOT(onMosItemRemoved(Image *)));
 
     //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
-    //  the footprints.
+    //  the footprints. Connection made in Directory from directory's signal to this signal since
+    //  Directory doesn't have access to the scene within the sceneWidget.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
     setStatusBar(statusBar);
@@ -171,6 +174,14 @@ namespace Isis {
 
 
   /**
+   * Accessor for the FileListWidget
+   */
+  ImageFileListWidget *Footprint2DView::fileListWidget() {
+    return m_fileListWidget;
+  }
+
+
+  /**
    * Event filter to filter out drag and drop events.
    *
    * @param[in] watched (QObject *) The object being filtered
@@ -197,8 +208,10 @@ namespace Isis {
 
 
   /**
-   * Slot to connect to the itemAdded signal from the model. If the
-   * item is an image it adds it to the scene.
+   * Slot to connect to the itemAdded signal from the model. If the item is an image or shape it is 
+   * added to a list. When everything has been added, then the list is added to the scene through 
+   * signal/slot connection from ProjectItemProxyModel signal, itemsAdded which is connected to 
+   * this objects onItemsAdded slot. 
    *
    * @param[in] item (ProjectItem *) The item
    */
@@ -206,26 +219,34 @@ namespace Isis {
     if (!item || (!item->isImage() && !item->isShape())) {
       return;
     }
-    //TODO 2016-09-09 TLS  Handle Shapes-Create image from shape since qmos only handles images?
-    //                   Still don't know if shape should inherit from image or contain an image?
-    //
+
     Image *image;
-    ImageList images;
     if (item->isShape()) {
-      //TEMPORARY UNTIL SHAPE IS FIXED TO HOLD IMAGE, once Shape holds image go back to old code
-      // previous to 10-21-16
       image = new Image(item->shape()->cube());
     }
     else if (item->isImage()) {
       image = item->image();
     }
-    images.append(image);
-    m_sceneWidget->addImages(images);
-    m_fileListWidget->addImages(&images);
+
+    m_images.append(image);
 
     if (!m_imageItemMap.value(image)) {
       m_imageItemMap.insert(image, item);
     }
+  }
+
+
+  /**
+   * Slot called once all selected images have been added to the proxy model.  This is much faster 
+   * than adding a single image at a time to the MosaicSceneWidget. This is connected from the 
+   * ProjectItemProxyModel::itemsAdded signal. 
+   *
+   */
+  void Footprint2DView::onItemsAdded() {
+    //  This is called once all selected images have been added to proxy model (internalModel())
+    //  This is much faster than adding a single image at a time to the scene widget
+    m_sceneWidget->addImages(m_images);
+    m_fileListWidget->addImages(&m_images);
   }
 
 

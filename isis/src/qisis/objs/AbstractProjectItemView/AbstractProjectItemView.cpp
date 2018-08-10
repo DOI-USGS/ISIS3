@@ -262,8 +262,7 @@ namespace Isis {
    * @param[in] item (ProjectItem *) The item to add.
    */
   void AbstractProjectItemView::addItem(ProjectItem *item) {
-        if (ProjectItemProxyModel *proxyModel =
-        qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+    if (ProjectItemProxyModel *proxyModel = qobject_cast<ProjectItemProxyModel *>( internalModel() )) {
       proxyModel->addItem(item);
     }
   }
@@ -271,13 +270,14 @@ namespace Isis {
 
   /**
    * Adds several items to the view. The items must be a part of the
-   * view's model.
+   * view's model. This method can be overriden in a subclass to filter out
+   * unneeded items.
    *
    * @param[in] items (QList<ProjectItem *>) The items to add.
    */
   void AbstractProjectItemView::addItems(QList<ProjectItem *> items) {
-    foreach (ProjectItem *item, items) {
-      addItem(item);
+    if (ProjectItemProxyModel *proxyModel = qobject_cast<ProjectItemProxyModel *>( internalModel() )) {
+      proxyModel->addItems(items);
     }
   }
 

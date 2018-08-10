@@ -28,6 +28,7 @@
 
 #include "AbstractProjectItemView.h"
 #include "FileName.h"
+#include "ImageList.h"
 #include "XmlStackedHandler.h"
 
 class QAction;
@@ -97,6 +98,13 @@ namespace Isis {
    *   @history 2018-07-12 Tracie Sucharski - Renamed m_controlNetTool to m_controlNetToolAction
    *                           to be clear it is not a pointer to the tool.  Add a call to
    *                           the MosaicControlNetTool::loadNetwork in enableControlNetTool.
+   *   @history 2018-07-31 Tracie Sucharski - Add accessor method for ImageFileListWidget.
+   *   @history 2018-08-10 Tracie Sucharski - Added new slot connected from ProjectItemProxyModel's
+   *                           itemsAdded signal which is emitted after all selected items have
+   *                           been added to the proxy model.  This allows the FootprintView to put
+   *                           all selected items into the scene widget at once rather than
+   *                           individually which speeds the display of footprints. Fixes #5296.
+   *  
    */
   class Footprint2DView : public AbstractProjectItemView {
 
@@ -107,6 +115,7 @@ namespace Isis {
       ~Footprint2DView();
 
       MosaicSceneWidget *mosaicSceneWidget();
+      ImageFileListWidget *fileListWidget();
 
       void load(XmlStackedHandlerReader *xmlReader);
       void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;
@@ -125,8 +134,12 @@ namespace Isis {
     protected:
       bool eventFilter(QObject *watched, QEvent *event);
 
+    protected slots:
+      //void rowsInserted(const QModelIndex &parent, int first, int last);
+
     private slots:
       void onItemAdded(ProjectItem *item);
+      void onItemsAdded();
       void onItemRemoved(ProjectItem *item);
       void onQueueSelectionChanged();
       void onMosItemRemoved(Image *image);
@@ -159,6 +172,7 @@ namespace Isis {
       MosaicSceneWidget *m_sceneWidget; //!< The scene widget
       ImageFileListWidget *m_fileListWidget; //!< The file list widget
       QMainWindow *m_window; //!< Main window
+      ImageList m_images;
       QMap<Image *, ProjectItem *> m_imageItemMap; //!< Maps images to their items
       Directory *m_directory; //!< The directory
 
