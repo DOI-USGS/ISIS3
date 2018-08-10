@@ -256,7 +256,7 @@ namespace Isis {
 
   /**
    * Adds an item to the view. The item must be part of the view's
-   * model. This method can be overriden in a subclass to filter out
+   * model. This method can be overridden in a subclass to filter out
    * unneeded items.
    *
    * @param[in] item (ProjectItem *) The item to add.
