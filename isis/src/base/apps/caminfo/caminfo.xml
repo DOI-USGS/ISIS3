@@ -362,6 +362,12 @@ End
     <change name="Janet Richie" date="2013-02-25">
       Reviewed documentation. References #1452.
     </change>
+    <change name="Kris Becker" date="2018-08-06">
+        Add all keyword/values found in the output of the camstats run into
+        the Camstats object. Provide option to read camstats data from the
+        CamstatsStatistics Table object in the cube label rather than
+        (potentially) rerunning camstats (see USECAMSTATSTBL).
+    </change>
   </history>
 
   <category>
@@ -554,6 +560,22 @@ End
           </UL>
         </description>
         <default><item>FALSE</item></default>
+      </parameter>
+
+     <parameter name="USECAMSTATSTBL">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Get camera statistics from CameraStatistics Table
+        </brief>
+        <description>
+          Read the camera statistics from the CameraStatistics Table contained
+          in file from a previous run of camstats if present. If you choose
+          this option and the Table object doesn't exist (i.e., camstats has
+          not been run with APPEND=TRUE), then the CAMSTATS parameter can
+          be set to TRUE to create the statistics to assure availability of
+          the data.
+        </description>
       </parameter>
 
       <parameter name="CAMSTATS">

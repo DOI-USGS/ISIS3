@@ -18,8 +18,14 @@
 #include "ProgramLauncher.h"
 #include "Progress.h"
 #include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "SerialNumber.h"
+#include "SpecialPixel.h"
 #include "Statistics.h"
+#include "Table.h"
+#include "TableRecord.h"
+#include "TableField.h"
 #include "UserInterface.h"
 
 #include <QList>
@@ -39,6 +45,10 @@ void GenerateCSVOutput(Cube *incube,
                        QList< QPair<QString, QString> > *camstats,
                        QList< QPair<QString, QString> > *statistics,
                        BandGeometry *bandGeom);
+
+bool getCamstatsBlob(Cube &cube, Pvl &camPvl);
+void transferCamstatsKeys(const PvlObject &camstats, QList<QPair<QString, QString> > &outkeys);
+
 
 void IsisMain() {
   const QString caminfo_program  = "caminfo";
@@ -77,14 +87,27 @@ void IsisMain() {
   // Run camstats on the entire image (all bands)
   // another camstats will be run for each band and output
   // for each band.
-  if(ui.GetBoolean("CAMSTATS")) {
-    camstats = new QList< QPair<QString, QString> >;
+  if(ui.GetBoolean("CAMSTATS") || ui.GetBoolean("USECAMSTATSTBL") ) {
 
-    QString filename = ui.GetAsString("FROM");
-    int sinc = ui.GetInteger("SINC");
-    int linc = ui.GetInteger("LINC");
-    CameraStatistics stats(filename, sinc, linc);
-    Pvl camPvl = stats.toPvl();
+    Pvl camPvl;
+    bool gotCamData(false);
+    // If requested, attempt to get the camstats 
+    if (ui.GetBoolean("USECAMSTATSTBL") ) {
+        gotCamData = getCamstatsBlob(*incube, camPvl);
+    }
+
+
+    // If haven't got data yet and 
+    if ( !gotCamData ) {
+        QString filename = ui.GetAsString("FROM");
+        int sinc = ui.GetInteger("SINC");
+        int linc = ui.GetInteger("LINC");
+        CameraStatistics stats(filename, sinc, linc);
+        camPvl = stats.toPvl();
+        gotCamData = true;
+    }
+
+    camstats = new QList<QPair<QString, QString> >;
 
     PvlGroup cg = camPvl.findGroup("Latitude", Pvl::Traverse);
     camstats->append(MakePair("MinimumLatitude", cg["latitudeminimum"][0]));
@@ -113,6 +136,9 @@ void IsisMain() {
     cg = camPvl.findGroup("LocalSolarTime", Pvl::Traverse);
     camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
     camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
+
+    // Transfer all the keys in the camstats keyword hierarchy
+    transferCamstatsKeys(camPvl, *camstats);
   }
 
   // Compute statistics for entire cube
@@ -431,4 +457,87 @@ void GenerateCSVOutput(Cube *incube,
   values.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
   outFile << values << endl;
   outFile.close();
+}
+
+
+/**
+ * @brief Get CameraStatistics from cube table and construct Pvl 
+ * 
+ * @author 2018-08-09 Kris Becker
+ * 
+ * @param cube   Cube to extract CameraStatistics table 
+ * @param camPvl Output Pvl object to write keywords
+ * 
+ * @return bool  True if successfully read, false if doesn't exist or read 
+ *               fails
+ */
+bool getCamstatsBlob(Cube &cube, Pvl &camPvl) {
+    Table camstats("CameraStatistics");
+    try {
+        cube.read(camstats);
+    } catch (IException &ie) {
+        // If it doesn't exist, simply let caller know
+        //ie.clear()
+        return ( false );
+    }
+
+    // Extract the keyword data and construct the camstats Pvl groups
+    for (int r = 0 ; r < camstats.Records() ; r++) {
+        TableRecord &record = camstats[r];
+        QString name = (QString) record[0];
+        PvlGroup group(name);
+        
+        // Test for "Angle" and remove it for compatability with
+        // CameraStatistics class (even though its in the group name!)
+        QString keyname(name);
+        keyname.replace("Angle","");
+
+        for (int fnum = 1; fnum < record.Fields() ; fnum++) {
+            TableField &field = record[fnum];
+            QString key = keyname + field.name();
+            double value = (double) field;
+            if ( IsSpecial(value) ) {
+                group.addKeyword( PvlKeyword(key, "NULL") );
+            }
+            else {
+                group.addKeyword( PvlKeyword(key, toString(value)) );
+            }
+        }
+        camPvl.addGroup(group);
+    }
+    
+    
+    return ( true );
+}
+
+/**
+ * @brief Transfer camstats keywords from Pvl to string pair
+ * 
+ * @author 2018-08-09 Kris Becker
+ * 
+ * @param camstats Input Pvl object containing camstats output
+ * @param outkeys  String pair structure
+ */
+void transferCamstatsKeys(const PvlObject &camstats, 
+                          QList<QPair<QString, QString> > &outkeys) {
+    PvlObject::ConstPvlGroupIterator group = camstats.beginGroup();
+    while ( group != camstats.endGroup() ) {
+        if ( group->name().toLower() != "user parameters") {
+            PvlContainer::ConstPvlKeywordIterator key = group->begin();
+            while ( key != group->end() ) {
+
+                // Fix camstats misspelling!
+                QString kname = key->name();
+                if ( kname.toLower() == "aspectratiomaximun" ) {
+                    kname = "AspectRatioMaximum";
+                }
+
+                outkeys.append(MakePair(kname, (*key)[0]));
+                ++key;
+            }
+        }
+        ++group;
+    }
+
+    return;
 }
