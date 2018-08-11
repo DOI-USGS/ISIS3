@@ -4,7 +4,8 @@ APPNAME = jigsaw
 # when the target body Enceladus when the target body parameter file is used.  This particular
 # test sets the RadiusSolveOption to mean.
 # 2018-07-24 Debbie A. Cook Changed the SED commands to remove digits beyond the second
-# decimal place instead of the third to get the MacOS test to match.
+# decimal place instead of the third to get the MacOS test to match.  Also changed
+#                        "-0.00" to "0.00" after truncating.
 
 
 # The "cat bundleout.txt" command in these tests uses perl and sed to do the following (in order):
@@ -29,6 +30,8 @@ commands:
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	       | sed 's/\ -0.00/ 0.00/' \
+	       | sed 's/\ -0.00/ 0.00/' \
 	       > $(OUTPUT)/pole-ra-dec-w0-wDot-mean-radius_bundleout.txt;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \

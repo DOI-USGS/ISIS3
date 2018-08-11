@@ -95,8 +95,9 @@ namespace Isis {
    *                           have not changed.  Also corrected the longitude conversion equation
    *                           in SetSphericalSigmasDistance and GetLonSigmaDistance.
    *                           References #5457.
-   *   @history 2018-07-16 Debbie A. Cook - Initialized the local radius whenever any 
-   *                           SurfacePoint coordinate was changed.  References #5457
+   *   @history 2018-07-30 Debbie A. Cook - Initialized the local radius whenever any 
+   *                           SurfacePoint coordinate was changed, removed memory errors,
+   *                           and cleaned up documentation.  References #5457
    */
 
   class SurfacePoint {
@@ -207,6 +208,7 @@ namespace Isis {
       SurfacePoint &operator=(const SurfacePoint &other);
 
     private:
+      void ComputeLocalRadius();
       void InitCovariance();
       void InitPoint();
       void SetRectangularPoint(const Displacement &x, const Displacement &y, const Displacement &z);
