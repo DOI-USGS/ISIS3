@@ -223,6 +223,6 @@ namespace Isis {
     // At this point, the file is not in the internal file list so append it
     // and return its new index.
     m_fileList.append(QPair<FileName, QString>(file, serialNumber));
-    return m_fileList.size() - 1 + VALID_MINUI4;
+    return m_fileList.size() - 1;
   }
 }
