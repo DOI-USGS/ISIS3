@@ -179,7 +179,6 @@ namespace Isis {
    * @return @b ProjectItem* The item in the proxy model.
    */
   ProjectItem *ProjectItemProxyModel::addItem(ProjectItem *sourceItem) {
-//  qDebug()<<"ProjectItemProxyModel::addItem";
     if (!sourceItem) {
       return 0;
     }
@@ -208,10 +207,10 @@ namespace Isis {
    *                                              source model.                                              
    */
   void ProjectItemProxyModel::addItems(QList<ProjectItem *> sourceItems) {
-//  qDebug()<<"ProjectItemProxyModel::addItem";
     foreach (ProjectItem *item, sourceItems) {
       addItem(item);
     }
+    emit itemsAdded();
   }
 
   

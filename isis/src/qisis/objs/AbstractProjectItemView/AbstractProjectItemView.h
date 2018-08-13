@@ -84,7 +84,11 @@ namespace Isis {
    *                           size, instead of being hard-coded. The percentages chosen allow for 2
    *                           CubeDnViews to be opened at once, since CubeDnView has an internal
    *                           size policy. References #5433
-   *   @history 2018-07-26 Tracie Sucharski - Cleaned up some documentation. 
+   *   @history 2018-07-26 Tracie Sucharski - Cleaned up some documentation.
+   *   @history 2018-08-10 Tracie Sucharski - Changed addItems method to call the
+   *                           ProjectItemProxyModel::addItems rather than this classes addItem.
+   *                           This speeds things up considerably loading items into the model.
+   *                           References #5296.
    */
   class AbstractProjectItemView : public QMainWindow {
 
