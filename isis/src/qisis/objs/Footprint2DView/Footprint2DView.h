@@ -101,9 +101,11 @@ namespace Isis {
    *   @history 2018-07-31 Tracie Sucharski - Add accessor method for ImageFileListWidget.
    *   @history 2018-08-10 Tracie Sucharski - Added new slot connected from ProjectItemProxyModel's
    *                           itemsAdded signal which is emitted after all selected items have
-   *                           been added to the proxy model.  This allows the FootprintView to put
-   *                           all selected items into the scene widget at once rather than
-   *                           individually which speeds the display of footprints. Fixes #5296.
+   *                           been added to the proxy model.  The images are added to a new private
+   *                           member as each item is added to the model through the slot,
+   *                           onItemAdded. This allows the FootprintView to put all selected items
+   *                           into the scene widget at once rather than individually which speeds
+   *                           the display of footprints. Fixes #5296.
    *  
    */
   class Footprint2DView : public AbstractProjectItemView {
@@ -133,9 +135,6 @@ namespace Isis {
 
     protected:
       bool eventFilter(QObject *watched, QEvent *event);
-
-    protected slots:
-      //void rowsInserted(const QModelIndex &parent, int first, int last);
 
     private slots:
       void onItemAdded(ProjectItem *item);
