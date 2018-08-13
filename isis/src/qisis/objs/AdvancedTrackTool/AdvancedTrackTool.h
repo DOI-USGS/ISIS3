@@ -28,6 +28,7 @@
 class QAction;
 
 namespace Isis {
+
   class TableMainWindow;
   class MdiCubeViewport;
 
@@ -82,6 +83,13 @@ namespace Isis {
    *                          before it attempts to record a point so that a table is created
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
+   *  @history 2018-07-18 Kristin Berry and Kaitlyn Lee - Updated TrackMosaicOrigin to work with
+   *                          an external tracking cube.
+   *  @history 2018-07-31 Kaitlyn Lee - Updated TrackMosaicOrigin to use a TrackingTable object
+   *                          to get the file name, serial number, and index of the image associated
+   *                          with the current pixel. Moved code opening the tracking cube to
+   *                          CubeViewport. If the cursor is over a pixel with no tracking info,
+   *                          file name and serial number display N/A now.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -179,11 +187,9 @@ namespace Isis {
       QAction *p_action;                   //!< Action to bring up the track tool
       int p_numRows;                       //!< The number of rows in the table
       int p_id;                            //!< The record id
-      TableMainWindow *p_tableWin;  //!< The table window
+      TableMainWindow *p_tableWin;         //!< The table window
       bool m_showHelpOnStart;              //!< True to show dialog When tool is started
-
   };
-
 };
 
 #endif
