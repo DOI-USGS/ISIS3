@@ -1,5 +1,5 @@
 pipeline { 
-    agent none
+    agent none 
     environment {
         ISISROOT="${workspace}" + "/build/"
         ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
