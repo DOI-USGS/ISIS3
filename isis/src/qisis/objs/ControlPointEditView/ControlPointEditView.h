@@ -50,6 +50,7 @@ namespace Isis {
    *                           and set its layout to QVBoxLayout. We used to set
    *                           the whole CnetEditorView widget's layout, now we only
    *                           set the central widget's layout.
+   *   @history 2018-06-13 Kaitlyn Lee - Removed toolbars, since they are not needed.
    *   @history 2018-06-28 Kaitlyn Lee - Removed toolbars. When multiple views are open,
    *                           there is a possibility of getting ambiguous shortcut errors.
    *                           To counter this, we enable/disable actions. On default, a
@@ -58,6 +59,8 @@ namespace Isis {
    *                           the view, the actions are disabled. Because this view uses
    *                           buttons instead of actions, overrode enableActions() and
    *                           disableActions() and added m_buttons to enable/disable buttons.
+   *   @history 2018-07-09 Tracie Sucharski -  Remove setSizePolicy and sizeHint method which is now
+   *                           taken care of in the parent class, AbstractProjectItemView.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
@@ -70,15 +73,11 @@ class ControlPointEditView : public AbstractProjectItemView {
 
     ControlPointEditWidget *controlPointEditWidget();
 
-//  setEditPoint(ControlPoint *editPoint);
-//  createNewPoint(QString serialNumber, Latitude lat, Longitude lon);
-
-  QSize sizeHint() const;
-
-  private:
+  private slots:
     void disableActions();
     void enableActions();
 
+  private:
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
     QList<QPushButton *> m_buttons;

@@ -1038,6 +1038,7 @@ namespace Isis {
     setIcon( QIcon(FileName("$base/icons/folder-activities.png")
                            .expanded()));
     setData( QVariant::fromValue<Project *>(project) );
+    setToolTip(project->projectRoot());
   }
 
 

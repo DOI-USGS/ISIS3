@@ -61,7 +61,6 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
-
   ControlNet::ControlNet(const ControlNet &other) {
 
     nullify();
@@ -394,7 +393,6 @@ namespace Isis {
     // Make sure there is a node for every measure
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-
       // If the graph doesn't have the sn, add a node for it
       if (!m_vertexMap.contains(sn)) {
         Image newImage;
@@ -766,7 +764,6 @@ namespace Isis {
     // Conceptually, I think this belongs in measureIgnored, but it isn't done
     // for the old graph.
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
-
   }
 
 
@@ -1820,6 +1817,7 @@ namespace Isis {
   void ControlNet::swap(ControlNet &other) {
     std::swap(points, other.points);
     std::swap(pointIds, other.pointIds);
+    m_controlGraph.swap(other.m_controlGraph);
     std::swap(m_mutex, other.m_mutex);
     std::swap(p_targetName, other.p_targetName);
     std::swap(p_networkId, other.p_networkId);
@@ -1833,7 +1831,7 @@ namespace Isis {
     std::swap(p_cameraList, other.p_cameraList);
     std::swap(p_targetRadii, other.p_targetRadii);
 
-    // points have parent pointers that need updated too...
+    // points have parent pointers that need to be updated too...
     QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
       i.next().value()->parentNetwork = this;
@@ -1844,8 +1842,23 @@ namespace Isis {
       i2.next().value()->parentNetwork = &other;
     }
 
-    emit networkModified(ControlNet::Swapped);
+    m_vertexMap.clear();
+    VertexIterator v, vend;
+    for (boost::tie(v, vend) = vertices(m_controlGraph); v != vend; ++v) {
+      ImageVertex imVertex = *v;
+      QString serialNum = m_controlGraph[*v].serial;
+      m_vertexMap[serialNum] = imVertex;
+    }
 
+    other.m_vertexMap.clear();
+    VertexIterator v2, vend2;
+    for (boost::tie(v2, vend2) = vertices(other.m_controlGraph); v2 != vend2; ++v2) {
+      ImageVertex imVertex = *v2;
+      QString serialNum = other.m_controlGraph[*v2].serial;
+      other.m_vertexMap[serialNum] = imVertex;
+    }
+
+    emit networkModified(ControlNet::Swapped);
   }
 
 
