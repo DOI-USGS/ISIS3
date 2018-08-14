@@ -49,7 +49,7 @@ void IsisMain() {
 
 
 
-    // run the compare function here.  This will conpare the
+    // run the compare function here.  This will compare the
     // labels of the first cube to the labels of each following cube.
     Pvl *matchLabel = cubeList[0]->label();
     for (int i = 0; i < (int)cubeList.size(); i++) {
@@ -210,6 +210,15 @@ void IsisMain() {
     QString mosaicPriority = ui.GetString("PRIORITY");
 
     QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority;
+
+    if (QString::compare(ui.GetString("GRANGE"), "USER", Qt::CaseInsensitive) == 0) {
+      parameters += " GRANGE=USER";
+      parameters += " MINLAT=" + ui.GetAsString("MINLAT");
+      parameters += " MAXLAT=" + ui.GetAsString("MAXLAT");
+      parameters += " MINLON=" + ui.GetAsString("MINLON");
+      parameters += " MAXLON=" + ui.GetAsString("MAXLON");
+    }
+
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // write out new information to new group mosaic

@@ -42,6 +42,9 @@
     <change name="Kristin Berry" date="2018-06-16">
       Update to read the ObservationId from the Archive Group. 
     </change>
+    <change name="Jeannie Backer" date="2018-08-10">
+      Added option to allow user to choose ground range. 
+    </change>
   </history>
 
   <groups>
@@ -102,6 +105,94 @@
             </description>
           </option>
         </list>
+      </parameter>
+    </group>
+    <group name="Ground Range">
+      <parameter name="GRANGE">
+      <type>string</type>
+      <default><item>AUTO</item></default>
+      <brief>Ground Range Options</brief>
+      <description>
+        AUTO is the default for this parameter. By default the ground range is
+        calculated automatically based on the list of input cubes.  The user can
+        override this default. If the USER option is selected, values must be
+        entered for the MINLAT, MAXLAT, MINLON, and MAXLON parameters.
+      </description>
+      <list>
+        <option value="AUTO">
+          <brief>Automatically Calculate Range</brief>
+          <description>
+            The program will automatically calculate the ground range for the
+            mosaic by examining that latitude and longitude range of all the
+            cubes contained in the list passed to FROMLIST.  This is the
+            default option.
+          </description>
+          <exclusions>
+            <item>MINLAT</item>
+            <item>MAXLAT</item>
+            <item>MINLON</item>
+            <item>MAXLON</item>
+          </exclusions>
+        </option>
+        <option value="USER">
+          <brief>User Entered Range</brief>
+          <description>
+            The program will apply the ground range values you entered for
+            the mosaic.
+          </description>
+          <inclusions>
+            <item>MINLAT</item>
+            <item>MAXLAT</item>
+            <item>MINLON</item>
+            <item>MAXLON</item>
+          </inclusions>
+        </option>
+      </list>
+      </parameter>
+      <parameter name="MINLAT">
+        <type>double</type>
+        <brief>Minimum Latitude</brief>
+        <description>
+          The minimum latitude value boundary extent for the output mosaic.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonCalcRange</function>
+            <brief>Calculate Ranges using FROMLIST</brief>
+            <description>
+              This button will calculate the latitude and longitude range using the files in the
+              FROMLIST.
+            </description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+        </helpers>
+      </parameter>
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <brief>Maximum Latitude</brief>
+        <description>
+          The maximum latitude value boundary extent for the output mosaic.
+        </description>
+        <greaterThan>
+            <item>MINLAT</item>
+        </greaterThan>
+      </parameter>
+      <parameter name="MINLON">
+        <type>double</type>
+        <brief>Minimum Longitude</brief>
+        <description>
+          The minimum longitude value boundary extent for the output mosaic.
+        </description>
+      </parameter>
+      <parameter name="MAXLON">
+        <type>double</type>
+        <brief>Maximum Longitude</brief>
+        <description>
+          The maximum longitude value bounary extent for the output mosaic.
+        </description>
+        <greaterThan>
+            <item>MINLON</item>
+        </greaterThan>
       </parameter>
     </group>
   </groups>
