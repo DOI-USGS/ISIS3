@@ -220,7 +220,7 @@ namespace Isis {
       }
 
     }
-    catch (IException e) {
+    catch (IException &e) {
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
     return false;
@@ -289,7 +289,7 @@ namespace Isis {
         project()->setClean(false);
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
         QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }
@@ -315,7 +315,7 @@ namespace Isis {
         m_newImages = NULL;
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       m_warning.append(e.what());
     }
@@ -414,7 +414,7 @@ namespace Isis {
 
         //  Set new ecub to readOnly.  When closing cube, the labels were being re-written because
         // the cube was read/write. This caused a segfault when imported large number of images
-        // because of a label template file being opened too many times. 
+        // because of a label template file being opened too many times.
         projectImage->reopen();
 
         delete input;
@@ -586,7 +586,7 @@ namespace Isis {
         setInternalData(newInternalData);
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
         QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }

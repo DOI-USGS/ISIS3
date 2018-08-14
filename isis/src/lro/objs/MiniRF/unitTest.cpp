@@ -109,25 +109,25 @@ int main(void) {
     try{
       cam->CkFrameId();
     }
-    catch(IException e){
+    catch(IException &e){
        e.print();
     }
     try{
       cam->CkReferenceId();
     }
-    catch (IException e){
+    catch (IException &e){
       e.print();
     }
     try{
       cam->SpkTargetId();
     }
-    catch (IException e){
+    catch (IException &e){
       e.print();
     }
     try{
       cam->SpkReferenceId();
     }
-    catch (IException e){
+    catch (IException &e){
        e.print();
     }
 
