@@ -40,7 +40,7 @@ dependencies:
   - icu==58.2=0
   - jpeg==9b=2
   - krb5==1.14.2=0
-  - libpng>=1.6.34=2
+  - libpng>=1.6.34
   - libtiff==4.0.9=0
   - libxml2==2.9.7=0
   - mesalib==17.2.0=0
