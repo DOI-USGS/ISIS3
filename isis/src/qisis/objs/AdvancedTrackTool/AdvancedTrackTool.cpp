@@ -306,7 +306,9 @@ namespace Isis {
     QString fnameName = fname.name();
     p_tableWin->table()->item(row, PATH)->setText(fnamePath);
     p_tableWin->table()->item(row, FILENAME)->setText(fnameName);
-    //p_tableWin->table()->item(row,34)->setText(SerialNumber::Compose(*cvp->cube()).c_str());
+    if (!cvp->cube()->hasGroup("Tracking") && !cvp->cube()->hasTable("InputImages")){
+      p_tableWin->table()->item(row, SERIAL_NUMBER)->setText(SerialNumber::Compose(*cvp->cube()));
+    }
 
     // If we are outside of the image then we are done
     if((sample < 0.5) || (line < 0.5) ||
@@ -535,14 +537,17 @@ namespace Isis {
     }
 
     // Track the Mosaic Origin -  Index (Zero based) and FileName
-    int iMosaicOrigin = -1;
-    QString sSrcFileName = "";
-    QString sSrcSerialNum = "";
-    TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
-    p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
-                         setText(QString(sSrcSerialNum));
+    if (cvp->cube()->hasTable("InputImages") || cvp->cube()->hasGroup("Tracking")) {
+      int iMosaicOrigin = -1;
+      QString sSrcFileName = "";
+      QString sSrcSerialNum = "";
+      TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
+      p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
+      p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName));
+      p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
+                           setText(QString(sSrcSerialNum));
+    }
+    
   }
 
 
@@ -566,53 +571,44 @@ namespace Isis {
       int piSample, int &piOrigin, QString &psSrcFileName,
       QString &psSrcSerialNum) {
       try {
-        Cube *cCube = cvp->cube();
-        int iTrackBand = -1;
-
-        if(cCube->hasTable(TABLE_MOSAIC_SRC)) {
-          Pvl *cPvl = cCube->label();
-          PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
-          PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
-          for(int i = 0; i < cGrpBandBin.keywords(); i++) {
-            PvlKeyword &cKeyTrackBand = cGrpBandBin[i];
-            for(int j = 0; j < cKeyTrackBand.size(); j++) {
-              if(cKeyTrackBand[j] == "TRACKING") {
-                iTrackBand = j;
-                break;
-              }
-            }
+        Cube *tempCube = cvp->cube();
+        Cube *cCube;
+        
+        // We need to set cCube to the tracking cube to locate input image information. If the cube
+        // in the currently active viewport is the mosaic, set cCube to its associated tracking 
+        // cube. If not, the cube in the currently active viewport is the tracking cube.
+        if (cvp->cube()->hasGroup("Tracking")) {
+          try {
+            QString trackingFileName = FileName(tempCube->fileName()).path() + 
+                 "/" + QString(tempCube->group("Tracking")[0]);
+            cCube = new Cube(trackingFileName);
           }
-
-          if(iTrackBand > 0 && iTrackBand <= cCube->bandCount()) {
-            Portal cOrgPortal(cCube->sampleCount(), 1,
-                              cCube->pixelType());
-            cOrgPortal.SetPosition(piSample, piLine, iTrackBand + 1); // 1 based
-            cCube->read(cOrgPortal);
-            piOrigin = (int)cOrgPortal[0];
-            switch(SizeOf(cCube->pixelType())) {
-              case 1:
-                piOrigin -= VALID_MIN1;
-                break;
-
-              case 2:
-                piOrigin -= VALID_MIN2;
-                break;
-
-              case 4:
-                piOrigin -= FLOAT_MIN;
-                break;
-            }
-
-            // Get the input file name and serial number
-            Table cFileTable(TABLE_MOSAIC_SRC);
-            cCube->read(cFileTable);
-            int iRecs =   cFileTable.Records();
-            if(piOrigin >= 0 && piOrigin < iRecs) {
-              psSrcFileName = QString(cFileTable[piOrigin][0]);
-              psSrcSerialNum = QString(cFileTable[piOrigin][1]);
-            }
+          catch (IException e) {
+            QString msg = "Unable to open associated tracking cube.";
+            throw IException(IException::User, msg, _FILEINFO_);
           }
+        } 
+        else {
+          cCube = new Cube(tempCube->fileName());
         }
+
+        // Read the DN value from the tracking cube
+        Portal cOrgPortal(cCube->sampleCount(), 1,
+                          cCube->pixelType());
+        cOrgPortal.SetPosition(piSample, piLine, 1);
+        cCube->read(cOrgPortal);
+        piOrigin = (int)cOrgPortal[0] - 3;
+
+        // Get the input file name and serial number based on DN in tracking cube
+        Table cFileTable("InputImages");
+        cCube->read(cFileTable);
+        int iRecs =   cFileTable.Records();
+        if(piOrigin >= 0 && piOrigin < iRecs) {
+          psSrcFileName = QString(cFileTable[piOrigin][0]);
+          psSrcSerialNum = QString(cFileTable[piOrigin][1]);
+        }
+
+        delete cCube;
       }
       catch (IException &e) {
           QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());

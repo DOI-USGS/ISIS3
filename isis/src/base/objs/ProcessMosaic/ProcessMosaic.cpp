@@ -128,6 +128,12 @@ namespace Isis {
     bool bTrackExists = false;
     if (!m_createOutputMosaic) {
       bTrackExists = GetTrackStatus();
+      if (m_trackingEnabled && 
+            !(OutputCubes[0]->hasGroup("Tracking") || OutputCubes[0]->hasTable("InputImages"))) {
+        QString m = "Cannot enable tracking while adding to a mosaic without tracking ";
+        m += "information. Confirm that your mosaic was originally created with tracking enabled.";
+        throw IException(IException::User, m, _FILEINFO_);
+      }
     }
 
     int ins = m_ins;
@@ -198,12 +204,15 @@ namespace Isis {
     // Tracking is done for:
     // (1) Band priority,
     // (2) Ontop and Beneath priority with number of bands equal to 1,
-    // (3) Ontop priority with all the special pixel flags set to true
+    // (3) Ontop priority with all the special pixel flags set to true. (All special pixel flags
+    //      must be set to true in order to handle multiple bands since we need to force pixels
+    //      from all bands in a single image to be copied to the mosaic with ontop priority so we
+    //      don't have multiple input bands to track for any single pixel in our tracking band.)
     if (m_trackingEnabled) {
       if (!(m_imageOverlay == UseBandPlacementCriteria ||
           ((m_imageOverlay == PlaceImagesOnTop || m_imageOverlay == PlaceImagesBeneath) &&
            // tracking band was already created for Tracking=true
-           (OutputCubes[0]->bandCount() - 1) <= 1) ||
+           (OutputCubes[0]->bandCount()) == 1) ||
           (m_imageOverlay == PlaceImagesOnTop && m_placeHighSatPixels && m_placeLowSatPixels &&
            m_placeNullPixels)) ){
         QString m = "Tracking cannot be True for multi-band Mosaic with ontop or beneath priority";
@@ -1154,9 +1163,6 @@ namespace Isis {
 
     int iOutBands = OutputCubes[0]->bandCount();
 
-    // if (m_trackingEnabled) {
-    //   iOutBands -= 1;     // leave tracking band
-    // }
     // else if (m_imageOverlay == AverageImageWithMosaic) {
     if (m_imageOverlay == AverageImageWithMosaic) {
       iOutBands /= 2;

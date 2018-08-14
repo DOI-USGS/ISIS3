@@ -20,28 +20,44 @@
     has the option of entering their own rad/az range to use for the mosaic.
    </p>
    <p>There are four different ways/priorities (input, mosaic, band, average) 
-    for how the input image has to be placed on the mosaic.</p>
-    
-   <p>Priority <b>Input</b> will place the input image on top of the mosaic.</p>
-   
-   <p>Priority <b>Mosaic</b> will place the input image beneath the mosaic.</p>
-   
-   <p>Priority <b>Band</b> will place the input image on the mosaic based on the "Lessser" or "Greater" criteria 
-   between user defined band in the input and the mosaic images.</p>
-   
-   <p>Priority <b>Average</b> will average the valid pixels in the input and mosaic images. For each mosaic band, a count band is maintained. The count band 
-   keeps track of the number of images involved in the averaging of the dn value for each pixel in the mosaic. Choosing this priority will cause the mosaic to have twice the number of 
-   bands of the input image, with a count band for each band. <b>Hence the file size of the mosaic is doubled due to the count band.</b>
+    for how the input image has to be placed on the mosaic. In case of special pixels and the
+    special pixel flags being enabled, the details for each priority is described in the tables
+    below.
    </p>
-   
-   <p>In case of special pixels and the special pixel flags being enabled, the details 
-   for each priority is described below.
+   <p>
+     The TRACK feature will create an external tracking cube that contains a single band. The
+     DN values for each pixel in this band represent the input image that that pixel was taken
+     from within the mosaic cube. The indexing begins at an offset DN value 3 to account for
+     special pixels. In other words, a pixel of DN value 3 in the tracking cube means that that
+     same pixel within the mosaic was taken from the first input image. 
+   </p>
+   <p>
+     The tracking cube is used by the QVIEW-AdvancedTracking tool to represent source images for
+     each pixel within the mosaic. As the user pans across either the mosaic cube or the
+     external tracking cube within a cube viewport, the QVIEW-AdvancedTracking will
+     interactively report the source cube filename, serial number and associate DN value for the
+     cube that was input into automos. The tracking cube must be in the same directory as the
+     mosaic cube in order to be used and so will be created there initially. <b>The tracking cube
+     will always be of type unsigned integer and so will have a constant storage size regardless of
+     the size of the mosaic cube itself.</b>
+   </p>
+   <p>
+     <b>Please Note: ringsautomos no longer works with mosaics that contain an attached tracking
+       band. This means that older mosaics may need to be run through the trackextract utility
+       application in order to extract the external tracking cube before they may be used in
+       future mosaics.</b>
+   </p>
+   <p>
+     The Track feature works with Priority options ONTOP (with HIGHSATURATION and
+     LOWSATURATION parameters) and BENEATH for single band input cubes.  It does NOT support
+     multiple band input cubes with these priority options. It does work for multiband cubes
+     when PRIORITY=BAND. Furthermore, this feature is NOT supported when PRIORITY=AVERAGE.
    </p>
     <p> Tracking can be set at the time of Mosaic creation
       only and cannot be turned on after the mosaic is created. But the tracking
       will be turned off for multiband ONTOP and BENEATH priority even though it 
       was turned on while creating the mosaic. Tracking for multiband input with
-      ONTOP priority is possible only if  all the Special Pixel Flags are set to 
+      ONTOP priority is possible only if all the Special Pixel Flags are set to 
       True else the Tracking will be turned off. ONTOP priority basically places 
       all the valid input pixels onto the mosaic unless the special pixel flags 
       are turned on or if mosaic has a NULL pixel. In a multi band scenario, a 
@@ -50,11 +66,8 @@
       band. i.e. the size of the tracking bands will be the same as the number 
       of bands in the mosaic.i.e the number of bands will be doubled. </p> 
       <p><b>WARNING: </b>If Tracking is turned on in a mosaic, any subsequent
-                             applications that modify "dn" values will corrupt
-                             the Tracking band. It may be necessary to remove
-                             the Tracking band from the mosaic and then add it
-                             back after all the processing is complete. See
-                             "crop" and "cubeit".
+                             applications that modify DN values will corrupt
+                             the Tracking cube.
       </p>
       <p>Priority BAND can track origin for multi band input image based on a 
       specified band using LESSER or GREATER than criteria. Each pixel in the
@@ -91,84 +104,298 @@
         of the <b>qview</b> application. Following are the Tracking info:</p> 
       <p><b>Index :</b> Zero based and is in the order in which  the image was 
         placed on the mosaic. No origin is represented as -1.</p>
-         <p><b>FileName:</b> File name  of  input image </p>
-         <p> <b>Serial Number:</b>Serial Number of the input image </p>
-       <p>Following are the values for the origin band depending on the pixel type
-             <table border="1" cellspacing="0" cellpadding="2" width="500">
-             <tr><th>Pixel Type<br></br>(bits)</th><th>Default<br></br> (No  Origin)</th><th>Start Value</th><th>Max Value</th><th>Total Images<br></br> Supported</th></tr>
-               <tr><td class="td">32</td><td class="td">-16777216</td><td class="td">-16777215</td><td class="td">16777216</td><td class="td">33549932</td></tr>
-               <tr><td class="td">16</td><td class="td">-32768</td><td class="td">-32767</td><td class="td">32767 </td><td class="td">65535</td></tr>
-               <tr><td class="td">8</td><td class="td">0</td><td class="td">1</td><td class="td">255</td><td class="td">255</td></tr>
-             </table>
+      <p><b>FileName:</b> File name  of  input image </p>
+      <p> <b>Serial Number:</b>Serial Number of the input image </p>
+      <p>
+        <b>
+          The following table describes how the program will determine the pixel value in the output
+          mosaic for areas of image overlap.
+        </b>
+        <table border="1" >
+          <tr><th>PRIORITY</th><th>RESULT</th></tr>
+          <tr>
+            <td>ONTOP</td>
+            <td>
+              This is the default.  The current input image will be placed on top of the
+              output mosaic. Thus in any area of overlap, the Valid pixel values for the
+              current input image will appear in the output mosaic (it replaces the output mosaic
+              pixel).  Invalid input <def>Special Pixels</def>
+              (<def>NULL</def>,<def>HRS</def>,<def>HIS</def>,<def>LRS</def>,<def>LIS</def>) will NOT
+              replace an existing Valid output mosaic pixel unless the optional flags are set. Refer
+              to parameters HIGHSATURATION,LOWSATURATION, and NULL to override replacement of Valid
+              output mosaic pixels. 
+              <p>
+                <b>NOTE:</b> When using this priority with multi-band mosaics and with the TRACK
+                option set, all Special Pixel flags must be set as well. This is because the same
+                pixel within different bands of a single input image may hold both Valid and Special
+                Pixel values, and since our Tracking capabilities can only track one input image per
+                pixel (as it is a single band), it must accept the values for that particular pixel
+                from <b>every</b> band in the input image being placed on top.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>BENEATH</td>
+            <td>
+              The current input image will be placed beneath the output mosaic. Thus in
+              any area of overlap, the Valid pixel values for the current mosaic will remain in
+              the output mosaic. The Valid pixel values for the current input image will only
+              replace the NULL pixels values in the output mosaic.  The HRS,HIS,LRS and LIS  special
+              pixel values in the output mosaic will NOT be replaced by the Valid input pixel.
+              The parameters HIGHSATURATION, LOWSATURATION and NULL are not supported under this
+              priority.
+            </td>
+          </tr>
+          <tr>
+            <td>BAND</td>
+            <td>
+              The input image pixels will be placed in the output mosaic based on the "Lesser" or
+              "Greater" criteria of a priority band defined by the user.  Parameters that apply to
+              this priority feature are TYPE, NUMBER, KEYNAME, KEYVALUE, CRITERIA.
+            </td>
+          </tr>
+          <tr>
+            <td>AVERAGE</td>
+            <td>
+              Overlapping Valid pixel values from the current input image and output mosaic will be
+              averaged for the new mosaic pixel values. A count-band is created with the output
+              mosaic file.  The count-band keeps track of the number of images involved in the
+              averaging of the input dn values for each pixel in the mosaic. Invalid input pixel
+              values will not be included in the average.  In the case where only one Valid pixel
+              exists between the input image pixels or the current mosaic pixel, the Valid pixel is
+              retained in the current output mosaic. Refer to parameters HIGHSATURATION,
+              LOWSATURATION, and NULL to override replacement of valid output mosaic pixels.
+              <p>
+                Choosing this priority will cause the mosaic to have twice the number of bands of
+                the input image. <b>Hence the file (byte) size of the mosaic is increased due to
+                the count-bands.</b>
+              </p>
+              <p>
+                <b>NOTE</b>: If an existing mosaic does not already contain a count-band, an error
+                will be encountered.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </p>   
+      <p>
+        Each of the following priority option tables indicates the resulting output pixel for a
+        particular input pixel, given the selected special pixel options  (parameters
+        HIGHSATURATION for HRS, HIS;  LOWSATURATION for LRS, LIS; and NULL) in each table row.
+
+        <!--
+          *******************************************************************************
+          The graphics below are commented out because they are no longer correct.
+          *******************************************************************************
+        -->
+        <!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u>  Priority OnTop</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/OnTop.jpg" alt="Priority OnTop" />  </td>
+              <td class="td"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="1" border="1" width="1000">
+                  <tr><th colspan="6" align="center">PRIORITY=ONTOP</th></tr>
+                  <tr><th colspan="3" align="center">Options</th>
+                      <th colspan="3" align="center">Images</th></tr>
+                  <tr><th>High Saturation</th>
+                      <th>Low Saturation</th>
+                      <th>Null</th>
+                      <th>Input Pixel Value Type</th>
+                      <th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">High Saturation or Low Saturation or Valid</td>
+                      <td class="td2">Mosaic</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Null</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                </table>
+<!--              </td>
+          </tr>
+        </table>-->
+        <br></br><br></br><br></br>
+<!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u>Priority Beneath</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/Beneath.jpg" alt="Priority Beneath" />  </td>
+              <td class="td" width="30"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="1" border="1">
+                  <tr><th colspan="3" align="center">PRIORITY=BENEATH</th></tr>
+                  <tr><th>Input Pixel Value Type</th>
+                      <th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th>
+                  </tr>
+                  <tr><td class="td2">Special or Valid</td>
+                      <td class="td2">Null</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">Special or Valid</td>
+                      <td class="td2">High Saturation or Low Saturation or Valid</td>
+                      <td class="td2">Mosaic</td>
+                  </tr>
+                </table>
+              <!--</td>
+          </tr>
+        </table>-->
+
+        <br></br><br></br><br></br>
+<!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u> Priority Band</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/Band.jpg" alt="Priority Band" />  </td>
+              <td class="td"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="0" border="1" width="1000">
+                  <tr><th colspan="6" align="center">PRIORITY=BAND</th></tr>
+                  <tr><th colspan="3" align="center">Options</th><th colspan="3" align="center">
+                    Images</th></tr>
+                  <tr><th>High Saturation</th><th>Low Saturation</th><th>Null</th>
+                      <th>Input Pixel Value Type</th><th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Criteria based</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">High Saturation or Low Saturation or Valid</td>
+                      <td class="td2">Mosaic</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Null</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Criteria based</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td></tr>
+                </table>
+<!--              </td>
+          </tr>
+        </table>-->
+        <br></br><br></br><br></br>
+<!--
+        <table cellspacing="0" cellpadding="1" border="0">
+          <tr><th colspan="3" align="center"><u>Priority Average</u></th></tr>
+          <tr height="15"><th colspan="3"></th></tr>
+          <tr><td class="td"><img src="assets/Average.jpg" alt="Priority Average" /></td>
+              <td class="td"></td>
+              <td class="td">-->
+                <table cellspacing="0" cellpadding="0" border="1" width="1000">
+                  <tr><th colspan="7" align="center">PRIORITY=AVERAGE</th></tr>
+                  <tr><th colspan="3" align="center">Options</th><th colspan="4" align="center">
+                    Images</th></tr>
+                  <tr><th>High Saturation</th><th>Low Saturation</th><th>Null</th>
+                      <th>Input Pixel Value Type</th><th>Current Mosaic Pixel Value Type</th>
+                      <th>Output Mosaic Pixel Value Source</th>
+                      <th>Count Band Pixel Value (# of images used for average)</th></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Average</td>
+                      <td class="td2">increment count by 1</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td>
+                      <td class="td2">count = 1</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Mosaic</td>
+                      <td class="td2">count = 0</td></tr>
+                  <tr><td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">False</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Mosaic</td>
+                      <td class="td2">count unchanged</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Special or Valid</td>
+                      <td class="td2">Input</td>
+                      <td class="td2">count = 0</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Average</td>
+                      <td class="td2">increment count by 1</td></tr>
+                  <tr><td class="td2">True or False</td>
+                      <td class="td2">True or False</td>
+                      <td class="td2">True</td>
+                      <td class="td2">Valid</td>
+                      <td class="td2">Special</td>
+                      <td class="td2">Input</td>
+                      <td class="td2">count = 1</td></tr>
+                </table>
+                <!--</td></tr>
+        </table>
+     -->
       </p>
-      <p> Following is the table for Special Pixel options, input, mosaic
-      pixels and the resulting output for different priorities.
-     <br><b>Tags: F(FALSE), T(TRUE), V(VALID), HS(HIGH SATURATION), LS(LOW SATURATION), 
-           S(SPECIAL PIXEL HS, LS, NULL), N(NULL), I(INPUT), M(MOSAIC),  HL(HS,LS)
-      </b></br>
-      </p> 
-     <li />
-     <table cellspacing="0" cellpadding="1" border="0"> 
-       <tr><th colspan="3" align="center"><u>Priority Beneath</u></th></tr>
-       <tr height="15"><th colspan="3"></th></tr>
-     <tr><td class="td"><img src="assets/Beneath.jpg" alt="Priority Beneath" />  </td><td class="td" width="30"></td>
-         <td class="td"><table cellspacing="0" cellpadding="1" border="1"> 
-         <tr><th colspan="3" align="center">BENEATH</th></tr>
-         <tr><th>Input</th><th>Mosaic</th> <th>Output </th></tr>
-         <tr><td class="td">S,V</td><td class="td">N</td><td class="td">I</td></tr>
-         <tr><td class="td">S,V</td><td class="td">HL,V</td><td class="td">M</td></tr>
-     </table></td></tr> </table><br></br><br></br><br></br>
-     <li />
-      <table cellspacing="0" cellpadding="1" border="0"> 
-        <tr><th colspan="3" align="center"><u>  Priority OnTop</u></th></tr>
-        <tr height="15"><th colspan="3"></th></tr>
-     <tr><td class="td"><img src="assets/OnTop.jpg" alt="Priority OnTop" />  </td><td class="td"></td>
-     <td class="td"><table cellspacing="0" cellpadding="1" border="1" width="350">
-          <tr><th colspan="6" align="center">ONTOP</th></tr>
-          <tr><th colspan="3" align="center">Options</th><th colspan="3" align="center">Images</th></tr>
-          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th></tr>
-          <tr><td class="td"> F</td><td class="td"> F </td><td class="td">F</td><td class="td">V</td><td class="td">S,V</td><td class="td">I</td></tr>
-          <tr><td class="td"> F</td><td class="td"> F </td><td class="td">F</td><td class="td"> S </td><td class="td"> HL,V</td><td class="td">M </td></tr>  
-          <tr><td class="td"> F</td><td class="td"> F </td><td class="td">F</td><td class="td"> S,V </td><td class="td"> N </td><td class="td">I</td></tr>                    
-          <tr><td class="td"> T OR </td><td class="td"> T OR  </td><td class="td">T</td><td class="td">V </td><td class="td">S,V</td><td class="td">I </td></tr>           
-          <tr><td class="td"> T OR </td><td class="td"> T OR  </td><td class="td">T</td><td class="td">S</td><td class="td">S,V</td><td class="td">I (H,L,N)</td></tr>
-      </table></td></tr> </table>
-      <br></br><br></br><br></br>
-      <li />
-      <table cellspacing="0" cellpadding="1" border="0"> 
-        <tr><th colspan="3" align="center"><u> Priority Band</u></th></tr>
-        <tr height="15"><th colspan="3"></th></tr>
-     <tr><td class="td"><img src="assets/Band.jpg" alt="Priority Band" />  </td><td class="td"></td>
-     <td class="td"><table cellspacing="0" cellpadding="0" border="1" width="380">
-          <tr><th colspan="6" align="center"> BAND</th></tr>
-          <tr><th colspan="3" align="center">Options</th><th colspan="3" align="center">Images</th></tr>
-          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th></tr>
-          <tr><td class="td"> F</td><td class="td">   F</td><td class="td">F </td><td class="td">V</td><td class="td">V</td><td class="td">Criteria based</td></tr>
-          <tr><td class="td">F</td><td class="td"> F </td><td class="td"> F</td><td class="td">V</td><td class="td">S </td><td class="td"> I </td></tr>
-          <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td"> S </td><td class="td">HL,V</td><td class="td">M</td></tr>
-          <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td">S,V</td><td class="td">N</td><td class="td">I</td></tr>
-          <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T</td><td class="td">  S</td><td class="td"> S,V</td><td class="td"> I(H,L,N)</td></tr>
-          <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td">T </td><td class="td">V</td><td class="td">V</td><td class="td">Criteria based</td></tr>
-          <tr><td class="td">T OR</td><td class="td"> T OR</td><td class="td"> T </td><td class="td">V</td><td class="td"> S</td><td class="td">I</td></tr>
-       </table></td></tr> </table><br></br><br></br><br></br><li />
-        
-       <table cellspacing="0" cellpadding="1" border="0"> 
-        <tr><th colspan="3" align="center"><u> Priority Average</u></th></tr>
-        <tr height="15"><th colspan="3"></th></tr>
-        <tr><td class="td"><img src="assets/Average.jpg" alt="Priority Average" />  
-        </td><td class="td"></td>
-        <td class="td"><table cellspacing="0" cellpadding="0" border="1" width="400">
-          <tr><th colspan="7" align="center"> AVERAGE</th></tr>
-          <tr><th colspan="3" align="center">Options</th><th colspan="4" align="center">Images</th></tr>
-          <tr><th>HS</th><th>LS</th><th>NULL</th><th>Input</th><th>Mosaic</th><th>Output</th><th>Count</th></tr>
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td"> F</td><td class="td">V</td><td class="td"> V</td><td class="td1">Average</td><td class="td1">count++</td></tr> 
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">V</td><td class="td">S</td><td class="td">I</td><td class="td">1</td></tr>
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">S</td><td class="td">S</td><td class="td">M</td><td class="td">0</td></tr> 
-        <tr><td class="td">F</td><td class="td"> F</td><td class="td">F</td><td class="td">S</td><td class="td">V</td><td class="td">M</td><td class="td1">count</td></tr>
-        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">S</td><td class="td">S,V</td><td class="td">I</td><td class="td">0</td></tr>
-        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">V</td><td class="td">V</td><td class="td1">Average</td><td class="td1">count++</td></tr>
-        <tr><td class="td1">T OR</td><td class="td1"> T OR</td><td class="td">T</td><td class="td">V</td><td class="td">S</td><td class="td">I</td><td class="td">1</td></tr>
-        </table></td></tr> </table><li />
    </font>
    </body></html>
   </description>
@@ -276,6 +503,12 @@
     <change name="Jeannie Backer" date="2013-03-12">
       Added appTests.  Test coverage appears low (52% scope, 54% line, 50% function), however these
       tests cover 100% in all three categories for the code that does not apply to the GUI helper methods. 
+    </change>
+    <change name="Summer Stapleton" date="2018-08-13">
+      Updated documentation to reflect new handling of tracking capabilities with an external
+      tracking cube and be more consistent with other mosaicking program documentation as well as
+      clarify why special pixel flags are required when priority=ontop for multiband mosaics.
+      References #2092
     </change>
   </history>
 

@@ -201,7 +201,10 @@ namespace Isis {
    *                           <baseMosaicFileName>_tracking.cub. This tracking cube will contain 
    *                           the tracking table as well as the tracking band; it will always be 
    *                           of PixelType::UnsignedInteger regardless of the pixel type of the 
-   *                           mosaic cube or of the input images.
+   *                           mosaic cube or of the input images. References #971
+   *   @history 2018-08-13 Summer Stapleton - Error now being thrown with appropriate message if 
+   *                           user attempts to add tracking capabilities to a mosaic that already
+   *                           exists without tracking. Fixes #2052.
    */
 
   class ProcessMosaic : public Process {

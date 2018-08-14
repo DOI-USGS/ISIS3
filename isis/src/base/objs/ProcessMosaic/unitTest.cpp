@@ -460,13 +460,33 @@ void IsisMain() {
     p.EndProcess();
     qDebug() << "";
   }
+  
+  // ***********************************************************
+  // Test tracking with ontop priotirty and multiple bands
+  qDebug() << "Test tracking with ontop priotirty and multiple bands";
+  try {
+    ProcessMosaic m;
+    m.SetTrackFlag(true);
+    m.SetImageOverlay(ProcessMosaic::UseBandPlacementCriteria);
+    m.SetBandNumber(10);
+
+    m.SetOutputCube("TO");
+    m.SetInputCube("FROM", 1, 1, 1, -1, -1, -1);
+    m.StartProcess(1, 1, 1);
+    m.EndProcess();
+  }
+  catch (IException &e) {
+    e.print();
+    p.EndProcess();
+    qDebug() << "";
+  }
 
   // ***********************************************************
   // Test Band not found with Band as Priority
   qDebug() << "Test Band not found with Band as Priority";
   try {
     ProcessMosaic m;
-    m.SetTrackFlag(true);
+    m.SetTrackFlag(false);
     m.SetImageOverlay(ProcessMosaic::UseBandPlacementCriteria);
     m.SetBandNumber(10);
 

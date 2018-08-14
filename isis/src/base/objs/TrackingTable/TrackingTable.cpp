@@ -22,6 +22,7 @@
 
 #include "TrackingTable.h"
 
+#include <QDebug>
 #include <QList>
 #include <QString>
 
@@ -165,7 +166,7 @@ namespace Isis {
   */
   unsigned int TrackingTable::fileNameToPixel(FileName file, QString serialNumber) {
     for (int i = 0; i < m_fileList.size(); i++) {
-      if (m_fileList[i].first == file) {
+      if (QString::compare(m_fileList[i].first.toString(), file.name()) == 0) {
         return i + VALID_MINUI4;
       }
     }

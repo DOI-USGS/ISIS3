@@ -60,10 +60,10 @@ void IsisMain() {
     nb = ui.GetInteger("NBANDS");
 
     // Create the origin band if the Track Flag is set
-    if (bTrack) {
-      nb += 1;
-    }
-    else if (overlay == ProcessMosaic::AverageImageWithMosaic) {
+    // if (bTrack) {
+    //   nb += 1;
+    // }
+    if (overlay == ProcessMosaic::AverageImageWithMosaic) {
       nb *= 2;
     }
     p.SetCreateFlag(true);

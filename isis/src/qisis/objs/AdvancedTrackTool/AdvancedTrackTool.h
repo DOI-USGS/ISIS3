@@ -82,6 +82,10 @@ namespace Isis {
    *                          before it attempts to record a point so that a table is created
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
+   *  @history 2018-08-13 Summer Stapleton - Updated the tool to properly display tracking
+   *                          information from the new tracking band in both the tracking band as
+   *                          well as the mosaic itself. Also added missing functionality to view
+   *                          serial number of a non-mosaicked cube. Fixes #971, #4899
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
