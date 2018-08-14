@@ -81,6 +81,13 @@ namespace Isis {
   *                           Fixes #5099.
   *   @history 2018-04-13 Christopher Combs - Added .lbl files to the list of single-cube file-extensions
   *                           to check before reading a cube list in addCubeViewport. Fixes #5350.
+  *   @history 2018-08-14 Adam Goins - Modified the logic for the addCubeViewport(QString filename) 
+  *                           To only accept .lis, .list, .txt fles as cubelists, otherwise assume
+  *                           it's a cube or a detached label pointing to a cube. This fixes an 
+  *                           issue with detached labels having extensions that aren't .lbl. 
+  *                           If the user provides a cube list under an unlisted extension,
+  *                            they are now provided the valid extensions in the error message. 
+  *                            Fixes #5476.
   */
   class Workspace : public QWidget {
       Q_OBJECT
