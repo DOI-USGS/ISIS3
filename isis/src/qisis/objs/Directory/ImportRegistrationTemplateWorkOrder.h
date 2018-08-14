@@ -34,6 +34,8 @@
    * Asks the user for a registration template and copies it into the project.
    *
    * @author 2018-07-05 Summer Stapleton
+   * @internal
+   *   @history 2018-07-05 Summer Stapleton - Created ImportRegistrationTemplateWorkOrder class
    */
     class ImportRegistrationTemplateWorkOrder : public WorkOrder {
         Q_OBJECT
