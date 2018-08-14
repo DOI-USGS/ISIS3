@@ -48,7 +48,7 @@ dependencies:
   - nn==1.86.0=2
   # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
-  - opencv==3.3.1
+  - opencv
   - nanoflann==1.2.2
   - gmm==5.0
   - jama==125
