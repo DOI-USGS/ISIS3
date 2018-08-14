@@ -177,4 +177,53 @@ namespace Isis {
     return m_fileList.size() - 1 + VALID_MINUI4;
   }
 
+
+  /**
+  * Returns the serial number that corresponds to a pixel value.
+  *
+  * @param pixel The pixel value to find the serial number for
+  * @returns @b QString The serial number represented by the pixel value
+  */
+  QString TrackingTable::pixelToSN(unsigned int pixel) {
+    if (pixel < VALID_MINUI4) {
+      QString msg = "Cannot convert pixel [" + toString(pixel)
+                  + "] to a serial number, pixel is below valid minimum ["
+                  + toString(VALID_MINUI4) + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    unsigned int index = pixel - VALID_MINUI4;
+    if (index >= (unsigned int)m_fileList.size()) {
+      QString msg = "Cannot convert pixel [" + toString(pixel)
+                  + "] to a serial number, pixel is above valid maximum ["
+                  + toString(VALID_MINUI4 + m_fileList.size()) + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return m_fileList[index].second;
+  }
+
+
+  /**
+  * Returns the index of the filename/serialnumber combination.
+  *
+  * @param file The FileName within m_fileList to find the index of
+  * @param serialNumber The QString of the serial number within m_fileList
+  *                     to find the index of
+  *
+  * @return @b int The index corresponding to the
+  *                              filename/serialnumber combination
+  */
+  int TrackingTable::fileNameToIndex(FileName file, QString serialNumber) {
+    for (int i = 0; i < m_fileList.size(); i++) {
+      if (m_fileList[i].first == file) {
+        return i;
+      }
+    }
+
+    // At this point, the file is not in the internal file list so append it
+    // and return its new index.
+    m_fileList.append(QPair<FileName, QString>(file, serialNumber));
+    return m_fileList.size() - 1;
+  }
 }
