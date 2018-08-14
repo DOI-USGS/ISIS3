@@ -1,8 +1,8 @@
 ********* Start testing of Isis::MosaicSceneWidgetTester *********
-Config: Using QTest library 4.8.0, Qt 4.8.0
+Config: Using QtTest library 5.6.2, Qt 5.6.2 (x86_64-little_endian-lp64 shared (dynamic) release build; by GCC 4.8.2 20140120 (Red Hat 4.8.2-15))
 PASS   : Isis::MosaicSceneWidgetTester::initTestCase()
 PASS   : Isis::MosaicSceneWidgetTester::testBasicFunctionality()
 PASS   : Isis::MosaicSceneWidgetTester::testSynchronization()
 PASS   : Isis::MosaicSceneWidgetTester::cleanupTestCase()
-Totals: 4 passed, 0 failed, 0 skipped
+Totals: 4 passed, 0 failed, 0 skipped, 0 blacklisted
 ********* Finished testing of Isis::MosaicSceneWidgetTester *********
