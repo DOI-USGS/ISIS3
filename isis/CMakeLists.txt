@@ -356,11 +356,6 @@ list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
-# add isis headers
-file(GLOB ISIS_HEADERS ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h
-${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp)
-file(COPY ${ISIS_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/inc)
-
 include_directories(${CMAKE_BINARY_DIR}/inc)
 set(CORE_LIB_NAME isis3)
 
@@ -415,7 +410,7 @@ else()
 endif()
 
 # Set up documentation build target.
-# - This script is called by running "make docs".
+# - This script is called by running "ninja docs".
 # - This long call passes all desired variables to the script.
 add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -423,6 +418,13 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DLATEX=${LATEX}
                   -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+
+# Add custom build target to copy modified header files to the build/incs directory.
+# ALL is specified so that the target is added to the default build target, i.e. the copy command 
+# will be executed when running "ninja install"
+# On a clean build, all files will be copied over.
+add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
