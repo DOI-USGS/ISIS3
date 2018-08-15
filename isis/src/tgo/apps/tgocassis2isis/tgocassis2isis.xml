@@ -122,6 +122,9 @@
       Stripped the "Z" from the StartTime value in the "Instrument" group to handle re-ingestion 
       of PDS4 compliant .xml files.
     </change>
+    <change name="Jeannie Backer" date="2018-08-12">
+      Added ObservationId to Archive group.
+    </change>
   </history>
 
   <category>

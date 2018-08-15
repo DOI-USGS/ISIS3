@@ -455,17 +455,14 @@ QString convertUniqueIdToObservationId(Pvl &outputLabel) {
   PvlGroup &archiveGroup = outputLabel.findGroup("Archive", Pvl::Traverse);
   QString uniqueId = archiveGroup.findKeyword("UniqueIdentifier")[0];
 
-  bool ok = false;
   QString observationId = "";
-  int uniqueIdDecimalValue = uniqueId.toInt(&ok, 16);
-
-  int operationPeriod = (uniqueIdDecimalValue & 1879048192);
+  BigInt uniqueIdDecimalValue = uniqueId.toLongLong();
+  BigInt operationPeriod = (uniqueIdDecimalValue & 1879048192);
   operationPeriod /= qPow(2,28);
   FileName transFile("$tgo/translations/tgoCassisOperationPeriod.trn");
   PvlTranslationTable transTable(transFile);
   observationId = transTable.Translate("OperationPeriod", toString(operationPeriod));
-
-  int orbitNumber = (uniqueIdDecimalValue & 268433408);
+  BigInt orbitNumber = (uniqueIdDecimalValue & 268433408);
   orbitNumber /= qPow(2,11);
   observationId += "_";
   observationId += QString("%1").arg(orbitNumber, 6, 10, QChar('0'));
