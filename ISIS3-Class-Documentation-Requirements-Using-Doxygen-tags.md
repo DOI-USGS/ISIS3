@@ -2,9 +2,9 @@ A new ISIS3 class needs to have the following Doxygen tags filled out just above
 
 `/**
     * @brief Add map templates to a project
-    * Asks the user for a map template and copies it into the project.<br>
+    * Asks the user for a map template and copies it into the project.
     *
-    * @author 2018-07-05 Summer Stapleton<br>
+    * @author 2018-07-05 Summer Stapleton
     * @internal
     *    @history 2018-07-05 Summer Stapleton - Created ImportMapTemplateWorkOrder class
     *
