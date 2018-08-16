@@ -282,8 +282,11 @@ namespace Isis {
       const Displacement &y, const Displacement &z, const Distance &xSigma,
       const Distance &ySigma, const Distance &zSigma) {
     
-    // Wipe out local radius to ensure it will be recalulated in SetRectangularPoint
-    if (p_localRadius) *p_localRadius = Distance();
+    // Wipe out current local radius to ensure it will be recalculated in SetRectangularPoint
+    if (p_localRadius) {
+      *p_localRadius = Distance();
+    }
+    
     SetRectangularPoint(x, y, z);
 
     if (xSigma.isValid() && ySigma.isValid() && zSigma.isValid())
@@ -304,8 +307,10 @@ namespace Isis {
    */
   void SurfacePoint::SetRectangular(Displacement x, Displacement y, Displacement z,
                                     const symmetric_matrix<double,upper>& covar) {
-    // Wipe out local radius to ensure it will be recalulated in SetRectangularPoint
-    if (p_localRadius) *p_localRadius = Distance();
+    // Wipe out current local radius to ensure it will be recalulated in SetRectangularPoint
+    if (p_localRadius) {
+      *p_localRadius = Distance();
+    }
 
     SetRectangularPoint(x, y, z);
     SetRectangularMatrix(covar);
@@ -434,8 +439,8 @@ namespace Isis {
     SpiceDouble rect[3];
     latrec_c ( dradius, dlon, dlat, rect);
 
-    // Set local radius now to avoid calculating it later
-    if(p_localRadius) {
+    // Set local radius now since we have it to avoid calculating it later
+    if (p_localRadius) {
       *p_localRadius = radius;
     }
     else {
@@ -465,14 +470,6 @@ namespace Isis {
       const Distance &radius, const Angle &latSigma, const Angle &lonSigma,
       const Distance &radiusSigma) {
 
-    // Set local radius now to avoid calculating it later
-    if (p_localRadius) {
-      *p_localRadius = radius;
-    }
-    else {
-      p_localRadius = new Distance(radius);
-    }
-    
     SetSphericalPoint(lat, lon, radius);
 
     if (latSigma.isValid() && lonSigma.isValid() && radiusSigma.isValid())
@@ -491,15 +488,6 @@ namespace Isis {
    */
   void SurfacePoint::SetSpherical(const Latitude &lat, const Longitude &lon,
       const Distance &radius, const symmetric_matrix<double, upper> &covar) {
-
-    // Set local radius now to avoid calculating it later
-    if (p_localRadius) {
-      *p_localRadius = radius;
-    }
-    else {
-      p_localRadius = new Distance(radius);
-    }
-
     SetSphericalPoint(lat, lon, radius);
     SetSphericalMatrix(covar);
   }
@@ -515,15 +503,6 @@ namespace Isis {
    */
   void SurfacePoint::SetSphericalCoordinates(const Latitude &lat,
                                                 const Longitude &lon, const Distance &radius) {
-
-    // Set local radius now to avoid calculating it later
-    if (p_localRadius) {
-      *p_localRadius = radius;
-    }
-    else {
-      p_localRadius = new Distance(radius);
-    }
-    
     SetSphericalPoint(lat, lon, radius);
   }
 
@@ -952,22 +931,22 @@ namespace Isis {
    * Return the latitude sigma in meters
    *
    */
-    Distance SurfacePoint::GetLatSigmaDistance() const {
-      Distance latSigmaDistance;
+  Distance SurfacePoint::GetLatSigmaDistance() const {
+    Distance latSigmaDistance;
 
-      if(Valid()) {
-        Angle latSigma = GetLatSigma();
+    if(Valid()) {
+      Angle latSigma = GetLatSigma();
 
-        if (latSigma.isValid()) {
-          // Distance scalingRadius = GetLocalRadius();
+      if (latSigma.isValid() && GetLocalRadius().isValid()) {
+        // Distance scalingRadius = GetLocalRadius();
 
-          // Convert from radians to meters
-          latSigmaDistance = latSigma.radians() * GetLocalRadius();
-        }
+        // Convert from radians to meters
+        latSigmaDistance = latSigma.radians() * GetLocalRadius();
       }
-
-      return latSigmaDistance;
     }
+
+    return latSigmaDistance;
+  }
 
 
   /**
