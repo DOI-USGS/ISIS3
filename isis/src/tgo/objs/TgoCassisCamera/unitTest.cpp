@@ -37,6 +37,13 @@ using namespace Isis;
 
 void TestLineSamp(Camera *cam, double samp, double line);
 
+/**
+ * Unit test for TGO CaSSIS camera. 
+ *
+ * @internal
+ *   @history 2018-08-15 Jeannie Backer - Updated lat/lon changes due to 
+ *                           changes in focal length.
+ */
 int main(void) {
   Preference::Preferences(true);
 
