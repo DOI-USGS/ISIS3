@@ -12,6 +12,7 @@
 #include "Preference.h"
 #include "Table.h"
 #include "TextFile.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -90,7 +91,9 @@ class ImportPdsTableTester : public ImportPdsTable {
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  QString inputFile = "data/VIR_IR_1A_1_332974737_1_HK.LBL";
+  Isis::FileName data("data/");
+
+  QString inputFile = data.expanded() + "VIR_IR_1A_1_332974737_1_HK.LBL";
   if (--argc == 1) { inputFile = argv[1]; }
 
   cout << "\n\nTesting ImportPdsTable class using file " << inputFile << "\n";
@@ -156,7 +159,7 @@ int main(int argc, char *argv[]) {
   // The following tests were added when the class was expanded to import binary
   // PDS tables also...
 
-  QString pdsTableDir = "data/";
+  QString pdsTableDir = data.expanded();
   QString pdsLabelFile = "";
   QString pdsTableFile = "";
 
@@ -226,8 +229,8 @@ int main(int argc, char *argv[]) {
   cout << myTable.name() << "\n";
 
 
-  QString merLabelFile = "data/edrindex.lbl";
-  QString merTableFile = "data/edrindex.tab";
+  QString merLabelFile = data.expanded() + "edrindex.lbl";
+  QString merTableFile = data.expanded() + "edrindex.tab";
   cout << "\n\nTesting ImportPdsTable protected methods with file " << merLabelFile;
 
   cout << "\n\nConstructing new ImportPdsTable where the PDS table object name is ";

@@ -390,7 +390,8 @@ namespace UA {
       unsigned int  CPMM,
       unsigned int  binning
     )
-    throw(Out_of_Range, Invalid_Argument) {
+    {
+
       if (CPMM >= CCDS) {
         ostringstream
         message;
@@ -414,7 +415,7 @@ namespace UA {
       return
         (int)rint(CCD_FOCAL_PLANE_X_OFFSETS_MM[CPMM]
                   / (CCD_PIXEL_SIZE_MM * binning));
-    }
 
+  }
   }   //  namespace HiRISE
 }   //  namespace UA

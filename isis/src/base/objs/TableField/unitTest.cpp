@@ -224,13 +224,13 @@ int main(int argc, char *argv[]) {
   try {
     cout << int(dblSingletonField) << endl; // try to cast a non-Integer type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     cout << int(intVectorField3); // try to cast an Integer type with multiple values
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -239,13 +239,13 @@ int main(int argc, char *argv[]) {
   try {
     cout << double(textField); // try to cast a non-Double type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     cout << double(dblVectorField3); // try to cast a Double type with multiple values
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -254,7 +254,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << QString(realSingletonField); // try to cast a non-Text type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -263,13 +263,13 @@ int main(int argc, char *argv[]) {
   try {
     cout << float(intSingletonField); // try to cast a non-Real type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     cout << float(realVectorField3); // try to cast a Real type with multiple values
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {
   try {
     vector<int> error = dblSingletonField; // try to cast a non Integer type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -287,7 +287,7 @@ int main(int argc, char *argv[]) {
   try {
     vector<double> error = realSingletonField; // try to cast a non Double type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -296,7 +296,7 @@ int main(int argc, char *argv[]) {
   try {
     vector<float> error = intVectorField3; // try to cast a non Real type
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -306,13 +306,13 @@ int main(int argc, char *argv[]) {
   try {
     realSingletonField = (int) 1; // try to set Real type to non-float value
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     intVectorField3 = (int) 1; // try to set single value to vector Field
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -321,13 +321,13 @@ int main(int argc, char *argv[]) {
   try {
     intSingletonField = (double) 3.14; // try to set Integer type to non-integer value
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     dblVectorField3 = (double) 3.14; // try to set single value to vector Field
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
   try {
     dblSingletonField = "Error"; // try to set Double type to non-double value
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -345,13 +345,13 @@ int main(int argc, char *argv[]) {
   try {
     textField = (float) 3.14; // try to set Text type to non-string value
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     realVectorField3 = (float) 3.14; // try to set single value to vector Field
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -364,13 +364,13 @@ int main(int argc, char *argv[]) {
   try {
     intVectorField3 = intVector2; // try to set wrong size vector
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     realVectorField3 = intVector2;  // try to set float vector to intVector
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -379,13 +379,13 @@ int main(int argc, char *argv[]) {
   try {
     dblVectorField3 = doubleVector2; // try to set wrong size vector
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     intVectorField3 = doubleVector2;  // try to set int vector to double vector
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
 
@@ -394,13 +394,13 @@ int main(int argc, char *argv[]) {
   try {
     realVectorField3 = floatVector2;  // try to set wrong size vector
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   try {
     dblVectorField3 = floatVector2;  // try to set double vector to float vector
   }
-  catch (IException e) {
+  catch (IException &e) {
     e.print();
   }
   cout << "----------------------------------------" << endl << endl;
