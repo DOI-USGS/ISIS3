@@ -426,6 +426,8 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
 add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different 
   ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
 
+add_dependencies(isis3 incs)
+
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.
 # - Only a few things are added in order to make the tests work properly so
