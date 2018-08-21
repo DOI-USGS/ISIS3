@@ -17,6 +17,9 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 * cd into the build directory and configure your build:
   * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
 
+* Copy header files to inc/ (This is temporary):
+  * `ninja incs`
+
 * Build ISIS inside of your build directory and install it to your install directory:
   * `ninja install`
 
