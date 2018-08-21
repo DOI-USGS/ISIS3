@@ -24,11 +24,14 @@
 
 #include <QAction>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QList>
 #include <QMainWindow>
+#include <QRect>
+#include <QSizePolicy>
 #include <QWidget>
 
 #include "ProjectItem.h"
@@ -45,8 +48,29 @@ namespace Isis {
   AbstractProjectItemView::AbstractProjectItemView(QWidget *parent) : QMainWindow(parent) {
 
     setWindowFlags(Qt::Widget);
+
+    QSizePolicy policy = sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Expanding);
+    policy.setVerticalPolicy(QSizePolicy::Expanding);
+    setSizePolicy(policy);
+
     m_internalModel = new ProjectItemProxyModel(this);
     setAcceptDrops(true);
+  }
+
+
+  /**
+   * Returns the suggested size
+   *
+   * @return @b QSize The size hint
+   */
+  QSize AbstractProjectItemView::sizeHint() const {
+
+    //  Size hint is made large as a hack to have the views fill the available dock
+    //  space. SizePolicy alone did not work.
+    QDesktopWidget deskTop;
+    QRect availableSpace = deskTop.availableGeometry(deskTop.primaryScreen());
+    return QSize( .89 * availableSpace.width(), .5 * availableSpace.height() );
   }
 
 
@@ -232,14 +256,13 @@ namespace Isis {
 
   /**
    * Adds an item to the view. The item must be part of the view's
-   * model. This method can be overriden in a subclass to filter out
+   * model. This method can be overridden in a subclass to filter out
    * unneeded items.
    *
    * @param[in] item (ProjectItem *) The item to add.
    */
   void AbstractProjectItemView::addItem(ProjectItem *item) {
-        if (ProjectItemProxyModel *proxyModel =
-        qobject_cast<ProjectItemProxyModel *>( internalModel() ) ) {
+    if (ProjectItemProxyModel *proxyModel = qobject_cast<ProjectItemProxyModel *>( internalModel() )) {
       proxyModel->addItem(item);
     }
   }
@@ -247,13 +270,14 @@ namespace Isis {
 
   /**
    * Adds several items to the view. The items must be a part of the
-   * view's model.
+   * view's model. This method can be overridden in a subclass to filter out
+   * unneeded items.
    *
    * @param[in] items (QList<ProjectItem *>) The items to add.
    */
   void AbstractProjectItemView::addItems(QList<ProjectItem *> items) {
-    foreach (ProjectItem *item, items) {
-      addItem(item);
+    if (ProjectItemProxyModel *proxyModel = qobject_cast<ProjectItemProxyModel *>( internalModel() )) {
+      proxyModel->addItems(items);
     }
   }
 

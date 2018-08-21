@@ -46,6 +46,11 @@ namespace Isis {
    * @internal
    *   @history 2018-06-07 Adam Goins - Initial Version.
    *   @history 2018-06-26 Adam Goins - Made the view dockable with setCentralWidget().
+   *   @history 2018-07-10 Tracie Sucharski - Remove sizePolicy and sizeHint. These are set in the
+   *                           parent class, AbstracProjectItemView.
+   *   @history 2018-07-25 Tracie Sucharski - Put sizeHint back since it was decided to put this
+   *                           view split with the project view, so we don't want this as large
+   *                           as the other views such as Footprint2DView or CubeDnView.
    */
 
 class ControlHealthMonitorView : public AbstractProjectItemView {
@@ -56,13 +61,13 @@ class ControlHealthMonitorView : public AbstractProjectItemView {
     ControlHealthMonitorView(Directory *directory, QWidget *parent = 0);
     ~ControlHealthMonitorView();
 
+    virtual QSize sizeHint() const;
+
     virtual QList<QAction *> permToolBarActions();
     virtual QList<QAction *> activeToolBarActions();
     virtual QList<QAction *> toolPadActions();
 
     ControlHealthMonitorWidget *controlHealthMonitorWidget();
-
-    QSize sizeHint() const;
 
   public slots:
 

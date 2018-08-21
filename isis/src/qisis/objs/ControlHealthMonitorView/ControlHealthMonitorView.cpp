@@ -89,12 +89,18 @@ namespace Isis {
 
     setAcceptDrops(true);
 
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   }
+
+
+  /**
+   * Return a reasonable size
+   */
+  QSize ControlHealthMonitorView::sizeHint() const {
+
+    return QSize(500, 700);
+  }
+
 
   /**
    *  This SLOT is designed to intercept the openPointEditor() signal that's emitted
@@ -163,16 +169,6 @@ namespace Isis {
    */
   ControlHealthMonitorWidget *ControlHealthMonitorView::controlHealthMonitorWidget() {
     return m_controlHealthMonitorWidget;
-  }
-
-
-  /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
-   */
-  QSize ControlHealthMonitorView::sizeHint() const {
-    return QSize(800, 600);
   }
 
 

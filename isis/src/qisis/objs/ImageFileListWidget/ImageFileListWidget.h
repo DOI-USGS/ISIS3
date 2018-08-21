@@ -54,6 +54,9 @@ namespace Isis {
    *   @history 2017-08-22 Cole Neuabuer - Added ability to search ImageFileListWidget. Fixes #1556
    *   @history 2018-05-15 Tracie Sucharski - Fixed xml serialization for Ipce project saves.  Fixes
    *                            #5422.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                           view can be re-created with the same objectName for restoring the
+   *                           project state. Qt's save/restoreState use the objectName.
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT

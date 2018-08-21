@@ -35,6 +35,9 @@ class QVariant;
 
 namespace Isis {
 
+class ProjectItem;
+class ProjectItemModel;
+
   /**  
    *
    * @author 2018-06-18 Tyler Wilson
@@ -43,10 +46,7 @@ namespace Isis {
    *   @history 2018-06-18 Tyler Wilson - Original version. A proxy class for filtering data
    *   within the JigsawSetupDialog Bundle Observation Solve Settings (BOSS) tab.
    */
-  
-   class ProjectItem;
-   class ProjectItemModel;
- 
+     
     class SortFilterProxyModel : public QSortFilterProxyModel  {
     Q_OBJECT
 

@@ -1592,6 +1592,7 @@ namespace Isis {
           m_templateFileName, _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent(), "Error", message);
+      emit setTemplateFailed(m_templateFileName);
       return false;
     }
   }

@@ -45,10 +45,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2015-10-21 Jeffrey Covington - Original version.
-   *   @history 2016-01-13 Jeffrey Covington - Added destructor and treeView() methods. Added 
+   *   @history 2016-01-13 Jeffrey Covington - Added destructor and treeView() methods. Added
    *                           onItemAdded() slot. Replaced setSourceModel() with
    *                           setInternalModel() method.
-   *   @history 2016-06-27 Ian Humphrey - Added documentation (treeView() and onItemAdded()), 
+   *   @history 2016-06-27 Ian Humphrey - Added documentation (treeView() and onItemAdded()),
    *                           checked coding standards. Fixes #4006.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
    *   @history 2016-12-01 Ian Humphrey - Updated #define header guard to match #ifndef pattern.
@@ -56,8 +56,16 @@ namespace Isis {
    *   @history 2017-04-12 Tracie Sucharski - Turn off dragging on the treeView for now since it is
    *                           does not work and is causing errors.
    *   @history 2018-05-29 Summer Stapleton - updated the view to include a central widget and to
-   *                           remove layout capacity. This change was made to adjust to parent 
+   *                           remove layout capacity. This change was made to adjust to parent
    *                           class now inheriting from QMainWindow instead of QWidget.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed the sizeHint to be calculated based on the deskTop
+   *                           size, instead of being hard-coded. The percentages chosen allow for
+   *                           2 CubeDnViews to be opened at once, since CubeDnView has an internal
+   *                           size policy and cannot be made smaller. Changed the setSizePolicy to
+   *                           minimum so that the tree does not expand when a view is closed. References #5433
+   *   @history 2018-07-25 Tracie Sucharski - Changed vertical sizePolicy so that other widgets such
+   *                           as JigsawRunWidget, ControlHealthMonitor can be split with the
+   *                           Project view.
    */
   class ProjectItemTreeView : public AbstractProjectItemView {
 
@@ -66,7 +74,9 @@ namespace Isis {
     public:
       ProjectItemTreeView(QWidget *parent=0);
       ~ProjectItemTreeView();
-      
+
+      virtual QSize sizeHint() const;
+
       virtual void setInternalModel(ProjectItemModel *model);
 
       QTreeView *treeView();
@@ -75,7 +85,7 @@ namespace Isis {
       bool eventFilter(QObject *watched, QEvent *event);
 
     private slots:
-      void onItemAdded(ProjectItem *item);  
+      void onItemAdded(ProjectItem *item);
 
     private:
       QTreeView *m_treeView; //!< The tree view (widget)
