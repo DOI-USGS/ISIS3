@@ -1,7 +1,7 @@
 APPNAME = photomet
 
-angleSourceDemUsedemFalse.cub.TOLERANCE = 0.0005
-angleSourceDemUsedemTrue.cub.TOLERANCE = 0.0005
+angleSourceDemUsedemFalse.cub.TOLERANCE = 0.001
+angleSourceDemUsedemTrue.cub.TOLERANCE = 0.001
 
 include $(ISISROOT)/make/isismake.tsts
 
