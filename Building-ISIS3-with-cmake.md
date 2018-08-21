@@ -87,7 +87,7 @@ Cleaning an individual object:
 
 The command (from the build directory) is:
 
-`make install <appname>_app`
+`make install <appname>`
 
 To build fx:  `make install fx`
 
