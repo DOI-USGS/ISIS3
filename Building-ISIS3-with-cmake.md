@@ -16,6 +16,7 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 
 * cd into the build directory and configure your build:
   * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
+  * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
 * Set your ISISROOT to `/the/path/to/your/build`:
   * `setisis .`
@@ -35,8 +36,6 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 * -DJP2KFLAG=OFF disables JP2000 support.  This is temporary.
 
 * -Dpybindings=OFF disables the bundle adjust python bindings.  This is temporary.
-
-* \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
 * Executables are no longer in an application's directory. When running in debug mode, it is important to give the correct path to an application's executable. Executables are located in build/bin and install/bin. Example using ddt with $ISISROOT set to the build directory:
   * `ddt $ISISROOT/bin/<application_name>`
