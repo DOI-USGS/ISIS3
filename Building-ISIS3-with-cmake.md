@@ -11,14 +11,6 @@ This will copy all files in your fork to your current location in the terminal. 
 
 `cd ISIS3`
 
-Now, you will need to add a remote, so you are able to pull down changes from the main ISIS3 repo. Type:
-
-`git remote add upstream git@github.com:USGS-Astrogeology/ISIS3.git`
-
-When you want to get the latest changes, you can type:
-
-`git pull upstream dev`
-
 For now, pull down the cmake branch. This is temporary until cmake is merged into dev.
 
 
