@@ -33,12 +33,12 @@ When you want to start making changes to ISIS, make a new branch from the cmake 
 
 `git push origin <name of the branch>` (origin is the name of the remote for your fork)
 
-Now, on the GitHub website on your fork's page, you should see your new branch come up. Click "New Pull Request" and make sure that the main ISIS3 repo's name and "dev" on the left side of the arrow, ensuring that we are making a PR into dev. Now, you can click "Create Pull Request". Your PR should be open, and another developer will review it and merge it.
+Now, on the GitHub website on your fork's page, you should see your new branch come up. Click "New Pull Request" and make sure that the main ISIS3 repo's name and "dev" are on the left side of the arrow, ensuring that we are making a PR into dev. Now, you can click "Create Pull Request". Your PR should be open, and another developer will review it and merge it.
 
 You now have the latest cmake files and can start building ISIS3 with cmake!
 
 ## Anaconda and ISIS3 dependencies
-ISIS3 dependencies are managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file  at the top level of the ISIS3 repo. To create the required Anaconda environment, enter the following command:
+ISIS3 dependencies are managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file  at the top level of the ISIS3 repo. To create the required Anaconda environment, go into the ISIS3 directory and enter the following command in:
 
 `conda env create -n <environment-name> -f environment.yml`
 
@@ -78,11 +78,10 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * `ddt $ISISROOT/bin/<application_name>`
 
  
-
 ## New Environmental Variable meanings
 `$ISISROOT` is no longer the ISIS3 source directory. `$ISISROOT` is now either the CMake build directory for development or the install directory for running a deployed copy of ISIS. 
 
-* **Source Directory**: Where the ISIS source code lives (i.e. your local repository)
+* **Source Directory**: Where the ISIS source code lives. This is the isis directory. If you are in build, this would be ../isis (i.e. your local repository)
 * **Build Directory**: Where generated project files live (Makefiles, Ninja files, Xcode project, etc.) and where binaries are built to.  This is where you spend most of your development time. 
 * **Install Directory**: Where the binaries are placed on install. 
 
