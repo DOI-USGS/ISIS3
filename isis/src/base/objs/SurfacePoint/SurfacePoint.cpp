@@ -26,12 +26,7 @@ namespace Isis {
    *
    */
   SurfacePoint::SurfacePoint(const SurfacePoint &other) {
-    if(other.p_localRadius) {
-      p_localRadius = new Distance(*other.p_localRadius);
-    }
-    else {
-      p_localRadius = NULL;
-    }
+    p_localRadius = other.p_localRadius;
 
     if(other.p_x) {
       p_x = new Displacement(*other.p_x);
@@ -204,7 +199,7 @@ namespace Isis {
     p_x = NULL;
     p_y = NULL;
     p_z = NULL;
-    p_localRadius = NULL;
+    p_localRadius = Distance();
   }
 
   
@@ -257,10 +252,10 @@ namespace Isis {
     //   throw IException(IException::User, msg, _FILEINFO_);
     // }
 
-    if (!p_localRadius || (p_localRadius && !(*p_localRadius).isValid())) {
+    if (!p_localRadius.isValid()) {
       ComputeLocalRadius();
+      p_localRadius = GetLocalRadius();
     }
-    *p_localRadius = GetLocalRadius();
   }
 
 
@@ -283,9 +278,7 @@ namespace Isis {
       const Distance &ySigma, const Distance &zSigma) {
     
     // Wipe out current local radius to ensure it will be recalculated in SetRectangularPoint
-    if (p_localRadius) {
-      *p_localRadius = Distance();
-    }
+     p_localRadius = Distance();
     
     SetRectangularPoint(x, y, z);
 
@@ -308,9 +301,7 @@ namespace Isis {
   void SurfacePoint::SetRectangular(Displacement x, Displacement y, Displacement z,
                                     const symmetric_matrix<double,upper>& covar) {
     // Wipe out current local radius to ensure it will be recalulated in SetRectangularPoint
-    if (p_localRadius) {
-      *p_localRadius = Distance();
-    }
+    p_localRadius = Distance();
 
     SetRectangularPoint(x, y, z);
     SetRectangularMatrix(covar);
@@ -440,12 +431,7 @@ namespace Isis {
     latrec_c ( dradius, dlon, dlat, rect);
 
     // Set local radius now since we have it to avoid calculating it later
-    if (p_localRadius) {
-      *p_localRadius = radius;
-    }
-    else {
-      p_localRadius = new Distance(radius);
-    }
+    p_localRadius = radius;
 
     SetRectangularPoint(Displacement(rect[0], Displacement::Kilometers),
                         Displacement(rect[1], Displacement::Kilometers),
@@ -708,7 +694,7 @@ namespace Isis {
     }
     
     ComputeLocalRadius();
-    *p_localRadius = GetLocalRadius();
+    p_localRadius = GetLocalRadius();
   }
 
 
@@ -736,12 +722,7 @@ namespace Isis {
     SpiceDouble lat = (double) GetLatitude().radians();
     SpiceDouble lon = (double) GetLongitude().radians();
     
-    if (p_localRadius) {
-      *p_localRadius = radius;
-    }
-    else {
-      p_localRadius = new Distance(radius);
-    }
+    p_localRadius = radius;
     
     // Set rectangular coordinates
     SpiceDouble rect[3];
@@ -888,20 +869,10 @@ namespace Isis {
         double y = p_y->meters();
         double z = p_z->meters();
 
-        if (p_localRadius) {
-        *p_localRadius = Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
-        }
-        else {
-        p_localRadius = new Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
-        }
+        p_localRadius = Distance(sqrt(x*x + y*y + z*z), Distance::Meters);
       }
       else if (*p_x == zero && *p_y == zero && *p_z == zero) { // for backwards compatability
-        if (p_localRadius) {
-          *p_localRadius = Distance(0., Distance::Meters);
-        }
-        else {
-          p_localRadius = new Distance(0., Distance::Meters);
-        }
+        p_localRadius = Distance(0., Distance::Meters);
       }
       else { // Invalid point
         IString msg = "SurfacePoint::Can't compute local radius on invalid point";
@@ -915,15 +886,7 @@ namespace Isis {
    *
    */
     Distance SurfacePoint::GetLocalRadius() const {
-      if (!Valid())
-        return Distance();
-
-      if (p_localRadius) {
-        return *p_localRadius;
-      }
-      else {
-        return Distance();
-      }
+     return p_localRadius;
     }
 
 
@@ -932,7 +895,7 @@ namespace Isis {
    *
    */
   Distance SurfacePoint::GetLatSigmaDistance() const {
-    Distance latSigmaDistance;
+    Distance latSigmaDistance = Distance();
 
     if(Valid()) {
       Angle latSigma = GetLatSigma();
@@ -1146,10 +1109,6 @@ namespace Isis {
       *p_x = *other.p_x;
       *p_y = *other.p_y;
       *p_z = *other.p_z;
-        // Finally initialize local radius to avoid using a previous value
-      if (p_localRadius && other.p_localRadius) {
-        *p_localRadius = other.GetLocalRadius();
-      }
     }
     else {
       FreeAllocatedMemory();
@@ -1166,10 +1125,6 @@ namespace Isis {
         p_z = new Displacement(*other.p_z);
       }
 
-      if(other.p_localRadius) {
-        p_localRadius = new Distance(other.GetLocalRadius());
-      }
-
       if(other.p_rectCovar) {
         p_rectCovar = new symmetric_matrix<double, upper>(*other.p_rectCovar);
       }
@@ -1178,6 +1133,9 @@ namespace Isis {
         p_sphereCovar = new symmetric_matrix<double, upper>(*other.p_sphereCovar);
       }
     }
+
+    // Finally initialize local radius to avoid using a previous value
+    p_localRadius = other.GetLocalRadius();
 
     return *this;
   }
@@ -1196,11 +1154,6 @@ namespace Isis {
     if(p_z) {
       delete p_z;
       p_z = NULL;
-    }
-
-    if(p_localRadius) {
-      delete p_localRadius;
-      p_localRadius = NULL;
     }
 
     if(p_rectCovar) {
