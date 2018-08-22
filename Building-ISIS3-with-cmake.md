@@ -1,7 +1,9 @@
 # QuickStart Guide
 
 ## Getting Started With GitHub
-You will not be directly making changes to the main ISIS3 repo. Instead, make a fork of the ISIS3 repo by clicking on "Fork" at the top of the page. This is the repo that you will be pushing your changes to. If you notice, there is a branch in the ISIS3 repo called "dev". This is the main branch of the repo where all changes are merged into and the branch where you will be pulling down the latest changes from. Next, you are going to create a clone of your fork on your machine so that you are able to make changes to ISIS. Go to your fork on the GitHub website and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal and in the terminal, type:
+You want a fresh copy of ISIS to work on. To get started, you first want to create a fork of the ISIS3 repo by going to the [main ISIS3 repo page](https://github.com/USGS-Astrogeology/ISIS3) and clicking on "Fork" at the top of the page.
+
+Next, you want to create a clone of your fork on your machine. Go to your fork of ISIS3 on the GitHub website (url should be https://github.com/<username>/ISIS3) and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal, go to the directory you want to make a clone in, and in the terminal, type:
 
 `git clone <paste the link>`
 
@@ -15,32 +17,15 @@ Now, you will need to add a remote, so you are able to pull down changes from th
 
 When you want to get the latest changes, you can type:
 
-`git pull upstream <branch you want to pull down>`
+`git pull upstream dev`
 
-You will most likely be pulling down changes from dev. Finally, we want to create a branch for cmake where all of the cmake files will be located. In your terminal, inside of your clone, type:
+For now, pull down the cmake branch. This is temporary until cmake is merged into dev.
 
-`git branch cmake`
-
-This will create a new branch called cmake. Then, to switch from dev to the cmake branch, type:
-
-`git checkout cmake`
-
-Now, if you type `git branch` again, the cmake branch should have an asterisk next to it (meaning this is the active branch). Now you will want to get to the latest changes from the cmake branch on the main ISIS3 repo. So, we will be using that command from earlier:
-
-`git pull upstream cmake`
-
-When you want to start making changes to ISIS, make a new branch from the cmake branch where all your changes will be made. When you are done making changes, you will want to push your changes to your fork and then make a pull request (PR) to get your changes merged into the main ISIS3 repo. To start, we want to push changes to your fork:
-
-`git push origin <name of the branch>` (origin is the name of the remote for your fork)
-
-Now, on the GitHub website on your fork's page, you should see your new branch come up. Click "New Pull Request" and make sure that the main ISIS3 repo's name and "dev" are on the left side of the arrow, ensuring that we are making a PR into dev. Now, you can click "Create Pull Request". Your PR should be open, and another developer will review and merge it.
-
-You now have the latest cmake files and can start building ISIS3 with cmake!
 
 ## Anaconda and ISIS3 dependencies
-ISIS3 dependencies are managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file  at the top level of the ISIS3 repo. To create the required Anaconda environment, go into the ISIS3 directory and enter the following command in:
+To started building ISIS3 with cmake, you first need anaconda installed. Go to the [download page for Anaconda](https://www.anaconda.com/download/) and follow the instructions for your machine. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
 
-`conda env create -n <environment-name> -f environment.yml`
+`conda env create -n <environment-name> -f environment.yml` (you may name the environment whatever you want)
 
 Building ISIS requires that the anaconda environment be activated. Activate your anaconda environment with:
 
@@ -50,6 +35,7 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 **At the top-level directory of an ISIS3 clone**:
 * Create a `build` directory and an `install` directory at this level:
   * `mkdir build install`
+  * There should now be a build/ install/ and isis/ directory in the ISIS3 directory.
 
 * cd into the build directory and configure your build:
   * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
@@ -68,11 +54,11 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 **Notes**
 * The -GNinja flag specifies creating Google [Ninja](https://ninja-build.org/manual.html) Makefile (an alternative Make system to the traditional GNU make system). If you instead want to use make, dont set this flag, and replace the ninja commands with their make counterparts.
 
-* To build with debug flags add `-DCMAKE_BUILD_TYPE=Debug` to the cmake configuration step.
-
 * -DJP2KFLAG=OFF disables JP2000 support.  This is temporary.
 
 * -Dpybindings=OFF disables the bundle adjust python bindings.  This is temporary.
+
+* To build with debug flags add `-DCMAKE_BUILD_TYPE=Debug` to the cmake configuration step.
 
 * Executables are no longer in an application's directory. When running in debug mode, it is important to give the correct path to an application's executable. Executables are located in build/bin and install/bin. Example using ddt with $ISISROOT set to the build directory:
   * `ddt $ISISROOT/bin/<application_name>`
