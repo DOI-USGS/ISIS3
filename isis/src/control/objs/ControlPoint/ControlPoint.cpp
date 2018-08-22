@@ -921,7 +921,7 @@ namespace Isis {
     }
 
     // Don't update the apriori x/y/z for fixed points  TODO This needs a closer look
-    if (GetType() == Free ) {
+    if (GetType() == Free && !id.contains("Lidar")) {  // TODO: temporary kluge for lidar points
       // point can be tagged as "Free" but still have constrained coordinates
       // if tagged "Free" we want to compute approximate a priori coordinates
     }
@@ -934,7 +934,8 @@ namespace Isis {
         || NumberOfConstrainedCoordinates() == 3
         || IsLatitudeConstrained()
         || IsLongitudeConstrained()
-        || IsRadiusConstrained()) {
+        || IsRadiusConstrained()
+        || id.contains("Lidar")) { // TODO: temporary kluge for lidar points
 
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
@@ -965,6 +966,7 @@ namespace Isis {
     }
     // Since we are not solving yet for x,y,and z in the bundle directly,
     // longitude must be constrained.  This constrains x and y as well.
+    // TODO: (Ken E.) this isn't clear to me anymore
     else {
       aprioriSurfacePoint.SetRectangular(
         aprioriSurfacePoint.GetX(),
@@ -1012,6 +1014,11 @@ namespace Isis {
 
     PointModified();
 
+    double cuSamp, cuLine;
+    double muSamp, muLine;
+    double cudx = 0.0;
+    double cudy = 0.0;
+
     // Loop for each measure to compute the error
     QList<QString> keys = measures->keys();
 
@@ -1025,20 +1032,8 @@ namespace Isis {
 //       if (!m->IsMeasured()) {
 //         continue;
 
-      // TODO:  Should we use crater diameter?
       Camera *cam = m->Camera();
-
-      double cuSamp;
-      double cuLine;
-      CameraFocalPlaneMap *fpmap = m->Camera()->FocalPlaneMap();
-
-      // Map the lat/lon/radius of the control point through the Spice of the
-      // measurement sample/line to get the computed sample/line.  This must be
-      // done manually because the camera will compute a new time for line scanners,
-      // instead of using the measured time.
-//      ComputeResiduals_Millimeters();
-      double cudx = 0.0;
-      double cudy = 0.0;
+      CameraFocalPlaneMap *fpmap = cam->FocalPlaneMap();
 
       // Map the lat/lon/radius of the control point through the Spice of the
       // measurement sample/line to get the computed undistorted focal plane
@@ -1052,10 +1047,17 @@ namespace Isis {
       }
 
       cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
-      // double mudx = m->GetFocalPlaneMeasuredX();
-      // double mudy = m->GetFocalPlaneMeasuredY();
-
       m->SetFocalPlaneComputed(cudx, cudy);
+
+
+      // TODO:TESTING
+//      cam->DistortionMap()->SetUndistortedFocalPlane(cudx,cudy);
+//      double distortedx = cam->DistortionMap()->FocalPlaneX();
+//      double distortedy = cam->DistortionMap()->FocalPlaneY();
+//      fpmap->SetFocalPlane(distortedx, distortedy);
+//      double distortedsample = fpmap->DetectorSample();
+//      double distortedline = fpmap->DetectorLine();
+      // TODO:TESTING
 
       if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
 
@@ -1073,7 +1075,6 @@ namespace Isis {
         cuSamp = fpmap->DetectorSample();
         cuLine = fpmap->DetectorLine();
       }
-
       else {
         // For radar line is calculated from time in the camera.  Use the
         // closest line to scale the focal plane y (doppler shift) to image line
@@ -1134,9 +1135,6 @@ namespace Isis {
         cuLine = m->GetLine() + deltaLine;
       }
 
-      double muSamp;
-      double muLine;
-
       if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneMeasuredX(), m->GetFocalPlaneMeasuredY())) {
@@ -1158,6 +1156,17 @@ namespace Isis {
       // undistorted pixels except for radar instruments.
       double sampResidual = muSamp - cuSamp;
       double lineResidual = muLine - cuLine;
+
+      // TODO: TESTING
+//      double x = cam->DistortionMap()->FocalPlaneX();
+//      double y = cam->DistortionMap()->FocalPlaneY();
+//      m->SetFocalPlaneMeasured(x, y);
+//      double mdissamp = fpmap->DetectorSample();
+//      double mdisline = fpmap->DetectorLine();
+//      double distortedSampleResidual = fpmap->DetectorSample() - distortedsample;
+//      double distortedLineResidual = fpmap->DetectorLine() - distortedline;
+      // TODO: TESTING
+
       m->SetResidual(sampResidual, lineResidual);
     }
 
