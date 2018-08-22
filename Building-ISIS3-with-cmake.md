@@ -33,9 +33,9 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 
 ## Building ISIS3
 **At the top-level directory of an ISIS3 clone**:
-* Create a `build` directory and an `install` directory at this level:
+* Create a `build` and an `install` directory at this level:
   * `mkdir build install`
-  * There should now be a build/ install/ and isis/ directory in the ISIS3 directory.
+  * There should now be a build/ install/ and isis/ directory.
 
 * cd into the build directory and configure your build:
   * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
