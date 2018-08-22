@@ -23,7 +23,7 @@ You will most likely be pulling down changes from dev. Finally, we want to creat
 
 This will create a new branch called cmake. Then, to switch from dev to the cmake branch, type:
 
-`git checkout cmake'
+`git checkout cmake`
 
 Now, if you type `git branch` again, the cmake branch should have an asterisk next to it (meaning this is the active branch). Now you will want to get to the latest changes from the cmake branch on the main ISIS3 repo. So, we will be using that command from earlier:
 
