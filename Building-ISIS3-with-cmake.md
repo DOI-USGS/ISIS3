@@ -1,11 +1,11 @@
 # QuickStart Guide
 
 ## Getting Started With GitHub
-You will not be directly making changes to the main ISIS3 repo. Instead, make a fork of the ISIS3 repo by clicking on "Fork" at the top of the page. This is the repo that you will be pushing your changes to. If you notice, there is a branch in in the ISIS3 repo called "dev". This is the main branch of the repo where all changes are merged into and the branch where you will be pulling down the latest changes from. Next, you are going to create a clone of your fork on your machine so that you are able to make changes to ISIS. Go to your fork on the GitHub website and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal and in the terminal, type:
+You will not be directly making changes to the main ISIS3 repo. Instead, make a fork of the ISIS3 repo by clicking on "Fork" at the top of the page. This is the repo that you will be pushing your changes to. If you notice, there is a branch in the ISIS3 repo called "dev". This is the main branch of the repo where all changes are merged into and the branch where you will be pulling down the latest changes from. Next, you are going to create a clone of your fork on your machine so that you are able to make changes to ISIS. Go to your fork on the GitHub website and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal and in the terminal, type:
 
 `git clone <paste the link>`
 
-This will copy all files in your fork to your current location in the terminal. Then in your terminal, navigate to the ISIS3 directory by typing:
+This will copy all files in your fork to your current location in the terminal. Then, in your terminal, navigate to the ISIS3 directory by typing:
 
 `cd ISIS3`
 
@@ -33,7 +33,7 @@ When you want to start making changes to ISIS, make a new branch from the cmake 
 
 `git push origin <name of the branch>` (origin is the name of the remote for your fork)
 
-Now, on the GitHub website on your fork's page, you should see your new branch come up. Click "New Pull Request" and make sure that the main ISIS3 repo's name and "dev" are on the left side of the arrow, ensuring that we are making a PR into dev. Now, you can click "Create Pull Request". Your PR should be open, and another developer will review it and merge it.
+Now, on the GitHub website on your fork's page, you should see your new branch come up. Click "New Pull Request" and make sure that the main ISIS3 repo's name and "dev" are on the left side of the arrow, ensuring that we are making a PR into dev. Now, you can click "Create Pull Request". Your PR should be open, and another developer will review and merge it.
 
 You now have the latest cmake files and can start building ISIS3 with cmake!
 
