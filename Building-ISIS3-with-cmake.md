@@ -1,5 +1,26 @@
 # QuickStart Guide
 
+## Getting Started With GitHub
+You will not be directly making changes to the main ISIS3 repo. Instead, make a fork of the ISIS3 repo by clicking on "Fork" at the top of the page. This is the repo that you will be pushing your changes to. If you notice, there is a branch in in the ISIS3 repo called "dev". This is the main branch of the repo where all changes are merged into and the branch where you will be pulling down the latest changes. Next, you are going to create a clone of your fork on your machine so that you are able to make changes to ISIS. Go to your fork on the GitHub website and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal and in the terminal, type:
+`git clone <paste the link>`
+This will copy all files in your fork to your current location in the terminal. Then in your terminal, navigate to the ISIS3 directory by typing:
+`cd ISIS3`
+Now, you will need to add a remote, so you are able to pull down changes from the main ISIS3 repo. Type:
+`git remote add upstream git@github.com:USGS-Astrogeology/ISIS3.git`
+When you want to get the latest changes, you can type:
+`git pull upstream <branch you want to pull down>`
+You will most likely be pulling down changes from dev. Finally, we want to create a branch for cmake where all of the cmake files will be located. In your terminal, inside of your clone, type:
+`git branch cmake`
+This will create a new branch called cmake. Then, to switch from dev to the cmake branch, type:
+`git checkout cmake'
+Now, if you type `git branch` again, the cmake branch should have an asterisk next to it (meaning this is the active branch). Now you will want to get to the latest changes from the cmake branch on the main ISIS3 repo. So, we will be using that command from earlier:
+`git pull upstream cmake`
+When you want to start making changes to ISIS, make a new branch from the cmake branch where all your changes will be made. When you are done making changes, you will want to push your changes to your fork and then make a pull request (PR) to get your changes merged into the main ISIS3 repo. To start, we want to push changes to your fork:
+`git push origin <name of the branch>` (origin is the name of the remote for your fork)
+Now, on the GitHub website on your fork's page, you should see your new branch come up. Click "New Pull Request" and make sure that the main ISIS3 repo's name and "dev" on the left side of the arrow, ensuring that we are making a PR into dev. Now, you can click "Create Pull Request". Your PR should be open, and another developer will review it and merge it.
+
+You now have the latest cmake files and can start building ISIS3 with cmake!
+
 ## Anaconda and ISIS3 dependencies
 ISIS3 dependencies are managed through Anaconda. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file  at the top level of the ISIS3 repo. To create the required Anaconda environment, enter the following command:
 
