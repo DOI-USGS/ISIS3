@@ -3,7 +3,7 @@
 ## Getting Started With GitHub
 To get started, you want a fresh copy of ISIS to work on. You first want to create a fork of the ISIS3 repo by going to the [main ISIS3 repo page](https://github.com/USGS-Astrogeology/ISIS3) and clicking on "Fork" at the top of the page.
 
-Next, you want to create a clone of your fork on your machine. Go to your fork of ISIS3 on the GitHub website,url should be "github.com/<username>/ISIS3", and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal, go to the directory you want to make a clone in, and in the terminal, type:
+Next, you want to create a clone of your fork on your machine. Go to your fork of ISIS3 on the GitHub website, url should be `github.com/<username>/ISIS3`, and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal, go to the directory you want to make a clone in, and in the terminal, type:
 
 `git clone <paste the link>`
 
