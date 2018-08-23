@@ -15,7 +15,7 @@ For now, pull down the cmake branch. This is temporary until cmake is merged int
 
 
 ## Anaconda and ISIS3 dependencies
-To started building ISIS3 with cmake, you first need anaconda installed. Go to the [download page for Anaconda](https://www.anaconda.com/download/) and follow the instructions for your machine. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
+To started building ISIS3 with cmake, you first need anaconda installed. Go to [Anaconda's download page](https://www.anaconda.com/download/) and follow the instructions for your operating system. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
 
 `conda env create -n <environment-name> -f environment.yml` (you may name the environment whatever you want)
 
