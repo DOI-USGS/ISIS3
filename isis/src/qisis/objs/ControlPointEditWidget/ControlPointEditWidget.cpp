@@ -52,6 +52,7 @@
 #include "Shape.h"
 #include "ShapeList.h"
 #include "SpecialPixel.h"
+#include "TemplateList.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 #include "ViewportMainWindow.h"
@@ -85,6 +86,9 @@ namespace Isis {
 
     connect(this, SIGNAL(newControlNetwork(ControlNet *)),
             m_measureEditor, SIGNAL(newControlNetwork(ControlNet *)));
+
+    connect(m_directory->project(), SIGNAL(templatesAdded(TemplateList *)),
+            this, SLOT(addTemplates(TemplateList *)));
   }
 
 
@@ -218,18 +222,35 @@ namespace Isis {
 
     m_cnetFileNameLabel = new QLabel("Control Network: " + m_cnetFileName);
 
-    m_templateFileNameLabel = new QLabel("Template File: " +
-        m_measureEditor->templateFileName());
-    m_templateFileNameLabel->setToolTip("Sub-pixel registration template File.");
-    m_templateFileNameLabel->setWhatsThis("FileName of the sub-pixel "
+    // Create a combobox to allow user to select either the default registration file or one of the
+    // imported registration files.
+    m_templateComboBox = new QComboBox();
+    m_templateComboBox->setToolTip("Choose a template file");
+    m_templateComboBox->setWhatsThis("FileName of the sub-pixel "
                   "registration template.  Refer to $ISISROOT/doc/documents/"
                   "PatternMatch/PatternMatch.html for a description of the "
                   "contents of this file.");
+    m_templateComboBox->addItem(m_measureEditor->templateFileName());
+    QList <TemplateList *> regTemplates = m_directory->project()->regTemplates();
+    foreach(TemplateList *templateList, regTemplates) {
+      foreach(Template *templateFile, *templateList){
+        m_templateComboBox->addItem(templateFile->importName()
+                                    + "/" + FileName(templateFile->fileName()).name());
+      }
+    }
+    QFormLayout *templateFileLayout = new QFormLayout();
+    templateFileLayout->addRow("Template File:", m_templateComboBox);
+
+    // Set-up connections to give registration combobox functionality
+    connect(m_templateComboBox, SIGNAL(activated(QString)),
+            this, SLOT(setTemplateFile(QString)));
+    connect(m_measureEditor, SIGNAL(setTemplateFailed(QString)),
+            this, SLOT(resetTemplateComboBox(QString)));
 
     QVBoxLayout * centralLayout = new QVBoxLayout;
 
     centralLayout->addWidget(m_cnetFileNameLabel);
-    centralLayout->addWidget(m_templateFileNameLabel);
+    centralLayout->addLayout(templateFileLayout);
     centralLayout->addWidget(createTopSplitter());
     centralLayout->addStretch();
     centralLayout->addWidget(m_measureEditor);
@@ -779,8 +800,6 @@ namespace Isis {
       groundFile = newFile.absoluteFilePath();
       m_controlNet->GetPoint(i)->SetAprioriSurfacePointSourceFile(groundFile.expanded());
     }
-    //  TODO:  Temporary until autosave is implemented Save control net to Backup file
-    emit saveControlNet();
   }
 
 
@@ -804,16 +823,18 @@ namespace Isis {
     //  is selected
     if (controlPoint->Parent() == NULL) {
       m_editPoint = controlPoint;
+
       // New point in editor, so colorize all save buttons
       colorizeAllSaveButtons("red");
     }
     else {
       m_editPoint = new ControlPoint;
       *m_editPoint = *controlPoint;
+
       // New point loaded, make sure all save button's text is default black color
       colorizeAllSaveButtons("black");
-
     }
+
     loadPoint(serialNumber);
     loadTemplateFile(m_measureEditor->templateFileName());
   }
@@ -1265,8 +1286,8 @@ namespace Isis {
       }
 
       // emit a signal to alert user to save when exiting
+      m_control->setModified(true);
       emit cnetModified();
-      emit saveControlNet();
 
       if (m_editPoint != NULL) {
         //  Change Save Point button text to red
@@ -1659,11 +1680,10 @@ namespace Isis {
 
     // At exit, or when opening new net, use for prompting user for a save
     m_cnetModified = true;
+    m_control->setModified(true);
     emit cnetModified();
     //   Refresh chipViewports to show new positions of controlPoints
     m_measureEditor->refreshChips();
-
-    emit saveControlNet();
   }
 
 
@@ -1992,8 +2012,8 @@ namespace Isis {
       delete m_leftMeasure;
       m_leftMeasure = NULL;
     }
-    m_leftMeasure = new ControlMeasure;
 
+    m_leftMeasure = new ControlMeasure;
     *m_leftMeasure = *((*m_editPoint)[serial]);
 
     //  If m_leftCube is not null, delete before creating new one
@@ -2041,8 +2061,8 @@ namespace Isis {
       delete m_rightMeasure;
       m_rightMeasure = NULL;
     }
-    m_rightMeasure = new ControlMeasure;
 
+    m_rightMeasure = new ControlMeasure;
     *m_rightMeasure = *((*m_editPoint)[serial]);
 
     //  If m_rightCube is not null, delete before creating new one
@@ -2242,7 +2262,6 @@ namespace Isis {
 
     m_templateModified = false;
     m_saveTemplateFile->setEnabled(false);
-    m_templateFileNameLabel->setText("Template File: " + fn);
   }
 
 
@@ -2328,7 +2347,6 @@ namespace Isis {
     if (m_measureEditor->setTemplateFile(fn)) {
       m_templateModified = false;
       m_saveTemplateFile->setEnabled(false);
-      m_templateFileNameLabel->setText("Template File: " + fn);
     }
   }
 
@@ -2386,6 +2404,59 @@ namespace Isis {
       return;
 
     m_templateEditorWidget->setVisible(!m_templateEditorWidget->isVisible());
+  }
+
+
+  /**
+  * Add registration TemplateList to combobox when imported to project
+  *
+  * @param templateList Reference to TemplateList that was imported
+  */
+  void ControlPointEditWidget::addTemplates(TemplateList *templateList) {
+    if(templateList->type() == "registrations") {
+      for(int i = 0; i < templateList->size(); i++) {
+        m_templateComboBox->addItem(templateList->at(i)->importName()
+                                    + "/" + FileName(templateList->at(i)->fileName()).name());
+      }
+    }
+  }
+
+
+  /**
+  * Appends the filename to the registrations path (unless this is the default template) and calls
+  * setTemplateFile for the control measure
+  *
+  * @param filename This is the import directory and the filename of the template file selected from
+  *                 the QComboBox.
+  */
+  void ControlPointEditWidget::setTemplateFile(QString filename) {
+    QString expandedFileName = filename;
+    if(!filename.startsWith("$base")){
+      expandedFileName = m_directory->project()->templateRoot()
+                                 + "/registrations/" + filename;
+    }
+    if (m_measureEditor->setTemplateFile(expandedFileName)) {
+      loadTemplateFile(expandedFileName);
+    }
+  }
+
+
+  /**
+  * Reset the selected template in the template combobox if the template selected by the user does
+  * not satisfy requirements for the control measure.
+  *
+  * @param fileName The filename that was previously selected in the template combo box
+  */
+  void ControlPointEditWidget::resetTemplateComboBox(QString fileName) {
+    if(fileName.startsWith("$base")) {
+      m_templateComboBox->setCurrentIndex(0);
+    }
+    QList<QString> components = fileName.split("/");
+    int size = components.size();
+    int index = m_templateComboBox->findText(components[size - 2] + "/" + components[size - 1]);
+    if (index != -1) {
+      m_templateComboBox->setCurrentIndex(index);
+    }
   }
 
 
@@ -2540,8 +2611,6 @@ namespace Isis {
 
     //  Change Save Measure button text back to default
     m_saveNet->setPalette(m_saveDefaultPalette);
-
-    emit saveControlNet();
   }
 
 

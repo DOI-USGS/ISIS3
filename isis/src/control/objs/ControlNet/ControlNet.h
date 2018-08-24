@@ -261,6 +261,7 @@ namespace Isis {
    *                           SurfacePoints now use their local radii to do sigma distance
    *                           conversions instead of the target equatorial and polar radii.
    *                           Fixes #5457.
+   *   @history 2018-07-22 Kristin Berry - Updated swap to include the graph and vertex map.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -437,8 +438,8 @@ namespace Isis {
 
       //! Used to define the edges of the graph.
       struct Connection {
-        int strength;
         Connection() : strength(0) {}
+        int strength;
       };
 
       //! Defines the graph type as an undirected graph that uses Images for verticies,
@@ -461,6 +462,7 @@ namespace Isis {
 
       //! Iterates over adjacent verticies
       typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator;
+      typedef boost::graph_traits<Network>::vertex_iterator VertexIterator;
 
       QHash<QString, ImageVertex> m_vertexMap; //! The serial number -> vertex hash used by the graph
       Network m_controlGraph; //! The ControlNet graph

@@ -37,19 +37,24 @@
    /**    
     *
     * @author 2017-11-01 Christopher Combs
+    *
     * @internal
     *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
-    *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
-    *     Adapted from ControlList.
+    *                           can easily be copied from one Project to another, saved to disk, or
+    *                           deleted from disk. Adapted from ControlList.
+    *   @history 2018-07-07 Summer Stapleton - Fixed a few errors in how the xmlhandling was 
+    *                           occuring and added additional handling of separating map templates
+    *                           from registration templates to reflect chagnes in Project.cpp.
     */
    class TemplateList : public QObject, public QList<Template *> {
      Q_OBJECT
 
      public:
        TemplateList(QString name, QString type, QString path, QObject *parent = NULL);
-       TemplateList(const TemplateList &);
-       TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
+       explicit TemplateList(QObject *parent = NULL);
+       explicit TemplateList(Project *project, XmlStackedHandlerReader *xmlReader,
                             QObject *parent = NULL);
+       TemplateList(const TemplateList &);
        ~TemplateList();
 
        QString name() const;
@@ -68,15 +73,16 @@
        QString m_name;
        QString m_type;
 
+       /**
+        *
+        * @author 2017-11-01 Christopher Combs
+        * @internal
+        *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
+        *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
+        *     Adapted from ControlList.
+        */
        class XmlHandler : public XmlStackedHandler {
-         /**
-          *
-          * @author 2017-11-01 Christopher Combs
-          * @internal
-          *   @history 2017-11-01 Christopher Combs - Maintains a list of Templates so that templates
-          *     can easily be copied from one Project to another, saved to disk, or deleted from disk.
-          *     Adapted from ControlList.
-          */
+
          public:
            XmlHandler(TemplateList *templateList, Project *project);
 
