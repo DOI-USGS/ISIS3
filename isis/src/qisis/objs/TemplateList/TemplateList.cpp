@@ -43,6 +43,15 @@ namespace Isis {
     m_path = path;
     m_type = type;
   }
+  
+  
+  /**
+   * Creates a blank template list.
+   *
+   * @param parent The Qt-relationship parent.
+   */
+  TemplateList::TemplateList(QObject *parent) : QObject(parent) {
+  }
 
 
   /**
@@ -185,18 +194,28 @@ namespace Isis {
    */
   void TemplateList::save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot)
       const {
-    stream.writeStartElement("templateList");
+    
+    if (m_type == "maps") {
+      stream.writeStartElement("mapTemplateList");
+    }
+    else if (m_type == "registrations") {
+      stream.writeStartElement("regTemplateList");
+    }
+    else {
+      throw IException(IException::Io,
+                       QString("Attempting to save unsupported template file type: [%1]").arg(m_type),
+                       _FILEINFO_);
+    }
     stream.writeAttribute("name", m_name);
     stream.writeAttribute("type", m_type);
     stream.writeAttribute("path", m_path);
 
-    FileName settingsFileName(
-      Project::templateRoot(newProjectRoot.toString()) + "/" + m_type + "/" + m_name + "/templates.xml");
+    FileName settingsFileName(Project::templateRoot(newProjectRoot.toString()) 
+                              + "/" + m_type + "/" + m_name + "/templates.xml");
 
     if (!settingsFileName.dir().mkpath(settingsFileName.path())) {
       throw IException(IException::Io,
-                       QString("Failed to create directory [%1]")
-                         .arg(settingsFileName.path()),
+                       QString("Failed to create directory [%1]").arg(settingsFileName.path()),
                        _FILEINFO_);
     }
 
@@ -261,9 +280,10 @@ namespace Isis {
   bool TemplateList::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
     if (XmlStackedHandler::startElement(namespaceURI, localName, qName, atts)) {
-      if (localName == "templateList") {
+      if (localName == "mapTemplateList" || localName == "regTemplateList") {
         QString name = atts.value("name");
         QString type = atts.value("type");
+        QString path = atts.value("path");
 
         if (!name.isEmpty()) {
           m_templateList->setName(name);
@@ -271,6 +291,10 @@ namespace Isis {
 
         if (!type.isEmpty()) {
           m_templateList->setType(type);
+        }
+        
+        if (!path.isEmpty()) {
+          m_templateList->setPath(path);
         }
       }
       else if (localName == "template") {
@@ -297,15 +321,17 @@ namespace Isis {
    */
   bool TemplateList::XmlHandler::endElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName) {
-    if (localName == "templateList") {
+    if (localName == "mapTemplateList" || localName == "regTemplateList") {
       XmlHandler handler(m_templateList, m_project);
 
       XmlStackedHandlerReader reader;
       reader.pushContentHandler(&handler);
       reader.setErrorHandler(&handler);
 
-      QString templateListXmlPath = m_project->templateRoot() +"/"+ m_templateList->type() + "/" +m_templateList->name() +
-                                       "/templates.xml";
+      QString templateListXmlPath = m_project->templateRoot() + "/" + m_templateList->type() + "/" 
+                                    + m_templateList->name() + "/templates.xml";
+      templateListXmlPath = QDir::cleanPath(templateListXmlPath);
+      
       QFile file(templateListXmlPath);
 
       if (!file.open(QFile::ReadOnly)) {

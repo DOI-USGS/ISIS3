@@ -190,15 +190,6 @@ namespace Isis {
 
 
   /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
-   */
-  QSize CnetEditorView::sizeHint() const {
-    return QSize(800, 600);
-  }
-
-  /**
    * This method pushes a new XmlHandler into the parser stack.
    *
    * @param xmlReader This is the parser stack.
@@ -217,7 +208,8 @@ namespace Isis {
    */
   void CnetEditorView::save(QXmlStreamWriter &stream, Project *, FileName) const {
 
-    stream.writeStartElement("control");
+    stream.writeStartElement("cnetEditorView");
+    stream.writeAttribute("objectName", objectName());
     stream.writeAttribute("id", m_control->id());
     stream.writeEndElement();
   }

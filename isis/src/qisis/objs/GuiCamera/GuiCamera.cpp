@@ -33,6 +33,8 @@ namespace Isis {
 //    m_radii[1] = target->radii().at(1);
 //    m_radii[2] = target->radii().at(2);
 
+    m_instrumentId = camera->instrumentId();
+
     m_spacecraftNameShort = camera->spacecraftNameShort();
     m_spacecraftNameLong = camera->spacecraftNameLong();
     m_instrumentNameShort = camera->instrumentNameShort();
@@ -296,6 +298,16 @@ namespace Isis {
   QString GuiCamera::id() const {
     return m_id->toString().remove(QRegExp("[{}]"));
   }
+  
+  
+  /**
+   * @brief Retrieve the InstrumentId as appears in the original cube label.
+   * @return @b QString Returns m_instrumentId
+   */
+  QString GuiCamera::instrumentId() {
+    return m_instrumentId;
+  }
+  
 
   /**
    * @brief Retrieves an abbreviated version for the name of the instrument.
@@ -305,6 +317,7 @@ namespace Isis {
     return m_instrumentNameShort;
   }
 
+
   /**
    * @brief Retrieves a long version for the name of the instrument.
    * @return @b QString Returns m_instrumentNameLong.
@@ -313,6 +326,7 @@ namespace Isis {
     return m_instrumentNameLong;
   }
 
+
   /**
    * @brief Retrieves an abbbreviated name for the spacecraft.
    * @return @b QString Returns m_spacecraftNameShort.
@@ -320,6 +334,7 @@ namespace Isis {
   QString GuiCamera::spacecraftNameShort() {
     return m_spacecraftNameShort;
   }
+
 
   /**
    * @brief Retrieves the full name of the spacecraft.

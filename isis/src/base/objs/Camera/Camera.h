@@ -241,6 +241,9 @@ namespace Isis {
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *   @history 2017-01-11 Christopher Combs - Added bool deleteExisting to SetDistortionMap to 
    *                           prevent a segfault when the distortion map is incomplete. Fixes $5163.
+   *   @history 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
+   *                           collect the InstrumentId from the original cube label for 
+   *                           comparisons related to image imports in ipce. References #5460.
    */
 
   class Camera : public Sensor {
@@ -328,6 +331,8 @@ namespace Isis {
       CameraDetectorMap *DetectorMap();
       CameraGroundMap *GroundMap();
       CameraSkyMap *SkyMap();
+      
+      QString instrumentId();
 
       QString instrumentNameLong() const;
       QString instrumentNameShort() const;
@@ -496,6 +501,8 @@ namespace Isis {
       // slant range changes.
       friend class RadarGroundMap;      //!< A friend class to calculate focal length
       friend class RadarSlantRangeMap;  //!< A friend class to calculate focal length
+      
+      QString m_instrumentId;        //!< The InstrumentId as it appears on the cube.
 
       QString m_instrumentNameLong;  //!< Full instrument name
       QString m_instrumentNameShort; //!< Shortened instrument name
