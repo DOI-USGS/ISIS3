@@ -62,18 +62,33 @@ namespace Isis {
    *                           to be main windows themselves, changing from an mdi interface to an
    *                           sdi interface.
    *   @history 2018-05-30 Tracie Sucharski - Added the WindowFlag to set this as a Widget.
-   *   @history 2018-06-15 Kaitlyn Lee - Removed methods returing toolbar and menu actions because each
-   *                            individual has its own toolbar. These methods are not needed anymore.
-   *   @History 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
+   *   @history 2018-06-15 Kaitlyn Lee - Removed methods returing toolbar and menu actions because
+   *                            each individual has its own toolbar. These methods are not needed
+   *                            anymore.
+   *   @history 2018-06-18 Summer Stapleton - Overloaded moveEvent and resizeEvent and added a
    *                           windowChangeEvent signal to allow project to recognize a new save
    *                           state. Fixes #5114
-   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
-   *                           ambiguous shortcut errors. To counter this, we need a way to focus on one
-   *                           widget. Giving the views focus did not work completely. Instead,
-   *                           enabling/disabling actions was the best option. Added enableActions(),
-   *                           disableActions(), enterEvent(), and leaveEvent(). On default, a view's
-   *                           actions are disabled. To enable the actions, move the cursor over the view.
-   *                           When a user moves the cursor outside of the view, the actions are disabled.
+   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of
+   *                           getting ambiguous shortcut errors. To counter this, we need a way to
+   *                           focus on one widget. Giving the views focus did not work completely.
+   *                           Instead, enabling/disabling actions was the best option. Added
+   *                           enableActions(), disableActions(), enterEvent(), and leaveEvent(). On
+   *                           default, a view's actions are disabled. To enable the actions, move
+   *                           the cursor over the view. When a user moves the cursor outside of the
+   *                           view, the actions are disabled.
+   *   @history 2018-07-05 Tracie Sucharski - Added SizePolicy and a large sizeHint.  The large
+   *                           sizeHint() is because using sizePolicy with a reasonable sizeHint did
+   *                           not work to have views fill the available space in the dock area.
+   *                           References #5433.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed the sizeHint to be calculated based on the deskTop
+   *                           size, instead of being hard-coded. The percentages chosen allow for 2
+   *                           CubeDnViews to be opened at once, since CubeDnView has an internal
+   *                           size policy. References #5433
+   *   @history 2018-07-26 Tracie Sucharski - Cleaned up some documentation.
+   *   @history 2018-08-10 Tracie Sucharski - Changed addItems method to call the
+   *                           ProjectItemProxyModel::addItems rather than this classes addItem.
+   *                           This speeds things up considerably loading items into the model.
+   *                           References #5296.
    */
   class AbstractProjectItemView : public QMainWindow {
 
@@ -81,6 +96,8 @@ namespace Isis {
 
     public:
       AbstractProjectItemView(QWidget *parent=0);
+
+      virtual QSize sizeHint() const;
 
       virtual void setModel(ProjectItemModel *model);
       virtual ProjectItemModel *model();

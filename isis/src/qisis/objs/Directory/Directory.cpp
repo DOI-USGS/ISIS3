@@ -74,7 +74,8 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
-#include "ImportTemplateWorkOrder.h"
+#include "ImportMapTemplateWorkOrder.h"
+#include "ImportRegistrationTemplateWorkOrder.h"
 #include "JigsawRunWidget.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixSceneWidget.h"
@@ -138,7 +139,14 @@ namespace Isis {
     connect( m_project, SIGNAL(projectLoaded(Project *) ),
               this, SLOT(updateRecentProjects(Project *) ) );
 
-    connect(this, SIGNAL(cnetModified()), m_project, SLOT(activeControlModified()));
+    // Send cnetModified() to project, so that we can set the project's clean state.
+    // In the slot cnetModified(), it checks if the active was modified and then emits
+    // activeControlModified(). This signal is connected below to this activeControlModified(),
+    // which connects to views that use the active cnet to redraw themselves.
+    // Ultimately, cnetModified() allows us to save changes made to any cnet, and
+    // activeControlModified() allows other views to be redrawn.
+    connect(this, SIGNAL(cnetModified()), m_project, SLOT(cnetModified()));
+    connect(project(), SIGNAL(activeControlModified()), this, SIGNAL(activeControlModified()));
 
     connect(m_project, SIGNAL(activeControlSet(bool)), this, SLOT(newActiveControl(bool)));
     connect(m_project, SIGNAL(discardActiveControlEdits()),
@@ -170,7 +178,8 @@ namespace Isis {
       m_importControlNetWorkOrder = createWorkOrder<ImportControlNetWorkOrder>();
       m_importImagesWorkOrder = createWorkOrder<ImportImagesWorkOrder>();
       m_importShapesWorkOrder = createWorkOrder<ImportShapesWorkOrder>();
-      m_importTemplateWorkOrder = createWorkOrder<ImportTemplateWorkOrder>();
+      m_importMapTemplateWorkOrder = createWorkOrder<ImportMapTemplateWorkOrder>();
+      m_importRegistrationTemplateWorkOrder = createWorkOrder<ImportRegistrationTemplateWorkOrder>();
       m_openProjectWorkOrder = createWorkOrder<OpenProjectWorkOrder>();
       m_saveProjectWorkOrder = createWorkOrder<SaveProjectWorkOrder>();
       m_saveProjectAsWorkOrder = createWorkOrder<SaveProjectAsWorkOrder>();
@@ -288,7 +297,7 @@ namespace Isis {
   /**
    * @brief Cleans directory of everything to do with the current project.
    *
-   * This function was implemented to be called from the Project::Open function
+   * This function was implemented to be called from the Project::clear function
    * to allow for a new project to be opened in IPCE.
    */
   void Directory::clean() {
@@ -446,7 +455,10 @@ namespace Isis {
     importMenu->addAction(m_importControlNetWorkOrder->clone() );
     importMenu->addAction(m_importImagesWorkOrder->clone() );
     importMenu->addAction(m_importShapesWorkOrder->clone() );
-    importMenu->addAction(m_importTemplateWorkOrder->clone() );
+
+    QMenu *importTemplateMenu = importMenu->addMenu("&Import Templates");
+    importTemplateMenu->addAction(m_importMapTemplateWorkOrder->clone() );
+    importTemplateMenu->addAction(m_importRegistrationTemplateWorkOrder->clone() );
 
     QMenu *exportMenu = fileMenu->addMenu("&Export");
 
@@ -552,23 +564,26 @@ namespace Isis {
 
     foreach(CnetEditorView *cnetEditorView, m_cnetEditorViewWidgets) {
       if (cnetEditorView->control() == project()->activeControl()) {
-        emit viewClosed(cnetEditorView);
-        project()->activeControl()->closeControlNet();
-        project()->activeControl()->openControlNet();
+        emit closeView(cnetEditorView);
         addCnetEditorView(project()->activeControl());
       }
     }
   }
 
 
+/**
+ * @description This slot is connected from the signal activeControlSet(bool) emitted from Project.
+ *
+ *
+ * @param newControl bool
+ *
+ */
   void Directory::newActiveControl(bool newControl) {
 
-//  if (newControl && m_controlPointEditViewWidget) {
-//    bool closed = m_controlPointEditViewWidget->close();
-//    qDebug()<<"Directory::newActiveControl  CPEditor closed = "<<closed;
-//    emit viewClosed(m_controlPointEditViewWidget);
-//    delete m_controlPointEditViewWidget;
-//  }
+    if (newControl && m_controlPointEditViewWidget) {
+     emit closeView(m_controlPointEditViewWidget);
+     delete m_controlPointEditViewWidget;
+    }
 
     // If the new active control is the same as what is showing in the cnetEditorWidget, allow
     // editing of control points from the widget, otherwise turnoff from context menu
@@ -603,7 +618,7 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupBundleObservationViews(QObject *) ) );
-             
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
@@ -652,7 +667,7 @@ namespace Isis {
    * @param Control to edit.
    * @return @b (CnetEditorView *) The view to add to the window.
    */
-  CnetEditorView *Directory::addCnetEditorView(Control *control) {
+  CnetEditorView *Directory::addCnetEditorView(Control *control, QString objectName) {
 
     QString title = tr("Cnet Editor View %1").arg( control->displayProperties()->displayName() );
     FileName configFile("$HOME/.Isis/" + QApplication::applicationName() + "/" + title + ".config");
@@ -667,7 +682,7 @@ namespace Isis {
     // connect destroyed signal to cleanupCnetEditorViewWidgets slot
     connect(result, SIGNAL( destroyed(QObject *) ),
             this, SLOT( cleanupCnetEditorViewWidgets(QObject *) ) );
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
 
@@ -675,22 +690,22 @@ namespace Isis {
     connect(result->cnetEditorWidget(), SIGNAL(editControlPoint(ControlPoint *, QString)),
             this, SLOT(modifyControlPoint(ControlPoint *, QString)));
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // IMPORTANT TODO::  The following connections seem recursive
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //
-    // Connection between cneteditor view & other views
+    // If a cnet is modified, we have to set the clean state in project and redraw measures.
     connect(result->cnetEditorWidget(), SIGNAL(cnetModified()), this, SIGNAL(cnetModified()));
-
-    // ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
-    // deleted or saved
     connect(this, SIGNAL(cnetModified()), result->cnetEditorWidget(), SLOT(rebuildModels()));
 
     m_cnetEditorViewWidgets.append(result);
     m_controlMap.insertMulti(control, result);
 
     result->setWindowTitle(title);
-    result->setObjectName(title);
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     emit newWidgetAvailable(result);
 
@@ -702,18 +717,26 @@ namespace Isis {
    * @brief Add the qview workspace to the window.
    * @return @b (CubeDnView*) The work space to display.
    */
-  CubeDnView *Directory::addCubeDnView() {
-    CubeDnView *result = new CubeDnView(this);
+  CubeDnView *Directory::addCubeDnView(QString objectName) {
+    CubeDnView *result = new CubeDnView(this, qobject_cast<QMainWindow *>(parent()));
     result->setModel(m_projectItemModel);
     m_cubeDnViewWidgets.append(result);
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupCubeDnViewWidgets(QObject *) ) );
-   
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
              m_project, SLOT(setClean(bool)));
 
-    result->setWindowTitle("Cube DN View");
     result->setWindowTitle( tr("Cube DN View %1").arg(m_cubeDnViewWidgets.count() ) );
+    //  Unique objectNames are needed for the save/restoreState
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     emit newWidgetAvailable(result);
 
@@ -731,7 +754,9 @@ namespace Isis {
     //  ControlNetTool::paintAllViewports().  ControlNetTool always redraws all control points, so
     //  both signals go to the same slot.
     connect(this, SIGNAL(redrawMeasures()), result, SIGNAL(redrawMeasures()));
-    connect(this, SIGNAL(cnetModified()), result, SIGNAL(redrawMeasures()));
+
+    // If the active cnet is modified, redraw the measures
+    connect(this, SIGNAL(activeControlModified()), result, SIGNAL(redrawMeasures()));
 
     connect (project(), SIGNAL(activeControlSet(bool)),
              result, SLOT(enableControlNetTool(bool)));
@@ -743,20 +768,29 @@ namespace Isis {
    * @brief Add the qmos view widget to the window.
    * @return @b (Footprint2DView*) A pointer to the Footprint2DView to display.
    */
-  Footprint2DView *Directory::addFootprint2DView() {
+  Footprint2DView *Directory::addFootprint2DView(QString objectName) {
     Footprint2DView *result = new Footprint2DView(this);
 
     //  Set source model on Proxy
     result->setModel(m_projectItemModel);
     m_footprint2DViewWidgets.append(result);
     result->setWindowTitle( tr("Footprint View %1").arg( m_footprint2DViewWidgets.count() ) );
+    //  Unique objectNames are needed for the save/restoreState
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     connect(result, SIGNAL(destroyed(QObject *)),
             this, SLOT(cleanupFootprint2DViewWidgets(QObject *)));
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
-                    
+
     emit newWidgetAvailable(result);
 
     //  Connections between mouse button events from footprint2DView and control point editing
@@ -770,8 +804,9 @@ namespace Isis {
             this, SLOT(createControlPoint(double, double)));
 
     // The ControlPointEditWidget is only object that emits cnetModified when ControlPoint is
-    // deleted or saved.  This requires the footprint view ControlNetGraphicsItems to be re-built.
-    connect(this, SIGNAL(cnetModified()), result->mosaicSceneWidget(), SIGNAL(cnetModified()));
+    // deleted or saved.  This requires the footprint view ControlNetGraphicsItems to be re-built
+    // when the active cnet is modified.
+    connect(this, SIGNAL(activeControlModified()), result->mosaicSceneWidget(), SIGNAL(cnetModified()));
 
     //  This signal is connected to the MosaicGraphicsScene::update(), which eventually calls
     //  ControlNetGraphicsItem::paint(), then ControlPointGraphicsItem::paint().  This should only
@@ -811,6 +846,7 @@ namespace Isis {
     }
     return controlHealthMonitorView();
   }
+
 
   ControlPointEditView *Directory::addControlPointEditView() {
 
@@ -856,22 +892,22 @@ namespace Isis {
 // 2017-06-09 Ken commented out for Data Workshop demo
 
 
-      //  Create connections between signals from control point edit view and equivalent directory
-      //  signals that can then be connected to other views that display control nets.
-//      connect(mainWidget, SIGNAL(cnetModified()),
-//              this, SIGNAL(cnetModified()));
+      // Create connections between signals from control point edit view and equivalent directory
+      // signals that can then be connected to other views that display control nets.
+      // If the active was modified, this will be signaled in project's cnetModified() and
+      // connected to other views to redraw themselves.
       connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
               this, SIGNAL(cnetModified()));
-      connect(result->controlPointEditWidget(), SIGNAL(cnetModified()),
-              m_project, SLOT(activeControlModified()));
 
-      connect(result->controlPointEditWidget(), SIGNAL(saveControlNet()),
-              this, SLOT(makeBackupActiveControl()));
       connect (project(), SIGNAL(activeControlSet(bool)),
               result->controlPointEditWidget(), SLOT(setControlFromActive()));
-               
+
       connect(result, SIGNAL(windowChangeEvent(bool)),
               m_project, SLOT(setClean(bool)));
+
+      // Recolors the save net button in controlPointEditView to black after the cnets are saved.
+      connect(m_project, SIGNAL(cnetSaved(bool)),
+              result->controlPointEditWidget(), SLOT(colorizeSaveNetButton(bool)));
     }
 
     return controlPointEditView();
@@ -904,9 +940,6 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupMatrixViewWidgets(QObject *) ) );
-             
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_matrixViewWidgets.append(result);
 
@@ -928,9 +961,6 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTargetInfoWidgets(QObject *) ) );
-             
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_targetInfoWidgets.append(result);
 
@@ -952,9 +982,6 @@ namespace Isis {
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupTemplateEditorWidgets(QObject *) ) );
-             
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_templateEditorWidgets.append(result);
 
@@ -994,9 +1021,6 @@ namespace Isis {
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupSensorInfoWidgets(QObject *) ) );
 
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
-
     m_sensorInfoWidgets.append(result);
 
     result->setWindowTitle( tr("%1").arg(camera->displayProperties()->displayName() ) );
@@ -1013,19 +1037,24 @@ namespace Isis {
    * @return @b (ImageFileListWidget *) A pointer to the widget to add to the window.
    */
 
-  ImageFileListWidget *Directory::addImageFileListView() {
+  ImageFileListWidget *Directory::addImageFileListView(QString objectName) {
     ImageFileListWidget *result = new ImageFileListWidget(this);
 
     connect( result, SIGNAL( destroyed(QObject *) ),
              this, SLOT( cleanupFileListWidgets(QObject *) ) );
-             
-    connect(result, SIGNAL(windowChangeEvent(bool)),
-             m_project, SLOT(setClean(bool)));
 
     m_fileListWidgets.append(result);
 
     result->setWindowTitle( tr("File List %1").arg( m_fileListWidgets.count() ) );
-    result->setObjectName( result->windowTitle() );
+    //  Unique objectNames are needed for the save/restoreState
+    if (objectName != "") {
+      result->setObjectName(objectName);
+    }
+    else {
+      //  If no objectName, create unique identifier
+      QString newObjectName = QUuid::createUuid().toString().remove(QRegExp("[{}]"));
+      result->setObjectName(newObjectName);
+    }
 
     return result;
   }
@@ -1038,12 +1067,14 @@ namespace Isis {
   ProjectItemTreeView *Directory::addProjectItemTreeView() {
     ProjectItemTreeView *result = new ProjectItemTreeView();
     result->setModel(m_projectItemModel);
+    result->setWindowTitle( tr("Project"));
+    result->setObjectName( result->windowTitle() );
 
     //  The model emits this signal when the user double-clicks on the project name, the parent
     //  node located on the ProjectTreeView.
     connect(m_projectItemModel, SIGNAL(projectNameEdited(QString)),
             this, SLOT(initiateRenameProjectWorkOrder(QString)));
-            
+
     connect(result, SIGNAL(windowChangeEvent(bool)),
             m_project, SLOT(setClean(bool)));
 
@@ -1262,6 +1293,7 @@ namespace Isis {
     if (!templateEditorWidget) {
       return;
     }
+
     m_templateEditorWidgets.removeAll(templateEditorWidget);
     m_project->setClean(false);
   }
@@ -1587,20 +1619,24 @@ namespace Isis {
   bool Directory::XmlHandler::startElement(const QString &namespaceURI, const QString &localName,
                                            const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-
     if (result) {
+      QString viewObjectName;
       if (localName == "footprint2DView") {
-        m_directory->addFootprint2DView()->load(reader());
+        viewObjectName = atts.value("objectName");
+        m_directory->addFootprint2DView(viewObjectName)->load(reader());
       }
       else if (localName == "imageFileList") {
-        m_directory->addImageFileListView()->load(reader());
+        viewObjectName = atts.value("objectName");
+        m_directory->addImageFileListView(viewObjectName)->load(reader());
       }
       else if (localName == "cubeDnView") {
-        m_directory->addCubeDnView()->load(reader(), m_directory->project());
+        viewObjectName = atts.value("objectName");
+        m_directory->addCubeDnView(viewObjectName)->load(reader(), m_directory->project());
       }
-      else if (localName == "control") {
+      else if (localName == "cnetEditorView") {
+        viewObjectName = atts.value("objectName");
         QString id = atts.value("id");
-        m_directory->addCnetEditorView(m_directory->project()->control(id));
+        m_directory->addCnetEditorView(m_directory->project()->control(id), viewObjectName);
       }
     }
 
@@ -1876,17 +1912,6 @@ namespace Isis {
         latitude, longitude, cube, isGroundSource);
 
     m_editPointId = controlPointEditView()->controlPointEditWidget()->editPointId();
-  }
-
-
-  /**
-   * Autosave for control net.  The control net is auto saved to the same directory as the input
-   * net.  It is saved to controlNetFilename.net.bak.
-   *
-   */
-  void Directory::makeBackupActiveControl() {
-
-    project()->activeControl()->controlNet()->Write(project()->activeControl()->fileName()+".bak");
   }
 
 

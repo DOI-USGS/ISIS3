@@ -93,15 +93,20 @@ namespace Isis {
    *                           view has its own toolbar, so having getters that return toolbar
    *                           actions to fill the toolbar of the IpceMainWindow are unnecessary.
    *                           Removed methods that returned menu and toolbar actions.
-   *                           Removed connections that connected the project and CubeDnView and called
-   *                           enableControlNetTool() because Directory now does this.
-   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of getting
-   *                           ambiguous shortcut errors. To counter this, we enable/disable actions.
-   *                           Overrode leaveEvent() to handle open menus causing a leave event. Overrode
-   *                           enable/disableActions() because we need to disable the active toolbar's widgets.
-   *                           On default, a view's actions are disabled. To enable the actions, move the
-   *                           cursor over the view. When a user moves the cursor outside of the view, the
-   *                           actions are disabled.
+   *                           Removed connections that connected the project and CubeDnView and
+   *                           called enableControlNetTool() because Directory now does this.
+   *   @history 2018-06-25 Kaitlyn Lee - When multiple views are open, there is a possibility of
+   *                           getting ambiguous shortcut errors. To counter this, we enable/disable
+   *                           actions. Overrode leaveEvent() to handle open menus causing a leave
+   *                           event. Overrode enable/disableActions() because we need to disable
+   *                           the active toolbar's widgets. On default, a view's actions are
+   *                           disabled. To enable the actions, move the cursor over the view. When
+   *                           a user moves the cursor outside of a view, the actions are disabled.
+   *   @history 2018-07-05 Tracie Sucharski - Moved sizeHint and sizePolicy to
+   *                           AbstractProjectItemView. References #5433.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                           view can be re-created with the same objectName for restoring the
+   *                           project state. Qt's save/restoreState use the objectName.
    */
   class CubeDnView : public AbstractProjectItemView {
 
@@ -110,8 +115,6 @@ namespace Isis {
     public:
       CubeDnView(Directory *directory, QWidget *parent=0);
       ~CubeDnView();
-
-      QSize sizeHint() const;
 
       bool viewportContainsShape(MdiCubeViewport *viewport);
 
@@ -174,6 +177,7 @@ namespace Isis {
     private:
       QMap<Cube *, ProjectItem *> m_cubeItemMap; //!< Maps cubes to their items
       Workspace *m_workspace; //!< The workspace
+      Directory *m_directory; //!< The directory
 
       ProjectItemViewMenu *m_viewMenu; //!< View menu for storing actions
       ProjectItemViewMenu *m_optionsMenu; //!< Options menu for storing actions

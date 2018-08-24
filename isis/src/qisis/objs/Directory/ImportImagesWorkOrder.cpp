@@ -192,7 +192,7 @@ namespace Isis {
                    tr("Copy Images into Project"),
                    tr("Should images (DN data) be copied into project?"),
                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                   QMessageBox::Yes);
+                   QMessageBox::No);
         }
 
         bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
@@ -531,10 +531,26 @@ namespace Isis {
 
           if (cube) {
 
-            Camera *camera = cube->camera();
-            project()->addCamera(camera);
-            Target *target = camera->target();
-            project()->addTarget(target);
+            // Confirm that the target body and the gui camera do not exist before creating and 
+            // and adding them for each image. Since a target may be covered by many cameras and a 
+            // camera may cover many targets, have to get tricky with the checking.
+            QString instrumentId = cube->label()->findGroup("Instrument", 
+                              PvlObject::FindOptions::Traverse).findKeyword("InstrumentId")[0];
+            QString targetName = cube->label()->findGroup("Instrument", 
+                              PvlObject::FindOptions::Traverse).findKeyword("TargetName")[0];
+            if (!project()->hasTarget(targetName)) {
+              Camera *camera = cube->camera();
+              Target *target = camera->target();
+              project()->addTarget(target);
+              
+              if (!project()->hasCamera(instrumentId)) {
+                project()->addCamera(camera);
+              }
+            }
+            else if (!project()->hasCamera(instrumentId)) {
+              Camera *camera = cube->camera();
+              project()->addCamera(camera);
+            }
 
             // Create a new image from the result in the thread spawned in WorkOrder::redo().
             Image *newImage = new Image(cube);
