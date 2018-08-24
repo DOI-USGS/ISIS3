@@ -3,13 +3,11 @@
 
 #include "AbstractNumberFilter.h"
 
-
+template< typename U, typename V > class QPair;
 class QString;
-
 
 namespace Isis {
   class AbstractFilterSelector;
-  class ControlCubeGraphNode;
   class ControlMeasure;
   class ControlPoint;
 
@@ -23,19 +21,21 @@ namespace Isis {
    *
    * @author 2012-04-23 Jai Rideout
    *
-   * @internal 
-   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054. 
+   * @internal
+   *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
+   *                           References #5434.
    */
   class AdjustedLatitudeFilter : public AbstractNumberFilter {
       Q_OBJECT
 
     public:
       AdjustedLatitudeFilter(AbstractFilter::FilterEffectivenessFlag flag,
-          int minimumForSuccess = -1);
+                             int minimumForSuccess = -1);
       AdjustedLatitudeFilter(const AdjustedLatitudeFilter &other);
       virtual ~AdjustedLatitudeFilter();
 
-      bool evaluate(const ControlCubeGraphNode *) const;
+      bool evaluate(const QPair<QString, ControlNet *> *) const;
       bool evaluate(const ControlPoint *) const;
       bool evaluate(const ControlMeasure *) const;
 
@@ -47,4 +47,3 @@ namespace Isis {
 }
 
 #endif
-

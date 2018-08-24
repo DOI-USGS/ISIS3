@@ -85,6 +85,13 @@ namespace Isis {
    *   @history 2017-11-01 Ken Edmundson - Modified to force number of segments to be 1 if
    *                                       m_instrumentPointingSolveOption = Angles or
    *                                       m_instrumentPositionSolveOption = Position.
+   *   @history 2018-06-21 Ian Humphrey - Added removeObservationNumber() to be able to remove an
+   *                           observation number from a BundleObservationSolveSettings.
+   *                           References #497.
+   *   @history 2018-06-26 Tyler Wilson - Added support for adding an arbitrary number of
+   *                           additional apriori sigma values in setInstrumentPositionSettings/
+   *                           setInstrumentPointingSettings beyond position/velocity/acceleration.
+   *                           References #497.
    *
    *   @todo Figure out why solve degree and num coefficients does not match solve option.
    *   @todo Determine whether xml stuff needs a Project pointer.
@@ -108,6 +115,7 @@ class BundleObservationSolveSettings {
       void setInstrumentId(QString instrumentId);
       QString instrumentId() const;
       void addObservationNumber(QString observationNumber);
+      bool removeObservationNumber(QString observationNumber);
       QSet<QString> observationNumbers() const;
 
 
@@ -134,7 +142,8 @@ class BundleObservationSolveSettings {
                                          bool solvePolynomialOverExisting = false,
                                          double anglesAprioriSigma = -1.0,
                                          double angularVelocityAprioriSigma = -1.0,
-                                         double angularAccelerationAprioriSigma = -1.0);
+                                         double angularAccelerationAprioriSigma = -1.0,
+                                         QList<double> * additionalPointingSigmas=nullptr);
       InstrumentPointingSolveOption instrumentPointingSolveOption() const;
       bool solveTwist() const;
       int ckDegree() const;
@@ -167,7 +176,8 @@ class BundleObservationSolveSettings {
                                          bool positionOverHermite = false,
                                          double positionAprioriSigma = -1.0,
                                          double velocityAprioriSigma = -1.0,
-                                         double accelerationAprioriSigma = -1.0);
+                                         double accelerationAprioriSigma = -1.0,
+                                         QList<double> * additionalPositionSigmas=nullptr);
       InstrumentPositionSolveOption instrumentPositionSolveOption() const;
       int spkDegree() const;
       int spkSolveDegree() const;

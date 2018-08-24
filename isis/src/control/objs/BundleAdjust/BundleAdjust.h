@@ -315,6 +315,10 @@ namespace Isis {
    *                           constructor in the BundleSolutionInfo class because it is derived
    *                           from QObject. Note that we ultimately want to return a QSharedPointer
    *                           instead of a raw pointer.
+   *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
+   *                           aborted. Added emits for status updates to the run widget.
+   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust. 
+   *                           Fixes #4171.
    *   @history 2018-06-27 Ken Edmundson - Now setting measure sigmas in BundleMeasure in init()
    *                           method; retrieving sigma and sqrt of weight in computePartials and
    *                           computeVtpv methods.
@@ -355,6 +359,7 @@ namespace Isis {
       BundleSolutionInfo*    solveCholeskyBR();
 
       QList<ImageList *> imageLists();
+      bool isAborted();
 
     public slots:
       bool solveCholesky();
@@ -377,7 +382,9 @@ namespace Isis {
     signals:
       void statusUpdate(QString);
       void error(QString);
-      void iterationUpdate(int, double);
+      void iterationUpdate(int);
+      void pointUpdate(int);
+      void statusBarUpdate(QString);
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
       void finished();
 

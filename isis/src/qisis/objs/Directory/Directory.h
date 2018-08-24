@@ -23,6 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QMainWindow>
 #include <QMultiMap>
 #include <QObject>
 #include <QPointer>
@@ -39,6 +40,7 @@
 
 class QAction;
 class QDockWidget;
+class QMainWindow;
 class QMenuBar;
 class QProgressBar;
 class QSplitter;
@@ -54,11 +56,13 @@ namespace Isis {
   class Control;
   class ControlNet;
   class ControlPointEditView;
+  class ControlHealthMonitorView;
   class CubeDnView;
   class FileItem;
   class Footprint2DView;
   class HistoryTreeWidget;
   class ImageFileListWidget;
+  class JigsawRunWidget;
   class MatrixSceneWidget;
   class MosaicSceneWidget;
   class Project;
@@ -200,10 +204,10 @@ namespace Isis {
    *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
    *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
-   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created. 
+   *   @history 2017-12-01 Summer Stapleton - Commented-out RemoveImagesWorkOrder being created.
    *                           Fixes #5224
    *   @history 2017-12-01 Adam Goins Modified updateRecentProjects() to update the recent projects
-   *                           menu it display a chronologically ordered list of recently loaded 
+   *                           menu it display a chronologically ordered list of recently loaded
    *                           projects. Fixes #5216.
    *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
    *                           TemplateEditViewWorkOrder. Fixes #5168.
@@ -236,6 +240,47 @@ namespace Isis {
    *   @history 2018-05-14 Tracie Sucharski - Serialize Footprint2DView rather than
    *                           MosaicSceneWidget. This will allow all parts of Footprint2DView to be
    *                           saved/restored including the ImageFileListWidget. Fixes #5422.
+   *   @history 2018-05-25 Christopher Combs - Made changes to reflect updates to JigsawRunWidget.
+   *                           Added addJigsawView method and m_jigsawRunWidget member variable.
+   *                           Fixes #5428.
+   *   @history 2018-06-07 Adam Goins - Added the addControlHealthMonitorView() method to directory.
+   *                           Fixes #5435.
+   *   @history 2018-06-13 Kaitlyn Lee - The signal activeControlSet() in addCubeDnView() and
+   *                           addFootprint2DView() now connects to enableControlNetTool() in
+   *                           CubeDnView and Footprint2DView, instead of enabling the tool directly.
+   *                           Removed  saveActiveControl() since users can save the control
+   *                           network with the project save button.
+   *   @history 2018-06-18 Summer Stapleton - Added connection to each view on creation to
+   *                           catch a windowChangeEvent on moveEvent or resizeEvent of these views
+   *                           to allow for saving of the project at these times. Fixes #5114.
+   *   @history 2018-06-19 Adam Goins - Gave the ControlHealthMonitorView() a reference to the
+   *                           directory instance rather than the activeControl. Fixes #5435.
+   *   @history 2018-07-07 Summer Stapleton - Implemented changes to handle implementation of
+   *                           separate import work orders for both map and registration templates.
+   *   @history 2018-07-09 Tracie Sucharski - When adding views, check if the objectName is set
+   *                           which it should be when creating a view from a project serialization.
+   *                           If the objectName has not been set, this is a new view and the unique
+   *                           objectName needs to be created.
+   *   @history 2018-07-09 Kaitlyn Lee - Uncommented code that closes a ControlPointEditView when a new
+   *                           active control is set.
+   *   @history 2018-07-12 Tracie Sucharski - Renamed viewClosed signal to closeView. Moved
+   *                           the close/open control net from reloadActiveControlInCnetEditorView
+   *                           to Project::setActiveControl to prevent seg fault when there are
+   *                           multiple cnetEditorViews with same cnet.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed connection between cnetModified() and project's
+   *                           activeControlModified() to cnetModified() and project's renamed
+   *                           method cnetModified(). This will allow users to save a nonactive
+   *                           cnet, since changes to multiple cnets will be connected. Fixes #5414.
+   *   @history 2018-07-13 Kaitlyn Lee - Added connection to color the save net button to black when
+   *                           a cnet is saved. Added signal activeControlModified() and changed
+   *                           connections that alerted views to redraw themselves when a cnet was
+   *                           modified. Now, views will only be redrawn when
+   *                           activeControlModified() is signaled, instead of cnetModified(). This
+   *                           stops views from being redrawn when any cnet is modified, but still
+   *                           occurs when the active is modified. Fixes #5396.
+   *   @history 2018-08-08 Tracie Sucharski - Removed makeBackupActive slot which was a temporary
+   *                           autosave of active control, most likely causing problems with large
+   *                           networks.
    */
   class Directory : public QObject {
     Q_OBJECT
@@ -249,15 +294,21 @@ namespace Isis {
       void setRecentProjectsList(QStringList recentProjects);
       QStringList recentProjectsList();
 
+      // When adding a new view if the possibility exists for more than 1 of the view make sure
+      // to use a QUuid for the objectName so that save/restoreState will work for the view. Also,
+      // make sure the objectName is serialized to the project. For more info, see ::addCubeDnView,
+      // ::XmlHandler::startElement and CubeDnView::save.
       BundleObservationView *addBundleObservationView(FileItemQsp fileItem);
-      CnetEditorView *addCnetEditorView(Control *control);
-      CubeDnView *addCubeDnView();
-      Footprint2DView *addFootprint2DView();
+      ControlHealthMonitorView *addControlHealthMonitorView();
+      CnetEditorView *addCnetEditorView(Control *control, QString objectName = "");
+      CubeDnView *addCubeDnView(QString objectName = "");
+      Footprint2DView *addFootprint2DView(QString objectName = "");
+      JigsawRunWidget *addJigsawRunWidget();
       MatrixSceneWidget *addMatrixView();
       TargetInfoWidget *addTargetInfoView(TargetBodyQsp target);
       TemplateEditorWidget *addTemplateEditorView(Template *currentTemplate);
       SensorInfoWidget *addSensorInfoView(GuiCameraQsp camera);
-      ImageFileListWidget *addImageFileListView();
+      ImageFileListWidget *addImageFileListView(QString objectName = "");
       ControlPointEditView *addControlPointEditView();
 
 
@@ -288,7 +339,9 @@ namespace Isis {
       QList<TemplateEditorWidget *> templateEditorViews();
       QList<ImageFileListWidget *> imageFileListViews();
       QList<QProgressBar *> progressBars();
+      ControlHealthMonitorView *controlHealthMonitorView();
       ControlPointEditView *controlPointEditView();
+      JigsawRunWidget *jigsawRunWidget();
 //      ChipViewportsWidget *controlPointChipViewports();
 
       bool controlUsedInCnetEditorWidget(Control *control);
@@ -354,11 +407,14 @@ namespace Isis {
     signals:
       void directoryCleaned();
       void newWarning();
+      void newDockAvailable(QMainWindow *newWidget);
       void newWidgetAvailable(QWidget *newWidget);
 
-      void viewClosed(QWidget *widget);
+      void closeView(QWidget *widget);
 
       void cnetModified();
+      void activeControlModified();
+
       void redrawMeasures();
 
       void cleanProject(bool);
@@ -374,12 +430,9 @@ namespace Isis {
       void cleanupSensorInfoWidgets(QObject *);
       void cleanupTargetInfoWidgets(QObject *);
       void cleanupTemplateEditorWidgets(QObject *);
+      void cleanupJigsawRunWidget(QObject *);
       //void imagesAddedToProject(ImageList *images);
       void updateControlNetEditConnections();
-
-      void saveActiveControl();
-      // TODO temporary slot until autosave is implemented
-      void makeBackupActiveControl();
 
       //  Slots in response to mouse clicks on CubeDnView (ControlNetTool) and
       //    Footprint2DView (MosaicControlNetTool)
@@ -448,6 +501,8 @@ namespace Isis {
       QPointer<HistoryTreeWidget> m_historyTreeWidget;  //!< Pointer to the HistoryTreeWidget.
       QPointer<Project> m_project;                      //!< Pointer to the Project.
       QPointer<WarningTreeWidget> m_warningTreeWidget;  //!< Pointer to the WarningTreeWidget.
+      QPointer<JigsawRunWidget> m_jigsawRunWidget;         //!< Pointer to the JigsawRunWidget.
+
 
       //!< List of BundleObservationView
       QList< QPointer<BundleObservationView> > m_bundleObservationViews;
@@ -455,6 +510,8 @@ namespace Isis {
       QList< QPointer<CubeDnView> > m_cubeDnViewWidgets;  //!< List of CubeDnCiew obs
       QList< QPointer<ImageFileListWidget> > m_fileListWidgets;  //!< List of ImageFileListWidgets
       QList< QPointer<Footprint2DView> > m_footprint2DViewWidgets; //!< List of Footprint2DView objs
+
+      QPointer<ControlHealthMonitorView> m_controlHealthMonitorView;
       QPointer <ControlPointEditView> m_controlPointEditViewWidget;
       //QPointer <ChipViewportsWidget> m_chipViewports;
       QList< QPointer<MatrixSceneWidget> > m_matrixViewWidgets; //!< List of MatrixSceneWidgets
@@ -478,7 +535,8 @@ namespace Isis {
       QPointer<WorkOrder> m_saveProjectAsWorkOrder; //!< The Save Project As WorkOrder.
       QPointer<WorkOrder> m_openRecentProjectWorkOrder; //!< The Open Recent Project WorkOrder.
       QPointer<WorkOrder> m_closeProjectWorkOrder; //!< The Close Project WorkOrder
-      QPointer<WorkOrder> m_importTemplateWorkOrder; //!< The Import Template WorkOrder
+      QPointer<WorkOrder> m_importMapTemplateWorkOrder; //!< The Import Map Template WorkOrder
+      QPointer<WorkOrder> m_importRegistrationTemplateWorkOrder; //!< The Import Registration Template WorkOrder
 
       QPointer<WorkOrder> m_runJigsawWorkOrder; //!< The Run Jigsaw WorkOrder
       QPointer<WorkOrder> m_renameProjectWorkOrder; //!< The Rename Project WorkOrder
