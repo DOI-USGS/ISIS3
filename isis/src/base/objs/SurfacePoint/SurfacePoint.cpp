@@ -1125,6 +1125,10 @@ namespace Isis {
         p_z = new Displacement(*other.p_z);
       }
 
+      if(other.p_localRadius) {
+        p_localRadius = new Distance(other.GetLocalRadius());
+      }
+
       if(other.p_rectCovar) {
         p_rectCovar = new symmetric_matrix<double, upper>(*other.p_rectCovar);
       }
