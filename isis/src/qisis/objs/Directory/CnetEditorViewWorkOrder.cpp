@@ -24,17 +24,13 @@
 
 #include <QtDebug>
 
-#include <QFileDialog>
-#include <QInputDialog>
-#include <QMessageBox>
+#include <QAction>
+#include <QUndoCommand>
 
-#include "CnetEditorWidget.h"
+#include "CnetEditorView.h"
 #include "Control.h"
 #include "ControlList.h"
-#include "ControlDisplayProperties.h"
 #include "Directory.h"
-#include "MosaicSceneItem.h"
-#include "MosaicSceneWidget.h"
 #include "Project.h"
 
 namespace Isis {

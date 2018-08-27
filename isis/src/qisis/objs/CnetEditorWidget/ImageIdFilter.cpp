@@ -2,24 +2,24 @@
 
 #include "ImageIdFilter.h"
 
+#include <QPair>
 #include <QString>
 
 #include "CnetDisplayProperties.h"
-#include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "IString.h"
 
 
 namespace Isis {
   ImageIdFilter::ImageIdFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractStringFilter(flag, minimumForSuccess) {
   }
 
 
-  ImageIdFilter::ImageIdFilter(
-    const ImageIdFilter &other): AbstractStringFilter(other) {
+  ImageIdFilter::ImageIdFilter(const ImageIdFilter &other): AbstractStringFilter(other) {
   }
 
 
@@ -27,11 +27,9 @@ namespace Isis {
   }
 
 
-  bool ImageIdFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
+  bool ImageIdFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
     return AbstractStringFilter::evaluate(
-        CnetDisplayProperties::getInstance()->getImageName(
-            (QString) node->getSerialNumber()));
+          CnetDisplayProperties::getInstance()->getImageName(imageAndNet->first));
   }
 
 
@@ -42,8 +40,8 @@ namespace Isis {
 
   bool ImageIdFilter::evaluate(const ControlMeasure *measure) const {
     return AbstractStringFilter::evaluate(
-        CnetDisplayProperties::getInstance()->getImageName(
-            (QString) measure->GetCubeSerialNumber()));
+          CnetDisplayProperties::getInstance()->getImageName(
+                (QString) measure->GetCubeSerialNumber()));
   }
 
 

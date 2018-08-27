@@ -78,6 +78,8 @@ namespace Isis {
    *                           dropMimeData() methods. Checked coding standards. Fixes #4006.
    *   @history 2016-08-11 Tracie Sucharski - Added itemRemoved signal.
    *   @history 2016-08-25 Adam Paquette - Updated documentation. Fixes #4299.
+   *   @history 2018-08-10 Tracie Sucharski - Added itemsAdded signal to indicate that all items
+   *                           in a list have been added to the model. References #5296.
    */
   class ProjectItemProxyModel : public ProjectItemModel {
 
@@ -106,6 +108,12 @@ namespace Isis {
                               int row, int column, const QModelIndex &parent);
 
   signals:
+    // This signal was added to speed up the Footprint2DView. Previously images were added one at a
+    // time which was extremely slow. This not the ideal handling, but without re-writing
+    // ProjectItemModel  and ProjectItemProxyModel to add insertRows method so that beginInsertRows
+    // and endInsertRows are called which would automatically emit the signal rowsInserted after 
+    // alls items are inserted into the model rather than calling after each row that is inserted.
+    void itemsAdded();
     void itemRemoved(ProjectItem *);
   
   public slots:

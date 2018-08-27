@@ -298,7 +298,7 @@ FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
 QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
 
 #---------------------------------------------------------------------------
-# Set up for Embree libraries 
+# Set up for Embree libraries
 #---------------------------------------------------------------------------
 EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
 EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
@@ -355,6 +355,7 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #---------------------------------------------------------------------------
 
 # Qt Libraries
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5.7.*[^g]"

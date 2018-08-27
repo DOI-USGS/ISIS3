@@ -360,10 +360,9 @@ namespace Isis {
     if (modelName.compare("HUBER", Qt::CaseInsensitive) == 0) {
       return Huber;
     }
-    else if (modelName.compare("HUBER_MODIFIED", Qt::CaseInsensitive) == 0) {
-      return HuberModified;
-    }
-    else if (modelName.compare("HUBERMODIFIED", Qt::CaseInsensitive) == 0) {
+    else if (modelName.compare("HUBER_MODIFIED", Qt::CaseInsensitive) == 0 ||
+             modelName.compare("HUBERMODIFIED", Qt::CaseInsensitive) == 0 ||
+             modelName.compare("HUBER MODIFIED", Qt::CaseInsensitive) == 0) {
       return HuberModified;
     }
     else if (modelName.compare("WELSCH", Qt::CaseInsensitive) == 0) {

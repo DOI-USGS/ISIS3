@@ -4,10 +4,11 @@
 #include <QProgressBar>
 
 namespace Isis {
-  /**
-   * @brief QProgressBar with customizable text
+  /**   
    *
    * @author ????-??-?? Steven Lambright
+   * @internal ????-??-?? Steven Lambright - QProgressBar with customizable text
+   *
    *                            
    */
 
