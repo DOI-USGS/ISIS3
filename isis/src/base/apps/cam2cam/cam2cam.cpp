@@ -1,6 +1,7 @@
 #include "Isis.h"
 #include "CameraFactory.h"
 #include "Camera.h"
+#include "Distance.h"
 #include "ProcessRubberSheet.h"
 #include "IException.h"
 #include "cam2cam.h"
@@ -118,7 +119,13 @@ bool cam2cam::Xform(double &inSample, double &inLine,
   // Get the universal lat/lon and see if it can be converted to input line/samp
   double lat = p_outcam->UniversalLatitude();
   double lon = p_outcam->UniversalLongitude();
-  if(!p_incam->SetUniversalGround(lat, lon)) return false;
+  Distance rad = p_outcam->LocalRadius();
+  if (rad.isValid()) {
+    if(!p_incam->SetUniversalGround(lat, lon, rad.meters())) return false;
+  }
+  else {
+    if(!p_incam->SetUniversalGround(lat, lon)) return false;
+  }
 
   // Make sure the point is inside the input image
   if(p_incam->Sample() < 0.5) return false;
