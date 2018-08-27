@@ -23,9 +23,7 @@
 #include "jama/jama_svd.h"
 #include "jama/jama_qr.h"
 
-#ifndef __sun__
-#include "gmm/gmm_superlu_interface.h"
-#endif
+#include <armadillo>
 
 #include "LeastSquares.h"
 #include "IException.h"
@@ -46,9 +44,6 @@ namespace Isis {
     p_sparse = sparse;
     p_sigma0 = 0.;
 
-#if defined(__sun__)
-    p_sparse = false;
-#endif
 
     if (p_sparse) {
 
@@ -59,10 +54,10 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-#ifndef __sun__
-      gmm::resize(p_sparseA, sparseRows, sparseCols);
-      gmm::resize(p_normals, sparseCols, sparseCols);
-      gmm::resize(p_ATb, sparseCols, 1);
+
+      p_sparseA.set_size(sparseRows, sparseCols);
+      p_normals.set_size(sparseCols, sparseCols);
+      p_ATb.resize(sparseCols, 1);
       p_xSparse.resize(sparseCols);
 
       if( p_jigsaw ) {
@@ -72,7 +67,7 @@ namespace Isis {
         p_parameterWeights.resize(sparseCols);
       }
 
-#endif
+
       p_sparseRows = sparseRows;
       p_sparseCols = sparseCols;
     }
@@ -132,9 +127,7 @@ namespace Isis {
     }
 
     if(p_sparse) {
-#ifndef __sun__
       FillSparseA(data);
-#endif
     }
     else {
       p_input.push_back(data);
@@ -157,7 +150,6 @@ namespace Isis {
    *          from p_weight to p_sqrtweight.
    *
    */
-#ifndef __sun__
   void LeastSquares::FillSparseA(const std::vector<double> &data) {
 
     p_basis->Expand(data);
@@ -171,7 +163,6 @@ namespace Isis {
       p_sparseA(p_currentFillRow, c) = p_basis->Term(c) * p_sqrtWeight[p_currentFillRow];
     }
   }
-#endif
 
 
   /**
@@ -230,10 +221,6 @@ namespace Isis {
    */
   int LeastSquares::Solve(Isis::LeastSquares::SolveMethod method) {
 
-#if defined(__sun__)
-    if(method == SPARSE) method = QRD;
-#endif
-
     if((method == SPARSE  &&  p_sparseRows == 0)  ||
        (method != SPARSE  &&  Rows() == 0 )) {
       p_solved = false;
@@ -248,10 +235,8 @@ namespace Isis {
       SolveQRD();
     }
     else if(method == SPARSE) {
-#ifndef __sun__
       int column = SolveSparse();
       return column;
-#endif
     }
     return 0;
   }
@@ -457,32 +442,27 @@ namespace Isis {
    * @history 2011-03-17  Ken Edmundson Corrected computation of residuals
    *
    */
-#ifndef __sun__
   int LeastSquares::SolveSparse() {
 
     // form "normal equations" matrix by multiplying ATA
-    gmm::mult(gmm::transposed(p_sparseA), p_sparseA, p_normals);
+    p_normals = p_sparseA.t()*p_sparseA;
 
     //  Test for any columns with all 0's
-    //  Return column number so caller can determine the appropriate error.
-    int numNonZeros;
-    for(int c = 0; c < p_sparseCols; c++) {
-      numNonZeros = gmm::nnz(gmm::sub_matrix(p_normals,
-                             gmm::sub_interval(0,p_sparseCols),
-                             gmm::sub_interval(c,1)));
-
-      if(numNonZeros == 0) return c + 1;
+    //  Return column number so caller can determine the appropriate error.  
+    umat nonZeros = any(p_normals);
+    for(int c = 0; c < nonZeros.n_rows; c++) {
+      if (nonZeros(0, c) == true) return c + 1;
     }
 
     // Create the right-hand-side column vector 'b'
-    gmm::dense_matrix<double> b(p_sparseRows, 1);
+    arma::mat b(p_sparseRows, 1);
 
     // multiply each element of 'b' by it's associated weight
     for ( int r = 0; r < p_sparseRows; r++ )
       b(r,0) = p_expected[r] * p_sqrtWeight[r];
 
     // form ATb
-    gmm::mult(gmm::transposed(p_sparseA), b, p_ATb);
+    p_ATb = p_sparseA.t()*b;
 
     // apply parameter weighting if Jigsaw (bundle adjustment)
     if ( p_jigsaw ) {
@@ -492,8 +472,8 @@ namespace Isis {
         if( weight <= 0.0 )
           continue;
 
-        p_normals[i][i] += weight;
-        p_ATb[i] -= p_epsilonsSparse[i]*weight;
+        p_normals(i, i) += weight;
+        p_ATb(0, i) -= p_epsilonsSparse[i]*weight;
       }
     }
 
@@ -594,7 +574,6 @@ namespace Isis {
     p_solved = true;
     return 0;
   }
-#endif
 
   /**
    * @brief  Error propagation for sparse least-squares solution
@@ -645,7 +624,6 @@ namespace Isis {
    * datum (i.e. constraining a minimum of seven parameters -
    * usually 3 coordinates of two points and 1 of a third).
    */
-#ifndef __sun__
   bool LeastSquares::SparseErrorPropagation ()
   {
     // clear memory
@@ -695,7 +673,6 @@ namespace Isis {
 
     return true;
   }
-#endif
 
 
   void LeastSquares::Reset ()
