@@ -26,6 +26,8 @@
 
 #include <string>
 
+#include <QMutex>
+
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
 
@@ -56,6 +58,20 @@ namespace Isis {
    *
    *  @history 2008-05-09 Steven Lambright - Optimized the
    *           FindObservationTranslation method
+   *  @history 2018-07-11 Ian Humphrey - Made FindObservationTranslation thread-safe. Added a
+   *                          static mutex for the FindObservationTranslation() method. This
+   *                          faciliates adding a QString observationNumber member to the Image
+   *                          class and calling ObservationNumber::Compose() within the Image
+   *                          constructors. When qmos or ipce opens a list of images, it uses an
+   *                          ImageReader, which uses a QtConcurrent mapped function to load its
+   *                          images. Since the FindObservationTranslation() method declares its
+   *                          static local variables within in, this could cause thread collisions
+   *                          on these static variables when ObservationNumbers are being composed
+   *                          for the Images being conucrrently opened by ImageReader. Added a
+   *                          QMutexLoccker to the FindObservationTranslation() method to auto-lock
+   *                          and unlock the mutex, which prevents multiple threads from colliding
+   *                          on the static variables. References #5206.
+   *
    */
   class ObservationNumber : public Isis::SerialNumber {
     public:
@@ -74,6 +90,12 @@ namespace Isis {
     private:
 
       static PvlGroup FindObservationTranslation(Pvl &label);
+
+      /**
+       * Static mutex for preventing threads from colliding on the static variables in
+       * FindObservationTranslation().
+       */
+      static QMutex m_mutex;
 
   }; // End of Class
 }; // End of namespace

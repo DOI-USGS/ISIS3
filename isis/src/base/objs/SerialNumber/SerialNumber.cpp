@@ -1,5 +1,8 @@
 #include <map>
 
+#include <QMutex>
+#include <QMutexLocker>
+
 #include "SerialNumber.h"
 #include "ObservationNumber.h"
 #include "SerialNumberList.h"
@@ -11,6 +14,8 @@
 #include "FileName.h"
 
 namespace Isis {
+  QMutex SerialNumber::m_mutex;
+
   /**
   * Create an empty SerialNumber object.
   */
@@ -85,10 +90,17 @@ namespace Isis {
   /**
    * Get Groups by translating from correct Translation table
    *
+   * This method is thread-safe.
+   *
    * @param label A pvl formatted label to be used to generate the serial number
    *
    */
   PvlGroup SerialNumber::FindSerialTranslation(Pvl &label) {
+    // Immediately lock the static mutex so multiple threads don't collide on the static variables
+    // inside of this method. This locker auto-locks upon construction and unlocks the mutex when
+    // it is destroyed (when this method finishes).
+    QMutexLocker lock(&m_mutex);
+
     Pvl outLabel;
     static PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
 
