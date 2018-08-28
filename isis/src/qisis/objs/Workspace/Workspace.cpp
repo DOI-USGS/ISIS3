@@ -332,19 +332,18 @@ namespace Isis {
    *                          relative paths. Fixes # 5177
    */
   void Workspace::addCubeViewport(QString cubename) {
-    
+
     QFileInfo cubeFileName(cubename);
 
     QList<QString> cubesToOpen;
 
-    // If the file is a cub file, we add the path to it to our list of cubes to open.
-    if ( cubeFileName.suffix() == "cub" || cubeFileName.suffix() == "cube" || cubeFileName.suffix() == "lbl") {
-      // cubesToOpen.append(cubeFileName.absoluteFilePath());
-      cubesToOpen.append(cubeFileName.filePath());
-    }
-    else {
-      // If the file received isn't a cube or label, it has to be a cubelist. We read every cube in
-      // the cubelist and append it to the cubesToOpen QList so that we can open them.
+    // We can ingest cubes or cube lists, so we check the extension to see if it's a .lis or .list 
+    // or .txt file and if so, read the file and add every cube listed in it to the cubesToOpen so 
+    // That they can be opened.
+    if (cubeFileName.suffix() == "lis"  || 
+        cubeFileName.suffix() == "list" ||
+        cubeFileName.suffix() == "txt") {
+
       QFile file(cubename);
       file.open(QIODevice::ReadOnly);
 
@@ -356,9 +355,17 @@ namespace Isis {
       }
       file.close();
     }
+
+    // If it doesn't have a .lis, .list, or .txt extension, then it's not a cubelist and should be 
+    // Opened as a cube or detached label.
+    else {
+      cubesToOpen.append(cubeFileName.filePath());
+    }
     
     if (cubesToOpen.size() == 0){
-        QMessageBox::critical((QWidget *)parent(), "Error", "No cubes to open from [" + cubename + "]");
+        QString msg = "No cubes to open from [" + cubename + "]" + 
+		      "\nIf your file is a cube list, the valid extensions are .lis, .list, and .txt";
+	QMessageBox::critical((QWidget *)parent(), "Error", msg);
         return;
     }
 
