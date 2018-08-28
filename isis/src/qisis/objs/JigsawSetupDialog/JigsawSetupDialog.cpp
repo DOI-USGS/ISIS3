@@ -850,11 +850,11 @@ namespace Isis {
       }
 
 
-      boss.setInstrumentPositionSettings(positionSolvingOption,spkDegree,spkSolveDegree,positionOverHermite,
+      boss.setInstrumentPositionSettings(positionSolvingOption,spkDegree,spkSolveDegree,1,positionOverHermite,
                                          positionAprioriSigma,velocityAprioriSigma,accelerationAprioriSigma,
                                          &additionalPositionCoefficients);
 
-      boss.setInstrumentPointingSettings(pointSolvingOption,solveTwist,ckDegree,ckSolveDegree,solvePolynomialOverExisting,
+      boss.setInstrumentPointingSettings(pointSolvingOption,solveTwist,ckDegree,ckSolveDegree,1,solvePolynomialOverExisting,
                                          anglesAprioriSigma,angularVelocityAprioriSigma,angularAccelerationAprioriSigma,
                                          &additionalAngularCoefficients);
 

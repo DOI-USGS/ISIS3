@@ -93,6 +93,10 @@ namespace Isis {
    *                           generalize how the sigma tables are updated. Solve options have
    *                           their respective solve degree and degree combo boxes set to 2 unless
    *                           the solve option is ALL. References #497.
+   *   @history 2018-098-28 Debbie A. Cook and Ken Edmundson - added a constant argument of "1"
+   *                            to setInstrumentPositionSettings and setInstrumentPointingSettings to indicate
+   *                            a single segment in both cases.  This is a new option that is not yet 
+   *                            listed in the gui.
    */
   class JigsawSetupDialog : public QDialog {
     Q_OBJECT
