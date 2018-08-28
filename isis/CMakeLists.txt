@@ -155,6 +155,7 @@ include(CTest)
 set(thirdPartyCppFlags -Wall
                        -fPIC
 		       -fuse-ld=gold
+		       -pthread
                        -std=c++11
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
