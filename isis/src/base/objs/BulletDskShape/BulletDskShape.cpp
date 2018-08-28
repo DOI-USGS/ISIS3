@@ -232,8 +232,8 @@ namespace Isis {
       btAssert ( pindex[i] < v_vertices );
     }
 
-    // bool useQuantizedAabbCompression = true;
-    bool useQuantizedAabbCompression = false;
+    bool useQuantizedAabbCompression = true;
+    // bool useQuantizedAabbCompression = false;
     btBvhTriangleMeshShape *v_triShape = new btBvhTriangleMeshShape(m_mesh.data(), 
                                                                     useQuantizedAabbCompression);
     v_triShape->setUserPointer(this);
