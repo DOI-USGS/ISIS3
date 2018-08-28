@@ -154,6 +154,7 @@ include(CTest)
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -fPIC
+		       -fuse-ld=gold
                        -std=c++11
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
