@@ -20,11 +20,13 @@ using namespace boost::numeric::ublas;
 
 /**
  *
- * @author 2010-07-30 Tracie Sucharski, Ken L. Edmunson, and Debbie A. Cook
+ * @author 2010-07-30 Tracie Sucharski, Ken L. Edmundson, and Debbie A. Cook
  *
  * @internal
  *   @history 2015-02-20 Jeannie Backer - Added print statement for
  *            latitude, longitude and radius weight accessor methods.
+ *   @history 2018-06-28 Debbie A.Cook - Removed test of obsolete method
+ *            SetRadii
  */
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
@@ -37,11 +39,7 @@ int main(int argc, char *argv[]) {
           "sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m" << endl << endl;
     Isis::SurfacePoint spRec;
 
-    spRec.SetRadii(Distance(1000., Distance::Meters),
-                   Distance(1000., Distance::Meters),
-                   Distance(1000., Distance::Meters));
-
-    symmetric_matrix<double,upper> covar;
+    symmetric_matrix<double,upper> covar; // Units are m**2
     covar.resize(3);
     covar.clear();
     covar(0,0) = 100.;

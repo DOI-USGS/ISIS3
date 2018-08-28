@@ -3,46 +3,46 @@
 <application name="cnetsplit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    The application cnetsplit splits the input control network into user 
+    The application cnetsplit splits the input control network into user
     specified number of control networks.
   </brief>
 
   <description>
-    The application cnetsplit splits the input control network into a user 
+    The application cnetsplit splits the input control network into a user
     specified number of control networks with the user specified output name.
-    A possible use of this application would be to allow extremely large 
+    A possible use of this application would be to allow extremely large
     control networks to be split, then further processing could be divided
     among multiple computers.  The application, "cnetmerge" can then be used
     to merge the individual control networks back into a single large
     network.  The application log will display statistics for the input
-    ControlNet.  
+    ControlNet.
     <p>
-      The input control network keyword values for Description, NetworkId, and 
-      Target Keywords will be copied to each output control network.  The 
+      The input control network keyword values for Description, NetworkId, and
+      Target Keywords will be copied to each output control network.  The
       DateTime and UserName keywords will be created new for the output control
-      networks.  The output control networks are filled from smallest to 
-      largest output file name from the first points in the input control 
-      network to the last. 
+      networks.  The output control networks are filled from smallest to
+      largest output file name from the first points in the input control
+      network to the last.
     </p>
     <p>
-      We can denote the number of control points in the input file by 
+      We can denote the number of control points in the input file by
       <i><b>n</b></i> and the number of output files to be created is by
       <i><b>k</b></i>.  Then, denote the remainder of <i><b>n/k</b></i> by
-      <i><b>R</b></i> .  If <i><b>R</b></i> is not zero, then, the first 
-      <i><b>R</b></i> files will have one more point than the last 
-      <i><b>k-R</b></i> files.  
-      Otherwise, if <i><b>R</b></i> = 0, i.e. if the number of output files 
-      evenly divides the number of points in the input control network, then 
-      each of the output files will have the same number of points.  
+      <i><b>R</b></i> .  If <i><b>R</b></i> is not zero, then, the first
+      <i><b>R</b></i> files will have one more point than the last
+      <i><b>k-R</b></i> files.
+      Otherwise, if <i><b>R</b></i> = 0, i.e. if the number of output files
+      evenly divides the number of points in the input control network, then
+      each of the output files will have the same number of points.
     </p>
     <p>
       Errors thrown by cnetsplit will include the following:
       <ul>
         <li>No question marks in the ONET_PREFIX string.</li>
         <li>More than one set of question marks in the ONET_PREFIX string.</li>
-        <li>Not enough question marks for the specified number of output 
+        <li>Not enough question marks for the specified number of output
               files.</li>
-        <li>Number of output files exceeds the number of control points in the 
+        <li>Number of output files exceeds the number of control points in the
               intput control network.</li>
       </ul>
     </p>
@@ -66,8 +66,12 @@
       Added appTests, improved error message, added documentation.
     </change>
     <change name="Jeannie Backer" date="2016-04-22">
-      Modified to set the new control net's target and radii by using the input control net's 
+      Modified to set the new control net's target and radii by using the input control net's
       values. References #3892
+    </change>
+    <change name="Jesse Mapel" date="2018-07-06">
+      Removed calls to set control net target radii because they are no longer needed by
+      the control network. Fixes #5457.
     </change>
   </history>
 
@@ -80,7 +84,7 @@
           Input control network to be split.
         </brief>
         <description>
-          The input control network whose control points will be 
+          The input control network whose control points will be
           divided among the output control networks.  This file is not modified
           by cnetsplit.
         </description>
@@ -92,19 +96,19 @@
       <parameter name="ONET_PREFIX">
         <type>string</type>
         <brief>
-          The output file name pattern string containing question marks where 
+          The output file name pattern string containing question marks where
           the file number should be placed.
         </brief>
         <description>
-          This string will be used to create unique output file names.  It 
-          should contain a set of question marks ("?") where the file number 
-          will be placed. The string should not have question marks 
-          anywhere else. For each output file, the question marks will be 
-          replaced with a number from one to the number of output files.  
-          For example, if the user sets the pattern to 
-          ONET_PREFIX="ControlNet????" and NUM_OUTPUT_FILES=999, 
-          then cnetsplit will create 999 files with file names 
-          "ControlNet0001.net" through "ControlNet0999.net". 
+          This string will be used to create unique output file names.  It
+          should contain a set of question marks ("?") where the file number
+          will be placed. The string should not have question marks
+          anywhere else. For each output file, the question marks will be
+          replaced with a number from one to the number of output files.
+          For example, if the user sets the pattern to
+          ONET_PREFIX="ControlNet????" and NUM_OUTPUT_FILES=999,
+          then cnetsplit will create 999 files with file names
+          "ControlNet0001.net" through "ControlNet0999.net".
           Note: If there are not enough "?"s for the number of output files to
           be created during this run, the user will be thrown an error .
         </description>
@@ -118,7 +122,7 @@
         The number of output files that will be created by cnetsplit
       </brief>
       <description>
-        The control points from the input control network will be split among 
+        The control points from the input control network will be split among
         this number of output files.
       </description>
     </parameter>
@@ -129,13 +133,13 @@
     <example>
 
       <brief>
-        Split a control network with 8 points into 3 control networks. 
+        Split a control network with 8 points into 3 control networks.
       </brief>
 
       <description>
-        This example will show how a control network is split when the number 
-        of output networks does not evenly divide the number points in the 
-        input control network.  
+        This example will show how a control network is split when the number
+        of output networks does not evenly divide the number points in the
+        input control network.
       </description>
 
       <terminalInterface>
@@ -143,7 +147,7 @@
           cnet=controlNet.net onet_prefix=outputNetSplit??? num_output_files=3
         </commandLine>
         <description>
-          In this example, cnetsplit will split the file controlNet.net into 3 
+          In this example, cnetsplit will split the file controlNet.net into 3
           output files with name pattern outputNetSplit???
         </description>
       </terminalInterface>
@@ -155,8 +159,8 @@
               Example GUI for cnetsplit.
             </brief>
             <description>
-              Screen shot of GUI for cnetsplit.  This run of the program will 
-              split the file controlNet.net into 3 output files with name 
+              Screen shot of GUI for cnetsplit.  This run of the program will
+              split the file controlNet.net into 3 output files with name
               pattern outputNetSplit???
             </description>
             <thumbnail width="200" height="193" src="assets/thumbs/cnetsplitGuiThumb.jpeg" caption="Screenshot of GUI command."/>
@@ -170,9 +174,9 @@
             PVL of the Input control network, (controlNet.net).
           </brief>
           <description>
-            This is the input control network with 8 control points that will 
-            be divided among 3 output control networks.  This file is not 
-            changed by cnetsplit. 
+            This is the input control network with 8 control points that will
+            be divided among 3 output control networks.  This file is not
+            changed by cnetsplit.
           </description>
           <parameterName>
             CNET
@@ -184,7 +188,7 @@
             PVL of the first output control network, (outputNetSplit001.net).
           </brief>
           <description>
-            This is the first of the output control networks created by 
+            This is the first of the output control networks created by
             cnetsplit.  It contains the 1st, 2nd, and 3rd control points from
             the input control network.
           </description>
@@ -198,7 +202,7 @@
             PVL of the second output control network, (outputNetSplit002.net).
           </brief>
           <description>
-            This is the first of the output control networks created by 
+            This is the first of the output control networks created by
             cnetsplit.  It contains the 4th, 5th, and 6th control points from
             the input control network.
           </description>
@@ -212,8 +216,8 @@
             PVL of the third output control network, (outputNetSplit003.net).
           </brief>
           <description>
-            This is the last of the output control networks created by 
-            cnetsplit.  It contains the 7th and 8th control points from the 
+            This is the last of the output control networks created by
+            cnetsplit.  It contains the 7th and 8th control points from the
             input control network.
           </description>
           <parameterName>
