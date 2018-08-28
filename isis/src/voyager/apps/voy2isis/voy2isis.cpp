@@ -499,7 +499,7 @@ QByteArray fixLabels(QString fileName, History *hist){
   // Check if image id is valid
   int imageIdIndex = labels.indexOf(QByteArray("IMAGE_ID"));
   int i = imageIdIndex;
-  char c;
+  char c = '';
   bool replaceImageId = false;
   while (c != '\n' && i != -1) {
     c = labels[i];
