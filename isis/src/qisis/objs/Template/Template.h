@@ -37,9 +37,9 @@
    /**   
     * @author 2017-11-01 Christopher Combs
     * @internal
-    *   @history - 2017-11-01 Christopher Combs -  This represents an ISIS template in a
-    *                         project-based GUI interface.  This encapsulates ideas about a
-    *                         template such as it's filename and import name.
+    *   @history 2017-11-01 Christopher Combs -  This represents an ISIS template in a
+    *                       project-based GUI interface.  This encapsulates ideas about a
+    *                       template such as it's filename and import name.
     */
    class Template : public QObject {
      Q_OBJECT

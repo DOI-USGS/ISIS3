@@ -65,6 +65,13 @@ namespace Isis {
    *   @history 2017-12-21 Adam Goins - Changed Pvl constructor to take PvlObject.
    *   @history 2017-12-21 Jesse Mapel - Improved documentation.
    *   @history 2017-01-27 Jesse Mapel - More documentation improvements.
+   *   @history 2018-06-28 Debbie A Cook - Removed all calls to obsolete method
+   *                                                   SurfacePoint::SetRadii.  References #5457.
+   *   @history 2018-07-11 Debbie A Cook - Removed obsolete tests for failure
+   *                                                   due to missing target radii.  SurfacePoint
+   *                                                   now uses the local radius of the point to 
+   *                                                   convert sigmas to target radii are no longer
+   *                                                   used.  References #5457
    */
   class ControlPointV0001 {
     public:

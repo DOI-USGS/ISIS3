@@ -113,6 +113,7 @@ void IsisMain() {
           // computation.
           NaifVertex observer(3);
           point.ToNaifArray(&observer[0]);
+
           NaifStatus::CheckErrors();
           vscl_c(1.5, &observer[0], &observer[0]);
           NaifStatus::CheckErrors();

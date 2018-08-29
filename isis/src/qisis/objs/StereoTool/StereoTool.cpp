@@ -55,10 +55,10 @@ using namespace std;
 namespace Isis {
   // initialize static
 /*        !!!!   TODOS   !!!!
- 
-1.  If DEM radius comboBox, update to DEM  ,  when? 
- 
- 
+
+1.  If DEM radius comboBox, update to DEM  ,  when?
+
+
 */
 
 
@@ -300,7 +300,7 @@ namespace Isis {
     m_radiusLineEdit->setToolTip("Custom local radius used for elevation "
                                  "calculations.  To enter a value, set box to "
                                  "the left to \"Custom Radius\"");
-    text = 
+    text =
       "<b>Function: </b>Custom local radius used to calculate elevations.  "
       "This can be changed by selecting \"Custom Radius\" in the box to "
       "the left.";
@@ -591,7 +591,7 @@ namespace Isis {
     mainLayout->addLayout(buttonsLayout);
 
     helpDialog->show();
-   
+
 
   }
 
@@ -621,7 +621,7 @@ namespace Isis {
   }
 
 
-  
+
   void StereoTool::updateRadiusLineEdit() {
 
 
@@ -673,12 +673,12 @@ namespace Isis {
   void StereoTool::setupFiles() {
 
     /*   TODO
-      .5   Get vector of all linked viewports 
-       1.  If no files linked or > 2 linked, print errror & return 
-       2.  Check if new files 
+      .5   Get vector of all linked viewports
+       1.  If no files linked or > 2 linked, print errror & return
+       2.  Check if new files
           if yes:  clear old
           if no: return
-         
+
     */
     m_linkedViewports.clear();
     for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
@@ -706,7 +706,7 @@ namespace Isis {
         return;
       }
     }
-     
+
     //  Control net already exists, make sure new cubes are the same target
     //  as the current control net.
     if (m_controlNet) {
@@ -803,10 +803,11 @@ namespace Isis {
       m_serialNumberList->add( m_rightCube->fileName() );
     }
 
-    std::vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
-    m_targetRadius = Distance(targetRadius[0]);
-    //  If radius combo box set to ellipsoid, update the radius line edit
-    if ( !m_targetRadius.isValid() ) {
+    try {
+      PvlGroup pvlRadii = Target::radiiGroup(m_controlNet->GetTarget());
+      m_targetRadius = Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
+    }
+    catch(IException &e) {
       QString message = "Could not determine target radius.";
       QMessageBox::critical(m_stereoTool,"Error",message);
       m_baseRadius = Distance(0., Distance::Meters);
@@ -904,11 +905,11 @@ namespace Isis {
       rubberBandTool()->clear();
       return;
     }
-    
+
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL)
       return;
-    
+
     QString file = cvp->cube()->fileName();
     QString sn;
     try {
@@ -1066,7 +1067,7 @@ namespace Isis {
     m_endPoint = NULL;
     rubberBandTool()->clear();
     delete m_profileDialog;
-    m_profileDialog = NULL;  
+    m_profileDialog = NULL;
   }
 
 
@@ -1374,7 +1375,7 @@ namespace Isis {
   void StereoTool::paintViewport(MdiCubeViewport *vp, QPainter *painter) {
 
     AbstractPlotTool::paintViewport(vp, painter);
-    
+
     //  Make sure we have points to draw
     if ( m_controlNet == NULL || m_controlNet->GetNumPoints() == 0 )
       return;
@@ -1391,7 +1392,7 @@ namespace Isis {
 //  }
 
     //  Get all measures for this viewport
-    QList<ControlMeasure *> measures = 
+    QList<ControlMeasure *> measures =
         m_controlNet->GetMeasuresInCube(serialNumber);
     // loop through all measures contained in this cube
     for (int i = 0; i < measures.count(); i++) {
@@ -1445,14 +1446,14 @@ namespace Isis {
 
 
 
-  /** 
+  /**
    * This method will repaint the control measures in each viewport
    * @internal
-   */    
+   */
   void StereoTool::paintAllViewports() {
 
     // Take care of drawing things on all viewPorts.
-    // Calling update will cause the Tool class to call all registered tools 
+    // Calling update will cause the Tool class to call all registered tools
     // if point has been deleted, this will remove it from the main window
     MdiCubeViewport *vp;
     for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
@@ -1636,8 +1637,8 @@ namespace Isis {
       data = p.GetId() + "," +
              QString::number( apriori.GetLatitude().degrees() ) + "," +
              QString::number( apriori.GetLongitude().degrees() ) + "," +
-             QString::number( p.GetMeasure(Left)->GetDiameter(), 'f', 6 ) + 
-             "," + 
+             QString::number( p.GetMeasure(Left)->GetDiameter(), 'f', 6 ) +
+             "," +
              QString::number( p.GetMeasure(Left)->GetFocalPlaneMeasuredX(), 'f',
                               6 ) + "," +
              QString::number( p.GetMeasure(Left)->GetFocalPlaneMeasuredY(), 'f',
@@ -1650,7 +1651,7 @@ namespace Isis {
       text << data << endl;
     }
     m_currentFile.close();
-  
+
   }
 
 
@@ -1681,7 +1682,7 @@ namespace Isis {
 
 //  calculateElevation(m_startPoint);
 //  calculateElevation(m_endPoint);
-  
+
     QPointF leftStart( (*m_startPoint)[Left]->GetSample(),
                       (*m_startPoint)[Left]->GetLine() );
     QPointF leftEnd( (*m_endPoint)[Left]->GetSample(),
@@ -1739,7 +1740,7 @@ namespace Isis {
     QVector<QPointF> profileData;
     double elevation = 0.;
     double elevationError = 0.;
-    
+
     Pvl regDef = m_pointEditor->templateFileName();
     AutoReg *ar = AutoRegFactory::Create(regDef);
 
@@ -1847,11 +1848,11 @@ namespace Isis {
     QList<int> bands;
     bands.push_back(1);
     bands.push_back(1);
-    plotCurve->setSource(m_linkedViewports, rubberBandVertices, bands); 
+    plotCurve->setSource(m_linkedViewports, rubberBandVertices, bands);
     plotWindow->add(plotCurve);
-  
+
     delete m_profileDialog;
-    m_profileDialog = NULL;  
+    m_profileDialog = NULL;
 //  m_startPoint = NULL;
 //  m_endPoint = NULL;
 //  rubberBandTool()->clear();
@@ -1924,4 +1925,3 @@ namespace Isis {
 
   }
 }
-
