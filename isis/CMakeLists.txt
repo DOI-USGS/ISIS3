@@ -154,8 +154,6 @@ include(CTest)
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
                        -fPIC
-		       -fuse-ld=gold
-		       -pthread
                        -std=c++11
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
@@ -170,8 +168,11 @@ set(thirdPartyCppFlags -Wall
 
 
 # Flag to fix numeric literals problem with boost on linux
+# Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
+	                                       -pthread
+					       -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
