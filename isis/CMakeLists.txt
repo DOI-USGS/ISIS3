@@ -68,8 +68,8 @@ option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
-option(JP2KFLAG        "Whether or not to build using JPEG2000 support" ON  )
-option(pybindings      "Turn on to build Python bindings"               ON )
+option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
+option(pybindings      "Turn on to build Python bindings"               OFF )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory
@@ -168,8 +168,11 @@ set(thirdPartyCppFlags -Wall
 
 
 # Flag to fix numeric literals problem with boost on linux
+# Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
+	                                       -pthread
+					       -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
@@ -356,11 +359,6 @@ list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
 
-# add isis headers
-file(GLOB ISIS_HEADERS ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h
-${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp)
-file(COPY ${ISIS_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/inc)
-
 include_directories(${CMAKE_BINARY_DIR}/inc)
 set(CORE_LIB_NAME isis3)
 
@@ -415,7 +413,7 @@ else()
 endif()
 
 # Set up documentation build target.
-# - This script is called by running "make docs".
+# - This script is called by running "ninja docs".
 # - This long call passes all desired variables to the script.
 add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -423,6 +421,14 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DLATEX=${LATEX}
                   -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+
+# Add custom build target to copy modified header files to the build/incs directory.
+# ALL is specified so that the target is added to the default build target, i.e. the copy command 
+# will be executed when running "ninja install"
+# On a clean build, all files will be copied over.
+add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
+add_dependencies(isis3 incs)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

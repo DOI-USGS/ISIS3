@@ -12,7 +12,7 @@ dependencies:
   - protobuf==3.5.2
   - libprotobuf==3.5.2
   - qwt=6.1.3
-  - pyqt==5.6.0
+  # - pyqt==5.6.0
   - sip==4.18
   - mysql==5.7.20
   - ninja==1.7.2=0
@@ -40,15 +40,15 @@ dependencies:
   - icu==58.2=0
   - jpeg==9b=2
   - krb5==1.14.2=0
-  - libpng==1.6.28=2
+  - libpng>=1.6.34
   - libtiff==4.0.9=0
   - libxml2==2.9.7=0
   - mesalib==17.2.0=0
   - mysql-connector-c==6.1.6=0
   - nn==1.86.0=2
-  - numpy==1.13.3=py36_blas_openblas_200
+  # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
-  - opencv==3.3.0
+  - opencv
   - nanoflann==1.2.2
   - gmm==5.0
   - jama==125
@@ -62,7 +62,7 @@ dependencies:
   - bz2file==0.98
   - bullet==2.86.1=0
   - qhull==7.2.0=0
-  - qt=5.6.2
+  - qt=5.7.1
   - qwt
   - tnt==126=0
   - xalan-c==1.11
