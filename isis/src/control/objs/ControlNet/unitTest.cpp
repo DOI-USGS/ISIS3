@@ -272,76 +272,30 @@ int main() {
 
   cout << "testing set target.................................\n";
 
-  cout << "Set target/radii directly. Invalid radii." << endl;
-  QVector<Distance> targetRadii;
-  try {
-    cn1.SetTarget("Fail", targetRadii);
-  }
-  catch (IException &e) {
-    e.print();
-  }
-  cout << endl;
-  cout << "Set target/radii directly. Valid radii." << endl;
-  targetRadii += Distance(Isis::PI, Distance::Meters);
-  targetRadii += Distance(Isis::HALFPI, Distance::Meters);
-  targetRadii += Distance(Isis::E, Distance::Meters);
-  cn1.SetTarget("SomethingStrange", targetRadii);
-  vector<Distance> targRad = cn1.GetTargetRadii();
-  cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
-  cout << endl;
-  cout << "Set target/radii using empty PVL." << endl;
+  cout << "Set target using empty PVL." << endl;
   Pvl label;
-  // no mapping group, (i.e. target name empty, no equatorial radius)
-  // catch exception and set radii to nulls
+  // no mapping group, (i.e. target name empty)
   cn1.SetTarget(label);
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
-  cout << "Set target/radii using PVL with no PolarRadius." << endl;
+
+  cout << "Set target using actual PVL." << endl;
   label += PvlGroup("Mapping");
   PvlGroup &mapping = label.findGroup("Mapping");
   mapping += PvlKeyword("TargetName", "Mars");
-  mapping += PvlKeyword("EquatorialRadius", "");
   cout << label << endl;
   cn1.SetTarget(label);
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
-  cout << "Set target/radii using PVL containing both radii." << endl;
-  mapping.addKeyword(PvlKeyword("EquatorialRadius", "6.0"), PvlContainer::Replace);
-  mapping.addKeyword(PvlKeyword("PolarRadius", "1.0"), PvlContainer::Replace);
-  cout << label << endl;
-  cn1.SetTarget(label);
-  targRad = cn1.GetTargetRadii();
-  cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
-  cout << endl;
+
   cout << "Set empty target." << endl;
   cn1.SetTarget("");
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
+
   cout << "Set Mars target." << endl;
   cn1.SetTarget("Mars");
-  targRad = cn1.GetTargetRadii();
   cout << "        TargetName = " << cn1.GetTarget() << endl;
-  cout << "        TargetRadii = (" << targRad[0].meters() << ", "
-                                    << targRad[1].meters() << ", "
-                                    << targRad[2].meters() << ")" << endl;
   cout << endl;
 
   cn1.SetTarget("Mars");
@@ -515,7 +469,6 @@ int main() {
   foreach ( QString sn, graphSNs ) {
     cout << "    " << sn << "\n";
   }
-
 
   cout << net.GraphToString() << endl;
   cout << "\nTesting getEdgeCount: " << net.getEdgeCount() << "\n";

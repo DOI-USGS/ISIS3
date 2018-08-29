@@ -81,12 +81,30 @@ namespace Isis {
    *   @history 2011-10-06 Steven Lambright - Get*SigmaDistance will no longer
    *                           throw an exception if there is no stored sigma
    *                           and there is no stored target radii.
+   *   @history 2018-06-28 Debbie A. Cook - Removed target body radii and all
+   *                           related methods.  Any reference to the major axis (equatorial
+   *                           radius) was replaced with the local radius. Technically I think
+   *                           we should be using the target body minor axis (polar) for the
+   *                           conversion of latitude degrees to/from distance and the local 
+   *                           radius of the surface point for conversion of longitude degrees 
+   *                           to/from distance.  For large bodies the percent error will be small, 
+   *                           so we will use the local radius for convenience.  For small bodies, 
+   *                           any bundle adjustment will likely use rectangular coordinates 
+   *                           where degree conversions will not be necessary.  Added new
+   *                           member p_localRadius to avoid recalculating when coordinates
+   *                           have not changed.  Also corrected the longitude conversion equation
+   *                           in SetSphericalSigmasDistance and GetLonSigmaDistance.
+   *                           References #5457.
+   *   @history 2018-08-15 Debbie A. Cook - Initialized the local radius whenever any 
+   *                           SurfacePoint coordinate was changed, removed memory errors,
+   *                           and cleaned up documentation.  Changed localRadius member
+   *                           from a pointer to value to reduce extraneous if blocks.  
+   *                           References #5457
    */
 
   class SurfacePoint {
     public:
       // Constructors
-//      SurfacePoint(const std::vector <double> radii);
       SurfacePoint();
       SurfacePoint(const SurfacePoint &other);
       SurfacePoint(const Latitude &lat, const Longitude &lon,
@@ -152,9 +170,6 @@ namespace Isis {
                                       const Distance &lonSigma,
                                       const Distance &radiusSigma);
 
-      void SetRadii(const Distance &majorRadius, const Distance &minorRadius,
-                    const Distance &polarRadius);
-
       void ResetLocalRadius(const Distance &radius);
       bool Valid() const;
 
@@ -195,16 +210,14 @@ namespace Isis {
       SurfacePoint &operator=(const SurfacePoint &other);
 
     private:
+      void ComputeLocalRadius();
       void InitCovariance();
       void InitPoint();
-      void InitRadii();
       void SetRectangularPoint(const Displacement &x, const Displacement &y, const Displacement &z);
       void SetSphericalPoint(const Latitude &lat, const Longitude &lon, const Distance &radius);
       void FreeAllocatedMemory();
 
-      Distance *p_majorAxis;
-      Distance *p_minorAxis;
-      Distance *p_polarAxis;
+      Distance p_localRadius;
       Displacement *p_x;
       Displacement *p_y;
       Displacement *p_z;
