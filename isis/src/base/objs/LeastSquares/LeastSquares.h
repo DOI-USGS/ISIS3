@@ -149,7 +149,6 @@ namespace Isis {
       void Reset ();
 
       void ResetSparse() { Reset(); }
-      bool SparseErrorPropagation();
       std::vector<double> GetEpsilons () const { return p_epsilonsSparse; }
       void SetParameterWeights(const std::vector<double> weights) { p_parameterWeights = weights; }
       void SetNumberOfConstrainedParameters(int n) { p_constrainedParameters = n; }
