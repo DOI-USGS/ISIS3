@@ -153,7 +153,6 @@ namespace Isis {
       std::vector<double> GetEpsilons () const { return p_epsilonsSparse; }
       void SetParameterWeights(const std::vector<double> weights) { p_parameterWeights = weights; }
       void SetNumberOfConstrainedParameters(int n) { p_constrainedParameters = n; }
-      const arma::mat GetCovarianceMatrix () const { return p_normals; }
 
     private:
       void SolveSVD();
@@ -164,12 +163,12 @@ namespace Isis {
       void FillSparseA(const std::vector<double> &data);
       bool ApplyParameterWeights();
 
-      std::vector<double> p_xSparse;          /**<sparse solution vector*/
+      arma::mat p_xSparse;          /**<sparse solution matrix*/
       std::vector<double> p_epsilonsSparse;   /**<sparse vector of total parameter corrections*/
       std::vector<double> p_parameterWeights; /**<vector of parameter weights*/
 
-      arma::mat p_sparseA; /**<design matrix 'A' */
-      arma::mat p_normals; /**<normal equations matrix 'N'*/
+      arma::SpMat<double> p_sparseA; /**<design matrix 'A' */
+      arma::SpMat<double> p_normals; /**<normal equations matrix 'N'*/
       arma::mat p_ATb;                   /**<right-hand side vector*/
       arma::mat p_SLU_Factor;          /**<decomposed normal equations matrix*/
 

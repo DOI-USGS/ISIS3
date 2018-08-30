@@ -436,7 +436,7 @@ namespace Isis {
    * @history  2009-04-08 Tracie Sucharski - Added return value which is a
    *                          column number of a column that contained all zeros.
    * @history 2009-12-21  Jeannie Walldren - Changed variable name
-   *          from p_weight to p_sqrtweight.
+   *                          from p_weight to p_sqrtweight.
    * @history 2010        Ken Edmundson
    * @history 2010-11-20  Debbie A. Cook Merged Ken Edmundson verion with system version
    * @history 2011-03-17  Ken Edmundson Corrected computation of residuals
@@ -447,12 +447,12 @@ namespace Isis {
     // form "normal equations" matrix by multiplying ATA
     p_normals = p_sparseA.t()*p_sparseA;
 
-    //  Test for any columns with all 0's
-    //  Return column number so caller can determine the appropriate error.  
-    umat nonZeros = any(p_normals);
-    for(int c = 0; c < nonZeros.n_rows; c++) {
-      if (nonZeros(0, c) == true) return c + 1;
-    }
+//     //  Test for any columns with all 0's
+//     //  Return column number so caller can determine the appropriate error.  
+//     arma::umat nonZeros = any(p_normals, 0);
+//     for(int c = 0; c < nonZeros.n_rows; c++) {
+//       if (nonZeros(0, c) == true) return c + 1;
+//     }
 
     // Create the right-hand-side column vector 'b'
     arma::mat b(p_sparseRows, 1);
@@ -476,21 +476,15 @@ namespace Isis {
         p_ATb(0, i) -= p_epsilonsSparse[i]*weight;
       }
     }
+    
+    bool status = spsolve(p_xSparse, p_normals, p_ATb, "superlu");
+    
+    if (status == false) {
+      //TODO what happens if it can't solve?
+    }
 
-//    printf("printing rhs\n");
-//    for( int i = 0; i < m_nSparseCols; i++ )
-//      printf("%20.10e\n",m_ATb[i]);
-
-    // decompose normal equations matrix
-    p_SLU_Factor.build_with(p_normals);
-
-    // solve with decomposed normals and right hand side
-    // int perm = 0;  //  use natural ordering
-    int perm = 2;     //  confirm meaning and necessity of
-//  double recond;    //  variables perm and recond
-    p_SLU_Factor.solve(p_xSparse,gmm::mat_const_col(p_ATb,0), perm);
     // Set the coefficients in our basis equation
-    p_basis->SetCoefficients(p_xSparse);
+    p_basis->SetCoefficients(arma::conv_to< std::vector<double> >::from(p_xSparse));
 
     // if Jigsaw (bundle adjustment)
     // add corrections into epsilon vector (keeping track of total corrections)
@@ -522,7 +516,7 @@ namespace Isis {
     // directly. Then we'll have to compute the residuals by back projection
 
     p_residuals.resize(p_sparseRows);
-    gmm::mult(p_sparseA, p_xSparse, p_residuals);
+    p_residuals = arma::conv_to< std::vector<double> >::from(p_sparseA*p_xSparse);
     p_sigma0 = 0.0;
 
     for ( int i = 0; i < p_sparseRows; i++ ) {
@@ -575,112 +569,13 @@ namespace Isis {
     return 0;
   }
 
-  /**
-   * @brief  Error propagation for sparse least-squares solution
-   *
-   * Computes the variance-covariance matrix of the parameters.
-   * This is the inverse of the normal equations matrix, scaled by
-   * the reference variance (also called variance of unit weight,
-   * etc).
-   *
-   * @internal
-   * @history  2009-11-19 Ken Edmundson, New method
-   *
-   * Notes:
-   *
-   * 1) The SLU_Factor (Super LU Factor) has already been
-   * factorised in each iteration but there is no gmm++ method to
-   * get the inverse of the sparse matrix implementation. so we
-   * have to get it ourselves. This is don by solving the
-   * factorized normals repeatedly with right-hand sides that are
-   * the columns of the identity matrix (which is how gmm - or
-   * anybody else would do it).
-   *
-   * 2) We should create our own matrix library, probably wrapping
-   * the gmm++ library (and perhaps other(s) that may have
-   * additional desired functionality). The inverse function
-   * should be part of the library, along with the capacity for
-   * triangular storage and other decomposition techniques -
-   * notably Cholesky.
-   *
-   * 3) The LU decomposition can be be performed even if the
-   * normal equations are singular. But, we should always be
-   * dealing with a positive-definite matrix (for the bundle
-   * adjustment). Cholesky is faster, more efficient, and requires
-   * a positive-definite matrix, so if it fails, it is an
-   * indication of a singular matrix - bottom line - we should be
-   * using Cholesky. Or a derivative of Cholesky, i.e., UTDU
-   * (LDLT).
-   *
-   * 4) As a consequence of 3), we should be checking for
-   * positive-definite state of the normals, perhaps via the
-   * matrix determinant, prior to solving. There is a check in
-   * place now that checks to see if a column of the design matrix
-   * (or basis?) is all zero. This is equivalent - if a set of
-   * vectors contains the zero vector, then the set is linearly
-   * dependent, and the matrix is not positive-definite. In
-   * Jigsaw, the most likely cause of the normals being
-   * non-positive-definite probably is failure to establish the
-   * datum (i.e. constraining a minimum of seven parameters -
-   * usually 3 coordinates of two points and 1 of a third).
-   */
-  bool LeastSquares::SparseErrorPropagation ()
-  {
-    // clear memory
-    gmm::clear(p_ATb);
-    gmm::clear(p_xSparse);
-
-    // for each column of the inverse, solve with a right-hand side consisting
-    // of a column of the identity matrix, putting each resulting solution vectfor
-    // into the corresponding column of the inverse matrix
-    for ( int i = 0; i < p_sparseCols; i++ )
-    {
-      if( i > 0 )
-        p_ATb(i-1,0) = 0.0;
-
-      p_ATb(i,0) = 1.0;
-
-      // solve with decomposed normals and right hand side
-      p_SLU_Factor.solve(p_xSparse,gmm::mat_const_col(p_ATb,0));
-
-      // put solution vector x into current column of inverse matrix
-      gmm::copy(p_xSparse, gmm::mat_row(p_normals, i));
-    }
-
-    // scale inverse by Sigma0 squared to get variance-covariance matrix
-    // if simulated data, we don't scale (effectively scaling by 1.0)
-    //    printf("scaling by Sigma0\n");
-    gmm::scale(p_normals,(p_sigma0*p_sigma0));
-
-//    printf("covariance matrix\n");
-//    for (int i = 0; i < p_sparseCols; i++ )
-//    {
-//      for (int j = 0; j < p_sparseCols; j++ )
-//      {
-//        if ( j == p_sparseCols-1 )
-//          printf("%20.20e \n",(double)(p_sparseInverse(i,j)));
-//        else
-//          printf("%20.20e ",(double)(p_sparseInverse(i,j)));
-//      }
-//    }
-
-    // standard deviations from covariance matrix
-//    printf("parameter standard deviations\n");
-//  for (int i = 0; i < p_sparseCols; i++ )
-//    {
-//      printf("Sigma Parameter %d = %20.20e \n",i+1,sqrt((double)(p_sparseInverse(i,i))));
-//    }
-
-    return true;
-  }
-
 
   void LeastSquares::Reset ()
   {
     if ( p_sparse ) {
-      gmm::clear(p_sparseA);
-      gmm::clear(p_ATb);
-      gmm::clear(p_normals);
+      p_sparseA.zeros();
+      p_ATb.zeros();
+      p_normals.zeros();
       p_currentFillRow = -1;
     }
     else {
