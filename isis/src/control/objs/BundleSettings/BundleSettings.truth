@@ -336,7 +336,7 @@ Serializing test XML object to file:
         <validateNetwork>Yes</validateNetwork>
         <solveOptions solveObservationMode="Yes" solveRadius="Yes" controlPointCoordTypeReports="1" controlPointCoordTypeBundle="1" updateCubeLabel="Yes" errorPropagation="Yes" createInverseMatrix="No"/>
         <aprioriSigmas pointCoord1="1000.0" pointCoord2="2000.0" pointCoord3="3000.0"/>
-       <outlierRejectionOptions rejection="Yes" multiplier="4.0"/>
+        <outlierRejectionOptions rejection="Yes" multiplier="4.0"/>
         <convergenceCriteriaOptions convergenceCriteria="ParameterCorrections" threshold="0.25" maximumIterations="26"/>
         <maximumLikelihoodEstimation>
             <model type="Huber" quantile="0.27"/>

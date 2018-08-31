@@ -308,7 +308,7 @@ namespace Isis {
 
   /**
    * Set surface point in rectangular coordinates with its variance/covariance
-   *   matrix in kilometers squared.
+   *   matrix in meters squared.
    *
    * @param x  x value of body-fixed coordinate of surface point
    * @param y  y value of body-fixed coordinate of surface point
@@ -325,8 +325,7 @@ namespace Isis {
 
 
   /**
-   * Set surface point in rectangular coordinates with its variance/covariance
-   *   matrix in kilometers squared.
+   * Set surface point in rectangular coordinates
    *
    * @param x  x value of body-fixed coordinate of surface point
    * @param y  y value of body-fixed coordinate of surface point

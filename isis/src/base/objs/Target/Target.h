@@ -62,6 +62,16 @@ namespace Isis {
    *  @history 2017-08-14 Stuart Sides - Added the ability to use a target code and the
    *                          NaifKeywords to find the radii. Added so osirisrex and spicelib v66.
    *                          References #4947.
+   *  @history 2018-06-06 Debbie A. Cook - Fixed method lookupNaifBodyCode to look
+   *                          up the Naif body code instead of the Naif body frame code.  We may
+   *                          need to add a method to look up the Naif body frame code as well.
+   *                          Also moved the try loop attempting to find the radii tagged with the
+   *                          Naif body code ahead of the try loop that attempts to find the radii 
+   *                           tagged with the body frame code in the method radiiGroup.  Fixed
+   *                           any mention of Naif body frame code that should me Naif body code.
+   *                           These are not the same.  Naif tags the body radii keyword with the
+   *                           Naif body code.  The Naif body frame code refers to the orientation
+   *                           (SpiceRotation) of the body.  References #TBD.
    */
   class Target {
 
