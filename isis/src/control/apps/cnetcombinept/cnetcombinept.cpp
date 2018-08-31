@@ -135,9 +135,6 @@ void IsisMain() {
     if ( description.isEmpty() ) {
       description = cnet->Description();
     }
-    if ( radii.isEmpty() )  {
-      radii = QVector<Distance>::fromStdVector(cnet->GetTargetRadii());
-    }
 
     // Now get list of all cube serials and add all to list
     QList<QString> serials = cnet->GetCubeSerials();
