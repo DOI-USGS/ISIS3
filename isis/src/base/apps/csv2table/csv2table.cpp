@@ -22,109 +22,80 @@
 
 #include "Isis.h"
 
-#include "Camera.h"
-#include "CubeCalculator.h"
-#include "CubeInfixToPostfix.h"
-#include "FileList.h"
-#include "FileName.h"
-#include "ProcessByLine.h"
+#include <QString>
 
-using namespace std;
+#include "Camera.h"
+#include "CSVReader.h"
+#include "FileName.h"
+#include "IException.h"
+#include "IString.h"
+#include "Table.h"
+#include "TableField.h"
+#include "TableRecord.h"
+
 using namespace Isis;
 
-Isis::CubeCalculator c;
-
-// Prototypes
-void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  ProcessByLine p;
-  QVector<Cube *> cubes;
-  Cube *outCube;
-  Cube *inCube;
-  int bands = 1;
 
-  if (ui.GetString("MODE") == "CUBES") {
-    // Require atleast one file to be specified
-    inCube = p.SetInputCube("F1", Isis::AllMatchOrOne);
-    cubes.push_back(inCube);
-    if (ui.WasEntered("F2")){
-        inCube = p.SetInputCube("F2", Isis::AllMatchOrOne);
-        cubes.push_back(inCube);
-    }
-    if (ui.WasEntered("F3")){
-        inCube = p.SetInputCube("F3", Isis::AllMatchOrOne);
-        cubes.push_back(inCube);
-    }
-    if (ui.WasEntered("F4")){
-        inCube = p.SetInputCube("F4", Isis::AllMatchOrOne);
-        cubes.push_back(inCube);
-    }
-    if (ui.WasEntered("F5")){
-        inCube = p.SetInputCube("F5", Isis::AllMatchOrOne);
-        cubes.push_back(inCube);
-    }
-    bands = cubes[0]->bandCount();
-    outCube = p.SetOutputCube("TO");
+  // Read the CSV file and get the header
+  QString csvFileName = ui.GetFileName("csv");
+  CSVReader reader;
+  try {
+    reader = CSVReader(csvFileName, true);
   }
-  else if (ui.GetString("MODE") == "LIST") {
-    FileList list(ui.GetFileName("FROMLIST"));
+  catch(IException &e) {
+    QString msg = "Failed to read CSV file [" + csvFileName + "].";
+    throw IException(e, IException::Io, msg, _FILEINFO_);
+  }
+  int numColumns = reader.columns();
+  int numRows = reader.rows();
+  if (numColumns < 1 || numRows < 1) {
+    QString msg = "CSV file does not have data.\nFile has [" + toString(numRows) +
+                  "] rows and [" + toString(numColumns) +"] columns.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  CSVReader::CSVAxis header = reader.getHeader();
 
-    // Run through file list and set its entries as input cubes
-    for (int i = 0; i < list.size(); i++) {
-      CubeAttributeInput att(list[i].original());
-      inCube = p.SetInputCube(list[i].original(), att, Isis::AllMatchOrOne);
-      cubes.push_back(inCube);
-    }
-    bands = cubes[0]->bandCount();
-    outCube = p.SetOutputCube("TO");
+  // Construct an empty table with the CSV header as field names
+  TableRecord tableRow;
+  for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+    TableField columnField(QString(header[columnIndex]), TableField::Double);
+    tableRow += columnField;
   }
-  else {
-    int lines = ui.GetInteger("LINES");
-    int samples = ui.GetInteger("SAMPLES");
-    bands = ui.GetInteger("BANDS");
-    outCube = p.SetOutputCube("TO", samples, lines, bands);
+  QString tableName = ui.GetString("tablename");
+  Table table(tableName, tableRow);
+
+  // Fill the table
+  for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
+    CSVReader::CSVAxis csvRow = reader.getRow(rowIndex);
+    for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+      tableRow[columnIndex] = toDouble(csvRow[columnIndex]);
+    }
+    table += tableRow;
   }
 
-  CubeInfixToPostfix infixToPostfix;
-  c.prepareCalculations(infixToPostfix.convert(ui.GetString("EQUATION")), cubes, outCube);
-  p.StartProcess(Evaluate);
-  p.EndProcess();
-}
-
-
-/**
- * Take in the input buffer, apply the user-defined equation to
- * it, then write the results to the output buffer
- *
- * @param input The input buffer vector
- * @param output The output buffer
- */
-void Evaluate(vector<Buffer *> &input, vector<Buffer *> &output) {
-  Buffer &outBuffer = *output[0];
-
-  QVector<Buffer *> inputCopy;
-
-  for (int i = 0; i < (int)input.size(); i++) {
-    inputCopy.push_back(input[i]);
+  // Write the table to the cube
+  QString outCubeFileName(ui.GetFileName("to"));
+  Cube outCube;
+  try {
+    outCube.open(outCubeFileName, "rw");
+  }
+  catch(IException &e) {
+    QString msg = "Could not open output cube [" + outCubeFileName + "].";
+    throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
-  QVector<double> results = c.runCalculations(inputCopy,
-                            outBuffer.Line(), outBuffer.Band());
+  try {
+    outCube.write(table);
+  }
+  catch(IException &e) {
+    QString msg = "Could not write output table [" + tableName +
+                  "] to output cube [" + outCubeFileName + "].";
+    throw IException(e, IException::Io, msg, _FILEINFO_);
+  }
 
-  // If final result is a scalar, set all pixels to that value.
-  if (results.size() == 1) {
-    for (int i = 0; i < (int)outBuffer.size(); i++) {
-      outBuffer[i] = results[0];
-    }
-  }
-  // Final result is a valid vector, write to output buffer
-  else {
-    for (int i = 0; i < (int)results.size(); i++) {
-      outBuffer[i] = results[i];
-    }
-  }
+  outCube.close();
 
 }
-
