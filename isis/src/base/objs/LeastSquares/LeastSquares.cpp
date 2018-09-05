@@ -43,6 +43,9 @@ namespace Isis {
     p_solved = false;
     p_sparse = sparse;
     p_sigma0 = 0.;
+    
+    p_sparseRows = sparseRows;
+    p_sparseCols = sparseCols;
 
 
     if (p_sparse) {
@@ -66,10 +69,7 @@ namespace Isis {
 
         p_parameterWeights.resize(sparseCols);
       }
-
-
-      p_sparseRows = sparseRows;
-      p_sparseCols = sparseCols;
+      
     }
     p_currentFillRow = -1;
   }
@@ -156,7 +156,6 @@ namespace Isis {
 
     p_currentFillRow++;
 
-    //  ??? Speed this up using iterator instead of array indices???
     int ncolumns = (int)data.size();
 
     for(int c = 0;  c < ncolumns; c++) {
@@ -448,13 +447,6 @@ namespace Isis {
     std::cout << p_sparseA.n_rows << ", " << p_sparseA.n_cols << std::endl;
     p_normals = p_sparseA.t()*p_sparseA;
 
-//     //  Test for any columns with all 0's
-//     //  Return column number so caller can determine the appropriate error.  
-//     arma::umat nonZeros = any(p_normals, 0);
-//     for(int c = 0; c < nonZeros.n_rows; c++) {
-//       if (nonZeros(0, c) == true) return c + 1;
-//     }
-
     // Create the right-hand-side column vector 'b'
     arma::mat b(p_sparseRows, 1);
 
@@ -474,14 +466,15 @@ namespace Isis {
           continue;
 
         p_normals(i, i) += weight;
-        p_ATb(0, i) -= p_epsilonsSparse[i]*weight;
+        p_ATb(i, 0) -= p_epsilonsSparse[i]*weight;
       }
     }
     
     bool status = spsolve(p_xSparse, p_normals, p_ATb, "superlu");
     
     if (status == false) {
-      //TODO what happens if it can't solve?
+      QString msg = "Could not solve sparse least squares problem.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Set the coefficients in our basis equation
@@ -493,23 +486,6 @@ namespace Isis {
       for( int i = 0; i < p_sparseCols; i++ )
         p_epsilonsSparse[i] += p_xSparse[i];
     }
-
-    // test print solution
-//    printf("printing solution vector and epsilons\n");
-//    for( int a = 0; a < p_sparseCols; a++ )
-//      printf("soln[%d]: %lf epsilon[%d]: %lf\n",a,p_xSparse[a],a,p_epsilonsSparse[a]);
-
-//    printf("printing design matrix A\n");
-//    for (int i = 0; i < p_sparseRows; i++ )
-//    {
-//      for (int j = 0; j < p_sparseCols; j++ )
-//      {
-//        if ( j == p_sparseCols-1 )
-//          printf("%20.20e \n",(double)(p_sparseA(i,j)));
-//        else
-//          printf("%20.20e ",(double)(p_sparseA(i,j)));
-//      }
-//    }
 
     // Compute the image coordinate residuals and sum into Sigma0
     // (note this is exactly what was being done before, but with less overhead - I think)
@@ -546,24 +522,14 @@ namespace Isis {
     p_degreesOfFreedom = p_sparseRows + p_constrainedParameters - p_sparseCols;
 
     if( p_degreesOfFreedom <= 0.0 ) {
-      printf("Observations: %d\nConstrained: %d\nParameters: %d\nDOF: %d\n",
-             p_sparseRows,p_constrainedParameters,p_sparseCols,p_degreesOfFreedom);
       p_sigma0 = 1.0;
     }
-    else
+    else {
       p_sigma0 = p_sigma0/(double)p_degreesOfFreedom;
+    }
 
     // check for p_sigma0 < 0
     p_sigma0 = sqrt(p_sigma0);
-
-    // kle testing - output residuals and some stats
-    printf("Sigma0 = %20.10lf\nNumber of Observations = %d\nNumber of Parameters = %d\nNumber of Constrained Parameters = %d\nDOF = %d\n",p_sigma0,p_sparseRows,p_sparseCols,p_constrainedParameters,p_degreesOfFreedom);
-//    printf("printing residuals\n");
-//    for( int k = 0; k < p_sparseRows; k++ )
-//    {
-//      printf("%lf %lf\n",p_residuals[k],p_residuals[k+1]);
-//      k++;
-//    }
 
     // All done
     p_solved = true;
