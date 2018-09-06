@@ -58,7 +58,7 @@ namespace Isis {
    *                            set the central widget's layout.
    *    @history 2018-06-05 Kaitlyn Lee - Added createMenus() and createToolBars(). The body of createMenus()
    *                            was moved from the constructor. createToolBars() was copied and edited
-   *                            from CnetEditorWindow. Fixes #5416
+   *                            from CnetEditorWindow. Fixes #5416. Fixes #4988
    *    @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                            view has its own toolbar, so having getters that return toolbar
    *                            actions to fill the toolbar of the IpceMainWindow are unnecessary.
@@ -68,6 +68,11 @@ namespace Isis {
    *                            leaveEvent() to handle open menus causing a leave event. On default, a view's
    *                            actions are disabled. To enable the actions, move the cursor over the view.
    *                            When a user moves the cursor outside of the view, the actions are disabled.
+   *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
+   *                            view can be re-created with the same objectName for restoring the
+   *                            project state. Qt's save/restoreState use the objectName. Remove
+   *                            sizeHint method which is now taken care of in the parent class,
+   *                            AbstractProjectItemView.
    */
 
 class CnetEditorView : public AbstractProjectItemView {
@@ -81,8 +86,6 @@ class CnetEditorView : public AbstractProjectItemView {
 
     CnetEditorWidget *cnetEditorWidget();
     Control *control();
-
-    QSize sizeHint() const;
 
     void load(XmlStackedHandlerReader *xmlReader);
     void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot) const;

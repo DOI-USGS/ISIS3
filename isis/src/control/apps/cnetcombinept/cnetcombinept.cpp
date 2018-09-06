@@ -112,7 +112,6 @@ void IsisMain() {
   QString netid;
   QString target;
   QString description;
-  QVector<Distance> radii;
 
   BigInt allPoints(0);
   BigInt validPoints(0);
@@ -135,9 +134,6 @@ void IsisMain() {
     }
     if ( description.isEmpty() ) {
       description = cnet->Description();
-    }
-    if ( radii.isEmpty() )  {
-      radii = QVector<Distance>::fromStdVector(cnet->GetTargetRadii());
     }
 
     // Now get list of all cube serials and add all to list
@@ -304,7 +300,7 @@ void IsisMain() {
 
     cnet->SetDescription(description);
     cnet->SetCreatedDate(Application::DateTime());
-    cnet->SetTarget(target, radii);
+    cnet->SetTarget(target);
 #if defined(HAS_WRITE_ONLY_OPTION)
     cnet->setWriteOnly();
 #endif

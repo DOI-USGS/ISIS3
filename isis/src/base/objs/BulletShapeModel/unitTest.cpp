@@ -56,7 +56,7 @@ void testGroundPointToCamera(Latitude &lat,
  *
  * @internal
  *   @history 2017-03-19 Kris Becker
- *   @history 2018-08-07 Adam Goins - Removed qDebut() output of maxnumtriangles and maxnumparts
+ *   @history 2018-08-07 Adam Goins - Removed qDebug() output of maxnumtriangles and maxnumparts
  *                           because they are values grabbed from Bullet so we don't need to be
  *                           testing them.
  *

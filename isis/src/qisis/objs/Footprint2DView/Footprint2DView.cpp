@@ -78,11 +78,13 @@ namespace Isis {
 
     connect( internalModel(), SIGNAL( itemAdded(ProjectItem *) ),
              this, SLOT( onItemAdded(ProjectItem *) ) );
+    connect( internalModel(), SIGNAL( itemsAdded() ),
+             this, SLOT( onItemsAdded() ) );
     connect( internalModel(), SIGNAL( itemRemoved(ProjectItem *) ),
              this, SLOT( onItemRemoved(ProjectItem *) ) );
 
-    connect(m_sceneWidget, SIGNAL(queueSelectionChanged() ),
-            this, SLOT(onQueueSelectionChanged() ) );
+    connect(m_sceneWidget, SIGNAL(queueSelectionChanged()),
+            this, SLOT(onQueueSelectionChanged()), Qt::QueuedConnection);
 
     //  Pass on Signals emitted from ControlNetTool, through the MosaicSceneWidget
     //  TODO 2016-09-09 TLS Design:  Use a proxy model instead of signals?
@@ -99,7 +101,8 @@ namespace Isis {
             this, SLOT(onMosItemRemoved(Image *)));
 
     //  Pass on redrawMeasure signal from Directory, so the control measures are redrawn on all
-    //  the footprints.
+    //  the footprints. Connection made in Directory from directory's signal to this signal since
+    //  Directory doesn't have access to the scene within the sceneWidget.
     connect(this, SIGNAL(redrawMeasures()), m_sceneWidget->getScene(), SLOT(update()));
 
     setStatusBar(statusBar);
@@ -108,6 +111,8 @@ namespace Isis {
 
     m_fileListWidget->setWindowTitle( tr("File List")  );
     m_fileListWidget->setObjectName( m_fileListWidget->windowTitle() );
+
+    m_directory = directory;
 
     QDockWidget *imageFileListdock = new QDockWidget( m_fileListWidget->windowTitle() );
     imageFileListdock->setObjectName(imageFileListdock->windowTitle());
@@ -143,19 +148,6 @@ namespace Isis {
     }
     // On default, actions are disabled until the cursor enters the view.
     disableActions();
-
-    // MosaicSceneWidget's default is to have the Control Net Tool enabled.
-    // In ipce, we want it to be disabled if an active control is not set.
-    foreach (QAction *action, m_toolPad->actions()) {
-      if (action->toolTip() == "Control Net (c)") {
-        m_controlNetTool = action;
-      }
-    }
-    if (!directory->project()->activeControl()) {
-      m_controlNetTool->setEnabled(false);
-    }
-
-    setAcceptDrops(true);
   }
 
   /**
@@ -174,19 +166,18 @@ namespace Isis {
 
 
   /**
-   * Returns the suggested size for the widget.
-   *
-   * @return @b QSize The size
-   */
-  QSize Footprint2DView::sizeHint() const {
-    return QSize(800, 600);
-  }
-
-  /**
    * Accessor for the MosaicSceneWidget
    */
   MosaicSceneWidget *Footprint2DView::mosaicSceneWidget() {
     return m_sceneWidget;
+  }
+
+
+  /**
+   * Accessor for the FileListWidget
+   */
+  ImageFileListWidget *Footprint2DView::fileListWidget() {
+    return m_fileListWidget;
   }
 
 
@@ -217,8 +208,10 @@ namespace Isis {
 
 
   /**
-   * Slot to connect to the itemAdded signal from the model. If the
-   * item is an image it adds it to the scene.
+   * Slot to connect to the itemAdded signal from the model. If the item is an image or shape it is 
+   * added to a list. When everything has been added, then the list is added to the scene through 
+   * signal/slot connection from ProjectItemProxyModel signal, itemsAdded which is connected to 
+   * this objects onItemsAdded slot. 
    *
    * @param[in] item (ProjectItem *) The item
    */
@@ -226,26 +219,34 @@ namespace Isis {
     if (!item || (!item->isImage() && !item->isShape())) {
       return;
     }
-    //TODO 2016-09-09 TLS  Handle Shapes-Create image from shape since qmos only handles images?
-    //                   Still don't know if shape should inherit from image or contain an image?
-    //
+
     Image *image;
-    ImageList images;
     if (item->isShape()) {
-      //TEMPORARY UNTIL SHAPE IS FIXED TO HOLD IMAGE, once Shape holds image go back to old code
-      // previous to 10-21-16
       image = new Image(item->shape()->cube());
     }
     else if (item->isImage()) {
       image = item->image();
     }
-    images.append(image);
-    m_sceneWidget->addImages(images);
-    m_fileListWidget->addImages(&images);
+
+    m_images.append(image);
 
     if (!m_imageItemMap.value(image)) {
       m_imageItemMap.insert(image, item);
     }
+  }
+
+
+  /**
+   * Slot called once all selected images have been added to the proxy model.  This is much faster 
+   * than adding a single image at a time to the MosaicSceneWidget. This is connected from the 
+   * ProjectItemProxyModel::itemsAdded signal. 
+   *
+   */
+  void Footprint2DView::onItemsAdded() {
+    //  This is called once all selected images have been added to proxy model (internalModel())
+    //  This is much faster than adding a single image at a time to the scene widget
+    m_sceneWidget->addImages(m_images);
+    m_fileListWidget->addImages(&m_images);
   }
 
 
@@ -326,16 +327,34 @@ namespace Isis {
 
   /**
    * A slot function that is called when directory emits a siganl that an active
-   * control network is set. It enables the control network editor tool in the
-   * toolpad.
-   * We do not load the network here because the network does not open until
-   * the tool is beng used. This is done in MosaicControlNetTool::updateTool() and
-   * is connected in MosaicTool.
+   * control network is set. It enables the control network editor tool in the toolpad.
    *
    * @param value The boolean that holds if a control network has been set.
    */
   void Footprint2DView::enableControlNetTool(bool value) {
-    m_controlNetTool->setEnabled(value);
+    foreach (QAction *action, m_toolPad->actions()) {
+      if (action->toolTip() == "Control Net (c)") {
+        action->setEnabled(value);
+        if (value) {
+          MosaicControlNetTool *cnetTool = static_cast<MosaicControlNetTool *>(action->parent());
+          cnetTool->loadNetwork();
+        }
+      }
+    }
+  }
+
+
+  /**
+   * Enables toolbars and toolpad actions. Overriden method.
+   * If an active control network has not been set, do not enable the cnet tool.
+   */
+  void Footprint2DView::enableActions() {
+    foreach (QAction *action, actions()) {
+      if (action->toolTip() == "Control Net (c)" && !m_directory->project()->activeControl()) {
+        continue;
+      }
+      action->setEnabled(true);
+    }
   }
 
 
@@ -362,6 +381,7 @@ namespace Isis {
                              FileName newProjectRoot) const {
 
     stream.writeStartElement("footprint2DView");
+    stream.writeAttribute("objectName", objectName());
 
     m_fileListWidget->save(stream, project, newProjectRoot);
     m_sceneWidget->save(stream, project, newProjectRoot);

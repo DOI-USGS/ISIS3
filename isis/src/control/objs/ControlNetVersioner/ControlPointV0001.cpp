@@ -36,8 +36,7 @@ namespace Isis {
    * Create a ControlPointV0001 object from a version 1 control point Pvl object
    *
    * @param pointObject The control point and its measures in a Pvl object
-   * @param targetName The name of the target used to get the body radii when converting from
-   *                   lat/lon to x/y/z.
+   * @param targetName The name of the target 
    */
   ControlPointV0001::ControlPointV0001(PvlObject &pointObject, const QString targetName)
       : m_pointData(new ControlNetFileProtoV0001_PBControlPoint),
@@ -228,29 +227,8 @@ namespace Isis {
     }
 
     // Copy the covariance matrices
-    // Sometimes they are not stored in version 1 Pvls so we compute them from a combination
-    // of the surface point sigmas and the target radii.
-
-    // We have to do this because Target::radiiGroup calls NAIF routines,
-    // but doesn't check for errors.
-    NaifStatus::CheckErrors();
-    PvlGroup radii;
-    try {
-     radii = Target::radiiGroup(targetName);
-    }
-    catch (IException &e) {
-     try {
-       NaifStatus::CheckErrors();
-     }
-     catch (IException &) {
-       // pass to the outer catch
-     }
-     QString msg = "Unable to get target body radii for [" + targetName
-                   + "] when calculating covariance matrix.";
-     throw IException(e, IException::Io, msg, _FILEINFO_);
-    }
-    Distance equatorialRadius(radii["EquatorialRadius"], Distance::Meters);
-    Distance polarRadius(radii["PolarRadius"], Distance::Meters);
+    // Sometimes they are not stored in version 1 Pvls so we compute them from the
+    // surface point sigmas using the local radius to convert to/from angular units.
 
     // Add the Apriori Covariance Matrix
     if ( pointObject.hasKeyword("AprioriCovarianceMatrix") ) {
@@ -300,7 +278,6 @@ namespace Isis {
       }
 
       SurfacePoint aprioriPoint;
-      aprioriPoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
       aprioriPoint.SetRectangular( Displacement(m_pointData->apriorix(), Displacement::Meters),
                                    Displacement(m_pointData->aprioriy(), Displacement::Meters),
                                    Displacement(m_pointData->aprioriz(), Displacement::Meters) );
@@ -360,7 +337,6 @@ namespace Isis {
       }
 
       SurfacePoint adjustedPoint;
-      adjustedPoint.SetRadii(equatorialRadius, equatorialRadius, polarRadius);
       adjustedPoint.SetRectangular( Displacement(m_pointData->adjustedx(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedy(), Displacement::Meters),
                                     Displacement(m_pointData->adjustedz(), Displacement::Meters) );
