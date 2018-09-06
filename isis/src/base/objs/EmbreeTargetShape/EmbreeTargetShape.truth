@@ -364,8 +364,6 @@ Testing error throws
 
 
 Invalid shapefile
-[1;31m[pcl::io::load] Don't know how to handle file with extension [0;m**I/O ERROR** Failed creating an EmbreeTargetShape from [notafile].
-**I/O ERROR** Failed loading target shape file [notafile].
 **I/O ERROR** Failed creating an EmbreeTargetShape from [junkyshapefile.bds].
 **USER ERROR** NAIF DSK file [junkyshapefile.bds] does not exist.
 **I/O ERROR** Failed creating an EmbreeTargetShape from [junkydem.cub].
