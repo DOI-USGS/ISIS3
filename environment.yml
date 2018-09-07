@@ -7,7 +7,7 @@ channels:
   - defaults
 
 dependencies:
-  - armadillo==8.2.0 
+  - armadillo==8.200.0 
   - pcl==1.8.1
   - geos==3.5.1
   - protobuf==3.5.2
@@ -63,7 +63,7 @@ dependencies:
   - bz2file==0.98
   - bullet==2.86.1=0
   - qhull==7.2.0=0
-  - qt=5.7.1
+  - qt=5.9.6
   - qwt
   - tnt==126=0
   - xalan-c==1.11
