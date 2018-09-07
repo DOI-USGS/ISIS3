@@ -23,6 +23,8 @@
 #include "jama/jama_svd.h"
 #include "jama/jama_qr.h"
 
+#include <armadillo>
+
 #include "LeastSquares.h"
 #include "IException.h"
 #include "IString.h"
@@ -41,6 +43,10 @@ namespace Isis {
     p_solved = false;
     p_sparse = sparse;
     p_sigma0 = 0.;
+    
+    p_sparseRows = sparseRows;
+    p_sparseCols = sparseCols;
+
 
     if (p_sparse) {
 
@@ -51,8 +57,19 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      p_sparseRows = sparseRows;
-      p_sparseCols = sparseCols;
+
+      p_sparseA.set_size(sparseRows, sparseCols);
+      p_normals.set_size(sparseCols, sparseCols);
+      p_ATb.resize(sparseCols, 1);
+      p_xSparse.resize(sparseCols);
+
+      if( p_jigsaw ) {
+        p_epsilonsSparse.resize(sparseCols);
+        std::fill_n(p_epsilonsSparse.begin(), sparseCols, 0.0);
+
+        p_parameterWeights.resize(sparseCols);
+      }
+      
     }
     p_currentFillRow = -1;
   }
@@ -109,9 +126,43 @@ namespace Isis {
       p_sqrtWeight.push_back(sqrt(weight));
     }
 
-
-    p_input.push_back(data);
+    if(p_sparse) {
+      FillSparseA(data);
+    }
+    else {
+      p_input.push_back(data);
+    }
   }
+
+
+
+  /**
+   *  Invoke this method for each set of knowns for sparse solutions.  The A
+   *  sparse matrix must be filled as we go or we will quickly run out of memory
+   *  for large solutions. So, expand the basis function, apply weights (which is
+   *  done in the Solve method for the non-sparse case.
+   *
+   * @param data A vector of knowns.
+   *
+   * @internal
+   * @history 2008-04-22  Tracie Sucharski - New method for sparse solutions.
+   * @history 2009-12-21  Jeannie Walldren - Changed variable name
+   *          from p_weight to p_sqrtweight.
+   *
+   */
+  void LeastSquares::FillSparseA(const std::vector<double> &data) {
+
+    p_basis->Expand(data);
+
+    p_currentFillRow++;
+
+    int ncolumns = (int)data.size();
+
+    for(int c = 0;  c < ncolumns; c++) {
+      p_sparseA(p_currentFillRow, c) = p_basis->Term(c) * p_sqrtWeight[p_currentFillRow];
+    }
+  }
+
 
   /**
    * This method returns the data at the given row.
@@ -181,6 +232,10 @@ namespace Isis {
     }
     else if(method == QRD) {
       SolveQRD();
+    }
+    else if(method == SPARSE) {
+      int column = SolveSparse();
+      return column;
     }
     return 0;
   }
@@ -253,8 +308,8 @@ namespace Isis {
     if (coefs.dim1() < p_basis->Coefficients()) {
       QString msg = "Unable to solve least-squares using SVD method. No "
                     "solution available. Not enough knowns or knowns are "
-                    "co-linear ... [Unknowns = "
-                    + toString(p_basis->Coefficients()) + "] [Knowns = "
+                    "co-linear ... [Unknowns = " 
+                    + toString(p_basis->Coefficients()) + "] [Knowns = " 
                     + toString(coefs.dim1()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -351,11 +406,149 @@ namespace Isis {
   }
 
 
+
+
+  /**
+   * @brief  Solve using sparse class
+   *
+   * After all the data has been registered through AddKnown, invoke this
+   * method to solve the system of equations Nx = b, where
+   *
+   * N = ATPA
+   * b = ATPl, and
+   *
+   * N is the "normal equations matrix;
+   * A is the so-called "design" matrix;
+   * P is the observation weight matrix (typically diagonal);
+   * l is the "computed - observed" column vector;
+   *
+   * The solution is achieved using a sparse matrix formulation of
+   * the LU decomposition of the normal equations.
+   *
+   * You can then use the Evaluate and Residual methods freely.
+   *
+   * @internal
+   * @history  2008-04-16 Debbie Cook / Tracie Sucharski, New method
+   * @history  2008-04-23 Tracie Sucharski,  Fill sparse matrix as we go in
+   *                          AddKnown method rather than in the solve method,
+   *                          otherwise we run out of memory very quickly.
+   * @history  2009-04-08 Tracie Sucharski - Added return value which is a
+   *                          column number of a column that contained all zeros.
+   * @history 2009-12-21  Jeannie Walldren - Changed variable name
+   *                          from p_weight to p_sqrtweight.
+   * @history 2010        Ken Edmundson
+   * @history 2010-11-20  Debbie A. Cook Merged Ken Edmundson verion with system version
+   * @history 2011-03-17  Ken Edmundson Corrected computation of residuals
+   *
+   */
+  int LeastSquares::SolveSparse() {
+
+    // form "normal equations" matrix by multiplying ATA
+    std::cout << p_sparseA.n_rows << ", " << p_sparseA.n_cols << std::endl;
+    p_normals = p_sparseA.t()*p_sparseA;
+
+    // Create the right-hand-side column vector 'b'
+    arma::mat b(p_sparseRows, 1);
+
+    // multiply each element of 'b' by it's associated weight
+    for ( int r = 0; r < p_sparseRows; r++ )
+      b(r,0) = p_expected[r] * p_sqrtWeight[r];
+
+    // form ATb
+    p_ATb = p_sparseA.t()*b;
+
+    // apply parameter weighting if Jigsaw (bundle adjustment)
+    if ( p_jigsaw ) {
+      for( int i = 0; i < p_sparseCols; i++) {
+        double weight = p_parameterWeights[i];
+
+        if( weight <= 0.0 )
+          continue;
+
+        p_normals(i, i) += weight;
+        p_ATb(i, 0) -= p_epsilonsSparse[i]*weight;
+      }
+    }
+    
+    bool status = spsolve(p_xSparse, p_normals, p_ATb, "superlu");
+    
+    if (status == false) {
+      QString msg = "Could not solve sparse least squares problem.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+
+    // Set the coefficients in our basis equation
+    p_basis->SetCoefficients(arma::conv_to< std::vector<double> >::from(p_xSparse));
+
+    // if Jigsaw (bundle adjustment)
+    // add corrections into epsilon vector (keeping track of total corrections)
+    if ( p_jigsaw ) {
+      for( int i = 0; i < p_sparseCols; i++ )
+        p_epsilonsSparse[i] += p_xSparse[i];
+    }
+
+    // Compute the image coordinate residuals and sum into Sigma0
+    // (note this is exactly what was being done before, but with less overhead - I think)
+    // ultimately, we should not be using the A matrix but forming the normals
+    // directly. Then we'll have to compute the residuals by back projection
+
+    p_residuals.resize(p_sparseRows);
+    p_residuals = arma::conv_to< std::vector<double> >::from(p_sparseA*p_xSparse);
+    p_sigma0 = 0.0;
+
+    for ( int i = 0; i < p_sparseRows; i++ ) {
+        p_residuals[i] = p_residuals[i]/p_sqrtWeight[i];
+        p_residuals[i] -= p_expected[i];
+        p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
+    }
+
+    // if Jigsaw (bundle adjustment)
+    // add contibution to Sigma0 from constrained parameters
+    if ( p_jigsaw ) {
+      double constrained_vTPv = 0.0;
+
+      for ( int i = 0; i < p_sparseCols; i++ ) {
+        double weight = p_parameterWeights[i];
+
+        if ( weight <= 0.0 )
+          continue;
+
+        constrained_vTPv += p_epsilonsSparse[i]*p_epsilonsSparse[i]*weight;
+      }
+      p_sigma0 += constrained_vTPv;
+    }
+    // calculate degrees of freedom (or redundancy)
+    // DOF = # observations + # constrained parameters - # unknown parameters
+    p_degreesOfFreedom = p_sparseRows + p_constrainedParameters - p_sparseCols;
+
+    if( p_degreesOfFreedom <= 0.0 ) {
+      p_sigma0 = 1.0;
+    }
+    else {
+      p_sigma0 = p_sigma0/(double)p_degreesOfFreedom;
+    }
+
+    // check for p_sigma0 < 0
+    p_sigma0 = sqrt(p_sigma0);
+
+    // All done
+    p_solved = true;
+    return 0;
+  }
+
+
   void LeastSquares::Reset ()
   {
-
-    p_input.clear();
-    p_sigma0 = 0.;
+    if ( p_sparse ) {
+      p_sparseA.zeros();
+      p_ATb.zeros();
+      p_normals.zeros();
+      p_currentFillRow = -1;
+    }
+    else {
+      p_input.clear();
+    }
+      p_sigma0 = 0.;
     p_residuals.clear();
     p_expected.clear();
     p_sqrtWeight.clear();
