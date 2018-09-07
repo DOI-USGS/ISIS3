@@ -547,7 +547,6 @@ namespace Isis {
     }
     else {
       p_input.clear();
-      //      p_sigma0 = 0.;
     }
       p_sigma0 = 0.;
     p_residuals.clear();
