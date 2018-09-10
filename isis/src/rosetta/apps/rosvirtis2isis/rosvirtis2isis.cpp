@@ -59,6 +59,7 @@ void IsisMain ()
 
   p.SetPdsFile(pdsLabel, inFile.expanded());
   p.SetOrganization(Isis::ProcessImport::BIP);
+  p.SaveDataSuffix(); 
 
   // NULL pixels are set to 65535 in the input QUB
   p.SetNull(65535, 65535);
@@ -90,6 +91,8 @@ void IsisMain ()
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
+  // Processing level 2 = uncalibrated
+  // Processing level 3 = calibrated
   int procLevel = (int) pdsLabel.findKeyword("PROCESSING_LEVEL_ID");
 
   // Override default DataTrailerBytes constructed from PDS header
@@ -328,19 +331,31 @@ void IsisMain ()
 
     outcube->write(table);
   }
+  // Level 3 = Calibrated VIRTIS-M data
   else if (procLevel == 3) {
-    std::vector<char *> hkData = p.DataTrailer();
+
+    // Create a table to hold SCET information
     TableRecord rec;
     TableField scETField("dataSCET", TableField::Double);
     rec += scETField;
     Table table("VIRTISHouseKeeping", rec);
-    for (unsigned int i=0; i < hkData.size() ; i++) {
-      const char *hk = hkData.at(i);
-      const unsigned short *uihk = reinterpret_cast<const unsigned short *> (hk);
-      int word1 = swapb(uihk[0]);
-      int word2 = swapb(uihk[1]);
-      int word3 = swapb(uihk[2]);
-      rec[0] = translateScet(word1, word2, word3);
+
+    std::vector<std::vector<char *> > dataSuffix = p.DataSuffix();
+
+    for (unsigned int i=0; i < dataSuffix.size(); i++) {
+      std::vector<char*> dataSuffixRecord = dataSuffix[i];
+
+      // The SCET for each line is stored as three 2-byte words. The three words are stored in the 
+      // second byte of each of the first 3 lines of the suffix record. 
+      std::vector<const unsigned short*> scetBytes; 
+      std::vector<int> scetWords; 
+      for (int j=0; j < 3; j++) {
+        scetBytes.push_back(reinterpret_cast<const unsigned short *>(dataSuffixRecord.at(j)));
+        scetWords.push_back(swapb(scetBytes[j][1]));    
+      }
+      
+      // Calculate the SCET and add it to the table
+      rec[0] = translateScet(scetWords[0], scetWords[1], scetWords[2]); 
       table += rec;
     }
     outcube->write(table);
