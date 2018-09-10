@@ -29,6 +29,8 @@
 #include "FileName.h"
 #include "IException.h"
 #include "IString.h"
+#include "Pvl.h"
+#include "PvlObject.h"
 #include "Table.h"
 #include "TableField.h"
 #include "TableRecord.h"
@@ -74,6 +76,24 @@ void IsisMain() {
       tableRow[columnIndex] = toDouble(csvRow[columnIndex]);
     }
     table += tableRow;
+  }
+
+  // If a set of label keywords was passed add them to the table
+  if (ui.WasEntered("label")) {
+    QString labelPvlFilename = ui.GetFileName("label");
+    Pvl labelPvl;
+    try {
+      labelPvl.read(labelPvlFilename);
+    }
+    catch(IException &e) {
+      QString msg = "Failed to read PVL label file [" + labelPvlFilename + "].";
+      throw IException(e, IException::Io, msg, _FILEINFO_);
+    }
+
+    PvlObject &tableLabel = table.Label();
+    for (int keyIndex = 0; keyIndex < labelPvl.keywords(); keyIndex++) {
+      tableLabel.addKeyword(labelPvl[keyIndex]);
+    }
   }
 
   // Write the table to the cube

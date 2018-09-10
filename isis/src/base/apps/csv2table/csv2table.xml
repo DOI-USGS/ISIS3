@@ -41,6 +41,20 @@
         </filter>
       </parameter>
 
+        <parameter name = "label">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>Input table label PVL filename</brief>
+          <description>
+            Input table label PVL filename. This is expected to be a flat PVL
+            file where all of the keywords and their values will be added to
+            the tabel label.
+          </description>
+          <filter>
+            *.pvl
+          </filter>
+        </parameter>
+
       <parameter name = "to">
         <type>cube</type>
         <fileMode>output</fileMode>
