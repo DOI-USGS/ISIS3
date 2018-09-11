@@ -375,7 +375,7 @@ endif()
 install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5.0${SO})")
 install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5${SO})")
 install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
-EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_BINARY_DIR}/)
+EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
@@ -423,10 +423,10 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
 
 # Add custom build target to copy modified header files to the build/incs directory.
-# ALL is specified so that the target is added to the default build target, i.e. the copy command 
+# ALL is specified so that the target is added to the default build target, i.e. the copy command
 # will be executed when running "ninja install"
 # On a clean build, all files will be copied over.
-add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
 add_dependencies(isis3 incs)
 
