@@ -36,9 +36,6 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 * Set your ISISROOT to `/the/path/to/your/build`:
   * `setisis .`
 
-* Copy header files to build/inc (This is temporary):
-  * `ninja incs`
-
 * Build ISIS inside of your build directory and install it to your install directory:
   * `ninja install`
 
