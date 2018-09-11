@@ -26,6 +26,8 @@
 
 #include "tnt/tnt_array2d.h"
 
+#include <armadillo>
+
 #include "BasisFunction.h"
 
 namespace Isis {
@@ -106,6 +108,8 @@ namespace Isis {
    *                            to reset all solution methods
    *   @history  2010-11-22 Debbie A. Cook - Merged with Ken Edmundson version
    *   @history  2013-12-29 Jeannie Backer - Improved error messages. Fixes #962.
+   *   @history  2019-09-05 Makayla Shepherd & Jesse Mapel - Changed sparse solution to use
+   *                            Armadillo library's SuperLU interface instead of GMM.
    *
    */
   class LeastSquares {
@@ -146,10 +150,28 @@ namespace Isis {
       int GetDegreesOfFreedom() { return p_degreesOfFreedom; }
       void Reset ();
 
+      void ResetSparse() { Reset(); }
+      std::vector<double> GetEpsilons () const { return p_epsilonsSparse; }
+      void SetParameterWeights(const std::vector<double> weights) { p_parameterWeights = weights; }
+      void SetNumberOfConstrainedParameters(int n) { p_constrainedParameters = n; }
+
     private:
       void SolveSVD();
       void SolveQRD();
       void SolveCholesky () {}
+
+      int SolveSparse();
+      void FillSparseA(const std::vector<double> &data);
+      bool ApplyParameterWeights();
+
+      arma::mat p_xSparse;          /**<sparse solution matrix*/
+      std::vector<double> p_epsilonsSparse;   /**<sparse vector of total parameter corrections*/
+      std::vector<double> p_parameterWeights; /**<vector of parameter weights*/
+
+      arma::SpMat<double> p_sparseA; /**<design matrix 'A' */
+      arma::SpMat<double> p_normals; /**<normal equations matrix 'N'*/
+      arma::mat p_ATb;                   /**<right-hand side vector*/
+      arma::mat p_SLU_Factor;          /**<decomposed normal equations matrix*/
 
       bool p_jigsaw;
       bool p_sparse;
