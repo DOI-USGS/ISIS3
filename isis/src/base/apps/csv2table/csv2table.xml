@@ -50,6 +50,7 @@
             file where all of the keywords and their values will be added to
             the tabel label.
           </description>
+          <internalDefault>None</internalDefault>
           <filter>
             *.pvl
           </filter>
