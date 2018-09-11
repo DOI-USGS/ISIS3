@@ -36,7 +36,10 @@ App/Category tests can be developed in the ISIS src tree similar to the old make
 
 ## Unit Tests
 
-Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest sub-directory of the build directory.
+Unit test no longer rely on the old ISIS make system. The unitTest.cpp of each object are compiled and an executable is made and saved in the unitTest sub-directory of the build directory. A symbolic link of the unit test executable is created in the object's directory. This allows the unit test to get files that it needs inside the object's directory, i.e. unitTest.xml. If a unit test passes, then the symbolic link is removed. If you want to run a passing unit test in debug mode, you will have to create a symbolic link of the unit test in the object's directory yourself. If you are inside the object's directory:
+
+`ln -s $ISISROOT/unitTest/<unit_test_name> unitTest`
+
 Steps To Create A New UnitTest:
 1. Create unitTest.cpp under new object directory in ISIS src tree
 2. re-configure cmake
