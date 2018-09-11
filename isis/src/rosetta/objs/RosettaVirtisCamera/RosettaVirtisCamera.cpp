@@ -93,7 +93,10 @@ namespace Isis {
 
     // Get other info from labels
     PvlKeyword &frameParam = inst["FrameParameter"];
-    m_exposureTime = toDouble(frameParam[0]);
+
+    // convert milliseconds to seconds
+
+    m_exposureTime = toDouble(frameParam[0]) * 0.001;
     m_summing  = toDouble(frameParam[1]);
     m_scanRate = toDouble(frameParam[2]);
 
@@ -296,14 +299,56 @@ namespace Isis {
      TableRecord &trec = hktable[i];
      double scet = (double) trec["dataSCET"];
      double lineMidTime;
-     lineMidTime = getClockTime(toString(scet), naifSpkCode()).Et();
+
+/*
+SCLK Format
+--------------------------------------------------------
+
+     The on-board clock, the conversion for which is provided by this SCLK
+     file, consists of two fields:
+
+          SSSSSSSSSS:FFFFF
+
+     where:
+
+          SSSSSSSSSS -- count of on-board seconds
+
+          FFFFF      -- count of fractions of a second with one fraction
+                        being 1/65536 of a second
+
+
+*/
+     QString scetString = toString(scet);
+     std::cout << "scetString: " << scetString << std::endl; 
+
+     // seconds stay the same
+     QStringList scetStringList = scetString.split('.');
+
+     // final format needs to be: SSSSSSSSSS:FFFFF
+
+     //  SSSSSSSSSS:
+     QString scetFinal = scetStringList[0];
+     scetFinal.append(":");
+
+     // FFFFF
+     double fractValue = toDouble(scetStringList[1])/65536.0;
+     scetStringList = toString(fractValue).split(".");
+
+     scetFinal.append(scetStringList[1].left(5));
+     std::cout << "final scet value: " << scetFinal << std::endl; 
+
+/*     if (i==0) {
+       setTime(iTime(scetFinal)); 
+     }*/
+
+     lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
                                           lineStartTime(lineMidTime),
                                           exposureTime()));
      lineno++;
    }
     // Adjust the last time
-    LineRateChange  lastR = m_lineRates.back();
+    LineRateChange lastR = m_lineRates.back();
 
     // Normally the line rate changes would store the line scan rate instead of exposure time.
     // Storing the exposure time instead allows for better time calculations within a line.
