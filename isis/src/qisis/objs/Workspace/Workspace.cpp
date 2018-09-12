@@ -321,7 +321,7 @@ namespace Isis {
    *           deallocation is already taking place in
    *           addCubeViewport(cube).
    *  @history 2015-05-13 Ian Humphrey - Caught exception now handled by sending a QMessageBox
-   *                          to the Workspace. This prevents undefined behavior caused by not 
+   *                          to the Workspace. This prevents undefined behavior caused by not
    *                          handling an exception within a connected slot.
    *  @history 2017-08-17 Adam Goins - Added the ability for this method to receive a cubelist
    *                          file as input to qview, parse out the .cub files from the
@@ -331,43 +331,79 @@ namespace Isis {
    *                          as this caused errors when working with cubelists that contained
    *                          relative paths. Fixes # 5177
    */
-  void Workspace::addCubeViewport(QString cubename) {
-    
-    QFileInfo cubeFileName(cubename);
+  void Workspace::addCubeViewport(QString filename) {
+
+    QFileInfo cubeFileName(filename);
+
+    QString cubename = cubeFileName.filePath();
+
+    try {
+      Cube *cube = new Cube;
+
+      // Read in the CubeAttribueInput from the cube name
+      CubeAttributeInput inAtt(cubename);
+      std::vector<QString> bands = inAtt.bands();
+
+      // Set the virtual bands to the bands specified by the input
+      cube->setVirtualBands(bands);
+      cube->open(cubename);
+
+      MdiCubeViewport *cvp = addCubeViewport(cube);
+
+      // Check for RGB format (#R,#G,#B)
+      if(bands.size() == 3) {
+        IString st = IString(bands.at(0));
+        int index_red = st.ToInteger();
+        st = IString(bands.at(1));
+        int index_green = st.ToInteger();
+        st = IString(bands.at(2));
+        int index_blue = st.ToInteger();
+        cvp->viewRGB(index_red, index_green, index_blue);
+      }
+    }
+
+    catch (IException &e) {
+
+      QString message("Error opening cube [" + cubename + "]...");
+      message += ("\nAttempting to open [" + cubename + "] as a cube list...")
+
+      try {
+        addCubeViewportFromList(cubename);
+      }
+      catch (IException &e) {
+        message += e.toString();
+        throw IException(e, IException::Programmer, message, _FILEINFO_);
+      }
+
+    }
+
+  }
+
+  void Workspace::addCubeViewportFromList(QString cubelist) {
+
+    QFileInfo cubeFileName(cubelist);
 
     QList<QString> cubesToOpen;
 
-    // If the file is a cub file, we add the path to it to our list of cubes to open.
-    if ( cubeFileName.suffix() == "cub" || cubeFileName.suffix() == "cube" || cubeFileName.suffix() == "lbl") {
-      // cubesToOpen.append(cubeFileName.absoluteFilePath());
-      cubesToOpen.append(cubeFileName.filePath());
-    }
-    else {
-      // If the file received isn't a cube or label, it has to be a cubelist. We read every cube in
-      // the cubelist and append it to the cubesToOpen QList so that we can open them.
-      QFile file(cubename);
-      file.open(QIODevice::ReadOnly);
+    QFile file(cubename);
+    file.open(QIODevice::ReadOnly);
 
-      QTextStream in(&file);
+    QTextStream in(&file);
 
-      while(!file.atEnd()){
-        QString line = file.readLine().replace("\n", "");
-        cubesToOpen.append(line);
-      }
-      file.close();
+    // Loop through every cube name in the cube list and add it to a list of cubes to open.
+    while ( !file.atEnd() ) {
+      QString line = file.readLine().replace("\n", "");
+      cubesToOpen.append(line);
     }
-    
-    if (cubesToOpen.size() == 0){
-        QMessageBox::critical((QWidget *)parent(), "Error", "No cubes to open from [" + cubename + "]");
-        return;
-    }
+
+    file.close();
 
     for (int i = 0; i < cubesToOpen.size(); i++) {
-      
+
       QString cubename;
       try {
         Cube *cube = new Cube;
-        cubename = cubesToOpen.value(i);
+        cubename = cubeFileName.filePath();
 
         // Read in the CubeAttribueInput from the cube name
         CubeAttributeInput inAtt(cubename);
@@ -376,7 +412,7 @@ namespace Isis {
         // Set the virtual bands to the bands specified by the input
         cube->setVirtualBands(bands);
         cube->open(cubename);
-          
+
         MdiCubeViewport *cvp = addCubeViewport(cube);
 
         // Check for RGB format (#R,#G,#B)
@@ -391,20 +427,9 @@ namespace Isis {
         }
       }
       catch (IException &e) {
-        QString title("Error opening cube from list...");
-        QString message(e.toString() + "\n\nWould you like to continue?");
-        
-        int response = QMessageBox::critical((QWidget *)parent(), 
-                                             title, 
-                                             message, 
-                                             QMessageBox::Yes|QMessageBox::No);
-        
-        if (response == QMessageBox::Yes) { 
-          continue;
-        }
-        else {
-          return;
-        }
+        QString message("Error attempting to open [" + cubename + "] from list [" + cubelist + "]...\n");
+        message += e.toString();
+        throw IException(e, IException::Programmer, message, _FILEINFO_);
       }
     }
   }
