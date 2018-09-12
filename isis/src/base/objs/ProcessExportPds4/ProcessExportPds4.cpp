@@ -434,6 +434,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Export BandBin group for 2D or 3D Image format.
+   */
   void ProcessExportPds4::translateBandBinImage(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinImage.trn";
@@ -443,6 +446,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Export BandBin group for uniformly spaced 3D Spectral data format.
+   */
   void ProcessExportPds4::translateBandBinSpectrumUniform(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumUniform.trn";
@@ -582,6 +588,9 @@ namespace Isis {
   }
 
 
+  /**
+   * Export BandBin group for non-uniformly spaced 3D Spectral data format.
+   */
   void ProcessExportPds4::translateBandBinSpectrumBinSet(Pvl &inputLabel) {
     QString translationFile = "$base/translations/";
     translationFile += "pds4ExportBandBinSpectrumBinSet.trn";
