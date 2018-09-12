@@ -49,6 +49,7 @@ void printXml(const BundleObservationSolveSettings &);
  *
  * @internal
  *   @history 2014-12-11 - Original version.
+   * @history 2018-07-03 Debbie A Cook - Removed target radii. References #5457.
  */
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
@@ -790,9 +791,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "Create ConstrainedPoint from constrained point with adjusted surface point "
                 "(32, 120, 1000)...";
     SurfacePoint aprioriSurfPt;
-    aprioriSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
-                           Distance(1000.0, Distance::Meters),
-                           Distance(1000.0, Distance::Meters));
     boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covar;
     covar.resize(3);
     covar.clear();
@@ -811,9 +809,6 @@ int main(int argc, char *argv[]) {
                                 Angle(1.64192315,Angle::Degrees),
                                 Angle(1.78752107, Angle::Degrees),
                                 Distance(38.454887335682053718134171237789, Distance::Meters));
-    adjustedSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
-                            Distance(1000.0, Distance::Meters),
-                            Distance(1000.0, Distance::Meters));
     bcp5.setAdjustedSurfacePoint(adjustedSurfPt);
     qDebug().noquote() << bcp5.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp5.formatBundleOutputDetailString(errorProp, radiansToMeters);

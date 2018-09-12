@@ -2,6 +2,7 @@
 
 #include "BundleObservationViewWorkOrder.h"
 #include "CnetEditorViewWorkOrder.h"
+#include "ControlHealthMonitorWorkOrder.h"
 #include "CubeDnViewWorkOrder.h"
 #include "ExportControlNetWorkOrder.h"
 #include "ExportImagesWorkOrder.h"
@@ -12,7 +13,8 @@
 #include "ImportControlNetWorkOrder.h"
 #include "ImportImagesWorkOrder.h"
 #include "ImportShapesWorkOrder.h"
-#include "ImportTemplateWorkOrder.h"
+#include "ImportMapTemplateWorkOrder.h"
+#include "ImportRegistrationTemplateWorkOrder.h"
 #include "IString.h"
 #include "JigsawWorkOrder.h"
 #include "MatrixViewWorkOrder.h"
@@ -50,6 +52,7 @@ namespace Isis {
 
     tryType<BundleObservationViewWorkOrder>(type, project, result);
     tryType<CnetEditorViewWorkOrder>(type, project, result);
+    tryType<ControlHealthMonitorWorkOrder>(type, project, result);
     tryType<CubeDnViewWorkOrder>(type, project, result);
     tryType<ExportImagesWorkOrder>(type, project, result);
     tryType<ExportControlNetWorkOrder>(type, project, result);
@@ -59,7 +62,8 @@ namespace Isis {
     tryType<ImportControlNetWorkOrder>(type, project, result);
     tryType<ImportImagesWorkOrder>(type, project, result);
     tryType<ImportShapesWorkOrder>(type, project, result);
-    tryType<ImportTemplateWorkOrder>(type, project, result);
+    tryType<ImportMapTemplateWorkOrder>(type, project, result);
+    tryType<ImportRegistrationTemplateWorkOrder>(type, project, result);
     tryType<JigsawWorkOrder>(type, project, result);
     tryType<MatrixViewWorkOrder>(type, project, result);
     tryType<MoveDownOneSceneWorkOrder>(type, project, result);

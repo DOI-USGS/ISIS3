@@ -1,5 +1,5 @@
-#ifndef ImportTemplateWorkOrder_H
-#define ImportTemplateWorkOrder_H
+#ifndef ImportRegistrationTemplateWorkOrder_H
+#define ImportRegistrationTemplateWorkOrder_H
 /**
  * @file
  * $Revision: 1.19 $
@@ -29,26 +29,22 @@
 
  namespace Isis {
    /**
-    * @brief Add templates to a project
-    *
-    * Asks the user for a template and its type and copies it into the project.
-    *
-    * @author 2017-07-31 Christopher Combs
-    *
-    * @internal
-    *   @history 2017-08-23 Tracie Sucharski - Fixed assignment to itemType in setupExecution to use
-    *                          assignment operator rather than comparison operator.
-    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
-    *                          classes. Fixes #5117.
-    */
-    class ImportTemplateWorkOrder : public WorkOrder {
+   * @brief Add registration templates to a project
+   *
+   * Asks the user for a registration template and copies it into the project.
+   *
+   * @author 2018-07-05 Summer Stapleton
+   * @internal
+   *   @history 2018-07-05 Summer Stapleton - Created ImportRegistrationTemplateWorkOrder class
+   */
+    class ImportRegistrationTemplateWorkOrder : public WorkOrder {
         Q_OBJECT
       public:
-        ImportTemplateWorkOrder(Project *project);
-        ImportTemplateWorkOrder(const ImportTemplateWorkOrder &other);
-        ~ImportTemplateWorkOrder();
+        ImportRegistrationTemplateWorkOrder(Project *project);
+        ImportRegistrationTemplateWorkOrder(const ImportRegistrationTemplateWorkOrder &other);
+        ~ImportRegistrationTemplateWorkOrder();
 
-        virtual ImportTemplateWorkOrder *clone() const;
+        virtual ImportRegistrationTemplateWorkOrder *clone() const;
 
         virtual bool isExecutable(ProjectItem *item);
         bool setupExecution();
@@ -56,10 +52,9 @@
         void undoExecution();
 
       private:
-        ImportTemplateWorkOrder &operator=(const ImportTemplateWorkOrder &rhs);
+        ImportRegistrationTemplateWorkOrder &operator=(const ImportRegistrationTemplateWorkOrder &rhs);
 
         TemplateList *m_list;
-        QString m_fileType; //!< The file type filter chosen in the QFileDialog
     };
  }
 

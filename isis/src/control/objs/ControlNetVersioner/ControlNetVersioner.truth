@@ -3,9 +3,10 @@ Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net
 
 Read network...
 Reading Control Points...
-0% Processed**I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net] failed.
-**I/O ERROR** Failed to initialize control point at index [0].
-**I/O ERROR** Unable to get target body radii for [] when calculating covariance matrix.
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Write the network and re-read it...
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
 
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
 
@@ -20,7 +21,6 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = Null
-  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -77,7 +77,6 @@ Object = ControlNetwork
   Created      = Null
   LastModified = Null
   Description  = "Test Network"
-  TargetRadii  = (2575000.0, 2575000.0, 2575000.0)
   Version      = 5
 
   Object = ControlPoint
@@ -134,7 +133,6 @@ Object = ControlNetwork
   Created      = 2010-07-10T12:50:15
   LastModified = 2010-07-10T12:50:55
   Description  = "UnitTest of ControlNetwork"
-  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -157,7 +155,7 @@ Object = ControlNetwork
     # AprioriRadius = 999.99999984142 <meters>
     AprioriZ                 = 529.919264 <meters>
 
-    # AprioriLatitudeSigma = 97324.497783569 <meters>  AprioriLongitudeSigma = 124939.57715415 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
+    # AprioriLatitudeSigma = 28.65696494252 <meters>  AprioriLongitudeSigma = 26.457513107566 <meters>  AprioriRadiusSigma = 38.454887341483 <meters>
     AprioriCovarianceMatrix  = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
     LatitudeConstrained      = True
     LongitudeConstrained     = True
@@ -172,7 +170,7 @@ Object = ControlNetwork
     # AdjustedRadius = 999.99999984142 <meters>
     AdjustedZ                = 529.919264 <meters>
 
-    # AdjustedLatitudeSigma = 97324.497783569 <meters>  AdjustedLongitudeSigma = 124939.57715415 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
+    # AdjustedLatitudeSigma = 28.65696494252 <meters>  AdjustedLongitudeSigma = 26.457513107566 <meters>  AdjustedRadiusSigma = 38.454887341483 <meters>
     AdjustedCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
 
     Group = ControlMeasure
@@ -319,7 +317,7 @@ Write the network and re-read it...
 After reading and writing to a binary form does Pvl match?
 Reading/Writing control network is consistent
 
-Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl...
+Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl...
 
 Read network...
 Reading Control Points...
@@ -332,7 +330,6 @@ Object = ControlNetwork
   Created      = 2012-01-04T12:09:57
   LastModified = 2012-01-04T12:09:57
   Description  = "Themis Day IR Network: Lunae Palus, Lat(0,30) Lon(270-315)"
-  TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
   Version      = 5
 
   Object = ControlPoint
@@ -361,7 +358,7 @@ Object = ControlNetwork
     # AdjustedRadius = 3394325.2138031 <meters>
     AdjustedZ                = 829595.31268436 <meters>
 
-    # AdjustedLatitudeSigma = 100.13842019954 <meters>  AdjustedLongitudeSigma = 106.48711145076 <meters>  AdjustedRadiusSigma = 0.099947528407384 <meters>
+    # AdjustedLatitudeSigma = 100.08343601321 <meters>  AdjustedLongitudeSigma = 100.07117311087 <meters>  AdjustedRadiusSigma = 0.099947528407384 <meters>
     AdjustedCovarianceMatrix = (8096.6118516192, 3791.9236705506,
                                 -1072.6708105639, 2516.0772474838,
                                 2117.9301543094, 9418.2547424025)
@@ -457,7 +454,7 @@ Object = ControlNetwork
     # AdjustedRadius = 3397378.3342506 <meters>
     AdjustedZ                = 93324.42152629 <meters>
 
-    # AdjustedLatitudeSigma = 56.560713922924 <meters>  AdjustedLongitudeSigma = 56.546411110445 <meters>  AdjustedRadiusSigma = 0.099943774867249 <meters>
+    # AdjustedLatitudeSigma = 56.58050463946 <meters>  AdjustedLongitudeSigma = 56.523513347564 <meters>  AdjustedRadiusSigma = 0.099943774867249 <meters>
     AdjustedCovarianceMatrix = (2621.8486551013, 1225.183985133,
                                 -35.999329178353, 575.49833284641,
                                 80.485341554024, 3198.9240672187)
@@ -563,12 +560,7 @@ After reading and writing to a binary form does Pvl match?
 Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 Check conversions between the binary format and the pvl format.
-8c8,9
-<   Version      = 3
----
->   TargetRadii  = (3396190.0, 3396190.0, 3376200.0)
->   Version      = 5
-The conversion from pvl to binary is incorrect.
+The conversion methods for pvl->bin and bin->pvl are correct.
 
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork5_PvlV0003.pvl...
 
@@ -585,7 +577,8 @@ Read network...
 Reading Control Points...
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Write the network and re-read it...
-
+After reading and writing to a binary form does Pvl match?
+Reading/Writing control network is consistent
 
 Reading: $control/testData/PvlNet_TestNetwork2_V3.net...
 
