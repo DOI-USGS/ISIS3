@@ -193,7 +193,6 @@ void IsisMain() {
     Application::Log(results);
 
     process.StandardPds4Label();
-//    ProcessExportPds4::translateUnits(pdsLabel);//???
     process.WritePds4(outFileName);
   }
 
