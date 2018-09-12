@@ -116,7 +116,6 @@ namespace Isis {
 
       void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
     protected:
-//      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
       void identificationArea();
       void standardInstrument();
       void standardBandBin(); 
