@@ -81,6 +81,11 @@ namespace Isis {
   *                           Fixes #5099.
   *   @history 2018-04-13 Christopher Combs - Added .lbl files to the list of single-cube file-extensions
   *                           to check before reading a cube list in addCubeViewport. Fixes #5350.
+  *  @history 2018-09-12 Adam Goins - Modified logic to attempt to open the file as a cube or
+  *                          detached label first, if that fails attempt to open it as a cube list
+  *                          and if that fails, throw an error to the user. This allows cubes and
+  *                          cube lists to be saved under any extension and opened. Fixes #5439,
+  *                          Fixes #5476.
   */
   class Workspace : public QWidget {
       Q_OBJECT

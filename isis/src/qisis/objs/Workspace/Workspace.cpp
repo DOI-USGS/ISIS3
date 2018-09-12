@@ -330,6 +330,11 @@ namespace Isis {
    *  @history 2017-10-12 Kristin Berry - Reverted to using relative instead of full file paths,
    *                          as this caused errors when working with cubelists that contained
    *                          relative paths. Fixes # 5177
+   *  @history 2018-09-12 Adam Goins - Modified logic to attempt to open the file as a cube or
+   *                          detached label first, if that fails attempt to open it as a cube list
+   *                          and if that fails, throw an error to the user. This allows cubes and
+   *                          cube lists to be saved under any extension and opened. Fixes #5439,
+   *                          Fixes #5476.
    */
   void Workspace::addCubeViewport(QString filename) {
 
@@ -376,9 +381,13 @@ namespace Isis {
       }
 
     }
-
   }
 
+  /**
+   *  @history 2018-09-12 Adam Goins - Added this method to attempt to open a file as a cube list.
+   *                          It's called by addCubeViewport() when that method attempts to open a
+   *                          file as a cube. Fixes #5439, Fixes #5476.
+   */
   void Workspace::addCubeViewportFromList(QString cubelist) {
 
     QFileInfo cubeFileName(cubelist);
@@ -397,7 +406,7 @@ namespace Isis {
     }
 
     file.close();
-	
+
     for (int i = 0; i < cubesToOpen.size(); i++) {
 
       QString cubename;
@@ -427,10 +436,10 @@ namespace Isis {
         }
       }
       catch (IException &e) {
-        
+
 	QString message("Error attempting to open [" + cubename + "] from list [" + cubelist + "]...\n");
         message += e.toString();
-        
+
 	throw IException(e, IException::Programmer, message, _FILEINFO_);
       }
     }
