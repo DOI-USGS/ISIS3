@@ -364,8 +364,8 @@ namespace Isis {
 
     catch (IException &e) {
 
-      QString message("Error opening cube [" + cubename + "]...");
-      message += ("\nAttempting to open [" + cubename + "] as a cube list...")
+      QString message("Error opening cube [" + cubename + "]...\n");
+      message += "Attempting to open [" + cubename + "] as a cube list...\n";
 
       try {
         addCubeViewportFromList(cubename);
@@ -385,7 +385,7 @@ namespace Isis {
 
     QList<QString> cubesToOpen;
 
-    QFile file(cubename);
+    QFile file(cubeFileName.filePath());
     file.open(QIODevice::ReadOnly);
 
     QTextStream in(&file);
@@ -397,13 +397,13 @@ namespace Isis {
     }
 
     file.close();
-
+	
     for (int i = 0; i < cubesToOpen.size(); i++) {
 
       QString cubename;
       try {
         Cube *cube = new Cube;
-        cubename = cubeFileName.filePath();
+        cubename = cubesToOpen.at(i);
 
         // Read in the CubeAttribueInput from the cube name
         CubeAttributeInput inAtt(cubename);
@@ -427,9 +427,11 @@ namespace Isis {
         }
       }
       catch (IException &e) {
-        QString message("Error attempting to open [" + cubename + "] from list [" + cubelist + "]...\n");
+        
+	QString message("Error attempting to open [" + cubename + "] from list [" + cubelist + "]...\n");
         message += e.toString();
-        throw IException(e, IException::Programmer, message, _FILEINFO_);
+        
+	throw IException(e, IException::Programmer, message, _FILEINFO_);
       }
     }
   }

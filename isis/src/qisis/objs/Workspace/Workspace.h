@@ -174,7 +174,7 @@ namespace Isis {
       void addCubeViewport(QString cubename);
 
 
-      void addCubeViewportFromList(QString cubelist)
+      void addCubeViewportFromList(QString cubelist);
 
 
       /**
