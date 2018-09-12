@@ -95,7 +95,7 @@ namespace Isis {
   }
 
 
-    /**
+  /**
    * Create a standard PDS4 image label from the input cube.
    * 
    * @return @b QDomDocument The output PDS4 label.
