@@ -8,4 +8,4 @@ Most of the packages listed in the file are pulled from conda-forge, but there a
 
 To build and upload a package to anaconda, run `python bin/build_package.py <package>` from the root of the isis_dependencies repo. This requires you to log into an anaconda account with write permissions for the usgs-astrogeology repo. This command will use the build.sh script and meta.yaml specifications found in the  recipies/<package> directory. If there is no meta.yaml file, but a meta.yaml.tmpl file exists, one will be created using the template. 
 
-Building some of the packages will require conda-forge and usgs-astrogeolgy to be in your channels, so add them with `conda config -add channels conda-forge usgs-astrogeology`
+Building some of the packages will require conda-forge and usgs-astrogeolgy to be in your channels, so add them with `conda config --add channels conda-forge --add channels usgs-astrogeology`
