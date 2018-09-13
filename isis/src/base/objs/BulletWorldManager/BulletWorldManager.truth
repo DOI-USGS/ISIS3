@@ -30,3 +30,8 @@ Get a non-existant target by name
 Target pointer is valid? false
 
 Get the bullet world pointer
+
+Make a (shared) copy of the world
+Are they the same worlds? true
+
+Done

@@ -25,7 +25,10 @@
 
 #include <QCache>
 #include <QMutex>
-#include <QSharedPointer>
+#include <QExplicitlySharedDataPointer>
+#include <QObject>
+#include <QSharedData>
+#include <QScopedPointer>
 #include <QString>
 #include <QtGlobal>
 
@@ -49,12 +52,23 @@ namespace Isis {
  * This design also allows for a whole target body DEM to be loaded or a large 
  * body broken up into smaller parts of the whole if needed. 
  *  
+ * This class has been made to be thread safe and explicitly shared using Qt's 
+ * sharing features. Note this implementation does not support copying the 
+ * shared BulletWorldData structure (it is ill-defined because of how Bullet 
+ * manages data pointer structures). Because of this, an explicit share only of 
+ * the data is provided while forbidding copying (detaching) the data. This is 
+ * enforced by use of scoped pointers and explicit use of Q_DISABLE_COPY. 
+ * However, copying of BulletWorldManager is encouraged! 
+ *  
  * @author 2017-03-17 Kris Becker 
  *  
  * @internal 
  *   @history 2017-03-17  Kris Becker  Original Version
- *   @history 2018-07-21 Kris Becker - Made this a completely shareable object
- *                         with thread safe implementation
+ *   @history 2018-07-21 UA/OSIRIS-REx IPWG Team - Made this a completely
+ *                         shareable object with a thread safe implementation
+ *   @history 2018-09-13 UA/OSIRIS-REx IPWG Team - Modified to use a more
+ *                         efficient shared object data strategy; improved
+ *                         implementation and documentation
  */
   class BulletWorldManager {
     public:
@@ -77,27 +91,70 @@ namespace Isis {
 
 
     private:
-      QString                                         m_name; /**! The name of the Bullet
-                                                                   world. */
-      QSharedPointer<btDefaultCollisionConfiguration> m_collision; /**! The collision
-                                                                        configuration for
-                                                                        the world. */
-      QSharedPointer<btCollisionDispatcher>           m_dispatcher; /**! The dispatcher for the
-                                                                         world. */
-      QSharedPointer<btBroadphaseInterface>           m_broadphase; /**! The interface for overlaps
-                                                                         in the world's aabb
-                                                                         acceleration tree. */
-      QSharedPointer<btCollisionWorld>                m_world; /**! The Bullet collision world that
-                                                                    contains the representation of
-                                                                    the body. */
 
-      mutable QSharedPointer<QMutex>                  m_mutex;       //!< Mutex for thread safety
+    /**
+     * Wrapper for Bullet World data 
+     *  
+     * @see QSharedData 
+     *  
+     * @author 2018-09-13 UA/OSIRIS-REx IPWG Team - Original Version
+     */
+      class BulletWorldData : public QSharedData {
+        public:
+          /** Basic initialization   */
+          BulletWorldData() : QSharedData()  {
+              initWorld();
+          }
 
-      void initWorld();
+          /** Create with a nammed world   */
+          BulletWorldData(const QString &name) : QSharedData()  {
+              initWorld(name);
+          }
+
+          /** Destructor   */
+          ~BulletWorldData() { }
+
+          QString                                         m_name; /**! The name of the Bullet
+                                                                       world. */
+          // Order of these pointers matter due to destructor behavior!
+          QScopedPointer<btDefaultCollisionConfiguration> m_collision; /**! The collision
+                                                                            configuration for
+                                                                            the world. */
+          QScopedPointer<btCollisionDispatcher>           m_dispatcher; /**! The dispatcher for the
+                                                                             world. */
+          QScopedPointer<btBroadphaseInterface>           m_broadphase; /**! The interface for overlaps
+                                                                             in the world's aabb
+                                                                             acceleration tree. */
+          QScopedPointer<btCollisionWorld>                m_world; /**! The Bullet collision world that
+                                                                        contains the representation of
+                                                                        the body. */
+          QScopedPointer<QMutex>                          m_mutex; //!< Mutex for thread safety
+
+        private:
+          Q_DISABLE_COPY(BulletWorldData);  // Copy is undefined for this context
+
+          /** Initialize a new Bullet world structure   */
+          void initWorld(const QString &name = "Body-Fixed-Coordinate-System") { 
+            m_name = name;   
+            m_collision.reset( new btDefaultCollisionConfiguration() );
+            m_dispatcher.reset(new btCollisionDispatcher( m_collision.data() ) );
+            m_broadphase.reset( new btDbvtBroadphase() );  // Could also be an AxisSweep
+            m_world.reset( new btCollisionWorld( m_dispatcher.data(), 
+                                                 m_broadphase.data(), 
+                                                 m_collision.data() ) );
+            m_mutex.reset( new QMutex() );
+          }
+      };
+
+      QExplicitlySharedDataPointer<BulletWorldData> m_data; //!< Shared data to Bullet world
 
   };
 
+
 } // namespace Isis
 
+//  Improves Qt container performance by notifying Qt's subsystem of its
+//  movable nature
+Q_DECLARE_TYPEINFO(Isis::BulletWorldManager, Q_MOVABLE_TYPE);
 #endif
 

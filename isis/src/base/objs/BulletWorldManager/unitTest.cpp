@@ -97,7 +97,16 @@ int main(int argc, char *argv[]) {
     qDebug() << "";
 
     qDebug() << "Get the bullet world pointer";
-    namedWorld.getWorld();
+    const btCollisionWorld &one = namedWorld.getWorld();
+
+    qDebug() << "\nMake a (shared) copy of the world";
+    BulletWorldManager worldTwo(namedWorld);
+    const btCollisionWorld &two = worldTwo.getWorld();
+    qDebug() << "Are they the same worlds?" << (&two == &one);
+
+    // Should add a thread test here...
+
+    qDebug() << "\nDone";
   }
   catch (IException &e) {
     qDebug() << "";
