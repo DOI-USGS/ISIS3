@@ -421,6 +421,7 @@ namespace Isis {
    *                           *** TODO *** make sure the new methods are fully functional
    *                           for either coordinate type once the new header keyword is added.
    *                           
+   *   @history 2018-07-03 Jesse Mapel - Removed target radii from versioner. References #5457.
    */
   class ControlNetVersioner {
 
@@ -435,8 +436,6 @@ namespace Isis {
       QString lastModificationDate() const;
       QString description() const;
       QString userName() const;
-      bool hasTargetRadii() const;
-      std::vector<Distance> targetRadii() const;
 
       int numPoints() const;
       ControlPoint *takeFirstPoint();
@@ -487,13 +486,6 @@ namespace Isis {
         QString description;
         //! The name of the user or program that last modified the control network
         QString userName;
-        /**
-         * The equatorial radius of the target body
-         * used to convert from spherical to rectangular coordinates
-         */
-
-         std::vector<Distance> targetRadii;
-
       };
 
       //! Typedef for consistent naming of containers for version 2

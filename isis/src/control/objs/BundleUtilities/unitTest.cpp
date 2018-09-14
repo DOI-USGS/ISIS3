@@ -49,15 +49,21 @@ void printXml(const BundleObservationSolveSettings &);
  * @author 2014 Jeannie Backer
  *
  * @internal
+ *   @history 2018-07-03 Debbie A Cook - Removed target radii. References #5457.
  *   @history 2014-12-11 - Original version.
- *   @history 2017-06-26 Debbie A. Cook - Updated to reflect changes made to BundleControlPoint. 
- *                               Some tests were no longer valid and new tests were added to exercise the
- *                               new option of adjusting in Rectangular coordinates.  The Latitudinal covariance
- *                               was being populated only along the diagonal (using the latitudinal sigmas).  This
- *                               produced inaccurate results.  Now it is created by converting  the rectangular 
- *                               covariance matrix to latitudinal.  References #4649 and #501.
- *   @history 2017-11-29 Debbie A. Cook - Updated to reflect changes made to units of covariance
- *                               matrix in SurfacePoint methods. 
+ *   @history 2018-09-06 Debbie A. Cook - Merged dev into BundleXYZ branch 
+ *                               Original branch history entry on 2017-06-26 
+ *                               Updated to reflect changes made to BundleControlPoint. 
+ *                               Some tests were no longer valid and new tests were added to exercise 
+ *                               the new option of adjusting in Rectangular coordinates.  The
+ *                               Latitudinal covariance was being populated only along the diagonal 
+ *                               (using the latitudinal sigmas).  This produced inaccurate results.  
+ *                               Now it is created by converting  the rectangular covariance 
+ *                               matrix to latitudinal.  References #4649 and #501.
+ *   @history 2018 -09-06 Debbie A. Cook Merged dev into BundleXYZ branch
+ *                               Original branch history entry on 2017-11-29 - Updated to reflect 
+ *                               changes made to units of covariance matrix in SurfacePoint methods 
+ *                               and removal of SurfacePoint::SetRadii method. 
  */
 namespace Isis {
   class XmlHandlerTester : public BundleObservationSolveSettings {
@@ -870,9 +876,6 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
     qDebug() << "BCP test 10 - Create ConstrainedPoint from constrained point with adjusted  ";
     qDebug() << "    pt (32, 120, 1000) & apriori pt with constraints from covar, solveRadius=F...";
     SurfacePoint aprioriSurfPt;
-    aprioriSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
-                           Distance(1000.0, Distance::Meters),
-                           Distance(1000.0, Distance::Meters));
     boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> covar;
     covar.resize(3);
     covar.clear();
@@ -904,9 +907,6 @@ settings->setSolveOptions(false, false, false, true, SurfacePoint::Latitudinal,
                                 // Angle(1.64192315,Angle::Degrees),
                                 // Angle(1.78752107, Angle::Degrees),
                                 // Distance(38.454887335682053718134171237789, Distance::Meters));
-    adjustedSurfPt.SetRadii(Distance(1000.0, Distance::Meters),
-                            Distance(1000.0, Distance::Meters),
-                            Distance(1000.0, Distance::Meters));
     bcp5a.setAdjustedSurfacePoint(adjustedSurfPt);
     qDebug().noquote() << bcp5a.formatBundleOutputSummaryString(errorProp);
     qDebug().noquote() << bcp5a.formatBundleOutputDetailString(errorProp, radiansToMeters);

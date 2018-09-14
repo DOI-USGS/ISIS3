@@ -302,18 +302,22 @@ namespace Isis {
    *                           constructor in the BundleSolutionInfo class because it is derived
    *                           from QObject. Note that we ultimately want to return a QSharedPointer
    *                           instead of a raw pointer.
-   *   @history 2018-06-04 Debbie A. Cook - (added to BundleXYZ branch on 2017-09-01) 
+   *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
+   *                           aborted. Added emits for status updates to the run widget.
+   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust. 
+   *                           Fixes #4171.
+   *   @history 2018-09-06 Debbie A. Cook - (added to BundleXYZ branch on 2017-09-01) 
    *                            Added BundleSettingsQsp as argument to BundleControlPoint constructor 
    *                            and moved setWeights call from BundleAdjust::init to BundleControlPoint 
    *                            constructor.  Don't allow solving for triaxial radii when coordinate type 
    *                            is not Latitudinal. Added new optional argument controlPointCoordType 
    *                            to ControlNet constructor call.  References #4649 and #501.
-   *                            
-   *   @history 2018-06-04 Debbie A. Cook - (added to BundleXYZ branch on (2018-05-31)
-   *                            Moved productAlphaAV and control point parameter correction code 
-   *                            to BundleControlPoint.  Earlier revised errorPropagation to compute the 
-   *                            sigmas via the variance/covariance matrices instead of the sigmas.
-   *                            This should produce more accurate results.  References #4649 and #501.
+   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ 
+   *                            branch on (2018-05-31).  Moved productAlphaAV and control point 
+   *                            parameter correction code to BundleControlPoint.  Earlier revised 
+   *                            errorPropagation to compute the sigmas via the variance/ 
+   *                            covariance matrices instead of the sigmas.  This should produce 
+   *                            more accurate results.  References #4649 and #501.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -346,6 +350,7 @@ namespace Isis {
       BundleSolutionInfo*    solveCholeskyBR();
 
       QList<ImageList *> imageLists();
+      bool isAborted();
 
     public slots:
       bool solveCholesky();
@@ -367,7 +372,9 @@ namespace Isis {
     signals:
       void statusUpdate(QString);
       void error(QString);
-      void iterationUpdate(int, double);
+      void iterationUpdate(int);
+      void pointUpdate(int);
+      void statusBarUpdate(QString);
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
       void finished();
 

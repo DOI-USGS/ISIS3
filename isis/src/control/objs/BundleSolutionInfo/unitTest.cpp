@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     bundleControlPointVector.append(fixedBundleControlPoint);
     Camera *camera = NULL;
     BundleImage bundleImage(camera,
-                            "TestImageSerialNumber",
+                            "Ignored",
                             "TestImageFileName");
     BundleObservationVector observationVector;
     QObject *parent = NULL;

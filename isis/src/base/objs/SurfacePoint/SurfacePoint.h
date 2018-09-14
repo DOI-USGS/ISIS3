@@ -85,26 +85,49 @@ namespace Isis {
    *   @history 2011-10-06 Steven Lambright - Get*SigmaDistance will no longer
    *                           throw an exception if there is no stored sigma
    *                           and there is no stored target radii.
-   *   @history 2017-06-25 Debbie A. Cook - Added CoordinateType, CoordUnits, and CoordIndex
+   *   @history 2018-06-28 Debbie A. Cook - Removed target body radii and all
+   *                           related methods.  Any reference to the major axis (equatorial
+   *                           radius) was replaced with the local radius. Technically I think
+   *                           we should be using the target body minor axis (polar) for the
+   *                           conversion of latitude degrees to/from distance and the local 
+   *                           radius of the surface point for conversion of longitude degrees 
+   *                           to/from distance.  For large bodies the percent error will be small, 
+   *                           so we will use the local radius for convenience.  For small bodies, 
+   *                           any bundle adjustment will likely use rectangular coordinates 
+   *                           where degree conversions will not be necessary.  Added new
+   *                           member p_localRadius to avoid recalculating when coordinates
+   *                           have not changed.  Also corrected the longitude conversion equation
+   *                           in SetSphericalSigmasDistance and GetLonSigmaDistance.
+   *                           References #5457.
+   *   @history 2018-08-15 Debbie A. Cook - Initialized the local radius whenever any 
+   *                           SurfacePoint coordinate was changed, removed memory errors,
+   *                           and cleaned up documentation.  Changed localRadius member
+   *                           from a pointer to value to reduce extraneous if blocks.  
+   *                           References #5457
+   *   @history 2018-09-06 Debbie A. Cook - Originally added to BundleXYZ branch on 
+   *                           2017-06-25 - Added CoordinateType, CoordUnits, and CoordIndex
    *                           to support new convenience methods GetCoord, GetSigma, and GetWeight.
    *                           Also added methods GetXWeight, GetYWeight, GetZWeight, LatToDouble, 
    *                           LonToDouble, DistanceToDouble, DisplacementToDouble,  
    *                           getCoordSigmaDistance, stringToCoordinateType, and 
    *                           coordinateTypeToString.  Fixed comment in GetLocalRadiusWeight method 
    *                           to indicate kilometers instead of meters.  References #4649 and #501.
-   *   @history 2017-07-25 Debbie A. Cook - corrected covar(2,2) units in SetSphericalSigmas,
+   *   @history 2018-09-06 Debbie A. Cook - Originally added to BundleXYZ branch on
+   *                           2017-07-25 - Corrected covar(2,2) units in SetSphericalSigmas,
    *                           and all diagonal units in SetRectangularSigmas.  Corrected spelling 
    *                           of equatorial in comments.  Corrected conversion of longitude sigma
    *                           from meters to radians in SetSphericalSigmasDistance and from radians
    *                           to meters in GetLonSigmaDistance.  Fixed SetRectangularMatrix to take
    *                           input in km instead of m. 
-   *   @history 2017-11-20 Debbie A. Cook - added an additional argument to SetRectangularMatrix
+   *   @history 2018-09-06 Debbie A. Cook - Originally added to BundleXYZ branch on
+   *                           2017-11-20  - Added an additional argument to SetRectangularMatrix
    *                           and SetSphericalMatrix to specify the units of the matrix.  This will allow the 
    *                           bundle adjust to set in km and existing software to continue setting in the default 
    *                           units (meters).  The matrix will be stored in km in this object to avoid extra 
    *                           conversions during processing.
    *  
-   *   @history 2018-03-07 Debbie A. Cook - added an additional argument to GetRectangularMatrix
+   *   @history 2018-09-06 Debbie A. Cook - Originally added to BundleXYZ branch on 
+   *                           2018-03-07 - Added an additional argument to GetRectangularMatrix
    *                           and GetSphericalMatrix to specify the units of the matrix.  This will allow existing
    *                           callers to get in m (the default) and bundle adjust software to get in km and 
    *                           minimize conversions. The matrix is held in this object in km to avoid extra 
@@ -137,7 +160,6 @@ namespace Isis {
     };
       
       // Constructors
-//      SurfacePoint(const std::vector <double> radii);
       SurfacePoint();
       SurfacePoint(const SurfacePoint &other);
       SurfacePoint(const Latitude &lat, const Longitude &lon,
@@ -206,9 +228,6 @@ namespace Isis {
       void SetSphericalSigmasDistance(const Distance &latSigma,
                                       const Distance &lonSigma,
                                       const Distance &radiusSigma);
-
-      void SetRadii(const Distance &majorRadius, const Distance &minorRadius,
-                    const Distance &polarRadius);
 
       void ResetLocalRadius(const Distance &radius);
       bool Valid() const;
@@ -280,16 +299,14 @@ namespace Isis {
       SurfacePoint &operator=(const SurfacePoint &other);
 
     private:
+      void ComputeLocalRadius();
       void InitCovariance();
       void InitPoint();
-      void InitRadii();
       void SetRectangularPoint(const Displacement &x, const Displacement &y, const Displacement &z);
       void SetSphericalPoint(const Latitude &lat, const Longitude &lon, const Distance &radius);
       void FreeAllocatedMemory();
 
-      Distance *p_majorAxis;
-      Distance *p_minorAxis;
-      Distance *p_polarAxis;
+      Distance p_localRadius;
       Displacement *p_x;
       Displacement *p_y;
       Displacement *p_z;

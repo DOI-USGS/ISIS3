@@ -75,10 +75,13 @@ namespace Isis {
 
     m_updatingSelection = false;
 
+    m_sortDialog = NULL;
+
     m_control = control;
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
         this, SLOT(rebuildModels()));
 
+    connect(this, SIGNAL(cnetModified()), this, SLOT(setCnetModified()));
     m_settingsPath = new QString(pathForSettings);
 
     QBoxLayout *mainLayout = createMainLayout();
@@ -151,6 +154,9 @@ namespace Isis {
 
     delete m_connectionModel;
     m_connectionModel = NULL;
+
+    delete m_sortDialog;
+    m_sortDialog = NULL;
   }
 
 
@@ -189,6 +195,8 @@ namespace Isis {
     m_control = NULL;
     m_settingsPath = NULL;
     m_workingVersion = NULL;
+
+    m_sortDialog = NULL;
   }
 
 
@@ -1015,12 +1023,14 @@ namespace Isis {
 
 
   /**
-   * Configures the sorting dialog
+   * Configures the sorting dialog.
+   * If one does not already exist, create it, then show the dialog
    */
   void CnetEditorWidget::configSorting() {
-    CnetEditorSortConfigDialog *dialog = new CnetEditorSortConfigDialog(this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
+    if (!m_sortDialog) {
+      m_sortDialog = new CnetEditorSortConfigDialog(this);
+    }
+    m_sortDialog->show();
   }
 
 
@@ -1040,5 +1050,13 @@ namespace Isis {
       m_imageModel->setFrozen(false);
       m_connectionModel->setFrozen(false);
     }
+  }
+
+
+  /**
+   * Connected to cnetModified(). Sets the modification of m_control when the cnet is modified.
+   */
+  void CnetEditorWidget::setCnetModified() {
+    m_control->setModified(true);
   }
 }

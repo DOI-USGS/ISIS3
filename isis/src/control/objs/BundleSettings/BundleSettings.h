@@ -107,6 +107,8 @@ namespace Isis {
    *                              is for creating and displaying the correlation matrix, which is
    *                              currently not working.
    *                           2) commented out hdf5 header includes in cpp
+   *   @history 2018-06-28 Christopher Combs - Added observationSolveSettings() method to retrieve
+   *                            m_observationSolveSettings. Fixes #497.
    *
    *   @history 2017-06-25 Debbie Cook - Added m_cpCoordTypeReports and m_cpCoordTypeBundle. 
    *                           The 2nd type determines how control point coordinates are entered 
@@ -193,6 +195,7 @@ namespace Isis {
       int numberSolveSettings() const;
       BundleObservationSolveSettings observationSolveSettings(QString instrumentId) const;
       BundleObservationSolveSettings observationSolveSettings(int n) const;
+      QList<BundleObservationSolveSettings> observationSolveSettings() const; 
 
 
       //=====================================================================//

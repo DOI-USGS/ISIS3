@@ -20,19 +20,23 @@ using namespace boost::numeric::ublas;
 
 /**
  *
- * @author 2010-07-30 Tracie Sucharski, Ken L. Edmunson, and Debbie A. Cook
+ * @author 2010-07-30 Tracie Sucharski, Ken L. Edmundson, and Debbie A. Cook
  *
  * @internal
  *   @history 2015-02-20 Jeannie Backer - Added print statement for
  *            latitude, longitude and radius weight accessor methods.
- *   @history 2017-05-27 Debbie A. Cook - Added tests for new methods:
+ *   @history 2018-06-28 Debbie A.Cook - Removed test of obsolete method
+ *            SetRadii
+ *   @history 2018-09-06 (added to BundleXYZ branch on 2017-05-27)  
+ *            Debbie A. Cook - Added tests for new methods:
  *            GetCoord, GetSigma, GetWeight, GetXSigma, GetYSigma, 
  *            GetZsigma, LatToDouble, LonToDouble, DistanceToDouble,
  *            DisplacementToDouble, and enum types CoordinateType, 
  *            CoordUnits, and CoordIndex.  Fixed incorrect units in report for
  *            latSig and lonSig.
- *   @history 2017-11-20 Debbie A. Cook - Added tests for new options
- *            in SetRectangularMatrix and SetSphericalMatrix.
+ *   @history 2018-09-06 (added to BundleXYZ branch on 2017-11-20) 
+ *            Debbie A. Cook - Added tests for new options in
+ *            SetRectangularMatrix and SetSphericalMatrix.
  *   
  */
 int main(int argc, char *argv[]) {
@@ -46,11 +50,7 @@ int main(int argc, char *argv[]) {
           "sigmaX=10. m, sigmaY=50. m, sigmaZ=20. m" << endl << endl;
     Isis::SurfacePoint spRec;
 
-    spRec.SetRadii(Distance(1000., Distance::Meters),
-                   Distance(1000., Distance::Meters),
-                   Distance(1000., Distance::Meters));
-
-    symmetric_matrix<double,upper> covar;
+    symmetric_matrix<double,upper> covar; // Units are m**2
     covar.resize(3);
     covar.clear();
     // Units are m**2
@@ -282,9 +282,9 @@ int main(int argc, char *argv[]) {
           "sigmaX=.01 km, sigmaY=.05 km, sigmaZ=.02 km" << endl << endl;
     Isis::SurfacePoint spRecKm;
 
-    spRecKm.SetRadii(Distance(1000., Distance::Meters),
-                   Distance(1000., Distance::Meters),
-                   Distance(1000., Distance::Meters));
+    // spRecKm.SetRadii(Distance(1000., Distance::Meters),
+    //                Distance(1000., Distance::Meters),
+    //                Distance(1000., Distance::Meters));
 
     symmetric_matrix<double,upper> covar;
     covar.resize(3);

@@ -1,0 +1,86 @@
+Testing Control Net Vitals 
+
+Loading Network
+Calculating Network Vitals
+Network ID: "LROC_NAC_LRPAIR_AUTO"
+Network Status: "Weak!"
+Status Details: "This network has 4 image(s) with less than 3 measures\n"
+Network has additional islands? no
+Number of islands in network: 1
+Serials in island  0
+   "LRO/1/274847978:28626/NACL"
+   "LRO/1/274847978:28626/NACR"
+   "LRO/1/274868345:16174/NACR"
+   "LRO/1/274888710:05688/NACR"
+   "LRO/1/274909074:43699/NACR"
+   "LRO/1/277164494:04377/NACR"
+   "LRO/1/277184863:36490/NACR"
+   "LRO/1/277205233:08310/NACR"
+   "LRO/1/277225597:08310/NACL"
+   "LRO/1/277245961:32558/NACL"
+   "LRO/1/277266323:25349/NACL"
+   "LRO/1/285452254:35179/NACL"
+   "LRO/1/290182186:06999/NACL"
+   "LRO/1/290182186:06999/NACR"
+   "LRO/1/292537538:63360/NACR"
+   "LRO/1/300686942:48419/NACL"
+   "LRO/1/300700514:53662/NACL"
+   "LRO/1/300700514:53662/NACR"
+   "LRO/1/300714095:63575/NACL"
+   "LRO/1/300714095:63575/NACR"
+   "LRO/1/300727653:10001/NACL"
+   "LRO/1/300727653:10001/NACR"
+   "LRO/1/300741228:63823/NACR"
+   "LRO/1/305389100:01888/NACL"
+   "LRO/1/305409449:44487/NACL"
+   "LRO/1/305409449:44487/NACR"
+   "LRO/1/305423011:64885/NACL"
+   "LRO/1/305423011:64885/NACR"
+   "LRO/1/305443365:16554/NACL"
+   "LRO/1/305443365:16554/NACR"
+   "LRO/1/305450184:05413/NACL"
+   "LRO/1/305450184:05413/NACR"
+   "LRO/1/305456931:43507/NACR"
+   "LRO/1/305463753:22535/NACL"
+   "LRO/1/305463753:22535/NACR"
+Number of images in network: 35
+Number of points in network: 75
+Number of measures in network: 651
+Number of ignored points in network: 0
+Number of editlocked points in network: 0
+Number of fixed points in network: 0
+Number of constrained points in network: 0
+Number of free points in network: 75
+Number of points without measures: 0
+Number of points with less than 3 measures: 0
+Number of images without measures: 0
+Number of images with less than 2 measures: 1
+Number of images with less 75 percent hull coverage: 0
+Testing getters...
+
+Testing signal/slots...
+Setting type to Free...
+Free points incremented correctly
+Setting type to Constrained...
+Constrained points incremented correctly
+Setting type to Fixed...
+Fixed points incremented correctly
+Locking the point...
+Locking the point works appropriately.
+Ignoring Point...
+Number of Ignored Points increments correctly.
+Ignored point no longer contributes to it's point type statistic correctly.
+Unignoring Point...
+Adding a measure...
+Measure added correctly.
+Setting ignored...
+Measure ignored correctly.
+Deleting Measure...
+Measure deleted correctly.
+Deleting point...
+Point deleted correctly.
+Adding dummy point...
+Deleting dummy point...
+Point deleted correctly
+Swapping Control Net...
+Net swapped correctly.

@@ -144,7 +144,10 @@ namespace Isis {
     *   @history 2017-08-11 Tracie Sucharski - Created a new ControlMeasure when editing points so
     *                           that the edit ControlPoint is no changed until user selects
     *                           "Save Measures", and colorize save buttons.  Fixes #4984.
-    *
+    *   @history 2018-06-28 Kaitlyn Lee - Removed shortcuts from zoom buttons because of ambiguous
+    *                           shortcut errors. Set the shortcut and tooltip of m_autoReg inside of
+    *                           registerPoint() to allow the user to use the shortcut after an
+    *                           undo-registration ocurs.
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.
@@ -164,7 +167,6 @@ namespace Isis {
       QString templateFileName() {
         return m_templateFileName;
       };
-      bool setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
 
     signals:
@@ -172,9 +174,11 @@ namespace Isis {
       void updateRightView(double sample, double line);
       void measureSaved();
       void newControlNetwork(ControlNet *);
+      void setTemplateFailed(QString);
       void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
+      bool setTemplateFile(QString);
       void setPoint(ControlPoint *editPoint, SerialNumberList *snList);
       void setLeftMeasure(ControlMeasure *leftMeasure,
                           Cube *leftCube, QString pointId);

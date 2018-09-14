@@ -237,18 +237,21 @@ namespace Isis {
    *   @history 2016-08-28 Kelvin Rodriguez - Removed unused member variables to eliminate warnings
    *                              in clang. Part of porting to OS X 10.11
    *
-   *   @history 2016-10-07 Makayla Shepherd - Modified the Radius Source File label behavior on the 
-   *                           Qnet Tool. When there is not a radius source open, a point is 
-   *                           selected, and a ground source is opened, the radius source will be 
-   *                           the ShapeModel of the reference measure if the ShapeModel is a cube. 
-   *                           If the ShapeModel is not a cube, the ABC of the target body will be 
-   *                           displayed as the Radius Source on the Qnet Tool. If there is not a 
-   *                           radius source open, there is not a point selected, and a ground 
-   *                           source is opened, the tool will exhibit the same behavior as before. 
+   *   @history 2016-10-07 Makayla Shepherd - Modified the Radius Source File label behavior on the
+   *                           Qnet Tool. When there is not a radius source open, a point is
+   *                           selected, and a ground source is opened, the radius source will be
+   *                           the ShapeModel of the reference measure if the ShapeModel is a cube.
+   *                           If the ShapeModel is not a cube, the ABC of the target body will be
+   *                           displayed as the Radius Source on the Qnet Tool. If there is not a
+   *                           radius source open, there is not a point selected, and a ground
+   *                           source is opened, the tool will exhibit the same behavior as before.
    *                           Fixes #2099.
    *   @history 2017-08-09 Adam Goins - Changed method references of SerialNumberList.Delete() to
    *                           SerialNumberList.remove()
-   *                           
+   *   @history 2018-06-28 Debbie A Cook - Removed all calls to obsolete method
+   *                           SurfacePoint::SetRadii. Fixes #5457.
+   *   @history 2018-07-06 Jesse Mapel - Removed calls to ControlNet::GetTargetRadii because it is
+   *                           both no longer needed and no longer available. Fixes #5457.
    */
   class QnetTool : public Tool {
     Q_OBJECT

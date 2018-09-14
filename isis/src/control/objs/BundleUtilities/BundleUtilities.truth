@@ -752,7 +752,7 @@ Status: CONSTRAINED
      Point         Initial               Total               Total              Final             Initial             Final
 Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
                  (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
-  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696495       28.65696495
+  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696494       28.65696495
  LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000       26.45751311       26.45751311
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000               N/A       38.45488734
 
@@ -768,12 +768,12 @@ Status: CONSTRAINED
      Point         Initial               Total               Total              Final             Initial             Final
 Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
                  (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
-  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696495       28.65696495
+  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696494       28.65696495
  LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000       26.45751311       26.45751311
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000       38.45488734       38.45488734
 
 
-aprioriSigmas:   "28.656964947064" "26.457513111762" "38.454887341483"
+aprioriSigmas:   "28.65696494252" "26.457513107566" "38.454887341483"
 weights:         1217.7 1027.41 676.234
 
 BCP test 12 - Create copy of FreePoint using copy constructor...
