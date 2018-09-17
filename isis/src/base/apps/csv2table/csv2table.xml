@@ -6,12 +6,14 @@
   </brief>
 
   <description>
+    This application converts a CSV file to a table and attaches it to a cube
     The first row of the CSV will be used as the fieldnames for the table.
-    Currently the table will be made of doubles
+    The contents of the CSV file will be converted to floating point numbers
+    before they are inserted into the table.
   </description>
 
   <category>
-    <categoryItem>Utilities</categoryItem>
+    <categoryItem>Scripting</categoryItem>
   </category>
 
   <seeAlso>
@@ -21,7 +23,7 @@
   </seeAlso>
 
   <history>
-    <change name="Jesse Mapel" date="2018-09-4">
+    <change name="Jesse Mapel" date="2018-09-04">
       Original version
     </change>
   </history>
@@ -82,5 +84,20 @@
     </group>
 
   </groups>
+
+  <examples>
+    <example>
+      <brief>Write a simple table</brief>
+      <description>Write a simple csv file to a cube.</description>
+      <terminalInterface>
+        <commandLine> csv=test.csv tablename=TestTable to=isisTruth.cub
+        </commandLine>
+        <description>
+          In this example, csv2table will write a table called TestTable on
+          isisTruth.cub with the contents of test.csv.
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
 
 </application>
