@@ -8,6 +8,7 @@ commands:
 	label=$(INPUT)/label.pvl \
 	tablename="TestTable" \
 	to=$(OUTPUT)/isisTruth.cub > /dev/null;
-	catlab from=$(OUTPUT)/isisTruth.cub \
-	to=$(OUTPUT)/output.pvl > /dev/null;
+	catlab from=$(OUTPUT)/isisTruth.cub | \
+	sed -n '/Object = Table/,/End_Object/p' > \
+	$(OUTPUT)/table.pvl;
 	rm $(OUTPUT)/isisTruth.cub;
