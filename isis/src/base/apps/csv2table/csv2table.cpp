@@ -24,9 +24,8 @@
 
 #include <QString>
 
-#include "Camera.h"
+#include "Cube.h"
 #include "CSVReader.h"
-#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Pvl.h"
