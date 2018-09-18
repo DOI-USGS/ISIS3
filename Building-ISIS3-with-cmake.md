@@ -147,6 +147,7 @@ Error: invalid package specification: ninja==1.7.2=0
 
 Update your conda installation using `conda update` and then try again. 
 
+
 * If you get the following error message while testing on a Mac:
 ```
 bash: line 10: /usr/local/bin/grep: No such file or directory
