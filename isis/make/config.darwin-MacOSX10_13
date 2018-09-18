@@ -90,7 +90,7 @@ ISIS3PROP        ?= $(IDK_ROOT)/proprietary
 #  Set up paths to needed for doxygen
 DOXYGEN     = $(ISIS3OPT)/bin/doxygen
 DOT_PATH    = $(ISIS3OPT)/bin
-GREP        = /usr/local/bin/ggrep
+GREP        = /usr/local/bin/grep
 
 # Set up path for OS specific locations of 3rd party licenses
 THIRDPARTYLICPATH := /opt/usgs/$(ISISLOCALVERSION)/3rdParty/license/
