@@ -319,7 +319,7 @@ SCLK Format
 
 */
      QString scetString = toString(scet);
-     std::cout << "scetString: " << scetString << std::endl; 
+//     std::cout << "scetString: " << scetString << std::endl; 
 
      // seconds stay the same
      QStringList scetStringList = scetString.split('.');
@@ -335,7 +335,7 @@ SCLK Format
      scetStringList = toString(fractValue).split(".");
 
      scetFinal.append(scetStringList[1].left(5));
-     std::cout << "final scet value: " << scetFinal << std::endl; 
+//     std::cout << "final scet value: " << scetFinal << std::endl; 
 
 /*     if (i==0) {
        setTime(iTime(scetFinal)); 

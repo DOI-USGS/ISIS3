@@ -106,6 +106,7 @@ void IsisMain ()
     p.SetDataSuffixBytes(4);
   }
 
+  double startScet = 0; 
   p.StartProcess();
 
   // Get the directory where the Rosetta translation tables are.
@@ -342,7 +343,6 @@ void IsisMain ()
     Table table("VIRTISHouseKeeping", rec);
 
     std::vector<std::vector<char *> > dataSuffix = p.DataSuffix();
-    double startScet = 0; 
     for (unsigned int i=0; i < dataSuffix.size(); i++) {
       std::vector<char*> dataSuffixRecord = dataSuffix[i];
 
@@ -363,56 +363,7 @@ void IsisMain ()
       table += rec; 
     }
     outcube->write(table);
-    std::cout << "starting SCET: " << toString(startScet) << std::endl;
-
-    // translate to SSSSSSSSSS:FFFFF format
-    QString scetString = toString(startScet);
-    std::cout << "scetString: " << scetString << std::endl; 
-
-    // seconds stay the same
-    QStringList scetStringList = scetString.split('.');
-
-    // final format needs to be: SSSSSSSSSS:FFFFF
-
-    //  SSSSSSSSSS:
-    QString scetFinal = scetStringList[0];
-    scetFinal.append(":");
-
-    // FFFFF
-    double fractValue = toDouble(scetStringList[1])/65536.0;
-    scetStringList = toString(fractValue).split(".");
-    
-    scetFinal.append(scetStringList[1].left(5));
-    std::cout << "final scet value: " << scetFinal << std::endl; 
-
-    // pass this value to naif to get the utc time. 
-
-    // change this to ask the kerneldb to return the most recent rosetta sclk kernel? 
-    // actually 
-    // add this to the changeset
-/*    KernelDb baseKernels(0);
-    baseKernels.loadSystemDb("rosetta", lab); // do we have a label at this point... is there another 
-                                              // possible input? 
-    
-    sclk      = baseKernels.spacecraftClock(lab);
-    lsk       = baseKernels.leapSecond(lab);
-*/
-
-    furnsh_c("/usgs/cpkgs/isis3/data/rosetta/kernels/sclk/ROS_160929_STEP.TSC");
-    furnsh_c("/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0012.tls"); 
-
-    SpiceDouble et; 
-    scs2e_c( (SpiceInt) -226, scetFinal.toLatin1().data(), &et);
-  
-    std::cout << "starting SCET: " << iTime(et).UTC() << std::endl; 
-
-    SpiceChar sclkString[50]; 
-    sce2s_c( (SpiceInt) -226, et, (SpiceInt) 50, sclkString);
-    
-    std::cout << "starting spacecraft clock start count: " << sclkString << std::endl; 
-
   }
-
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
@@ -427,6 +378,66 @@ void IsisMain ()
   PvlToPvlTranslationManager instrumentXlater (pdsLabel, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
+  if (procLevel == 3) {
+    // Fix the StartTime and SpacecraftStartClockCount in the ISIS3 label
+    PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
+
+    // translate to SSSSSSSSSS:FFFFF format
+    QString scetString = toString(startScet);
+
+    // seconds stay the same
+    QStringList scetStringList = scetString.split('.');
+
+    // final format needs to be: SSSSSSSSSS:FFFFF
+    
+    //  SSSSSSSSSS:
+    QString scetFinal = scetStringList[0];
+    scetFinal.append(":");
+
+    // FFFFF
+    double fractValue = toDouble(scetStringList[1])/65536.0;
+    scetStringList = toString(fractValue).split(".");
+    
+    scetFinal.append(scetStringList[1].left(5));
+
+    // pass this value to naif to get the utc time. 
+    QString sclk = "$ISIS3DATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
+    QString lsk  = "$ISIS3DATA/base/kernels/lsk/naif????.tls"; 
+    FileName sclkName(sclk);
+    FileName lskName(lsk); 
+
+    sclkName = sclkName.highestVersion(); 
+    lskName = lskName.highestVersion(); 
+
+    furnsh_c(lskName.expanded().toLatin1().data());
+    furnsh_c(sclkName.expanded().toLatin1().data());
+    
+    SpiceDouble et; 
+    scs2e_c( (SpiceInt) -226, scetFinal.toLatin1().data(), &et);
+    QString startTime = iTime(et).UTC(); 
+
+    double exposureTime = toDouble(frameParam[0]*0.001); // covert to s
+        
+    SpiceChar sclkString[50]; 
+    SpiceChar endSclkString[50]; 
+    sce2s_c( (SpiceInt) -226, et, (SpiceInt) 50, sclkString);
+    sce2s_c( (SpiceInt) -226, et+exposureTime, (SpiceInt) 50, endSclkString);
+    
+    inst.findKeyword("StartTime").setValue(startTime);
+    inst.findKeyword("SpacecraftClockStartCount").setValue(sclkString); 
+
+    PvlKeyword &frameParam = inst["FrameParameter"];
+
+    QString stopTime = iTime(et + exposureTime).UTC(); 
+    inst.findKeyword("StopTime).setValue(stopTime); 
+    //TODO: inst.findKeyword("SpacecraftClockStopCount); 
+    outcube->putGroup(inst);
+
+    // Unload the naif kernels
+    unload_c(lsk.toLatin1().data());
+    unload_c(sclk.toLatin1().data());
+  }
+  
   // Write the Archive and Instrument groups to the output cube label
   outcube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
   outcube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
