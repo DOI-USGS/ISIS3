@@ -137,7 +137,7 @@ The documentation is placed in install/docs (after being copied over from build/
 
 ## Problems
 
-If you get the following error message when trying to set up your environment:
+*If you get the following error message when trying to set up your environment:
 
 ```
 conda env create -n cmake -f environment.yml
@@ -147,7 +147,7 @@ Error: invalid package specification: ninja==1.7.2=0
 
 Update your conda installation using `conda update` and then try again. 
 
-If you get the following error message while testing on a Mac:
+*If you get the following error message while testing on a Mac:
 ```
 bash: line 10: /usr/local/bin/grep: No such file or directory
 bash: line 11: /usr/local/bin/grep: No such file or directory
@@ -155,6 +155,7 @@ bash: /usr/local/bin/grep: No such file or directory
 ```
 
 Check to see if grep is installed in `/usr/local/bin`. If grep is not installed, install grep with Homebrew:
+
 `brew install grep -with-default-names`
 
 This will install GNU grep under the name "grep". If you do not add the flag at the end, GNU grep will be installed under "ggrep" instead. 
