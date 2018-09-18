@@ -429,8 +429,8 @@ void IsisMain ()
     PvlKeyword &frameParam = inst["FrameParameter"];
 
     QString stopTime = iTime(et + exposureTime).UTC(); 
-    inst.findKeyword("StopTime).setValue(stopTime); 
-    //TODO: inst.findKeyword("SpacecraftClockStopCount); 
+    inst.findKeyword("StopTime").setValue(stopTime); 
+    inst.findKeyword("SpacecraftClockStopCount").setValue(endSclkString); 
     outcube->putGroup(inst);
 
     // Unload the naif kernels
