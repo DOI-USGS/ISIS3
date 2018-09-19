@@ -23,6 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QExplicitlySharedDataPointer>
+#include <QObject>
+#include <QSharedData>
 #include <QScopedPointer>
 #include <QString>
 #include <QVector>
@@ -38,8 +41,8 @@ namespace Isis {
  * @author 2017-03-17 Kris Becker 
  * @internal 
  *   @history 2017-03-17  Kris Becker  Original Version
- *   @history 2018-07-21 Kris Becker - Add filename() method to return name of
- *                          DSK file associated with this object
+ *   @history 2018-07-21 UA/OSIRIS-REx IPWG Team  - Add filename() method to
+ *                          return name of DSK file associated with this object
  */
   class BulletDskShape : public BulletTargetShape {
     public:
@@ -51,12 +54,47 @@ namespace Isis {
       int getNumTriangles() const;
       int getNumVertices() const;
 
-      virtual btVector3 getNormal(const int indexId) const;
+      virtual btVector3 getNormal(const int index) const;
       virtual btMatrix3x3 getTriangle(const int index) const;
 
     private:
+    /**
+     * Wrapper for Bullet DSK Mesh data 
+     *  
+     * @see QSharedData 
+     *  
+     * @author 2018-09-13 UA/OSIRIS-REx IPWG Team - Original Version
+     */
+      class BulletDskData : public QSharedData {
+        public:
+          typedef QScopedPointer<btTriangleIndexVertexArray>                  BtTriangleMesh;
+          typedef QScopedPointer<double, QScopedPointerArrayDeleter<double> > BtVertexArray;
+          typedef QScopedPointer<int, QScopedPointerArrayDeleter<int> >       BtIndexArray;
+
+          BulletDskData() : QSharedData(), m_vertices(0), m_indexes(0),
+                            m_btMesh(0), m_btIndex(0), m_btVertex(0) { 
+              // allocate(0, 0);
+          }
+          ~BulletDskData() { }
+
+          void allocate(const int nVertices, const int nIndexes) {
+            m_btMesh.reset( new btTriangleIndexVertexArray() );
+            m_btVertex.reset( new double[nVertices * 3] );
+            m_btIndex.reset( new int[nIndexes * 3] );
+          }
+
+          int m_vertices;              //!< Number verticies in DSK
+          int m_indexes;               //!< Number indexes in DSK
+          BtTriangleMesh m_btMesh;     //!< Bullet mesh structure
+          BtVertexArray  m_btVertex;   //!< Vertex array
+          BtIndexArray   m_btIndex;    //!< Index array
+
+        private:
+          Q_DISABLE_COPY(BulletDskData);  // Undefined for this usage
+      };
+
       QString                                    m_dskfile; /**! Name of DSK file */
-      QSharedPointer<btTriangleIndexVertexArray> m_mesh; /**! Triangular mesh representation of
+      QExplicitlySharedDataPointer<BulletDskData> m_mesh; /**! Triangular mesh representation of
                                                               the target shape. The vertex ordering
                                                               is the same as in the DSK file,
                                                               except the DSK uses 1-based indexing

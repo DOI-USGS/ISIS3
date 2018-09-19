@@ -22,8 +22,21 @@ Number of vertices:  25350
 Vertices for triangle 0: ( -0.15153 ,  0.08183 ,  0.07523 )
                          ( -0.05653 ,  0.08832 ,  0.08776 )
                          ( 0.08183 ,  0.07523 ,  -0.14726 )
-Normal for triangle 0: ( -0.00136126 ,  0.0240606 ,  -0.00214151 )
+Normal for triangle 0:   ( -0.00136126 ,  0.0240606 ,  -0.00214151 )
 
+
+Vertices for last triangle: ( -0.07327 ,  0.03952 ,  -0.08117 )
+                            ( -0.04789 ,  -0.13245 ,  0.03132 )
+                            ( 0.03067 ,  -0.04789 ,  -0.13245 )
+
+Testing some intersection...
+Origin:               ( 1000 ,  0 ,  0 )
+Raydir:               ( -1 ,  0 ,  0 )
+Got a hit? true
+Intersection:         ( 0.29165 ,  0 ,  0 )
+Normal for intercept: ( 0.847199 ,  -0.194494 ,  0.494394 )
+PlateId:  36673
+PartId:   0
 
 Testing loading non-existant file
 **USER ERROR** NAIF DSK file [not_a_file] does not exist.

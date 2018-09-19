@@ -32,35 +32,58 @@
 namespace Isis {
 
 class Target;
+class BulletShapeModel;
 
 /**
  * @brief Class for managing the construction and destruction of 
  *        BulletWorldManagers
  * 
- * This class is a singleton that constructs and holds BulletWorldMangers. Due 
- * to the time required to construct a new BulletWorldManger and the large 
- * memory requirements, this class limits their creation and the number that can 
- * be held in memory at one time. 
+ * This class is a singleton that constructs and holds BulletWorldMangers. Its 
+ * intent is to provide a single instance of a BulletShapeModel to many cubes 
+ * that refer to the same model. These models typically are large and may 
+ * require significant memory/resources. Unique instances of these models for
+ * applications (e.g., qview, qmos, jigsaw, etc...) that open many cubes with 
+ * Bullet shapes at a time will quickly consume resources and lead to failures. 
  * 
- * When an BulletWorldManger is requested the cache will first be checked if one
- * for that file already exists. If one does, a shared pointer to the existing 
- * BulletWorldManger is returned. If one does not exist yet, a new
- * BulletWorldManger is created on the heap. Because a shared pointer is 
- * returned to the object, reference counting is inhererently maintined. Once 
- * can explicitly remove a Bullet instance at any time but subsequent requests 
- * will create new instances if they dont exist. Upon application exit, they are 
- * removed if not explicity requested. 
+ * When an BulletWorldManager is requested the cache will first be checked if 
+ * one for that file already exists. If it exists in the cache, a shared 
+ * reference to the existing BulletWorldManger is returned. If one does not 
+ * exist yet, a new BulletWorldManger is created on the heap. Reference counting 
+ * is presumed to be managed in BulletWorldManager. 
+ *  
+ * It follows that when creating a BulletShapeModel, a BulletWorldManager is 
+ * also created and added to the cache. The pointers returned by the create
+ * methods are owned by the caller and can safely be deleted without affecting 
+ * the cache. 
+ *  
+ * When creating BulletWordManagers, you can force the creation of a new one in 
+ * the API. This may become necessary as geometry operations can slow down if 
+ * all are using the same instance of the a Bullet shape. Creating a new world 
+ * with the same shape file will replace the existing one with a new instance. 
+ * All existing instances are unaffected. Subsequent requests for the same shape 
+ * file will use the newly create one providing better control over balancing 
+ * the load. 
+ *  
+ * One can explicitly remove a Bullet world object at any time wihthout 
+ * affecting existing instances. However, subsequent requests will create new 
+ * instance if they don't exist. Upon application exit, they are removed if not 
+ * explicity removed. 
  * 
- * @author 2018-07-21 Kris Becker
+ * @author 2018-07-21 UA/OSIRIS-REx IPWG Team 
  * @internal 
- *   @history 2018-07-21 Kris Becker - Original Version.
+ *   @history 2018-07-21 UA/OSIRIS-REx IPWG Team  - Original Version.
+ *   @history 2018-09-14 UA/OSIRIS-REx IPWG Team - Improved implementation;
+ *                          return a BulletShapeModel as well as a
+ *                          BulletWorldManager which is the fundamental shared
+ *                          component
  */
   class BulletShapeFactory {
     public:
-      typedef QSharedPointer<BulletWorldManager> SharedBulletWorld;
       static BulletShapeFactory *getInstance();
 
-      BulletWorldManager *create(const QString &shapeFile);
+      BulletWorldManager *createWorld(const QString &shapeFile, const bool forceNew = false);
+      BulletShapeModel   *createShape(const QString &shapeFile, Target *target, Pvl &pvl,
+                                      const bool forceNew = false);
       int remove(const QString &shapeFile);
 
       int size() const;
@@ -78,6 +101,8 @@ class Target;
       QString fullFilePath(const QString &filePath) const;
 
       static BulletShapeFactory         *m_maker; /**!< Pointer to the singleton factory. */
+
+      typedef QSharedPointer<BulletWorldManager> SharedBulletWorld;
       QHash<QString, SharedBulletWorld>  m_cache; /**!< The cache of created
                                                         target shapes. */
   };

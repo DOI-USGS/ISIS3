@@ -30,6 +30,7 @@
 #include "IException.h"
 
 #include "BulletShapeFactory.h"
+#include "BulletShapeModel.h"
 #include "Target.h"
 
 using namespace std;
@@ -55,7 +56,7 @@ namespace Isis {
 
 
   /**
-   * Destructor that frees all of the EmbreeTargetShapes managed by this object
+   * Destructor that frees all of the BulletWorldManager managed by this object
    */
   BulletShapeFactory::~BulletShapeFactory() {
       m_cache.clear();
@@ -116,7 +117,20 @@ namespace Isis {
   /**
    * Return a BulletWorldManager object for a shape model file 
    *  
-   * @param shapeFile The path to the file to create an EmbreeTargetShape from
+   * This method returns a requested BulletWorldManager which may already exit. If 
+   * it doesn't exist or the caller wishes to force a new one to be created (via 
+   * forceNew), then it is created with a BulletTargetShape added for the file 
+   * provided. 
+   *  
+   * If the caller sets forceNew = true, then if a model exists in the cache by 
+   * the same filename, it will be replaced and any future request for the same 
+   * file will return this instance. Note that all other instances will still be 
+   * valid and the memory resource for each will be properly managed. 
+   *  
+   * @param shapeFile The path to the file to create a BulletWorldManager from 
+   * @param forceNew  Force the creation of a new instance even if one already 
+   *                  exists. This may be needed if too many uses impedes
+   *                  performance, which can happen with Bullet worlds
    * 
    * @return @b BulletWorldManager* A pointer to the loaded target shape. This 
    *                                pointer is owned by the caller and must be
@@ -124,14 +138,15 @@ namespace Isis {
    * 
    * @see BulletShapeFactory::remove
    * 
-   * @throws IException::Programmer
+   * @throws IException::Programmer Unable to create the Bullet world
    */
-  BulletWorldManager *BulletShapeFactory::create(const QString &shapeFile) {
+  BulletWorldManager *BulletShapeFactory::createWorld(const QString &shapeFile, 
+                                                      const bool forceNew) {
     // Get the full path to the file
     QString fullPath = fullFilePath(shapeFile);
 
-    // Check existance of Bullet model in the cache
-    if ( !exists(fullPath) ) {
+    // Check existance of Bullet model in the cache or create a new one if forced
+    if ( !exists(fullPath) || forceNew ) {
       // Otherwise, make a new BulletWorldManager
       QScopedPointer<BulletTargetShape> shape(BulletTargetShape::load(shapeFile));
       if ( shape.isNull() ) {
@@ -149,17 +164,40 @@ namespace Isis {
     return ( new BulletWorldManager( *m_cache[fullPath] ) );
   }
 
+/**
+ * Return a BulletShapeModel containing a BulletWorldManager 
+ *  
+ * This method will return a complete BulletShapeModel initialized from a shape 
+ * file. If a previous model has been created from a previous call using the 
+ * same file a shared instance of this model will be returned. 
+ * 
+ * @param shapeFile Name of shape file
+ * @param target    A Target object associated with the shape
+ * @param pvl       A Pvl lable file accompanying the files 
+ * @param forceNew  Force the creation of a new BulletWorldManager instance even
+ *                  if one already exists. This may be needed if too many uses
+ *                  impedes performance, which can happen with Bullet worlds
+ * 
+ * @return BulletShapeModel* A pointer to the newly created shape model. This 
+ *                           pointer is owned by the caller
+ */
+  BulletShapeModel *BulletShapeFactory::createShape(const QString &shapeFile, 
+                                                    Target *target, Pvl &pvl,
+                                                    const bool forceNew) {
+    return ( new BulletShapeModel(createWorld(shapeFile, forceNew), target, pvl) );
+  }
 
+  
   /**
-   * Notify the manager that an EmbreeTargetShape is no longer in use. This
+   * Notify the manager that an BulletWorldManager is no longer in use. This
    * method will decrease the internal reference count for the target shape.
    * Then if there are not more references. the EmbreeTargetShape is destroyed
    * to free up memory.
    * 
-   * @param shapeFile The path to the file used to create the EmbreeTargetShape.
+   * @param shapeFile The path to the file used to create the BulletWorldManager.
    *                  This should be the same as the parameter used with
    *                  BulletShapeFactory::create to get a pointer to the
-   *                  EmbreeTargetShape.
+   *                  BulletWorldManager.
    * 
    * @throws IException::Programmer
    */
@@ -170,16 +208,16 @@ namespace Isis {
   }
 
   /**
-   * Return the number of currently stored EmbreeTargetShapes.
+   * Return the number of currently stored BulletWorldManager.
    * 
-   * @return @b int The number of currently stored EmbreeTargetShapes.
+   * @return @b int The number of currently stored BulletWorldManager.
    */
   int BulletShapeFactory::size() const {
     return ( m_cache.size() );
   }
 
   /**
-   * Check if there is an already created EmbreeTargetShape for a file.
+   * Check if there is an already created BulletWorldManager for a file.
    * 
    * @param shapeFile The path to the file to check for
    */

@@ -76,7 +76,8 @@ namespace Isis {
    * @return ShapeModel* Pointer to the created ShapeModel object.
    * 
    * @author 2017-03-17 Kris Becker 
-   * @history 2018-07-21 Kris Becker - Modified to use new Bullet interface 
+   * @history UA/OSIRIS-REx IPWG Team - Modified to use new Bullet 
+   *             interface
    */
   ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
 
@@ -179,9 +180,9 @@ namespace Isis {
         // Cubes are not supported at this time. 
 
         try {
-          BulletShapeFactory *blt = BulletShapeFactory::getInstance();
-          BulletWorldManager *bullet = blt->create(shapeModelFilenames);
-          BulletShapeModel *b_model = new BulletShapeModel(bullet, target, pvl);
+          BulletShapeFactory *factory = BulletShapeFactory::getInstance();
+          BulletShapeModel *b_model = factory->createShape(shapeModelFilenames, 
+                                                           target, pvl);
           b_model->setTolerance(tolerance);
 
           // Do this here, otherwise default behavior will ensue from here on out

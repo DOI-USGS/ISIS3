@@ -21,7 +21,6 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.                                    
  */
-
 #include "BulletDskShape.h"
 
 #include <iostream>
@@ -36,6 +35,7 @@
 
 #include "FileName.h"
 #include "IException.h"
+#include "IsisBullet.h"
 #include "IString.h"
 #include "Pvl.h"
 #include "NaifDskPlateModel.h"
@@ -48,7 +48,7 @@ namespace Isis {
   /**
    * Default empty constructor.
    */
-  BulletDskShape::BulletDskShape() :  m_dskfile(), m_mesh() { }
+  BulletDskShape::BulletDskShape() :  m_dskfile(), m_mesh( new BulletDskData() ) { }
 
 
   /**
@@ -56,7 +56,8 @@ namespace Isis {
    * 
    * @param dskfile The DSK file to load into a Bullet target shape.
    */
-  BulletDskShape::BulletDskShape(const QString &dskfile) : m_dskfile(dskfile), m_mesh()  {
+  BulletDskShape::BulletDskShape(const QString &dskfile) : m_dskfile(dskfile), 
+                                                           m_mesh(new BulletDskData() )  {
     loadFromDsk(dskfile);
     setMaximumDistance();
   }
@@ -65,7 +66,9 @@ namespace Isis {
   /**
    * Desctructor
    */
-  BulletDskShape::~BulletDskShape() { }
+  BulletDskShape::~BulletDskShape() { 
+
+  }
 
 /**
  * Returns the name of the DSK file
@@ -83,11 +86,12 @@ namespace Isis {
    * @return @b int The number of triangles. If nothing has been loaded, then 0 is returned.
    */
   int BulletDskShape::getNumTriangles() const {
-    if (m_mesh) {
-      return ( m_mesh->getIndexedMeshArray()[0].m_numTriangles );
+    int nTriangles(0);
+    if ( !m_mesh->m_btMesh.isNull() ) {
+      nTriangles =  m_mesh->m_btMesh->getIndexedMeshArray()[0].m_numTriangles;
     }
 
-    return 0;
+    return ( nTriangles );
   }
 
 
@@ -97,11 +101,12 @@ namespace Isis {
    * @return @b int The number of verticies. If nothing has been loaded, then 0 is returned.
    */
   int BulletDskShape::getNumVertices() const {
-    if (m_mesh) {
-      return ( m_mesh->getIndexedMeshArray()[0].m_numVertices );
+    int nVerticies(0);
+    if ( !m_mesh->m_btMesh.isNull() ) {
+      return ( m_mesh->m_btMesh->getIndexedMeshArray()[0].m_numVertices );
     }
 
-    return 0;
+    return ( nVerticies );
   }
 
 
@@ -117,8 +122,8 @@ namespace Isis {
   * 
   * @return @b btVector3 The local normal for the triangle.
   */
-  btVector3 BulletDskShape::getNormal(const int indexId) const {
-    btMatrix3x3 triangle = getTriangle(indexId);
+  btVector3 BulletDskShape::getNormal(const int index) const {
+    btMatrix3x3 triangle = getTriangle(index);
     btVector3 edge1 = triangle.getRow(1) - triangle.getRow(0);
     btVector3 edge2 = triangle.getRow(2) - triangle.getRow(0);
     return ( edge1.cross( edge2 ) );
@@ -139,7 +144,7 @@ namespace Isis {
     btAssert ( index < getNumTriangles() );
 
      // Set up pointers to triangle indexes
-    const btIndexedMesh &v_mesh = m_mesh->getIndexedMeshArray()[0];
+    const btIndexedMesh &v_mesh = m_mesh->m_btMesh->getIndexedMeshArray()[0];
 
     const int *t_index = static_cast<int32_t *> ((void *) v_mesh.m_triangleIndexBase);
     int p_index = 3 * index;
@@ -201,49 +206,51 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Now allocate a new indexed mesh to contain all the DSK data
-    btIndexedMesh i_mesh;
-    m_mesh.reset( new btTriangleIndexVertexArray());
-    m_mesh->addIndexedMesh(i_mesh, PHY_INTEGER);
-
-    // Get internal mesh reference and set parameters appropriately
-    btIndexedMesh &v_mesh = m_mesh->getIndexedMeshArray()[0];
-    v_mesh.m_vertexType = PHY_DOUBLE;
-
-    // Set and allocate data for triangle indexes
-    v_mesh.m_numTriangles = v_plates;
-    v_mesh.m_triangleIndexBase = new unsigned char[v_plates * 3 * sizeof(int)];
-    v_mesh.m_triangleIndexStride = (sizeof(int) * 3);
-
-    // Set and allocate vertex data
-    v_mesh.m_numVertices = v_vertices;
-    v_mesh.m_vertexBase = new unsigned char[v_vertices * 3 * sizeof(double)];
-    v_mesh.m_vertexStride = (sizeof(double) * 3);
+    m_mesh->allocate(v_vertices, v_plates);
+    btAssert( !m_mesh->m_btVertex.isNull() );
+    btAssert( !m_mesh->m_btIndex.isNull() );
+    double *vVertexBasePtr = m_mesh->m_btVertex.data();
+    int    *vIndexBasePtr = m_mesh->m_btIndex.data();
 
     SpiceInt n;
     (void) dskv02_c(v_handle, &v_dladsc, 1, v_vertices, &n, 
-                    ( SpiceDouble(*)[3] ) (v_mesh.m_vertexBase));
+                    ( SpiceDouble(*)[3] ) (vVertexBasePtr));
     NaifStatus::CheckErrors();
 
     // Read the indexes from the DSK
     (void) dskp02_c(v_handle, &v_dladsc, 1, v_plates, &n, 
-                    ( SpiceInt(*)[3] ) (v_mesh.m_triangleIndexBase));
+                    ( SpiceInt(*)[3] ) (vIndexBasePtr));
     NaifStatus::CheckErrors();
 
     // Ok, close the DSK...
     dascls_c(v_handle);
 
+    // Set mesh parameters appropriately
+    btIndexedMesh v_mesh;
+    v_mesh.m_vertexType = PHY_DOUBLE;
+
+    // Set and allocate data for triangle indexes
+    v_mesh.m_numTriangles = v_plates;
+    v_mesh.m_triangleIndexBase = reinterpret_cast<unsigned char *> (vIndexBasePtr);
+    v_mesh.m_triangleIndexStride = (sizeof(int) * 3);
+
+    // Set and allocate vertex data
+    v_mesh.m_numVertices = v_vertices;
+    v_mesh.m_vertexBase = reinterpret_cast<unsigned char *> (vVertexBasePtr);
+    v_mesh.m_vertexStride = (sizeof(double) * 3);
+
     // Got to reset the vertex indexes to 0-based
-    int *pindex = static_cast<int *> ((void *) v_mesh.m_triangleIndexBase);
     int nverts = v_plates * 3;
     for (int i = 0 ; i < nverts ; i++) {
-      pindex[i] -= 1;
-      btAssert ( pindex[i] >= 0 );
-      btAssert ( pindex[i] < v_vertices );
+      vIndexBasePtr[i] -= 1;
+      btAssert ( vIndexBasePtr[i] >= 0 );
+      btAssert ( vIndexBasePtr[i] < v_vertices );
     }
 
+    m_mesh->m_btMesh->addIndexedMesh(v_mesh, PHY_INTEGER);
     bool useQuantizedAabbCompression = true;
     // bool useQuantizedAabbCompression = false;
-    btBvhTriangleMeshShape *v_triShape = new btBvhTriangleMeshShape(m_mesh.data(), 
+    btBvhTriangleMeshShape *v_triShape = new btBvhTriangleMeshShape(m_mesh->m_btMesh.data(), 
                                                                     useQuantizedAabbCompression);
     v_triShape->setUserPointer(this);
     btCollisionObject *vbody = new btCollisionObject();

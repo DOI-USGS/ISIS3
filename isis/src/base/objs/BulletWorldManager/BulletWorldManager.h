@@ -47,10 +47,12 @@ namespace Isis {
  * a per target basis. 
  *  
  * This class uses only the collision body world of Bullet, which is static and
- * will not be subject to simulation operations. 
+ * will not be subject to simulation iterations. 
  *  
  * This design also allows for a whole target body DEM to be loaded or a large 
- * body broken up into smaller parts of the whole if needed. 
+ * body broken up into smaller parts of the whole if needed. Secondarily, this 
+ * class creates a BulletTargetShape which is automatically added to the world 
+ * as its fundamental target. 
  *  
  * This class has been made to be thread safe and explicitly shared using Qt's 
  * sharing features. Note this implementation does not support copying the 

@@ -26,7 +26,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "Distance.h"
-#include "EmbreeTargetManager.h"
+#include "BulletShapeFactory.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Intercept.h"
@@ -41,29 +41,21 @@
 using namespace Isis;
 
 /** 
- * Unit test for Embree Ray Tracing Kernels
+ * Unit test for Bullet Ray Tracing Kernels
  *
  */
 int main(int argc, char *argv[]) {
   try {
     Preference::Preferences(true);
-    qDebug() << "Testing EmbreeTargetManager";
+    qDebug() << "Testing BulletWorldManager";
     qDebug() << endl;
 
     qDebug() << "Get an instance of the target manager";
-    EmbreeTargetManager *manager = EmbreeTargetManager::getInstance();
-    qDebug() << "Maximum cache size: " << manager->maxCacheSize();
-    qDebug() << "Current cache size: " << manager->currentCacheSize();
-    qDebug() << "";
-
-    qDebug() << "Change the maximum cache size: ";
-    manager->setMaxCacheSize(5);
-    qDebug() << "New maximum cache size: " << manager->maxCacheSize();
-    qDebug() << "";
+    BulletShapeFactory *manager = BulletShapeFactory::getInstance();
 
     QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Create a target shape for " << dskfile;
-    EmbreeTargetShape *managedTargetShape = manager->create(dskfile);
+    BulletWorldManager *managedTargetShape = manager->create(dskfile);
     qDebug() << "Target shape status:";
     qDebug() << "  Number of polygons: " << managedTargetShape->numberOfPolygons();
     qDebug() << "  Number of vertices: " << managedTargetShape->numberOfVertices();
