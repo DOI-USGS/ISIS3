@@ -178,7 +178,11 @@ namespace Isis {
        */
       void addCubeViewport(QString cubename);
 
-
+      /**
+       * Method adds cubes into Workspace as a CubeViewport from a list of cubes.
+       *
+       * @param cubename The name of the cube list file.
+       */
       void addCubeViewportFromList(QString cubelist);
 
 
