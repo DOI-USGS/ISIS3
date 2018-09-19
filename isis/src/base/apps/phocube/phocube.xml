@@ -109,6 +109,7 @@ xsi:noNamespaceSchemaLocation=
      <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
      <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
      <li><def link="Local Solar Time">LOCALTIME</def></li>
+     <li>SUNILLUMINATIONMASK</li>
      </ul>
        The following options are available for Level2 images:
      <ul>
@@ -325,6 +326,9 @@ xsi:noNamespaceSchemaLocation=
     <change name="Adam Paquette" date="2020-08-23">
       Added initial slope and backplane options for the local normal and the
       ellipsoid normal.
+    <change name="UA/OSIRIS-REx IPWG Team" date="2024-04-09">
+      Added solar illumination mask backplane (SUNILLUMINATIONMASK).
+      Originally added to UofA 2018-01-25.
     </change>
   </history>
 
@@ -418,6 +422,7 @@ xsi:noNamespaceSchemaLocation=
               <item>RADEC</item>
               <item>BODYFIXED</item>
               <item>LOCALTIME</item>
+              <item>SUNILLUMINATIONMASK</item>
             </exclusions>
           </option>
         </list>
@@ -846,6 +851,43 @@ xsi:noNamespaceSchemaLocation=
            every pixel in the output cube. The output cube label will contain "Local Solar Time"
            in the BandBin group. Local Solar Time is in hours.
          </description>
+       </parameter>
+      <parameter name="SUNILLUMINATIONMASK">
+         <type>boolean</type>
+         <default><item>FALSE</item></default>
+         <brief>Create band of 1 (illuminated) or 0 (shadowed) indicating sun illumination state</brief>
+         <description>
+             <p>
+    	        If this parameter is true, the <b>Solar Illumination Mask</b>
+                or shadow mask, will be determined for every pixel. This option is mainly
+                useful for small irregular bodies, such as comets, where terrain is
+                occluded from solar illumination at the surface intersection point at
+                a given pixel. This information cannot be provided soley by incidence
+                or local incidence angles because the occlusion occurs due to
+                foreground terrain, such as lobes in comets, at much larger distances
+                than the proximity of the initial surface point of intersection. 
+            </p>
+            <p>
+                The output mask pixel is a boolean value computed using ray tracing
+                functions whereby a look direction from the sun is computed to the
+                spacecraft (camera) pixel intercept location on the surface. If the solar
+                intercept point on the surface is not the same point as seen from the
+                spacecraft/camera perspective, it is deemed occluded (shadowed). 
+                For tesselated plate shape models, which are often used to represent
+                the shape of irregular bodies, both camera and solar surface
+                intercept points must occur on the same triangle at approximately
+                the same location.
+            </p>
+            <p>
+                If the surface point is occluded/shadowed, a 0 (false) value is
+                written as the output pixel mask value indicating it is not
+                illuminated by the sun. All other cases will result in setting
+                the output pixel mask value to 1 (true) indicating illumination by
+                the sun. Note this mask will also include (i.e., identify pixels in)
+                the <b>local</b> incidence backplane where the angles are greater
+                than 90 degrees.
+            </p>
+	 </description>
        </parameter>
     </group>
   </groups>
