@@ -43,11 +43,11 @@ namespace Isis {
    *
    * @see CameraGroundMap
    *
-   * @author 2018-07-26 Kris Becker
+   * @author 2018-07-26 UA/OSIRIS-REx IPWG Team 
    *
    * @internal
-   *  @history 2018-07-26 Kris Becker - Developed to support control of irregular
-   *                         bodies
+   *  @history 2018-07-26 UA/OSIRIS-REx IPWG Team  - Developed to support control
+   *                         of irregular bodies
    */
   class IrregularBodyCameraGroundMap : public CameraGroundMap {
     public:
