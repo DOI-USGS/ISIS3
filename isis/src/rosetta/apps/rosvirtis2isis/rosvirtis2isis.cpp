@@ -30,6 +30,7 @@ int word(const char byte1, const char byte2);
 int swapb(const unsigned short int word);
 double translateScet(int word1, int word2, int word3);
 bool isValid(int word);
+QString convertSCET(QString scetOriginal); 
 
 void IsisMain ()
 {
@@ -107,6 +108,7 @@ void IsisMain ()
   }
 
   double startScet = 0; 
+  double stopScet   = 0; 
   p.StartProcess();
 
   // Get the directory where the Rosetta translation tables are.
@@ -356,11 +358,17 @@ void IsisMain ()
       }
       
       // Calculate the SCET and add it to the table
-      rec[0] = translateScet(scetWords[0], scetWords[1], scetWords[2]); 
-      if ((i==0)) {
-        startScet = translateScet(scetWords[0], scetWords[1], scetWords[2]); 
-      }
+      double translatedScet = translateScet(scetWords[0], scetWords[1], scetWords[2]); 
+      rec[0] = translatedScet; 
       table += rec; 
+
+      // Save off first and last scet values. 
+      if (i==0) {
+        startScet = translatedScet; 
+      }
+      else if (i == dataSuffix.size() - 1) {
+        stopScet = translatedScet; 
+      }
     }
     outcube->write(table);
   }
@@ -383,24 +391,10 @@ void IsisMain ()
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
     // translate to SSSSSSSSSS:FFFFF format
-    QString scetString = toString(startScet);
+    QString scetStart = convertSCET(toString(startScet));
+    QString scetEnd = convertSCET(toString(stopScet)); 
 
-    // seconds stay the same
-    QStringList scetStringList = scetString.split('.');
-
-    // final format needs to be: SSSSSSSSSS:FFFFF
-    
-    //  SSSSSSSSSS:
-    QString scetFinal = scetStringList[0];
-    scetFinal.append(":");
-
-    // FFFFF
-    double fractValue = toDouble(scetStringList[1])/65536.0;
-    scetStringList = toString(fractValue).split(".");
-    
-    scetFinal.append(scetStringList[1].left(5));
-
-    // pass this value to naif to get the utc time. 
+    // Pass this value to naif to get the utc time. 
     QString sclk = "$ISIS3DATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
     QString lsk  = "$ISIS3DATA/base/kernels/lsk/naif????.tls"; 
     FileName sclkName(sclk);
@@ -412,25 +406,24 @@ void IsisMain ()
     furnsh_c(lskName.expanded().toLatin1().data());
     furnsh_c(sclkName.expanded().toLatin1().data());
     
-    SpiceDouble et; 
-    scs2e_c( (SpiceInt) -226, scetFinal.toLatin1().data(), &et);
-    QString startTime = iTime(et).UTC(); 
+    SpiceDouble etStart;
+    SpiceDouble etEnd;
+    scs2e_c( (SpiceInt) -226, scetStart.toLatin1().data(), &etStart);
+    scs2e_c( (SpiceInt) -226, scetEnd.toLatin1().data(), &etEnd);
+    QString startTime = iTime(etStart).UTC(); 
+    QString stopTime = iTime(etEnd).UTC(); 
 
-    double exposureTime = toDouble(frameParam[0]*0.001); // covert to s
-        
-    SpiceChar sclkString[50]; 
+    SpiceChar startSclkString[50]; 
     SpiceChar endSclkString[50]; 
-    sce2s_c( (SpiceInt) -226, et, (SpiceInt) 50, sclkString);
-    sce2s_c( (SpiceInt) -226, et+exposureTime, (SpiceInt) 50, endSclkString);
+    sce2s_c( (SpiceInt) -226, etStart, (SpiceInt) 50, startSclkString);
+    sce2s_c( (SpiceInt) -226, etEnd, (SpiceInt) 50, endSclkString);
     
     inst.findKeyword("StartTime").setValue(startTime);
-    inst.findKeyword("SpacecraftClockStartCount").setValue(sclkString); 
-
-    PvlKeyword &frameParam = inst["FrameParameter"];
-
-    QString stopTime = iTime(et + exposureTime).UTC(); 
     inst.findKeyword("StopTime").setValue(stopTime); 
+
+    inst.findKeyword("SpacecraftClockStartCount").setValue(startSclkString); 
     inst.findKeyword("SpacecraftClockStopCount").setValue(endSclkString); 
+
     outcube->putGroup(inst);
 
     // Unload the naif kernels
@@ -484,6 +477,23 @@ void IsisMain ()
   p.EndProcess ();
 }
 
+// Converts SCET format to SSSSSSSSSS:FFFFF format
+QString convertSCET(QString scetOriginal) {
+  // whole seconds stay the same
+  QStringList scetStringList = scetOriginal.split('.');
+  
+  //  SSSSSSSSSS:
+  QString scetFinal = scetStringList[0];
+  scetFinal.append(":");
+
+  // FFFFF
+  double fractValue = toDouble(scetStringList[1])/65536.0;
+  scetStringList = toString(fractValue).split(".");
+  scetFinal.append(scetStringList[1].left(5));
+
+  return scetFinal;
+}
+
 
 /**
  * Convert 2 bytes into a 2-byte word
@@ -505,6 +515,7 @@ int word(const char byte1, const char byte2)
   return swapper.w;
 }
 
+// swap bytes
 int swapb(const unsigned short int word) {
   union {
     unsigned short int w;
