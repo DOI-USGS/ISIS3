@@ -108,7 +108,7 @@ void IsisMain ()
   }
 
   double startScet = 0; 
-  double stopScet   = 0; 
+  double stopScet  = 0; 
   p.StartProcess();
 
   // Get the directory where the Rosetta translation tables are.

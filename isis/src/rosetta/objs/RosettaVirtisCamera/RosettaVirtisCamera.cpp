@@ -300,26 +300,7 @@ namespace Isis {
      double scet = (double) trec["dataSCET"];
      double lineMidTime;
 
-/*
-SCLK Format
---------------------------------------------------------
-
-     The on-board clock, the conversion for which is provided by this SCLK
-     file, consists of two fields:
-
-          SSSSSSSSSS:FFFFF
-
-     where:
-
-          SSSSSSSSSS -- count of on-board seconds
-
-          FFFFF      -- count of fractions of a second with one fraction
-                        being 1/65536 of a second
-
-
-*/
      QString scetString = toString(scet);
-//     std::cout << "scetString: " << scetString << std::endl; 
 
      // seconds stay the same
      QStringList scetStringList = scetString.split('.');
@@ -335,11 +316,6 @@ SCLK Format
      scetStringList = toString(fractValue).split(".");
 
      scetFinal.append(scetStringList[1].left(5));
-//     std::cout << "final scet value: " << scetFinal << std::endl; 
-
-/*     if (i==0) {
-       setTime(iTime(scetFinal)); 
-     }*/
 
      lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
