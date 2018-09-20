@@ -27,4 +27,7 @@ commands:
 	  true; \
 	fi;
 
-	rm $(OUTPUT)/isisTruth.cub;
+	cat $(OUTPUT)/errors.txt | sed 's/\/[^ ]*\/input\///g' \
+	    > $(OUTPUT)/clean_errors.txt;
+
+	rm $(OUTPUT)/isisTruth.cub $(OUTPUT)/errors.txt;
