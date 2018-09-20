@@ -26,7 +26,7 @@ Current cache size:  1
 Remove the common copy
 Current cache size:  0
 
-Ensure the world instance is still valid
+Ensure remaining world instance is still valid
   Number of polygons:  49152
   Number of vertices:  25350
   Maximum distance:    0.683956
@@ -39,4 +39,7 @@ Name:  ""
 Current cache size:  1
 
 
-Attempt to free a shape that doesn't exist
+Shows instances live on in factory after last requested shape is deleted
+Current cache size:  1
+
+Attempt to free a shape that doesn't exist - ignored in this implementation

@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
     qDebug() << "Current cache size: " << manager->size();
     qDebug() << "";
 
-    qDebug() << "Ensure the world instance is still valid";
+    qDebug() << "Ensure remaining world instance is still valid";
     qDebug() << "  Number of polygons: " << managedTargetShape->getNumTriangles();
     qDebug() << "  Number of vertices: " << managedTargetShape->getNumVertices();
     qDebug() << "  Maximum distance:   " << managedTargetShape->maximumDistance();
@@ -117,7 +117,12 @@ int main(int argc, char *argv[]) {
     }
     qDebug() << "";
 
-    qDebug() << "Attempt to free a shape that doesn't exist";
+    qDebug() << "Shows instances live on in factory after last requested shape is deleted";
+    qDebug() << "Current cache size: " << manager->size();
+    qDebug() << "";
+
+
+    qDebug() << "Attempt to free a shape that doesn't exist - ignored in this implementation";
     try {
       manager->remove("Not a DSK file");
     }
