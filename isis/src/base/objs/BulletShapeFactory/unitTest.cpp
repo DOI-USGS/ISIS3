@@ -26,7 +26,9 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "Distance.h"
+#include "BulletDskShape.h"
 #include "BulletShapeFactory.h"
+#include "BulletTargetShape.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Intercept.h"
@@ -55,48 +57,60 @@ int main(int argc, char *argv[]) {
 
     QString dskfile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
     qDebug() << "Create a target shape for " << dskfile;
-    BulletWorldManager *managedTargetShape = manager->create(dskfile);
+    BulletWorldManager *world = manager->createWorld(dskfile);
+    BulletDskShape  *managedTargetShape = reinterpret_cast<BulletDskShape *> (world->getTarget());
     qDebug() << "Target shape status:";
-    qDebug() << "  Number of polygons: " << managedTargetShape->numberOfPolygons();
-    qDebug() << "  Number of vertices: " << managedTargetShape->numberOfVertices();
-    qDebug() << "  Maximum distance:   " << managedTargetShape->maximumSceneDistance();
-    qDebug() << "Current cache size: " << manager->currentCacheSize();
+    qDebug() << "  Number of polygons: " << managedTargetShape->getNumTriangles();
+    qDebug() << "  Number of vertices: " << managedTargetShape->getNumVertices();
+    qDebug() << "  Maximum distance:   " << managedTargetShape->maximumDistance();
+    qDebug() << "Current cache size: " << manager->size();
     qDebug() << "";
 
     qDebug() << "Create a new target shape for the same file";
     QString copyDSKFile = "$ISIS3DATA/base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds";
-    EmbreeTargetShape *copyTargetShape = manager->create(copyDSKFile);
+    BulletWorldManager *copiedWorld = manager->createWorld(copyDSKFile);
+    BulletDskShape  *copiedTargetShape = reinterpret_cast<BulletDskShape *> (copiedWorld->getTarget());
     qDebug() << "Target shape status:";
-    qDebug() << "  Number of polygons: " << copyTargetShape->numberOfPolygons();
-    qDebug() << "  Number of vertices: " << copyTargetShape->numberOfVertices();
-    qDebug() << "  Maximum distance:   " << copyTargetShape->maximumSceneDistance();
-    qDebug() << "Current cache size: " << manager->currentCacheSize();
+    qDebug() << "  Number of polygons: " << copiedTargetShape->getNumTriangles();
+    qDebug() << "  Number of vertices: " << copiedTargetShape->getNumVertices();
+    qDebug() << "  Maximum distance:   " << copiedTargetShape->maximumDistance();
+    qDebug() << "Current cache size: " << manager->size();
     qDebug() << "";
-    qDebug() << "Shape file is in the cache? " << manager->inCache(copyDSKFile);
+    qDebug() << "Both shape instances point to the same object? "
+             << (copiedTargetShape == managedTargetShape);
     qDebug() << "";
-    qDebug() << "Both instances point to the same object? "
-             << (copyTargetShape == managedTargetShape);
+    qDebug() << "Both world instances point to the same object? "
+             << (&copiedWorld->getWorld() == &world->getWorld() );
     qDebug() << "";
 
     qDebug() << "Free one of them";
-    manager->free(copyDSKFile);
-    qDebug() << "Current cache size: " << manager->currentCacheSize();
+    delete copiedWorld;
+    qDebug() << "Current cache size: " << manager->size();
+    qDebug() << "";
+
+    qDebug() << "Remove the common copy";
+    manager->remove(dskfile);
+    qDebug() << "Current cache size: " << manager->size();
+    qDebug() << "";
+
+    qDebug() << "Ensure the world instance is still valid";
+    qDebug() << "  Number of polygons: " << managedTargetShape->getNumTriangles();
+    qDebug() << "  Number of vertices: " << managedTargetShape->getNumVertices();
+    qDebug() << "  Maximum distance:   " << managedTargetShape->maximumDistance();
     qDebug() << "";
 
     qDebug() << "Free the other";
-    manager->free(dskfile);
-    qDebug() << "Current cache size: " << manager->currentCacheSize();
-    qDebug() << "Shape file is in the cache? " << manager->inCache(copyDSKFile);
-    qDebug() << "";
-
-    qDebug() << "Set the maximum number of target shapes to 0";
-    manager->setMaxCacheSize(0);
-    qDebug() << "New maximum cache size: " << manager->maxCacheSize();
+    delete world;
+    qDebug() << "Current cache size: " << manager->size();
     qDebug() << "";
 
     qDebug() << "Attempt to create a new target shape";
     try {
-      manager->create(dskfile);
+      QScopedPointer<BulletWorldManager> tmp_world(manager->createWorld(dskfile));
+      qDebug() << "Name: " << tmp_world->name();
+      qDebug() << "Current cache size: " << manager->size();
+      qDebug() << "";
+
     }
     catch (IException &e) {
       e.print();
@@ -105,7 +119,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Attempt to free a shape that doesn't exist";
     try {
-      manager->free("Not a DSK file");
+      manager->remove("Not a DSK file");
     }
     catch (IException &e) {
       e.print();
