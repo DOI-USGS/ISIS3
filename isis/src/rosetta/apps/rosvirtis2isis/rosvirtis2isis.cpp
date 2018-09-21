@@ -30,7 +30,7 @@ int word(const char byte1, const char byte2);
 int swapb(const unsigned short int word);
 double translateScet(int word1, int word2, int word3);
 bool isValid(int word);
-QString convertSCET(QString scetOriginal); 
+QString convertSCET(int word1, int word2, int word3); 
 
 void IsisMain ()
 {
@@ -107,8 +107,9 @@ void IsisMain ()
     p.SetDataSuffixBytes(4);
   }
 
-  double startScet = 0; 
-  double stopScet  = 0; 
+  QString startScet;
+  QString stopScet; 
+
   p.StartProcess();
 
   // Get the directory where the Rosetta translation tables are.
@@ -340,7 +341,7 @@ void IsisMain ()
 
     // Create a table to hold SCET information
     TableRecord rec;
-    TableField scETField("dataSCET", TableField::Double);
+    TableField scETField("dataSCET", TableField::Text, 50);
     rec += scETField;
     Table table("VIRTISHouseKeeping", rec);
 
@@ -358,7 +359,7 @@ void IsisMain ()
       }
       
       // Calculate the SCET and add it to the table
-      double translatedScet = translateScet(scetWords[0], scetWords[1], scetWords[2]); 
+      QString translatedScet = convertSCET(scetWords[0], scetWords[1], scetWords[2]); 
       rec[0] = translatedScet; 
       table += rec; 
 
@@ -390,11 +391,7 @@ void IsisMain ()
     // Fix the StartTime and SpacecraftStartClockCount in the ISIS3 label
     PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
 
-    // translate to SSSSSSSSSS:FFFFF format
-    QString scetStart = convertSCET(toString(startScet));
-    QString scetEnd = convertSCET(toString(stopScet)); 
-
-    // Pass this value to naif to get the utc time. 
+    // Pass the Start/Stop SCET values to naif to get the utc time. 
     QString sclk = "$ISIS3DATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
     QString lsk  = "$ISIS3DATA/base/kernels/lsk/naif????.tls"; 
     FileName sclkName(sclk);
@@ -408,8 +405,10 @@ void IsisMain ()
     
     SpiceDouble etStart;
     SpiceDouble etEnd;
-    scs2e_c( (SpiceInt) -226, scetStart.toLatin1().data(), &etStart);
-    scs2e_c( (SpiceInt) -226, scetEnd.toLatin1().data(), &etEnd);
+    std::cout << "startScet: " << startScet << std::endl; 
+    std::cout << "startScet: " << stopScet << std::endl; 
+    scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
+    scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
     QString startTime = iTime(etStart).UTC(); 
     QString stopTime = iTime(etEnd).UTC(); 
 
@@ -421,8 +420,10 @@ void IsisMain ()
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime); 
 
+    std::cout << "Do we match: " << startScet << ", " << stopScet << std::endl;
     inst.findKeyword("SpacecraftClockStartCount").setValue(startSclkString); 
     inst.findKeyword("SpacecraftClockStopCount").setValue(endSclkString); 
+    std::cout << "Do we match: " << startSclkString << ", " << endSclkString << std::endl;
 
     outcube->putGroup(inst);
 
@@ -478,20 +479,16 @@ void IsisMain ()
 }
 
 // Converts SCET format to SSSSSSSSSS:FFFFF format
-QString convertSCET(QString scetOriginal) {
-  // whole seconds stay the same
-  QStringList scetStringList = scetOriginal.split('.');
-  
-  //  SSSSSSSSSS:
-  QString scetFinal = scetStringList[0];
-  scetFinal.append(":");
-
-  // FFFFF
-  double fractValue = toDouble(scetStringList[1])/65536.0;
-  scetStringList = toString(fractValue).split(".");
-  scetFinal.append(scetStringList[1].left(5));
-
-  return scetFinal;
+QString convertSCET(int word1, int word2, int word3)
+{
+  double seconds = (double ((double) word1 * pow(2.0,16.0))) + (double) word2;
+  double fractionalSeconds = (double) word3; 
+  QString scetString = QString::number(seconds, 'f');
+  QStringList scetStringList = scetString.split(".");
+  scetString = scetStringList[0];
+  scetString.append(":");
+  scetString.append(QString::number(fractionalSeconds));
+  return scetString; 
 }
 
 

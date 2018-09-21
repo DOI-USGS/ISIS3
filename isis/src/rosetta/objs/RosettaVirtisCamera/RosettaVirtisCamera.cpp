@@ -297,27 +297,8 @@ namespace Isis {
    int lineno(1);
    for (int i = 0; i < hktable.Records(); i++) {
      TableRecord &trec = hktable[i];
-     double scet = (double) trec["dataSCET"];
-     double lineMidTime;
-
-     QString scetString = toString(scet);
-
-     // seconds stay the same
-     QStringList scetStringList = scetString.split('.');
-
-     // final format needs to be: SSSSSSSSSS:FFFFF
-
-     //  SSSSSSSSSS:
-     QString scetFinal = scetStringList[0];
-     scetFinal.append(":");
-
-     // FFFFF
-     double fractValue = toDouble(scetStringList[1])/65536.0;
-     scetStringList = toString(fractValue).split(".");
-
-     scetFinal.append(scetStringList[1].left(5));
-
-     lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
+     QString scetString = trec["dataSCET"];
+     double lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
                                           lineStartTime(lineMidTime),
                                           exposureTime()));
