@@ -377,7 +377,7 @@ namespace Isis {
       }
       catch (IException &e) {
         message += e.toString();
-        throw IException(e, IException::Programmer, message, _FILEINFO_);
+        throw IException(e, IException::User, message, _FILEINFO_);
       }
 
     }
@@ -386,7 +386,7 @@ namespace Isis {
   /**
    *  @history 2018-09-12 Adam Goins - Added this method to attempt to open a file as a cube list.
    *                          It's called by addCubeViewport() when that method attempts to open a
-   *                          file as a cube. Fixes #5439, Fixes #5476.
+   *                          file as a cube but fails. Fixes #5439, Fixes #5476.
    */
   void Workspace::addCubeViewportFromList(QString cubelist) {
 
@@ -436,11 +436,9 @@ namespace Isis {
         }
       }
       catch (IException &e) {
+	       QString message("Error attempting to open [" + cubename + "] from list [" + cubelist + "]...\n");
 
-	QString message("Error attempting to open [" + cubename + "] from list [" + cubelist + "]...\n");
-        message += e.toString();
-
-	throw IException(e, IException::Programmer, message, _FILEINFO_);
+	       throw IException(e, IException::User, message, _FILEINFO_);
       }
     }
   }
