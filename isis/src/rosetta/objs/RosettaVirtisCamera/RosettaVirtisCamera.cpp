@@ -93,7 +93,10 @@ namespace Isis {
 
     // Get other info from labels
     PvlKeyword &frameParam = inst["FrameParameter"];
-    m_exposureTime = toDouble(frameParam[0]);
+
+    // convert milliseconds to seconds
+
+    m_exposureTime = toDouble(frameParam[0]) * 0.001;
     m_summing  = toDouble(frameParam[1]);
     m_scanRate = toDouble(frameParam[2]);
 
@@ -294,16 +297,15 @@ namespace Isis {
    int lineno(1);
    for (int i = 0; i < hktable.Records(); i++) {
      TableRecord &trec = hktable[i];
-     double scet = (double) trec["dataSCET"];
-     double lineMidTime;
-     lineMidTime = getClockTime(toString(scet), naifSpkCode()).Et();
+     QString scetString = trec["dataSCET"];
+     double lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
                                           lineStartTime(lineMidTime),
                                           exposureTime()));
      lineno++;
    }
     // Adjust the last time
-    LineRateChange  lastR = m_lineRates.back();
+    LineRateChange lastR = m_lineRates.back();
 
     // Normally the line rate changes would store the line scan rate instead of exposure time.
     // Storing the exposure time instead allows for better time calculations within a line.

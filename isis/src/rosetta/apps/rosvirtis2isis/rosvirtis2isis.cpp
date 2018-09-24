@@ -19,6 +19,7 @@
 #include "UserInterface.h"
 #include "PolynomialUnivariate.h"
 #include "VirtisHK.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -29,6 +30,7 @@ int word(const char byte1, const char byte2);
 int swapb(const unsigned short int word);
 double translateScet(int word1, int word2, int word3);
 bool isValid(int word);
+QString convertSCET(int word1, int word2, int word3); 
 
 void IsisMain ()
 {
@@ -104,6 +106,9 @@ void IsisMain ()
     p.SetDataTrailerBytes(0);
     p.SetDataSuffixBytes(4);
   }
+
+  QString startScet;
+  QString stopScet; 
 
   p.StartProcess();
 
@@ -336,12 +341,11 @@ void IsisMain ()
 
     // Create a table to hold SCET information
     TableRecord rec;
-    TableField scETField("dataSCET", TableField::Double);
+    TableField scETField("dataSCET", TableField::Text, 50);
     rec += scETField;
     Table table("VIRTISHouseKeeping", rec);
 
     std::vector<std::vector<char *> > dataSuffix = p.DataSuffix();
-
     for (unsigned int i=0; i < dataSuffix.size(); i++) {
       std::vector<char*> dataSuffixRecord = dataSuffix[i];
 
@@ -355,12 +359,20 @@ void IsisMain ()
       }
       
       // Calculate the SCET and add it to the table
-      rec[0] = translateScet(scetWords[0], scetWords[1], scetWords[2]); 
-      table += rec;
+      QString translatedScet = convertSCET(scetWords[0], scetWords[1], scetWords[2]); 
+      rec[0] = translatedScet; 
+      table += rec; 
+
+      // Save off first and last scet values. 
+      if (i==0) {
+        startScet = translatedScet; 
+      }
+      else if (i == dataSuffix.size() - 1) {
+        stopScet = translatedScet; 
+      }
     }
     outcube->write(table);
   }
-
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
@@ -375,6 +387,51 @@ void IsisMain ()
   PvlToPvlTranslationManager instrumentXlater (pdsLabel, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
+  if (procLevel == 3) {
+    // Fix the StartTime and SpacecraftStartClockCount in the ISIS3 label
+    PvlGroup &inst = outLabel.findGroup("Instrument", Pvl::Traverse);
+
+    // Pass the Start/Stop SCET values to naif to get the utc time. 
+    QString sclk = "$ISIS3DATA/rosetta/kernels/sclk/ROS_??????_STEP.TSC"; 
+    QString lsk  = "$ISIS3DATA/base/kernels/lsk/naif????.tls"; 
+    FileName sclkName(sclk);
+    FileName lskName(lsk); 
+
+    sclkName = sclkName.highestVersion(); 
+    lskName = lskName.highestVersion(); 
+
+    furnsh_c(lskName.expanded().toLatin1().data());
+    furnsh_c(sclkName.expanded().toLatin1().data());
+    
+    SpiceDouble etStart;
+    SpiceDouble etEnd;
+    std::cout << "startScet: " << startScet << std::endl; 
+    std::cout << "startScet: " << stopScet << std::endl; 
+    scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
+    scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
+    QString startTime = iTime(etStart).UTC(); 
+    QString stopTime = iTime(etEnd).UTC(); 
+
+    SpiceChar startSclkString[50]; 
+    SpiceChar endSclkString[50]; 
+    sce2s_c( (SpiceInt) -226, etStart, (SpiceInt) 50, startSclkString);
+    sce2s_c( (SpiceInt) -226, etEnd, (SpiceInt) 50, endSclkString);
+    
+    inst.findKeyword("StartTime").setValue(startTime);
+    inst.findKeyword("StopTime").setValue(stopTime); 
+
+    std::cout << "Do we match: " << startScet << ", " << stopScet << std::endl;
+    inst.findKeyword("SpacecraftClockStartCount").setValue(startSclkString); 
+    inst.findKeyword("SpacecraftClockStopCount").setValue(endSclkString); 
+    std::cout << "Do we match: " << startSclkString << ", " << endSclkString << std::endl;
+
+    outcube->putGroup(inst);
+
+    // Unload the naif kernels
+    unload_c(lsk.toLatin1().data());
+    unload_c(sclk.toLatin1().data());
+  }
+  
   // Write the Archive and Instrument groups to the output cube label
   outcube->putGroup(outLabel.findGroup("Archive", Pvl::Traverse));
   outcube->putGroup(outLabel.findGroup("Instrument", Pvl::Traverse));
@@ -421,6 +478,19 @@ void IsisMain ()
   p.EndProcess ();
 }
 
+// Converts SCET format to SSSSSSSSSS:FFFFF format
+QString convertSCET(int word1, int word2, int word3)
+{
+  double seconds = (double ((double) word1 * pow(2.0,16.0))) + (double) word2;
+  double fractionalSeconds = (double) word3; 
+  QString scetString = QString::number(seconds, 'f');
+  QStringList scetStringList = scetString.split(".");
+  scetString = scetStringList[0];
+  scetString.append(":");
+  scetString.append(QString::number(fractionalSeconds));
+  return scetString; 
+}
+
 
 /**
  * Convert 2 bytes into a 2-byte word
@@ -442,6 +512,7 @@ int word(const char byte1, const char byte2)
   return swapper.w;
 }
 
+// swap bytes
 int swapb(const unsigned short int word) {
   union {
     unsigned short int w;
