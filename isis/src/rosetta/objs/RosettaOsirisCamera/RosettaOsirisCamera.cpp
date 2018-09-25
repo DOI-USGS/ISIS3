@@ -45,7 +45,8 @@ namespace Isis {
    * @author Stuart Sides
    *
    * @internal
-   * @history modified by Sasha Brownsberger
+   * @history modified by Sasha Brownsberger 
+   * @history 9/24/2018 modified by Kaj Williams 
    */
 
   RosettaOsirisCamera::RosettaOsirisCamera(Cube &cube) : FramingCamera(cube) {
@@ -85,6 +86,15 @@ namespace Isis {
     // Because images are flipped on ingestion,
     // the first line on the label is actually the last line.
     detectorMap->SetStartingDetectorLine(2050 - cube.lineCount() - (double) inst["FirstLine"]);
+
+    //Read the pixel averaging width/height and update the detector map:
+    double pixelAveragingWidth=(double) inst["PixelAveragingWidth"];
+    double pixelAveragingHeight=(double) inst["PixelAveragingHeight"];
+    detectorMap->SetDetectorSampleSumming(pixelAveragingWidth);
+    detectorMap->SetDetectorLineSumming(pixelAveragingHeight);
+    //std::cout<<"binning mode: "<<binningMode<<std::endl;
+    //The binning modes are square:
+
 
     RosettaOsirisCameraDistortionMap* distortionMap = new RosettaOsirisCameraDistortionMap(this);
 
