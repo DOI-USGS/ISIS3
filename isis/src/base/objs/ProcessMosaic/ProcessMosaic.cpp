@@ -276,7 +276,7 @@ namespace Isis {
     }
     
     // Set index of tracking image to the default offset of the Isis::UnsignedByte
-    int iIndex = 3;
+    int iIndex = VALID_MINUI4;
     // Propogate tracking if adding to mosaic that was previouly tracked.
     if (OutputCubes[0]->hasGroup("Tracking") && !m_createOutputMosaic) {
       m_trackingEnabled = true;

@@ -14,98 +14,121 @@
       padding-left: 5px; width:70px; align:left;
     }
    </style></head><body> <font size="2" face="Verdana">
-   <p>This program uses a text-based list of cubes, all in the same map projection and equivalent projection parameters (PixelResolution, 
-    CenterRingLongitude, etc), to generate a mosaic.  By default,
-    The program automatically determines the size of the mosaic by examining each cube.  The user also
-    has the option of entering their own rad/az range to use for the mosaic.
+   <p>This program uses a text-based list of cubes, all in the same map projection and equivalent
+    projection parameters (PixelResolution, CenterRingLongitude, etc), to generate a mosaic. By default,
+    The program automatically determines the size of the mosaic by examining each cube. The user also
+    has the option of entering their own ring radius and ring longitude range to use for the mosaic.
    </p>
-   <p>There are four different ways/priorities (input, mosaic, band, average) 
-    for how the input image has to be placed on the mosaic. In case of special pixels and the
+   <p>There are four different ways/priorities (ONTOP, BENEATH, BAND and AVERAGE) 
+    for how the input image can be placed on the mosaic. In case of special pixels and the
     special pixel flags being enabled, the details for each priority is described in the tables
     below.
    </p>
    <p>
-     The TRACK feature will create an external tracking cube that contains a single band. The
-     DN values for each pixel in this band represent the input image that that pixel was taken
-     from within the mosaic cube. The indexing begins at an offset DN value 3 to account for
-     special pixels. In other words, a pixel of DN value 3 in the tracking cube means that that
-     same pixel within the mosaic was taken from the first input image. 
+     The TRACK feature creates a separate tracking cube in addition to the mosaic cube, and
+     contains information for the source files of every pixel within the output mosaic.
+     The tracking cube will have the same base-name as the mosaic cube, but will end in 
+     "_tracking.cub", and must always reside in the same directory as the
+     mosaic cube to be properly accessed.
+     <b>The tracking cube will always be of type unsigned integer. Depending on the
+     bit-type of the mosaic cube and/or the number of bands it contains, the tracking cube
+     may be as much as four times the size of the mosaic cube itself.</b>
    </p>
    <p>
-     The tracking cube is used by the QVIEW-AdvancedTracking tool to represent source images for
-     each pixel within the mosaic. As the user pans across either the mosaic cube or the
-     external tracking cube within a cube viewport, the QVIEW-AdvancedTracking will
-     interactively report the source cube filename, serial number and associate DN value for the
-     cube that was input into automos. The tracking cube must be in the same directory as the
-     mosaic cube in order to be used and so will be created there initially. <b>The tracking cube
-     will always be of type unsigned integer and so will have a constant storage size regardless of
-     the size of the mosaic cube itself.</b>
+     The tracking cube can be used appropriately through the QVIEW-AdvancedTracking
+     tool. As the user pans across the displayed mosaic, for every mosaic pixel location,
+     QVIEW-AdvancedTracking will interactively report the index, the filename and the
+     serial number of the input cube that was input to ringsautomos for that specific pixel
+     location. Since the tracking cube is of bit-type unsigned integer, the DN values of
+     0, 1 and 2 are reserved for NULL, LRS and LIS, respectively, so valid pixel DN values
+     will begin at an offset of 3. In other words, a pixel of DN value 3 in the tracking
+     cube means that this same pixel within the mosaic was taken from the first input
+     image. The tracking cube cannot be used outside of the QVIEW-AdvancedTracking tool
+     except as a visual representation of the source cubes for the different pixels. 
    </p>
    <p>
-     <b>Please Note: ringsautomos no longer works with mosaics that contain an attached tracking
-       band. This means that older mosaics may need to be run through the trackextract utility
-       application in order to extract the external tracking cube before they may be used in
-       future mosaics.</b>
+     The TRACK feature works differently depending on the Priority options and whether you are
+     using single- or multi-band cubes:
    </p>
    <p>
-     The Track feature works with Priority options ONTOP (with HIGHSATURATION and
-     LOWSATURATION parameters) and BENEATH for single band input cubes.  It does NOT support
-     multiple band input cubes with these priority options. It does work for multiband cubes
-     when PRIORITY=BAND. Furthermore, this feature is NOT supported when PRIORITY=AVERAGE.
+     <ul>
+       <li>For single band cubes, you can specify PRIORITY as ONTOP and BENEATH.</li>
+       <li>For multiband cubes, you can use PRIORITY=BAND.</li>
+       <li>For multiband cubes, you can use PRIORITY=ONTOP only when the NULL, HIGHSATURATION and
+         LOWSATURATION options are set to true. </li>
+       <li>This feature is NOT supported for any single- or multi-band cubes when using 
+         PRIORITY=AVERAGE.</li>
+     </ul>
    </p>
-    <p> Tracking can be set at the time of Mosaic creation
-      only and cannot be turned on after the mosaic is created. But the tracking
-      will be turned off for multiband ONTOP and BENEATH priority even though it 
-      was turned on while creating the mosaic. Tracking for multiband input with
-      ONTOP priority is possible only if all the Special Pixel Flags are set to 
-      True else the Tracking will be turned off. ONTOP priority basically places 
-      all the valid input pixels onto the mosaic unless the special pixel flags 
-      are turned on or if mosaic has a NULL pixel. In a multi band scenario, a 
-      pixel origin in particular line and sample will not be the same in all the 
-      different bands, which means we have to keep track of every pixel in every 
-      band. i.e. the size of the tracking bands will be the same as the number 
-      of bands in the mosaic.i.e the number of bands will be doubled. </p> 
-      <p><b>WARNING: </b>If Tracking is turned on in a mosaic, any subsequent
-                             applications that modify DN values will corrupt
-                             the Tracking cube.
-      </p>
-      <p>Priority BAND can track origin for multi band input image based on a 
-      specified band using LESSER or GREATER than criteria. Each pixel in the
-      specified band is compared to the corresponding pixel in the chosen band 
-      in the mosaic based on the chosen criteria. This comparison true or false 
-      is used for all the other bands whether the input pixel is copied onto the 
-      mosaic and hence the origin for that pixel is stored. Band can be chosen 
-      by choosing the TYPE, BANDNUMBER or KEYWORD. If BANDNUMBER is chosen then 
-      the band number can be entered in the NUMBER field. If KEYWORD is chosen 
-      then PVL key name and value from the BANDBIN group can be entered in the 
-      KEYNAME and KEYVALUE fields. </p> 
-     <p>For example,  for a multi band input  with BAND priority,  if the BAND 
-        chosen is Emission Angle band(EMA), if input pixels are (30,30,30) in 
-        EMA Band for some sample, line and the corresponding pixels in the EMA 
-        band in the mosaic has (75, 75, 75) and the criteria is GREATER than, 
-        then since input pixels are not GREATER than corresponding mosaic 
-        pixels, then the input pixels are not copied to the mosaic, so also the
-        corresponding pixels in all the other bands in the input. Hence the 
-        origin for those pixels remains unchanged. If LESSER than was the 
-        criteria, then all the corresponding pixels in all the input bands will 
-        be copied to the mosaic and the origin for those pixels is the current 
-        input image. 
+   <p>
+     <b>Please Note: Older versions of ringsautomos (prior to isis3.5.3) no longer work with
+     mosaics that contain an attached tracking band. Mosaics including an attached tracking
+     cube can be updated and reformatted by running the program trackextract. This new
+     utility will create a new version of the mosaic with the appropriate label information
+     and a separate tracking cube to which it points.</b>
+   </p>
+   <p> 
+      Tracking can be set at the time of Mosaic creation
+      only and cannot be turned on after the mosaic is created. For multiband mosaics, if
+      PRIORITY=ONTOP and all the Special Pixel flags are not set to true, or if PRIORITY=BENEATH,
+      tracking will be turned off even if it was turned on while creating the mosaic. ONTOP
+      priority places all the valid input pixels onto the mosaic unless the special pixel flags 
+      are turned on or if the mosaic has a NULL pixel. In a multi band scenario, a 
+      pixel origin within a particular line and sample will not be the same in all the 
+      different bands.
+    </p> 
+    <p><b>WARNING: </b>If Tracking is turned on in a mosaic, any subsequent
+                           applications that modify DN values will corrupt
+                           the Tracking cube.
+    </p>
+    <p>
+      Priority BAND can track the origin for multiband input cubes. 
+      The input cube pixels will be placed in the output mosaic based on the "Lesser" or
+      "Greater" criteria of a priority band defined by the user. Band can be implemented with the
+      TYPE, BANDNUMBER or KEYWORD options.
+        <ul>
+          <li>If BANDNUMBER is chosen then the band number can be entered in the NUMBER field.</li>
+          <li>If KEYWORD is chosen then PVL key name and value from the BANDBIN group can be entered
+            in the KEYNAME and KEYVALUE fields. </li> 
+        </ul>
      </p>
-      <p>There are options like MATCHBANDIN, if set requires the specfied input 
-      bands to match the mosaic bands and the bands can be anywhere in the 
-      mosaic but must be contiguous for multi-band. If MATCHBANDIN is not set 
-      then any input image can be placed on the mosaic within it's boundaries.
+     <p>Multiband input example with BAND priority and example parameters:
+       <ul>
+         <li>BAND = Emission Angle band(EMA)</li>
+         <li>Input pixels = (30,30,30) in EMA Band for some sample and line</li>
+         <li>Corresponding pixels in the EMA band in the mosaic = (75, 75, 75)</li>
+         <li>Criteria = GREATER than</li>
+       </ul>
+       <p>
+         Expected Result:
+         <ul>Since input pixels are not GREATER than corresponding mosaic 
+          pixels, then the input pixels are not copied to the mosaic, so also the
+          corresponding pixels in all the other bands in the input. Hence the 
+          origin for those pixels remains unchanged. </ul>
+        </p>
+        <p>
+          Given this same example with CRITERIA=LESSER than:
+          <ul>All corresponding pixels in all the
+            input bands will be copied to the mosaic and the origin for those pixels is the current 
+            input cube. </ul>
+        </p>
       </p>
-      <p> Options HIGHSATURATION, LOWSATURATION and NULL if
-      set will cause the the input pixels with these values to be copied to the
-      mosaic for ONTOP and BAND priorities regardless of the CRITERIA for the
-      BAND priority. These options are not supported for BENEATH priority. </p>
-      <p>Currently Tracking can be viewed in the Advanced Tool Tracking  option 
+      <p>
+        MATCHBANDIN, if set, requires the specified input bands to match the mosaic bands and the
+        bands can be anywhere in the mosaic but must be contiguous for multi-band. If MATCHBANDIN
+        is not set then any input image can be placed on the mosaic within its boundaries.
+      </p>
+      <p>
+        HIGHSATURATION, LOWSATURATION and NULL options, if set, will cause the the input pixels
+        with these values to be copied to the mosaic for ONTOP and BAND priorities regardless of
+        the CRITERIA for the BAND priority. These options are not supported for BENEATH priority.
+      </p>
+      <p>Currently Tracking can be viewed in the Advanced Tool Tracking option 
         of the <b>qview</b> application. Following are the Tracking info:</p> 
-      <p><b>Index :</b> Zero based and is in the order in which  the image was 
+      <p><b>Index:</b> Zero based and is in the order in which the image was 
         placed on the mosaic. No origin is represented as -1.</p>
       <p><b>FileName:</b> File name  of  input image </p>
-      <p> <b>Serial Number:</b>Serial Number of the input image </p>
+      <p> <b>Serial Number:</b> Serial Number of the input image </p>
       <p>
         <b>
           The following table describes how the program will determine the pixel value in the output
@@ -159,9 +182,9 @@
             <td>
               Overlapping Valid pixel values from the current input image and output mosaic will be
               averaged for the new mosaic pixel values. A count-band is created with the output
-              mosaic file.  The count-band keeps track of the number of images involved in the
-              averaging of the input dn values for each pixel in the mosaic. Invalid input pixel
-              values will not be included in the average.  In the case where only one Valid pixel
+              mosaic file. The count-band keeps track of the number of images involved in the
+              averaging of the input DN values for each pixel in the mosaic. Invalid input pixel
+              values will not be included in the average. In the case where only one Valid pixel
               exists between the input image pixels or the current mosaic pixel, the Valid pixel is
               retained in the current output mosaic. Refer to parameters HIGHSATURATION,
               LOWSATURATION, and NULL to override replacement of valid output mosaic pixels.
@@ -506,7 +529,7 @@
     </change>
     <change name="Summer Stapleton" date="2018-08-13">
       Updated documentation to reflect new handling of tracking capabilities with an external
-      tracking cube and be more consistent with other mosaicking program documentation as well as
+      tracking cube and to be more consistent with other mosaicking program documentation as well as
       clarify why special pixel flags are required when priority=ontop for multiband mosaics.
       References #2092
     </change>
@@ -575,8 +598,8 @@
           <option value="ONTOP">
             <brief> Input cube will be placed on top of the mosaic </brief>
             <description>
-              An input pixel will always be copied onto a NULL mosaic pixel . 
-              Valid input pixel will also be always copied onto the mosaic. 
+              An input pixel will always be copied onto a NULL mosaic pixel. 
+              Valid input pixel will also be copied onto the mosaic. 
               Special input pixel will be copied onto the mosaic only if the 
               special pixel flags are set.
             </description>
@@ -833,12 +856,30 @@
       <parameter name="TRACK">
           <type>boolean</type>
          <default><item>FALSE</item></default>
-          <brief>
-            Track the mosaic origin
-          </brief>
+          <brief>Track the source filename for each mosaic pixel</brief>
           <description>
-            If selected the application will track the mosaic origin. Once 
-            origin is tracked, the tracker cannot be turned off.
+            <p>
+              The Track feature creates a separate tracking cube containing the index values for
+              the source of every pixel in the output mosaic. The tracking cube can only be used
+              appropriately through the  QVIEW-AdvancedTracking tool. As the user pans across the
+              displayed mosaic, for every mosaic pixel location QVIEW-AdvancedTracking will
+              interactively report the filename, the serial number and the index of the input cube
+              that was input to ringsautomos for that specific pixel location. The tracking cube cannot
+              be used outside the QVIEW-AdvancedTracking tool except as a visual representation of
+              the source cubes for the different pixels. TRACK must be set to TRUE at the time of
+              mosaic creation only and cannot be turned on after the mosaic is created. When a
+              mosaic is created with TRACK=TRUE, all subsequent runs will default to TRACK=TRUE.
+              When a mosaic is created with TRACK=FALSE, an error will be encountered if subsequent
+              runs have TRACK=TRUE. <b>The tracking cube will always be of type unsigned integer.
+              Depending on the bit-type of the mosaic cube and/or the number of bands it contains,
+              the tracking cube may be as much as four times the size of the mosaic cube itself.</b>
+            </p>
+            <p>
+              WARNING:
+              If Tracking is turned on in a mosaic, any subsequent applications that modify DN
+              values, such as the application<def>reduce</def>, will corrupt the DN values in the
+              tracking cube.
+            </p>
           </description>
         </parameter>
       <parameter name="MATCHBANDBIN">
