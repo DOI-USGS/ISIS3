@@ -1,5 +1,2 @@
-3.6.0      # Public version number
-2018-08-01   # Version date
-v007         # 3rd party libraries version
+3.6.0        # Public version number
 alpha        # release stage (alpha, beta, stable)
-
