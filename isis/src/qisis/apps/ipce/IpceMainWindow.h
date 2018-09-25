@@ -143,8 +143,9 @@ namespace Isis {
    *   @history 2018-06-13 Tracie Sucharski - Fixed cleanup of views and QDockWidgets.
    *   @history 2018-06-13 Kaitlyn Lee - Since views now inherit from QMainWindow, each individual
    *                           view has its own toolbar, so having an active toolbar and tool pad is
-   *                           not needed. Removed code adding the save active control net button and
-   *                           the toolpad, since control nets can be saved with the project save button.
+   *                           not needed. Removed code adding the save active control net button
+   *                           and the toolpad, since control nets can be saved with the project
+   *                           save button.
    *   @history 2018-06-14 Christopher Combs - Changed addView method to take in JigsawRunWidget as
    *                           a QDockWidget object instead of wrapping it in one.
    *   @history 2018-06-15 Tracie Sucharski - Fixed break to recent projects.  The readSettings
@@ -153,24 +154,66 @@ namespace Isis {
    *   @history 2018-06-18 Makayla Shepherd - Set the QApplication name so that BundleAdjust does
    *                           not output text to the command line for ipce. Fixes #4171.
    *   @history 2018-06-19 Kaitlyn Lee - Added tabViews() and the menu option under the View menu to
-   *                           tab the views. Currently, this can tab all attached/detached views. I
-   *                           left the line setting dock options to allow grouped dragging, but tabbing
-   *                           views does not always work with this enabled. With this option enabled, the
-   *                           type of a view will randomly change and setting its type has no effect.
-   *                           Use windowType() to get the type. Also added the toolbar title in the
-   *                           permanent toolbar constructor.
+   *                           tab the views. Currently, this can tab all attached/detached views.
+   *                           I left the line setting dock options to allow grouped dragging, but
+   *                           tabbing views does not always work with this enabled. With this
+   *                           option enabled, the type of a view will randomly change and setting
+   *                           its type has no effect. Use windowType() to get the type. Also added
+   *                           the toolbar title in the permanent toolbar constructor.
    *   @history 2018-06-22 Tracie Sucharski - Cleanup destruction of dock widgets and the views they
    *                           hold.  Extra destroy slots were causing double deletion of memory.
    *   @history 2018-06-22 Tracie Sucharski - Added a showEvent handler so that the project clean
    *                           state can be reset after the IpceMainWindow::show() causes resize and
    *                           move events which in turn cause the project clean flag to be false
    *                           even though the project has just opened.
+   *   @history 2018-07-07 Summer Stapleton - Added check in the closeEvent() for changes to any
+   *                           TemplateEditorWidget currently open to create a pop-up warning/
+   *                           option to save.
+   *   @history 2018-07-09 Kaitlyn Lee - Added tileViews() and the menu option to tile all
+   *                           docked/undocked and tabbed/untabbed views. Changed removeView() to
+   *                           delete the parent dock widget. If we do not delete the dock widget,
+   *                           an empty dock widget will remain where the view used to be.
+   *   @history 2018-07-10 Tracie Sucharski - Change initial interface of views to tabbed view.
+   *                           Changed the QMainWindow separator to a different color and wider size
+   *                           for ease of use.  Create the QMainWindow initial size to prevent the
+   *                           Viewports in CubeDnView from being created as a small size.
+   *   @history 2018-07-11 Kaitlyn Lee - Added a value in the project settings that stores whether a
+   *                           project was in fullscreen or not when saved. If not, we call showNormal()
+   *                           to restore the poject's window size. This also fixes the warning/history tabs
+   *                           being misplaced when opening a project. Fixes #5175. References #5436.
+   *   @history 2018-07-12 Tracie Sucharski - Renamed the signal Directory::viewClosed to
+   *                           Directory::closeView since Directory does not close the view but
+   *                           indicate that the view needs closing.  This signal is now used by
+   *                           more than the cnetEditorView, so updated documentation.  Did a little
+   *                           cleanup on the removeView  method by removing some code that
+   *                           automatically happens due to connection made on destroyed signal.
+   *   @history 2018-07-12 Kaitlyn Lee - Removed code that makes the window fullscreen in memory,
+   *                           since this was causing a project's window size to not be restored
+   *                           when opening from the command line. Decreased the size and changed
+   *                           the color of the splitter. In writeGlobalSettings(), check to see if
+   *                           the geometry value does not exist in the config file. This allows the
+   *                           geometry to be saved if the config file does not exist and a user
+   *                           opens a project. Before, it would not save the geometry because the
+   *                           opened project was not temporary. References #5433.
+   *   @history 2018-07-17 Kaitlyn Lee - Added signal enableViewActions(bool) to enable/disable
+   *                           tab/tile views when views are opened/closed.
+   *                           opened project was not temporary. References #5433
+   *   @history 2018-07-19 Tracie Sucharski - Keep separate dock lists for the view docks and
+   *                           "special" docks such as sensor, target and jigsaw. The
+   *                           ControlHealthView is now added under the Project instead of in
+   *                           workspace area. Removed unnecessary call to addDock for the History
+   *                           widget. It is added with the call to tabifyDockWidget.
+   *   @history 2018-07-29 Tracie Sucharski - Set background of centralWidget to a pattern to
+   *                           distinguish it from dockable areas.
    */
   class IpceMainWindow : public QMainWindow {
       Q_OBJECT
     public:
       explicit IpceMainWindow(QWidget *parent = 0);
       ~IpceMainWindow();
+
+    signals:
+      void enableViewActions(bool value);
 
     public slots:
       void addView(QWidget *newWidget, Qt::DockWidgetArea area = Qt::LeftDockWidgetArea,
@@ -192,8 +235,10 @@ namespace Isis {
       void enterWhatsThisMode();
 
       void tabViews();
+      void tileViews();
 
       void raiseWarningTab();
+
       void cleanupViewDockList(QObject *obj);
 
     private:
@@ -215,6 +260,7 @@ namespace Isis {
       QDockWidget *m_projectDock;
       QDockWidget *m_warningsDock;
 
+      QList<QDockWidget *> m_specialDocks;  //!< Non-view dock widgets such as jigsawRun
       QList<QDockWidget *> m_viewDocks; //!< QDockWidgets holding the views
 
       /**
@@ -243,9 +289,6 @@ namespace Isis {
       QList<QAction *> m_helpMenuActions;//!< Internal list of help actions
 
       QList<QAction *> m_permToolBarActions;//!< Internal list of permanent toolbar actions
-
-      QAction *m_cascadeViewsAction; //!< Action that cascades the mdi area
-      QAction *m_tileViewsAction; //!< Action that tiles the mdi area
   };
 }
 

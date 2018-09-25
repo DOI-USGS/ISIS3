@@ -101,6 +101,13 @@ namespace Isis {
    * @history 2016-08-28 Kelvin Rodriguez - Changed SetOutputCube default parameters to
    *                         avoid hidden virtual function warnings in clang and the abiguous called
    *                         errors. Part of porting to OS X 10.11.
+   * @history 2018-08-13 Summer Stapleton - Removed code that added tracking band to mosaic cube as
+   *                         tracking is now being stored in a separate tracking cube. This was part
+   *                         of a larger refactoring project to turn the tracking band of a mosaic
+   *                         cube into its own tracking cube containing the InputImages table to
+   *                         relate DN values to input images. Mosaic cube no longer holds tracking
+   *                         band or InputImages table, but instead has a Tracking group that points
+   *                         to external tracking cube.
    */
 
   class ProcessMapMosaic : public Isis::ProcessMosaic {

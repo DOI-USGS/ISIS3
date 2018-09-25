@@ -6,14 +6,21 @@
   </brief>
 
   <description>
-    Updates a mosaic cube with a tracking band created on or before isis version 3.5.2 to be up to 
-    date with isis version 3.5.3 or above. Removes the tracking band and table from the input mosaic 
-    cube and places them into a separate tracking cube. A reference to the tracking cube is added to 
-    the mosaic label. The mosaic cube's bit type remains the same, but the tracking cube's bit type 
-    is made unsigned integer. We also have to update the tracking cube's pixels by subtracting the 
-    offsett ProcessMosaic adds to each pixel and adding the new offset, the minimum value of an 
-    unsigned integer. ProcessMosaic also sets pixels that are not from any cube to a default value. 
-    If a pixel has this value, we set it to Null.
+    <p>
+      Updates a mosaic cube with tracking information that was created using older versions of ISIS
+      (prior to 3.5.3) to be up to date with ISIS version 3.5.3 and above. Removes the tracking
+      band and the InputImages table from the input mosaic cube and places them into a separate
+      tracking cube. A reference to the tracking cube is then added to the mosaic label. In the
+      copying process, if a pixel in the tracking band of the input mosaic is not associated with
+      any of the original input images, a NULL value is written to that pixel in the tracking cube.
+      The mosaic cube's bit type remains the same, but the tracking cube's bit type will always be
+      unsigned integer. 
+    </p>
+    <p>
+      <b>Please Note: This application only works for 32-bit ("Real") mosaics as both 8-bit and
+      16-bit mosaics created prior to ISIS version 3.5.3 are considered to be corrupted.</b>
+    </p>
+    
   </description>
 
   <category>
@@ -23,6 +30,12 @@
   <history>
     <change name="Kaitlyn Lee" date="2018-07-20">
       Original version
+    </change>
+    <change name="Summer Stapleton" date="2018-09-06">
+      Updated code to throw user error if input mosaic is anything other than bit-type of "Real" as
+      it has been decided that 8-bit and 16-bit mosaics are corrupted. Updated documentation for
+      this. Also fixed the NULL value being written to the tracking cube as LRS was originally
+      being written instead.
     </change>
   </history>
 
@@ -35,8 +48,10 @@
           Input cube with tracking band
         </brief>
         <description>
-          The mosaic created on or before the isis version 3.5.2 that contains the tracking band to 
-          be extracted.
+          The mosaic created on or before the ISIS version 3.5.2 that contains the tracking band
+          and InputImages table to be extracted. <b>Please Note: This mosaic cube must be of
+          bit-type "Real" as both 8-bit and 16-bit mosaics created before ISIS version 3.5.3 are
+          considered to be corrupted.</b>
         </description>
         <filter>
           *.cub
@@ -50,9 +65,10 @@
           Output mosaic and tracking cube
         </brief>
         <description>
-          The output mosaic cube name that will be up to date with isis version 3.5.3 or above. 
-          This cube will not have the tracking band, but instead the tracking information will be 
-          placed into a new cube with the same name but with "_tracking" added to the end.
+          The output mosaic cube name that will be up to date with isis version 3.5.3 and above. 
+          This cube will no longer have the tracking band or the InputImages table, but a tracking
+          cube will be created in the same location with this information. This tracking cube will
+          have the same base name as the mosaic, but will end in "_tracking.cub".
         </description>
         <filter>
           *.cub

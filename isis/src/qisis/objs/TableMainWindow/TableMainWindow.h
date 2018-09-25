@@ -51,6 +51,8 @@ namespace Isis {
   *                          Added resizeColumn() slot and readColumnSettings().
   *                          modified writeSettings() to write updated settings on destroy.
   *                          Fixes #5142.
+  *   @history 2018-04-20 Adam Goins - Added the ctrl+del keyboard shortcut to the TableMainWindow's
+  *                          "Clear Table" menu option. Fixes #4912.
   */
   class TableMainWindow : public MainWindow {
       Q_OBJECT

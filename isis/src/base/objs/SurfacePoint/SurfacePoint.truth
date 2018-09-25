@@ -8,7 +8,7 @@ UnitTest for SurfacePoint
     lat = 0.55850536 radians, lon = 2.0943951 radians, radius = 1000 meters
     latitude sigma=1.64192315 degrees, longitude sigma=1.78752107 degrees, radius sigma=38.4548873 m
     latitude sigma=0.0286569649 radians, longitude sigma=0.0311981281 radians, radius sigma=38.4548873 m
-    latitude sigma=28.6569649 m, longitude sigma=36.7881588 m, radius sigma=38.4548873 m
+    latitude sigma=28.6569649 m, longitude sigma=26.4575131 m, radius sigma=38.4548873 m
     latitude weight =1217.69806, longitude weight =1027.40796, radius weight =676.233861
     spherical covariance matrix = 0.00082122164  0.000649383279  -0.674095535
                                   0.000649383279  0.000973323195  -1.03923048

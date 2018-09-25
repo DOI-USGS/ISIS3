@@ -24,7 +24,7 @@
       falls outside of the dimensions of the mosaic, it will be
       clipped. The line, sample, band dimensions of the output mosaic
       are required to be specified at the time of creation.  This
-      appication does not require a camera model, Instrument Group or
+      application does not require a camera model, Instrument Group or
       Mapping Group keywords as required by the other mosaic applications, <b>mapmos</b> and <b>automos</b>.
     </p>
     <p>
@@ -36,7 +36,7 @@
     </p>
     <p>
       MATCHDEM = FALSE, the default does not check the SHAPEMODEL keyword of the input cube
-      files and does not propogate what DEM Shapemodel that was used when the input files were
+      files and does not propagate what DEM Shapemodel that was used when the input files were
       projected.
     </p>
     <p>
@@ -47,19 +47,41 @@
       options is explained in the tables and descriptions below.
     </p>
     <p>
-      The Track feature creates a band in the output mosaic file containing the index
-      values for every pixel in the output mosaic.The Track-band can only be used appropriately through
-      the  QVIEW-AdvancedTracking tool. As the user interactively pans across the displayed
-      mosaic band (Band1), for every mosaic pixel location QVIEW-AdvancedTracking will report
-      the source cube filename that was input to automos. The Track-band cannot be used outside
-      the QVIEW-AdvancedTracking tool. <b>Hence the file (byte) size of the mosaic is increased due to
-      the track-band.</b>
+      The TRACK feature creates a separate tracking cube in addition to the mosaic cube, and
+      contains information for the source files of every pixel within the output mosaic.
+      This cube will have the same base-name as the mosaic cube, but will end in 
+      "_tracking.cub". The tracking cube must always reside in the same directory as the
+      mosaic cube to be properly accessed; this means that if the mosaic cube is copied or
+      moved, then its associated tracking cube must be copied or moved to the same location.
+      <b>The tracking cube will always be of type unsigned integer. Depending on the
+      bit-type of the mosaic cube and/or the number of bands it contains, the tracking cube
+      may be as much as four times the size of the mosaic cube itself.</b>
     </p>
     <p>
-      The Track feature works with Priority options ONTOP (with HIGHSATURATION and
-      LOWSATURATION parameters) and BENEATH for single band input cubes.  It does NOT support
-      multiple band input cubes with these priority options. It does work for multiband cubes
-      when PRIORITY=BAND. Furthermore, this feature is NOT supported when PRIORITY=AVERAGE.
+      The tracking cube can be used appropriately through the QVIEW-AdvancedTracking
+      tool. As the user pans across the displayed mosaic, for every mosaic pixel location,
+      QVIEW-AdvancedTracking will interactively report the index, the filename and the
+      serial number of the input cube that was input to handmos for that specific pixel
+      location. Since the tracking cube is of bit-type unsigned integer, the DN values of
+      0, 1 and 2 are reserved for NULL, LRS and LIS, respectively, so valid pixel DN values
+      will begin at an offset of 3. In other words, a pixel of DN value 3 in the tracking
+      cube means that this same pixel within the mosaic was taken from the first input
+      image. The tracking cube cannot be used outside of the QVIEW-AdvancedTracking tool
+      except as a visual representation of the source cubes for the different pixels. 
+    </p>
+    <p>
+      The TRACK feature works with Priority options ONTOP and BENEATH for single band input
+      cubes. It works for multiband cubes for PRIORITY=ONTOP only when the NULL,
+      HIGHSATURATION and LOWSATURATION options are set to true. It also works for multiband
+      cubes when PRIORITY=BAND. Furthermore, this feature is NOT supported when
+      PRIORITY=AVERAGE.
+    </p>
+    <p>
+      <b>Please Note: Older versions of handmos (prior to isis3.5.3) no longer work with
+      mosaics that contain an attached tracking band. Mosaics including an attached tracking
+      cube can be updated and reformatted by running the program trackextract. This new
+      utility will create a new version of the mosaic with the appropriate label information
+      and a separate tracking cube to which it points.</b>
     </p>
     <p>
       <b>
@@ -76,8 +98,17 @@
             current input image will appear in the output mosaic (it replaces the output mosaic
             pixel).  Invalid input <def>Special Pixels</def>
             (<def>NULL</def>,<def>HRS</def>,<def>HIS</def>,<def>LRS</def>,<def>LIS</def>) will NOT
-            replace an existing Valid output mosaic pixel. Refer to parameters HIGHSATURATION,
-            LOWSATURATION, and NULL to override replacement of Valid output mosaic pixels.
+            replace an existing Valid output mosaic pixel unless the optional flags are set. Refer
+            to parameters HIGHSATURATION,LOWSATURATION, and NULL to override replacement of Valid
+            output mosaic pixels. 
+            <p>
+              <b>NOTE:</b> When using this priority with multi-band mosaics and with the TRACK
+              option set, all Special Pixel flags must be set as well. This is because the same
+              pixel within different bands of a single input image may hold both Valid and Special
+              Pixel values, and since our Tracking capabilities can only track one input image per
+              pixel (as it is a single band), it must accept the values for that particular pixel
+              from <b>every</b> band in the input image being placed on top.
+            </p>
           </td>
         </tr>
         <tr>
@@ -106,7 +137,7 @@
             Overlapping Valid pixel values from the current input image and output mosaic will be
             averaged for the new mosaic pixel values. A count-band is created with the output
             mosaic file.  The count-band keeps track of the number of images involved in the
-            averaging of the input dn values for each pixel in the mosaic. Invalid input pixel
+            averaging of the input DN values for each pixel in the mosaic. Invalid input pixel
             values will not be included in the average.  In the case where only one Valid pixel
             exists between the input image pixels or the current mosaic pixel, the Valid pixel is
             retained in the current output mosaic. Refer to parameters HIGHSATURATION,
@@ -436,6 +467,11 @@
       group in the cube labels which could impact processing scripts/pipelines. Fixes #1620.
       References #1623.
     </change>
+    <change name="Summer Stapleton" date="2018-08-13">
+      Updated code and documentation to reflect new handling of tracking capabilities with an 
+      external tracking cube as well as clarify why special pixel flags are required when 
+      priority=ontop for multiband mosaics. References #2092
+    </change>
   </history>
 
   <oldName>
@@ -536,7 +572,7 @@
             </brief>
             <description>
               If the input and mosaic pixel of the priority band, specified by NUMBER or KEYNAME
-              and KEYVALUE, are valid, a less than or greater than comparison is done. Depending on
+              and KEYVALUE are valid, a less than or greater than comparison is done. Depending on
               the CRITERIA selected, the lower or higher of the two pixels is placed on top.
               Special and NULL pixels are not placed on top unless their flags are set. So, if the
               comparison of the priority band says that the input pixel should be on top but the
@@ -588,7 +624,7 @@
           <option value="BANDNUMBER">
             <brief>Band Number </brief>
             <description>
-              You can enter the band number to use in the pixel comparison.
+              The band number to use in the pixel comparison.
             </description>
             <inclusions>
               <item>NUMBER</item> 
@@ -662,7 +698,7 @@
         <list>
           <option value="LESSER">
             <brief>
-                The lower DN value between the input and mosaic pixels will be placed on top.
+                The lower DN value between the input and mosaic pixels will be placed on top
             </brief>
             <description>
               The lower DN value between the input and mosaic pixels will be placed on top of
@@ -671,7 +707,7 @@
           </option>
           <option value="GREATER">
             <brief>
-              The larger DN value between the input and mosaic pixels will be placed on top.
+              The larger DN value between the input and mosaic pixels will be placed on top
             </brief>
             <description>
               The larger DN value between the input and mosaic pixels will be placed on top of
@@ -686,7 +722,7 @@
       <parameter name="INSAMPLE">
         <type>integer</type>
         <brief>This sample in the input cube will be placed
-          at OUTSAMPLE in the mosaic.
+          at OUTSAMPLE in the mosaic
           </brief>
         <description>  
           This is a sample in the input image. This sample in the input cube will be placed at
@@ -698,7 +734,7 @@
       <parameter name="INLINE">
         <type>integer</type>
         <brief>This line in the input cube will be placed
-          at OUTLINE in the mosaic.
+          at OUTLINE in the mosaic
           </brief>
         <description>  
           This is a line in the input image. This line in the input cube will be placed at
@@ -710,7 +746,7 @@
       <parameter name="INBAND">
         <type>integer</type>
         <brief>This band in the input cube will be placed
-          at OUTBAND in the mosaic.
+          at OUTBAND in the mosaic
           </brief>
         <description>  
           This is a band in the input image. This band in the input cube will be placed at
@@ -785,7 +821,7 @@
         <description>
           This option causes High Saturation values (both Instrument and 
           Representation) in the input image to be automatically copied to the 
-          mosaic regardless of the priority
+          mosaic regardless of the priority.
         </description>
       </parameter>
       <parameter name="LOWSATURATION">
@@ -795,7 +831,7 @@
         <description>
           This option causes Low Saturation values (both Instrument and 
           Representation) in the input image to be automatically copied to the 
-          mosaic regardless of the priority
+          mosaic regardless of the priority.
         </description>
       </parameter>
       <parameter name="NULL">
@@ -804,7 +840,7 @@
         <brief>Copy Input NULL values </brief>
         <description>
           This option causes NULL values  in the input image to be automatically 
-          copied to the mosaic regardless of the priority
+          copied to the mosaic regardless of the priority.
         </description>
       </parameter>
     </group>
@@ -822,7 +858,7 @@
           <option value="NO">
             <brief> The output mosaic already exists </brief>
             <description>
-              Choose this option if the output mosaic already exists
+              Choose this option if the output mosaic already exists.
             </description>
             <exclusions>
               <item>NSAMPLES</item>
@@ -836,7 +872,7 @@
           <option value="YES">
             <brief>Create the output mosaic </brief>
             <description>
-              The output mosaic does not exist and will be created
+              The output mosaic does not exist and will be created.
             </description>
             <inclusions>
               <item>NSAMPLES</item>
@@ -856,27 +892,26 @@
         </brief>
           <description>
             <p>
-              The Track feature creates a band in the output mosaic file containing the index
-              values for every pixel in the output mosaic. The Track-band can only be used
-              appropriately through the  QVIEW-AdvancedTracking tool. As the user interactively
-              pans across the displayed mosaic band (Band1), for every mosaic pixel location
-              QVIEW-AdvancedTracking will report the source cube filename that was input to
-              automos. The Track-band cannot be used outside the QVIEW-AdvancedTracking tool.
-              TRACK must be set to TRUE at the time of mosaic creation only and cannot be turned
-              on after the mosaic is created. When a mosaic is created with TRACK=TRUE, all
-              subsequent runs will default to TRACK=TRUE. When a mosaic is created with
-              TRACK=FALSE, an error will be encountered if subsequent runs have TRACK=TRUE.
-              <b>Hence the file (byte) size of the mosaic is increased due to
-              the track-band.</b>
-            </p>
-            <p>
-              A table, called InputImages, containing the names of the images used in the mosaic
-              will be added to the cube when TRACK=TRUE.
+              The Track feature creates a separate tracking cube containing the index values for
+              the source of every pixel in the output mosaic. The tracking cube can only be used
+              appropriately through the  QVIEW-AdvancedTracking tool. As the user pans across the
+              displayed mosaic, for every mosaic pixel location QVIEW-AdvancedTracking will
+              interactively report the filename, the serial number and the index of the input cube
+              that was input to handmos for that specific pixel location. The tracking cube cannot
+              be used outside the QVIEW-AdvancedTracking tool except as a visual representation of
+              the source cubes for the different pixels. TRACK must be set to TRUE at the time of
+              mosaic creation only and cannot be turned on after the mosaic is created. When a
+              mosaic is created with TRACK=TRUE, all subsequent runs will default to TRACK=TRUE.
+              When a mosaic is created with TRACK=FALSE, an error will be encountered if subsequent
+              runs have TRACK=TRUE. <b>The tracking cube will always be of type unsigned integer.
+              Depending on the bit-type of the mosaic cube and/or the number of bands it contains,
+              the tracking cube may be as much as four times the size of the mosaic cube itself.</b>
             </p>
             <p>
               WARNING:
-              If Tracking is turned on in a mosaic, any subsequent applications that modify "dn"
-              values will corrupt the track-band, for instance the application <def>reduce</def>.
+              If Tracking is turned on in a mosaic, any subsequent applications that modify DN
+              values, such as the application<def>reduce</def>, will corrupt the DN values in the
+              tracking cube.
             </p>
           </description>
       </parameter>
@@ -885,7 +920,7 @@
         <type>boolean</type>
         <default><item>TRUE</item></default>
         <brief>
-          Propagate the labels, tables, and BLOBs from the input cube.
+          Propagate the labels, tables, and BLOBs from the input cube
         </brief>
         <description>
           If selected the application will transfer the labels, tables,

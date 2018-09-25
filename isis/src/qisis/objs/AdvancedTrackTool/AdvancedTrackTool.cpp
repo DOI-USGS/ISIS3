@@ -306,7 +306,9 @@ namespace Isis {
     QString fnameName = fname.name();
     p_tableWin->table()->item(row, PATH)->setText(fnamePath);
     p_tableWin->table()->item(row, FILENAME)->setText(fnameName);
-    //p_tableWin->table()->item(row,34)->setText(SerialNumber::Compose(*cvp->cube()).c_str());
+    if (!cvp->cube()->hasGroup("Tracking") && !cvp->cube()->hasTable("InputImages")){
+      p_tableWin->table()->item(row, SERIAL_NUMBER)->setText(SerialNumber::Compose(*cvp->cube()));
+    }
 
     // If we are outside of the image then we are done
     if((sample < 0.5) || (line < 0.5) ||
@@ -535,14 +537,17 @@ namespace Isis {
     }
 
     // Track the Mosaic Origin -  Index (Zero based) and FileName
-    int iMosaicOrigin = -1;
-    QString sSrcFileName = "";
-    QString sSrcSerialNum = "";
-    TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
-    p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
-                         setText(QString(sSrcSerialNum));
+    if (cvp->cube()->hasTable("InputImages") || cvp->cube()->hasGroup("Tracking")) {
+      int iMosaicOrigin = -1;
+      QString sSrcFileName = "";
+      QString sSrcSerialNum = "";
+      TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
+      p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
+      p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName));
+      p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
+                           setText(QString(sSrcSerialNum));
+    }
+    
   }
 
 
@@ -569,8 +574,17 @@ namespace Isis {
         Cube *cCube = cvp->cube();
         int iTrackBand = -1;
 
-        if(cCube->hasGroup("Tracking")) {
-          Cube *trackingCube = cvp->trackingCube();
+        // This is a mosaic in the new format or the external tracking cube itself
+        if(cCube->hasGroup("Tracking") || 
+                (cCube->hasTable(trackingTableName) && cCube->bandCount() == 1)) {
+          Cube *trackingCube;
+          if(cCube->hasGroup("Tracking")) {
+            trackingCube = cvp->trackingCube();
+          }
+          else {
+            trackingCube = cCube;
+          }
+          
           // Read the cube DN value from TRACKING cube at location (piLine, piSample)
           Portal trackingPortal(trackingCube->sampleCount(), 1, trackingCube->pixelType());
           trackingPortal.SetPosition(piSample, piLine, 1);
@@ -632,8 +646,8 @@ namespace Isis {
               psSrcSerialNum = QString(cFileTable[piOrigin][1]);
             }
           }
-        }
-
+        } 
+        
         if (piOrigin == -1) { // If not from an image, display N/A
           psSrcFileName = "N/A";
           psSrcSerialNum = "N/A";
