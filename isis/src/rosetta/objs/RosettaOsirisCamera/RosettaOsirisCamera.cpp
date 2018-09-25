@@ -92,9 +92,6 @@ namespace Isis {
     double pixelAveragingHeight=(double) inst["PixelAveragingHeight"];
     detectorMap->SetDetectorSampleSumming(pixelAveragingWidth);
     detectorMap->SetDetectorLineSumming(pixelAveragingHeight);
-    //std::cout<<"binning mode: "<<binningMode<<std::endl;
-    //The binning modes are square:
-
 
     RosettaOsirisCameraDistortionMap* distortionMap = new RosettaOsirisCameraDistortionMap(this);
 
