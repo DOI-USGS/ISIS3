@@ -66,15 +66,19 @@ Errors while running CTest
 
 ## Make Truth Replacement
 
-The MakeTruth functionality that exists in the Makefiles of the old make system now exists in a script (makeOutput.py) located in (ISIS3/isis/scripts/makeOutput.py)
+The MakeTruth functionality that exists in the Makefiles of the old make system now exists in a script (makeOutput.py) located in `ISIS3/isis/scripts/makeOutput.py`.
 A developer will want output of a test before setting it as truth data. This is currently done with the following command in the form of:
-    python3 makeOutput.py test
+
+    `python3 makeOutput.py test`
+
 where test is the cmake name for the unit or app test. It is important to note that this command must be ran from the the src directory, i.e., the object's directory that output is being made for.
-For unit tests, this will output a file in the form of <objectname>.Truth in the directory build/testOutputDir.
-For app tests, this will output a directory (truth) in the directory build/testOutputDir that contains the truth data for the app test.
+For unit tests, this will output a file in the form of <objectname>.Truth in the directory `build/testOutputDir`.
+For app tests, this will output a directory (truth) in the directory `build/testOutputDir` that contains the truth data for the app test.
 
 To check in truth data the command should be in the form of:
-    python3 makeOutput.py -t test
+
+    `python3 makeOutput.py -t test`
+
 Example makeOutput.py for object Apollo:
 ```shell
 command:    python3 $ISISROOT/../isis/scripts/makeOutput.py apollo_unit_test_Apollo
