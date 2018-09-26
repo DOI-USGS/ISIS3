@@ -90,6 +90,9 @@ namespace Isis {
    *                          with the current pixel. Moved code opening the tracking cube to
    *                          CubeViewport. If the cursor is over a pixel with no tracking info,
    *                          file name and serial number display N/A now.
+   *  @history 2018-08-13 Summer Stapleton - Added logic to trackingMosaicOrigin() for the tracking
+   *                          cube (in addition to the mosaic cube) and added logic to track the
+   *                          serial number of all other cubes. Fixes #4899
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT

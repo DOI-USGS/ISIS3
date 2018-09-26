@@ -70,6 +70,9 @@ namespace Isis {
    *   @history 2015-10-04 Jeannie Backer Improved coding standards. Uncommented error throw for
    *                           operator+=(record) that verifies that the record sizes match.
    *                           References #1178
+   *   @history 2018-08-13 Summer Stapleton - Added a default constructor for logic relating to the
+   *                           overhaul of the mosaic tracking now being handled in a separate 
+   *                           tracking cube.
    */
   class Table : public Isis::Blob {
     public:
@@ -84,6 +87,7 @@ namespace Isis {
       };
 
       // Constructors and Destructors
+      Table();
       Table(const QString &tableName, TableRecord &rec);
       Table(const QString &tableName);// Only use this constructor for reading in an existing table
       Table(const QString &tableName, const QString &file);

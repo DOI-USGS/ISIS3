@@ -1734,15 +1734,15 @@ namespace Isis {
                 }
               }
               else {
-                if(bufferVal == NULLUI4)
+                if(bufferVal == NULL8)
                   raw = NULLUI4;
-                else if(bufferVal == LOW_INSTR_SATUI4)
+                else if(bufferVal == LOW_INSTR_SAT8)
                   raw = LOW_INSTR_SATUI4;
-                else if(bufferVal == LOW_REPR_SATUI4)
+                else if(bufferVal == LOW_REPR_SAT8)
                   raw = LOW_REPR_SATUI4;
-                else if(bufferVal == HIGH_INSTR_SATUI4)
+                else if(bufferVal == HIGH_INSTR_SAT8)
                   raw = HIGH_INSTR_SATUI4;
-                else if(bufferVal == HIGH_REPR_SATUI4)
+                else if(bufferVal == HIGH_REPR_SAT8)
                   raw = HIGH_REPR_SATUI4;
                 else
                   raw = LOW_REPR_SATUI4;
