@@ -607,7 +607,9 @@ namespace Isis {
       if (p_degree > 0 && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
       // Load the time cache first
-      p_minimizeCache = No;
+      if (p_minimizeCache != Fixed) {
+        p_minimizeCache = No; 
+      }
       LoadTimeCache();
 
       if (p_fullCacheSize > 1) {
@@ -635,7 +637,9 @@ namespace Isis {
       p_cacheAv.clear();
 
       // Reload the time cache first
-      p_minimizeCache = No;
+      if (p_minimizeCache != Fixed) {
+        p_minimizeCache = No; 
+      }
       LoadTimeCache();
 
       for (std::vector<double>::size_type pos = 0; pos < maxSize; pos++) {
@@ -714,8 +718,10 @@ namespace Isis {
       LineCache(tableName);
 
       //std::cout << "Full cache size is " << p_cache.size() << endl;
-
-      p_minimizeCache = Yes;
+      
+      if (p_minimizeCache != Fixed) {
+        p_minimizeCache = Yes; 
+      }
       LoadTimeCache();
 
       //std::cout << "Minimized cache size is " << p_cache.size() << endl;
@@ -1929,8 +1935,13 @@ namespace Isis {
     p_overrideTimeScale = timeScale;
     p_noOverride = false;
     return;
-  }
+ }
 
+  // NEW: sets the cache time
+  void SpiceRotation::SetCacheTime(std::vector<double> cacheTime) {
+    MinimizeCache(DownsizeStatus::Fixed); // look at this later. Needed for VIRTIS-M 
+    p_cacheTime = cacheTime; 
+  }
 
   /**
    * Evaluate the derivative of the fit polynomial defined by the
@@ -2296,11 +2307,13 @@ namespace Isis {
     ktotal_c("ck", (SpiceInt *) &count);
 
     // Downsize the loaded cache
-    if ((p_source == Memcache) && p_minimizeCache == Yes) {
+    if ((p_source == Memcache) && p_minimizeCache == Yes) { // FIXME me (skip this if: minimizeCache == no)
       // Multiple ck case, type 5 ck case, or PolyFunctionOverSpice
       //  final step -- downsize loaded cache and reload
 
       if (p_fullCacheSize != (int) p_cache.size()) {
+        std::cout << "fullcachesize: " << p_fullCacheSize << std::endl; 
+        std::cout << "p_cache.size(): " << p_cache.size() << std::endl; 
 
         QString msg =
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
@@ -2397,7 +2410,7 @@ namespace Isis {
         dafus_c(sum, (SpiceInt) 2, (SpiceInt) 6, dc, ic);
 
         // Don't read type 5 ck here
-        if (ic[2] == 5) break;
+        if (ic[2] == 5) break; // FIXME: ic[2] is the ck type
 //
         // Check times for type 3 ck segment if spacecraft matches
         if (ic[0] == spCode && ic[2] == 3) {
@@ -2476,15 +2489,21 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    // FIXME: this is the only place we can go with p_minimizeCache = No 
     // Load times according to cache size (body rotations) -- handle first round of type 5 ck case
     //   and multiple ck case --Load a time for every line scan line and downsize later
-    if (!timeLoaded) {
-      double cacheSlope = 0.0;
+    if (! (timeLoaded || (p_cacheTime.size() > 1))) {
+      double cacheSlope = 0.0; 
       if (p_fullCacheSize > 1)
         cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
       for (int i = 0; i < p_fullCacheSize; i++)
-        p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope);
-      if (p_source == Nadir) p_minimizeCache = No;
+        p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope); 
+      // could try to change the kernels: type, resample, something else? check on type 2 or 3, concerned about interpolation
+      // it's already type 2 or 3... 
+      // FIXME
+      if (p_source == Nadir && (p_minimizeCache != Fixed)) {
+        p_minimizeCache = No;
+      }
     }
     NaifStatus::CheckErrors();
   }

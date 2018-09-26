@@ -4,6 +4,7 @@
 #include <istream>
 #include <sstream>
 #include <cmath>
+#include <iomanip>
 
 #include <QString>
 #include <QFileInfo>
@@ -406,16 +407,21 @@ void IsisMain ()
     SpiceDouble etStart;
     SpiceDouble etEnd;
     std::cout << "startScet: " << startScet << std::endl; 
-    std::cout << "startScet: " << stopScet << std::endl; 
+    std::cout << "stopScet: " << stopScet << std::endl; 
     scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
-    QString startTime = iTime(etStart).UTC(); 
-    QString stopTime = iTime(etEnd).UTC(); 
+    QString startTime = iTime(etStart-16.0).UTC(); 
+    QString stopTime = iTime(etEnd-16.0).UTC(); 
+    std::cout << "starTime: " << startTime  << std::endl; 
+    std::cout << "stopTime: " << stopTime  << std::endl; 
+    std::cout << std::setprecision(15) << "start et: " << etStart << std::endl; 
+    std::cout << std::setprecision(15) << "stop et: " << etEnd << std::endl; 
+    std::cout << std::setprecision(15) << "difference: " << etEnd - etStart << std::endl; 
 
     SpiceChar startSclkString[50]; 
     SpiceChar endSclkString[50]; 
-    sce2s_c( (SpiceInt) -226, etStart, (SpiceInt) 50, startSclkString);
-    sce2s_c( (SpiceInt) -226, etEnd, (SpiceInt) 50, endSclkString);
+    sce2s_c( (SpiceInt) -226, etStart-16.0, (SpiceInt) 50, startSclkString);
+    sce2s_c( (SpiceInt) -226, etEnd-16.0, (SpiceInt) 50, endSclkString);
     
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime); 
@@ -485,6 +491,7 @@ QString convertSCET(int word1, int word2, int word3)
   double fractionalSeconds = (double) word3; 
   QString scetString = QString::number(seconds, 'f');
   QStringList scetStringList = scetString.split(".");
+  // The integer portion
   scetString = scetStringList[0];
   scetString.append(":");
   scetString.append(QString::number(fractionalSeconds));

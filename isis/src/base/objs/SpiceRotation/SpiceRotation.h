@@ -280,7 +280,8 @@ namespace Isis {
       enum DownsizeStatus {
         Yes,  //!< Downsize the cache
         Done, //!< Cache is downsized
-        No    //!< Do not downsize the cache
+        No,   //!< Do not downsize the cache
+        Fixed //!< Never downsize the cache
       };
 
       /**
@@ -392,6 +393,7 @@ namespace Isis {
       double GetTimeScale();
 
       void SetOverrideBaseTime(double baseTime, double timeScale);
+      void SetCacheTime(std::vector<double> cacheTime); 
 
       // Derivative methods
       double DPolynomial(const int coeffIndex);
