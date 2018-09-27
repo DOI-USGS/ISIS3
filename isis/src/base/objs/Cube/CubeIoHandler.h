@@ -119,6 +119,8 @@ namespace Isis {
    *   @history 2018-07-20 Tyler Wilson - Added support for unsigned integer special pixel values.
    *                            in functions writeIntoRaw(...) and writeIntoDouble(...)
    *                            References #971.
+   *   @history 2018-08-13 Summer Stapleton - Fixed incoming buffer comparison values for 
+   *                            unsigned int type in writeIntoRaw(...). 
    */
   class CubeIoHandler {
     public:

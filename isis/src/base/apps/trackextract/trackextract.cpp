@@ -36,6 +36,7 @@ void copyPixels(Buffer &in, Buffer &out);
  * @author 2018-07-30 Kaitlyn Lee
  * @internal
  *   @history 2018-07-30 Kaitlyn Lee - Original Version.
+ *
  */
 class CopyPixelsFunctor {
   private:
@@ -63,7 +64,7 @@ class CopyPixelsFunctor {
     void operator()(Buffer &in, Buffer &out) const {
       for (int i = 0; i < in.size(); i++) {
         if (in[i] == (float) m_defaultValue) {
-          out[i] = NULLUI4;  // Set to the unsigned 4 byte Null value
+          out[i] = Isis::Null;
         }
         else {
           out[i] = ((int) in[i]) - m_offset + VALID_MINUI4;
@@ -77,6 +78,17 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString inputName = ui.GetFileName("FROM");
   QString outputName = ui.GetFileName("TO");
+  
+  // Confirm that the input mosaic is of pixel-type "Real" as trackextract does not work on other
+  // bit types due to corruption of these files
+  Cube inputCube = Cube(inputName);
+  PixelType pixelType = inputCube.pixelType();
+  if (pixelType != Real) {
+    QString msg = "The input mosaic [" + inputName + "] is of pixel type [" 
+    + PixelTypeName(pixelType) + "]. This application only works for mosaics of pixel type Real.";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+  
   QVector<QString> copyBands;
   int trackBand;
   findTrackBand(inputName, copyBands, trackBand);
