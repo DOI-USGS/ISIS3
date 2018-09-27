@@ -77,11 +77,13 @@
       PRIORITY=AVERAGE.
     </p>
     <p>
-      <b>Please Note: Older versions of handmos (prior to isis3.5.3) no longer work with
-      mosaics that contain an attached tracking band. Mosaics including an attached tracking
-      cube can be updated and reformatted by running the program trackextract. This new
-      utility will create a new version of the mosaic with the appropriate label information
-      and a separate tracking cube to which it points.</b>
+      <b>Please Note: Prior to ISIS version 3.6.0, tracking for the various mosaicking apllications
+        was being handled with an internal tracking band. Tracking is now being handled by an
+        external tracking cube that contains the associated tracking information. This application
+        can no longer add to mosaics of the old format. In order to continue to use these
+        older mosaics with the updated mosaicking applications, you must first use the
+        <def>trackextract</def> utility application to extract the tracking band and the associated
+        tracking information into an external tracking cube.</b>
     </p>
     <p>
       <b>

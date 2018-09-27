@@ -8,7 +8,7 @@
   <description>
     <p>
       Updates a mosaic cube with tracking information that was created using older versions of ISIS
-      (prior to 3.5.3) to be up to date with ISIS version 3.5.3 and above. Removes the tracking
+      (prior to 3.6.0) to be up to date with ISIS version 3.6.0 and above. Removes the tracking
       band and the InputImages table from the input mosaic cube and places them into a separate
       tracking cube. A reference to the tracking cube is then added to the mosaic label. In the
       copying process, if a pixel in the tracking band of the input mosaic is not associated with
@@ -18,7 +18,7 @@
     </p>
     <p>
       <b>Please Note: This application only works for 32-bit ("Real") mosaics as both 8-bit and
-      16-bit mosaics created prior to ISIS version 3.5.3 are considered to be corrupted.</b>
+      16-bit mosaics created prior to ISIS version 3.6.0 are considered to be corrupted.</b>
     </p>
     
   </description>
@@ -48,9 +48,9 @@
           Input cube with tracking band
         </brief>
         <description>
-          The mosaic created on or before the ISIS version 3.5.2 that contains the tracking band
+          The mosaic created prior to ISIS version 3.6.0 that contains the tracking band
           and InputImages table to be extracted. <b>Please Note: This mosaic cube must be of
-          bit-type "Real" as both 8-bit and 16-bit mosaics created before ISIS version 3.5.3 are
+          bit-type "Real" as both 8-bit and 16-bit mosaics created before ISIS version 3.6.0 are
           considered to be corrupted.</b>
         </description>
         <filter>
@@ -65,7 +65,7 @@
           Output mosaic and tracking cube
         </brief>
         <description>
-          The output mosaic cube name that will be up to date with isis version 3.5.3 and above. 
+          The output mosaic cube name that will be up to date with isis version 3.6.0 and above. 
           This cube will no longer have the tracking band or the InputImages table, but a tracking
           cube will be created in the same location with this information. This tracking cube will
           have the same base name as the mosaic, but will end in "_tracking.cub".

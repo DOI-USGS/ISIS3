@@ -22,7 +22,6 @@
 
 #include "TrackingTable.h"
 
-#include <QDebug>
 #include <QList>
 #include <QString>
 
