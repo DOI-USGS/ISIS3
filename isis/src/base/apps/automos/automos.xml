@@ -91,7 +91,7 @@
         PRIORITY=AVERAGE.
       </p>
       <p>
-        <b>Please Note: Older versions of automos (prior to isis3.5.3) no longer work with
+        <b>Please Note: Older versions of automos (prior to isis3.6.0) no longer work with
         mosaics that contain an attached tracking band. Mosaics including an attached tracking
         cube can be updated and reformatted by running the program trackextract. This new
         utility will create a new version of the mosaic with the appropriate label information
