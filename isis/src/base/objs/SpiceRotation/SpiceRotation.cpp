@@ -306,7 +306,9 @@ namespace Isis {
    * @param status The DownsizeStatus enumeration value.
    */
   void SpiceRotation::MinimizeCache(DownsizeStatus status) {
-    p_minimizeCache = status;
+    if (p_minimizeCache != DownsizeStatus::Fixed) {
+      p_minimizeCache = status; 
+    }
   }
 
 
