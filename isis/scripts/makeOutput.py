@@ -38,24 +38,25 @@ userInput = parser.parse_args()
 testInput = userInput.test
 
 if "_unit_" in testInput:
-    unitTestName = testInput.split("_test_")[1] + ".truth"
-    # we should probably append the path to the front so it ends up in
-    # in the same directory as the test
-    unitTestPath = builddir + "/unitTest/"
+    unitTestName = testInput.split("_test_")[1]
+    truthFileName = unitTestName + ".truth"
 
-    os.system(unitTestPath + testInput + ">&" + builddir + "/testOutputDir/" + unitTestName)
-    print("Unit Test Output In " + builddir + "/testOutputDir/ As " + unitTestName)
+    # We need to run the unit test from the object's directory because 
+    # some tests have an xml file in the object's directory. If we ran the 
+    # unit test from /unitTest, these files would not be able to be opened.
+    with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
+        for line in testFile:
+            if "/" + unitTestName + "/" in line:
+                unitTestSrcPath = line.split("\" \"")[2][13:].split(unitTestName + "/")[0] + unitTestName + "/"
+                if not os.path.exists(unitTestSrcPath + "unitTest"):              
+                    os.system("ln -s " + builddir + "/unitTest/" + testInput + " " + unitTestSrcPath + "unitTest")
+                os.system(unitTestSrcPath + "unitTest" + ">& " + builddir + "/testOutputDir/" + truthFileName)
+                print("Unit Test Output In " + builddir + "/testOutputDir/ As " + truthFileName)
+                break
 
     if userInput.truth:
-        with open(builddir + "/objects/CTestTestfile.cmake") as testFile:
-            for line in testFile:
-                if unitTestName in line:
-                    unitTestSrcPath = line.split("\" \"")[2][13:]
-                    os.system("cp -f " + builddir + "/testOutputDir/" + unitTestName + " " + unitTestSrcPath)
-                    break
-
+        os.system("cp -f " + builddir + "/testOutputDir/" + truthFileName + " " + unitTestSrcPath + truthFileName)
         print("Checked In Truth Data To " + unitTestSrcPath)
-
 
 else:
     apptest = testInput

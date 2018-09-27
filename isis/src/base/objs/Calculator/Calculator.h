@@ -64,7 +64,8 @@ namespace Isis {
    *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *  @history 2017-08-30 Tyler Wilson and Ian Humphrey - provided std:: namespace for isnan
    *                          to fix ambiguity error when using c++11. References #4809.
-   *
+   *  @history 2018-09-27 Kaitlyn Lee - Fixed the cout in PrintTop() so that -nan is printed
+   *                          as nan. 
    */
   class Calculator {
     public:

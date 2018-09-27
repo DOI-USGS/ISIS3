@@ -22,6 +22,7 @@
 
 #include <cmath>
 
+#include <QRegExp>
 #include <QStack>
 #include <QVector>
 
@@ -1003,12 +1004,16 @@ namespace Isis {
   void Calculator::PrintTop() {
     if(p_valStack->empty()) return;
 
-    std::cout << "[ ";
+    QString temp;
+    temp += "[ ";
     QVector<double> top = p_valStack->top();
     for(int i = 0; i < (int)top.size(); i++) {
-      std::cout << top[i] << " ";
+      temp += QString::number(top[i]);
+      temp += " ";
     }
-    std::cout << "]" << std::endl;
+    temp += "]";
+    temp.replace(QRegExp("-nan"), "nan");
+    std::cout<<temp<<std::endl;
   }
 
 
