@@ -406,17 +406,10 @@ void IsisMain ()
     
     SpiceDouble etStart;
     SpiceDouble etEnd;
-    std::cout << "startScet: " << startScet << std::endl; 
-    std::cout << "stopScet: " << stopScet << std::endl; 
     scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
     QString startTime = iTime(etStart-16.0).UTC(); 
     QString stopTime = iTime(etEnd-16.0).UTC(); 
-    std::cout << "starTime: " << startTime  << std::endl; 
-    std::cout << "stopTime: " << stopTime  << std::endl; 
-    std::cout << std::setprecision(15) << "start et: " << etStart << std::endl; 
-    std::cout << std::setprecision(15) << "stop et: " << etEnd << std::endl; 
-    std::cout << std::setprecision(15) << "difference: " << etEnd - etStart << std::endl; 
 
     SpiceChar startSclkString[50]; 
     SpiceChar endSclkString[50]; 
@@ -426,10 +419,8 @@ void IsisMain ()
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime); 
 
-    std::cout << "Do we match: " << startScet << ", " << stopScet << std::endl;
     inst.findKeyword("SpacecraftClockStartCount").setValue(startSclkString); 
     inst.findKeyword("SpacecraftClockStopCount").setValue(endSclkString); 
-    std::cout << "Do we match: " << startSclkString << ", " << endSclkString << std::endl;
 
     outcube->putGroup(inst);
 

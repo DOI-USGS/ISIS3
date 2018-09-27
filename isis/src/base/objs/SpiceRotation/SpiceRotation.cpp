@@ -2312,8 +2312,6 @@ namespace Isis {
       //  final step -- downsize loaded cache and reload
 
       if (p_fullCacheSize != (int) p_cache.size()) {
-        std::cout << "fullcachesize: " << p_fullCacheSize << std::endl; 
-        std::cout << "p_cache.size(): " << p_cache.size() << std::endl; 
 
         QString msg =
           "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
@@ -3111,7 +3109,7 @@ namespace Isis {
                     (p_cacheTime[cacheIndex+1] - p_cacheTime[cacheIndex]);
       /*        Quaternion Q2 (p_cache[cacheIndex+1]);
                Quaternion Q1 (p_cache[cacheIndex]);*/
-      std::vector<double> CJ2(p_cache[cacheIndex+1]);
+      std::vector<double> CJ2(p_cache[cacheIndex+1]); 
       std::vector<double> CJ1(p_cache[cacheIndex]);
       SpiceDouble J2J1[3][3];
       mtxm_c((SpiceDouble( *)[3]) &CJ2[0], (SpiceDouble( *)[3]) &CJ1[0], J2J1);

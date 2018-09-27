@@ -300,35 +300,17 @@ namespace Isis {
    for (int i = 0; i < hktable.Records(); i++) {
      TableRecord &trec = hktable[i];
      QString scetString = trec["dataSCET"];
-//     double lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
-     double exposureDuration = exposureTime(); //16.0; // 16.099999999999998
      lineEndTime = getClockTime(scetString, naifSpkCode()).Et();
-//     std::cout << lineno << ", " << iTime(lineEndTime-exposureDuration).UTC()  << ", " << 
-//         iTime(lineEndTime).UTC() << std::endl; 
-//      std::cout << "UTC: " << getClockTime(scetString, naifSpkCode()).UTC() << std::endl;
-
      m_lineRates.push_back(LineRateChange(lineno,
-                                          lineEndTime-exposureDuration,
-                                          //lineStartTime(lineMidTime),
+                                          lineEndTime-exposureTime(),
                                           exposureTime()));
      cacheTime.push_back(lineEndTime-exposureTime());
      lineno++;
    }
    cacheTime.push_back(lineEndTime);
 
-//   std::cout << "failing #: " << iTime(528395445.01256).UTC() << std::endl; 
-//  2016-SEP-29 04:29:20.638 2016-SEP-29 04:29:36.738 Y
-/// 2016-09-29T0 4:29:20.580302, 2016-09-29T04:29:36.580302
-
-//2016-09-29T04:21:20.5558536, 2016-09-29T04:21:36.5558536
-//  2016-SEP-29 04:21:20.614 2016-SEP-29 04:21:36.714 Y
-
-
-//  2016-SEP-29 04:29:40.623 2016-SEP-29 04:29:56.723 Y
-//failing #: 2016-09-29T04:29:36.9302085
-
-    // Adjust the last time
-    LineRateChange lastR = m_lineRates.back();
+   // Adjust the last time
+   LineRateChange lastR = m_lineRates.back();
 
     // Normally the line rate changes would store the line scan rate instead of exposure time.
     // Storing the exposure time instead allows for better time calculations within a line.
