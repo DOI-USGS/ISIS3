@@ -84,8 +84,8 @@ void IsisMain() {
   Cube inputCube = Cube(inputName);
   PixelType pixelType = inputCube.pixelType();
   if (pixelType != Real) {
-    QString msg = "The input mosaic [" + inputName + "] is of pixel type [" + pixelType + "]. ";
-    msg += "This application only works for mosaics of pixel type Real.";
+    QString msg = "The input mosaic [" + inputName + "] is of pixel type [" 
+    + PixelTypeName(pixelType) + "]. This application only works for mosaics of pixel type Real.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   
