@@ -71,10 +71,10 @@ namespace Isis {
 
   //! Destructor
   ProcessExport::~ProcessExport() {
-    if(p_endianSwap != NULL) {
+    if (p_endianSwap != NULL) {
       delete p_endianSwap;
     }
-    for(unsigned int i = 0; i < p_str.size(); i++) {
+    for (unsigned int i = 0; i < p_str.size(); i++) {
       delete p_str[i];
     }
     p_str.clear();
@@ -167,12 +167,12 @@ namespace Isis {
    */
   void ProcessExport::SetInputRange(const double minimum, const double middle,
                                     const double maximum) {
-    if(minimum >= middle) {
+    if (minimum >= middle) {
       string message =
         "minimum must be less than the middle [ProcessExport::SetInputRange]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
-    if(middle >= maximum) {
+    if (middle >= maximum) {
       string message =
         "middle must be less than the maximum [ProcessExport::SetInputRange]";
       throw IException(IException::Programmer, message, _FILEINFO_);
@@ -215,17 +215,17 @@ namespace Isis {
   */
   void ProcessExport::SetInputRange(const double minimum, const double middle,
                                     const double maximum, const int index) {
-    if(minimum >= middle) {
+    if (minimum >= middle) {
       string message =
         "minimum must be less than the middle [ProcessExport::SetInputRange]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
-    if(middle >= maximum) {
+    if (middle >= maximum) {
       string message =
         "middle must be less than the maximum [ProcessExport::SetInputRange]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
-    if(index >= (int)InputCubes.size() || index < 0) {
+    if (index >= (int)InputCubes.size() || index < 0) {
       string message =
         "index out of bounds";
       throw IException(IException::Programmer, message, _FILEINFO_);
@@ -376,10 +376,10 @@ namespace Isis {
     p_inputMiddle.clear();
     p_inputMaximum.clear();
 
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
+    for (unsigned int i = 0; i < InputCubes.size(); i++) {
       // Get the manual stretch parameters if needed
       QString strType = Application::GetUserInterface().GetString("STRETCH");
-      if(strType == "MANUAL") {
+      if (strType == "MANUAL") {
         p_inputMinimum.push_back(Application::GetUserInterface().GetDouble("MINIMUM"));
         p_inputMaximum.push_back(Application::GetUserInterface().GetDouble("MAXIMUM"));
 
@@ -387,7 +387,7 @@ namespace Isis {
       }
 
       // Or get the automatic parameters
-      else if(strType != "NONE") {
+      else if (strType != "NONE") {
         Isis::Histogram *hist = InputCubes[i]->histogram(0);
         p_inputMinimum.push_back(hist->Percent(
                                    Application::GetUserInterface().GetDouble("MINPERCENT")));
@@ -399,20 +399,20 @@ namespace Isis {
         Application::GetUserInterface().PutDouble("MINIMUM", p_inputMinimum[i]);
         Application::GetUserInterface().PutDouble("MAXIMUM", p_inputMaximum[i]);
 
-        if(strType == "PIECEWISE") {
+        if (strType == "PIECEWISE") {
           p_inputMiddle[i] = hist->Median();
 
           // If the median is the min or max, back off to linear
-          if(p_inputMiddle[i] == p_inputMinimum[i] ||
+          if (p_inputMiddle[i] == p_inputMinimum[i] ||
               p_inputMiddle[i] == p_inputMaximum[i]) {
             p_inputMiddle[i] = Isis::NULL8;
           }
         }
 
         // Make sure the image isn't constant
-        if(p_inputMinimum[i] == p_inputMaximum[i]) {
+        if (p_inputMinimum[i] == p_inputMaximum[i]) {
           p_inputMaximum[i] = p_inputMinimum[i] + 1.0;
-          if(strType == "PIECEWISE") p_inputMiddle[i] = p_inputMinimum[i] + 0.5;
+          if (strType == "PIECEWISE") p_inputMiddle[i] = p_inputMinimum[i] + 0.5;
         }
       }
     }
@@ -462,7 +462,7 @@ namespace Isis {
    * @throws Isis::iException::Message
    */
   void ProcessExport::SetOutputRange(const double minimum, const double maximum) {
-    if(minimum >= maximum) {
+    if (minimum >= maximum) {
       string message =
         "minimum must be less than the maximum [ProcessExport::SetOutputRange]";
       throw IException(IException::Programmer, message, _FILEINFO_);
@@ -618,19 +618,19 @@ namespace Isis {
   void ProcessExport::SetOutputType(Isis::PixelType pixelIn) {
     p_pixelType = pixelIn;
 
-    if(p_format < 0 || p_format > 3) {
+    if (p_format < 0 || p_format > 3) {
       string message =
         "Format of the output file must be set prior to calling this method [ProcessExport::SetOutputType]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
-    if(pixelIn == Isis::UnsignedByte)
+    if (pixelIn == Isis::UnsignedByte)
       SetOutputRange((double)VALID_MIN1, (double)VALID_MAX1);
-    else if(pixelIn == Isis::UnsignedWord)
+    else if (pixelIn == Isis::UnsignedWord)
       SetOutputRange((double)VALID_MINU2, (double)VALID_MAXU2);
-    else if(pixelIn == Isis::SignedWord)
+    else if (pixelIn == Isis::SignedWord)
       SetOutputRange((double)VALID_MIN2, (double)VALID_MAX2);
-    else if(pixelIn == Isis::Real)
-      if(p_format == JP2) {
+    else if (pixelIn == Isis::Real)
+      if (p_format == JP2) {
         string message =
           "Unsupported bit type for JP2 formatted files [ProcessExport::SetOutputType]";
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -657,17 +657,17 @@ namespace Isis {
   * @param byteOrderIn enumeration of the endianness (MSB or LSB)
   */
   void ProcessExport::SetOutputEndian(enum ByteOrder byteOrderIn) {
-    if(p_endianSwap != NULL) {
+    if (p_endianSwap != NULL) {
       delete p_endianSwap;
     }
     p_endianType = byteOrderIn;
-    if(byteOrderIn == Isis::NoByteOrder) {
+    if (byteOrderIn == Isis::NoByteOrder) {
       p_endianSwap = new EndianSwapper("NoByteOrder");
     }
-    else if(byteOrderIn == Isis::Lsb) {
+    else if (byteOrderIn == Isis::Lsb) {
       p_endianSwap = new EndianSwapper("LSB");
     }
-    else if(byteOrderIn == Isis::Msb) {
+    else if (byteOrderIn == Isis::Msb) {
       p_endianSwap = new EndianSwapper("MSB");
     }
   }
@@ -734,7 +734,7 @@ namespace Isis {
   * @throws Isis::iException::Message - No input cube was specified
   */
   void ProcessExport::InitProcess() {
-    if(InputCubes.size() < 1) {
+    if (InputCubes.size() < 1) {
       string m = "You have not specified any input cubes";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
@@ -745,7 +745,7 @@ namespace Isis {
     //if (!HasInputRange()) SetInputRange();
 
     // Construct a line buffer manager
-    if(p_format == BIP) {
+    if (p_format == BIP) {
       p_progress->SetMaximumSteps((InputCubes[0]->sampleCount()) * (InputCubes[0]->lineCount()));
     }
     else {
@@ -755,12 +755,12 @@ namespace Isis {
 
     // Setup a stretch object
     p_str.clear();
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
+    for (unsigned int i = 0; i < InputCubes.size(); i++) {
       p_str.push_back(new Stretch());
-      if(p_inputMinimum.size() > 0) {
-        if(Isis::IsValidPixel(p_inputMinimum[i])) {
+      if (p_inputMinimum.size() > 0) {
+        if (Isis::IsValidPixel(p_inputMinimum[i])) {
           p_str[i]->AddPair(p_inputMinimum[i], p_outputMinimum);
-          if(Isis::IsValidPixel(p_inputMiddle[i])) {
+          if (Isis::IsValidPixel(p_inputMiddle[i])) {
             p_str[i]->AddPair(p_inputMiddle[i], p_outputMiddle);
           }
           p_str[i]->AddPair(p_inputMaximum[i], p_outputMaximum);
@@ -801,13 +801,13 @@ namespace Isis {
     InitProcess();
 
     Isis::BufferManager *buff;
-    if(p_format == BSQ) {
+    if (p_format == BSQ) {
       buff = new Isis::LineManager(*InputCubes[0]);
     }
-    else if(p_format == BIL || p_format == JP2) {
+    else if (p_format == BIL || p_format == JP2) {
       buff = new Isis::LineManager(*InputCubes[0], true);
     }
-    else if(p_format == BIP) {
+    else if (p_format == BIP) {
       buff = new Isis::BandManager(*InputCubes[0]);
     }
     else {
@@ -816,11 +816,11 @@ namespace Isis {
     }
 
     // Loop and let the app programmer fiddle with the buffers
-    for(buff->begin(); !buff->end(); buff->next()) {
+    for (buff->begin(); !buff->end(); buff->next()) {
       // Read a line of data
       InputCubes[0]->read(*buff);
       // Stretch the pixels into the desired range
-      for(int i = 0; i < buff->size(); i++) {
+      for (int i = 0; i < buff->size(); i++) {
         (*buff)[i] = p_str[0]->Map((*buff)[i]);
       }
       // Invoke the user function
@@ -918,7 +918,7 @@ namespace Isis {
 
     vector<BufferManager *> imgrs;
     for (unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->sampleCount() == samples) &&
+      if ((InputCubes[i]->sampleCount() == samples) &&
           (InputCubes[i]->lineCount() == lines)) {
 
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i]);
@@ -994,8 +994,8 @@ namespace Isis {
     int samples = InputCubes[0]->sampleCount();
 
     vector<BufferManager *> imgrs;
-    for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->bandCount() == bands) && (InputCubes[i]->sampleCount() == samples)) {
+    for (unsigned int i = 0; i < InputCubes.size(); i++) {
+      if ((InputCubes[i]->bandCount() == bands) && (InputCubes[i]->sampleCount() == samples)) {
         Isis::BandManager *iband = new Isis::BandManager(*InputCubes[i]);
         iband->begin();
         imgrs.push_back(iband);
@@ -1028,13 +1028,13 @@ namespace Isis {
     InitProcess();
 
     Isis::BufferManager *buff;
-    if(p_format == BSQ) {
+    if (p_format == BSQ) {
       buff = new Isis::LineManager(*InputCubes[0]);
     }
-    else if(p_format == BIL) {
+    else if (p_format == BIL) {
       buff = new Isis::LineManager(*InputCubes[0], true);
     }
-    else if(p_format == BIP) {
+    else if (p_format == BIP) {
       buff = new Isis::BandManager(*InputCubes[0]);
     }
     else {
@@ -1045,42 +1045,42 @@ namespace Isis {
     //This if is the changed one
     if (m_canGenerateChecksum) {
       // Loop for each line of data
-      for(buff->begin(); !buff->end(); buff->next()) {
+      for (buff->begin(); !buff->end(); buff->next()) {
         // Read a line of data
         InputCubes[0]->read(*buff);
         QByteArray byteArray;
         // Stretch the pixels into the desired range
-        for(int i = 0; i < buff->size(); i++) {
+        for (int i = 0; i < buff->size(); i++) {
           (*buff)[i] = p_str[0]->Map((*buff)[i]);
           byteArray.append((*buff)[i]);
         }
-        if(p_pixelType == Isis::UnsignedByte)
+        if (p_pixelType == Isis::UnsignedByte)
           isisOut8(*buff, fout);
-        else if(p_pixelType == Isis::UnsignedWord)
+        else if (p_pixelType == Isis::UnsignedWord)
           isisOut16u(*buff, fout);
-        else if(p_pixelType == Isis::SignedWord)
+        else if (p_pixelType == Isis::SignedWord)
           isisOut16s(*buff, fout);
-        else if(p_pixelType == Isis::Real)
+        else if (p_pixelType == Isis::Real)
           isisOut32(*buff, fout);
         p_progress->CheckStatus();
         m_cryptographicHash->addData(byteArray);
       }
     }
     else {
-      for(buff->begin(); !buff->end(); buff->next()) {
+      for (buff->begin(); !buff->end(); buff->next()) {
         // Read a line of data
         InputCubes[0]->read(*buff);
         // Stretch the pixels into the desired range
-        for(int i = 0; i < buff->size(); i++) {
+        for (int i = 0; i < buff->size(); i++) {
           (*buff)[i] = p_str[0]->Map((*buff)[i]);
         }
-        if(p_pixelType == Isis::UnsignedByte)
+        if (p_pixelType == Isis::UnsignedByte)
           isisOut8(*buff, fout);
-        else if(p_pixelType == Isis::UnsignedWord)
+        else if (p_pixelType == Isis::UnsignedWord)
           isisOut16u(*buff, fout);
-        else if(p_pixelType == Isis::SignedWord)
+        else if (p_pixelType == Isis::SignedWord)
           isisOut16s(*buff, fout);
-        else if(p_pixelType == Isis::Real)
+        else if (p_pixelType == Isis::Real)
           isisOut32(*buff, fout);
         p_progress->CheckStatus();
       }
@@ -1108,13 +1108,13 @@ namespace Isis {
   */
   void ProcessExport::isisOut8(Buffer &in, std::ofstream &fout) {
     char *out8 = new char[in.size()];
-    for(int samp = 0; samp < in.size(); samp++) {
+    for (int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
-      if(pixel <= 0.0) {
+      if (pixel <= 0.0) {
         out8[samp] = 0;
       }
-      else if(pixel >= 255.0) {
-        out8[samp] = 255;
+      else if (pixel >= 255.0) {
+        out8[samp] = (char)255;
       }
       else {
         out8[samp] = (char)(in[samp] + 0.5);  //Rounds
@@ -1145,18 +1145,19 @@ namespace Isis {
   */
   void ProcessExport::isisOut16s(Buffer &in, std::ofstream &fout) {
     short *out16s = new short[in.size()];
-    for(int samp = 0; samp < in.size(); samp++) {
+    for (int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
       short tempShort;
-      if(pixel <= -32768.0) {
-        tempShort = -(short)32768;
+      if (pixel <= -32768.0) {
+        tempShort = (short)32768;
+        tempShort = -1 * tempShort;
       }
-      else if(pixel >= 32767.0) {
+      else if (pixel >= 32767.0) {
         tempShort = (short)32767;
       }
       else {
         //Rounds
-        if(in[samp] < 0.0) {
+        if (in[samp] < 0.0) {
           tempShort = (short)(in[samp] - 0.5);
         }
         else {
@@ -1191,13 +1192,13 @@ namespace Isis {
   */
   void ProcessExport::isisOut16u(Buffer &in, std::ofstream &fout) {
     unsigned short *out16u = new unsigned short[in.size()];
-    for(int samp = 0; samp < in.size(); samp++) {
+    for (int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
       unsigned short tempShort;
-      if(pixel <= 0.0) {
+      if (pixel <= 0.0) {
         tempShort = 0;
       }
-      else if(pixel >= 65535.0) {
+      else if (pixel >= 65535.0) {
         tempShort = 65535;
       }
       else {
@@ -1231,13 +1232,13 @@ namespace Isis {
   */
   void ProcessExport::isisOut32(Buffer &in, std::ofstream &fout) {
     int *out32 = new int[in.size()];
-    for(int samp = 0; samp < in.size(); samp++) {
+    for (int samp = 0; samp < in.size(); samp++) {
       double pixel = in[samp];
       float tempFloat;
-      if(pixel <= -((double)FLT_MAX)) {
+      if (pixel <= -((double)FLT_MAX)) {
         tempFloat = -((double)FLT_MAX);
       }
-      else if(pixel >= (double)FLT_MAX) {
+      else if (pixel >= (double)FLT_MAX) {
         tempFloat = (double)FLT_MAX;
       }
       else {

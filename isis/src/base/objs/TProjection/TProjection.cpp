@@ -1564,9 +1564,10 @@ namespace Isis {
       }
       if (!m_good) {
         minBorderX = Null;
-        minBorderY = minBorderX;
-        minBorderX = minBorderX;
-        minBorderY = minBorderX;
+        minBorderY = Null;
+        // minBorderY = minBorderX;
+        // minBorderX = minBorderX;
+        // minBorderY = minBorderX;
         return;
       }
     }
