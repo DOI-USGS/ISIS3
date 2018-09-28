@@ -42,11 +42,13 @@ namespace Isis {
    *
    * @param cube The image cube.
    *
-   * @author Stuart Sides
+   * @author ????-??-?? Stuart Sides
    *
    * @internal
-   * @history modified by Sasha Brownsberger 
-   * @history 9/24/2018 modified by Kaj Williams 
+   *   @history ????-??-?? Stuart Sides - Original version. 
+   *   @history ????-??-?? Sasha Brownsberger 
+   *   @history 2018-09-24 Kaj Williams - Added support for summed images. NOTE: Summed test data has not been 
+   *                           found, so this code has not been fully tested at this time.
    */
 
   RosettaOsirisCamera::RosettaOsirisCamera(Cube &cube) : FramingCamera(cube) {
