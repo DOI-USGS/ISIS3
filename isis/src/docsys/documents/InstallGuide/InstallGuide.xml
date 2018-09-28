@@ -104,7 +104,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       <li>A quality graphics card</li>
     </ul>
 
-    
+
 <A NAME="RunningOnWindows"> </A>
 <h3>Running ISIS3 on Windows 10</h3>
   <ul>
@@ -495,7 +495,7 @@ is a popular choice and may be downloaded below.
 
   <history>
     <change name="Kristin Berry" date="2018-08-28">Original Version</change>
-    <change name ="Tyler Wilson" date="2018-09-26">Updated version with coordinated input from the ASC Development Team</change>
+    <change name ="ASC Development Team" date="2018-09-26">Updated version to incorporate installing via conda/building with cmake</change>
   </history>
 
 
