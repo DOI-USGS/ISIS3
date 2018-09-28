@@ -46,26 +46,26 @@ namespace Isis {
    *
    * @internal
    *  @history 2007-06-11 Jeff Anderson - Fixed bug in
-   *           Push(Buffer) method.  NAN was not computed
-   *           properly.
+   *                          Push(Buffer) method.  NAN was not computed
+   *                          properly.
    *  @history 2007-08-21 Steven Lambright - Moved the infix to postfix
-   *           conversion into its own class.
+   *                          conversion into its own class.
    *  @history 2008-01-28 Steven Lambright - Added more support for the
-   *           power operator
+   *                          power operator
    *  @history 2008-03-28 Steven Lambright - Condensed math methods to
-   *           just call PerformOperation(...). Converted valarray's to vectors
-   *           (in order to use iterators)
+   *                          just call PerformOperation(...). Converted 
+   *                          valarray's to vectors (in order to use iterators).
    *  @history 2008-06-18 Christopher Austin - Added as well as fixed
-   *           documentation
+   *                          documentation
    *  @history 2010-02-23 Steven Lambright - Added Minimum2, Maximum2 and all
-   *           min/max operations now ignore special pixels.
+   *                          min/max operations now ignore special pixels.
    *  @history 2010-04-08 Steven Lambright - Made min, max have proper
-   *           implementations and vectors are now QVectors.
+   *                          implementations and vectors are now QVectors.
    *  @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
    *  @history 2017-08-30 Tyler Wilson and Ian Humphrey - provided std:: namespace for isnan
    *                          to fix ambiguity error when using c++11. References #4809.
    *  @history 2018-09-27 Kaitlyn Lee - Fixed the cout in PrintTop() so that -nan is printed
-   *                          as nan. 
+   *                          as nan. Updated code up to standards. References #5520.
    */
   class Calculator {
     public:

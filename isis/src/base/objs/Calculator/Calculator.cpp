@@ -52,7 +52,7 @@ namespace Isis {
 
   //! Destructor
   Calculator::~Calculator() {
-    if(p_valStack) {
+    if (p_valStack) {
       delete p_valStack;
       p_valStack = NULL;
     }
@@ -455,7 +455,7 @@ namespace Isis {
    */
   void Calculator::LeftShift() {
     QVector<double> y = Pop();
-    if(y.size() != 1) {
+    if (y.size() != 1) {
       IString msg = "When trying to do a left shift calculation, a non-scalar "
                     "shift value was encountered. Shifting requires scalars.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -463,7 +463,7 @@ namespace Isis {
     else {
       QVector<double> x = Pop();
 
-      if((int)y[0] > (int)x.size()) {
+      if ((int)y[0] > (int)x.size()) {
         IString msg = "When trying to do a left shift calculation, a shift "
                       "value greater than the data size was encountered. "
                       "Shifting by this value would erase all of the data.";
@@ -474,8 +474,8 @@ namespace Isis {
         int shift = (int)y[0];
         result.resize(x.size());
 
-        for(int i = 0; i < result.size(); i++) {
-          if(i + shift < x.size() && i + shift >= 0)
+        for (int i = 0; i < result.size(); i++) {
+          if (i + shift < x.size() && i + shift >= 0)
             result[i] = x[i+shift];
           else
             result[i] = sqrt(-1.0); // create a NaN
@@ -494,7 +494,7 @@ namespace Isis {
    */
   void Calculator::RightShift() {
     QVector<double> y = Pop();
-    if(y.size() != 1) {
+    if (y.size() != 1) {
       IString msg = "When trying to do a right shift calculation, a non-scalar "
                     "shift value was encountered. Shifting requires scalars.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -502,7 +502,7 @@ namespace Isis {
     else {
       QVector<double> x = Pop();
 
-      if((int)y[0] > (int)x.size()) {
+      if ((int)y[0] > (int)x.size()) {
         IString msg = "When trying to do a right shift calculation, a shift "
                       "value greater than the data size was encountered. "
                       "Shifting by this value would erase all of the data.";
@@ -513,8 +513,8 @@ namespace Isis {
         int shift = (int)y[0];
         result.resize(x.size());
 
-        for(int i = 0; i < (int)result.size(); i++) {
-          if(i - shift < (int)x.size() && i - shift >= 0) {
+        for (int i = 0; i < (int)result.size(); i++) {
+          if (i - shift < (int)x.size() && i - shift >= 0) {
             result[i] = x[i-shift];
           }
           else {
@@ -534,8 +534,8 @@ namespace Isis {
     QVector<double> result = Pop();
 
     double minVal = result[0];
-    for(int i = 0; i < result.size(); i++) {
-      if(!IsSpecial(result[i])) {
+    for (int i = 0; i < result.size(); i++) {
+      if (!IsSpecial(result[i])) {
         minVal = min(minVal, result[i]);
       }
     }
@@ -553,8 +553,8 @@ namespace Isis {
     QVector<double> result = Pop();
 
     double maxVal = result[0];
-    for(int i = 0; i < result.size(); i++) {
-      if(!IsSpecial(result[i])) {
+    for (int i = 0; i < result.size(); i++) {
+      if (!IsSpecial(result[i])) {
         maxVal = max(maxVal, result[i]);
       }
     }
@@ -920,26 +920,26 @@ namespace Isis {
   void Calculator::Push(Buffer &buff) {
     QVector<double> b(buff.size());
 
-    for(int i = 0; i < buff.size(); i++) {
+    for (int i = 0; i < buff.size(); i++) {
       // Test for special pixels and map them to valid values
-      if(IsSpecial(buff[i])) {
-        if(Isis::IsNullPixel(buff[i])) {
+      if (IsSpecial(buff[i])) {
+        if (Isis::IsNullPixel(buff[i])) {
           //b[i] = NAN;
           b[i] = sqrt(-1.0);
         }
-        else if(Isis::IsHrsPixel(buff[i])) {
+        else if (Isis::IsHrsPixel(buff[i])) {
           //b[i] = INFINITY;
           b[i] = DBL_MAX * 2;
         }
-        else if(Isis::IsHisPixel(buff[i])) {
+        else if (Isis::IsHisPixel(buff[i])) {
           //b[i] = INFINITY;
           b[i] = DBL_MAX * 2;
         }
-        else if(Isis::IsLrsPixel(buff[i])) {
+        else if (Isis::IsLrsPixel(buff[i])) {
           //b[i] = -INFINITY;
           b[i] = -DBL_MAX * 2;
         }
-        else if(Isis::IsLisPixel(buff[i])) {
+        else if (Isis::IsLisPixel(buff[i])) {
           //b[i] = -INFINITY;
           b[i] = -DBL_MAX * 2;
         }
@@ -964,7 +964,7 @@ namespace Isis {
   QVector<double> Calculator::Pop(bool keepSpecials) {
     QVector<double> top;
 
-    if(p_valStack->empty()) {
+    if (p_valStack->empty()) {
       IString msg = "Math calculator stack is empty, cannot perform any "
                     "more operations.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -972,17 +972,17 @@ namespace Isis {
 
     top = p_valStack->top();
 
-    if(keepSpecials) {
-      for(int i = 0; i < (int)top.size(); i++) {
-        if(std::isnan(top[i])) {
+    if (keepSpecials) {
+      for (int i = 0; i < (int)top.size(); i++) {
+        if (std::isnan(top[i])) {
           top[i] = Isis::Null;
         }
         // Test for +INFINITY
-        else if(top[i] > DBL_MAX) {
+        else if (top[i] > DBL_MAX) {
           top[i] = Isis::Hrs;
         }
         // Test for -INFINITY)
-        else if(top[i] < -DBL_MAX) {
+        else if (top[i] < -DBL_MAX) {
           top[i] = Isis::Lrs;
         }
         else {
@@ -1002,12 +1002,12 @@ namespace Isis {
    * Print the vector at the top of the stack
    */
   void Calculator::PrintTop() {
-    if(p_valStack->empty()) return;
+    if (p_valStack->empty()) return;
 
     QString temp;
     temp += "[ ";
     QVector<double> top = p_valStack->top();
-    for(int i = 0; i < (int)top.size(); i++) {
+    for (int i = 0; i < (int)top.size(); i++) {
       temp += QString::number(top[i]);
       temp += " ";
     }
@@ -1031,7 +1031,7 @@ namespace Isis {
    * Clear out the stack
    */
   void Calculator::Clear() {
-    while(!p_valStack->empty()) {
+    while (!p_valStack->empty()) {
       p_valStack->pop();
     }
   }
@@ -1052,7 +1052,7 @@ namespace Isis {
                                     double operation(double)) {
     results.resize(arg1End - arg1Start);
 
-    for(int pos = 0; pos < results.size(); pos++) {
+    for (int pos = 0; pos < results.size(); pos++) {
       results[pos] = operation(*arg1Start);
 
       arg1Start++;
@@ -1081,7 +1081,7 @@ namespace Isis {
                                     QVector<double>::iterator arg2Start,
                                     QVector<double>::iterator arg2End,
                                     double operation(double, double)) {
-    if(arg1End - arg1Start != 1 && arg2End - arg2Start != 1 &&
+    if (arg1End - arg1Start != 1 && arg2End - arg2Start != 1 &&
         arg1End - arg1Start != arg2End - arg2Start) {
       IString msg = "The stack based calculator cannot operate on vectors "
                     "of differing sizes.";
@@ -1091,11 +1091,11 @@ namespace Isis {
     int iSize = max(arg1End - arg1Start, arg2End - arg2Start);
     results.resize(iSize);
 
-    for(int pos = 0; pos < results.size(); pos++) {
+    for (int pos = 0; pos < results.size(); pos++) {
       results[pos] = operation(*arg1Start, *arg2Start);
 
-      if(arg1Start + 1 != arg1End) arg1Start++;
-      if(arg2Start + 1 != arg2End) arg2Start++;
+      if (arg1Start + 1 != arg1End) arg1Start++;
+      if (arg2Start + 1 != arg2End) arg2Start++;
     }
   }
 } // End of namespace Isis
