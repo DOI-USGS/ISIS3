@@ -68,9 +68,12 @@ void IsisMain() {
     productId.setValue( ui.GetString("PRODUCTID") );
   }
   else {
-    QString observationId = targetGroup.findKeyword("ObservationId")[0];
+    // Get the observationId from the Archive Group.
+    PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+    QString observationId = archiveGroup.findKeyword("ObservationId")[0];
     productId.setValue(observationId);
   }
+
   targetGroup.addKeyword(productId);  
   logicalId += productId[0];
   process.setLogicalId(logicalId);
