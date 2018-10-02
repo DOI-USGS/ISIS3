@@ -39,7 +39,8 @@ void IsisMain() {
   id = id.simplified().trimmed();
   if (id != "TC_MAP" 
       && id != "TCO_MAP"
-      && id != "TC1_Level2B") {
+      && id != "TC1_Level2B"
+      && id != "TC2_Level2B") {
     QString msg = "Input file [" + labelFile + "] does not appear to be " +
                   "a supported Kaguya Terrain Camera format. " +
                   "DATA_SET_ID is [" + id + "]" +
