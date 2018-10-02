@@ -93,7 +93,7 @@ namespace Isis {
    * @internal
    *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original version.
    */
-  pair<iTime, iTime> UvvisCamera::ShutterOpenCloseTimes(double time,
+  pair<iTime, iTime> KaguyaTcCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
@@ -101,13 +101,13 @@ namespace Isis {
 
 
 /**
- * This is the function that is called in order to instantiate a UvvisCamera
+ * This is the function that is called in order to instantiate a KaguyaCamera
  * object.
  *
  * @param lab Cube labels
  *
  * @return Isis::Camera* Kaguya
  */
-extern "C" Isis::Camera *KaguyaCameraPlugin(Isis::Cube &cube) {
+extern "C" Isis::Camera *KaguyaTcCameraPlugin(Isis::Cube &cube) {
   return new Isis::KaguyaTcCamera(cube);
 }
