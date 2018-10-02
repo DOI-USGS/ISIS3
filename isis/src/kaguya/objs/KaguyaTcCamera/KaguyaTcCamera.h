@@ -32,29 +32,11 @@ namespace Isis {
       virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
                                                              double exposureDuration);
 
-      /**
-       * CK frame ID -  - Instrument Code from spacit run on CK
-       *
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Frame ID
-       */
-      virtual int CkFrameId() const { return (-40000); }
+       virtual int CkFrameId() const;
+       virtual int CkReferenceId() const;
+       virtual int SpkReferenceId() const;
 
-      /**
-       * CK Reference ID - J2000
-       *
-       * @return @b int The appropriate instrument code for the "Camera-matrix"
-       *         Kernel Reference ID
-       */
-      virtual int CkReferenceId() const { return (1); }
 
-      /**
-       * SPK Reference ID - J2000
-       *
-       * @return @b int The appropriate instrument code for the Spacecraft
-       *         Kernel Reference ID
-       */
-      virtual int SpkReferenceId() const { return (1); }
   };
 };
 #endif

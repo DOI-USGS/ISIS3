@@ -33,17 +33,17 @@
 using namespace std;
 namespace Isis {
   /**
-   * Constructor for the Kaguya MI Camera Model
+   * Constructor for the Kaguya TC Camera Model
    *
    * @param lab Pvl Label to create the camera model from
    *
    * @internal
-   *   @history 2012-06-14 Orrin Thomas - original version
+   *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original Version
    */
   KaguyaTcCamera::KaguyaTcCamera(Cube &cube) : FramingCamera(cube) {
-    m_instrumentNameLong = " ";
-    m_instrumentNameShort = " ";
-    m_spacecraftNameLong = "Kaguya";
+    m_instrumentNameLong  = "Terrain Camera";
+    m_instrumentNameShort = "TC";
+    m_spacecraftNameLong  = "Kaguya";
     m_spacecraftNameShort = "Kaguya";
 
     NaifStatus::CheckErrors();
@@ -97,6 +97,38 @@ namespace Isis {
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
   }
+
+
+  /**
+   * CK frame ID -  - Instrument Code from spacit run on CK
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Frame ID
+   */
+  int KaguyaTcCamera::CkFrameId() const {
+     return (-40000);
+    }
+
+  /**
+   * CK Reference ID - J2000
+   *
+   * @return @b int The appropriate instrument code for the "Camera-matrix"
+   *         Kernel Reference ID
+   */
+  int KaguyaTcCamera::CkReferenceId() const {
+    return (1);
+  }
+
+  /**
+   * SPK Reference ID - J2000
+   *
+   * @return @b int The appropriate instrument code for the Spacecraft
+   *         Kernel Reference ID
+   */
+  int KaguyaTcCamera::SpkReferenceId() const { 
+    return (1);
+  }
+
 }
 
 
