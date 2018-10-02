@@ -1,3 +1,6 @@
+# Tests import of Kaguya TC2 L2B0 image. 
+#
+# history 2018-10-02 Jeannie Backer - Original version.
 APPNAME = kaguyatc2isis
 
 include $(ISISROOT)/make/isismake.tsts
