@@ -13,7 +13,7 @@ dependencies:
   - bzip2==1.0.6=1
   - cmake==3.9.1=0
   - cspice==66-0
-  - curl==7.55.1=0
+  - curl==7.60.0=0
   - doxygen==1.8.14=0
   - eigen==3.3.3=0
   - embree==2.14.0=0

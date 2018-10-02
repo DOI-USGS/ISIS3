@@ -158,6 +158,7 @@ set(thirdPartyCppFlags -Wall
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
+                       -Wno-strict-aliasing
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
