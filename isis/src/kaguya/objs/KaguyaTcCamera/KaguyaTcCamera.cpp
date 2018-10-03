@@ -106,7 +106,7 @@ namespace Isis {
    *         Kernel Frame ID
    */
   int KaguyaTcCamera::CkFrameId() const {
-     return (-40000);
+     return (-131000);
     }
 
   /**
@@ -125,7 +125,7 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the Spacecraft
    *         Kernel Reference ID
    */
-  int KaguyaTcCamera::SpkReferenceId() const { 
+  int KaguyaTcCamera::SpkReferenceId() const {
     return (1);
   }
 
