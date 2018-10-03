@@ -1,2 +1,7 @@
-include $(ISISROOT)/make/isismake.cat
-
+ifeq ($(ISISROOT), $(BLANK))
+.SILENT:
+error:
+	echo "Please set ISISROOT";
+else
+	include $(ISISROOT)/make/isismake.objs
+endif
