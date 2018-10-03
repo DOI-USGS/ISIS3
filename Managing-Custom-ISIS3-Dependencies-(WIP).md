@@ -6,6 +6,7 @@ TODO:
 * what is anaconda.org?
 * what are "channels"
 * Do we describe these things here or link to external documentation?
+```
 
 The third-party dependencies required to build and run ISIS3 versions 3.6.0 and above are specified in the [environment.yml](https://github.com/USGS-Astrogeology/ISIS3/blob/cmake/environment.yml) file located at the root of the ISIS3 repo. For more info on editing a conda environment file, view the [Conda Documentation](https://conda.io/docs/user-guide/tasks/manage-environments.html)
 
