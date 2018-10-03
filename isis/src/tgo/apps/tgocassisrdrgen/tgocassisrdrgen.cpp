@@ -68,9 +68,17 @@ void IsisMain() {
     productId.setValue( ui.GetString("PRODUCTID") );
   }
   else {
-    // Get the observationId from the Archive Group.
-    PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
-    QString observationId = archiveGroup.findKeyword("ObservationId")[0];
+    // Get the observationId from the Archive Group, or the Mosaic group, if the input is a mosaic
+    QString observationId; 
+
+    if(label->findObject("IsisCube").hasGroup("Archive")){
+      PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+      observationId = archiveGroup.findKeyword("ObservationId")[0];
+    }
+    else if (label->findObject("IsisCube").hasGroup("Mosaic")) {
+      PvlGroup mosaicGroup = label->findObject("IsisCube").findGroup("Mosaic");
+      observationId = mosaicGroup.findKeyword("ObservationId")[0];
+    }
     productId.setValue(observationId);
   }
 
