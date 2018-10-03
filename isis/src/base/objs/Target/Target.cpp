@@ -202,11 +202,11 @@ namespace Isis {
           return code;
         }
         // getInteger automatically calls Spice::readValue which looks in the NaifKeywords
-        // else if (lab.hasObject("NaifKeywords") 
-        //          && lab.findObject("NaifKeywords").hasKeyword("BODY_CODE") ) {
-        //   code = int(lab.findObject("NaifKeywords").findKeyword("BODY_CODE"));
-        //   return code;
-        // }  TODO  Delete this section
+        else if (lab.hasObject("NaifKeywords") 
+                 && lab.findObject("NaifKeywords").hasKeyword("BODY_CODE") ) {
+          code = int(lab.findObject("NaifKeywords").findKeyword("BODY_CODE"));
+          return code;
+        }
         else {
           throw IException(e, 
                            IException::Unknown, 

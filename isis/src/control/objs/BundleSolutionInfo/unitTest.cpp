@@ -122,11 +122,12 @@ int main(int argc, char *argv[]) {
     ControlNet outNet;
     outNet.AddPoint(freePoint);
     outNet.AddPoint(fixedPoint);
-    double metersToRadians = 1./23.68;  // Use what BundleResults used
+    // Obsolete argument - now using local radius.
+    // double metersToRadians = 1./23.68;  // Use what BundleResults used
     BundleControlPointQsp freeBundleControlPoint(
-                                     new BundleControlPoint(settings, freePoint, metersToRadians));
+                                                 new BundleControlPoint(settings, freePoint));
     BundleControlPointQsp fixedBundleControlPoint(
-                                     new BundleControlPoint(settings, fixedPoint, metersToRadians));
+                                     new BundleControlPoint(settings, fixedPoint));
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);

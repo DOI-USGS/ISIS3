@@ -97,14 +97,17 @@ namespace Isis {
    *                           methods applyParameterCorrections, updateAdjustedSurfacePointLatitudinally, and
    *                           updateAdjustedSurfacePointRectangularly in BundleControlPoint.  Reference 
    *                           #4649 and #501.
+   *  @history 2018-09-28 Debbie A. Cook - Removed the metersToRadians argument from
+   *                           the constructor and from the setWeights method since we are now
+   *                           using the local radius of the point to convert lat/lon sigmas 
+   *                           from meters to radians.  References #
   */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 
     public:
       // default constructor
       BundleControlPoint(BundleSettingsQsp bundleSettings,
-                         ControlPoint *point,
-                         double metersToRadians);
+                         ControlPoint *point);
       // copy constructor
       BundleControlPoint(const BundleControlPoint &src);
 
@@ -123,7 +126,8 @@ namespace Isis {
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
       void setNumberOfRejectedMeasures(int numRejected);
       void setRejected(bool reject);
-      void setWeights(const BundleSettingsQsp settings, double metersToRadians);
+      void setWeights(const BundleSettingsQsp settings);
+      void setSigmaWeightFromGlobals(double gSigma, int index); 
       void setSigmaWeightFromGlobals(double gSigma, int index, double cFactor); 
       void zeroNumberOfRejectedMeasures();
       void productAlphaAV(double alpha,
@@ -154,8 +158,8 @@ namespace Isis {
 
       // string format methods
       QString formatBundleOutputSummaryString(bool errorPropagation) const;
-      QString formatBundleOutputDetailString(bool errorPropagation, double RTM, bool solveRadius=false) const;
-      QString formatBundleLatitudinalOutputDetailString(bool errorPropagation, double RTM,
+      QString formatBundleOutputDetailString(bool errorPropagation, bool solveRadius=false) const;
+      QString formatBundleLatitudinalOutputDetailString(bool errorPropagation, 
                                                         bool solveRadius=false) const;
       QString formatBundleRectangularOutputDetailString(bool errorPropagation) const;
       QString formatValue(double value, int fieldWidth, int precision) const;

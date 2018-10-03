@@ -89,6 +89,8 @@ namespace Isis {
    *                            control point coordinate names.  Methods changed:  copy constructor, 
    *                            assignment operator, initialize,  Also added access methods for coordinate types.
    *                            References #4649 and #501.
+   *   @history 2018-09-30 Debbie A. Cook - Removed methods setRadiansToMeters and 
+   *                            radiansToMeters and member variable m_radiansToMeters.
    */
   class BundleResults : public QObject {
     Q_OBJECT
@@ -170,7 +172,6 @@ namespace Isis {
       void setSigma0(double sigma0);
       void setElapsedTime(double time);
       void setElapsedTimeErrorProp(double time);
-      void setRadiansToMeters(double rtm);
       void setConverged(bool converged); // or initialze method
       void setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints);
       void setOutputControlNet(ControlNetQsp outNet);
@@ -211,7 +212,6 @@ namespace Isis {
       double rmsRy() const;  // currently unused ???
       double rmsRxy() const; // currently unused ???
       double rejectionLimit() const;
-      double radiansToMeters() const;
       int numberRejectedObservations() const;
       int numberObservations() const;
 
@@ -322,7 +322,6 @@ namespace Isis {
       double m_sigma0;                         //!< std deviation of unit weight
       double m_elapsedTime;                    //!< elapsed time for bundle
       double m_elapsedTimeErrorProp;           //!< elapsed time for error propagation
-      double m_radiansToMeters;                //!< radian to meters conversion factor for the body
       bool m_converged;
       
       // Variables for output methods in BundleSolutionInfo

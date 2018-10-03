@@ -188,7 +188,6 @@ int main(int argc, char *argv[]) {
     results.incrementFixedPoints();
     results.incrementHeldImages();
     results.incrementIgnoredPoints();
-    results.setRadiansToMeters(23.68);
     results.setIterations(6);
     printXml(results);
     qDebug() << "";
@@ -233,11 +232,10 @@ int main(int argc, char *argv[]) {
     outNet.AddPoint(freePoint);
     outNet.AddPoint(fixedPoint);
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings());
-    double metersToRadians = 1./23.68;
     BundleControlPointQsp freeBundleControlPoint(
-                                     new BundleControlPoint(settings, freePoint, metersToRadians));
+                                     new BundleControlPoint(settings, freePoint));
     BundleControlPointQsp fixedBundleControlPoint(
-                                     new BundleControlPoint(settings, fixedPoint, metersToRadians));
+                                     new BundleControlPoint(settings, fixedPoint));
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
@@ -322,9 +320,9 @@ int main(int argc, char *argv[]) {
     // outNetRect.SetCoordType(SurfacePoint::Rectangular);
     outNet.SetCoordType(SurfacePoint::Rectangular);
     BundleControlPointQsp freeRBundleControlPoint(
-                                     new BundleControlPoint(settings, freePoint, metersToRadians));
+                                     new BundleControlPoint(settings, freePoint));
     BundleControlPointQsp fixedRBundleControlPoint(
-                                     new BundleControlPoint(settings, fixedPoint, metersToRadians));
+                                     new BundleControlPoint(settings, fixedPoint));
     QVector<BundleControlPointQsp> bundleControlPointVectorR;
     bundleControlPointVectorR.append(freeRBundleControlPoint);
     bundleControlPointVectorR.append(fixedRBundleControlPoint);

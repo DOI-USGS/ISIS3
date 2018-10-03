@@ -368,8 +368,6 @@ namespace Isis {
     // JWB
     // - some of these not originally initialized.. better values???
     m_iteration = 0;
-    m_radiansToMeters = 0.0;
-    m_metersToRadians = 0.0;
     m_rank = 0;
     m_iterationSummary = "";
 
@@ -397,22 +395,6 @@ namespace Isis {
     m_cholmodTriplet = NULL;
 
     // should we initialize objects m_xResiduals, m_yResiduals, m_xyResiduals
-
-    // (must be a smarter way)
-    // get target body radii and body specific conversion factors between radians and meters.
-    // need validity checks and different conversion factors for lat and long
-    // initialize m_bodyRadii
-    m_bodyRadii[0] = m_bodyRadii[1] = m_bodyRadii[2] = Distance();
-    Camera *cnetCamera = m_controlNet->Camera(0);
-    if (cnetCamera) {
-      cnetCamera->radii(m_bodyRadii);  // meters
-
-      if (m_bodyRadii[0] >= Distance(0, Distance::Meters)) {
-        m_metersToRadians = 0.001 / m_bodyRadii[0].kilometers(); // at equator
-        m_radiansToMeters = 1.0 / m_metersToRadians;
-        m_bundleResults.setRadiansToMeters(m_radiansToMeters);
-      }
-     }
 
       // TESTING
       // TODO: code below should go into a separate method???
@@ -461,7 +443,7 @@ namespace Isis {
         }
 
         BundleControlPointQsp bundleControlPoint(new BundleControlPoint
-                            (m_bundleSettings, point, m_metersToRadians));
+                            (m_bundleSettings, point));
         m_bundleControlPoints.append(bundleControlPoint);
 
         // set parent observation for each BundleMeasure

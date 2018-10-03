@@ -125,7 +125,6 @@ namespace Isis {
    *                           bundle adjust to set in km and existing software to continue setting in the default 
    *                           units (meters).  The matrix will be stored in km in this object to avoid extra 
    *                           conversions during processing.
-   *  
    *   @history 2018-09-06 Debbie A. Cook - Originally added to BundleXYZ branch on 
    *                           2018-03-07 - Added an additional argument to GetRectangularMatrix
    *                           and GetSphericalMatrix to specify the units of the matrix.  This will allow existing
@@ -133,6 +132,11 @@ namespace Isis {
    *                           minimize conversions. The matrix is held in this object in km to avoid extra 
    *                           conversions during the bundle adjustment.  The control net stores the distance
    *                           values of the matrix in m**2.
+   *   @history 2018-09-20 Debbie A. Cook - Added new methods 
+   *                           LatitudeToMeters, MetersToLatitude,
+   *                           LongitudeToMeters, and MetersToLongitude
+   *                           for converting sigmas and corrections at the current SurfacePoint 
+   *                           coordinates.
    *                                                    
    */
 
@@ -278,6 +282,10 @@ namespace Isis {
 // Conversion methods (for convenience)
       double DisplacementToDouble(Displacement disp, CoordUnits units);
       double DistanceToDouble(Distance dist, CoordUnits units);
+      double MetersToLatitude(double latLength);
+      double MetersToLongitude(double lonLength);
+      double LatitudeToMeters(double latitude) const;
+      double LongitudeToMeters(double longitude) const;
       double LatToDouble(Latitude lat, CoordUnits units);
       double LonToDouble(Longitude lon, CoordUnits units);
       static CoordinateType stringToCoordinateType(QString type);

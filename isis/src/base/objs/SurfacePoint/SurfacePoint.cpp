@@ -6,6 +6,7 @@
 #include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "SpecialPixel.h"
 
 using namespace boost::numeric::ublas;
 using namespace std;
@@ -483,7 +484,7 @@ namespace Isis {
     SpiceDouble rect[3];
     latrec_c ( dradius, dlon, dlat, rect);
 
-    // Set local radius now since we have it to avoid calculating it later
+    // Set local radius now since we have it and avoid calculating it later
     p_localRadius = radius;
 
     SetRectangularPoint(Displacement(rect[0], Displacement::Kilometers),
@@ -612,23 +613,8 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    // Convert Latitude sigma to radians
-    double latSigRadians = latSigma / GetLocalRadius();
-
-    // Convert Longitude sigma to radians
-    double convFactor = cos((double)GetLatitude().radians());
-    double lonSigRadians;
-    
-    if (convFactor > 0.0000000000000001) {             
-      lonSigRadians = lonSigma / (convFactor*GetLocalRadius());
-    }
-    else {
-      //  Brent Archinal suggested setting sigma to pi in the case of a point near the pole
-      lonSigRadians = PI;
-    }
-
-    SetSphericalSigmas( Angle(latSigRadians, Angle::Radians),
-                        Angle(lonSigRadians, Angle::Radians), radiusSigma);
+    SetSphericalSigmas(Angle(MetersToLatitude(latSigma.meters()),Angle::Radians),
+           Angle(MetersToLongitude(lonSigma.meters()), Angle::Radians), radiusSigma);
   }
 
 
@@ -1240,6 +1226,117 @@ namespace Isis {
 
 
   /**
+   * This method returns an angular measure of a distance in the direction 
+   * of and relative to the latitude of the SurfacePoint.  It should only be used to convert 
+   * lengths relative to the SurfacePoint and in the direction of latitude.
+   * Typical usage would be to convert latitude sigmas and point 
+   * corrections for the SurfacePoint.
+   *
+   * @param latLength The latitude in meters to convert to radian units
+   * @return @b LatDispAngle The converted linear measure in radian units
+   *
+   */
+  double SurfacePoint::MetersToLatitude(double latLength) {
+    if (Valid() && !IsSpecial(latLength)) {
+      // Convert angle measure in meters to radians relative to latitude of SurfacePoint.
+      return latLength / GetLocalRadius().meters();
+    }
+    else {
+      // Return Null to be consistent with the bundle classes
+      return Isis::Null;
+    }
+  }
+
+
+  /**
+   * This method returns an angular measure in radians of a distance in the direction 
+   * of and relative to the longitude of the SurfacePoint.  It should only be used to  
+   * convert lengths relative to the SurfacePoint and in the direction of longitude.
+   * Typical usage is to convert longitude sigmas and point corrections for the 
+   * SurfacePoint.
+   *
+   * @param lonLength The delta longitude distance in meters  to convert to radians
+   * @return @b LonDistAngle The converted delta length in radians
+   *
+   */
+  double SurfacePoint::MetersToLongitude(double deltaLonMeters) {
+    
+    if (Valid() && !IsSpecial(deltaLonMeters)) {
+      double convFactor = cos((double)GetLatitude().radians());
+      double deltaLonRadians;
+
+      // Convert angle displacement to radians relative to longitude of SurfacePoint.      
+      if (convFactor > DBL_EPSILON) {             
+        deltaLonRadians = deltaLonMeters / (convFactor*GetLocalRadius().meters());
+      }
+      else {
+        //  Brent Archinal suggested setting sigma to pi in the case of a point near the pole
+        deltaLonRadians = PI;
+      }
+      return deltaLonRadians;
+    }
+    else {
+      // Return Null to be consistent with the bundle classes
+      return Isis::Null;
+    }
+  }
+
+
+  /**
+   * This method returns a Displacement of an Angle relative to the current 
+   * SurfacePoint latitude.  It should only be used to convert relative latitudes 
+   * near the SurfacePoint latitude.  Typical usage would be to convert
+   * latitude sigmas and point corrections for the SurfacePoint.
+   *
+   * @param latRadians The latitude in Angle units to convert to Displacement units
+   * @return @b LatDisp The converted latitude in displacement units at the 
+   *                                  SurfacePoint latitude
+   *
+   */
+  double SurfacePoint::LatitudeToMeters(double relativeLat) const {
+    // Returns are consistent with the bundle classes
+    if (relativeLat == 0.) {
+      return 0.;
+    }
+    else if (Valid() && !IsSpecial(relativeLat) && GetLocalRadius().isValid() ) {
+      return relativeLat * GetLocalRadius().meters();
+    }
+    else {
+      return Isis::Null;
+    }
+  }
+
+
+  /**
+   * This method returns a length in meters version of a delta longitude angle 
+   * in radians  relative to the current SurfacePoint longitude.  It should only be 
+   * used to convert delta longitudes relative to the SurfacePoint longitude.  
+   * Typical usage would be to convert longitude sigmas and point corrections 
+   * for the SurfacePoint.
+   *
+   * @param lonRadians The delta longitude in radians to convert to meters
+   * @return @b relativeLonDist The delta longitude in meters from the 
+   *                                  SurfacePoint longitude
+   *
+   */
+  double SurfacePoint::LongitudeToMeters(double deltaLonRadians) const{
+    // Returns are consistent with the bundle classes
+    double deltaLonMeters = Isis::Null;
+
+    if (deltaLonRadians == 0.) {
+      deltaLonMeters = 0.;
+    }
+    else if (Valid() && !IsSpecial(deltaLonRadians) && GetLocalRadius().isValid() ) {
+      // Convert from radians to meters and return
+      double scalingRadius = cos(GetLatitude().radians()) * GetLocalRadius().meters();
+      deltaLonMeters = deltaLonRadians * scalingRadius;
+    }
+    
+    return deltaLonMeters;
+  }
+
+
+    /**
    * This method converts the given string value to a SurfacePoint::CoordinateType
    * enumeration.  Currently (March 31, 2017) accepted inputs are listed below.  
    * This method is case insensitive.
@@ -1256,9 +1353,11 @@ namespace Isis {
     else if (type.compare("RECTANGULAR", Qt::CaseInsensitive) == 0) {
       return SurfacePoint::Rectangular;
     }
-    else throw IException(IException::Programmer,
+    else {
+      throw IException(IException::Programmer,
                           "Unknown coordinate type for a SurfacePoint [" + type + "].",
                           _FILEINFO_);
+    }
   }
 
 
@@ -1376,7 +1475,6 @@ namespace Isis {
    *
    */
   double SurfacePoint::GetWeight(CoordinateType type, CoordIndex index) {
-    // TODO *** Add tests for new method(s) to unitTest.
     double value = 0;  // See first TODO in GetCoord
     
     switch (type) {
@@ -1627,19 +1725,14 @@ namespace Isis {
    *
    */
   Distance SurfacePoint::GetLatSigmaDistance() const {
-    Distance latSigmaDistance = Distance();
+    double d = LatitudeToMeters(GetLatSigma().radians());
 
-    if(Valid()) {
-      Angle latSigma = GetLatSigma();
-
-      if (latSigma.isValid() && GetLocalRadius().isValid()) {
-
-        // Convert from radians to meters
-        latSigmaDistance = latSigma.radians() * GetLocalRadius();
-      }
+    if (d > DBL_EPSILON)  {
+      return Distance(d,  Distance::Meters);
     }
-
-    return latSigmaDistance;
+    else {
+      return Distance();
+    }
   }
 
 
@@ -1647,23 +1740,16 @@ namespace Isis {
    * Return the longitude sigma in meters
    *
    */
-  Distance SurfacePoint::GetLonSigmaDistance() const {
-    Distance lonSigmaDistance;
-
-    if(Valid()) {
-      Angle lonSigma = GetLonSigma();
-
-      if (lonSigma.isValid()) {
-        Distance scalingRadius = cos(GetLatitude().radians()) * GetLocalRadius();
-
-        // Convert from radians to meters and return
-        // TODO What do we do when the scaling radius is 0 (at the pole)?
-        if (scalingRadius.meters() != 0.)
-          lonSigmaDistance = lonSigma.radians() * scalingRadius;
-      }
-    }
-
-    return lonSigmaDistance;
+  Distance SurfacePoint::GetLonSigmaDistance() const{
+    // return lonSigmaDistance;
+    double d = LongitudeToMeters(GetLonSigma().radians());
+// TODO What do we do when the scaling radius is 0 (at the pole)?
+    // if (d > DBL_EPSILON)  {  
+      return Distance(d,  Distance::Meters);
+    // }
+    // else { // Too close to the pole
+    //   return Distance();
+    // }
   }
 
 

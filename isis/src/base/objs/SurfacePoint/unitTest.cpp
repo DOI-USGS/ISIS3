@@ -37,6 +37,8 @@ using namespace boost::numeric::ublas;
  *   @history 2018-09-06 (added to BundleXYZ branch on 2017-11-20) 
  *            Debbie A. Cook - Added tests for new options in
  *            SetRectangularMatrix and SetSphericalMatrix.
+ *   @history 2018-09-21 Debbie A. Cook - Added tests for new 
+ *            SurfacePoint modifications.
  *   
  */
 int main(int argc, char *argv[]) {
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]) {
     double latSig = spRec.GetLatSigma().degrees();
     double lonSig = spRec.GetLonSigma().degrees();
     double radSig = spRec.GetLocalRadiusSigma().meters();
+;
     symmetric_matrix<double,upper> covarSphere(3);
     covarSphere.clear();
     // Default is to get matrix with length units in meters**2
@@ -194,9 +197,9 @@ int main(int argc, char *argv[]) {
     // The next test will not match previous results because only the sigmas are set
     // and not the whole variance/covariance matrix
     cout << endl;
-    cout << "4-Testing planetocentric set with point and sigmas only in degrees ..."
+    cout << "4-Testing planetocentric set with point and sigmas  ..."
          << endl;
-    Isis::SurfacePoint spSphere1,spSphere2;
+    Isis::SurfacePoint spSphere1,spSphere2,spSphere4;
     spSphere1.SetSpherical(Latitude(32., Angle::Degrees),
                          Longitude(120., Angle::Degrees),
                          Distance(1000., Distance::Meters),
@@ -212,6 +215,13 @@ int main(int argc, char *argv[]) {
                               Distance(1000., Distance::Meters),
                               Angle(0.028656965, Angle::Radians),
                               Angle(0.0311981281, Angle::Radians),
+                              Distance(38.4548873, Distance::Meters));
+    spSphere4.SetSpherical(Latitude(0.55850536, Angle::Radians),
+                              Longitude(2.0943951, Angle::Radians),
+                              Distance(1000., Distance::Meters));
+    spSphere4.SetSphericalSigmasDistance(
+                              Distance(28.6569649, Distance::Meters),
+                              Distance(26.4575131, Distance::Meters),
                               Distance(38.4548873, Distance::Meters));
 
     // TODO try to convert ocentric sigmas to meters and get error to test error
@@ -247,7 +257,13 @@ int main(int argc, char *argv[]) {
          << covarRec(1,1) << "  " << covarRec(1,2) << endl;
     cout << "                                    " << covarRec(2,0) << "  "
          << covarRec(2,1) << "  " << covarRec(2,2) << endl;
+    cout << "  4c-Output spherical sigmas from meters..." << endl;
+    cout << "    latitude sigma=" << spSphere4.GetLatSigma().radians() <<
+            " radians, longitude sigma=" << spSphere4.GetLonSigma().radians()
+         << " radians, radius sigma=" << spSphere4.GetLocalRadiusSigma().meters()
+         << " m" << endl;
     cout << endl << "5-Testing copy constructor" << endl;
+
     Isis::SurfacePoint spRec2(spSphere1);
     lat = (spRec2.GetLatitude()).degrees();
     lon = (spRec2.GetLongitude()).degrees();
@@ -373,6 +389,7 @@ int main(int argc, char *argv[]) {
     cout << "                                    "
          << setw(10) << covarRecKm(2,0) << setw(10) << covarRecKm(2,1)
          << setw(10) << covarRecKm(2,2) << endl << endl;
+
   }
   catch(Isis::IException &e) {
     e.print();
@@ -458,13 +475,26 @@ int main(int argc, char *argv[]) {
   }
 
     try {
-    // Test point coordinates only set.  Try GetWeight.  Set sigmas. Try GetWeight. Set body radii.
+    // Test point coordinates only set.  Try GetWeight.  Set sigmas. Try GetWeight.
     // Try GetWeight and GetCoord for all possibilities
       cout << endl;
       cout << "Test error statements: case where weights are requested after only coordinates "
               << "have  been set..." << endl;
     double value = spRec1.GetWeight(SurfacePoint::Rectangular, SurfacePoint::One);
     cout << "X sigma-degrees = " << value << endl;
+   }
+   catch(Isis::IException &e) {
+    e.print();
+  }
+
+    try {
+    // Test SetSphericalSigmasDistance error condition
+      cout << endl;
+      cout << "Test error statements: case of invalid SurfacePoint in"
+              << " SetSphericalSigmasDistance " << endl;
+      SurfacePoint sp;
+      sp.SetSphericalSigmasDistance(Distance(3.,Distance::Meters),
+           Distance(3.,Distance::Meters),Distance(3.,Distance::Meters));
    }
    catch(Isis::IException &e) {
     e.print();

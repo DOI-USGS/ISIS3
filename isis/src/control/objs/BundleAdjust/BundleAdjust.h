@@ -318,6 +318,10 @@ namespace Isis {
    *                            errorPropagation to compute the sigmas via the variance/ 
    *                            covariance matrices instead of the sigmas.  This should produce 
    *                            more accurate results.  References #4649 and #501.
+   *   @history 2018-09-06 Debbie A. Cook - Removed obsolete member variables: 
+   *                            m_radiansToMeters, m_metersToRadians, and m_bodyRadii
+   *                            which have been replaced with the local radius of a control
+   *                            point for converting point sigmas to/from radians from/to meters.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -469,7 +473,6 @@ namespace Isis {
       SerialNumberList *m_serialNumberList;                  //!< List of image serial numbers.
       BundleTargetBodyQsp m_bundleTargetBody;                /**!< Contains information about the
                                                                    target body.*/
-      Distance m_bodyRadii[3];                               //!< Triaxial body radii in meters.
       bool m_abort;                                          //!< If the bundle should abort.
       QString m_iterationSummary;                            /**!< Summary of the most recently
                                                                    completed iteration.*/
@@ -482,10 +485,6 @@ namespace Isis {
       int m_rank;                                            //!< The rank of the system.
       int m_iteration;                                       //!< The current iteration.
       int m_numberOfImagePartials;                           //!< number of image-related partials.
-      double m_radiansToMeters;                              /**!< The body specific radians to
-                                                                   meters conversion factor.*/
-      double m_metersToRadians;                              /**!< The body specific meters to
-                                                                   radians conversion factor.*/
       QList<ImageList *> m_imageLists;                        /**!< The lists of images used in the
                                                                    bundle.*/
 

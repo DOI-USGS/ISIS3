@@ -1340,9 +1340,9 @@ namespace Isis {
     for (int i = 0; i < nPoints; i++) {
       BundleControlPointQsp bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
 
+      // Removed radiansToMeters argument 9/18/2018 DAC
       QString pointDetailString =
           bundleControlPoint->formatBundleOutputDetailString(berrorProp,
-                                                           m_statisticsResults->radiansToMeters(),
                                                            solveRadius);
       fpOut << (const char*)pointDetailString.toLatin1().data();
     }
@@ -1421,8 +1421,9 @@ namespace Isis {
       // point corrections and initial sigmas
       boost::numeric::ublas::bounded_vector< double, 3 > corrections = bundlecontrolpoint->
                                                                            corrections();
-      cor_lat_m = corrections[0]*m_statisticsResults->radiansToMeters();
-      cor_lon_m = corrections[1]*m_statisticsResults->radiansToMeters()*cos(dLat*Isis::DEG2RAD);
+      // Now use the local radius to convert radians to meters instead of the target body equatorial radius
+      cor_lat_m = bundlecontrolpoint->adjustedSurfacePoint().LatitudeToMeters(corrections[0]);
+      cor_lon_m = bundlecontrolpoint->adjustedSurfacePoint().LongitudeToMeters(corrections[1]);
       cor_rad_m  = corrections[2]*1000.0;
 
       if (bundlecontrolpoint->type() == ControlPoint::Fixed) {

@@ -32,7 +32,7 @@ UnitTest for SurfacePoint
                                  0.000649383279  0.000973323195  -0.00103923048
                                  -0.000674095535  -0.00103923048  0.00147877836
 
-4-Testing planetocentric set with point and sigmas only in degrees ...
+4-Testing planetocentric set with point and sigmas  ...
   4a-Output rectangular from degrees...
     x=-424.024048 m, y=734.431195 m, z=529.919264 m
     X sigma =29.1295681 m, Y sigma = 33.8466425 m, Z sigma = 31.7155018m
@@ -45,6 +45,8 @@ UnitTest for SurfacePoint
     rectangular covariance matrix = 0.000848531737  -0.000257264513  -0.000147752014
                                     -0.000257264513  0.00114559521  0.000255913997
                                     -0.000147752014  0.000255913997  0.00100587305
+  4c-Output spherical sigmas from meters...
+    latitude sigma=0.0286569649 radians, longitude sigma=0.031198128 radians, radius sigma=38.4548873 m
 
 5-Testing copy constructor
   Output spherical...
@@ -98,6 +100,9 @@ LonToDouble,  GetSigmaDistance, DistanceToDouble, and DisplacementToDouble...
 
 Test error statements: case where weights are requested after only coordinates have  been set...
 **PROGRAMMER ERROR** SurfacePoint::GetXWeight(): Sigma <= 0.0.
+
+Test error statements: case of invalid SurfacePoint in SetSphericalSigmasDistance 
+**PROGRAMMER ERROR** Cannot set spherical sigmas on an invalid surface point.
 
 ...Testing GetCoord, GetSigma, and GetWeight...  
 

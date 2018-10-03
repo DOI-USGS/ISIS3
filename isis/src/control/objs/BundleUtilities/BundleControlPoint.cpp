@@ -23,7 +23,7 @@ namespace Isis {
    *                     construct this BundleControlPoint.
    */
   BundleControlPoint::BundleControlPoint(const BundleSettingsQsp bundleSettings,
-                                         ControlPoint *controlPoint, double metersToRadians) {
+                                         ControlPoint *controlPoint) {
     m_controlPoint = controlPoint;
 
     // setup vector of BundleMeasures for this control point
@@ -56,7 +56,7 @@ namespace Isis {
     // m_coordType = SurfacePoint::Latitudinal;
     m_coordTypeReports = bundleSettings->controlPointCoordTypeReports();
     m_coordTypeBundle = bundleSettings->controlPointCoordTypeBundle();
-    setWeights(bundleSettings, metersToRadians);
+    setWeights(bundleSettings);
   }
 
 
@@ -175,7 +175,7 @@ namespace Isis {
    * @param settings A QSharedPointer to BundleSettings object.
    * @param metersToRadians A double precision conversion factor.
    */
-  void BundleControlPoint::setWeights(const BundleSettingsQsp settings, double metersToRadians) {
+  void BundleControlPoint::setWeights(const BundleSettingsQsp settings) {
 
     double globalPointCoord1AprioriSigma = settings->globalPointCoord1AprioriSigma();
     double globalPointCoord2AprioriSigma = settings->globalPointCoord2AprioriSigma();
@@ -188,36 +188,26 @@ namespace Isis {
       // m_aprioriSigmas = Isis::Null by default
     }
     
-    double cFactor = metersToRadians;
-
-    if (m_coordTypeBundle == SurfacePoint::Rectangular) {
-        cFactor = 0.001;  // meters to km
-    }
-    
     if (m_controlPoint->GetType() == ControlPoint::Free) {
       // Global sigmas are temporary and should not be stored in the control net.  Currently
       // global sigmas are always in meters.  Make sure unit of weights is 1/(var unit squared),
       // where var is a value being solved for in the adjustment.  Latitude and longitude are in
       // radians and everything else is in km.
       if (!IsSpecial(globalPointCoord1AprioriSigma)) {
-        setSigmaWeightFromGlobals(globalPointCoord1AprioriSigma, 0, cFactor); 
+        setSigmaWeightFromGlobals(globalPointCoord1AprioriSigma, 0);
       } // else m_aprioriSigma = Isis::Null
         // m_weights = 0.0
       if (!IsSpecial(globalPointCoord2AprioriSigma)) {
-        setSigmaWeightFromGlobals(globalPointCoord2AprioriSigma, 1, cFactor); 
-      } // else m_aprioriSigma = Isis::Null
-        // m_weights = 0.0
+        m_aprioriSigmas[1] = globalPointCoord2AprioriSigma;
+        setSigmaWeightFromGlobals(globalPointCoord2AprioriSigma, 1);
+      }// else m_aprioriSigma = Isis::Null
+       // m_weights = 0.0
       if (m_coordTypeBundle == SurfacePoint::Latitudinal && !settings->solveRadius()) {
         m_weights[2] = 1.0e+50;
       }
-      //  *** TODO *** delete this note
-      // test to prove problem in unitTest DAC
-      // else if (settings->solveRadius()) {
-      //   m_weights[2] = 0.0;
-      // }
       else {
         if (!IsSpecial(globalPointCoord3AprioriSigma)) {
-          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2, 0.001); 
+          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2); 
         }
       }
     }
@@ -225,7 +215,7 @@ namespace Isis {
       // *** Be careful...Is m_aprioriSigmas an output (for reports) or bundle variable? ***
 
       // Assuming the member variable sigmas are for output reports (internal use only) so use
-      //   the report coordinate type to calculate.  All point sigma are in meters.  Radius weights
+      //   the report coordinate type to calculate.  All point sigmas are in meters.  Radius weights
       //   are in 1/km^2.  Make x/y/z weights the same because BundleAdjust works in km.
       //   Weights and corrections go into the bundle so use bundle coordinate type.
       if ( m_controlPoint->IsCoord1Constrained() ) {
@@ -236,7 +226,7 @@ namespace Isis {
              m_controlPoint->GetAprioriSurfacePoint().GetWeight(m_coordTypeBundle, SurfacePoint::One);
       }
       else if (!IsSpecial(globalPointCoord1AprioriSigma)) {
-        setSigmaWeightFromGlobals(globalPointCoord1AprioriSigma, 0, cFactor); 
+        setSigmaWeightFromGlobals(globalPointCoord1AprioriSigma, 0); 
       } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
         // m_weights = 0.0
 
@@ -248,7 +238,7 @@ namespace Isis {
           m_controlPoint->GetAprioriSurfacePoint().GetWeight(m_coordTypeBundle, SurfacePoint::Two);
       }
       else if (!IsSpecial(globalPointCoord2AprioriSigma)) {
-        setSigmaWeightFromGlobals(globalPointCoord2AprioriSigma, 1, cFactor); 
+        setSigmaWeightFromGlobals(globalPointCoord2AprioriSigma, 1); 
       } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
         // m_weights = 0.0
 
@@ -264,7 +254,7 @@ namespace Isis {
             (m_coordTypeBundle, SurfacePoint::Three);
         }
         else if (!IsSpecial(globalPointCoord3AprioriSigma)) {
-          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2, 0.001); 
+          setSigmaWeightFromGlobals(globalPointCoord3AprioriSigma, 2); 
         } // else not constrained and global sigma is Null, then  m_aprioriSigmas = Isis::Null
           // m_weights = 0.0
       }
@@ -282,10 +272,63 @@ namespace Isis {
    * 
     * @see formatAprioriSigmaString() 
    */
-  void BundleControlPoint::setSigmaWeightFromGlobals(double gSigma, int index, double cFactor) {
+  void BundleControlPoint::setSigmaWeightFromGlobals(double gSigma, int index) {    
     m_aprioriSigmas[index] = gSigma;
-    double d = gSigma*cFactor;
-    m_weights[index] = 1.0/(d*d);
+    
+    switch (index) {
+      case 0:
+        if (m_coordTypeBundle == SurfacePoint::Latitudinal) {
+          m_aprioriSigmas[index] = gSigma;
+          double sigmaRadians =
+            m_controlPoint->GetAprioriSurfacePoint().MetersToLatitude(gSigma);  // m to radians
+          if (sigmaRadians > DBL_EPSILON) {
+            m_weights[index] = 1. / (sigmaRadians*sigmaRadians);  // 1/radians^2
+          }
+        }
+        else if (m_coordTypeBundle == SurfacePoint::Rectangular) {
+          double sigmakm = gSigma * .001;  // km
+          if (sigmakm > DBL_EPSILON) {
+            m_weights[0] = 1./ (sigmakm*sigmakm); // 1/km^2
+          }
+        }
+        else {
+          IString msg ="Unknown surface point coordinate type enum ["
+            + toString(m_coordTypeBundle) + "]." ;
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+        break;
+      case 1:  
+        // if (!IsSpecial(globalPointCoord2AprioriSigma)) {
+        if (m_coordTypeBundle == SurfacePoint::Latitudinal) {
+          double sigmaRadians =
+            m_controlPoint->GetAprioriSurfacePoint().MetersToLongitude(gSigma);  // m to radians
+          if (sigmaRadians > DBL_EPSILON) {
+            m_weights[1] = 1. / (sigmaRadians*sigmaRadians);  // 1/radians^2
+          }
+        }
+        else if (m_coordTypeBundle == SurfacePoint::Rectangular) {
+          double sigmakm = gSigma * 0.001;  // km
+          if (sigmakm > DBL_EPSILON) m_weights[1] = 1./ (sigmakm*sigmakm); // 1/km^2
+        }
+        else {
+          IString msg ="Unknown surface point coordinate type enum ["
+            + toString(m_coordTypeBundle) + "]." ;
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        } 
+        break;
+      
+      case 2:
+      // Coordinate 2 is either latitudinal radius or rectangular z, both in m
+      {
+        double sigmakm = gSigma * .001;  // km
+        m_weights[2] = 1./ (sigmakm*sigmakm); // 1/km^2
+        }
+        break;
+      
+      default:
+          IString msg ="Unknown coordinate index [" + toString(index) + "]." ;
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
   }
 
 
@@ -310,12 +353,8 @@ namespace Isis {
    */
   void BundleControlPoint::productAlphaAV(double alpha,
                                     SparseBlockMatrix &sparseNormals,
-                                    // boost::numeric::ublas::bounded_vector<double,3> &v2,
-                                    // SparseBlockRowMatrix &Q,
                                     LinearAlgebra::Vector &v1) {
-                                    // LinearAlgebra::Vector<double> &v1) {
 
-    // QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
     QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
 
     int subrangeStart, subrangeEnd;
@@ -328,7 +367,6 @@ namespace Isis {
       subrangeStart = sparseNormals.at(columnIndex)->startColumn();
       subrangeEnd = subrangeStart + Qit.value()->size2();
       
-      // v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
       m_nicVector += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
     }
   }
@@ -573,8 +611,8 @@ namespace Isis {
     int numGoodRays    = numRays - numberOfRejectedMeasures();
     double ResidualRms = residualRms();
 
-    // Return generic set of control point coordinates as floating point values - possibly dangerous 
-    // because of the potential to confuse units, but convenient.
+    // Return generic set of control point coordinates as floating point values 
+    // Be careful because of the potential to confuse units.
     SurfacePoint::CoordUnits units = SurfacePoint::Degrees;
     if (m_coordTypeReports == SurfacePoint::Rectangular) units = SurfacePoint::Kilometers;
     double cpc1         = m_controlPoint->GetAdjustedSurfacePoint().GetCoord(m_coordTypeReports,
@@ -615,13 +653,12 @@ namespace Isis {
    * @return @b QString The formatted output detailed string.
    */
   QString BundleControlPoint::formatBundleOutputDetailString(bool errorPropagation,
-                                                             double RTM,
                                                              bool solveRadius) const {
     QString output;
     
     switch (m_coordTypeReports) {
       case SurfacePoint::Latitudinal:
-        output = formatBundleLatitudinalOutputDetailString(errorPropagation, RTM, solveRadius);
+        output = formatBundleLatitudinalOutputDetailString(errorPropagation, solveRadius);
         break;
       case SurfacePoint::Rectangular:
         output = formatBundleRectangularOutputDetailString(errorPropagation);
@@ -647,7 +684,7 @@ namespace Isis {
    * 
    * @internal
    *  @history 2017-08-24 Debbie A. Cook - Revised units of cor_rad to be km instead of meters
-   *                                                     when outputting latitudical corrections in degrees.  Fixed
+   *                                                     when outputting latitudinal corrections in degrees.  Fixed
    *                                                     coordinate type for rectPoint to be Displacement::Kilometers
    *                                                     instead of Distance::Kilometers.  Corrected conversions
    *                                                     of corrections in lat/longitudinal degrees to rectangular meters.
@@ -656,7 +693,6 @@ namespace Isis {
    */
   QString BundleControlPoint::formatBundleLatitudinalOutputDetailString(
                                                              bool errorPropagation,
-                                                             double RTM,
                                                              bool solveRadius) const {
 
     int numRays     = numberOfMeasures();
@@ -664,6 +700,10 @@ namespace Isis {
     double lat      = m_controlPoint->GetAdjustedSurfacePoint().GetLatitude().degrees();
     double lon      = m_controlPoint->GetAdjustedSurfacePoint().GetLongitude().degrees();
     double rad      = m_controlPoint->GetAdjustedSurfacePoint().GetLocalRadius().kilometers();
+
+    // Use the local radius in meters, rad*1000., to convert radians to meters now instead of the
+    // target body equatorial radius DAC 09/17/2018
+    double rtm = rad * 1000.;
 
     // Coordinate corrections are currently set in BundleAdjust::applyParameterCorrections in the
     //  coordTypeBundle coordinates (radians for Latitudinal coordinates and km for Rectangular).
@@ -695,11 +735,11 @@ namespace Isis {
         radInit = rectPoint.GetLocalRadius().kilometers();
         if (!IsSpecial(lat)) {
           cor_lat_dd = (lat - latInit); // degrees
-          cor_lat_m  =  cor_lat_dd * DEG2RAD * RTM;
+          cor_lat_m  =  cor_lat_dd * DEG2RAD * rtm;
         }
         if (!IsSpecial(lon)) {
           cor_lon_dd = (lon - lonInit); // degrees
-          cor_lon_m  =  cor_lon_dd * DEG2RAD * RTM * cos(lat*DEG2RAD);  // lon corrections meters
+          cor_lon_m  =  cor_lon_dd * DEG2RAD * rtm * cos(lat*DEG2RAD);  // lon corrections meters
         }
         if (!IsSpecial(rad)) {
           cor_rad_km  =  rad - radInit;
@@ -712,9 +752,8 @@ namespace Isis {
       cor_lon_dd = m_corrections(1) * RAD2DEG;               // lon correction, decimal degs
       cor_rad_m  = m_corrections(2) * 1000.0;                   // radius correction, meters
 
-
-      cor_lat_m = m_corrections(0) * RTM;                     // lat correction, meters
-      cor_lon_m = m_corrections(1) * RTM * cos(lat*DEG2RAD);  // lon correction, meters
+      cor_lat_m = m_controlPoint->GetAdjustedSurfacePoint().LatitudeToMeters(m_corrections(0));
+      cor_lon_m = m_controlPoint->GetAdjustedSurfacePoint().LongitudeToMeters(m_corrections(1));  
       cor_rad_km = m_corrections(2);
 
       if (!IsSpecial(lat)) {
@@ -952,8 +991,7 @@ namespace Isis {
         pointType = "N/A";
     }
     double sigma = m_aprioriSigmas[int(index)];
-    // std::cout << "sigma = " << sigma << std::endl;
-    if (IsSpecial(sigma)) { // if globalAprioriSigma <= 0 (including Isis::NUll), then m_aprioriSigmas = Null
+    if (IsSpecial(sigma)) { // if globalAprioriSigma <= 0 (including Isis::Null), then m_aprioriSigmas = Null
       aprioriSigmaStr = QString("%1").arg(pointType, fieldWidth);
     }
     else {

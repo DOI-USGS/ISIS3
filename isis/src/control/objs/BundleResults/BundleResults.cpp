@@ -98,7 +98,6 @@ namespace Isis {
         m_sigma0(src.m_sigma0),
         m_elapsedTime(src.m_elapsedTime),
         m_elapsedTimeErrorProp(src.m_elapsedTimeErrorProp),
-        m_radiansToMeters(src.m_radiansToMeters),
         m_converged(src.m_converged),
         m_bundleControlPoints(src.m_bundleControlPoints),
         m_outNet(src.m_outNet),
@@ -184,7 +183,6 @@ namespace Isis {
       m_sigma0 = src.m_sigma0;
       m_elapsedTime = src.m_elapsedTime;
       m_elapsedTimeErrorProp = src.m_elapsedTimeErrorProp;
-      m_radiansToMeters = src.m_radiansToMeters;
       m_converged = src.m_converged;
       m_bundleControlPoints = src.m_bundleControlPoints;
       m_outNet = src.m_outNet;
@@ -317,7 +315,6 @@ namespace Isis {
     m_maximumLikelihoodFunctions.clear();
     m_cumProRes = NULL;
 
-    m_radiansToMeters = 0;
     m_observations.clear();
     m_outNet.clear();
 
@@ -810,16 +807,6 @@ namespace Isis {
 
 
   /**
-   * Sets the radians to meters conversion constant for the target body.
-   *
-   * @param rtm The (double) conversion factor.
-   */
-  void BundleResults::setRadiansToMeters(double rtm) {
-    m_radiansToMeters = rtm;
-  }
-
-
-  /**
    * Sets if the bundle adjustment converged.
    *
    * @param converged If the bundle adjustment converged.
@@ -1149,16 +1136,6 @@ namespace Isis {
    */
   double BundleResults::rejectionLimit() const {
     return m_rejectionLimit;
-  }
-
-
-  /**
-   * Returns the radians to meters conversion factor for the target body.
-   *
-   * @return @b double The conversion factor.
-   */
-  double BundleResults::radiansToMeters() const {
-    return m_radiansToMeters;
   }
 
 
