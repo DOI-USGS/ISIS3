@@ -1,5 +1,12 @@
 # The ISIS Conda Environment
 
+```
+TODO:
+* what is conda?
+* what is anaconda.org?
+* what are "channels"
+* Do we describe these things here or link to external documentation?
+
 The third-party dependencies required to build and run ISIS3 versions 3.6.0 and above are specified in the [environment.yml](https://github.com/USGS-Astrogeology/ISIS3/blob/cmake/environment.yml) file located at the root of the ISIS3 repo. For more info on editing a conda environment file, view the [Conda Documentation](https://conda.io/docs/user-guide/tasks/manage-environments.html)
 
 Most of the packages listed in the file are pulled from conda-forge, but there are a few custom builds that we have uploaded to [usgs-astrogeology](https://anaconda.org/usgs-astrogeology/repo), such as qt. The recipes to build and upload these packages can be found on the [isis3_dependencies](https://github.com/USGS-Astrogeology/isis3_dependencies) repo.
@@ -13,6 +20,24 @@ Most of the packages listed in the file are pulled from conda-forge, but there a
   ```bash
   conda config --add channels conda-forge --add channels usgs-astrogeology
   ```
+
+# Important files in the isis3_dependencies repo
+
+There are three directories in the `isis3_dependencies` repo: `bin/`, `meta/`, and `recipies/`.
+
+The `bin/` directory contains some python scripts that are used for determining dependencies and available packages, as well as a script for building packages. The `build_package.py` script is the script we will use to build a package for uploading to the [USGS-Astrogeology anaconda.org cloud](https://anaconda.org/usgs-astrogeology).
+
+The `meta/` directory contains
+
+The `recipies/` directory contains 
+
+For more information on how conda builds work, see the [Conda build recipes documentation](https://conda.io/docs/user-guide/tasks/build-packages/recipe.html).
+
+## bin/
+
+## meta/
+
+## recipies/
 
 # Using the Anaconda Upload Python Scripts
 
