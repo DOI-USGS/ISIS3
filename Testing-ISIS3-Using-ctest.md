@@ -91,10 +91,10 @@ output:     Checked In Truth Data To /scratch/cmake/isis3_cmake/isis/src/apollo/
 ```
 When making OS specific truth data, do not add the "-t" flag. Instead, you will need to rename the output and copy it to the directory of the object or app you are making truth data for.
 
-* For unit tests, you will need to rename the output put in build/testOutputDir as "<objectname>_<OStype>_x86_64_<OSname>.truth". If we wanted to make Mac truth data for ProgramLauncher: "ProgramLauncher_Darwin_x86_64_MacOSX10_13.truth".
+* For unit tests, you will need to rename the output put in build/testOutputDir as `<objectname>_<OStype>_x86_64_<OSname>.truth`. If we wanted to make Mac truth data for ProgramLauncher: "ProgramLauncher_Darwin_x86_64_MacOSX10_13.truth".
 
 * For app tests, you will need to rename the truth directory put in build/testOutputDir as
-"truth.<OStype>.x86_64.<OSname>". If we wanted to make Mac truth data: "truth.Darwin.x86_64.MacOSX10_13".
+`truth.<OStype>.x86_64.<OSname>`. If we wanted to make Mac truth data: "truth.Darwin.x86_64.MacOSX10_13".
 
 # Building in Debug Mode
 1. reconfigure cmake with flag (-DCMAKE_BUILD_TYPE=DEBUG)
