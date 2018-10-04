@@ -24,16 +24,22 @@ commands:
 	for label in `ls $(OUTPUT)/*.xml`; do \
 	  $(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
 	    $$label > $${label%.xml}1.txt; \
-	  $(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
+	  $(SED) 's+\description.*>+\description>+' \
 	    $${label%.xml}1.txt > $${label%.xml}2.txt; \
-	  $(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
+	  $(SED) 's+\modification_date.*>+\modification_date>+' \
 	    $${label%.xml}2.txt > $${label%.xml}3.txt; \
+	  $(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
+	    $${label%.xml}3.txt > $${label%.xml}4.txt; \
+	  $(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
+	    $${label%.xml}4.txt > $${label%.xml}5.txt; \
 	  $(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
-	    $${label%.xml}3.txt > $${label%.xml}.txt; \
+	    $${label%.xml}5.txt > $${label%.xml}.txt; \
 	  $(RM) $$label; \
 	  $(RM) $${label%.xml}1.txt; \
 	  $(RM) $${label%.xml}2.txt; \
 	  $(RM) $${label%.xml}3.txt; \
+ 	  $(RM) $${label%.xml}4.txt; \
+  	  $(RM) $${label%.xml}5.txt; \
 	done;
 	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl
 	$(RM) $(OUTPUT)/inputs.lis
