@@ -58,6 +58,8 @@ namespace Isis {
    *                           loaded.
    *   @history 2018-04-13 Tracie Sucharski - In mouseButtonRelease method return if a control net
    *                           has not been set.
+   *   @history 2018-09-21 Tracie Sucharski - Draw Fixed and Constrained points on ground cubes.
+   *                           Refereces #5504.
    */
   class ControlNetTool : public Tool {
     Q_OBJECT
@@ -91,6 +93,7 @@ namespace Isis {
       void createActions();
       void createMenus();
       void drawAllMeasurements(MdiCubeViewport *vp, QPainter *painter);
+      void drawGroundMeasures (MdiCubeViewport *vp, QPainter *painter, UniversalGroundMap *groundMap);
 
       QPointer<MainWindow> m_ControlNetTool;
       Directory *m_directory;

@@ -57,6 +57,9 @@ namespace Isis {
    *   @history 2018-07-09 Tracie Sucharski - Serialize the objectName for this view so that the
    *                           view can be re-created with the same objectName for restoring the
    *                           project state. Qt's save/restoreState use the objectName.
+  *   @history 2018-10-04 Tracie Sucharski - When serializing images for ipce project saving, check
+  *                           for shapes in project if image for given id cannot be found.
+  *                           References #5495.
    */
   class ImageFileListWidget : public QWidget {
       Q_OBJECT

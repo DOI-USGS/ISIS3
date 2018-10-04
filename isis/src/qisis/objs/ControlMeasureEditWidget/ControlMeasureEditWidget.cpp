@@ -47,8 +47,6 @@ namespace Isis {
    * @param allowLeftMouse[in] Allow/Disallow mouse events on Left ChipViewport
    * @param useGeometry[in]    Allow/Disallow geometry and rotation on right ChipViewport
    *
-   * @throws IException::Io    "Cannot create AutoRegFactory. As a result, sub-pixel registration
-   *                            will not work."
    * @author Tracie Sucharski
    * @internal
    *   @history 2008-15-??  Jeannie Walldren - Added error
@@ -72,20 +70,7 @@ namespace Isis {
     m_leftGroundMap = 0;
     m_rightGroundMap = 0;
 
-    try {
-      m_templateFileName = "$base/templates/autoreg/qnetReg.def";
-      Pvl pvl(m_templateFileName);
-      m_autoRegFact = AutoRegFactory::Create(pvl);
-    }
-    catch (IException &e) {
-      m_autoRegFact = NULL;
-      IException fullError(e, IException::Io,
-                           "Cannot create AutoRegFactory. As a result, "
-                           "sub-pixel registration will not work.",
-                           _FILEINFO_);
-      QString message = fullError.toString();
-      QMessageBox::information((QWidget *)parent, "Error", message);
-    }
+    m_templateFileName = "$base/templates/autoreg/qnetReg.def";
 
     createMeasureEditor(parent);
   }
@@ -769,6 +754,20 @@ namespace Isis {
   }
 
 
+  void ControlMeasureEditWidget::setLeftPosition(double sample, double line) {
+
+    m_leftChip->TackCube(sample, line);
+    emit updateLeftView(sample, line);
+  }
+
+
+  void ControlMeasureEditWidget::setRightPosition(double sample, double line) {
+
+    m_rightChip->TackCube(sample, line);
+    emit updateRightView(sample, line);
+  }
+
+
   /**
    * Set the measure displayed in the right ChipViewport
    *
@@ -1012,9 +1011,28 @@ namespace Isis {
    *                             successful, change save button to red.
    *   @history 2011-10-21  Tracie Sucharski - Add try/catch around registration
    *                             to catch errors thrown from autoreg class.
+   *   @history 2017-04-21 Marjorie Hahn - Added auto registration factory creation.
    *
    */
   void ControlMeasureEditWidget::registerPoint() {
+
+    // if the auto registration factory has not been initialized, do it here
+    if (m_autoRegFact == NULL) {
+      try {
+        Pvl pvl(m_templateFileName);
+        m_autoRegFact = AutoRegFactory::Create(pvl);
+      }
+      catch (IException &e) {
+        m_autoRegFact = NULL;
+        IException fullError(e, IException::Io,
+                            "Cannot create AutoRegFactory. As a result, "
+                            "sub-pixel registration will not work.",
+                            _FILEINFO_);
+        QString message = fullError.toString();
+        QMessageBox::information((QWidget *)parent(), "Error", message);
+        return;
+      }
+    }
 
     if ( m_autoRegShown ) {
       //  Undo Registration
@@ -1174,6 +1192,11 @@ namespace Isis {
    *                          QnetTool::measureSaved to ::saveMeasure.  The error checking now
    *                          forces the edit lock check box to be unchecked before the measure
    *                          can be saved.
+   *   @history 2015-01-09 Ian Humphrey - Modified to prevent segmentation fault that arises when
+   *                           registering, opening a template file, and saving the measure. This
+   *                           was caused by not handling the exception thrown by
+   *                           ControlMeasure::SetLogData(), which produces undefined behavior
+   *                           within the Qt signal-slot connection mechanism.
    *
    */
   void ControlMeasureEditWidget::saveMeasure() {
@@ -1188,6 +1211,29 @@ namespace Isis {
       }
 
       if ( m_autoRegShown ) {
+        try {
+          //  Save  autoreg parameters to the right measure log entry
+          //  Eccentricity may be invalid, check before writing.
+          m_rightMeasure->SetLogData(ControlMeasureLogData(
+                                     ControlMeasureLogData::GoodnessOfFit,
+                                     m_autoRegFact->GoodnessOfFit()));
+          double minZScore, maxZScore;
+          m_autoRegFact->ZScores(minZScore,maxZScore);
+          m_rightMeasure->SetLogData(ControlMeasureLogData(
+                                     ControlMeasureLogData::MinimumPixelZScore,
+                                     minZScore));
+          m_rightMeasure->SetLogData(ControlMeasureLogData(
+                                     ControlMeasureLogData::MaximumPixelZScore,
+                                     maxZScore));
+        }
+        // need to handle exception that SetLogData throws if our data is invalid -
+        // unhandled exceptions thrown in Qt signal and slot connections produce undefined behavior
+        catch (IException &e) {
+          QString message = e.toString();
+          QMessageBox::critical((QWidget *)parent(), "Error", message);
+          return;
+        }
+
         //  Reset AprioriSample/Line to the current coordinate, before the
         //  coordinate is updated with the registered coordinate.
         m_rightMeasure->SetAprioriSample(m_rightMeasure->GetSample());
@@ -1195,23 +1241,13 @@ namespace Isis {
 
         m_rightMeasure->SetChooserName("Application qnet");
         m_rightMeasure->SetType(ControlMeasure::RegisteredSubPixel);
-        //  Save  autoreg parameters to the right measure log entry
-        //  Eccentricity may be invalid, check before writing.
-        m_rightMeasure->SetLogData(ControlMeasureLogData(
-                               ControlMeasureLogData::GoodnessOfFit,
-                               m_autoRegFact->GoodnessOfFit()));
-        double minZScore, maxZScore;
-        m_autoRegFact->ZScores(minZScore,maxZScore);
-        m_rightMeasure->SetLogData(ControlMeasureLogData(
-                                 ControlMeasureLogData::MinimumPixelZScore,
-                                 minZScore));
-        m_rightMeasure->SetLogData(ControlMeasureLogData(
-                                 ControlMeasureLogData::MaximumPixelZScore,
-                                 maxZScore));
 
         m_autoRegShown = false;
         m_autoRegExtension->hide();
         m_autoReg->setText("Register");
+        m_autoReg->setToolTip("Sub-pixel register the right measure to the left. "
+                              "<strong>Shortcut: R</strong>");
+        m_autoReg->setShortcut(Qt::Key_R);
       }
       else {
         m_rightMeasure->SetChooserName(Application::UserName());

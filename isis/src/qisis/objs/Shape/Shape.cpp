@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QMutexLocker>
 #include <QScopedPointer>
 #include <QString>
@@ -17,19 +18,20 @@
 
 #include "Angle.h"
 #include "CameraFactory.h"
+#include "ControlPoint.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "DisplayProperties.h"
 #include "Distance.h"
-#include "ShapeDisplayProperties.h"
-#include "IString.h"
 #include "FileName.h"
+#include "IException.h"
 #include "ImagePolygon.h"
-
+#include "IString.h"
 #include "PolygonTools.h"
 #include "Project.h"
 #include "ProjectionFactory.h"
 #include "SerialNumber.h"
+#include "ShapeDisplayProperties.h"
 #include "Target.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -43,9 +45,9 @@ namespace Isis {
   Shape::Shape(QString imageFileName, QObject *parent) : QObject(parent) {
 
     m_fileName = imageFileName;
-    cube();
 
     initMemberData();
+    cube();
     initShape();
   }
 
@@ -59,9 +61,9 @@ namespace Isis {
   Shape::Shape(Cube *shapeCube, QObject *parent) : QObject(parent) {
 
     m_fileName = shapeCube->fileName();
-    m_cube = shapeCube;
 
     initMemberData();
+    m_cube = shapeCube;
     initShape();
   }
 
@@ -126,50 +128,89 @@ namespace Isis {
 
   void Shape::initShape() {
 
+    m_displayProperties = new ShapeDisplayProperties(FileName(m_fileName).name(), this);
+    m_id = new QUuid(QUuid::createUuid());
+
+    m_radiusSource = ControlPoint::RadiusSource::None;
+
     if (cube()->hasTable("ShapeModelStatistics")) {
+      m_surfacePointSource = ControlPoint::SurfacePointSource::Basemap;
+      m_radiusSource = ControlPoint::RadiusSource::DEM;
       m_shapeType = Dem;
     }
     // Is this a level 1 or level 2?
     else {
       try {
         ProjectionFactory::CreateFromCube(*(cube()));
+        m_surfacePointSource = ControlPoint::SurfacePointSource::Basemap;
+        m_radiusSource = ControlPoint::RadiusSource::Ellipsoid;
         m_shapeType = Basemap;
       }
       catch (IException &) {
+        // TODO  Determine if unprojected shape has been bundle adjusted. Otherwise, ??
         try {
           CameraFactory::Create(*(cube()));
+          m_surfacePointSource = ControlPoint::SurfacePointSource::Reference;
+
+          PvlGroup kernels = cube()->group("Kernels");
+          if (kernels.hasKeyword("ShapeModel")) {
+            QString shapeFile = kernels["ShapeModel"]; 
+            if (shapeFile.contains("dem")) {
+              m_radiusSource = ControlPoint::RadiusSource::DEM;
+            }
+            else {
+              m_radiusSource = ControlPoint::RadiusSource::Ellipsoid;
+            }
+          }
           m_shapeType = Unprojected;
         }
-        catch (IException &) {
-          QString message = "Cannot create either Camera or Projections ";
-          message += "for the ground source file.  Check the validity of the ";
-          message += " cube labels.  The cube must either be projected or ";
-          message += " run through spiceinit.";
-          //TODO 2016-07-25 TLS  Where should info msgs go in IPCE?
+        catch (IException &e) {
+          m_surfacePointSource = ControlPoint::SurfacePointSource::None;
+          m_radiusSource = ControlPoint::RadiusSource::None;
           m_shapeType = Unknown;
+          QString message = "Cannot create either Camera or Projections "
+            "for the ground source file [" + displayProperties()->displayName() + "].  "
+            "Check the validity of the  cube labels.  The cube must either be projected or "
+            " run through spiceinit.";
+          throw IException(e, IException::Io, message, _FILEINFO_);
         }
       }
     }
 
-    if (m_shapeType == Unprojected) {
-      initCamStats();
-    }
-    else if (m_shapeType == Basemap || m_shapeType == Dem) {
-      initMapStats();
-      if (m_shapeType == Dem) {
-        initDemStats();
+    try {
+      if (m_shapeType == Unprojected) {
+        initCamStats();
       }
+      else if (m_shapeType == Basemap || m_shapeType == Dem) {
+        initMapStats();
+        if (m_shapeType == Dem) {
+          initDemStats();
+        }
+      }
+    }
+    catch (IException &e) {
+      QString message = "Cannot initialize the camera, map or dem statistics for this shape file [" +
+          displayProperties()->displayName() + "]. Check the validity of the  cube labels.  The "
+          "cube must either be projected or run through spiceinit. \n";
+      message += e.toString();
+      QMessageBox::warning((QWidget *) parent(), "Warning", message);
     }
 
     try {
       initQuickFootprint();
     }
-    catch (IException &) {
+    catch (IException &e) {
     }
+  }
 
-    m_displayProperties = new ShapeDisplayProperties(FileName(m_fileName).name(), this);
 
-    m_id = new QUuid(QUuid::createUuid());
+  ControlPoint::SurfacePointSource::Source Shape::surfacePointSource() {
+    return m_surfacePointSource;
+  }
+
+
+  ControlPoint::RadiusSource::Source Shape::radiusSource() {
+    return m_radiusSource;
   }
 
 
@@ -341,7 +382,7 @@ namespace Isis {
    * @return SerialNumber The cube's serial number.
    */
   QString Shape::serialNumber() {
-    return SerialNumber::Compose(*(cube()));
+    return m_serialNumber;
   }
 
   /**
@@ -816,6 +857,10 @@ namespace Isis {
       type = "Dem";
     }
     stream.writeAttribute("shapeType", type);
+    stream.writeAttribute("surfacePointSource",
+               ControlPoint::SurfacePointSourceToString(m_surfacePointSource));
+    stream.writeAttribute("radiusSource",
+               ControlPoint::RadiusSourceToString(m_radiusSource));
 
     if (m_shapeType == Unprojected) {
       stream.writeAttribute("instrumentId", m_instrumentId);
@@ -903,6 +948,10 @@ namespace Isis {
           m_shape->m_fileName = m_shapeFolder.expanded() + "/" + fileName;
         }
 
+        m_shape->m_surfacePointSource =
+          ControlPoint::StringToSurfacePointSource(atts.value("surfacePointSource"));
+        m_shape->m_radiusSource =
+          ControlPoint::StringToRadiusSource(atts.value("radiusSource"));
         QString shapeType = atts.value("shapeType");
 
         if (shapeType == "Unprojected") {
@@ -1002,8 +1051,12 @@ namespace Isis {
                                      const QString &qName) {
     if (localName == "footprint" && !m_characters.isEmpty()) {
       geos::io::WKTReader wktReader(&globalFactory);
-      m_shape->m_footprint = PolygonTools::MakeMultiPolygon(
-          wktReader.read(m_characters.toStdString()));
+      try {
+        m_shape->m_footprint = PolygonTools::MakeMultiPolygon(
+            wktReader.read(m_characters.toStdString()));
+      }
+      catch (IException &) {
+      }
     }
     else if (localName == "shape" && !m_shape->m_footprint) {
       QMutex mutex;
