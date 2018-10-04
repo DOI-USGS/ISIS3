@@ -124,52 +124,55 @@ void IsisMain() {
 
   PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory", Pvl::Traverse));
   QString transDir = (QString) dataDir["hayabusa"] + "/translations/";
-  QString instrumentTrans = transDir + "nirsInstrument.trn";
-  QString archiveTrans = transDir + "nirsArchive.trn";
-
   Pvl newLabel;
 
-  Isis::PvlToPvlTranslationManager instXlater(label, instrumentTrans);
+  QString instTrans = transDir + "nirsInstrument.trn";
+  Isis::PvlToPvlTranslationManager instXlater(label, instTrans);
   instXlater.Auto(newLabel);
 
-  Isis::PvlToPvlTranslationManager archXlater(label, archiveTrans);
+  QString archTrans = transDir + "nirsArchive.trn";
+  Isis::PvlToPvlTranslationManager archXlater(label, archTrans);
   archXlater.Auto(newLabel);
+
+  QString bandTrans = transDir + "nirsBandBin.trn";
+  Isis::PvlToPvlTranslationManager bandXlater(label, bandTrans);
+  bandXlater.Auto(newLabel);
+
+  QString kernTrans = transDir + "nirsKernels.trn";
+  Isis::PvlToPvlTranslationManager kernXlater(label, kernTrans);
+  kernXlater.Auto(newLabel);
 
   // Create the bandbin group
   // The following equation is from:
   // Abe et al., 2004. Characteristics and current status of near infrared
   // spectrometer for Hayabusa mission. Lunar & Planet. Sci. XXXV, 1724.
-  PvlGroup bandBinGroup("BandBin");
   PvlKeyword filterNumber("FilterNumber");
   PvlKeyword center("Center");
-  for (int i = 1; i <= 64; i++) {
-    filterNumber += toString( i );
-    center += toString( 2.27144 - 0.02356 * (65 - i) );
+  for (int channelNumber = 1; channelNumber <= 64; channelNumber++) {
+    filterNumber += toString( channelNumber );
+    center += toString( 2.27144 - 0.02356 * (65 - channelNumber) );
   }
-  bandBinGroup += filterNumber;
-  bandBinGroup += center;
-
-  // Create the Kernels group
-  PvlGroup kerns("Kernels");
-  kerns += PvlKeyword("NaifFrameCode","-130200");
+  newLabel.findGroup("BandBin", Pvl::Traverse).addKeyword(filterNumber);
+  newLabel.findGroup("BandBin", Pvl::Traverse).addKeyword(center);
+  newLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Width").setUnits("micrometers");
 
   //  Create YearDoy keyword in Archive group
   iTime stime(newLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
-  (void) newLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
+  newLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
 
   // Add the instrument, band bin, archive, mission data, and kernels
   // groups to the output cube labels
   reflectanceCube->putGroup( newLabel.findGroup("Instrument", Pvl::Traverse) );
-  reflectanceCube->putGroup( bandBinGroup );
+  reflectanceCube->putGroup( newLabel.findGroup("BandBin", Pvl::Traverse) );
   reflectanceCube->putGroup( newLabel.findGroup("Archive", Pvl::Traverse) );
   reflectanceCube->putGroup( newLabel.findGroup("MissionData", Pvl::Traverse) );
-  reflectanceCube->putGroup( kerns );
+  reflectanceCube->putGroup( newLabel.findGroup("Kernels", Pvl::Traverse) );
   stdevCube->putGroup( newLabel.findGroup("Instrument", Pvl::Traverse) );
-  stdevCube->putGroup( bandBinGroup );
+  stdevCube->putGroup( newLabel.findGroup("BandBin", Pvl::Traverse) );
   stdevCube->putGroup( newLabel.findGroup("Archive", Pvl::Traverse) );
   stdevCube->putGroup( newLabel.findGroup("MissionData", Pvl::Traverse) );
-  stdevCube->putGroup( kerns );
+  stdevCube->putGroup( newLabel.findGroup("Kernels", Pvl::Traverse) );
 
   // Attach the original fits label and detached label
   OriginalLabel originalFits(label);

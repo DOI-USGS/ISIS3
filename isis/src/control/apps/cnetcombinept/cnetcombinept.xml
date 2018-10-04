@@ -9,9 +9,9 @@
   <description>
     <p>
       This program will create a control network by combining control points
-      from one or more control networks into single points that satisfy image 
+      from one or more control networks into single points that satisfy image
       distance criteria. It employs a more robust/direct technique than
-      <em>cnetmerge</em>. This technique evaluates each control point in all 
+      <em>cnetmerge</em>. This technique evaluates each control point in all
       input networks by finding all candidate merger control points who have a
       measure within IMAGETOL. Then, for each candidate point, the average
       distance of the measures in the candidate to a measure in the source
@@ -24,12 +24,12 @@
     </p>
     <p>
        When all control points have been searched and all mergers have taken
-       place, a new single combined control network is created. 
+       place, a new single combined control network is created.
     </p>
     <p>
-        Note that this application can be ran more than once and directly on the 
-        output of any past run (in other words, you need only provide a single 
-        network, if desired). 
+        Note that this application can be ran more than once and directly on the
+        output of any past run (in other words, you need only provide a single
+        network, if desired).
     </p>
   </description>
 
@@ -47,16 +47,16 @@
       Corrected the count when SAVEMINS=TRUE.
     </change>
     <change name="Kris Becker" date="2015-11-13">
-      Uses modified ControlNet class  which provides the ability to take 
-      ownership of all points in the control net efficiently. This is needed 
-      in order to ensure only a single copies of control points are utlized to 
+      Uses modified ControlNet class  which provides the ability to take
+      ownership of all points in the control net efficiently. This is needed
+      in order to ensure only a single copies of control points are utlized to
       minimize memory overhead.
     </change>
     <change name="Jeannie Backer" date="2016-03-11">
       Added program to ISIS package.
     </change>
     <change name="Jeannie Backer" date="2016-04-22">
-      Modified to set the new control net's target and radii by using the input control net's 
+      Modified to set the new control net's target and radii by using the input control net's
       values. References #3892
     </change>
     <change name="Kris Becker" date="2016-12-05">
@@ -76,6 +76,10 @@
     <change name="Tyler Wilson" date="2017-06-29">
       cnetcombinept now properly sets apriori lat/lon values to adjusted values.  Fixes #4772.
     </change>
+    <change name="Jesse Mapel" date="2018-07-06">
+      Removed calls to set control net target radii because they are no longer needed by
+      the control network. Fixes #5457.
+    </change>
   </history>
 
   <category>
@@ -87,11 +91,11 @@
 
       <parameter name="CNETBASE">
         <type>filename</type>
-        <fileMode>input</fileMode>           
+        <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
         <brief>Master control network file to match</brief>
         <description>
-          The base control network file to which others will be matched. 
+          The base control network file to which others will be matched.
         </description>
         <filter>*.net *.cnet *.ctl</filter>
       </parameter>
@@ -142,8 +146,8 @@
           Write a list of all serial numbers contained in the network
         </brief>
         <description>
-           Provided with a filename in this option, all the cube serial numbers 
-           that are contained in the network are written to this file as soon as 
+           Provided with a filename in this option, all the cube serial numbers
+           that are contained in the network are written to this file as soon as
            it is determined in the processing.
         </description>
         <filter>*.lis</filter>
@@ -182,10 +186,10 @@
            </description>
         </parameter>
 
-        <parameter name="KDNODES"> 
+        <parameter name="KDNODES">
            <type>integer</type>
            <default><item>10</item></default>
-           <brief>Specify the leaf size of the kd-tree</brief> 
+           <brief>Specify the leaf size of the kd-tree</brief>
            <description>
               Number of leaves in the kd-tree structure.
            </description>
@@ -197,8 +201,8 @@
               Reset the apriori surface point to best available
            </brief>
            <description>
-               When TRUE, all points apriori latitude/longitude surface point is 
-               updated to use the best one available. This is often the 
+               When TRUE, all points apriori latitude/longitude surface point is
+               updated to use the best one available. This is often the
                resulting coordinate after jigsaw has adjusted the surface point.
            </description>
            <default><item>false</item></default>
@@ -210,18 +214,18 @@
            <brief>Remove all invalid or ignored control points/measures</brief>
            <description>
              <p>
-                 When true, all invalid or ignored control points and measures 
-                 are removed from the output control network as one of 
-                 the main objectives of this application is to remove 
-                 redundancies and mimimize the size of networks. However, for 
-                 evaluation purposes, you can set this to false, which will 
-                 preserve all control points. 
+                 When true, all invalid or ignored control points and measures
+                 are removed from the output control network as one of
+                 the main objectives of this application is to remove
+                 redundancies and mimimize the size of networks. However, for
+                 evaluation purposes, you can set this to false, which will
+                 preserve all control points.
              </p>
              <p>
-                 When specifying the minimum number of measures/control point 
-                 using the MINMEASURES parameter, any control point that does 
-                 not meet this criteria will also be removed from the netwrk 
-                 when CLEANNET=true, otherwise these points will be set to 
+                 When specifying the minimum number of measures/control point
+                 using the MINMEASURES parameter, any control point that does
+                 not meet this criteria will also be removed from the netwrk
+                 when CLEANNET=true, otherwise these points will be set to
                  ignored.
              </p>
            </description>
@@ -233,18 +237,18 @@
            <brief>Remove all invalid or ignored control measures</brief>
            <description>
              <p>
-                 When true, all invalid or ignored control points and measures 
-                 are removed from the output control network as one of 
-                 the main objectives of this application is to remove 
-                 redundancies and mimimize the size of networks. However, for 
-                 evaluation purposes, you can set this to false, which will 
-                 preserve all control points. 
+                 When true, all invalid or ignored control points and measures
+                 are removed from the output control network as one of
+                 the main objectives of this application is to remove
+                 redundancies and mimimize the size of networks. However, for
+                 evaluation purposes, you can set this to false, which will
+                 preserve all control points.
              </p>
              <p>
-                 When specifying the minimum number of measures/control point 
-                 using the MINMEASURES parameter, any control point that does 
-                 not meet this criteria will also be removed from the netwrk 
-                 when CLEANNET=true, otherwise these points will be set to 
+                 When specifying the minimum number of measures/control point
+                 using the MINMEASURES parameter, any control point that does
+                 not meet this criteria will also be removed from the netwrk
+                 when CLEANNET=true, otherwise these points will be set to
                  ignored.
              </p>
            </description>
@@ -253,18 +257,18 @@
         <parameter name="MINMEASURES">
             <type>integer</type>
             <default><item>0</item></default>
-            <brief>Select minimim number of valid measures/point</brief> 
+            <brief>Select minimim number of valid measures/point</brief>
             <description>
-                 This allows users to disable points that have less than   
-                 MINMEASURES control measures/control point. For example, if you 
-                 want to flag all points as ignored with 2 measures or less, set 
-                 MINMEASURES=3. Points that don't meet this critieria are set to 
-                 ignore and are subject to the CLEANNET action requested by the 
-                 user (i.e., all ignored points are removed from the network if 
+                 This allows users to disable points that have less than
+                 MINMEASURES control measures/control point. For example, if you
+                 want to flag all points as ignored with 2 measures or less, set
+                 MINMEASURES=3. Points that don't meet this critieria are set to
+                 ignore and are subject to the CLEANNET action requested by the
+                 user (i.e., all ignored points are removed from the network if
                  CLEANNET=true).
             </description>
         </parameter>
-      
+
     </group>
   </groups>
 </application>

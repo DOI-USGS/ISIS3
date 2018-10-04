@@ -770,10 +770,6 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
     SurfacePoint aprioriSP) {
-    if (parentNetwork) {
-      std::vector<Distance> targetRadii = parentNetwork->GetTargetRadii();
-      aprioriSurfacePoint.SetRadii(targetRadii[0], targetRadii[1], targetRadii[2]);
-    }
     if (editLock) {
       return PointLocked;
     }

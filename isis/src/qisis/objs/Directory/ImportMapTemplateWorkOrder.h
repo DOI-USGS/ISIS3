@@ -34,6 +34,8 @@
     * Asks the user for a map template and copies it into the project.
     *
     * @author 2018-07-05 Summer Stapleton
+    * @internal
+    *    @history 2018-07-05 Summer Stapleton - Created ImportMapTemplateWorkOrder class
     *
     */
     class ImportMapTemplateWorkOrder : public WorkOrder {

@@ -37,29 +37,31 @@ void IsisMain() {
     // Setup the input cube
     p.SetInputCube("FROM");
 
-    if(ui.GetString("STRETCH") == "LINEAR") {
-      if(ui.GetString("BITTYPE") != "32BIT")
+    if (ui.GetString("STRETCH") == "LINEAR") {
+      if (ui.GetString("BITTYPE") != "32BIT") {
         p.SetInputRange();
+      }
     }
-    if(ui.GetString("STRETCH") == "MANUAL")
+    if (ui.GetString("STRETCH") == "MANUAL") {
       p.SetInputRange(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"));
+    }
 
     double min = -DBL_MAX;
     double max = DBL_MAX;
 
-    if(ui.GetString("BITTYPE") == "8BIT") {
+    if (ui.GetString("BITTYPE") == "8BIT") {
       p.SetOutputType(Isis::UnsignedByte);
       min = 0.0;
       max = 255.0;
       setRangeAndPixels(ui, p, min, max, BOTH);
     }
-    else if(ui.GetString("BITTYPE") == "S16BIT") {
+    else if (ui.GetString("BITTYPE") == "S16BIT") {
       p.SetOutputType(Isis::SignedWord);
       min = -32768.0;
       max = 32767.0;
       setRangeAndPixels(ui, p, min, max, NEG);
     }
-    else if(ui.GetString("BITTYPE") == "U16BIT") {
+    else if (ui.GetString("BITTYPE") == "U16BIT") {
       p.SetOutputType(Isis::UnsignedWord);
       min = 0.0;
       max = 65535.0;
@@ -75,13 +77,16 @@ void IsisMain() {
       setRangeAndPixels(ui, p, min, max, NONE);
     }
 
-    if(ui.GetString("ENDIAN") == "MSB")
+    if (ui.GetString("ENDIAN") == "MSB") {
       p.SetOutputEndian(Isis::Msb);
-    else if(ui.GetString("ENDIAN") == "LSB")
+    }
+    else if (ui.GetString("ENDIAN") == "LSB") {
       p.SetOutputEndian(Isis::Lsb);
+    }
 
-    if(ui.GetString("LABTYPE") == "FIXED")
+    if (ui.GetString("LABTYPE") == "FIXED") {
       p.SetExportType(ProcessExportPds::Fixed);
+    }
 
     if (ui.GetBoolean("CHECKSUM")) {
       p.setCanGenerateChecksum(true);
@@ -122,36 +127,38 @@ void IsisMain() {
     PvlObject *label= icube->label();
     if (!label->hasObject("IsisCube")) {
       QString msg = "Input file [" + ui.GetFileName("FROM") +
-                  "] does not appear to be an ISIS3 cube.";
+                    "] does not appear to be an ISIS3 cube.";
       throw  IException(IException::User, msg, _FILEINFO_);
     }
     
     FileName outFile(ui.GetFileName("TO", "img"));
     QString outFileName(outFile.expanded());
     
-    if(ui.GetString("STRETCH") == "LINEAR") {
-      if(ui.GetString("BITTYPE") != "32BIT")
+    if (ui.GetString("STRETCH") == "LINEAR") {
+      if (ui.GetString("BITTYPE") != "32BIT") {
         process.SetInputRange();
+      }
     }
-    if(ui.GetString("STRETCH") == "MANUAL")
+    if (ui.GetString("STRETCH") == "MANUAL") {
       process.SetInputRange(ui.GetDouble("MINIMUM"), ui.GetDouble("MAXIMUM"));
+    }
 
     double min = -DBL_MAX;
     double max = DBL_MAX;
 
-    if(ui.GetString("BITTYPE") == "8BIT") {
+    if (ui.GetString("BITTYPE") == "8BIT") {
       process.SetOutputType(Isis::UnsignedByte);
       min = 0.0;
       max = 255.0;
       setRangeAndPixels(ui, process, min, max, BOTH);
     }
-    else if(ui.GetString("BITTYPE") == "S16BIT") {
+    else if (ui.GetString("BITTYPE") == "S16BIT") {
       process.SetOutputType(Isis::SignedWord);
       min = -32768.0;
       max = 32767.0;
       setRangeAndPixels(ui, process, min, max, NEG);
     }
-    else if(ui.GetString("BITTYPE") == "U16BIT") {
+    else if (ui.GetString("BITTYPE") == "U16BIT") {
       process.SetOutputType(Isis::UnsignedWord);
       min = 0.0;
       max = 65535.0;
@@ -167,10 +174,12 @@ void IsisMain() {
       setRangeAndPixels(ui, process, min, max, NONE);
     }
 
-    if(ui.GetString("ENDIAN") == "MSB")
+    if (ui.GetString("ENDIAN") == "MSB") {
       process.SetOutputEndian(Isis::Msb);
-    else if(ui.GetString("ENDIAN") == "LSB")
+    }
+    else if (ui.GetString("ENDIAN") == "LSB") {
       process.SetOutputEndian(Isis::Lsb);
+    }
 
     // Records what it did to the print.prt file
     PvlGroup results("DNs Used");
@@ -192,37 +201,37 @@ void IsisMain() {
 
 //Sets up special pixels and valid pixel ranges
 void setRangeAndPixels(UserInterface &ui, ProcessExport &p, double &min, double &max, Pixtype ptype) {
-  if(ptype == NEG) {
-    if(ui.GetBoolean("NULL")) {
+  if (ptype == NEG) {
+    if (ui.GetBoolean("NULL")) {
       p.SetOutputNull(min++);
     }
-    if(ui.GetBoolean("LRS")) {
+    if (ui.GetBoolean("LRS")) {
       p.SetOutputLrs(min++);
     }
-    if(ui.GetBoolean("LIS")) {
+    if (ui.GetBoolean("LIS")) {
       p.SetOutputLis(min++);
     }
-    if(ui.GetBoolean("HIS")) {
+    if (ui.GetBoolean("HIS")) {
       p.SetOutputHis(min++);
     }
-    if(ui.GetBoolean("HRS")) {
+    if (ui.GetBoolean("HRS")) {
       p.SetOutputHrs(min++);
     }
   }
-  else if(ptype == BOTH) {
-    if(ui.GetBoolean("NULL")) {
+  else if (ptype == BOTH) {
+    if (ui.GetBoolean("NULL")) {
       p.SetOutputNull(min++);
     }
-    if(ui.GetBoolean("LRS")) {
+    if (ui.GetBoolean("LRS")) {
       p.SetOutputLrs(min++);
     }
-    if(ui.GetBoolean("LIS")) {
+    if (ui.GetBoolean("LIS")) {
       p.SetOutputLis(min++);
     }
-    if(ui.GetBoolean("HRS")) {
+    if (ui.GetBoolean("HRS")) {
       p.SetOutputHrs(max--);
     }
-    if(ui.GetBoolean("HIS")) {
+    if (ui.GetBoolean("HIS")) {
       p.SetOutputHis(max--);
     }
   }
