@@ -4,8 +4,180 @@ Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net
 Read network...
 Reading Control Points...
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+Converted directly to Pvl:
+Object = ControlNetwork
+  NetworkId    = Null
+  TargetName   = Null
+  UserName     = Null
+  Created      = Null
+  LastModified = Null
+  Description  = Null
+  Version      = 5
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = 1
+    ChooserName = Unknown
+    DateTime    = 2018-10-04T14:38:48
+
+    Group = ControlMeasure
+      SerialNumber = M0
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Ignore       = True
+      Sample       = 0.0
+      Line         = 0.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1.0
+      Line         = 1.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1.0
+      Line         = 1.0
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = 2
+    ChooserName = Unknown
+    DateTime    = 2018-10-04T14:38:48
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 100.0
+      Line         = 1.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1000.0
+      Line         = 1.0
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = 3
+    ChooserName = Unknown
+    DateTime    = 2018-10-04T14:38:48
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1.0
+      Line         = 500.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 250.0
+      Line         = 500.0
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = 4
+    ChooserName = Unknown
+    DateTime    = 2018-10-04T14:38:48
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 100.0
+      Line         = 500.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 750.0
+      Line         = 500.0
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = 5
+    ChooserName = Unknown
+    DateTime    = 2018-10-04T14:38:48
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1.0
+      Line         = 1000.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1.0
+      Line         = 1000.0
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = 6
+    ChooserName = Unknown
+    DateTime    = 2018-10-04T14:38:48
+
+    Group = ControlMeasure
+      SerialNumber = M1
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 100.0
+      Line         = 1000.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = M2
+      MeasureType  = Candidate
+      ChooserName  = Unknown
+      DateTime     = 2018-10-04T14:38:48
+      Sample       = 1000.0
+      Line         = 1000.0
+    End_Group
+  End_Object
+End_Object
+End
 Write the network and re-read it...
 After reading and writing to a binary form does Pvl match?
+Conversion to Pvl stays consistent
 Reading/Writing control network is consistent
 
 Reading: $control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net...
