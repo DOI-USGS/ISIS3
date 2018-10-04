@@ -6,6 +6,7 @@ namespace Isis {
    *
    */
   ProgressBar::ProgressBar(QWidget *parent): QProgressBar(parent) {
+    
   }
 
   /**

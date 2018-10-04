@@ -49,6 +49,7 @@ namespace Isis {
   class Project;
   class ProjectItem;
   class ShapeList;
+  class Template;
   class XmlStackedHandlerReader;
 
   /**
@@ -309,6 +310,14 @@ namespace Isis {
    *                           if a workorder errors Fixes #5026
    *   @history 2017-08-11 Cole Neubauer - Updated documentation for accessor methods and when one
    *                           of these accessors should be used in the workorder template #5113
+   *   @history 2017-11-02 Tyler Wilson - Added a virtual setData method for a QString, and
+   *                           a private QString object called m_data.  References #4492.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168.
+   *   @history 2018-06-28 Makayla Shepherd - Removed the ProgressBar cleanup because it was 
+   *                           causing a seg fault when the ProgressBar was added to the 
+   *                           HistoryTreeWidget. The HistoryTreeWidget will now clean up the
+   *                           ProgressBar. Fixes #5228.
    */
   class WorkOrder : public QAction, public QUndoCommand {
     Q_OBJECT
@@ -354,6 +363,7 @@ namespace Isis {
       virtual bool isExecutable(ControlList *controls);
       virtual bool isExecutable(CorrelationMatrix);
       virtual bool isExecutable(TargetBodyQsp targetBody);
+      virtual bool isExecutable(Template *currentTemplate);
       virtual bool isExecutable(GuiCameraQsp guiCamera);
       virtual bool isExecutable(FileItemQsp fileItem);
       virtual bool isExecutable(ProjectItem *item);
@@ -362,14 +372,17 @@ namespace Isis {
       void save(QXmlStreamWriter &stream) const;
 
       virtual void setData(Context);
+      virtual void setData(QString data);
       virtual void setData(ImageList *images);
       virtual void setData(ShapeList *shapes);
       virtual void setData(ControlList *controls);
+      virtual void setData(Template *currentTemplate);
       virtual void setData(CorrelationMatrix);
       virtual void setData(TargetBodyQsp targetBody);
       virtual void setData(GuiCameraQsp guiCamera);
       virtual void setData(FileItemQsp fileItem);
       virtual void setData(ProjectItem *item);
+
 
 
       void setNext(WorkOrder *nextWorkOrder);
@@ -428,6 +441,8 @@ namespace Isis {
 
       QPointer<ControlList> controlList();
 
+      Template *getTemplate();
+
       TargetBodyQsp targetBody();
 
       GuiCameraQsp guiCamera();
@@ -469,7 +484,6 @@ namespace Isis {
       void executionFinished();
       void clearImageList();
       void clearShapeList();
-      void deleteProgress();
       void updateProgress();
       void startRedo();
 
@@ -568,6 +582,7 @@ namespace Isis {
       int m_progressValue;
 
       Context m_context;
+      QString m_data;
       QPointer<ImageList> m_imageList;
       QPointer<ShapeList> m_shapeList;
       QPointer<ControlList> m_controlList;
@@ -577,6 +592,13 @@ namespace Isis {
        * framework
        */
       GuiCameraQsp m_guiCamera;
+
+
+      /**
+       * A QSharedPointer to the Template (A Template object but encapsulated within a Gui
+       * framework.
+       */
+      Template *m_template;
 
 
       /**

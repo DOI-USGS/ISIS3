@@ -295,6 +295,7 @@ void IsisMain() {
 
   g_timeRatio = g_tvct / (g_exposureTime + g_tvct);
   g_darkCurrent = g_d0 * exp(g_d1 * g_temperature);
+  g_calibrationScale = 1.0;
   QString g_units = "DN";
 
   if ( !sunDistanceAU(startTime, target, g_solarDist) ) {
@@ -303,7 +304,12 @@ void IsisMain() {
                       _FILEINFO_);
   }
 
-  if ( QString::compare(g_iofCorrection, "dn", Qt::CaseInsensitive) != 0 ) {
+  //  Add DN/S as an output option
+  if ( QString::compare(g_iofCorrection, "dn/s", Qt::CaseInsensitive) == 0 ) {
+      g_calibrationScale = 1.0 / g_exposureTime;
+      g_units = "DN/S";
+  }
+  else if ( QString::compare(g_iofCorrection, "dn", Qt::CaseInsensitive) != 0 ) {
     /* Note - this radiance calibration scaling factor is applied to both radiance and iof
      * 
      * Units of RADIANCE
@@ -776,10 +782,8 @@ void calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     imageOut[i] = pow(imageOut[i], g_gamma) + g_L0 * imageOut[i] * exp(g_L1 * imageOut[i]);
 
 
-    // 3) DARK Current - Currently negligible and removed
-#if 0
+    // 3) DARK Current
       imageOut[i] = imageOut[i] - g_darkCurrent;
-#endif
 
     // 4) HOT Pixel Removal
 

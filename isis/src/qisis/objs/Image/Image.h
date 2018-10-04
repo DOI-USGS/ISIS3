@@ -85,7 +85,20 @@ namespace Isis {
    *                           (the Spacecraft name associated with this image).
    *   @history 2016-06-22 Tyler Wilson - Added documentation to member functions/variables.
    *                           Fixes #3950.
-   *
+   *   @history 2017-10-11 Summer Stapleton - Removed path to instrumentId and spacecraftName in
+   *                           the startElement method. Fixes #5179.
+   *   @history 2017-11-01 Tracie Sucharski - Changed copyToNewProjectRoot to handle Images that are
+   *                           located outside of the import image directories such as the updated
+   *                           Images from a bundle run.  To improve efficiency, return from method
+   *                           if the project root has not changed. Fixes #4849.
+   *   @history 2018-06-30 Ian Humphrey - Added observationNumber() method so anything that grabs
+   *                           an Image ProjectItem can easily get both the serial number and
+   *                           observation number now. References #497.
+   *   @history 2018-07-02 Ian Humphrey - Changed serialNumber() implementation to follow how
+   *                           observationNumber() is implemented. This ensures that any calls
+   *                           after the first call to these methods are O(1) and are not
+   *                           bottlenecekd by any file I/O that occurs in the Compose()
+   *                           methods. References #497.
    */
 
   class Image : public QObject {
@@ -105,6 +118,7 @@ namespace Isis {
       ImageDisplayProperties *displayProperties();
       const ImageDisplayProperties *displayProperties() const;
       QString fileName() const;
+      QString observationNumber();
       QString serialNumber();
       geos::geom::MultiPolygon *footprint();
       const geos::geom::MultiPolygon *footprint() const;
@@ -138,7 +152,7 @@ namespace Isis {
 
     private:
       /**
-       * @brief Process XML in a stack-oriented fashion  
+       * @brief Process XML in a stack-oriented fashion
        *
        * Child class for XmlStackedHandler which is used to process XML in
        * a stack-oriented way.  It's been modified to process an Image object
@@ -200,6 +214,16 @@ namespace Isis {
        * Instrument id associated with this Image.
        */
       QString m_instrumentId;
+
+      /**
+       * The observation number for this image.
+       */
+      QString m_observationNumber; 
+
+      /**
+       * The serial number for this image.
+       */
+      QString m_serialNumber;
 
       /**
        * Spacecraft name associated with this Image.

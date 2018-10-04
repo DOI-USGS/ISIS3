@@ -44,6 +44,7 @@ namespace Isis {
   class PointTableModel;
   class TableView;
   class TreeView;
+  class CnetEditorSortConfigDialog;
 
   /**
    * This widget provides full editing, filtering and viewing capabilities for
@@ -71,6 +72,18 @@ namespace Isis {
    *                           a ControlNet. Added load and save methods as well as an XmlHandler
    *                           to allow for serialization of the widget into the project.
    *                           Fixes #4989.
+   *   @history 2018-04-11 Tracie Sucharski - Moved the Xml serialization to the newly created
+   *                           CnetEditorView class for ipce.
+   *   @history 2018-06-12 Kaitlyn Lee - Added m_sortDialog to keep track if a dialog exists
+   *                           so only one instance can be open at a time.
+   *   @history 2018-07-12 Kaitlyn Lee - Added setCnetModified() and the connection with
+   *                           cnetModified() to call setModified(true) on a control when a user
+   *                           edits a cnet. cnetModified() was only connected to a slot in
+   *                           Directory, and this was connected to a slot in Project called
+   *                           activeControlModified() that would call setModified(true) on the
+   *                           active control. So, when a user changed any cnets, the only cnet that
+   *                           was recognized as being modified was the active. Adding this allows
+   *                           a user to save changes made to a nonactive cnet. Fixes #5414.
    */
   class CnetEditorWidget : public QWidget {
       Q_OBJECT
@@ -116,9 +129,6 @@ namespace Isis {
       void setPointTableSortingEnabled(bool enabled);
       void setPointTableSortLimit(int limit);
 
-      void load(XmlStackedHandlerReader *xmlReader);
-      void save(QXmlStreamWriter &stream, Project *project, FileName newProjectRoot);
-
 
     public slots:
       void configSorting();
@@ -139,6 +149,8 @@ namespace Isis {
       void handlePointTableFilterCountsChanged(int visibleRows, int totalRows);
       void handleMeasureTableFilterCountsChanged(int visibleRows,
           int totalRows);
+      void setCnetModified();
+
 
     private:
       //methods
@@ -192,33 +204,8 @@ namespace Isis {
 
       QString *m_settingsPath; //!< Path to read/write settings
 
+      CnetEditorSortConfigDialog *m_sortDialog; //!< Sorting dialog
 
-    private:
-      /**
-       * This class is a placeholder for future plans to serialize more of
-       * CnetEditorWidget's configurations when saving a project.
-       *  
-       * @author 2017-07-25 Christopher Combs
-       * @internal
-       *   @history 2017-07-25 Christopher Combs - Added Xml StackedHandler class
-       *                           to implement serialization of the CnetEditorWidget.
-       *                           References #4989.
-       */
-      class XmlHandler : public XmlStackedHandler {
-        public:
-          XmlHandler(CnetEditorWidget *cnetEditor);
-          ~XmlHandler();
-
-          virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                                    const QString &qName, const QXmlAttributes &atts);
-          virtual bool endElement(const QString &namespaceURI, const QString &localName,
-                                  const QString &qName);
-
-        private:
-          Q_DISABLE_COPY(XmlHandler);
-
-          CnetEditorWidget *m_cnetEditor;
-      };
   };
 }
 

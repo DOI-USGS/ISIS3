@@ -103,25 +103,30 @@ void IsisMain ()
   // Create a PVL to store the translated labels in
   Pvl outLabel;
 
-  // Translate the BandBin group
-  FileName transFile (transDir + "amicaBandBin.trn");
-  PvlToPvlTranslationManager bandBinXlater (label, transFile.expanded());
-  bandBinXlater.Auto(outLabel);
+  // Translate the Instrument group
+  FileName transFile = transDir + "amicaInstrument.trn";
+  PvlToPvlTranslationManager instrumentXlater (label, transFile.expanded());
+  instrumentXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile = transDir + "amicaArchive.trn";
   PvlToPvlTranslationManager archiveXlater (label, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
-  // Translate the Instrument group
-  transFile = transDir + "amicaInstrument.trn";
-  PvlToPvlTranslationManager instrumentXlater (label, transFile.expanded());
-  instrumentXlater.Auto(outLabel);
+  // Translate the BandBin group
+  transFile = transDir + "amicaBandBin.trn";
+  PvlToPvlTranslationManager bandBinXlater (label, transFile.expanded());
+  bandBinXlater.Auto(outLabel);
+
+  // Translate the Kernels group
+  transFile = transDir + "amicaKernels.trn";
+  PvlToPvlTranslationManager kernelsXlater (label, transFile.expanded());
+  kernelsXlater.Auto(outLabel);
 
   //  Create YearDoy keyword in Archive group
   iTime stime(outLabel.findGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
   PvlKeyword yeardoy("YearDoy", toString(stime.Year()*1000 + stime.DayOfYear()));
-  (void) outLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
+  outLabel.findGroup("Archive", Pvl::Traverse).addKeyword(yeardoy);
 
 
   //  Update target if user specifies it
@@ -130,16 +135,22 @@ void IsisMain ()
     igrp["TargetName"] = target;
   }
 
+  QString units = "";
+  if (outLabel.findGroup("BandBin", Pvl::Traverse).hasKeyword("Unit")) {
+    units = outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Unit")[0].toLower();
+  }
+  else {
+    units = "nanometers";
+  }
+  outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Center").setUnits(units);
+  outLabel.findGroup("BandBin", Pvl::Traverse).findKeyword("Width").setUnits(units);
+
   // Write the BandBin, Archive, and Instrument groups
   // to the output cube label
-  outcube->putGroup(outLabel.findGroup("BandBin",Pvl::Traverse));
-  outcube->putGroup(outLabel.findGroup("Archive",Pvl::Traverse));
   outcube->putGroup(outLabel.findGroup("Instrument",Pvl::Traverse));
-
-  // Use the HAYABUSA_AMICA frame code rather than HAYABUSA_AMICA_IDEAL
-  PvlGroup kerns("Kernels");
-  kerns += PvlKeyword("NaifFrameCode","-130102");
-  outcube->putGroup(kerns);
+  outcube->putGroup(outLabel.findGroup("Archive",Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("BandBin",Pvl::Traverse));
+  outcube->putGroup(outLabel.findGroup("Kernels",Pvl::Traverse));
 
   // Now write the FITS augmented label as the original label
   OriginalLabel oldLabel(label);
