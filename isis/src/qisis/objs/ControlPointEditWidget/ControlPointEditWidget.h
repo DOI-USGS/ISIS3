@@ -105,6 +105,8 @@ namespace Isis {
    *                           likely causing problems with large networks.
    *   @history 2018-10-04 Tracie Sucharski - Changed functionality of ground and radius source
    *                           choices on constrained and fixed points.  Fixes #5504.
+   *   @history 2018-10-04 Tracie Sucharski - Removed calls to ControlNet::GetTargetRadii because of
+   *                           changes to ControlNet.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
