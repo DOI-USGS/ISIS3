@@ -72,7 +72,7 @@ A developer will want output of a test before setting it as truth data. This is 
     python3 makeOutput.py test
 
 where test is the cmake name for the unit or app test. It is important to note that this command must be ran from the the src directory, i.e., the object's directory that output is being made for.
-For unit tests, this will output a file in the form of <objectname>.Truth in the directory `build/testOutputDir`.
+For unit tests, this will output a file in the form of <objectname>.truth in the directory `build/testOutputDir`.
 For app tests, this will output a directory (truth) in the directory `build/testOutputDir` that contains the truth data for the app test.
 
 To check in truth data the command should be in the form of:
@@ -89,6 +89,12 @@ output:     Unit Test Output In /scratch/cmake/isis3_cmake/build/testOutputDir/ 
 command:    python3 $ISISROOT/../isis/scripts/makeOutput.py apollo_unit_test_Apollo -t
 output:     Checked In Truth Data To /scratch/cmake/isis3_cmake/isis/src/apollo/objs/Apollo/Apollo.truth
 ```
+When making OS specific truth data, do not add the "-t" flag. Instead, you will need to rename the output and copy it to the directory of the object or app you are making truth data for.
+
+* For unit tests, you will need to rename the output put in build/testOutputDir as "<objectname>_<OStype>_x86_64_<OSname>.truth". If we wanted to make Mac truth data for ProgramLauncher: "ProgramLauncher_Darwin_x86_64_MacOSX10_13.truth".
+
+* For app tests, you will need to rename the truth directory put in build/testOutputDir as
+"truth.<OStype>.x86_64.<OSname>". If we wanted to make Mac truth data: "truth.Darwin.x86_64.MacOSX10_13".
 
 # Building in Debug Mode
 1. reconfigure cmake with flag (-DCMAKE_BUILD_TYPE=DEBUG)
