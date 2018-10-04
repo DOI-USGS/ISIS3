@@ -25,7 +25,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
   <h2>Overview</h2>
 
   <p>
-    This installation guide is for ISIS3 users interested in installing ISIS3 through conda, or compiling on their own systems using cmake.  
+    This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda.  
     If you are a developer, we refer you to our <a href="https://github.com/USGS-Astrogeology/ISIS3">GitHub repository.</a>
   </p>
 
@@ -34,7 +34,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <ol>
       <li>Download either the Anaconda or Miniconda installation script for your OS platform.  Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: 
       <a href="https://www.anaconda.com/download">Anaconda installer</a>, <a href="https://conda.io/miniconda.html">Miniconda installer</a></li>
-      <li>Open a terminal window in the directory where you downloaded the script, and run the following commands (in this example, we chose to do a full install of Anaconda):</li>
+      <li>Open a terminal window in the directory where you downloaded the script, and run the following commands.  In this example, we chose to do a full install of Anaconda, and our OS is Linux-based.  Your file name may be different depending on your environment.</li>
         <pre>
           chmod +x Anaconda3-5.2.0-Linux-x86_64.sh
           ./Anaconda3-5.2.0-Linux-x86_64.sh          
@@ -48,19 +48,27 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           conda config --add channels usgs-astrogeology
 
           #Create a new conda environment to install ISIS3 in
-          conda create -n isis3alpha
+          conda create -n isis3
 
           #Activate the environment
-          source activate isis3alpha
+          source activate isis3
 
           #Download the ISIS3 version with label alpha
-          conda install -c usgs-astrogeology/label/alpha isis3
-
-          #Set the ISISROOT variable
-          export ISISROOT=$CONDA_PREFIX
+          conda install -c usgs-astrogeology isis3
           
-          #Execute the ISIS3 startup script
-          source $CONDA_PREFIX/scripts/isis3Startup.sh
+          #Execute the ISIS3 variable initialization script.  
+          #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
+
+         ./$CONDA_PREFIX/scripts/isis3VarInit
+
+          #Run the source activate command a second time to process the changes:
+
+          source activate isis3alpha
+
+
+
+
+
 
         </pre>
       </li>
@@ -470,9 +478,9 @@ is a popular choice and may be downloaded below.
 
 <h3>How do I install ISIS3.5.2 or earlier?</h3>
     <p>
-         If you are looking for a version of ISIS3 prior to 3.5.3, please
+         If you are looking for a version of ISIS3 prior to 3.6.0, please
         <a href="../../documents/LegacyInstallGuide/index.html">refer to the Legacy ISIS3 Installation
-        Guide</a> for instructions on downloading and installing ISIS3, version 3.5.2 or earlier.
+        Guide</a> for instructions on downloading and installing ISIS3, versions prior to 3.6.0.
     </p>
 
       </body>
@@ -506,7 +514,7 @@ is a popular choice and may be downloaded below.
       This document describes how to download/compile and install a
       binary version of ISIS3 as well
     </description>
-    <author>ASC Development Team</author>
+    <author>Kristin Berry</author>
     <date>2018-08-28</date>
   </bibliography>
 </documentation>
