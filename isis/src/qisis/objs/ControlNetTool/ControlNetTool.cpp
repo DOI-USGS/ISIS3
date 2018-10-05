@@ -415,7 +415,7 @@ namespace Isis {
           painter->drawLine(x, y - 5, x, y + 5);
         }
         // If this point is the current edit point in ControlPointEditView
-        else if (currentEditPoint != NULL && &p == currentEditPoint) {
+        else if (currentEditPoint != NULL && p.GetId() == currentEditPoint->GetId()) {
           //  Draw circle, then crosshair inside circle
           QPainterPath path;
           path.addEllipse(QPointF(x,y), 5., 5.);

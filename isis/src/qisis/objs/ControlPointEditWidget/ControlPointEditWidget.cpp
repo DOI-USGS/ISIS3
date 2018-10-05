@@ -1459,6 +1459,21 @@ namespace Isis {
         m_serialNumberList, m_lastUsedPointId, this, true, true, true);
     newPointDialog->setFiles(pointFiles);
     newPointDialog->setGroundSource(m_projectShapeNames, m_numberProjectShapesWithPoint);
+
+    //  Load imported project shapes that are Dems and contain point location into the radius combo.
+    if (m_projectShapeNames.count() > 0) {
+      QStringList radiusSourceFiles;
+      for (int i=0; i<m_numberProjectShapesWithPoint; i++) {
+        Shape *shape = m_nameToShapeMap[m_projectShapeNames.at(i)];
+        if (shape->radiusSource() == ControlPoint::RadiusSource::DEM) {
+          radiusSourceFiles<<shape->fileName();
+        }
+      }
+      newPointDialog->setRadiusSource(radiusSourceFiles);
+    }
+
+
+
     if (newPointDialog->exec() == QDialog::Accepted) {
       m_lastUsedPointId = newPointDialog->pointId();
       ControlPoint *newPoint =

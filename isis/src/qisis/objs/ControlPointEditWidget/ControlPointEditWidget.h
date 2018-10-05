@@ -107,6 +107,8 @@ namespace Isis {
    *                           choices on constrained and fixed points.  Fixes #5504.
    *   @history 2018-10-04 Tracie Sucharski - Removed calls to ControlNet::GetTargetRadii because of
    *                           changes to ControlNet.
+   *   @history 2018-10-05 Tracie Sucharski - Added radius source combo to the NewControlPoint
+   *                           dialog.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
