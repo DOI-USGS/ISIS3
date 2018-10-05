@@ -27,10 +27,10 @@
 #include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
+#include "KaguyaTcCamera.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "KaguyaTcCamera.h"
 
 using namespace std;
 using namespace Isis;
@@ -38,11 +38,10 @@ using namespace Isis;
 void TestLineSamp(Camera *cam, double samp, double line);
 
 /**
- * Unit test for Kaguya Tc Camera.
+ * Unit test for Kaguya TC Camera.
  *
  * @internal
- *   @history 2018-08-15 Jeannie Backer - Updated lat/lon changes due to
- *                           changes in focal length.
+ *   @history 2018-10-05 Jeannie Backer and Adam Goins - Original version.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -55,7 +54,7 @@ int main(void) {
     double knownLat = 0; //
     double knownLon = 0; //
 
-    Cube c("$tgo/testData/CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub", "r");
+    Cube c("$kaguya/testData/TC1W2B0_01_00296N081E2387.cub", "r");
     KaguyaTcCamera *cam = (KaguyaTcCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
