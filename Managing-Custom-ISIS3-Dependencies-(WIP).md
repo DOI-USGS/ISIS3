@@ -15,6 +15,9 @@ If we do need to build a custom version of a library, we can build our own with 
 The third-party dependencies required to build and run ISIS3 versions 3.6.0 and above are specified in the [environment.yml](https://github.com/USGS-Astrogeology/ISIS3/blob/cmake/environment.yml) file located at the root of the ISIS3 repo. For more info on editing a conda environment file, view the [Conda Documentation](https://conda.io/docs/user-guide/tasks/manage-environments.html)
 
 Most of the packages listed in this environment file are pulled from conda-forge, but there are a few custom builds that we have uploaded to [our usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology/repo), such as Qt. The recipes to build and upload these packages can be found on the [isis3_dependencies](https://github.com/USGS-Astrogeology/isis3_dependencies) repo.
+ 
+
+:building_construction: _**should the following sections be on a page on the isis3_dependencies wiki?**_
 
 # Environment Setup
 
