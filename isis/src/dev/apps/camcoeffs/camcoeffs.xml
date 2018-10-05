@@ -6,7 +6,9 @@
   </brief>
 
   <description>
-      This application is for camera development is not supported for general public use.
+      <strong>
+        This application is for camera development and is not supported for general public use.
+      </strong>
 
       This program outputs the exact IAK Kernel keywords that should be added to the kernel. The
       TRANSX,TRANSY keywords are the result of the input (no processing done, this should be known information).

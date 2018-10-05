@@ -4,7 +4,9 @@
   <brief>Perform basic camera accuracy tests</brief>
 
   <description>
-      This application is for camera development is not supported for general public use.
+      <strong>
+        This application is for camera development and is not supported for general public use.
+      </strong>
 
       This program will do basic tests for new camera models.  There are calls 
       to SetImage(sample, line) and SetUniversalGround(lat, lon) that are used 

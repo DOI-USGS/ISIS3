@@ -8,7 +8,9 @@
 
   <description>
   <p>
-    This application is for camera development is not supported for general public use.
+    <strong>
+      This application is for camera development and is not supported for general public use.
+    </strong>
 
     This program, camdev, creates backplane bands that contain photometric, geometric, and 
     spacecraft instrument information for an image file.  The parameter options
