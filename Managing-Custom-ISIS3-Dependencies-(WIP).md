@@ -2,7 +2,7 @@
 
 _Note: This page is describes dependency management for ISIS3 versions 3.6.0 and above._
 
-With the release of isis3.6.0, the ISIS3 dependencies are being managed by a package manager called [conda](https://conda.io/docs/). These packages are hosted on a publicly available servers at (anaconda.org)[https://anaconda.org].
+With the release of isis3.6.0, the ISIS3 dependencies are being managed by a package manager called [conda](https://conda.io/docs/). These packages are hosted on a publicly available servers at [anaconda.org](https://anaconda.org).
 
 ## Why do we use conda?
 
