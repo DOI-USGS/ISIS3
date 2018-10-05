@@ -17,7 +17,7 @@ Most of the packages listed in the file are pulled from conda-forge, but there a
 1. [Download and install the latest version of Anaconda](https://www.anaconda.com/download).
 1. Fork and clone the [isis3_dependencies repo](https://github.com/usgs-astrogeology/isis3_depenedencies).
 1. Change directory into the isis3_dependencies clone (e.g. ```cd isis3_dependencies```)
-1. Add the conda-forge and usgs-astrogeology anaconda.org channels to your anaconda configuration:
+1. Since we pull most of our dependencies from conda-forge and some custom ones from our usgs-astrogeology account, add the conda-forge and usgs-astrogeology anaconda.org channels to your anaconda configuration:
   ```bash
   conda config --add channels conda-forge --add channels usgs-astrogeology
   ```
