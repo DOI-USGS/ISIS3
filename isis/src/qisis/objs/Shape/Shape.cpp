@@ -130,6 +130,7 @@ namespace Isis {
 
     m_displayProperties = new ShapeDisplayProperties(FileName(m_fileName).name(), this);
     m_id = new QUuid(QUuid::createUuid());
+    m_serialNumber = SerialNumber::Compose(m_fileName, true);
 
     m_radiusSource = ControlPoint::RadiusSource::None;
 
@@ -200,6 +201,7 @@ namespace Isis {
       initQuickFootprint();
     }
     catch (IException &e) {
+      
     }
   }
 
@@ -675,7 +677,8 @@ namespace Isis {
           }
         }
       }
-      catch (IException &) {
+      catch (IException &e) {
+        e.print();
       }
     }
 
@@ -734,7 +737,8 @@ namespace Isis {
             m_instrumentId = obj.findGroup("Instrument")["InstrumentId"][0];
         }
       }
-      catch (IException &) {
+      catch (IException &e) {
+        e.print();
       }
     }
   }
@@ -796,7 +800,8 @@ namespace Isis {
             m_scale = obj.findGroup("Mapping")["Scale"];
         }
       }
-      catch (IException &) {
+      catch (IException &e) {
+        e.print();
       }
     }
   }
@@ -845,6 +850,7 @@ namespace Isis {
 
     stream.writeAttribute("id", m_id->toString());
     stream.writeAttribute("fileName", FileName(m_fileName).name());
+    stream.writeAttribute("serialNumber", m_serialNumber);
 
     QString type;
     if (m_shapeType == Unprojected) {
@@ -937,6 +943,7 @@ namespace Isis {
       if (localName == "shape") {
         QString id = atts.value("id");
         QString fileName = atts.value("fileName");
+        m_shape->m_serialNumber = atts.value("serialNumber");
 
         if (!id.isEmpty()) {
           delete m_shape->m_id;
@@ -946,6 +953,10 @@ namespace Isis {
 
         if (!fileName.isEmpty()) {
           m_shape->m_fileName = m_shapeFolder.expanded() + "/" + fileName;
+        }
+
+        if (m_shape->m_serialNumber.isEmpty()) {
+          m_shape->m_serialNumber = SerialNumber::Compose(*m_shape->cube(), true);
         }
 
         m_shape->m_surfacePointSource =
@@ -1055,13 +1066,19 @@ namespace Isis {
         m_shape->m_footprint = PolygonTools::MakeMultiPolygon(
             wktReader.read(m_characters.toStdString()));
       }
-      catch (IException &) {
+      catch (IException &e) {
+        e.print();
       }
     }
     else if (localName == "shape" && !m_shape->m_footprint) {
-      QMutex mutex;
-      m_shape->initFootprint(&mutex);
-      m_shape->closeCube();
+      try {
+        QMutex mutex; 
+        m_shape->initFootprint(&mutex);
+        m_shape->closeCube();
+      }
+      catch (IException &e) {
+        e.print();
+      }
     }
 
     m_characters = "";
