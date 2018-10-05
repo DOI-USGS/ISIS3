@@ -1,11 +1,16 @@
 # The ISIS3 Conda Environment
 
-_Note: This page is describes dependency management ISIS3 versions 3.6.0 and above._
+_Note: This page is describes dependency management for ISIS3 versions 3.6.0 and above._
 
 With the release of isis3.6.0, the ISIS3 dependencies are being managed by a package manager called [conda](https://conda.io/docs/). These packages are hosted on a publicly available servers at (anaconda.org)[https://anaconda.org].
 
-One of the primary benefits of using conda is that we do not have to internally build and manage as many libraries that ISIS3 depends on; instead, we can use "channels" that already maintain hundreds of packages (e.g. [conda-forge](https://conda-forge.org/)). If we do need to build a custom version of a library, we can build our own with the conda-build system and upload them to our own [usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology). 
+## Why do we use conda?
 
+One of the primary benefits of using conda is that we do not have to internally build and manage as many libraries that ISIS3 depends on; instead, we can use "channels" that already maintain hundreds of packages (e.g. [conda-forge](https://conda-forge.org/)). 
+
+If we do need to build a custom version of a library, we can build our own with the conda-build system and upload them to our own [usgs-astrogeology channel](https://anaconda.org/usgs-astrogeology). All of these recipes are publicly accessible via our [isis3_dependencies GitHub repo](https://github.com/usgs-astrogeology/isis3_dependencies).
+
+## How are dependencies specified for ISIS3?
 
 The third-party dependencies required to build and run ISIS3 versions 3.6.0 and above are specified in the [environment.yml](https://github.com/USGS-Astrogeology/ISIS3/blob/cmake/environment.yml) file located at the root of the ISIS3 repo. For more info on editing a conda environment file, view the [Conda Documentation](https://conda.io/docs/user-guide/tasks/manage-environments.html)
 
