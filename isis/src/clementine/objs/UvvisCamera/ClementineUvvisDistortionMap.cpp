@@ -65,7 +65,7 @@ namespace Isis {
   /** 
    * Deconstruct the distortion map for the Clementine UVVIS instrument. 
    */ 
-  ~ClementineUvvisDistortionMap() {
+  ClementineUvvisDistortionMap::~ClementineUvvisDistortionMap() {
   }
 
 
