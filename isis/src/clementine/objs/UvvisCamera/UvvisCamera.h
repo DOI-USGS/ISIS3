@@ -72,6 +72,10 @@ namespace Isis {
    *   @history 2015-10-16 Ian Humphrey - Removed declarations of spacecraft and instrument 
    *                           members and methods and removed implementation of these methods
    *                           since Camera now handles this. References #2335.
+   *   @history 2017-12-27 Jeff Anderson & Victor Silva - Added instrument specific distortion
+   *                           model for Clementine UVVIS.
+   *   @history 2018-09-01 Jeannie Backer - Added documentation, brought closer to coding
+   *            standards and merged into public repo.
    */
   class UvvisCamera : public FramingCamera {
     public:
