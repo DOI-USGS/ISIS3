@@ -97,12 +97,36 @@ void IsisMain() {
   PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
   
+  // Create a Kernels group
+  transFile = transDir + "kaguyaTcKernels.trn";
+  PvlToPvlTranslationManager kernelsXlater(label, transFile.expanded());
+  kernelsXlater.Auto(otherLabels);
+
   if ( otherLabels.hasGroup("Mapping") 
        && otherLabels.findGroup("Mapping").keywords() > 0 ) {
     outcube->putGroup(otherLabels.findGroup("Mapping"));
   }
   if ( otherLabels.hasGroup("Instrument") 
        && otherLabels.findGroup("Instrument").keywords() > 0 ) {
+    PvlGroup &inst = otherLabels.findGroup("Instrument", Pvl::Traverse);
+    if (inst.hasKeyword("StartTime")) {
+      // Remove trailing "Z" from keyword
+      PvlKeyword &startTime = inst["StartTime"];
+      QString startTimeString = startTime[0];
+      if (QString::compare(startTimeString.at(startTimeString.size() - 1), "Z", Qt::CaseInsensitive) == 0){
+        startTimeString = startTimeString.left(startTimeString.length() - 1);
+        startTime.setValue(startTimeString);
+      }
+    }
+    if (inst.hasKeyword("StopTime")) {
+      // Remove trailing "Z" from keyword
+      PvlKeyword &stopTime = inst["StopTime"];
+      QString stopTimeString = stopTime[0];
+      if (QString::compare(stopTimeString.at(stopTimeString.size() - 1), "Z", Qt::CaseInsensitive) == 0){
+        stopTimeString = stopTimeString.left(stopTimeString.length() - 1);
+        stopTime.setValue(stopTimeString);
+      }
+    }
     outcube->putGroup(otherLabels.findGroup("Instrument"));
   }
   if ( otherLabels.hasGroup("BandBin") 
@@ -132,6 +156,10 @@ void IsisMain() {
   if ( otherLabels.hasGroup("Archive") 
        && otherLabels.findGroup("Archive").keywords() > 0 ) {
     outcube->putGroup(otherLabels.findGroup("Archive"));
+  }
+  if ( otherLabels.hasGroup("Kernels") 
+       && otherLabels.findGroup("Kernels").keywords() > 0 ) {
+    outcube->putGroup(otherLabels.findGroup("Kernels", Pvl::Traverse));
   }
 
   importPds.EndProcess();
