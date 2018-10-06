@@ -1,6 +1,11 @@
-Group = KAGUYA/TC
+Group = KAGUYA/TC1
   Version = 1
   Library = KaguyaTcCamera
   Routine = KaguyaTcCameraPlugin
 EndGroup
  
+Group = KAGUYA/TC2
+  Version = 1
+  Library = KaguyaTcCamera
+  Routine = KaguyaTcCameraPlugin
+EndGroup
