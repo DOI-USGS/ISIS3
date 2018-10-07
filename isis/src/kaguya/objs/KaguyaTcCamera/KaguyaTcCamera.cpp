@@ -18,13 +18,14 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "KaguyaTcCamera.h"
+
+#include <QString>
+
 #include "CameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-
-#include <QString>
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
@@ -69,13 +70,14 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-
+    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, Lines() / 2.0 + 0.5);
+/*
     focalMap->SetDetectorOrigin(
       Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
       Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_LINE"));
-
+*/
     // Setup distortion map
     new CameraDistortionMap(this);
 
