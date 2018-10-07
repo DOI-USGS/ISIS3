@@ -1,0 +1,69 @@
+Unit Test for KaguyaTcCamera...
+Testing TC2 w L2B0 image...
+FileName:  "TC2W2B0_01_02735N583E3115.cub"
+CK Frame:  -131370
+
+Kernel IDs: 
+CK Frame ID =  -131000
+CK Reference ID =  1
+SPK Target ID =  -131
+SPK Reference ID =  1
+
+Shutter open =  264540314.197006702
+Shutter close =  264540317.447006702
+Focal Length =  72.6299999999999955
+
+For upper left corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For upper right corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For lower left corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For lower right corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+
+Testing TC1 s L2B0 image...
+FileName:  "TC1S2B0_01_06691S820E0465.cub"
+CK Frame:  -131350
+
+Kernel IDs: 
+CK Frame ID =  -131000
+CK Reference ID =  1
+SPK Target ID =  -131
+SPK Reference ID =  1
+
+Shutter open =  292234259.793133914
+Shutter close =  292234266.293133914
+Focal Length =  72.4500000000000028
+
+For upper left corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For upper right corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For lower left corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For lower right corner ...
+DeltaSample =  0
+DeltaLine =  0
+
+For center pixel position ...
+Latitude OK
+Longitude OK

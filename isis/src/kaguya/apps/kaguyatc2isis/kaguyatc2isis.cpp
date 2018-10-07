@@ -97,7 +97,6 @@ void IsisMain() {
   PvlToPvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
   
-  // Create a Kernels group
   transFile = transDir + "kaguyaTcKernels.trn";
   PvlToPvlTranslationManager kernelsXlater(label, transFile.expanded());
   kernelsXlater.Auto(otherLabels);
@@ -128,6 +127,125 @@ void IsisMain() {
       }
     }
     outcube->putGroup(otherLabels.findGroup("Instrument"));
+/*
+    // add kernels group
+    QString instId = inst["InstrumentId"];
+    QString encoding = inst["EncodingType"];
+    QString swath = inst["SwathModeId"];
+    PvlGroup kern("Kernels");
+    if (instId == "TC1") {
+      if (swath == "Full") {
+        if (productSetId == "TC_w_Level2B0") {
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131352));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131353));
+          }
+        }
+        else if (productSetId == "TC_s_Level2B0") { 
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131354));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131355));
+          }
+        }
+      }
+      else if (swath == "Nominal") {
+        if (productSetId == "TC_w_Level2B0") {
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131356));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131357));
+          }
+        }
+        else if (productSetId == "TC_s_Level2B0") { 
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131358));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131359));
+          }
+        }
+      }
+      else { // swath == "Half"
+        if (productSetId == "TC_w_Level2B0") {
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131360));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131361));
+          }
+        }
+        else if (productSetId == "TC_s_Level2B0") { 
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131362));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131363));
+          }
+        }
+      }
+    }
+    if (instId == "TC2") {
+      if (swath == "Full") {
+        if (productSetId == "TC_w_Level2B0") {
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131372));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131373));
+          }
+        }
+        else if (productSetId == "TC_s_Level2B0") { 
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131374));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131375));
+          }
+        }
+      }
+      else if (swath == "Nominal") {
+        if (productSetId == "TC_w_Level2B0") {
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131376));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131377));
+          }
+        }
+        else if (productSetId == "TC_s_Level2B0") { 
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131378));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131379));
+          }
+        }
+      }
+      else { // swath == "Half"
+        if (productSetId == "TC_w_Level2B0") {
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131380));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131381));
+          }
+        }
+        else if (productSetId == "TC_s_Level2B0") { 
+          if (encoding == "DCT") {
+            kern += PvlKeyword("NaifFrameCode", toString(-131382));
+          }
+          else { // encoding == "N/A" so no compression
+            kern += PvlKeyword("NaifFrameCode", toString(-131383));
+          }
+        }
+      }
+    }
+    */
   }
   if ( otherLabels.hasGroup("BandBin") 
        && otherLabels.findGroup("BandBin").keywords() > 0 ) {

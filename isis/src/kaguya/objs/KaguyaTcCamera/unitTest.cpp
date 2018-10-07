@@ -51,10 +51,11 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = 0; //
-    double knownLon = 0; //
+    double knownLat = 59.0972605733461691;
+    double knownLon = 311.467742700096323;
 
-    Cube c("$kaguya/testData/TC1W2B0_01_00296N081E2387.cub", "r");
+    qDebug() << "Testing TC2 w L2B0 image...";
+    Cube c("$kaguya/testData/TC2W2B0_01_02735N583E3115.cub", "r");
     KaguyaTcCamera *cam = (KaguyaTcCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
@@ -71,9 +72,9 @@ int main(void) {
     // Test Shutter Open/Close
     const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
     double exposureDuration = toDouble( inst["ExposureDuration"][0] );
-    QString stime = inst["StartTime"];
+    QString startTime = inst["StartTime"];
     double et;
-    str2et_c(stime.toLatin1().data(), &et);
+    str2et_c(startTime.toLatin1().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     qDebug() << qSetRealNumberPrecision(18) << "Shutter open = " << shuttertimes.first.Et();
     qDebug() << qSetRealNumberPrecision(18) << "Shutter close = " << shuttertimes.second.Et();
@@ -116,6 +117,76 @@ int main(void) {
     else {
       qDebug() << qSetRealNumberPrecision(18)
                << "Longitude off by: " << cam->UniversalLongitude() - knownLon;
+    }
+
+
+    qDebug() << "";
+    qDebug() << "";
+    qDebug() << "Testing TC1 s L2B0 image...";
+    knownLat = -81.2150653963736175;
+    knownLon = 47.1989499604665284;
+
+    Cube c2("$kaguya/testData/TC1S2B0_01_06691S820E0465.cub", "r");
+    KaguyaTcCamera *cam2 = (KaguyaTcCamera *) CameraFactory::Create(c2);
+    qDebug() << "FileName: " << FileName(c2.fileName()).name();
+    qDebug() << "CK Frame: " << cam2->instrumentRotation()->Frame();
+    qDebug() << "";
+
+    // Test kernel IDs
+    qDebug() << "Kernel IDs: ";
+    qDebug() << "CK Frame ID = " << cam2->CkFrameId();
+    qDebug() << "CK Reference ID = " << cam2->CkReferenceId();
+    qDebug() << "SPK Target ID = " << cam2->SpkTargetId();
+    qDebug() << "SPK Reference ID = " << cam2->SpkReferenceId();
+    qDebug() << "";
+
+    // Test Shutter Open/Close
+    const PvlGroup &inst2 = c2.label()->findGroup("Instrument", Pvl::Traverse);
+    exposureDuration = toDouble( inst2["ExposureDuration"][0] );
+    QString startTime2 = inst2["StartTime"];
+    str2et_c(startTime2.toLatin1().data(), &et);
+    shuttertimes = cam2->ShutterOpenCloseTimes(et, exposureDuration);
+    qDebug() << qSetRealNumberPrecision(18) << "Shutter open = " << shuttertimes.first.Et();
+    qDebug() << qSetRealNumberPrecision(18) << "Shutter close = " << shuttertimes.second.Et();
+    qDebug() << qSetRealNumberPrecision(18) << "Focal Length = " << cam2->FocalLength();
+    qDebug() << "";
+
+    // Test all four corners to make sure the conversions are right
+    qDebug() << "For upper left corner ...";
+    TestLineSamp(cam2, 1.0, 1.0);
+
+    qDebug() << "For upper right corner ...";
+    TestLineSamp(cam2, cam2->Samples(), 1.0);
+
+    qDebug() << "For lower left corner ...";
+    TestLineSamp(cam2, 1.0, cam2->Lines());
+
+    qDebug() << "For lower right corner ...";
+    TestLineSamp(cam2, cam2->Samples(), cam2->Lines());
+
+    samp = cam2->Samples() / 2;
+    line = cam2->Lines() / 2;
+    qDebug() << "For center pixel position ...";
+
+    if(!cam2->SetImage(samp, line)) {
+      qDebug() << "ERROR";
+      return 0;
+    }
+
+    if(abs(cam2->UniversalLatitude() - knownLat) < 1E-13) {
+      qDebug() << "Latitude OK";
+    }
+    else {
+      qDebug() << qSetRealNumberPrecision(18)
+               << "Latitude off by: " << cam2->UniversalLatitude() - knownLat;
+    }
+
+    if(abs(cam2->UniversalLongitude() - knownLon) < 1E-11) {
+      qDebug() << "Longitude OK";
+    }
+    else {
+      qDebug() << qSetRealNumberPrecision(18)
+               << "Longitude off by: " << cam2->UniversalLongitude() - knownLon;
     }
   }
   catch(IException &e) {
