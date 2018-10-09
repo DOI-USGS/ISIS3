@@ -158,6 +158,7 @@ set(thirdPartyCppFlags -Wall
                        -DISIS_LITTLE_ENDIAN=1
                        -Wno-unused-parameter
                        -Wno-overloaded-virtual
+                       -Wno-strict-aliasing
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
@@ -209,7 +210,9 @@ find_package(Qt5 COMPONENTS
                 WebChannel
                 Widgets
                 Xml
-                XmlPatterns REQUIRED)
+                XmlPatterns
+                # Search this path explicitly for MacOS OpenGL Framework
+                PATHS /System/Library/Frameworks/ REQUIRED)
 
 # Some of these will have non-traditional installs with version numbers in the paths in v007
 # For these, we pass in a version number, and use it in the path suffix
@@ -424,10 +427,10 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
 
 # Add custom build target to copy modified header files to the build/incs directory.
-# ALL is specified so that the target is added to the default build target, i.e. the copy command 
+# ALL is specified so that the target is added to the default build target, i.e. the copy command
 # will be executed when running "ninja install"
 # On a clean build, all files will be copied over.
-add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
   ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
 add_dependencies(isis3 incs)
 
