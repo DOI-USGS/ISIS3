@@ -257,6 +257,11 @@ namespace Isis {
    *   @history 2018-07-06 Jesse Mapel - Modified addEdge and removeEdge to always emit a graph
    *                           modified signal if an edge is added or removed. Added graph
    *                           modified signal when a vertex is added.
+   *   @history 2018-07-06 Jesse Mapel - Removed target radii from ControlNet objects because
+   *                           SurfacePoints now use their local radii to do sigma distance
+   *                           conversions instead of the target equatorial and polar radii.
+   *                           Fixes #5457.
+   *   @history 2018-07-22 Kristin Berry - Updated swap to include the graph and vertex map.
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -342,7 +347,6 @@ namespace Isis {
       QString GetLastModified() const;
       QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
-      std::vector<Distance> GetTargetRadii();
 
 
       void SetCreatedDate(const QString &date);
@@ -356,8 +360,6 @@ namespace Isis {
       void SetTarget(const QString &target);
       void SetTarget(Pvl label);
       void SetTarget(const ControlNet &other);
-      void SetTarget(const QString &target,
-                     const QVector<Distance> &radii);
       void SetUserName(const QString &name);
 
       void swap(ControlNet &other);
@@ -436,8 +438,8 @@ namespace Isis {
 
       //! Used to define the edges of the graph.
       struct Connection {
-        int strength;
         Connection() : strength(0) {}
+        int strength;
       };
 
       //! Defines the graph type as an undirected graph that uses Images for verticies,
@@ -460,6 +462,7 @@ namespace Isis {
 
       //! Iterates over adjacent verticies
       typedef boost::graph_traits<Network>::adjacency_iterator AdjacencyIterator;
+      typedef boost::graph_traits<Network>::vertex_iterator VertexIterator;
 
       QHash<QString, ImageVertex> m_vertexMap; //! The serial number -> vertex hash used by the graph
       Network m_controlGraph; //! The ControlNet graph
@@ -477,7 +480,6 @@ namespace Isis {
       QMap<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
       //!  #rejected measures
       QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
-      QVector<Distance> p_targetRadii;        //!< Radii of target body
 
       bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
   };

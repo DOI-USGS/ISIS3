@@ -767,7 +767,7 @@ weights:         25 11.1111 62500
 
 
 Create ConstrainedPoint from constrained point with adjusted surface point (32, 120, 1000)...
-ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     26.45751316     38.45488734
 
  Label: ConstrainedPoint
 Status: CONSTRAINED
@@ -777,12 +777,12 @@ Status: CONSTRAINED
 Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
                  (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
   LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000               N/A       28.65696503
- LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000               N/A       36.78815890
+ LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000               N/A       26.45751316
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000               N/A       38.45488734
 
 
 Modify ConstrainedPoint - setWeights() - solveRadius=t, lat/lon/rad constrained
-ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     36.78815890     38.45488734
+ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696503     26.45751316     38.45488734
 
  Label: ConstrainedPoint
 Status: CONSTRAINED
@@ -791,12 +791,12 @@ Status: CONSTRAINED
      Point         Initial               Total               Total              Final             Initial             Final
 Coordinate          Value             Correction          Correction            Value             Accuracy          Accuracy
                  (dd/dd/km)           (dd/dd/km)           (Meters)           (dd/dd/km)          (Meters)          (Meters)
-  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696495       28.65696503
- LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000       36.78815884       36.78815890
+  LATITUDE      32.00000000           0.00000000          0.00000000         32.00000000       28.65696494       28.65696503
+ LONGITUDE     120.00000000           0.00000000          0.00000000        120.00000000       26.45751311       26.45751316
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000       38.45488734       38.45488734
 
 
-aprioriSigmas:   "28.656964947064" "36.788158835093" "38.454887341483"
+aprioriSigmas:   "28.65696494252" "26.457513107566" "38.454887341483"
 weights:         1217.7 1027.41 676.234
 
 Create copy of FreePoint using copy constructor...

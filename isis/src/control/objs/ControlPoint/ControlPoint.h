@@ -354,6 +354,8 @@ namespace Isis {
    *  @history 2018-06-29 Adam Goins - Modified to operator= method to use setters when copying
    *                           one Control Point to another so that the proper signals get called.
    *                           Fixes #5435.
+   *   @history 2018-06-30 Debbie A. Cook Removed all calls to obsolete method
+   *                           SurfacePoint::SetRadii.  References #5457.
    */
   class ControlPoint : public QObject {
 

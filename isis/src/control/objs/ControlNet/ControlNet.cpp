@@ -61,7 +61,6 @@ namespace Isis {
     p_modified = Application::DateTime();
   }
 
-
   ControlNet::ControlNet(const ControlNet &other) {
 
     nullify();
@@ -77,7 +76,6 @@ namespace Isis {
     m_ownPoints = true;
 
     p_targetName = other.p_targetName;
-    p_targetRadii = other.p_targetRadii;
     p_networkId = other.p_networkId;
     p_created = other.p_created;
     p_modified = other.p_modified;
@@ -260,16 +258,7 @@ namespace Isis {
 
     FileName cnetFileName(filename);
     ControlNetVersioner versionedReader(cnetFileName, progress);
-    if ( versionedReader.hasTargetRadii() ) {
-      p_targetName = versionedReader.targetName();
-      p_targetRadii.clear();
-      foreach (Distance distance, versionedReader.targetRadii()) {
-        p_targetRadii.push_back(distance);
-      }
-    }
-    else {
-      SetTarget( versionedReader.targetName() );
-    }
+    SetTarget( versionedReader.targetName() );
     p_networkId   = versionedReader.netId();
     p_userName    = versionedReader.userName();
     p_created     = versionedReader.creationDate();
@@ -394,7 +383,6 @@ namespace Isis {
     // Make sure there is a node for every measure
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
-
       // If the graph doesn't have the sn, add a node for it
       if (!m_vertexMap.contains(sn)) {
         Image newImage;
@@ -766,7 +754,6 @@ namespace Isis {
     // Conceptually, I think this belongs in measureIgnored, but it isn't done
     // for the old graph.
     m_controlGraph[m_vertexMap[serial]].measures.remove(measure->Parent());
-
   }
 
 
@@ -1679,31 +1666,7 @@ namespace Isis {
    * @param target The name of the target of this Control Network
    */
   void ControlNet::SetTarget(const QString &target) {
-    QScopedPointer <QMutexLocker> locker;
-
-    if (m_mutex) {
-      locker.reset(new QMutexLocker(m_mutex));
-    }
-
     p_targetName = target;
-
-    p_targetRadii.clear();
-    try {
-      PvlGroup pvlRadii = Target::radiiGroup(target);
-      p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-                                       Distance::Meters));
-      // The method Projection::Radii does not provide the B radius
-      p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
-                                       Distance::Meters));
-      p_targetRadii.push_back(Distance(pvlRadii["PolarRadius"],
-                                       Distance::Meters));
-    }
-    catch (IException &e) {
-      // Fill target radii vector will Null-valued distances
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
-    }
   }
 
 
@@ -1715,81 +1678,23 @@ namespace Isis {
    *              group or NaifKeywords object).
    */
   void ControlNet::SetTarget(Pvl label) {
-    QScopedPointer <QMutexLocker> locker;
-
-    if (m_mutex) {
-      locker.reset(new QMutexLocker(m_mutex));
-    }
-
     PvlGroup mapping;
-    p_targetRadii.clear();
-    try {
-      if ( (label.hasObject("IsisCube") && label.findObject("IsisCube").hasGroup("Mapping"))
-           || label.hasGroup("Mapping") ) {
-        mapping = label.findGroup("Mapping", Pvl::Traverse);
-      }
-      // If radii values don't exist in the labels
-      // or if they are set to null,
-      // try to get target radii using the TargetName or NaifKeywords object values
-      Distance equatorialRadius, polarRadius;
-      if (!mapping.hasKeyword("EquatorialRadius")
-          || !mapping.hasKeyword("PolarRadius")) {
-
-        mapping = Target::radiiGroup(label, mapping);
-
-      }
-
-      equatorialRadius = Distance(mapping["EquatorialRadius"], Distance::Meters);
-      polarRadius      = Distance(mapping["PolarRadius"],      Distance::Meters);
-
-      p_targetRadii.push_back(equatorialRadius);
-      p_targetRadii.push_back(equatorialRadius);
-      p_targetRadii.push_back(polarRadius);
-    }
-    catch (IException &e) {
-      // leave equatorialRadius and polarRadius as Null-valued distances if this fails
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
-      p_targetRadii.push_back(Distance());
+    if ( (label.hasObject("IsisCube") && label.findObject("IsisCube").hasGroup("Mapping"))
+         || label.hasGroup("Mapping") ) {
+      mapping = label.findGroup("Mapping", Pvl::Traverse);
     }
 
     if (mapping.hasKeyword("TargetName")) {
       p_targetName = mapping["TargetName"][0];
     }
+    else if (label.hasObject("IsisCube")
+             && label.findObject("IsisCube").hasGroup("Instrument")
+             && label.findObject("IsisCube").findGroup("Instrument").hasKeyword("TargetName")) {
+      p_targetName = label.findObject("IsisCube").findGroup("Instrument").findKeyword("TargetName")[0];
+    }
     else {
       p_targetName = "";
     }
-  }
-
-
-  /**
-   * Directly sets the target name and radii using the given information.
-   *
-   * @see Target::radiiGroup(Pvl, PvlGroup)
-   *
-   * @param target The name of the target for this Control Network
-   * @param target A 3-dimensional vector containing the A (equatorial major), B
-   *               (equatorial minor), and C (polar) triaxial radii values of
-   *               the target for this Control Network
-   *
-   */
-  void ControlNet::SetTarget(const QString &target,
-                             const QVector<Distance> &radii) {
-    QScopedPointer <QMutexLocker> locker;
-
-    if (m_mutex) {
-      locker.reset(new QMutexLocker(m_mutex));
-    }
-
-    if (radii.size() != 3) {
-      throw IException(IException::Unknown,
-                       "Unable to set target radii. The given list must have length 3.",
-                       _FILEINFO_);
-    }
-
-    p_targetName = target;
-    p_targetRadii = radii;
-
   }
 
 
@@ -1820,6 +1725,7 @@ namespace Isis {
   void ControlNet::swap(ControlNet &other) {
     std::swap(points, other.points);
     std::swap(pointIds, other.pointIds);
+    m_controlGraph.swap(other.m_controlGraph);
     std::swap(m_mutex, other.m_mutex);
     std::swap(p_targetName, other.p_targetName);
     std::swap(p_networkId, other.p_networkId);
@@ -1831,9 +1737,8 @@ namespace Isis {
     std::swap(p_cameraValidMeasuresMap, other.p_cameraValidMeasuresMap);
     std::swap(p_cameraRejectedMeasuresMap, other.p_cameraRejectedMeasuresMap);
     std::swap(p_cameraList, other.p_cameraList);
-    std::swap(p_targetRadii, other.p_targetRadii);
 
-    // points have parent pointers that need updated too...
+    // points have parent pointers that need to be updated too...
     QHashIterator< QString, ControlPoint * > i(*points);
     while (i.hasNext()) {
       i.next().value()->parentNetwork = this;
@@ -1844,8 +1749,23 @@ namespace Isis {
       i2.next().value()->parentNetwork = &other;
     }
 
-    emit networkModified(ControlNet::Swapped);
+    m_vertexMap.clear();
+    VertexIterator v, vend;
+    for (boost::tie(v, vend) = vertices(m_controlGraph); v != vend; ++v) {
+      ImageVertex imVertex = *v;
+      QString serialNum = m_controlGraph[*v].serial;
+      m_vertexMap[serialNum] = imVertex;
+    }
 
+    other.m_vertexMap.clear();
+    VertexIterator v2, vend2;
+    for (boost::tie(v2, vend2) = vertices(other.m_controlGraph); v2 != vend2; ++v2) {
+      ImageVertex imVertex = *v2;
+      QString serialNum = other.m_controlGraph[*v2].serial;
+      other.m_vertexMap[serialNum] = imVertex;
+    }
+
+    emit networkModified(ControlNet::Swapped);
   }
 
 
@@ -1907,16 +1827,6 @@ namespace Isis {
     }
 
     return GetPoint(pointIds->at(index));
-  }
-
-
-  /**
-   * Get the target radii
-   *
-   * @returns the radii of the target body
-   */
-  std::vector<Distance> ControlNet::GetTargetRadii() {
-    return p_targetRadii.toStdVector();
   }
 
 

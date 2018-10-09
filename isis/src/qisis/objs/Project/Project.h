@@ -255,18 +255,36 @@ namespace Isis {
    *                           the wrong place on the project tree. Fixes #5274.
    *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
    *                           button when the active control net is modified, i.e. a point is modified.
-   *  
-   *  !!!!!!!!!!!!!   Delete following history entry when project save/restore geometry/state
-   *                   implemented
-   *  !!!!!!!!!!!!!!!
-   *  @history 2018-06-08 Tracie Sucharski - Quick fix for the project save/restore prototype: The
-   *                          changes made to readSettings, writeSettings cause following problem:
-   *                          save project with view, close view and exit, the project
-   *                          geometry/state is saved on closeEvent instead of project save. Quickly
-   *                          added signal when project is saved, so the writeSettings can happen
-   *                          for project.  This will be cleaned up when save/restore is fully
-   *                          implemented.
-   *  
+   *  @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of
+   *                           the project.
+   *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and 
+   *                           m_regTemplates to keep track of the two template types as well as 
+   *                           adjusted logic to save these serparately into the .xml files in the 
+   *                           project directory. Also added clean-up of unsaved templates at
+   *                           project close in Project::clear().
+   *  @history 2018-07-12 Summer Stapleton - Added hasTemplate() and hasCamera() and modified 
+   *                           addCamera() and addTarget logic in order to determine if a targetBody
+   *                           or a guiCamera already exist in a project. This allows cameras and 
+   *                           targets to be created in ImportImagesWorkOrder only when needed 
+   *                           rather than creating them for every image imported and then removing
+   *                           them if not needed. Fixed segfault occuring on astrovm4 with larger 
+   *                           imports. References #5460.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed activeControlModified() to cnetModified() and
+   *                          removed the line m_activeControl->setModified(true) in cnetModified()
+   *                          since this is now done in the CnetEditorWidget and it caused a seg
+   *                          fault when no images were imported and a user tried to edit a cnet. I
+   *                          changed this because when a user made changes to a cnet, even if it
+   *                          was not the active, the active was the only one that was recognized as
+   *                          being modified. This stopped any changes made to a nonactive cnet from
+   *                          being saved and caused the active to be saved if a nonactive was
+   *                          edited. Fixes #5414.
+   *   @history 2018-07-13 Kaitlyn Lee - Added singal cnetSaved() so that the save net button goes
+   *                          back to black after the cnet is saved. Added signal
+   *                          activeControlModified() that is emitted in cnetModified() and is
+   *                          connected to Directory. This stops views from being redrawn when
+   *                          any cnet is modified. Only the active should cause this. Fixes #5396.
+   *  @history 2018-07-26 Tracie Sucharski - Fixed history entry errors introduced during
+   *                           the merge conflict resolution for PR #255.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -279,6 +297,9 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+
+      bool hasTarget(QString id);
+      bool hasCamera(QString id);
 
       QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
@@ -355,6 +376,8 @@ namespace Isis {
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
       QList<TemplateList *> templates();
+      QList<TemplateList *> mapTemplates();
+      QList<TemplateList *> regTemplates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -497,10 +520,12 @@ namespace Isis {
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
       void projectRelocated(Project *);
+
       /**
        * Emitted when work order starts
        */
       void workOrderStarting(WorkOrder *);
+
       /**
        * Emitted when work order ends
        */
@@ -510,10 +535,22 @@ namespace Isis {
 
       void discardActiveControlEdits();
 
+      /**
+       * Emmited in cnetModified() when the actice control is modified.
+       * Connected to Directory so that other views can redraw measures.
+       */
+      void activeControlModified();
+
+      /**
+       * Emmited in save() when the project is being saved
+       * Connected to Directory so that ControlPointEditWidget can recolor the save net button.
+       */
+      void cnetSaved(bool value);
+
     public slots:
       void open(QString);
       void setClean(bool value);
-      void activeControlModified();
+      void cnetModified();
 
     private slots:
       void controlClosed(QObject *control);
@@ -574,7 +611,8 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<TemplateList *> m_templates;
+          QList<TemplateList *> m_mapTemplateLists;
+          QList<TemplateList *> m_regTemplateLists;
           WorkOrder *m_workOrder;
       };
 
@@ -590,7 +628,8 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
-      QList<TemplateList *> *m_templates;
+      QList<TemplateList *> *m_mapTemplates;
+      QList<TemplateList *> *m_regTemplates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 

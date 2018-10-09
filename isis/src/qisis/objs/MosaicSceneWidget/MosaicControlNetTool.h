@@ -66,6 +66,8 @@ namespace Isis {
    *                           point was added or deleted.  Fixes #5007, #5008.
    *   @history 2017-08-15 Tracie Sucharski - Added check in ::rebuildPointGraphics() to check for
    *                           existence of graphics items.  Fixes #4984.
+   *   @history 2018-07-12 Tracie Sucharski - Made the slot loadNetwork public so that ipce can
+   *                           load a new network.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT
@@ -119,6 +121,7 @@ namespace Isis {
       void deleteControlPoint(QString controlPointId);
 
     public slots:
+      void loadNetwork();
       void rebuildPointGraphics();
       void displayNewControlPoint(QString pointId);
       void displayChangedControlPoint(QString pointId);
@@ -136,7 +139,6 @@ namespace Isis {
       void displayControlNet();
       void displayConnectivity();
       void closeNetwork();
-      void loadNetwork();
       void randomizeColors();
 
       void objectDestroyed(QObject *);
