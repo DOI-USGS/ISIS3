@@ -44,8 +44,8 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       <li>Create a new environment for your ISIS3 installation:
         <pre>
           #Add the following channels to the Anaconda installation
-          conda config --add channels conda-forge
-          conda config --add channels usgs-astrogeology
+          conda config --add channels conda-forge, usgs-astrogeology
+          
 
           #Create a new conda environment to install ISIS3 in
           conda create -n isis3
@@ -53,7 +53,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           #Activate the environment
           source activate isis3
 
-          #Download the ISIS3 version with label alpha
+          #Download the ISIS3 version
           conda install -c usgs-astrogeology isis3
           
           #Execute the ISIS3 variable initialization script with default arguments.
@@ -97,8 +97,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
     <p>ISIS3 is also built and tested nightly on the following operating systems.</p>
 
-    <ul>
-      <li>Ubuntu 14.04.3 LTS</li>
+    <ul>      
       <li>Debian Linux 8 (jessie)</li>
       <li>CentOS Linux 7.2.1511</li>
       <li>Fedora 25</li>
@@ -200,7 +199,7 @@ is a popular choice and may be downloaded below.
     To download all ISIS3 data files, continue reading.
 </p>
 <p>
-    To download all ISIS3 data, enter the following commands at the command prompt:
+    To download all ISIS3 data (approximately 180 GB), enter the following commands at the command prompt:
 
 </p>
       <pre>      
@@ -509,7 +508,7 @@ is a popular choice and may be downloaded below.
 
   <history>
     <change name="Kristin Berry" date="2018-08-28">Original Version</change>
-    <change name ="Tyler Wilson" date="2018-09-26">Updated version to incorporate installing via conda/building with cmake</change>
+    <change name ="Tyler Wilson along with the ASC Development Team" date="2018-09-26">Updated version to incorporate installation through Conda</change>
   </history>
 
 
