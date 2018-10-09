@@ -5,7 +5,7 @@ import sys
 #Author:  Tyler Wilson
 #Date  :  2018-10-05
 #Description:  This script sets ISISROOT/ISIS3DATA/ISIS3TESTDATA for the user and is executed
-#within the conda environment created for their ISIS3 installation.
+#within the conda environment created for the ISIS3 installation.
 #The data directory and test directory are optional command line arguments.  If the user chooses
 #not to set them, they will both be placed created on the same level as the $ISISROOT directory
 #within the conda environment.
@@ -23,8 +23,7 @@ args=parser.parse_args()
 if (data_dir != args.data_dir):
     os.system("mkdir -p "+args.data_dir)
     data_dir = args.data_dir
-else:
-    print("mkdir -p "+data_dir)
+else:    
     os.system("mkdir -p "+data_dir)
 
 if (testdata_dir != args.test_dir):

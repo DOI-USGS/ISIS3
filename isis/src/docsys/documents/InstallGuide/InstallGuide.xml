@@ -89,8 +89,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     The UNIX variants ISIS3 has been successfully built on are:</p>
     <ul>
       <li>Ubuntu 18.04 LTS</li>
-      <li>Mac OS X 10.13.6 High Sierra</li>
-      <li>CentOS Linux 7.2.1511</li>
+      <li>Mac OS X 10.13.6 High Sierra</li>     
       <li>Fedora 28</li>
     </ul>
 
@@ -98,8 +97,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <p>ISIS3 is also built and tested nightly on the following operating systems.</p>
 
     <ul>      
-      <li>Debian Linux 8 (jessie)</li>
-      <li>CentOS Linux 7.2.1511</li>
+      <li>Debian Linux 8 (jessie)</li>      
       <li>Fedora 25</li>
       <li>Mac OS X 10.11.6</li>
     </ul>
