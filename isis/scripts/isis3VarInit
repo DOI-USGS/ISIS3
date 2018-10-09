@@ -13,8 +13,8 @@ import sys
 parser = argparse.ArgumentParser(description='Usage:  ./isis3VarInit --data_dir <data dir path> --test_dir <test dir path')
    
 isisroot = '$CONDA_PREFIX'
-data_dir='$CONDA_PREFIX/..data'
-testdata_dir='$CONDA_PREFIX/..testData'
+data_dir='$CONDA_PREFIX/data'
+testdata_dir='$CONDA_PREFIX/testData'
 
 parser.add_argument("--data_dir",default= data_dir,help="ISIS3 Mission Data Directory")
 parser.add_argument("--test_dir",default=testdata_dir,help="ISIS3 Mission Test Data Directory")
@@ -23,10 +23,15 @@ args=parser.parse_args()
 if (data_dir != args.data_dir):
     os.system("mkdir -p "+args.data_dir)
     data_dir = args.data_dir
+else:
+    print("mkdir -p "+data_dir)
+    os.system("mkdir -p "+data_dir)
 
 if (testdata_dir != args.test_dir):
     os.system("mkdir -p "+args.test_dir)
     testdata_dir=args.test_dir
+else:
+    os.system("mkdir -p "+testdata_dir)
 
 os.popen('mkdir -p '+isisroot+'/etc/conda/activate.d')
 os.popen('mkdir -p '+isisroot+'/etc/conda/deactivate.d')
