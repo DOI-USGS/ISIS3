@@ -1,9 +1,7 @@
 Testing ProcessMosaic Class ... 
 Create output mosaic with Tracking set to True
 1. Drop a small area into the middle of the output
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processedunittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed
+
 a. SUCCESS - Track Table Exists
 FileName		SerialNumber	
 isisTruth2.cub	MGS/561812335:32/MOC-WA/RED
@@ -111,8 +109,7 @@ Total Bands= "2"
 ***********************************************************************************
 2. Drop 2,2,1 into the lower right corner of band 2
 Tracking is set to False
-unittest: Working
-0% Processed10% Processed20% Processed
+
 ***  Input Image  ***  
 Stats  2 ,  2 ,  1 ,  5 ,  5 ,  1
 ( "2" , "2" , "1" )= "162"
@@ -214,8 +211,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 3. Drop 3,3,1 into the upper right corner of band 1
-unittest: Working
-0% Processed10% Processed
+
 ***  Input Image  ***  
 Stats  3 ,  3 ,  1 ,  5 ,  5 ,  1
 ( "3" , "3" , "1" )= "162"
@@ -317,8 +313,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 4. Drop the first 3x3x1 to the upper left corner
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  3 ,  3 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -402,8 +397,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 5. Test for mosaic priority with existing mosaic
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  5 ,  5 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -505,8 +499,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 6. Test for band priority with Keyname "FilterName" and value "Red" with Criteria "Greater" than in an existing mosaic
-unittest: Working
-0% Processed10% Processed
+
 ***  Input Image  ***  
 Stats  3 ,  3 ,  1 ,  1 ,  10 ,  1
 ( "3" , "3" , "1" )= "162"
@@ -590,8 +583,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 7. Test for band priority for existing mosaic with Keyname "OriginalBand" and value "1" and Criteria "Lesser" than
-unittest: Working
-0% Processed10% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  1 ,  10 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -675,8 +667,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 8. Test for band priority with BandNumber set
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  5 ,  5 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -778,8 +769,7 @@ Total Bands= "2"
 
 ***********************************************************************************
 9. Test for Null flag set with existing mosaic
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  5 ,  5 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -881,8 +871,7 @@ Total Bands= "2"
 
 
 10. Test Average Priority
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  5 ,  5 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -982,8 +971,7 @@ Total Bands= "2"
 ( "5" , "5" , "2" )= "1"
 
 
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed
+
 ***  Mosaic Image  ***  
 Start Stats  "1" ,  "1" ,  "1"
 Total Bands= "2"
@@ -1051,8 +1039,7 @@ Total Bands= "2"
 
 ****** End Average **********************
 11. Test for band priority with Tracking Off and BandNumber set
-unittest: Working
-0% Processed
+
 ***  Input Image  ***  
 Stats  1 ,  1 ,  1 ,  5 ,  5 ,  1
 ( "1" , "1" , "1" )= "-2147483648"
@@ -1152,8 +1139,7 @@ Total Bands= "2"
 ( "5" , "5" , "2" )= "-2147483648"
 
 
-unittest: Working
-0% Processed
+
 ***  Mosaic Image  ***  
 Start Stats  "1" ,  "1" ,  "1"
 Total Bands= "2"
@@ -1246,17 +1232,13 @@ Test no output cube
 **PROGRAMMER ERROR** You must specify exactly one input and one output cube.
 
 Test Band cannot be a priority if Track is not set
-unittest: Working
-0% ProcessedTest Band not found with Band as Priority
-unittest: Working
-0% Processed**USER ERROR** Invalid Band / Key Name, Value.
+Test Band not found with Band as Priority
+**USER ERROR** Invalid Band / Key Name, Value.
 
 ***********************************************************************************
 Test Pvl Group [BandBin] for mismatch between input cube and established mosaic
     Create output mosaic
     Modify Group [BandBin] so it will differ
     Mosaic the same cube to verify proper error is thrown
-unittest: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processedunittest: Working
-0% Processed**USER ERROR** The input cube [/usgs/cpkgs/isis3/data/base/testData/isisTruth2.cub] and the base mosaic values of the Pvl Group [BandBin] for Keyword [OriginalBand] do not match. Base mosaic value at index [0] = 3. Input cube value at index [0] = 1. **Note: use mapmos/automos MatchBandBin = false to override this check**.
+**USER ERROR** The input cube [/usgs/cpkgs/isis3/data/base/testData/isisTruth2.cub] and the base mosaic values of the Pvl Group [BandBin] for Keyword [OriginalBand] do not match. Base mosaic value at index [0] = 3. Input cube value at index [0] = 1. **Note: use mapmos/automos MatchBandBin = false to override this check**.
 
