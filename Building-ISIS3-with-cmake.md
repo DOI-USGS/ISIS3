@@ -30,7 +30,7 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * There should now be a build/ install/ and isis/ directory.
 
 * cd into the build directory and configure your build:
-  * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
+  * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=<path-to-isis3-data> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
   * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
 * Set your ISISROOT to `/the/path/to/your/build`:
@@ -42,6 +42,8 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 
 **Notes**
 * The -GNinja flag specifies creating Google [Ninja](https://ninja-build.org/manual.html) Makefile (an alternative Make system to the traditional GNU make system). If you instead want to use make, dont set this flag, and replace the ninja commands with their make counterparts.
+
+* -Disis3Data is used to set the location of the isis3 data directory, which includes kernels, icons, templates, etc. *This is needed to successfully run the app and module tests.*
 
 * -DJP2KFLAG=OFF disables JP2000 support.  This is temporary.
 
