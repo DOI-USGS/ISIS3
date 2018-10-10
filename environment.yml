@@ -38,7 +38,7 @@ dependencies:
   - mysql-connector-c==6.1.6=0
   - nanoflann==1.2.2
   - ninja==1.7.2=0
-  - nn==1.86.0=2
+  - conda-forge/label/gcc7::nn
   # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
   - opencv
