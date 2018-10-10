@@ -68,7 +68,7 @@ namespace Isis {
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      virtual QString Translate(QString nName, int findex = 0) = 0;
+      virtual QString Translate(QString translationGroupName, int findex = 0) = 0;
 
       // Translate all translation table groups which contain "Auto"
       virtual void Auto(Pvl &outputLabel);
@@ -76,8 +76,8 @@ namespace Isis {
       virtual QStringList parseSpecification(QString specification) const;
     protected:
 
-      virtual PvlKeyword DoTranslation(const QString nName);
-      virtual PvlContainer *CreateContainer(const QString nName, Pvl &pvl);
+      virtual PvlKeyword DoTranslation(const QString translationGroupName);
+      virtual PvlContainer *CreateContainer(const QString translationGroupName, Pvl &pvl);
   };
 };
 
