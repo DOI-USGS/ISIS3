@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tgocassismos" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Produce an output mosaic of TGO CaSSIS images from the same observation and filter.
+  </brief>
+
+  <description>
+    <p>
+  If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.
+  This program produces a mosaic and adds keywords to the label group "Mosaic". <br/>
+
+  The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>
+
+   A new label group, required by tgocassisrdrgen, called "Mosaic"  is added to the image labels of
+   the output cube.  The original label blob is also propagated from the first file in the input list.<br/>
+   </p>
+
+<p>
+  <b> processing sequence for single filter products that will become RDRs </b><br/>
+         <b>cam2map</b> - project the cube.<br/>
+         <b>tgocassismos</b> - mosaic files and add keywords to the mosaic group.<br/>
+         <b>tgocassisrdrgen</b> - produce a RDR product.<br/>
+</p>
+
+ </description>
+
+  <category>
+    <missionItem>Trace Gas Orbiter</missionItem>
+  </category>
+
+  <history>
+    <change name="Makayla Shepherd" date="2018-05-09">
+      Original version.
+    </change>
+    <change name="Adam Goins" date="2018-05-17">
+      Added SpacecraftName and InstrumentId to mosaic group.
+    </change>
+    <change name="Kristin Berry" date="2018-06-12">
+      Removed the "_filtername" from the ProductId. 
+    </change>
+    <change name="Kristin Berry" date="2018-06-16">
+      Update to read the ObservationId from the Archive Group. 
+    </change>
+    <change name="Jeannie Backer" date="2018-08-10">
+      Added option to allow user to choose ground range. 
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input list of files
+        </brief>
+        <description>
+          A single colume list of TGO CaSSIS files that will be mosaiced together.  The input
+          files must be from the some observation and be from the same filter.  The files must also
+          be map projected.
+        </description>
+        <filter>
+          *.lis *.lst *.txt
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output mosaic
+        </brief>
+        <description>
+          The output mosaic cube with the new mosaic label group added.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="PRIORITY">
+        <type>string</type>
+        <default>
+          <item>ONTOP</item>
+        </default>
+        <brief>The priority of pixel placement</brief>
+        <description>
+          This parameter is used to select one of two ways to masaic the
+          pixels in areas of overlap.
+        </description>
+
+        <list>
+          <option value="ONTOP">
+            <brief>Input cube will be placed on top of the mosaic </brief>
+            <description>
+              When the input pixel is not Null, the input pixel
+              value will be written to the output cube.
+            </description>
+          </option>
+          <option value="BENEATH">
+            <brief>Input cube will be placed beneath the mosaic</brief>
+            <description>
+              When the mosaic pixel is not Null it will be left unchanged.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+    <group name="Ground Range">
+      <parameter name="GRANGE">
+      <type>string</type>
+      <default><item>AUTO</item></default>
+      <brief>Ground Range Options</brief>
+      <description>
+        AUTO is the default for this parameter. By default the ground range is
+        calculated automatically based on the list of input cubes.  The user can
+        override this default. If the USER option is selected, values must be
+        entered for the MINLAT, MAXLAT, MINLON, and MAXLON parameters.
+      </description>
+      <list>
+        <option value="AUTO">
+          <brief>Automatically Calculate Range</brief>
+          <description>
+            The program will automatically calculate the ground range for the
+            mosaic by examining that latitude and longitude range of all the
+            cubes contained in the list passed to FROMLIST.  This is the
+            default option.
+          </description>
+          <exclusions>
+            <item>MINLAT</item>
+            <item>MAXLAT</item>
+            <item>MINLON</item>
+            <item>MAXLON</item>
+          </exclusions>
+        </option>
+        <option value="USER">
+          <brief>User Entered Range</brief>
+          <description>
+            The program will apply the ground range values you entered for
+            the mosaic.
+          </description>
+          <inclusions>
+            <item>MINLAT</item>
+            <item>MAXLAT</item>
+            <item>MINLON</item>
+            <item>MAXLON</item>
+          </inclusions>
+        </option>
+      </list>
+      </parameter>
+      <parameter name="MINLAT">
+        <type>double</type>
+        <brief>Minimum Latitude</brief>
+        <description>
+          The minimum latitude value boundary extent for the output mosaic.
+        </description>
+        <helpers>
+          <helper name="H1">
+            <function>helperButtonCalcRange</function>
+            <brief>Calculate Ranges using FROMLIST</brief>
+            <description>
+              This button will calculate the latitude and longitude range using the files in the
+              FROMLIST.
+            </description>
+            <icon>$ISIS3DATA/base/icons/exec.png</icon>
+          </helper>
+        </helpers>
+      </parameter>
+      <parameter name="MAXLAT">
+        <type>double</type>
+        <brief>Maximum Latitude</brief>
+        <description>
+          The maximum latitude value boundary extent for the output mosaic.
+        </description>
+        <greaterThan>
+            <item>MINLAT</item>
+        </greaterThan>
+      </parameter>
+      <parameter name="MINLON">
+        <type>double</type>
+        <brief>Minimum Longitude</brief>
+        <description>
+          The minimum longitude value boundary extent for the output mosaic.
+        </description>
+      </parameter>
+      <parameter name="MAXLON">
+        <type>double</type>
+        <brief>Maximum Longitude</brief>
+        <description>
+          The maximum longitude value bounary extent for the output mosaic.
+        </description>
+        <greaterThan>
+            <item>MINLON</item>
+        </greaterThan>
+      </parameter>
+    </group>
+  </groups>
+</application>

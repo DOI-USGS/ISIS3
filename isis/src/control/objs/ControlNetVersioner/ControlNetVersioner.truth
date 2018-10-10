@@ -621,23 +621,23 @@ Test reading a random PVL file
 **I/O ERROR** Reading the control network [equirectangular.map] failed.
 **I/O ERROR** Could not determine the control network file type.
 
-Test reading a PVL files with missing header information
+Test reading a PVL file with missing header information
 
 **I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net] failed.
 **I/O ERROR** Missing required header information.
-**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net].
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV1.net].
 **I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net] failed.
 **I/O ERROR** Missing required header information.
-**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net].
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV2.net].
 **I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net] failed.
 **I/O ERROR** Missing required header information.
-**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net].
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV3.net].
 **I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net] failed.
 **I/O ERROR** Missing required header information.
-**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net].
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV4.net].
 **I/O ERROR** Reading the control network [unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net] failed.
 **I/O ERROR** Missing required header information.
-**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [/usgs/cpkgs/isis3/data/control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net].
+**ERROR** PVL Keyword [TargetName] does not exist in [Object = ControlNetwork] in file [control/testData/unitTest_ControlNetVersioner_PvlNetwork_BadHeaderV5.net].
 
 Test reading a protobuf file with a bad version number
 
