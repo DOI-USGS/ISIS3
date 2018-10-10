@@ -33,7 +33,6 @@
 #include <QMenuBar>
 #include <QModelIndex>
 #include <QSize>
-#include <QSizePolicy>
 #include <QStatusBar>
 #include <QToolBar>
 #include <QToolButton>
@@ -107,6 +106,8 @@ namespace Isis {
     m_workspace = new Workspace(false, this);
     m_workspace->mdiArea()->setActivationOrder(QMdiArea::StackingOrder);
 
+    m_directory = directory;
+
     // Since this is a QMainWindow, set the workspace as the central widget.
     setCentralWidget(m_workspace);
 
@@ -117,12 +118,8 @@ namespace Isis {
 
     connect(m_workspace, SIGNAL( cubeViewportAdded(MdiCubeViewport *) ),
             this, SLOT( onCubeViewportAdded(MdiCubeViewport *) ) );
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
   }
+
 
   void CubeDnView::createActions(Directory *directory) {
 
@@ -309,9 +306,13 @@ namespace Isis {
 
   /**
    * Enables toolbars and toolpad actions/widgets. Overriden method.
+   * If an active control network has not been set, do not enable the cnet tool.
    */
   void CubeDnView::enableActions() {
     foreach (QAction *action, actions()) {
+      if (action->objectName() == "ControlNetTool" && !m_directory->project()->activeControl()) {
+        continue;
+      }
       action->setEnabled(true);
     }
     foreach (QWidget *widget, m_childWidgets) {
@@ -372,15 +373,6 @@ namespace Isis {
     }
 
     AbstractProjectItemView::addItem(item);
-  }
-
-  /**
-   * Returns the suggested size
-   *
-   * @return @b QSize The size hint
-   */
-  QSize CubeDnView::sizeHint() const {
-    return QSize(800, 600);
   }
 
 
@@ -559,6 +551,7 @@ namespace Isis {
 
   void CubeDnView::save(QXmlStreamWriter &stream, Project *, FileName) const {
     stream.writeStartElement("cubeDnView");
+    stream.writeAttribute("objectName", objectName());
 
     foreach (MdiCubeViewport *cvp, *(m_workspace->cubeViewportList())) {
       ProjectItem *item = m_cubeItemMap.value(cvp->cube());

@@ -59,6 +59,9 @@ namespace Isis {
    *                              class.  Fixes #5220.
    *   @history 2018-06-18 Adam Goins - Added ControlHealthMonitorWorkOrder to WorkOrderFactory.
    *                           Fixes #5435.
+   *   @history 2018-07-07 Summer Stapleton - Removed importTemplateWorkOrder and replaced it with 
+   *                           the new map and registration import work orders to reflect changes
+   *                           in Project.cpp for handling these differently.
    */
   class WorkOrderFactory {
     public:

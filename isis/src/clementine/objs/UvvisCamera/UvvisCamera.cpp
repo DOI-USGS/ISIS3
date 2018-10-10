@@ -23,10 +23,10 @@
 #include <QString>
 
 #include "CameraDetectorMap.h"
-#include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "ClementineUvvisDistortionMap.h"
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
@@ -79,8 +79,17 @@ namespace Isis {
       Spice::getDouble("INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_LINE"));
 
+    QString ppKey("INS" + toString(naifIkCode()) + "_PP");
+    QString odKey("INS" + toString(naifIkCode()) + "_OD_K");
+    QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
+
     // Setup distortion map
-    new CameraDistortionMap(this);
+    new ClementineUvvisDistortionMap(this, 
+                                    getDouble(ppKey, 0), getDouble(ppKey, 1),
+                                    getDouble(odKey, 0), getDouble(odKey, 1), getDouble(odKey, 2),
+                                    getDouble(decenterKey, 0), getDouble(decenterKey, 1));
+
+
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -90,6 +99,7 @@ namespace Isis {
     LoadCache();
     NaifStatus::CheckErrors();
   }
+
 
   /**
    * Returns the shutter open and close times. The user should pass in the

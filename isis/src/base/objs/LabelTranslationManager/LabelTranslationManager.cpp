@@ -105,18 +105,18 @@ namespace Isis {
    * Creates all parent PVL containers for an output keyword. If any parent
    * containers already exist then they will not be recreated.
    *
-   * @param nName The name of the output keyword. The OutputPosition keyword
-   *              in the translation group for nName will be used to determine
+   * @param translationGroupName The name of the output keyword. The OutputPosition keyword
+   *              in the translation group for translationGroupName will be used to determine
    *              which containers are made.
    * @param pvl The PVL file to create the containers in.
    *
-   * @return @b PvlContainer The immediate parent container for nName.
+   * @return @b PvlContainer The immediate parent container for translationGroupName.
    */
-  PvlContainer *LabelTranslationManager::CreateContainer(const QString nName,
+  PvlContainer *LabelTranslationManager::CreateContainer(const QString translationGroupName,
                                                          Pvl &pvl) {
 
     // Get the array of Objects/Groups from the OutputName keyword
-    PvlKeyword np = OutputPosition(nName);
+    PvlKeyword np = OutputPosition(translationGroupName);
 
     PvlObject *obj = &pvl;
 

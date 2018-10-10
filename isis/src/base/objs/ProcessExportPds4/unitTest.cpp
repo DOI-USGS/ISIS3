@@ -18,6 +18,8 @@ using namespace Isis;
  *  @internal
  *   @history 2017-05-30 Marjorie Hahn - Original Version
  *   @history 2016-12-28 Kristin Berry - Updated to test xml input. 
+ *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
+ *                           test output.
  *  
  */
 void IsisMain() {
@@ -200,7 +202,10 @@ void IsisMain() {
       testProcess.StandardPds4Label();
     }
     catch(Isis::IException &e) {
-      e.print();
+      QString message = e.toString();
+      cout << message.replace(QRegExp("file.*base/translations"), "file [base/translations");
+      cout << endl;
+      cout << endl;
     }
     instGroup.addKeyword( PvlKeyword("targetName", cassisTarget) );
   }

@@ -32,21 +32,21 @@ using namespace std;
 namespace Isis {
   QnetSetAprioriDialog::QnetSetAprioriDialog(QnetTool *qnetTool, QWidget *parent) : QDialog(parent) {
     m_qnetTool = qnetTool;
-    
+
     m_aprioriDialog = NULL;
     m_aprioriGridLayout = NULL;
     m_okButton = NULL;
     m_cancelButton = NULL;
     m_applyButton = NULL;
     m_pointInfoStack = NULL;
-    
+
     m_singlePointInfoGroup = NULL;
     m_pointIDLabel = NULL;
     m_pointTypeLabel = NULL;
     m_pointMeasureNumber = NULL;
     m_editLockedBoolLabel = NULL;
     m_ignoredBoolLabel = NULL;
-    
+
     m_multiplePointsInfoGroup = NULL;
     m_pointsCount = NULL;
     m_pointsMeasuresCount = NULL;
@@ -55,7 +55,7 @@ namespace Isis {
     m_freePointsCount = NULL;
     m_pointsEditLockedCount = NULL;
     m_pointsIgnoredCount = NULL;
-    
+
     m_pointGroup = NULL;
     m_aprioriLatLabel = NULL;
     m_aprioriLonLabel = NULL;
@@ -66,7 +66,7 @@ namespace Isis {
     m_currentAprioriButton = NULL;
     m_referenceAprioriButton = NULL;
     m_averageAprioriButton = NULL;
-    
+
     m_sigmaGroup = NULL;
     m_sigmaWarningLabel = NULL;
     m_currentSigmaButton = NULL;
@@ -75,38 +75,38 @@ namespace Isis {
     m_radiusSigmaLabel = NULL;
     m_latSigmaLineEdit = NULL;
     m_lonSigmaLineEdit = NULL;
-    m_radiusSigmaLineEdit = NULL;    
-    
+    m_radiusSigmaLineEdit = NULL;
+
     m_multiPointsMeasureCount = 0;
     m_multiPointsConstraintedCount = 0;
     m_multiPointsFixedCount = 0;
     m_multiPointsFreeCount = 0;
     m_multiPointsEditLockedCount = 0;
     m_multiPointsIgnoredCount = 0;
-    
+
     createSetAprioriDialog(parent);
-        
+
     connect(m_currentAprioriButton, SIGNAL(clicked()), this, SLOT(fillCurrentAprioriLineEdits()));
-    connect(m_referenceAprioriButton, SIGNAL(clicked()), this, 
+    connect(m_referenceAprioriButton, SIGNAL(clicked()), this,
             SLOT(fillReferenceAprioriLineEdits()));
     connect(m_averageAprioriButton, SIGNAL(clicked()), this, SLOT(fillAverageAprioriLineEdits()));
-    
-    //TODO create a ground button that retrieves the lat/lon/radius of the ground source if there 
+
+    //TODO create a ground button that retrieves the lat/lon/radius of the ground source if there
     //is one. The basic connections are already done, just need to actually do it
-//     connect(m_groundAprioriButton, SIGNAL(clicked()), this, 
+//     connect(m_groundAprioriButton, SIGNAL(clicked()), this,
 //     SLOT(fillGroundSourceAprioriLineEdits()));
-    
+
     connect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
     connect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
-    
+
     connect(m_aprioriDialog, SIGNAL(rejected()), this, SLOT(reject()));
-    
+
     connect(m_okButton, SIGNAL(clicked()), this, SLOT(setApriori()));
     connect(m_okButton, SIGNAL(clicked()), this, SLOT(closeEvent()));
     connect(m_okButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));
-    
+
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(setApriori()));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(closeEvent()));   
+    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(closeEvent()));
     connect(m_cancelButton, SIGNAL(clicked()), m_aprioriDialog, SLOT(close()));
   }
 
@@ -117,17 +117,17 @@ namespace Isis {
    * @param parent The parent widget for the set apriori dialog
    *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::createSetAprioriDialog(QWidget *parent) {
-        
-    //Create all of the individual elements 
+
+    //Create all of the individual elements
     m_pointIDLabel = new QLabel("Point ID: ");
     m_pointTypeLabel = new QLabel("Point Type: ");
     m_pointMeasureNumber = new QLabel("Number of Measures: ");
     m_editLockedBoolLabel = new QLabel("EditLocked: ");
     m_ignoredBoolLabel= new QLabel("Ignored: ");
-    
+
     m_pointsCount = new QLabel("Number of Points: ");
     m_pointsMeasuresCount = new QLabel("Total Number of Measures: ");
     m_constrainedPointsCount = new QLabel("Number of Constrained Points: ");
@@ -135,50 +135,50 @@ namespace Isis {
     m_freePointsCount = new QLabel("Number of Free Points: ");
     m_pointsEditLockedCount = new QLabel("Number of Edit Locked Points: ");
     m_pointsIgnoredCount = new QLabel("Number of Ignored Points: ");
-    
+
     m_currentAprioriButton = new QPushButton("Current");
     m_currentAprioriButton->setDefault(false);
     m_currentAprioriButton->setToolTip("Populate with the current Apriori Position");
-    
+
     m_referenceAprioriButton = new QPushButton("Reference");
     m_referenceAprioriButton->setToolTip("Populate with Apriori Position of the reference measure");
-    
+
     m_averageAprioriButton = new QPushButton("Average");
     m_averageAprioriButton->setToolTip("Calculate and populate with the average Apriori Position");
-    
+
 //     m_groundAprioriButton = new QPushButton("Ground");
 //     m_groundAprioriButton->setToolTip("Populate with the Ground Source position, if a Ground Source is loaded");
-    
+
     m_aprioriLatLabel = new QLabel(tr("Apriori Latitude"));
     m_aprioriLonLabel = new QLabel(tr("Apriori Longitude"));
     m_aprioriRadiusLabel = new QLabel(tr("Apriori Radius"));
     m_latLineEdit = new QLineEdit();
     m_lonLineEdit = new QLineEdit();
     m_radiusLineEdit = new QLineEdit();
-    
+
     m_sigmaWarningLabel = new QLabel("");
-    
+
     m_currentSigmaButton = new QPushButton("Current");
     m_currentSigmaButton->setToolTip("Populate the current sigma values");
-    
+
     m_latSigmaLabel = new QLabel(tr("Latitude Sigma"));
     m_lonSigmaLabel = new QLabel(tr("Longitude Sigma"));
     m_radiusSigmaLabel = new QLabel(tr("Radius Sigma"));
     m_latSigmaLineEdit = new QLineEdit();
     m_lonSigmaLineEdit = new QLineEdit();
     m_radiusSigmaLineEdit = new QLineEdit();
-    
+
     m_okButton = new QPushButton("&OK");
     m_okButton->setToolTip("Apply changes and close this dialog");
-    
+
     m_cancelButton = new QPushButton("&Cancel");
     m_cancelButton->setToolTip("Discard changes and close this dialog");
-    
+
     m_applyButton = new QPushButton("&Apply");
     m_applyButton->setAutoDefault(true);
     m_applyButton->setDefault(true);
     m_applyButton->setToolTip("Apply changes");
-        
+
     //Create the point group box and layout
     m_pointGroup = new QGroupBox(tr("Apriori Point"));
     m_pointGroup->setToolTip("Apriori Point Position");
@@ -195,7 +195,7 @@ namespace Isis {
     pointGridLayout->addWidget(m_lonLineEdit, 3, 2, 1, -1);
     pointGridLayout->addWidget(m_radiusLineEdit, 4, 2, 1, -1);
     m_pointGroup->setLayout(pointGridLayout);
-    
+
     //Create the sigma group box and layout
     m_sigmaGroup = new QGroupBox(tr("Apriori Constraints"));
     QGridLayout *sigmaGridLayout = new QGridLayout(m_sigmaGroup);
@@ -207,11 +207,11 @@ namespace Isis {
     sigmaGridLayout->addWidget(m_lonSigmaLineEdit, 3, 2, 1, 3);
     sigmaGridLayout->addWidget(m_radiusSigmaLineEdit, 4, 2, 1, 3);
     m_sigmaGroup->setLayout(sigmaGridLayout);
-    
+
     //Create group box for the single point information labels
     m_singlePointInfoGroup = new QGroupBox(tr("Point Information"));
     m_singlePointInfoGroup->setToolTip("Information on Point selected");
-    
+
     QVBoxLayout *m_singlePointInfoLayout = new QVBoxLayout(m_singlePointInfoGroup);
     m_singlePointInfoLayout->addWidget(m_pointIDLabel);
     m_singlePointInfoLayout->addWidget(m_pointTypeLabel);
@@ -219,7 +219,7 @@ namespace Isis {
     m_singlePointInfoLayout->addWidget(m_editLockedBoolLabel);
     m_singlePointInfoLayout->addWidget(m_ignoredBoolLabel);
     m_singlePointInfoGroup->setLayout(m_singlePointInfoLayout);
-    
+
     //Create group box for the multiple point information labels
     m_multiplePointsInfoGroup = new QGroupBox(tr("Multiple Point Information"));
     m_multiplePointsInfoGroup->setToolTip("Information on Points selected");
@@ -230,14 +230,14 @@ namespace Isis {
     m_multiplePointsInfoLayout->addWidget(m_fixedPointsCount);
     m_multiplePointsInfoLayout->addWidget(m_freePointsCount);
     m_multiplePointsInfoLayout->addWidget(m_pointsEditLockedCount);
-    m_multiplePointsInfoLayout->addWidget(m_pointsIgnoredCount); 
+    m_multiplePointsInfoLayout->addWidget(m_pointsIgnoredCount);
     m_multiplePointsInfoGroup->setLayout(m_multiplePointsInfoLayout);
-    
+
     //Create a stacked widget to switch between the single point and multiple point labels
     m_pointInfoStack = new QStackedWidget;
     m_pointInfoStack->addWidget(m_singlePointInfoGroup);
     m_pointInfoStack->addWidget(m_multiplePointsInfoGroup);
-    
+
     //Add all of the major widgets to the main dialog layout
     m_aprioriGridLayout = new QGridLayout(m_aprioriDialog);
     m_aprioriGridLayout->addWidget(m_pointInfoStack, 1, 1, 1, -1);
@@ -247,59 +247,59 @@ namespace Isis {
     m_aprioriGridLayout->addWidget(m_okButton, 8, 2);
     m_aprioriGridLayout->addWidget(m_cancelButton, 8, 3);
     m_aprioriGridLayout->addWidget(m_applyButton, 8, 4);
-    
-    
+
+
     m_aprioriDialog = new QDialog(parent);
     m_aprioriDialog->setWindowTitle("Set Apriori Point and Constraints");
     m_aprioriDialog->setLayout(m_aprioriGridLayout);
-   
+
     setVisiblity();
   }
-  
-  
+
+
   /**
    * This is called when the user selects the X button on the top right or they hit ESC.
    * Disconnect all slots on close event.
-   * 
+   *
    * @author 2016-11-18 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::reject() {
     closeEvent();
     QDialog::reject();
   }
-  
-  
+
+
   /**
    * Disconnect all of the slots on a close event
-   * 
+   *
    * @author 2016-11-18 Makayla Shepherd
    */
   void QnetSetAprioriDialog::closeEvent() {
-    
-      disconnect(m_currentAprioriButton, SIGNAL(clicked()), this, 
+
+      disconnect(m_currentAprioriButton, SIGNAL(clicked()), this,
                 SLOT(fillCurrentAprioriLineEdits()));
-      disconnect(m_referenceAprioriButton, SIGNAL(clicked()), this, 
+      disconnect(m_referenceAprioriButton, SIGNAL(clicked()), this,
                 SLOT(fillReferenceAprioriLineEdits()));
-      disconnect(m_averageAprioriButton, SIGNAL(clicked()), this, 
+      disconnect(m_averageAprioriButton, SIGNAL(clicked()), this,
                 SLOT(fillAverageAprioriLineEdits()));
-      
+
       disconnect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
       disconnect(m_currentSigmaButton, SIGNAL(clicked()), this, SLOT(fillSigmaLineEdits()));
-      
+
       disconnect(m_okButton, SIGNAL(clicked()), this, SLOT(setApriori()));
       disconnect(m_applyButton, SIGNAL(clicked()), this, SLOT(setApriori()));
-      
+
       emit aprioriDialogClosed();
-    
+
   }
-  
-  
+
+
   /**
-   * Shows the dialog box 
-   * 
+   * Shows the dialog box
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::setVisiblity() {
     if (m_aprioriDialog != NULL) {
@@ -320,27 +320,27 @@ namespace Isis {
    */
   void QnetSetAprioriDialog::setPoints(QList<QListWidgetItem *> selectedPoints) {
     m_points = selectedPoints;
-    
+
     checkPointInfoDisable(m_points);
     resetInfoLabels();
     clearLineEdits();
 
     setInfoStack(m_points);
-    
+
     if (m_points.size() == 1) {
       fillCurrentAprioriLineEdits();
       fillSigmaLineEdits();
     }
   }
-  
+
 
   /**
    * Populates the apriori lat/lon/radius line edits with the current values. If
    * there are no current values, the line edits are empty. This only works on single points
    * and is disabled for multiple points.
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::fillCurrentAprioriLineEdits() {
     if (m_points.size() == 0) {
@@ -348,17 +348,13 @@ namespace Isis {
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
       return;
     }
-    
+
     //we can only populate the line edits if there is one point selected
     if (m_points.size() == 1) {
       QString id = m_points.at(0)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       SurfacePoint sPt = pt->GetAprioriSurfacePoint();
-      vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-      
-      sPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
+
       if (sPt.GetLatitude().degrees() != Null) {
         m_latLineEdit->setText(
           QString::number(sPt.GetLatitude().degrees()));
@@ -384,15 +380,15 @@ namespace Isis {
       m_aprioriSource = (Source) USER;
     }
   }
-  
+
 
   /**
-   * Populates the apriori lat/lon/radius line edits with the reference measure values. 
+   * Populates the apriori lat/lon/radius line edits with the reference measure values.
    * This only works on single points and is disabled for multiple points. The calculations
    * were moved from setApriori.
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::fillReferenceAprioriLineEdits() {
     if (m_points.size() == 0) {
@@ -400,24 +396,20 @@ namespace Isis {
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
       return;
     }
-    
+
     //we can only populate the line edits if there is one point selected
     if (m_points.size() == 1) {
-      
+
       QString id = m_points.at(0)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       ControlMeasure *m = pt->GetRefMeasure();
-      vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-      
+
       // Find camera from network camera list
       int camIndex = m_qnetTool->serialNumberList()->serialNumberIndex(
           m->GetCubeSerialNumber());
       Camera *cam = m_qnetTool->controlNet()->Camera(camIndex);
       cam->SetImage(m->GetSample(),m->GetLine());
       SurfacePoint refSPt = cam->GetSurfacePoint();
-      refSPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
       if (refSPt.GetLatitude().degrees() != Null) {
          m_latLineEdit->setText(
           QString::number(refSPt.GetLatitude().degrees()));
@@ -440,9 +432,9 @@ namespace Isis {
       else {
         m_radiusLineEdit->clear();
       }
-      
+
       //If all of the line edits are empty something went wrong, tell the user, and return
-      if ((m_latLineEdit->text() == "") && (m_lonLineEdit->text() == "") 
+      if ((m_latLineEdit->text() == "") && (m_lonLineEdit->text() == "")
           && (m_radiusLineEdit->text() == "")) {
         QString msg = "Cannot retrieve the latitude, longitude, and radius from the reference";
         msg = msg + "measure; this is the result of a known problem in our system. Please select ";
@@ -453,22 +445,22 @@ namespace Isis {
       m_aprioriSource = (Source) REFERENCE;
     }
   }
-  
+
 
   /**
-   * Populates the apriori lat/lon/radius line edits with the average measure values. 
+   * Populates the apriori lat/lon/radius line edits with the average measure values.
    * This only works on single points and is disabled for multiple points. The calculations
    * were moved from setApriori.
-   * 
-   * the code used to compute the average of the measures is copied from 
+   *
+   * the code used to compute the average of the measures is copied from
    * ControlPoint::ComputeApriori
-   * 
+   *
    * There is a known issue with this code that if something goes wrong and the average cannot be
-   * computed then the lat, lon, radius is set to null. In that case, clear the line edits 
+   * computed then the lat, lon, radius is set to null. In that case, clear the line edits
    * and display an error message.
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::fillAverageAprioriLineEdits() {
     if (m_points.size() == 0) {
@@ -476,7 +468,7 @@ namespace Isis {
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
       return;
     }
-    
+
     //we can only populate the line edits if there is one point selected
     if (m_points.size() == 1) {
       double xB = 0.0;
@@ -485,14 +477,14 @@ namespace Isis {
       double r2B = 0.0;
       int goodMeasures = 0;
       SurfacePoint aprioriSurfacePoint;
-      
+
       QString id = m_points.at(0)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
-      
-      
-      
+
+
+
       //this code is copied from ControlPoint::ComputeApriori
-      
+
       for (int i = 0; i < pt->GetNumMeasures(); i++) {
         ControlMeasure *m = pt->GetMeasure(i);
         if (m->IsIgnored()) {
@@ -532,7 +524,7 @@ namespace Isis {
            "project to lat/lon/radius (x/y/z)";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      
+
       // Compute the averages
       //if (NumberOfConstrainedCoordinates() == 0) {
       if (pt->GetPointTypeString() == "Free" || pt->NumberOfConstrainedCoordinates() == 0) {
@@ -554,23 +546,19 @@ namespace Isis {
                !pt->IsLatitudeConstrained() &&
                !pt->IsLongitudeConstrained() &&
                !pt->IsRadiusConstrained()){
-        
+
         aprioriSurfacePoint.SetRectangular(
           Displacement(aprioriSurfacePoint.GetX().meters(), Displacement::Meters),
           Displacement(aprioriSurfacePoint.GetY().meters(), Displacement::Meters),
           Displacement((zB / goodMeasures), Displacement::Kilometers));
       }
-      
+
       //End of copied code
-      
-      
-      
+
+
+
       SurfacePoint sPt = aprioriSurfacePoint;
-      vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-  
-      sPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
+
       if (sPt.GetLatitude().degrees() != Null) {
         m_latLineEdit->setText(
           QString::number(sPt.GetLatitude().degrees()));
@@ -593,10 +581,10 @@ namespace Isis {
       else {
         m_radiusLineEdit->clear();
       }
-      
+
       //If all of the line edits are empty something went wrong
       //tell the user that the average canot be computed and leave the apriori source alone
-      if ((m_latLineEdit->text() == "") && (m_lonLineEdit->text() == "") 
+      if ((m_latLineEdit->text() == "") && (m_lonLineEdit->text() == "")
           && (m_radiusLineEdit->text() == "")) {
         QString msg = "Average cannot be computed for this point [" + m_points.at(0)->text();
         msg = msg + "]; this is the result of a known problem in our system. Please select ";
@@ -607,15 +595,15 @@ namespace Isis {
       m_aprioriSource = (Source) AVERAGE;
     }
   }
-  
+
 //   /**
 //    This is the base for a new ticket that allows for a ground source button
 //
-//    * Populates the apriori lat/lon/radius line edits with the ground source values, if there is a 
+//    * Populates the apriori lat/lon/radius line edits with the ground source values, if there is a
 //    * ground source. This only works on single points and is disabled for multiple points.
-//    * 
+//    *
 //    * @author 2016-08-05 Makayla Shepherd
-//    * 
+//    *
 //    */
 //   void QnetSetAprioriDialog::fillGroundSourceAprioriLineEdits() {
 //     if (m_points.size() == 0) {
@@ -624,18 +612,18 @@ namespace Isis {
 //       return;
 //     }
 //     if (m_points.size() == 1) {
-//       
+//
 //     }
 //   }
-  
+
 
   /**
    * Populates the sigma lat/lon/radius line edits with the current values. If
    * there are no current sigma values, the line edits are empty. This only works on
    * single points and is disabled for multiple points.
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::fillSigmaLineEdits() {
     if (m_points.size() == 0) {
@@ -643,16 +631,12 @@ namespace Isis {
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
       return;
     }
-    
+
     //we can only populate the sigma line edits if there is one point selected
     if (m_points.size() == 1) {
       QString id = m_points.at(0)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       SurfacePoint sPt = pt->GetAprioriSurfacePoint();
-      vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-      sPt.SetRadii(Distance(targetRadii[0]),
-                   Distance(targetRadii[1]),
-                   Distance(targetRadii[2]));
       if (sPt.GetLatSigmaDistance().meters() != Null) {
         m_latSigmaLineEdit->setText(
           QString::number(sPt.GetLatSigmaDistance().meters()));
@@ -674,9 +658,9 @@ namespace Isis {
   /**
    * Switches what information is visible based on how many points are selected. Defaults to single point
    * information.
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::setInfoStack(QList<QListWidgetItem *> selectedPoints) {
     if (selectedPoints.size() > 1) {
@@ -686,15 +670,15 @@ namespace Isis {
       m_pointInfoStack->setCurrentWidget(m_singlePointInfoGroup);
     }
   }
-  
+
 
   /**
    * Enables/Disables features based on if there are multiple points selected or not. If multiple points are
-   * selected it also counts how many are EditLocked, Ignored, the number of each type of point, and the total 
+   * selected it also counts how many are EditLocked, Ignored, the number of each type of point, and the total
    * number of measures.
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::checkPointInfoDisable(QList<QListWidgetItem *> selectedPoints) {
     m_points = selectedPoints;
@@ -703,14 +687,14 @@ namespace Isis {
     m_pointGroup->setEnabled(true);
     m_currentSigmaButton->setEnabled(true);
     m_sigmaWarningLabel->clear();
-    
+
     m_multiPointsMeasureCount = 0;
     m_multiPointsConstraintedCount = 0;
     m_multiPointsFixedCount = 0;
     m_multiPointsFreeCount = 0;
     m_multiPointsEditLockedCount = 0;
     m_multiPointsIgnoredCount = 0;
-    
+
     //handle multiple points
     if (m_points.size() > 1) {
       for (int i = 0; i < m_points.size(); i++) {
@@ -774,13 +758,13 @@ namespace Isis {
       }
     }
   }
-  
+
 
   /**
    * Clears the line edits
-   * 
+   *
    * @author ????-??-?? Unknown
-   * 
+   *
    * @internal
    * @history 2016-02-05 Makayla Shepherd - Modified to work with new UI
    */
@@ -792,17 +776,17 @@ namespace Isis {
     m_lonSigmaLineEdit->clear();
     m_radiusSigmaLineEdit->clear();
   }
-  
+
 
   /**
    * Resets and populates the information stack labels
-   * 
+   *
    * @author 2016-02-05 Makayla Shepherd
-   * 
+   *
    */
   void QnetSetAprioriDialog::resetInfoLabels() {
-    
-    if (m_points.size() < 0) { 
+
+    if (m_points.size() < 0) {
       m_pointIDLabel->setText("Point ID: ");
       m_pointTypeLabel->setText("Point Type: ");
       m_pointMeasureNumber->setText("Number of Measures: ");
@@ -816,7 +800,7 @@ namespace Isis {
       m_pointIDLabel->setText("Point ID: " + QString(id));
       m_pointTypeLabel->setText("Point Type: " + QString(pt->GetPointTypeString()));
       m_pointMeasureNumber->setText("Number of Measures: " + QString::number(pt->GetNumMeasures()));
-      
+
       if (pt->IsEditLocked()) {
         m_editLockedBoolLabel->setText("EditLocked: True");
       }
@@ -831,19 +815,19 @@ namespace Isis {
       }
     }
     //reset all of the information needed for multiple points
-    else if (m_points.size() > 1) { 
+    else if (m_points.size() > 1) {
       m_pointsCount->setText("Number of Points: " + QString::number(m_points.size()));
-      m_pointsMeasuresCount->setText("Total Number of Measures: " + 
+      m_pointsMeasuresCount->setText("Total Number of Measures: " +
                                      QString::number(m_multiPointsMeasureCount));
-      m_constrainedPointsCount->setText("Number of Constrained Points: " + 
+      m_constrainedPointsCount->setText("Number of Constrained Points: " +
                                         QString::number(m_multiPointsConstraintedCount));
-      m_fixedPointsCount->setText("Number of Fixed Points: " + 
+      m_fixedPointsCount->setText("Number of Fixed Points: " +
                                   QString::number(m_multiPointsFixedCount));
       m_freePointsCount->setText("Number of Free Points: " +
                                  QString::number(m_multiPointsFreeCount));
       m_pointsEditLockedCount->setText("Number of Edit Locked Points: " +
                                        QString::number(m_multiPointsEditLockedCount));
-      m_pointsIgnoredCount->setText("Number of Ignored Points: " + 
+      m_pointsIgnoredCount->setText("Number of Ignored Points: " +
                                     QString::number(m_multiPointsIgnoredCount));
     }
   }
@@ -868,19 +852,19 @@ namespace Isis {
    *                        only takes the values in the line edits and uses them to set the
    *                        Apriori values. The calculations for reference and average values
    *                        are made and populated in the fill methods.
-   * @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be set 
+   * @history 2016-10-14 Makayla Shepherd - Fixed an issue that caused the apriori sigmas to be set
    *                        to NULL. You can now set the apriori sigmas.
    * @history 2016-11-16 Makayla Shepherd - Fixed the sigma setting for Fixed and Free points.
-   *                        
+   *
    */
   void QnetSetAprioriDialog::setApriori() {
-    
+
     if (m_points.size() == 0) {
       QString msg = "There are no Points selected. Please select a Point.";
       QMessageBox::warning((QWidget *)parent(), "Warning", msg);
       return;
     }
-    
+
     double latSigma = Null;
     double lat = Null;
     double lonSigma = Null;
@@ -888,7 +872,7 @@ namespace Isis {
     double radiusSigma = Null;
     double radius = Null;
     bool lineEditModified = false;
-    
+
     //retrieve all of the line edit values and check if the line edits have been modified
     if (m_latLineEdit->text() != "") {
       lat = m_latLineEdit->text().toDouble();
@@ -922,20 +906,20 @@ namespace Isis {
     if (m_radiusSigmaLineEdit->text() != "") {
       radiusSigma = m_radiusSigmaLineEdit->text().toDouble();
     }
-    
-    
-    //if any of the line edits have been modified then the AprioriSurfacePointSource and 
+
+
+    //if any of the line edits have been modified then the AprioriSurfacePointSource and
     //RadiusSource are the user
     if (lineEditModified) {
       m_aprioriSource = (Source) USER;
     }
-    
+
     for (int i = 0; i < m_points.size(); i++) {
       QString id = m_points.at(i)->text();
       ControlPoint *pt = m_qnetTool->controlNet()->GetPoint(id);
       if (m_points.size() == 1) {
         pt->SetAprioriSurfacePoint(SurfacePoint(
-                                   Latitude(lat, Angle::Degrees), 
+                                   Latitude(lat, Angle::Degrees),
                                    Longitude(lon, Angle::Degrees),
                                    Distance(radius,Distance::Meters)));
         if (m_aprioriSource == (Source) REFERENCE) {
@@ -948,7 +932,7 @@ namespace Isis {
         else if (m_aprioriSource == (Source) USER) {
           pt->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::User);
 //          pt->SetAprioriRadiusSource(ControlPoint::RadiusSource::User);
-        } 
+        }
       }
       if (!pt->HasAprioriCoordinates()) {
         QString msg = "Point [" + id + "] does not have an Apriori coordinate.  "
@@ -968,10 +952,6 @@ namespace Isis {
         //  Read Surface point from the control point and set the sigmas,
         //  first set the target radii
         SurfacePoint spt = pt->GetAprioriSurfacePoint();
-        vector<Distance> targetRadii = m_qnetTool->controlNet()->GetTargetRadii();
-        spt.SetRadii(Distance(targetRadii[0]),
-                     Distance(targetRadii[1]),
-                     Distance(targetRadii[2]));
 
         spt.SetSphericalSigmasDistance(Distance(latSigma,Distance::Meters),
                                         Distance(lonSigma,Distance::Meters),

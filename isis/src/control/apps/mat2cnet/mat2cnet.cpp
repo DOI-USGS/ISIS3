@@ -90,11 +90,6 @@ void IsisMain() {
 
   // first try to set target from user entered TargetName
   cnet.SetTarget(ui.GetString("TARGET"));
-  // if that fails, look in a cube label for the info
-  if ( !cnet.GetTargetRadii()[0].isValid() ) {
-    Pvl isis3Lab(snl.fileName(0));
-    cnet.SetTarget(isis3Lab);
-  }
   cnet.SetUserName(Application::UserName());
   cnet.SetCreatedDate(Application::DateTime());
   cnet.SetDescription(ui.GetString("DESCRIPTION"));
