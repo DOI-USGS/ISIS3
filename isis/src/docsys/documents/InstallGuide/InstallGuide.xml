@@ -59,7 +59,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           #Execute the ISIS3 variable initialization script with default arguments.
           #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
 
-         python $CONDA_PREFIX/scripts/isis3VarInit
+          python $CONDA_PREFIX/scripts/isis3VarInit.py
 
          Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data, 
          and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
@@ -70,12 +70,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
           #Run the source activate command a second time to process the changes:
 
-          source activate isis3
-
-
-
-
-
+          source activate isi
 
         </pre>
       </li>
