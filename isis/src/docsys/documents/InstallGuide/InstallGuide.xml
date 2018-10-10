@@ -59,7 +59,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           #Execute the ISIS3 variable initialization script with default arguments.
           #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
 
-         ./$CONDA_PREFIX/scripts/isis3VarInit
+         python $CONDA_PREFIX/scripts/isis3VarInit
 
          Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data, 
          and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
@@ -70,7 +70,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
           #Run the source activate command a second time to process the changes:
 
-          source activate isis3alpha
+          source activate isis3
 
 
 
@@ -133,7 +133,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
   </p>
 
 <A NAME="RunningOnWindowsWithSSH"> </A>
-<h3>Setting Up X11 forwarding on Windows with Putty and XMing</h3>
+<h3>Setting Up X11 forwarding on Windows with Putty and Xming</h3>
 <p>
 Some ISIS3 users prefer to run ISIS3 in Windows, but SSH into a computer
 that is running ISIS3 and has enabled X11 forwarding.  This requires the
@@ -472,9 +472,9 @@ is a popular choice and may be downloaded below.
         </pre>
 
 <h2>Installing older versions of ISIS</h2>
-    <h3>How do I install ISIS 2?</h3>
+    <h3>How do I install ISIS2?</h3>
     <p>
-         If you are looking for ISIS 2, please
+         If you are looking for ISIS2, please
         <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">refer to the ISIS 2 Installation
         Guide</a> for instructions on downloading and installing ISIS 2.
     </p>
