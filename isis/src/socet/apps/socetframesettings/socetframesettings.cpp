@@ -95,13 +95,12 @@ void IsisMain() {
     spacecraftName = (QString) orig["SpacecraftName"];
   }
 
-#define VEC3_ZEROS { 0.0, 0.0, 0.0 }
-#define MTX3x3_ZEROS { VEC3_ZEROS, VEC3_ZEROS, VEC3_ZEROS }
-
   // Get sensor position and orientation (opk) angles
-  SpiceDouble ographicCamPos[3] = VEC3_ZEROS;
-  SpiceDouble omegaPhiKappa[3] = VEC3_ZEROS;
-  SpiceDouble isisFocalPlane2SocetPlateTranspose[3][3] = MTX3x3_ZEROS;
+  SpiceDouble ographicCamPos[3] = { 0.0, 0.0, 0.0 };
+  SpiceDouble omegaPhiKappa[3] = { 0.0, 0.0, 0.0 };
+  SpiceDouble isisFocalPlane2SocetPlateTranspose[3][3] = { { 0.0, 0.0, 0.0 },
+                                                           { 0.0, 0.0, 0.0 },
+                                                           { 0.0, 0.0, 0.0 } };
 
   getCamPosOPK(spice, spacecraftName, et, cam, ographicCamPos,
                omegaPhiKappa,isisFocalPlane2SocetPlateTranspose);
@@ -133,7 +132,7 @@ void IsisMain() {
   //  else if (spacecraftName == "MARS_EXPRESS") {
   //    socetCamFile += "SRC.cam";
   //  }
-  //----------------------------------------------------- 
+  //-----------------------------------------------------
   //TO DO: Uncomment these lines when Themis is supported
   //-----------------------------------------------------
   //  // THEMIS VIS images (MARS Odyssey)
@@ -163,7 +162,7 @@ void IsisMain() {
     else {
       socetCamFile += "Galileo_SSI.cam";
     }
-  } 
+  }
   else if (spacecraftName == "Cassini-Huygens") {
     // Get the image filter and replace "/" with "_"
     PvlGroup bandBin = cube.label()->findGroup("BandBin", Pvl::Traverse);
@@ -195,8 +194,9 @@ void IsisMain() {
       socetCamFile += "OCAMS_PolyCam.cam";
     }
     else {
-      QString msg = QString("The ISIS to SOCET Set translation of input image [%1] is currently "
-                            "not supported for instrument [%2].").arg(from).arg(instrumentId);
+      QString msg = QString("The ISIS to SOCET Set translation of input image "
+                            "[%1] is currently not supported for OSIRIS-REX "
+                            "instrument [%2].").arg(from).arg(instrumentId);
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -213,7 +213,7 @@ void IsisMain() {
   //TO DO: Uncomment these lines when Themis is supported
   //-----------------------------------------------------
   //  if (spacecraftName == "MARS_ODYSSEY") {
-  //    try { 
+  //    try {
   //      summation = (int) detectorMap->SampleScaleFactor();
   //    }
   //    catch (IException &e) {
@@ -260,7 +260,7 @@ void IsisMain() {
   // Make sure the Socet Set project name has the .prj extension
   if (socetProject.endsWith(".prj", Qt::CaseInsensitive) == false)  socetProject += ".prj";
 
-  // Find cube base name w/o extensions & establish the Socet Set support file name 
+  // Find cube base name w/o extensions & establish the Socet Set support file name
   // Note: I'm using the QFileInfo class because the baseName method in the ISIS
   // FileName class only strips the last extension, and we need the core name
   // of the file without any extensions, or path
@@ -361,7 +361,7 @@ void IsisMain() {
     double sampleSumming = (int) detectorMap->SampleScaleFactor();
     double lineSumming = (int) detectorMap->LineScaleFactor();
 
-    // Get the Starting Detector Line/Sample 
+    // Get the Starting Detector Line/Sample
     double startingSample = detectorMap->AdjustedStartingSample();
     double startingLine = detectorMap->AdjustedStartingLine();
 
@@ -434,12 +434,12 @@ void IsisMain() {
 
 // OVERVIEW
 
-// getCamPosOPK converts the geometry contained in ISIS CUB labels, and
+// getCamPosOPK converts the geometry contained in ISIS Cube labels, and
 // passed via Spice and Cam object arguments, into camera position
 // (lat,Elon,height) and camera attitude Euler angles (omega,phi,kappa; OPK)
 // sensor model parameters understood by SOCET SET.  The conversion is
 // dependent on spacecraft- and instrument-dependent parameters, which may
-// not be contained in any ISIS CUB label, and so have been hard-coded here.
+// not be contained in any ISIS Cube label, and so have been hard-coded here.
 
 
 // DETAILS
@@ -477,10 +477,10 @@ void IsisMain() {
 // a) ISIS image data layout
 //
 //    The definitions of ISIS samples and lines are the fastest- and
-//    slowest-moving indices, respectively, of the 2D ISIS CUB image data,
+//    slowest-moving indices, respectively, of the 2D ISIS Cube image data,
 //    starting at the beginning of the image data in the file.  The number
 //    of samples per line, and lines per image, is specified in the ISIS
-//    CUB label.
+//    Cube label.
 //
 // b) ISIS reference frame definition wrt image data layout
 //
@@ -506,7 +506,8 @@ void IsisMain() {
 //
 //
 //    The first values in _ITRANSS and _ITRANSL may be ignored as long as
-//    they are zero; refer to the ISIS documentation if they are otherwise.
+//    they are zero. If these values are non-zero, then the transformation is
+//    an affine transformation where the values are the offset.
 //
 // c) ISIS display
 //
@@ -539,10 +540,10 @@ void IsisMain() {
 //    down with increasing line - slowest index), but it does ***NOT***
 //    allow for mirrored images.
 //
-// The instrument-specific pixel storage convention used in ISIS CUBs,
+// The instrument-specific pixel storage convention used in ISIS Cubes,
 // coupled with the _ITRANSS/_ITRANSL KPVs and the mapping of the pixel
 // storage from ISIS to SS determines calculation of the matrix.  Copying
-// ISIS CUB image pixel data to SS raw images is a process that is external
+// ISIS Cube image pixel data to SS raw images is a process that is external
 // to this application, and therefore must be coordinated with the output of
 // this application.
 
@@ -592,7 +593,7 @@ void IsisMain() {
 //               axisN
 //
 //     frame rotation is a matrix, which rotates vectors by -angleN radians
-//     about the axisN coordinate axis cf. SPICE RECGEO documentation 
+//     about the axisN coordinate axis cf. SPICE RECGEO documentation
 //
 //       https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/recgeo_c.html
 
@@ -648,10 +649,12 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   //      so the hard-coded per-instrument choices made and parameters
   //      set here make assumptions about that process.  For the most
   //      part, the SS storage order is the same as in ISIS CUBs; the
-  //      only exception, as of 2017-11-16, are OSIRIS-REx MapCam and
+  //      only exceptions, as of 2017-11-16, are OSIRIS-REx MapCam and
   //      PolyCam.
 
-  SpiceDouble isisFocalPlane2SocetPlate[3][3] = MTX3x3_ZEROS;
+  SpiceDouble isisFocalPlane2SocetPlate[3][3] = { { 0.0, 0.0, 0.0 },
+                                                  { 0.0, 0.0, 0.0 },
+                                                  { 0.0, 0.0, 0.0 } };
   //-----------------------------------------------------
   //TO DO: Uncomment these lines when Apollo is supported
   //-----------------------------------------------------
@@ -682,13 +685,14 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
 
   //-----------------------------------------------------
   //TO DO: Uncomment these lines when Themis-VIS is supported
-  //----------------------------------------------------- 
+  //-----------------------------------------------------
   //  if (spacecraftName == "MARS_ODYSSEY"    || spacecraftName == "Galileo Orbiter" ||
   //      spacecraftName == "Cassini-Huygens" || spacecraftName == "Messenger" ) {
   //-----------------------------------------------------
   //TO DO: Delete this next line when Themis-VIS is supported
   //-----------------------------------------------------
-  if (spacecraftName == "Galileo Orbiter" || spacecraftName == "Cassini-Huygens" ||
+  else if (spacecraftName == "Galileo Orbiter" ||
+           spacecraftName == "Cassini-Huygens" ||
            spacecraftName == "Messenger") {
     isisFocalPlane2SocetPlate[0][0] = 1.0;
     isisFocalPlane2SocetPlate[1][1] = -1.0;
@@ -729,12 +733,12 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
 
    - Pixels are displayed left-to-right (+SAMPLEisis) and down (+LINEisis)
 
-   - Pixels are stored in the same order in ORX ISIS CUBs as they are
+   - Pixels are stored in the same order in OREX ISIS Cubes as they are
      in FITS files
      - +SAMPLEisis == +NAXIS1(fits)
      - +LINEisis == +NAXIS2(fits)
 
-   - N.B. So ORX ISIS image display is mirrored about horizontal axis
+   - N.B. So OREX ISIS image display is mirrored about horizontal axis
           w.r.t.  as seen on sky
 
    - MapCam and PolyCam ISIS use FITS reference frame
@@ -755,14 +759,14 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
 
 
                               dLine    dLine              dLine
-                             -------   -----              -----  
+                             -------   -----              -----
                               dBand?    dX                 dY
 
        INS-64360_ITRANSL = (     0.0,  117.64705882353,    0.0           )
        INS-64361_ITRANSL = (     0.0,  117.64705882353,    0.0           )
 
    - dSample/dXisis = 0, dSample/dYisis > 0: +SAMPLEisis = +Yisis = right
-   -   dLine/dXisis > 0,   dLine/dYisis = 0: +LINEisis   = +Xisis = down 
+   -   dLine/dXisis > 0,   dLine/dYisis = 0: +LINEisis   = +Xisis = down
 
    - N.B. since BORESIGHT == -Zisis, ISIS displays a left-handed frame
 
@@ -841,8 +845,8 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
              |+Zfits = +Zisis (into screen)
           ---X---------------------------------> +NAXIS1fits
              |                                   +SAMPLEisis
-             |                                   +Yfits      
-             |                                   +Yisis      
+             |                                   +Yfits
+             |                                   +Yisis
 
  +Xss == +Yisis == +Yfits
  +Yss == +Xisis == +Xfits
@@ -850,7 +854,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
 
    ********************************************************************/
 
-  if (spacecraftName == "OSIRIS-REX") {
+  else if (spacecraftName == "OSIRIS-REX") {
     /* MapCam and PolyCam ISIS-to-SS Matrix swaps X and Y, inverts Z */
     isisFocalPlane2SocetPlate[1][0] =  1.0;  // +Xisis => +Yss
     isisFocalPlane2SocetPlate[0][1] =  1.0;  // +Yisis => +Xss
@@ -858,7 +862,7 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   }
 
   // Confirm that matrix is now a rotation matrix
-  if (!isrot_c(isisFocalPlane2SocetPlate, 1e-10, 1e-10)) {
+  else {
     QString msg = QString("The ISIS to SOCET Set translation of input image is currently "
                           "not supported for instrument [%1].").arg(spacecraftName);
     throw IException(IException::User, msg, _FILEINFO_);
@@ -880,8 +884,12 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   vector<double>  j2000ToIsisFocalPlaneMatrixVector = cam->instrumentRotation()->Matrix();
 
   // Reformat rotation matrices from 9-element vector<double>'s to 3x3 arrays
-  SpiceDouble j2000ToOcentricRotationMatrix[3][3] = MTX3x3_ZEROS;
-  SpiceDouble j2000ToIsisFocalPlaneMatrix[3][3] = MTX3x3_ZEROS;
+  SpiceDouble j2000ToOcentricRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                      { 0.0, 0.0, 0.0 },
+                                                      { 0.0, 0.0, 0.0 } };
+  SpiceDouble j2000ToIsisFocalPlaneMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                    { 0.0, 0.0, 0.0 },
+                                                    { 0.0, 0.0, 0.0 } };
 
   for (int j = 0; j < 3; j++) {
     for (int k = 0; k < 3; k++) {
@@ -891,12 +899,14 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   }
 
   // Compute rotation matrix from ISIS Focal Plane frame to Ocentric frame
-  SpiceDouble isisFocalPlaneToOcentricRotationMatrix[3][3] = MTX3x3_ZEROS;
+  SpiceDouble isisFocalPlaneToOcentricRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                               { 0.0, 0.0, 0.0 },
+                                                               { 0.0, 0.0, 0.0 } };
   mxmt_c(j2000ToOcentricRotationMatrix, j2000ToIsisFocalPlaneMatrix,
          isisFocalPlaneToOcentricRotationMatrix);
 
   // Get instrumemt position vector, convert to meters
-  SpiceDouble instrumentPosition[3] = VEC3_ZEROS;
+  SpiceDouble instrumentPosition[3] = { 0.0, 0.0, 0.0 };
   spice.instrumentPosition(instrumentPosition);
   vscl_c(1000.0, instrumentPosition, instrumentPosition);
 
@@ -905,54 +915,40 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   spice.radii(dRadii);
 
   // Calculate ographic coordinates of spacecraft position vector, in meters
-  SpiceDouble equatorRadius_m = dRadii[0].meters();
-  SpiceDouble flattening = (equatorRadius_m - dRadii[2].meters()) / equatorRadius_m;
+  SpiceDouble equatorialRadiusMeters = dRadii[0].meters();
+  SpiceDouble flattening = ( equatorialRadiusMeters - dRadii[2].meters() ) /
+                           equatorialRadiusMeters;
   SpiceDouble lon = 0.0;
   SpiceDouble lat = 0.0;
   SpiceDouble height = 0.0;
-  recgeo_c (instrumentPosition, equatorRadius_m, flattening, &lon, &lat, &height);
+  recgeo_c (instrumentPosition, equatorialRadiusMeters, flattening,
+            &lon, &lat, &height);
 
   // Calculate rotation matrix from Socet Set plate to ocentric ground coordinates
-  SpiceDouble ocentricGroundToSocetPlateRotationMatrix[3][3] = MTX3x3_ZEROS;
+  SpiceDouble ocentricGroundToSocetPlateRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                                 { 0.0, 0.0, 0.0 },
+                                                                 { 0.0, 0.0, 0.0 } };
 
   mxmt_c (isisFocalPlane2SocetPlate, isisFocalPlaneToOcentricRotationMatrix,
           ocentricGroundToSocetPlateRotationMatrix);
 
   // Populate the ocentric-to-LSR rotation matrix; it is a function of
   // camera position only
-  SpiceDouble lsrToOcentricRotationMatrix[3][3] = MTX3x3_ZEROS;
-  SpiceDouble ocentricToLsrRotationMatrix[3][3] = MTX3x3_ZEROS;
-
-  // LSR:  Calculate matrix to rotate vectors from LSR frame to
-  //       Planetocentric Body-Fixed frame
+  SpiceDouble lsrToOcentricRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                    { 0.0, 0.0, 0.0 },
+                                                    { 0.0, 0.0, 0.0 } };
+  SpiceDouble ocentricToLsrRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                    { 0.0, 0.0, 0.0 },
+                                                    { 0.0, 0.0, 0.0 } };
 
   twovec_c(instrumentPosition, 3, uvPlusZ, 2, ocentricToLsrRotationMatrix);
   xpose_c(ocentricToLsrRotationMatrix, lsrToOcentricRotationMatrix);
 
-  /* OLD:
-  double xyzLength = instrumentPosition[0] * instrumentPosition[0] +
-                instrumentPosition[1] * instrumentPosition[1];
-  double xyLength = sqrt(xyzLength);
-  xyzLength = sqrt (xyzLength + instrumentPosition[2] * instrumentPosition[2]);
-
-  dXouble sinLon = instrumentPosition[1] / xyLength;
-  dXouble cosLon = instrumentPosition[0] / xyLength;
-  dXouble sinLat = instrumentPosition[2] / xyzLength;
-  dXouble cosLat = xyLength / xyzLength;
-  oXcentricToOgraphicRotationMatrix[0][0] = -sinLon;
-  oXcentricToOgraphicRotationMatrix[1][0] = cosLon;
-  oXcentricToOgraphicRotationMatrix[2][0] = 0.0;
-  oXcentricToOgraphicRotationMatrix[0][1] = -sinLat * cosLon;
-  oXcentricToOgraphicRotationMatrix[1][1] = -sinLat * sinLon;
-  oXcentricToOgraphicRotationMatrix[2][1] = cosLat;
-  oXcentricToOgraphicRotationMatrix[0][2] = cosLat * cosLon;
-  oXcentricToOgraphicRotationMatrix[1][2] = cosLat * sinLon;
-  oXcentricToOgraphicRotationMatrix[2][2] = sinLat;
-   */
-
   // Compute the Rotation matrix from LSR frame to Socet Set Plate frame,
   // and extract the euler angles to get omega-phi-kappa attidude angles
-  SpiceDouble lsrGroundToSocetPlateRotationMatrix[3][3] = MTX3x3_ZEROS;
+  SpiceDouble lsrGroundToSocetPlateRotationMatrix[3][3] = { { 0.0, 0.0, 0.0 },
+                                                            { 0.0, 0.0, 0.0 },
+                                                            { 0.0, 0.0, 0.0 } };
 
   mxmt_c (ocentricGroundToSocetPlateRotationMatrix, ocentricToLsrRotationMatrix,
           lsrGroundToSocetPlateRotationMatrix);
@@ -982,5 +978,3 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
 
   return;
 }
-int noop_intreturn() { return (int) IVALID_MAX4; } // Eliminate compiler warning about -Wunused-variable
-
