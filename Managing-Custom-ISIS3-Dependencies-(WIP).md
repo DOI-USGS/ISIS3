@@ -2,7 +2,7 @@
 
 _Note: This page is describes dependency management for ISIS3 versions 3.6.0 and above._
 
-With the release of isis3.6.0, the ISIS3 dependencies are being managed by a package manager called [conda](https://conda.io/docs/). These packages are hosted on a publicly available servers at [anaconda.org](https://anaconda.org).
+With the release of isis3.6.0, the ISIS3 dependencies are being managed with a package manager called [conda](https://conda.io/docs/). These packages are hosted on a publicly available servers at [anaconda.org](https://anaconda.org).
 
 ## Why do we use conda?
 
@@ -28,20 +28,20 @@ Most of the packages listed in this environment file are pulled from conda-forge
 ```bash
 conda config --add channels conda-forge --add channels usgs-astrogeology
 ```
-
+_Note: If your environment pulls SuperLu from usgs-astrogeology instead of conda-forge, try changing their order_
 # Important files in the isis3_dependencies repo
 
 There are three directories in the `isis3_dependencies` repo: `bin/`, `meta/`, and `recipies/`.
 
-The `bin/` directory contains some python scripts that are used for determining dependencies and available packages, as well as a script for building packages. The `build_package.py` script is the script we will use to build a package for uploading to the [USGS-Astrogeology anaconda.org cloud](https://anaconda.org/usgs-astrogeology).
+The `bin/` directory contains some python scripts that are used for determining dependencies and available packages, as well as a script for building packages. The `build_package.py` script is the script we will use to build a package for uploading to the [USGS-Astrogeology anaconda.org cloud](https://anaconda.org/usgs-astrogeology). It is essentially a wrapper around a conda-build command. 
 
-The `meta/` directory contains
+The `meta/` directory contains general metadata about the version numbers and configurations of the packages. The package-specific metadata will pull some values from this directory.
 
-The `recipies/` directory contains 
+The `recipes/` directory contains build scripts, package-specific metadata, and patch files. Some of the metadata files here will have an .tmpl extension, which means that they are templates that will generate the real meta.yml file during a build. 
 
 For more information on how conda builds work, see the [Conda build recipes documentation](https://conda.io/docs/user-guide/tasks/build-packages/recipe.html).
 
-# Using the Anaconda Upload Python Scripts
+# Using the Python Build and Upload Scripts
 
 To build and upload a package to anaconda, run `python bin/build_package.py <package>` from the root of the isis_dependencies repo. This requires you to log into an anaconda account with write permissions for the usgs-astrogeology repo. This command will use the build.sh script and meta.yaml specifications found in the  recipies/<package> directory. If there is no meta.yaml file, but a meta.yaml.tmpl file exists, one will be created using the template. 
 
