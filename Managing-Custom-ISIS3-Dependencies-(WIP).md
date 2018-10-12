@@ -37,7 +37,9 @@ The `bin/` directory contains some python scripts that are used for determining 
 
 The `meta/` directory contains general metadata about the version numbers and configurations of the packages. The package-specific metadata will pull some values from this directory.
 
-The `recipes/` directory contains build scripts, package-specific metadata, and patch files. Some of the metadata files here will have an .tmpl extension, which means that they are templates that will generate the real meta.yml file during a build. 
+The `recipes/` directory contains build scripts, package-specific metadata, and patch files. Some of the metadata files here will have an .tmpl extension, which means that they are templates that will generate the real meta.yml file during a build.
+
+_Note: For information on the justification behind each custom build, check the comments at the top of each recipe's build.sh script._ 
 
 For more information on how conda builds work, see the [Conda build recipes documentation](https://conda.io/docs/user-guide/tasks/build-packages/recipe.html).
 
