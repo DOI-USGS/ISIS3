@@ -69,15 +69,6 @@ int main(void) {
     qDebug() << "SPK Reference ID = " << cam->SpkReferenceId();
     qDebug() << "";
 
-    // Test Shutter Open/Close
-    const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
-    double exposureDuration = toDouble( inst["ExposureDuration"][0] );
-    QString startTime = inst["StartTime"];
-    double et;
-    str2et_c(startTime.toLatin1().data(), &et);
-    pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
-    qDebug() << qSetRealNumberPrecision(18) << "Shutter open = " << shuttertimes.first.Et();
-    qDebug() << qSetRealNumberPrecision(18) << "Shutter close = " << shuttertimes.second.Et();
     qDebug() << qSetRealNumberPrecision(18) << "Focal Length = " << cam->FocalLength();
     qDebug() << "";
 
@@ -140,14 +131,6 @@ int main(void) {
     qDebug() << "SPK Reference ID = " << cam2->SpkReferenceId();
     qDebug() << "";
 
-    // Test Shutter Open/Close
-    const PvlGroup &inst2 = c2.label()->findGroup("Instrument", Pvl::Traverse);
-    exposureDuration = toDouble( inst2["ExposureDuration"][0] );
-    QString startTime2 = inst2["StartTime"];
-    str2et_c(startTime2.toLatin1().data(), &et);
-    shuttertimes = cam2->ShutterOpenCloseTimes(et, exposureDuration);
-    qDebug() << qSetRealNumberPrecision(18) << "Shutter open = " << shuttertimes.first.Et();
-    qDebug() << qSetRealNumberPrecision(18) << "Shutter close = " << shuttertimes.second.Et();
     qDebug() << qSetRealNumberPrecision(18) << "Focal Length = " << cam2->FocalLength();
     qDebug() << "";
 
