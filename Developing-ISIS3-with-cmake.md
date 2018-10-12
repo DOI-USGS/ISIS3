@@ -12,7 +12,7 @@ This will copy all files in your fork to your current location in the terminal. 
 For now, pull down the cmake branch. This is temporary until cmake is merged into dev.
 
 
-## Anaconda and ISIS3 dependencies
+## Anaconda and ISIS3 Dependencies
 To started building ISIS3 with cmake, you first need anaconda installed. Go to [Anaconda's download page](https://www.anaconda.com/download/) and follow the instructions for your operating system. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
 
 `conda env create -n <environment-name> -f environment.yml` (you may name the environment whatever you want)
@@ -53,20 +53,20 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * `ddt $ISISROOT/bin/<application_name>`
 
  
-## New Environmental Variable meanings
+## New Environmental Variable Meanings
 `$ISISROOT` is no longer the ISIS3 source directory. `$ISISROOT` is now either the CMake build directory for development or the install directory for running a deployed copy of ISIS. 
 
 * **Source Directory**: Where the ISIS source code lives. This is the isis directory. If you are in build, this would be ../isis (i.e. your local repository)
 * **Build Directory**: Where generated project files live (Makefiles, Ninja files, Xcode project, etc.) and where binaries are built to.  This is where you spend most of your development time. 
 * **Install Directory**: Where the binaries are placed on install. 
 
-## Custom data and test data directories
+## Custom Data and Test Data Directories
 Custom data and test data directories now have to be relative to the new $ISISROOT
 Therefore your data or testdata directories must be at the same hierarchical level as your build or install directories.
 
-## Cleaning builds
+## Cleaning Builds
 
-**Using the Ninja build system:**
+**Using the Ninja Build System:**
 
 Removes all built objects except for those built by the build generator:
 `ninja -t clean` 
