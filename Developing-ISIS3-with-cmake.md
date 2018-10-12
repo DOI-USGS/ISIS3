@@ -138,10 +138,6 @@ The documentation is placed in install/docs (after being copied over from build/
 1. reconfigure cmake with flag (-DCMAKE_BUILD_TYPE=DEBUG)
 2. rebuild
 
-
-
-# Testing ISIS3
-
 ## Identifying Tests
 The test names are as follows:
 * unit test : `<modulename>_unit_test_<objectname>`
