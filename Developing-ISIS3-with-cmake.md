@@ -1,5 +1,3 @@
-# QuickStart Guide
-
 ## Getting Started With GitHub
 To get started, you want a fresh copy of ISIS to work on. You first want to create a fork of the ISIS3 repo by going to the [main ISIS3 repo page](https://github.com/USGS-Astrogeology/ISIS3) and clicking on "Fork" at the top of the page.
 
@@ -141,7 +139,8 @@ The documentation is placed in install/docs (after being copied over from build/
 2. rebuild
 
 
-#Testing ISIS3
+
+# Testing ISIS3
 
 ## Identifying Tests
 The test names are as follows:
