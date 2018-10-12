@@ -1,7 +1,7 @@
 Testing Isis::ProcessMapMosaic Class ... 
 Testing Mosaic 1
-/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest1.cub is inside the mosaic
-/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest2.cub is inside the mosaic
+base/testData/ProcessMapMosaic/unitTest1.cub is inside the mosaic
+base/testData/ProcessMapMosaic/unitTest2.cub is inside the mosaic
 Mosaic label: 
 Object = IsisCube
   Object = Core
@@ -55,8 +55,8 @@ Object = History
 End_Object
 End
 Testing Mosaic 2
-/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest1.cub is inside the mosaic
-/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest2.cub is inside the mosaic
+base/testData/ProcessMapMosaic/unitTest1.cub is inside the mosaic
+base/testData/ProcessMapMosaic/unitTest2.cub is inside the mosaic
 Mosaic label: 
 Object = IsisCube
   Object = Core
@@ -574,8 +574,8 @@ End_Object
 End
 
 Testing Mosaic containing cropped image.
-/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest_crop.cub is inside the mosaic
-/usgs/cpkgs/isis3/data/base/testData/ProcessMapMosaic/unitTest_nocrop.cub is inside the mosaic
+base/testData/ProcessMapMosaic/unitTest_crop.cub is inside the mosaic
+base/testData/ProcessMapMosaic/unitTest_nocrop.cub is inside the mosaic
 Mosaic label: 
 Object = IsisCube
   Object = Core

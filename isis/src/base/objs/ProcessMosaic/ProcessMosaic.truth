@@ -1240,5 +1240,5 @@ Test Pvl Group [BandBin] for mismatch between input cube and established mosaic
     Create output mosaic
     Modify Group [BandBin] so it will differ
     Mosaic the same cube to verify proper error is thrown
-**USER ERROR** The input cube [/usgs/cpkgs/isis3/data/base/testData/isisTruth2.cub] and the base mosaic values of the Pvl Group [BandBin] for Keyword [OriginalBand] do not match. Base mosaic value at index [0] = 3. Input cube value at index [0] = 1. **Note: use mapmos/automos MatchBandBin = false to override this check**.
+**USER ERROR** The input cube [base/testData/isisTruth2.cub] and the base mosaic values of the Pvl Group [BandBin] for Keyword [OriginalBand] do not match. Base mosaic value at index [0] = 3. Input cube value at index [0] = 1. **Note: use mapmos/automos MatchBandBin = false to override this check**.
 
