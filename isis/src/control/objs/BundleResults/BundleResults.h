@@ -90,7 +90,8 @@ namespace Isis {
    *                            assignment operator, initialize,  Also added access methods for coordinate types.
    *                            References #4649 and #501.
    *   @history 2018-09-30 Debbie A. Cook - Removed methods setRadiansToMeters and 
-   *                            radiansToMeters and member variable m_radiansToMeters.
+   *                            radiansToMeters and member variable m_radiansToMeters.  References #4649 
+   *                            and #501.
    */
   class BundleResults : public QObject {
     Q_OBJECT

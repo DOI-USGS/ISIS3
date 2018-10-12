@@ -100,7 +100,7 @@ namespace Isis {
    *  @history 2018-09-28 Debbie A. Cook - Removed the metersToRadians argument from
    *                           the constructor and from the setWeights method since we are now
    *                           using the local radius of the point to convert lat/lon sigmas 
-   *                           from meters to radians.  References #
+   *                           from meters to radians.  References #4649 and #501.
   */
   class BundleControlPoint : public QVector<BundleMeasureQsp> {
 

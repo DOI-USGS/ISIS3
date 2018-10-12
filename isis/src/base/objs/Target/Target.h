@@ -71,7 +71,7 @@ namespace Isis {
    *                           any mention of Naif body frame code that should be Naif body code.
    *                           These are not the same.  Naif tags the body radii keyword with the
    *                           Naif body code.  The Naif body frame code refers to the orientation
-   *                           (SpiceRotation) of the body.  References #TBD.
+   *                           (SpiceRotation) of the body.  References #4649 and #501.
    */
   class Target {
 

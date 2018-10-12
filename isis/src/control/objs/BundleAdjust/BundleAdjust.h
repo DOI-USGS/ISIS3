@@ -322,6 +322,7 @@ namespace Isis {
    *                            m_radiansToMeters, m_metersToRadians, and m_bodyRadii
    *                            which have been replaced with the local radius of a control
    *                            point for converting point sigmas to/from radians from/to meters.
+   *                            References #4649 and #501.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT

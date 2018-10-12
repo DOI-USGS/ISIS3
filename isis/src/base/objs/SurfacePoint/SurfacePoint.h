@@ -136,7 +136,7 @@ namespace Isis {
    *                           LatitudeToMeters, MetersToLatitude,
    *                           LongitudeToMeters, and MetersToLongitude
    *                           for converting sigmas and corrections at the current SurfacePoint 
-   *                           coordinates.
+   *                           coordinates.  References #4649 and #501.
    *                                                    
    */
 

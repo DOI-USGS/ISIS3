@@ -147,7 +147,8 @@ namespace Isis {
    *                           on the coordinate type.  Also added a utility method to return the 
    *                           coordinate name based on coordinate type and coordinate index. 
    *                           References #4649 and #501.
-   *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument 
+   *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References 
+   *                           #4649 and #501
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
