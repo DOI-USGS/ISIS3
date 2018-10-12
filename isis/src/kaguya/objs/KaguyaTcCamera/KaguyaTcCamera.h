@@ -20,23 +20,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "FramingCamera.h"
+#include "LineScanCamera.h"
 
 namespace Isis {
 
-  class KaguyaTcCamera : public FramingCamera {
+  class KaguyaTcCamera : public LineScanCamera {
     public:
       KaguyaTcCamera(Cube &cube);
-      //! Destroys the KaguyaTcCamera object.
-      ~KaguyaTcCamera() {};
-      virtual std::pair <iTime, iTime> ShutterOpenCloseTimes(double time,
-                                                             double exposureDuration);
-
-       virtual int CkFrameId() const;
-       virtual int CkReferenceId() const;
-       virtual int SpkReferenceId() const;
-
-
+      ~KaguyaTcCamera();
+      virtual int CkFrameId() const;
+      virtual int CkReferenceId() const;
+      virtual int SpkReferenceId() const;
   };
 };
 #endif

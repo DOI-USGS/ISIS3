@@ -41,7 +41,7 @@ namespace Isis {
    * @internal
    *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original Version
    */
-  KaguyaTcCamera::KaguyaTcCamera(Cube &cube) : FramingCamera(cube) {
+  KaguyaTcCamera::KaguyaTcCamera(Cube &cube) : LineScanCamera(cube) {
     m_instrumentNameLong  = "Terrain Camera";
     m_instrumentNameShort = "TC";
     m_spacecraftNameLong  = "Kaguya";
@@ -61,9 +61,6 @@ namespace Isis {
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
-    pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(time, exposureDuration);
-    // Add half exposure duration to get time at center of image
-    iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
 
     // Setup detector map
     new CameraDetectorMap(this);
@@ -85,19 +82,13 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    setTime(centerTime);
+    setTime(time);
     LoadCache();
     NaifStatus::CheckErrors();
   }
 
-  /**
-   * @author 2018-10-02 Adam Goins & Jeannie Backer
-   * @internal
-   *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original version.
-   */
-  pair<iTime, iTime> KaguyaTcCamera::ShutterOpenCloseTimes(double time,
-                                                        double exposureDuration) {
-    return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  //! Destroys the KaguyaTcCamera object.
+  KaguyaTcCamera::~KaguyaTcCamera() {
   }
 
 
