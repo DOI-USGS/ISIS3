@@ -321,6 +321,9 @@ namespace Isis {
   void SurfacePoint::SetRectangularCoordinates(const Displacement &x,
                                                                                      const Displacement &y,
                                                                                      const Displacement &z) {
+    // Wipe out current local radius to ensure it will be recalculated in SetRectangularPoint
+     p_localRadius = Distance();
+     
     SetRectangularPoint(x, y, z);
   }
 

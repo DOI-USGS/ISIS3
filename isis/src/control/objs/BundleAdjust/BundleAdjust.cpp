@@ -3281,7 +3281,7 @@ namespace Isis {
           maxSigmaCoord2Dist = sigmaCoord2Dist;
           maxSigmaCoord2PointId = point->id();
         }
-        if (m_bundleSettings->solveRadius()) {
+        if (m_bundleSettings->solveRadius() || type == SurfacePoint::Rectangular) {
           if (sigmaCoord3Dist > maxSigmaCoord3Dist) {
             maxSigmaCoord3Dist = sigmaCoord3Dist;
             maxSigmaCoord3PointId = point->id();

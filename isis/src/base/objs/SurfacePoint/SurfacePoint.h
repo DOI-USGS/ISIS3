@@ -137,6 +137,8 @@ namespace Isis {
    *                           LongitudeToMeters, and MetersToLongitude
    *                           for converting sigmas and corrections at the current SurfacePoint 
    *                           coordinates.  References #4649 and #501.
+   *   @history 2018-10-12 Debbie A. Cook - Initialized local radius in 
+   *                           SetRectangularCoordinates 
    *                                                    
    */
 
