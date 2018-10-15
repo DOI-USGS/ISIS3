@@ -24,30 +24,131 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 -->
   <h2>Overview</h2>
 
+  <p>
+    This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda.  
+    If you are a developer, we refer you to our <a href="https://github.com/USGS-Astrogeology/ISIS3">GitHub repository.</a>
+  </p>
+
+
+  <h3>ISIS3 Installation With Conda</h3>
+    <ol>
+      <li>Download either the Anaconda or Miniconda installation script for your OS platform.  Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: 
+      <a href="https://www.anaconda.com/download">Anaconda installer</a>, <a href="https://conda.io/miniconda.html">Miniconda installer</a></li>
+      <li>Open a terminal window in the directory where you downloaded the script, and run the following commands.  In this example, we chose to do a full install of Anaconda, and our OS is Linux-based.  Your file name may be different depending on your environment.</li>
+        <pre>
+          chmod +x Anaconda3-5.2.0-Linux-x86_64.sh
+          ./Anaconda3-5.2.0-Linux-x86_64.sh          
+        </pre>
+        This will start the Anaconda installer which will guide you through the installation process.
+      <li>After the installation has finished, open up a bash prompt in your terminal window.</li>
+      <li>Create a new environment for your ISIS3 installation:
+        <pre>
+          #Add the following channels to the Anaconda installation
+          conda config --add channels conda-forge, usgs-astrogeology
+          
+
+          #Create a new conda environment to install ISIS3 in
+          conda create -n isis3
+
+          #Activate the environment
+          source activate isis3
+
+          #Download the ISIS3 version
+          conda install -c usgs-astrogeology isis3
+          
+          #Execute the ISIS3 variable initialization script with default arguments.
+          #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
+
+          python $CONDA_PREFIX/scripts/isis3VarInit.py
+
+         Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data, 
+         and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
+         for both of these optional values:
+
+         ./$CONDA_PREFIX/scripts/isis3VarInit --data-dir=[path to data directory]  --test-dir=[path to test data directory]
+
+
+          #Run the source activate command a second time to process the changes:
+
+          source activate isi
+
+        </pre>
+      </li>
+    </ol>
   <h3>Operating System Requirements</h3>
-  <p>ISIS runs on many UNIX variants. ISIS does not run on MS Windows. The UNIX variants supported are listed here:</p>
+  <p>ISIS3 runs on many UNIX variants. ISIS does not run natively on MS Windows,
+     although it has been successfully run on Windows 10 using the Windows
+     Subsystem for Linux (WSL).  Instructions for doing this can be found
+     <a href="#RunningOnWindows">here.</a>
+
+    The UNIX variants ISIS3 has been successfully built on are:</p>
     <ul>
       <li>Ubuntu 18.04 LTS</li>
-      <li>Mac OS X 10.13.6 High Sierra</li>
-      <li>CentOS Linux 7.2.1511</li>
+      <li>Mac OS X 10.13.6 High Sierra</li>     
       <li>Fedora 28</li>
     </ul>
 
+
+    <p>ISIS3 is also built and tested nightly on the following operating systems.</p>
+
+    <ul>      
+      <li>Debian Linux 8 (jessie)</li>      
+      <li>Fedora 25</li>
+      <li>Mac OS X 10.11.6</li>
+    </ul>
+<p>
+    ISIS3 may be run on other operating systems then those listed above,
+    but it has not been tested.
+</p>
    <h3>Hardware Requirements</h3>
    <p>Here are the minimum hardware requirements</p>
     <ul>
       <li>64-bit (x86) processors</li>
-      <li>2 GB memory</li>
-      <li>10 GB to 180 GB disk space for ISIS installation</li>
+      <li>2 GB RAM</li>
+      <li>2.5 GB of disk space for ISIS3 binaries</li>
+      <li>10 GB to 510 GB disk space for ISIS3 data</li>
       <li>10 GB to many TB disk space for processing images</li>
       <li>A quality graphics card</li>
     </ul>
-<p>Note: More processors, memory, disk storage, and an additional graphcis card (to support the use of two monitors at
-one time) may be useful depending on the complexity of your processing requirements
+
+
+<A NAME="RunningOnWindows"> </A>
+<h3>Running ISIS3 on Windows 10</h3>
+  <ul>
+    <li><a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Installing the Windows Subsystem for Linux</a></li>
+    <li><a href="http://planetarygis.blogspot.com/2017/07/isis3-on-windows-10-bash.html">Instructions for using the Windows
+      Subsystem for Linux (WSL) to run ISIS3</a></li>
+  </ul>
+  <p>
+  While the ISIS3 development team has not examined these
+  instructions for correctness or completeness, they appear to have
+  successfully worked for a number of ISIS3 users within the USGS who run Windows.
+  Thanks for these instructions are directed towards Trent Hare who maintains an
+  excellent and thoughtful blog on <a href="http://planetarygis.blogspot.com/">Planetary GIS Science.</a>
+  </p>
+
+<A NAME="RunningOnWindowsWithSSH"> </A>
+<h3>Setting Up X11 forwarding on Windows with Putty and Xming</h3>
+<p>
+Some ISIS3 users prefer to run ISIS3 in Windows, but SSH into a computer
+that is running ISIS3 and has enabled X11 forwarding.  This requires the
+installation of an X server on Windows.  Below are links to two popular choices
+in Astrogeology.
 </p>
+  <ul>
+    <li><a href="https://sourceforge.net/projects/xming/">Xming X server for Windows</a></li>
+    <li><a href="https://sourceforge.net/projects/vcxsrv/">VcXsrv Windows X Server</a></li>
+  </ul>
+<p>
+Additionally, a Windows SSH client is required to create an SSH connection.  PuTTY
+is a popular choice and may be downloaded below.
+</p>
+<ul>
+    <li><a href="https://www.putty.org/">PuTTY - an SSH and telnet client for the Windows platform.</a></li>
+</ul>
 
    <h3>Mission Requirements</h3>
-   <p>ISIS 3 supports many planetary missions; in fact, over 40 different instruments including some
+   <p>ISIS3 supports many planetary missions; in fact, over 40 different instruments including some
    flown as early as the 1960s.  Ancillary data are required to process images from these instruments.  For example, translation
    definition files to help convert from PDS format to ISIS cubes, dark current and flat file images for radiometric
    calibration, and large quantities of SPICE files (spacecraft pointing and position) for map projecting images.
@@ -59,64 +160,57 @@ one time) may be useful depending on the complexity of your processing requireme
    </p>
 
    <h3>DTM Requirements</h3>
-   <p>The strength of ISIS 3 strength lies in its capabilities for planetary cartography.
+   <p>The strength of ISIS3 lies in its capabilities for planetary cartography.
    The image orthorectification process is improved if a digital
    terrain model (DTM) is used.  The DTMs can be quite large and take some time to download.  They exist for
    many planetary bodies (e.g., the Moon, Mars, etc.). Therefore, there are options for selecting which DTMs to download
    if you are only working with a particular target body.
    </p>
 
-<p>To build and compile ISIS 3 requires following the instructions listed below, which are given on
-   the GitHub wiki page for the ISIS 3 project:
+<p>To build and compile ISIS3 requires following the instructions listed below, which are given on
+   the GitHub wiki page for the ISIS3 project:
   <ul>
     <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#getting-started-with-github">Getting Started With GitHub</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#anaconda-and-isis3-dependencies">Installing Anaconda and satisfying ISIS 3 Dependencies</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-isis3">Building ISIS 3 With cmake</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#new-environmental-variable-meanings">New ISIS 3 environmental variables and their meanings</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-isis3">Building ISIS3 With cmake</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#new-environmental-variable-meanings">New ISIS3 environmental variables and their meanings</a></li>
     <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#custom-data-and-test-data-directories">Custom data and test directories</a></li>
     <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#cleaning-builds">Cleaning builds</a></li>
     <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-individual-isis3-applicationsobjects">Building individual applications/objects</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-isis3-documentation">Building ISIS 3 documentation</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-isis3-documentation">Building ISIS3 documentation</a></li>
     <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#problems">What to do if you encounter any problems</a></li>
   </ul>
 </p>
 
-<h3>Links for Developers</h3>
 
-  <ul>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developer-Checklists">ISIS 3 Developer Checklist</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Jenkins-CI">Jenkins Continuous Integration Testing</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Managing-Custom-ISIS-Dependencies-(WIP)">Managing Custom ISIS 3 Dependencies</a></li>
-  </ul>
-
-<h3>Full ISIS 3 Data Download</h3>
+<h3>Full ISIS3 Data Download</h3>
 
 <p>
-    If you have the disk space and network speed, you may want to download all of the ISIS data areas which
-    includes all missions supported by ISIS.   This takes over 130 GB of disk space!  If you only have a 10 Mbps
-    network connection it will take nearly two days to download.  If you want to acquire only certain mission data
-     <a href="#MissionSpecific">click here</a>.   To download all ISIS 3 data files continue reading.
+    Mission data is hosted on rsync servers and not through conda channels like the ISIS3 distribution.
+    This requires using the rsync command from within a terminal window within your Unix distribution, or
+    from within WSL if running Windows 10.   Downloading all mission data requires over 130 GB of disk space.
+    If you want to acquire only certain mission data <a href="#MissionSpecific">click here</a>.
+    To download all ISIS3 data files, continue reading.
 </p>
 <p>
-    Remember to use the following command from the same directory you ran the previous rsync
-    command. In the example it was "/work1/isis3".
+    To download all ISIS3 data (approximately 180 GB), enter the following commands at the command prompt:
+
 </p>
-      <pre>
+      <pre>      
+      cd $ISIS3DATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
       </pre>
 <p>
  Note:  The above command downloads all ISIS data including the required base data area and all of the optional mission
- data areas.  After completing this step, skip to the <a href="#UnixEnvironment">Unix Environment Setup</a>.  If you chose
- not to download everything at once then continue below.
+ data areas.
 </p>
 
 
  <A NAME="MissionSpecific"> </A>
 
-        <h3>Partial Download of ISIS 3 Base Data (Required)</h3>
+        <h3>Partial Download of ISIS3 Base Data (Required)</h3>
         <p>
             The base data area is separate from the source code. This data area is
-            crucial to ISIS 3 and must be downloaded.
+            crucial to ISIS3 and must be downloaded.
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
@@ -177,8 +271,6 @@ one time) may be useful depending on the complexity of your processing requireme
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </pre>
-
-
         <A NAME="ChandrayaanMission"> </A>
 <p>
   Chandrayaan Mission (kernels can be excluded):
@@ -375,28 +467,19 @@ one time) may be useful depending on the complexity of your processing requireme
         </pre>
 
 <h2>Installing older versions of ISIS</h2>
-    <h3>How do I install ISIS 2?</h3>
+    <h3>How do I install ISIS2?</h3>
     <p>
-         If you are looking for ISIS 2, please
+         If you are looking for ISIS2, please
         <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">refer to the ISIS 2 Installation
         Guide</a> for instructions on downloading and installing ISIS 2.
     </p>
 
-<h3>How do I install ISIS 3.5.2 or earlier?</h3>
+<h3>How do I install ISIS3.5.2 or earlier?</h3>
     <p>
-         If you are looking for a version of ISIS3 prior to 3.5.3, please
+         If you are looking for a version of ISIS3 prior to 3.6.0, please
         <a href="../../documents/LegacyInstallGuide/index.html">refer to the Legacy ISIS3 Installation
-        Guide</a> for instructions on downloading and installing ISIS3, version 3.5.2 or earlier.
+        Guide</a> for instructions on downloading and installing ISIS3, versions prior to 3.6.0.
     </p>
-
-<A NAME="UnixEnvironment"> </A>
-
-    <h2>UNIX Environment Setup</h2>
-    <p>
-        Still working on this part...
-    </p>
-
-
 
       </body>
 
@@ -418,18 +501,18 @@ one time) may be useful depending on the complexity of your processing requireme
 
   <history>
     <change name="Kristin Berry" date="2018-08-28">Original Version</change>
-    <change name ="Tyler Wilson" date="2018-09-26">Added links to installation instructions on the ISIS3 GitHub Wiki</change>
+    <change name ="Tyler Wilson along with the ASC Development Team" date="2018-09-26">Updated version to incorporate installation through Conda</change>
   </history>
 
 
   <bibliography>
      <title>Installing ISIS</title>
-    <brief>Downloading and installing ISIS 3</brief>
+    <brief>Downloading and installing ISIS3</brief>
     <description>
       This document describes how to download/compile and install a
-      binary version of ISIS 3.
+      binary version of ISIS3 as well
     </description>
-    <author>Kristin Berry</author>
+    <author>ASC Development Team</author>
     <date>2018-08-28</date>
   </bibliography>
 </documentation>
