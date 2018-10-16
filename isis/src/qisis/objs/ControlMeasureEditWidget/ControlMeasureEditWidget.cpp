@@ -612,9 +612,11 @@ namespace Isis {
     m_saveMeasure->setShortcut(Qt::Key_M);
     m_saveDefaultPalette = m_saveMeasure->palette();
 
+    //  Blink extension allows all measures in the current control point to be blinked and gives
+    //  user ability to select which measures and the order for blinking
     m_blinkExtension = new QWidget;
 
-    QPushButton *blinkButton = new QPushButton("Blink");
+    QPushButton *blinkButton = new QPushButton("Advanced Blink");
     blinkButton->setCheckable(true);
     connect(blinkButton, &QAbstractButton::toggled, m_blinkExtension, &QWidget::setVisible);
     connect(blinkButton, SIGNAL(clicked()), this, SLOT(showBlinkExtension()));
@@ -1706,16 +1708,6 @@ namespace Isis {
   }
 
 
-
-
-
-
-
-//  TODO IPCE   2016-06-13  ALL CODE BELOW HERE IS TEMPORARY PROTOTYPE CODE  NEEDS MUCH CLEANUP, LEAKY MEMORY, ETC
-
-
-
-
   void ControlMeasureEditWidget::setPoint(ControlPoint *editPoint, SerialNumberList *snList) {
 
     m_editPoint = editPoint;
@@ -1747,12 +1739,13 @@ namespace Isis {
   }
 
 
-  //!  Slot to start blink function
+  //!  Slot to start blink function for advanced blink functionality
   void ControlMeasureEditWidget::blinkStartRight() {
 
     if ( m_timerOnRight ) return;
 
-    //  Set up blink list.  Create ChipViewport for each cube active in the ListWidget
+    //  Set up blink list.  Create ChipViewport for each cube active in the ListWidget, using the
+    //  correct zoom and geom selections
     QList<QListWidgetItem *> selected = m_blinkListWidget->selectedItems();
     if (selected.size() < 1) {
       QMessageBox::information((QWidget *)parent(), "Error", "No files selected for blinking.");
@@ -1770,7 +1763,13 @@ namespace Isis {
       blinkChip->Load(*blinkCube);
       ChipViewport *blinkViewport = new ChipViewport(VIEWSIZE, VIEWSIZE, this);
       blinkViewport->setChip(blinkChip, blinkCube);
-      m_blinkChipViewportListRight.append(blinkViewport);
+      if (m_geomIt) {
+        blinkViewport->geomChip(m_leftChip, m_leftCube);
+      }
+      else {
+        blinkViewport->zoom(m_leftView->zoomFactor());
+      }
+      m_blinkChipViewportListRight.append(blinkViewport); 
     }
 
     m_blinkIndexRight = 0;

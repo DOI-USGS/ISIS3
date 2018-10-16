@@ -156,6 +156,8 @@ namespace Isis {
     *                           Application::User.
     *   @history 2018-09-26 Tracie Sucharski - Added public method to allow change measure tack
     *                           points.
+    *   @history 2018-10-10 Tracie Sucharski - Fixed blink extension to use geom if selected and
+    *                           correct zoom factor.
     *                          
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
