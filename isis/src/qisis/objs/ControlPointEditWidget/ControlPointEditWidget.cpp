@@ -560,8 +560,8 @@ namespace Isis {
 
 
   /**
-   * Fill m_projectShapeNames with ALL shapes currently in project for the current m_editPoint. The 
-   * first m_numberProjectShapesWithPoint contain the location of m_editPoint.
+   * Fill m_projectShapeNames with ALL shapes currently in project. The first 
+   * m_numberProjectShapesWithPoint actually contain the location of m_editPoint.
    *
    * @param latitude (double) Latitude for determining point location.  Defaults to Null which 
    *                          results in the m_editPoint location being used, AprioriCoordinates
@@ -1001,6 +1001,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Initialize the given Dem and appropriate member variables for later use editing Fixed or 
+   * Constrained control points. 
+   * 
+   * @param demFile QString The file name of the DEM
+   *
+   */
   void ControlPointEditWidget::initDem (QString demFile) {
 
       // If a DEM is already opened, check if new is same as old. If new,
@@ -1426,6 +1433,16 @@ namespace Isis {
     this->raise();
   }
 
+
+  /**
+   * Create a new control point at the given latitude, longitude 
+   *  
+   * @param latitude The latitude position for the new control point
+   * @param longitude The longitude position for the new control point
+   * @param cube The cube that the user used to select position for new control point 
+   * @param isGroundSource Boolean indicating whether the cube used to choose position is a ground source 
+   *
+   */
 
   void ControlPointEditWidget::createControlPoint(double latitude, double longitude, Cube *cube,
                                                   bool isGroundSource) {

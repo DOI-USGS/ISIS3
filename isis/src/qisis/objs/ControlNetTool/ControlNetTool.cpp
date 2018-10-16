@@ -289,7 +289,7 @@ namespace Isis {
     QString serialNumber = SerialNumber::Compose(*vp->cube(), true);
 
     // Get list of shapes in the ipce project and see if the serial number for viewport passed in
-    // matches any of the project shapes.  If there's a match, draw any ground measures.
+    // matches any of the project shapes.  If there's a match, draw any ground points.
     QList<ShapeList *> projectShapes = m_directory->project()->shapes();
     foreach (ShapeList *shapeList, projectShapes) {
       foreach (Shape *shape, *shapeList) {
@@ -373,12 +373,11 @@ namespace Isis {
 
   /**
    * Draw all Fixed or Constrained points on the ground source viewport
+   *  
    * @param vp Viewport whose measurements will be drawn
-   * @param painter
+   * @param painter The QPainter used to draw crosshair 
+   * @param groundMap The UniversalGroundMap for the Cube associated with this viewport 
    *
-   * @author 2011-09-16  Tracie Sucharski
-   *
-   * @internal
    */
   void ControlNetTool::drawGroundMeasures(MdiCubeViewport *vp, QPainter *painter,
                                           UniversalGroundMap *groundMap) {
@@ -399,7 +398,7 @@ namespace Isis {
       if (p.GetType() == ControlPoint::Free) continue;
       if (!p.HasAprioriCoordinates()) continue;
 
-      // Find the measure on the ground image
+      // Find the sample, line location on the ground image
       if (groundMap->SetGround(p.GetAprioriSurfacePoint().GetLatitude(),
                                p.GetAprioriSurfacePoint().GetLongitude())) {
         double samp = groundMap->Sample();

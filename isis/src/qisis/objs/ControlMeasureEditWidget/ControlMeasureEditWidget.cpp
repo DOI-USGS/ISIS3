@@ -756,6 +756,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the tack position of the measure in the left ChipViewport
+   *
+   * @param sample[in]  Sample of the tack position for the right ChipViewport
+   * @param line[in]    Line of the tack position for the left ChipViewport 
+   *  
+   */
   void ControlMeasureEditWidget::setLeftPosition(double sample, double line) {
 
     m_leftChip->TackCube(sample, line);
@@ -763,6 +770,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the tack position of the measure in the right ChipViewport
+   *
+   * @param sample[in]  Sample of the tack position for the right ChipViewport
+   * @param line[in]    Line of the tack position for the left ChipViewport 
+   *  
+   */
   void ControlMeasureEditWidget::setRightPosition(double sample, double line) {
 
     m_rightChip->TackCube(sample, line);
@@ -1708,6 +1722,13 @@ namespace Isis {
   }
 
 
+  /**
+   * Set the Control Point for this widget
+   *
+   * @param editPoint[in]  ControlPoint for this widget
+   * @param snList[in]     SerialNumberList associated with the control net containing the ControlPoint 
+   *  
+   */
   void ControlMeasureEditWidget::setPoint(ControlPoint *editPoint, SerialNumberList *snList) {
 
     m_editPoint = editPoint;
