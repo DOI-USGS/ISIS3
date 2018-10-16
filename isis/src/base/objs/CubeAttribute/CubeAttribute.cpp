@@ -75,14 +75,14 @@ namespace Isis {
 //     QString commaTok;
 //     while((commaTok = str.Token(",")).length() > 0) {
 //       // Is this token a range of bands
-//       if(commaTok.find('-') != string::npos) {
+//       if (commaTok.find('-') != string::npos) {
 //         QString dashTok;
 //         int start = commaTok.Token("-").ToInteger();
 //         int end = commaTok.Token("-").ToInteger();
 //         int direction;
 //         direction = (start <= end) ? 1 : -1;
 //         // Save the entire range of bands
-//         for(int band = start; band != end; band += direction) {
+//         for (int band = start; band != end; band += direction) {
 //           m_bands.push_back(Isis::QString(band));
 //         }
 //         m_bands.push_back(Isis::QString(end));
@@ -103,14 +103,14 @@ namespace Isis {
     QStringList strSplit = str.split(",", QString::SkipEmptyParts);
     foreach (QString commaTok, strSplit) {
       // Is this token a range of bands
-      if(commaTok.contains('-')) {
+      if (commaTok.contains('-')) {
         QString dashTok;
         int start = toInt(commaTok.mid(0, commaTok.indexOf("-")));
         int end =  toInt(commaTok.mid(commaTok.indexOf("-") + 1));
         int direction;
         direction = (start <= end) ? 1 : -1;
         // Save the entire range of bands
-        for(int band = start; band != end; band += direction) {
+        for (int band = start; band != end; band += direction) {
           result.push_back(Isis::toString(band));
         }
         result.push_back(Isis::toString(end));
@@ -131,7 +131,7 @@ namespace Isis {
 
 
   void CubeAttributeInput::setBands(const vector<QString> &bands) {
-    setAttributes(toString(bands));
+    setAttributes("+" + toString(bands));
   }
 
 
@@ -142,8 +142,8 @@ namespace Isis {
 
   QString CubeAttributeInput::toString(const vector<QString> &bands) {
     QString result;
-    for(unsigned int i = 0; i < bands.size(); i++) {
-      if(i > 0)
+    for (unsigned int i = 0; i < bands.size(); i++) {
+      if (i > 0)
         result += ",";
 
       result += bands[i];
@@ -212,12 +212,12 @@ namespace Isis {
 //     while((tok = str.Token("+")).length() > 0) {
 //
 //       // If there is a ":" in this token then it is assumed to be a min:max
-//       if(tok.find(":") != string::npos) {
+//       if (tok.find(":") != string::npos) {
 //
 //         // Pull out the minimum
 //         Isis::QString colonTok = tok;
 //         Isis::QString min = colonTok.Token(":");
-//         if(min.length() > 0) {
+//         if (min.length() > 0) {
 //           m_minimum = min.ToDouble();
 //         }
 //         else {
@@ -226,7 +226,7 @@ namespace Isis {
 //
 //         // Pull out the maximum
 //         Isis::QString max = colonTok.Token(":");
-//         if(max.length() > 0) {
+//         if (max.length() > 0) {
 //           m_maximum = max.ToDouble();
 //         }
 //         else {
@@ -236,44 +236,44 @@ namespace Isis {
 //       }
 //
 //       // Parse any pixel type attributes
-//       else if(tok == "8BIT" || tok == "8-BIT" || tok == "UNSIGNEDBYTE") {
+//       else if (tok == "8BIT" || tok == "8-BIT" || tok == "UNSIGNEDBYTE") {
 //         m_pixelType = Isis::UnsignedByte;
 //         m_pixelTypeDef = "SET";
 //       }
-//       else if(tok == "16BIT" || tok == "16-BIT" || tok == "SIGNEDWORD") {
+//       else if (tok == "16BIT" || tok == "16-BIT" || tok == "SIGNEDWORD") {
 //         m_pixelType = Isis::SignedWord;
 //         m_pixelTypeDef = "SET";
 //       }
-//       else if(tok == "32BIT" || tok == "32-BIT" || tok == "REAL") {
+//       else if (tok == "32BIT" || tok == "32-BIT" || tok == "REAL") {
 //         m_pixelType = Isis::Real;
 //         m_pixelTypeDef = "SET";
 //       }
-//       else if(tok == "PROPAGATE") {
+//       else if (tok == "PROPAGATE") {
 //         m_pixelType = Isis::None;
 //         m_pixelTypeDef = "PROPAGATE";
 //       }
 //
 //       // Parse any file formats
-//       else if(tok == "TILE") {
+//       else if (tok == "TILE") {
 //         m_format = Cube::Tile;
 //       }
-//       else if(tok == "BSQ" || tok == "BANDSEQUENTIAL") {
+//       else if (tok == "BSQ" || tok == "BANDSEQUENTIAL") {
 //         m_format = Cube::Bsq;
 //       }
 //
 //       // Parse any byte order
-//       else if(tok == "LSB") {
+//       else if (tok == "LSB") {
 //         m_order = Isis::Lsb;
 //       }
-//       else if(tok == "MSB") {
+//       else if (tok == "MSB") {
 //         m_order = Isis::Msb;
 //       }
 //
 //       // Parse any label type
-//       else if(tok == "ATTACHED") {
+//       else if (tok == "ATTACHED") {
 //         m_labelAttachment = Isis::AttachedLabel;
 //       }
-//       else if(tok == "DETACHED") {
+//       else if (tok == "DETACHED") {
 //         m_labelAttachment = Isis::DetachedLabel;
 //       }
 //     }
@@ -379,17 +379,23 @@ namespace Isis {
     if (!propagatePixelType()) {
       QString pixelTypeAtt = attributeList(&CubeAttributeOutput::isPixelType).last();
 
-      if(pixelTypeAtt == "8BIT" || pixelTypeAtt == "8-BIT" || pixelTypeAtt == "UNSIGNEDBYTE") {
+      if (pixelTypeAtt == "8BIT" || pixelTypeAtt == "8-BIT" || pixelTypeAtt == "UNSIGNEDBYTE") {
         result = UnsignedByte;
       }
-      else if(pixelTypeAtt == "16BIT" || pixelTypeAtt == "16-BIT" || pixelTypeAtt == "SIGNEDWORD") {
+      else if (pixelTypeAtt == "16BIT" || pixelTypeAtt == "16-BIT" || pixelTypeAtt == "SIGNEDWORD") {
         result = SignedWord;
       }
-      else if(pixelTypeAtt == "16UBIT" || pixelTypeAtt == "16-UBIT" || pixelTypeAtt == "UNSIGNEDWORD") {
+      else if (pixelTypeAtt == "16UBIT" || pixelTypeAtt == "16-UBIT" || pixelTypeAtt == "UNSIGNEDWORD") {
         result = UnsignedWord;
       }
-      else if(pixelTypeAtt == "32BIT" || pixelTypeAtt == "32-BIT" || pixelTypeAtt == "REAL") {
+      else if (pixelTypeAtt == "32BIT" || pixelTypeAtt == "32-BIT" || pixelTypeAtt == "REAL") {
         result = Real;
+      }
+      else if (pixelTypeAtt == "32UINT" || pixelTypeAtt == "32-UINT" || pixelTypeAtt == "UNSIGNEDINTEGER") {
+        result = UnsignedInteger;
+      }
+      else if (pixelTypeAtt == "32INT" || pixelTypeAtt == "32-INT" || pixelTypeAtt == "SIGNEDINTEGER") {
+        result = SignedInteger;
       }
     }
 
@@ -440,9 +446,11 @@ namespace Isis {
 
 
   bool CubeAttributeOutput::isPixelType(QString attribute) const {
-    return QRegExp("(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|UNSIGNEDWORD|REAL)").exactMatch(attribute);
-  }
+    QString expressions = "(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|UNSIGNEDWORD|REAL";
+    expressions += "|32-?UINT|32-?INT|UNSIGNEDINTEGER|SIGNEDINTEGER)";
+    return QRegExp(expressions).exactMatch(attribute);
 
+  }
 
 
   bool CubeAttributeOutput::isRange(QString attribute) const {
