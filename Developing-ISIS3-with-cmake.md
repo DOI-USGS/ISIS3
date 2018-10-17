@@ -13,10 +13,11 @@ For now, pull down the cmake branch. This is temporary until cmake is merged int
 
 
 ## Anaconda and ISIS3 Dependencies
-To started building ISIS3 with cmake, you first need anaconda installed. **If you are internally developing, please expand the `Details` drop-down for more information; otherwise, continue reading the instructions in this section**.
+To started building ISIS3 with cmake, you first need anaconda installed. **If you are internally developing, please expand the `Details` drop-down for more information; otherwise, continue reading the instructions in this section**. 
+
 <details>
 
-When developing internally, it is *recommended* when you start working with cmake and anaconda that you use the shared anaconda environments in `/usgs/cpkgs/`. This makes setup simple and can make sharing builds easier.
+When developing internally, it is *recommended* when you start working with cmake and anaconda that you use the shared anaconda environments in `/usgs/cpkgs/`. These anaconda environments have the isis3 dependencies installed that are needed for development. This makes setup simple and can make sharing builds easier.
 You will need to modify your `~/.bashrc` as follows:
 
 (Linux)
@@ -60,8 +61,23 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=<path-to-isis3-data> -Disis3TestData=<path-to-isis3-test-data> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
   * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
-* Set up your ISIS3 environment (ISISROOT, ISIS3DATA, ISIS3TESTDATA) to `/the/path/to/your/build`:
-  * `setisis .`
+* Set your ISISROOT to `/the/path/to/your/build`:
+  * `export ISISROOT=$(pwd)`
+  * **For internal instructions, see `Details` section below.**
+
+<details>
+
+Run the `setisis` command for your build directory:
+```bash
+setisis .
+```
+If this does not work (i.e. `no setisis in PATH`), run the following command to add an alias to your `~/.bashrc`:
+```bash
+echo -e "alias setisis='. /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh'" >> ~/.bashrc
+```
+
+</details>
+<br/>
 
 * Build ISIS inside of your build directory and install it to your install directory:
   * `ninja install`
@@ -71,6 +87,8 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 * The -GNinja flag specifies creating Google [Ninja](https://ninja-build.org/manual.html) Makefile (an alternative Make system to the traditional GNU make system). If you instead want to use make, dont set this flag, and replace the ninja commands with their make counterparts.
 
 * -Disis3Data is used to set the location of the isis3 data directory, which includes kernels, icons, templates, etc. *This is needed to successfully run the app and module tests.*
+
+* -Disis3TestData is used to the location of the isis3 testData directory, which includes input and expected truth files for running and validating tests.
 
 * -DJP2KFLAG=OFF disables JP2000 support.  **If you are internal, you should turn this ON.**
 
