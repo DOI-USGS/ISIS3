@@ -70,7 +70,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
           #Run the source activate command a second time to process the changes:
 
-          source activate isi
+          source activate isis3
 
         </pre>
       </li>
@@ -88,17 +88,9 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       <li>Fedora 28</li>
     </ul>
 
-
-    <p>ISIS3 is also built and tested nightly on the following operating systems.</p>
-
-    <ul>      
-      <li>Debian Linux 8 (jessie)</li>      
-      <li>Fedora 25</li>
-      <li>Mac OS X 10.11.6</li>
-    </ul>
 <p>
-    ISIS3 may be run on other operating systems then those listed above,
-    but it has not been tested.
+    ISIS3 may be run on other Linux or macOS operating systems then those listed above,
+    but it has not been tested and is not supported.
 </p>
    <h3>Hardware Requirements</h3>
    <p>Here are the minimum hardware requirements</p>
