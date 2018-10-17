@@ -13,7 +13,36 @@ For now, pull down the cmake branch. This is temporary until cmake is merged int
 
 
 ## Anaconda and ISIS3 Dependencies
-To started building ISIS3 with cmake, you first need anaconda installed. Go to [Anaconda's download page](https://www.anaconda.com/download/) and follow the instructions for your operating system. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
+To started building ISIS3 with cmake, you first need anaconda installed. **If you are internally developing, please expand the `Details` drop-down for more information; otherwise, continue reading the instructions in this section**.
+<details>
+
+When developing internally, it is *recommended* when you start working with cmake and anaconda that you use the shared anaconda environments in `/usgs/cpkgs/`. This makes setup simple and can make sharing builds easier.
+You will need to modify your `~/.bashrc` as follows:
+
+(Linux)
+```bash
+echo -e "\n# Adding shared /usgs/cpkgs/ anaconda3 environment" >> ~/.bashrc
+echo "export PATH=/usgs/cpkgs/anaconda3_linux/bin:$PATH" >> ~/.bashrc
+```
+
+(macOS)
+```bash
+echo -e "\n# Adding shared /usgs/cpkgs/ anaconda3 environment" >> ~/.bashrc
+echo "export PATH=/usgs/cpkgs/anaconda3_macOS/bin:$PATH" >> ~/.bashrc
+```
+
+You will then need to `source ~/.bashrc` or open a new `bash` terminal to get the anaconda3 binaries added to your path.
+
+To activate the isis3.6.0 environment and start developing, you can run:
+```bash
+source activate isis3
+```
+
+You can continue to the [Building ISIS3](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3) section.
+</details>
+
+<br/>
+Go to [Anaconda's download page](https://www.anaconda.com/download/) and follow the instructions for your operating system. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
 
 `conda env create -n <environment-name> -f environment.yml` (you may name the environment whatever you want)
 
@@ -28,10 +57,10 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * There should now be a build/ install/ and isis/ directory.
 
 * cd into the build directory and configure your build:
-  * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=<path-to-isis3-data> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
+  * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=<path-to-isis3-data> -Disis3TestData=<path-to-isis3-test-data> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
   * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
-* Set your ISISROOT to `/the/path/to/your/build`:
+* Set up your ISIS3 environment (ISISROOT, ISIS3DATA, ISIS3TESTDATA) to `/the/path/to/your/build`:
   * `setisis .`
 
 * Build ISIS inside of your build directory and install it to your install directory:
@@ -43,7 +72,7 @@ Building ISIS requires that the anaconda environment be activated. Activate your
 
 * -Disis3Data is used to set the location of the isis3 data directory, which includes kernels, icons, templates, etc. *This is needed to successfully run the app and module tests.*
 
-* -DJP2KFLAG=OFF disables JP2000 support.  This is temporary.
+* -DJP2KFLAG=OFF disables JP2000 support.  **If you are internal, you should turn this ON.**
 
 * -Dpybindings=OFF disables the bundle adjust python bindings.  This is temporary.
 
