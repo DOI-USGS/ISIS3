@@ -9,7 +9,7 @@
 // boost library
 #include <boost/foreach.hpp>
 
-#include "nanoflann/nanoflann.hpp"
+#include "nanoflann.hpp"
 
 #include "ControlNet.h"
 #include "ControlPointCloudPt.h"

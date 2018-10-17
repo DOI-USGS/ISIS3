@@ -34,10 +34,6 @@ BinCount(20):      0
 
 End old unit test.
 data/base/testData/enceladus_sp-Jig.net
-Reading Control Points...
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Adding Control Points to Network...
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -222,7 +218,7 @@ Sum Square:            0
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Constructor3:   
-Histogram(icube,1)
+Histogram(icube,1) Real
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -284,6 +280,276 @@ Minimum:               -1.79769e+308
 Maximum:               -1.79769e+308
 # Bins:                65536
 BinWidth:              0.000610361
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         70
+Valid Maximum:         110
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Constructor3:   
+Histogram(icube,1) SignedWord
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-1.00049e+20,1e+20)
+Bin Range:              (-1.00049e+20,1e+20)
+Average:               -1.14471e+15
+Std Deviation:         3.10107e+19
+Variance:              9.61663e+38
+Median:                -1.52627e+15
+Mode:                  -1.52627e+15
+Skew:                  3.69133e-05
+Percent(0.5):          -1e+20
+Percent(99.5):         1e+20
+Minimum:               -1e+20
+Maximum:               1e+20
+# Bins:                65536
+BinWidth:              3.05255e+15
+MaxBinCount:           5292
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          15876
+Valid pixels:          7056
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           1764
+Lis pixels:            1764
+His pixels:            1764
+Lrs pixels:            1764
+Hrs pixels:            1764
+Out of range pixels:   0
+Minimum:               -1e+20
+Maximum:               1e+20
+Valid Minimum:         -1.00049e+20
+Valid Maximum:         1e+20
+Sum:                   -8.07705e+18
+Sum Square:            6.78453e+42
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Resetting bin range to (70,110)
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (70,110)
+Bin Range:              (70,110)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                65536
+BinWidth:              0.000610361
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         70
+Valid Maximum:         110
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Constructor3:   
+Histogram(icube,1) UnsignedWord
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-1.00009e+20,1.0004e+20)
+Bin Range:              (-1.00009e+20,1.0004e+20)
+Average:               3.33468e+19
+Std Deviation:         5.35272e+19
+Variance:              2.86516e+39
+Median:                1.52627e+15
+Mode:                  1.52627e+15
+Skew:                  1.86888
+Percent(0.5):          -1e+20
+Percent(99.5):         1.0004e+20
+Minimum:               -1e+20
+Maximum:               1.0004e+20
+# Bins:                65536
+BinWidth:              3.05255e+15
+MaxBinCount:           5292
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          15876
+Valid pixels:          10584
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           1764
+Lis pixels:            1764
+His pixels:            0
+Lrs pixels:            1764
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1e+20
+Maximum:               1.0004e+20
+Valid Minimum:         -1.00009e+20
+Valid Maximum:         1.0004e+20
+Sum:                   3.52943e+23
+Sum Square:            4.20915e+43
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Resetting bin range to (70,110)
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (70,110)
+Bin Range:              (70,110)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                65536
+BinWidth:              0.000610361
+MaxBinCount:           0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          0
+Valid pixels:          0
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           0
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            0
+Out of range pixels:   0
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+Valid Minimum:         70
+Valid Maximum:         110
+Sum:                   0
+Sum Square:            0
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Constructor3:   
+Histogram(icube,1) UnsignedByte
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (-1.00791e+20,1.00791e+20)
+Bin Range:              (-1.00791e+20,1.00791e+20)
+Average:               2.96443e+17
+Std Deviation:         3.10605e+19
+Variance:              9.64757e+38
+Median:                3.95257e+17
+Mode:                  3.95257e+17
+Skew:                  -0.00954403
+Percent(0.5):          -1e+20
+Percent(99.5):         1e+20
+Minimum:               -1e+20
+Maximum:               1e+20
+# Bins:                256
+BinWidth:              7.90514e+17
+MaxBinCount:           5292
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++ Statistics Counters ++++++++++++++++++
+
+Total pixels:          15876
+Valid pixels:          7056
+Over Range pixels:     0
+Under Range pixels:    0
+Null pixels:           5292
+Lis pixels:            0
+His pixels:            0
+Lrs pixels:            0
+Hrs pixels:            3528
+Out of range pixels:   0
+Minimum:               -1e+20
+Maximum:               1e+20
+Valid Minimum:         -1.00791e+20
+Valid Maximum:         1.00791e+20
+Sum:                   2.0917e+21
+Sum Square:            6.80698e+42
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Resetting bin range to (70,110)
+
++++++++++++++++++++ Histogram Members +++++++++++++++++++
+
+Stats Range:            (70,110)
+Bin Range:              (70,110)
+Average:               -1.79769e+308
+Std Deviation:         -1.79769e+308
+Variance:              -1.79769e+308
+Median:                -1.79769e+308
+Mode:                  -1.79769e+308
+Skew:                  -1.79769e+308
+Percent(0.5):          -1.79769e+308
+Percent(99.5):         -1.79769e+308
+Minimum:               -1.79769e+308
+Maximum:               -1.79769e+308
+# Bins:                256
+BinWidth:              0.156863
 MaxBinCount:           0
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++

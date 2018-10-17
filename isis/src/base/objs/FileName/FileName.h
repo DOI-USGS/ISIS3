@@ -132,7 +132,35 @@ namespace Isis {
       QString baseName() const;
       QString name() const;
       QString extension() const;
+
+
+      /**
+       * Returns a QString of the full file name including the file path, excluding the attributes.
+       * Any Isis Preferences or environment variables indicated by $, are changed to what they
+       * represent.
+       *
+       * @returns QString
+       * <pre>
+       *   for a full file specification of:
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
+       *   expanded() gives:
+       *    "/usgs/pkgs/isis3/isis/tmp/Peaks.cub"
+       * </pre>
+       */
       QString expanded() const;
+
+
+      /**
+       * Returns the full file name including the file path
+       *
+       * @returns QString containing every character in the file name and the path
+       * <pre>
+       *   for a full file specification of:
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
+       *   original() gives:
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
+       * </pre>
+       */
       QString original() const;
 
       FileName addExtension(const QString &extension) const;
@@ -151,6 +179,21 @@ namespace Isis {
       bool fileExists() const;
       QDir dir() const;
       static FileName createTempFile(FileName templateFileName = "$TEMPORARY/temp");
+
+
+      /**
+       * Returns a QString of the full file name including the file path, excluding the attributes
+       * with any Isis Preferences or environment variables indicated by $, changed to what they
+       * represent.
+       *
+       * @returns QString
+       * <pre>
+       *   for a full file specification of:
+       *    QString(ISISROOT) + "/tmp/Peaks.cub+Bsq"
+       *   toString() gives:
+       *    "/usgs/pkgs/isis3/isis/tmp/Peaks.cub"
+       * </pre>
+       */
       QString toString() const;
       FileName &operator=(const FileName &rhs);
       bool operator==(const FileName &rhs);

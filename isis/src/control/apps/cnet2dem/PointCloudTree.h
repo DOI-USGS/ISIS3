@@ -28,7 +28,7 @@
 
 #include <QSharedPointer>
 
-#include <nanoflann/nanoflann.hpp>
+#include <nanoflann.hpp>
 
 #include "PointCloud.h"
 #include "PointCloudSearchResult.h"

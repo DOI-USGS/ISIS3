@@ -54,7 +54,7 @@ namespace Isis {
    *                           errors and give a more accurate error message.
    *   @history 2017-09-11 Adam Goins - Added the ExportToList menu item to allow all open cubes
    *                           to be exported into a cubelist. References #5097
-   * 
+   *  @history 2018-07-27 Kaitlyn Lee - Added unsigned/signed integer pixel type handling.
    */
   class FileTool : public Tool {
       Q_OBJECT
@@ -136,15 +136,15 @@ namespace Isis {
 
       /**
        * Saves the cube as a full image
-       * 
+       *
        * @param icube The input Cube
        * @param ocube The output Cube
        */
       void saveAsFullImage(Cube *icube, Cube *ocube);
 
       /** Copy input cube details into output file given its dimensions
-       * 
-       * 
+       *
+       *
        * @param psOutFile The psFileName
        * @param icube The input cube
        * @param ocube The output cube
@@ -156,14 +156,14 @@ namespace Isis {
            Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
 
       /** Save image AsIs (As viewed in the viewport window) into output file
-       * 
+       *
        * @param icube The input Cube
        * @param psOutFile The output file
        */
       void saveAs_AsIs(Cube *icube, const QString & psOutFile);
 
       /** Save image Full Resolution (image viewed in the viewport window) into output
-       * 
+       *
        * @param pInCube The input cube.
        * @param pOutCube The output cube.
        * @param pNumSamples The number of samples
@@ -173,16 +173,16 @@ namespace Isis {
                                  int pNumSamples, int pNumLines);
 
       /** Save image AsIs Enlarged into output
-       * 
+       *
        * @param icube The input cube
-       * @param psOutFile The output file 
+       * @param psOutFile The output file
        */
       void saveAsEnlargedCube(Cube *icube, const QString & psOutFile);
 
       /**
-       * 
+       *
        * @param icube The input cube
-       * @param psOutFile The output file 
+       * @param psOutFile The output file
        */
       void saveAsReducedCube (Cube *icube, const QString & psOutFile);
   };
