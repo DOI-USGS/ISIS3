@@ -192,6 +192,19 @@ namespace Isis {
    *   @history 2017-05-19 Christopher Combs - Modified unitTest.cpp to truncate paths before date
    *                           directory. Allows test to pass when not using the default data area.
    *                           Fixes #4738.
+   *   @history 2018-07-30 Jesse Mapel & Summer Stapleton - Refactoring of class to create a 
+   *                           separate tracking cube to keep track of input images for a mosaic 
+   *                           instead of storing this information within the mosaic cube itself. 
+   *                           The mosaic cube no longer contains a tracking band or a tracking 
+   *                           table; it now contains a tracking group containing the name of the 
+   *                           tracking file. The tracking file is named 
+   *                           <baseMosaicFileName>_tracking.cub. This tracking cube will contain 
+   *                           the tracking table as well as the tracking band; it will always be 
+   *                           of PixelType::UnsignedInteger regardless of the pixel type of the 
+   *                           mosaic cube or of the input images. References #971
+   *   @history 2018-08-13 Summer Stapleton - Error now being thrown with appropriate message if 
+   *                           user attempts to add tracking capabilities to a mosaic that already
+   *                           exists without tracking. Fixes #2052.
    */
 
   class ProcessMosaic : public Process {
@@ -226,6 +239,9 @@ namespace Isis {
       // Line Processing method for one input and output cube
       virtual void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
 
+      // Finish with tracking cube
+      virtual void EndProcess();
+
       // Accessor for the placed images.
       PvlObject imagePositions();
 
@@ -255,8 +271,6 @@ namespace Isis {
       Isis::Cube *SetOutputCube(const QString &psParameter);
 
       void SetBandBinMatch(bool enforceBandBinMatch);
-      void SetMosaicOrigin(int &piIndex);
-
 
       void SetBandKeyword(QString bandPriorityKeyName, QString bandPriorityKeyValue);
       void SetBandNumber(int bandPriorityBandNumber);
@@ -283,12 +297,10 @@ namespace Isis {
       static ImageOverlay StringToOverlay(QString);
 
     private:
-      // Get the file index offset to be saved in the band by pixel type
-      int GetIndexOffsetByPixelType();
 
       //Compare the input and mosaic for the specified band based on the criteria and update the
       //  mosaic origin band.
-      void BandComparison(int iss, int isl, int isb, int ins, int inl, int inb,
+      void BandComparison(int iss, int isl, int ins, int inl,
                           int bandPriorityInputBandNumber, int bandPriorityOutputBandNumber,
                           int index);
 
@@ -306,9 +318,6 @@ namespace Isis {
 
       // Checks for the table with name "InputImage"
       bool GetTrackStatus();
-
-      // Reset the origin band
-      void ResetOriginBand();
 
       // New mosaic, add the Band Bin group specific to the mosaic
       void AddBandBinGroup(int origIsb);
@@ -328,6 +337,7 @@ namespace Isis {
       void MatchDEMShapeModel();
 
       bool m_trackingEnabled;         //!<
+      Cube *m_trackingCube;           //!< Output tracking cube. NULL unless tracking is enabled.
       bool m_createOutputMosaic;      //!<
       int  m_bandPriorityBandNumber;  //!<
       QString m_bandPriorityKeyName;  //!<
