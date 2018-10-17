@@ -4,6 +4,7 @@
 
 #include "ControlPoint.h"
 #include "FileName.h"
+#include "SpecialPixel.h"
 #include "TemplateList.h"
 
 #include <QCloseEvent>
@@ -102,6 +103,12 @@ namespace Isis {
    *                           References #5396.
    *   @history 2018-08-08 Tracie Sucharski - Removed temporary autosave of active control, most
    *                           likely causing problems with large networks.
+   *   @history 2018-10-04 Tracie Sucharski - Changed functionality of ground and radius source
+   *                           choices on constrained and fixed points.  Fixes #5504.
+   *   @history 2018-10-04 Tracie Sucharski - Removed calls to ControlNet::GetTargetRadii because of
+   *                           changes to ControlNet.
+   *   @history 2018-10-05 Tracie Sucharski - Added radius source combo to the NewControlPoint
+   *                           dialog.
    */
   class ControlPointEditWidget : public QWidget {
     Q_OBJECT
@@ -136,7 +143,6 @@ namespace Isis {
       void createControlPoint(double latitude, double longitude, Cube *cube = 0,
                               bool isGroundSource = false);
 
-      void updatePointInfo(ControlPoint &updatedPoint);
       // Changed colorizeSaveNetButton to public slot so it could be called from
       // Directory::saveActiveControl().  This should be temporary until the modify/save functionality
       // of active control is re-factored. Also added reset parameter, defaulting to false so button
@@ -153,7 +159,7 @@ namespace Isis {
       void reloadPoint();
       void saveNet();
 //    void addMeasure();
-//    void setPointType (int pointType);
+      void setPointType (int pointType);
       void setLockPoint (bool ignore);
       void setIgnorePoint (bool ignore);
       void setLockLeftMeasure (bool ignore);
@@ -170,6 +176,12 @@ namespace Isis {
 
       void measureSaved();
       void checkReference();
+
+      void updateGroundPosition();
+      void updateSurfacePointInfo ();
+      void openReferenceRadius();
+      void groundSourceFileSelectionChanged(int index);
+
       void savePoint();
 
       void colorizeAllSaveButtons(QString color);
@@ -191,7 +203,7 @@ namespace Isis {
       void createActions();
 
       void loadPoint(QString serialNumber = "");
-      void loadMeasureTable();
+      void loadGroundMeasure();
       void createPointEditor(QWidget *parent, bool addMeasures);
       QSplitter * createTopSplitter();
       QGroupBox * createControlPointGroupBox();
@@ -203,10 +215,15 @@ namespace Isis {
       bool IsMeasureLocked(QString serialNumber);
       bool validateMeasureChange(ControlMeasure *m);
 
+      void setShapesForPoint(double latitude=Null, double longitude=Null);
       ControlMeasure *createTemporaryGroundMeasure();
-      FileName findGroundFile();
+      bool setGroundSourceInfo();
+      FileName checkGroundFileLocation(FileName groundFile);
       void changeGroundLocationsInNet();
+      void clearGroundSource();
 
+      void initDem(QString demFile);
+      double demRadius(double latitude, double longitude);
 
     private:
 
@@ -242,8 +259,10 @@ namespace Isis {
       bool m_templateModified; //!< Indicates if the registration template was edited
 
       QPointer<QComboBox> m_templateComboBox; //!< ComboBox of imported registration templates
+      QPointer<QComboBox> m_groundSourceCombo; //!< ComboBox for selecting ground source
+      QPointer<QComboBox> m_radiusSourceCombo; //!< ComboBox for selecting ground source
       QPointer<QLabel> m_ptIdValue; //!< Label for the point id of the current point
-      QPointer<QComboBox> m_pointType; //!< Combobox to change the type of the current point
+      QPointer<QComboBox> m_pointTypeCombo; //!< Combobox to change the type of the current point
       QPointer<QLabel> m_numMeasures;
       QPointer<QLabel> m_aprioriLatitude;
       QPointer<QLabel> m_aprioriLongitude;
@@ -283,11 +302,28 @@ namespace Isis {
       QScopedPointer<Cube> m_leftCube; //!< Left cube
       QScopedPointer<Cube> m_rightCube; //!< Right cube
 
+      QStringList m_projectShapeNames; //!< List of Shapes imported into project, at time of loaded CP
+      int m_numberProjectShapesWithPoint; //!< Number of shapes containing control point
+      QMap<QString, Shape *> m_nameToShapeMap; //!< Map between Shape display name and object
+
+      QString m_groundFilename; //!< File name of ground source
       QString m_groundSN; //!< Serial number of ground source file
+      ControlPoint::SurfacePointSource::Source m_groundSourceType; //!< SurfacePoint type of ground source
+      QScopedPointer<UniversalGroundMap> m_groundGmap;
+
       bool m_changeAllGroundLocation; //!< Change the ground source location of all fixed,
                                       //!  constrained points in the network
       bool m_changeGroundLocationInNet; //!< Change the ground source location
       QString m_newGroundDir; //!< Contains the ground source location
+     
+      //  TODO:  Combine the following m_groundSourceFile, m_radiusSourceFile
+      //           with m_groundFile and m_demFile.  Is it just a matter of
+      //           full path vs filename only?
+      QString m_radiusFilename;
+      ControlPoint::RadiusSource::Source m_radiusSourceType;
+      bool m_demOpen; //!< Has a radius source been opened?
+      QString m_demFile;
+      QScopedPointer<Cube> m_demCube;
   };
 };
 #endif
