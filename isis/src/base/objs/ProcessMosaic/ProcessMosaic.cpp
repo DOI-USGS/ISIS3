@@ -340,7 +340,7 @@ namespace Isis {
               table = new Table(TRACKING_TABLE_NAME, m_trackingCube->fileName());
               trackingTable = new TrackingTable(*table);
             }
-            catch (IException e) {
+            catch (IException &e) {
               QString msg = "Unable to find Tracking Table in " + m_trackingCube->fileName() + ".";
               throw IException(IException::User, msg, _FILEINFO_);
             }
