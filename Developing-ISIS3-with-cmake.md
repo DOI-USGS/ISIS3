@@ -208,13 +208,14 @@ Using the setisis script on your build directory should fix these environment is
 ctest               # run all tests
 ctest -R _unit_     # run unit tests
 ctest -R _app_      # run app tests
+ctest -R _module_   # run module (cat) tests
 ctest -R jigsaw     # run jigsaw's app tests
 ctest -R lro        # run all lro tests
 ctest -E tgo        # Run everything but tgo tests
 ```
 ## Building New Tests
 
-The workflow for creating a new tests will be the same as the old ISIS make system besides adding test data. See Make Truth Replacement below for how this set in the process changes.
+The workflow for creating a new tests will be the same as the old ISIS make system besides adding test data. See [Make Truth Replacement](#make-truth-replacement) below for how this set in the process changes.
 
 
 ## App Tests and Category Tests
