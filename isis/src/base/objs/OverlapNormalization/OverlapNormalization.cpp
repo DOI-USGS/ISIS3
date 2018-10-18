@@ -176,7 +176,7 @@ namespace Isis {
                    "holds must be greater than the number of input images";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-
+    
     if ( method == LeastSquares::SPARSE ) {
       m_offsetLsq = NULL;
       m_gainLsq = NULL;
@@ -267,7 +267,7 @@ namespace Isis {
           m_gainLsq->AddKnown(input, log(tanp), m_weights[overlap]);
         }
         else {
-          m_gainLsq->AddKnown(input, 0.0, 1e30); // Set gain to 1.0
+          m_gainLsq->AddKnown(input, 0.0, 1e10); // Set gain to 1.0
         }
       }
 
@@ -279,7 +279,7 @@ namespace Isis {
         input.resize(m_statsList.size());
         for (int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
         input[hold] = 1.0;
-        m_gainLsq->AddKnown(input, 0.0, 1e30);
+        m_gainLsq->AddKnown(input, 0.0, 1e10);
       }
 
       // Solve the least squares and get the gain coefficients to apply to the

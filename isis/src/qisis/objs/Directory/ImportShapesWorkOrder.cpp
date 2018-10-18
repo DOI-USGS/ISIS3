@@ -28,6 +28,7 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
+#include "IException.h"
 #include "Project.h"
 #include "ProjectItem.h"
 #include "ProjectItemModel.h"
@@ -49,8 +50,8 @@ namespace Isis {
     m_newShapes = NULL;
     m_list = NULL;
 
-    QAction::setText(tr("Import &Shape Models..."));
-    QUndoCommand::setText(tr("Import Shape Models"));
+    QAction::setText(tr("Import &Shape Models and Ground source..."));
+    QUndoCommand::setText(tr("Import Shape Models and Ground source"));
     setModifiesDiskState(true);
   }
 
@@ -380,73 +381,78 @@ namespace Isis {
    */
   void ImportShapesWorkOrder::importConfirmedShapes(QStringList confirmedShapes,
                                                              bool copyDnData) {
-    if (!confirmedShapes.isEmpty()) {
-      QDir folder = project()->addShapeFolder("import");
+    try {
+      if (!confirmedShapes.isEmpty()) {
+        QDir folder = project()->addShapeFolder("import");
 
-      setProgressRange(0, confirmedShapes.count());
+        setProgressRange(0, confirmedShapes.count());
 
-      m_newShapes = new ShapeList;
-      m_newShapes->reserve(confirmedShapes.count());
+        m_newShapes = new ShapeList;
+        m_newShapes->reserve(confirmedShapes.count());
 
-      QStringList confirmedShapesFileNames;
-      QStringList confirmedShapesIds;
+        QStringList confirmedShapesFileNames;
+        QStringList confirmedShapesIds;
 
-      foreach (QString confirmedShape, confirmedShapes) {
-        QStringList fileNameAndId = confirmedShape.split(",");
+        foreach (QString confirmedShape, confirmedShapes) {
+          QStringList fileNameAndId = confirmedShape.split(",");
 
-        confirmedShapesFileNames.append(fileNameAndId.first());
+          confirmedShapesFileNames.append(fileNameAndId.first());
 
-        if (fileNameAndId.count() == 2) {
-          confirmedShapesIds.append(fileNameAndId.last());
-        }
-        else {
-          confirmedShapesIds.append(QString());
-        }
-      }
-
-      OriginalFileToProjectCubeFunctor functor(thread(), folder, copyDnData);
-      QFuture<Cube *> future = QtConcurrent::mapped(confirmedShapesFileNames, functor);
-
-      QStringList newInternalData;
-      newInternalData.append(internalData().first());
-
-      QThreadPool::globalInstance()->releaseThread();
-      for (int i = 0; i < confirmedShapes.count(); i++) {
-        setProgressValue(i);
-
-        Cube *cube = future.resultAt(i);
-
-        if (cube) {
-          Shape *newShape = new Shape(future.resultAt(i));
-
-          if (confirmedShapesIds[i].isEmpty()) {
-            confirmedShapesIds[i] = newShape->id();
+          if (fileNameAndId.count() == 2) {
+            confirmedShapesIds.append(fileNameAndId.last());
           }
           else {
-            newShape->setId(confirmedShapesIds[i]);
+            confirmedShapesIds.append(QString());
           }
-
-          QStringList ShapeInternalData;
-          ShapeInternalData.append(confirmedShapesFileNames[i]);
-          ShapeInternalData.append(confirmedShapesIds[i]);
-
-          newInternalData.append(ShapeInternalData.join(","));
-
-          m_newShapes->append(newShape);
-
-          newShape->moveToThread(thread());
-          newShape->displayProperties()->moveToThread(thread());
-
-          newShape->closeCube();
         }
+
+        OriginalFileToProjectCubeFunctor functor(thread(), folder, copyDnData);
+        QFuture<Cube *> future = QtConcurrent::mapped(confirmedShapesFileNames, functor);
+
+        QStringList newInternalData;
+        newInternalData.append(internalData().first());
+
+        QThreadPool::globalInstance()->releaseThread();
+        for (int i = 0; i < confirmedShapes.count(); i++) {
+          setProgressValue(i);
+
+          Cube *cube = future.resultAt(i);
+
+          if (cube) {
+            Shape *newShape = new Shape(future.resultAt(i));
+
+            if (confirmedShapesIds[i].isEmpty()) {
+              confirmedShapesIds[i] = newShape->id();
+            }
+            else {
+              newShape->setId(confirmedShapesIds[i]);
+            }
+
+            QStringList ShapeInternalData;
+            ShapeInternalData.append(confirmedShapesFileNames[i]);
+            ShapeInternalData.append(confirmedShapesIds[i]);
+
+            newInternalData.append(ShapeInternalData.join(","));
+
+            m_newShapes->append(newShape);
+
+            newShape->moveToThread(thread());
+            newShape->displayProperties()->moveToThread(thread());
+
+            newShape->closeCube();
+          }
+        }
+        QThreadPool::globalInstance()->reserveThread();
+
+        m_warning = functor.errors().toString();
+
+        m_newShapes->moveToThread(thread());
+
+        setInternalData(newInternalData);
       }
-      QThreadPool::globalInstance()->reserveThread();
-
-      m_warning = functor.errors().toString();
-
-      m_newShapes->moveToThread(thread());
-
-      setInternalData(newInternalData);
+    }
+    catch (IException e) {
+      QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }
 }

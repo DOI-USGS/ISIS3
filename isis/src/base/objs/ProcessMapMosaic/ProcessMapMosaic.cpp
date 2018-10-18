@@ -171,6 +171,11 @@ namespace Isis {
           int outBand = 1;
           
           ProcessMosaic::StartProcess(outSample, outLine, outBand);
+          // Reset the creation flag to ensure that the data within the tracking cube written from
+          // this call of StartProcess isn't over-written in the next. This needs to occur since the 
+          // tracking cube is created in ProcessMosaic if the m_createOutputMosaic flag is set to 
+          // true and the cube would then be completely re-created (setting all pixels to Null).
+          ProcessMosaic::SetCreateFlag(false);
 
           // Increment for projections where occurrances may happen multiple times
           outSample += worldSize;
@@ -570,12 +575,8 @@ namespace Isis {
       p.PropagatePolygons(false);
       p.PropagateOriginalLabel(false);
 
-      // If track set, create the origin band
-      if (GetTrackFlag()) {
-        nbands += 1;
-      }
       // For average priority, get the new band count
-      else if (GetImageOverlay() == AverageImageWithMosaic) {
+      if (GetImageOverlay() == AverageImageWithMosaic) {
         nbands *= 2;
       }
 
@@ -652,12 +653,8 @@ namespace Isis {
       p.PropagatePolygons(false);
       p.PropagateOriginalLabel(false);
 
-      // If track set, create the origin band
-      if (GetTrackFlag()) {
-        nbands += 1;
-      }
       // For average priority, get the new band count
-      else if (GetImageOverlay() == AverageImageWithMosaic) {
+      if (GetImageOverlay() == AverageImageWithMosaic) {
         nbands *= 2;
       }
 
@@ -711,12 +708,8 @@ namespace Isis {
       Cube *propCube = p.SetInputCube(inputFile, inAtt);
       bands = propCube->bandCount();
 
-      // If track set, create the origin band
-      if (GetTrackFlag()) {
-        bands += 1;
-      }
       // For average priority, get the new band count
-      else if (GetImageOverlay() == AverageImageWithMosaic) {
+      if (GetImageOverlay() == AverageImageWithMosaic) {
         bands *= 2;
       }
 
@@ -773,12 +766,8 @@ namespace Isis {
       Cube *propCube = p.SetInputCube(inputFile, inAtt);
       bands = propCube->bandCount();
 
-      // If track set, create the origin band
-      if (GetTrackFlag()) {
-        bands += 1;
-      }
       // For average priority, get the new band count
-      else if (GetImageOverlay() == AverageImageWithMosaic) {
+      if (GetImageOverlay() == AverageImageWithMosaic) {
         bands *= 2;
       }
 

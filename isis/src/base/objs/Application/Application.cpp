@@ -102,6 +102,11 @@ namespace Isis {
     strncpy(env, "LANG=en_US", 1023);
     putenv(env);
 
+    // add qt path to 3rdParty so no default is taken from enviroment
+    QString pluginPath = getenv("ISISROOT");
+    pluginPath.append("/3rdParty/lib/");
+    QCoreApplication::addLibraryPath(pluginPath);
+
     // Get the starting cpu time, direct I/Os, page faults, and swaps
     //p_startClock = clock();
     p_startDirectIO = DirectIO();

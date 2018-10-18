@@ -82,14 +82,22 @@ namespace Isis {
               this, SLOT(pointTypeChanged(QString)));
     }
 
-
+    QHBoxLayout *groundSourceLayout = NULL;
+    QHBoxLayout *radiusSourceLayout = NULL;
     if (groundSource) {
-      m_groundSourceLayout = new QHBoxLayout();
+      groundSourceLayout = new QHBoxLayout();
       m_groundSourceCombo = new QComboBox;
       QLabel *groundSourceLabel = new QLabel("Ground Source:");
-      m_groundSourceLayout->addWidget(groundSourceLabel);
-      m_groundSourceLayout->addWidget(m_groundSourceCombo);
+      groundSourceLayout->addWidget(groundSourceLabel);
+      groundSourceLayout->addWidget(m_groundSourceCombo);
       m_groundSourceCombo->setVisible(false);
+
+      radiusSourceLayout = new QHBoxLayout();
+      m_radiusSourceCombo = new QComboBox;
+      QLabel *radiusSourceLabel = new QLabel("Radius Source:");
+      radiusSourceLayout->addWidget(radiusSourceLabel);
+      radiusSourceLayout->addWidget(m_radiusSourceCombo);
+      m_radiusSourceCombo->setVisible(false);
     }
 
     if (subpixelRegisterMeasures) {
@@ -132,7 +140,8 @@ namespace Isis {
     }
 
     if (groundSource) {
-      vLayout->addLayout(m_groundSourceLayout);
+      vLayout->addLayout(groundSourceLayout);
+      vLayout->addLayout(radiusSourceLayout);
     }
 
     if (subpixelRegisterMeasures) {
@@ -187,9 +196,15 @@ namespace Isis {
   }
 
 
+  QString NewControlPointDialog::radiusSource() const {
+    return m_radiusSourceCombo->currentText();
+  }
+
+
   void NewControlPointDialog::pointTypeChanged(QString pointType) {
     if (pointType == "Fixed" || pointType == "Constrained") {
       m_groundSourceCombo->setVisible(true);
+      m_radiusSourceCombo->setVisible(true);
     }
   }
 
@@ -213,6 +228,16 @@ namespace Isis {
       m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Constrained"));
       m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Fixed"));
       m_pointTypeCombo->setCurrentText("Free");
+    }
+  }
+
+
+  void NewControlPointDialog::setRadiusSource(QStringList radiusFiles) {
+    //  If radiusFiles not empty, add to the radius source combo, first adding "None" as option.
+    m_radiusSourceCombo->addItem("None");
+    m_radiusSourceCombo->setCurrentText("None");
+    if (radiusFiles.count() != 0) {
+      m_radiusSourceCombo->addItems(radiusFiles);
     }
   }
 

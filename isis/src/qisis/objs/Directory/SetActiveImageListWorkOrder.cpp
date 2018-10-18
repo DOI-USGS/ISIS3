@@ -111,7 +111,7 @@ namespace Isis {
     try {
       project()->setActiveImageList(imageList()->name());
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }

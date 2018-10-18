@@ -180,7 +180,7 @@ namespace Isis {
       }
       project()->setClean(false);
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }

@@ -222,7 +222,7 @@ namespace Isis {
 
     Image *image;
     if (item->isShape()) {
-      image = new Image(item->shape()->cube());
+      image = new Image(item->shape()->cube(), item->shape()->footprint(), item->shape()->id());
     }
     else if (item->isImage()) {
       image = item->image();
