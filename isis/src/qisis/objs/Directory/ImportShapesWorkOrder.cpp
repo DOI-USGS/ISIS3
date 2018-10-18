@@ -451,7 +451,7 @@ namespace Isis {
         setInternalData(newInternalData);
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }
