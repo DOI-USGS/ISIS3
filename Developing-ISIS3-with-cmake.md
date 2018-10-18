@@ -23,13 +23,13 @@ You will need to modify your `~/.bashrc` as follows:
 (Linux)
 ```bash
 echo -e "\n# Adding shared /usgs/cpkgs/ anaconda3 environment" >> ~/.bashrc
-echo "export PATH=/usgs/cpkgs/anaconda3_linux/bin:$PATH" >> ~/.bashrc
+echo 'export PATH=/usgs/cpkgs/anaconda3_linux/bin:$PATH' >> ~/.bashrc
 ```
 
 (macOS)
 ```bash
 echo -e "\n# Adding shared /usgs/cpkgs/ anaconda3 environment" >> ~/.bashrc
-echo "export PATH=/usgs/cpkgs/anaconda3_macOS/bin:$PATH" >> ~/.bashrc
+echo 'export PATH=/usgs/cpkgs/anaconda3_macOS/bin:$PATH' >> ~/.bashrc
 ```
 
 You will then need to `source ~/.bashrc` or open a new `bash` terminal to get the anaconda3 binaries added to your path.
