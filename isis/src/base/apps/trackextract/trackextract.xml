@@ -37,6 +37,10 @@
       this. Also fixed the NULL value being written to the tracking cube as LRS was originally
       being written instead.
     </change>
+    <change name="Kaitlyn Lee" date="2018-10-16">
+      Removed FLOAT_MAX because it was not being used in the code and was causing build warnings 
+      on MacOS 10.13.
+    </change>
   </history>
 
   <groups>
