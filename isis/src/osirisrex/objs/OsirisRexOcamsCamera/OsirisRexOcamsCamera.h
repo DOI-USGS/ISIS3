@@ -22,6 +22,7 @@
 
 #include "FramingCamera.h"
 
+
 #include <QString>
 
 namespace Isis {
@@ -51,6 +52,9 @@ namespace Isis {
    *                           instrument frame code. Fixes #5127
    *   @history 2018-03-27 Jesse Mapel - Changed to only replace the IK code with the PolyCam focus
    *                                     setting ID if the image is a PolyCam image. Fixes #5213.
+   *   @history 2018-07-26 UA/OSIRIS-REx IPWG Team - Use
+   *                           IrregularBodyCameraGroundMap to work with jigsaw
+   *                           control
    *
    */
   class OsirisRexOcamsCamera : public FramingCamera {

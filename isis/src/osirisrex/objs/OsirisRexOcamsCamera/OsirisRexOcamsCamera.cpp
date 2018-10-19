@@ -28,6 +28,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "IrregularBodyCameraGroundMap.h"
 #include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
@@ -122,7 +123,7 @@ namespace Isis {
     distortionMap->SetDistortion(ikCode.toInt(), filterName);
 
     // Setup the ground and sky map
-    new CameraGroundMap(this);
+    new IrregularBodyCameraGroundMap(this);
     new CameraSkyMap(this);
 
     setTime(centerTime);
