@@ -117,6 +117,27 @@ int main() {
     cerr << "  tre = " << evalSVD3 << "\t\t" << evalQRD3 << endl;
     cerr << "  x =   " << xcoefSVD << "\t\t" << xcoefQRD << endl;
     cerr << "  y =   " << ycoefSVD << "\t\t" << ycoefQRD << endl ;
+    cerr << "---" << endl;
+
+    cerr << "*** TEST 4:  SAME 3 POINTS, SPARSE ***" << endl;
+    Isis::LeastSquares sparse(b, true, 3, 2, false);
+    sparse.AddKnown(one, 3.0);
+    sparse.AddKnown(two, 1.0);
+    sparse.AddKnown(tre, 2.0);
+    int sparseKnowns = sparse.Knowns();;
+    sparse.Solve(Isis::LeastSquares::SPARSE);
+    double evalSPARSE1 = sparse.Evaluate(one);
+    double evalSPARSE2 = sparse.Evaluate(two);
+    double evalSPARSE3 = sparse.Evaluate(tre);
+    double xcoefSPARSE = b.Coefficient(0);
+    double ycoefSPARSE = b.Coefficient(1);
+    cerr << "Number of Knowns = " << sparseKnowns << endl;
+    cerr << "        SPARSE" << endl;
+    cerr << "  one = " << evalSPARSE1 << endl;
+    cerr << "  two = " << evalSPARSE2 << endl;
+    cerr << "  tre = " << evalSPARSE3 << endl;
+    cerr << "  x =   " << xcoefSPARSE << endl;
+    cerr << "  y =   " << ycoefSPARSE << endl ;
   }
   catch(Isis::IException &e) {
     e.print();

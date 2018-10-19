@@ -7,7 +7,7 @@ else
 .NOTPARALLEL:
 endif
 
-PACKAGES = $(filter-out Makefile docsys CVS IsisObjectConvert.xsl, $(wildcard *))
+PACKAGES = $(filter-out Makefile CMakeLists.txt docsys CVS IsisObjectConvert.xsl, $(wildcard *))
 
 PACKAGESCLEAN := $(PACKAGES:%=%-clean)
 PACKAGESQUICKCLEAN := $(PACKAGES:%=%-quickclean)
@@ -21,7 +21,7 @@ PACKAGESCATTEST := $(filter-out qisis-catTest,   $(PACKAGES:%=%-catTest))
 
 # Allow parallel builds of applications
 applications: $(PACKAGESAPPS)
-	
+
 %-apps:
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-apps//'`; \
 	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \

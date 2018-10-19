@@ -166,16 +166,18 @@ namespace Isis {
    *   @history 2016-05-10 Jeannie Backer - Moved TargetRadii() methods to Target class.
    *   @history 2016-05-25 Jeannie Backer - Updated documentation. References #3877
    *   @history 2016-08-28 Kelvin Rodriguez - Removed redundant var=var lines
-   *                            causing warnings in clang. Part of porting to OS X 10.11.
+   *                           causing warnings in clang. Part of porting to OS X 10.11.
    *   @history 2016-12-28 Jeannie Backer - Added inLatitudeRange, and inLongitudeRange methods.
-   *                            References #3877
+   *                           References #3877
    *   @history 2017-06-26 Jesse Mapel - Added a new method to set the universal ground point
-   *                            without adjusting for the longitude domain. Fixes #2185.
+   *                           without adjusting for the longitude domain. Fixes #2185.
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove
    *         "Get" from methods GetX and GetY, change methods to lower camel
    *         case, add methods for RelativeScaleFactorLatitude and
    *         RelativeScaleFactorLongitude (see LambertAzimuthalEqualArea.cpp).
+   *   @history 2018-09-28 Kaitlyn Lee - Removed unnecessary lines of code that were
+   *                           causing build warnings on MacOS 10.13. References #5520.
    */
   class TProjection : public Projection {
     public:

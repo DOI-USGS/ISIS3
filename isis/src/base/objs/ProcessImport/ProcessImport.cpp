@@ -279,7 +279,7 @@ namespace Isis {
 
     if ((type == Isis::Double) || (type == Isis::Real) || (type == Isis::SignedWord) ||
         (type == Isis::UnsignedWord) || (type == Isis::UnsignedByte) ||
-        (type == Isis::SignedInteger)) {
+        (type == Isis::SignedInteger) || type==Isis::UnsignedInteger) {
       p_pixelType = type;
     }
     else {
@@ -1226,6 +1226,11 @@ namespace Isis {
         min = Isis::IVALID_MIN4;
         max = Isis::IVALID_MAX4;
       }
+
+      else if (p_pixelType == Isis::UnsignedInteger) {
+        min = Isis::VALID_MINUI4;
+        max = Isis::VALID_MAXUI4;
+      }
       else if (p_pixelType == Isis::SignedWord) {
         min = Isis::VALID_MIN2 * p_mult[0] + p_base[0];
         max = Isis::VALID_MAX2 * p_mult[0] + p_base[0];
@@ -1480,6 +1485,10 @@ namespace Isis {
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int((int *)in+samp);
               break;
+
+          case Isis::UnsignedInteger:
+            (*out)[samp] = (double)swapper.Uint32_t((unsigned int *)in+samp);
+            break;
             case Isis::Real:
               if(p_vax_convert) {
                 (*out)[samp]= VAXConversion( (float *)in+samp );
@@ -1733,6 +1742,9 @@ namespace Isis {
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int((int *)in+samp);
               break;
+          case Isis::UnsignedInteger:
+            (*out)[samp] = (double)swapper.Uint32_t((unsigned int *)in+samp);
+            break;
             case Isis::Real:
               if(p_vax_convert) {
                 (*out)[samp]= VAXConversion( (float *)in+samp );
@@ -1965,7 +1977,10 @@ namespace Isis {
               break;
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int(&in[bufferIndex]);
-              break;
+              break;            
+          case Isis::UnsignedInteger:
+            (*out)[samp] = (double)swapper.Uint32_t(&in[bufferIndex]);
+            break;
             case Isis::Real:
               if(p_vax_convert) {
                 (*out)[osamp]= VAXConversion(&in[bufferIndex]);

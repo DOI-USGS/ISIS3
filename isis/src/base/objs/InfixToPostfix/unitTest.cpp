@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
       QString postfix = converter.convert(equations[equation]);
       cout << "   Postfix: '" << postfix << "'" << endl;
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
   }

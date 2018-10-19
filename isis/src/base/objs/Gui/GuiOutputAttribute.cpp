@@ -74,6 +74,10 @@ namespace Isis {
     p_signedWord->setToolTip("Signed 16-bit pixels");
     p_unsignedWord = new QRadioButton("Unsigned Word");
     p_unsignedWord->setToolTip("Unsigned 16-bit pixels");
+    p_signedInteger = new QRadioButton("&Signed Integer");
+    p_signedInteger->setToolTip("Signed 32-bit integer");
+    p_unsignedInteger = new QRadioButton("Unsigned Integer");
+    p_unsignedInteger->setToolTip("Unsigned 32-bit integer");
     p_real = new QRadioButton("&Real");
     p_real->setToolTip("Floating point 32-bit pixels");
 
@@ -82,6 +86,8 @@ namespace Isis {
     buttonGroup->addButton(p_unsignedByte);
     buttonGroup->addButton(p_signedWord);
     buttonGroup->addButton(p_unsignedWord);
+    buttonGroup->addButton(p_unsignedInteger);
+    buttonGroup->addButton(p_signedInteger);
     buttonGroup->addButton(p_real);
     buttonGroup->setExclusive(true);
 
@@ -97,6 +103,10 @@ namespace Isis {
     connect(p_signedWord, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
     connect(p_unsignedWord, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
     connect(p_unsignedWord, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
+    connect(p_unsignedInteger, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
+    connect(p_unsignedInteger, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
+    connect(p_signedInteger, SIGNAL(toggled(bool)), p_minEdit, SLOT(setEnabled(bool)));
+    connect(p_signedInteger, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
     connect(p_real, SIGNAL(toggled(bool)), p_minEdit, SLOT(setDisabled(bool)));
     connect(p_real, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setDisabled(bool)));
     p_minEdit->setValidator(new QDoubleValidator(p_minEdit));
@@ -107,7 +117,9 @@ namespace Isis {
     gridLayout->addWidget(p_unsignedByte, 1, 0);
     gridLayout->addWidget(p_signedWord, 2, 0);
     gridLayout->addWidget(p_unsignedWord, 3, 0);
-    gridLayout->addWidget(p_real, 4, 0);
+    gridLayout->addWidget(p_signedInteger, 4, 0);
+    gridLayout->addWidget(p_unsignedInteger, 5, 0);
+    gridLayout->addWidget(p_real, 6, 0);
     gridLayout->addWidget(minLabel, 0, 1);
     gridLayout->addWidget(p_minEdit, 1, 1);
     gridLayout->addWidget(maxLabel, 2, 1);
@@ -213,8 +225,11 @@ namespace Isis {
     if(p_unsignedByte->isChecked()) att += "+UnsignedByte";
     if(p_signedWord->isChecked()) att += "+SignedWord";
     if(p_unsignedWord->isChecked()) att += "+UnsignedWord";
+    if(p_signedInteger->isChecked()) att += "+SignedInteger";
+    if(p_unsignedInteger->isChecked()) att += "+UnsignedInteger";
 
-    if(p_unsignedByte->isChecked() || p_signedWord->isChecked() || p_unsignedWord->isChecked()) {
+    if(p_unsignedByte->isChecked() || p_signedWord->isChecked() || p_unsignedWord->isChecked()
+        || p_signedInteger->isChecked() || p_unsignedInteger->isChecked()) {
       if((p_minEdit->text() != "") && (p_maxEdit->text() != "")) {
         att += "+";
         att += p_minEdit->text();
@@ -264,6 +279,12 @@ namespace Isis {
     else if(att.pixelType() == Isis::UnsignedWord) {
       p_unsignedWord->setChecked(true);
     }
+    else if(att.pixelType() == Isis::SignedInteger) {
+      p_signedInteger->setChecked(true);
+    }
+    else if(att.pixelType() == Isis::UnsignedInteger) {
+      p_unsignedInteger->setChecked(true);
+    }
     else {
       p_real->setChecked(true);
     }
@@ -280,4 +301,3 @@ namespace Isis {
     p_propagate->setEnabled(enabled);
   }
 }
-

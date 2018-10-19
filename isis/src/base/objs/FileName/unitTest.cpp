@@ -40,18 +40,6 @@ int main(int argc, char *argv[]) {
     TestExpanded("\t", fileToTest);
   }
 
-  // Variable expansion will change truth data on these
-  QStringList filesToTestSafely;
-  filesToTestSafely << "$base/testData/isisTruth.cub" << "${base}/testData/isisTruth.cub"
-                    << "$ISISROOT/src/Makefile" << "$ISISROOT/src/Makefile.elifekaM"
-                    << "/$TEMPORARY/unitTest.cpp";
-
-  foreach (QString fileToTest, filesToTestSafely) {
-    cout << "Running Safe Test on [" << qPrintable(fileToTest) << "]" << endl;
-    TestGenericAccessors("\t", fileToTest, false);
-    TestExtensionChanges("\t", fileToTest, false);
-  }
-
   // Test temp files thoroughly
   cout << "Testing temporary file name placement" << endl;
   QString tempFileNameTestStr = "$TEMPORARY/tttt.tmp";
@@ -286,7 +274,7 @@ void TestExtensionChanges(QString prefix, QString name, bool showExpandedValues)
   if (!showExpandedValues) {
     toStringMethod = &FileName::original;
   }
-  
+
   cout << prefix << "Testing Extension change [" << name << "]" << endl;
   cout << prefix << "\tBefore modification:      " << (test.*toStringMethod)() << endl;
   cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
