@@ -227,9 +227,9 @@ namespace Isis {
    *  
    * @return bool True if valid, false if invalid or non-existant 
    *  
-   * @history 2018-07-29 Kris Becker - If the geometry is invalid, it throws an 
-   *                        exception. Catch all exceptions an return proper
-   *                        status
+   * @history 2018-07-29 UA/OSIRIS-REx IPWG Team - If the geometry is invalid, it 
+   *                        throws an exception. Catch all exceptions and return
+   *                        proper status
    */  
   bool GisGeometry::isValid() const {
     if (!isDefined()) {
@@ -638,9 +638,9 @@ namespace Isis {
  * These cases are often identified by calling isValid() and getting a false 
  * value returned. 
  * 
- * @author 2018-07-29 Kris Becker
+ * @author 2018-07-29 UA/OSIRIS-REx IPWG Team - Original Version
  * 
- * @param width    With to enlarge or shrink polygon 
+ * @param width    Width to enlarge or shrink polygon 
  * @param quadsegs Numnber of segments to define a circle on corners
  * 
  * @return GisGeometry* Pointer to new GisGeometry with buffer applied

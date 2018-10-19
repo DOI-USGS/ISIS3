@@ -33,6 +33,7 @@ void printTypes();
  *                           References #2398.
  *   @history 2016-03-04 Ian Humphrey - Updated test and truthdata for equals() method. 
  *                           References #2398.
+ *   @history 2018-09-13 UA/OSIRIS-REx IPWG Team - Added buffer() test 
  *
  *
  * NOTE - distance(), intersects(), contains(), disjoin(), overlaps() methods
@@ -157,6 +158,9 @@ int main() {
 
     GisGeometry *convexHullGeom = geomCube.convexHull();
     printBasicInfo(*convexHullGeom, "Convex Hull Geometry from Geometry from Cube");
+
+    GisGeometry *bufferGeom = geomCube.buffer(1.0);
+    printBasicInfo(*bufferGeom, "Buffer Geometry from Geometry from Cube");
 
     GisGeometry *convexHullInvalidGeom = geomDefault.convexHull();
     printBasicInfo(*convexHullInvalidGeom, "Convex Hull Geometry from Invalid Geometry");

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: isisminer.xml 6513 2016-01-14 23:04:44Z kbecker@GS.DOI.NET $ -->
 <application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-<!--<application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usgs/pkgs/isis3/isis/doc/Schemas/Application/application.xsd">  -->
+<!-- <application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usgs/pkgs/isis3/isis/doc/Schemas/Application/application.xsd"> -->
 
   <brief>
        Run a series of algorithms (Strategies) that perform various operations on input 
@@ -352,7 +352,7 @@
          that are often read by <b>isisminer</b> as output from <b>caminfo</b>.
          These types of invalid geometries can
          be repaired by applying the GIS buffer algorithm with a width of 0. If an
-         invalid geometry occurs in isisminer, and RepairInvalidGeometry = True, the
+         invalid geometry occurs in <b>isisminer</b>, and RepairInvalidGeometry = True, the
          buffer algorithm will be run to attempt to repair the geometry. The default
          value of this keyword is true so that invalid geometries will be repaired.
          See also InvalidGeometryAction.
@@ -4746,7 +4746,7 @@ End
         the number of keywords created/Resource. This allows the jigsaw residual 
         file to read the rejected column.
     </change>
-    <change name="Kris Becker" date="2018-07-31">
+    <change name="UA/OSIRIS-REx IPWG Team" date="2018-07-31">
         Corrected problems with invalid geometries aborting isisminer. Added two
         new parameters, RepairInvalidGeometry and InvalidGeometryAction, to allow user
         more control over how invalid geometries are managed. Update some of the

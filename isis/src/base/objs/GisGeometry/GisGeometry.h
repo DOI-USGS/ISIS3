@@ -63,10 +63,11 @@ namespace Isis {
    *                           ISIS. Fixes #2398.
    *   @history 2016-03-04 Kris Becker - Completed the documentation and implmented the equals()
    *                           method.
-   *   @history 2018-07-29 Kris Becker - Added buffer() method; isValid() was
-   *                           throwing an exception if the geometry was invalid
-   *                           (e.g., self-intersecting geometry), which is now
-   *                           trapped and a false condition is properly returned.
+   *   @history 2018-07-29 UA/OSIRIS-REx IPWG Team - Added buffer() method;
+   *                           isValid() was throwing an exception if the geometry
+   *                           was invalid (e.g., self-intersecting geometry),
+   *                           which is now trapped and a false condition is
+   *                           properly returned.
    * 
    */   
   class GisGeometry {
