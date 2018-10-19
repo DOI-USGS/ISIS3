@@ -264,7 +264,7 @@ namespace Isis {
     }
 
     //set up the histogram ranges
-    
+
     SetValidRange(min, max);
     //SetBinRange(min, max);
   }
@@ -309,9 +309,13 @@ namespace Isis {
         nbins = 65536;
       }
     }
-    else if (cube.pixelType() == Real) {
-      // We can't account for all the possibilities of a double inside of any
-      //   data range, so don't guess min/max DN values.
+    // 32-bit data covers too big of a range of values to use
+    // the min and max possible values to set our value range.
+    // So, just set the number of bins and then later we will
+    // compute the min and max value in the actual cube.
+    else if (cube.pixelType() == UnsignedInteger ||
+             cube.pixelType() == SignedInteger ||
+             cube.pixelType() == Real) {
       if (nbins == 0) {
         nbins = 65536;
       }
