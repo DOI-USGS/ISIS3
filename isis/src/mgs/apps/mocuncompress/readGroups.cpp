@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -55,7 +62,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 extern void exit();
 
-uint32 *readGroups(register uint32 numBlocks, register BITSTRUCT *bitStuff)
+uint32 *readGroups(uint32 numBlocks, BITSTRUCT *bitStuff)
 {
 uint32 block;
   uint32 *groups;

@@ -28,6 +28,11 @@ Changing from "gets" to "fgets" also required a check
 to make sure there was no '\n' at the end of the input
 string.
 ==================================================
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
 
 
 NOTICE
@@ -104,7 +109,7 @@ static int mbr = 0;
 
 byte *decode(struct msdp_header h, byte *data, int datlen, int *len, int mbr);
 void init_output(struct msdp_header h);
-extern unsigned int CS8EACC2(register unsigned char *dat, unsigned int len);
+extern unsigned int CS8EACC2(unsigned char *dat, unsigned int len);
 
 #define FRAGSIZE (256*1024)
 

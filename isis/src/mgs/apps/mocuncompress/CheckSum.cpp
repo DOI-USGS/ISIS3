@@ -47,7 +47,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 #include "fs.h"
 #include "CheckSum.h"
 
-uint8 CS8EAC(register uint8 *d, register uint32 l)
+uint8 CS8EAC(uint8 *d, register uint32 l)
 {
   /*
   * Compute the eight bit end-around-carry checksum of a data vector.
