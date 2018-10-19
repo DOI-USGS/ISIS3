@@ -13,7 +13,7 @@ For now, pull down the cmake branch. This is temporary until cmake is merged int
 
 
 ## Anaconda and ISIS3 Dependencies
-To start building ISIS3 with cmake, you first need anaconda installed. **If you are internally developing, please expand the `Details` drop-down for more information; otherwise, continue reading the instructions in this section**. 
+To start building ISIS3 with cmake, you first need anaconda installed. **If you are developing internally to USGS, please expand the `Details` drop-down for more information; otherwise, continue reading the instructions in this section**. 
 
 <details>
 
