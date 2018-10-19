@@ -34,7 +34,7 @@ namespace Isis {
 
   /**
    * Creates a Camera object using Pvl Specifications
-   * 
+   *
    * @param cube The original cube with the current version camera model
    *
    * @return Camera* The Camera object created
@@ -131,9 +131,9 @@ namespace Isis {
 
   /**
    * Looks up the current camera model version in the pvl labels.
-   * 
+   *
    * @param lab The pvl labels
-   * 
+   *
    * @returns The current camera model version
    */
   int CameraFactory::CameraVersion(Pvl &lab) {

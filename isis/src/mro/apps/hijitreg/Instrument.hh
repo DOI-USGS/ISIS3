@@ -41,7 +41,7 @@ namespace HiRISE
 	characterize the MRO HiRISE instrument.
 <p>
 @author		Bradford Castalia, UA/PIRL
-$Revision: 1.1.1.1 $ 
+$Revision: 1.1.1.1 $
 */
 
 class Instrument
@@ -96,7 +96,7 @@ static const unsigned int
 /**	CPMM numbers associated with each CCD, indexed by CCD sensor array number.
 
 	<b>N.B.</b>: All other arrays in this Instrument class are indexed by
-	CPMM number. 
+	CPMM number.
 
 	@see	#CCD_BY_CPMM
 */
@@ -146,7 +146,7 @@ static const double
 	CCD_FOCAL_PLANE_Y_OFFSETS_MM[];
 
 //!	CCD detector pixel size in millimeters.
-static const double 
+static const double
 	CCD_PIXEL_SIZE_MM;
 
 
@@ -278,7 +278,7 @@ static const char* const
 //!	Exposure operation setup time.
 static const double
 	EXPOSURE_SETUP_MICROS;
-	
+
 //!	Engineering_Header Delta_Line_Time maximum valid value.
 static const unsigned int
 	DELTA_LINE_TIME_MAX;
@@ -399,8 +399,7 @@ static unsigned int calibration_lines_minimum
 	@see	#BINNING_FACTORS
 */
 static int focal_plane_x_offset
-	(unsigned int CPMM, unsigned int binning = 1) 
-	throw (Out_of_Range, Invalid_Argument);
+	(unsigned int CPMM, unsigned int binning = 1) ;
 
 };	//	class Instrument
 

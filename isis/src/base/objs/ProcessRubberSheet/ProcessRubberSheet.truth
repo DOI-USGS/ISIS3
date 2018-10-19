@@ -1,6 +1,5 @@
 Testing ProcessRubberSheet Class ... 
-unittest: Working
-0% ProcessedThe band changed to :1
+The band changed to :1
 Output Sample:Line = 1:1
 Output Sample:Line = 128:1
 Output Sample:Line = 1:128
@@ -26,7 +25,7 @@ Output Sample:Line = 128:65
 Output Sample:Line = 65:128
 Output Sample:Line = 128:128
 Output Sample:Line = 96.5:96.5
-10% Processed20% Processed30% Processed40% Processed50% ProcessedThe band changed to :2
+The band changed to :2
 Output Sample:Line = 1:1
 Output Sample:Line = 128:1
 Output Sample:Line = 1:128
@@ -52,7 +51,6 @@ Output Sample:Line = 128:65
 Output Sample:Line = 65:128
 Output Sample:Line = 128:128
 Output Sample:Line = 96.5:96.5
-60% Processed70% Processed80% Processed90% Processed100% Processed
 
 Testing NO input with one output error ...
 **PROGRAMMER ERROR** You must specify exactly one input cube.
