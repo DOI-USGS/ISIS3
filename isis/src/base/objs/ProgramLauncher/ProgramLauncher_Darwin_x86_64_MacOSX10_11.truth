@@ -4,7 +4,6 @@ Testing ls, grep, sed and pipes ...
 
 ProgramLauncher.cpp
 ProgramLauncher.h
-ProgramLauncher.o
 ProgramLauncher.truth
 Testing stats ... 
 
@@ -54,7 +53,7 @@ NOTE: The exit code for this test differs on each OS.
 That is the reason for the OS specific truth files. Please ignore the exit codes.
 
 libc++abi.dylib: terminating with uncaught exception of type Isis::IException: **ERROR** This process (program) was executed by an existing Isis 3 process. However, we failed to establish a communication channel with the parent (launcher) process. The parent process has a PID of [999].
-**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [6].
+**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/TestPreferences] failed with return status [6].
 
 Testing using Isis 3 program as a system program without pid... 
 

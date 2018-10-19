@@ -382,7 +382,9 @@ namespace Isis {
         else if((cube->pixelType() != Isis::Real) &&
                 (cube->pixelType() != Isis::UnsignedByte) &&
                 (cube->pixelType() != Isis::UnsignedWord) &&
-                (cube->pixelType() != Isis::SignedWord)) {
+                (cube->pixelType() != Isis::SignedWord) &&
+                (cube->pixelType() != Isis::UnsignedInteger) &&
+                (cube->pixelType() != Isis::SignedInteger)) {
           QString msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);

@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     try {
       interp.SetInterpType(NumericalApproximation::InterpType(11));
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     cout << "\t************************************************" << endl;
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
       y.pop_back();
       NumericalApproximation uneven(x, y);
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     cout << "\t************************************************" << endl;
@@ -177,14 +177,14 @@ int main(int argc, char *argv[]) {
       interp2.AddData(0, .8);
       interp2.DomainMinimum();
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     interp2.Reset();
     try { // DATA SET IS LESS THAN MINPOINTS
       interp2.DomainMaximum();
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     interp2.AddData(x, y);
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
     try {
       interp4.Evaluate(.5);
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     interp4.SetCubicClampedEndptDeriv(fstderiv(x[0]), fstderiv(x[x.size()-1]));
@@ -202,14 +202,14 @@ int main(int argc, char *argv[]) {
       interp4.AddData(.9, f(.9));
       interp4.Evaluate(.5);
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try { // CubicClamped DATA SET IS NOT IN ASCENDING ORDER
       interp4.AddData(.5, f(.5));
       interp4.DomainMinimum();
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     // restore interp4 object
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
       interp5.SetInterpType(NumericalApproximation::CubicNatPeriodic);
       interp5.DomainMinimum();
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     interp5.Reset(NumericalApproximation::PolynomialNeville);
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]) {
     try { //  DATA SET SIZE DOESN'T MATCH NUMBER OF DERIVATIVES ADDED
       interp6.AddCubicHermiteDeriv(fstderiv(3));
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     interp6.Reset();
@@ -311,35 +311,35 @@ int main(int argc, char *argv[]) {
     try {
       interp2.Evaluate(.9);
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     // Test outside domain Extrapolate throws exception for GSL
     try {
       interp2.Evaluate(.9, NumericalApproximation::Extrapolate);
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     // Test outside domain Extrapolate throws exception for CubicNeighborhood
     try {
       interp3.Evaluate(.9, NumericalApproximation::Extrapolate);
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     // interp2 IS NOT OF INTERP TYPE polynomial-Neville
     try {
       interp2.PolynomialNevilleErrorEstimate();
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try { // Evaluate() HAS NOT BEEN CALLED
       interp2.SetInterpType(NumericalApproximation::PolynomialNeville);
       interp2.PolynomialNevilleErrorEstimate();
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     // Test Reset() and restore the state of interp2
@@ -398,133 +398,133 @@ int main(int argc, char *argv[]) {
     try {
       interp2.GslFirstDerivative(1.0); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.GslFirstDerivative(0.2); // not GSL supported
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.BackwardFirstDifference(-1.0); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.BackwardFirstDifference(0.01, 2, .1); // steps outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.BackwardFirstDifference(0.1, 4, .01); // no 4pt formula
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.ForwardFirstDifference(-0.01); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.ForwardFirstDifference(0.75, 3, .1); // steps outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.ForwardFirstDifference(0.1, 4, .01); // no 4pt formula
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.CenterFirstDifference(.81); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.CenterFirstDifference(0.01, 5, .1); // steps outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.CenterFirstDifference(0.1, 4, .01); // no 4pt formula
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp1.GslSecondDerivative(1.0); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.GslSecondDerivative(0.8); // not GSL supported
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.BackwardSecondDifference(-1.0); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.BackwardSecondDifference(0.01, 3, .1); // steps outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.BackwardSecondDifference(0.1, 2, .01); // no 2pt formula
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.ForwardSecondDifference(-0.01); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.ForwardSecondDifference(0.75, 3, .1); // steps outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.ForwardSecondDifference(0.1, 2, .01); // no 2pt formula
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.CenterSecondDifference(.81); // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.CenterSecondDifference(0.01, 5, .1); // steps outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       interp3.CenterSecondDifference(0.1, 4, .01); // no 4pt formula
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     //interp2.AddData(x,y);
@@ -572,31 +572,31 @@ int main(int argc, char *argv[]) {
     try {
       cout << interp1.GslIntegral(1.1, 1.0) << endl; // invalid interval
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       cout << interp1.GslIntegral(1.0, 1.1) << endl; // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       cout << interp3.GslIntegral(0.0, 0.8) << endl; // not GSL supported
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       cout << interp1.TrapezoidalRule(.81, .70) << endl; // invalid interval
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     try {
       cout << interp1.TrapezoidalRule(-.1, .70) << endl; // outside domain
     }
-    catch(IException e) {
+    catch(IException &e) {
       e.print();
     }
     cout << "\t************************************************" << endl;

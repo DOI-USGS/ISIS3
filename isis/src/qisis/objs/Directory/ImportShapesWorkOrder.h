@@ -60,6 +60,8 @@ namespace Isis {
    *                           labels were not complete due to a resulting ecub not being closed
    *                           properly in thread.  The resulting ecub needs to be re-opened as
    *                           readOnly to prevent this problem.  Fixes #5274.
+   *   @history 2018-09-10 Tracie Sucharski - Added try/catch around importConfirmedShapes to catch
+   *                           any errors.
    */
   class ImportShapesWorkOrder : public WorkOrder {
       Q_OBJECT

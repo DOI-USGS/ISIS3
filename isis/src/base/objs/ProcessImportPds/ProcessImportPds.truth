@@ -1,6 +1,4 @@
 Testing PDS file containing an ^IMAGE pointer
-isisimportpds: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 PDS_VERSION_ID                 = PDS3
 
 /* FILE DATA ELEMENTS */
@@ -440,8 +438,6 @@ Group = SITE_DERIVED_GEOMETRY_PARMS
   SOLAR_ELEVATION              = -74.5811 <deg>
 End_Group
 End
-isisimportpds: Gathering statistics
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 687.556
 282178
 PDS_VERSION_ID                 = PDS3
@@ -885,8 +881,6 @@ End_Group
 End
 
 Testing PDS file containing a ^QUBE pointer
-isisimportpds: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 PDS_VERSION_ID                 = PDS3
 
 /* FILE DATA ELEMENTS */
@@ -948,8 +942,6 @@ Object = QUBE
   CORE_ITEM_BYTES = 2
 End_Object
 End
-isisimportpds: Gathering statistics
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 687.556
 282178
 **I/O ERROR** Unable to open OriginalLabel [IsisCube] in file [./unitTest.cub].
@@ -957,8 +949,6 @@ isisimportpds: Gathering statistics
 **PROGRAMMER ERROR** Unable to find OriginalLabel [IsisCube].
 
 Testing Isis2 file
-isisimportpds: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Group = BandBin
   FilterName   = B
   Center       = 0.7500
@@ -974,8 +964,6 @@ Group = Instrument
 End_Group
 End
 Testing PDS file containing an ^IMAGE pointer and ^TABLE pointer
-isisimportpds: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 PDS_VERSION_ID       = PDS3
 RECORD_TYPE          = FIXED_LENGTH
 RECORD_BYTES         = 40000
@@ -1179,8 +1167,6 @@ Object = OriginalLabel
   Bytes     = Null
 End_Object
 End
-isisimportpds: Gathering statistics
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 0.136336
 0.000260177
 PDS_VERSION_ID       = PDS3
@@ -1308,8 +1294,6 @@ Testing file with invalid Pds label
 
 ********************************************************************
 Test that defaults for projection offsets are changed and can be returned
-isisimportpds: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Projection offsets were changed. New values:
 xOffset = -0.5
 yOffset = 1

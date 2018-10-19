@@ -140,4 +140,3 @@ namespace Isis {
 extern "C" Isis::InterestOperator *ForstnerOperatorPlugin(Isis::Pvl &pvl) {
   return new Isis::ForstnerOperator(pvl);
 }
-

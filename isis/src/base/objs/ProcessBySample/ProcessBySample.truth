@@ -1,6 +1,5 @@
 Testing StartProcess routines that accept processing functions:
-unittest: Working
-0% ProcessedTesting one input cube ... 
+Testing one input cube ... 
 Buffer Samples:  1
 Buffer Lines:    126
 Buffer Bands:    1
@@ -31,7 +30,7 @@ Sample:  23  Line:  1  Band:  1
 Sample:  24  Line:  1  Band:  1
 Sample:  25  Line:  1  Band:  1
 Sample:  26  Line:  1  Band:  1
-10% ProcessedSample:  27  Line:  1  Band:  1
+Sample:  27  Line:  1  Band:  1
 Sample:  28  Line:  1  Band:  1
 Sample:  29  Line:  1  Band:  1
 Sample:  30  Line:  1  Band:  1
@@ -56,7 +55,7 @@ Sample:  48  Line:  1  Band:  1
 Sample:  49  Line:  1  Band:  1
 Sample:  50  Line:  1  Band:  1
 Sample:  51  Line:  1  Band:  1
-20% ProcessedSample:  52  Line:  1  Band:  1
+Sample:  52  Line:  1  Band:  1
 Sample:  53  Line:  1  Band:  1
 Sample:  54  Line:  1  Band:  1
 Sample:  55  Line:  1  Band:  1
@@ -81,7 +80,7 @@ Sample:  73  Line:  1  Band:  1
 Sample:  74  Line:  1  Band:  1
 Sample:  75  Line:  1  Band:  1
 Sample:  76  Line:  1  Band:  1
-30% ProcessedSample:  77  Line:  1  Band:  1
+Sample:  77  Line:  1  Band:  1
 Sample:  78  Line:  1  Band:  1
 Sample:  79  Line:  1  Band:  1
 Sample:  80  Line:  1  Band:  1
@@ -106,7 +105,7 @@ Sample:  98  Line:  1  Band:  1
 Sample:  99  Line:  1  Band:  1
 Sample:  100  Line:  1  Band:  1
 Sample:  101  Line:  1  Band:  1
-40% ProcessedSample:  102  Line:  1  Band:  1
+Sample:  102  Line:  1  Band:  1
 Sample:  103  Line:  1  Band:  1
 Sample:  104  Line:  1  Band:  1
 Sample:  105  Line:  1  Band:  1
@@ -131,7 +130,7 @@ Sample:  123  Line:  1  Band:  1
 Sample:  124  Line:  1  Band:  1
 Sample:  125  Line:  1  Band:  1
 Sample:  126  Line:  1  Band:  1
-50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  1  Band:  2
 Sample:  2  Line:  1  Band:  2
 Sample:  3  Line:  1  Band:  2
 Sample:  4  Line:  1  Band:  2
@@ -157,7 +156,7 @@ Sample:  23  Line:  1  Band:  2
 Sample:  24  Line:  1  Band:  2
 Sample:  25  Line:  1  Band:  2
 Sample:  26  Line:  1  Band:  2
-60% ProcessedSample:  27  Line:  1  Band:  2
+Sample:  27  Line:  1  Band:  2
 Sample:  28  Line:  1  Band:  2
 Sample:  29  Line:  1  Band:  2
 Sample:  30  Line:  1  Band:  2
@@ -182,7 +181,7 @@ Sample:  48  Line:  1  Band:  2
 Sample:  49  Line:  1  Band:  2
 Sample:  50  Line:  1  Band:  2
 Sample:  51  Line:  1  Band:  2
-70% ProcessedSample:  52  Line:  1  Band:  2
+Sample:  52  Line:  1  Band:  2
 Sample:  53  Line:  1  Band:  2
 Sample:  54  Line:  1  Band:  2
 Sample:  55  Line:  1  Band:  2
@@ -207,7 +206,7 @@ Sample:  73  Line:  1  Band:  2
 Sample:  74  Line:  1  Band:  2
 Sample:  75  Line:  1  Band:  2
 Sample:  76  Line:  1  Band:  2
-80% ProcessedSample:  77  Line:  1  Band:  2
+Sample:  77  Line:  1  Band:  2
 Sample:  78  Line:  1  Band:  2
 Sample:  79  Line:  1  Band:  2
 Sample:  80  Line:  1  Band:  2
@@ -232,7 +231,7 @@ Sample:  98  Line:  1  Band:  2
 Sample:  99  Line:  1  Band:  2
 Sample:  100  Line:  1  Band:  2
 Sample:  101  Line:  1  Band:  2
-90% ProcessedSample:  102  Line:  1  Band:  2
+Sample:  102  Line:  1  Band:  2
 Sample:  103  Line:  1  Band:  2
 Sample:  104  Line:  1  Band:  2
 Sample:  105  Line:  1  Band:  2
@@ -257,9 +256,7 @@ Sample:  123  Line:  1  Band:  2
 Sample:  124  Line:  1  Band:  2
 Sample:  125  Line:  1  Band:  2
 Sample:  126  Line:  1  Band:  2
-100% Processed
-unittest: Working
-0% Processed
+
 Testing one output cube ... 
 Buffer Samples:  1
 Buffer Lines:    20
@@ -268,36 +265,34 @@ Buffer Bands:    1
 Sample:  1  Line:  1  Band:  1
 Sample:  2  Line:  1  Band:  1
 Sample:  3  Line:  1  Band:  1
-10% ProcessedSample:  4  Line:  1  Band:  1
+Sample:  4  Line:  1  Band:  1
 Sample:  5  Line:  1  Band:  1
 Sample:  6  Line:  1  Band:  1
-20% ProcessedSample:  7  Line:  1  Band:  1
+Sample:  7  Line:  1  Band:  1
 Sample:  8  Line:  1  Band:  1
 Sample:  9  Line:  1  Band:  1
-30% ProcessedSample:  10  Line:  1  Band:  1
+Sample:  10  Line:  1  Band:  1
 Sample:  1  Line:  1  Band:  2
 Sample:  2  Line:  1  Band:  2
-40% ProcessedSample:  3  Line:  1  Band:  2
+Sample:  3  Line:  1  Band:  2
 Sample:  4  Line:  1  Band:  2
 Sample:  5  Line:  1  Band:  2
-50% ProcessedSample:  6  Line:  1  Band:  2
+Sample:  6  Line:  1  Band:  2
 Sample:  7  Line:  1  Band:  2
 Sample:  8  Line:  1  Band:  2
-60% ProcessedSample:  9  Line:  1  Band:  2
+Sample:  9  Line:  1  Band:  2
 Sample:  10  Line:  1  Band:  2
 Sample:  1  Line:  1  Band:  3
-70% ProcessedSample:  2  Line:  1  Band:  3
+Sample:  2  Line:  1  Band:  3
 Sample:  3  Line:  1  Band:  3
 Sample:  4  Line:  1  Band:  3
-80% ProcessedSample:  5  Line:  1  Band:  3
+Sample:  5  Line:  1  Band:  3
 Sample:  6  Line:  1  Band:  3
 Sample:  7  Line:  1  Band:  3
-90% ProcessedSample:  8  Line:  1  Band:  3
+Sample:  8  Line:  1  Band:  3
 Sample:  9  Line:  1  Band:  3
 Sample:  10  Line:  1  Band:  3
-100% Processed
-unittest: Working
-0% Processed
+
 Testing one input and output cube ... 
 Buffer Samples:  1
 Buffer Lines:    126
@@ -329,7 +324,7 @@ Sample:  23  Line:  1  Band:  1
 Sample:  24  Line:  1  Band:  1
 Sample:  25  Line:  1  Band:  1
 Sample:  26  Line:  1  Band:  1
-10% ProcessedSample:  27  Line:  1  Band:  1
+Sample:  27  Line:  1  Band:  1
 Sample:  28  Line:  1  Band:  1
 Sample:  29  Line:  1  Band:  1
 Sample:  30  Line:  1  Band:  1
@@ -354,7 +349,7 @@ Sample:  48  Line:  1  Band:  1
 Sample:  49  Line:  1  Band:  1
 Sample:  50  Line:  1  Band:  1
 Sample:  51  Line:  1  Band:  1
-20% ProcessedSample:  52  Line:  1  Band:  1
+Sample:  52  Line:  1  Band:  1
 Sample:  53  Line:  1  Band:  1
 Sample:  54  Line:  1  Band:  1
 Sample:  55  Line:  1  Band:  1
@@ -379,7 +374,7 @@ Sample:  73  Line:  1  Band:  1
 Sample:  74  Line:  1  Band:  1
 Sample:  75  Line:  1  Band:  1
 Sample:  76  Line:  1  Band:  1
-30% ProcessedSample:  77  Line:  1  Band:  1
+Sample:  77  Line:  1  Band:  1
 Sample:  78  Line:  1  Band:  1
 Sample:  79  Line:  1  Band:  1
 Sample:  80  Line:  1  Band:  1
@@ -404,7 +399,7 @@ Sample:  98  Line:  1  Band:  1
 Sample:  99  Line:  1  Band:  1
 Sample:  100  Line:  1  Band:  1
 Sample:  101  Line:  1  Band:  1
-40% ProcessedSample:  102  Line:  1  Band:  1
+Sample:  102  Line:  1  Band:  1
 Sample:  103  Line:  1  Band:  1
 Sample:  104  Line:  1  Band:  1
 Sample:  105  Line:  1  Band:  1
@@ -429,7 +424,7 @@ Sample:  123  Line:  1  Band:  1
 Sample:  124  Line:  1  Band:  1
 Sample:  125  Line:  1  Band:  1
 Sample:  126  Line:  1  Band:  1
-50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  1  Band:  2
 Sample:  2  Line:  1  Band:  2
 Sample:  3  Line:  1  Band:  2
 Sample:  4  Line:  1  Band:  2
@@ -455,7 +450,7 @@ Sample:  23  Line:  1  Band:  2
 Sample:  24  Line:  1  Band:  2
 Sample:  25  Line:  1  Band:  2
 Sample:  26  Line:  1  Band:  2
-60% ProcessedSample:  27  Line:  1  Band:  2
+Sample:  27  Line:  1  Band:  2
 Sample:  28  Line:  1  Band:  2
 Sample:  29  Line:  1  Band:  2
 Sample:  30  Line:  1  Band:  2
@@ -480,7 +475,7 @@ Sample:  48  Line:  1  Band:  2
 Sample:  49  Line:  1  Band:  2
 Sample:  50  Line:  1  Band:  2
 Sample:  51  Line:  1  Band:  2
-70% ProcessedSample:  52  Line:  1  Band:  2
+Sample:  52  Line:  1  Band:  2
 Sample:  53  Line:  1  Band:  2
 Sample:  54  Line:  1  Band:  2
 Sample:  55  Line:  1  Band:  2
@@ -505,7 +500,7 @@ Sample:  73  Line:  1  Band:  2
 Sample:  74  Line:  1  Band:  2
 Sample:  75  Line:  1  Band:  2
 Sample:  76  Line:  1  Band:  2
-80% ProcessedSample:  77  Line:  1  Band:  2
+Sample:  77  Line:  1  Band:  2
 Sample:  78  Line:  1  Band:  2
 Sample:  79  Line:  1  Band:  2
 Sample:  80  Line:  1  Band:  2
@@ -530,7 +525,7 @@ Sample:  98  Line:  1  Band:  2
 Sample:  99  Line:  1  Band:  2
 Sample:  100  Line:  1  Band:  2
 Sample:  101  Line:  1  Band:  2
-90% ProcessedSample:  102  Line:  1  Band:  2
+Sample:  102  Line:  1  Band:  2
 Sample:  103  Line:  1  Band:  2
 Sample:  104  Line:  1  Band:  2
 Sample:  105  Line:  1  Band:  2
@@ -555,9 +550,7 @@ Sample:  123  Line:  1  Band:  2
 Sample:  124  Line:  1  Band:  2
 Sample:  125  Line:  1  Band:  2
 Sample:  126  Line:  1  Band:  2
-100% Processed
-unittest: Working
-0% ProcessedTesting two input and output cubes ... 
+Testing two input and output cubes ... 
 Number of input cubes:   2
 Number of output cubes:  2
 
@@ -587,7 +580,7 @@ Sample:  23:23  Line:  1:1  Band:  1:1
 Sample:  24:24  Line:  1:1  Band:  1:1
 Sample:  25:25  Line:  1:1  Band:  1:1
 Sample:  26:26  Line:  1:1  Band:  1:1
-10% ProcessedSample:  27:27  Line:  1:1  Band:  1:1
+Sample:  27:27  Line:  1:1  Band:  1:1
 Sample:  28:28  Line:  1:1  Band:  1:1
 Sample:  29:29  Line:  1:1  Band:  1:1
 Sample:  30:30  Line:  1:1  Band:  1:1
@@ -612,7 +605,7 @@ Sample:  48:48  Line:  1:1  Band:  1:1
 Sample:  49:49  Line:  1:1  Band:  1:1
 Sample:  50:50  Line:  1:1  Band:  1:1
 Sample:  51:51  Line:  1:1  Band:  1:1
-20% ProcessedSample:  52:52  Line:  1:1  Band:  1:1
+Sample:  52:52  Line:  1:1  Band:  1:1
 Sample:  53:53  Line:  1:1  Band:  1:1
 Sample:  54:54  Line:  1:1  Band:  1:1
 Sample:  55:55  Line:  1:1  Band:  1:1
@@ -637,7 +630,7 @@ Sample:  73:73  Line:  1:1  Band:  1:1
 Sample:  74:74  Line:  1:1  Band:  1:1
 Sample:  75:75  Line:  1:1  Band:  1:1
 Sample:  76:76  Line:  1:1  Band:  1:1
-30% ProcessedSample:  77:77  Line:  1:1  Band:  1:1
+Sample:  77:77  Line:  1:1  Band:  1:1
 Sample:  78:78  Line:  1:1  Band:  1:1
 Sample:  79:79  Line:  1:1  Band:  1:1
 Sample:  80:80  Line:  1:1  Band:  1:1
@@ -662,7 +655,7 @@ Sample:  98:98  Line:  1:1  Band:  1:1
 Sample:  99:99  Line:  1:1  Band:  1:1
 Sample:  100:100  Line:  1:1  Band:  1:1
 Sample:  101:101  Line:  1:1  Band:  1:1
-40% ProcessedSample:  102:102  Line:  1:1  Band:  1:1
+Sample:  102:102  Line:  1:1  Band:  1:1
 Sample:  103:103  Line:  1:1  Band:  1:1
 Sample:  104:104  Line:  1:1  Band:  1:1
 Sample:  105:105  Line:  1:1  Band:  1:1
@@ -687,7 +680,7 @@ Sample:  123:123  Line:  1:1  Band:  1:1
 Sample:  124:124  Line:  1:1  Band:  1:1
 Sample:  125:125  Line:  1:1  Band:  1:1
 Sample:  126:126  Line:  1:1  Band:  1:1
-50% ProcessedSample:  1:1  Line:  1:1  Band:  2:1
+Sample:  1:1  Line:  1:1  Band:  2:1
 Sample:  2:2  Line:  1:1  Band:  2:1
 Sample:  3:3  Line:  1:1  Band:  2:1
 Sample:  4:4  Line:  1:1  Band:  2:1
@@ -713,7 +706,7 @@ Sample:  23:23  Line:  1:1  Band:  2:1
 Sample:  24:24  Line:  1:1  Band:  2:1
 Sample:  25:25  Line:  1:1  Band:  2:1
 Sample:  26:26  Line:  1:1  Band:  2:1
-60% ProcessedSample:  27:27  Line:  1:1  Band:  2:1
+Sample:  27:27  Line:  1:1  Band:  2:1
 Sample:  28:28  Line:  1:1  Band:  2:1
 Sample:  29:29  Line:  1:1  Band:  2:1
 Sample:  30:30  Line:  1:1  Band:  2:1
@@ -738,7 +731,7 @@ Sample:  48:48  Line:  1:1  Band:  2:1
 Sample:  49:49  Line:  1:1  Band:  2:1
 Sample:  50:50  Line:  1:1  Band:  2:1
 Sample:  51:51  Line:  1:1  Band:  2:1
-70% ProcessedSample:  52:52  Line:  1:1  Band:  2:1
+Sample:  52:52  Line:  1:1  Band:  2:1
 Sample:  53:53  Line:  1:1  Band:  2:1
 Sample:  54:54  Line:  1:1  Band:  2:1
 Sample:  55:55  Line:  1:1  Band:  2:1
@@ -763,7 +756,7 @@ Sample:  73:73  Line:  1:1  Band:  2:1
 Sample:  74:74  Line:  1:1  Band:  2:1
 Sample:  75:75  Line:  1:1  Band:  2:1
 Sample:  76:76  Line:  1:1  Band:  2:1
-80% ProcessedSample:  77:77  Line:  1:1  Band:  2:1
+Sample:  77:77  Line:  1:1  Band:  2:1
 Sample:  78:78  Line:  1:1  Band:  2:1
 Sample:  79:79  Line:  1:1  Band:  2:1
 Sample:  80:80  Line:  1:1  Band:  2:1
@@ -788,7 +781,7 @@ Sample:  98:98  Line:  1:1  Band:  2:1
 Sample:  99:99  Line:  1:1  Band:  2:1
 Sample:  100:100  Line:  1:1  Band:  2:1
 Sample:  101:101  Line:  1:1  Band:  2:1
-90% ProcessedSample:  102:102  Line:  1:1  Band:  2:1
+Sample:  102:102  Line:  1:1  Band:  2:1
 Sample:  103:103  Line:  1:1  Band:  2:1
 Sample:  104:104  Line:  1:1  Band:  2:1
 Sample:  105:105  Line:  1:1  Band:  2:1
@@ -813,10 +806,8 @@ Sample:  123:123  Line:  1:1  Band:  2:1
 Sample:  124:124  Line:  1:1  Band:  2:1
 Sample:  125:125  Line:  1:1  Band:  2:1
 Sample:  126:126  Line:  1:1  Band:  2:1
-100% Processed
 Testing Process routines which accept functors:
-unittest: Working
-0% ProcessedTesting one input cube ... 
+Testing one input cube ... 
 Buffer Samples:  1
 Buffer Lines:    126
 Buffer Bands:    1
@@ -847,7 +838,7 @@ Sample:  23  Line:  1  Band:  1
 Sample:  24  Line:  1  Band:  1
 Sample:  25  Line:  1  Band:  1
 Sample:  26  Line:  1  Band:  1
-10% ProcessedSample:  27  Line:  1  Band:  1
+Sample:  27  Line:  1  Band:  1
 Sample:  28  Line:  1  Band:  1
 Sample:  29  Line:  1  Band:  1
 Sample:  30  Line:  1  Band:  1
@@ -872,7 +863,7 @@ Sample:  48  Line:  1  Band:  1
 Sample:  49  Line:  1  Band:  1
 Sample:  50  Line:  1  Band:  1
 Sample:  51  Line:  1  Band:  1
-20% ProcessedSample:  52  Line:  1  Band:  1
+Sample:  52  Line:  1  Band:  1
 Sample:  53  Line:  1  Band:  1
 Sample:  54  Line:  1  Band:  1
 Sample:  55  Line:  1  Band:  1
@@ -897,7 +888,7 @@ Sample:  73  Line:  1  Band:  1
 Sample:  74  Line:  1  Band:  1
 Sample:  75  Line:  1  Band:  1
 Sample:  76  Line:  1  Band:  1
-30% ProcessedSample:  77  Line:  1  Band:  1
+Sample:  77  Line:  1  Band:  1
 Sample:  78  Line:  1  Band:  1
 Sample:  79  Line:  1  Band:  1
 Sample:  80  Line:  1  Band:  1
@@ -922,7 +913,7 @@ Sample:  98  Line:  1  Band:  1
 Sample:  99  Line:  1  Band:  1
 Sample:  100  Line:  1  Band:  1
 Sample:  101  Line:  1  Band:  1
-40% ProcessedSample:  102  Line:  1  Band:  1
+Sample:  102  Line:  1  Band:  1
 Sample:  103  Line:  1  Band:  1
 Sample:  104  Line:  1  Band:  1
 Sample:  105  Line:  1  Band:  1
@@ -947,7 +938,7 @@ Sample:  123  Line:  1  Band:  1
 Sample:  124  Line:  1  Band:  1
 Sample:  125  Line:  1  Band:  1
 Sample:  126  Line:  1  Band:  1
-50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  1  Band:  2
 Sample:  2  Line:  1  Band:  2
 Sample:  3  Line:  1  Band:  2
 Sample:  4  Line:  1  Band:  2
@@ -973,7 +964,7 @@ Sample:  23  Line:  1  Band:  2
 Sample:  24  Line:  1  Band:  2
 Sample:  25  Line:  1  Band:  2
 Sample:  26  Line:  1  Band:  2
-60% ProcessedSample:  27  Line:  1  Band:  2
+Sample:  27  Line:  1  Band:  2
 Sample:  28  Line:  1  Band:  2
 Sample:  29  Line:  1  Band:  2
 Sample:  30  Line:  1  Band:  2
@@ -998,7 +989,7 @@ Sample:  48  Line:  1  Band:  2
 Sample:  49  Line:  1  Band:  2
 Sample:  50  Line:  1  Band:  2
 Sample:  51  Line:  1  Band:  2
-70% ProcessedSample:  52  Line:  1  Band:  2
+Sample:  52  Line:  1  Band:  2
 Sample:  53  Line:  1  Band:  2
 Sample:  54  Line:  1  Band:  2
 Sample:  55  Line:  1  Band:  2
@@ -1023,7 +1014,7 @@ Sample:  73  Line:  1  Band:  2
 Sample:  74  Line:  1  Band:  2
 Sample:  75  Line:  1  Band:  2
 Sample:  76  Line:  1  Band:  2
-80% ProcessedSample:  77  Line:  1  Band:  2
+Sample:  77  Line:  1  Band:  2
 Sample:  78  Line:  1  Band:  2
 Sample:  79  Line:  1  Band:  2
 Sample:  80  Line:  1  Band:  2
@@ -1048,7 +1039,7 @@ Sample:  98  Line:  1  Band:  2
 Sample:  99  Line:  1  Band:  2
 Sample:  100  Line:  1  Band:  2
 Sample:  101  Line:  1  Band:  2
-90% ProcessedSample:  102  Line:  1  Band:  2
+Sample:  102  Line:  1  Band:  2
 Sample:  103  Line:  1  Band:  2
 Sample:  104  Line:  1  Band:  2
 Sample:  105  Line:  1  Band:  2
@@ -1073,9 +1064,7 @@ Sample:  123  Line:  1  Band:  2
 Sample:  124  Line:  1  Band:  2
 Sample:  125  Line:  1  Band:  2
 Sample:  126  Line:  1  Band:  2
-100% Processed
-unittest: Working
-0% Processed
+
 Testing one input and output cube ... 
 Buffer Samples:  1
 Buffer Lines:    126
@@ -1107,7 +1096,7 @@ Sample:  23  Line:  1  Band:  1
 Sample:  24  Line:  1  Band:  1
 Sample:  25  Line:  1  Band:  1
 Sample:  26  Line:  1  Band:  1
-10% ProcessedSample:  27  Line:  1  Band:  1
+Sample:  27  Line:  1  Band:  1
 Sample:  28  Line:  1  Band:  1
 Sample:  29  Line:  1  Band:  1
 Sample:  30  Line:  1  Band:  1
@@ -1132,7 +1121,7 @@ Sample:  48  Line:  1  Band:  1
 Sample:  49  Line:  1  Band:  1
 Sample:  50  Line:  1  Band:  1
 Sample:  51  Line:  1  Band:  1
-20% ProcessedSample:  52  Line:  1  Band:  1
+Sample:  52  Line:  1  Band:  1
 Sample:  53  Line:  1  Band:  1
 Sample:  54  Line:  1  Band:  1
 Sample:  55  Line:  1  Band:  1
@@ -1157,7 +1146,7 @@ Sample:  73  Line:  1  Band:  1
 Sample:  74  Line:  1  Band:  1
 Sample:  75  Line:  1  Band:  1
 Sample:  76  Line:  1  Band:  1
-30% ProcessedSample:  77  Line:  1  Band:  1
+Sample:  77  Line:  1  Band:  1
 Sample:  78  Line:  1  Band:  1
 Sample:  79  Line:  1  Band:  1
 Sample:  80  Line:  1  Band:  1
@@ -1182,7 +1171,7 @@ Sample:  98  Line:  1  Band:  1
 Sample:  99  Line:  1  Band:  1
 Sample:  100  Line:  1  Band:  1
 Sample:  101  Line:  1  Band:  1
-40% ProcessedSample:  102  Line:  1  Band:  1
+Sample:  102  Line:  1  Band:  1
 Sample:  103  Line:  1  Band:  1
 Sample:  104  Line:  1  Band:  1
 Sample:  105  Line:  1  Band:  1
@@ -1207,7 +1196,7 @@ Sample:  123  Line:  1  Band:  1
 Sample:  124  Line:  1  Band:  1
 Sample:  125  Line:  1  Band:  1
 Sample:  126  Line:  1  Band:  1
-50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  1  Band:  2
 Sample:  2  Line:  1  Band:  2
 Sample:  3  Line:  1  Band:  2
 Sample:  4  Line:  1  Band:  2
@@ -1233,7 +1222,7 @@ Sample:  23  Line:  1  Band:  2
 Sample:  24  Line:  1  Band:  2
 Sample:  25  Line:  1  Band:  2
 Sample:  26  Line:  1  Band:  2
-60% ProcessedSample:  27  Line:  1  Band:  2
+Sample:  27  Line:  1  Band:  2
 Sample:  28  Line:  1  Band:  2
 Sample:  29  Line:  1  Band:  2
 Sample:  30  Line:  1  Band:  2
@@ -1258,7 +1247,7 @@ Sample:  48  Line:  1  Band:  2
 Sample:  49  Line:  1  Band:  2
 Sample:  50  Line:  1  Band:  2
 Sample:  51  Line:  1  Band:  2
-70% ProcessedSample:  52  Line:  1  Band:  2
+Sample:  52  Line:  1  Band:  2
 Sample:  53  Line:  1  Band:  2
 Sample:  54  Line:  1  Band:  2
 Sample:  55  Line:  1  Band:  2
@@ -1283,7 +1272,7 @@ Sample:  73  Line:  1  Band:  2
 Sample:  74  Line:  1  Band:  2
 Sample:  75  Line:  1  Band:  2
 Sample:  76  Line:  1  Band:  2
-80% ProcessedSample:  77  Line:  1  Band:  2
+Sample:  77  Line:  1  Band:  2
 Sample:  78  Line:  1  Band:  2
 Sample:  79  Line:  1  Band:  2
 Sample:  80  Line:  1  Band:  2
@@ -1308,7 +1297,7 @@ Sample:  98  Line:  1  Band:  2
 Sample:  99  Line:  1  Band:  2
 Sample:  100  Line:  1  Band:  2
 Sample:  101  Line:  1  Band:  2
-90% ProcessedSample:  102  Line:  1  Band:  2
+Sample:  102  Line:  1  Band:  2
 Sample:  103  Line:  1  Band:  2
 Sample:  104  Line:  1  Band:  2
 Sample:  105  Line:  1  Band:  2
@@ -1333,9 +1322,7 @@ Sample:  123  Line:  1  Band:  2
 Sample:  124  Line:  1  Band:  2
 Sample:  125  Line:  1  Band:  2
 Sample:  126  Line:  1  Band:  2
-100% Processed
-unittest: Working
-0% ProcessedSample:  1:1  Line:  1:1  Band:  1:1
+Sample:  1:1  Line:  1:1  Band:  1:1
 Sample:  2:2  Line:  1:1  Band:  1:1
 Sample:  3:3  Line:  1:1  Band:  1:1
 Sample:  4:4  Line:  1:1  Band:  1:1
@@ -1361,7 +1348,7 @@ Sample:  23:23  Line:  1:1  Band:  1:1
 Sample:  24:24  Line:  1:1  Band:  1:1
 Sample:  25:25  Line:  1:1  Band:  1:1
 Sample:  26:26  Line:  1:1  Band:  1:1
-10% ProcessedSample:  27:27  Line:  1:1  Band:  1:1
+Sample:  27:27  Line:  1:1  Band:  1:1
 Sample:  28:28  Line:  1:1  Band:  1:1
 Sample:  29:29  Line:  1:1  Band:  1:1
 Sample:  30:30  Line:  1:1  Band:  1:1
@@ -1386,7 +1373,7 @@ Sample:  48:48  Line:  1:1  Band:  1:1
 Sample:  49:49  Line:  1:1  Band:  1:1
 Sample:  50:50  Line:  1:1  Band:  1:1
 Sample:  51:51  Line:  1:1  Band:  1:1
-20% ProcessedSample:  52:52  Line:  1:1  Band:  1:1
+Sample:  52:52  Line:  1:1  Band:  1:1
 Sample:  53:53  Line:  1:1  Band:  1:1
 Sample:  54:54  Line:  1:1  Band:  1:1
 Sample:  55:55  Line:  1:1  Band:  1:1
@@ -1411,7 +1398,7 @@ Sample:  73:73  Line:  1:1  Band:  1:1
 Sample:  74:74  Line:  1:1  Band:  1:1
 Sample:  75:75  Line:  1:1  Band:  1:1
 Sample:  76:76  Line:  1:1  Band:  1:1
-30% ProcessedSample:  77:77  Line:  1:1  Band:  1:1
+Sample:  77:77  Line:  1:1  Band:  1:1
 Sample:  78:78  Line:  1:1  Band:  1:1
 Sample:  79:79  Line:  1:1  Band:  1:1
 Sample:  80:80  Line:  1:1  Band:  1:1
@@ -1436,7 +1423,7 @@ Sample:  98:98  Line:  1:1  Band:  1:1
 Sample:  99:99  Line:  1:1  Band:  1:1
 Sample:  100:100  Line:  1:1  Band:  1:1
 Sample:  101:101  Line:  1:1  Band:  1:1
-40% ProcessedSample:  102:102  Line:  1:1  Band:  1:1
+Sample:  102:102  Line:  1:1  Band:  1:1
 Sample:  103:103  Line:  1:1  Band:  1:1
 Sample:  104:104  Line:  1:1  Band:  1:1
 Sample:  105:105  Line:  1:1  Band:  1:1
@@ -1461,7 +1448,7 @@ Sample:  123:123  Line:  1:1  Band:  1:1
 Sample:  124:124  Line:  1:1  Band:  1:1
 Sample:  125:125  Line:  1:1  Band:  1:1
 Sample:  126:126  Line:  1:1  Band:  1:1
-50% ProcessedSample:  1:1  Line:  1:1  Band:  2:1
+Sample:  1:1  Line:  1:1  Band:  2:1
 Sample:  2:2  Line:  1:1  Band:  2:1
 Sample:  3:3  Line:  1:1  Band:  2:1
 Sample:  4:4  Line:  1:1  Band:  2:1
@@ -1487,7 +1474,7 @@ Sample:  23:23  Line:  1:1  Band:  2:1
 Sample:  24:24  Line:  1:1  Band:  2:1
 Sample:  25:25  Line:  1:1  Band:  2:1
 Sample:  26:26  Line:  1:1  Band:  2:1
-60% ProcessedSample:  27:27  Line:  1:1  Band:  2:1
+Sample:  27:27  Line:  1:1  Band:  2:1
 Sample:  28:28  Line:  1:1  Band:  2:1
 Sample:  29:29  Line:  1:1  Band:  2:1
 Sample:  30:30  Line:  1:1  Band:  2:1
@@ -1512,7 +1499,7 @@ Sample:  48:48  Line:  1:1  Band:  2:1
 Sample:  49:49  Line:  1:1  Band:  2:1
 Sample:  50:50  Line:  1:1  Band:  2:1
 Sample:  51:51  Line:  1:1  Band:  2:1
-70% ProcessedSample:  52:52  Line:  1:1  Band:  2:1
+Sample:  52:52  Line:  1:1  Band:  2:1
 Sample:  53:53  Line:  1:1  Band:  2:1
 Sample:  54:54  Line:  1:1  Band:  2:1
 Sample:  55:55  Line:  1:1  Band:  2:1
@@ -1537,7 +1524,7 @@ Sample:  73:73  Line:  1:1  Band:  2:1
 Sample:  74:74  Line:  1:1  Band:  2:1
 Sample:  75:75  Line:  1:1  Band:  2:1
 Sample:  76:76  Line:  1:1  Band:  2:1
-80% ProcessedSample:  77:77  Line:  1:1  Band:  2:1
+Sample:  77:77  Line:  1:1  Band:  2:1
 Sample:  78:78  Line:  1:1  Band:  2:1
 Sample:  79:79  Line:  1:1  Band:  2:1
 Sample:  80:80  Line:  1:1  Band:  2:1
@@ -1562,7 +1549,7 @@ Sample:  98:98  Line:  1:1  Band:  2:1
 Sample:  99:99  Line:  1:1  Band:  2:1
 Sample:  100:100  Line:  1:1  Band:  2:1
 Sample:  101:101  Line:  1:1  Band:  2:1
-90% ProcessedSample:  102:102  Line:  1:1  Band:  2:1
+Sample:  102:102  Line:  1:1  Band:  2:1
 Sample:  103:103  Line:  1:1  Band:  2:1
 Sample:  104:104  Line:  1:1  Band:  2:1
 Sample:  105:105  Line:  1:1  Band:  2:1
@@ -1587,4 +1574,3 @@ Sample:  123:123  Line:  1:1  Band:  2:1
 Sample:  124:124  Line:  1:1  Band:  2:1
 Sample:  125:125  Line:  1:1  Band:  2:1
 Sample:  126:126  Line:  1:1  Band:  2:1
-100% Processed
