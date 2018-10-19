@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id: isisminer.xml 6513 2016-01-14 23:04:44Z kbecker@GS.DOI.NET $ -->
-<!-- <application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> -->
-<application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usgs/pkgs/isis3/isis/doc/Schemas/Application/application.xsd">
+<application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<!--<application name="isisminer" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usgs/pkgs/isis3/isis/doc/Schemas/Application/application.xsd">  -->
 
   <brief>
        Run a series of algorithms (Strategies) that perform various operations on input 
