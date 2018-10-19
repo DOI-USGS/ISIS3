@@ -8,10 +8,13 @@
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
+#include "Target.h"
 #include "TProjection.h"
 
 #include <cmath>
+#include <SpiceUsr.h>
 
 using namespace std;
 using namespace Isis;
@@ -48,6 +51,7 @@ bool declination;
 bool bodyFixedX;
 bool bodyFixedY;
 bool bodyFixedZ;
+bool sunilluminationmask;
 
 void phocubeDN(Buffer &in, Buffer &out);
 void phocube(Buffer &out);
@@ -134,6 +138,7 @@ void IsisMain() {
   bodyFixedX = false;
   bodyFixedY = false;
   bodyFixedZ = false;
+  sunilluminationmask = false;
   if (!noCamera) {
     if ((phase = ui.GetBoolean("PHASE"))) nbands++;
     if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
@@ -157,6 +162,7 @@ void IsisMain() {
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
+    if ((sunilluminationmask = ui.GetBoolean("SUNILLUMINATIONMASK"))) nbands++;
   }
   if((dn = ui.GetBoolean("DN"))) nbands++;
   if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
@@ -210,6 +216,7 @@ void IsisMain() {
   if (bodyFixedX) name += "Body Fixed X";
   if (bodyFixedY) name += "Body Fixed Y";
   if (bodyFixedZ) name += "Body Fixed Z";
+  if (sunilluminationmask) name += "Sun Illumination Mask";
 
 
   // Create the output cube.  Note we add the input cube to expedite propagation
@@ -446,6 +453,21 @@ void phocube(Buffer &out) {
             out[index] = pB[2];
             index += 64 * 64;
           }
+
+          // Compute the solar illumination mask
+            if ( sunilluminationmask ) {
+                vector<double> sB(3), pB(3);
+                cam->sunPosition(&sB[0]);
+                cam->Coordinate(&pB[0]);
+
+                // Look direction is the sun position to the surface point
+                // in body-fixed
+                vector<double> slookdir(3);
+                vsub_c(&pB[0], &sB[0], &slookdir[0]);
+
+                out[index]= (int) cam->target()->shape()->isVisibleFrom(sB, slookdir);
+                index += 64 * 64;
+            }
         }
         
       }
