@@ -125,6 +125,9 @@ namespace Isis {
    *  @history 2017-08-11 Adam Goins - Added the ability to ctrl + c to copy the filename
    *                          of the current cube into the system's clipboard.
    *                          Fixes #5098.
+   *  @history 2018-07-31 Kaitlyn Lee - Added setTrackingCube() and trackingCube() so that a
+   *                          tracking cube is stored when needed and we do not have to open it in
+   *                          AdvancedTrackTool every time the cursor is moved.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
@@ -132,14 +135,14 @@ namespace Isis {
     public:
       /**
        * Constructor for the CubeViewport
-       * 
+       *
        * @param cube The cube to load into a CubeViewport
        * @param cubeData The Cube Data Thread
        * @param parent The parent widget to this Viewport
-       * 
+       *
        */
       CubeViewport(Cube *cube, CubeDataThread * cdt = 0, QWidget *parent = 0);
-      
+
       /**
        * Deconstructor for the Cubeviewport
        */
@@ -158,7 +161,7 @@ namespace Isis {
           BandInfo(const BandInfo &other);
           //! Deconstructor
           ~BandInfo();
-          
+
           /**
            * The BandInfo for the Cube
            *
@@ -166,7 +169,7 @@ namespace Isis {
            * @return The BandInfo
            */
           const BandInfo &operator=(BandInfo other);
-          
+
           //! @return The Stretch
           Stretch getStretch() const;
           //! @param newStretch The new Stretch value
@@ -239,7 +242,7 @@ namespace Isis {
 
       /**
        * Calle dhwen the contents of the cube changes
-       * 
+       *
        * @param rect The QRect
        */
       void cubeContentsChanged(QRect rect);
@@ -253,7 +256,7 @@ namespace Isis {
 
       /**
        * Turns a viewport into a cube
-       * 
+       *
        * @param x
        * @param y
        * @param sample
@@ -261,20 +264,20 @@ namespace Isis {
        */
       void viewportToCube(int x, int y,
                           double &sample, double &line) const;
-                          
+
        /**
        * Turns a cube into a viewport
-       * 
+       *
        * @param x
        * @param y
        * @param sample
        * @param line
-       */             
+       */
       void cubeToViewport(double sample, double line,
                           int &x, int &y) const;
        /**
        * Turns contents to a cube
-       * 
+       *
        * @param x
        * @param y
        * @param sample
@@ -284,7 +287,7 @@ namespace Isis {
                           double &sample, double &line) const;
        /**
        * Turns a cube into contents
-       * 
+       *
        * @param x
        * @param y
        * @param sample
@@ -295,40 +298,40 @@ namespace Isis {
 
       /**
        * Gets the red pixel
-       * 
+       *
        * @param sample The sample
        * @param line The line
-       * 
+       *
        * @return The redPixel value
        */
       double redPixel(int sample, int line);
-      
+
       /**
        * Gets the green pixel
-       * 
+       *
        * @param sample The sample
        * @param line The line
-       * 
+       *
        * @return The greenPixel value
        */
       double greenPixel(int sample, int line);
-       
+
       /**
        * Gets the blue pixel
-       * 
+       *
        * @param sample The sample
        * @param line The line
-       * 
+       *
        * @return The bluePixel value
        */
       double bluePixel(int sample, int line);
-      
+
       /**
        * Gets the gray pixel
-       * 
+       *
        * @param sample The sample
        * @param line The line
-       * 
+       *
        * @return The grayPixel value
        */
       double grayPixel(int sample, int line);
@@ -359,6 +362,11 @@ namespace Isis {
       //! @return the universal ground map associated with the cube (NULL implies none)
       UniversalGroundMap *universalGroundMap() const {
         return p_groundMap;
+      };
+
+      //! @return The tracking cube associated with p_cube (if it has one)
+      Cube *trackingCube() const {
+        return p_trackingCube;
       };
 
       void moveCursor(int x, int y);
@@ -512,6 +520,8 @@ namespace Isis {
 
       bool confirmClose();
 
+      void setTrackingCube();
+
     signals:
       void viewportUpdated();//!< Emitted when viewport updated.
       void viewportClosed(CubeViewport *);//!< Emitted when viewport is closed.
@@ -628,6 +638,7 @@ namespace Isis {
       Camera *p_camera;  //!< The camera from the cube.
       Projection *p_projection;  //!< The projection from the cube.
       UniversalGroundMap *p_groundMap;  //!< The universal ground map from the cube.
+      Cube *p_trackingCube; //<! The tracking cube associated with p_cube
 
       //! Activated to update progress bar
       QTimer *p_progressTimer;

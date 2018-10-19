@@ -79,6 +79,8 @@ namespace Isis {
    *   @history 2017-09-08 Summer Stapleton - Included test for Isis::Null being returned from
    *                            accessor method call in Histogram::rangesFromNet(). Fixes #5123,
    *                            #1673.
+   *   @history 2018-07-27 Jesse Mapel - Added support for initializing a histogram from
+   *                           signed and unsigned word cubes. References #971.
    */
 
   class Histogram : public Statistics {

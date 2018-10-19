@@ -120,7 +120,7 @@ namespace Isis {
     try {
       project()->directory()->addControlHealthMonitorView();
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }

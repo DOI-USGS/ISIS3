@@ -2,17 +2,17 @@
  * @file
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
- *   domain. See individual third-party library and package descriptions for 
+ *   domain. See individual third-party library and package descriptions for
  *   intellectual property information,user agreements, and related information.
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
- *   is made by the USGS as to the accuracy and functioning of such software 
- *   and related material nor shall the fact of distribution constitute any such 
- *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
  *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
@@ -54,13 +54,13 @@ int main(void) {
       cam = CameraFactory::Create(cube);
       cout << "FileName: " << FileName(files[i]).name() << endl;
       cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
-      
+
       // Test name methods
       cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
       cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
       cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
       cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
-      
+
       cout.setf(std::ios::fixed);
       cout << setprecision(9);
 
@@ -105,13 +105,13 @@ int main(void) {
     // Test kernel ID messages
     cout << "Kernel ID error messages: " << endl;
     try{ cam->CkFrameId(); }
-    catch (IException e){ e.print(); }
+    catch (IException &e){ e.print(); }
     try{ cam->CkReferenceId(); }
-    catch (IException e){ e.print(); }
+    catch (IException &e){ e.print(); }
     try{ cam->SpkTargetId(); }
-    catch (IException e){ e.print(); }
+    catch (IException &e){ e.print(); }
     try{ cam->SpkReferenceId(); }
-    catch (IException e){ e.print(); }
+    catch (IException &e){ e.print(); }
     delete cam;
   }
   catch(IException &e) {

@@ -32,6 +32,7 @@ commands:
 	       -e 's/\(.*second:\).*/\1/' \
 	       -e 's/\(Processing.*:\).*/\1/' \
                -e 's/\(.*\) [0-9]*\.[0-9]* \(seconds*\)/\1 \2/' \
+            -e 's/\(Total threads:\).*/\1/' \
 	       $(OUTPUT)/debug_temp.txt > $(OUTPUT)/debug.txt;
 	# Do same to stdoutdebug_temp, and remove total threads and
 	# MatchSolution Group

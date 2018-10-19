@@ -51,11 +51,14 @@ void testGroundPointToCamera(Latitude &lat,
                              std::vector<double> &observer,
                              BulletShapeModel &bulletModel);
 
-/** 
+/**
  * Unit test for Bullet Physics Ray Tracing library
- *  
+ *
  * @internal
  *   @history 2017-03-19 Kris Becker
+ *   @history 2018-08-07 Adam Goins - Removed qDebug() output of maxnumtriangles and maxnumparts
+ *                           because they are values grabbed from Bullet so we don't need to be
+ *                           testing them.
  *
  */
 int main(int argc, char *argv[]) {
@@ -66,8 +69,6 @@ int main(int argc, char *argv[]) {
     QString itokawaDskFile("$base/testData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
 
     qDebug() << "Unit test for BulletShapeModel";
-    qDebug() << "  MaxTriangles: " << bt_MaxTriangles();
-    qDebug() << "  MaxBodyParts: " << bt_MaxBodyParts();
     qDebug() << "";
     qDebug() << "";
 
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     itokawaModel.setTolerance(0.001);
     outputModelStatus(itokawaModel);
     qDebug() << "";
-    
+
     qDebug() << "----====     Test camera to ground intersections     ====----";
     qDebug() << "";
     qDebug() << "";
@@ -188,19 +189,19 @@ int main(int argc, char *argv[]) {
     testLon.setDegrees(328.573);
     testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
     qDebug() << "";
-    
+
 
     testLat.setDegrees(-26.1383);
     testLon.setDegrees(356.964);
     testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
     qDebug() << "";
-    
+
 
     testLat.setDegrees(12.8509);
     testLon.setDegrees(291.106);
     testGroundPointToCamera(testLat, testLon, observer, itokawaModel);
     qDebug() << "";
-    
+
 
     testLat.setDegrees(-18.6357);
     testLon.setDegrees(60);

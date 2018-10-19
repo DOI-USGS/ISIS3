@@ -43,6 +43,8 @@ namespace Isis {
    *                          check text instead of int values. Add tool tip explaining why point
    *                          type cannot be changed.  Set tool tip on Ok button explaining why it
    *                          is not enabled. Fixes #5087.
+   *   @history 2018-10-05 Tracie Sucharski - Add radius source combo for choosing the radius
+   *                          source. References #5504.
    */
   class NewControlPointDialog : public QDialog {
 
@@ -60,7 +62,9 @@ namespace Isis {
       QString pointId() const;
       int pointType() const;
       void setGroundSource(QStringList groundFiles, int numberShapesWithPoint);
+      void setRadiusSource(QStringList radiusFiles);
       QString groundSource() const;
+      QString radiusSource() const;
       QStringList selectedFiles() const;
       void setFiles(QStringList pointFiles);
       bool subpixelRegisterPoint();
@@ -76,7 +80,7 @@ namespace Isis {
       QLabel *m_ptIdLabel;
       QComboBox *m_pointTypeCombo;
       QComboBox *m_groundSourceCombo;
-      QHBoxLayout *m_groundSourceLayout;
+      QComboBox *m_radiusSourceCombo;
       QRadioButton *m_subpixelRegisterButton;
       QPushButton *m_okButton;
       QLineEdit *m_ptIdEdit;

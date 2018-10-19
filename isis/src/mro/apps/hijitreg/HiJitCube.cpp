@@ -281,7 +281,7 @@ namespace Isis {
                         jdata.summing);
       }
     }
-    catch(Exception hiExc) {
+    catch(Exception &hiExc) {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
           << ") is illegal (must be > 0) or CPMM number (" << jdata.cpmmNumber
