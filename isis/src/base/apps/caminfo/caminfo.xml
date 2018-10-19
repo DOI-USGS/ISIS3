@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <application name="caminfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-
+<!-- <application name="caminfo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/usgs/pkgs/isis3/isis/doc/Schemas/Application/application.xsd"> -->
   <brief>
     Outputs a PVL file that contains camera information. 
   </brief>
@@ -362,7 +362,7 @@ End
     <change name="Janet Richie" date="2013-02-25">
       Reviewed documentation. References #1452.
     </change>
-    <change name="Kris Becker" date="2018-08-06">
+    <change name="UA/OSIRIS-REx IPWG Team" date="2018-08-06">
         Add all keyword/values found in the output of the camstats run into
         the Camstats object. Provide option to read camstats data from the
         CamstatsStatistics Table object in the cube label rather than

@@ -463,7 +463,7 @@ void GenerateCSVOutput(Cube *incube,
 /**
  * @brief Get CameraStatistics from cube table and construct Pvl 
  * 
- * @author 2018-08-09 Kris Becker
+ * @author 2018-08-09 UA/OSIRIS-REx IPWG Team 
  * 
  * @param cube   Cube to extract CameraStatistics table 
  * @param camPvl Output Pvl object to write keywords
@@ -513,7 +513,7 @@ bool getCamstatsBlob(Cube &cube, Pvl &camPvl) {
 /**
  * @brief Transfer camstats keywords from Pvl to string pair
  * 
- * @author 2018-08-09 Kris Becker
+ * @author 2018-08-09 UA/OSIRIS-REx IPWG Team 
  * 
  * @param camstats Input Pvl object containing camstats output
  * @param outkeys  String pair structure
