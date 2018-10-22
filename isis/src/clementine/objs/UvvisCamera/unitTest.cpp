@@ -45,8 +45,10 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -78.45421507741148;
-    double knownLon = 126.8232718994049;
+//    double knownLat = -78.45421507741148;
+//    double knownLon = 126.8232718994049;
+    double knownLat = -78.5596210979503127;
+    double knownLon = 126.7917803447135014;
 
     Cube c("$clementine1/testData/lub0428b.cub", "r");
     UvvisCamera *cam = (UvvisCamera *) CameraFactory::Create(c);

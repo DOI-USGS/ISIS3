@@ -52,6 +52,7 @@
 #include "Shape.h"
 #include "ShapeList.h"
 #include "SpecialPixel.h"
+#include "Table.h"
 #include "TemplateList.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
@@ -76,9 +77,11 @@ namespace Isis {
     m_cnetModified = false;
     m_templateModified = false;
     m_serialNumberList = NULL;
+    m_editPoint = NULL;
 
     m_changeAllGroundLocation = false;
     m_changeGroundLocationInNet = false;
+    m_demOpen = false;
 
     m_parent = parent;
 
@@ -93,9 +96,6 @@ namespace Isis {
 
 
   ControlPointEditWidget::~ControlPointEditWidget () {
-
-    // TODO: Don't write settings in destructor, must do this earlier in close event
-//  writeSettings();
 
   }
 
@@ -164,7 +164,6 @@ namespace Isis {
 
     connect(this, SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
             m_measureEditor, SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
-    connect(m_measureEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
     connect(m_measureEditor, SIGNAL(measureSaved()), this, SLOT(measureSaved()));
     connect(this, SIGNAL(cnetModified()), this, SLOT(colorizeSaveNetButton()));
 
@@ -318,11 +317,7 @@ namespace Isis {
     // create left vertical layout
     m_ptIdValue = new QLabel;
 
-//TODO 2014-07-22 TLS ipce Handle ground control points SOON
     m_numMeasures = new QLabel;
-//  QHBoxLayout *pointInfoLayout = new QHBoxLayout;
-//  pointInfoLayout->addWidget(m_ptIdValue);
-//  pointInfoLayout->addWidget(m_numMeasures);
 
     m_aprioriLatitude = new QLabel;
     m_aprioriLongitude = new QLabel;
@@ -336,34 +331,36 @@ namespace Isis {
       this, SLOT(setIgnorePoint(bool)));
     connect(this, SIGNAL(ignorePointChanged()), m_ignorePoint, SLOT(toggle()));
 
-//  QHBoxLayout * pointStatusLayout = new QHBoxLayout;
-//  pointStatusLayout->addWidget(m_lockPoint);
-//  pointStatusLayout->addWidget(m_ignorePoint);
-
-    m_pointType = new QComboBox;
+    m_pointTypeCombo = new QComboBox;
     for (int i=0; i<ControlPoint::PointTypeCount; i++) {
-      m_pointType->insertItem(i, ControlPoint::PointTypeToString(
+      m_pointTypeCombo->insertItem(i, ControlPoint::PointTypeToString(
             (ControlPoint::PointType) i));
     }
     QFormLayout *pointTypeLayout = new QFormLayout;
-//  QLabel *pointTypeLabel = new QLabel("PointType:");
-    pointTypeLayout->addRow("PointType:", m_pointType);
-//  pointTypeLayout->addWidget(m_pointType);
-//  connect(m_pointType, SIGNAL(activated(int)),
-//    this, SLOT(setPointType(int)));
+    pointTypeLayout->addRow("PointType:", m_pointTypeCombo);
+    connect(m_pointTypeCombo, SIGNAL(activated(int)),
+            this, SLOT(setPointType(int)));
+
+    m_groundSourceCombo = new QComboBox();
+    m_radiusSourceCombo = new QComboBox();
+    connect(m_groundSourceCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(groundSourceFileSelectionChanged(int)));
+    QFormLayout *groundSourceLayout = new QFormLayout;
+    groundSourceLayout->addRow("Ground Source:", m_groundSourceCombo);
+    QFormLayout *radiusSourceLayout = new QFormLayout;
+    radiusSourceLayout->addRow("Radius Source:", m_radiusSourceCombo);
 
     QVBoxLayout * mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_ptIdValue);
     mainLayout->addWidget(m_numMeasures);
+    mainLayout->addLayout(groundSourceLayout);
+    mainLayout->addLayout(radiusSourceLayout);
     mainLayout->addWidget(m_aprioriLatitude);
     mainLayout->addWidget(m_aprioriLongitude);
     mainLayout->addWidget(m_aprioriRadius);
     mainLayout->addWidget(m_lockPoint);
     mainLayout->addWidget(m_ignorePoint);
     mainLayout->addLayout(pointTypeLayout);
-//  mainLayout->addLayout(pointInfoLayout);
-//  mainLayout->addLayout(pointStatusLayout);
-//  mainLayout->addLayout(pointTypeLayout);
 
     // create the groupbox
     QGroupBox * groupBox = new QGroupBox("Control Point");
@@ -440,8 +437,8 @@ namespace Isis {
     m_rightCombo->view()->setDropIndicatorShown(true);
     m_rightCombo->view()->setDragDropMode(QAbstractItemView::InternalMove);
 
-    // Attach shortcuts to Qnet Tool's window for selecting right measures
-    // Note: Qt handles this memory for us since m_qnetTool is the parent of these shortcuts
+    // Attach shortcuts to this widget for selecting right measures
+    // Note: Qt handles this memory for us since ControlPointEditWidget is the parent of these shortcuts
     QShortcut *nextMeasure = new QShortcut(Qt::Key_PageDown, this);
     connect(nextMeasure, SIGNAL(activated()), this, SLOT(nextRightMeasure()));
     QShortcut *prevMeasure = new QShortcut(Qt::Key_PageUp, this);
@@ -563,6 +560,72 @@ namespace Isis {
 
 
   /**
+   * Fill m_projectShapeNames with ALL shapes currently in project. The first 
+   * m_numberProjectShapesWithPoint actually contain the location of m_editPoint.
+   *
+   * @param latitude (double) Latitude for determining point location.  Defaults to Null which 
+   *                          results in the m_editPoint location being used, AprioriCoordinates
+   *                          if they exist, otherwise the reference measure's location will be
+   *                          used.
+   * @param longitude (double) Longitude for determining point location.  Defaults to Null which 
+   *                          results in the m_editPoint location being used, AprioriCoordinates
+   *                          if they exist, otherwise the reference measure's location will be
+   *                          used.
+   *
+   */
+  void ControlPointEditWidget::setShapesForPoint(double latitude, double longitude) {
+
+    if (latitude == Null || longitude == Null) {
+      //  Use current editPoint to get latitude, longitude.
+      // Use apriori surface point to find location on ground source.  If
+      // apriori surface point does not exist use reference measure
+      if (m_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint sPt = m_editPoint->GetAprioriSurfacePoint();
+        latitude = sPt.GetLatitude().degrees();
+        longitude = sPt.GetLongitude().degrees();
+      }
+      else {
+        ControlMeasure m = *(m_editPoint->GetRefMeasure());
+        int camIndex = m_serialNumberList->serialNumberIndex(m.GetCubeSerialNumber());
+        Camera *cam;
+        cam = m_controlNet->Camera(camIndex);
+        cam->SetImage(m.GetSample(),m.GetLine());
+        latitude = cam->UniversalLatitude();
+        longitude = cam->UniversalLongitude();
+      }
+    }
+
+    m_numberProjectShapesWithPoint = 0;
+    m_projectShapeNames.clear();
+    m_nameToShapeMap.clear();
+
+    // Get all shapes from project, putting shapes that contain the current m_editPoint at the
+    // top of the list.
+    QStringList shapeNamesNoPoint;
+    // Create map between the Shape file name & Shape
+    QList<ShapeList *> shapeLists = m_directory->project()->shapes();
+    foreach (ShapeList *shapeList, shapeLists) {
+      foreach (Shape *shape, *shapeList) {
+        UniversalGroundMap *gmap = new UniversalGroundMap(*(shape->cube()));
+        if (gmap->SetUniversalGround(latitude, longitude)) {
+          m_projectShapeNames<<shape->fileName();
+        }
+        else {
+          shapeNamesNoPoint<<shape->fileName();
+        }
+        m_nameToShapeMap[shape->fileName()] = shape;
+        delete gmap;
+      }
+    }
+    m_numberProjectShapesWithPoint = m_projectShapeNames.count();
+    // Add shapes that do not contain point
+    if (shapeNamesNoPoint.count() > 0) {
+      m_projectShapeNames<<shapeNamesNoPoint;
+    }
+  }
+
+
+  /**
    * Set both chip viewports to their original measures for the control point
    *
    * @internal
@@ -639,6 +702,38 @@ namespace Isis {
 
 
   /**
+   * Load ground measure into right side and add to file combo boxes.
+   *
+   * @author 2013-12-06 Tracie Sucharski
+   *
+   * @internal
+   *   @history 2013-12-06 Tracie Sucharski - Original version.
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - moved duplicated code to
+   *                           findPointLocation() and createTemporaryGroundMeasure().
+   *
+   */
+  void ControlPointEditWidget::loadGroundMeasure() {
+
+    ControlMeasure *groundMeasure = createTemporaryGroundMeasure();
+    if (groundMeasure) {
+      m_editPoint->Add(groundMeasure);
+
+      // Add to measure combo boxes
+      QString groundFile = m_serialNumberList->fileName(groundMeasure->GetCubeSerialNumber());
+      QString tempFileName = FileName(groundFile).name();
+
+      m_pointFiles<<groundFile;
+      m_leftCombo->addItem(tempFileName);
+      m_rightCombo->addItem(tempFileName);
+      int rightIndex = m_rightCombo->findText(tempFileName);
+      m_rightCombo->setCurrentIndex(rightIndex);
+      selectRightMeasure(rightIndex);
+      updateSurfacePointInfo();
+    }
+  }
+
+
+  /**
    * @brief Create a temporary measure to hold the ground point info for ground source
    *
    * @return ControlMeasure* the created ground measure
@@ -652,28 +747,12 @@ namespace Isis {
    */
   ControlMeasure *ControlPointEditWidget::createTemporaryGroundMeasure() {
 
-    //  If a ground serial number has already been added to the serial number list, clear out
-    //  the old before adding the new.
-    if (!m_groundSN.isEmpty()) {
-      if (m_serialNumberList->hasSerialNumber(m_groundSN)) {
-        m_serialNumberList->remove(m_groundSN);
-        m_groundSN.clear();
-      }
-    }
-
     ControlMeasure *groundMeasure = NULL;
 
-    FileName groundFile = findGroundFile();
-    if (!groundFile.fileExists()) {
+    //  Try to set ground source file information.  If unsuccessful, return null ground measure
+    if (!setGroundSourceInfo()) {
       return groundMeasure;
     }
-
-    //  If ground file exists, open, create cube and ground map.  If doesn't exist, prompt
-    //  for new location or new source, either a Shape in the project, or import a new shape,
-    //  or simplay choose file?
-    //  THIS SHOULD BE MOVED TO ::LOADPOINT AND info needs to be saved
-    QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
-    QScopedPointer<UniversalGroundMap> groundMap(new UniversalGroundMap(*groundCube));
 
     // Use apriori surface point to find location on ground source.  If
     // apriori surface point does not exist use reference measure
@@ -695,8 +774,7 @@ namespace Isis {
     }
 
     //  Try to locate point position on current ground source,
-    //  TODO ???if doesn't exist,???
-    if (!groundMap->SetUniversalGround(lat,lon)) {
+    if (!m_groundGmap->SetUniversalGround(lat,lon)) {
       QString message = "This point does not exist on the ground source.\n";
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
@@ -704,102 +782,372 @@ namespace Isis {
       QMessageBox::warning(this, "Warning", message);
     }
     else {
-      //  Create new serial number for ground source and add to serial number list
-      m_groundSN = SerialNumber::Compose(groundFile.expanded(), true);
-      m_serialNumberList->add(groundFile.expanded(), true);
-
       groundMeasure = new ControlMeasure;
       groundMeasure->SetCubeSerialNumber(m_groundSN);
       groundMeasure->SetType(ControlMeasure::Candidate);
-      groundMeasure->SetCoordinate(groundMap->Sample(), groundMap->Line());
+      groundMeasure->SetCoordinate(m_groundGmap->Sample(), m_groundGmap->Line());
       groundMeasure->SetChooserName("GroundMeasureTemporary");
     }
 
     return groundMeasure;
-
   }
 
 
   /**
-   *  Find the ground source location from ControlPoint parameter, AprioriXYZSourceFile.  If file
-   *  does not exist, give option to look in another location and change location in the ControlNet
-   *  for either this point and/or all points in net.
+   *  Find the ground source location: First look at current edit point for parameter,
+   *  AprioriXYZSourceFile. If not there, see if user has selected a groundSource file from the
+   *  groundSourceCombo.  If file does not exist, give option to look in another location and change
+   *  location in the ControlNet for either this point and/or all points in net.
    *
-   * @return FileName The filename including full path of the ground source
+   * @return bool success Returns the success status of setting ground source info
    *
    */
-  FileName ControlPointEditWidget::findGroundFile() {
+  bool ControlPointEditWidget::setGroundSourceInfo() {
 
-    FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
-    if (m_changeAllGroundLocation) {
-      QFileInfo oldFile(groundFile.expanded());
-      QFileInfo newFile(m_newGroundDir, oldFile.fileName());
+    FileName groundFile;
+    ControlPoint::SurfacePointSource::Source groundSourceType =
+      ControlPoint::SurfacePointSource::None;
 
-      groundFile = newFile.absoluteFilePath();
+    bool success = false;
+
+    //  No ground source chosen, clear out any old info
+    if (m_groundSourceCombo->currentText().contains("NONE")) {
+      success = false;
     }
+    else {
+      //  Chosen ground source is an imported shape in project
+      if (m_groundSourceCombo->currentText().contains(".ecub")) {
+        Shape *shape = m_nameToShapeMap[m_groundSourceCombo->currentText()];
+        groundFile = FileName(shape->fileName());
+        //groundSourceType = shape->surfacePointSource();
+        success = true;
+      }
+      //  Not imported shape, must be from m_editPoints AprioriXYZSource in the cnet
+      else if (m_editPoint->HasAprioriSurfacePointSourceFile()) {
+        groundFile = FileName(m_groundSourceCombo->currentText());
+        //  Apriori ground source does not exist and user chose not to give new location so simply
+        //  return unsuccessful
+        if (!groundFile.fileExists()) {
+          success = false;
+        }
+        else {
+          groundSourceType = m_editPoint->GetAprioriSurfacePointSource(); 
+          success = true;
+        }
+      }
+    }
+
+    // If a new ground file was found set ground source information for later use, first clearing
+    // out the old ground source information.  If new ground same as old ground, we will not change
+    // anything, simply return successful.
+    if (success && (groundFile.expanded() != m_groundFilename)) {
+      clearGroundSource();
+      m_groundFilename = groundFile.expanded();
+
+      // Get cube, then universal groundmap
+      QScopedPointer<Cube> groundCube(new Cube(groundFile, "r"));
+      m_groundGmap.reset(NULL);
+      QScopedPointer<UniversalGroundMap> newGroundGmap(new UniversalGroundMap(*groundCube));
+      m_groundGmap.reset(newGroundGmap.take());
+
+      //  Create new serial number for ground source and add to serial number list
+      m_groundSN = SerialNumber::Compose(groundFile.expanded(), true);
+      m_serialNumberList->add(m_groundFilename, true);
+
+      m_groundSourceType = groundSourceType;
+    }
+    // Could not successfully find a ground source file, clear out any old info and return
+    // unsuccessful
+    else if (!success) {
+      clearGroundSource();
+    }
+
+    return success;
+  }
+
+
+  /**
+   * Ground source file from control net cannot be found, give user option to give new location. 
+   * The option also exists to change for the rest of the ground points in the control net and to 
+   * change the apriori xyz source file in the control net to the new location. 
+   * 
+   * @param groundFile FileName of ground source that has moved location
+   * 
+   * @return FileName Ground source with new location path
+   *
+   */
+  FileName ControlPointEditWidget::checkGroundFileLocation(FileName groundFile) {
+
+    FileName newGroundFile;
 
     if (!groundFile.fileExists()) {
 
-      //  simply print error for now, need to prompt
-      //  for new location or new source, either a Shape in the project, or import a new shape,
-      //  or simplay choose file?
-      QString message = "Ground Source file " + groundFile.expanded();
-      message += " doesn't exist.  Has the file moved?  Would you like to enter a new location for"
-                 " this ground source?";
-      int ret = QMessageBox::question(this, "Ground Source not found", message);
-      if (ret == QMessageBox::Yes) {
-        QString dir = m_directory->project()->shapeDataRoot();
-        NewGroundSourceLocationDialog *dialog = new NewGroundSourceLocationDialog(
-            "New Ground Source Location", dir);
-        if (dialog->exec() == QDialog::Accepted) {
-          m_newGroundDir = dialog->selectedFiles().value(0);
-          m_changeAllGroundLocation = dialog->changeAllGroundSourceLocation();
-          m_changeGroundLocationInNet = dialog->changeControlNet();
-          //  Change all ground source locations to reflect new directory
-          if (m_changeGroundLocationInNet) {
-            changeGroundLocationsInNet();
-            //groundFile = NULL;
-          }
-          //  Don't change control net, but look for ground source in new directory
-          else  {
+      // If user previously chose to change all ground source locations, but didn't update the net
+      // fix this ground source to new location
+      // If all groundLocations are to be changed...
+      if (m_changeAllGroundLocation) {
+        QFileInfo oldFile(groundFile.expanded());
+        QFileInfo newFile(m_newGroundDir, oldFile.fileName());
+
+        newGroundFile = FileName(newFile.absoluteFilePath());
+      }
+
+      //  If can't find ground, re-prompt user for new location. Maybe it's a new ground source.
+      if (!newGroundFile.fileExists()) {
+        //  Give options for finding ground source file location. A new location 
+        //  for new location or new source, either a Shape in the project, or import a new shape,
+        //  or simplay choose file?
+        QString message = "Ground Source file " + groundFile.expanded();
+        message += " doesn't exist.  Has the file moved?  Would you like to enter a new location for"
+                   " this ground source?";
+        int ret = QMessageBox::question(this, "Ground Source not found", message);
+        if (ret == QMessageBox::Yes) {
+          QString dir = m_directory->project()->shapeDataRoot();
+          NewGroundSourceLocationDialog *dialog = new NewGroundSourceLocationDialog(
+              "New Ground Source Location", dir);
+          if (dialog->exec() == QDialog::Accepted) {
+            m_newGroundDir = dialog->selectedFiles().value(0);
+            m_changeAllGroundLocation = dialog->changeAllGroundSourceLocation();
+            m_changeGroundLocationInNet = dialog->changeControlNet();
+            //  Change all ground source locations to reflect new directory
+            if (m_changeGroundLocationInNet) {
+              changeGroundLocationsInNet();
+            }
+            //  Change location of apriori for current edit point so combo boxes updated properly
             QFileInfo oldFile(groundFile.expanded());
             QFileInfo newFile(m_newGroundDir, oldFile.fileName());
-
-            groundFile = newFile.absoluteFilePath();
+            newGroundFile = newFile.absoluteFilePath();
+            m_editPoint->SetAprioriSurfacePointSourceFile(newGroundFile.toString());
+          }
+          else {
+            //  Either user does not want to change location of ground source or the new location
+            //  Dialog was cancelled. Load point without the ground source.
+            newGroundFile = NULL;
           }
         }
         else {
           //  Either user does not want to change location of ground source or the new location
           //  Dialog was cancelled. Load point without the ground source.
-          groundFile = NULL;
+          newGroundFile = NULL;
         }
       }
-      else {
-        //  Either user does not want to change location of ground source or the new location
-        //  Dialog was cancelled. Load point without the ground source.
-        groundFile = NULL;
-      }
     }
-    return groundFile;
+    return newGroundFile;
   }
 
 
   /**
    * Change the location of all ground source locations in the ControlNet.  This changes the
-   * ControlPoint parameter, AprioriXYZSourceFile.
+   * ControlPoint parameter, AprioriSurfacePointSourceFile.
    *
    */
   void ControlPointEditWidget::changeGroundLocationsInNet() {
 
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++ ) {
-      FileName groundFile(m_editPoint->GetAprioriSurfacePointSourceFile());
-
-      QFileInfo oldFile(groundFile.expanded());
-      QFileInfo newFile(m_newGroundDir, oldFile.fileName());
-
-      groundFile = newFile.absoluteFilePath();
-      m_controlNet->GetPoint(i)->SetAprioriSurfacePointSourceFile(groundFile.expanded());
+      ControlPoint *cp = m_controlNet->GetPoint(i);
+      if (cp->HasAprioriSurfacePointSourceFile()) {
+        FileName groundFile(cp->GetAprioriSurfacePointSourceFile()); 
+        QFileInfo oldFile(groundFile.expanded());
+        QFileInfo newFile(m_newGroundDir, oldFile.fileName());
+        groundFile = newFile.absoluteFilePath();
+        cp->SetAprioriSurfacePointSourceFile(groundFile.expanded());
+      }
     }
+    emit cnetModified();
+  }
+
+
+  /**
+   * Open a radius source using the shape model of the reference measure of m_editPoint
+   *
+   * @author 2016-10-07 Makayla Shepherd - Changed radius source handling and moved it from OpenGround.
+   *
+   */
+  void ControlPointEditWidget::openReferenceRadius() {
+
+    //Get the reference image's shape model
+    QString referenceSN = m_editPoint->GetReferenceSN();
+    QString referenceFileName = m_serialNumberList->fileName(referenceSN);
+    QScopedPointer<Cube> referenceCube(new Cube(referenceFileName, "r"));
+    PvlGroup kernels = referenceCube->group("Kernels");
+    QString shapeFile = kernels["ShapeModel"];
+
+    //  If the reference measure has a shape model cube then set that as the radius
+    //  This will NOT WORK for shape model files (not the default of Null or Ellipsoid)
+    //  that are not cubes
+    if (shapeFile.contains(".cub")) {
+      if (shapeFile.contains("dem")) {
+        m_radiusSourceType = ControlPoint::RadiusSource::DEM;
+      }
+      else {
+        m_radiusSourceType = ControlPoint::RadiusSource::Ellipsoid;
+      }
+
+      m_radiusFilename = shapeFile;
+      initDem(shapeFile);
+    }
+    //  If no shape model then use the ABC of the target body
+    else {
+      m_radiusSourceType = ControlPoint::RadiusSource::Ellipsoid;
+      Spice *refSpice = new Spice(*referenceCube);
+      Distance refRadii[3];
+      refSpice->radii(refRadii);
+      m_demFile = QString::number(refRadii[0].meters()) + ", " +
+                  QString::number(refRadii[1].meters()) + ", " +
+                  QString::number(refRadii[2].meters());
+
+      m_radiusFilename = "";
+    }
+  }
+
+
+  /**
+   * Initialize the given Dem and appropriate member variables for later use editing Fixed or 
+   * Constrained control points. 
+   * 
+   * @param demFile QString The file name of the DEM
+   *
+   */
+  void ControlPointEditWidget::initDem (QString demFile) {
+
+      // If a DEM is already opened, check if new is same as old. If new,
+      //  close old, open new.
+      if (m_demOpen) {
+        if (m_demFile == demFile) {
+          return;
+        }
+
+        m_demCube.reset(NULL);
+        m_demFile.clear();
+      }
+
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+      try {
+        QScopedPointer<Cube> newDemCube(new Cube(demFile, "r"));
+
+        m_demFile = FileName(newDemCube->fileName()).name();
+        m_demCube.reset(newDemCube.take());
+      }
+      catch (IException &e) {
+        QMessageBox::critical(this, "Error", e.toString());
+        QApplication::restoreOverrideCursor();
+        return;
+      }
+      m_demOpen = true;
+
+      //  Make sure this is a dem
+      if (!m_demCube->hasTable("ShapeModelStatistics")) {
+        QString message = m_demFile + " is not a DEM.";
+        QMessageBox::critical(this, "Error", message);
+        m_demCube.reset(NULL);
+        m_demOpen = false;
+        m_demFile.clear();
+        QApplication::restoreOverrideCursor();
+        return;
+      }
+      m_radiusSourceType = ControlPoint::RadiusSource::DEM;
+      m_radiusFilename = demFile;
+
+      QApplication::restoreOverrideCursor();
+  }
+
+
+  /**
+   * Return a radius values from the dem using bilinear interpolation
+   *
+   * @author  2011-08-01 Tracie Sucharski
+   *
+   * @internal
+   */
+  double ControlPointEditWidget::demRadius(double latitude, double longitude) {
+
+    if (!m_demOpen) return Null;
+
+    UniversalGroundMap *demMap = new UniversalGroundMap(*m_demCube);
+    if (!demMap->SetUniversalGround(latitude, longitude)) {
+      delete demMap;
+      demMap = NULL;
+      return Null;
+    }
+
+    //  Use bilinear interpolation to read radius from DEM
+    //   Use bilinear interpolation from dem
+    Interpolator *interp = new Interpolator(Interpolator::BiLinearType);
+
+    //   Buffer used to read from the model
+    Portal *portal = new Portal(interp->Samples(), interp->Lines(),
+                                m_demCube->pixelType(),
+                                interp->HotSample(), interp->HotLine());
+    portal->SetPosition(demMap->Sample(), demMap->Line(), 1);
+    m_demCube->read(*portal);
+    double radius = interp->Interpolate(demMap->Sample(), demMap->Line(),
+                                        portal->DoubleBuffer());
+    delete demMap;
+    demMap = NULL;
+    delete interp;
+    interp = NULL;
+    delete portal;
+    portal = NULL;
+
+    return radius;
+  }
+
+
+  /**
+   * Slot called when user changes selection in m_groundSourceCombo
+   * 
+   * @param index int 
+   *
+   */
+  void ControlPointEditWidget::groundSourceFileSelectionChanged(int index) {
+
+    QString newChosenGroundFile = m_groundSourceCombo->currentText();
+    if (newChosenGroundFile == m_groundFilename) {
+      return;
+    }
+    loadGroundMeasure();
+  }
+
+
+  /**
+   *   Clear out the ground source used for Constrained or Fixed control points.  Clears serial
+   *   number, cube and gui elements.
+   */
+  void ControlPointEditWidget::clearGroundSource () {
+
+    if (m_groundSN.isEmpty()) {
+      return;
+    }
+
+    //  If the loaded point is a fixed point, see if there is a temporary measure
+    //  holding the coordinate information for the current ground source. If so,
+    //  delete this measure and remove from the Chip viewport and measure selection combo.
+    if (m_editPoint && m_editPoint->GetType() != ControlPoint::Free &&
+        m_editPoint->HasSerialNumber(m_groundSN)) {
+      m_editPoint->Delete(m_groundSN);
+
+      if (m_leftCombo->findText(QFileInfo(m_groundFilename).fileName()) >= 0) {
+        m_leftCombo->removeItem(m_leftCombo->findText(QFileInfo(m_groundFilename).fileName()));
+        if (m_leftMeasure->GetCubeSerialNumber() == m_groundSN) {
+          selectLeftMeasure(0); 
+        }
+      }
+      if (m_rightCombo->findText(QFileInfo(m_groundFilename).fileName())) {
+        m_rightCombo->removeItem(m_rightCombo->findText(QFileInfo(m_groundFilename).fileName()));
+        if (m_rightMeasure->GetCubeSerialNumber() == m_groundSN) {
+          selectRightMeasure(0); 
+        }
+      }
+      m_pointFiles.removeAll(m_groundFilename);
+    }
+    // Remove from serial number list
+    m_serialNumberList->remove(m_groundSN);
+
+    //  Reset ground source variables
+    m_groundFilename.clear();
+    m_groundSN.clear();
+    m_groundGmap.reset(NULL);
+    m_groundSourceType = ControlPoint::SurfacePointSource::None;
   }
 
 
@@ -834,7 +1182,6 @@ namespace Isis {
       // New point loaded, make sure all save button's text is default black color
       colorizeAllSaveButtons("black");
     }
-
     loadPoint(serialNumber);
     loadTemplateFile(m_measureEditor->templateFileName());
   }
@@ -859,7 +1206,7 @@ namespace Isis {
   /**
    * Load point into ControlPointEditWidget.
    *
-   * @param serialNumber (QString) The serial number of cube point was chosen from.  This will
+   * @param serialNumber (QString) The serial number of cube point was chosen from.  
    *
    * @internal
    *   @history 2008-11-26  Jeannie Walldren - Added "Number of Measures" to
@@ -885,45 +1232,13 @@ namespace Isis {
     ptId += (QString) CPId;
     m_ptIdValue->setText(ptId);
 
-    m_pointType->setCurrentIndex((int) m_editPoint->GetType());
+    // Set shapes for this point.  Shapes are what has been imported into project.
+    setShapesForPoint();
 
     //  Write number of measures
     QString ptsize = "Number of Measures:  " +
                    QString::number(m_editPoint->GetNumMeasures());
     m_numMeasures->setText(ptsize);
-
-
-    SurfacePoint surfPoint = m_editPoint->GetAprioriSurfacePoint();
-    QString lat, lon, rad;
-
-    //  Write apriori latitude
-    if (surfPoint.GetLatitude().degrees() == Null) {
-      lat = "Apriori Latitude:  Null";
-    }
-    else {
-      lat = "Apriori Latitude:  " + QString::number(surfPoint.GetLatitude().degrees());
-    }
-    m_aprioriLatitude->setText(lat);
-
-    //  Write apriori longitude
-    if (surfPoint.GetLongitude().degrees() == Null) {
-      lon = "Apriori Longitude:  Null";
-    }
-    else {
-      lon = "Apriori Longitude:  " + QString::number(surfPoint.GetLongitude().degrees());
-
-    }
-    m_aprioriLongitude->setText(lon);
-
-    //  Write apriori radius
-    if (surfPoint.GetLocalRadius().meters() == Null) {
-      rad = "Apriori Radius:  Null";
-    }
-    else {
-      rad = "Apriori Radius:  " + QString::number(surfPoint.GetLocalRadius().meters(), 'f', 2);
-    }
-
-    m_aprioriRadius->setText(rad);
 
     //  Set EditLock box correctly
     m_lockPoint->setChecked(m_editPoint->IsEditLocked());
@@ -931,14 +1246,80 @@ namespace Isis {
     //  Set ignore box correctly
     m_ignorePoint->setChecked(m_editPoint->IsIgnored());
 
-    // Clear combo boxes
-    m_leftCombo->clear();
-    m_rightCombo->clear();
-    m_pointFiles.clear();
 
-    //  If fixed, add ground source file to combos, create a measure for
+    //  Refill combos since they are dependent on the current edit point
+    //  Turn off signals until filled since we don't want slot called.
+    m_groundSourceCombo->blockSignals(true);
+    m_radiusSourceCombo->blockSignals(true);
+    m_groundSourceCombo->clear();
+    m_radiusSourceCombo->clear();
+    m_groundSourceCombo->addItem("NONE");
+    m_groundSourceCombo->setCurrentText("NONE");
+    m_radiusSourceCombo->addItem("NONE - Use reference measure's radius");
+    m_radiusSourceCombo->setCurrentText("NONE - Use reference measure's radius");
+
+    //  Load any imported project shapes that contain m_editPoint into the ground and any Dem's into
+    //  radius source combo boxes. Only add Dems to radius combo.
+    if (m_projectShapeNames.count() > 0) {
+      for (int i=0; i<m_numberProjectShapesWithPoint; i++) {
+        Shape *shape = m_nameToShapeMap[m_projectShapeNames.at(i)];
+        if (shape->radiusSource() == ControlPoint::RadiusSource::DEM) {
+          m_radiusSourceCombo->addItem(shape->fileName());
+        }
+        else {
+          m_groundSourceCombo->addItem(shape->fileName());
+        }
+      }
+    }
+
+    //  If available, add the CP AprioriSurfacePointSourceFile and AprioriRadiusSourceFile
+    if (m_editPoint->HasAprioriSurfacePointSourceFile()) {
+      FileName aprioriSurfacePointFile = FileName(m_editPoint->GetAprioriSurfacePointSourceFile());
+      //  If file doesn't exist, prompt user for changing location before adding to combo
+      if (!aprioriSurfacePointFile.fileExists()) {
+        aprioriSurfacePointFile = checkGroundFileLocation(aprioriSurfacePointFile);
+      }
+      if (!aprioriSurfacePointFile.toString().isEmpty()) {
+        m_groundSourceCombo->addItem(aprioriSurfacePointFile.toString()); 
+        m_groundSourceCombo->setCurrentText(aprioriSurfacePointFile.toString());
+        m_groundSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
+                                         QColor(Qt::darkGreen), Qt::ForegroundRole); 
+        m_groundSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
+                                         QFont("DejaVu Sans", 10, QFont::Bold), Qt::FontRole);
+      }
+    }
+
+    if (m_editPoint->HasAprioriRadiusSourceFile()) {
+      //TODO  check location of radius file
+      m_radiusSourceCombo->addItem(m_editPoint->GetAprioriRadiusSourceFile());
+      m_radiusSourceCombo->setCurrentText(m_editPoint->GetAprioriRadiusSourceFile());
+      m_radiusSourceCombo->setItemData(m_radiusSourceCombo->currentIndex(),
+                                       QColor(Qt::green), Qt::ForegroundRole);
+      m_radiusSourceCombo->setItemData(m_groundSourceCombo->currentIndex(),
+                                       QFont("DejaVu Sans", 10, QFont::Bold), Qt::FontRole);
+    }
+    if (m_editPoint->GetType() == ControlPoint::Free) {
+      m_groundSourceCombo->setEnabled(false); 
+      m_radiusSourceCombo->setEnabled(false);
+    }
+    else {
+      m_groundSourceCombo->setEnabled(true); 
+      m_radiusSourceCombo->setEnabled(true);
+    }
+    m_groundSourceCombo->blockSignals(false);
+    m_radiusSourceCombo->blockSignals(false);
+
+
+    //  If constrained or fixed point, create a measure for
     //  the ground source, load reference on left, ground source on right
     if (m_editPoint->GetType() != ControlPoint::Free) {
+      // If m_editPoint already has a ground measure, delete
+      for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+        ControlMeasure &m = *(*m_editPoint)[i];
+        if (m.GetChooserName() == "GroundMeasureTemporary") {
+          m_editPoint->Delete(&m);
+        }
+      }
       // Create a temporary measure to hold the ground point info for ground source
       // This measure will be deleted when the ControlPoint is saved to the
       // ControlNet.
@@ -946,36 +1327,44 @@ namespace Isis {
       if (groundMeasure) {
         m_editPoint->Add(groundMeasure);
       }
-      else {
-//      QString message = "Cannot create ground measure on ground source file ";
-//      message += m_groundSN;
-//      QMessageBox::warning(this, "Warning", message);
-      }
     }
+
+
+
+    // Reset PointType combo box appropriately.
+    m_pointTypeCombo->clear();
+    for (int i=0; i<ControlPoint::PointTypeCount; i++) {
+      m_pointTypeCombo->insertItem(i, ControlPoint::PointTypeToString(
+            (ControlPoint::PointType) i));
+    }
+    m_pointTypeCombo->setCurrentText(ControlPoint::PointTypeToString(m_editPoint->GetType()));
+    m_pointTypeCombo->setToolTip("Change ControlPoint type");
+
+    updateSurfacePointInfo();
+
+
+
+    // Clear combo boxes
+    m_leftCombo->clear();
+    m_rightCombo->clear();
+    m_pointFiles.clear();
+
 
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      QString file;
-//    if (m.GetChooserName() == "GroundMeasureTemporary") {
-//      qDebug()<<"::loadPoint before setting file to groundFile = "<<groundFile;
-//      file = groundFile;
-//    }
-//    else {
-        file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
-//    }
+      QString file = m_serialNumberList->fileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name();
 
       // This actually fills the right combo box for selecting measures.  A model was used to enable
       // drag & drop for ordering measures which will also set the blink order.
       QStandardItem *item = new QStandardItem(tempFileName);
-//    qDebug()<<"before item flags = "<<item->flags();
       item->setFlags(item->flags() & ~Qt::ItemIsDropEnabled);
       m_model->appendRow(item);
 
       m_leftCombo->addItem(tempFileName);
-//    m_rightCombo->addItem(tempFileName);
+
       if (m_editPoint->IsReferenceExplicit() &&
           (QString)m.GetCubeSerialNumber() == m_editPoint->GetReferenceSN()) {
         m_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
@@ -983,24 +1372,8 @@ namespace Isis {
       }
     }
 
-    //TODO   IPCE  2016-06-08    TEMPORARY for prototype,
     m_measureEditor->setPoint(m_editPoint, m_serialNumberList);
 
-
-
-
-
-
-
-
-    //  TODO:  WHAT HAPPENS IF THERE IS ONLY ONE MEASURE IN THIS CONTROLPOINT??
-    // Assuming combo loaded in same order as measures in the control point-is
-    // this a safe assumption???
-    //
-    //  Find the file from the cubeViewport that was originally used to select
-    //  the point, this will be displayed on the left ChipViewport, unless the
-    //  point was selected on the ground source image.  In this case, simply
-    //  load the first measure on the left.
     int leftIndex = -1;
     int rightIndex = -1;
 
@@ -1009,7 +1382,6 @@ namespace Isis {
     if (m_editPoint->IsReferenceExplicit()) {
       referenceSerialNumber = m_editPoint->GetReferenceSN();
       leftIndex = m_editPoint->IndexOfRefMeasure();
-//    qDebug()<<"ControlPointEditWidget::loadPoint  reference index= "<<leftIndex;
     }
 
     if (!serialNumber.isEmpty() && serialNumber != referenceSerialNumber) {
@@ -1033,7 +1405,12 @@ namespace Isis {
         leftIndex = 0;
       }
     }
-    if (rightIndex == -1) {
+
+    //  If ground measure exists, load in right viewport
+    if (m_editPoint->HasSerialNumber(m_groundSN)) {
+      rightIndex = m_rightCombo->findText(m_groundSN);
+    }
+    if (rightIndex <= 0) {
       if (leftIndex == 0) {
         rightIndex =  1;
       }
@@ -1057,9 +1434,19 @@ namespace Isis {
   }
 
 
+  /**
+   * Create a new control point at the given latitude, longitude 
+   *  
+   * @param latitude The latitude position for the new control point
+   * @param longitude The longitude position for the new control point
+   * @param cube The cube that the user used to select position for new control point 
+   * @param isGroundSource Boolean indicating whether the cube used to choose position is a ground source 
+   *
+   */
+
   void ControlPointEditWidget::createControlPoint(double latitude, double longitude, Cube *cube,
                                                   bool isGroundSource) {
-//  qDebug()<<"ControlPointEditWidget::createControlPoint cube = "<<cube->fileName()<<"  isGroundSource = "<<isGroundSource;
+
     //  TODO:   CHECK SUBPIXEL REGISTER RADIO BUTTON OPTION (CHECKBOX?)
 
     //  Create list box of all files highlighting those that
@@ -1081,35 +1468,30 @@ namespace Isis {
       }
     }
 
-    // Get shapes from project to fill dialog, changing the font for shapes the point is located in.
-    QStringList shapeNames;
-    QStringList shapeNamesNoPoint;
-    // Create map between the Shape display name & Shape
-    QMap<QString, Shape *> nameToShapeMap;
-    QList<ShapeList *> shapeLists = m_directory->project()->shapes();
-    foreach (ShapeList *shapeList, shapeLists) {
-      foreach (Shape *shape, *shapeList) {
-        UniversalGroundMap *gmap = new UniversalGroundMap(*(shape->cube()));
-        if (gmap->SetUniversalGround(latitude, longitude)) {
-          shapeNames<<shape->displayProperties()->displayName();
-        }
-        else {
-          shapeNamesNoPoint<<shape->displayProperties()->displayName();
-        }
-        nameToShapeMap[shape->displayProperties()->displayName()] = shape;
-        delete gmap;
-      }
-    }
+    // Set shapes from project to fill dialog, indicating number of shapes that contain the CP.
+    // The shapes which contain the CP will be at the front of the QStringList.
+    setShapesForPoint(latitude, longitude);
 
-    int numberShapesWithPoint = shapeNames.count();
-    shapeNames<<shapeNamesNoPoint;
-
-    //m_directory->project()->shapes().count()<<"  1st shape= "<<m_directory->project()->shapes().at(0)->at(0)->fileName();
     NewControlPointDialog *newPointDialog = new NewControlPointDialog(m_controlNet,
         m_serialNumberList, m_lastUsedPointId, this, true, true, true);
     newPointDialog->setFiles(pointFiles);
-    newPointDialog->setGroundSource(shapeNames, numberShapesWithPoint);
-    if (newPointDialog->exec()) {
+    newPointDialog->setGroundSource(m_projectShapeNames, m_numberProjectShapesWithPoint);
+
+    //  Load imported project shapes that are Dems and contain point location into the radius combo.
+    if (m_projectShapeNames.count() > 0) {
+      QStringList radiusSourceFiles;
+      for (int i=0; i<m_numberProjectShapesWithPoint; i++) {
+        Shape *shape = m_nameToShapeMap[m_projectShapeNames.at(i)];
+        if (shape->radiusSource() == ControlPoint::RadiusSource::DEM) {
+          radiusSourceFiles<<shape->fileName();
+        }
+      }
+      newPointDialog->setRadiusSource(radiusSourceFiles);
+    }
+
+
+
+    if (newPointDialog->exec() == QDialog::Accepted) {
       m_lastUsedPointId = newPointDialog->pointId();
       ControlPoint *newPoint =
           new ControlPoint(m_lastUsedPointId);
@@ -1153,17 +1535,15 @@ namespace Isis {
       newPoint->SetType((ControlPoint::PointType) newPointDialog->pointType());
 
       if (isGroundPoint) {
-        Shape *shape = nameToShapeMap[newPointDialog->groundSource()];
+        Shape *shape = m_nameToShapeMap[newPointDialog->groundSource()];
         //  Save ground source information in control point
-        if (shape->shapeType() == Shape::Dem ||
-            shape->shapeType() == Shape::Basemap) {
-          newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::Basemap);
+        if (shape) {
+          newPoint->SetAprioriSurfacePointSource(shape->surfacePointSource());
         }
-        else if (shape->shapeType() == Shape::Unprojected) {
-          // TODO  Determine if unprojected shape has been bundle adjusted or is simply ??
-//        newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::???
+        else {
+          newPoint->SetAprioriSurfacePointSource(ControlPoint::SurfacePointSource::None);
         }
-        newPoint->SetAprioriSurfacePointSourceFile(shape->fileName());
+        newPoint->SetAprioriSurfacePointSourceFile(shape->cube()->externalCubeFileName().expanded());
       }
 
       setEditPoint(newPoint);
@@ -1410,6 +1790,29 @@ namespace Isis {
       savedAMeasure = true;
     }
 
+    // If this is a fixed or constrained point, and either the left or right measure is the ground
+    // source, update the lat,lon,radius.  
+    //
+    if (m_editPoint->GetType() != ControlPoint::Free && 
+        (m_leftMeasure->GetCubeSerialNumber() == m_groundSN ||
+         m_rightMeasure->GetCubeSerialNumber() == m_groundSN)) {
+      // If point is locked and it is not a new point, print error
+      if (m_editPoint->IsEditLocked() && m_controlNet->ContainsPoint(m_editPoint->GetId())) {
+        QString message = "This control point is edit locked.  The Apriori latitude, longitude and ";
+        message += "radius cannot be updated.  You must first unlock the point by clicking the ";
+        message += "check box above labeled \"Edit Lock Point\".";
+        QMessageBox::warning(this, "Point Locked", message);
+        return;
+      }
+      if (m_leftMeasure->IsIgnored()) {
+        QString message = "This is a Constrained or Fixed point and the reference measure is ";
+        message += "Ignored.  Unset the Ignore flag on the reference measure before saving.";
+        QMessageBox::warning(this, "Point Locked", message);
+        return;
+      }
+      updateGroundPosition();
+    }
+
     // If left measure == right measure, update left
     if (m_leftMeasure->GetCubeSerialNumber() == m_rightMeasure->GetCubeSerialNumber()) {
       *m_leftMeasure = *m_rightMeasure;
@@ -1510,14 +1913,17 @@ namespace Isis {
           message += "may need to move all of the other measures to match the new ";
           message += " coordinate of the reference measure.  Do you really want to ";
           message += " change the reference measure's location? ";
-          switch(QMessageBox::question(this, "Match Tool Save Measure",
+          switch(QMessageBox::question(this, "Save Measure",
                                        message, "&Yes", "&No", 0, 0)){
             // Yes:  Save measure
             case 0:
               break;
             // No:  keep original reference, return without saving
             case 1:
-              loadPoint();
+              ControlMeasure *origLeftMeasure =
+                m_editPoint->GetMeasure(m_leftMeasure->GetCubeSerialNumber());
+              m_measureEditor->setLeftPosition(origLeftMeasure->GetSample(),
+                                               origLeftMeasure->GetLine());
               return false;
           }
         }
@@ -1527,7 +1933,7 @@ namespace Isis {
         QString message = "This point already contains a reference measure.  ";
         message += "Would you like to replace it with the measure on the left?";
         int  response = QMessageBox::question(this,
-                                  "Match Tool Save Measure", message,
+                                  "Save Measure", message,
                                   QMessageBox::Yes | QMessageBox::No,
                                   QMessageBox::Yes);
         // Replace reference measure
@@ -1617,8 +2023,147 @@ namespace Isis {
 
           // ??? Need to set rest of measures to Candiate and add more warning. ???//
     }
+  }
 
 
+  /*
+  * Update the position of ground point
+  *
+  * @author 2012-04-26 Tracie Sucharski - moved functionality from measureSaved
+  *
+  * @internal
+  *
+  */
+  void ControlPointEditWidget::updateGroundPosition() {
+
+    //  Determine if the left or right measure is the ground.  Use ground measure to update
+    //  apriori surface point.
+    ControlMeasure *groundMeasure;
+    if (m_leftMeasure->GetCubeSerialNumber() == m_groundSN) {
+      groundMeasure = m_leftMeasure;
+    }
+    else {
+      groundMeasure = m_rightMeasure;
+    }
+    m_groundGmap->SetImage(groundMeasure->GetSample(), groundMeasure->GetLine());
+
+    double lat = m_groundGmap->UniversalLatitude();
+    double lon = m_groundGmap->UniversalLongitude();
+
+    //  Find radius source file
+    //  If nothing has been selected from the Radius source combo, use the Reference measure
+    if (m_radiusSourceCombo->currentText().contains("NONE")) {
+      m_radiusFilename.clear();
+      m_demOpen = false;
+      m_demFile.clear();
+      m_demCube.reset(NULL);
+      openReferenceRadius();
+    }
+    else {
+      Shape *shape = m_nameToShapeMap[m_radiusSourceCombo->currentText()];
+      if (shape) {
+        m_radiusFilename = shape->cube()->externalCubeFileName().toString(); 
+        //m_radiusSourceType = shape->radiusSource();
+      }
+      // Radius source comes from what is already saved in the cnet as AprioriRadiusSourceFile
+      // This will contain the path
+      else {
+        m_radiusFilename = m_radiusSourceCombo->currentText();
+        m_radiusSourceType = m_editPoint->GetAprioriRadiusSource();
+      }
+      initDem(m_radiusFilename);
+    }
+
+
+    double radius;
+    //  Update radius, order of precedence
+    //  1.  If a dem has been opened, read radius from dem.
+    //  2.  Get radius from reference measure
+    //        If image has shape model, radius will come from shape model
+    //
+    if (m_demOpen) {
+      radius = demRadius(lat,lon);
+      if (radius == Null) {
+        QString msg = "Could not read radius from DEM, will default to "
+          "local radius of reference measure.";
+        QMessageBox::warning(this, "Warning", msg);
+        if (m_editPoint->GetRefMeasure()->Camera()->SetGround(Latitude(lat, Angle::Degrees), 
+                                                              Longitude(lon, Angle::Degrees))) {
+          radius = m_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
+          //  TODO  Should this be set here, this is probably not working as intended since it is
+          //         overwritten below outside of if (radius == Null) 
+          m_editPoint->SetAprioriRadiusSource(ControlPoint::RadiusSource::None);
+        }
+        else {
+          QString message = "Error trying to get radius at this pt.  "
+              "Lat/Lon does not fall on the reference measure.  "
+              "Cannot save this measure.";
+          QMessageBox::critical(this,"Error",message);
+          return;
+        }
+      }
+      m_editPoint->SetAprioriRadiusSource(m_radiusSourceType);
+      m_editPoint->SetAprioriRadiusSourceFile(m_radiusFilename);
+    }
+    else {
+      //  Get radius from reference image
+      if (m_editPoint->GetRefMeasure()->Camera()->SetGround(Latitude(lat, Angle::Degrees),
+                                                            Longitude(lon, Angle::Degrees))) {
+        radius = m_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
+      }
+      else {
+        QString message = "Error trying to get radius at this pt.  "
+            "Lat/Lon does not fall on the reference measure.  "
+            "Cannot save this measure.";
+        QMessageBox::critical(this,"Error",message);
+        return;
+      }
+    }
+
+    try {
+      //  Read apriori surface point if it exists so that point is
+      //  replaced, but sigmas are retained.  Save sigmas because the
+      //  SurfacePoint class will change them if the coordinates change.
+      if (m_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint aprioriPt = m_editPoint->GetAprioriSurfacePoint();
+        Distance latSigma = aprioriPt.GetLatSigmaDistance();
+        Distance lonSigma = aprioriPt.GetLonSigmaDistance();
+        Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
+        aprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
+                                          Longitude(lon, Angle::Degrees),
+                                          Distance(radius, Distance::Meters));
+        aprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma, radiusSigma);
+        m_editPoint->SetAprioriSurfacePoint(aprioriPt);
+      }
+      else {
+        m_editPoint->SetAprioriSurfacePoint(SurfacePoint(
+                                        Latitude(lat, Angle::Degrees),
+                                        Longitude(lon, Angle::Degrees),
+                                        Distance(radius, Distance::Meters)));
+      }
+    }
+    catch (IException &e) {
+      QString message = "Unable to set Apriori Surface Point.\n";
+      message += "Latitude = " + QString::number(lat);
+      message += "  Longitude = " + QString::number(lon);
+      message += "  Radius = " + QString::number(radius) + "\n";
+      message += e.toString();
+      QMessageBox::critical(this,"Error",message);
+      return;
+    }
+
+    m_editPoint->SetAprioriSurfacePointSource(m_groundSourceType);
+    QString fullGroundFilename;
+    if (m_groundFilename.contains(".ecub")) {
+      // Find shape to get external cube filename
+      fullGroundFilename = m_nameToShapeMap[m_groundFilename]->cube()->externalCubeFileName().expanded();
+    }
+    else {
+      fullGroundFilename = m_groundFilename;
+    }
+    m_editPoint->SetAprioriSurfacePointSourceFile(fullGroundFilename);
+
+    updateSurfacePointInfo ();
   }
 
 
@@ -1647,15 +2192,9 @@ namespace Isis {
     //  measure holding the coordinate information from the ground source.
     //  If so, delete this measure before saving point.  Clear out the
     //  fixed Measure variable (memory deleted in ControlPoint::Delete).
-    if (updatePoint->GetType() != ControlPoint::Free) {
-      // Find measure with chooser name = GroundMeasureTemporary
-      for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
-        ControlMeasure &m = *(*m_editPoint)[i];
-        QString file;
-        if (m.GetChooserName() == "GroundMeasureTemporary") {
-          updatePoint->Delete(&m);
-        }
-      }
+    if (updatePoint->GetType() != ControlPoint::Free && updatePoint->HasSerialNumber(m_groundSN)) {
+      // Delete measure with m_groundSN
+      updatePoint->Delete(m_groundSN);
     }
 
     //  If edit point exists in the network, save the updated point.  If it
@@ -1666,12 +2205,10 @@ namespace Isis {
       *p = *updatePoint;
       delete updatePoint;
       updatePoint = NULL;
-      //qDebug()<<"ControlPOintEditWidget::savePoint before point Changed signal";
       emit controlPointChanged(m_editPoint->GetId());
     }
     else {
       m_controlNet->AddPoint(updatePoint);
-//    qDebug()<<"ControlPOintEditWidget::savePoint before point added signal ptId = "<<m_editPoint->GetId();
       emit controlPointAdded(m_editPoint->GetId());
     }
 
@@ -1697,30 +2234,30 @@ namespace Isis {
    * @internal
    *   @history 2013-12-06 Tracie Sucharski - If changing point type to constrained or fixed make
    *                           sure reference measure is not ignored.
+   *   @history 2015-05-19 Ian Humphrey and Makayla Shepherd - When changing a ground point between
+   *                           fixed and constrained and vice versa, the ground measure will not be
+   *                           reloaded (otherwise m_editPoint->Add() will throw an exception
+   *                           within a connected slot).
    */
-#if 0  //TODO 2014-07-22 TLS ipce Handle ground control points SOON
   void ControlPointEditWidget::setPointType (int pointType) {
+
     if (m_editPoint == NULL) return;
 
     //  If pointType is equal to current type, nothing to do
     if (m_editPoint->GetType() == pointType) return;
+    int oldType = m_editPoint->GetType();
 
+    // Error check ignored and locked status
     if (pointType != ControlPoint::Free && m_leftMeasure->IsIgnored()) {
-      m_pointType->setCurrentIndex((int) m_editPoint->GetType());
+      m_pointTypeCombo->setCurrentIndex((int) m_editPoint->GetType());
       QString message = "The reference measure is Ignored.  Unset the Ignore flag on the ";
       message += "reference measure before setting the point type to Constrained or Fixed.";
       QMessageBox::warning(m_parent, "Ignored Reference Measure", message);
       return;
     }
-
-//TODO 07-07-2014 TLS ipce This needs to be uncommented & handled correctly
-    bool unloadGround = false;
-//    if (m_editPoint->GetType() != ControlPoint::Free && pointType == ControlPoint::Free)
-//      unloadGround = true;
-
     ControlPoint::Status status = m_editPoint->SetType((ControlPoint::PointType) pointType);
     if (status == ControlPoint::PointLocked) {
-      m_pointType->setCurrentIndex((int) m_editPoint->GetType());
+      m_pointTypeCombo->setCurrentIndex((int) m_editPoint->GetType());
       QString message = "This control point is edit locked.  The point type cannot be changed.  You ";
       message += "must first unlock the point by clicking the check box above labeled ";
       message += "\"Edit Lock Point\".";
@@ -1728,26 +2265,37 @@ namespace Isis {
       return;
     }
 
-//TODO 07-07-2014 TLS ipce This needs to be uncommented & handled correctly
-    //  If ground loaded, read temporary ground measure to the point
-    if (pointType != ControlPoint::Free && m_groundOpen) {
-//    loadGroundMeasure();
-//    m_measureEditor->colorizeSaveNetButton();
+    // Changing type between Contrained and Fixed, simply colorize Save CP button and return.  Do
+    // not re-load CP or re-create ground CM.
+    if (oldType != ControlPoint::Free && m_editPoint->GetType() != ControlPoint::Free) {
+      colorizeSavePointButton();
     }
-    //  If going from constrained or fixed to free, unload the ground measure.
-    else if (unloadGround) {
-      // Find in point and delete, it will be re-created with current
-      // ground source if this is a fixed point
-      if (m_editPoint->HasSerialNumber(m_groundSN)) {
-    m_editPoint->Delete(m_groundSN);
+    // If changing from Constrained or Fixed to Free, remove ground CM, disable ground/radius source
+    // combos, re-load CP, colorize Save CP.
+    else if (oldType != ControlPoint::Free && m_editPoint->GetType() == ControlPoint::Free) {
+      //  Find temporary measure holding the coordinate information from the ground source and
+      //  delete from CP. This CM has a chooser name = GroundMeasureTemporary.
+      //  Clear out the fixed Measure variable (memory deleted in ControlPoint::Delete).
+      for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
+        ControlMeasure &m = *(*m_editPoint)[i];
+        if (m.GetChooserName() == "GroundMeasureTemporary") {
+          m_editPoint->Delete(&m);
+        }
       }
-
       loadPoint();
-      m_measureEditor->colorizeSaveNetButton();
+      m_groundSourceCombo->setEnabled(false);
+      m_radiusSourceCombo->setEnabled(false);
+      colorizeSavePointButton();
     }
-
+    // Changing from Free to Constrained or Fixed, loadGroundMeasure,which will create temporary
+    // gound measure, load into the measure combo boxes and colorize Save CP button.
+    else if (oldType == ControlPoint::Free && m_editPoint->GetType() != ControlPoint::Free) {
+      loadGroundMeasure();
+      m_groundSourceCombo->setEnabled(true);
+      m_radiusSourceCombo->setEnabled(true);
+      colorizeSavePointButton();
+    }
   }
-#endif
 
 
   /**
@@ -2461,38 +3009,47 @@ namespace Isis {
 
 
   /**
-   * Update the current editPoint information in the Point Editor labels
+   * Update the Surface Point Information in the ControlPointEditWidget
    *
-   * @param updatedPoint Reference to the ControlPoint to edit information on
+   * @author 2011-03-01 Tracie Sucharski
    *
-   * @author 2011-05-05 Tracie Sucharski
-   *
-   * @TODO  Instead of a single method, should slots be separate for each
-   *        updated point parameter, ie. ignore, editLock, apriori, etc.
-   *        This is not robust, if other point attributes are changed outside
-   *        of ControlPointEditWidget, this method will need to be updated.
-   *       *** THIS METHOD SHOULD GO AWAY WHEN CONTROLpOINTEDITOR IS INCLUDED
-   *           IN MATCH ***
-   *       TODO:  THIS IS ONLY CONNECTED IN qnet.cpp FROM THE NAV TOOL.  REFACTOR WILL
-   *                  NEED TO CONNECT CORRECT SIGNALS FROM OTHER WIDGETS TO THIS SLOT.
+   * @internal
+   * @history 2011-05-12 Tracie Sucharski - Type printing Apriori Values
+   * @history 2011-05-24 Tracie Sucharski - Set target radii on apriori
+   *                        surface point, so that sigmas can be converted to
+   *                        meters.
    */
-  void ControlPointEditWidget::updatePointInfo(ControlPoint &updatedPoint) {
-    if (m_editPoint == NULL) return;
-    if (updatedPoint.GetId() != m_editPoint->GetId()) return;
-    //  The edit point has been changed by SetApriori, so m_editPoint needs
-    //  to possibly update some values.  Need to retain measures from m_editPoint
-    //  because they might have been updated, but not yet saved to the network
-    //   ("Save Point").
-    m_editPoint->SetEditLock(updatedPoint.IsEditLocked());
-    m_editPoint->SetIgnored(updatedPoint.IsIgnored());
+  void ControlPointEditWidget::updateSurfacePointInfo() {
 
-    //  Set EditLock box correctly
-    m_lockPoint->setChecked(m_editPoint->IsEditLocked());
+    QString s;
 
-    //  Set ignore box correctly
-    m_ignorePoint->setChecked(m_editPoint->IsIgnored());
+    SurfacePoint aprioriPoint = m_editPoint->GetAprioriSurfacePoint();
+    if (aprioriPoint.GetLatitude().degrees() == Null) {
+      s = "Apriori Latitude:  Null";
+    }
+    else {
+      s = "Apriori Latitude:  " +
+          QString::number(aprioriPoint.GetLatitude().degrees());
+    }
+    m_aprioriLatitude->setText(s);
+    if (aprioriPoint.GetLongitude().degrees() == Null) {
+      s = "Apriori Longitude:  Null";
+    }
+    else {
+      s = "Apriori Longitude:  " +
+          QString::number(aprioriPoint.GetLongitude().degrees());
+    }
+    m_aprioriLongitude->setText(s);
+    if (aprioriPoint.GetLocalRadius().meters() == Null) {
+      s = "Apriori Radius:  Null";
+    }
+    else {
+      s = "Apriori Radius:  " +
+          QString::number(aprioriPoint.GetLocalRadius().meters(),'f',2) +
+          " <meters>";
+    }
+    m_aprioriRadius->setText(s);
   }
-
 
 
   /**
@@ -2612,43 +3169,6 @@ namespace Isis {
     //  Change Save Measure button text back to default
     m_saveNet->setPalette(m_saveDefaultPalette);
   }
-
-
-  /**
-   * This was used when ipce used docked widgets.
-   * This method is called from the constructor so that when the
-   * Main window is created, it know's it's size and location.
-   *
-   */
-#if 0
-  void ControlPointEditWidget::readSettings() {
-    FileName config("$HOME/.Isis/qview/ControlPointEditWidget.config");
-    QSettings settings(config.expanded(),
-                       QSettings::NativeFormat);
-    QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
-    QSize size = settings.value("size", QSize(900, 500)).toSize();
-    this->resize(size);
-    this->move(pos);
-  }
-
-
-  /**
-   * This method is called when the Main window is closed or
-   * hidden to write the size and location settings to a config
-   * file in the user's home directory.
-   *
-   */
-  void ControlPointEditWidget::writeSettings() const {
-    /*We do not want to write the settings unless the window is
-      visible at the time of closing the application*/
-    if (!this->isVisible()) return;
-    FileName config("$HOME/.Isis/qview/ControlPointEditWidget.config");
-    QSettings settings(config.expanded(),
-                       QSettings::NativeFormat);
-    settings.setValue("pos", this->pos());
-    settings.setValue("size", this->size());
-  }
-#endif
 
 
   /**
