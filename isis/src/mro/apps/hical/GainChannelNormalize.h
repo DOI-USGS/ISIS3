@@ -63,7 +63,7 @@ namespace Isis {
       virtual ~GainChannelNormalize() { }
 
     private:
-      double   _normalizer;
+      double _normalizer;
 
       void init(const HiCalConf &conf) {
         _history.clear();
@@ -72,7 +72,7 @@ namespace Isis {
 
         double bin = ToDouble(prof("Summing"));
         double tdi = ToDouble(prof("Tdi"));
-        double _normalizer = 128.0 / tdi / (bin*bin);
+        _normalizer = 128.0 / tdi / (bin*bin);
         _history.add("ModeNormalizer["+ToString(_normalizer)+"]");
 
         HiVector z = loadCsv("Gains", conf, prof, 0);

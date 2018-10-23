@@ -4,6 +4,8 @@ APPNAME = jigsaw
 # Solving for position, angles (with twist), and radius with error propagation.
 #
 # 2018-10-12 Debbie A. Cook - original test
+# 2018-10-22 Jesse Mapel - Added DIFF file for control network. Reduced number of
+#                          decimals in CSVs.
 
 # The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
 # 1. remove cube filename paths
@@ -35,9 +37,11 @@ commands:
 	       > $(OUTPUT)/rect-latConstrained_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rect-latConstrained_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rect-latConstrained_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rect-latConstrained_bundleout_points.csv > /dev/null;
@@ -60,9 +64,11 @@ commands:
 	       > $(OUTPUT)/rectFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rectFree_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rectFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rectFree_bundleout_points.csv > /dev/null;
@@ -85,9 +91,11 @@ commands:
 	       > $(OUTPUT)/lat-rectFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/lat-rectFree_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/lat-rectFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/lat-rectFree_bundleout_points.csv > /dev/null;
@@ -113,9 +121,11 @@ commands:
 	       > $(OUTPUT)/lat-rectConstrained_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/lat-rectConstrained_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/lat-rectConstrained_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/lat-rectConstrained_bundleout_points.csv > /dev/null;
@@ -141,9 +151,11 @@ commands:
 	       > $(OUTPUT)/rectConstrained_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rectConstrained_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rectConstrained_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rectConstrained_bundleout_points.csv > /dev/null;
@@ -166,9 +178,11 @@ commands:
 	       > $(OUTPUT)/rect-latFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rect-latFree_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/rect-latFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rect-latFree_bundleout_points.csv > /dev/null;
@@ -192,9 +206,11 @@ commands:
 	       > $(OUTPUT)/latFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       > $(OUTPUT)/latFree_residuals.csv;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([[0-9]0-9]*\)/\1/g' \
 	       > $(OUTPUT)/latFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/latFree_bundleout_points.csv > /dev/null;

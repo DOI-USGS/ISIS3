@@ -3,7 +3,7 @@
 
 #include "AbstractNumberFilter.h"
 
-template< typename U, typename V > class QPair;
+template< typename U, typename V > struct QPair;
 class QString;
 
 namespace Isis {
@@ -25,6 +25,8 @@ namespace Isis {
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
    *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
    *                           References #5434.
+   *   @history 2018-09-28 Kaitlyn Lee - Changed the declaration of QPair from class to struct.
+   *                           Fixes build warning on MacOS 10.13. References #5520.
    */
   class APrioriLongitudeFilter : public AbstractNumberFilter {
       Q_OBJECT

@@ -81,8 +81,6 @@ namespace Isis {
     private:
       int _tdi;
       int _bin;
-      int _ccd;
-      int _channel;
 
       HiVector _BM;
       HiVector _slope;
