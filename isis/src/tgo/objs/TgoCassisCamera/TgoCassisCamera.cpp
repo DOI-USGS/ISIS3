@@ -165,7 +165,7 @@ namespace Isis {
    *                Kernel Frame ID.
    */
   int TgoCassisCamera::CkFrameId() const {
-    return (-143410);
+    return (-143000);
   }
 
 
