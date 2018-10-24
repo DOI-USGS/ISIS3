@@ -31,7 +31,7 @@ Group=UserInterface
   GuiWidth           = 460
   GuiHeight          = 600
   HistoryPath        = $HOME/.Isis/history
-  HistoryRecording   = On
+  HistoryRecording   = Off
   HistoryLength      = 10
 EndGroup
 
@@ -165,7 +165,7 @@ EndGroup
 ########################################################
 Group = Performance
   CubeWriteThread = Optimized
-  GlobalThreads = Optimized
+  GlobalThreads = 2
 EndGroup
 
 ########################################################
