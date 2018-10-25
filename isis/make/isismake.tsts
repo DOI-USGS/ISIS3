@@ -773,7 +773,7 @@ checkout: FORCE
 	    if [ "$$inputdir" != "" ]; \
 	    then \
 	      $(MAKE) dirs; \
-	      $(RSYNC) -rt --delete $(TESTDATA_PATH)/input/ input; \
+	      $(RSYNC) -rt --copy-links --delete $(TESTDATA_PATH)/input/ input; \
 	    fi; \
 	  fi; \
 	  $(MAKE) copyOutTruth DEST=$(TESTDATA_PATH); \
@@ -795,7 +795,7 @@ copyOutTruth: FORCE
 	  files=`$(LS) $(DEST)/$$i`; \
 	  if [ "$$files" != "" ]; \
 	  then \
-	    $(RSYNC) -rt --delete $(DEST)/$$i/ $$i; \
+	    $(RSYNC) -rt --copy-links --delete $(DEST)/$$i/ $$i; \
 	  fi; \
 	done;
 
