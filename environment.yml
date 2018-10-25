@@ -2,7 +2,6 @@ channels:
   - usgs-astrogeology
   - conda-forge
   - probcomp
-  - anaconda
   - defaults
 
 dependencies:
@@ -69,4 +68,3 @@ dependencies:
   - xorg-libxi
   - zlib==1.2.11=0
 
-prefix: /scratch/anaconda3/envs/isis
