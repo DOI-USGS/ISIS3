@@ -109,7 +109,7 @@ void IsisMain() {
     if (ui.GetBoolean("UPDATE") ) {
       if ( !bundleAdjustment->isConverged() ) {
         gp += PvlKeyword("Status","Bundle did not converge, camera pointing NOT updated");
-	QString msg = "Bundle did not converge within MAXITS [" + ui.GetString("MAXITS") + "] iterations [" + cnetFile +  "]";
+	QString msg = "Bundle did not converge within MAXITS [" + toString(ui.GetInteger("MAXITS")) + "] iterations [" + cnetFile +  "]";
 	throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
