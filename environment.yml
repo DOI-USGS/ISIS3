@@ -1,5 +1,4 @@
 channels:
-  - jessemapel
   - usgs-astrogeology
   - conda-forge
   - probcomp

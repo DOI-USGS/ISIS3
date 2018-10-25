@@ -3,7 +3,6 @@ channels:
   - usgs-astrogeology
   - conda-forge
   - probcomp
-  - anaconda
   - defaults
 
 dependencies:
@@ -40,7 +39,6 @@ dependencies:
   - nanoflann==1.2.2
   - ninja==1.7.2=0
   - nn==1.86.0=2
-#  - conda-forge/label/gcc7::nn
   # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
   - opencv
@@ -71,4 +69,3 @@ dependencies:
   - xorg-libxi
   - zlib==1.2.11=0
 
-prefix: /scratch/anaconda3/envs/isis
