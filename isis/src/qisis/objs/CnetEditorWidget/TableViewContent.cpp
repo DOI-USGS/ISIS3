@@ -1681,17 +1681,18 @@ namespace Isis {
     if (QApplication::applicationName() != "cneteditor") {
       if (m_activeControlNet) {
         m_editControlPointAct->setEnabled(true);
-        m_deleteSelectedRowsAct->setEnabled(true);
         m_applyToSelectionAct->setEnabled(true);
         m_applyToAllAct->setEnabled(true);
       }
       else {
         m_editControlPointAct->setEnabled(false);
-        m_deleteSelectedRowsAct->setEnabled(false);
         m_applyToSelectionAct->setEnabled(false);
         m_applyToAllAct->setEnabled(false);
       }
-      
+
+      // We want to be able to delete rows in a nonactive control.
+      m_deleteSelectedRowsAct->setEnabled(true);
+
       if (hasActiveCell() && selectedRows.count() <= 1) {
         contextMenu.addAction(m_editControlPointAct);
       }

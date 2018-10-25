@@ -15,8 +15,7 @@ class QPushButton;
 class QReadWriteLock;
 
 namespace Isis {
-  class AbstractFilter;
-  class ControlCubeGraphNode;
+  class ControlNet;
   class ControlMeasure;
   class ControlPoint;
 
@@ -33,6 +32,8 @@ namespace Isis {
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2015-11-16 Ian Humphrey - Removed embedded close button icon. References #1041.
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
+   *                           References #5434.
    */
   class AbstractFilterSelector : public QWidget {
       Q_OBJECT

@@ -46,6 +46,8 @@ namespace Isis {
     *                           have braces. This prevents a misleading-indentation warning from
     *                           occuring during Fedora25 (c++14) builds. No functionality has been
     *                           changed. References #4809.
+    *   @history 2018-07-17 Kaitlyn Lee - Modified showContextMenu() to enable 
+                                m_deleteSelectedRowsAct regardless if an active control is set. 
     */
   class TableViewContent : public QAbstractScrollArea {
       Q_OBJECT

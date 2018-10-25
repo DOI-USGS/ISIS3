@@ -26,6 +26,7 @@
 #include <QPointer>
 #include <QToolBar>
 #include <QWidgetAction>
+#include <QPushButton>
 
 #include "AbstractProjectItemView.h"
 
@@ -40,10 +41,26 @@ namespace Isis {
    * View for editing a single ControlPoint
    *
    * @author 2016-04-06 Tracie Sucharski
-   *    
-   * @internal 
+   *
+   * @internal
    *   @history 2016-09-30 Tracie Sucharski - Pass in directory to constructor, so that we can
-   *                           query for shapes and other data from the project. 
+   *                           query for shapes and other data from the project.
+   *   @history 2018-05-28 Kaitlyn Lee - Since AbstractProjectItemView now inherits
+   *                           from QMainWindow, I added a dummy central widget
+   *                           and set its layout to QVBoxLayout. We used to set
+   *                           the whole CnetEditorView widget's layout, now we only
+   *                           set the central widget's layout.
+   *   @history 2018-06-13 Kaitlyn Lee - Removed toolbars, since they are not needed.
+   *   @history 2018-06-28 Kaitlyn Lee - Removed toolbars. When multiple views are open,
+   *                           there is a possibility of getting ambiguous shortcut errors.
+   *                           To counter this, we enable/disable actions. On default, a
+   *                           view's actions are disabled. To enable the actions, move the
+   *                           cursor over the view. When a user moves the cursor outside of
+   *                           the view, the actions are disabled. Because this view uses
+   *                           buttons instead of actions, overrode enableActions() and
+   *                           disableActions() and added m_buttons to enable/disable buttons.
+   *   @history 2018-07-09 Tracie Sucharski -  Remove setSizePolicy and sizeHint method which is now
+   *                           taken care of in the parent class, AbstractProjectItemView.
    */
 
 class ControlPointEditView : public AbstractProjectItemView {
@@ -54,30 +71,16 @@ class ControlPointEditView : public AbstractProjectItemView {
     ControlPointEditView(Directory *directory, QWidget *parent = 0);
     ~ControlPointEditView();
 
-    virtual QList<QAction *> permToolBarActions();
-    virtual QList<QAction *> activeToolBarActions();
-    virtual QList<QAction *> toolPadActions();
-
     ControlPointEditWidget *controlPointEditWidget();
 
-//  setEditPoint(ControlPoint *editPoint);
-//  createNewPoint(QString serialNumber, Latitude lat, Longitude lon);
-
-    QSize sizeHint() const;
-
-  public slots:
-
   private slots:
+    void disableActions();
+    void enableActions();
 
   private:
     QPointer<ControlPointEditWidget> m_controlPointEditWidget;
     QMap<Control *, ProjectItem *> m_controlItemMap;  //!<Maps control net to project item
-
-    QToolBar *m_permToolBar; //!< The permanent tool bar
-    QToolBar *m_activeToolBar; //!< The active tool bar
-    ToolPad *m_toolPad; //!< The tool pad
-
-    QWidgetAction *m_activeToolBarAction; //!< Stores the active tool bar
+    QList<QPushButton *> m_buttons;
   };
 }
 

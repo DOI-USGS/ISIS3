@@ -25,6 +25,10 @@
 #include "WorkOrder.h"
 
 namespace Isis {
+class ControlList;
+class Directory;
+class Project;
+
   /**
    * @brief This work order allows the user to open a cnet editor (table) view of a single control network.
    * This workorder is synchronous and undoable.
@@ -42,6 +46,7 @@ namespace Isis {
    *   @history 2017-11-02  Tyler Wilson - Added a null pointer check on the ControList *controls
    *                          pointer in the isExecutable(...) function to prevent potential
    *                          segfaults.  References #4492.
+   *   @history 2018-04-07 Tracie Sucharski - Clean up includes.
    */
   class CnetEditorViewWorkOrder : public WorkOrder {
       Q_OBJECT

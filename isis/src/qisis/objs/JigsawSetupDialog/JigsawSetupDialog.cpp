@@ -3,18 +3,28 @@
 #include <vector>
 
 #include <QDebug>
+#include <QIdentityProxyModel>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
+#include <QItemSelection>
 
+#include "BundleObservationSolveSettings.h"
 #include "BundleSolutionInfo.h"
 #include "BundleSettings.h"
 #include "BundleTargetBody.h"
+#include "Camera.h"
 #include "Control.h"
+#include "Cube.h"
+#include "Image.h"
 #include "IString.h"
 #include "MaximumLikelihoodWFunctions.h"
 #include "Project.h"
+#include "ProjectItem.h"
+#include "ProjectItemProxyModel.h"
 #include "SpecialPixel.h"
+#include "SortFilterProxyModel.h"
 #include "ui_JigsawSetupDialog.h"
 
 namespace Isis {
@@ -28,7 +38,7 @@ namespace Isis {
     // care of in the ui setup.
 
     // For example:
-    //   radiusCheckBox is connected to pointRadiusSigmaLabel and pointRadiusSigmaLineEdit
+    //   pointRadiusSigmaCheckBox is connected to pointRadiusSigmaLineEdit
     //   outlierRejectionCheckBox is connected
     //       to outlierRejectionMultiplierLabel and outlierRejectionMultiplierLineEdit
     //
@@ -47,6 +57,11 @@ namespace Isis {
       makeReadOnly();
     }
 
+    m_bundleSettings = BundleSettingsQsp(new BundleSettings());
+
+    //connect( m_project->directory()->model(), SIGNAL(selectionChanged(QList<ProjectItem *> &)),
+    //         this, SLOT(on_projectItemSelectionChanged(const QList<ProjectItem *> &) ) );
+
     // initializations for general tab
 
     // fill control net combo box from project
@@ -57,36 +72,123 @@ namespace Isis {
 
         QVariant v = qVariantFromValue((void*)control);
 
-        m_ui->controlNetworkComboBox->addItem(control->displayProperties()->displayName(), v);
+        m_ui->inputControlNetCombo->addItem(control->displayProperties()->displayName(), v);
+      }
+    }
+    // add control nets from bundle solutions, if any
+    int numBundles = project->bundleSolutionInfo().size();
+    for (int i = 0; i < numBundles; i++) {
+      Control *bundleControl = project->bundleSolutionInfo().at(i)->control();
+
+      QVariant v = qVariantFromValue((void*)bundleControl);
+
+      m_ui->inputControlNetCombo->addItem(bundleControl->displayProperties()->displayName(), v);
+    }
+
+    // initialize default output control network filename
+    FileName fname = m_ui->inputControlNetCombo->currentText();
+    m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
+
+    // initializations for observation solve settings tab
+    createObservationSolveSettingsTreeView();
+
+
+    // Create default settings for all of the observations
+    QList<Image *> imagesToAdd;
+    // If we have selected any project items, find the images and add them to imagesToAdd
+    if (!m_project->directory()->model()->selectedItems().isEmpty()) {
+      foreach (ProjectItem * projItem, m_project->directory()->model()->selectedItems()) {
+        if (projItem->isImage()) {
+          imagesToAdd.append(projItem->image());  
+        }
+        else if (projItem->isImageList()) {
+          for (int i = 0; i < projItem->rowCount(); i++) {
+            imagesToAdd.append(projItem->child(i)->image());  
+          }
+        }
+      }
+    }
+    // if we didnt have any images selected in the previous case, or no proj items were selected,
+    // take all images from the project tree
+    if (imagesToAdd.isEmpty()) {
+      ProjectItem *imgRoot = m_project->directory()->model()->findItemData(QVariant("Images"),0);
+      if (imgRoot) {
+        for (int i = 0; i < imgRoot->rowCount(); i++) {
+          ProjectItem * imglistItem = imgRoot->child(i);
+          for (int j = 0; j < imglistItem->rowCount(); j++) {
+            ProjectItem * imgItem = imglistItem->child(j);
+            if (imgItem->isImage()) {
+              imagesToAdd.append(imgItem->image());     
+            }
+          }
+        } 
+      }
+    }
+    
+    // create default  solve settings for supported camera types
+    BundleObservationSolveSettings defaultFramingSettings;
+    BundleObservationSolveSettings defaultLineScanSettings;
+    defaultLineScanSettings.setInstrumentPointingSettings(
+                      BundleObservationSolveSettings::AnglesVelocityAcceleration, true, 2, 2, true);
+
+
+    // sort each chosen image into its camera type 
+    foreach (Image * image, imagesToAdd) {
+      int cameraType = image->cube()->camera()->GetCameraType();
+      if (cameraType == Camera::LineScan) {
+        defaultLineScanSettings.addObservationNumber(image->observationNumber());
+      }
+      else { // assume cameraType == Camera::Framing
+        defaultFramingSettings.addObservationNumber(image->observationNumber());  
       }
     }
 
-    QList<BundleSolutionInfo *> bundleSolutionInfo = m_project->bundleSolutionInfo();
-    if (useLastSettings && bundleSolutionInfo.size() > 0) {
-     BundleSettingsQsp lastBundleSettings = (bundleSolutionInfo.last())->bundleSettings();
-     // Retrieve the control net name used in the last bundle adjustment.
-     // Note that this returns a fully specified path and filename, while the cnet combo box
-     // only stores file names.
-     selectControl(bundleSolutionInfo.last()->controlNetworkFileName());
-     fillFromSettings(lastBundleSettings);
-    }
+    // only add defaults that have been applied
+    QList<BundleObservationSolveSettings> solveSettingsList;
+    if (defaultFramingSettings.observationNumbers().count()) 
+      solveSettingsList.append(defaultFramingSettings);
+    if (defaultLineScanSettings.observationNumbers().count())
+      solveSettingsList.append(defaultLineScanSettings);
 
-    // Update setup dialog with settings from any active (current) settings in jigsaw dialog.
+    m_bundleSettings->setObservationSolveOptions(solveSettingsList);
 
-    // initializations for observation solve settings tab
-    m_ui->spkSolveDegreeSpinBox_2->setValue(-1);
+    // Populate the solve option comboboxes
+    const QStringList positionOptions{"NONE", "POSITION", "VELOCITY", "ACCELERATION", "ALL"};
+    m_ui->positionComboBox->insertItems(0, positionOptions);
+    m_ui->positionComboBox->setCurrentIndex(0);
+
+    const QStringList pointingOptions{"NONE", "ANGLES", "VELOCITY", "ACCELERATION", "ALL"};
+    m_ui->pointingComboBox->insertItems(0, pointingOptions);
+    m_ui->pointingComboBox->setCurrentIndex(1);
+
+    // The degree solve options' minimums are -1 (set in ui file), make the -1's display as N/A
+    m_ui->spkSolveDegreeSpinBox->setSpecialValueText("N/A");
+    m_ui->ckSolveDegreeSpinBox->setSpecialValueText("N/A");
+
 
     QStringList tableHeaders;
-    tableHeaders << "coefficients" << "a priori sigma" << "units";
+    tableHeaders << "coefficients" << "description" << "units" << "a priori sigma";
     m_ui->positionAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
-
-    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)));
-    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)));
-    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)));
-
     m_ui->pointingAprioriSigmaTable->setHorizontalHeaderLabels(tableHeaders);
 
+    // Set the default size of the columns
+    m_ui->positionAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
+    m_ui->positionAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
 
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(0, fontMetrics().width(tableHeaders.at(0)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(1, fontMetrics().width(tableHeaders.at(1)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(2, fontMetrics().width(tableHeaders.at(2)) + 10);
+    m_ui->pointingAprioriSigmaTable->setColumnWidth(3, fontMetrics().width(tableHeaders.at(3)) + 10);
+
+
+    // Add validators to the tables in the observation solve settings tab to validate the a priori
+    // sigma items
+    connect(m_ui->positionAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
+            this, SLOT(validateSigmaValue(QTableWidgetItem *)));
+    connect(m_ui->pointingAprioriSigmaTable, SIGNAL(itemChanged(QTableWidgetItem *)),
+            this, SLOT(validateSigmaValue(QTableWidgetItem *)));
 
     // initializations for target body tab
 
@@ -121,7 +223,7 @@ namespace Isis {
     m_ui->noneRadiiRadioButton->setChecked(true);
 
     // validators for target body entries...
-    QDoubleValidator *sigmaValidator = new QDoubleValidator(0.0, 1.0e+10, 8, this);
+    QDoubleValidator *sigmaValidator = new QDoubleValidator(0.0, 1.0e+4, 8, this);
     sigmaValidator->setNotation(QDoubleValidator::ScientificNotation);
 
     // right ascension valid range is from 0 to 360 degrees
@@ -168,6 +270,30 @@ namespace Isis {
                                                                 m_ui->meanRadiusLineEdit));
     m_ui->meanRadiusSigmaLineEdit->setValidator(sigmaValidator);
 
+
+
+    // jigsaw run setup general tab validation
+    // global apriori point sigmas
+    m_ui->pointLatitudeSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->pointLongitudeSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8,this));
+    m_ui->pointRadiusSigmaLineEdit->setValidator(new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+
+    // outlier rejection
+    m_ui->outlierRejectionMultiplierLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0e+10, 8, this));
+    m_ui->maximumLikelihoodModel1QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+    m_ui->maximumLikelihoodModel2QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+    m_ui->maximumLikelihoodModel3QuantileLineEdit->setValidator(
+                                                  new QDoubleValidator(1.0e-10, 1.0, 8, this));
+
+    // convergence criteria
+    m_ui->sigma0ThresholdLineEdit->setValidator(new QDoubleValidator(1.0e-20, 1.0e+10, 8, this));
+    m_ui->maximumIterationsLineEdit->setValidator(new QIntValidator(1, 10000, this));
+
+
+
     // signals for target body tab
 //    connect(m_ui->radiiButtonGroup, SIGNAL(buttonClicked(int)),
 //            this, SLOT(on_radiiGroupClicked(int)));
@@ -180,6 +306,7 @@ namespace Isis {
   }
 
 
+
   JigsawSetupDialog::~JigsawSetupDialog() {
     // delete/null m_ui since we did "new" this pointers in the constructor
     if (m_ui) {
@@ -190,157 +317,158 @@ namespace Isis {
   }
 
 
-  void JigsawSetupDialog::on_radiusCheckBox_toggled(bool checked) {
-    m_ui->pointRadiusSigmaLabel->setEnabled(checked);
+  void JigsawSetupDialog::on_pointRadiusSigmaCheckBox_toggled(bool checked) {
     m_ui->pointRadiusSigmaLineEdit->setEnabled(checked);
-    m_ui->pointRadiusSigmaUnitsLabel->setEnabled(checked);
   }
 
+//  m_ui->positionComboBox has been removed from the general tab, it is planned to be moved to 
+//  the obs solve settings tab. This function will be commented out until it is added back.
+//   void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(int index) {
 
+//     // indices:
+//     // 0 = none, 1 = position, 2 = velocity, 3 = acceleration, 4 = all
+//     bool solvePosition                  = (bool) (index > 0);
+//     bool solveVelocity                  = (bool) (index > 1);
+//     bool solveAcceleration              = (bool) (index > 2);
+// //    bool solveAllPolynomialCoefficients = (bool) (index > 3);
 
-//  void JigsawSetupDialog::on_outlierRejectionCheckBox_toggled(bool checked) {
-//    m_ui->outlierRejectionMultiplierLabel->setEnabled(checked);
-//    m_ui->outlierRejectionMultiplierLineEdit->setEnabled(checked);
-//  }
+//     m_ui->hermiteSplineCheckBox->setEnabled(solvePosition);
+//     m_ui->positionSigmaLabel->setEnabled(solvePosition);
+//     m_ui->positionSigmaLineEdit->setEnabled(solvePosition);
+//     m_ui->positionSigmaUnitsLabel->setEnabled(solvePosition);
 
+//     m_ui->velocitySigmaLabel->setEnabled(solveVelocity);
+//     m_ui->velocitySigmaLineEdit->setEnabled(solveVelocity);
+//     m_ui->velocitySigmaUnitsLabel->setEnabled(solveVelocity);
 
-  void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(int index) {
+//     m_ui->accelerationSigmaLabel->setEnabled(solveAcceleration);
+//     m_ui->accelerationSigmaLineEdit->setEnabled(solveAcceleration);
+//     m_ui->accelerationSigmaUnitsLabel->setEnabled(solveAcceleration);
 
-    // indices:
-    // 0 = none, 1 = position, 2 = velocity, 3 = acceleration, 4 = all
-    bool solvePosition                  = (bool) (index > 0);
-    bool solveVelocity                  = (bool) (index > 1);
-    bool solveAcceleration              = (bool) (index > 2);
-//    bool solveAllPolynomialCoefficients = (bool) (index > 3);
+// //    m_ui->spkDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->spkSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
 
-    m_ui->hermiteSplineCheckBox->setEnabled(solvePosition);
-    m_ui->positionSigmaLabel->setEnabled(solvePosition);
-    m_ui->positionSigmaLineEdit->setEnabled(solvePosition);
-    m_ui->positionSigmaUnitsLabel->setEnabled(solvePosition);
+//   }
 
-    m_ui->velocitySigmaLabel->setEnabled(solveVelocity);
-    m_ui->velocitySigmaLineEdit->setEnabled(solveVelocity);
-    m_ui->velocitySigmaUnitsLabel->setEnabled(solveVelocity);
+//  m_ui->pointingComboBox has been removed from the general tab, it is planned to be moved to 
+//  the obs solve settings tab. This function will be commented out until it is added back.
+//   void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(int index) {
 
-    m_ui->accelerationSigmaLabel->setEnabled(solveAcceleration);
-    m_ui->accelerationSigmaLineEdit->setEnabled(solveAcceleration);
-    m_ui->accelerationSigmaUnitsLabel->setEnabled(solveAcceleration);
+//     // indices:
+//     // 0 = angles, 1 = none, 2 = velocity, 3 = acceleration, 4 = all
+//     bool solveAngles                    = (bool) (index == 0 || index > 1);
+//     bool solveAngularVelocity           = (bool) (index > 1);
+//     bool solveAngularAcceleration       = (bool) (index > 2);
+// //    bool solveAllPolynomialCoefficients = (bool) (index > 3);
 
-//    m_ui->spkDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->spkDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->spkSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->spkSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+//     m_ui->twistCheckBox->setEnabled(solveAngles);
+//     m_ui->fitOverPointingCheckBox->setEnabled(solveAngles);
 
-  }
+// //    m_ui->ckDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
+// //    m_ui->ckSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
 
+//     m_ui->pointingAnglesSigmaLabel->setEnabled(solveAngles);
+//     m_ui->pointingAnglesSigmaLineEdit->setEnabled(solveAngles);
+//     m_ui->pointingAnglesSigmaUnitsLabel->setEnabled(solveAngles);
 
-  void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(int index) {
+//     m_ui->pointingAngularVelocitySigmaLabel->setEnabled(solveAngularVelocity);
+//     m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(solveAngularVelocity);
+//     m_ui->pointingAngularVelocitySigmaUnitsLabel->setEnabled(solveAngularVelocity);
 
-    // indices:
-    // 0 = angles, 1 = none, 2 = velocity, 3 = acceleration, 4 = all
-    bool solveAngles                    = (bool) (index == 0 || index > 1);
-    bool solveAngularVelocity           = (bool) (index > 1);
-    bool solveAngularAcceleration       = (bool) (index > 2);
-//    bool solveAllPolynomialCoefficients = (bool) (index > 3);
+//     m_ui->pointingAngularAccelerationSigmaLabel->setEnabled(solveAngularAcceleration);
+//     m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(solveAngularAcceleration);
+//     m_ui->pointingAngularAccelerationSigmaUnitsLabel->setEnabled(solveAngularAcceleration);
 
-    m_ui->twistCheckBox->setEnabled(solveAngles);
-    m_ui->fitOverPointingCheckBox->setEnabled(solveAngles);
-
-//    m_ui->ckDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->ckDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->ckSolveDegreeSpinBox->setEnabled(solveAllPolynomialCoefficients);
-//    m_ui->ckSolveDegreeLabel->setEnabled(solveAllPolynomialCoefficients);
-
-    m_ui->pointingAnglesSigmaLabel->setEnabled(solveAngles);
-    m_ui->pointingAnglesSigmaLineEdit->setEnabled(solveAngles);
-    m_ui->pointingAnglesSigmaUnitsLabel->setEnabled(solveAngles);
-
-    m_ui->pointingAngularVelocitySigmaLabel->setEnabled(solveAngularVelocity);
-    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(solveAngularVelocity);
-    m_ui->pointingAngularVelocitySigmaUnitsLabel->setEnabled(solveAngularVelocity);
-
-    m_ui->pointingAngularAccelerationSigmaLabel->setEnabled(solveAngularAcceleration);
-    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(solveAngularAcceleration);
-    m_ui->pointingAngularAccelerationSigmaUnitsLabel->setEnabled(solveAngularAcceleration);
-
-  }
+//   }
 
 
   void JigsawSetupDialog::on_maximumLikelihoodModel1ComboBox_currentIndexChanged(int index) {
 
     bool model1Selected = (bool) (index > 0);
-    m_ui->maximumLikelihoodModel1QuantileLabel->setEnabled(model1Selected);
+
+    // lock/unlock current tier's quantile and next tier's model
     m_ui->maximumLikelihoodModel1QuantileLineEdit->setEnabled(model1Selected);
     m_ui->maximumLikelihoodModel2Label->setEnabled(model1Selected);
     m_ui->maximumLikelihoodModel2ComboBox->setEnabled(model1Selected);
+    m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(
+                                            m_ui->maximumLikelihoodModel2ComboBox->currentIndex());
 
+    // when setting "NONE", set remaining max likelihood options to false  
+    if (!model1Selected) {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(false);
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(false);
+      m_ui->maximumLikelihoodModel3Label->setEnabled(false);
+      m_ui->maximumLikelihoodModel3ComboBox->setEnabled(false);
+    }
+
+    on_maximumLikelihoodModel1QuantileLineEdit_textChanged("");
+    on_maximumLikelihoodModel2QuantileLineEdit_textChanged("");
+    on_maximumLikelihoodModel3QuantileLineEdit_textChanged("");
+
+    // sigma and max likelihood options are exclusive
+    m_ui->outlierRejectionCheckBox->setEnabled(!model1Selected);
   }
 
 
   void JigsawSetupDialog::on_maximumLikelihoodModel2ComboBox_currentIndexChanged(int index) {
 
     bool model2Selected = (bool)(index > 0);
-    m_ui->maximumLikelihoodModel2QuantileLabel->setEnabled(model2Selected);
+
+    // lock/unlock current tier's quantile and next tier's model
     m_ui->maximumLikelihoodModel2QuantileLineEdit->setEnabled(model2Selected);
     m_ui->maximumLikelihoodModel3Label->setEnabled(model2Selected);
     m_ui->maximumLikelihoodModel3ComboBox->setEnabled(model2Selected);
+    m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(
+                                            m_ui->maximumLikelihoodModel3ComboBox->currentIndex());
 
+    // when setting "NONE", set remaining max likelihood options to false  
+    if (!model2Selected) {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(false);
+    }
+
+    on_maximumLikelihoodModel2QuantileLineEdit_textChanged("");
+    on_maximumLikelihoodModel3QuantileLineEdit_textChanged("");
   }
 
 
   void JigsawSetupDialog::on_maximumLikelihoodModel3ComboBox_currentIndexChanged(int index) {
 
     bool model3Selected = (bool)(index > 0);
-    m_ui->maximumLikelihoodModel3QuantileLabel->setEnabled(model3Selected);
-    m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(model3Selected);
 
+    m_ui->maximumLikelihoodModel3QuantileLineEdit->setEnabled(model3Selected);
+    on_maximumLikelihoodModel3QuantileLineEdit_textChanged("");
+
+  }
+
+
+  void JigsawSetupDialog::on_outlierRejectionCheckBox_stateChanged(int arg1) {
+
+    on_outlierRejectionMultiplierLineEdit_textChanged("");
+    m_ui->outlierRejectionMultiplierLineEdit->setEnabled(arg1);
+
+    // sigma and maxlikelihood options are exclusive
+    m_ui->CQuantileLabel->setEnabled(!arg1);
+    m_ui->maxLikelihoodEstimationLabel->setEnabled(!arg1);
+    m_ui->maximumLikelihoodModel1ComboBox->setEnabled(!arg1);
+    m_ui->maximumLikelihoodModel1Label->setEnabled(!arg1);
   }
 
 
   void JigsawSetupDialog::fillFromSettings(const BundleSettingsQsp settings) {
 
-    BundleObservationSolveSettings observationSolveSettings = settings->observationSolveSettings(0);
-
     // general tab
     m_ui->observationModeCheckBox->setChecked(settings->solveObservationMode());
-    m_ui->radiusCheckBox->setChecked(settings->solveRadius());
-    m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
+    m_ui->pointRadiusSigmaCheckBox->setChecked(settings->solveRadius());
+    // m_ui->updateCubeLabelCheckBox->setChecked(settings->updateCubeLabel());
     m_ui->errorPropagationCheckBox->setChecked(settings->errorPropagation());
     m_ui->outlierRejectionCheckBox->setChecked(settings->outlierRejection());
     m_ui->outlierRejectionMultiplierLineEdit->setText(toString(settings->outlierRejectionMultiplier()));
     m_ui->sigma0ThresholdLineEdit->setText(toString(settings->convergenceCriteriaThreshold()));
     m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
-
-
-    m_ui->positionComboBox->setCurrentIndex(observationSolveSettings.instrumentPositionSolveOption());
-    m_ui->hermiteSplineCheckBox->setChecked(observationSolveSettings.solvePositionOverHermite());
-    m_ui->spkDegreeSpinBox->setValue(observationSolveSettings.spkDegree());
-    m_ui->spkSolveDegreeSpinBox->setValue(observationSolveSettings.spkSolveDegree());
-
-
-    int pointingOption = observationSolveSettings.instrumentPointingSolveOption();
-    if (pointingOption == 0) {
-      pointingOption = 1;
-    }
-    if (pointingOption == 1) {
-      pointingOption = 0;
-    }
-
-    if ( pointingOption > 0 ) {
-      m_ui->twistCheckBox->setEnabled(true);
-    }
-    else {
-      m_ui->twistCheckBox->setEnabled(true);
-    }
-
-    m_ui->pointingComboBox->setCurrentIndex(pointingOption);
-//    m_ui->pointingComboBox->setCurrentIndex(observationSolveSettings.instrumentPointingSolveOption());
-
-
-    m_ui->twistCheckBox->setChecked(observationSolveSettings.solveTwist());
-    m_ui->fitOverPointingCheckBox->setChecked(observationSolveSettings.solvePolyOverPointing());
-    m_ui->ckDegreeSpinBox->setValue(observationSolveSettings.ckDegree());
-    m_ui->ckSolveDegreeSpinBox->setValue(observationSolveSettings.ckSolveDegree());
 
     // weighting tab
     if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
@@ -357,46 +485,27 @@ namespace Isis {
 
     }
 
-    QList<double> aprioriPositionSigmas = observationSolveSettings.aprioriPositionSigmas();
+    // If we click setup after changing image selection in the project tree, not all images will
+    // have solve settings. Here we add those images and their default settings to the list
+    QList<BundleObservationSolveSettings> defaultSettings = m_bundleSettings->observationSolveSettings();
+    QList<BundleObservationSolveSettings> fillSettings = settings->observationSolveSettings();
 
-    if ( aprioriPositionSigmas.size() > 0 && !IsNullPixel(aprioriPositionSigmas[0]) ) {
-      m_ui->positionSigmaLineEdit->setText(toString(aprioriPositionSigmas[0]));
-      m_ui->positionSigmaLineEdit->setModified(true);
+    for (auto &solveSettings : defaultSettings) {      
+      // Remove any images from defaultSettings that exist in fillSettings
+      foreach (QString observationNumber, solveSettings.observationNumbers()) {
+        // The method will return a default with no obs numbers if none are found
+        if (!settings->observationSolveSettings(observationNumber).observationNumbers().isEmpty()) {
+          solveSettings.removeObservationNumber(observationNumber);
+        }
+      }
+      // Append leftover defaultSettings
+      if (!solveSettings.observationNumbers().isEmpty()) {
+        fillSettings.append(solveSettings);
+      }
     }
 
-    if ( aprioriPositionSigmas.size() > 1 && !IsNullPixel(aprioriPositionSigmas[1]) ) {
-      m_ui->velocitySigmaLineEdit->setText(toString(aprioriPositionSigmas[1]));
-      m_ui->velocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPositionSigmas.size() > 2 && !IsNullPixel(aprioriPositionSigmas[2]) ) {
-      m_ui->accelerationSigmaLineEdit->setText(toString(aprioriPositionSigmas[2]));
-      m_ui->accelerationSigmaLineEdit->setModified(true);
-    }
-
-    QList<double> aprioriPointingSigmas = observationSolveSettings.aprioriPointingSigmas();
-
-    if ( aprioriPointingSigmas.size() > 0 && !IsNullPixel(aprioriPointingSigmas[0]) ) {
-      m_ui->pointingAnglesSigmaLineEdit->setText(toString(aprioriPointingSigmas[0]));
-      m_ui->pointingAnglesSigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 1 && !IsNullPixel(aprioriPointingSigmas[1]) ) {
-      m_ui->pointingAngularVelocitySigmaLineEdit->setText(toString(aprioriPointingSigmas[1]));
-      m_ui->pointingAngularVelocitySigmaLineEdit->setModified(true);
-    }
-
-    if ( aprioriPointingSigmas.size() > 2 && !IsNullPixel(aprioriPointingSigmas[2]) ) {
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setText(toString(aprioriPointingSigmas[2]));
-      m_ui->pointingAngularAccelerationSigmaLineEdit->setModified(true);
-    }
-
-    // maximum liklihood tab
-
-    // self-calibration tab
-
-    // target body tab
-
+    m_bundleSettings->setObservationSolveOptions(fillSettings);
+    
     update();
 
   }
@@ -404,7 +513,7 @@ namespace Isis {
 
   BundleSettingsQsp JigsawSetupDialog::bundleSettings() {
 
-    BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+    BundleSettingsQsp settings = m_bundleSettings;
     settings->setValidateNetwork(true);
 
     // solve options
@@ -421,65 +530,16 @@ namespace Isis {
       radiusSigma = m_ui->pointRadiusSigmaLineEdit->text().toDouble();
     }
     settings->setSolveOptions(m_ui->observationModeCheckBox->isChecked(),
-                              m_ui->updateCubeLabelCheckBox->isChecked(),
+                              false,
+                              // m_ui->updateCubeLabelCheckBox->isChecked(),
                               m_ui->errorPropagationCheckBox->isChecked(),
-                              m_ui->radiusCheckBox->isChecked(),
+                              m_ui->pointRadiusSigmaCheckBox->isChecked(),
                               latitudeSigma,
                               longitudeSigma,
                               radiusSigma);
     settings->setOutlierRejection(m_ui->outlierRejectionCheckBox->isChecked(),
                                   m_ui->outlierRejectionMultiplierLineEdit->text().toDouble());
 
-
-
-
-    QList<BundleObservationSolveSettings> observationSolveSettingsList;
-    BundleObservationSolveSettings observationSolveSettings;
-
-    // pointing settings
-    double anglesSigma              = -1.0;
-    double angularVelocitySigma     = -1.0;
-    double angularAccelerationSigma = -1.0;
-
-    if (m_ui->pointingAnglesSigmaLineEdit->isModified()) {
-      anglesSigma = m_ui->pointingAnglesSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularVelocitySigmaLineEdit->isModified()) {
-      angularVelocitySigma = m_ui->pointingAngularVelocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->pointingAngularAccelerationSigmaLineEdit->isModified()) {
-      angularAccelerationSigma = m_ui->pointingAngularAccelerationSigmaLineEdit->text().toDouble();
-    }
-    observationSolveSettings.setInstrumentPointingSettings(
-        BundleObservationSolveSettings::stringToInstrumentPointingSolveOption(m_ui->pointingComboBox->currentText()),
-        m_ui->twistCheckBox->isChecked(),
-        m_ui->ckDegreeSpinBox->text().toInt(),
-        m_ui->ckSolveDegreeSpinBox->text().toInt(),
-        m_ui->fitOverPointingCheckBox->isChecked(),
-        anglesSigma, angularVelocitySigma, angularAccelerationSigma);
-
-    // position option
-    double positionSigma     = -1.0;
-    double velocitySigma     = -1.0;
-    double accelerationSigma = -1.0;
-    if (m_ui->positionSigmaLineEdit->isModified()) {
-      positionSigma = m_ui->positionSigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->velocitySigmaLineEdit->isModified()) {
-      velocitySigma = m_ui->velocitySigmaLineEdit->text().toDouble();
-    }
-    if (m_ui->accelerationSigmaLineEdit->isModified()) {
-      accelerationSigma = m_ui->accelerationSigmaLineEdit->text().toDouble();
-    }
-    observationSolveSettings.setInstrumentPositionSettings(
-        BundleObservationSolveSettings::stringToInstrumentPositionSolveOption(m_ui->positionComboBox->currentText()),
-        m_ui->spkDegreeSpinBox->text().toInt(),
-        m_ui->spkSolveDegreeSpinBox->text().toInt(),
-        m_ui->hermiteSplineCheckBox->isChecked(),
-        positionSigma, velocitySigma, accelerationSigma);
-
-    observationSolveSettingsList.append(observationSolveSettings);
-    settings->setObservationSolveOptions(observationSolveSettingsList);
     // convergence criteria
     settings->setConvergenceCriteria(BundleSettings::Sigma0,
                                      m_ui->sigma0ThresholdLineEdit->text().toDouble(),
@@ -509,7 +569,6 @@ namespace Isis {
         }
       }
     }
-
     // target body
     // ensure user entered something to adjust
     if (m_ui->poleRaCheckBox->isChecked()              ||
@@ -616,10 +675,6 @@ namespace Isis {
 
       settings->setBundleTargetBody(bundleTargetBody);
     }
-
-     // output options
-//???     settings->setOutputFilePrefix("");
-
     return settings;
   }
 
@@ -645,7 +700,7 @@ namespace Isis {
    * @param const QString &controlName The name of the control to try to find in the combo box.
    */
   void JigsawSetupDialog::selectControl(const QString &controlName) {
-    QComboBox &cnetBox = *(m_ui->controlNetworkComboBox);
+    QComboBox &cnetBox = *(m_ui->inputControlNetCombo);
     int foundControlIndex = cnetBox.findText(FileName(controlName).name());
     // We did not find it, so we need to see if the combo box is empty or not.
     if (foundControlIndex == -1) {
@@ -666,53 +721,209 @@ namespace Isis {
 
   Control *JigsawSetupDialog::selectedControl() {
 
-      int nIndex = m_ui->controlNetworkComboBox->currentIndex();
+      int nIndex = m_ui->inputControlNetCombo->currentIndex();
       Control *selectedControl
-                   = (Control *)(m_ui->controlNetworkComboBox->itemData(nIndex).value< void * >());
+                   = (Control *)(m_ui->inputControlNetCombo->itemData(nIndex).value< void * >());
       return selectedControl;
 
   }
 
 
   QString JigsawSetupDialog::selectedControlName() {
-    return QString(m_ui->controlNetworkComboBox->currentText());
+    return QString(m_ui->inputControlNetCombo->currentText());
+  }
+
+  
+
+  /**
+   * @brief updateBundleObservationSolveSettings:  This function sets the parameters of
+   * a BundleObservationSolveSettings object by reading user settings from the BOSS
+   * tab, as well as reading in the selected images on the BOSS QTreeView these
+   * BOSS settings are to be applied to.
+   * @param BundleObservationSolveSettings &boss The object which stores user-specified
+   * settings from the BOSS tab.
+   */
+  void JigsawSetupDialog::updateBundleObservationSolveSettings(BundleObservationSolveSettings &boss)
+    {
+
+      int ckSolveDegree = m_ui->ckSolveDegreeSpinBox->value();
+      int spkSolveDegree = m_ui->spkSolveDegreeSpinBox->value();
+      int ckDegree = m_ui->ckDegreeSpinBox->value();
+      int spkDegree = m_ui->spkDegreeSpinBox->value();
+      int instrumentPointingSolveOption=m_ui->pointingComboBox->currentIndex();
+      int instrumentPositionSolveOption=m_ui->positionComboBox->currentIndex();
+
+      BundleObservationSolveSettings::InstrumentPointingSolveOption  pointSolvingOption;
+      BundleObservationSolveSettings::InstrumentPositionSolveOption  positionSolvingOption;
+
+      double anglesAprioriSigma(-1.0);
+      double angularVelocityAprioriSigma(-1.0);
+      double angularAccelerationAprioriSigma(-1.0);
+      QList<double> additionalAngularCoefficients;
+
+      double positionAprioriSigma(-1.0);
+      double velocityAprioriSigma(-1.0);
+      double accelerationAprioriSigma(-1.0);
+      QList<double> additionalPositionCoefficients;
+
+      bool solveTwist(false);
+      bool solvePolynomialOverExisting(false);
+      bool positionOverHermite(false);
+
+      if (m_ui->pointingAprioriSigmaTable->item(0,3))
+        anglesAprioriSigma = m_ui->pointingAprioriSigmaTable->item(0,3)->data(0).toDouble();
+
+      if (m_ui->pointingAprioriSigmaTable->item(1,3))
+        angularVelocityAprioriSigma = m_ui->pointingAprioriSigmaTable->item(1,3)->data(0).toDouble();
+
+      if (m_ui->pointingAprioriSigmaTable->item(2,3) )
+        angularAccelerationAprioriSigma = m_ui->pointingAprioriSigmaTable->item(2,3)->data(0).toDouble();
+
+      if (m_ui->positionAprioriSigmaTable->item(0,3))
+        positionAprioriSigma = m_ui->positionAprioriSigmaTable->item(0,3)->data(0).toDouble();
+
+      if (m_ui->positionAprioriSigmaTable->item(1,3))
+        velocityAprioriSigma = m_ui->positionAprioriSigmaTable->item(1,3)->data(0).toDouble();
+
+      if (m_ui->positionAprioriSigmaTable->item(2,3) )
+        accelerationAprioriSigma = m_ui->positionAprioriSigmaTable->item(2,3)->data(0).toDouble();
+
+      //Saving additionalPositional/Angular coefficients (deg >=3) in case they are needed
+      //later.
+      if (spkSolveDegree >2) {
+        for (int i = 3;i <= spkSolveDegree;i++ ) {
+          if (m_ui->positionAprioriSigmaTable->item(i,3))
+            additionalPositionCoefficients.append(m_ui->positionAprioriSigmaTable->item(i,3)->data(0).toDouble() );
+        }
+      }
+
+      if (ckSolveDegree > 2) {
+         for (int i = 3;i <= ckSolveDegree;i++ ) {
+           if (m_ui->pointingAprioriSigmaTable->item(i,3))
+             additionalAngularCoefficients.append(m_ui->pointingAprioriSigmaTable->item(i,3)->data(0).toDouble() );
+         }
+
+      }
+
+
+      if (m_ui->twistCheckBox->checkState() == Qt::Checked)
+        solveTwist = true;
+      if (m_ui->fitOverPointingCheckBox->checkState() == Qt::Checked)
+        solvePolynomialOverExisting = true;
+      if (m_ui->hermiteSplineCheckBox->checkState() == Qt::Checked)
+        positionOverHermite = true;
+
+      switch(instrumentPointingSolveOption) {
+
+      case 0: pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::NoPointingFactors;
+        break;
+      case 1:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AnglesOnly;
+        break;
+      case 2:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AnglesVelocity;
+        break;
+      case 3:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AnglesVelocityAcceleration;
+        break;
+
+      case 4:pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::AllPointingCoefficients;
+        break;
+      default:  pointSolvingOption = BundleObservationSolveSettings::InstrumentPointingSolveOption::NoPointingFactors;
+        break;
+
+      }
+
+      switch(instrumentPositionSolveOption) {
+
+      case 0: positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::NoPositionFactors;
+        break;
+      case 1:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::PositionOnly;
+        break;
+      case 2:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::PositionVelocity;
+        break;
+      case 3:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::PositionVelocityAcceleration;
+        break;
+
+      case 4:positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::AllPositionCoefficients;
+        break;
+      default:  positionSolvingOption = BundleObservationSolveSettings::InstrumentPositionSolveOption::NoPositionFactors;
+        break;
+
+      }
+
+
+      boss.setInstrumentPositionSettings(positionSolvingOption,spkDegree,spkSolveDegree,positionOverHermite,
+                                         positionAprioriSigma,velocityAprioriSigma,accelerationAprioriSigma,
+                                         &additionalPositionCoefficients);
+
+      boss.setInstrumentPointingSettings(pointSolvingOption,solveTwist,ckDegree,ckSolveDegree,solvePolynomialOverExisting,
+                                         anglesAprioriSigma,angularVelocityAprioriSigma,angularAccelerationAprioriSigma,
+                                         &additionalAngularCoefficients);
+
+      //What if multiple instrument IDs are represented?
+      boss.setInstrumentId("");
+
+
+      SortFilterProxyModel* proxyModel = (SortFilterProxyModel *)m_ui->treeView->model();
+      ProjectItemModel* sourceModel = (ProjectItemModel *)proxyModel->sourceModel();
+      QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
+
+      foreach (QModelIndex index, selectedIndexes) {
+
+        QModelIndex sourceix = proxyModel->mapToSource(index);
+        ProjectItem * projItem = sourceModel->itemFromIndex(sourceix);
+
+        if (projItem) {
+
+          if (projItem->isImage() ) {
+            Image * img = projItem->data().value<Image *>();
+            boss.addObservationNumber(img->observationNumber() );
+
+          }
+        }
+
+      }
+
+    }
+
+
+  QString JigsawSetupDialog::outputControlName() {
+    return QString(m_ui->outputControlNetLineEdit->text());
   }
 
 
   void JigsawSetupDialog::makeReadOnly() {
-    m_ui->controlNetworkComboBox->setEnabled(false);
+    m_ui->inputControlNetCombo->setEnabled(false);
     m_ui->observationModeCheckBox->setEnabled(false);
-    m_ui->radiusCheckBox->setEnabled(false);
-    m_ui->updateCubeLabelCheckBox->setEnabled(false);
+    m_ui->pointRadiusSigmaCheckBox->setEnabled(false);
+    // m_ui->updateCubeLabelCheckBox->setEnabled(false);
     m_ui->errorPropagationCheckBox->setEnabled(false);
     m_ui->outlierRejectionCheckBox->setEnabled(false);
     m_ui->outlierRejectionMultiplierLineEdit->setEnabled(false);
     m_ui->sigma0ThresholdLineEdit->setEnabled(false);
     m_ui->maximumIterationsLineEdit->setEnabled(false);
-    m_ui->positionComboBox->setEnabled(false);
+    // m_ui->positionComboBox->setEnabled(false);
     m_ui->hermiteSplineCheckBox->setEnabled(false);
     m_ui->spkDegreeSpinBox->setEnabled(false);
     m_ui->spkSolveDegreeSpinBox->setEnabled(false);
     m_ui->twistCheckBox->setEnabled(false);
-    m_ui->pointingComboBox->setEnabled(false);
+    // m_ui->pointingComboBox->setEnabled(false);
     m_ui->fitOverPointingCheckBox->setEnabled(false);
     m_ui->ckDegreeSpinBox->setEnabled(false);
     m_ui->ckSolveDegreeSpinBox->setEnabled(false);
 
-    // weighting tab
-    m_ui->pointLatitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointLongitudeSigmaLineEdit->setEnabled(false);
-    m_ui->pointRadiusSigmaLineEdit->setEnabled(false);
-    m_ui->positionSigmaLineEdit->setEnabled(false);
-    m_ui->velocitySigmaLineEdit->setEnabled(false);
-    m_ui->accelerationSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAnglesSigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularVelocitySigmaLineEdit->setEnabled(false);
-    m_ui->pointingAngularAccelerationSigmaLineEdit->setEnabled(false);
-
-    // maximum liklihood tab
-
-    // self-calibration tab
+    // observation solve settings tab
+    m_ui->treeView->setEnabled(false);
+    m_ui->positionComboBox->setEnabled(false);
+    m_ui->spkSolveDegreeSpinBox->setEnabled(false);
+    m_ui->spkDegreeSpinBox->setEnabled(false);
+    m_ui->hermiteSplineCheckBox->setEnabled(false);
+    m_ui->positionAprioriSigmaTable->setEnabled(false);
+    m_ui->pointingComboBox->setEnabled(false);
+    m_ui->ckSolveDegreeSpinBox->setEnabled(false);
+    m_ui->ckDegreeSpinBox->setEnabled(false);
+    m_ui->twistCheckBox->setEnabled(false);
+    m_ui->fitOverPointingCheckBox->setEnabled(false);
+    m_ui->pointingAprioriSigmaTable->setEnabled(false);
+    m_ui->applySettingsPushButton->setEnabled(false);
 
     // target body tab
     m_ui->targetBodyComboBox->setEnabled(false);
@@ -847,7 +1058,7 @@ namespace Isis {
 
       // if we're not solving for target body triaxial radii or mean radius, we CAN solve for point
       // radii so we ensure the point radius checkbox under the general settings tab is enabled
-      m_ui->radiusCheckBox->setEnabled(true);
+      m_ui->pointRadiusSigmaCheckBox->setEnabled(true);
     }
     else if (arg1 == 1) {
       m_ui->aRadiusLabel->setEnabled(true);
@@ -865,8 +1076,8 @@ namespace Isis {
       // if we're solving for target body mean radius, we can't solve for point radii
       // so we uncheck and disable the point radius checkbox under the general settings tab
       // and remind the user
-      m_ui->radiusCheckBox->setChecked(false);
-      m_ui->radiusCheckBox->setEnabled(false);
+      m_ui->pointRadiusSigmaCheckBox->setChecked(false);
+      m_ui->pointRadiusSigmaCheckBox->setEnabled(false);
 
       QMessageBox *msgBox = new QMessageBox(QMessageBox::Information, "Triaxial Radii Reminder!",
                   "Individual point radii and target body triaxial radii can't be solved for"
@@ -890,8 +1101,8 @@ namespace Isis {
       // if we're solving for target body triaxial radii, we can't solve for point radii
       // so we uncheck and disable the point radius checkbox under the general settings tab
       // and remind the user
-      m_ui->radiusCheckBox->setChecked(false);
-      m_ui->radiusCheckBox->setEnabled(false);
+      m_ui->pointRadiusSigmaCheckBox->setChecked(false);
+      m_ui->pointRadiusSigmaCheckBox->setEnabled(false);
 
       QMessageBox *msgBox = new QMessageBox(QMessageBox::Information, "Mean Radius Reminder!",
                   "Individual point radii and target body mean radius can't be solved for"
@@ -974,47 +1185,6 @@ namespace Isis {
   }
 
 
-  void Isis::JigsawSetupDialog::on_spkSolveDegreeSpinBox_2_valueChanged(int arg1) {
-    if (arg1 == -1) {
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(NONE)");
-      m_ui->positionAprioriSigmaTable->setRowCount(0);
-    }
-    m_ui->positionAprioriSigmaTable->setRowCount(arg1+1);
-    m_ui->positionAprioriSigmaTable->resizeColumnsToContents();
-
-    if (arg1 == 0) {
-      QTableWidgetItem *twItem = new QTableWidgetItem();
-      twItem->setText("POSITION");
-      m_ui->positionAprioriSigmaTable->setItem(arg1,0, twItem);
-      QTableWidgetItem *twItemunits = new QTableWidgetItem();
-      twItemunits->setText("meters");
-      //m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("meters");
-    }
-    else if (arg1 == 1) {
-      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("VELOCITY");
-      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/sec");
-    }
-    else if (arg1 == 2) {
-      m_ui->positionAprioriSigmaTable->item(arg1,0)->setText("ACCELERATION");
-      m_ui->positionAprioriSigmaTable->item(arg1,2)->setText("m/s^2");
-    }
-  /*
-    else if (arg1 == 0) {
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(POSITION)");
-      int nRows = m_ui->positionAprioriSigmaTable->rowCount();
-
-      m_ui->positionAprioriSigmaTable->insertRow(nRows);
-    }
-    else if (arg1 == 1)
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(VELOCITY)");
-    else if (arg1 == 2)
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("(ACCELERATION)");
-    else
-      m_ui->spkSolveDegreeSpinBox_2->setSuffix("");
-  */
-  }
-
-
   void Isis::JigsawSetupDialog::on_rightAscensionLineEdit_textChanged(const QString &arg1) {
     if (!m_ui->rightAscensionLineEdit->hasAcceptableInput()) {
       m_ui->rightAscensionLineEdit->setStyleSheet("QLineEdit { background-color: red }");
@@ -1092,6 +1262,129 @@ namespace Isis {
     update();
   }
 
+  // general tab text validation
+  // global apriori point sigmas
+  void Isis::JigsawSetupDialog::on_pointLatitudeSigmaLineEdit_textChanged(const QString &arg1) {
+    if (arg1 == "" || m_ui->pointLatitudeSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->pointLatitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+  void Isis::JigsawSetupDialog::on_pointLongitudeSigmaLineEdit_textChanged(const QString &arg1) {
+    if (arg1 == "" || m_ui->pointLongitudeSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->pointLongitudeSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_pointRadiusSigmaLineEdit_textChanged(const QString &arg1) {
+    if (arg1 == "" || m_ui->pointRadiusSigmaLineEdit->hasAcceptableInput()) {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->pointRadiusSigmaLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+  // outlier rejection
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel1QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel1QuantileLineEdit->isEnabled() ||
+        m_ui->maximumLikelihoodModel1QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumLikelihoodModel1QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel2QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel2QuantileLineEdit->isEnabled() ||
+        m_ui->maximumLikelihoodModel2QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumLikelihoodModel2QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumLikelihoodModel3QuantileLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->maximumLikelihoodModel3QuantileLineEdit->isEnabled() ||
+        m_ui->maximumLikelihoodModel3QuantileLineEdit->hasAcceptableInput()) {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumLikelihoodModel3QuantileLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
+  // convergence criteria
+  void Isis::JigsawSetupDialog::on_outlierRejectionMultiplierLineEdit_textChanged(const QString &arg1) {
+    if (!m_ui->outlierRejectionCheckBox->isChecked() || 
+        m_ui->outlierRejectionMultiplierLineEdit->hasAcceptableInput()) {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->outlierRejectionMultiplierLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_sigma0ThresholdLineEdit_textChanged(const QString &arg1) {
+    if (m_ui->sigma0ThresholdLineEdit->hasAcceptableInput()) {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->sigma0ThresholdLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
+  void Isis::JigsawSetupDialog::on_maximumIterationsLineEdit_textChanged(const QString &arg1) {
+    if (m_ui->maximumIterationsLineEdit->hasAcceptableInput()) {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: white }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    }
+    else {
+      m_ui->maximumIterationsLineEdit->setStyleSheet("QLineEdit { background-color: red }");
+      m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    }
+    update();
+  }
+
+
   void JigsawSetupDialog::showTargetParametersGroupBox() {
     m_ui->targetParametersGroupBox->setEnabled(true);
   }
@@ -1100,4 +1393,493 @@ namespace Isis {
   void JigsawSetupDialog::hideTargetParametersGroupBox() {
     m_ui->targetParametersGroupBox->setEnabled(false);
   }
+
+  void Isis::JigsawSetupDialog::on_inputControlNetCombo_currentTextChanged(const QString &arg1) {
+    FileName fname = arg1;
+    m_ui->outputControlNetLineEdit->setText(fname.baseName() + "-out.net");
+  }
+
+
+  /**
+   * Validates the a priori sigma values for a given QTableWidgetItem.
+   *
+   * This will only validate items in the a priori sigma column. Valid a priori sigma values are
+   * "FREE" or any positive double. Items that are invalid will be marked with a red background
+   * color.
+   *
+   * @param QTableWidgetItem* Pointer to the QTableWidgetItem to be validated.
+   */
+  void JigsawSetupDialog::validateSigmaValue(QTableWidgetItem *item) {
+    // Only validate the "a priori sigma" column
+    if (item->column() != 3) {
+      return;
+    }
+    // FREE is a valid value for the a priori sigma column
+    int free = item->text().simplified().compare("FREE", Qt::CaseInsensitive);
+
+    // Positive doubles are valid values for the a priori sigma column
+    bool convertSuccess = false;
+    double sigma = item->text().toDouble(&convertSuccess);
+    if ((convertSuccess && sigma >= 0.0) || free == 0) {
+      const QTableWidget *table = item->tableWidget();
+      item->setData(Qt::UserRole, QVariant(true));
+      // Set background color depending on if the table has alternating row colors and row is odd
+      if (table->alternatingRowColors() && item->row() % 2 != 0) {
+        item->setBackground(table->palette().color(QPalette::AlternateBase));
+      }
+      else {
+        item->setBackground(table->palette().color(QPalette::Base));
+      }
+
+      if (sigma == 0.0) {
+        item->setText("FREE");
+      }
+    }
+    else {
+      item->setData(Qt::UserRole, QVariant(false));
+      item->setBackground(Qt::red);
+    }
+
+    validateSigmaTables();
+  }
+
+
+  /**
+   * Validates the tables in the observation solve settings tab and enables/disables the OK
+   * button appropriately.
+   *
+   * This method validates both the position and pointing a priori sigma tables in the observation
+   * solve settings tab. If any of the sigma values are invalid, the JigsawSetupDialog's OK button
+   * is disabled. If all of the sigma values are valid, the JigsawSetupDialog's OK button is
+   * (re)enabled.
+   */
+  void JigsawSetupDialog::validateSigmaTables() {
+    bool tablesAreValid = true;
+    
+    // Evaluate both tables; if any value is invalid, the table is invalid
+    QList<const QTableWidget *> tables{m_ui->positionAprioriSigmaTable,
+                                       m_ui->pointingAprioriSigmaTable};
+                                       
+    for (const auto &table : tables) {
+      for (int i = 0; i < table->rowCount(); i++) {
+        // a priori sigma column is column 3
+        const QTableWidgetItem *item = table->item(i,3);
+        if (item) { 
+          if (item->data(Qt::UserRole).toBool() == false) {
+            tablesAreValid = false;
+            break;
+          }
+        }
+      }
+    }
+
+    m_ui->okCloseButtonBox->button(QDialogButtonBox::Ok)->setEnabled(tablesAreValid);
+    if (!m_ui->treeView->selectionModel()->selectedRows().isEmpty()) {
+      m_ui->applySettingsPushButton->setEnabled(tablesAreValid);
+    }
+  }
+
+
+  /**
+   * Slot that listens for changes to the SPK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Position Solve Options table according to the value of the
+   * SPK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the SPK Solve Degree + 1. Note that this relies on the updateSolveSettingsSigmaTables
+   * slot, which uses the SPK Solve Degree if the ALL position option is selected.
+   *
+   * @param int Value the SPK Solve Degree spin box was changed to.
+   */
+  void JigsawSetupDialog::on_spkSolveDegreeSpinBox_valueChanged(int i) {
+    // Update the position apriori sigma table and use the position combo box solve option
+    updateSolveSettingsSigmaTables(m_ui->positionComboBox, m_ui->positionAprioriSigmaTable);
+  }
+
+
+  /**
+   * Slot that listens for changes to the CK Solve Degree spin box.
+   *
+   * This slot populates the Instrument Pointing Solve Options table according to the value of the
+   * CK Solve Degree. Rows are added depending on the degree set, where number of rows added is
+   * equal to the CK Solve Degree + 1. Note that this relies on the updateSolveSettingsSigmaTables
+   * slot, which uses the CK Solve Degree if the ALL pointing option is selected.
+   *
+   * @param int Value the CK Solve Degree spin box was changed to.
+   */
+  void JigsawSetupDialog::on_ckSolveDegreeSpinBox_valueChanged(int i) {
+    // Update the pointing apriori sigma table and use the pointing combo box solve option
+    updateSolveSettingsSigmaTables(m_ui->pointingComboBox, m_ui->pointingAprioriSigmaTable);
+  }
+
+
+  /**
+   * Slot that updates the sigma tables based on the current solve option selection.
+   *
+   * This will add/remove rows based on the solve option selected, and if ALL, the current
+   * solve degree value.
+   *
+   * @param const QComboBox * The solve option combo box to read the solve option from
+   * @param QTableWidget * The a priori sigma table we are going to update rows for
+   */
+  void JigsawSetupDialog::updateSolveSettingsSigmaTables(const QComboBox *solveOptionComboBox,
+                                                         QTableWidget *table) {
+    int rowCount = solveOptionComboBox->currentIndex();
+
+    // Position: { NONE, POSITION, VELOCITY, ACCELERATION, ALL }
+    // Pointing: { NONE, ANGLES, ANGULAR VELOCITY, ANGULAR ACCELERATION, ALL }
+    // Need to add to the solve degree value since number of rows == number of solve coefficients,
+    // and for our polynomials the number of solve coefficients == solve degree + 1
+    // When solve option is ALL (index 4), use the spk/ck solve degree value + 1 for number of rows
+    if (rowCount == 4) {
+      if (solveOptionComboBox == m_ui->positionComboBox) {
+        rowCount = m_ui->spkSolveDegreeSpinBox->value() + 1;
+      }
+      else { // if (solveOptionComboBox == m_ui->pointingComboBox)
+        rowCount = m_ui->ckSolveDegreeSpinBox->value() + 1;
+      }
+    }
+
+    // number of rows == position solve option == SolveDegree value + 1 (i+1)
+    const int oldRowCount = table->rowCount();
+    // if solving ALL, don't add extra row
+    table->setRowCount(rowCount);
+    const int newRowCount = table->rowCount();
+
+    // Need to check if table is valid in case a row is removed (a row is removed implicitly when
+    // the setRowCount() is called when newRowCount < oldRowCount
+    validateSigmaTables();
+
+    // Determine the units for either position or pointing
+    QStringList solveOptions;
+    QString longUnits("N/A");
+    QString shortUnits("N/A");
+    if (solveOptionComboBox == m_ui->positionComboBox) {
+      longUnits = "meters";
+      shortUnits = "m";
+      solveOptions += {"POSITION", "VELOCITY", "ACCELERATION"};
+    }
+    else { // if (solveOptionComboBox == m_ui->pointingComboBox) {
+      longUnits = "degrees";
+      shortUnits = "deg";
+      solveOptions += {"ANGLES", "ANGULAR VELOCITY", "ANGULAR ACCELERATION"};
+    }
+
+    // Rows need to be added
+    if (newRowCount > oldRowCount) {
+      for (int row = oldRowCount; row < newRowCount; row++) {
+        // Headers : coefficient, description, units, a priori sigma
+        QTableWidgetItem *coefficient = new QTableWidgetItem();
+        coefficient->setFlags(Qt::ItemIsEnabled);
+        coefficient->setText(QString::number(row + 1));
+        table->setItem(row, 0, coefficient);
+
+        QTableWidgetItem *description = new QTableWidgetItem();
+        description->setFlags(Qt::ItemIsEnabled);
+        description->setText("N/A");
+        table->setItem(row, 1, description);
+
+        QTableWidgetItem *units = new QTableWidgetItem();
+        units->setFlags(Qt::ItemIsEnabled);
+        units->setText(shortUnits + "/s^" + QString::number(row));
+        table->setItem(row, 2, units);
+
+        QTableWidgetItem *sigma = new QTableWidgetItem();
+        sigma->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        sigma->setText("0.0");
+        sigma->setData(Qt::UserRole, QVariant(true));
+        table->setItem(row, 3, sigma);
+
+        // Solve option: spk degree { NONE: -1, POSITION: 0, VELOCITY: 1, ACCELERATION: 2, ALL: 2 }
+        // POSITION
+        if (row == 0) { 
+          QTableWidgetItem *description = table->item(0, 1);
+          description->setText(solveOptions.at(row));
+
+          QTableWidgetItem *units = table->item(0, 2);
+          units->setText(longUnits);
+        }
+
+        // VELOCITY
+        else if (row == 1) {
+          QTableWidgetItem *description = table->item(1, 1);
+          description->setText(solveOptions.at(row));
+
+          QTableWidgetItem *units = table->item(1, 2);
+          units->setText(shortUnits + "/s");
+        }
+
+        // ACCELERATION
+        else if (row == 2) {
+          QTableWidgetItem *description = table->item(2, 1);
+          description->setText(solveOptions.at(row));
+
+          QTableWidgetItem *units = table->item(2, 2);
+          units->setText(shortUnits + "/s^2");
+        }
+      }
+    }
+
+    table->resizeColumnToContents(1);
+    table->resizeColumnToContents(2);
+  }
+
+
+  /**
+   * Slot that listens for when the Instrument Position Solve Option combobox changes.
+   *
+   * This slot updates the value of the SPK Solve Degree spin box according to which solve position
+   * option is selected. This slot also disables the SPK spin boxes whenever a solve
+   * position that is not ALL is selected.
+   *
+   * @param const QString & Reference to the value that the position option combobox was changed to.
+   */
+  void JigsawSetupDialog::on_positionComboBox_currentIndexChanged(const QString &arg1) {
+    int solveIndex = m_ui->positionComboBox->currentIndex();
+    QList<QSpinBox *> spinBoxes{m_ui->spkSolveDegreeSpinBox, m_ui->spkDegreeSpinBox};
+    for (auto &spinBox : spinBoxes) {
+      // ALL enables the solve degree spin box, but does not increase the degree
+      // Below shows the corresponding degree for each of the solve options:
+      //   NONE = -1; ANGLES = 0; VELOCITY = 1; ACCELERATION = 2; ALL = 2
+      if (arg1 == "ALL") {
+        spinBox->setValue(solveIndex - 2);
+        spinBox->setEnabled(true);
+      }
+      else {
+        // The default value for the spk solve degree and spk degree spinboxes is 2. This is
+        // emulating jigsaw's defaults for position solve options that are not ALL.
+        spinBox->setValue(2);
+        spinBox->setEnabled(false);
+      }
+    }
+
+    updateSolveSettingsSigmaTables(m_ui->positionComboBox, m_ui->positionAprioriSigmaTable);
+  }
+
+
+  /**
+   * Slot that listens for when the Instrument Pointing Solve Option combobox changes.
+   *
+   * This slot updates the value of the CK Solve Degree spin box according to which solve pointing
+   * option is selected. This slot also disables the CK spin boxes whenever a solve
+   * pointing that is not ALL is selected.
+   *
+   * @param const QString & Reference to the value that the pointing option combobox was changed to.
+   */
+ void JigsawSetupDialog::on_pointingComboBox_currentIndexChanged(const QString &arg1) {
+    int solveIndex = m_ui->pointingComboBox->currentIndex();
+    QList<QSpinBox *> spinBoxes{m_ui->ckSolveDegreeSpinBox, m_ui->ckDegreeSpinBox};
+    for (auto &spinBox : spinBoxes) {
+      // ALL enables the solve degree spin box, but does not increase the degree
+      // Below shows the corresponding degree for each of the solve options:
+      //   NONE = -1; ANGLES = 0; ANGULAR VELOCITY = 1; ANGULAR ACCELERATION = 2; ALL = 2
+      if (arg1 == "ALL") {
+        spinBox->setValue(solveIndex - 2);
+        spinBox->setEnabled(true);
+      }
+      else {
+        // The default value for the ck solve degree and spk degree spinboxes is 2. This is
+        // emulating jigsaw's defaults for pointing solve options that are not ALL.
+        spinBox->setValue(2);
+        spinBox->setEnabled(false);
+      }
+    }
+
+    updateSolveSettingsSigmaTables(m_ui->pointingComboBox, m_ui->pointingAprioriSigmaTable);
+  }
+
+
+
+  void JigsawSetupDialog::createObservationSolveSettingsTreeView() {
+
+    QList<ProjectItem *> selectedBOSSItems = m_project->directory()->model()->selectedBOSSImages();
+
+    ProjectItemModel *model = m_project->directory()->model();
+
+    SortFilterProxyModel *osspm = new SortFilterProxyModel;
+    osspm->setSourceModel(model);
+
+    //osspm->setDynamicSortFilter(true);
+    osspm->setSelectedItems(selectedBOSSItems );
+    m_ui->treeView->setModel(osspm);
+
+
+
+
+         ProjectItem *imgRoot = model->findItemData(QVariant("Images"),0);
+         if (imgRoot) {
+
+            m_ui->treeView->setRootIndex(osspm->mapFromSource(imgRoot->index()));
+         }
+         else {
+          m_ui->treeView->setRootIndex(QModelIndex());
+         }
+  
+    connect(m_ui->treeView->selectionModel(), 
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+            this, 
+            SLOT(treeViewSelectionChanged(const QItemSelection&,const QItemSelection&)));
+
+
+    // Try to loop through the view here to add the "groups" so they aren't part of the model
+
+    // Add apply button to the tab view
+    // set the text to bold?
+
+
+  }
+
+
+  void JigsawSetupDialog::treeViewSelectionChanged(const QItemSelection &selected, 
+                                                   const QItemSelection &deselected) {
+    QModelIndexList indexList = m_ui->treeView->selectionModel()->selectedRows();
+
+    // qDebug() << "\n\nselected: " << selected.indexes();
+    // qDebug() << "deselected: " << deselected.indexes();
+    // qDebug() << "selectedRows: " << m_ui->treeView->selectionModel()->selectedRows();
+
+
+    if (!indexList.isEmpty()) {
+      QModelIndex displayIndex = indexList[0];
+
+      SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model(); 
+      ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
+
+      QModelIndex sourceIndex = proxyModel->mapToSource(displayIndex);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
+
+      if (projItem->isImageList()) {
+        projItem = projItem->child(0);  
+      }
+      BundleObservationSolveSettings settings = m_bundleSettings->observationSolveSettings(
+                                                                projItem->image()->observationNumber());
+
+      // Populate RHS of Observation Solve Settings tab with selected image's BOSS
+      // Instrument Position Solve Options
+      m_ui->positionComboBox->setCurrentIndex(settings.instrumentPositionSolveOption());
+      m_ui->spkSolveDegreeSpinBox->setValue(settings.spkSolveDegree());
+      m_ui->spkDegreeSpinBox->setValue(settings.spkDegree());
+      m_ui->hermiteSplineCheckBox->setChecked(settings.solvePositionOverHermite());
+
+      for (int row = 0; row < settings.aprioriPositionSigmas().count(); row++) {
+        QTableWidgetItem * sigmaItem = m_ui->positionAprioriSigmaTable->item(row, 3);
+        double sigma = settings.aprioriPositionSigmas()[row];
+        if (sigma == Isis::Null) {
+          sigmaItem->setText("FREE");
+        }
+        else {
+          sigmaItem->setText(QString::number(sigma));
+        }
+      }
+
+      // Instrument Pointing Solve Options
+      m_ui->pointingComboBox->setCurrentIndex(settings.instrumentPointingSolveOption());
+      m_ui->ckSolveDegreeSpinBox->setValue(settings.ckSolveDegree());
+      m_ui->ckDegreeSpinBox->setValue(settings.ckDegree());
+      m_ui->twistCheckBox->setChecked(settings.solveTwist());
+      m_ui->fitOverPointingCheckBox->setChecked(settings.solvePolyOverPointing());
+
+      for (int row = 0; row < settings.aprioriPointingSigmas().count(); row++) {
+        QTableWidgetItem * sigmaItem = m_ui->pointingAprioriSigmaTable->item(row, 3);
+        double sigma = settings.aprioriPointingSigmas()[row];
+        if (sigma == Isis::Null) {
+          sigmaItem->setText("FREE");
+        }
+        else {
+          sigmaItem->setText(QString::number(sigma));
+        }
+      }      
+
+    } 
+
+    m_ui->applySettingsPushButton->setEnabled(!selected.isEmpty());
+  }
+
+
+
+  /**
+   * Slot for handling the Observation Solve Settings tab's Apply button. Retrieve's the selected
+   * ProjectItems and adds their images' serial numbers to a new BundleObservationSolveSettings
+   * object. Serial numbers will be removed from all other BOSS objects, and empty BOSS objects will
+   * be removed. 
+   */ 
+  void JigsawSetupDialog::on_applySettingsPushButton_clicked() {
+
+    // Get the current selected images and the item models
+    SortFilterProxyModel * proxyModel = (SortFilterProxyModel *) m_ui->treeView->model();
+    ProjectItemModel *sourceModel = (ProjectItemModel *) proxyModel->sourceModel();
+
+    QModelIndexList selectedIndexes = m_ui->treeView->selectionModel()->selectedIndexes();
+    QStringList selectedObservationNumbers;
+
+    // Append selected images' serial numbers to selectedObservationNumbers
+    foreach (QModelIndex index, selectedIndexes) {
+      QModelIndex sourceIndex = proxyModel->mapToSource(index);
+      ProjectItem * projItem = sourceModel->itemFromIndex(sourceIndex);
+
+      if (projItem) {
+        // Tree traversal is top down so we dont need to do this check for imagelists?
+        if (projItem->isImage()) {
+          // Grab the observation up front so we don't need to re-compose the observation number
+          // more than once (@todo: this should not be necessary when 5026 is integrated)
+          const QString observationNumber = projItem->image()->observationNumber();
+          if (!selectedObservationNumbers.contains(observationNumber)) {
+            selectedObservationNumbers.append(observationNumber);
+          }
+        }
+        else if (projItem->isImageList()) {
+          // Use the proxymodel's children as it might not include all of the sourcemodel's children 
+          for (int i = 0; i < proxyModel->rowCount(index); i++) {
+            QModelIndex childProxyIndex = proxyModel->index(i, 0, index);
+            QModelIndex childSourceIndex = proxyModel->mapToSource(childProxyIndex);
+            ProjectItem * childItem = sourceModel->itemFromIndex(childSourceIndex);
+            selectedObservationNumbers.append(childItem->image()->observationNumber());
+          }
+        }
+      }
+    }
+
+    QList<BundleObservationSolveSettings> solveSettingsList = m_bundleSettings->observationSolveSettings();
+
+    //find the bundle observation solve settings for each of the selected observations and remove
+    // the observation number from them 
+    for (auto &solveSettings : solveSettingsList) {      
+      foreach (QString observationNumber, selectedObservationNumbers) {
+        solveSettings.removeObservationNumber(observationNumber);
+      }
+    }
+
+
+    // Remove any existing solve settings that no longer have any observation numbers
+    int iter = 0;
+    while (iter < solveSettingsList.count()) {
+      if (solveSettingsList[iter].observationNumbers().isEmpty() ) {
+        solveSettingsList.removeAt(iter);
+      }
+      else {
+        iter++; // This list shrinks as we remove, so we dont need to iterate every time
+      }
+    }
+
+    // Create a new bundle observation solve settings
+    BundleObservationSolveSettings solveSettings;
+    foreach (QString observationNumber, selectedObservationNumbers) {
+      solveSettings.addObservationNumber(observationNumber);
+    }
+
+    // Grab the data from the right hand side of the observation solve settings tab to set
+    // up the new bundle observation solve settings
+    updateBundleObservationSolveSettings(solveSettings);
+
+    // Add the new solve settings to the solve settings list
+    solveSettingsList.append(solveSettings);
+
+    // Update bundle settings with the new list of bundle observation solve settings
+    m_bundleSettings->setObservationSolveOptions(solveSettingsList);
+
+    // qDebug()<<"Current BOSS list --------";
+    // for (int i = 0; i < solveSettingsList.count(); i++) {
+    //   qDebug() << "solveSettingsList["<<i<<"]: " << solveSettingsList[i].observationNumbers();
+    // }
+  }
+
 }

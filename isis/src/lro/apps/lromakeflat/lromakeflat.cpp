@@ -2,9 +2,9 @@
  * @Brief This application creates three flatfield (Sensitivity Non-Uniformity Matrix) cubes used for calibration
  *
  * This application creates three flatfield (Sensitivity Non-Uniformity Matrix) cubes used for calibration.
- * The cubes consist of median, mean, and standard deviation values per pixel. Process varies for the three 
- * cameras this application can be used for but general pixel stacking column approach is the same. The 
- * three camera types are line-scan, push-frame, and framing. Invalid pixel values are changed to Isis::Null. 
+ * The cubes consist of median, mean, and standard deviation values per pixel. Process varies for the three
+ * cameras this application can be used for but general pixel stacking column approach is the same. The
+ * three camera types are line-scan, push-frame, and framing. Invalid pixel values are changed to Isis::Null.
  *
  * The application uses a two step process.
  *
@@ -12,19 +12,19 @@
  *
  * The first part of the process is to stack cube pixels at their respective pixel locations.
  *
- * These stacked pixels are processed to produce the median, mean, and standard deviation values for the 
- * pixel location, and to toss out invalid pixel values.  Normalization can also be done at this time if 
- * images were not normalized prior. The mean is used to normalize images. 
+ * These stacked pixels are processed to produce the median, mean, and standard deviation values for the
+ * pixel location, and to toss out invalid pixel values.  Normalization can also be done at this time if
+ * images were not normalized prior. The mean is used to normalize images.
  *
  * Step #2 - PROCESSING STACKED PIXEL COLUMNS AND TRANSFERRING TO SNU
  *
- * Once pixels have been stacked into pixel columns mean and median averages, and standard devation for that 
+ * Once pixels have been stacked into pixel columns mean and median averages, and standard devation for that
  * pixel location is saved to the SNU matrix (flatfield cubes).
  *
  * Mean
  *  -The summed pixels are divided by the number of pixels.
- * Standard Deviation 
- *  -The mean average is used to calculate the standard deviation. 
+ * Standard Deviation
+ *  -The mean average is used to calculate the standard deviation.
  * Median
  *  -The pixel column is sorted and the median is obtained.
  *
@@ -91,7 +91,7 @@ vector < PvlObject > g_excludedDetails;
    *
    * Computes flatfield image for linescan, pushbroom, and framing
    * Cameras
-   * 
+   *
    * @throws IException::User "Only single band images accepted"
    * @throws IException::User "User selected lines value exceeds number of lines in cube"
    * @throws IException::Programmer "Could not write to output cube"
@@ -100,7 +100,7 @@ vector < PvlObject > g_excludedDetails;
    *
    * @internal
    *   @history 2016-08-17 Victor Silva - New app for lroc adapted from makeflat app
-   *                         
+   *
    */
 void IsisMain() {
 
@@ -115,7 +115,7 @@ void IsisMain() {
   int cubeWidthPixels = 0, frameHeightLines = 0, framesPerCube, frameLineCount;
 
   // Setup Sensitivity Non-uniformity Matrix cubes (flatfielding matrix) and line managers
-  Cube *oStdevCube = NULL, *oMedianCube = NULL, *oMeanCube = NULL; 
+  Cube *oStdevCube = NULL, *oMedianCube = NULL, *oMeanCube = NULL;
   LineManager *oStdevlineMgr = NULL, *oMeanLineMgr = NULL, *oMedianLineMgr = NULL;
 
   // Get some info from first cube in list
@@ -144,7 +144,7 @@ void IsisMain() {
     oLineCount = 1;
     frameLineCount = abs(ui.GetInteger("NUMLINES"));
     if (iLineCount != frameLineCount) {
-      string err = "User selected lines value (" + IString(frameLineCount) + 
+      string err = "User selected lines value (" + IString(frameLineCount) +
          ") exceeds number of lines in cube (" + IString(iLineCount) + ". \n";
       throw IException(IException::User, err, _FILEINFO_);
     }
@@ -192,7 +192,7 @@ void IsisMain() {
       tmp2.open(g_list[listIndex].toString());
       // Only run for cubes with one band
       if (tmp2.bandCount() != 1) {
-        string err = "Warning: This cube has too many bands(" + IString(tmp2.bandCount()) + 
+        string err = "Warning: This cube has too many bands(" + IString(tmp2.bandCount()) +
           " and will be excluded). Only single band images accepted. \n";
         cerr << err << endl;
         exclude(listIndex, err);
@@ -201,7 +201,7 @@ void IsisMain() {
       }
       // Reset frame for every cube in list
       int frame = 0;
-      // Cube line has to match oLine as we are slicing the cubes one line at a time to stack pixels 
+      // Cube line has to match oLine as we are slicing the cubes one line at a time to stack pixels
       for (long cubeLine = oLine; cubeLine <= iLineCount; cubeLine = cubeLine + frameLineCount) {
         LineManager cubeMgr(tmp2);
         cubeMgr.SetLine(cubeLine);
@@ -211,7 +211,7 @@ void IsisMain() {
         for (int column = 0; column < g_sampleCount; column++) {
           pixelVal = cubeMgr[column];
           int frameIndex = listIndex * framesPerCube + frame;
-          // If frame avg is zero, will cause div/zero error. Set pixel to 0? nil?  
+          // If frame avg is zero, will cause div/zero error. Set pixel to 0? nil?
           (normMatrix[listIndex][frame])? pixelVal = (pixelVal/(normMatrix[listIndex][frame])):pixelVal = Isis::Null;
           pixelMatrix[column][frameIndex] = pixelVal;
         }
@@ -239,7 +239,7 @@ void IsisMain() {
       oMeanCube->write(*oMeanLineMgr);
       oMedianCube->write(*oMedianLineMgr);
     }
-    catch (IException e) {
+    catch (IException &e) {
       //cout << "It's no use at this point. Just go. Leave me here. I'll only slow you down.";
       string err = "Could not write to output cube " + IString(FileName(ui.GetFileName("TO")).expanded()) + ".\n";
       throw IException(IException::Programmer, err, _FILEINFO_);
@@ -298,7 +298,7 @@ void IsisMain() {
  * @param int frameHeight size of frame in rows
  * @param long frameLineCount number of lines to make a frame
  * @param long iLineCount number of lines total in cube
- * 
+ *
  * @throws IException::User "This selection will yield less than 1 pixel (width). This is not enough to normalize."
  * @throws IException::User "This percentage will yield less than 1 line. This is not enough to normalize."
  *
@@ -306,7 +306,7 @@ void IsisMain() {
  *
  * @internal
  *   @history 2016-08-17 Victor Silva - New app for lroc adapted from makeflat app
- *   
+ *
  */
 void getCubeListNormalization(Matrix2d &matrix, int cubeWidth, int frameHeight, long frameLineCount, long iLineCount) {
 
@@ -362,11 +362,11 @@ void getCubeListNormalization(Matrix2d &matrix, int cubeWidth, int frameHeight, 
 
 
 /**
- * @brief This function returns the median, mean, and standard deviation for a vector 
+ * @brief This function returns the median, mean, and standard deviation for a vector
  *        of valid pixels
  *
- * It will return Isis::Null if it doesn't find any valid pixels. The function builds 
- * a vector of valid pixels. It also calculates the mean and standard deviation of the 
+ * It will return Isis::Null if it doesn't find any valid pixels. The function builds
+ * a vector of valid pixels. It also calculates the mean and standard deviation of the
  * vector. The function also sorts the vector and finds the median. If there are an even
  * number of valid pixels, it will average (mean) the two middle pixels and return
  * that average as the median. It does not return the median pixel but rather its
@@ -414,7 +414,7 @@ void getVectorStats(vector<double> &inVec, double &mean, double &median, double 
       sum = 0;
       vector <double> v2;
       for(int i = 0; i < v_size; i++ ){
-        if( (abs(tempMean - v1[i])) <= (tempStdev * g_numStdevs) ){  
+        if( (abs(tempMean - v1[i])) <= (tempStdev * g_numStdevs) ){
           v2.push_back(v1[i]);
           sum += v1[i];
         }
@@ -440,10 +440,10 @@ void getVectorStats(vector<double> &inVec, double &mean, double &median, double 
           median = double(v2[medianIndex]);
         }
         v2.clear();
-      } 
+      }
       v1.clear();
-    } 
-  } 
+    }
+  }
 }
 
 
@@ -502,4 +502,3 @@ void exclude(int listIndex, int frame, string reason){
     g_excludedDetails.push_back(exclusion);
   }
 }
-

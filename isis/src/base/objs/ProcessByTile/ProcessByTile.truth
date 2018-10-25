@@ -1,6 +1,5 @@
 **PROGRAMMER ERROR** Use the SetTileSize method to set the tile size.
-unittest: Working
-0% ProcessedTesting inplace cube processing function. 
+Testing inplace cube processing function. 
 Sample:  1  Line:  1  Band:  1
 Sample:  11  Line:  1  Band:  1
 Sample:  21  Line:  1  Band:  1
@@ -35,7 +34,7 @@ Sample:  41  Line:  21  Band:  1
 Sample:  51  Line:  21  Band:  1
 Sample:  61  Line:  21  Band:  1
 Sample:  71  Line:  21  Band:  1
-10% ProcessedSample:  81  Line:  21  Band:  1
+Sample:  81  Line:  21  Band:  1
 Sample:  91  Line:  21  Band:  1
 Sample:  101  Line:  21  Band:  1
 Sample:  111  Line:  21  Band:  1
@@ -69,7 +68,7 @@ Sample:  121  Line:  41  Band:  1
 Sample:  1  Line:  51  Band:  1
 Sample:  11  Line:  51  Band:  1
 Sample:  21  Line:  51  Band:  1
-20% ProcessedSample:  31  Line:  51  Band:  1
+Sample:  31  Line:  51  Band:  1
 Sample:  41  Line:  51  Band:  1
 Sample:  51  Line:  51  Band:  1
 Sample:  61  Line:  51  Band:  1
@@ -103,7 +102,7 @@ Sample:  71  Line:  71  Band:  1
 Sample:  81  Line:  71  Band:  1
 Sample:  91  Line:  71  Band:  1
 Sample:  101  Line:  71  Band:  1
-30% ProcessedSample:  111  Line:  71  Band:  1
+Sample:  111  Line:  71  Band:  1
 Sample:  121  Line:  71  Band:  1
 Sample:  1  Line:  81  Band:  1
 Sample:  11  Line:  81  Band:  1
@@ -137,7 +136,7 @@ Sample:  21  Line:  101  Band:  1
 Sample:  31  Line:  101  Band:  1
 Sample:  41  Line:  101  Band:  1
 Sample:  51  Line:  101  Band:  1
-40% ProcessedSample:  61  Line:  101  Band:  1
+Sample:  61  Line:  101  Band:  1
 Sample:  71  Line:  101  Band:  1
 Sample:  81  Line:  101  Band:  1
 Sample:  91  Line:  101  Band:  1
@@ -170,7 +169,7 @@ Sample:  91  Line:  121  Band:  1
 Sample:  101  Line:  121  Band:  1
 Sample:  111  Line:  121  Band:  1
 Sample:  121  Line:  121  Band:  1
-50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  1  Band:  2
 Sample:  11  Line:  1  Band:  2
 Sample:  21  Line:  1  Band:  2
 Sample:  31  Line:  1  Band:  2
@@ -204,7 +203,7 @@ Sample:  41  Line:  21  Band:  2
 Sample:  51  Line:  21  Band:  2
 Sample:  61  Line:  21  Band:  2
 Sample:  71  Line:  21  Band:  2
-60% ProcessedSample:  81  Line:  21  Band:  2
+Sample:  81  Line:  21  Band:  2
 Sample:  91  Line:  21  Band:  2
 Sample:  101  Line:  21  Band:  2
 Sample:  111  Line:  21  Band:  2
@@ -238,7 +237,7 @@ Sample:  121  Line:  41  Band:  2
 Sample:  1  Line:  51  Band:  2
 Sample:  11  Line:  51  Band:  2
 Sample:  21  Line:  51  Band:  2
-70% ProcessedSample:  31  Line:  51  Band:  2
+Sample:  31  Line:  51  Band:  2
 Sample:  41  Line:  51  Band:  2
 Sample:  51  Line:  51  Band:  2
 Sample:  61  Line:  51  Band:  2
@@ -272,7 +271,7 @@ Sample:  71  Line:  71  Band:  2
 Sample:  81  Line:  71  Band:  2
 Sample:  91  Line:  71  Band:  2
 Sample:  101  Line:  71  Band:  2
-80% ProcessedSample:  111  Line:  71  Band:  2
+Sample:  111  Line:  71  Band:  2
 Sample:  121  Line:  71  Band:  2
 Sample:  1  Line:  81  Band:  2
 Sample:  11  Line:  81  Band:  2
@@ -306,7 +305,7 @@ Sample:  21  Line:  101  Band:  2
 Sample:  31  Line:  101  Band:  2
 Sample:  41  Line:  101  Band:  2
 Sample:  51  Line:  101  Band:  2
-90% ProcessedSample:  61  Line:  101  Band:  2
+Sample:  61  Line:  101  Band:  2
 Sample:  71  Line:  101  Band:  2
 Sample:  81  Line:  101  Band:  2
 Sample:  91  Line:  101  Band:  2
@@ -339,9 +338,7 @@ Sample:  91  Line:  121  Band:  2
 Sample:  101  Line:  121  Band:  2
 Sample:  111  Line:  121  Band:  2
 Sample:  121  Line:  121  Band:  2
-100% Processed
-unittest: Working
-0% ProcessedInput Functor:  
+Input Functor:  
 Testing cube processing in place. 
 Sample:  1  Line:  1  Band:  1
 Sample:  11  Line:  1  Band:  1
@@ -377,7 +374,7 @@ Sample:  41  Line:  21  Band:  1
 Sample:  51  Line:  21  Band:  1
 Sample:  61  Line:  21  Band:  1
 Sample:  71  Line:  21  Band:  1
-10% ProcessedSample:  81  Line:  21  Band:  1
+Sample:  81  Line:  21  Band:  1
 Sample:  91  Line:  21  Band:  1
 Sample:  101  Line:  21  Band:  1
 Sample:  111  Line:  21  Band:  1
@@ -411,7 +408,7 @@ Sample:  121  Line:  41  Band:  1
 Sample:  1  Line:  51  Band:  1
 Sample:  11  Line:  51  Band:  1
 Sample:  21  Line:  51  Band:  1
-20% ProcessedSample:  31  Line:  51  Band:  1
+Sample:  31  Line:  51  Band:  1
 Sample:  41  Line:  51  Band:  1
 Sample:  51  Line:  51  Band:  1
 Sample:  61  Line:  51  Band:  1
@@ -445,7 +442,7 @@ Sample:  71  Line:  71  Band:  1
 Sample:  81  Line:  71  Band:  1
 Sample:  91  Line:  71  Band:  1
 Sample:  101  Line:  71  Band:  1
-30% ProcessedSample:  111  Line:  71  Band:  1
+Sample:  111  Line:  71  Band:  1
 Sample:  121  Line:  71  Band:  1
 Sample:  1  Line:  81  Band:  1
 Sample:  11  Line:  81  Band:  1
@@ -479,7 +476,7 @@ Sample:  21  Line:  101  Band:  1
 Sample:  31  Line:  101  Band:  1
 Sample:  41  Line:  101  Band:  1
 Sample:  51  Line:  101  Band:  1
-40% ProcessedSample:  61  Line:  101  Band:  1
+Sample:  61  Line:  101  Band:  1
 Sample:  71  Line:  101  Band:  1
 Sample:  81  Line:  101  Band:  1
 Sample:  91  Line:  101  Band:  1
@@ -512,7 +509,7 @@ Sample:  91  Line:  121  Band:  1
 Sample:  101  Line:  121  Band:  1
 Sample:  111  Line:  121  Band:  1
 Sample:  121  Line:  121  Band:  1
-50% ProcessedSample:  1  Line:  1  Band:  2
+Sample:  1  Line:  1  Band:  2
 Sample:  11  Line:  1  Band:  2
 Sample:  21  Line:  1  Band:  2
 Sample:  31  Line:  1  Band:  2
@@ -546,7 +543,7 @@ Sample:  41  Line:  21  Band:  2
 Sample:  51  Line:  21  Band:  2
 Sample:  61  Line:  21  Band:  2
 Sample:  71  Line:  21  Band:  2
-60% ProcessedSample:  81  Line:  21  Band:  2
+Sample:  81  Line:  21  Band:  2
 Sample:  91  Line:  21  Band:  2
 Sample:  101  Line:  21  Band:  2
 Sample:  111  Line:  21  Band:  2
@@ -580,7 +577,7 @@ Sample:  121  Line:  41  Band:  2
 Sample:  1  Line:  51  Band:  2
 Sample:  11  Line:  51  Band:  2
 Sample:  21  Line:  51  Band:  2
-70% ProcessedSample:  31  Line:  51  Band:  2
+Sample:  31  Line:  51  Band:  2
 Sample:  41  Line:  51  Band:  2
 Sample:  51  Line:  51  Band:  2
 Sample:  61  Line:  51  Band:  2
@@ -614,7 +611,7 @@ Sample:  71  Line:  71  Band:  2
 Sample:  81  Line:  71  Band:  2
 Sample:  91  Line:  71  Band:  2
 Sample:  101  Line:  71  Band:  2
-80% ProcessedSample:  111  Line:  71  Band:  2
+Sample:  111  Line:  71  Band:  2
 Sample:  121  Line:  71  Band:  2
 Sample:  1  Line:  81  Band:  2
 Sample:  11  Line:  81  Band:  2
@@ -648,7 +645,7 @@ Sample:  21  Line:  101  Band:  2
 Sample:  31  Line:  101  Band:  2
 Sample:  41  Line:  101  Band:  2
 Sample:  51  Line:  101  Band:  2
-90% ProcessedSample:  61  Line:  101  Band:  2
+Sample:  61  Line:  101  Band:  2
 Sample:  71  Line:  101  Band:  2
 Sample:  81  Line:  101  Band:  2
 Sample:  91  Line:  101  Band:  2
@@ -681,10 +678,8 @@ Sample:  91  Line:  121  Band:  2
 Sample:  101  Line:  121  Band:  2
 Sample:  111  Line:  121  Band:  2
 Sample:  121  Line:  121  Band:  2
-100% Processed
 **PROGRAMMER ERROR** Use the SetTileSize method to set the tile size.
-unittest: Working
-0% ProcessedInputOutput Functor:  
+InputOutput Functor:  
 Testing one input and one output cube.
 Sample:  1:1  Line:  1:1  Band:  1:1
 Sample:  11:11  Line:  1:1  Band:  1:1
@@ -720,7 +715,7 @@ Sample:  41:41  Line:  21:21  Band:  1:1
 Sample:  51:51  Line:  21:21  Band:  1:1
 Sample:  61:61  Line:  21:21  Band:  1:1
 Sample:  71:71  Line:  21:21  Band:  1:1
-10% ProcessedSample:  81:81  Line:  21:21  Band:  1:1
+Sample:  81:81  Line:  21:21  Band:  1:1
 Sample:  91:91  Line:  21:21  Band:  1:1
 Sample:  101:101  Line:  21:21  Band:  1:1
 Sample:  111:111  Line:  21:21  Band:  1:1
@@ -754,7 +749,7 @@ Sample:  121:121  Line:  41:41  Band:  1:1
 Sample:  1:1  Line:  51:51  Band:  1:1
 Sample:  11:11  Line:  51:51  Band:  1:1
 Sample:  21:21  Line:  51:51  Band:  1:1
-20% ProcessedSample:  31:31  Line:  51:51  Band:  1:1
+Sample:  31:31  Line:  51:51  Band:  1:1
 Sample:  41:41  Line:  51:51  Band:  1:1
 Sample:  51:51  Line:  51:51  Band:  1:1
 Sample:  61:61  Line:  51:51  Band:  1:1
@@ -788,7 +783,7 @@ Sample:  71:71  Line:  71:71  Band:  1:1
 Sample:  81:81  Line:  71:71  Band:  1:1
 Sample:  91:91  Line:  71:71  Band:  1:1
 Sample:  101:101  Line:  71:71  Band:  1:1
-30% ProcessedSample:  111:111  Line:  71:71  Band:  1:1
+Sample:  111:111  Line:  71:71  Band:  1:1
 Sample:  121:121  Line:  71:71  Band:  1:1
 Sample:  1:1  Line:  81:81  Band:  1:1
 Sample:  11:11  Line:  81:81  Band:  1:1
@@ -822,7 +817,7 @@ Sample:  21:21  Line:  101:101  Band:  1:1
 Sample:  31:31  Line:  101:101  Band:  1:1
 Sample:  41:41  Line:  101:101  Band:  1:1
 Sample:  51:51  Line:  101:101  Band:  1:1
-40% ProcessedSample:  61:61  Line:  101:101  Band:  1:1
+Sample:  61:61  Line:  101:101  Band:  1:1
 Sample:  71:71  Line:  101:101  Band:  1:1
 Sample:  81:81  Line:  101:101  Band:  1:1
 Sample:  91:91  Line:  101:101  Band:  1:1
@@ -855,7 +850,7 @@ Sample:  91:91  Line:  121:121  Band:  1:1
 Sample:  101:101  Line:  121:121  Band:  1:1
 Sample:  111:111  Line:  121:121  Band:  1:1
 Sample:  121:121  Line:  121:121  Band:  1:1
-50% ProcessedSample:  1:1  Line:  1:1  Band:  2:2
+Sample:  1:1  Line:  1:1  Band:  2:2
 Sample:  11:11  Line:  1:1  Band:  2:2
 Sample:  21:21  Line:  1:1  Band:  2:2
 Sample:  31:31  Line:  1:1  Band:  2:2
@@ -889,7 +884,7 @@ Sample:  41:41  Line:  21:21  Band:  2:2
 Sample:  51:51  Line:  21:21  Band:  2:2
 Sample:  61:61  Line:  21:21  Band:  2:2
 Sample:  71:71  Line:  21:21  Band:  2:2
-60% ProcessedSample:  81:81  Line:  21:21  Band:  2:2
+Sample:  81:81  Line:  21:21  Band:  2:2
 Sample:  91:91  Line:  21:21  Band:  2:2
 Sample:  101:101  Line:  21:21  Band:  2:2
 Sample:  111:111  Line:  21:21  Band:  2:2
@@ -923,7 +918,7 @@ Sample:  121:121  Line:  41:41  Band:  2:2
 Sample:  1:1  Line:  51:51  Band:  2:2
 Sample:  11:11  Line:  51:51  Band:  2:2
 Sample:  21:21  Line:  51:51  Band:  2:2
-70% ProcessedSample:  31:31  Line:  51:51  Band:  2:2
+Sample:  31:31  Line:  51:51  Band:  2:2
 Sample:  41:41  Line:  51:51  Band:  2:2
 Sample:  51:51  Line:  51:51  Band:  2:2
 Sample:  61:61  Line:  51:51  Band:  2:2
@@ -957,7 +952,7 @@ Sample:  71:71  Line:  71:71  Band:  2:2
 Sample:  81:81  Line:  71:71  Band:  2:2
 Sample:  91:91  Line:  71:71  Band:  2:2
 Sample:  101:101  Line:  71:71  Band:  2:2
-80% ProcessedSample:  111:111  Line:  71:71  Band:  2:2
+Sample:  111:111  Line:  71:71  Band:  2:2
 Sample:  121:121  Line:  71:71  Band:  2:2
 Sample:  1:1  Line:  81:81  Band:  2:2
 Sample:  11:11  Line:  81:81  Band:  2:2
@@ -991,7 +986,7 @@ Sample:  21:21  Line:  101:101  Band:  2:2
 Sample:  31:31  Line:  101:101  Band:  2:2
 Sample:  41:41  Line:  101:101  Band:  2:2
 Sample:  51:51  Line:  101:101  Band:  2:2
-90% ProcessedSample:  61:61  Line:  101:101  Band:  2:2
+Sample:  61:61  Line:  101:101  Band:  2:2
 Sample:  71:71  Line:  101:101  Band:  2:2
 Sample:  81:81  Line:  101:101  Band:  2:2
 Sample:  91:91  Line:  101:101  Band:  2:2
@@ -1024,9 +1019,7 @@ Sample:  91:91  Line:  121:121  Band:  2:2
 Sample:  101:101  Line:  121:121  Band:  2:2
 Sample:  111:111  Line:  121:121  Band:  2:2
 Sample:  121:121  Line:  121:121  Band:  2:2
-100% Processed
-unittest: Working
-0% ProcessedTesting one input/one output cube function
+Testing one input/one output cube function
 Sample:  1:1  Line:  1:1  Band:  1:1
 Sample:  11:11  Line:  1:1  Band:  1:1
 Sample:  21:21  Line:  1:1  Band:  1:1
@@ -1061,7 +1054,7 @@ Sample:  41:41  Line:  21:21  Band:  1:1
 Sample:  51:51  Line:  21:21  Band:  1:1
 Sample:  61:61  Line:  21:21  Band:  1:1
 Sample:  71:71  Line:  21:21  Band:  1:1
-10% ProcessedSample:  81:81  Line:  21:21  Band:  1:1
+Sample:  81:81  Line:  21:21  Band:  1:1
 Sample:  91:91  Line:  21:21  Band:  1:1
 Sample:  101:101  Line:  21:21  Band:  1:1
 Sample:  111:111  Line:  21:21  Band:  1:1
@@ -1095,7 +1088,7 @@ Sample:  121:121  Line:  41:41  Band:  1:1
 Sample:  1:1  Line:  51:51  Band:  1:1
 Sample:  11:11  Line:  51:51  Band:  1:1
 Sample:  21:21  Line:  51:51  Band:  1:1
-20% ProcessedSample:  31:31  Line:  51:51  Band:  1:1
+Sample:  31:31  Line:  51:51  Band:  1:1
 Sample:  41:41  Line:  51:51  Band:  1:1
 Sample:  51:51  Line:  51:51  Band:  1:1
 Sample:  61:61  Line:  51:51  Band:  1:1
@@ -1129,7 +1122,7 @@ Sample:  71:71  Line:  71:71  Band:  1:1
 Sample:  81:81  Line:  71:71  Band:  1:1
 Sample:  91:91  Line:  71:71  Band:  1:1
 Sample:  101:101  Line:  71:71  Band:  1:1
-30% ProcessedSample:  111:111  Line:  71:71  Band:  1:1
+Sample:  111:111  Line:  71:71  Band:  1:1
 Sample:  121:121  Line:  71:71  Band:  1:1
 Sample:  1:1  Line:  81:81  Band:  1:1
 Sample:  11:11  Line:  81:81  Band:  1:1
@@ -1163,7 +1156,7 @@ Sample:  21:21  Line:  101:101  Band:  1:1
 Sample:  31:31  Line:  101:101  Band:  1:1
 Sample:  41:41  Line:  101:101  Band:  1:1
 Sample:  51:51  Line:  101:101  Band:  1:1
-40% ProcessedSample:  61:61  Line:  101:101  Band:  1:1
+Sample:  61:61  Line:  101:101  Band:  1:1
 Sample:  71:71  Line:  101:101  Band:  1:1
 Sample:  81:81  Line:  101:101  Band:  1:1
 Sample:  91:91  Line:  101:101  Band:  1:1
@@ -1196,7 +1189,7 @@ Sample:  91:91  Line:  121:121  Band:  1:1
 Sample:  101:101  Line:  121:121  Band:  1:1
 Sample:  111:111  Line:  121:121  Band:  1:1
 Sample:  121:121  Line:  121:121  Band:  1:1
-50% ProcessedSample:  1:1  Line:  1:1  Band:  2:2
+Sample:  1:1  Line:  1:1  Band:  2:2
 Sample:  11:11  Line:  1:1  Band:  2:2
 Sample:  21:21  Line:  1:1  Band:  2:2
 Sample:  31:31  Line:  1:1  Band:  2:2
@@ -1230,7 +1223,7 @@ Sample:  41:41  Line:  21:21  Band:  2:2
 Sample:  51:51  Line:  21:21  Band:  2:2
 Sample:  61:61  Line:  21:21  Band:  2:2
 Sample:  71:71  Line:  21:21  Band:  2:2
-60% ProcessedSample:  81:81  Line:  21:21  Band:  2:2
+Sample:  81:81  Line:  21:21  Band:  2:2
 Sample:  91:91  Line:  21:21  Band:  2:2
 Sample:  101:101  Line:  21:21  Band:  2:2
 Sample:  111:111  Line:  21:21  Band:  2:2
@@ -1264,7 +1257,7 @@ Sample:  121:121  Line:  41:41  Band:  2:2
 Sample:  1:1  Line:  51:51  Band:  2:2
 Sample:  11:11  Line:  51:51  Band:  2:2
 Sample:  21:21  Line:  51:51  Band:  2:2
-70% ProcessedSample:  31:31  Line:  51:51  Band:  2:2
+Sample:  31:31  Line:  51:51  Band:  2:2
 Sample:  41:41  Line:  51:51  Band:  2:2
 Sample:  51:51  Line:  51:51  Band:  2:2
 Sample:  61:61  Line:  51:51  Band:  2:2
@@ -1298,7 +1291,7 @@ Sample:  71:71  Line:  71:71  Band:  2:2
 Sample:  81:81  Line:  71:71  Band:  2:2
 Sample:  91:91  Line:  71:71  Band:  2:2
 Sample:  101:101  Line:  71:71  Band:  2:2
-80% ProcessedSample:  111:111  Line:  71:71  Band:  2:2
+Sample:  111:111  Line:  71:71  Band:  2:2
 Sample:  121:121  Line:  71:71  Band:  2:2
 Sample:  1:1  Line:  81:81  Band:  2:2
 Sample:  11:11  Line:  81:81  Band:  2:2
@@ -1332,7 +1325,7 @@ Sample:  21:21  Line:  101:101  Band:  2:2
 Sample:  31:31  Line:  101:101  Band:  2:2
 Sample:  41:41  Line:  101:101  Band:  2:2
 Sample:  51:51  Line:  101:101  Band:  2:2
-90% ProcessedSample:  61:61  Line:  101:101  Band:  2:2
+Sample:  61:61  Line:  101:101  Band:  2:2
 Sample:  71:71  Line:  101:101  Band:  2:2
 Sample:  81:81  Line:  101:101  Band:  2:2
 Sample:  91:91  Line:  101:101  Band:  2:2
@@ -1365,10 +1358,8 @@ Sample:  91:91  Line:  121:121  Band:  2:2
 Sample:  101:101  Line:  121:121  Band:  2:2
 Sample:  111:111  Line:  121:121  Band:  2:2
 Sample:  121:121  Line:  121:121  Band:  2:2
-100% Processed
 **PROGRAMMER ERROR** Use the SetTileSize method to set the tile size.
-unittest: Working
-0% ProcessedTesting two input and output cubes function.
+Testing two input and output cubes function.
 Number of input cubes:   2
 Number of output cubes:  2
 
@@ -1409,7 +1400,7 @@ Sample:  51:51  Line:  21:21  Band:  1:1
 Sample:  61:61  Line:  21:21  Band:  1:1
 Sample:  71:71  Line:  21:21  Band:  1:1
 Sample:  81:81  Line:  21:21  Band:  1:1
-10% ProcessedSample:  91:91  Line:  21:21  Band:  1:1
+Sample:  91:91  Line:  21:21  Band:  1:1
 Sample:  101:101  Line:  21:21  Band:  1:1
 Sample:  111:111  Line:  21:21  Band:  1:1
 Sample:  121:121  Line:  21:21  Band:  1:1
@@ -1445,7 +1436,7 @@ Sample:  131:131  Line:  41:41  Band:  1:1
 Sample:  1:1  Line:  51:51  Band:  1:1
 Sample:  11:11  Line:  51:51  Band:  1:1
 Sample:  21:21  Line:  51:51  Band:  1:1
-20% ProcessedSample:  31:31  Line:  51:51  Band:  1:1
+Sample:  31:31  Line:  51:51  Band:  1:1
 Sample:  41:41  Line:  51:51  Band:  1:1
 Sample:  51:51  Line:  51:51  Band:  1:1
 Sample:  61:61  Line:  51:51  Band:  1:1
@@ -1482,7 +1473,7 @@ Sample:  81:81  Line:  71:71  Band:  1:1
 Sample:  91:91  Line:  71:71  Band:  1:1
 Sample:  101:101  Line:  71:71  Band:  1:1
 Sample:  111:111  Line:  71:71  Band:  1:1
-30% ProcessedSample:  121:121  Line:  71:71  Band:  1:1
+Sample:  121:121  Line:  71:71  Band:  1:1
 Sample:  131:131  Line:  71:71  Band:  1:1
 Sample:  1:1  Line:  81:81  Band:  1:1
 Sample:  11:11  Line:  81:81  Band:  1:1
@@ -1518,7 +1509,7 @@ Sample:  21:21  Line:  101:101  Band:  1:1
 Sample:  31:31  Line:  101:101  Band:  1:1
 Sample:  41:41  Line:  101:101  Band:  1:1
 Sample:  51:51  Line:  101:101  Band:  1:1
-40% ProcessedSample:  61:61  Line:  101:101  Band:  1:1
+Sample:  61:61  Line:  101:101  Band:  1:1
 Sample:  71:71  Line:  101:101  Band:  1:1
 Sample:  81:81  Line:  101:101  Band:  1:1
 Sample:  91:91  Line:  101:101  Band:  1:1
@@ -1554,7 +1545,7 @@ Sample:  101:101  Line:  121:121  Band:  1:1
 Sample:  111:111  Line:  121:121  Band:  1:1
 Sample:  121:121  Line:  121:121  Band:  1:1
 Sample:  131:131  Line:  121:121  Band:  1:1
-50% ProcessedSample:  1:1  Line:  1:1  Band:  2:2
+Sample:  1:1  Line:  1:1  Band:  2:2
 Sample:  11:11  Line:  1:1  Band:  2:2
 Sample:  21:21  Line:  1:1  Band:  2:2
 Sample:  31:31  Line:  1:1  Band:  2:2
@@ -1591,7 +1582,7 @@ Sample:  51:51  Line:  21:21  Band:  2:2
 Sample:  61:61  Line:  21:21  Band:  2:2
 Sample:  71:71  Line:  21:21  Band:  2:2
 Sample:  81:81  Line:  21:21  Band:  2:2
-60% ProcessedSample:  91:91  Line:  21:21  Band:  2:2
+Sample:  91:91  Line:  21:21  Band:  2:2
 Sample:  101:101  Line:  21:21  Band:  2:2
 Sample:  111:111  Line:  21:21  Band:  2:2
 Sample:  121:121  Line:  21:21  Band:  2:2
@@ -1627,7 +1618,7 @@ Sample:  131:131  Line:  41:41  Band:  2:2
 Sample:  1:1  Line:  51:51  Band:  2:2
 Sample:  11:11  Line:  51:51  Band:  2:2
 Sample:  21:21  Line:  51:51  Band:  2:2
-70% ProcessedSample:  31:31  Line:  51:51  Band:  2:2
+Sample:  31:31  Line:  51:51  Band:  2:2
 Sample:  41:41  Line:  51:51  Band:  2:2
 Sample:  51:51  Line:  51:51  Band:  2:2
 Sample:  61:61  Line:  51:51  Band:  2:2
@@ -1664,7 +1655,7 @@ Sample:  81:81  Line:  71:71  Band:  2:2
 Sample:  91:91  Line:  71:71  Band:  2:2
 Sample:  101:101  Line:  71:71  Band:  2:2
 Sample:  111:111  Line:  71:71  Band:  2:2
-80% ProcessedSample:  121:121  Line:  71:71  Band:  2:2
+Sample:  121:121  Line:  71:71  Band:  2:2
 Sample:  131:131  Line:  71:71  Band:  2:2
 Sample:  1:1  Line:  81:81  Band:  2:2
 Sample:  11:11  Line:  81:81  Band:  2:2
@@ -1700,7 +1691,7 @@ Sample:  21:21  Line:  101:101  Band:  2:2
 Sample:  31:31  Line:  101:101  Band:  2:2
 Sample:  41:41  Line:  101:101  Band:  2:2
 Sample:  51:51  Line:  101:101  Band:  2:2
-90% ProcessedSample:  61:61  Line:  101:101  Band:  2:2
+Sample:  61:61  Line:  101:101  Band:  2:2
 Sample:  71:71  Line:  101:101  Band:  2:2
 Sample:  81:81  Line:  101:101  Band:  2:2
 Sample:  91:91  Line:  101:101  Band:  2:2
@@ -1736,9 +1727,7 @@ Sample:  101:101  Line:  121:121  Band:  2:2
 Sample:  111:111  Line:  121:121  Band:  2:2
 Sample:  121:121  Line:  121:121  Band:  2:2
 Sample:  131:131  Line:  121:121  Band:  2:2
-100% Processed
-unittest: Working
-0% ProcessedInputOutputList Functor:  
+InputOutputList Functor:  
 Testing two input and two output cubes.
 InputSample:  1:1 InputLine:  1:1 InputBand:  1:1
 OutputSample:  1:1 OutputLine:  1:1 OutputBand:  1:1
@@ -1814,7 +1803,7 @@ InputSample:  71:71 InputLine:  21:21 InputBand:  1:1
 OutputSample:  71:71 OutputLine:  21:21 OutputBand:  1:1
 InputSample:  81:81 InputLine:  21:21 InputBand:  1:1
 OutputSample:  81:81 OutputLine:  21:21 OutputBand:  1:1
-10% ProcessedInputSample:  91:91 InputLine:  21:21 InputBand:  1:1
+InputSample:  91:91 InputLine:  21:21 InputBand:  1:1
 OutputSample:  91:91 OutputLine:  21:21 OutputBand:  1:1
 InputSample:  101:101 InputLine:  21:21 InputBand:  1:1
 OutputSample:  101:101 OutputLine:  21:21 OutputBand:  1:1
@@ -1886,7 +1875,7 @@ InputSample:  11:11 InputLine:  51:51 InputBand:  1:1
 OutputSample:  11:11 OutputLine:  51:51 OutputBand:  1:1
 InputSample:  21:21 InputLine:  51:51 InputBand:  1:1
 OutputSample:  21:21 OutputLine:  51:51 OutputBand:  1:1
-20% ProcessedInputSample:  31:31 InputLine:  51:51 InputBand:  1:1
+InputSample:  31:31 InputLine:  51:51 InputBand:  1:1
 OutputSample:  31:31 OutputLine:  51:51 OutputBand:  1:1
 InputSample:  41:41 InputLine:  51:51 InputBand:  1:1
 OutputSample:  41:41 OutputLine:  51:51 OutputBand:  1:1
@@ -1960,7 +1949,7 @@ InputSample:  101:101 InputLine:  71:71 InputBand:  1:1
 OutputSample:  101:101 OutputLine:  71:71 OutputBand:  1:1
 InputSample:  111:111 InputLine:  71:71 InputBand:  1:1
 OutputSample:  111:111 OutputLine:  71:71 OutputBand:  1:1
-30% ProcessedInputSample:  121:121 InputLine:  71:71 InputBand:  1:1
+InputSample:  121:121 InputLine:  71:71 InputBand:  1:1
 OutputSample:  121:121 OutputLine:  71:71 OutputBand:  1:1
 InputSample:  131:131 InputLine:  71:71 InputBand:  1:1
 OutputSample:  131:131 OutputLine:  71:71 OutputBand:  1:1
@@ -2032,7 +2021,7 @@ InputSample:  41:41 InputLine:  101:101 InputBand:  1:1
 OutputSample:  41:41 OutputLine:  101:101 OutputBand:  1:1
 InputSample:  51:51 InputLine:  101:101 InputBand:  1:1
 OutputSample:  51:51 OutputLine:  101:101 OutputBand:  1:1
-40% ProcessedInputSample:  61:61 InputLine:  101:101 InputBand:  1:1
+InputSample:  61:61 InputLine:  101:101 InputBand:  1:1
 OutputSample:  61:61 OutputLine:  101:101 OutputBand:  1:1
 InputSample:  71:71 InputLine:  101:101 InputBand:  1:1
 OutputSample:  71:71 OutputLine:  101:101 OutputBand:  1:1
@@ -2104,7 +2093,7 @@ InputSample:  121:121 InputLine:  121:121 InputBand:  1:1
 OutputSample:  121:121 OutputLine:  121:121 OutputBand:  1:1
 InputSample:  131:131 InputLine:  121:121 InputBand:  1:1
 OutputSample:  131:131 OutputLine:  121:121 OutputBand:  1:1
-50% ProcessedInputSample:  1:1 InputLine:  1:1 InputBand:  2:2
+InputSample:  1:1 InputLine:  1:1 InputBand:  2:2
 OutputSample:  1:1 OutputLine:  1:1 OutputBand:  2:2
 InputSample:  11:11 InputLine:  1:1 InputBand:  2:2
 OutputSample:  11:11 OutputLine:  1:1 OutputBand:  2:2
@@ -2178,7 +2167,7 @@ InputSample:  71:71 InputLine:  21:21 InputBand:  2:2
 OutputSample:  71:71 OutputLine:  21:21 OutputBand:  2:2
 InputSample:  81:81 InputLine:  21:21 InputBand:  2:2
 OutputSample:  81:81 OutputLine:  21:21 OutputBand:  2:2
-60% ProcessedInputSample:  91:91 InputLine:  21:21 InputBand:  2:2
+InputSample:  91:91 InputLine:  21:21 InputBand:  2:2
 OutputSample:  91:91 OutputLine:  21:21 OutputBand:  2:2
 InputSample:  101:101 InputLine:  21:21 InputBand:  2:2
 OutputSample:  101:101 OutputLine:  21:21 OutputBand:  2:2
@@ -2250,7 +2239,7 @@ InputSample:  11:11 InputLine:  51:51 InputBand:  2:2
 OutputSample:  11:11 OutputLine:  51:51 OutputBand:  2:2
 InputSample:  21:21 InputLine:  51:51 InputBand:  2:2
 OutputSample:  21:21 OutputLine:  51:51 OutputBand:  2:2
-70% ProcessedInputSample:  31:31 InputLine:  51:51 InputBand:  2:2
+InputSample:  31:31 InputLine:  51:51 InputBand:  2:2
 OutputSample:  31:31 OutputLine:  51:51 OutputBand:  2:2
 InputSample:  41:41 InputLine:  51:51 InputBand:  2:2
 OutputSample:  41:41 OutputLine:  51:51 OutputBand:  2:2
@@ -2324,7 +2313,7 @@ InputSample:  101:101 InputLine:  71:71 InputBand:  2:2
 OutputSample:  101:101 OutputLine:  71:71 OutputBand:  2:2
 InputSample:  111:111 InputLine:  71:71 InputBand:  2:2
 OutputSample:  111:111 OutputLine:  71:71 OutputBand:  2:2
-80% ProcessedInputSample:  121:121 InputLine:  71:71 InputBand:  2:2
+InputSample:  121:121 InputLine:  71:71 InputBand:  2:2
 OutputSample:  121:121 OutputLine:  71:71 OutputBand:  2:2
 InputSample:  131:131 InputLine:  71:71 InputBand:  2:2
 OutputSample:  131:131 OutputLine:  71:71 OutputBand:  2:2
@@ -2396,7 +2385,7 @@ InputSample:  41:41 InputLine:  101:101 InputBand:  2:2
 OutputSample:  41:41 OutputLine:  101:101 OutputBand:  2:2
 InputSample:  51:51 InputLine:  101:101 InputBand:  2:2
 OutputSample:  51:51 OutputLine:  101:101 OutputBand:  2:2
-90% ProcessedInputSample:  61:61 InputLine:  101:101 InputBand:  2:2
+InputSample:  61:61 InputLine:  101:101 InputBand:  2:2
 OutputSample:  61:61 OutputLine:  101:101 OutputBand:  2:2
 InputSample:  71:71 InputLine:  101:101 InputBand:  2:2
 OutputSample:  71:71 OutputLine:  101:101 OutputBand:  2:2
@@ -2468,4 +2457,3 @@ InputSample:  121:121 InputLine:  121:121 InputBand:  2:2
 OutputSample:  121:121 OutputLine:  121:121 OutputBand:  2:2
 InputSample:  131:131 InputLine:  121:121 InputBand:  2:2
 OutputSample:  131:131 OutputLine:  121:121 OutputBand:  2:2
-100% Processed

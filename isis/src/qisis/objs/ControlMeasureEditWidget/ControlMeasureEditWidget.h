@@ -144,7 +144,21 @@ namespace Isis {
     *   @history 2017-08-11 Tracie Sucharski - Created a new ControlMeasure when editing points so
     *                           that the edit ControlPoint is no changed until user selects
     *                           "Save Measures", and colorize save buttons.  Fixes #4984.
-    *
+    *   @history 2018-06-28 Kaitlyn Lee - Removed shortcuts from zoom buttons because of ambiguous
+    *                           shortcut errors. Set the shortcut and tooltip of m_autoReg inside of
+    *                           registerPoint() to allow the user to use the shortcut after an
+    *                           undo-registration ocurs.
+    *   @history 2018-09-06 Tracie Sucharski - Added bug fixes from qnet's ControlPointEdit class
+    *                           including moving the creation of AutoRegFactory from constructor
+    *                           to the registerPoint method and fixing seg fault happening in
+    *                           saveMeasure when calling ControlMeasure::SetLogData.
+    *   @history 2018-09-24 Tracie Sucharski - Fixed right measure chooser name to the
+    *                           Application::User.
+    *   @history 2018-09-26 Tracie Sucharski - Added public method to allow change measure tack
+    *                           points.
+    *   @history 2018-10-10 Tracie Sucharski - Fixed blink extension to use geom if selected and
+    *                           correct zoom factor.
+    *                          
     *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
     *                          ::updateLeftPositionLabel because it was the fastest solution, but
     *                          should this be put somewhere else.
@@ -164,17 +178,21 @@ namespace Isis {
       QString templateFileName() {
         return m_templateFileName;
       };
-      bool setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
+
+      void setLeftPosition(double sample, double line);
+      void setRightPosition(double sample, double line);
 
     signals:
       void updateLeftView(double sample, double line);
       void updateRightView(double sample, double line);
       void measureSaved();
       void newControlNetwork(ControlNet *);
+      void setTemplateFailed(QString);
       void stretchChipViewport(Stretch *, CubeViewport *);
 
     public slots:
+      bool setTemplateFile(QString);
       void setPoint(ControlPoint *editPoint, SerialNumberList *snList);
       void setLeftMeasure(ControlMeasure *leftMeasure,
                           Cube *leftCube, QString pointId);

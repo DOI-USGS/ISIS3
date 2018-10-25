@@ -457,10 +457,9 @@ noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.
 lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3"
 PIPELINE -------> unitTest6 <------- PIPELINE
 
-unittest: unitTest6
+**ERROR** Running Isis program [noisefilter] failed with return status [2].
 **USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
-unittest: Running lowpass
 
 *** Application level continue option ***
 PIPELINE -------> unitTest7 <------- PIPELINE
@@ -468,7 +467,6 @@ noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.
 lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3"
 PIPELINE -------> unitTest7 <------- PIPELINE
 
-unittest: unitTest7
+**ERROR** Running Isis program [noisefilter] failed with return status [2].
 **USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
-unittest: Running lowpass

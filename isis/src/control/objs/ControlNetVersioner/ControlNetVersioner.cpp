@@ -202,23 +202,9 @@ namespace Isis {
     network += PvlKeyword("Created", m_header.created);
     network += PvlKeyword("LastModified", m_header.lastModified);
     network += PvlKeyword("Description", m_header.description);
-    // optionally add username to output?
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "5");
-
-    //  Get Target Radii from naif kernel
-    PvlGroup pvlRadii;
-    QString target = (QString)network.findKeyword("TargetName",Pvl::Traverse);
-    if ( target != "" ) {
-      try {
-        NaifStatus::CheckErrors();
-        pvlRadii = Target::radiiGroup(target);
-      }
-      catch (IException) {
-        // leave pvlRadii empty if target is not recognized by NAIF
-      }
-    }
 
     foreach (ControlPoint *controlPoint, m_points) {
       PvlObject pvlPoint("ControlPoint");
@@ -236,7 +222,7 @@ namespace Isis {
       }
 
       if ( controlPoint->GetId().isEmpty() ) {
-        QString msg = "Unbable to write control net to PVL file. "
+        QString msg = "Unable to write control net to PVL file. "
                       "Invalid control point has no point ID value.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -341,25 +327,18 @@ namespace Isis {
           matrix += toString(aprioriCovarianceMatrix(1, 2));
           matrix += toString(aprioriCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
+          if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
+               && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
+               && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
 
-            aprioriSurfacePoint.SetRadii( Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
-
-            if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
-                 && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
-                 && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
-
-              QString sigmas = "AprioriLatitudeSigma = "
+            QString sigmas = "AprioriLatitudeSigma = "
               + toString(aprioriSurfacePoint.GetLatSigmaDistance().meters())
               + " <meters>  AprioriLongitudeSigma = "
               + toString(aprioriSurfacePoint.GetLonSigmaDistance().meters())
               + " <meters>  AprioriRadiusSigma = "
               + toString(aprioriSurfacePoint.GetLocalRadiusSigma().meters())
               + " <meters>";
-              matrix.addComment(sigmas);
-            }
+            matrix.addComment(sigmas);
           }
 
           // If the covariance matrix has a value, add it to the PVL point.
@@ -424,26 +403,19 @@ namespace Isis {
           matrix += toString(adjustedCovarianceMatrix(1, 2));
           matrix += toString(adjustedCovarianceMatrix(2, 2));
 
-          if ( pvlRadii.hasKeyword("EquatorialRadius") && pvlRadii.hasKeyword("PolarRadius") ) {
-
-            adjustedSurfacePoint.SetRadii(Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["EquatorialRadius"], Distance::Meters),
-                                          Distance(pvlRadii["PolarRadius"], Distance::Meters) );
-
-            if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
-                 && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
-                 && adjustedSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
+          if ( adjustedSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
+               && adjustedSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
+               && adjustedSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
 
             QString sigmas = "AdjustedLatitudeSigma = "
-                             + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
-                             + " <meters>  AdjustedLongitudeSigma = "
-                             + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
-                             + " <meters>  AdjustedRadiusSigma = "
-                             + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
-                             + " <meters>";
+              + toString(adjustedSurfacePoint.GetLatSigmaDistance().meters())
+              + " <meters>  AdjustedLongitudeSigma = "
+              + toString(adjustedSurfacePoint.GetLonSigmaDistance().meters())
+              + " <meters>  AdjustedRadiusSigma = "
+              + toString(adjustedSurfacePoint.GetLocalRadiusSigma().meters())
+              + " <meters>";
 
             matrix.addComment(sigmas);
-            }
           }
           // If the covariance matrix has a value, add it to the PVL point.
           if ( adjustedCovarianceMatrix(0, 0) != 0.0
@@ -716,6 +688,7 @@ namespace Isis {
       try {
         PvlObject pointObject = network.object(objectIndex);
         ControlPointV0002 point(pointObject);
+
         m_points.append( createPoint(point) );
 
         if (progress) {
@@ -1170,6 +1143,7 @@ namespace Isis {
   void ControlNetVersioner::readProtobufV0005(const Pvl &header,
                                               const FileName netFile,
                                               Progress *progress) {
+
     // read the header protobuf object
     const PvlObject &protoBufferInfo = header.findObject("ProtoBuffer");
     const PvlObject &protoBufferCore = protoBufferInfo.findObject("Core");
@@ -1278,7 +1252,7 @@ namespace Isis {
 
         uint32_t size;
         pointCodedInStream.ReadRaw(reinterpret_cast<char *>(&size), sizeof(size));
-        
+
         size = lsb.Uint32_t(&size);
 
         CodedInputStream::Limit oldPointLimit = pointCodedInStream.PushLimit(size);
@@ -1357,6 +1331,7 @@ namespace Isis {
    * @return @b ControlPoint* The ControlPoint constructed from the given point.
    */
   ControlPoint *ControlNetVersioner::createPoint(ControlPointV0003 &point) {
+
     ControlPointFileEntryV0002 protoPoint = point.pointData();
     ControlPoint *controlPoint = new ControlPoint;
 
@@ -1522,18 +1497,10 @@ namespace Isis {
       controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
     }
 
-    if ( m_header.equatorialRadius.isValid() && m_header.polarRadius.isValid() ) {
-      SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
-      SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
-      aprioriSurfacePoint.SetRadii(m_header.equatorialRadius,
-                                   m_header.equatorialRadius,
-                                   m_header.polarRadius);
-      adjustedSurfacePoint.SetRadii(m_header.equatorialRadius,
-                                    m_header.equatorialRadius,
-                                    m_header.polarRadius);
-      controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
-      controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
-    }
+    SurfacePoint aprioriSurfacePoint = controlPoint->GetAprioriSurfacePoint();
+    SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();
+    controlPoint->SetAdjustedSurfacePoint(adjustedSurfacePoint);
+    controlPoint->SetAprioriSurfacePoint(aprioriSurfacePoint);
 
     // adding measure information
     for (int m = 0 ; m < protoPoint.measures_size(); m++) {
@@ -1669,18 +1636,6 @@ namespace Isis {
     if ( m_header.targetName.startsWith("MRO/") ) {
       m_header.targetName = "Mars";
     }
-
-    if ( !m_header.targetName.isEmpty() ) {
-      try {
-        // attempt to get target radii values...
-        PvlGroup pvlRadii = Target::radiiGroup(m_header.targetName);
-        m_header.equatorialRadius.setMeters(pvlRadii["EquatorialRadius"]);
-        m_header.polarRadius.setMeters(pvlRadii["PolarRadius"]);
-       }
-       catch (IException &e) {
-         // do nothing
-       }
-    }
   }
 
 
@@ -1753,7 +1708,6 @@ namespace Isis {
       netInfo += PvlKeyword("LastModified", protobufHeader.lastmodified().c_str());
       netInfo += PvlKeyword("Description", protobufHeader.description().c_str());
       netInfo += PvlKeyword("NumberOfPoints", toString(numPoints));
-
       netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
       netInfo += PvlKeyword("Version", "5");
       protoObj.addGroup(netInfo);

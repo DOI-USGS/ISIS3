@@ -143,6 +143,12 @@ namespace Isis {
    *                           was deleted or added to the control net.  Renamed deleteControlPoint
    *                           signal to controlPointDeleted.  Removed some unneeded connections.
    *                           Fixes #5007, #5008.
+   *   @history 2018-05-14 Tracie Sucharski - Change the xml tag from footprint2DView to
+   *                           mosaicScene. Reference #5422.
+   *   @history 2018-10-04 Tracie Sucharski - When serializing images for ipce project saving, check
+   *                           for shapes in project if image for given id cannot be found.
+   *                           References #5495.
+   *  
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

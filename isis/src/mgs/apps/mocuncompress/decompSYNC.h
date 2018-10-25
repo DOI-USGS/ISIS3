@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -44,6 +51,6 @@ SCCSID @(#)decompSYNC.h  1.1 10/04/99
 
 #define decompSYNC_h
 
-extern void decompSYNC(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint16 sync, BITSTRUCT *bitStuff);
+extern void decompSYNC(uint8 *curLine, uint8 *prevLine, uint32 size, uint16 sync, BITSTRUCT *bitStuff);
 
 #endif

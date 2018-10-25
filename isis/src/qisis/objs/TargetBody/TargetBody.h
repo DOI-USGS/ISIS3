@@ -72,6 +72,9 @@ namespace Isis {
    *   @history 2016-06-13 Tyler Wilson - Added new documentation and corrected
    *                          formatting to be consisten with ISIS3 coding standards.
    *                          Fixes #3997 and #4018.
+   *   @hitsory 2018-07-12 Summer Stapleton - Added m_targetName and targetName() in order to 
+   *                           collect the TargetName from the original cube label for 
+   *                           comparisons related to image imports in ipce. References #5460.
    *  
    */
   class TargetBody : public QObject {
@@ -91,6 +94,7 @@ namespace Isis {
       const TargetBodyDisplayProperties *displayProperties() const;
 
       QString id() const;
+      QString targetName();
 //    void deleteFromDisk();
 
       int frameType();
@@ -167,6 +171,11 @@ namespace Isis {
        *   when saving to disk).
        */
       QUuid *m_id;
+      
+      /**
+       * The TargetName as it appears in the original cube.
+       */
+      QString m_targetName;
 
       /**
        * TODO -   RETHINK MEMBER VARIABLES AND METHODS
