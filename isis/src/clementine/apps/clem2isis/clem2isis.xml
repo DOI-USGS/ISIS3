@@ -72,6 +72,13 @@
       Modified label transfer to include MCP_Gain_Mode_ID when images is from 
       HIRES camera.
     </change>
+    <change name="Jeff Anderson and Victor Silva" date="2017-12-27">
+      Modified Kernels group to support filter dependent focal length and optical distortion 
+      for UVVIS camera.
+    </change>
+    <change name="Jeannie Backer" date="2018-09-01">
+      Added documentation, brought closer to coding standards and merged into public repo.
+    </change>
   </history>
 
   <groups>

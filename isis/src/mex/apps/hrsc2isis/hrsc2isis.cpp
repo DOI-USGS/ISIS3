@@ -93,7 +93,7 @@ void IsisMain() {
     }
   }
 
-  catch (IException e) {
+  catch (IException &e) {
       QString msg = "File cannot be read by hrsc2isis, use pds2isis.";
       throw IException(e, IException::User, msg, _FILEINFO_);
   }

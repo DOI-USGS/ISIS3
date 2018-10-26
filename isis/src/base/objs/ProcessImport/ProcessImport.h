@@ -150,8 +150,21 @@ namespace Isis {
    *                           imports. Brought code closer to coding standards.
    *   @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *   @history 2017-05-29 Kristin Berry - Added support for data trailers in BIP files and fixed
-   *                            a typo so that DataTrailerBytes() will return the correct value.
-   *                            References #3888.
+   *                           a typo so that DataTrailerBytes() will return the correct value.
+   *                           References #3888.
+   *   @history 2018-05-01 Jesse Mapel - Changed data suffix and prefix in BIP files. Previously,
+   *                           data suffixes and prefixes were for each band before/after each line.
+   *                           Now, data suffixes and prefixes are before/after each sample. For a
+   *                           RGB, 3-band image with n samples a line of data was previously
+   *                           | Header | R prefix | G prefix | B prefix | R 1 | G 1 | B 1| ...
+   *                           | R n | G n | B n| R suffix | G suffix | B suffix | Trailer |. Now
+   *                           it is | Header | Prefix 1 | R 1 | G 1 | B 1 | Suffix 1 | ...
+   *                           | Prefix n | R n | G n | B n | Suffix n | Trailer |. This change
+   *                           was made to accomodate Rosetta VIRTIS-m calibrated data files and
+   *                           has no impact on other supported BIP files.
+   *                           Fixes #5398.
+   *   @history 208-07-19 Tyler Wilson - Added support for 4-byte UnsignedInteger special pixel
+   *                            values.
    *
    */
   class ProcessImport : public Isis::Process {

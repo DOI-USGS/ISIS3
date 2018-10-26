@@ -46,7 +46,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 #include "decompNONE.h"
 
-void decompNONE(register uint8 *curLine, register uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff)
+void decompNONE(uint8 *curLine, uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff)
 {
 uint32 bitCount;
 uint8 *data;

@@ -147,7 +147,18 @@ namespace Isis{
         QString importName = atts.value("importName");
 
         if (!fileName.isEmpty()) {
-          m_xmlHandlerTemplate->m_fileName = fileName;
+          m_xmlHandlerTemplate->m_fileName = m_xmlHandlerTemplateFolderName.expanded() 
+                                             + "/" + templateType 
+                                             + "/" + importName
+                                             + "/" + fileName;
+        }
+        
+        if (!templateType.isEmpty()) {
+          m_xmlHandlerTemplate->m_templateType = templateType;
+        }
+        
+        if (!importName.isEmpty()) {
+          m_xmlHandlerTemplate->m_importName = importName;
         }
       }
     }

@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -46,7 +53,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 #include "decompYPRED.h"
 
-void decompYPRED(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff)
+void decompYPRED(uint8 *curLine, uint8 *prevLine, uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff)
 {
 uint32 bitCount;
 uint8 *data;

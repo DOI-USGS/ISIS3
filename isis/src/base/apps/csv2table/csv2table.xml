@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="csv2table" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Convert a CSV file to a table and attach it to a cube
+  </brief>
+
+  <description>
+    This application converts a CSV file to a table and attaches it to a cube
+    The first row of the CSV will be used as the fieldnames for the table.
+    The contents of the CSV file will be converted to floating point numbers
+    before they are inserted into the table.
+  </description>
+
+  <category>
+    <categoryItem>Scripting</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>tabledump</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Jesse Mapel" date="2018-09-04">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name = "Files">
+      <parameter name = "csv">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Input CSV filename</brief>
+        <description>
+          Input CSV filename. The first row of this file will be used as the
+          table field names.
+        </description>
+        <filter>
+          *.csv
+        </filter>
+      </parameter>
+
+        <parameter name = "label">
+          <type>filename</type>
+          <fileMode>input</fileMode>
+          <brief>Input table label PVL filename</brief>
+          <description>
+            Input table label PVL filename. This is expected to be a flat PVL
+            file where all of the keywords and their values will be added to
+            the tabel label.
+          </description>
+          <internalDefault>None</internalDefault>
+          <filter>
+            *.pvl
+          </filter>
+        </parameter>
+
+      <parameter name = "to">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>Output cube filename</brief>
+        <description>
+          Output cube filename that the table will be attached to
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name = "Table">
+      <parameter name = "tablename">
+        <type>string</type>
+        <brief>The name of the table</brief>
+        <description>
+          A table will be created with this name on the output cube using the
+          data from the CSV file. If a table with this name already exists on
+          the cube it will be overwritten.
+        </description>
+      </parameter>
+    </group>
+
+  </groups>
+
+  <examples>
+    <example>
+      <brief>Write a simple table</brief>
+      <description>Write a simple csv file to a cube.</description>
+      <terminalInterface>
+        <commandLine> csv=test.csv tablename=TestTable to=isisTruth.cub
+        </commandLine>
+        <description>
+          In this example, csv2table will write a table called TestTable on
+          isisTruth.cub with the contents of test.csv.
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
+
+</application>

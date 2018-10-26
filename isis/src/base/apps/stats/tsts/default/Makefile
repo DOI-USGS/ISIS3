@@ -16,6 +16,6 @@ commands:
 	           > /dev/null;
 	  
 	$(APPNAME) from=$(INPUT)/isisTruth.cub \
-	           | grep -v stats \
+		   | grep -v "stats:" \
 	           | grep -v Processed \
 	           >& $(OUTPUT)/output.pvl;

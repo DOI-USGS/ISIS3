@@ -13,6 +13,16 @@
 using namespace Isis;
 using namespace std;
 
+/** 
+ * Unit test for ProcessMapMosaic class
+ *  
+ * @author ????-??-?? Unknown 
+ *  
+ *  @internal
+ *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
+ *                           test output.
+ *  
+ */
 void IsisMain() {
 
   Preference::Preferences(true);
@@ -35,10 +45,10 @@ void IsisMain() {
 
   for(int i = 0; i < cubes.size(); i++) {
     if(m1.StartProcess(cubes[i].toString())) {
-      cout << cubes[i].toString() << " is inside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegExp(".*base/testData"), "base/testData") << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes[i].toString() << " is outside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegExp(".*base/testData"), "base/testData") << " is outside the mosaic" << endl;
     }
   }
 
@@ -60,10 +70,10 @@ void IsisMain() {
 
   for(int i = 0; i < cubes.size(); i++) {
     if(m2.StartProcess(cubes[i].toString())) {
-      cout << cubes[i].toString() << " is inside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegExp(".*base/testData"), "base/testData") << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes[i].toString() << " is outside the mosaic" << endl;
+      cout << cubes[i].toString().replace(QRegExp(".*base/testData"), "base/testData") << " is outside the mosaic" << endl;
     }
   }
 
@@ -146,10 +156,10 @@ void IsisMain() {
 
   for(int i = 0; i < cubes_crop.size(); i++) {
     if(m4.StartProcess(cubes_crop[i].toString())) {
-      cout << cubes_crop[i].toString() << " is inside the mosaic" << endl;
+      cout << cubes_crop[i].toString().replace(QRegExp(".*base/testData"), "base/testData") << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes_crop[i].toString() << " is outside the mosaic" << endl;
+      cout << cubes_crop[i].toString().replace(QRegExp(".*base/testData"), "base/testData") << " is outside the mosaic" << endl;
     }
   }
 

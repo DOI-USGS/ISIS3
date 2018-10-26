@@ -1,6 +1,4 @@
 Unit test for BulletShapeModel
-  MaxTriangles:  134217728
-  MaxBodyParts:  16
 
 
 ----====        Construct default shape model        ====----

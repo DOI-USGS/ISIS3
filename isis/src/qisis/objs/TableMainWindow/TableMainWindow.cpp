@@ -140,6 +140,7 @@ namespace Isis {
 
     QAction *clear = new QAction(this);
     clear->setText("Clear table");
+    clear->setShortcut(Qt::CTRL + Qt::Key_Delete);
     connect(clear, SIGNAL(triggered()), this, SLOT(clearTable()));
 
     QAction *close = new QAction(this);

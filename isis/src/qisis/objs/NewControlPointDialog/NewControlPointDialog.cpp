@@ -20,9 +20,15 @@
 
 namespace Isis {
   /**
-   * NewControlPointDialog constructor
-   * @param parent The parent widget for the
-   *               cube points filter
+   * @description Create dialog for creating a new Control Point
+   *  
+   * @param controlNet               The control net the new control point will be contained in 
+   * @param serialNumberList         The serial number list corresponding to the controlNet 
+   * @param defaultPointId           The default pointID, usually empty string 
+   * @param parent                   Parent widget 
+   * @param pointType                Show the Point Type combo box, default = false 
+   * @param groundSource             Show the Ground Source list, default = false 
+   * @param subpixelRegisterMeasures Show the check box for sub-pixel registration option, default = false
    *
    * @internal
    *   @history 2008-11-26 Jeannie Walldren - Set lastPointIdValue
@@ -68,21 +74,30 @@ namespace Isis {
         m_pointTypeCombo->insertItem(i, ControlPoint::PointTypeToString(
                                      (ControlPoint::PointType) i));
       }
-      m_pointTypeCombo->setCurrentIndex(2);
-      QLabel *pointTypeLabel = new QLabel("PointType:");
+      m_pointTypeCombo->setCurrentText("Free");
+      QLabel *pointTypeLabel = new QLabel("Point Type:");
       pointTypeLayout->addWidget(pointTypeLabel);
       pointTypeLayout->addWidget(m_pointTypeCombo);
-      connect(m_pointTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(pointTypeChanged(int)));
+      connect(m_pointTypeCombo, SIGNAL(currentIndexChanged(QString)),
+              this, SLOT(pointTypeChanged(QString)));
     }
 
-
+    QHBoxLayout *groundSourceLayout = NULL;
+    QHBoxLayout *radiusSourceLayout = NULL;
     if (groundSource) {
-      m_groundSourceLayout = new QHBoxLayout();
+      groundSourceLayout = new QHBoxLayout();
       m_groundSourceCombo = new QComboBox;
       QLabel *groundSourceLabel = new QLabel("Ground Source:");
-      m_groundSourceLayout->addWidget(groundSourceLabel);
-      m_groundSourceLayout->addWidget(m_groundSourceCombo);
+      groundSourceLayout->addWidget(groundSourceLabel);
+      groundSourceLayout->addWidget(m_groundSourceCombo);
       m_groundSourceCombo->setVisible(false);
+
+      radiusSourceLayout = new QHBoxLayout();
+      m_radiusSourceCombo = new QComboBox;
+      QLabel *radiusSourceLabel = new QLabel("Radius Source:");
+      radiusSourceLayout->addWidget(radiusSourceLabel);
+      radiusSourceLayout->addWidget(m_radiusSourceCombo);
+      m_radiusSourceCombo->setVisible(false);
     }
 
     if (subpixelRegisterMeasures) {
@@ -99,6 +114,7 @@ namespace Isis {
 
     //  Create OK & Cancel buttons
     m_okButton = new QPushButton("OK");
+
     //  If the last point id used was never saved to network, do not set ok
     //  button to faslse
     enableOkButton("");
@@ -124,7 +140,8 @@ namespace Isis {
     }
 
     if (groundSource) {
-      vLayout->addLayout(m_groundSourceLayout);
+      vLayout->addLayout(groundSourceLayout);
+      vLayout->addLayout(radiusSourceLayout);
     }
 
     if (subpixelRegisterMeasures) {
@@ -147,7 +164,14 @@ namespace Isis {
 
 
   int NewControlPointDialog::pointType() const {
-    return m_pointTypeCombo->currentIndex();
+    int result = ControlPoint::Free;
+    if (m_pointTypeCombo->currentText() == "Constrained") {
+      result = ControlPoint::Constrained;
+    }
+    if (m_pointTypeCombo->currentText() == "Fixed") {
+      result = ControlPoint::Fixed;
+    }
+    return result;
   }
 
 
@@ -172,19 +196,49 @@ namespace Isis {
   }
 
 
-  void NewControlPointDialog::pointTypeChanged(int pointType) {
-    if (pointType == ControlPoint::Constrained || pointType == ControlPoint::Fixed) {
+  QString NewControlPointDialog::radiusSource() const {
+    return m_radiusSourceCombo->currentText();
+  }
+
+
+  void NewControlPointDialog::pointTypeChanged(QString pointType) {
+    if (pointType == "Fixed" || pointType == "Constrained") {
       m_groundSourceCombo->setVisible(true);
+      m_radiusSourceCombo->setVisible(true);
     }
   }
 
 
   void NewControlPointDialog::setGroundSource(QStringList groundFiles, int numberShapesWithPoint) {
-    m_groundSourceCombo->addItems(groundFiles);
-    for (int i = 0; i < numberShapesWithPoint; i++) {
-      m_groundSourceCombo->setItemData(i, QColor(Qt::red), Qt::ForegroundRole);
+    //  If groundFiles not empty, add to the list widget for selection
+    if (groundFiles.count() != 0) {
+      m_groundSourceCombo->addItems(groundFiles); 
+      for (int i = 0; i < numberShapesWithPoint; i++) {
+        m_groundSourceCombo->setItemData(i, QColor(Qt::red), Qt::ForegroundRole);
+      }
+      m_groundSourceCombo->insertSeparator(numberShapesWithPoint);
     }
-    m_groundSourceCombo->insertSeparator(numberShapesWithPoint);
+    // If groundFiles is empty, remove option to change point type to Constrained or Fixed, add a
+    // tooltip to give user hint as to why they don't have option to change point type and set
+    // default point type back to "Free".
+    else {
+      m_pointTypeCombo->setToolTip("The Point Type cannot be changed to \"Fixed\" or "
+                                   "\"Constrained\", because there are no shapes imported into "
+                                   "your project.");
+      m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Constrained"));
+      m_pointTypeCombo->removeItem(m_pointTypeCombo->findText("Fixed"));
+      m_pointTypeCombo->setCurrentText("Free");
+    }
+  }
+
+
+  void NewControlPointDialog::setRadiusSource(QStringList radiusFiles) {
+    //  If radiusFiles not empty, add to the radius source combo, first adding "None" as option.
+    m_radiusSourceCombo->addItem("None");
+    m_radiusSourceCombo->setCurrentText("None");
+    if (radiusFiles.count() != 0) {
+      m_radiusSourceCombo->addItems(radiusFiles);
+    }
   }
 
 
@@ -227,7 +281,15 @@ namespace Isis {
    *            to the ptIdValue
    */
   void NewControlPointDialog::enableOkButton(const QString &) {
-    m_okButton->setEnabled(!m_ptIdEdit->text().isEmpty() &&
-                           !m_controlNet->ContainsPoint(m_ptIdEdit->text()));
+    bool enable = !m_ptIdEdit->text().isEmpty() &&
+                  !m_controlNet->ContainsPoint(m_ptIdEdit->text());
+    m_okButton->setEnabled(enable);
+    if (enable) {
+      m_okButton->setToolTip("");
+    }
+    else {
+      m_okButton->setToolTip("Cannot create point because Point Id is either empty or the active "
+                             "control net already contains a control point with this point Id.");
+    }
   }
 }
