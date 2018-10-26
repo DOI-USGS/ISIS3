@@ -37,6 +37,14 @@ namespace Isis {
    *
    * @param lab Pvl Label to create the camera model from
    *
+   * Data can be found in /work/projects/jaxa01
+   * To unpack this data:
+   *   1. mv or cp filename.sl2 to filename.tar
+   *   2. tar xvf filename.tar
+   *   3. mv or cp filename.igz to filename.img.gz
+   *   4. gzip -d filename.img.gz
+   *   5. filename.img are the files to be imported using kaguyatc2isis
+   *
    * @internal
    *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original Version
    */
