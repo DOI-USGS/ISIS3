@@ -31,6 +31,7 @@ commands:
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	       | $(SED) 's/-0\.000/0\.000/g' \
 	       > $(OUTPUT)/pole-ra-dec-w0-wDot-triaxial-radii_bundleout.txt;
 	$(CAT) $(OUTPUT)/bundleout_images.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
