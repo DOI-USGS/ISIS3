@@ -27,8 +27,10 @@ using namespace Isis;
 void translateLabel(Pvl &inputLabel, Pvl &outputLabel);
 void processFramelets(Buffer &in);
 void processFullFrames(Buffer &in);
+void openNextCube(int index);
 
 QList<Cube *> g_outputCubes;
+QList<QString> g_outputCubeFileNames;
 int g_frameletLines = 0;
 QStringList g_filterList;
 QList<int> g_filterOffsetList; 
@@ -125,6 +127,8 @@ void IsisMain() {
                                      + ".cub");
       fullFrameCube->create(fullFrameCubeFileName.expanded());
       g_outputCubes.append(fullFrameCube);
+      fullFrameCube->close();
+      g_outputCubeFileNames.append(fullFrameCubeFileName.expanded());
       allCubesListWriter << fullFrameCubeFileName.baseName() << ".cub\n";
     }
     progress.CheckStatus();
@@ -141,7 +145,10 @@ void IsisMain() {
     for (int i = 0; i < numFullFrames; i++) {
       progress.CheckStatus();
       for (int j = 0; j < outputLabel.findObject("IsisCube").groups(); j++) {
-        g_outputCubes[i]->putGroup(outputLabel.findObject("IsisCube").group(j));
+        if (!g_outputCubes[i]->isOpen()) {
+          g_outputCubes[i]->open(g_outputCubeFileNames[i], "rw");
+        }
+        g_outputCubes[i]->putGroup(outputLabel.findObject("IsisCube").group(j)); 
       }
       // Update the labels
       Pvl *fullFrameLabel = g_outputCubes[i]->label();
@@ -163,7 +170,6 @@ void IsisMain() {
     progress.CheckStatus();
   }
   else { 
-
     // Process individual framelets: For now, keep processing the "old" way.
     int numSubimages = importPds.Lines() / g_frameletLines;
     int frameletsPerFilter = numSubimages / g_filterList.size();
@@ -184,6 +190,7 @@ void IsisMain() {
     Progress progress;
     progress.SetText("Setting up output framelet cubes.");
     progress.SetMaximumSteps(numSubimages);
+
     for (int i = 0; i < numSubimages; i++) {
       progress.CheckStatus();
       Cube *frameletCube = new Cube();
@@ -196,10 +203,12 @@ void IsisMain() {
                                     + "_" + g_filterList[filterIndex] 
                                     + "_" + frameletNumString 
                                     + ".cub");
+
       frameletCube->create(frameletCubeFileName.expanded());
-
       g_outputCubes.append(frameletCube);
-
+      frameletCube->close();
+      g_outputCubeFileNames.append(frameletCubeFileName.expanded());
+      
       QFile filterListFile(outputBaseName + "_" + g_filterList[filterIndex] + ".lis");
       if ( (frameletNumber == 1 && !filterListFile.open(QFile::WriteOnly | QFile::Text))
            || (frameletNumber > 1 && !filterListFile.open(QFile::Append | QFile::Text)) ) {
@@ -212,6 +221,7 @@ void IsisMain() {
       filterListWriter << frameletCubeFileName.baseName() << ".cub\n";
       filterListFile.close();
     }
+
     progress.CheckStatus();
     allCubesListFile.close();
 
@@ -224,7 +234,12 @@ void IsisMain() {
     progress.SetText("Updating labels of output cubes.");
     progress.SetMaximumSteps(numSubimages);
     for (int i = 0; i < numSubimages; i++) {
-      // fix labels
+      // re-open cube
+      QString cubeFileName = g_outputCubes[i]->fileName(); 
+      if ( !g_outputCubes[i]->isOpen() ) {
+        g_outputCubes[i]->open(g_outputCubeFileNames[i], "rw"); 
+      }
+      // fromeix labels
       progress.CheckStatus();
       for (int j = 0; j < outputLabel.findObject("IsisCube").groups(); j++) {
         g_outputCubes[i]->putGroup(outputLabel.findObject("IsisCube").group(j));
@@ -349,6 +364,20 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
 
 }
 
+/**
+ * Opens cube from g_outputCubes at provided index, closes cube at index-1 (last cube) 
+ */
+void openNextCube(int nextCubeIndex) {
+  if (nextCubeIndex >= 1) {
+    if (g_outputCubes[nextCubeIndex-1]->isOpen()) {
+      g_outputCubes[nextCubeIndex - 1]->close(); 
+    }
+  }
+  if (!g_outputCubes[nextCubeIndex]->isOpen()) {
+    g_outputCubes[nextCubeIndex]->open(g_outputCubeFileNames[nextCubeIndex], "rw"); 
+  }
+}
+
 
 /**
  * Separates each of the individual frames into their own file. 
@@ -358,6 +387,12 @@ void translateLabel(Pvl &inputLabel, Pvl &outputLabel) {
 void processFramelets(Buffer &in) {
   // get the index for the correct output cube
   int outputCube = (in.Line() - 1) / g_frameletLines % g_outputCubes.size();
+
+  // When we move to a new framlet, close the old cube and open the next one to avoid
+  // having too many cubes open and hitting the open file limit. 
+  if( ((in.Line() - 1) % g_frameletLines) == 0 ) {
+    openNextCube(outputCube);
+  }
 
   LineManager mgr(*g_outputCubes[outputCube]);
   int outputCubeLineNumber = (in.Line()-1) % g_frameletLines + 1;
@@ -378,6 +413,12 @@ void processFramelets(Buffer &in) {
 void processFullFrames(Buffer &in) {
   // get the index for the correct output cube
   int outputCube = (in.Line() - 1) / g_fullFrameLines % g_outputCubes.size();
+
+  // When we move to a new framlet, close the old cube and open the next one to avoid
+  // having too many cubes open and hitting the open file limit. 
+  if( ((in.Line() - 1) % g_fullFrameLines) == 0 ) {
+    openNextCube(outputCube);
+  }
 
   LineManager mgr(*g_outputCubes[outputCube]);
   

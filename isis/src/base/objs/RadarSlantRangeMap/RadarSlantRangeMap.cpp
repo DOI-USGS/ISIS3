@@ -68,7 +68,7 @@ namespace Isis {
     p_focalPlaneX = dx;  // dx is a ground range distance in meters
     p_focalPlaneY = dy;  // dy is Doppler shift in htz and should always be 0
 
-    if(p_et != p_camera->time().Et()) ComputeA();
+    if (p_et != p_camera->time().Et()) ComputeA();
     double slantRange = p_a[0] + p_a[1] * dx + p_a[2] * dx * dx + p_a[3] * dx * dx * dx; // meters
 
     p_camera->SetFocalLength(slantRange);
@@ -86,7 +86,7 @@ namespace Isis {
     p_undistortedFocalPlaneX = ux * p_rangeSigma;    // ux converts to slant range in meters
     p_undistortedFocalPlaneY = uy * p_dopplerSigma;  // uy converts to Doppler shift in htz and should always be 0
 
-    if(p_et != p_camera->time().Et()) ComputeA();
+    if (p_et != p_camera->time().Et()) ComputeA();
 
     double slant = p_undistortedFocalPlaneX;
     // First trap the case where no iteration is needed. Since this occurs at
@@ -144,19 +144,17 @@ namespace Isis {
         if (abs(funcMin) <= abs(funcMax)) {
           //min is closer
           xMin = xMax - 2*dist; 
-          xMax = xMax; //doesn't change
         }
         else {
           //max is closer
           xMax = xMin + 2*dist;
-          xMin = xMin; //doesn't change
         }
 
         funcMin = slant -(p_a[0]+ xMin *(p_a[1] + xMin * (p_a[2] + xMin * p_a[3])));
         funcMax = slant - (p_a[0] + xMax *(p_a[1] + xMax * (p_a[2] + xMax * p_a[3])));
         
         // if we've successfully bracketed the root, we can break. 
-        if((funcMin <= 0.0 && funcMax >= 0.0) || (funcMin >= 0.0 && funcMax <= 0.0)){
+        if ((funcMin <= 0.0 && funcMax >= 0.0) || (funcMin >= 0.0 && funcMax <= 0.0)){
           p_initialMinGroundRangeGuess = xMin;
           p_initialMaxGroundRangeGuess = xMax;
           minGroundRangeGuess = funcMin;
@@ -169,7 +167,7 @@ namespace Isis {
     // If the ground range guesses at the 2 extremes of the image are equal
     // or they have the same sign, then the ground range cannot be solved for.
     // The only case where they are equal should be at zero, which we already trapped.
-    if((minGroundRangeGuess == maxGroundRangeGuess) ||
+    if ((minGroundRangeGuess == maxGroundRangeGuess) ||
         (minGroundRangeGuess < 0.0 && maxGroundRangeGuess < 0.0) ||
        (minGroundRangeGuess > 0.0 && maxGroundRangeGuess > 0.0)) {
       return false;
@@ -196,13 +194,13 @@ namespace Isis {
 
     do {
       iter++;
-      if(fbx * fcx > 0.0) {
+      if (fbx * fcx > 0.0) {
         cx = ax;
         fcx = fax;
         d = bx - ax;
         e = d;
       }
-      if(fabs(fcx) < fabs(fbx)) {
+      if (fabs(fcx) < fabs(fbx)) {
         ax = bx;
         bx = cx;
         cx = ax;
@@ -212,14 +210,14 @@ namespace Isis {
       }
       tol1 = 2.0 * eps * fabs(bx) + 0.5 * p_tolerance;
       xm = 0.5 * (cx - bx);
-      if(fabs(xm) <= tol1 || fbx == 0.0) {
+      if (fabs(xm) <= tol1 || fbx == 0.0) {
         p_focalPlaneX = bx;
         p_focalPlaneY = 0.0;
         return true;
       }
-      if(fabs(e) >= tol1 && fabs(fax) > fabs(fbx)) {
+      if (fabs(e) >= tol1 && fabs(fax) > fabs(fbx)) {
         s = fbx / fax;
-        if(ax == cx) {
+        if (ax == cx) {
           p = 2.0 * xm * s;
           q = 1.0 - s;
         }
@@ -229,11 +227,11 @@ namespace Isis {
           p = s * (2.0 * xm * q * (q - r) - (bx - ax) * (r - 1.0));
           q = (q - 1.0) * (r - 1.0) * (s - 1.0);
         }
-        if(p > 0.0) q = -q;
+        if (p > 0.0) q = -q;
         p = fabs(p);
         t = 3.0 * xm * q - fabs(tol1 * q);
-        if(t > fabs(e * q)) t = fabs(e * q);
-        if(2.0 * p < t) {
+        if (t > fabs(e * q)) t = fabs(e * q);
+        if (2.0 * p < t) {
           e = d;
           d = p / q;
         }
@@ -248,11 +246,11 @@ namespace Isis {
       }
       ax = bx;
       fax = fbx;
-      if(fabs(d) > tol1) {
+      if (fabs(d) > tol1) {
         bx = bx + d;
       }
       else {
-        if(xm >= 0.0) {
+        if (xm >= 0.0) {
           t = fabs(tol1);
         }
         else {
@@ -262,7 +260,7 @@ namespace Isis {
       }
       fbx = slant - (p_a[0] + bx * (p_a[1] + bx * (p_a[2] + bx * p_a[3])));
     }
-    while(iter <= p_maxIterations);
+    while (iter <= p_maxIterations);
 
     return false;
   }
@@ -274,7 +272,7 @@ namespace Isis {
   void RadarSlantRangeMap::SetCoefficients(PvlKeyword &keyword) {
     PvlSequence seq;
     seq = keyword;
-    for(int i = 0; i < seq.Size(); i++) {
+    for (int i = 0; i < seq.Size(); i++) {
       // TODO:  Test array size to be 4 if not throw error
       std::vector<QString> array = seq[i];
       double et;

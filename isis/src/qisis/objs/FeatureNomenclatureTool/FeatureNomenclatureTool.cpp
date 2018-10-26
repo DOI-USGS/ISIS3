@@ -17,11 +17,8 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
-#if defined(__APPLE__)
-#include <QtWebEngineWidgets/QWebEngineView>
-#else
-#include <QWebEngineView>
-#endif
+#include <QPainter>
+#include <QUrl>
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateSequence.h>
@@ -40,7 +37,7 @@
 
 
 namespace Isis {
-  
+
   /**
    * This instantiates a FeatureNomenclatureTool. This will read this tool's
    *   saved settings and potentially automatically enable itself.
@@ -244,7 +241,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Set whether to show approved features and exclude unapproved features.
    *
@@ -262,7 +259,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Set whether to draw vectors from the feature center to the feature extents
    *   on the viewport. This takes effect immediately.
@@ -277,7 +274,7 @@ namespace Isis {
       for (int i = 0; i < m_foundNomenclature->count(); i++) {
         (*m_foundNomenclature)[i].applyExtentType(m_extentType);
       }
-      
+
       nomenclaturePositionsOutdated();
 
       foreach (MdiCubeViewport *vp, *cubeViewportList())
@@ -588,7 +585,7 @@ namespace Isis {
       QProgressDialog updatingFeaturesProgress(
           tr("Projecting Features for [%1]").arg(vp->cube()->fileName().section('/',-1)),
           QString(), 0, 100);
-          
+
       updatingFeaturesProgress.setWindowModality(Qt::WindowModal);
 
       FeatureNomenclature::Feature feature;
@@ -608,7 +605,7 @@ namespace Isis {
           m_findNomenclatureCheckBox->setChecked(false);
           break;
         }
-        
+
         if ( !m_showApprovedOnly ||
             (m_showApprovedOnly && feature.status() == FeatureNomenclature::Approved) ) {
 
@@ -762,7 +759,7 @@ namespace Isis {
         FeatureNomenclature *searcher = new FeatureNomenclature;
         connect(searcher, SIGNAL(featuresIdentified(FeatureNomenclature *)),
                 this, SLOT(featuresIdentified(FeatureNomenclature *)));
-      
+
         (*m_nomenclatureSearchers)[vp] = searcher;
         toolStateChanged();
         (*m_nomenclatureSearchers)[vp]->queryFeatures(target.toUpper(),
@@ -994,7 +991,7 @@ namespace Isis {
     FileName config("$HOME/.Isis/qview/nomenclature.config");
     QSettings settings(
         config.expanded(), QSettings::NativeFormat);
-    
+
     m_fontSize = settings.value("fontSize", m_fontSize).toInt();
     *m_fontColor = settings.value("fontColor", *m_fontColor).value<QColor>();
     m_defaultEnabled =
@@ -1239,7 +1236,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Trade member data with other. This should never throw an exception.
    *
@@ -1497,7 +1494,7 @@ namespace Isis {
     delete m_viewportCubeRange;
     m_viewportCubeRange = NULL;
   }
-  
+
 
   /**
    * Apply the extent type to all of the features for the source viewport.
@@ -1574,7 +1571,7 @@ namespace Isis {
     return positionList;
   }
 
-  
+
   /**
    * Get the viewport associated with this feature display.
    *
@@ -1585,7 +1582,7 @@ namespace Isis {
     return m_sourceViewport;
   }
 
-  
+
   /**
    * Paint features onto the viewport.
    *
@@ -1601,7 +1598,7 @@ namespace Isis {
 
       for (int i = 0; i < m_features->count() &&
                       i < m_featureScreenAreas->count(); i++) {
-        
+
         FeatureNomenclature::Feature feature = (*m_features)[i].feature();
         FeatureDisplayPosition pos = (*m_featureScreenAreas)[i];
         QRect textArea = pos.textArea();
@@ -1662,7 +1659,7 @@ namespace Isis {
                 vectors.append(QLine(newVectorStart, point));
               }
             }
-            
+
             foreach (QLine vector, vectors) {
               painter->drawLine(vector);
 
@@ -1788,12 +1785,12 @@ namespace Isis {
 
     for (int i = 0; i < m_features->count(); i++) {
       FeatureNomenclature::Feature feature = (*m_features)[i].feature();
-      
+
       m_featureScreenAreas->append(FeatureDisplayPosition());
 
       if ( !tool->m_showApprovedOnly ||
             (tool->m_showApprovedOnly && feature.status() == FeatureNomenclature::Approved) ) {
-      
+
         double sample = (*m_features)[i].center().first;
         double line = (*m_features)[i].center().second;
 
@@ -1829,7 +1826,7 @@ namespace Isis {
                                             viewportX, viewportY);
             edgeScreenPoints.append(QPoint(viewportX, viewportY));
           }
-          
+
           if (tool->vectorType() != Box) {
             foreach (QPoint screenPoint, edgeScreenPoints) {
               fullDisplayArea = fullDisplayArea.united(

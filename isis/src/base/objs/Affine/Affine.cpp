@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include <jama/jama_svd.h>
@@ -227,7 +228,7 @@ namespace Isis {
    * are returned in a 3-dimensional vector
    *
    * @param var The coefficient vector index (1 or 2)
-   * 
+   *
    * @return vector<double> Vector of coefficients
    */
   vector<double> Affine::Coefficients(int var) {
@@ -244,7 +245,7 @@ namespace Isis {
    * The coefficients are returned in a 3-dimensional vector
    *
    * @param var The inverse coefficient vector index
-   * 
+   *
    * @return vector<double> Vector of inverse coefficients
    */
   vector<double> Affine::InverseCoefficients(int var) {

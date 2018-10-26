@@ -192,7 +192,7 @@ namespace Isis {
                    tr("Copy Images into Project"),
                    tr("Should images (DN data) be copied into project?"),
                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                   QMessageBox::Yes);
+                   QMessageBox::No);
         }
 
         bool copyDnData = (copyImagesAnswer == QMessageBox::Yes);
@@ -220,7 +220,7 @@ namespace Isis {
       }
 
     }
-    catch (IException e) {
+    catch (IException &e) {
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
     return false;
@@ -289,7 +289,7 @@ namespace Isis {
         project()->setClean(false);
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
         QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }
@@ -315,7 +315,7 @@ namespace Isis {
         m_newImages = NULL;
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       m_warning.append(e.what());
     }
@@ -412,7 +412,9 @@ namespace Isis {
           projectImage->relocateDnData(FileName(destination).name());
         }
 
-        //  Set new ecub to readOnly
+        //  Set new ecub to readOnly.  When closing cube, the labels were being re-written because
+        // the cube was read/write. This caused a segfault when imported large number of images
+        // because of a label template file being opened too many times.
         projectImage->reopen();
 
         delete input;
@@ -529,10 +531,26 @@ namespace Isis {
 
           if (cube) {
 
-            Camera *camera = cube->camera();
-            project()->addCamera(camera);
-            Target *target = camera->target();
-            project()->addTarget(target);
+            // Confirm that the target body and the gui camera do not exist before creating and 
+            // and adding them for each image. Since a target may be covered by many cameras and a 
+            // camera may cover many targets, have to get tricky with the checking.
+            QString instrumentId = cube->label()->findGroup("Instrument", 
+                              PvlObject::FindOptions::Traverse).findKeyword("InstrumentId")[0];
+            QString targetName = cube->label()->findGroup("Instrument", 
+                              PvlObject::FindOptions::Traverse).findKeyword("TargetName")[0];
+            if (!project()->hasTarget(targetName)) {
+              Camera *camera = cube->camera();
+              Target *target = camera->target();
+              project()->addTarget(target);
+              
+              if (!project()->hasCamera(instrumentId)) {
+                project()->addCamera(camera);
+              }
+            }
+            else if (!project()->hasCamera(instrumentId)) {
+              Camera *camera = cube->camera();
+              project()->addCamera(camera);
+            }
 
             // Create a new image from the result in the thread spawned in WorkOrder::redo().
             Image *newImage = new Image(cube);
@@ -584,7 +602,7 @@ namespace Isis {
         setInternalData(newInternalData);
       }
     }
-    catch (IException e) {
+    catch (IException &e) {
         QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }
   }

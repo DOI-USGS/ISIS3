@@ -47,6 +47,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-04-22 Jesse Mapel and Jeannie Backer - Original Version
+   *   @history 2018-05-01 Christopher Combs - Removed emissionAngle function to
+   *                fix issues with using ellipsoids to find normals. Fixes #5387.
    */
   class EmbreeShapeModel : public ShapeModel {
     public:
@@ -84,9 +86,7 @@ namespace Isis {
       virtual void calculateSurfaceNormal();
       QVector<double> ellipsoidNormal();
 
-      virtual double emissionAngle(const std::vector<double> &sB);
       virtual double incidenceAngle(const std::vector<double> &uB);
-
 
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon);
 

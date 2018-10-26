@@ -25,6 +25,7 @@
 #include "Directory.h"
 #include "BundleObservationView.h"
 #include "Project.h"
+#include "ProjectItemModel.h"
 
 namespace Isis {
 
@@ -113,7 +114,7 @@ namespace Isis {
    *
    */
   void BundleObservationViewWorkOrder::execute() {
-    //ProjectItem * selectedItem = project()->directory()->model()->selectedItems();
+//    ProjectItem * selectedItem = project()->directory()->model()->selectedItems();
     project()->directory()->addBundleObservationView(fileItem());
     project()->setClean(false);
   }

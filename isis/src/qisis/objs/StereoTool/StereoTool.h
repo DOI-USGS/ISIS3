@@ -38,13 +38,13 @@ namespace Isis {
    *
    * @author 2011-12-07 Tracie Sucharski
    * @internal
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets
    *                          #775 and #1114.
    *   @history 2013-05-09 Tracie Sucharski - When deleting (right button) a point, check for empty
    *                             network immediately print warning and return.  References #1493.
-   *   @history 2014-05-15 Ian Humphrey - Removed the shortcut from StereoTool to avoid conflict 
+   *   @history 2014-05-15 Ian Humphrey - Removed the shortcut from StereoTool to avoid conflict
    *                           with StretchTool shortcut. Minor corrections for coding standards.
    *                           Fixes #2086.
    *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
@@ -52,6 +52,8 @@ namespace Isis {
    *                           References #3892
    *   @history 2016-08-10 Jeannie Backer - Added std:: scope to vector to distinguish with boost
    *                           vectors. References #4163.
+   *   @history 2018-07-06 Jesse Mapel - Changed call to get the target radius from using the
+   *                           control network to using the Target class. Fixes #5457.
    *
    */
   class StereoTool : public AbstractPlotTool {

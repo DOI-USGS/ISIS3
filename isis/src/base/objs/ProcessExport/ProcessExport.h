@@ -101,24 +101,26 @@ namespace Isis {
    *  @history 2012-10-04 Jeannie Backer - Added documentation and fixed
    *                          indentation of history entries. No mantis ticket.
    *  @history 2013-06-05 Jeannie Backer - Replaced redundant code in
-   *                           InitProcess() with accessor methods for
-   *                           OutputNull(), et al. Changed local variable names
-   *                           in ProcessCubes for clarity. References #1380.
+   *                          InitProcess() with accessor methods for
+   *                          OutputNull(), et al. Changed local variable names
+   *                          in ProcessCubes for clarity. References #1380.
    *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several
-   *                                            functions to ensure successful
-   *                                            inheritance between Process and its
-   *                                            child classes.  Added virtual keyword
-   *                                            to destructor.  References #2215.
+   *                          functions to ensure successful
+   *                          inheritance between Process and its
+   *                          child classes.  Added virtual keyword
+   *                          to destructor.  References #2215.
    *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
    *  @history 2017-05-17 Makayla Shepherd - Added setCanGenerateChecksum(), canGenerateChecksum(),
    *                          and checksum(). Added m_cryptographicHash and m_canGenerateChecksum.
    *                          This allows an MD5 checksum to be generated when exporting an image.
    *                          This checksum is generated based on the image data. Fixes #1013.
-   *
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
-   *                                  method
+   *                          method
    *  @todo 2005-02-09 Jeff Anderson - add coded example to class file and
-   *                                   implementation examples
+   *                          implementation examples
+   *  @history 2018-09-28 Kaitlyn Lee - Added (char) cast to fix implicit conversion. Split up 
+   *                          "-(short)32768" into two lines. Fixes build warnings on MacOS 10.13. 
+   *                          Updated code up to standards. References #5520.
    */
   class ProcessExport : public Isis::Process {
 

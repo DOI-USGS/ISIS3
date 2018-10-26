@@ -31,6 +31,7 @@ namespace Isis {
     m_controlNet = NULL;
     m_displayProperties = NULL;
     m_project = NULL;
+    m_modified = false;
 
     try {
       openControlNet();
@@ -59,6 +60,7 @@ namespace Isis {
     m_controlNet = NULL;
     m_displayProperties = NULL;
     m_project = project;
+    m_modified = false;
 
     m_displayProperties
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
@@ -82,6 +84,7 @@ namespace Isis {
     m_controlNet = controlNet;
     m_displayProperties = NULL;
     m_project = NULL;
+    m_modified = false;
 
     m_displayProperties
         = new ControlDisplayProperties(FileName(m_fileName).name(), this);
@@ -103,6 +106,7 @@ namespace Isis {
     m_displayProperties = NULL;
     m_id = NULL;
     m_project = NULL;
+    m_modified = false;
 
     xmlReader->pushContentHandler(new XmlHandler(this, cnetFolder));
   }
@@ -122,6 +126,9 @@ namespace Isis {
     //    destructor will take care of deleting the display props. See call to
     //    DisplayProperties' constructor.
     m_displayProperties = NULL;
+
+    // TODO: If control net is modified, prompt for save before destroying??
+
   }
 
 
@@ -154,12 +161,40 @@ namespace Isis {
         if (m_project) {
           m_controlNet->SetMutex(m_project->mutex());
         }
+        m_modified = false;
 
       }
       catch (IException &e) {
         throw IException(e, IException::Programmer, "Error opening control net.", _FILEINFO_);
       }
     }
+  }
+
+
+  /**
+   * @description Write control net to disk.  This method is used instead of calling 
+   * ControlNet::Write directly so that Control knows the modification state of the control net. 
+   * Note that if there is not a control net opened, there should no be any changes to write.
+   *  
+   * @return @b bool Returns false if there is not a control net open to write 
+   *  
+   * @throws IException::Programmer "Cannot write control net to disk" 
+   */
+  bool Control::write() {
+
+    if (!m_controlNet) {
+      return false;
+    }
+
+    try {
+      m_controlNet->Write(fileName());
+    }
+    catch (IException &e) {
+      throw IException(e, IException::Programmer, "Cannot write control net.", _FILEINFO_);
+    }
+
+    m_modified = false;
+    return true;
   }
 
 
@@ -173,6 +208,31 @@ namespace Isis {
       delete m_controlNet;
       m_controlNet = NULL;
     }
+    m_modified = false;
+  }
+
+
+  /**
+   * @description Has this control been modified? 
+   *  
+   * @return @b bool Has this control been modified? 
+   *  
+   */
+  bool Control::isModified() {
+    return m_modified;
+  }
+
+
+  /**
+   * @description Sets the modification state of this control. This is needed for now since many 
+   * classes make changes to the control net contained in this object, but the control does not 
+   * know the state of the control net. 
+   * TODO:  Change this class to always know the state of the control Net.
+   *  
+   */
+  void Control::setModified(bool modified) {
+    
+    m_modified = modified;
   }
 
 
@@ -224,17 +284,35 @@ namespace Isis {
    *                       will be copied.
    */
   void Control::copyToNewProjectRoot(const Project *project, FileName newProjectRoot) {
-    if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
 
+    if (FileName(newProjectRoot).toString() != FileName(project->projectRoot()).toString()) {
+  
       QString newNetworkPath =  project->cnetRoot(newProjectRoot.toString()) + "/" +
                   FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
 
-      QString oldNetworkPath = project->cnetRoot(project->projectRoot()) + "/" +
-                  FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
-      if (!QFile::copy(oldNetworkPath,newNetworkPath) ) {
-        throw IException(IException::Io, "Error saving control net.", _FILEINFO_);
+      // If there is active control & it has been modified, write to disk instead of copying
+      //  Leave control net at old location in unmodified state
+      if (isModified()) {
+        controlNet()->Write(newNetworkPath);
+        setModified(false);
       }
-    }//end outer-if
+      else {
+        QString oldNetworkPath = project->cnetRoot(project->projectRoot()) + "/" +
+                    FileName(m_fileName).dir().dirName() + "/" + FileName(m_fileName).name();
+        if (!QFile::copy(oldNetworkPath,newNetworkPath) ) {
+          throw IException(IException::Io, "Error saving control net.", _FILEINFO_);
+        }
+      }
+    }
+    //   Project "Save" to current location, if active control exists & is modified, write to disk
+    //  Note:  It does not look like this code is ever executed.  If project is saved with a
+    //         "Save" this method is not called.
+    else {
+      if (isModified()) {
+        write();
+        setModified(false);
+      }
+    }
 
   }
 
@@ -256,6 +334,7 @@ namespace Isis {
     // If we're the last thing in the folder, remove the folder too.
     QDir dir;
     dir.rmdir(FileName(m_fileName).path());
+    m_modified = false;
   }
 
 

@@ -24,6 +24,7 @@
 #include "ImageDisplayProperties.h"
 #include "ImagePolygon.h"
 #include "IString.h"
+#include "ObservationNumber.h"
 #include "PolygonTools.h"
 #include "Project.h"
 #include "SerialNumber.h"
@@ -98,6 +99,36 @@ namespace Isis {
     m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
 
     m_id = new QUuid(QUuid::createUuid());
+  }
+
+
+  /**
+   * @brief Create an image from a cube file on disk including the footprint
+   * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub 
+   * @param footprint The calculated footprint
+   * @param parent The Qt-relationship parent
+   */
+  Image::Image(Cube *imageCube, geos::geom::MultiPolygon *footprint, QString id, QObject *parent) :
+      QObject(parent) {
+    m_fileName = imageCube->fileName();
+
+    m_bodyCode = NULL;
+    m_cube = imageCube;
+    m_displayProperties = NULL;
+    m_id = NULL;
+
+    m_aspectRatio = Null;
+    m_resolution = Null;
+    m_lineResolution = Null;
+    m_sampleResolution = Null;
+
+    initCamStats();
+
+    m_footprint = footprint;
+
+    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+
+    setId(id);
   }
 
 
@@ -312,11 +343,26 @@ namespace Isis {
 
 
   /**
+   * @brief Returns the observation number of the Cube
+   * @return QString A string representation of the observation number of the cube.
+   */
+  QString Image::observationNumber() {
+    if (m_observationNumber.isEmpty()) {
+      m_observationNumber = ObservationNumber::Compose(*(cube()));
+    }
+    return m_observationNumber;
+  }
+
+
+  /**
    * @brief Returns the serial number of the Cube
    * @return @b QString  A string representation of the serial number of the cube.
    */
   QString Image::serialNumber() {
-    return SerialNumber::Compose(*(cube()));
+    if (m_serialNumber.isEmpty()) {
+      m_serialNumber = SerialNumber::Compose(*(cube()));
+    } 
+    return m_serialNumber;
   }
 
 
@@ -335,7 +381,7 @@ namespace Isis {
    * @param id The id tjat overrides the automatically generated id.
    */
   void Image::setId(QString id) {
-    *m_id = QUuid(QString("{%1}").arg(id));
+    m_id = new QUuid(id);
   }
 
 

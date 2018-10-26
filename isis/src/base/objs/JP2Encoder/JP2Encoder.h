@@ -30,6 +30,7 @@
 #include "jp2.h"
 #include "kdu_stripe_compressor.h"
 #endif
+
 #define MIN_STRIPE_HEIGHT 256
 #define MAX_STRIPE_HEIGHT 8192
 #define INCREMENTAL_FLUSH_BYTES                         (256 * 1024 * 1024)

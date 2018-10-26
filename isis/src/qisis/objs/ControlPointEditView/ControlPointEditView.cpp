@@ -29,7 +29,6 @@
 #include <QSize>
 #include <QSizePolicy>
 #include <QToolBar>
-#include <QVBoxLayout>
 #include <QWidgetAction>
 
 #include "ControlNet.h"
@@ -53,41 +52,13 @@ namespace Isis {
     //       net, while the editors might be using a different net.  Will Directory keep track?
     //
 
+    setCentralWidget(m_controlPointEditWidget);
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
+    // Store the buttons (actions) for easy enable/disable.
+    m_buttons = m_controlPointEditWidget->findChildren<QPushButton *>();
 
-    layout->addWidget(m_controlPointEditWidget);
-
-    m_permToolBar = new QToolBar("Standard Tools", 0);
-    m_permToolBar->setObjectName("permToolBar");
-    m_permToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_permToolBar);
-
-    m_activeToolBar = new QToolBar("Active Tool", 0);
-    m_activeToolBar->setObjectName("activeToolBar");
-    m_activeToolBar->setIconSize(QSize(22, 22));
-    //toolBarLayout->addWidget(m_activeToolBar);
-
-    m_toolPad = new ToolPad("Tool Pad", 0);
-    m_toolPad->setObjectName("toolPad");
-    //toolBarLayout->addWidget(m_toolPad);
-
-
-//  m_controlPointEditWidget->addToPermanent(m_permToolBar);
-//  m_controlPointEditWidget->addTo(m_activeToolBar);
-//  m_controlPointEditWidget->addTo(m_toolPad);
-
-    m_activeToolBarAction = new QWidgetAction(this);
-    m_activeToolBarAction->setDefaultWidget(m_activeToolBar);
-
-    setAcceptDrops(true);
-
-    QSizePolicy policy = sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Expanding);
-    policy.setVerticalPolicy(QSizePolicy::Expanding);
-    setSizePolicy(policy);
-
+    // On default, actions are disabled until the cursor enters the view.
+    disableActions();
   }
 
 
@@ -96,13 +67,6 @@ namespace Isis {
    */
   ControlPointEditView::~ControlPointEditView() {
     delete m_controlPointEditWidget;
-    delete m_permToolBar;
-    delete m_activeToolBar;
-    delete m_toolPad;
-
-    m_permToolBar = 0;
-    m_activeToolBar = 0;
-    m_toolPad = 0;
   }
 
 
@@ -118,46 +82,21 @@ namespace Isis {
 
 
   /**
-   * Returns the suggested size for the widget.
-   *
-   * @return (QSize) The size
+   * Disables buttons/actions. Overriden method.
    */
-  QSize ControlPointEditView::sizeHint() const {
-    return QSize(800, 600);
+  void ControlPointEditView::disableActions() {
+    foreach (QPushButton *button, m_buttons) {
+      button->setDisabled(true);
+    }
   }
 
 
   /**
-   * Returns a list of actions for the permanent tool bar.
-   *
-   * @return (QList<QAction *>) The actions
+   * Enables buttons/actions. Overriden method.
    */
-  QList<QAction *> ControlPointEditView::permToolBarActions() {
-    return m_permToolBar->actions();
+  void ControlPointEditView::enableActions() {
+    foreach (QPushButton *button, m_buttons) {
+      button->setEnabled(true);
+    }
   }
-
-
-  /**
-   * Returns a list of actions for the active tool bar.
-   *
-   * @return (QList<QAction *>) The actions
-   */
-  QList<QAction *> ControlPointEditView::activeToolBarActions() {
-    QList<QAction *> actions;
-    actions.append(m_activeToolBarAction);
-    return actions;
-  }
-
-
-  /**
-   * Returns a list of actions for the tool pad.
-   *
-   * @return (QList<QAction *>) The actions
-   */
-  QList<QAction *> ControlPointEditView::toolPadActions() {
-    return m_toolPad->actions();
-  }
-
-
 }
-

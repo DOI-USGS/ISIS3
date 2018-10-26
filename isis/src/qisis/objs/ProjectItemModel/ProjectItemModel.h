@@ -121,11 +121,27 @@ namespace Isis {
    *                           in the project tree if there is no valid currentIndex. This would
    *                           happen if the user was interacting with a cubeDN or footprint view
    *                           and then tried right clicking on the project tree. Fixes #5111.
-   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or 
-   *                           BundeSolutionInfo on the ProjectTree now sets the project to 
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to
    *                           not clean. Fixes #5174.
    *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
    *                           classes. Fixes #5117.
+   *   @history 2018-03-22 Ken Edmundson - Modified method onBundleSolutionInfoAdded to append the
+   *                           bundleoutput.txt (Summary) file to the BundleSolution Statistics
+   *                           node. Also changed the name of the Images node under Statistics to
+   *                           Image to prevent Import Images to appear on it's context menu.
+   *   @history 2018-06-21 Tyler Wilson - Added the function selectedBOSSImages().  This is a
+   *                           refinement of selectedItems and is used by the JigsawSetupDialog
+   *                           Bundle Observation Solve Settings (BOSS) tab when displaying a
+   *                           subset of user-selected images.  References #497
+   *   @history 2018-06-24 Tyler Wilson - Fixed an edge-case scenario in the selection criteria for
+   *                           selectedBOSSImages().   If a user selected an image list and some
+   *                           (but not all) of the images within that list, the function returned
+   *                           all of the images in the list and not just the selected ones.
+   *                           References #497.
+   *   @history 2018-07-10 Kaitlyn Lee - If a user does not select any images in the project tree,
+   *                           all image lists and images will be returned in selectedBOSSImages().
+   *                           References #497.
    */
   class ProjectItemModel : public QStandardItemModel {
 
@@ -151,6 +167,8 @@ namespace Isis {
 
       ProjectItem *currentItem();
       QList<ProjectItem *> selectedItems();
+      QList<ProjectItem *> selectedBOSSImages();
+
 
       void appendRow(ProjectItem *item);
       void clean();
@@ -175,7 +193,7 @@ namespace Isis {
        * This signal is emitted when a ProjectItem is removed to the model.
        */
       void itemRemoved(ProjectItem *);
-      
+
       /**
        * This signal is emitted whrn a ProjectItem's name is changed.
        */

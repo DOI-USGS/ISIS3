@@ -214,9 +214,11 @@ namespace Isis {
    * Translates a single output value from the given translation 
    * group name and input value. 
    *
-   * @param translationGroupName The name of the pvl translation 
-   *                             group. Often, this is the same
-   *                             as the output keyword name.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * @param inputKeyValue The value to be translated, from the 
    *                      input keyword.
    *
@@ -283,7 +285,11 @@ namespace Isis {
    * Returns the input group name from the translation table corresponding to
    * the output name argument.
    *
-   * @param translationGroupName The output name to be used to search the translation table.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * @param inst The occurence number of the "InputGroup" keyword
    *             (first one is zero)
    *
@@ -357,9 +363,15 @@ namespace Isis {
    * Returns the input keyword name from the translation table corresponding to
    * the output name argument.
    *
-   * @param translationGroupName The output name to be used to search the translation table.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
+   *  
+   * @return QString The input keyword name
    *
-   * @return QString The input keyword name.
+   * @throws IException::Programmer
    */
   QString PvlTranslationTable::InputKeywordName(const QString translationGroupName) const {
 
@@ -375,7 +387,11 @@ namespace Isis {
    * Returns the input default value from the translation table corresponding
    * to the output name argument.
    *
-   * @param translationGroupName The output name to be used to search the translation table.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    *
    * @return QString The input default value.
    */
@@ -395,7 +411,11 @@ namespace Isis {
    * PvlKeyword with the name "InputDefault". Note: no value needs
    * to be assigned to this keyword. 
    *  
-   * @param translationGroupName The name of the PVL translation group.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * 
    * @return bool Indicates whether the given group has an 
    *         InputDefault keyword.
@@ -416,7 +436,11 @@ namespace Isis {
    * group contains a PvlKeyword with the name "Auto". Note: 
    * no value is assigned to this keyword. 
    *  
-   * @param translationGroupName The name of the PVL translation group.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * 
    * @return bool Indicates whether the given group has an Auto 
    *         keyword.
@@ -437,7 +461,11 @@ namespace Isis {
    * PvlKeyword with the name "Optional". Note: no value is 
    * assigned to this keyword. 
    *  
-   * @param translationGroupName The name of the PVL translation group.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * 
    * @return bool Indicates whether the given group has an 
    *         Optional keyword.
@@ -456,7 +484,11 @@ namespace Isis {
    * Retrieves the OutputPosition PvlKeyword for the translation 
    * group with the given name. 
    *  
-   * @param translationGroupName The name of the PVL translation group.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * 
    * @return PvlKeyword The OutputPosition keyword from the given 
    *         translation group.
@@ -483,7 +515,11 @@ namespace Isis {
    * Retrieves a string containing the value of the OutputName 
    * keyword for the translation group with the given name. 
    *  
-   * @param translationGroupName The name of the PVL translation group.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * 
    * @return @b QString The value of the OutputName keyword from 
    *         the given translation group.
@@ -504,7 +540,11 @@ namespace Isis {
    *  
    * @see PvlObject::findGroup() 
    *  
-   * @param translationGroupName Name of the PVL group to search for.
+   * @param translationGroupName The name of the PVL translation 
+   *                             group used to identify the
+   *                             input/output keywords to be
+   *                             translated. Often, this is the
+   *                             same as the output keyword name.
    * 
    * @return const PvlGroup& The first PVL group with the given name.
    *  

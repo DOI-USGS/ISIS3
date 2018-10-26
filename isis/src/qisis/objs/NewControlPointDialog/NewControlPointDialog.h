@@ -33,8 +33,18 @@ namespace Isis {
    *   @history 2016-10-18 Tracie Sucharski - Added method to return value of the
    *                          subpixelRegister radio button.  If set, all measures in the control
    *                          point created will be subpixel registered.
-   *   @history 2017-07-04 Christopher Combs - Added bools to toggle on specific elements of the
-   *                          dialog to remove similar classes like QnetNewPointDialog. Fixes #4383.
+   *   @history 2017-07-04 Christopher Combs - Combined functionality of dialogs from qnet,
+   *                          qview and ipce applications by adding bools to toggle on specific
+   *                          elements of the dialog to remove similar classes like
+   *                          QnetNewPointDialog. Fixes #4383.
+   *   @history 2018-05-02 Tracie Sucharski - If no shapes available remove option to change point
+   *                          type to "Constrained" or "Fixed". Because pointType combo dependent on
+   *                          having all 3 types to use ControlPoint's enum, change comparisons to
+   *                          check text instead of int values. Add tool tip explaining why point
+   *                          type cannot be changed.  Set tool tip on Ok button explaining why it
+   *                          is not enabled. Fixes #5087.
+   *   @history 2018-10-05 Tracie Sucharski - Add radius source combo for choosing the radius
+   *                          source. References #5504.
    */
   class NewControlPointDialog : public QDialog {
 
@@ -52,13 +62,15 @@ namespace Isis {
       QString pointId() const;
       int pointType() const;
       void setGroundSource(QStringList groundFiles, int numberShapesWithPoint);
+      void setRadiusSource(QStringList radiusFiles);
       QString groundSource() const;
+      QString radiusSource() const;
       QStringList selectedFiles() const;
       void setFiles(QStringList pointFiles);
       bool subpixelRegisterPoint();
 
     private slots:
-      void pointTypeChanged(int pointType);
+      void pointTypeChanged(QString pointType);
       void enableOkButton(const QString &text);
 
     private:
@@ -68,7 +80,7 @@ namespace Isis {
       QLabel *m_ptIdLabel;
       QComboBox *m_pointTypeCombo;
       QComboBox *m_groundSourceCombo;
-      QHBoxLayout *m_groundSourceLayout;
+      QComboBox *m_radiusSourceCombo;
       QRadioButton *m_subpixelRegisterButton;
       QPushButton *m_okButton;
       QLineEdit *m_ptIdEdit;

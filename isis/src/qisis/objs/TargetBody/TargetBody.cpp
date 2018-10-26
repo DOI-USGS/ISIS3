@@ -28,6 +28,8 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
 
     m_bodyCode = new SpiceInt;
     m_systemCode = new SpiceInt;
+    
+    m_targetName = target->name();
 
     m_systemName = target->systemName();
 
@@ -203,7 +205,15 @@ TargetBody::TargetBody(Target *target, QObject *parent) : QObject(parent) {
   const TargetBodyDisplayProperties *TargetBody::displayProperties() const {
     return m_displayProperties;
   }
-
+  
+  
+  /**
+   * @brief Returns the value stored at TargetName in the original pvl label.
+   * @return QString Returns m_targetName
+   */
+  QString TargetBody::targetName() {
+    return m_targetName;
+  }
 
 
   /**
