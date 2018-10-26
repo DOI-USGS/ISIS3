@@ -13,8 +13,7 @@ Testing Isis::ProcessByQuickFilter Class ...
 
 **USER ERROR** Boxcar width is too big for cube size.
 
-unittest: Working
-0% Processed
+
 Boxcar width:   5
 Boxcar height:  7
 Low:            -1.79769e+308
@@ -48,7 +47,7 @@ Working on line:  23
 Working on line:  24
 Working on line:  25
 Working on line:  26
-10% ProcessedWorking on line:  27
+Working on line:  27
 Working on line:  28
 Working on line:  29
 Working on line:  30
@@ -73,7 +72,7 @@ Working on line:  48
 Working on line:  49
 Working on line:  50
 Working on line:  51
-20% ProcessedWorking on line:  52
+Working on line:  52
 Working on line:  53
 Working on line:  54
 Working on line:  55
@@ -98,7 +97,7 @@ Working on line:  73
 Working on line:  74
 Working on line:  75
 Working on line:  76
-30% ProcessedWorking on line:  77
+Working on line:  77
 Working on line:  78
 Working on line:  79
 Working on line:  80
@@ -123,7 +122,7 @@ Working on line:  98
 Working on line:  99
 Working on line:  100
 Working on line:  101
-40% ProcessedWorking on line:  102
+Working on line:  102
 Working on line:  103
 Working on line:  104
 Working on line:  105
@@ -148,7 +147,7 @@ Working on line:  123
 Working on line:  124
 Working on line:  125
 Working on line:  126
-50% ProcessedWorking on line:  1
+Working on line:  1
 Working on line:  2
 Working on line:  3
 Working on line:  4
@@ -174,7 +173,7 @@ Working on line:  23
 Working on line:  24
 Working on line:  25
 Working on line:  26
-60% ProcessedWorking on line:  27
+Working on line:  27
 Working on line:  28
 Working on line:  29
 Working on line:  30
@@ -199,7 +198,7 @@ Working on line:  48
 Working on line:  49
 Working on line:  50
 Working on line:  51
-70% ProcessedWorking on line:  52
+Working on line:  52
 Working on line:  53
 Working on line:  54
 Working on line:  55
@@ -224,7 +223,7 @@ Working on line:  73
 Working on line:  74
 Working on line:  75
 Working on line:  76
-80% ProcessedWorking on line:  77
+Working on line:  77
 Working on line:  78
 Working on line:  79
 Working on line:  80
@@ -249,7 +248,7 @@ Working on line:  98
 Working on line:  99
 Working on line:  100
 Working on line:  101
-90% ProcessedWorking on line:  102
+Working on line:  102
 Working on line:  103
 Working on line:  104
 Working on line:  105
@@ -274,10 +273,8 @@ Working on line:  123
 Working on line:  124
 Working on line:  125
 Working on line:  126
-100% Processed
 
-unittest: Working
-0% Processed
+
 Boxcar width:   9
 Boxcar height:  9
 Low:            -1.79769e+308
@@ -311,7 +308,7 @@ Working on line:  23
 Working on line:  24
 Working on line:  25
 Working on line:  26
-10% ProcessedWorking on line:  27
+Working on line:  27
 Working on line:  28
 Working on line:  29
 Working on line:  30
@@ -336,7 +333,7 @@ Working on line:  48
 Working on line:  49
 Working on line:  50
 Working on line:  51
-20% ProcessedWorking on line:  52
+Working on line:  52
 Working on line:  53
 Working on line:  54
 Working on line:  55
@@ -361,7 +358,7 @@ Working on line:  73
 Working on line:  74
 Working on line:  75
 Working on line:  76
-30% ProcessedWorking on line:  77
+Working on line:  77
 Working on line:  78
 Working on line:  79
 Working on line:  80
@@ -386,7 +383,7 @@ Working on line:  98
 Working on line:  99
 Working on line:  100
 Working on line:  101
-40% ProcessedWorking on line:  102
+Working on line:  102
 Working on line:  103
 Working on line:  104
 Working on line:  105
@@ -411,7 +408,7 @@ Working on line:  123
 Working on line:  124
 Working on line:  125
 Working on line:  126
-50% ProcessedWorking on line:  1
+Working on line:  1
 Working on line:  2
 Working on line:  3
 Working on line:  4
@@ -437,7 +434,7 @@ Working on line:  23
 Working on line:  24
 Working on line:  25
 Working on line:  26
-60% ProcessedWorking on line:  27
+Working on line:  27
 Working on line:  28
 Working on line:  29
 Working on line:  30
@@ -462,7 +459,7 @@ Working on line:  48
 Working on line:  49
 Working on line:  50
 Working on line:  51
-70% ProcessedWorking on line:  52
+Working on line:  52
 Working on line:  53
 Working on line:  54
 Working on line:  55
@@ -487,7 +484,7 @@ Working on line:  73
 Working on line:  74
 Working on line:  75
 Working on line:  76
-80% ProcessedWorking on line:  77
+Working on line:  77
 Working on line:  78
 Working on line:  79
 Working on line:  80
@@ -512,7 +509,7 @@ Working on line:  98
 Working on line:  99
 Working on line:  100
 Working on line:  101
-90% ProcessedWorking on line:  102
+Working on line:  102
 Working on line:  103
 Working on line:  104
 Working on line:  105
@@ -537,4 +534,3 @@ Working on line:  123
 Working on line:  124
 Working on line:  125
 Working on line:  126
-100% Processed

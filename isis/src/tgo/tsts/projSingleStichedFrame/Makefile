@@ -54,21 +54,30 @@ commands:
             from=$(OUTPUT)/projected.cub \
             to=$(OUTPUT)/exported.img > /dev/null;
 
+	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
+               $(OUTPUT)/exported.xml \
+	       > $(OUTPUT)/tempLabel1.txt;
+	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
+	       $(OUTPUT)/tempLabel1.txt \
+	       > $(OUTPUT)/tempLabel2.txt;
+	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
+	       $(OUTPUT)/tempLabel2.txt \
+	       > $(OUTPUT)/tempLabel3.txt;
+	$(SED) 's+\modification_date.*>+\modification_date>+' \
+	       $(OUTPUT)/tempLabel3.txt \
+	       > $(OUTPUT)/tempLabel4.txt
+	$(SED) 's+\ISIS version.*<+\ISIS version.<+' \
+	       $(OUTPUT)/tempLabel4.txt \
+               > $(OUTPUT)/exported.xmlLabel.txt;
+
 	$(RM) $(OUTPUT)/stitched.lis;
 
 	$(MV) $(OUTPUT)/stitched.map $(OUTPUT)/stitched.pvl;
 
-	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
-         $(OUTPUT)/exported.xml > $(OUTPUT)/exported1.xml;
+		# Cleanup
+	$(RM) $(OUTPUT)/exported.xml;
+	$(RM) $(OUTPUT)/tempLabel1.txt;
+	$(RM) $(OUTPUT)/tempLabel2.txt;
+	$(RM) $(OUTPUT)/tempLabel3.txt;
+	$(RM) $(OUTPUT)/tempLabel4.txt;
 
-	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
-         $(OUTPUT)/exported1.xml > $(OUTPUT)/exported2.xml;
-
-	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
-         $(OUTPUT)/exported2.xml > $(OUTPUT)/exported3.xml;
-
-	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
-         $(OUTPUT)/exported3.xml > $(OUTPUT)/exported.txt;
-
-	$(RM) $(OUTPUT)/exported.xml $(OUTPUT)/exported1.xml \
-        $(OUTPUT)/exported2.xml $(OUTPUT)/exported3.xml

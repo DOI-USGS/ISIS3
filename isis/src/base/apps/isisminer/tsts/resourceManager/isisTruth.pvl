@@ -1,0 +1,18 @@
+Object = IsisCube
+    SpacecraftName        = "MARS GLOBAL SURVEYOR"
+    InstrumentId          = MOC-WA
+    TargetName            = Mars
+    StartTime             = 1997-10-20T10:58:37.46
+    StopTime              = 1997-10-20T11:03:44.66
+    CrosstrackSumming     = 4
+    DowntrackSumming      = 4
+    FocalPlaneTemperature = 213.1
+    GainModeId            = 1A
+    LineExposureDuration  = 100.000000 <milliseconds>
+    MissionPhaseName      = AB-1
+    OffsetModeId          = 5
+    SpacecraftClockCount  = 561812335:32
+    RationaleDesc         = "OLYMPUS MONS SPECIAL RED WIDE ANGLE"
+    FirstLineSample       = 673
+End_Object
+End

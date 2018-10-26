@@ -1,5 +1,3 @@
-hist: Importing
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 LBLSIZE                       = 7140
 FORMAT                        = BYTE
 TYPE                          = IMAGE
@@ -256,7 +254,5 @@ SPICE_FILE_NAME               = mars_iau2000_v0.tpc
 SPICE_FILE_ID                 = PCK
 GEOMETRIC_CALIB_FILE_NAME     = h2ggr_01.cal
 End
-hist: Gathering statistics
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 226.411
 33.6794
