@@ -69,7 +69,7 @@ namespace Isis {
    *                           documentation
    *   @history 2005-10-03 Elizabeth Miller - changed @ingroup tag
    *   @history 2005-12-21 Elizabeth Miller - Added command line options
-   *                           -BATCHLIST, -SAVE, -ERRLIST, -ONERROR, 
+   *                           -BATCHLIST, -SAVE, -ERRLIST, -ONERROR,
    *                           -PREFERENCE, and -PRINTFILE
    *   @history 2006-01-23 Elizabeth Miller - Renamed -HELP to -WEBHELP and made
    *                           it accept abbreviations of reserve params
@@ -128,25 +128,28 @@ namespace Isis {
    *   @history 2014-06-09 Ian Humphrey - Added PreProcess() and ResolveParameter()
    *                           functions to replace redundant code in LoadCommandLine().
    *                           These functions evaulate -HELP and -WEBHELP flags regardless
-   *                           of errors on commandline. Fixes #552. 
-   *   @history 2014-06-10 Ian Humphrey - Fixed issue causing parameter name values 
+   *                           of errors on commandline. Fixes #552.
+   *   @history 2014-06-10 Ian Humphrey - Fixed issue causing parameter name values
    *                           on the -HELP flag to only evaluate if uppercase. Fixes #1735.
    *                           Reorganized header and cpp layout. Renamed private member functions
    *                           to follow code convention. Began modifying unitTest.cpp.
-   *   @history 2014-06-11 Ian Humphrey - Added throws to evaluateOption() so that if the parameter 
+   *   @history 2014-06-11 Ian Humphrey - Added throws to evaluateOption() so that if the parameter
    *                           is -HELP or -WEBHELP unitTest.cpp can catch and continue running.
    *   @history 2014-06-12 Ian Humphrey - Modified logic in loadCommandLine() throw statements so
    *                           an exception is thrown when -BATCHLIST is used with -GUI, -SAVE,
    *                           -LAST, or -RESTORE options. Added bool usedDashRestore.
-   *   @history 2014-06-17 Ian Humphrey - Added to unitTest.xml to test -HELP=value. Renamed 
+   *   @history 2014-06-17 Ian Humphrey - Added to unitTest.xml to test -HELP=value. Renamed
    *                           application name from 'hist' to 'unitTest'. Modified logic of
    *                           resolveParameter() to give appropriate error message to user
    *                           when using an invalid reserved parameter (e.g. -x).
-   *   @history 2014-06-18 Ian Humphrey - Finished developing unitTest.cpp and reorganized. 
+   *   @history 2014-06-18 Ian Humphrey - Finished developing unitTest.cpp and reorganized.
    *                           Added lacking [at]throws documentation to UserInterface.cpp.
    *   @history 2016-04-05 Jesse Mapel - Changed bad histroy file error message to reflect that
    *                           the history file could be for a different application. Fixes #2366
-   *                           
+   *   @history 2018-04-20 Adam Goins - Modified loadHistory() to print out the last command
+   *                           so that users can see the actual command that the -last arg loads.
+   *                           Fixes #4779.
+   *
    */
 
   class UserInterface : public IsisAml {
@@ -162,8 +165,8 @@ namespace Isis {
        */
       bool AbortOnError() {
         return p_abortOnError;
-      };    
-      
+      };
+
       /**
        * Returns the size of the batchlist.  If there is no batchlist, it will
        * return 0
@@ -173,7 +176,7 @@ namespace Isis {
       int BatchListSize() {
         return p_batchList.size();
       };
-      
+
       /**
        * Indicates if the Isis Graphical User Interface is operating.
        *
@@ -190,8 +193,8 @@ namespace Isis {
        */
       int ParentId() {
         return p_parentId;
-      };  
-      
+      };
+
       /**
        * @return the Gui
        */
@@ -201,24 +204,24 @@ namespace Isis {
 
       QString GetInfoFileName();
       bool GetInfoFlag();
-      
+
       void SetBatchList(int i);
       void SetErrorList(int i);
-      
+
       void SaveHistory();
 
     private:
       void loadBatchList(const QString file);
       void loadCommandLine(int argc, char *argv[]);
       void loadHistory(const QString file);
-      
+
       void evaluateOption(const QString name, const QString value);
-      void getNextParameter(unsigned int &curPos, 
-                            QString &unresolvedParam, 
+      void getNextParameter(unsigned int &curPos,
+                            QString &unresolvedParam,
                             std::vector<QString> &value);
       void preProcess(QString fullReservedName, std::vector<QString> &reservedParams);
       std::vector<QString> readArray(QString arrayString);
-      QString resolveParameter(QString &name, 
+      QString resolveParameter(QString &name,
                                std::vector<QString> &reservedParams,
                                bool handleNoMatches = true);
 
@@ -227,23 +230,23 @@ namespace Isis {
       //! Vector of batchlist data.
       std::vector<std::vector<QString> > p_batchList;
       //! This variable will contain argv.
-      std::vector<char *> p_cmdline; 
+      std::vector<char *> p_cmdline;
       //! FileName to write batchlist line that caused error on.
       QString p_errList;
       //! Pointer to the gui object.
-      Gui *p_gui;                  
+      Gui *p_gui;
       //! Boolean value representing if it's in debug mode.
-      bool p_info;  
+      bool p_info;
       //! FileName to save debugging info.
-      QString p_infoFileName;  
+      QString p_infoFileName;
       //! Boolean value representing whether the program is interactive or not.
-      bool p_interactive;  
-      //! This is a status to indicate if the GUI is running or not.                         
-      int p_parentId;               
-      //! Name of program to run.                                  
-      QString p_progName;        
+      bool p_interactive;
+      //! This is a status to indicate if the GUI is running or not.
+      int p_parentId;
+      //! Name of program to run.
+      QString p_progName;
       //! FileName to save last history to.
-      QString p_saveFile;          
+      QString p_saveFile;
   };
 };
 
