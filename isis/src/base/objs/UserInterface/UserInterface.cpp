@@ -551,8 +551,6 @@ namespace Isis {
                 for (int k = 0; k < up.keywords(); k++) {
                   QString keyword = up[k].name();
                   QString value = up[k][0];
-                  std::cout << "Keyword: " << keyword << std::endl;
-                  std::cout << "Value: " << value << std::endl;
                   PutAsString(keyword, value);
                 }
               }
