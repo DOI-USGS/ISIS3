@@ -1,5 +1,6 @@
 #include "Isis.h"
 #include "Pipeline.h"
+#include "Preference.h"
 #include "SpecialPixel.h"
 #include "UserInterface.h"
 
@@ -14,6 +15,8 @@ void PipeListed();
 void PipeContinue();
 
 void IsisMain() {
+  Preference::Preferences(true);
+  
   UserInterface &ui = Application::GetUserInterface();
   ui.PutFileName("FROM",  "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
   ui.PutFileName("FROM2", "$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub");
@@ -22,9 +25,9 @@ void IsisMain() {
 
   ui.Clear("MAPPING");
   ui.PutBoolean("MAPPING", true);
-  std::cout << "Simple Pipe" << std::endl;
+  std::cerr << "Simple Pipe" << std::endl;
   PipeSimple();
-  std::cout << "Simple Pipe 2" << std::endl;
+  std::cerr << "Simple Pipe 2" << std::endl;
   ui.Clear("MAPPING");
   ui.PutBoolean("MAPPING", false);
   ui.PutString("BANDS", "2,4-5");
@@ -32,33 +35,33 @@ void IsisMain() {
 
   ui.Clear("MAPPING");
   ui.PutBoolean("MAPPING", true);
-  std::cout << "Non-Merging Branching Pipe" << std::endl;
+  std::cerr << "Non-Merging Branching Pipe" << std::endl;
   PipeBranched();
-  std::cout << "Standard Branching Pipe" << std::endl;
+  std::cerr << "Standard Branching Pipe" << std::endl;
   ui.Clear("MAPPING");
   ui.PutBoolean("MAPPING", false);
   PipeBranched();
 
-  std::cout << "Complicated Branching Pipe" << std::endl;
+  std::cerr << "Complicated Branching Pipe" << std::endl;
   PipeMultiBranched();
 
   ui.Clear("FROM");
   ui.Clear("TO");
   ui.PutFileName("FROM", "unitTest.lis");
-  std::cout << "Testing listing methods" << std::endl;
+  std::cerr << "Testing listing methods" << std::endl;
   PipeListed();
   
   ui.Clear("FROM");
   ui.Clear("TO");
   ui.PutAsString("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
   ui.PutFileName("TO", "./out.cub");
-  std::cout << "*** Branching Pipe with a branch disabled ***" << std::endl;
+  std::cerr << "*** Branching Pipe with a branch disabled ***" << std::endl;
   PipeBranchDisabled();
   
   ui.Clear("TO");
   ui.PutFileName("TO",   "./out.cub");
-  std::cout << "\n*** Continue option ***" << endl;
-  cout << "input=" << ui.GetAsString("FROM") << endl;
+  std::cerr << "\n*** Continue option ***" << endl;
+  cerr << "input=" << ui.GetAsString("FROM") << endl;
   PipeContinue();
 }
 
@@ -76,7 +79,7 @@ void PipeBranched() {
   p.Application("thm2isis").AddBranch("even", PipelineApplication::ConstantStrings);
   p.Application("thm2isis").AddBranch("odd", PipelineApplication::ConstantStrings);
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("spiceinit");
   p.Application("spiceinit").SetInputParameter("FROM", false);
@@ -87,13 +90,13 @@ void PipeBranched() {
   p.Application("spiceinit").AddParameter("MODEL", "MODEL");
   p.Application("spiceinit").AddParameter("CKNADIR", "CKNADIR");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("thmvisflat");
   p.Application("thmvisflat").SetInputParameter("FROM", true);
   p.Application("thmvisflat").SetOutputParameter("TO", "flat");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("thmvistrim");
   p.Application("thmvistrim").SetInputParameter("FROM", true);
@@ -104,7 +107,7 @@ void PipeBranched() {
     p.Application("thmvistrim").Disable();
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("cam2map");
   p.Application("cam2map").SetInputParameter("FROM", true);
@@ -117,19 +120,19 @@ void PipeBranched() {
     p.Application("cam2map").AddConstParameter("even", "PIXRES", "MPP");
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.Application("cam2map").AddParameter("odd", "MAP", PipelineApplication::LastOutput);
   p.Application("cam2map").AddConstParameter("odd", "PIXRES", "MAP");
   p.Application("cam2map").AddConstParameter("odd", "DEFAULTRANGE", "MAP");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("automos");
   p.Application("automos").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
   p.Application("automos").SetOutputParameter("TO", "mos");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   if(ui.GetBoolean("INGESTION")) {
     p.SetFirstApplication("thm2isis");
@@ -138,7 +141,7 @@ void PipeBranched() {
     p.SetFirstApplication("spiceinit");
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 
   if(ui.GetBoolean("MAPPING")) {
     p.SetLastApplication("automos");
@@ -147,7 +150,7 @@ void PipeBranched() {
     p.SetLastApplication("thmvistrim");
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 }
 
 void PipeSimple() {
@@ -163,7 +166,7 @@ void PipeSimple() {
   p.Application("thm2isis").SetInputParameter("FROM", false);
   p.Application("thm2isis").SetOutputParameter("TO", "lev1");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("spiceinit");
   p.Application("spiceinit").SetInputParameter("FROM", false);
@@ -174,7 +177,7 @@ void PipeSimple() {
   p.Application("spiceinit").AddParameter("MODEL", "MODEL");
   p.Application("spiceinit").AddParameter("CKNADIR", "CKNADIR");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("cam2map");
   p.Application("cam2map").SetInputParameter("FROM", true);
@@ -182,13 +185,13 @@ void PipeSimple() {
   p.Application("cam2map").AddParameter("MAP", "MAP");
   p.Application("cam2map").AddParameter("PIXRES", "RESOLUTION");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   if(ui.WasEntered("PIXRES")) {
     p.Application("cam2map").AddConstParameter("PIXRES", "MPP");
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 
   if(ui.GetBoolean("INGESTION")) {
     p.SetFirstApplication("thm2isis");
@@ -197,7 +200,7 @@ void PipeSimple() {
     p.SetFirstApplication("spiceinit");
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 
   if(ui.GetBoolean("MAPPING")) {
     p.SetLastApplication("cam2map");
@@ -206,7 +209,7 @@ void PipeSimple() {
     p.SetLastApplication("spiceinit");
   }
 
-  cout << p << endl;
+  cerr << p << endl;
 }
 
 void PipeMultiBranched() {
@@ -227,7 +230,7 @@ void PipeMultiBranched() {
   p.Application("fft").SetOutputParameter("FROM2.mag", "MAGNITUDE", "fft", "cub");
   p.Application("fft").SetOutputParameter("FROM2.phase", "PHASE", "fft", "cub");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("fx");
   p.Application("fx").SetInputParameter("FILELIST", PipelineApplication::LastAppOutputListNoMerge, false);
@@ -237,14 +240,14 @@ void PipeMultiBranched() {
   p.Application("fx").AddConstParameter("MODE", "list");
   p.Application("fx").AddConstParameter("FROM2.phase", "equation", "1+3");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("ifft");
   p.Application("ifft").SetInputParameter("MAGNITUDE", true);
   p.Application("ifft").AddParameter("PHASE", PipelineApplication::LastOutput);
   p.Application("ifft").SetOutputParameter("FROM.mag", "TO", "untranslated", "cub");
 
-  cout << p << endl;
+  cerr << p << endl;
 
   p.AddToPipeline("translate");
   p.Application("translate").SetInputParameter("FROM", true);
@@ -253,7 +256,7 @@ void PipeMultiBranched() {
   p.Application("translate").AddConstParameter("INTERP", "near");
   p.Application("translate").SetOutputParameter("FROM.mag", "TO", "final", "cub");
 
-  cout << p << endl;
+  cerr << p << endl;
 }
 
 void PipeListed() {
@@ -284,7 +287,7 @@ void PipeListed() {
   p.Application("noproj").SetOutputParameter("TO", "noproj");
   p.Application("noproj").SetOutputParameter("TO", "jitter");
 
-  std::cout << p << std::endl;
+  std::cerr << p << std::endl;
 }
 
 /**
@@ -310,7 +313,7 @@ void PipeBranchDisabled(void)
   p.Application("lowpass").EnableBranch("lpf", true);
   p.Application("lowpass").EnableBranch("hpf", false);
   
-  //std::cout << p;
+  //std::cerr << p;
     
   p.AddToPipeline("highpass");
   p.Application("highpass").SetInputParameter("FROM", false);
@@ -320,7 +323,7 @@ void PipeBranchDisabled(void)
   p.Application("highpass").EnableBranch("lpf", false);
   p.Application("highpass").EnableBranch("hpf", true);
   
-  //std::cout << p;
+  //std::cerr << p;
   
   p.AddToPipeline("fx");
   p.Application("fx").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
@@ -328,7 +331,7 @@ void PipeBranchDisabled(void)
   p.Application("fx").AddConstParameter("MODE", "LIST");
   p.Application("fx").AddConstParameter("EQUATION", "f1+f2");
   
-  std::cout << p;
+  std::cerr << p;
 }
 
 void PipeContinue(void)
@@ -354,12 +357,12 @@ void PipeContinue(void)
   pc1.Application("lowpass").AddConstParameter ("SAMPLES", "3");
   pc1.Application("lowpass").AddConstParameter ("LINES", "3");
   
-  cout << pc1 << endl;
+  cerr << pc1 << endl;
   
   pc1.Run();
   
 
-  cout << "\n*** Application level continue option ***\n";
+  cerr << "\n*** Application level continue option ***\n";
   Pipeline pc2("unitTest7");
   
   pc2.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
@@ -380,7 +383,7 @@ void PipeContinue(void)
   pc2.Application("lpf1").AddConstParameter ("SAMPLES", "3");
   pc2.Application("lpf1").AddConstParameter ("LINES", "3");
   
-  cout << pc2 << endl;
+  cerr << pc2 << endl;
   
   pc2.Run();
   remove("./out.cub");
