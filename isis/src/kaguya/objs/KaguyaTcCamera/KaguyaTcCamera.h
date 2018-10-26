@@ -24,7 +24,7 @@
 
 namespace Isis {
 
-  class KaguyaTcCamera : public FramingCamera {
+  class KaguyaTcCamera : public LineScanCamera {
     public:
       KaguyaTcCamera(Cube &cube);
       //! Destroys the KaguyaTcCamera object.

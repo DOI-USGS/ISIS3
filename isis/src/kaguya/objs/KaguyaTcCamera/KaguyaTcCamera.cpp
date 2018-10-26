@@ -40,11 +40,14 @@ namespace Isis {
    * @internal
    *   @history 2018-10-02 Adam Goins & Jeannie Backer - Original Version
    */
-  KaguyaTcCamera::KaguyaTcCamera(Cube &cube) : FramingCamera(cube) {
+  KaguyaTcCamera::KaguyaTcCamera(Cube &cube) : LineScanCamera(cube) {
     m_instrumentNameLong  = "Terrain Camera";
     m_instrumentNameShort = "TC";
     m_spacecraftNameLong  = "Kaguya";
     m_spacecraftNameShort = "Kaguya";
+
+    QString msg = "Kaguya TC Camera is still under development.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
 
     NaifStatus::CheckErrors();
     // Get the camera characteristics
@@ -73,8 +76,7 @@ namespace Isis {
     focalMap->SetDetectorOrigin(
       Spice::getDouble("INS" + toString(naifIkCode()) +
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) +
-                       "_BORESIGHT_LINE"));
+      Spice::getDouble(0.5);
 
     // Setup distortion map
     new CameraDistortionMap(this);
