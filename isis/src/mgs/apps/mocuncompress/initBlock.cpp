@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -58,7 +65,7 @@ extern void exit();
 
 BITTREE *encodeTrees[MAXCODES];
 
-static uint32 bitReverse(register uint32 num)
+static uint32 bitReverse(uint32 num)
 {
 uint32 rev;
 uint32 i;

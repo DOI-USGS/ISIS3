@@ -82,7 +82,7 @@ namespace Isis {
     FileTool::addTo(menu);
   }
 
-  
+
   ControlNet *QnetFileTool::controlNet() {
     return m_qnetTool->controlNet();
   }
@@ -219,11 +219,19 @@ namespace Isis {
     emit newControlNetwork(controlNet());
   }
 
-
   /**
-   * Exit the program
+   *  Exit the program
+   *
+   *  @internal
+   *  @history 2018-04-24 Adam Goins - Added QCloseEvent optional parameter to
+   *                          set the CloseEvent triggered by an onwindowclose
+   *                          to ignore the event if the 'cancel' option was selected
+   *                          after clicking the close button of the viewport window.
+   *                          This fixes an issue where clicking the close button and then clicking
+   *                          'cancel' from the QMessageBox would close the window but keep the
+   *                          application running. Fixes #4146.
    */
-  void QnetFileTool::exit() {
+  void QnetFileTool::exit(QCloseEvent *event) {
     //  If control net has been changed , prompt for user to save
     if (m_isDirty) {
       int resp = QMessageBox::warning((QWidget *)parent(), "QnetTool",
@@ -236,13 +244,14 @@ namespace Isis {
         saveAs();
       }
       if (resp == QMessageBox::Cancel) {
+        if (event) {
+          event->setAccepted(false);
+        }
         return;
       }
     }
     qApp->quit();
   }
-
-
 
     /**
    *  Save control network with given file
