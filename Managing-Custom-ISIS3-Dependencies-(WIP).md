@@ -52,3 +52,5 @@ Building some of the packages will require conda-forge and usgs-astrogeolgy to b
 # Known Issues
 
 Conda build has issues with building ISIS only on mac. The Qt find scripts that come with cmake have issues linking with the .tbd files in the mac sdk. For now, the temporary solution is to remove the OpenGL.framework and AGL.framework directories found at `/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk/System/Library/Frameworks/` and in their place create symlinks to the same directories at `/System/Library/Frameworks/`
+
+This can also occur with `/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks`.
