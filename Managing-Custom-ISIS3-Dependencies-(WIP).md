@@ -54,3 +54,12 @@ Building some of the packages will require conda-forge and usgs-astrogeolgy to b
 Conda build has issues with building ISIS only on mac. The Qt find scripts that come with cmake have issues linking with the .tbd files in the mac sdk. For now, the temporary solution is to remove the OpenGL.framework and AGL.framework directories found at `/Library/Developer/CommandLineTools/SDKs/MacOSX10.13.sdk/System/Library/Frameworks/` and in their place create symlinks to the same directories at `/System/Library/Frameworks/`
 
 This can also occur with `/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks`.
+
+# Using miniconda3 instead of anaconda3
+If you are having issues with installing / running the uploaded package, try using miniconda3 with a clean conda cache to re-build and re-upload.
+
+1. Download miniconda3
+1. Ensure miniconda3 is in your path (`which conda` should point to `<some-path>/miniconda3/bin/conda`)
+1. `conda clean --all` and reply `y` to all prompts
+1. `conda install conda-build conda-verify yaml` to get packages required for building packages
+1. `conda config --add channels conda-forge --add channels usgs-astrogeology`
