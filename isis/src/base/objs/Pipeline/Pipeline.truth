@@ -460,6 +460,8 @@ PIPELINE -------> unitTest6 <------- PIPELINE
 **ERROR** Running Isis program [noisefilter] failed with return status [2].
 **USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
+unittest: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 
 *** Application level continue option ***
 PIPELINE -------> unitTest7 <------- PIPELINE
@@ -470,3 +472,5 @@ PIPELINE -------> unitTest7 <------- PIPELINE
 **ERROR** Running Isis program [noisefilter] failed with return status [2].
 **USER ERROR** Parameter [SAMPLES] must be greater than or equal to [1].
 Continuing ......
+unittest: Working
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed

@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -125,7 +132,7 @@ int32 t0,t1,t2,t3,t4;      \
     out[(oi)*(o3)] = t0;        \
   }
 
-static void invFwht16_row(register int32 *in, register int32 *out)
+static void invFwht16_row(int32 *in, int32 *out)
 {
   /*
   * This function does a 16 point, one dimensional inverse WHT on 16, 32
@@ -160,7 +167,7 @@ int32 *tmp;    /* Register pointer to the temporary storage */
   BUTTERFLY4(tmp, 1, 3, 7, 11, 15, out, 1, 8, 11, 9, 10);
 }
 
-static void invFwht16_col(register int32 *in, register int32 *out)
+static void invFwht16_col(int32 *in, int32 *out)
 {
   /*
   * This function does a 16 point, one dimensional inverse WHT on 16, 32
@@ -196,7 +203,7 @@ int32 *tmp;    /* Register pointer to the temporary storage */
   BUTTERFLY4(tmp, 1, 3, 7, 11, 15, out, 16, 8, 11, 9, 10);
 }
 
-void invFwht16x16(register int16 *in, register int16 *out)
+void invFwht16x16(int16 *in, int16 *out)
 {
   /*
   * This function does a "sequency" ordered WHT on a 16 x 16 array of data

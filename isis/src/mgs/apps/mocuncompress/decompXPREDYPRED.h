@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -44,6 +51,6 @@ SCCSID @(#)decompXPREDYPRED.h  1.1 10/04/99
 
 #define decompXPREDYPRED_h
 
-extern void decompXPREDYPRED(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff);
+extern void decompXPREDYPRED(uint8 *curLine, uint8 *prevLine, uint32 size, uint8 *code, uint8 *left, uint8 *right, BITSTRUCT *bitStuff);
 
 #endif
