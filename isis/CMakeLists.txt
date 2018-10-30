@@ -28,16 +28,15 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.5.00.0")
+set(VERSION            "3.6.0.1")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2017-04-24")
-set(THIRD_PARTY_LIBS_VERSION  "v007")
-set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
+set(VERSION_DATE              "2018-10-26")
+set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
