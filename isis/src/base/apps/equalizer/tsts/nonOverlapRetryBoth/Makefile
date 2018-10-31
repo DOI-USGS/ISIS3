@@ -1,11 +1,13 @@
 # This tests calculating statistics for input with non-overlapping files,
-# correcting the input list by REMOVING non-overlaps and recalculating to 
-# determine normalization gains and offsets for equalization, 
+# correcting the input list by REMOVING non-overlaps and recalculating to
+# determine normalization gains and offsets for equalization,
 # and then applying corrections.
 #
 # NOTE: An exception occurs when there are non-overlaps during calculation,
 # it is handled and the output is sent to nonOverlapError.txt
 APPNAME = equalizer
+
+I10047011EDR.proj.reduced.cub.TOLERANCE = .00001
 
 include $(ISISROOT)/make/isismake.tsts
 
