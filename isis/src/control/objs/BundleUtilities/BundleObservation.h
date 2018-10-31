@@ -180,7 +180,7 @@ namespace Isis {
 
       void computePartials(LinearAlgebra::Matrix &coeffImagePosition,     //!< multi-segment version
                            LinearAlgebra::Matrix &coeffImagePointing);
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections, bool updateBodyRotation);
+      bool applyParameterCorrections(LinearAlgebra::Vector corrections, bool updateBodyRotation=false);
 
       SparseBlockMatrix &continuityContraintSpkMatrix();
       SparseBlockMatrix &continuityContraintCkMatrix();

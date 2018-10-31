@@ -40,6 +40,32 @@ namespace Isis {
    */
   BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
                                          FileName controlNetworkFileName,
+                                         BundleResults outputStatistics,
+                                         QList<ImageList *> imgList,
+                                         QObject *parent) : QObject(parent) {
+    m_id = new QUuid(QUuid::createUuid());
+    m_runTime = "";
+    m_name = m_runTime;
+    m_inputControlNetFileName = new FileName(controlNetworkFileName);
+    m_outputControl = NULL;
+    m_outputLidarDataSet = NULL;
+    m_settings = inputSettings;
+    m_statisticsResults = new BundleResults(outputStatistics);
+    m_images = new QList<ImageList *>(imgList);
+    m_adjustedImages = new QList<ImageList *>;
+  }
+
+
+  /**
+   * Constructor. Creates a BundleSolutionInfo.
+   *
+   * @param inputSettings The settings saved in BundleSolutionInfo
+   * @param controlNetworkFileName The file name and path of the control network
+   * @param outputStatistics The results of the BundleAdjust
+   * @param parent The Qt-relationship parent
+   */
+  BundleSolutionInfo::BundleSolutionInfo(BundleSettingsQsp inputSettings,
+                                         FileName controlNetworkFileName,
                                          FileName lidarDataFileName,
                                          BundleResults outputStatistics,
                                          QList<ImageList *> imgList,
@@ -57,7 +83,7 @@ namespace Isis {
     m_adjustedImages = new QList<ImageList *>;
   }
 
-
+  
   /**
    * Constructor. Creates a BundleSolutionInfo from disk.
    *

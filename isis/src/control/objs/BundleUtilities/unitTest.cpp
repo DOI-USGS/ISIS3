@@ -741,7 +741,7 @@ int main(int argc, char *argv[]) {
     boost::numeric::ublas::bounded_vector< double, 3 > adjustedSigmas = bcp1.adjustedSigmas();
     //??? never set 000c??? 1.0e+50???
     boost::numeric::ublas::bounded_vector< double, 3 > nicVector = bcp1.nicVector();
-    SparseBlockRowMatrix qMatrix = bcp1.cholmodQMatrix(); //??? empty matrix...
+    SparseBlockRowMatrix qMatrix = bcp1.qMatrix(); //??? empty matrix...
     qDebug() << "aprioriSigmas:  "
                << (Isis::IsSpecial(aprioriSigmas[0]) ? "N/A" : Isis::toString(aprioriSigmas[0]))
                << (Isis::IsSpecial(aprioriSigmas[1]) ? "N/A" : Isis::toString(aprioriSigmas[1]))

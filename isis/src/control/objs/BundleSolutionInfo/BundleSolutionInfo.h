@@ -161,6 +161,11 @@ namespace Isis {
     public:
       BundleSolutionInfo(BundleSettingsQsp inputSettings,
                     FileName controlNetworkFileName,
+                    BundleResults outputStatistics,
+                    QList<ImageList *> imgList,
+                    QObject *parent = 0);
+      BundleSolutionInfo(BundleSettingsQsp inputSettings,
+                    FileName controlNetworkFileName,
                     FileName lidarDataFileName,
                     BundleResults outputStatistics,
                     QList<ImageList *> imgList,

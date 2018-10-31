@@ -109,12 +109,8 @@ int main(int argc, char *argv[]) {
     SurfacePoint sp2(Latitude(latAd, Angle::Units::Degrees),
                     Longitude(lonAd, Angle::Units::Degrees),
                     Distance(radAd, Distance::Units::Kilometers));
-    sp.SetRadii(Distance(1000.0, Distance::Meters), Distance(1000.0, Distance::Meters),
-                Distance(1000.0, Distance::Meters));
     sp.SetSphericalMatrix(aprioriMatrix);
     lcp->SetAprioriSurfacePoint(sp);
-    sp2.SetRadii(Distance(1000.0, Distance::Meters), Distance(1000.0, Distance::Meters),
-                Distance(1000.0, Distance::Meters));
     sp2.SetSphericalMatrix(adjustedMatrix);
     lcp->SetAdjustedSurfacePoint(sp2);
     for (int j = 0; j < 2; j++) {
