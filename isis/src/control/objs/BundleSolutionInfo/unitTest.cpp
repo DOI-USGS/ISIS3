@@ -122,8 +122,12 @@ int main(int argc, char *argv[]) {
     ControlNet outNet;
     outNet.AddPoint(freePoint);
     outNet.AddPoint(fixedPoint);
-    BundleControlPointQsp freeBundleControlPoint(new BundleControlPoint(freePoint));
-    BundleControlPointQsp fixedBundleControlPoint(new BundleControlPoint(fixedPoint));
+    // Obsolete argument - now using local radius.
+    // double metersToRadians = 1./23.68;  // Use what BundleResults used
+    BundleControlPointQsp freeBundleControlPoint(
+                                                 new BundleControlPoint(settings, freePoint));
+    BundleControlPointQsp fixedBundleControlPoint(
+                                     new BundleControlPoint(settings, fixedPoint));
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
@@ -167,6 +171,9 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
     XmlStackedHandlerReader reader1;
     BundleSolutionInfoXmlHandlerTester bsFromXml1(project, &reader1, xmlFile1);
+    // Now manually set the control net in BundleSolutionInfo's BundleResults to
+    //  complete its initialization.  This seems awkward.
+    bsFromXml1.bundleResults().setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
     printXml(bsFromXml1);  // Save comparison output to log file
 

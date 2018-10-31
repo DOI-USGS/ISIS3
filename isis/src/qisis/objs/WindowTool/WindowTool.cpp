@@ -166,8 +166,7 @@ namespace Isis {
     return std::max(sx,sy);
   }
 
-
-  /**
+ /**
    * Tiles the cube viewports over the Cube DN View.
    *
    * @internal

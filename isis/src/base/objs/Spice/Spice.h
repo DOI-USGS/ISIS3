@@ -269,7 +269,7 @@ namespace Isis {
    *   @history 2015-07-21 Kristin Berry - Added additional NaifStatus::CheckErrors() to see if any
    *                           NAIF errors were signaled. References #2248.
    *   @history 2016-05-18 Jeannie Backer and Stuart Sides - Moved the construction of the Target
-   *                           after the NAIF kenels have been loaded or the NAIF keywords
+   *                           after the NAIF kernels have been loaded or the NAIF keywords
    *                           have been pulled from the cube labels, so we can find target
    *                           body codes that are defined in kernels and not just body codes
    *                           build into spicelib. References #3934
@@ -278,6 +278,13 @@ namespace Isis {
    *                           m_et is set. References #4476. 
    *   @history 2016-10-21 Jeannie Backer - Reorder method signatures and member variable
    *                           declarations to fit ISIS coding standards. References #4476.
+   *   @history 2018-06-07 Debbie A Cook - Added BODY_CODE to Naif keywords.  This code
+   *                           is used in the target body radii keyword name.  Isis retrieves this code
+   *                           from the standard PCK.  Because target bodies new to Naif are not 
+   *                           included in the standard PCK, missions create a special body-specific
+   *                           PCK to define the new body, including its body code.  This PCK is only
+   *                           loaded in spiceinit so the code needs to be saved so that the radii 
+   *                           keyword can be created to retrieve the target radii.
    */
   class Spice {
     public:
