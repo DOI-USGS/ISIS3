@@ -42,15 +42,17 @@ You can continue to the [Building ISIS3](https://github.com/USGS-Astrogeology/IS
 
 <br/>
 
-Go to [Anaconda's download page](https://www.anaconda.com/download/) and follow the instructions for your operating system. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter the following command:
+Go to [Anaconda's download page](https://www.anaconda.com/download/) and follow the instructions for your operating system. ISIS3 dependencies are managed through Anaconda and ISIS3 uses Anaconda environments when building. Third party libraries are added inside of an environment. The cmake build configuration system expects an active [Anaconda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#activating-an-environment) containing these dependencies. There is an environment.yml file in the ISIS3 directory of your clone.  To create the required Anaconda environment, go into the ISIS3 directory and enter one of the following commands:
 
 For CentOS7:
 
-`conda env create -n <environment-name> -f environment_gcc4.yml` (you may name the environment whatever you want)
+`conda env create -n <environment-name> -f environment_gcc4.yml` 
 
 For any other supported OS:
 
-`conda env create -n <environment-name> -f environment.yml` (you may name the environment whatever you want)
+`conda env create -n <environment-name> -f environment.yml` 
+
+Give the environment whatever name you choose by substituting it for '<environment-name>'
 
 Building ISIS requires that the anaconda environment be activated. Activate your anaconda environment with:
 
