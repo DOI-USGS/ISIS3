@@ -186,7 +186,7 @@ namespace Isis {
       window->setGeometry(rect);
       window->move(position);
 
-     position.setX(position.x() + window->width());
+      position.setX(position.x() + window->width());
       if (position.x() + window->width() > p_mdiArea->width()) {
         position.setX(0);
         position.setY(position.y() + window->height());

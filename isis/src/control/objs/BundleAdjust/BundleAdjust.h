@@ -141,7 +141,7 @@ namespace Isis {
    *                           updates to held images.
    *   @history 2011-06-27 Debbie A. Cook - and Ken Edmundson Added names to top header fields of
    *                           .csv output and fixed bugs in sparse output.
-   *   @history 2011-07-12 Ken Edmundson - Segmentation fault bugfix in OutputHeadsolveCholesker method.
+   *   @history 2011-07-12 Ken Edmundson - Segmentation fault bugfix in OutputHeader method.
    *                           Previously was attempting to output camera angle sigmas when none had
    *                           been allocated.
    *   @history 2011-07-14 Ken Edmundson and Debbie Cook - Added new member, m_bDeltack to indicate
@@ -269,7 +269,7 @@ namespace Isis {
    *                           there is no longer a -Wformat-security warning.
    *   @history 2017-05-01 Makayla Shepherd - Added imageLists() to track and return the images
    *                           bundled. Fixes #4818.
-   *   @history 2017-05-09 Tracie Sucharski - Fixed an empty pointer in ::imgeLists method. 
+   *   @history 2017-05-09 Tracie Sucharski - Fixed an empty pointer in ::imgeLists method.
    *   @history 2017-05-09 Ken Edmundson - Speed improvements and error propagation bug fix.
    *                           Separated initializations for Normal Equations matrix out of
    *                           ::initializeCholmodLibraryVariables() into
@@ -286,10 +286,10 @@ namespace Isis {
    *                           in each of the constructors to verify valid control net input.
    *                           Fixes #5068.
    *   @history 2017-09-01 Debbie A. Cook - Added BundleSettingsQsp as argument to
-   *                            BundleControlPoint constructor and moved setWeights call from 
+   *                            BundleControlPoint constructor and moved setWeights call from
    *                            BundleAdjust::init to BundleControlPoint constructor.  Don't allow
-   *                            solving for triaxial radii when coordinate type is not Latitudinal. 
-   *                            Added new optional argument controlPointCoordType to ControlNet 
+   *                            solving for triaxial radii when coordinate type is not Latitudinal.
+   *                            Added new optional argument controlPointCoordType to ControlNet
    *                            constructor call.  References #4649 and #501.
    *   @history 2018-05-31 Debbie A. Cook - Moved productAlphaAV and control point parameter
    *                            correction code to BundleControlPoint.  Earlier revised errorPropagation to
@@ -304,21 +304,21 @@ namespace Isis {
    *                           instead of a raw pointer.
    *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
    *                           aborted. Added emits for status updates to the run widget.
-   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust. 
+   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust.
    *                           Fixes #4171.
-   *   @history 2018-09-06 Debbie A. Cook - (added to BundleXYZ branch on 2017-09-01) 
-   *                            Added BundleSettingsQsp as argument to BundleControlPoint constructor 
-   *                            and moved setWeights call from BundleAdjust::init to BundleControlPoint 
-   *                            constructor.  Don't allow solving for triaxial radii when coordinate type 
-   *                            is not Latitudinal. Added new optional argument controlPointCoordType 
+   *   @history 2018-09-06 Debbie A. Cook - (added to BundleXYZ branch on 2017-09-01)
+   *                            Added BundleSettingsQsp as argument to BundleControlPoint constructor
+   *                            and moved setWeights call from BundleAdjust::init to BundleControlPoint
+   *                            constructor.  Don't allow solving for triaxial radii when coordinate type
+   *                            is not Latitudinal. Added new optional argument controlPointCoordType
    *                            to ControlNet constructor call.  References #4649 and #501.
-   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ 
-   *                            branch on (2018-05-31).  Moved productAlphaAV and control point 
-   *                            parameter correction code to BundleControlPoint.  Earlier revised 
-   *                            errorPropagation to compute the sigmas via the variance/ 
-   *                            covariance matrices instead of the sigmas.  This should produce 
+   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ
+   *                            branch on (2018-05-31).  Moved productAlphaAV and control point
+   *                            parameter correction code to BundleControlPoint.  Earlier revised
+   *                            errorPropagation to compute the sigmas via the variance/
+   *                            covariance matrices instead of the sigmas.  This should produce
    *                            more accurate results.  References #4649 and #501.
-   *   @history 2018-09-06 Debbie A. Cook - Removed obsolete member variables: 
+   *   @history 2018-09-06 Debbie A. Cook - Removed obsolete member variables:
    *                            m_radiansToMeters, m_metersToRadians, and m_bodyRadii
    *                            which have been replaced with the local radius of a control
    *                            point for converting point sigmas to/from radians from/to meters.
@@ -526,7 +526,7 @@ namespace Isis {
                                                                    cholmod_factorize.*/
       LinearAlgebra::Vector m_imageSolution;                 /**!< The image parameter solution
                                                                    vector.*/
-                                                                   
+
       int m_previousNumberImagePartials;                     /**!< used in ::computePartials method
                                                                    to avoid unnecessary resizing
                                                                    of the coeffImage matrix.*/
