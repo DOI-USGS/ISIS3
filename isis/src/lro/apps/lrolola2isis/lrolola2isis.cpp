@@ -138,7 +138,6 @@ void IsisMain() {
                 minorAx = targetRadii[1];
                 polarAx = targetRadii[2];
                 setSurfacePointRadii = false;
-                spoint.SetRadii(majorAx, minorAx, polarAx);
                 spoint.SetSphericalSigmasDistance(
                                      Distance(latSigma, Distance::Units::Meters),
                                      Distance(lonSigma, Distance::Units::Meters),

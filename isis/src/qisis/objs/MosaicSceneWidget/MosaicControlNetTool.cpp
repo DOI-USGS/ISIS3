@@ -611,18 +611,20 @@ namespace Isis {
     QString netFile = m_controlNetFile;
     closeNetwork();
     m_controlNetFile = netFile;
-    m_controlNetFileLabel->setText( QFileInfo(netFile).fileName() );
 
     if (m_controlNetFile.size() > 0) {
       try {
         //  If qmos application create new control net from chosen filename
         if (!getWidget()->directory()) {
+          m_controlNetFileLabel->setText( QFileInfo(netFile).fileName() );
           m_controlNet = new ControlNet(m_controlNetFile);
         }
         //  If ipce application, get the active control net from the project.  This control has
         //  already been read into memory.
         else {
           m_controlNet = getWidget()->directory()->project()->activeControl()->controlNet();
+          m_controlNetFileLabel->setText( QFileInfo(
+              getWidget()->directory()->project()->activeControl()->fileName()).fileName() );
         }
         m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());

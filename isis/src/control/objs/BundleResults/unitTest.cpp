@@ -97,8 +97,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Unit test for BundleResults...";
     qDebug() << "XML from the default constructor...";
-    QObject *parent = NULL;
-    BundleResults results(parent);
+    BundleResults results;
 
     printXml(results);
 

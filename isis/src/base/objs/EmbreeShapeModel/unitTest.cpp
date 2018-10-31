@@ -304,20 +304,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing errors";
     qDebug() << endl;
 
-    qDebug() << "ShapeModel with a bad file name";
-    try {
-      testLabel.findGroup("Kernels").findKeyword("ShapeModel").setValue("NotADSKFile");
-      EmbreeShapeModel badModel(itokawaTarget, testLabel, manager);
-    }
-    catch (IException &e) {
-      e.print();
-    }
-    try {
-      EmbreeShapeModel badModel(itokawaTarget, "NotADSKFile", manager);
-    }
-    catch (IException &e) {
-      e.print();
-    }
   }
   catch (IException &e) {
     qDebug() << "";

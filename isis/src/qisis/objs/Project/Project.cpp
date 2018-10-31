@@ -1865,7 +1865,7 @@ namespace Isis {
           m_activeControl->controlNet()->SetImages(*(activeImageList()->serialNumberList()));
           item->setTextColor(Qt::darkGreen);
       }
-      catch(IException e){
+      catch(IException &e){
           if (previousControl) {
             m_activeControl = previousControl;
             item = directory()->model()->findItemData(m_activeControl->
@@ -1967,7 +1967,7 @@ namespace Isis {
         try {
           activeControl()->controlNet()->SetImages(*(m_activeImageList->serialNumberList()));
         }
-        catch(IException e){
+        catch(IException &e){
           if (previousImageList) {
             m_activeImageList = previousImageList;
             item = directory()->model()->findItemData(m_activeImageList->

@@ -1,6 +1,5 @@
 Testing Isis::ProcessByBoxcar Class ... 
-unittest: Working
-0% Processed
+
 Testing one input and output cube ... 
 Boxcar Samples:  3
 Boxcar Lines:    3
@@ -32,7 +31,7 @@ Top Left Sample:  0, Top Left Line:  22, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  23, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  24, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  25, Top Left Band:  1
-10% ProcessedTop Left Sample:  0, Top Left Line:  26, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  26, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  27, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  28, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  29, Top Left Band:  1
@@ -57,7 +56,7 @@ Top Left Sample:  0, Top Left Line:  47, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  48, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  49, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  50, Top Left Band:  1
-20% ProcessedTop Left Sample:  0, Top Left Line:  51, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  51, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  52, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  53, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  54, Top Left Band:  1
@@ -82,7 +81,7 @@ Top Left Sample:  0, Top Left Line:  72, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  73, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  74, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  75, Top Left Band:  1
-30% ProcessedTop Left Sample:  0, Top Left Line:  76, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  76, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  77, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  78, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  79, Top Left Band:  1
@@ -107,7 +106,7 @@ Top Left Sample:  0, Top Left Line:  97, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  98, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  99, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  100, Top Left Band:  1
-40% ProcessedTop Left Sample:  0, Top Left Line:  101, Top Left Band:  1
+Top Left Sample:  0, Top Left Line:  101, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  102, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  103, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  104, Top Left Band:  1
@@ -132,7 +131,7 @@ Top Left Sample:  0, Top Left Line:  122, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  123, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  124, Top Left Band:  1
 Top Left Sample:  0, Top Left Line:  125, Top Left Band:  1
-50% ProcessedTop Left Sample:  0, Top Left Line:  0, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  0, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  1, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  2, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  3, Top Left Band:  2
@@ -158,7 +157,7 @@ Top Left Sample:  0, Top Left Line:  22, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  23, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  24, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  25, Top Left Band:  2
-60% ProcessedTop Left Sample:  0, Top Left Line:  26, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  26, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  27, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  28, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  29, Top Left Band:  2
@@ -183,7 +182,7 @@ Top Left Sample:  0, Top Left Line:  47, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  48, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  49, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  50, Top Left Band:  2
-70% ProcessedTop Left Sample:  0, Top Left Line:  51, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  51, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  52, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  53, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  54, Top Left Band:  2
@@ -208,7 +207,7 @@ Top Left Sample:  0, Top Left Line:  72, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  73, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  74, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  75, Top Left Band:  2
-80% ProcessedTop Left Sample:  0, Top Left Line:  76, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  76, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  77, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  78, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  79, Top Left Band:  2
@@ -233,7 +232,7 @@ Top Left Sample:  0, Top Left Line:  97, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  98, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  99, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  100, Top Left Band:  2
-90% ProcessedTop Left Sample:  0, Top Left Line:  101, Top Left Band:  2
+Top Left Sample:  0, Top Left Line:  101, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  102, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  103, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  104, Top Left Band:  2
@@ -258,7 +257,6 @@ Top Left Sample:  0, Top Left Line:  122, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  123, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  124, Top Left Band:  2
 Top Left Sample:  0, Top Left Line:  125, Top Left Band:  2
-100% Processed
 Testing for no inputs/outputs ...
 **PROGRAMMER ERROR** You must specify exactly one input cube.
 

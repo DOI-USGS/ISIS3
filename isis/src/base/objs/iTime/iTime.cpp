@@ -47,8 +47,8 @@ namespace Isis {
   }
 
   /**
-   * Constructs a iTime object and initializes it to the time from the argument.
-   *
+   * Constructs a iTime object and initializes it to the time from the argument.  
+   *  
    * @param time A time string formatted in standard UTC or similar format.
    *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
    */
@@ -56,6 +56,7 @@ namespace Isis {
     LoadLeapSecondKernel();
 
     NaifStatus::CheckErrors();
+
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
     str2et_c(time.toLatin1().data(), &et);

@@ -60,7 +60,6 @@ static AlphaCube *alpha(0);
 
 QString g_filter = "";
 static QString g_target ="";
-static const int g_Hayabusa2NaifCode = -130;
 static Pvl g_configFile;
 
 //Bias calculation variables

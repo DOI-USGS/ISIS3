@@ -225,8 +225,11 @@ int main(int argc, char *argv[]) {
     /**** EXITING ****/
     // Connect the viewport's close signal to the file tool's exit method
     // Added 2008-12-04 by Jeannie Walldren
-    QObject::connect(vw , SIGNAL(closeWindow()),
-                     ftool, SLOT(exit()));
+    // Added 2018-04-24 by Adam Goins - Added in optional parameters to the closeWindow() signal
+    //                         And the exit() slot so that the window's closeEvent can be handled
+    //                         Appropriately. Fixes #4146.
+    QObject::connect(vw , SIGNAL(closeWindow(QCloseEvent *)),
+                     ftool, SLOT(exit(QCloseEvent *)));
     //-----------------------------------------------------------------
 
     vw->show();
