@@ -148,12 +148,12 @@ namespace Isis {
    *                           because BundleSolutionInfo is derived from QObject (see comment
    *                           below). Removed copy constructor and assignment operator from cpp
    *                           file.
-   *   @history 2018-06-01 Debbie A. Cook - ( Added 2018-02-21 to BundleXYZ branch) Added 
+   *   @history 2018-06-01 Debbie A. Cook - ( Added 2018-02-21 to BundleXYZ branch) Added
    *                           coordinate types to report and appropriate headings for columns based
-   *                           on the coordinate type.  Also added a utility method to return the 
-   *                           coordinate name based on coordinate type and coordinate index. 
+   *                           on the coordinate type.  Also added a utility method to return the
+   *                           coordinate name based on coordinate type and coordinate index.
    *                           References #4649 and #501.
-   *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References 
+   *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References
    *                           #4649 and #501
    */
   class BundleSolutionInfo : public QObject {
@@ -205,7 +205,7 @@ namespace Isis {
 
       QString surfacePointCoordName(SurfacePoint::CoordinateType type,
                                     SurfacePoint::CoordIndex coordInx) const;
-      
+
     public slots:
       void updateFileName(Project *);
 
@@ -249,7 +249,7 @@ namespace Isis {
       QUuid              *m_id;
       QString             m_name;                        //!< Name of the bundle. Defaults to the id
       QString             m_runTime;                     //!< Run time of the bundle adjustment
-      FileName        *m_inputControlNetFileName;     //!< Input control network file name
+      FileName           *m_inputControlNetFileName;     //!< Input control network file name
       Control            *m_outputControl;               //!< Output control
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results

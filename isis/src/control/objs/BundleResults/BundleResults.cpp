@@ -34,7 +34,7 @@ namespace Isis {
 
   /**
    * Constructs a BundleResults object.
-   * 
+   *
    * @param parent The Qt-relationship parent.
    */
   BundleResults::BundleResults(QObject *parent) : QObject(parent) {
@@ -243,7 +243,7 @@ namespace Isis {
 
     // set in BundleAdjust init()
     m_numberHeldImages = 0;
-    
+
     // members set while computing bundle stats
     m_rmsImageSampleResiduals.clear();
     m_rmsImageLineResiduals.clear();
@@ -1440,17 +1440,6 @@ namespace Isis {
   }
 
 
-  // *** TO DO *** Do we not need this method?
-  // SurfacePoint::CoordinateType BundleResults::coordTypeBundle() {
-  //   // Get the coordinate type from the output net if it exists.  Otherwise use the default.
-  //   SurfacePoint::CoordinateType type = SurfacePoint::Latitudinal;
-  //   if (m_outNet  && m_outNet->IsValid()) {
-  //       type = outputControlNet()->GetCoordType();
-  //   }
-  //   return type;
-  // }
-
-
   /**
    * Saves the BundleResults object to an XML file.
    *
@@ -1461,10 +1450,10 @@ namespace Isis {
     // Get the coordinate type from the output net if it exists.  Otherwise use the default.
     SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
 
-    if (m_outNet) { 
+    if (m_outNet) {
         coordType = outputControlNet()->GetCoordType();
     }
-    
+
     stream.writeStartElement("bundleResults");
     stream.writeStartElement("correlationMatrix");
     stream.writeAttribute("correlationFileName",
@@ -1518,13 +1507,13 @@ namespace Isis {
     // Set the label based of the coordinate type set for reports
     switch (coordType) {
       case SurfacePoint::Latitudinal:
-        stream.writeAttribute("lat", toString(sigmaCoord1StatisticsRms())); 
-        stream.writeAttribute("lon", toString(sigmaCoord2StatisticsRms())); 
+        stream.writeAttribute("lat", toString(sigmaCoord1StatisticsRms()));
+        stream.writeAttribute("lon", toString(sigmaCoord2StatisticsRms()));
         stream.writeAttribute("rad", toString(sigmaCoord3StatisticsRms()));
         break;
       case SurfacePoint::Rectangular:
-        stream.writeAttribute("x", toString(sigmaCoord1StatisticsRms())); 
-        stream.writeAttribute("y", toString(sigmaCoord2StatisticsRms())); 
+        stream.writeAttribute("x", toString(sigmaCoord1StatisticsRms()));
+        stream.writeAttribute("y", toString(sigmaCoord2StatisticsRms()));
         stream.writeAttribute("z", toString(sigmaCoord3StatisticsRms()));
         break;
       default:
@@ -1630,54 +1619,54 @@ namespace Isis {
     switch (coordType) {
       case SurfacePoint::Latitudinal:
         stream.writeStartElement("minLat");
-        stream.writeAttribute("value", toString(minSigmaCoord1Distance().meters())); 
-        stream.writeAttribute("pointId", minSigmaCoord1PointId()); 
+        stream.writeAttribute("value", toString(minSigmaCoord1Distance().meters()));
+        stream.writeAttribute("pointId", minSigmaCoord1PointId());
         stream.writeEndElement();
         stream.writeStartElement("maxLat");
-        stream.writeAttribute("value", toString(maxSigmaCoord1Distance().meters())); 
-        stream.writeAttribute("pointId", maxSigmaCoord1PointId()); 
+        stream.writeAttribute("value", toString(maxSigmaCoord1Distance().meters()));
+        stream.writeAttribute("pointId", maxSigmaCoord1PointId());
         stream.writeEndElement();
         stream.writeStartElement("minLon");
-        stream.writeAttribute("value", toString(minSigmaCoord2Distance().meters())); 
-        stream.writeAttribute("pointId", minSigmaCoord2PointId()); 
+        stream.writeAttribute("value", toString(minSigmaCoord2Distance().meters()));
+        stream.writeAttribute("pointId", minSigmaCoord2PointId());
         stream.writeEndElement();
         stream.writeStartElement("maxLon");
-        stream.writeAttribute("value", toString(maxSigmaCoord2Distance().meters())); 
-        stream.writeAttribute("pointId", maxSigmaCoord2PointId()); 
+        stream.writeAttribute("value", toString(maxSigmaCoord2Distance().meters()));
+        stream.writeAttribute("pointId", maxSigmaCoord2PointId());
         stream.writeEndElement();
         stream.writeStartElement("minRad");
-        stream.writeAttribute("value", toString(minSigmaCoord3Distance().meters())); 
-        stream.writeAttribute("pointId", minSigmaCoord3PointId()); 
+        stream.writeAttribute("value", toString(minSigmaCoord3Distance().meters()));
+        stream.writeAttribute("pointId", minSigmaCoord3PointId());
         stream.writeEndElement();
         stream.writeStartElement("maxRad");
-        stream.writeAttribute("value", toString(maxSigmaCoord3Distance().meters())); 
-        stream.writeAttribute("pointId", maxSigmaCoord3PointId()); 
+        stream.writeAttribute("value", toString(maxSigmaCoord3Distance().meters()));
+        stream.writeAttribute("pointId", maxSigmaCoord3PointId());
         stream.writeEndElement();
         break;
       case SurfacePoint::Rectangular:
         stream.writeStartElement("minX");
-        stream.writeAttribute("value", toString(minSigmaCoord1Distance().meters())); 
-        stream.writeAttribute("pointId", minSigmaCoord1PointId()); 
+        stream.writeAttribute("value", toString(minSigmaCoord1Distance().meters()));
+        stream.writeAttribute("pointId", minSigmaCoord1PointId());
         stream.writeEndElement();
         stream.writeStartElement("maxX");
-        stream.writeAttribute("value", toString(maxSigmaCoord1Distance().meters())); 
-        stream.writeAttribute("pointId", maxSigmaCoord1PointId()); 
+        stream.writeAttribute("value", toString(maxSigmaCoord1Distance().meters()));
+        stream.writeAttribute("pointId", maxSigmaCoord1PointId());
         stream.writeEndElement();
         stream.writeStartElement("minY");
-        stream.writeAttribute("value", toString(minSigmaCoord2Distance().meters())); 
-        stream.writeAttribute("pointId", minSigmaCoord2PointId()); 
+        stream.writeAttribute("value", toString(minSigmaCoord2Distance().meters()));
+        stream.writeAttribute("pointId", minSigmaCoord2PointId());
         stream.writeEndElement();
         stream.writeStartElement("maxY");
-        stream.writeAttribute("value", toString(maxSigmaCoord2Distance().meters())); 
-        stream.writeAttribute("pointId", maxSigmaCoord2PointId()); 
+        stream.writeAttribute("value", toString(maxSigmaCoord2Distance().meters()));
+        stream.writeAttribute("pointId", maxSigmaCoord2PointId());
         stream.writeEndElement();
         stream.writeStartElement("minZ");
-        stream.writeAttribute("value", toString(minSigmaCoord3Distance().meters())); 
-        stream.writeAttribute("pointId", minSigmaCoord3PointId()); 
+        stream.writeAttribute("value", toString(minSigmaCoord3Distance().meters()));
+        stream.writeAttribute("pointId", minSigmaCoord3PointId());
         stream.writeEndElement();
         stream.writeStartElement("maxZ");
-        stream.writeAttribute("value", toString(maxSigmaCoord3Distance().meters())); 
-        stream.writeAttribute("pointId", maxSigmaCoord3PointId()); 
+        stream.writeAttribute("value", toString(maxSigmaCoord3Distance().meters()));
+        stream.writeAttribute("pointId", maxSigmaCoord3PointId());
         stream.writeEndElement();
         break;
       default:
@@ -1686,7 +1675,7 @@ namespace Isis {
     }
     stream.writeEndElement(); // end minMaxSigmas
 
-    // call max likelihood setup from startElement to fill the rest of these values... 
+    // call max likelihood setup from startElement to fill the rest of these values...
     stream.writeStartElement("maximumLikelihoodEstimation");
     stream.writeAttribute("numberModels", toString(numberMaximumLikelihoodModels()));
     stream.writeAttribute("maximumLikelihoodIndex", toString(maximumLikelihoodModelIndex()));

@@ -683,7 +683,7 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAdjustedSurfacePoint(
     SurfacePoint newSurfacePoint) {
-    
+
     PointModified();
     adjustedSurfacePoint = newSurfacePoint;
     return Success;
@@ -779,7 +779,7 @@ namespace Isis {
     }
       // ***TBD*** Does it make sense to try to do a generic check here? The
       // data types are different (angles vs distance) so for now do a switch.
-    switch (coordType) {      
+    switch (coordType) {
       case SurfacePoint::Latitudinal:
         if (aprioriSP.GetLatSigma().isValid())
           constraintStatus.set(Coord1Constrained);
@@ -796,7 +796,7 @@ namespace Isis {
         if (aprioriSP.GetZSigma().isValid())
           constraintStatus.set(Coord3Constrained);
       }
-        
+
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;
@@ -881,7 +881,7 @@ namespace Isis {
     // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
     // 2013-11-12 KLE I think this check should include points with any
-    // number of constrained coordinates???  I agree DAC.  *** TODO *** 
+    // number of constrained coordinates???  I agree DAC.  *** TODO ***
     if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
         QString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
@@ -992,16 +992,6 @@ namespace Isis {
         Displacement((avgY*scale), Displacement::Kilometers),
         Displacement((avgZ*scale), Displacement::Kilometers));
     }
-    // *** TODO *** This block appears to never get executed.  All cases fall into a
-    // previous if or else block.  It was not added in response to a bug according
-    // to history entries either.  I commented it out on 5/31/2017.  If no problems
-    // occur in the next 6 months, it can likely be deleted.
-    // else {
-    //   aprioriSurfacePoint.SetRectangular(
-    //     aprioriSurfacePoint.GetX(),
-    //     aprioriSurfacePoint.GetY(),
-    //     Displacement((zB / goodMeasures), Displacement::Kilometers));
-    // }
 
     adjustedSurfacePoint = aprioriSurfacePoint;
     SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);

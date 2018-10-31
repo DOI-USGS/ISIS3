@@ -333,8 +333,8 @@ namespace Isis {
    *   @history 2013-11-13 Kimberly Oyama - Added missing member variables to == operator and
    *                           made sure the comparisons are being done correctly. Fixes #1014.
    *   @history 2015-11-05 Kris Becker - invalid flag was not properly
-   *                           initialized in ControlPointFileEntryV0002 
-   *                           constructor (Merged by Kristin Berry. Fixes #2392) 
+   *                           initialized in ControlPointFileEntryV0002
+   *                           constructor (Merged by Kristin Berry. Fixes #2392)
    *   @history 2017-05-25 Debbie A. Cook - coordType to SetPrioriSurfacePoint with a default of
    *                            Latitudinal.  Changed LatitudeConstrained to Coord1Constrained, etc.
    *                            References #4649 and #501.
@@ -422,21 +422,9 @@ namespace Isis {
        * coordinates in the SurfacePoint
        */
       enum ConstraintStatus {
-        /**
-         * This is the status of constrained coordinates in the SurfacePoint.
-         * @todo We will eventually need to deal with rectangular
-         *             coordinates as well, but for now BundleAdjust uses spherical
-         *             coordinates only.
-         */
         Coord1Constrained = 0,
         Coord2Constrained = 1,
-        Coord3Constrained = 2,
-//        LatitudeConstrained = 0,
-//        LongitudeConstrained = 1,
-//        RadiusConstrained = 2,
-//      XConstrained = 3,
-//      YConstrained = 4,
-//      ZConstrained = 5;
+        Coord3Constrained = 2
       };
 
       /**
@@ -735,9 +723,6 @@ namespace Isis {
        * of the measures.
        */
       int numberOfRejectedMeasures;
-        
-      //! BundleControlPoint coordinate type.  This will default to Latitudinal, but is initialized from the parent Net.
-//      SurfacePoint::CoordinateType coordType;
   };
 }
 

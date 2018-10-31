@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
     results.setSigmaCoord3Range(Distance(0.9, Distance::Meters),
                                 Distance(354.4, Distance::Meters),
                                 "MinRadId", "MaxRadId");
-    
+
     results.setRmsFromSigmaStatistics(0.123, 0.456, 0.789);
     results.setRmsXYResiduals(4.0, 5.0, 6.0);
     results.setRejectionLimit(7.0);
@@ -410,12 +410,6 @@ int main(int argc, char *argv[]) {
       QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
-
-    // deleted = qXmlFileR.remove();
-    // if (!deleted) {
-    //   QString msg = "Unit Test failed. XML file [" + xmlPath + "not deleted.";
-    //   throw IException(IException::Io, msg, _FILEINFO_);
-    // }
   }
   catch (IException &e) {
     e.print();
