@@ -52,7 +52,7 @@ For any other supported OS:
 
 `conda env create -n <environment-name> -f environment.yml` 
 
-Give the environment whatever name you choose by substituting it for "<environment-name>"
+Give the environment whatever name you choose by substituting it for `<environment-name>`
 
 Building ISIS requires that the anaconda environment be activated. Activate your anaconda environment with:
 
