@@ -55,9 +55,9 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           <em>#You should see:</em>
 
           <strong>channels:</strong>
-           <strong>&ensp; - usgs-astrogeology</strong>
-           <strong>&ensp; - conda-forge</strong>
-           <strong>&ensp; - defaults</strong>
+           <strong>   - usgs-astrogeology</strong>
+           <strong>   - conda-forge</strong>
+           <strong>   - defaults</strong>
 
            <em>#The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:</em>
 
