@@ -34,43 +34,70 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     <ol>
       <li>Download either the Anaconda or Miniconda installation script for your OS platform.  Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: 
       <a href="https://www.anaconda.com/download">Anaconda installer</a>, <a href="https://conda.io/miniconda.html">Miniconda installer</a></li>
-      <li>Open a terminal window in the directory where you downloaded the script, and run the following commands.  In this example, we chose to do a full install of Anaconda, and our OS is Linux-based.  Your file name may be different depending on your environment.</li>
+      <li>If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands.  In this example, we chose to do a full install of Anaconda, and our OS is Linux-based.  Your file name may be different depending on your environment.</li>
         <pre>
-          chmod +x Anaconda3-5.2.0-Linux-x86_64.sh
-          ./Anaconda3-5.2.0-Linux-x86_64.sh          
+          <strong>chmod +x Anaconda3-5.2.0-Linux-x86_64.sh</strong>
+          <strong>./Anaconda3-5.2.0-Linux-x86_64.sh</strong>          
         </pre>
+       
         This will start the Anaconda installer which will guide you through the installation process.
       <li>After the installation has finished, open up a bash prompt in your terminal window.</li>
-      <li>Create a new environment for your ISIS3 installation:
+       <li>If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86_64.pkg) will be downloaded.  Double-click on the file to start the installation process.</li>
+      <li>Again from within a terminal window, create a new environment for your ISIS3 installation:
         <pre>
-          #Add the following channels to the Anaconda installation
-          conda config --add channels conda-forge, usgs-astrogeology
+          <em>#Add the following channels to the Anaconda installation</em>
+          <strong>conda config --add channels conda-forge</strong>
+          <strong>conda config --add channels usgs-astrogeology</strong>
+
+          #Verify you have the correct channels:
+          <strong>conda config --show channels</strong>
+
+          <em>#You should see:</em>
+
+          <strong>channels:</strong>
+           <strong>   - usgs-astrogeology</strong>
+           <strong>   - conda-forge</strong>
+           <strong>   - defaults</strong>
+
+           <em>#The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:</em>
+
+           <strong>conda config --add channels usgs-astrogeology</strong>
+
+
+          <em>#Create a new conda environment to install ISIS3 in.</em>
+          <strong>conda create -n isis3</strong>
+
+          <em>#Activate the environment</em>
+          <strong>source activate isis3</strong>
+
+          <em>#Download the ISIS3 version</em>
+          <strong>conda install -c usgs-astrogeology isis3</strong>
           
+          <em>#Execute the ISIS3 variable initialization script with default arguments.</em>
+          <em>#This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA</em>
 
-          #Create a new conda environment to install ISIS3 in
-          conda create -n isis3
-
-          #Activate the environment
-          source activate isis3
-
-          #Download the ISIS3 version
-          conda install -c usgs-astrogeology isis3
-          
-          #Execute the ISIS3 variable initialization script with default arguments.
-          #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
-
-          python $CONDA_PREFIX/scripts/isis3VarInit.py
+          <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
 
          Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data, 
          and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
          for both of these optional values:
 
-         ./$CONDA_PREFIX/scripts/isis3VarInit --data-dir=[path to data directory]  --test-dir=[path to test data directory]
+         <strong>./$CONDA_PREFIX/scripts/isis3VarInit --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
 
 
-          #Run the source activate command a second time to process the changes:
+          <em>#Run the source activate command a second time to process the changes:</em>
 
-          source activate isis3
+          <strong>source activate isis3</strong>
+
+          To avoid having to do this every time you open a new terminal window, we suggest adding the following lines to the end of your .bashrc file
+          (to ensure that conda is in your PATH variable):
+
+          
+          <strong>source activate isis3</strong>
+          <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
+          <strong>source activate isis3</strong>
+
+
 
         </pre>
       </li>
@@ -494,6 +521,7 @@ is a popular choice and may be downloaded below.
   <history>
     <change name="Kristin Berry" date="2018-08-28">Original Version</change>
     <change name ="Tyler Wilson along with the ASC Development Team" date="2018-09-26">Updated version to incorporate installation through Conda</change>
+    <change name="Tyler Wilson" date="2018-10-01">Updated version after feedback was received from outside users.</change>
   </history>
 
 
