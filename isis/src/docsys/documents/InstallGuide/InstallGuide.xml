@@ -89,6 +89,16 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
           <strong>source activate isis3</strong>
 
+          To avoid having to do this every time you open a new terminal window, we suggest adding the following lines to the end of your .bashrc file
+          (to ensure that conda is in your PATH variable):
+
+          
+          <strong>source activate isis3</strong>
+          <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
+          <strong>source activate isis3</strong>
+
+
+
         </pre>
       </li>
     </ol>
