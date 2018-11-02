@@ -9,6 +9,13 @@ import sys
 #The data directory and test directory are optional command line arguments.  If the user chooses
 #not to set them, they will both be placed created on the same level as the $ISISROOT directory
 #within the conda environment.
+#History:
+#   Author:  Tyler Wilson
+#   Date:    2018-11-01
+#   Description:  Removed a pair of lines which were causing output errors on Mac OS X and were note
+#                 needed anyway.
+#   
+
 
 parser = argparse.ArgumentParser(description='Usage:  ./isis3VarInit --data_dir <data dir path> --test_dir <test dir path')
    
@@ -35,8 +42,6 @@ else:
 os.popen('mkdir -p '+isisroot+'/etc/conda/activate.d')
 os.popen('mkdir -p '+isisroot+'/etc/conda/deactivate.d')
 
-os.system("echo -n '' >"+isisroot+"/etc/conda/activate.d/env_vars.sh")
-os.popen("echo -n '' >"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
 os.popen('touch '+isisroot+'/etc/conda/activate.d/env_vars.sh')
 os.popen('touch '+isisroot+'/etc/conda/activate.d/env_vars.sh')
 
