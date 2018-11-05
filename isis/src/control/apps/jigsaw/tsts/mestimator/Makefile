@@ -11,6 +11,9 @@ APPNAME = jigsaw
 # 2014-07-23 Jeannie Backer - Commented out references to bundleout_images.csv.  
 #                Removed default parameters.
 # 2016-08-11 Jeannie Backer - Updated documentation
+# 2018-07-24 Debbie A. Cook - Now removing digits beyond the fourth decimal place of
+#                        decimal numbers to make the mac test work.  Also changed
+#                        "-0.0000" to "0.0000" after truncating.
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
@@ -28,8 +31,10 @@ commands:
 	           spsolve=position > /dev/null;
 	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
+	       | sed 's/\-0.0000/ 0.0000/' \
+	       | sed 's/\-0.0000/ 0.0000/' \
 	       > $(OUTPUT)/mEstimator_bundleout.txt;
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/mEstimator_residuals.csv

@@ -8,7 +8,6 @@ APPNAME = reduce
 # user had entered.
 
 labels.txt.IGNORELINES = ByteOrder StartByte Bytes TileSamples TileLines
-results.pvl.SKIPLINES=2
 
 include $(ISISROOT)/make/isismake.tsts
 

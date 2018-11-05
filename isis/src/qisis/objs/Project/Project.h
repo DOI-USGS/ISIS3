@@ -40,6 +40,7 @@ class QXmlStreamWriter;
 #include "ImageList.h"
 #include "ShapeList.h"
 #include "TargetBody.h"
+#include "TemplateList.h"
 #include "XmlStackedHandler.h"
 
 namespace Isis {
@@ -53,6 +54,8 @@ namespace Isis {
   class ImageReader;
   class ProgressBar;
   class ShapeReader;
+  class Template;
+  class TemplateList;
   class WorkOrder;
 
   /**
@@ -147,15 +150,11 @@ namespace Isis {
    *                           imports, shape imports, and bundle solution info. Fixes #4855,
    *                           #4979, #4980.
    *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
-   *
-   *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969.
-   *   @history 2017-07-17 Cole Neubauer - Changed activeControl signal to emit a bool to be able
    *                           to slot a setEnabled(bool) call to a QAction. This was necessary to
    *                           reenable the CNet Tool when a control net is made active.
    *                           Fixes #5046.
    *   @history 2017-07-24 Cole Neubauer - Added isOpen, isClean, setClean, and clear functions to
-   *                           allow for opening of a new project. Fixes #4969
+   *                           allow for opening of a new project. Fixes #4969.
    *   @history 2017-07-27 Cole Neubauer - Added check before emmiting workOrderStarting()
    *                           Fixes #4715.
    *   @history 2017-07-27 Cole Neubauer - Added a workordermutex to be used in workorder accessors
@@ -174,6 +173,118 @@ namespace Isis {
    *                           addTemplateFolder(), templateRoot(), and m_templates as well as
    *                           serialization and structure for importing template filenames
    *                           Fixes #5086.
+   *   @history 2017-09-13 Tracie Sucharski - Fixed problems with cleanup on temporary projects.
+   *                           Remove shapes, controls, and results.
+   *   @history 2017-09-26 Tracie Sucharski - Close Image cube in
+   *                           ::addTargetsFromImportedImagesToProject and
+   *                           ::addCamerasFromImportedImagesToProject.  Fixes #4955.
+   *   @history 2017-10-04 Tracie Sucharski - Comment out connections for
+   *                           addTargetsFromImportedImagesToProject and
+   *                           addCamerasFromImportedImagesToProject.  This functionality needs to
+   *                           be put into the asynchronous process of importing images for speed
+   *                           and memory efficiency.  See ticket #5181.  Fixes #4955.
+   *   @history 2017-10-16 Ian Humphrey - Modified activeControl() to check if any images have been
+   *                           imported into the project before trying to set an active control
+   *                           when there is only one control in the project. Fixes #5160.
+   *   @history 2017-11-01 Tracie Sucharski - Added new member variable for the
+   *                           new project root when a Save As is being executed.  Both the old and
+   *                           new project roots are needed for copying files into the new project
+   *                           folders. Also updated the project name based on the new project.
+   *                           Fixes #4849.
+   *   @history 2017-11-02 Tyler Wilson - Added support for opening Recent Projects from the
+   *                           File Menu.  Fixes #4492.
+   *   @history 2017-11-08 Ian Humphrey - Changed save() from a void to a bool return value. This
+   *                           indicates if the save dialog (for a temp project) is successfully
+   *                           saved (i.e. not cancelled). Fixes #5205.
+   *   @history 2017-11-03 Christopher Combs - Added support for new Template and TemplateList
+   *                           classes. Fixes #5117.
+   *   @history 2017-11-13 Makayla Shepherd - Modifying the name of an ImageList, ShapeList or
+   *                           BundeSolutionInfo on the ProjectTree now sets the project to
+   *                           not clean. Fixes #5174.
+   *   @history 2017-11-15 Cole Neubauer - Added a check if there was an arg for the command line
+   *                           to avoid creation of new temp project if a user is opening one from
+   *                           the command line #5222
+   *   @history 2017-12-01 Adam Goins - Added the maxRecentProjects() function to return the max
+   *                           number of recent projects to be displayed. Fixes #5216.
+   *   @history 2017-12-05 Christopher Combs - Added support for TemplateEditorWidget and
+   *                           TemplateEditViewWorkOrder. Fixes #5168. Also fixed issue with saving
+   *                           a project before save as where isOpen was not set to true.
+   *   @history 2017-12-08 Tracie Sucharski - Added public method to add an Image to the
+   *                           idToImageMap.  This was needed to add Images from the results item.
+   *                           We need to access the map when opening saved projects that contain
+   *                           images from groups other than the main project data area.  This is
+   *                           a temporary fix until the project and model/view is improved.
+   *                           Corrected the setting of the project root when pening a project from
+   *                           the command line. Removed m_projectPath, it is no longer needed since
+   *                           m_projectRoot contains the correct path. References #5104.
+   *   @history 2018-03-14 Ken Edmundson - Modified save method to reopen project if we are saving
+   *                           a temporary project to ensure all project files are pointing to the
+   *                           correct directory. Note that this is NOT ideal, particularly it the
+   *                           project has many files.
+   *   @history 2018-03-14 Tracie Sucharski - Call the appropriate workorder from the methods
+   *                           activeControl and activeImageList when returning a default value.
+   *                           This ensures that all the proper error checking is handled and
+   *                           prevents duplicate code.
+   *   @history 2018-03-23 Ken Edmundson - Modified loadBundleSolutionInfo method to add the
+   *                           BundleSolutionInfo's output control id to the project member variable
+   *                           m_idToControlMap.
+   *   @history 2018-03-26 Tracie Sucharski - When setting a new active control do not close the old
+   *                           active control net if it is still being viewed in a CnetEditorWidget.
+   *                           References #5026.
+   *   @history 2018-03-27 Tracie Sucharski - Removed the calls to work orders from activeImageList
+   *                           and activeControl methods.  Additional errors checks needed for
+   *                           default values that are not in work orders.  Fixes #5256.
+   *   @history 2018-03-30 Tracie Sucharski - Added public slot, activeControlModified, which sets
+   *                           the modified state on the active Control. This was done, so that a
+   *                           Control knows if its control net has been modified. Also added
+   *                           signal, discardActiveControlEdits if user does not want to save
+   *                           edits.  This is needed for CnetEditorWidgets that are displaying
+   *                           the modified active control, it will effectively close that
+   *                           CnetEditorView and reload with the original control net.  It was
+   *                           done this way because there is no easy way to reload a control net in
+   *                           the CnetEditor widgets. When saving Project, if there is an active
+   *                           control and it has been modified, write active control to disk.
+   *                           Unfortunately this is done in 2 different places depending on whether
+   *                           a project "Save" or "Save As" is being done.  If "Save As", a
+   *                           modified active cnet is not written out to the original project only
+   *                           to the new project, so this had to be done in
+   *                           Control::copyToNewProjectRoot.  If simply saving current projct,
+   *                           the write is done here in the save method.
+   *  @history 2018-04-25 Tracie Sucharski - Fixed typo in XmlHandler::startElement reading
+   *                           imported shapes from a project which caused the shapes to be put in
+   *                           the wrong place on the project tree. Fixes #5274.
+   *  @history 2018-06-06 Kaitlyn Lee - activeControlModified() calls setClean(false) to enable the save
+   *                           button when the active control net is modified, i.e. a point is modified.
+   *  @history 2018-06-14 Makayla Shepherd - Save and Save As now save the geometry and state of
+   *                           the project.
+   *  @history 2018-07-07 Summer Stapleton - Separated m_templates into m_mapTemplates and 
+   *                           m_regTemplates to keep track of the two template types as well as 
+   *                           adjusted logic to save these serparately into the .xml files in the 
+   *                           project directory. Also added clean-up of unsaved templates at
+   *                           project close in Project::clear().
+   *  @history 2018-07-12 Summer Stapleton - Added hasTemplate() and hasCamera() and modified 
+   *                           addCamera() and addTarget logic in order to determine if a targetBody
+   *                           or a guiCamera already exist in a project. This allows cameras and 
+   *                           targets to be created in ImportImagesWorkOrder only when needed 
+   *                           rather than creating them for every image imported and then removing
+   *                           them if not needed. Fixed segfault occuring on astrovm4 with larger 
+   *                           imports. References #5460.
+   *   @history 2018-07-12 Kaitlyn Lee - Changed activeControlModified() to cnetModified() and
+   *                          removed the line m_activeControl->setModified(true) in cnetModified()
+   *                          since this is now done in the CnetEditorWidget and it caused a seg
+   *                          fault when no images were imported and a user tried to edit a cnet. I
+   *                          changed this because when a user made changes to a cnet, even if it
+   *                          was not the active, the active was the only one that was recognized as
+   *                          being modified. This stopped any changes made to a nonactive cnet from
+   *                          being saved and caused the active to be saved if a nonactive was
+   *                          edited. Fixes #5414.
+   *   @history 2018-07-13 Kaitlyn Lee - Added singal cnetSaved() so that the save net button goes
+   *                          back to black after the cnet is saved. Added signal
+   *                          activeControlModified() that is emitted in cnetModified() and is
+   *                          connected to Directory. This stops views from being redrawn when
+   *                          any cnet is modified. Only the active should cause this. Fixes #5396.
+   *  @history 2018-07-26 Tracie Sucharski - Fixed history entry errors introduced during
+   *                           the merge conflict resolution for PR #255.
    */
   class Project : public QObject {
     Q_OBJECT
@@ -186,18 +297,26 @@ namespace Isis {
 //      static QStringList verifyCNets(QStringList);
 
       QList<QAction *> userPreferenceActions();
+
+      bool hasTarget(QString id);
+      bool hasCamera(QString id);
+
       QDir addBundleSolutionInfoFolder(QString folder);
       QDir addCnetFolder(QString prefix);
       void addControl(Control *control);
       QDir addImageFolder(QString prefix);
       void addImages(QStringList imageFiles);
       void addImages(ImageList newImages);
+      void addImagesToIdMap(ImageList images);
       QDir addShapeFolder(QString prefix);
       void addShapes(QStringList shapeFiles);
       void addShapes(ShapeList newShapes);
-      void addTemplates(QList<FileName> templateFiles);
+      void addTemplates(TemplateList *templateFiles);
       QDir addTemplateFolder(QString prefix);
       void addBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
+      void addTarget(Target *target);
+      void addCamera(Camera *camera);
+
       void loadBundleSolutionInfo(BundleSolutionInfo *bundleSolutionInfo);
       void clear();
       bool clearing(); //! Accessor for if the project is clearing or not
@@ -217,12 +336,14 @@ namespace Isis {
       QMutex *workOrderMutex();
       QMutex *mutex();
       QString projectRoot() const;
-      void setClean(bool value);
+      QString newProjectRoot() const;
+
       void setName(QString newName);
       QUndoStack *undoStack();
       void waitForImageReaderFinished();
       void waitForShapeReaderFinished();
       QList<WorkOrder *> workOrderHistory();
+      void writeSettings(FileName projName) const;
 
       void setActiveControl(QString displayName);
       Control  *activeControl();
@@ -254,7 +375,9 @@ namespace Isis {
 
       static QString templateRoot(QString projectRoot);
       QString templateRoot() const;
-      QList<FileName> templates();
+      QList<TemplateList *> templates();
+      QList<TemplateList *> mapTemplates();
+      QList<TemplateList *> regTemplates();
       void removeTemplate(FileName file);
 
       void deleteAllProjectFiles();
@@ -266,12 +389,18 @@ namespace Isis {
        */
       BundleSettings *bundleSettings() {return m_bundleSettings;}
 
+      /**
+       * Return max number of recent projects to be displayed.
+       * @return Max number of recent Projects
+       */
+      static int maxRecentProjects() { return m_maxRecentProjects; }
+
       QProgressBar *progress();
 
       void removeImages(ImageList &imageList);
 
-      void save();
-      void save(FileName newPath, bool verifyPathDoesntExist = true);
+      bool save();
+      void save(FileName projectPath, bool verifyPathDoesntExist = true);
 
       void addToProject(WorkOrder *);
 
@@ -381,30 +510,52 @@ namespace Isis {
       void projectLoaded(Project *);
 
       /**
+       * Emitted when project is saved.
+       * receivers: IpceMainWindow
+       */
+      void projectSaved(Project *);
+
+      /**
        * Emitted when project location moved
        * receivers: Control, BundleSolutionInfo, Image, TargetBody
        */
       void projectRelocated(Project *);
+
       /**
        * Emitted when work order starts
        */
       void workOrderStarting(WorkOrder *);
+
       /**
        * Emitted when work order ends
        */
       void workOrderFinished(WorkOrder *);
 
-      void templatesAdded(QList<FileName> newFileList);
+      void templatesAdded(TemplateList *newTemplates);
+
+      void discardActiveControlEdits();
+
+      /**
+       * Emmited in cnetModified() when the actice control is modified.
+       * Connected to Directory so that other views can redraw measures.
+       */
+      void activeControlModified();
+
+      /**
+       * Emmited in save() when the project is being saved
+       * Connected to Directory so that ControlPointEditWidget can recolor the save net button.
+       */
+      void cnetSaved(bool value);
 
     public slots:
       void open(QString);
+      void setClean(bool value);
+      void cnetModified();
 
     private slots:
       void controlClosed(QObject *control);
       void controlListDeleted(QObject *controlList);
       void imagesReady(ImageList);
-      void addTargetsFromImportedImagesToProject(ImageList *imageList);
-      void addCamerasFromImportedImagesToProject(ImageList *imageList);
       void imageClosed(QObject *image);
       void imageListDeleted(QObject *imageList);
       void bundleSolutionInfoClosed(QObject *bundleSolutionInfo);
@@ -419,9 +570,12 @@ namespace Isis {
       Project(const Project &other);
       Project &operator=(const Project &rhs);
       void createFolders();
-      ControlList *createOrRetrieveControlList(QString name);
-      ImageList *createOrRetrieveImageList(QString name);
-      ShapeList *createOrRetrieveShapeList(QString name);
+
+      ControlList *createOrRetrieveControlList(QString name, QString path = "");
+      ImageList *createOrRetrieveImageList(QString name, QString path = "");
+      ShapeList *createOrRetrieveShapeList(QString name, QString path = "");
+
+      void writeSettings();
 
 
       QString nextImageListGroupName();
@@ -457,13 +611,16 @@ namespace Isis {
           QList<ShapeList *> m_shapeLists;
           QList<ControlList *> m_controls;
           QList<BundleSolutionInfo *> m_bundleSolutionInfos;
-          QList<FileName> m_templates;
+          QList<TemplateList *> m_mapTemplateLists;
+          QList<TemplateList *> m_regTemplateLists;
           WorkOrder *m_workOrder;
       };
 
     private:
 
+      static const int m_maxRecentProjects = 5;
       QDir *m_projectRoot;
+      QString m_newProjectRoot;
       QDir *m_cnetRoot;
       QDir m_currentCnetFolder;
       QPointer<Directory> m_directory;
@@ -471,7 +628,8 @@ namespace Isis {
       QList<ControlList *> *m_controls;
       QList<ShapeList *> *m_shapes;
       TargetBodyList *m_targets;
-      QList<FileName> m_templates;
+      QList<TemplateList *> *m_mapTemplates;
+      QList<TemplateList *> *m_regTemplates;
       GuiCameraList *m_guiCameras;
       QList<BundleSolutionInfo *> *m_bundleSolutionInfo;
 

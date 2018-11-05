@@ -80,10 +80,6 @@ R/W    = 0
 Lbytes = 65536
 
 Testing histogram method, band 1 ... 
-Computing min/max for histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Gathering histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Average:        14900
 Standard Dev:   8602.66
 Mode:           149.148
@@ -91,10 +87,6 @@ Total Pixels:   30000
 Null Pixels:    0
 
 Testing histogram method, all bands ... 
-Computing min/max for histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Gathering histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Average:        29800
 Standard Dev:   17205.2
 Mode:           149.148
@@ -105,16 +97,12 @@ Null Pixels:    0
 **PROGRAMMER ERROR** Cannot create histogram object for an unopened cube.
 
 Testing statistics method, band 1 ... 
-Gathering statistics
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Average:        14900
 Standard Dev:   8602.66
 Total Pixels:   30000
 Null Pixels:    0
 
 Testing statistics method, all bands ... 
-Gathering statistics
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Average:        29800
 Standard Dev:   17205.2
 Total Pixels:   60000
@@ -356,31 +344,3 @@ End_Object
 End
 0 0 0 20 20 20 39 39 39 0 20 39 0 20 39 0 20 39 
 **PROGRAMMER ERROR** Cannot write to the cube [isisTruth_external2.ecub] because it is opened read-only.
-
-Test reading an ecub that points to detached lbl
-Object = IsisCube
-  Object = Core
-    ^DnFile = IsisCube_02.lbl
-  End_Object
-End_Object
-
-Object = Label
-  Bytes = 65536
-End_Object
-End
-0 0 0 1 1 1 2 2 2 N N N N N N N N N 
-**ERROR** The cube [isisTruth_external3.ecub] does not support storing DN data because it is using an external file for DNs.
-
-Test copying an ecub that points to detached lbl
-Object = IsisCube
-  Object = Core
-    ^DnFile = isisTruth_external3.ecub
-  End_Object
-End_Object
-
-Object = Label
-  Bytes = 65536
-End_Object
-End
-0 0 0 1 1 1 2 2 2 N N N N N N N N N 
-**ERROR** The cube [isisTruth_external3.copy.ecub] does not support storing DN data because it is using an external file for DNs.

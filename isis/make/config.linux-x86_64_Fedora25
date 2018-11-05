@@ -301,14 +301,14 @@ FLANNINCDIR = -I$(ISIS3LOCAL)/include/flann
 #QHULLINCDIR = -I$(ISIS3LOCAL)/include/qhull
 
 #---------------------------------------------------------------------------
-# Set up for Embree libraries 
+# Set up for Embree libraries
 #---------------------------------------------------------------------------
 EMBREEINCDIR = -I$(ISIS3LOCAL)/include/embree2
 EMBREELIBDIR = -L$(ISIS3LOCAL)/lib
 EMBREELIB    = -lembree
 
 #---------------------------------------------------------------------------
-# Set up for OpenCV libraries 
+# Set up for OpenCV libraries
 #
 # Add the following line to your app's Makefile (see the NN notes)
 # ALLLIBS += $(OPENCVLIBS)
@@ -345,11 +345,11 @@ NNLIB = -lnn
 BULLETLIB     = -lBullet3Collision  -lBullet3Common          \
                 -lBullet3Dynamics   -lBullet3Geometry  -lBullet3OpenCL_clew     \
                 -lBulletCollision   -lBulletDynamics   -lBulletInverseDynamics  \
-                -lBulletSoftBody    -lLinearMath 
+                -lBulletSoftBody    -lLinearMath
 #BULLETLIB     = -lBullet3OpenCL_clew     -lBullet3Common    -lBullet3Geometry   \
 #                -lBulletSoftBody         -lBulletDynamics   -lBullet3Dynamics   \
 #                -lBulletInverseDynamics  -lBulletCollision  -lBullet3Collision  \
-#                -lLinearMath 
+#                -lLinearMath
 BULLETINCDIR  = -I$(ISIS3LOCAL)/include/bullet
 BULLETLIBDIR  = -L$(ISIS3LOCAL)/lib
 
@@ -368,6 +368,7 @@ DEFAULTINCDIR =  -I$(ISIS3LOCAL)/include
 #---------------------------------------------------------------------------
 
 # Qt Libraries
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQt5Concurrent.so.5.7.*[^g]"
@@ -479,7 +480,6 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuitesparseconfig.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas*.so*"
-THIRDPARTYLIBS    += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeotiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
@@ -532,6 +532,10 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtbb*.so*"
 
 # Add the Boost libraries
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libboost*.so*"
+
+# Add and patch the gfortran's rpath to $ORIGIN (so it can find its quadmath dependency) -- #4610
+PATCHLIBS         += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
+THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libquadmath*.so*"
 
 #  Plugins
 THIRDPARTYPLUGINS += "$(ISIS3LOCAL)/plugins/"

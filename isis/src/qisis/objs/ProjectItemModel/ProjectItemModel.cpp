@@ -44,6 +44,7 @@
 #include "ProjectItem.h"
 #include "ShapeList.h"
 #include "TargetBodyList.h"
+#include "TemplateList.h"
 
 
 namespace Isis {
@@ -131,8 +132,8 @@ namespace Isis {
             this, SLOT( onShapesAdded(ShapeList *) ) );
     connect(project, SIGNAL( targetsAdded(TargetBodyList *) ),
             this, SLOT( onTargetsAdded(TargetBodyList *) ) );
-    connect(project, SIGNAL( templatesAdded(QList<FileName>)),
-            this, SLOT( onTemplatesAdded(QList<FileName>)));
+    connect(project, SIGNAL( templatesAdded(TemplateList *)),
+            this, SLOT( onTemplatesAdded(TemplateList *)));
     connect(project, SIGNAL( guiCamerasAdded(GuiCameraList *) ),
             this, SLOT( onGuiCamerasAdded(GuiCameraList *) ) );
     ProjectItem *projectItem = new ProjectItem(project);
@@ -148,7 +149,16 @@ namespace Isis {
    * @return @b ProjectItem* The current item.
    */
   ProjectItem *ProjectItemModel::currentItem() {
-    return itemFromIndex( selectionModel()->currentIndex() );
+
+    ProjectItem *item = itemFromIndex( selectionModel()->currentIndex() );
+
+    // We do this because if the user was in a footprint or cubeDN view, then
+    // There is no valid currentIndex(). In that case, we grab whichever item
+    // was right clicked that triggered this call.
+    if (item == NULL) {
+      item = selectedItems().at(0);
+    }
+    return item;
   }
 
 
@@ -161,11 +171,121 @@ namespace Isis {
     QItemSelection selection = selectionModel()->selection();
     QList<ProjectItem *> items;
 
+
     foreach ( QModelIndex index, selection.indexes() ) {
       items.append( itemFromIndex(index) );
     }
 
     return items;
+  }
+  /**
+   * @brief ProjectItemModel::selectedBOSSImages
+   * @return This is a refinement of the selectedItems function which
+   * was needed to display a subset of Images/ImageLists in the
+   * Bundle Observation Solve Settings (BOSS) tab of the JigsawSetupDialog widget.
+   * The primary consumer of the selected images is going to be the SortFilterProxyModel
+   * class.
+   */
+  QList<ProjectItem *> ProjectItemModel::selectedBOSSImages() {
+
+    QItemSelection selection = selectionModel()->selection();
+    QList<ProjectItem *> items;
+    QModelIndexList indices = selection.indexes();
+
+    // If nothing is selected, fill items with all image lists and images.
+    if (indices.size() == 0) {
+      ProjectItem *imageRoot = findItemData(QVariant("Images"), 0);
+      items.append(imageRoot);
+      for (int i = 0; i < imageRoot->rowCount(); i++) {
+        ProjectItem *imglistItem = imageRoot->child(i);
+        items.append(imglistItem);
+        for (int j = 0; j < imglistItem->rowCount(); j++) {
+          ProjectItem *imgItem = imglistItem->child(j);
+          if (imgItem->isImage()) {
+            items.append(imgItem);
+          }
+        }
+      }
+      return items;
+    }
+
+    //Query the selected items to see if they have children
+    foreach ( QModelIndex ix, indices ) {
+
+      ProjectItem *item = this->itemFromIndex(ix);
+
+      //Anything that is not an image or an image list does
+      //not make sense to display in the BOSS treeview tab,
+      //so we need to exclude these items.
+      if (item->isImageList() || item->isImage() ) {
+        items.append( item );
+      }
+      else {
+        return items;
+      }
+
+      //If the selected ImageList has children, we have to handle
+      //the case where some of the children are selected, or
+      //the possibility that the user wants all of the children selected.
+      if (this->hasChildren(ix)) {
+
+        //If the node has children, loop through all of them
+        //and add them to selected items.
+        bool childrenSelected(false);
+        int numChildren = this->rowCount(ix);
+
+        //First loop through the children to see if any of them are also selected
+        for (int i = 0; i < numChildren;i++) {
+          QModelIndex ixchild = this->index(i,0,ix);
+          if (indices.contains(ixchild) ){
+              childrenSelected=true;
+              break;
+          }
+        }
+          //If they are, then add them to selected items
+          if (childrenSelected) {
+            for (int i =0;i < numChildren;i++) {
+              QModelIndex ixchild = this->index(i,0,ix);
+              if (indices.contains(ixchild))
+                items.append(this->itemFromIndex(ixchild ));
+            }
+          }
+          //No children selected, so we are assuming that the user
+          //wanted to select all of the children under the parent.
+          else {
+            for (int i =0;i < numChildren;i++) {
+               QModelIndex ixchild = this->index(i,0,ix);
+               items.append(this->itemFromIndex(ixchild ));
+            }
+
+          }
+
+      }//end if
+
+      //Append the parent of any selected child.  This is so
+      //the children aren't hanging on the tree without
+      //a collapsible parent node.
+      if( item->parent() ->hasChildren()) {
+        ProjectItem * parent = item->parent();
+        if (!items.contains(parent)){
+          items.append(parent);
+        }// end inner if
+      }//end outer if
+      //Also include the grandparent.  This handles the event
+      //that we may have multiple image lists selected to the treeview
+      //and we need a grandparent node attached to group them under.
+      if (this->itemFromIndex(ix)->parent()->parent() ){
+        ProjectItem *grandparent = this->itemFromIndex(ix)->parent()->parent();
+        if (!items.contains(grandparent)) {
+          items.append(grandparent);
+        } //end inner if
+
+      } //end outer if
+
+  }// end foreach
+
+    return items;
+
   }
 
 
@@ -374,7 +494,13 @@ namespace Isis {
             ProjectItem *pItem = new ProjectItem(bundleSolutionInfo);
             resultsItem->appendRow( pItem );
 
-            // Append the CSV files to the Statistics in the project
+            // Append text bundle summary and CSV files to the Statistics in the project
+            ProjectItem *bundleSummaryItem = new ProjectItem(FileItemQsp(
+               new FileItem(bundleSolutionInfo->savedBundleOutputFilename())),
+                            "Summary", bundleSolutionInfo->savedBundleOutputFilename(),
+                            QIcon(FileName("$base/icons/office-chart-pie.png")
+                            .expanded()));
+            pItem->child(2)->appendRow(bundleSummaryItem);
             ProjectItem *residualsItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedResidualsFilename())),
                             "Measure Residuals", bundleSolutionInfo->savedResidualsFilename(),
@@ -383,7 +509,7 @@ namespace Isis {
             pItem->child(2)->appendRow(residualsItem);
             ProjectItem *imagesItem = new ProjectItem(FileItemQsp(
                new FileItem(bundleSolutionInfo->savedImagesFilename())),
-                            "Images", bundleSolutionInfo->savedImagesFilename(),
+                            "Image", bundleSolutionInfo->savedImagesFilename(),
                             QIcon(FileName("$base/icons/office-chart-pie.png")
                             .expanded()));
             pItem->child(2)->appendRow(imagesItem);
@@ -403,35 +529,32 @@ namespace Isis {
   /**
    * Slot connected to the templatesAdded() signal from a project. Adds a ProjectItem for
    * each newly added template FileName to the model. The Item is added to the corresponding
-   * ProjectItem under "Templates" (currently only "Maps" and "Registrations" ).
+   * ProjectItem under "Templates" (currently only "Maps" and "Registrations" ) and the name
+   * of the TemplateList (import1, import2, etc...).
    *
-   * @param newFileList QList of FileNames being added to the project.
+   * @param templateList TemplateList of Templates being added to the project.
    */
-  void ProjectItemModel::onTemplatesAdded(QList<FileName> newFileList) {
+  void ProjectItemModel::onTemplatesAdded(TemplateList *templateList) {
     Project *project = qobject_cast<Project *>( sender() );
+    if (!project) { return; }
 
-    if (!project) {
-      return;
-    }
-
+    // Start at our project's node
+    // Start at our project's node
     for (int i = 0; i<rowCount(); i++) {
       ProjectItem *projectItem = item(i);
       if (projectItem->project() == project) {
+
+        // Find the "Templates" node
         for (int j = 0; j < projectItem->rowCount(); j++) {
           ProjectItem *templatesItem = projectItem->child(j);
           if (templatesItem->text() == "Templates"){
-            foreach (FileName newFile, newFileList) {
-              QString type = newFile.dir().dirName();
-              for (int k = 0; k < templatesItem->rowCount(); k++) {
+
+            // Find either the "Maps" or "Registrations" node
+            QString type = templateList->type();
+            for (int k = 0; k < templatesItem->rowCount(); k++) {
                 ProjectItem *templateType = templatesItem->child(k);
                 if (templateType->text().toLower() == type) {
-                  ProjectItem *fileItem = new ProjectItem(FileItemQsp(
-                    new FileItem(newFile.expanded())),
-                    newFile.name(),
-                    QIcon(":folder"));
-                  fileItem->setData(QVariant(newFile.toString()));
-                  templateType->appendRow(fileItem);
-                }
+                  templateType->appendRow( new ProjectItem(templateList));
               }
             }
           }
@@ -684,6 +807,7 @@ namespace Isis {
         item->image()->displayProperties()->setSelected(false);
       }
     }
+
   }
 
 
@@ -763,21 +887,26 @@ namespace Isis {
     else if (item->isBundleSolutionInfo() && role == Qt::EditRole) {
       item->setText(name);
       item->bundleSolutionInfo()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isImageList() && role == Qt::EditRole) {
       item->setText(name);
       item->imageList()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isControlList() && role == Qt::EditRole) {
       item->setText(name);
       item->controlList()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isShapeList() && role == Qt::EditRole) {
       item->setText(name);
       item->shapeList()->setName(name);
+      emit cleanProject(false);
     }
     else if (item->isTemplate() && role == Qt::EditRole) {
       item->setText(name);
+      emit cleanProject(false);
     }
     return true;
   }
@@ -833,15 +962,28 @@ namespace Isis {
    * Used to clean the ProjectItemModel of everything but the headers
    */
    void ProjectItemModel::clean() {
-
      for (int i=0; i<rowCount(); i++) {
        ProjectItem *projectItem = item(i);
        if (projectItem->project()) {
          for (int j=0; j < projectItem->rowCount(); j++) {
            if (projectItem->hasChildren()) {
              ProjectItem *subProjectItem = projectItem->child(j);
-             while (subProjectItem->hasChildren()) {
-               removeItem(subProjectItem->child(0));
+
+             // The header "Templates" has two subheaders that we want to keep
+             if (subProjectItem->text() == "Templates") {
+               if (subProjectItem->hasChildren()) {
+                 for (int k=0; k < subProjectItem->rowCount(); k++) {
+                   ProjectItem *tempProjectItem = subProjectItem->child(k);
+                   while (tempProjectItem->hasChildren()) {
+                       removeItem(tempProjectItem->child(0));
+                   }
+                 }
+               }
+             }
+             else {
+               while (subProjectItem->hasChildren()) {
+                   removeItem(subProjectItem->child(0));
+               }
              }
            }
          }

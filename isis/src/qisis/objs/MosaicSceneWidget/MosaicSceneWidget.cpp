@@ -53,6 +53,7 @@
 #include "ProjectionFactory.h"
 #include "PvlObject.h"
 #include "Pvl.h"
+#include "Shape.h"
 #include "TextFile.h"
 #include "Target.h"
 #include "ToolPad.h"
@@ -623,9 +624,9 @@ namespace Isis {
   }
 
 
-  void MosaicSceneWidget::save(QXmlStreamWriter &stream, Project *, FileName) const {
+  void MosaicSceneWidget::save(QXmlStreamWriter &stream, Project *, FileName ) const {
     if (m_projection) {
-      stream.writeStartElement("footprint2DView");
+      stream.writeStartElement("mosaicScene");
 
       stream.writeStartElement("projection");
       PvlGroup mapping = m_projection->Mapping();
@@ -2136,6 +2137,14 @@ namespace Isis {
         QString id = atts.value("id");
         double zValue = atts.value("zValue").toDouble();
         Image *image = m_scene->m_directory->project()->image(id);
+        // If Image for id doesn't exist, check shapes.  If corresponds to Shape, new Image will
+        // need to be created.
+        if (!image) {
+          Shape *shape = m_scene->m_directory->project()->shape(id);
+          if (shape) {
+            image = new Image(shape->cube(), shape->footprint(), id);
+          }
+        }
         if (image) {
           m_imagesToAdd->append(image);
           m_imageZValues.append(zValue);

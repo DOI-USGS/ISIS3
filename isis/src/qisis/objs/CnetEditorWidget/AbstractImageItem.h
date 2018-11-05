@@ -4,13 +4,11 @@
 
 #include "AbstractTreeItem.h"
 
-
 class QString;
 class QVariant;
 
-
 namespace Isis {
-  class ControlCubeGraphNode;
+  class ControlNet;
 
   /**
    * @brief Base class for an image item in the tree
@@ -23,11 +21,13 @@ namespace Isis {
    * @internal
    *   @history 2012-09-28 Kimberly Oyama - Changed member variables to be prefixed with "m_".
    *   @history 2017-07-25 Summer Stapleton - Removed the CnetViz namespace. Fixes #5054.
+   *   @history 2018-06-01 Jesse Mapel - Changed ControlCubeGraphNode to image serial number.
+   *                           References #5434.
    */
   class AbstractImageItem : public virtual AbstractTreeItem {
     public:
-      AbstractImageItem(ControlCubeGraphNode *cubeGraphNode,
-          int avgCharWidth, AbstractTreeItem *parent = 0);
+      AbstractImageItem(QString imageSerial, ControlNet *net,
+                        int avgCharWidth, AbstractTreeItem *parent = 0);
       virtual ~AbstractImageItem();
 
       QVariant getData() const;
@@ -37,7 +37,7 @@ namespace Isis {
       void deleteSource();
       InternalPointerType getPointerType() const;
       void *getPointer() const;
-      bool hasNode(ControlCubeGraphNode *) const;
+      bool hasImage(QString imageSerial) const;
 
 
     protected:
@@ -49,7 +49,7 @@ namespace Isis {
 
 
     private:
-      ControlCubeGraphNode *m_ccgn;
+      QPair<QString, ControlNet *> *m_imageAndNet;
   };
 }
 

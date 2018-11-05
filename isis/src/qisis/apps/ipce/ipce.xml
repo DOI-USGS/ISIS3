@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="ipce" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+    
+    <brief>
+      Integrated Photogrammetric Control Environment
+    </brief>
+
+    <description>
+    <img src='assets/images/IpceUserInterface.png' alt='IPCE User Interface' width='1050' height='388' />
+    <p><label>Figure 1:</label> <caption>IPCE User Interface</caption></p>
+       
+    <h4>Photogrammetric Control and IPCE</h4>
+    <p>
+      The quality of digital image mosaics (DIM) and digital elevation models (DEM) - and geologic maps using such products as basemaps - depends greatly upon accurate sensor position and pointing parameters. Spacecraft ephemeris and attitude data provide initial estimates for these parameters. Uncertainty in these data propagate to errors in mapping products. To minimize errors, images are controlled photogrammetrically. Overlapping images are registered to one another by measuring common features (tie points). Images may be tied to the ground by measuring features identifiable on base maps or DEMs (control points). Image measurements are input to the least-squares bundle adjustment which generates improved sensor position and pointing parameters plus the triangulated coordinates of tie and control points.
+    </p>
+    <p>
+        The objective of the Integrated Photogrammetric Control Environment (IPCE) is to incorporate all aspects of the photogrammetric control process within a single interactive and user friendly environment. A project oriented design simplifies data management with the ability to save and restore project data and settings. Multiple, integrated views of data and processing output help to streamline the control workflow.
+    </p>        
+    <p>
+        IPCE currently includes functionality from the standalone isis3 applications <b><i>jigsaw</i></b>, <b><i>qview</i></b>, <b><i>qnet</i></b>, <b><i>qmos</i></b>, and <b><i>cneteditor</i></b>. Control networks can be visualized in a table view (e.g. <b><i>cneteditor</i></b>), or overlaid on an image view (e.g. <b><i>qview</i></b>, <b><i>qnet</i></b>) or an image footprint view (e.g. <b><i>qmos</i></b>). Control networks can be edited from these views as well. Editing includes adding, deleting, and refining control points and measures or modifying metadata associated with them. The bundle adjustment (e.g. <b><i>jigsaw</i></b>) can be performed any number of times within IPCE. Results can be analyzed, compared against other bundle adjustment runs, and saved/restored as part of the IPCE project.
+    </p>
+        
+    <p>
+        A link to the IPCE User's Manual (PDF format) is given below under <b>Related Objects and Documents</b>. It contains example workflows as well as details on using the application.
+     </p>
+     
+    <h4>Known Issues</h4>
+      <p>
+<ol>
+<li>	Cubes must be Level1 (i.e. not projected) in order to import into IPCE. They must contain SPICE information (via <b><i>spiceinit</i></b>). It is recommended that <b><i>footprintinit</i></b> be run on cubes prior to import.</li>
+<li>	Currently there is no mechanism to selectively bundle adjust subsets of images within an IPCE project. So, all images associated with the active control network should be in the project (and no others). All images related to the active control network should be bundle adjusted simultaneously.</li>
+<li>	Images and control networks cannot be deleted from a project once imported.</li>
+<li>	Target body and sensors are not visible on the project tree after invoking File->Save Project As from the main menu to save the project.</li>
+<li>	The Spacecraft node of the project tree is empty for now.</li>
+<li>	When a project is closed, but IPCE remains open, the project name on the tree does not reset to the default name “Project.”</li>
+<li>	Closing cubes within the Footprint view cube list can cause a crash.</li>
+<li>	Images in bundle results will not contain footprint information until the project is saved and re-opened. Re-opening the project will generate the footprint information.</li>
+<li>	It is recommended that bundle output control networks be named uniquely. Otherwise unpredictable behavior may occur.</li>
+</ol>
+	
+      </p>
+
+   </description>
+
+   
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>jigsaw</item>
+      <item>qview</item>
+      <item>qnet</item>
+      <item>qmos</item>
+       <item>cneteditor</item>
+    </applications>
+
+    <documents>
+      <document>
+        <title>
+            IPCE User's Manual
+        </title>
+        <source>
+          <filename>IPCE_UsersGuide_2018-10-17.pdf</filename>
+          <path>assets/</path>
+        </source>
+        <author>Ken Edmundson</author>
+        </document>
+    </documents>
+
+
+    
+    
+
+  </seeAlso>
+
+  <history>
+    <change name="Ken Edmundson" date="2012-04-03">
+      Original version
+    </change>
+    <change name="Ian Humphrey" date="2016-11-09">
+      The main window state is now saved properly when running ipce. If running ipce
+      without opening a project, the config files are saved as ipce_Project.config (Project is
+      the default project name). Otherwise, when a project is loaded, config files are saved as
+      ipce_ProjectName.config, where ProjectName is the name of the loaded project.
+      Fixes #4358.
+    </change>
+   <change name="Tyler Wilson" date="2016-11-10">
+      Changed the alias reference for the data_management.png icon from 'data' to 'data-management'.  
+      Annoying errors were showing up on the command line when the application was launched due
+      to a naming conflict.  Fixes #3982.
+   </change> 
+   <change name="Tracie Sucharski" date="2017-06-22">
+     Changed name of application from cnetsuite to ipce.
+   </change>
+   <change name="Summer Stapleton" date="2017-08-14">
+     Updated ipce to only include licensed or open source images and icons. Fixes #5105.
+   </change>
+   <change name="Ken Edmundson, et al." date="2018-07-30">
+     Added ability to specify bundle observation solve settings on a per image basis. Added control net health monitor. Changed interface to allow views to be dockable.
+   </change>
+  </history>
+
+  </application>
+
+
+
+

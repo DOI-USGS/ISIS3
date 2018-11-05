@@ -267,12 +267,12 @@ void IsisMain() {
       QObject::connect( bundleAdjust, SIGNAL( statusUpdate(QString) ),
                         bundleAdjust, SLOT( outputBundleStatus(QString) ) );
 
-      BundleSolutionInfo bundleSolution = bundleAdjust->solveCholeskyBR();
+      BundleSolutionInfo *bundleSolution = bundleAdjust->solveCholeskyBR();
 
 
       // Output bundle adjust files
-      bundleSolution.outputText();
-      bundleSolution.outputResiduals();
+      bundleSolution->outputText();
+      bundleSolution->outputResiduals();
 
       Table cmatrix = bundleAdjust->cMatrix(0);
 
@@ -285,6 +285,9 @@ void IsisMain() {
       //cmatrix.Label().findObject("Table",Pvl::Traverse).addKeyword(description);
 
       c.write(cmatrix);
+      
+      delete bundleAdjust;
+      delete bundleSolution;
     }
 
     // Now do final clean up as the update was successful if we reach here...
@@ -351,7 +354,8 @@ BundleSettingsQsp bundleSettings() {
   //     longitude sigma        = 1000.0
   //     radius sigma           = Null since we are not solving for radius
   //     outlier rejection      = false
-  settings->setSolveOptions(false, false, false, false, 1000.0, 1000.0, Isis::Null);
+  settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal, 
+                            SurfacePoint::Latitudinal, 1000.0, 1000.0, Isis::Null);
   settings->setOutlierRejection(false);
 
   // =========================================================================================//

@@ -399,10 +399,29 @@ namespace Isis {
    *                           Target::GetRadii calls to speed up createPoint().
    *   @history 2018-01-12 Adam Goins - Added Progress during reads.
    *   @history 2018-01-24 Jesse Mapel - Fixed c++11 build warnings.
+   *                         
    *   @history 2018-01-27 Jesse Mapel - Fixed some documentation formatting. Added a section
    *                           describing the different file format versions.
    *   @history 2018-01-30 Adam Goins - Ensured point sizes are written/read as lsb by using
    *                           EndianSwapper.
+   *   @history 2018-02-25 Debbie A. Cook - Generalized calls to 
+   *                           ControlPoint::IsLatitudeConstrained to IsCoord1Constained 
+   *                           and added or updated a few comments. *** TODO *** make sure
+   *                           the new methods are fully functional for either coordinate type
+   *                           once the new header keyword is added.
+   *   @history 2018-03-28 Adam Goins - Added targetRadii groups to the header. Changed the
+   *                           versioner to write these values out in a targetRadii group for
+   *                           both binary V0005 and PvlV0005 networks. Fixes #5361.
+   *   @history 2018-04-05 Adam Goins - Added hasTargetRadii() and targetRadii() to the versioner
+   *                           so that these values can be grabbed from a ControlNet on read.
+   *                           Also Fixes #5361.
+   *   @history 2018-06-01 Debbie A. Cook - (added to BundleXYZ 2018-02-25)
+   *                           Generalized calls to ControlPoint::IsLatitudeConstrained to 
+   *                           IsCoord1Constained and added or updated a few comments.
+   *                           *** TODO *** make sure the new methods are fully functional
+   *                           for either coordinate type once the new header keyword is added.
+   *                           
+   *   @history 2018-07-03 Jesse Mapel - Removed target radii from versioner. References #5457.
    */
   class ControlNetVersioner {
 
@@ -467,16 +486,6 @@ namespace Isis {
         QString description;
         //! The name of the user or program that last modified the control network
         QString userName;
-        /**
-         * The equatorial radius of the target body
-         * used to convert from spherical to rectangular coordinates
-         */
-        Distance equatorialRadius;
-        /**
-         * The equatorial radius of the target body
-         * used to convert from spherical to rectangular coordinates
-         */
-        Distance polarRadius;
       };
 
       //! Typedef for consistent naming of containers for version 2

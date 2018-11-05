@@ -79,11 +79,15 @@ namespace Isis {
    * @return  @b bool True if  we can set as active, False otherwise.
    */
   bool SetActiveControlWorkOrder::isExecutable(ControlList *controls) {
-    if (controls->size() != 1 || project()->activeControl() == controls->at(0)) {
-      return false;
-    }
 
-    return true;
+    // Return false if more than 1 control was selected or if selected is already active
+    if (controls) {
+      if (controls->size() != 1 || project()->activeControl() == controls->at(0)) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 
 
@@ -125,7 +129,7 @@ namespace Isis {
     try {
       project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }

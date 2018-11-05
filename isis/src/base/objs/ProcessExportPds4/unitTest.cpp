@@ -10,12 +10,21 @@
 using namespace std;
 using namespace Isis;
 
-/**
- * @author 2017-05-30 Marjorie Hahn
+/** 
+ * Unit test for ProcessExportPds4 class
+ *  
+ * @author 2017-05-30 Marjorie Hahn 
+ *  
+ *  @internal
+ *   @history 2017-05-30 Marjorie Hahn - Original Version
+ *   @history 2016-12-28 Kristin Berry - Updated to test xml input. 
+ *   @history 2018-06-06 Jeannie Backer - Removed file paths from error message written to
+ *                           test output.
+ *  
  */
 void IsisMain() {
   Preference::Preferences(true);
-  
+
   try {
     std::cout << "Testing ProcessExportPds4" << std::endl << std::endl;
 
@@ -27,24 +36,24 @@ void IsisMain() {
     defaultLabel.remove(QRegExp(" xsi.*=\".*\""));
     std::cout << defaultLabel;
 
-    std::cout << std::endl << "Testing defaulte CaSSIS export" << std::endl;
+    std::cout << std::endl << "Testing default CaSSIS export" << std::endl;
 
     Isis::ProcessExportPds4 p;
-    
+
     QString cubeName = "$tgo/testData/CAS-MCO-2016-11-26T22.32.39.582-BLU-03025-00.cub";
-    
-    Isis::Cube cub; 
-    cub.open(cubeName, "r"); 
-    
+
+    Isis::Cube cub;
+    cub.open(cubeName, "r");
+
     p.SetInputCube(&cub);
-    
+
     // Remove the schema from the lable because we cannot ensure that
     // attributes come out in the same order every time
     QString rawLabel = p.StandardPds4Label().toString();
     rawLabel.remove(QRegExp(" xmlns.*=\".*\""));
     rawLabel.remove(QRegExp(" xsi.*=\".*\""));
     std::cout << rawLabel;
-             
+
     std::ofstream ofs;
     p.OutputLabel(ofs);
 
@@ -60,6 +69,13 @@ void IsisMain() {
     p.WritePds4("temp.img");
     remove("temp.img");
     remove("temp.xml");
+
+    std::cout << std::endl << "Testing xml input" << std::endl; 
+    Isis::ProcessExportPds4 xmlTest;
+    xmlTest.SetInputCube(&cub);
+    xmlTest.WritePds4("tempxml.xml");
+    remove("tempxml.img");
+    remove("tempxml.xml");
 
     std::cout << std::endl << "Testing export pixel types" << std::endl;
 
@@ -135,7 +151,7 @@ void IsisMain() {
     Cube projectedCube(projectedName);
     ProcessExportPds4 projectedProcess;
     projectedProcess.SetInputCube(&projectedCube);
- 
+
     QString projectedLabel = projectedProcess.StandardPds4Label().toString();
     projectedLabel.remove(QRegExp(" xmlns.*=\".*\""));
     projectedLabel.remove(QRegExp(" xsi.*=\".*\""));
@@ -186,7 +202,10 @@ void IsisMain() {
       testProcess.StandardPds4Label();
     }
     catch(Isis::IException &e) {
-      e.print();
+      QString message = e.toString();
+      cout << message.replace(QRegExp("file.*base/translations"), "file [base/translations");
+      cout << endl;
+      cout << endl;
     }
     instGroup.addKeyword( PvlKeyword("targetName", cassisTarget) );
   }

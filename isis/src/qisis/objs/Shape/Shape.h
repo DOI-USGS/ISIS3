@@ -24,6 +24,7 @@
 #include <QString>
 
 #include "Angle.h"
+#include "ControlPoint.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "Latitude.h"
@@ -62,10 +63,17 @@ namespace Isis {
    *
    * @author 2016-07-25 Tracie Sucharski
    *
-   * @internal 
+   * @internal
    *   @history 2016-10-21 Tracie Sucharski - Add Image to the Shape class.  This was done because
    *                          the qmos class expect Images, and we want to display a footprint of
    *                          a Shape.
+   *   @history 2018-09-10 Tracie Sucharski - Added surface point source and radius source along
+   *                          with access methods.
+   *   @history 2018-09-21 Tracie Sucharski - Serial number is composed on construction and is
+   *                          always the filename.
+   *   @history 2018-10-03 Tracie Sucharski - Fixed problem in constructor with cube being
+   *                          set before member data was initialized. Fixed the computation for
+   *                          surfacePointSource and radiusSource. References #5504.
    */
   class Shape : public QObject {
     Q_OBJECT
@@ -85,12 +93,12 @@ namespace Isis {
       PvlObject toPvl() const;
 
       bool isFootprintable() const;
-//    bool hasImage() const;
-//    Image *image();
       Cube *cube();
       void closeCube();
-      ShapeType shapeType();
+      ControlPoint::SurfacePointSource::Source surfacePointSource();
+      ControlPoint::RadiusSource::Source radiusSource();
       ShapeDisplayProperties *displayProperties();
+      ShapeType shapeType();
       const ShapeDisplayProperties *displayProperties() const;
       QString fileName() const;
       QString serialNumber();
@@ -168,7 +176,8 @@ namespace Isis {
        *   initializing because no more than a thousand of these should ever be open at once.
        */
       Cube *m_cube;
-
+      ControlPoint::SurfacePointSource::Source m_surfacePointSource;
+      ControlPoint::RadiusSource::Source m_radiusSource;
       ShapeType m_shapeType;
 
       /**
@@ -179,6 +188,10 @@ namespace Isis {
        * The on-disk file name of the cube associated with this Shape.
        */
       QString m_fileName;
+      /**
+       * This will always be simply the filename and is created on construction.
+       */
+      QString m_serialNumber;
       /**
        * Instrument id associated with this Shape.
        */

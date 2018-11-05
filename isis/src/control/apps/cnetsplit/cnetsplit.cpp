@@ -66,7 +66,7 @@ void IsisMain() {
       oNet.SetCreatedDate(Application::DateTime());
       oNet.SetDescription(cNet.Description());
       oNet.SetNetworkId(cNet.GetNetworkId());
-      oNet.SetTarget(cNet.GetTarget(), QVector<Distance>::fromStdVector(cNet.GetTargetRadii()));
+      oNet.SetTarget(cNet.GetTarget());
       oNet.SetUserName(Application::UserName());
 
       startIndex = endIndex;

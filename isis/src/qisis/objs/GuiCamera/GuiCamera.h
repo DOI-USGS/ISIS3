@@ -64,7 +64,9 @@ namespace Isis {
    *                           metatype for use with QVariant.
    *   @history 2016-06-08 Tyler Wilson - Added documentation to some functions
    *                           and corrected the formatting.  Fixes #3997.
-   *
+   *   @hitsory 2018-07-12 Summer Stapleton - Added m_instrumentId and instrumentId() in order to 
+   *                           collect the InstrumentId from the original cube label for 
+   *                           comparisons related to image imports in ipce. References #5460.
    *  
    */
   class GuiCamera : public QObject {
@@ -82,7 +84,7 @@ namespace Isis {
 
       QString id() const;
 
-//    Camera *camera();
+      QString instrumentId();
 
       QString instrumentNameShort();
       QString instrumentNameLong();
@@ -163,16 +165,13 @@ namespace Isis {
        */
       GuiCameraDisplayProperties *m_displayProperties;
       
-      
+      QString m_instrumentId;        //!< The InstrumentId as it appears on the cube.
 
       QString m_spacecraftNameShort; //!< An abbreviated name for the spacecraft.
 
-
       QString m_spacecraftNameLong; //!< The full spacecraft name
 
-
       QString m_instrumentNameShort; //!< The abbreviated instrument name
-
 
       QString m_instrumentNameLong; //!< The full instrument name
   };

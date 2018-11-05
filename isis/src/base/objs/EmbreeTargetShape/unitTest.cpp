@@ -257,12 +257,6 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Invalid shapefile";
     try {
-      EmbreeTargetShape invalidShapefile("notafile");
-    }
-    catch (IException &e) {
-      e.print();
-    }
-    try {
       EmbreeTargetShape invalidShapefile("junkyshapefile.bds");
     }
     catch (IException &e) {

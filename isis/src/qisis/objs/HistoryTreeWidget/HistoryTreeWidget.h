@@ -37,12 +37,23 @@ namespace Isis {
    *                            addresses the immediate problem, but will have to be tackled
    *                            in a future ticket.  Fixes #5096.  References #4492.
    *   @history 2017-08-11 Cole Neubauer - Added some checks to avoid segfaults Fixes #5064
+   *   @history 2017-11-08 Tyler Wilson - Reverted the code change in #5096 to restore the 
+   *                            ProgressBar, and changed code in OpenRecentProjectsWorkOrder.cpp
+   *                            to prevent the segfault which #5096 was addressing.  Fixes #5149.
+   *   @history 2018-04-07 Tracie Sucharski - Added method to force a history entry using a string
+   *                            rather than a WorkOrder.  This should be a temporary method until
+   *                            saving a control is turned into a WorkOrder.  This was done for the
+   *                            alpha release simply to notify the user that the control was saved.
+   *                            However, this history entry is not saved/restored to a project.
+   *   @history 2018-06-28 Makayla Shepherd - Restored the ProgressBar. Fixes #5228.
    */
   class HistoryTreeWidget : public QTreeWidget {
       Q_OBJECT
     public:
       HistoryTreeWidget(Project *project, QWidget *parent = 0);
       virtual ~HistoryTreeWidget();
+
+      void addToHistory(QString historyEntry);
 
     protected:
       int sizeHintForColumn(int column) const;

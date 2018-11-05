@@ -26,6 +26,8 @@
 #include "MdiCubeViewport.h"
 #include "Project.h"
 #include "SerialNumber.h"
+#include "Shape.h"
+#include "ShapeList.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 #include "ViewportMainWindow.h"
@@ -35,9 +37,10 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Ipce (Qnet) tool - Handles mouse button actions and drawing control points on viewports
+   * ControlNet tool - Handles mouse button actions and drawing control points on viewports in the
+   * CubeDnView for the ipce application. 
    *
-   * @param parent Pointer to the parent widget for the Ipce tool
+   * @param parent Pointer to the parent widget for the ControlNet tool
    *
    * @author 2016-09-01 Tracie Sucharski
    *
@@ -56,10 +59,10 @@ namespace Isis {
 
 
   /**
-    * Adds the Ipce tool action to the tool pad.
+    * Adds the ControlNet tool action to the tool pad.
     *
     * @param pad Tool pad
-    * @return @b QAction* Pointer to Tie tool action
+    * @return @b QAction* Pointer to ControlNet tool action
     *
     * @internal
     *   @history 2017-07-25 Tyler Wilson - Set the
@@ -73,6 +76,8 @@ namespace Isis {
      QAction *action = new QAction(this);
      action->setIcon(QPixmap(toolIconDir()+"/HILLBLU_molecola.png"));
      action->setToolTip("Control Point Editor (T)");
+     action->setStatusTip("If tool disabled, make sure you have a control net in your project and "
+                          "it is set to the active control.");
      action->setShortcut(Qt::Key_T);
 
      //The object name is being set and used as a key to search with for this action in
@@ -99,13 +104,16 @@ namespace Isis {
     */
    void ControlNetTool::setControlNet(ControlNet *cnet) {
      m_controlNet = cnet;
-     // TODO:  TLS 7-25-17  This method is called by Project::open before there are any viewports,
-     // so the following command seg faults.  Need to add check for viewports or ??
-     //paintAllViewports();
+     //  Cannot use Tool::cubeViewportList() because it does not properly return a NULL if viewports
+     //  don't exist.
+     if (workspace() && workspace()->cubeViewportList()) {
+       paintAllViewports();
+     }
    }
 
 
    void ControlNetTool::loadNetwork() {
+
      setControlNet(m_directory->project()->activeControl()->controlNet());
    }
 
@@ -122,7 +130,7 @@ namespace Isis {
    */
   void ControlNetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp  == NULL) return;
+    if (m_controlNet == NULL || cvp  == NULL) return;
 
     // Determine if the cvp is a Shape
     //  Get all ShapeLists from Project
@@ -134,12 +142,13 @@ namespace Isis {
 
     if (s == Qt::LeftButton) {
 
-//      if (sn == m_groundSN) {
-//        QString message = "Cannot select point for editing on ground source.  Select ";
-//        message += "point using un-projected images or the Navigator Window.";
-//        QMessageBox::critical(m_ControlNetTool, "Error", message);
-//        return;
-//      }
+      if (isGroundSource) {
+        QString message = "Cannot select point for editing on ground source.  Select ";
+        message += "point using un-projected images or the Cnet Editor View (choose \"View Network\" ";
+        message += "from the context menu for control nets on the project tree).";
+        QMessageBox::critical(m_ControlNetTool, "Error", message);
+        return;
+      }
 
       //  Find closest control point in network
       // since we are in a connected slot, we need to handle exceptions thrown by FindClosest
@@ -164,12 +173,13 @@ namespace Isis {
         return;
       }
 
-//      if (m_groundOpen && file == m_groundCube->fileName()) {
-//        QString message = "Cannot select point for deleting on ground source.  Select ";
-//        message += "point using un-projected images or the Navigator Window.";
-//        QMessageBox::critical(m_ControlNetTool, "Error", message);
-//        return;
-//      }
+      if (isGroundSource) {
+        QString message = "Cannot select point for deleting on ground source.  Select ";
+        message += "point using un-projected images or the Cnet Editor View (choose \"View Network\" ";
+        message += "from the context menu for control nets on the project tree).";
+        QMessageBox::critical(m_ControlNetTool, "Error", message);
+        return;
+      }
 
       //  Find closest control point in network
       ControlPoint *point = NULL;
@@ -278,10 +288,23 @@ namespace Isis {
     // TODO: Should we add the SN to the viewPort
     QString serialNumber = SerialNumber::Compose(*vp->cube(), true);
 
-//    if (serialNumber == m_groundSN) {
-//      drawGroundMeasures(vp, painter);
-//      return;
-//    }
+    // Get list of shapes in the ipce project and see if the serial number for viewport passed in
+    // matches any of the project shapes.  If there's a match, draw any ground points.
+    QList<ShapeList *> projectShapes = m_directory->project()->shapes();
+    foreach (ShapeList *shapeList, projectShapes) {
+      foreach (Shape *shape, *shapeList) {
+        QString shapeSn = shape->serialNumber();
+        if (serialNumber == shapeSn) {
+          //  Get cube, then ground map so that location can be calculated
+          UniversalGroundMap *gmap = new UniversalGroundMap(*(shape->cube()));
+          drawGroundMeasures(vp, painter, gmap);
+          delete gmap;
+          gmap = NULL;
+          return;
+        }
+      }
+    }
+
 
     if (!m_controlNet->GetCubeSerials().contains(
                       serialNumber)) return;
@@ -343,6 +366,76 @@ namespace Isis {
         // draw the selected point in each image last so it's on top of the rest of the points
         painter->setPen(pen);
         painter->drawPath(path);
+      }
+    }
+  }
+
+
+  /**
+   * Draw all Fixed or Constrained points on the ground source viewport
+   *  
+   * @param vp Viewport whose measurements will be drawn
+   * @param painter The QPainter used to draw crosshair 
+   * @param groundMap The UniversalGroundMap for the Cube associated with this viewport 
+   *
+   */
+  void ControlNetTool::drawGroundMeasures(MdiCubeViewport *vp, QPainter *painter,
+                                          UniversalGroundMap *groundMap) {
+
+
+    // if ControlPointEditView is open, the editPointId will contain the ControlPoint Id of the
+    // current edit point. Save so that when drawing point, it can be drawn to indicate current
+    // edit point.
+    ControlPoint *currentEditPoint = NULL;
+    if (m_directory->controlPointEditView()) {
+      currentEditPoint = m_directory->controlPointEditView()->controlPointEditWidget()->editPoint();
+    }
+
+
+    // loop through control network looking for fixed and constrained points
+    for (int i = 0; i < m_controlNet->GetNumPoints(); i++) {
+      ControlPoint &p = *((*m_controlNet)[i]);
+      if (p.GetType() == ControlPoint::Free) continue;
+      if (!p.HasAprioriCoordinates()) continue;
+
+      // Find the sample, line location on the ground image
+      if (groundMap->SetGround(p.GetAprioriSurfacePoint().GetLatitude(),
+                               p.GetAprioriSurfacePoint().GetLongitude())) {
+        double samp = groundMap->Sample();
+        double line = groundMap->Line();
+        int x, y;
+        vp->cubeToViewport(samp, line, x, y);
+
+        // if the point is ignored,
+        if (p.IsIgnored()) {
+          painter->setPen(QColor(255, 255, 0)); // set point marker yellow
+          // draw points
+          painter->drawLine(x - 5, y, x + 5, y);
+          painter->drawLine(x, y - 5, x, y + 5);
+        }
+        // If this point is the current edit point in ControlPointEditView
+        else if (currentEditPoint != NULL && p.GetId() == currentEditPoint->GetId()) {
+          //  Draw circle, then crosshair inside circle
+          QPainterPath path;
+          path.addEllipse(QPointF(x,y), 5., 5.);
+          path.moveTo(x, y-5);
+          path.lineTo(x, y+5);
+          path.moveTo(x-5, y);
+          path.lineTo(x+5, y);
+          // set point marker red
+          QBrush brush(Qt::red);
+          // set point marker bold - line width 2
+          QPen pen(brush, 2);
+          painter->setPen(pen);
+          painter->drawPath(path);
+        }
+        //  Only Constrained or Fixed pts.  If Free, we've already skipped.
+        else {
+          painter->setPen(Qt::magenta);// set point marker magenta
+          // draw points
+          painter->drawLine(x - 5, y, x + 5, y);
+          painter->drawLine(x, y - 5, x, y + 5);
+        }
       }
     }
   }
