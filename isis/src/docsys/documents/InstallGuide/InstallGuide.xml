@@ -84,13 +84,17 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
 
          <strong>./$CONDA_PREFIX/scripts/isis3VarInit --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
 
+         
+         Directions for running rsync to download ISIS3 data can be found <a href="#ISIS3DataDownload">here.</a>
+
 
           <em>#Run the source activate command a second time to process the changes:</em>
 
           <strong>source activate isis3</strong>
 
-          To avoid having to do this every time you open a new terminal window, we suggest adding the following lines to the end of your .bashrc file
-          (to ensure that conda is in your PATH variable):
+          To avoid having to do this every time you open a new terminal window, we suggest adding the following lines to the end of your .bashrc file 
+          (if running a variant of Linux) to ensure that conda is in your PATH variable.  If you are running Mac OS X, these lines would be appended
+          to the end of your .bash_profile file:
 
           
           <strong>source activate isis3</strong>
@@ -200,7 +204,7 @@ is a popular choice and may be downloaded below.
   </ul>
 </p>
 
-
+<A NAME="ISIS3DataDownload"></A>
 <h3>Full ISIS3 Data Download</h3>
 
 <p>

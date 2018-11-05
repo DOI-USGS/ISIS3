@@ -5,18 +5,18 @@ import os
 import sys
 
 ##########################################################################################################
-#Author:  Tyler Wilson
-#Date  :  2018-10-05
-#Description:  This script sets ISISROOT/ISIS3DATA/ISIS3TESTDATA for the user and is executed
-#within the conda environment created for the ISIS3 installation.
-#The data directory and test directory are optional command line arguments.  If the user chooses
-#not to set them, they will both be placed created on the same level as the $ISISROOT directory
-#within the conda environment.
-#History:
 #   Author:  Tyler Wilson
-#   Date:    2018-11-01
-#   Description:  Removed a pair of lines which were causing output errors on Mac OS X and were note
-#                 needed anyway.
+#   Date  :  2018-10-05
+#   Description:  This script sets ISISROOT/ISIS3DATA/ISIS3TESTDATA for the user and is executed
+#   within the conda environment created for the ISIS3 installation.
+#   The data directory and test directory are optional command line arguments.  If the user chooses
+#   not to set them, they will both be placed created on the same level as the $ISISROOT directory
+#   within the conda environment.
+#   History:
+#       Author:  Tyler Wilson
+#       Date:    2018-11-01
+#       Description:  Removed a pair of lines which were causing output errors on Mac OS X and were not
+#                     required anyway.
 #
 ##########################################################################################################
 
