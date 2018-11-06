@@ -31,6 +31,7 @@ pipeline {
                     ctest -R _unit_ --timeout 500
                     ctest -R _app_ --timeout 500
                     ctest -R _module_ --timeout 500
+                    source deactivate
                     conda env remove -n isis3
                     """
             }
