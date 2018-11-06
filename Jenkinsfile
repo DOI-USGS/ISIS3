@@ -39,7 +39,7 @@ pipeline {
           stage('CentOS7') {
               agent {
                   docker {
-                      label 'cmake_cool'
+                      label 'cmake'
                       image 'chrisryancombs/docker_isis_centos'
                       args  '''\
                               -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
