@@ -18,7 +18,7 @@ class FileName_Fixture_NotVersioned : public ::testing::TestWithParam<const char
 
 TEST(FileName, DefaultConstructor) {
   FileName file;
-  
+
 //   EXPECT_EQ("", file.originalPath());
 //   EXPECT_EQ("", file.path());
 //   EXPECT_EQ("", file.attributes());
@@ -30,47 +30,47 @@ TEST(FileName, DefaultConstructor) {
 TEST(FileName, OriginalPath) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("/testy/mc/test/face", file.originalPath());
 }
 
 TEST(FileName, Path) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("/testy/mc/test/face", file.path());
 }
 
 TEST(FileName, Attributes) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("", file.attributes());
-  
+
   QString testAtt = "/testy/mc/test/face/test.cub+Bsq";
   FileName fileAtt(testAtt);
-  
+
   EXPECT_EQ("Bsq", fileAtt.attributes());
 }
 
 TEST(FileName, BaseName) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("test", file.baseName());
 }
 
 TEST(FileName, Name) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("test.cub", file.name());
 }
 
 TEST(FileName, Extension) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("cub", file.extension());
 }
 
@@ -82,14 +82,14 @@ TEST(FileName, Extension) {
 TEST(FileName, Original) {
   QString test = "$ISISROOT/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("$ISISROOT/testy/mc/test/face/test.cub", file.original());
 }
 
 TEST(FileName, AddExtension) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("txt", file.addExtension(".txt").extension());
 }
 
@@ -103,28 +103,28 @@ TEST(FileName, RemoveExtension) {
 TEST(FileName, SetExtension) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("log", file.setExtension("log").extension());
 }
 
 TEST(FileName, isQuestionMarksNoExtensionVersioned) {
   QString test = "/testy/mc/test/face/test??????";
   FileName file(test);
-  
+
   EXPECT_EQ(true, file.isVersioned());
 }
 
 TEST(FileName, isQuestionMarksExtensionVersioned) {
   QString test = "/testy/mc/test/face/test??????.cub";
   FileName file(test);
-  
+
   EXPECT_EQ(true, file.isVersioned());
 }
 
 TEST(FileName, isDDMMMYYYVersioned) {
   QString test = "/testy/mc/test/face/test{ddMMMyyyy}..cub";
   FileName file(test);
-  
+
   EXPECT_EQ(true, file.isVersioned());
 }
 
@@ -142,7 +142,7 @@ TEST(FileName, isDDMMMYYYVersioned) {
 TEST(FileName, ToString) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  
+
   EXPECT_EQ("/testy/mc/test/face/test.cub", file.toString());
 }
 
@@ -155,20 +155,20 @@ TEST(FileName, ToString) {
 
 TEST_P(FileName_Fixture_Versioned, IsVersioned) {
   FileName file(GetParam());
-  
+
   EXPECT_TRUE(file.isVersioned());
 }
 
-const char* versionedFiles[] = {"tttt??????", "tttt??????.tmp", "tttt_?.tmp", "??tttt", 
-                                "?tttt000008.tmp", "junk?", "tttt{ddMMMyyyy}.tmp", 
+const char* versionedFiles[] = {"tttt??????", "tttt??????.tmp", "tttt_?.tmp", "??tttt",
+                                "?tttt000008.tmp", "junk?", "tttt{ddMMMyyyy}.tmp",
                                 "tt{MMM}tt{dd}yy{yy}.tmp", "tt{d}tt{MMM}.tmp", "tt{d}tt{MMMM}.tmp",
                                 "tt{dd}.tmp", "tttt{dd}.tmp", "$TEMPORARY/{MMM}-{dd}-{yy}_v???.tmp"};
 
 INSTANTIATE_TEST_CASE_P(FileName, FileName_Fixture_Versioned, ::testing::ValuesIn(versionedFiles));
-                                   
+
 TEST_P(FileName_Fixture_NotVersioned, IsVersioned) {
   FileName file(GetParam());
-  
+
   EXPECT_FALSE(file.isVersioned());
 }
 

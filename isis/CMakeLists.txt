@@ -347,7 +347,7 @@ if(pybindings)
 
  file(GLOB SIP_GENERATED_SOURCE_FILES ${ISIS_SIP_CODE_DIR}/*.cpp)
  add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
- target_link_libraries(isispy ${ALLLIBS} gtest ${CMAKE_THREAD_LIBS_INIT})
+ target_link_libraries(isispy ${ALLLIBS})
  target_link_libraries(isispy isis3)
  set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3 INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
  add_dependencies(isispy sipfiles)
