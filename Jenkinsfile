@@ -50,7 +50,7 @@ pipeline {
               }
               steps {
                   sh """
-                      conda env create -n isis3 -f environment.yml
+                      conda env create -n isis3 -f environment_gcc4.yml
                       source activate isis3
                       cd build
                       set +e
