@@ -25,41 +25,41 @@ dependencies:
   - bzip2==1.0.6=1
   - cmake==3.9.1=0
   - cspice==66-0
-  - curl==7.55.1=0
-  - doxygen==1.8.14=0
-  - eigen==3.3.3=0
-  - embree==2.14.0=0
-  - geotiff==1.4.2=1
-  - gmp==6.1.2=0
+  - curl==7.55.1
+  - doxygen==1.8.14
+  - eigen==3.3.3
+  - embree==2.14.0
+  - geotiff==1.4.2
+  - gmp==6.1.2
   - gsl==2.2.1=blas_openblas_3
-  - hdf5==1.8.18=2
-  - icu==58.2=0
-  - jpeg==9b=2
-  - krb5==1.14.2=0
-  - libpng==1.6.28=2
-  - libtiff==4.0.9=0
-  - libxml2==2.9.7=0
-  - mesalib==17.2.0=0
-  - mysql-connector-c==6.1.6=0
-  - nn==1.86.0=2
+  - hdf5==1.8.18
+  - icu==58.2
+  - jpeg==9b
+  - krb5==1.14.2
+  - libpng==1.6.28
+  - libtiff==4.0.9
+  - libxml2==2.9.7
+  - mesalib==17.2.0
+  - mysql-connector-c==6.1.6
+  - nn==1.86.0
   - numpy==1.13.3=py36_blas_openblas_200
-  - openblas==0.2.19=2
+  - openblas==0.2.19
   - opencv==3.3.0
   - nanoflann==1.2.2
   - gmm==5.0
   - jama==125
-  - openssl==1.0.2n=0
+  - openssl==1.0.2n
   - python==3.6
-  - sqlite==3.13.0=1
+  - sqlite==3.13.0
   - suitesparse==4.5.4=blas_openblas_200
   - superlu==5.2.1=blas_openblas_201
-  - xorg-kbproto==1.0.7=1
-  - xorg-libx11==1.6.4=6
+  - xorg-kbproto==1.0.7
+  - xorg-libx11==1.6.4
   - bz2file==0.98
-  - bullet==2.86.1=0
-  - qhull==7.2.0=0
+  - bullet==2.86.1
+  - qhull==7.2.0
   - qt=5.6.2
   - qwt
-  - tnt==126=0
+  - tnt==126
   - xalan-c==1.11
 prefix: /scratch/anaconda3/envs/isis
