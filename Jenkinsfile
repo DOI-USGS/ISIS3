@@ -11,7 +11,7 @@ pipeline {
           stage('Fedora25') {
               agent {
                   docker {
-                      label 'cmake'
+                      label 'docker'
                       image 'chrisryancombs/docker_isis'
                       args  '''\
                               -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
@@ -39,7 +39,7 @@ pipeline {
           stage('CentOS7') {
               agent {
                   docker {
-                      label 'cmake'
+                      label 'docker'
                       image 'chrisryancombs/docker_isis_centos'
                       args  '''\
                               -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
