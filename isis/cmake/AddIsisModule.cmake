@@ -222,10 +222,10 @@ function(add_isis_module name)
   # - Base module depends on 3rd party libs, other libs also depend on base.
   # - Only the base module gets both a static and shared library.
   if(${name} STREQUAL ${CORE_LIB_NAME})
-    set(reqLibs ${ALLLIBS})
+    set(reqLibs "${ALLLIBS};gtest;${CMAKE_THREAD_LIBS_INIT}")
     set(alsoStatic ON)
   else()
-    set(reqLibs "${CORE_LIB_NAME};${ALLLIBS}")
+    set(reqLibs "${CORE_LIB_NAME};${ALLLIBS};gtest;${CMAKE_THREAD_LIBS_INIT}")
     set(alsoStatic OFF)
   endif()
 
