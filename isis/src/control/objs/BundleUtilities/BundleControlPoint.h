@@ -71,7 +71,6 @@ namespace Isis {
    *                           formatAprioriSigmaString, and formatBundleOutputDetailString to
    *                           accept a third argument (bool solveRadius) with a default value =
    *                           false.  References #4317.
-   */
    *   @history 2017-07-26 Debbie A. Cook - Added BundleSettings and metersToRadians as arguments 
    *                           to constructor and moved setWeights call from BundleAdjust::init into 
    *                           constructor.   Added m_bundleControlPointCoordinateType.  This option 
