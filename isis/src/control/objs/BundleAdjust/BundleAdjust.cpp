@@ -1277,7 +1277,7 @@ namespace Isis {
 //        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
 //            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
           status = computePartials(coeffTarget, coeffImagePosition, coeffImagePointing,
-                                   coeffPoint3D, coeffRHS, measure);
+                                   coeffPoint3D, coeffRHS, *measure, *point);
 //        }
 //        else {
 //          status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, measure);
@@ -2402,7 +2402,7 @@ namespace Isis {
     double deltaX, deltaY;
 
     Camera *measureCamera = NULL;
-    measureCamera = measure->camera();
+    measureCamera = measure.camera();
 
     // clear partial derivative matrices and vectors
     if (m_bundleSettings->solveTargetBody()) {
@@ -2431,21 +2431,21 @@ namespace Isis {
     // TODO: should we do this in initialization? But SetImage would have to be called there for
     // time dependent sensors.
     if (m_iteration == 1) {
-      measure->setPolySegmentIndices();
+      measure.setPolySegmentIndices();
       if (m_bundleSettings->solveTargetBody()) {
-        measure->setNormalsBlockIndices(1);
+        measure.setNormalsBlockIndices(1);
       }
       else {
-        measure->setNormalsBlockIndices();
+        measure.setNormalsBlockIndices();
       }
     }
 
     // Compute the look vector in instrument coordinates based on time of observation and apriori
     // lat/lon/radius
-    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
+    if (!(measureCamera.GroundMap()->GetXY(point.adjustedSurfacePoint(),
                                             &computedX, &computedY))) {
       QString msg = "Unable to map apriori surface point for measure ";
-      msg += measure->cubeSerialNumber() + " on point " + point->id() + " into focal plane";
+      msg += measure->cubeSerialNumber() + " on point " + point.id() + " into focal plane";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
