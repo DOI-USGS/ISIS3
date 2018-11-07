@@ -551,7 +551,7 @@ namespace Isis {
         continue;
       }
 
-      BundleLidarControlPointQsp bundleLidarPoint(new BundleLidarControlPoint(m_bundleSettings. lidarPoint));
+      BundleLidarControlPointQsp bundleLidarPoint(new BundleLidarControlPoint(m_bundleSettings, lidarPoint));
       m_bundleControlPoints.append(bundleLidarPoint);
 
       // set parent observation for each BundleMeasure
