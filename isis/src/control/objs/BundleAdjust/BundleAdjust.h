@@ -442,7 +442,8 @@ namespace Isis {
                            LinearAlgebra::Matrix  &coeffImagePointing,
                            LinearAlgebra::Matrix  &coeffPoint3D,
                            LinearAlgebra::Vector  &coeffRHS,
-                           BundleMeasureQsp       measure);
+                           BundleMeasure          &measure,
+                           BundleControlPoint     &point);
       bool formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22, //!< multi-segment version
                               SparseBlockColumnMatrix              &N12,
                               LinearAlgebra::VectorCompressed      &n1,
