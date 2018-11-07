@@ -881,7 +881,12 @@ namespace Isis {
       m_iteration = 1;
       double vtpv = 0.0;
       double previousSigma0 = 0.0;
-
+      
+      // Set up formatting for status updates with doubles (e.g. Sigma0, Elapsed Time)
+      int fieldWidth = 20;
+      char format = 'f';
+      int precision = 10;
+      
       // start the clock
       clock_t solveStartClock = clock();
 
@@ -996,11 +1001,6 @@ namespace Isis {
         // compute sigma0
         // (also called variance of unit weight, reference variance, variance factor, etc.)
         m_bundleResults.computeSigma0(vtpv, m_bundleSettings->convergenceCriteria());
-
-        // Set up formatting for status updates with doubles (e.g. Sigma0, Elapsed Time)
-        int fieldWidth = 20;
-        char format = 'f';
-        int precision = 10;
 
         emit statusUpdate(QString("Iteration: %1 \n")
                                   .arg(m_iteration));
