@@ -929,7 +929,7 @@ int main(int argc, char *argv[]) {
     {
       int myArgc = 0;
       strcpy(myArgv[myArgc++], "./unitTest");
-      strcpy(myArgv[myArgc++], "-save");
+      strcpy(myArgv[myArgc++], "-save=unitTestSaveArgs.par");
 
       Isis::UserInterface ui(unitTestXml, myArgc, myArgv);
       ui.SaveHistory();

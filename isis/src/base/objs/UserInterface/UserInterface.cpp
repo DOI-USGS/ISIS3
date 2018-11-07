@@ -541,6 +541,7 @@ namespace Isis {
         int g = lab.groups() - 1;
         if (g >= 0 && lab.group(g).isNamed("UserParameters") ) {
           Isis::PvlGroup &up = lab.group(g);
+          QString commandline(p_progName + " ");
           for (int k = 0; k < up.keywords(); k++) {
             QString keyword = up[k].name();
 
@@ -566,9 +567,15 @@ namespace Isis {
               }
             }
 
-            if (!matchesDefault)
+            if (!matchesDefault) {
               PutAsString(keyword, values);
+              commandline += keyword + "=";
+              foreach(QString val, values) {
+                commandline += val + " ";
+              }
+            }
           }
+          std::cout << commandline << std::endl;
           return;
         }
 

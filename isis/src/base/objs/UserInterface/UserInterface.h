@@ -146,6 +146,9 @@ namespace Isis {
    *                           Added lacking [at]throws documentation to UserInterface.cpp.
    *   @history 2016-04-05 Jesse Mapel - Changed bad histroy file error message to reflect that
    *                           the history file could be for a different application. Fixes #2366
+   *   @history 2018-04-20 Adam Goins - Modified loadHistory() to print out the last command
+   *                           so that users can see the actual command that the -last arg loads.
+   *                           Fixes #4779.
    *
    */
 

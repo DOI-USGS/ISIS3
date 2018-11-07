@@ -108,7 +108,6 @@ namespace Isis {
   }
 
 
-
   /**
    * Construct a control point with given Id
    *
@@ -192,7 +191,7 @@ namespace Isis {
   *                         It was also decided that when importing old
   *                         networks that contain Sigmas, the sigmas will not
   *                         be imported , due to conflicts with the units of
-  *                         the sigmas,we cannot get accurate x,y,z sigams from
+  *                         the sigmas,we cannot get accurate x,y,z sigmas from
   *                         the lat,lon,radius sigmas without the covariance
   *                         matrix.
   * @history 2010-09-28 Tracie Sucharski, Added back the conversion methods
@@ -684,6 +683,7 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAdjustedSurfacePoint(
     SurfacePoint newSurfacePoint) {
+
     PointModified();
     adjustedSurfacePoint = newSurfacePoint;
     return Success;
@@ -770,18 +770,33 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePoint(
     SurfacePoint aprioriSP) {
+    SurfacePoint::CoordinateType coordType = SurfacePoint::Latitudinal;
+    if (parentNetwork) {
+      coordType = parentNetwork->GetCoordType();
+    }
     if (editLock) {
       return PointLocked;
     }
-    if (aprioriSP.GetLatSigma().isValid()) {
-      constraintStatus.set(LatitudeConstrained);
-    }
-    if (aprioriSP.GetLonSigma().isValid()) {
-      constraintStatus.set(LongitudeConstrained);
-    }
-    if (aprioriSP.GetLocalRadiusSigma().isValid()) {
-      constraintStatus.set(RadiusConstrained);
-    }
+      // ***TBD*** Does it make sense to try to do a generic check here? The
+      // data types are different (angles vs distance) so for now do a switch.
+    switch (coordType) {
+      case SurfacePoint::Latitudinal:
+        if (aprioriSP.GetLatSigma().isValid())
+          constraintStatus.set(Coord1Constrained);
+        if (aprioriSP.GetLonSigma().isValid())
+          constraintStatus.set(Coord2Constrained);
+        if (aprioriSP.GetLocalRadiusSigma().isValid())
+          constraintStatus.set(Coord3Constrained);
+        break;
+      case SurfacePoint::Rectangular:
+        if (aprioriSP.GetXSigma().isValid())
+          constraintStatus.set(Coord1Constrained);
+        if (aprioriSP.GetYSigma().isValid())
+          constraintStatus.set(Coord2Constrained);
+        if (aprioriSP.GetZSigma().isValid())
+          constraintStatus.set(Coord3Constrained);
+      }
+
     PointModified();
     aprioriSurfacePoint = aprioriSP;
     return Success;
@@ -854,6 +869,9 @@ namespace Isis {
    *                               points, which are already left unchanged by
    *                               ComputeApriori. If a free point is editLocked
    *                               the editLock will be ignored by this method.
+   *  @history 2017-04-25 Debbie A. Cook - change constraint status calls
+   *                               to use generic coordinate names (Coord1, Coord2,
+   *                               and Coord3).
    *
    * @return Status Success or PointLocked
    */
@@ -863,7 +881,7 @@ namespace Isis {
     // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
     // 2013-11-12 KLE I think this check should include points with any
-    // number of constrained coordinates???
+    // number of constrained coordinates???  I agree DAC.  *** TODO ***
     if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
         QString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
@@ -942,9 +960,9 @@ namespace Isis {
     // constrained coordinates > 1" ???
     else if (GetType() == Fixed
         || NumberOfConstrainedCoordinates() == 3
-        || IsLatitudeConstrained()
-        || IsLongitudeConstrained()
-        || IsRadiusConstrained()) {
+        || IsCoord1Constrained()
+        || IsCoord2Constrained()
+        || IsCoord3Constrained()) {
 
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
@@ -952,6 +970,7 @@ namespace Isis {
       return Success;
     }
 
+    // Beyond this point, we assume the point is free ***TODO*** confirm this
     // Did we have any measures?
     if (goodMeasures == 0) {
       QString msg = "ControlPoint [" + GetId() + "] has no measures which "
@@ -959,7 +978,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // Compute the averages
+    // Compute the averages if all coordinates are free
     //if (NumberOfConstrainedCoordinates() == 0) {
     if (GetType() == Free || NumberOfConstrainedCoordinates() == 0) {
       double avgX = xB / goodMeasures;
@@ -972,14 +991,6 @@ namespace Isis {
         Displacement((avgX*scale), Displacement::Kilometers),
         Displacement((avgY*scale), Displacement::Kilometers),
         Displacement((avgZ*scale), Displacement::Kilometers));
-    }
-    // Since we are not solving yet for x,y,and z in the bundle directly,
-    // longitude must be constrained.  This constrains x and y as well.
-    else {
-      aprioriSurfacePoint.SetRectangular(
-        aprioriSurfacePoint.GetX(),
-        aprioriSurfacePoint.GetY(),
-        Displacement((zB / goodMeasures), Displacement::Kilometers));
     }
 
     adjustedSurfacePoint = aprioriSurfacePoint;
@@ -1039,7 +1050,7 @@ namespace Isis {
       double cuLine;
       CameraFocalPlaneMap *fpmap = m->Camera()->FocalPlaneMap();
 
-      // Map the lat/lon/radius of the control point through the Spice of the
+      // Map the coordinates of the control point through the Spice of the
       // measurement sample/line to get the computed sample/line.  This must be
       // done manually because the camera will compute a new time for line scanners,
       // instead of using the measured time.
@@ -1194,7 +1205,7 @@ namespace Isis {
       Camera *cam = m->Camera();
       double cudx, cudy;
 
-      // Map the lat/lon/radius of the control point through the Spice of the
+      // Map the coordinates of the control point through the Spice of the
       // measurement sample/line to get the computed undistorted focal plane
       // coordinates (mm if not radar).  This works for radar too because in
       // the undistorted focal plane, y has not been set to 0 (set to 0 when
@@ -1574,16 +1585,16 @@ namespace Isis {
     return constraintStatus.any();
   }
 
-  bool ControlPoint::IsLatitudeConstrained() {
-    return constraintStatus[LatitudeConstrained];
+  bool ControlPoint::IsCoord1Constrained() {
+    return constraintStatus[Coord1Constrained];
   }
 
-  bool ControlPoint::IsLongitudeConstrained() {
-    return constraintStatus[LongitudeConstrained];
+  bool ControlPoint::IsCoord2Constrained() {
+    return constraintStatus[Coord2Constrained];
   }
 
-  bool ControlPoint::IsRadiusConstrained() {
-    return constraintStatus[RadiusConstrained];
+  bool ControlPoint::IsCoord3Constrained() {
+    return constraintStatus[Coord3Constrained];
   }
 
   int ControlPoint::NumberOfConstrainedCoordinates() {
@@ -2109,6 +2120,7 @@ namespace Isis {
   /**
    * Set jigsaw rejected flag for all measures to false
    * and set the jigsaw rejected flag for the point itself to false
+   *
    */
   void ControlPoint::ClearJigsawRejected() {
     int nmeasures = measures->size();

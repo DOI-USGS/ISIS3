@@ -602,13 +602,13 @@ namespace Isis {
     if (m_bundleSettings->errorPropagation()) {
       m_ui->rmsAdjustedPointSigmasGroupBox->setEnabled(true);
       m_ui->latitudeLcdNumber->display(
-                              m_bundleSolutionInfo->bundleResults().sigmaLatitudeStatisticsRms());
+                              m_bundleSolutionInfo->bundleResults().sigmaCoord1StatisticsRms());
       m_ui->longitudeLcdNumber->display(
-                              m_bundleSolutionInfo->bundleResults().sigmaLongitudeStatisticsRms());
+                              m_bundleSolutionInfo->bundleResults().sigmaCoord2StatisticsRms());
 
       if (m_bundleSettings->solveRadius()) {
         m_ui->radiusLcdNumber->display(
-                              m_bundleSolutionInfo->bundleResults().sigmaRadiusStatisticsRms());
+                              m_bundleSolutionInfo->bundleResults().sigmaCoord3StatisticsRms());
         m_ui->radiusLcdNumber->setEnabled(true);
         m_ui->radiusLcdLabel->setEnabled(true);
       }

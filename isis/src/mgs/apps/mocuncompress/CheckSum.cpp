@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -47,7 +54,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 #include "fs.h"
 #include "CheckSum.h"
 
-uint8 CS8EAC(register uint8 *d, register uint32 l)
+uint8 CS8EAC(uint8 *d, uint32 l)
 {
   /*
   * Compute the eight bit end-around-carry checksum of a data vector.
@@ -91,7 +98,7 @@ uint32 cs = 0;
 }
 
 #if defined(TEST)
-uint8 tcs8eac(d, l)register uint8 *d;
+uint8 tcs8eac(d, l)uint8 *d;
 uint32 l;
 {
   /*
@@ -106,7 +113,7 @@ uint32 cs = 0;
 }
 #endif
 
-void CS8EACA1(register uint8 *dat, uint32 len)
+void CS8EACA1(uint8 *dat, uint32 len)
 {
   /*
   * Apply type 1 CS8EAC checksum to dat.
@@ -122,7 +129,7 @@ void CS8EACA1(register uint8 *dat, uint32 len)
   *(uint8 *)&dat[len-1] = t;
 }
 
-void CS8EACA2(register uint8 *dat, uint32 len)
+void CS8EACA2(uint8 *dat, uint32 len)
 {
   /*
   * Apply type 2 CS8EAC checksum to dat.
@@ -138,7 +145,7 @@ void CS8EACA2(register uint8 *dat, uint32 len)
   *(uint8 *)&dat[len-1] = 0xff - t;
 }
 
-unsigned int CS8EACC1(register uint8 *dat, unsigned int len)
+unsigned int CS8EACC1(uint8 *dat, unsigned int len)
 {
   /*
   * Check type 1 checksum.
@@ -156,7 +163,7 @@ unsigned int CS8EACC1(register uint8 *dat, unsigned int len)
   return rv;
 }
 
-unsigned int CS8EACC2(register uint8 *dat, unsigned int len)
+unsigned int CS8EACC2(uint8 *dat, unsigned int len)
 {
   /*
   * Check type 2 checksum.
@@ -174,7 +181,7 @@ unsigned int CS8EACC2(register uint8 *dat, unsigned int len)
   return rv;
 }
 
-uint16 CS16EAC(register uint8 *d, uint32 len)
+uint16 CS16EAC(uint8 *d, uint32 len)
 {
   /*
   * Compute the sixteen bit end-around-carry checksum of a data vector.
@@ -229,7 +236,7 @@ uint16 t;
 }
 
 #if defined(TEST)
-uint16 tcs16eac(d, l)register uint8 *d;
+uint16 tcs16eac(d, l)uint8 *d;
 uint32 l;
 {
   /*
@@ -247,7 +254,7 @@ uint32 cs = 0;
 }
 #endif
 
-void CS16EACA1(register uint8 *dat, uint32 len)
+void CS16EACA1(uint8 *dat, uint32 len)
 {
   /*
   * Apply type 1 CS16EAC checksum to dat.
@@ -265,7 +272,7 @@ void CS16EACA1(register uint8 *dat, uint32 len)
   /* *(uint16*)&(dat[len-2]) = t; */
 }
 
-void CS16EACA2(register uint8 *dat, uint32 len)
+void CS16EACA2(uint8 *dat, uint32 len)
 {
   /*
   * Apply type 2 CS16EAC checksum to dat.
@@ -284,7 +291,7 @@ void CS16EACA2(register uint8 *dat, uint32 len)
   /* *(uint16*)&(dat[len-2]) = t; */
 }
 
-unsigned int CS16EACC1(register uint8 *dat, unsigned int len)
+unsigned int CS16EACC1(uint8 *dat, unsigned int len)
 {
   /*
   * Check type 1 checksum.
@@ -305,7 +312,7 @@ unsigned int CS16EACC1(register uint8 *dat, unsigned int len)
   return rv;
 }
 
-unsigned int CS16EACC2(register uint8 *dat, unsigned int len)
+unsigned int CS16EACC2(uint8 *dat, unsigned int len)
 {
   /*
   * Check type 2 checksum.
@@ -323,7 +330,7 @@ unsigned int CS16EACC2(register uint8 *dat, unsigned int len)
   return rv;
 }
 
-unsigned int ParityOf(register uint8 *d, register uint32 l)
+unsigned int ParityOf(uint8 *d, uint32 l)
 {
   /*
   * Compute parity of data vector.

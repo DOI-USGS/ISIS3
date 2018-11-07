@@ -289,33 +289,33 @@ Pixel Ifov:
 -0.0115 , 0.0115
 Basic Mapping: 
 Group = Mapping
-  TargetName         = Moon
+  TargetName         = MOON
   EquatorialRadius   = 1737400.0 <meters>
   PolarRadius        = 1737400.0 <meters>
   LatitudeType       = Planetocentric
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 360
-  MinimumLatitude    = 87.8
+  MinimumLatitude    = 87.83
   MaximumLatitude    = 90.0
   MinimumLongitude   = 0.0
   MaximumLongitude   = 360.0
-  PixelResolution    = 193.58
+  PixelResolution    = 194.06
   ProjectionName     = Sinusoidal
 End_Group
 End
 
 180 Domain Range: 
-Latitude Range: 87.8 to 90
+Latitude Range: 87.83 to 90
 Longitude Range: -180 to 180
 
 Test Forward/Reverse Camera Calculations At Center Of Image...
 Sample = 192
 Line = 144
 SetImage (sample, line): Yes
-Latitude = 89.18
-Longitude = 13.54
+Latitude = 89.23
+Longitude = 12.57
 Radius = 1.736e+06
-Point = 24.26 5.844 1736
+Point = 22.82 5.089 1736
 SetUniversalGround (cam2->UniversalLatitude(), cam2->UniversalLongitude()): 1
 Sample = 192
 Line = 144

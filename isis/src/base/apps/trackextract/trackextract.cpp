@@ -17,7 +17,6 @@ using namespace Isis;
 
 // Taken from ProcessMosaic
 const int FLOAT_MIN = -16777215;
-const int FLOAT_MAX = 16777216;
 
 void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBand);
 void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector);

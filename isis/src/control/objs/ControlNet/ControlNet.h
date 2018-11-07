@@ -27,6 +27,7 @@
 #include <QMetaType>
 #include <QObject> // parent class
 #include <QSharedPointer>
+#include "SurfacePoint.h"
 #include <QString>
 #include <QMap>
 #include <QVariant>
@@ -213,6 +214,10 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added throw to caught exception for bad control net
    *                           import in constructor. Also removed p_invalid as it was no longer
    *                           being used anywhere. Fixes #5068.
+   *   @history 2017-08-30 Debbie A. Cook - Added an optional argument to the constructor 
+   *                           for the control point coordinate type.  At this point this value is only 
+   *                           stored in the active ControlNet.  It will be added to the stored 
+   *                           ControlNet at a later date.  References #4649 and #501.
    *   @history 2017-12-12 Kristin Berry - Updated to use QMap and QVector rather than std::map
    *                           and std::vector. Fixes #5259.
    *   @history 2017-12-18 Adam Goins - Added GetLastModified() accessor. References #5258.
@@ -285,9 +290,10 @@ namespace Isis {
         GraphModified
       };
 
-      ControlNet();
+      ControlNet(SurfacePoint::CoordinateType = SurfacePoint::Latitudinal);
       ControlNet(const ControlNet &other);
-      ControlNet(const QString &filename, Progress *progress = 0);
+      ControlNet(const QString &filename, Progress *progress = 0,
+                 SurfacePoint::CoordinateType = SurfacePoint::Latitudinal);
 
       ~ControlNet();
 
@@ -347,7 +353,7 @@ namespace Isis {
       QString GetLastModified() const;
       QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
-
+      SurfacePoint::CoordinateType GetCoordType();
 
       void SetCreatedDate(const QString &date);
       void SetDescription(const QString &newDescription);
@@ -361,6 +367,7 @@ namespace Isis {
       void SetTarget(Pvl label);
       void SetTarget(const ControlNet &other);
       void SetUserName(const QString &name);
+      void SetCoordType(SurfacePoint::CoordinateType coordType);
 
       void swap(ControlNet &other);
       ControlNet &operator=(const ControlNet &other);
@@ -481,7 +488,8 @@ namespace Isis {
       //!  #rejected measures
       QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
 
-      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object.
+      bool m_ownPoints; //!< Specifies ownership of point list. True if owned by this object. 
+      SurfacePoint::CoordinateType m_coordType; //!< The coordinate type of the control points
   };
 
   //! This typedef is for future implementation of target body

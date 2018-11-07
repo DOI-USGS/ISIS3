@@ -99,6 +99,9 @@ namespace Isis {
    *                           after the first call to these methods are O(1) and are not
    *                           bottlenecekd by any file I/O that occurs in the Compose()
    *                           methods. References #497.
+   *   @history 2018-10-03 Tracie Sucharski - Added constructor which takes cube and a calculated
+   *                           footprint.  This was done for ipce imported shapes which do not
+   *                           contain a footprint. References #5504.
    */
 
   class Image : public QObject {
@@ -106,6 +109,8 @@ namespace Isis {
     public:
       explicit Image(QString imageFileName, QObject *parent = 0);
       explicit Image(Cube *imageCube, QObject *parent = 0);
+      explicit Image(Cube *imageCube, geos::geom::MultiPolygon *footprint, QString id,
+                     QObject *parent = 0);
       Image(FileName imageFolder, XmlStackedHandlerReader *xmlReader, QObject *parent = 0);
       ~Image();
 

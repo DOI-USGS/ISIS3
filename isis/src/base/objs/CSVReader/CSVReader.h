@@ -77,6 +77,9 @@ namespace Isis {
    *                           QString/StringTools merge
    *   @history 2008-06-18 Christopher Austin - Fixed documentation
    *   @history 2017-09-22 Cole Neubauer - Fixed documentation. References #4807
+   *   @history 2018-10-18 Kaitlyn Lee - Added "[]" around file names in exception 
+   *                           messages. References #5520.
+
    */
   template <typename TokenStore = QString>
   class CSVParser {

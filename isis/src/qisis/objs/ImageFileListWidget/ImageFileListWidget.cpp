@@ -23,12 +23,14 @@
 #include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "Image.h"
 #include "ImageTreeWidget.h"
 #include "ImageTreeWidgetItem.h"
 #include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
 #include "PvlObject.h"
+#include "Shape.h"
 #include "TextFile.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -827,7 +829,15 @@ namespace Isis {
 
       else if (localName == "image" && m_currentGroup) {
         Image *image = m_fileList->m_directory->project()->image(atts.value("id"));
-        m_currentGroup->addChild(m_fileList->m_tree->prepCube(m_currentImageList, image));
+        // If Image for id doesn't exist, check shapes.  If corresponds to Shape, new Image will
+        // need to be created.
+        if (!image) {
+          Shape *shape = m_fileList->m_directory->project()->shape(atts.value("id"));
+          if (shape) {
+            image = new Image(shape->cube(), shape->footprint(), atts.value("id"));
+          }
+        }
+        m_currentGroup->addChild(m_fileList->m_tree->prepCube(m_currentImageList, image)); 
       }
 
     }

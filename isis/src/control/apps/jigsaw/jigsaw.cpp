@@ -109,6 +109,8 @@ void IsisMain() {
     if (ui.GetBoolean("UPDATE") ) {
       if ( !bundleAdjustment->isConverged() ) {
         gp += PvlKeyword("Status","Bundle did not converge, camera pointing NOT updated");
+        QString msg = "Bundle did not converge within MAXITS [" + toString(ui.GetInteger("MAXITS")) + "] iterations [" + cnetFile +  "]";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
         for (int i = 0; i < bundleAdjustment->numberOfImages(); i++) {
@@ -166,26 +168,49 @@ BundleSettingsQsp bundleSettings(UserInterface &ui) {
   settings->setValidateNetwork(true);
 
   // solve options
-  double latitudeSigma  = Isis::Null;
-  double longitudeSigma = Isis::Null;
-  double radiusSigma    = Isis::Null;
+  QString coordTypeBundleStr = ui.GetString("CONTROL_POINT_COORDINATE_TYPE_BUNDLE");
+  QString coordTypeReportsStr = ui.GetString("CONTROL_POINT_COORDINATE_TYPE_REPORTS");
+  SurfacePoint::CoordinateType ctypeBundle = SurfacePoint::Latitudinal;
+  SurfacePoint::CoordinateType ctypeReports = SurfacePoint::Latitudinal;
+  
+  if (coordTypeBundleStr == "RECTANGULAR") {
+    ctypeBundle = SurfacePoint::Rectangular;
+  }
+
+  if (coordTypeReportsStr == "RECTANGULAR") {
+    ctypeReports = SurfacePoint::Rectangular;
+  }
+  
+  double coord1Sigma  = Isis::Null;
+  double coord2Sigma = Isis::Null;
+  double coord3Sigma    = Isis::Null;
   if (ui.WasEntered("POINT_LATITUDE_SIGMA")) {
-    latitudeSigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
+    coord1Sigma = ui.GetDouble("POINT_LATITUDE_SIGMA");
   }
   if (ui.WasEntered("POINT_LONGITUDE_SIGMA")) {
-    longitudeSigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
+    coord2Sigma = ui.GetDouble("POINT_LONGITUDE_SIGMA");
   }
   if (ui.WasEntered("POINT_RADIUS_SIGMA")) {
-    radiusSigma = ui.GetDouble("POINT_RADIUS_SIGMA");
+    coord3Sigma = ui.GetDouble("POINT_RADIUS_SIGMA");
+  }
+  if (ui.WasEntered("POINT_X_SIGMA")) {
+    coord1Sigma = ui.GetDouble("POINT_X_SIGMA");
+  }
+  if (ui.WasEntered("POINT_Y_SIGMA")) {
+    coord2Sigma = ui.GetDouble("POINT_Y_SIGMA");
+  }
+  if (ui.WasEntered("POINT_Z_SIGMA")) {
+    coord3Sigma = ui.GetDouble("POINT_Z_SIGMA");
   }
 
   settings->setSolveOptions(ui.GetBoolean("OBSERVATIONS"), 
                             ui.GetBoolean("UPDATE"), 
                             ui.GetBoolean("ERRORPROPAGATION"), 
                             ui.GetBoolean("RADIUS"),
-                            latitudeSigma, 
-                            longitudeSigma, 
-                            radiusSigma);
+                            ctypeBundle, ctypeReports, 
+                            coord1Sigma, 
+                            coord2Sigma, 
+                            coord3Sigma);
 
   // Don't create the inverse correlation matrix file
   settings->setCreateInverseMatrix(false);
