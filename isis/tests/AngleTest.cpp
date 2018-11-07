@@ -4,6 +4,7 @@
 #include "IException.h"
 
 #include <QString>
+#include <QDebug> 
 
 #include <gtest/gtest.h>
 
@@ -56,9 +57,13 @@ TEST(AngleTest, Mutators) {
   EXPECT_NEAR(angle.radians(), Isis::PI, TEST_EPSILON); 
 }
 
-// How do we test qDebug() << angle
-TEST(AngleOperators, DISABLED_QDebug) {
-  EXPECT_TRUE(true); 
+TEST(AngleOperators, QDebug) {
+  // Stream qDebug output to a string and then do a string comparison?
+  Isis::Angle angle(45.0, Isis::Angle::Degrees);
+  QString qdebug_output;
+  QDebug debug(&qdebug_output);
+  debug << angle;
+  EXPECT_STREQ(qdebug_output.toLatin1(), "0.785398 <radians> (45 <degrees>) "); 
 }
 
 
@@ -133,11 +138,20 @@ TEST(AngleOperators, LessThanOrEqualTo) {
   EXPECT_FALSE(angle2 <= angle1); 
 }
 
-// Can we test error messages with an EXPECT_THROW?? 
+
 TEST(AngleExceptions, NullAngle){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
-  EXPECT_THROW(angle1 < Isis::Angle(), Isis::IException);
-  // TODO: use Jesse's code to test error message. 
+  
+  try {
+    angle1 < Isis::Angle();
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator." );
+   }
+   catch(...) {
+     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator, but got something else "; 
+   }
 }
     
 
