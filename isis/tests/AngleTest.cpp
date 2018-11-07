@@ -139,7 +139,7 @@ TEST(AngleOperators, LessThanOrEqualTo) {
 }
 
 
-TEST(AngleExceptions, NullAngle){
+TEST(AngleExceptions, LessThanNullAngle){
   Isis::Angle angle1(30., Isis::Angle::Degrees );
   
   try {
@@ -154,6 +154,68 @@ TEST(AngleExceptions, NullAngle){
    }
 }
     
+TEST(AngleExceptions, NullAngleLessThan){
+  Isis::Angle angle1(30., Isis::Angle::Degrees );
+
+  try {
+    Isis::Angle() < angle1;
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator." );
+   }
+   catch(...) {
+     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator, but got something else "; 
+   }
+}
+
+TEST(AngleExceptions, NullAngleLessThanOrEqual){
+  Isis::Angle angle1(30., Isis::Angle::Degrees );
+
+  try {
+    Isis::Angle() <= angle1;
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator." );
+   }
+   catch(...) {
+     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator, but got something else "; 
+   }
+}
+
+
+TEST(AngleExceptions, GreaterThanNullAngle){
+  Isis::Angle angle1(30., Isis::Angle::Degrees );
+  
+  try {
+    angle1 > Isis::Angle();
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator." );
+   }
+   catch(...) {
+     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator, but got something else "; 
+   }
+}
+
+
+TEST(AngleExceptions, GreaterThanOrEqualToNullAngle){
+  Isis::Angle angle1(30., Isis::Angle::Degrees );
+  
+  try {
+    angle1 >= Isis::Angle();
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator." );
+   }
+   catch(...) {
+     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator, but got something else "; 
+   }
+}
+
 
 TEST(AngleOperators, Multiplication) {
   Isis::Angle angle(30.0, Isis::Angle::Degrees );
