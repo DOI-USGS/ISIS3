@@ -2442,7 +2442,7 @@ namespace Isis {
 
     // Compute the look vector in instrument coordinates based on time of observation and apriori
     // lat/lon/radius
-    if (!(measureCamera.GroundMap()->GetXY(point.adjustedSurfacePoint(),
+    if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
                                             &computedX, &computedY))) {
       QString msg = "Unable to map apriori surface point for measure ";
       msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
