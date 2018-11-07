@@ -71,7 +71,6 @@ option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
 option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
-option(pybindings      "Turn on to build Python bindings"               OFF )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory
@@ -294,70 +293,6 @@ endforeach()
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
-
-#===============================================================================
-#===============================================================================
-
-# Set python bindings configuration and set target for generating C++ files
-if(pybindings)
-  message("Configuring Python Bindings")
-
-  if (NOT DEFINED PYINSTALL_DIR)
-    set(PYINSTALL_DIR ${PYTHON_SITE_PACKAGES_DIR})
-  endif()
-  message(STATUS "PYTHON BINDINGS INSTALL DIR: ${PYINSTALL_DIR}")
-
- # We need to get the locations for sip files, modules, etc.
- set(ISIS_SIP_DIR "${CMAKE_SOURCE_DIR}/sipfiles")
- set(ISIS_SIP_MODULE "${CMAKE_SOURCE_DIR}/sipfiles/master.sip")
- set(SIP_BUILD_FILE "isispy.sbf")
- set(ISIS_SIP_CODE_DIR ${CMAKE_BINARY_DIR}/sipsrc)
-
- # Create the output directory for the new .CPP files
- execute_process(COMMAND mkdir -p "${ISIS_SIP_CODE_DIR}")
-
- # get list of output files exepected from sip
-
- # get the PYQT configuration based flags from Python
- execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
-                 "from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict;print(qtconfigdict['sip_flags'])"
-                 OUTPUT_VARIABLE PYQT_SIP_FLAGS)
-
- # CMAKE doesn't handle spaces from python well when piping that into the
- # command because of white space and a trailing new line,
- # so we turn it into a list
- message(STATUS "Getting SIP config...")
- message(STATUS "Attempting 'python -c \"from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict; print(qtconfigdict['sip_flags'])\"'")
-
- if (${PYQT_SIP_FLAGS} STREQUAL "")
-    message(FATAL_ERROR "print(qtconfigdict['sip_flags']) returned empty string, is sip installed? Python binding can be disabled with pybindings=OFF")
- endif()
- string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
- string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
-
- message(STATUS "FLAGS: ${PYQT_SIP_FLAGS}")
- message(STATUS "Generating C++ code from sip files")
- message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
- message(STATUS "SIP MODULE: ${ISIS_SIP_MODULE}")
- message(STATUS "SIP GENERATED CODE DIR: ${ISIS_SIP_CODE_DIR}")
-
- execute_process(COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE})
-
- # add target so users can run the command after initial configuration
- add_custom_target(sipfiles
-                  COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE}
-                  COMMENT "Generating C++ code from sip files")
-
- file(GLOB SIP_GENERATED_SOURCE_FILES ${ISIS_SIP_CODE_DIR}/*.cpp)
- add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
- target_link_libraries(isispy ${ALLLIBS})
- target_link_libraries(isispy isis3)
- set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3 INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
- add_dependencies(isispy sipfiles)
-
- install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})
-endif()
-
 
 #===============================================================================
 #===============================================================================

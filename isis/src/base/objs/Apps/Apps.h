@@ -11,5 +11,5 @@
 #include "UserInterface.h"
 
 namespace Isis {
-  extern void crop(std::vector<char*>);
+  extern void crop(std::vector<char*>&);
 }

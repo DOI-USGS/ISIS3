@@ -1,20 +1,7 @@
 #include "Isis.h"
 
-#include <cmath>
-
 #include "Apps.h"
-#include "Cube.h"
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
-#include "LineManager.h"
-#include "FileName.h"
-#include "IException.h"
-#include "Projection.h"
-#include "AlphaCube.h"
-#include "Table.h"
-#include "SubArea.h"
 
-using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
@@ -24,13 +11,13 @@ int sinc, linc;
 Cube *cube = NULL;
 LineManager *in = NULL;
 
-void crop(Buffer &out);
-
 void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  Isis::crop(ui.getArgs());
+  std::vector<char *> args = ui.getArgs();
+  crop(args);
 
+  // not super worried about this for now
   // Write the results to the log
   // Application::Log(results);
 }

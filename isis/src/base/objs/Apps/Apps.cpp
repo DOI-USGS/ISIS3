@@ -34,10 +34,9 @@ void run_crop(Buffer &out) {
   if(out.Line() == nl) sb++;
 }
 
-void crop(std::vector<char*> args) {
+void crop(std::vector<char*>& args) {
   // hard code for now
   UserInterface ui("/Users/krodriguez-pr/repos/ISIS3/isis/src/base/apps/crop/crop.xml", args);
-
   ProcessByLine p;
 
   // Open the input cube

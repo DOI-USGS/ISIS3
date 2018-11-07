@@ -48,9 +48,28 @@ namespace Isis {
       argv[i] = args[i];
     }
 
-    // reinstantiate using argc,argv constructor.
-    this->~UserInterface();
-    new (this) UserInterface(xmlfile, argc, argv);
+    p_interactive = false;
+    p_info = false;
+    p_infoFileName = "";
+    p_gui = NULL;
+    p_errList = "";
+    p_saveFile = "";
+    p_abortOnError = true;
+    p_parentId = 0;
+
+    // Make sure the user has a .Isis and .Isis/history directory
+    try {
+      FileName setup = "$HOME/.Isis/history";
+      // cannot completely test this if in unit test
+      if ( !setup.fileExists() ) {
+        setup.dir().mkpath(".");
+      }
+    }
+    catch (IException &) {
+    }
+
+    // Parse the user input
+    loadCommandLine(argc, argv);
   }
 
   /**
