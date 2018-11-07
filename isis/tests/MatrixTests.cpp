@@ -6,7 +6,7 @@
 
 TEST (MatrixTests, ConstructorWithBadArgs) {
   try {
-    Isis::Matrix A(0, 2);
+    Isis::Matrix A(0, 1);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -17,7 +17,7 @@ TEST (MatrixTests, ConstructorWithBadArgs) {
   }
   
   try {
-    Isis::Matrix A(-1, 2);
+    Isis::Matrix A(-1, 1);
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -55,7 +55,7 @@ TEST (MatrixTests, IdentityConstructorWithBadArgs) {
 
 
 TEST (MatrixTests, DeterminantWithBadArgs) {
-  Isis::Matrix A(2, 1);
+  Isis::Matrix A(1, 2));
   
   try {
     A.determinant();
@@ -71,7 +71,7 @@ TEST (MatrixTests, DeterminantWithBadArgs) {
 
 
 TEST (MatrixTests, TraceWithBadArgs) {
-  Isis::Matrix A(2, 1);
+  Isis::Matrix A(1, 2);
   
   try {
     A.Trace();
@@ -87,11 +87,23 @@ TEST (MatrixTests, TraceWithBadArgs) {
 
 
 TEST (MatrixTests, AddMatricesWithBadArgs) {
-  Isis::Matrix A(2, 1);
-  Isis::Matrix B(1, 2);
+  Isis::Matrix A(1, 2);
+  Isis::Matrix B(2, 2);
+  Isis::Matrix C(2, 1);
   
   try {
     A + B;
+    FAIL() << "Expected an IException";
+  }
+  catch(Isis::IException &e) {
+    EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Incompatible matrix dimensions, cannot add the matrices.");
+  }
+  catch(...) {
+    FAIL() << "Expected error message: **PROGRAMMER ERROR** Incompatible matrix dimensions, cannot add the matrices."
+  }
+  
+  try {
+    A + C;
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -104,11 +116,23 @@ TEST (MatrixTests, AddMatricesWithBadArgs) {
 
 
 TEST (MatrixTests, SubtractMatricesWithBadArgs) {
-  Isis::Matrix A(2, 1);
-  Isis::Matrix B(1, 2);
+  Isis::Matrix A(1, 2);
+  Isis::Matrix B(2, 2);
+  Isis::Matrix C(2, 1);
   
   try {
     A - B;
+    FAIL() << "Expected an IException";
+  }
+  catch(Isis::IException &e) {
+    EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Incompatible matrix dimensions, cannot subtract the matrices.");
+  }
+  catch(...) {
+    FAIL() << "Expected error message: **PROGRAMMER ERROR** Incompatible matrix dimensions, cannot subtract the matrices."
+  }
+  
+  try {
+    A - C;
     FAIL() << "Expected an IException";
   }
   catch(Isis::IException &e) {
@@ -121,8 +145,8 @@ TEST (MatrixTests, SubtractMatricesWithBadArgs) {
 
 
 TEST (MatrixTests, MultiplyMatrixWithBadArgs) {
-  Isis::Matrix A(2, 1);
-  Isis::Matrix B(1, 2);
+  Isis::Matrix A(1, 1);
+  Isis::Matrix B(2, 1);
   
   try {
     A * B;
@@ -138,8 +162,9 @@ TEST (MatrixTests, MultiplyMatrixWithBadArgs) {
 
 
 TEST (MatrixTests, MultiplyMatrixElementwiseWithBadArgs) {
-  Isis::Matrix A(2, 1);
-  Isis::Matrix B(1, 2);
+  Isis::Matrix A(1, 2);
+  Isis::Matrix B(2, 2);
+  Isis::Matrix C(2, 1);
   
   try {
     A.MultiplyElementWise(B);
@@ -151,7 +176,69 @@ TEST (MatrixTests, MultiplyMatrixElementwiseWithBadArgs) {
   catch(...) {
     FAIL() << "Expected error message: **PROGRAMMER ERROR** Incompatible matrix dimensions, cannot multiply the matrices."
   }
+  
+  try {
+    A.MultiplyElementWise(C);
+    FAIL() << "Expected an IException";
+  }
+  catch(Isis::IException &e) {
+    EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Incompatible matrix dimensions, cannot multiply the matrices.");
+  }
+  catch(...) {
+    FAIL() << "Expected error message: **PROGRAMMER ERROR** Incompatible matrix dimensions, cannot multiply the matrices."
+  }
 }
+
+
+TEST (MatrixTests, InverseWithBadArgs) {
+  Isis::Matrix A(1, 2);
+  
+  try {
+    A.Inverse();
+    FAIL() << "Expected an IException";
+  }
+  catch(Isis::IException &e) {
+    EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Unable to calculate the inverse, the matrix is not square.");
+  }
+  catch(...) {
+    FAIL() << "Expected error message: **PROGRAMMER ERROR** Unable to calculate the inverse, the matrix is not square."
+  }
+}
+
+
+TEST (MatrixTests, EigenValuesWithBadArgs) {
+  Isis::Matrix A(1, 2);
+  
+  try {
+    A.eigenvalues();
+    FAIL() << "Expected an IException";
+  }
+  catch(Isis::IException &e) {
+    EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Unable to calculate eigenvalues, the matrix is not square.");
+  }
+  catch(...) {
+    FAIL() << "Expected error message: **PROGRAMMER ERROR** Unable to calculate eigenvalues, the matrix is not square."
+  }
+}
+
+
+TEST (MatrixTests, EigenVectorsWithBadArgs) {
+  Isis::Matrix A(1, 2);
+  
+  try {
+    A.eigenvalues();
+    FAIL() << "Expected an IException";
+  }
+  catch(Isis::IException &e) {
+    EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Unable to calculate eigenvectors, the matrix is not square.");
+  }
+  catch(...) {
+    FAIL() << "Expected error message: **PROGRAMMER ERROR** Unable to calculate eigenvectors, the matrix is not square."
+  }
+}
+
+
+
 
 
 
