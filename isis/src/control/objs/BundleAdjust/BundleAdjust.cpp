@@ -2445,7 +2445,7 @@ namespace Isis {
     if (!(measureCamera.GroundMap()->GetXY(point.adjustedSurfacePoint(),
                                             &computedX, &computedY))) {
       QString msg = "Unable to map apriori surface point for measure ";
-      msg += measure->cubeSerialNumber() + " on point " + point.id() + " into focal plane";
+      msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -2513,7 +2513,7 @@ namespace Isis {
       if (m_bundleTargetBody->solveTriaxialRadii()) {
 
         std::vector<double> lookBWRTRadiusA =
-            measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+            measureCamera->GroundMap()->EllipsoidPartial(point.adjustedSurfacePoint(),
                                                          CameraGroundMap::WRT_MajorAxis);
 
         measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusA, &coeffTarget(0, index),
@@ -2521,7 +2521,7 @@ namespace Isis {
         index++;
 
         std::vector<double> lookBWRTRadiusB =
-            measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+            measureCamera->GroundMap()->EllipsoidPartial(point.adjustedSurfacePoint(),
                                                          CameraGroundMap::WRT_MinorAxis);
 
         measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusB, &coeffTarget(0, index),
@@ -2529,7 +2529,7 @@ namespace Isis {
         index++;
 
         std::vector<double> lookBWRTRadiusC =
-            measureCamera->GroundMap()->EllipsoidPartial(surfacePoint,
+            measureCamera->GroundMap()->EllipsoidPartial(point.adjustedSurfacePoint(),
                                                          CameraGroundMap::WRT_PolarAxis);
 
         measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRadiusC, &coeffTarget(0, index),
@@ -2538,7 +2538,7 @@ namespace Isis {
       }
     }
 
-    measure->parentBundleObservation()->computePartials(coeffImagePosition, coeffImagePointing);
+    measure.parentBundleObservation()->computePartials(coeffImagePosition, coeffImagePointing);
 
     // Complete partials calculations for 3D point (latitudinal or rectangular)
     measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
@@ -2568,8 +2568,8 @@ namespace Isis {
     obsValue = deltaY / measureCamera->PixelPitch();
     m_bundleResults.addResidualsProbabilityDistributionObservation(obsValue);
 
-    double observationSigma = measure->measureSigma();
-    double observationWeightSqrt = measure->measureWeightSqrt();
+    double observationSigma = measure.measureSigma();
+    double observationWeightSqrt = measure.measureWeightSqrt();
 
     if (m_bundleResults.numberMaximumLikelihoodModels()
           > m_bundleResults.maximumLikelihoodModelIndex()) {
