@@ -882,11 +882,6 @@ namespace Isis {
       double vtpv = 0.0;
       double previousSigma0 = 0.0;
 
-      // Set up formatting for status updates with doubles (e.g. Sigma0, Elapsed Time)
-      int fieldWidth = 20;
-      char format = 'f';
-      int precision = 10;
-
       // start the clock
       clock_t solveStartClock = clock();
 
