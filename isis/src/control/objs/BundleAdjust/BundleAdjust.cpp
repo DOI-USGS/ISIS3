@@ -2502,7 +2502,7 @@ namespace Isis {
 
       if (m_bundleTargetBody->solveMeanRadius()) {
         std::vector<double> lookBWRTMeanRadius =
-            measureCamera->GroundMap()->MeanRadiusPartial(surfacePoint,
+            measureCamera->GroundMap()->MeanRadiusPartial(point.adjustedSurfacePoint(),
                                                           m_bundleTargetBody->meanRadius());
 
         measureCamera->GroundMap()->GetdXYdPoint(lookBWRTMeanRadius, &coeffTarget(0, index),
