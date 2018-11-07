@@ -8,7 +8,8 @@
 #include "AlphaCube.h"
 #include "Table.h"
 #include "SubArea.h"
+#include "UserInterface.h"
 
 namespace Isis {
-  extern void crop(QString from, QString to, int line, int sample, int sinc, int linc, int nsamples=-1, int nlines=-1, bool propSpice=true);
+  extern void crop(std::vector<char*>);
 }

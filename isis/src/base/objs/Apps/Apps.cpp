@@ -6,6 +6,12 @@ using namespace Isis;
 
 namespace Isis {
 
+
+// global variables in the original app, not a problem on self contained
+// apps but more than a little sloppy here since these symbols are going into
+// libisis. They exist because crop_proccess needs access. Putting these into
+// there own namespace a quick solution for this? Long term maybe make
+// proccess functions more flexible.
 int ss, sl, sb;
 int ns, nl, nb;
 int linc, sinc;
@@ -14,7 +20,7 @@ LineManager *in = NULL;
 
 
 // Line processing routine
-void crop_process(Buffer &out) {
+void run_crop(Buffer &out) {
   // Read the input line
   int iline = sl + (out.Line() - 1) * linc;
   in->SetLine(iline, sb);
@@ -28,36 +34,35 @@ void crop_process(Buffer &out) {
   if(out.Line() == nl) sb++;
 }
 
-void crop(QString from, QString to, int line, int sample, int nsamples, int nlines, int s_inc, int l_inc, bool propSpice) {
+void crop(std::vector<char*> args) {
+  // hard code for now
+  UserInterface ui("/Users/krodriguez-pr/repos/ISIS3/isis/src/base/apps/crop/crop.xml", args);
+
   ProcessByLine p;
-  linc = l_inc;
-  sinc = s_inc;
+
   // Open the input cube
+  QString from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
-  CubeAttributeOutput outAtt(to);
   cube = new Cube();
   cube->setVirtualBands(inAtt.bands());
-  from = from;
+  from = ui.GetFileName("FROM");
   cube->open(from);
 
   // Determine the sub-area to extract
-  ss = sample;
-  sl = line;
+  ss = ui.GetInteger("SAMPLE");
+  sl = ui.GetInteger("LINE");
   sb = 1;
 
   int origns = cube->sampleCount();
   int orignl = cube->lineCount();
   int es = cube->sampleCount();
-
-  if (nsamples < 0)
-    es = ss + nsamples - 1;
-
+  if (ui.WasEntered("NSAMPLES")) es = ss + ui.GetInteger("NSAMPLES") - 1;
   int el = cube->lineCount();
-
-  if (nlines < 0)
-    el = sl + nlines - 1;
-
+  if (ui.WasEntered("NLINES")) el = sl + ui.GetInteger("NLINES") - 1;
   int eb = cube->bandCount();
+
+  sinc = ui.GetInteger("SINC");
+  linc = ui.GetInteger("LINC");
 
   // Make sure starting positions fall within the cube
   if (ss > cube->sampleCount()) {
@@ -97,9 +102,9 @@ void crop(QString from, QString to, int line, int sample, int nsamples, int nlin
   el = sl + (nl - 1) * linc;
 
   // Allocate the output file and make sure things get propogated nicely
-  p.SetInputCube(from, inAtt);
+  p.SetInputCube("FROM");
   p.PropagateTables(false);
-  Cube *ocube = p.SetOutputCube(to, outAtt, ns, nl, nb);
+  Cube *ocube = p.SetOutputCube("TO", ns, nl, nb);
   p.ClearInputCubes();
 
   // propagate tables manually
@@ -112,7 +117,7 @@ void crop(QString from, QString to, int line, int sample, int nsamples, int nlin
     if(obj.name() != "Table") continue;
 
     // If we're not propagating spice data, dont propagate the following tables...
-    if(!propSpice) {
+    if(!ui.GetBoolean("PROPSPICE")) {
       if((IString)obj["Name"][0] == "InstrumentPointing") continue;
       if((IString)obj["Name"][0] == "InstrumentPosition") continue;
       if((IString)obj["Name"][0] == "BodyRotation") continue;
@@ -157,7 +162,7 @@ void crop(QString from, QString to, int line, int sample, int nsamples, int nlin
   }
 
   Pvl &outLabels = *ocube->label();
-  if(!propSpice && outLabels.findObject("IsisCube").hasGroup("Kernels")) {
+  if(!ui.GetBoolean("PROPSPICE") && outLabels.findObject("IsisCube").hasGroup("Kernels")) {
     PvlGroup &kerns = outLabels.findObject("IsisCube").findGroup("Kernels");
 
     QString tryKey = "NaifIkCode";
@@ -176,13 +181,12 @@ void crop(QString from, QString to, int line, int sample, int nsamples, int nlin
   in = new LineManager(*cube);
 
   // Crop the input cube
-  p.StartProcess(crop_process);
+  p.StartProcess(run_crop);
 
   delete in;
   in = NULL;
 
-  // Construct a label with the results/home/krodriguez/repos/ISIS3/isis/src/base/objs/Apps/Apps.cpp:7:1: error: expected ‘;’ before ‘namespace’
-
+  // Construct a label with the results
   PvlGroup results("Results");
   results += PvlKeyword("InputLines", toString(orignl));
   results += PvlKeyword("InputSamples", toString(origns));
@@ -210,6 +214,8 @@ void crop(QString from, QString to, int line, int sample, int nsamples, int nlin
   delete cube;
   cube = NULL;
 
+  // Write the results to the log
+  // Application::Log(results);
 }
 
 

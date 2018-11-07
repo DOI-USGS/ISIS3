@@ -39,6 +39,20 @@
 using namespace std;
 namespace Isis {
 
+
+  UserInterface::UserInterface(const QString &xmlfile, std::vector<char*> &args) : IsisAml::IsisAml(xmlfile) {
+    int argc = args.size();
+    char **argv =  new char*[argc];
+
+    for (int i = 0; i < argc; i++) {
+      argv[i] = args[i];
+    }
+
+    // reinstantiate using argc,argv constructor.
+    this->~UserInterface();
+    new (this) UserInterface(xmlfile, argc, argv);
+  }
+
   /**
    * Constructs an UserInterface object.
    *
@@ -91,6 +105,10 @@ namespace Isis {
     }
   }
 
+  std::vector<char*> UserInterface::getArgs() {
+    return p_cmdline;
+  }
+
   /**
    * This method returns the filename where the debugging info is
    * stored when the "-info" tag is used.
@@ -101,7 +119,7 @@ namespace Isis {
     return p_infoFileName;
   }
 
-  
+
   /**
    * This method returns the flag state of info. This returns if
    * its in debugging mode(the -info tag was specified).
@@ -118,7 +136,7 @@ namespace Isis {
    * the new parameters
    *
    * @param i The line number to retrieve parameter information from
-   * 
+   *
    * @throws Isis::IException::User - Invalid command line
    */
   void UserInterface::SetBatchList(int i) {
@@ -139,7 +157,7 @@ namespace Isis {
 
       try {
         getNextParameter(currArgument, paramName, paramValue);
-    
+
         if (paramName[0] == '-')
           continue;
 
@@ -174,7 +192,7 @@ namespace Isis {
       catch (IException &e) {
         throw IException(IException::User, "Invalid command line", _FILEINFO_);
       }
-     
+
       PutAsString(paramName, paramValue);
 
       cout << paramName;
@@ -201,14 +219,14 @@ namespace Isis {
     VerifyAll();
   }
 
-  
+
   /**
    * This method adds the line specified in the BatchList that the error occured
    * on.  The BatchList line is added exactly as it is seen, so the BatchList
    * command can be run on the errorlist file created.
    *
    * @param i The line of the batchlist to write to the error file
-   * 
+   *
    * @throws Isis::IException::User - Unable to create error list - Disk may be full or
    *                                  directory permissions not writeable
    */
@@ -234,7 +252,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Saves the user parameter information in the history of the program for later
    * use
@@ -288,7 +306,7 @@ namespace Isis {
 
   }
 
-  
+
   /**
    * Loads the user entered batchlist file into a private variable for later use
    *
@@ -354,7 +372,7 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * This is used to load the command line into p_cmdline and the Aml object
    * using information contained in argc and argv.
@@ -384,7 +402,7 @@ namespace Isis {
     for (int i = 0; i < argc; i++) {
       p_cmdline.push_back(argv[i]);
     }
-    
+
     // Check for special tokens (reserved parameters) (those beginning with a dash)
     vector<QString> options;
     options.push_back("-GUI");
@@ -405,41 +423,41 @@ namespace Isis {
 
     bool usedDashLast = false;
     bool usedDashRestore = false; //< for throwing -batchlist exceptions at end of function
-    
+
     // pre-process command line for -HELP first
     preProcess("-HELP", options);
     // pre-process command line for -WEBHELP
     preProcess("-WEBHELP", options);
     // now, parse command line to evaluate -LAST
     preProcess("-LAST", options);
-     
+
     for (unsigned int currArgument = 1; currArgument < (unsigned)argc; currArgument++) {
       QString paramName;
       vector<QString> paramValue;
 
       getNextParameter(currArgument, paramName, paramValue);
-      
+
       // we now have a name,value pair
       if (paramName[0] == '-') {
         paramName = paramName.toUpper();
-        
+
         // where if(paramname == -last ) to continue } was originally
-        
+
         if (paramValue.size() > 1) {
           QString msg = "Invalid value for reserve parameter ["
                        + paramName + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        
+
         // resolve the reserved parameter (e.g. set -h to -HELP)
         paramName = resolveParameter(paramName, options);
-        
+
         // Prevent double handling of -LAST to prevent conflicts
         // Keep track of using -LAST to prevent conflicts with -BATCHLIST
         if (paramName == "-LAST") {
           usedDashLast = true;
           continue;
-        }        
+        }
 
 
         // Keep track of using -RESTORE to prevent conflicts with -BATCHLIST
@@ -453,7 +471,7 @@ namespace Isis {
         if ( paramValue.size() ) {
           realValue = paramValue[0];
         }
-        
+
         evaluateOption(paramName, realValue);
         continue;
       }
@@ -468,7 +486,7 @@ namespace Isis {
     }
 
     // Can't use the batchlist with the gui, save, last or restore option
-    if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != "" 
+    if ( BatchListSize() != 0 && (p_interactive || usedDashLast || p_saveFile != ""
                                   || usedDashRestore) ) {
       QString msg = "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
       msg += "or -LAST";
@@ -482,8 +500,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-   
-   
+
+
   /**
    * Loads the previous history for the program
    *
@@ -567,14 +585,14 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
- 
- 
+
+
   /**
    * This interprets the "-" options for reserved parameters
    *
    * @param name "-OPTIONNAME" (name of the reserved parameter)
    * @param value Value of the option, if supplied (-name=value)
-   * 
+   *
    * @throws Isis::IException::Programmer - evaluating -WEBHELP throws an exception when
    *                                        unit testing to avoid exiting from the unit test
    * @throws Isis::IException::Programmer - evaluating -HELP throws an exception when
@@ -624,7 +642,7 @@ namespace Isis {
       command += FileName(p_progName).name() + "/" + FileName(p_progName).name() + ".html";
       // cannot test else in unit test - don't want to open webhelp
       if (unitTest) {
-        throw IException(IException::Programmer, 
+        throw IException(IException::Programmer,
                          "Evaluating -WEBHELP should only throw this exception during a unitTest",
                          _FILEINFO_);
       }
@@ -632,7 +650,7 @@ namespace Isis {
         ProgramLauncher::RunSystemCommand(command);
         exit(0);
       }
-      
+
     }
     else if (name == "-INFO") {
       p_info = true;
@@ -785,7 +803,7 @@ namespace Isis {
       }
       // we must throw an exception for unitTest to handle to continue testing
       if (unitTest) {
-        throw IException(IException::Programmer, 
+        throw IException(IException::Programmer,
                          "Evaluating -HELP should only throw this exception during a unitTest",
                          _FILEINFO_);
       }
@@ -855,8 +873,8 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
- 
- 
+
+
   /**
    * This gets the next parameter in the list of arguments. curPos will be changed
    * to be the end of the current argument (still needs incremented to get the
@@ -865,11 +883,11 @@ namespace Isis {
    * @param curPos End of previous argument
    * @param name Resulting parameter name
    * @param value Resulting array of parameter values (usually just 1 element)
-   * 
+   *
    * @throws Isis::IException::User - parameters cannot start with "="
    */
   void UserInterface::getNextParameter(unsigned int &curPos,
-                                       QString &name, 
+                                       QString &name,
                                        std::vector<QString> &value) {
     QString paramName = p_cmdline[curPos];
     QString paramValue = "";
@@ -941,44 +959,44 @@ namespace Isis {
       value = readArray(paramValue);
     }
   }
- 
- 
+
+
   /**
    * This parses the command line and looks for the specified reserved parameter
-   * name passed. Resolves and evaluates the passed reserved parameter. 
+   * name passed. Resolves and evaluates the passed reserved parameter.
    * This method ignores invalid parameters ( @see resolveParameter() ).
-   * 
+   *
    * Example: preProcess("-HELP", options) will try to resolve any reserved parameters
    * and will evaluate if one resolves to -HELP.
-   * 
+   *
    * @param fullReservedName the full name of reserved parameter being looked for
    * @param reservedParams the list of reserved parameters for resolving parameter name
-   *                        
-   */   
-  void UserInterface::preProcess(QString fullReservedName, 
+   *
+   */
+  void UserInterface::preProcess(QString fullReservedName,
                                  std::vector<QString> &reservedParams) {
-    for (unsigned int currArgument = 1; currArgument < (unsigned)p_cmdline.size(); 
+    for (unsigned int currArgument = 1; currArgument < (unsigned)p_cmdline.size();
          currArgument++) {
-      
+
       QString paramName = p_cmdline[currArgument];
       QString trueParamValue = "";
       vector<QString> paramValue;
-      
+
       // reserved parameters start with -
       if (paramName[0] == '-') {
-        
+
         // grab the current argument
         getNextParameter(currArgument, paramName, paramValue);
         paramName = paramName.toUpper();
-        
+
         // grab the argument's value
         if ( paramValue.size() ) {
           trueParamValue = paramValue[0].toUpper();
         }
-        
+
         // resolve the reserved parameter token
         paramName = resolveParameter(paramName, reservedParams, false);
-        
+
         // evaluate the resolved parameter if it matches fullReservedName
         if (fullReservedName == paramName) {
           evaluateOption(paramName, trueParamValue);
@@ -986,8 +1004,8 @@ namespace Isis {
       }
     }
   }
-   
-   
+
+
   /**
    * This interprets an array value from the command line.
    *
@@ -995,7 +1013,7 @@ namespace Isis {
    *   format (a,b,c)
    *
    * @return std::vector<QString> Values in the array QString
-   * 
+   *
    * @throws Isis::IException::User - arrays not starting with '(' are invalid
    * @throws Isis::IException::User - arrays ending in a backslash are invalid
    * @throws Isis::IException::User - invalid array format
@@ -1108,34 +1126,34 @@ namespace Isis {
 
     return values;
   }
-   
-   
+
+
   /**
    * This resolves a reserved parameter token on the command line to its fullname.
-   * Matches with the list of reserved parameters (options). 
+   * Matches with the list of reserved parameters (options).
    * Resolution necessary for evaluateOption().
-   * 
+   *
    * Example: an -h token on the command line will resolve to -HELP
    *
    * @param unresolvedParam the parameter name that needs to be resolved
    * @param reservedParams the list of reserved parameters for resolving parameter name
-   * @param handleNoMatches boolean value defaulted to true for handling invalid reserved 
+   * @param handleNoMatches boolean value defaulted to true for handling invalid reserved
    *                        parameters
-   * 
+   *
    * @return @b QString the resolved parameter name
-   * 
+   *
    * @throws Isis::IException::User - unresolved reserved parameter is ambigious
    * @throws Isis::IException::User - reserved parameter cannot be matched (invalid)
-   * 
-   */  
-  QString UserInterface::resolveParameter(QString &unresolvedParam, 
-                                          std::vector<QString> &reservedParams, 
+   *
+   */
+  QString UserInterface::resolveParameter(QString &unresolvedParam,
+                                          std::vector<QString> &reservedParams,
                                           bool handleNoMatches) {
     // index of the reserved parameter in options that matches the cmdline parameter
     int matchOption = -1;
     // determine if the reserved parameter on cmdline is shortened (e.g. -h for -HELP)
     for (int option = 0; option < (int)reservedParams.size(); option++) {
-      
+
       // If our option starts with the parameter name so far, this is it
       if ( reservedParams[option].startsWith(unresolvedParam) ) {
         if (matchOption >= 0) {
@@ -1153,17 +1171,17 @@ namespace Isis {
       if (matchOption < 0) {
         QString msg = "Invalid Reserve Parameter Option ["
         + unresolvedParam + "]. Choices are ";
-        
+
         QString msgOptions;
         for (int option = 0; option < (int)reservedParams.size(); option++) {
           // Make sure not to show -PID as an option
           if (reservedParams[option].compare("-PID") == 0) {
             continue;
           }
-          
+
           msgOptions += reservedParams[option];
           msgOptions += ",";
-          
+
           // this condition will never evaluate to FALSE -
           // this condition is only reachable when reservedParams.size() == 0 (empty) -
           // if this is the case, this for loop will never be entered
@@ -1171,11 +1189,11 @@ namespace Isis {
 //             msgOptions += ",";
 //           }
         }
-        
+
         // remove the terminating ',' from msgOptions
-        msgOptions.chop(1);        
+        msgOptions.chop(1);
         msg += " [" + msgOptions + "]";
-        
+
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -1185,5 +1203,5 @@ namespace Isis {
     else {
       return reservedParams[matchOption];
     }
-  }  
+  }
 } // end namespace isis

@@ -27,20 +27,9 @@ LineManager *in = NULL;
 void crop(Buffer &out);
 
 void IsisMain() {
-  ProcessByLine p;
-
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-
-  Isis::crop(ui.GetAsString("FROM"),
-             ui.GetAsString("TO"),
-             ui.GetInteger("LINE"),
-             ui.GetInteger("SAMPLE"),
-             ui.GetInteger("SINC"),
-             ui.GetInteger("LINC"),
-             ui.GetInteger("NSAMPLES"),
-             ui.GetInteger("NLINES"),
-             ui.GetBoolean("PROPSPICE"));
+  Isis::crop(ui.getArgs());
 
   // Write the results to the log
   // Application::Log(results);
