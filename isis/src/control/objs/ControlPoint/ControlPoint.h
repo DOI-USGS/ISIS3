@@ -335,6 +335,9 @@ namespace Isis {
    *   @history 2015-11-05 Kris Becker - invalid flag was not properly
    *                           initialized in ControlPointFileEntryV0002
    *                           constructor (Merged by Kristin Berry. Fixes #2392)
+   *   @history 2017-05-25 Debbie A. Cook - coordType to SetPrioriSurfacePoint with a default of
+   *                            Latitudinal.  Changed LatitudeConstrained to Coord1Constrained, etc.
+   *                            References #4649 and #501.
    *   @history 2017-12-18 Kristin Berry - Added convenience methods:
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
    *                            HasRefMeasure().
@@ -422,18 +425,9 @@ namespace Isis {
        * coordinates in the SurfacePoint
        */
       enum ConstraintStatus {
-        /**
-         * This is the status of constrained coordinates in the SurfacePoint.
-         * @todo We will eventually need to deal with rectangular
-         *             coordinates as well, but for now BundleAdjust uses spherical
-         *             coordinates only.
-         */
-        LatitudeConstrained = 0,
-        LongitudeConstrained = 1,
-        RadiusConstrained = 2,
-//      XConstrained = 3,
-//      YConstrained = 4,
-//      ZConstrained = 5;
+        Coord1Constrained = 0,
+        Coord2Constrained = 1,
+        Coord3Constrained = 2
       };
 
       /**
@@ -535,14 +529,15 @@ namespace Isis {
       QString GetId() const;
       bool IsIgnored() const;
       bool IsValid() const;
+      // Can we get rid of this? It doesn't appear to be used anywhere.  *** ToDo ***
       bool IsInvalid() const;
       bool IsFixed() const;
       bool HasAprioriCoordinates();
 
       bool IsConstrained();
-      bool IsLatitudeConstrained();
-      bool IsLongitudeConstrained();
-      bool IsRadiusConstrained();
+      bool IsCoord1Constrained();
+      bool IsCoord2Constrained();
+      bool IsCoord3Constrained();
       int NumberOfConstrainedCoordinates();
 
       static QString PointTypeToString(PointType type);
@@ -673,7 +668,7 @@ namespace Isis {
 
       /**
        * This stores the constraint status of the a priori SurfacePoint
-       *   @todo Eventually add x, y, and z
+       *   @todo Eventually add x, y, and z.  Instead we made generic coordinates
        */
       std::bitset<6> constraintStatus;
 

@@ -28,6 +28,7 @@
 
 #include "BundleSettings.h"
 #include "LidarData.h"
+#include "SurfacePoint.h"
 
 #include "XmlStackedHandler.h"
 
@@ -153,8 +154,15 @@ namespace Isis {
    *                           file.
    *   @history 2018-06-01 Ken Edmundson - modifications to add lidar data input, output, and
    *                          serialization.
+   *   @history 2018-06-01 Debbie A. Cook - ( Added 2018-02-21 to BundleXYZ branch) Added
+   *                           coordinate types to report and appropriate headings for columns based
+   *                           on the coordinate type.  Also added a utility method to return the
+   *                           coordinate name based on coordinate type and coordinate index.
+   *                           References #4649 and #501.
    *   @history 2018-06-27 Ken Edmundson - Changed method "outputHeader" to get numDegreesOfFreedom
    *                          directly from m_statisticsResults object.
+   *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References
+   *                           #4649 and #501
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -211,6 +219,9 @@ namespace Isis {
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
 
+      QString surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                    SurfacePoint::CoordIndex coordInx) const;
+
     public slots:
       void updateFileName(Project *);
 
@@ -236,6 +247,8 @@ namespace Isis {
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName);
+          QString surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                        SurfacePoint::CoordIndex coordIdx) const;
 
         private:
           Q_DISABLE_COPY(XmlHandler)

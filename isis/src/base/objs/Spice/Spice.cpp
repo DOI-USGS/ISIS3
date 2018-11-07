@@ -258,7 +258,12 @@ namespace Isis {
     *m_ckCode   = *m_ikCode;
 
     if (!m_target->isSky()) {
+      // Get target body code and radii and store them in the Naif group
+      // DAC modified to look for and store body code so that the radii keyword name
+      // will be able to be constructed even for new bodies not in the standard PCK yet.
       QString radiiKey = "BODY" + Isis::toString(m_target->naifBodyCode()) + "_RADII";
+      QVariant result = m_target->naifBodyCode();
+      storeValue("BODY_CODE", 0, SpiceIntType, result);
       std::vector<Distance> radii(3,Distance());
       radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);

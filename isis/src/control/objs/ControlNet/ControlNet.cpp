@@ -48,9 +48,11 @@ namespace Isis {
     m_mutex = NULL;
   }
 
+  //!Creates an empty ControlNet object
+  ControlNet::ControlNet(SurfacePoint::CoordinateType coordType) {
+    
   //! Creates an empty ControlNet object
-  ControlNet::ControlNet() {
-
+  // ControlNet::ControlNet() {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -60,6 +62,7 @@ namespace Isis {
 
     p_created = Application::DateTime();
     p_modified = Application::DateTime();
+    m_coordType = coordType;
   }
 
   ControlNet::ControlNet(const ControlNet &other) {
@@ -84,6 +87,7 @@ namespace Isis {
     p_userName = other.p_userName;
     p_cameraMap = other.p_cameraMap;
     p_cameraList = other.p_cameraList;
+    m_coordType = other.m_coordType;
   }
 
 
@@ -93,15 +97,17 @@ namespace Isis {
    * @param ptfile Name of network file
    * @param progress A pointer to the progress of reading in the control points
    */
-  ControlNet::ControlNet(const QString &ptfile, Progress *progress) {
-
+  ControlNet::ControlNet(const QString &ptfile, Progress *progress,
+                         SurfacePoint::CoordinateType coordType) {
+    
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
     pointIds = new QStringList;
 
     m_ownPoints = true;
-
+    m_coordType = coordType;
+    
     try {
       ReadControl(ptfile, progress);
     }
@@ -837,6 +843,16 @@ namespace Isis {
         }
       }
     }
+  }
+
+
+  /**
+   * Sets the control point coordinate type 
+   *
+   * @param coordType Control point coordinate type
+   */
+  void ControlNet::SetCoordType(SurfacePoint::CoordinateType coordType)  {
+    m_coordType = coordType;
   }
 
 
@@ -1830,6 +1846,15 @@ namespace Isis {
     return GetPoint(pointIds->at(index));
   }
 
+
+  /**
+   * Get the control point coordinate type (see the available types in SurfacePoint.h).
+   *
+   * @returns the control point coordinate type
+   */
+  SurfacePoint::CoordinateType ControlNet::GetCoordType() {
+    return m_coordType;
+  }
 
   const ControlPoint *ControlNet::operator[](QString id) const {
     return GetPoint(id);

@@ -223,7 +223,6 @@ namespace Isis {
         destinationColumn = startCol + i;
         p_table->insertColumn(startCol + i);
       }
-
       QTableWidgetItem *header = new QTableWidgetItem(htext);
       if (insertAt >= 0) {
 
