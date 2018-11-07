@@ -1,13 +1,42 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
-#include <limits>
 #include <string>
 
 #include "Pixel.h"
 #include "SpecialPixel.h"
 
 using namespace Isis;
+
+/**
+ * Shared resource test class
+ */
+// class PixelTest : public ::testing::Test {
+// protected:
+//   static void SetUpTestCase() {
+//     default_pixel = new Pixel;
+//     slbdn_pixel = new Pixel(1, 2, 3, 4.0);
+//   }
+
+//   static void TearDownTestCase() {
+//     delete default_pixel;
+//     delete slbdn_pixel;
+//     default_pixel = nullptr;
+//     slbdn_pixel = nullptr;
+//   }
+
+//   static Pixel* default_pixel;
+//   static Pixel* slbdn_pixel;
+// };
+
+// Pixel *PixelTest::default_pixel = nullptr;
+// Pixel *PixelTest::slbdn_pixel = nullptr;
+
+// template <typename T>
+// class Pixeltest : public ::testing::Test {
+// public:
+//   typdedf
+// }
 
 // // Construction (fixture?)
 // class TestPixel : public ::testing::Test {
@@ -71,6 +100,10 @@ TEST(Pixel, To8Bit) {
   EXPECT_EQ(Isis::LOW_REPR_SAT1, Pixel::To8Bit(-1.0));
   // Trivial positive test
   EXPECT_EQ(1, Pixel::To8Bit(1.0));
+  // Minimum valid input
+  EXPECT_EQ(Isis::VALID_MIN1, Pixel::To8Bit(Isis::ValidMinimum));
+  // Maximum valid input
+  EXPECT_EQ(Isis::VALID_MAX1, Pixel::To8Bit(Isis::ValidMaximum));
   // "Null" pixel
   EXPECT_EQ(Isis::NULL1, Pixel::To8Bit(Isis::Null));
   // HRS
@@ -92,6 +125,10 @@ TEST(Pixel, To16UBit) {
   EXPECT_EQ(Isis::LOW_REPR_SATU2, Pixel::To16UBit(-1.0));
   // Positive test
   EXPECT_EQ(1.0, Pixel::To16UBit(1.0));
+  // Minimum valid input
+  EXPECT_EQ(Isis::VALID_MINU2, Pixel::To16UBit(Isis::ValidMinimum));
+  // Maximum valid input
+  EXPECT_EQ(Isis::VALID_MAXU2, Pixel::To16UBit(Isis::ValidMaximum));
   // "Null" pixel
   EXPECT_EQ(Isis::NULLU2, Pixel::To16UBit(Isis::Null));
   // HRS
@@ -104,89 +141,189 @@ TEST(Pixel, To16UBit) {
   EXPECT_EQ(Isis::LOW_INSTR_SATU2, Pixel::To16UBit(Isis::Lis));
 }
 
-// TEST(Pixel, To16Bit) {
-//   // EXPECT_EQ()
-// }
+TEST(Pixel, To16Bit) {
+  // Zero test
+  EXPECT_EQ(0.0, Pixel::To16Bit(0.0));
+  // Negative test
+  EXPECT_EQ(-1.0, Pixel::To16Bit(-1.0));
+  // Positive test
+  EXPECT_EQ(1.0, Pixel::To16Bit(1.0));
+  // Minimum valid input
+  EXPECT_EQ(Isis::VALID_MIN2, Pixel::To16Bit(Isis::ValidMinimum));
+  // Maximum valid input
+  EXPECT_EQ(Isis::VALID_MAX2, Pixel::To16Bit(Isis::ValidMaximum));
+  // "Null" pixel
+  EXPECT_EQ(Isis::NULL2, Pixel::To16Bit(Isis::Null));
+  // HRS
+  EXPECT_EQ(Isis::HIGH_REPR_SAT2, Pixel::To16Bit(Isis::Hrs));
+  // HIS
+  EXPECT_EQ(Isis::HIGH_INSTR_SAT2, Pixel::To16Bit(Isis::His));
+  // LRS
+  EXPECT_EQ(Isis::LOW_REPR_SAT2, Pixel::To16Bit(Isis::Lrs));
+  // LIS
+  EXPECT_EQ(Isis::LOW_INSTR_SAT2, Pixel::To16Bit(Isis::Lis));
+}
 
-// TEST(Pixel, To16UBit) {
+TEST(Pixel, To32Bit) {
+  // Zero test
+  EXPECT_EQ(Isis::NULL4, Pixel::To32Bit(0.0));
+  // Negative test
+  EXPECT_EQ(-1.0, Pixel::To32Bit(-1.0));
+  // Positive test
+  EXPECT_EQ(1.0, Pixel::To32Bit(1.0));
+  // Minimum valid input
+  EXPECT_EQ(Isis::VALID_MIN4, Pixel::To32Bit(Isis::ValidMinimum));
+  // Maximum valid input
+  EXPECT_EQ(Isis::VALID_MAX4, Pixel::To32Bit(Isis::ValidMaximum));
+  // "Null" pixel
+  EXPECT_EQ(Isis::NULL4, Pixel::To32Bit(Isis::Null));
+  // HRS
+  EXPECT_EQ(Isis::HIGH_REPR_SAT4, Pixel::To32Bit(Isis::Hrs));
+  // HIS
+  EXPECT_EQ(Isis::HIGH_INSTR_SAT4, Pixel::To32Bit(Isis::His));
+  // LRS
+  EXPECT_EQ(Isis::LOW_REPR_SAT4, Pixel::To32Bit(Isis::Lrs));
+  // LIS
+  EXPECT_EQ(Isis::LOW_INSTR_SAT4, Pixel::To32Bit(Isis::Lis));
+}
 
-// }
+TEST(Pixel, ToDouble) {
+  // unsigned char
+  unsigned char uc = 0;
+  EXPECT_DOUBLE_EQ(Isis::Null, Pixel::ToDouble(uc));
 
+  // short
+  short s = 0.0;
+  EXPECT_DOUBLE_EQ(0.0, Pixel::ToDouble(s));
 
+  // unsigned short
+  unsigned short us = 0.0;
+  EXPECT_DOUBLE_EQ(Isis::Null, Pixel::ToDouble(us));
 
-// TEST(PixelTest, DefaultConstruction) {
-//   Pixel p;
-  
+  // float
+  float f = 0.0;
+  EXPECT_DOUBLE_EQ(0.0, Pixel::ToDouble(f));
 
-//   EXPECT_EQ(0, p.to8Bit());
-//   EXPECT_EQ(0, p.to16Bit());
-//   EXPECT_EQ(0, p.to16UBit());
-//   EXPECT_FLOAT_EQ(0, p.to32Bit());
-//   EXPECT_FLOAT_EQ(0, p.toFloat());
-//   EXPECT_DOUBLE_EQ(0, p.toDouble())
-//   EXPECT_EQ(string("0.0"), p.toString());
+}
 
-//   EXPECT_FALSE(p.IsSpecial());
-//   EXPECT_FALSE(p.IsValid());
-//   EXPECT_FALSE(p.IsNull());
-//   EXPECT_FALSE(p.IsHigh());
-//   EXPECT_FALSE(p.IsLow());
-//   EXPECT_FALSE(p.IsHrs());
-//   EXPECT_FALSE(p.IsLrs());
-//   EXPECT_FALSE(p.IsHis());
-//   EXPECT_FALSE(p.IsLis());
-// }
+TEST(Pixel, ToFloat) {
+  // unsigned char
+  unsigned char uc = 0;
+  EXPECT_DOUBLE_EQ(Isis::NULL4, Pixel::ToFloat(uc));
 
-// TEST(PixelTest, Special) {
-  
-// }
+  // short
+  short s = 0.0;
+  EXPECT_DOUBLE_EQ(0.0, Pixel::ToFloat(s));
 
-// TEST(PixelTest, Valid) {
+  // unsigned short
+  unsigned short us = 0.0;
+  EXPECT_DOUBLE_EQ(Isis::NULL4, Pixel::ToFloat(us));
 
-// }
+  // float
+  float f = 0.0;
+  EXPECT_DOUBLE_EQ(0.0, Pixel::ToFloat(f));
 
-// TEST(PixelTest, Null) {
+}
 
-// }
+TEST(Pixel, IsSpecial) {
+  EXPECT_TRUE(Pixel::IsSpecial(Isis::His));
+  EXPECT_TRUE(Pixel::IsSpecial(Isis::Hrs));
+  EXPECT_TRUE(Pixel::IsSpecial(Isis::Lis));
+  EXPECT_TRUE(Pixel::IsSpecial(Isis::Lrs));
+  EXPECT_TRUE(Pixel::IsSpecial(Isis::Null));
+  EXPECT_FALSE(Pixel::IsSpecial(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsSpecial(Isis::ValidMinimum));
+}
 
-// TEST(PixelTest, High) {
+TEST(Pixel, IsValid) {
+  EXPECT_FALSE(Pixel::IsValid(Isis::His));
+  EXPECT_FALSE(Pixel::IsValid(Isis::Hrs));
+  EXPECT_FALSE(Pixel::IsValid(Isis::Lis));
+  EXPECT_FALSE(Pixel::IsValid(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsValid(Isis::Null));
+  EXPECT_TRUE(Pixel::IsValid(Isis::ValidMaximum));
+  EXPECT_TRUE(Pixel::IsValid(Isis::ValidMinimum));
+}
 
-// }
+TEST(Pixel, IsNull) {
+  EXPECT_FALSE(Pixel::IsNull(Isis::His));
+  EXPECT_FALSE(Pixel::IsNull(Isis::Hrs));
+  EXPECT_FALSE(Pixel::IsNull(Isis::Lis));
+  EXPECT_FALSE(Pixel::IsNull(Isis::Lrs));
+  EXPECT_TRUE(Pixel::IsNull(Isis::Null));
+  EXPECT_FALSE(Pixel::IsNull(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsNull(Isis::ValidMinimum));
+}
 
-// TEST(PixelTest, Low) {
+TEST(Pixel, IsHigh) {
+  EXPECT_TRUE(Pixel::IsHigh(Isis::His));
+  EXPECT_TRUE(Pixel::IsHigh(Isis::Hrs));
+  EXPECT_FALSE(Pixel::IsHigh(Isis::Lis));
+  EXPECT_FALSE(Pixel::IsHigh(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsHigh(Isis::Null));
+  EXPECT_FALSE(Pixel::IsHigh(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsHigh(Isis::ValidMinimum));
+}
 
-// }
+TEST(Pixel, IsLow) {
+  EXPECT_FALSE(Pixel::IsLow(Isis::His));
+  EXPECT_FALSE(Pixel::IsLow(Isis::Hrs));
+  EXPECT_TRUE(Pixel::IsLow(Isis::Lis));
+  EXPECT_TRUE(Pixel::IsLow(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsLow(Isis::Null));
+  EXPECT_FALSE(Pixel::IsLow(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsLow(Isis::ValidMinimum));
+}
 
-// TEST(PixelTest, Hrs) {
+TEST(Pixel, IsHrs) {
+  EXPECT_FALSE(Pixel::IsHrs(Isis::His));
+  EXPECT_TRUE(Pixel::IsHrs(Isis::Hrs));
+  EXPECT_FALSE(Pixel::IsHrs(Isis::Lis));
+  EXPECT_FALSE(Pixel::IsHrs(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsHrs(Isis::Null));
+  EXPECT_FALSE(Pixel::IsHrs(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsHrs(Isis::ValidMinimum));
+}
 
-// }
+TEST(Pixel, IsHis) {
+  EXPECT_TRUE(Pixel::IsHis(Isis::His));
+  EXPECT_FALSE(Pixel::IsHis(Isis::Hrs));
+  EXPECT_FALSE(Pixel::IsHis(Isis::Lis));
+  EXPECT_FALSE(Pixel::IsHis(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsHis(Isis::Null));
+  EXPECT_FALSE(Pixel::IsHis(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsHis(Isis::ValidMinimum));
+}
 
-// TEST(PixelTest, Lrs) {
+TEST(Pixel, IsLis) {
+  EXPECT_FALSE(Pixel::IsLis(Isis::His));
+  EXPECT_FALSE(Pixel::IsLis(Isis::Hrs));
+  EXPECT_TRUE(Pixel::IsLis(Isis::Lis));
+  EXPECT_FALSE(Pixel::IsLis(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsLis(Isis::Null));
+  EXPECT_FALSE(Pixel::IsLis(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsLis(Isis::ValidMinimum));
+}
 
-// }
+TEST(Pixel, IsLrs) {
+  EXPECT_FALSE(Pixel::IsLrs(Isis::His));
+  EXPECT_FALSE(Pixel::IsLrs(Isis::Hrs));
+  EXPECT_FALSE(Pixel::IsLrs(Isis::Lis));
+  EXPECT_TRUE(Pixel::IsLrs(Isis::Lrs));
+  EXPECT_FALSE(Pixel::IsLrs(Isis::Null));
+  EXPECT_FALSE(Pixel::IsLrs(Isis::ValidMaximum));
+  EXPECT_FALSE(Pixel::IsLrs(Isis::ValidMinimum));
+}
 
-// TEST(PixelTest, His) {
+TEST(Pixel, ToString) {
+  EXPECT_EQ(std::string("1"), Pixel::ToString(1.0));
+  EXPECT_EQ(std::string("-1.2"), Pixel::ToString(-1.2));
 
-// }
-
-// TEST(PixelTest, Lis) {
-
-// }
-
-
-
-
-
-// // Test accessors
-// TEST(accessors, line) {
-//   // Pixel p()
-// }
-// TEST(accessors, sample) {
-
-// }
-// TEST(accessors, band) {
-
-// }
-// TEST(accessors, DN) {
-
-// }
+  // Special pixels
+  EXPECT_EQ(std::string("His"), Pixel::ToString(Isis::His));
+  EXPECT_EQ(std::string("Hrs"), Pixel::ToString(Isis::Hrs));
+  EXPECT_EQ(std::string("Lis"), Pixel::ToString(Isis::Lis));
+  EXPECT_EQ(std::string("Lrs"), Pixel::ToString(Isis::Lrs));
+  EXPECT_EQ(std::string("Null"), Pixel::ToString(Isis::Null));
+  EXPECT_EQ(std::string("Invalid"), Pixel::ToString(-1.0e+1000));
+}
