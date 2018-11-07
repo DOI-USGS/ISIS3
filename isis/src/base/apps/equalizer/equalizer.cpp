@@ -70,6 +70,9 @@ void IsisMain() {
         if (solveMethod == "SVD") {
           methodType = LeastSquares::SVD;
         }
+        else if (solveMethod == "SPARSE") {
+          methodType = LeastSquares::SPARSE;
+        }
 
         equalizer.calculateStatistics(sampPercent, mincnt, wtopt, methodType);
       }

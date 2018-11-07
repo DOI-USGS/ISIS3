@@ -241,4 +241,18 @@ namespace Isis {
 
   }
 
+
+  double Blobber::int2ToDouble(unsigned int value) const {
+    if (value == NULLUI4) return NULL8;
+    else if (value == LOW_REPR_SATUI4) return LOW_REPR_SAT8;
+    else if (value == LOW_INSTR_SATUI4) return LOW_INSTR_SAT8;
+    else if (value == HIGH_INSTR_SATUI4) return HIGH_INSTR_SAT8;
+    else if (value == HIGH_REPR_SATUI4) return HIGH_REPR_SAT8;
+    else return value;
+
+  }
+
+
+
+
 }  //  end namespace Isis

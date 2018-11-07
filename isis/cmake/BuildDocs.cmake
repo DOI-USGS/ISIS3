@@ -96,21 +96,29 @@ function(build_documents_folder)
   message("Building documents folder...")
   message("    Building table of contents XML...")
 
+  # Create RealeaseNotes.xml, ApiChanges.xml and ParameterChanges.xml if need-be
+  if(EXISTS "${docBuildFolder}/documents/ReleaseNotes/ReleaseNotesList.xml")
+    execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} dirParam \"ReleaseNotes\" ${XALAN_INFILE_OPTION} ${docBuildFolder}/documents/ReleaseNotes/ReleaseNotesList.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/ReleaseNotes.xsl OUTPUT_FILE ${docBuildFolder}/documents/ReleaseNotes/ReleaseNotes.xml)
+    execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} dirParam \"ParameterChanges\" ${XALAN_INFILE_OPTION} ${docBuildFolder}/documents/ReleaseNotes/ReleaseNotesList.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/ParameterChanges.xsl OUTPUT_FILE ${docBuildFolder}/documents/ParameterChanges/ParameterChanges.xml)
+    execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} dirParam \"ApiChanges\" ${XALAN_INFILE_OPTION} ${docBuildFolder}/documents/ReleaseNotes/ReleaseNotesList.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/ApiChanges.xsl OUTPUT_FILE ${docBuildFolder}/documents/ApiChanges/ApiChanges.xml)
+  else()
+    # Confirm that empty directories are not going to be traversed in loops coming up
+    message("    ReleaseNotesList.xml does not exist. Removing ReleaseNotes/ ParameterChanges/ and ApiChanges/ directories...")
+    execute_process(COMMAND rm -rf ${docBuildFolder}/documents/ReleaseNotes ${docBuildFolder}/documents/ParameterChanges ${docBuildFolder}/documents/ApiChanges)
+  endif()
+
   # Get list of folders of interest
   get_subdirectory_list(${docBuildFolder}/documents docFolders)
-  set(blacklistFolders  ${docBuildFolder}/documents/ReleaseNotes # Folders we don't want
-                        ${docBuildFolder}/documents/ParameterChanges
-                        ${docBuildFolder}/documents/ApiChanges)
-  list(REMOVE_ITEM docFolders ${blacklistFolders})
 
   # Build doctoc.xml, the documents table of contents file.
   set(doctocPath ${docBuildFolder}/build/doctoc.xml)
   file(REMOVE ${doctocPath})
   cat(${docBuildFolder}/build/doctoc_header.xml ${doctocPath})
   foreach(f ${docFolders})
+    
     # Each folder in documents gets a section added to doctoc
     get_filename_component(docName ${f} NAME_WE)
-
+    
     execute_process(COMMAND ${XALAN} ${XALAN_PARAM_OPTION} dirParam \"${docName}\"  ${XALAN_INFILE_OPTION} ${f}/${docName}.xml ${XALAN_XSL_OPTION} ${docBuildFolder}/build/IsisDocumentTOCbuild.xsl OUTPUT_VARIABLE result)
     file(APPEND ${doctocPath} ${result})
 

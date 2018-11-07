@@ -9,8 +9,7 @@ class BundleSolutionInfo : public QObject {
   %End
 
  public:
-   BundleSolutionInfo();
-
+   // do constructor since at the moment there doesn't seem to be a reason to contruct it directly in the python side
    void setOutputStatistics(Isis::BundleResults statisticsResults) throw(Isis::IException);
    void setRunTime(QString runTime) throw(Isis::IException);
 

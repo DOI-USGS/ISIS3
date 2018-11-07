@@ -70,8 +70,8 @@ option(buildCore       "Build the core ISIS modules"                    ON  )
 option(buildMissions   "Build the mission specific modules"             ON  )
 option(buildStaticCore "Build libisis3 static as well as dynamic"       OFF )
 option(buildTests      "Set up unit, application, and module tests."    ON  )
-option(JP2KFLAG        "Whether or not to build using JPEG2000 support" ON  )
-option(pybindings      "Turn on to build Python bindings"               ON )
+option(JP2KFLAG        "Whether or not to build using JPEG2000 support" OFF )
+option(pybindings      "Turn on to build Python bindings"               OFF )
 
 # if cmake install prefix is not set, and conda env is activated, use the
 # conda env as the install directory
@@ -147,19 +147,20 @@ if(JP2KFLAG)
  set(JP2KFLAG 1)
 endif()
 
- # Set up the ctest tool which is used to run all of the tests.
- enable_testing()
- include(CTest)
+# Set up the ctest tool which is used to run all of the tests.
+enable_testing()
+include(CTest)
 
 # Specify flags used
 # on linux, add the conda prefix to handle possible issues with rpaths at link time
 # sometimes third parties do not set their rpaths correctly
 set(thirdPartyCppFlags -Wall
-                       -std=c++11
                        -fPIC
+                       -std=c++11
                        -DISIS_LITTLE_ENDIAN=1
-                       -fPIC -Wno-unused-parameter
+                       -Wno-unused-parameter
                        -Wno-overloaded-virtual
+                       -Wno-strict-aliasing
                        -DGMM_USES_SUPERLU
                        -DENABLEJP2K=${JP2KFLAG}
                      )
@@ -170,8 +171,11 @@ set(thirdPartyCppFlags -Wall
 
 
 # Flag to fix numeric literals problem with boost on linux
+# Add gold linker (and therefore, phtread) to speed up linux (spec. Ubuntu18.04) builds
 if(NOT APPLE)
-  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fext-numeric-literals
+  set(thirdPartyCppFlags ${thirdPartyCppFlags} -fuse-ld=gold
+	                                       -pthread
+					       -fext-numeric-literals
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
@@ -240,6 +244,7 @@ find_package(nanoflann         REQUIRED)
 find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0   REQUIRED)
+find_package(Armadillo         REQUIRED)
 
 
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -293,67 +298,65 @@ list(REMOVE_DUPLICATES ALLINCDIRS)
 #===============================================================================
 #===============================================================================
 
-# # Set python bindings configuration and set target for generating C++ files
-# if(pybindings)
-#   message("Configuring Python Bindings")
-#
-#   if (NOT DEFINED PYINSTALL_DIR)
-#     set(PYINSTALL_DIR ${PYTHON_SITE_PACKAGES_DIR})
-#   endif()
-#   message(STATUS "PYTHON BINDINGS INSTALL DIR: ${PYINSTALL_DIR}")
-#
-#  # We need to get the locations for sip files, modules, etc.
-#  set(ISIS_SIP_DIR "${CMAKE_SOURCE_DIR}/sipfiles")
-#  set(ISIS_SIP_MODULE "${CMAKE_SOURCE_DIR}/sipfiles/master.sip")
-#  set(SIP_BUILD_FILE "isispy.sbf")
-#  set(ISIS_SIP_CODE_DIR ${CMAKE_BINARY_DIR}/sipsrc)
-#
-#  # Create the output directory for the new .CPP files
-#  execute_process(COMMAND mkdir -p "${ISIS_SIP_CODE_DIR}")
-#
-#  # get list of output files exepected from sip
-#
-#  # get the PYQT configuration based flags from Python
-#  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
-#                  "from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict;print(qtconfigdict['sip_flags'])"
-#                  OUTPUT_VARIABLE PYQT_SIP_FLAGS)
-#
-#  # CMAKE doesn't handle spaces from python well when piping that into the
-#  # command because of white space and a trailing new line,
-#  # so we turn it into a list
-#  message(STATUS "Getting SIP config...")
-#  message(STATUS "Attempting 'python -c \"from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict; print(qtconfigdict['sip_flags'])\"'")
-#
-#  if (${PYQT_SIP_FLAGS} STREQUAL "")
-#     message(FATAL_ERROR "print(qtconfigdict['sip_flags']) returned empty string, is sip installed? Python binding can be disabled with pybindings=OFF")
-#  endif()
-#  string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
-#  string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
-#
-#  message(STATUS "FLAGS: ${PYQT_SIP_FLAGS}")
-#  message(STATUS "Generating C++ code from sip files")
-#  message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
-#  message(STATUS "SIP MODULE: ${ISIS_SIP_MODULE}")
-#  message(STATUS "SIP GENERATED CODE DIR: ${ISIS_SIP_CODE_DIR}")
-#
-#  execute_process(COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE})
-#
-#  # add target so users can run the command after initial configuration
-#  add_custom_target(sipfiles
-#                   COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE}
-#                   COMMENT "Generating C++ code from sip files")
-#
-#  file(GLOB SIP_GENERATED_SOURCE_FILES ${ISIS_SIP_CODE_DIR}/*.cpp)
-#  add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
-#  target_link_libraries(isispy ${ALLLIBS})
-#  target_link_libraries(isispy isis3)
-#  set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3
-#                                          INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}
-#                                          INSTALL_RPATH ${CMAKE_SOURCE_DIR})
-#  add_dependencies(isispy sipfiles)
-#
-#  install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})
-# endif()
+# Set python bindings configuration and set target for generating C++ files
+if(pybindings)
+  message("Configuring Python Bindings")
+
+  if (NOT DEFINED PYINSTALL_DIR)
+    set(PYINSTALL_DIR ${PYTHON_SITE_PACKAGES_DIR})
+  endif()
+  message(STATUS "PYTHON BINDINGS INSTALL DIR: ${PYINSTALL_DIR}")
+
+ # We need to get the locations for sip files, modules, etc.
+ set(ISIS_SIP_DIR "${CMAKE_SOURCE_DIR}/sipfiles")
+ set(ISIS_SIP_MODULE "${CMAKE_SOURCE_DIR}/sipfiles/master.sip")
+ set(SIP_BUILD_FILE "isispy.sbf")
+ set(ISIS_SIP_CODE_DIR ${CMAKE_BINARY_DIR}/sipsrc)
+
+ # Create the output directory for the new .CPP files
+ execute_process(COMMAND mkdir -p "${ISIS_SIP_CODE_DIR}")
+
+ # get list of output files exepected from sip
+
+ # get the PYQT configuration based flags from Python
+ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
+                 "from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict;print(qtconfigdict['sip_flags'])"
+                 OUTPUT_VARIABLE PYQT_SIP_FLAGS)
+
+ # CMAKE doesn't handle spaces from python well when piping that into the
+ # command because of white space and a trailing new line,
+ # so we turn it into a list
+ message(STATUS "Getting SIP config...")
+ message(STATUS "Attempting 'python -c \"from PyQt5.QtCore import PYQT_CONFIGURATION as qtconfigdict; print(qtconfigdict['sip_flags'])\"'")
+
+ if (${PYQT_SIP_FLAGS} STREQUAL "")
+    message(FATAL_ERROR "print(qtconfigdict['sip_flags']) returned empty string, is sip installed? Python binding can be disabled with pybindings=OFF")
+ endif()
+ string(STRIP ${PYQT_SIP_FLAGS} PYQT_SIP_FLAGS)
+ string(REPLACE " " ";" PYQT_SIP_FLAGS ${PYQT_SIP_FLAGS})
+
+ message(STATUS "FLAGS: ${PYQT_SIP_FLAGS}")
+ message(STATUS "Generating C++ code from sip files")
+ message(STATUS "SIP BUILD FILE: ${SIP_BUILD_FILE}")
+ message(STATUS "SIP MODULE: ${ISIS_SIP_MODULE}")
+ message(STATUS "SIP GENERATED CODE DIR: ${ISIS_SIP_CODE_DIR}")
+
+ execute_process(COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE})
+
+ # add target so users can run the command after initial configuration
+ add_custom_target(sipfiles
+                  COMMAND ${SIP_BINARY_PATH} -e -o -c ${ISIS_SIP_CODE_DIR} -I ${SIP_DEFAULT_SIP_DIR}/PyQt5 ${PYQT_SIP_FLAGS} ${ISIS_SIP_MODULE}
+                  COMMENT "Generating C++ code from sip files")
+
+ file(GLOB SIP_GENERATED_SOURCE_FILES ${ISIS_SIP_CODE_DIR}/*.cpp)
+ add_library(isispy MODULE ${SIP_GENERATED_SOURCE_FILES})
+ target_link_libraries(isispy ${ALLLIBS})
+ target_link_libraries(isispy isis3)
+ set_target_properties(isispy PROPERTIES LINK_DEPENDS isis3 INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
+ add_dependencies(isispy sipfiles)
+
+ install(TARGETS isispy DESTINATION ${PYINSTALL_DIR})
+endif()
 
 
 #===============================================================================
@@ -366,11 +369,6 @@ list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3 .so.6 .so.5)
 # Allow everything to include the 3rd party libraries
 include_directories(SYSTEM ${ALLINCDIRS})
 link_directories(${ALLLIBDIRS})
-
-# add isis headers
-file(GLOB ISIS_HEADERS ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h
-${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp)
-file(COPY ${ISIS_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/inc)
 
 include_directories(${CMAKE_BINARY_DIR}/inc)
 set(CORE_LIB_NAME isis3)
@@ -385,10 +383,10 @@ endif()
 
 # We will set up some links with these files at the end of the install process so
 #  make sure they are cleared at the start of the install process.
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5.0${SO})")
-install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.5${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.6.0${SO})")
+install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.6${SO})")
 install(CODE "EXECUTE_PROCESS(COMMAND rm -f ${CMAKE_INSTALL_PREFIX}/lib/libisis3.${SO})")
-EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_BINARY_DIR}/)
+EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/TestPreferences ${CMAKE_BINARY_DIR}/)
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/src/base/objs/Preference/TestPreferences ${CMAKE_INSTALL_PREFIX}/)")
 install(CODE "EXECUTE_PROCESS(COMMAND cp -f ${CMAKE_SOURCE_DIR}/IsisPreferences ${CMAKE_INSTALL_PREFIX}/)")
 
@@ -426,7 +424,7 @@ else()
 endif()
 
 # Set up documentation build target.
-# - This script is called by running "make docs".
+# - This script is called by running "ninja docs".
 # - This long call passes all desired variables to the script.
 add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -434,6 +432,14 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
                   -DLATEX=${LATEX}
                   -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                   -P ${CMAKE_MODULE_PATH}/BuildDocs.cmake)
+
+# Add custom build target to copy modified header files to the build/incs directory.
+# ALL is specified so that the target is added to the default build target, i.e. the copy command
+# will be executed when running "ninja install"
+# On a clean build, all files will be copied over.
+add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
+add_dependencies(isis3 incs)
 
 # Add a custom build target to clean out everything that gets added to the source
 #  directory during the build process.

@@ -45,8 +45,14 @@ namespace Isis {
 
   /**
    * @brief Container class for BundleAdjustment results.
+   *
    * This class includes the settings used to run the bundle adjustment, the resulting statistics
    * values, and the name of the control network used.
+   *  NOTE: BundleSolutionInfo is derived from QObject as it has one slot (perhaps more signals
+   *       and slots in the future? As a child of QObject it should have no copy constructor or
+   *       assignment operator. See for example...
+   *
+   *       http://doc.qt.io/qt-5/qobject.html#no-copy-constructor
    *
    * @ingroup ControlNetworks
    *

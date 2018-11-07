@@ -70,6 +70,8 @@ namespace Isis {
    *                           message. Fixes #962,
    *   @history 2013-02-14 Steven Lambright - Added SolutionType GainsWithoutNormalization. Fixes
    *                           #911.
+   *   @history 2019-09-05 Makayla Shepherd & Jesse Mapel - Changed weight for hold images from
+   *                           1E30 to 1E10 to avoid poorly conditioned normal matrix.
    */
 
   class OverlapNormalization {

@@ -176,6 +176,21 @@ namespace Isis {
                    "holds must be greater than the number of input images";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+    
+    if ( method == LeastSquares::SPARSE ) {
+      m_offsetLsq = NULL;
+      m_gainLsq = NULL;
+      delete m_offsetLsq;
+      delete m_gainLsq;
+      int sparseMatrixRows = m_overlapList.size() + m_idHoldList.size();
+      int sparseMatrixCols = m_offsetFunction->Coefficients();
+      m_offsetLsq = new LeastSquares(*m_offsetFunction, true, sparseMatrixRows, sparseMatrixCols, true);
+      sparseMatrixCols = m_gainFunction->Coefficients();
+      m_gainLsq = new LeastSquares(*m_gainFunction, true, sparseMatrixRows, sparseMatrixCols, true);
+      const std::vector<double> alphaWeight(sparseMatrixCols, 1/1000.0);
+      m_offsetLsq->SetParameterWeights( alphaWeight );
+      m_gainLsq->SetParameterWeights( alphaWeight );
+    }
 
     // Calculate offsets
     if (type != Gains && type != GainsWithoutNormalization) {
@@ -252,7 +267,7 @@ namespace Isis {
           m_gainLsq->AddKnown(input, log(tanp), m_weights[overlap]);
         }
         else {
-          m_gainLsq->AddKnown(input, 0.0, 1e30); // Set gain to 1.0
+          m_gainLsq->AddKnown(input, 0.0, 1e10); // Set gain to 1.0
         }
       }
 
@@ -264,7 +279,7 @@ namespace Isis {
         input.resize(m_statsList.size());
         for (int i = 0; i < (int)input.size(); i++) input[i] = 0.0;
         input[hold] = 1.0;
-        m_gainLsq->AddKnown(input, 0.0, 1e30);
+        m_gainLsq->AddKnown(input, 0.0, 1e10);
       }
 
       // Solve the least squares and get the gain coefficients to apply to the
