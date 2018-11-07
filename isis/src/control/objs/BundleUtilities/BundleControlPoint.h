@@ -135,11 +135,7 @@ namespace Isis {
       void setSigmaWeightFromGlobals(double gSigma, int index); 
       void setSigmaWeightFromGlobals(double gSigma, int index, double cFactor); 
       void zeroNumberOfRejectedMeasures();
-      void productAlphaAV(double alpha,
-                          SparseBlockMatrix &sparseNormals,
-                          // boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
-                          // SparseBlockRowMatrix                                &Q,
-                          LinearAlgebra::Vector                               &v1);
+      void productAlphaAV(double alpha, SparseBlockMatrix &sparseMatrix, LinearAlgebra::Vector &v1);
       void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
            SparseBlockMatrix &sparseNormals, const BundleTargetBodyQsp target);
 
@@ -191,9 +187,6 @@ namespace Isis {
                                             BundleMeasureQsp measure);
 
       virtual double vtpvRangeContribution();
-
-      void productAlphaAV(double alpha, SparseBlockMatrix &sparseMatrix,
-                          LinearAlgebra::Vector &v1);
 
       double vtpv();
       double vtpvMeasures();

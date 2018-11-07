@@ -349,36 +349,6 @@ namespace Isis {
 
 
   /**
-   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
-   *
-   * @param alpha A constant multiplier.
-   * @param sparseNormals The sparse block normal equations matrix.
-   * @param v2 The output vector.
-   * @param Q A sparse block matrix.
-   * @param v1 A vector.
-   */
-  void BundleControlPoint::productAlphaAV(double alpha,
-                                    SparseBlockMatrix &sparseNormals,
-                                    LinearAlgebra::Vector &v1) {
-
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
-
-    int subrangeStart, subrangeEnd;
-    
-    while ( Qit.hasNext() ) {
-      Qit.next();
-
-      int columnIndex = Qit.key();
-
-      subrangeStart = sparseNormals.at(columnIndex)->startColumn();
-      subrangeEnd = subrangeStart + Qit.value()->size2();
-      
-      m_nicVector += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
-    }
-  }
-
-
-  /**
    * Apply the parameter corrections to the bundle control point.
    *
    * @param imageSolution Image vector.
@@ -1265,8 +1235,7 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
    * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
    *
    * @param alpha A constant multiplier.
-   * @param v2 The output vector.
-   * @param Q A sparse block matrix.
+   * @param sparseMatrix Sparse input matrix
    * @param v1 A vector.
    */
   void BundleControlPoint::productAlphaAV(double alpha,
