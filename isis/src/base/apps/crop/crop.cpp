@@ -36,7 +36,7 @@ void IsisMain() {
   else
     ns = -1;
 
-  if (ui.WasEntered("NLINESS"))
+  if (ui.WasEntered("NLINES"))
     nl = ui.GetInteger("LINES");
   else
     nl = -1;
