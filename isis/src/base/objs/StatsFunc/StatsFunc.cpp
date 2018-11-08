@@ -34,6 +34,12 @@ namespace Isis {
 
     Pvl statsPvl = stats(inputCube, validMin, validMax);
 
+    for (int resultIndex = 0; resultIndex < statsPvl.groups(); resultIndex++) {
+      if (statsPvl.group(resultIndex).name() == "Results") {
+        Application::Log(statsPvl.group(resultIndex));
+      }
+    }
+
     delete inputCube;
     inputCube = NULL;
 
@@ -117,9 +123,6 @@ namespace Isis {
 
       delete stats;
       stats = NULL;
-
-      // Write the results to the log
-      Application::Log(results);
     }
 
     return statsPvl;
