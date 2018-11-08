@@ -24,7 +24,6 @@ pipeline {
                     source activate isis3
                     mkdir -p ./install ./build && cd build
                     cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-                    ./scripts/isis3Startup.py
                     set +e
                     ninja -j8 && ninja install
                     ctest -V -R _unit_ --timeout 500
