@@ -156,15 +156,16 @@ int main(int argc, char *argv[]) {
     results.setRmsImageResidualLists(rmsImageLineResiduals,
                                      rmsImageSampleResiduals,
                                      rmsImageResiduals);
-    results.setSigmaLatitudeRange(Distance(0.5, Distance::Meters),
+    results.setSigmaCoord1Range(Distance(0.5, Distance::Meters),
                                   Distance(89.6, Distance::Meters),
                                   "MinLatId", "MaxLatId");
-    results.setSigmaLongitudeRange(Distance(0.7, Distance::Meters),
+    results.setSigmaCoord2Range(Distance(0.7, Distance::Meters),
                                   Distance(179.2, Distance::Meters),
                                   "MinLonId", "MaxLonId");
-    results.setSigmaRadiusRange(Distance(0.9, Distance::Meters),
+    results.setSigmaCoord3Range(Distance(0.9, Distance::Meters),
                                 Distance(354.4, Distance::Meters),
                                 "MinRadId", "MaxRadId");
+
     results.setRmsFromSigmaStatistics(0.123, 0.456, 0.789);
     results.setRmsXYResiduals(4.0, 5.0, 6.0);
     results.setRejectionLimit(7.0);
@@ -187,7 +188,6 @@ int main(int argc, char *argv[]) {
     results.incrementFixedPoints();
     results.incrementHeldImages();
     results.incrementIgnoredPoints();
-    results.setRadiansToMeters(23.68);
     results.setIterations(6);
     printXml(results);
     qDebug() << "Number of continuity constraints:"
@@ -212,6 +212,7 @@ int main(int argc, char *argv[]) {
     imgsAndParams.insert("img1", list1);
     imgsAndParams.insert("img2", list2);
     results.setCorrMatImgsAndParams(imgsAndParams);
+    copyResults = results;
     qDebug() << "";
 
     qDebug() << "Testing storage for output methods...";
@@ -235,8 +236,11 @@ int main(int argc, char *argv[]) {
     ControlNet outNet;
     outNet.AddPoint(freePoint);
     outNet.AddPoint(fixedPoint);
-    BundleControlPointQsp freeBundleControlPoint(new BundleControlPoint(freePoint));
-    BundleControlPointQsp fixedBundleControlPoint(new BundleControlPoint(fixedPoint));
+    BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings());
+    BundleControlPointQsp freeBundleControlPoint(
+                                     new BundleControlPoint(settings, freePoint));
+    BundleControlPointQsp fixedBundleControlPoint(
+                                     new BundleControlPoint(settings, fixedPoint));
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
@@ -315,6 +319,58 @@ int main(int argc, char *argv[]) {
     printXml(bsFromXml);
 
 
+    qDebug() << "Testing rectangular coordinate type in control net and settings";
+    settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
+                              SurfacePoint::Rectangular);
+    // outNetRect.SetCoordType(SurfacePoint::Rectangular);
+    outNet.SetCoordType(SurfacePoint::Rectangular);
+    BundleControlPointQsp freeRBundleControlPoint(
+                                     new BundleControlPoint(settings, freePoint));
+    BundleControlPointQsp fixedRBundleControlPoint(
+                                     new BundleControlPoint(settings, fixedPoint));
+    QVector<BundleControlPointQsp> bundleControlPointVectorR;
+    bundleControlPointVectorR.append(freeRBundleControlPoint);
+    bundleControlPointVectorR.append(fixedRBundleControlPoint);
+    copyResults.setBundleControlPoints(bundleControlPointVectorR);
+    copyResults.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
+    copyResults.setObservations(observationVector);
+    qDebug() << "";
+
+    qDebug() << "bundle control points...";
+    accessedControlPoints = copyResults.bundleControlPoints();
+    for (int i = 0; i < accessedControlPoints.size(); i++) {
+      qDebug().noquote() << accessedControlPoints[i]->formatBundleOutputSummaryString(false);
+    }
+
+    qDebug() << "";
+
+    qDebug() << "Testing XML serialization for a rectangular net 1: round trip serialization of fully populated BundleSettings object...";
+    qDebug() << "Serializing test XML object to file...";
+    printXml(copyResults);
+    FileName xmlFileR("./BundleResultsR.xml");
+    xmlPath = xmlFileR.expanded();
+    QFile qXmlFileR(xmlPath);
+    if (!qXmlFileR.open(QIODevice::WriteOnly|QIODevice::Text)) {
+      throw IException(IException::Io,
+                       QString("Unable to open xml file, [%1],  with write access").arg(xmlPath),
+                       _FILEINFO_);
+    }
+    QXmlStreamWriter writerR(&qXmlFileR);
+    writerR.setAutoFormatting(true);
+    writerR.writeStartDocument();
+    project = NULL;
+    copyResults.save(writerR, project);
+    writerR.writeEndDocument();
+    qXmlFileR.close();
+
+    qDebug() << "Testing rectangular XML: reading serialized BundleResults back in...";
+    BundleResultsXmlHandlerTester bsRectFromXml(project, &reader, xmlFileR);
+    // Set the output control net in bsRectFromXml in order to get the desired coordinate type
+    bsRectFromXml.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
+    qDebug() << "Testing rectangular XML: Object deserialized as (should match object above):";
+    printXml(bsRectFromXml);
+
+
     qDebug() << "Testing error throws...";
     try {
       results.setNumberObservations(0);
@@ -339,8 +395,16 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     try {
-      BundleResults defaultResaults;
-      defaultResaults.outputControlNet();
+      BundleResults defaultResults;
+      defaultResults.outputControlNet();
+    }
+    catch (IException &e) {
+      e.print();
+    }
+    try {
+      outNet.SetCoordType(SurfacePoint::CoordinateType (-1));
+      results.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
+      printXml(results);
     }
     catch (IException &e) {
       e.print();

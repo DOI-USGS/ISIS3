@@ -26,6 +26,7 @@
 
 #include "BundleControlPoint.h"
 #include "BundleMeasure.h"
+#include "BundleSettings.h"
 #include "LidarControlPoint.h"
 
 namespace Isis {
@@ -53,8 +54,8 @@ namespace Isis {
   class BundleLidarControlPoint : public BundleControlPoint {
 
     public:
-      BundleLidarControlPoint(LidarControlPointQsp lidarControlPoint);
-//    BundleLidarControlPoint(const BundleLidarControlPoint &src);
+      BundleLidarControlPoint(BundleSettingsQsp bundleSettings,
+                              LidarControlPointQsp lidarControlPoint);
       ~BundleLidarControlPoint();
 
       // copy

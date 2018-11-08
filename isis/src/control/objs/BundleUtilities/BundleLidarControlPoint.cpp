@@ -31,13 +31,16 @@ namespace Isis {
    * Constructs a BundleLidarControlPoint object from a LidarControlPoint. Only the
    * non-ignored measures are added to the BundleLidarControlPoint.
    *  
+   * @param bundleSettings BundleSettings.
+   *
    * @param controlPoint Pointer to a ControlPoint that will be used to 
    *                     construct this BundleLidarControlPoint.
    *
    * TODO: is the typecast expensive?
    */
-  BundleLidarControlPoint::BundleLidarControlPoint(LidarControlPointQsp lidarControlPoint)
-    : BundleControlPoint((ControlPoint*)  lidarControlPoint.data()) {
+  BundleLidarControlPoint::BundleLidarControlPoint(const BundleSettingsQsp bundleSettings,
+                                                   LidarControlPointQsp lidarControlPoint)
+    : BundleControlPoint(bundleSettings, (ControlPoint*)  lidarControlPoint.data()) {
 
     m_lidarControlPoint = lidarControlPoint;
   }

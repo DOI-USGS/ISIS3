@@ -4,16 +4,9 @@ Testing ls, grep, sed and pipes ...
 
 ProgramLauncher.cpp
 ProgramLauncher.h
-ProgramLauncher.o
 ProgramLauncher.truth
 Testing stats ... 
 
-greyscale: Working
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-hist: Computing min/max for histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-hist: Gathering histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Group = Results
   From                    = unitTest.cub
   Band                    = 1
@@ -55,14 +48,10 @@ That is the reason for the OS specific truth files. Please ignore the exit codes
 
 terminate called after throwing an instance of 'Isis::IException'
   what():  **ERROR** This process (program) was executed by an existing Isis 3 process. However, we failed to establish a communication channel with the parent (launcher) process. The parent process has a PID of [999].
-**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/src/base/objs/Preference/TestPreferences] failed with return status [6].
+**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/TestPreferences] failed with return status [6].
 
 Testing using Isis 3 program as a system program without pid... 
 
-stats: Computing min/max for histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-stats: Gathering histogram
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Group = Results
   From                    = unitTest.cub
   Band                    = 1
