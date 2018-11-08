@@ -17,10 +17,11 @@ class CropApp: public QObject {
     Q_OBJECT
     public:
 
-    CropApp(QString &from, QString &to, int ssample = 1,int nsamples = -1,int sinc=1,
-             int sline =1,int nlines=-1,int linc=1,bool propspice=true);
+    CropApp(QString &from, QString &to, int ssample = 1, int nsamples = -1, int sinc=1,
+             int sline =1, int nlines=-1, int linc=1, bool propspice=true, Cube *cube);
 
     public slots:
+    void start();
     void handleResults();
 
     signals:

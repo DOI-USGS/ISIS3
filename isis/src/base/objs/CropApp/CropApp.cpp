@@ -2,6 +2,7 @@
 
 #include <QString>
 #include <QThread>
+#include <QDebug>
 
 #include <cmath>
 
@@ -39,7 +40,7 @@ bool cropper::m_propspice = false;
 
 
          CropApp::CropApp(QString &from, QString &to, int ssample,int nsamples,
-                          int sinc, int sline,int nlines,int linc,bool propspice){
+                          int sinc, int sline,int nlines,int linc,bool propspice,Cube *cube){
 
             m_fromCube =from;
             m_toCube = to;
@@ -54,11 +55,10 @@ bool cropper::m_propspice = false;
             m_in = NULL;
             m_cube = NULL;
 
-
-            CubeAttributeInput inAtt(from);
-            m_cube = new Cube();
-            m_cube->setVirtualBands(inAtt.bands());
-            m_cube->open(from);
+            //CubeAttributeInput inAtt(from);
+            //m_cube = new Cube();
+            //m_cube->setVirtualBands(inAtt.bands());
+            //m_cube->open(from);
 
 
             cropper *crop = new cropper(ssample,nsamples,sinc,
@@ -70,11 +70,20 @@ bool cropper::m_propspice = false;
             connect(crop, &cropper::resultReady, this, &CropApp::handleResults);
             cropThread.start();
 
+         }
+
+         void start() {
+
+
+          emit (operate (from,to,m_ssample,m_nsamples,
+                       m_sinc,m_sline,m_nlines,m_linc,m_propspice,m_cube));
 
 
          }
 
          void CropApp::handleResults() {
+           qDebug() << "Results are handled here.";
+
 
          }
 
