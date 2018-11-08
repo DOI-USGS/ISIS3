@@ -84,7 +84,7 @@ void IsisMain() {
 
 
   CropApp *capp = new CropApp(from,to,ss,ns,sinc,sl,nl,linc,propspice,cube);
-  capp->start();
+  //capp->start();
 
   // Write the results to the log
   //Application::Log(results);

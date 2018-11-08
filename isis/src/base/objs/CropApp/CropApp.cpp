@@ -3,6 +3,7 @@
 #include <QString>
 #include <QThread>
 #include <QDebug>
+#include <QMetaType>
 
 #include <cmath>
 
@@ -19,6 +20,8 @@
 
 using namespace std;
 using namespace Isis;
+
+
 
 namespace Isis {
 
@@ -64,9 +67,12 @@ bool cropper::m_propspice = false;
             cropper *crop = new cropper(ssample,nsamples,sinc,
                                           sline,nlines,linc,propspice,to,m_cube);
             crop->moveToThread(&cropThread);
+            connect(&cropThread,SIGNAL(started()),crop,
+                    SLOT(cropit()));
 
             connect(&cropThread, &QThread::finished,crop, &QObject::deleteLater);
-            connect(this, &CropApp::operate, crop, &cropper::cropit);
+
+            //connect(this, &CropApp::operate, crop, &cropper::cropit);
             connect(crop, &cropper::resultReady, this, &CropApp::handleResults);
             cropThread.start();
 
@@ -92,10 +98,14 @@ bool cropper::m_propspice = false;
           int sinc, int sline,int nlines,int linc,bool propspice,QString to,Cube *cube){
 
 
+
           m_sline= sline;
           m_linc= linc;
           m_sband=1;
           m_ssample=ssample;
+          m_osamples = nsamples;
+          m_olines = nlines;
+
           m_sinc=sinc;
           m_cube=cube;
           m_outputCubeName=to;
@@ -117,6 +127,125 @@ bool cropper::m_propspice = false;
         if(out.Line() == m_olines) m_sband++;
 
         }
+
+
+        void cropper::cropit() {
+
+          ProcessByLine p;
+
+          int origns = m_cube->sampleCount();
+          int orignl = m_cube->lineCount();
+          int es = m_cube->sampleCount();
+          int el = m_cube->lineCount();
+          int eb = m_cube->bandCount();
+
+
+          if (m_osamples !=-1) {
+            es = m_ssample + m_osamples -1;
+          }
+
+          if (m_olines != -1) {
+            el = m_sline + m_olines -1;
+          }
+
+          m_osamples = ceil((double)(es - m_ssample + 1) / m_sinc);
+          m_olines = ceil((double)(el - m_sline + 1) / m_linc);
+          m_obands = eb;
+
+          es = m_ssample + (m_osamples - 1) * m_sinc;
+          el = m_sline + (m_olines - 1) * m_linc;
+
+          p.SetInputCube(m_cube);
+          p.PropagateTables(false);
+          CubeAttributeOutput outAtt(m_outputCubeName);
+          Cube * ocube = p.SetOutputCube(m_outputCubeName,outAtt,m_osamples,m_olines,m_obands);
+
+          p.ClearInputCubes();
+
+        // propagate tables manually
+        Pvl &inLabels = *m_cube->label();
+
+        // Loop through the labels looking for object = Table
+        for(int labelObj = 0; labelObj < inLabels.objects(); labelObj++) {
+          PvlObject &obj = inLabels.object(labelObj);
+
+          if(obj.name() != "Table") continue;
+
+          // If we're not propagating spice data, dont propagate the following tables...
+          if( m_propspice ) {
+            if((IString)obj["Name"][0] == "InstrumentPointing") continue;
+            if((IString)obj["Name"][0] == "InstrumentPosition") continue;
+            if((IString)obj["Name"][0] == "BodyRotation") continue;
+            if((IString)obj["Name"][0] == "SunPosition") continue;
+          }
+
+          // Read the table into a table object
+          Table table(obj["Name"], m_cube->fileName() );
+
+          // Write the table
+          ocube->write(table);
+        }
+
+        Pvl &outLabels = *ocube->label();
+        if(! m_propspice && outLabels.findObject("IsisCube").hasGroup("Kernels")) {
+          PvlGroup &kerns = outLabels.findObject("IsisCube").findGroup("Kernels");
+
+          QString tryKey = "NaifIkCode";
+          if(kerns.hasKeyword("NaifFrameCode")) {
+            tryKey = "NaifFrameCode";
+          }
+
+          if(kerns.hasKeyword(tryKey)) {
+            PvlKeyword ikCode = kerns[tryKey];
+            kerns = PvlGroup("Kernels");
+            kerns += ikCode;
+          }
+        }
+
+        // Create a buffer for reading the input cube
+        LineManager * m_in = new LineManager(*m_cube);
+
+        // Crop the input cube
+        p.StartProcess(this->crop);
+
+        delete m_in;
+        m_in = NULL;
+
+        // Construct a label with the results
+        PvlGroup results("Results");
+        results += PvlKeyword("InputLines", toString(orignl));
+        results += PvlKeyword("InputSamples", toString(origns));
+        results += PvlKeyword("StartingLine", toString(m_sline));
+        results += PvlKeyword("StartingSample", toString(m_ssample));
+        results += PvlKeyword("EndingLine", toString(el));
+        results += PvlKeyword("EndingSample", toString(es));
+        results += PvlKeyword("LineIncrement", toString(m_linc));
+        results += PvlKeyword("SampleIncrement", toString(m_sinc));
+        results += PvlKeyword("OutputLines", toString(m_olines));
+        results += PvlKeyword("OutputSamples", toString(m_osamples));
+
+        // Update the Mapping, Instrument, and AlphaCube groups in the output
+        // cube label
+        SubArea *s;
+        s = new SubArea;
+        s->SetSubArea(orignl, origns, m_sline, m_ssample, el, es, m_linc, m_sinc);
+        s->UpdateLabel(m_cube, ocube, results);
+        delete s;
+        s = NULL;
+
+        // Cleanup
+        p.EndProcess();
+        m_cube->close();
+        delete m_cube;
+        m_cube = NULL;
+
+        QString result;
+
+        emit resultReady(result);
+
+       }//end cropit
+
+
 
         void cropper::cropit(QString &from, QString &to, int ssample,int nsamples,
                       int sinc, int sline,
@@ -234,5 +363,6 @@ bool cropper::m_propspice = false;
            emit resultReady(result);
 
           }//end cropit
+
 
 }

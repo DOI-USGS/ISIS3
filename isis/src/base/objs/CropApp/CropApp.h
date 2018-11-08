@@ -79,6 +79,8 @@ public slots:
               int sinc, int sline,
               int nlines,int linc,bool propspice,Cube *cube);
 
+   void cropit();
+
 
 
 
