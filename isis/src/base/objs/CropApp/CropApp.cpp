@@ -72,10 +72,10 @@ bool cropper::m_propspice = false;
 
          }
 
-         void start() {
+         void CropApp::start() {
 
 
-          emit (operate (from,to,m_ssample,m_nsamples,
+          emit (operate (m_fromCube,m_toCube,m_ssample,m_nsamples,
                        m_sinc,m_sline,m_nlines,m_linc,m_propspice,m_cube));
 
 

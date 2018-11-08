@@ -18,7 +18,7 @@ class CropApp: public QObject {
     public:
 
     CropApp(QString &from, QString &to, int ssample = 1, int nsamples = -1, int sinc=1,
-             int sline =1, int nlines=-1, int linc=1, bool propspice=true, Cube *cube);
+             int sline =1, int nlines=-1, int linc=1, bool propspice=true, Cube *cube=NULL);
 
     public slots:
     void start();
