@@ -14,17 +14,19 @@ void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
   QString from = ui.GetAsString("FROM");
+  QString to = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
-  cube = new Cube();
+  Cube *cube = new Cube();
   cube->setVirtualBands(inAtt.bands());
   from = ui.GetFileName("FROM");
   cube->open(from);
   bool propspice =false;
 
   // Determine the sub-area to extract
-  ss = ui.GetInteger("SAMPLE");
-  sl = ui.GetInteger("LINE");
-  sb = 1;
+
+  int ss = ui.GetInteger("SAMPLE");
+  int sl = ui.GetInteger("LINE");
+  //int sb = 1;
 
 
   int ns;
@@ -41,10 +43,12 @@ void IsisMain() {
 
 
 
-  int eb = cube->bandCount();
+  int es = cube->sampleCount();
+  int el = cube->lineCount();
+  //int eb = cube->bandCount();
 
-  sinc = ui.GetInteger("SINC");
-  linc = ui.GetInteger("LINC");
+  int sinc = ui.GetInteger("SINC");
+  int linc = ui.GetInteger("LINC");
 
   // Make sure starting positions fall within the cube
   if (ss > cube->sampleCount()) {
@@ -75,7 +79,7 @@ void IsisMain() {
   }
 
   if (ui.GetBoolean("PROPSPICE") ) {
-    propsice = true;
+    propspice = true;
   }
 
 
