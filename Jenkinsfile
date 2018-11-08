@@ -20,6 +20,7 @@ pipeline {
             }
             steps {
                 sh """
+                    echo "workspace directory is ${workspace}"
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
