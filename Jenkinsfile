@@ -16,7 +16,7 @@ pipeline {
             }
             steps {
                 sh """
-                    ls /usgs/cpkgs/isis3/
+                    ls /usgs/cpkgs/isis3/data/
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
