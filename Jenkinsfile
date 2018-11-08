@@ -20,6 +20,7 @@ pipeline {
             }
             steps {
                 sh """
+                    ls /scratch/krodriguez/isis3_data/data
                     ls /usgs/cpkgs/isis3/data
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
