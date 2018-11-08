@@ -5,7 +5,7 @@
 
 # Specify the required version of CMake.  If your machine does not
 #  have this, it should be easy to build from https://cmake.org/download/
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10)
 
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -18,6 +18,8 @@ include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
+include(cmake/gtest.cmake)
+include(GoogleTest)
 
 #===============================================================================
 #===============================================================================
@@ -30,15 +32,15 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.5.00.0")
+set(VERSION            "3.6.00.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2017-04-24")
-set(THIRD_PARTY_LIBS_VERSION  "v007")
+set(VERSION_DATE              "2018-11-09")
+set(THIRD_PARTY_LIBS_VERSION  "v008")
 set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
@@ -245,6 +247,7 @@ find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0   REQUIRED)
 find_package(Armadillo         REQUIRED)
+find_package(Threads)
 
 
 # Im this case, we specify the version numbers being searched for in the non-traditional installs.
@@ -401,3 +404,9 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTA
 #   the end of this file containing a CMakeLists.txt file which includes all of
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
+option (BUILD_TESTS "Build tests" ON)
+if(BUILD_TESTS)
+  include(CTest)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

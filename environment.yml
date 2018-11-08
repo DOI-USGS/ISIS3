@@ -10,7 +10,7 @@ dependencies:
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
-  - cmake==3.9.1
+  - cmake>=3.10
   - cspice==66=h470a237_3
   - curl==7.60.0=0
   - doxygen==1.8.14
@@ -67,4 +67,3 @@ dependencies:
   - xorg-libx11==1.6.4
   - xorg-libxi
   - zlib==1.2.11
-
