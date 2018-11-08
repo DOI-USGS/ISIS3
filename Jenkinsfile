@@ -12,8 +12,8 @@ pipeline {
                     label 'docker'
                     image 'chrisryancombs/docker_isis'
                     args  '''\
-                            -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
-                            -v /usgs/cpkgs/isis3/testData:/usgs/cpkgs/isis3/testData\
+                            -v /scratch/krodriguez/isis3_data/data:/usgs/cpkgs/isis3/data \
+                            -v /scratch/krodriguez/isis3_data/testData:/usgs/cpkgs/isis3/testData\
                             -v /usgs/cpkgs/isis3/isis3mgr_scripts:/usgs/cpkgs/isis3/isis3mgr_scripts
                           '''
                 }
@@ -42,9 +42,9 @@ pipeline {
                     label 'docker'
                     image 'chrisryancombs/docker_isis_centos'
                     args  '''\
-                            -v /usgs/cpkgs/isis3/data:/usgs/cpkgs/isis3/data \
-                            -v /usgs/cpkgs/isis3/testData:/usgs/cpkgs/isis3/testData\
-                            -v /usgs/cpkgs/isis3/isis3mgr_scripts:/usgs/cpkgs/isis3/isis3mgr_scripts
+                             -v /scratch/krodriguez/isis3_data/data:/usgs/cpkgs/isis3/data \
+                             -v /scratch/krodriguez/isis3_data/testData:/usgs/cpkgs/isis3/testData\
+                             -v /usgs/cpkgs/isis3/isis3mgr_scripts:/usgs/cpkgs/isis3/isis3mgr_scripts
                           '''
                 }
             }
