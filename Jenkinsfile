@@ -27,10 +27,9 @@ pipeline {
                     cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
                     set +e
                     ninja -j8 && ninja install
-                    ./isis/scripts/isis3Startup.py
-                    ctest -R -V _unit_ --timeout 500
-                    ctest -R -V _app_ --timeout 500
-                    ctest -R -V _module_ --timeout 500
+                    ctest -V -R _unit_ --timeout 500
+                    ctest -V -R _app_ --timeout 500
+                    ctest -V -R _module_ --timeout 500
                     """
             }
         }
