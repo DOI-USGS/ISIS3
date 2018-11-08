@@ -1,61 +1,52 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+#include <list>
 #include <string>
+#include <utility>
 
 #include "Pixel.h"
 #include "SpecialPixel.h"
 
 using namespace Isis;
 
-/**
- * Shared resource test class
- */
-// class PixelTest : public ::testing::Test {
-// protected:
-//   static void SetUpTestCase() {
-//     default_pixel = new Pixel;
-//     slbdn_pixel = new Pixel(1, 2, 3, 4.0);
-//   }
+template <typename T>
+class PixelTestTemplate : public ::testing::Test {
+public:
+  typedef std::list<T> List;
+  T _value;
+};
+TYPED_TEST_CASE_P(PixelTestTemplate);
+TYPED_TEST_P(PixelTestTemplate, xx) {
+  TypeParam n = this->_value;
+  std::cout << "TEST: n: " << n <<  std::endl;
+  std::cout << std::to_string(n) << std::endl;
+}
 
-//   static void TearDownTestCase() {
-//     delete default_pixel;
-//     delete slbdn_pixel;
-//     default_pixel = nullptr;
-//     slbdn_pixel = nullptr;
-//   }
+REGISTER_TYPED_TEST_CASE_P(PixelTestTemplate, xx);
+typedef ::testing::Types<unsigned char, unsigned short> MyTypes;
+INSTANTIATE_TYPED_TEST_CASE_P(TESTTEST, PixelTestTemplate, MyTypes);
 
-//   static Pixel* default_pixel;
-//   static Pixel* slbdn_pixel;
-// };
+class PixelTest : public ::testing::TestWithParam< std::pair<unsigned char,double> > {
 
-// Pixel *PixelTest::default_pixel = nullptr;
-// Pixel *PixelTest::slbdn_pixel = nullptr;
+};
 
-// template <typename T>
-// class Pixeltest : public ::testing::Test {
-// public:
-//   typdedf
-// }
+TEST_P(PixelTest, testtest) {
+  // std::cout << "TEST: 0: " << GetParam().first;
+  // std::cout << "\n" << Isis::NULL1;
+  // std::cout << "\nTEST: 1: " << GetParam().second;
+  // std::cout << "\n" << std::to_string(GetParam().second) << std::endl;
+  EXPECT_EQ(GetParam().first, Pixel::To8Bit(GetParam().second));
+}
 
-// // Construction (fixture?)
-// class TestPixel : public ::testing::Test {
-// protected:
+std::vector<std::pair<unsigned char, double> > inOut {
+  std::make_pair(Isis::NULL1, 0.0),
+  std::make_pair(static_cast<unsigned char>(1), 1.0)
+};
 
-//   void SetUp() override {
-//     pixel_f = new Pixel;
-//   }
-
-//   // void SetUp(int sample, int line, int band, double DN) {
-//   //   pixel = new Pixel(sample, line, band, DN);
-//   // }
-
-//   void TearDown() override {
-//     delete pixel;
-//   }
-
-//   Pixel *pixel_f;
-// }
+INSTANTIATE_TEST_CASE_P(Pixel,
+                        PixelTest,
+                        ::testing::ValuesIn(inOut));
 
 TEST(Pixel, DefaultConstructor) {
   Pixel p;
