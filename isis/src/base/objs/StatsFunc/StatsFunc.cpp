@@ -5,6 +5,7 @@
 
 #include "Application.h"
 #include "Cube.h"
+#include "FileName.h"
 #include "Histogram.h"
 #include "Process.h"
 #include "Pvl.h"
@@ -18,10 +19,7 @@ namespace Isis {
     // TODO is this line bad?
     UserInterface ui("/work/users/jmapel/ISIS3/isis/src/base/apps/stats/stats.xml", args);
 
-    Process process;
-
-    // Get the histogram
-    Cube *inputCube = process.SetInputCube("FROM");
+    Cube *inputCube = new Cube(ui.GetFileName("FROM"));
 
     double validMin = Isis::ValidMinimum;
     double validMax = Isis::ValidMaximum;
@@ -34,19 +32,65 @@ namespace Isis {
       validMax = ui.GetDouble("VALIDMAX");
     }
 
+    Pvl statsPvl = stats(inputCube, validMin, validMax);
+
+    delete inputCube;
+    inputCube = NULL;
+
+    if ( ui.WasEntered("TO") ) {
+      QString outFile = FileName(ui.GetFileName("TO")).expanded();
+      bool append = ui.GetBoolean("APPEND");
+      //write the results in the requested format.
+      if ( ui.GetString("FORMAT") == "PVL" ) {
+        if (append) {
+          statsPvl.append(outFile);
+        }
+        else {
+          statsPvl.write(outFile);
+        }
+      }
+      else {
+        bool exists = FileName(outFile).fileExists();
+        bool writeHeader = false;
+        ofstream *os = new ofstream;
+        if (append) {
+          os->open(outFile.toLatin1().data(), ios::app);
+          if (!exists) {
+            writeHeader = true;
+          }
+        }
+        else {
+          os->open(outFile.toLatin1().data(), ios::out);
+          writeHeader = true;
+        }
+        writeStatsStream(statsPvl, writeHeader, os);
+        delete os;
+        os = NULL;
+      }
+    }
+  }
+
+
+  Pvl stats(Cube *cube, double validMin, double validMax) {
+
+    Process process;
+
+    // Get the histogram
+    process.SetInputCube(cube);
+
     // Set a global Pvl for storing results
-    Pvl mainPvl;
+    Pvl statsPvl;
 
     // Get the number of bands to process
-    int bandCount = inputCube->bandCount();
+    int bandCount = cube->bandCount();
 
     for (int i = 1; i <= bandCount; i++) {
-      Histogram *stats = inputCube->histogram(i, validMin, validMax);
+      Histogram *stats = cube->histogram(i, validMin, validMax);
 
       // Construct a label with the results
       PvlGroup results("Results");
-      results += PvlKeyword("From", inputCube->fileName());
-      results += PvlKeyword("Band", toString(inputCube->physicalBand(i)));
+      results += PvlKeyword("From", cube->fileName());
+      results += PvlKeyword("Band", toString(cube->physicalBand(i)));
       if ( stats->ValidPixels() != 0 ) {
         results += PvlKeyword("Average", toString(stats->Average()));
         results += PvlKeyword("StandardDeviation", toString(stats->StandardDeviation()));
@@ -69,7 +113,7 @@ namespace Isis {
       results += PvlKeyword("HisPixels", toString(stats->HisPixels()));
       results += PvlKeyword("HrsPixels", toString(stats->HrsPixels()));
 
-      mainPvl.addGroup(results);
+      statsPvl.addGroup(results);
 
       delete stats;
       stats = NULL;
@@ -78,55 +122,30 @@ namespace Isis {
       Application::Log(results);
     }
 
-    // Write the results to the output file if the user specified one
-    if ( ui.WasEntered("TO") ) {
-      QString outFile = FileName(ui.GetFileName("TO")).expanded();
-      bool exists = FileName(outFile).fileExists();
-      bool append = ui.GetBoolean("APPEND");
-      ofstream os;
-      bool writeHeader = false;
-      //write the results in the requested format.
-      if ( ui.GetString("FORMAT") == "PVL" ) {
-        if (append) {
-          mainPvl.append(outFile);
-        }
-        else {
-          mainPvl.write(outFile);
+    return statsPvl;
+  }
+
+
+  void writeStatsStream(Pvl statsPvl, bool writeHeader, ostream *stream) {
+    if (writeHeader) {
+      for (int i = 0; i < statsPvl.group(0).keywords(); i++) {
+        *stream << statsPvl.group(0)[i].name();
+        if ( i < statsPvl.group(0).keywords() - 1 ) {
+          *stream << ",";
         }
       }
-      else {
-        //if the format was not PVL, write out a flat file.
-        if (append) {
-          os.open(outFile.toLatin1().data(), ios::app);
-          if (!exists) {
-            writeHeader = true;
-          }
-        }
-        else {
-          os.open(outFile.toLatin1().data(), ios::out);
-          writeHeader = true;
-        }
+      *stream << endl;
+    }
 
-        if (writeHeader) {
-          for (int i = 0; i < mainPvl.group(0).keywords(); i++) {
-            os << mainPvl.group(0)[i].name();
-            if ( i < mainPvl.group(0).keywords() - 1 ) {
-              os << ",";
-            }
-          }
-          os << endl;
-        }
-
-        for (int i = 0; i < mainPvl.groups(); i++) {
-          for (int j = 0; j < mainPvl.group(i).keywords(); j++) {
-            os << (QString) mainPvl.group(i)[j];
-            if ( j < mainPvl.group(i).keywords() - 1 ) {
-              os << ",";
-            }
-          }
-          os << endl;
+    for (int i = 0; i < statsPvl.groups(); i++) {
+      for (int j = 0; j < statsPvl.group(i).keywords(); j++) {
+        *stream << (QString) statsPvl.group(i)[j];
+        if ( j < statsPvl.group(i).keywords() - 1 ) {
+          *stream << ",";
         }
       }
+      *stream << endl;
     }
   }
+
 }
