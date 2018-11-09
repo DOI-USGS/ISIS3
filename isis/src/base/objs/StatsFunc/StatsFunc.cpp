@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Application.h"
+#include "CubeAttribute.h"
 #include "Cube.h"
 #include "FileName.h"
 #include "Histogram.h"
@@ -19,7 +20,10 @@ namespace Isis {
     // TODO is this line bad?
     UserInterface ui("/work/users/jmapel/ISIS3/isis/src/base/apps/stats/stats.xml", args);
 
-    Cube *inputCube = new Cube(ui.GetFileName("FROM"));
+    Cube *inputCube = new Cube();
+    CubeAttributeInput inAtt(ui.GetAsString("FROM"));
+    inputCube->setVirtualBands(inAtt.bands());
+    inputCube->open(ui.GetFileName("FROM"));
 
     double validMin = Isis::ValidMinimum;
     double validMax = Isis::ValidMaximum;
