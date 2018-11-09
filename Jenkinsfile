@@ -11,13 +11,11 @@ pipeline {
                 docker {
                     label 'docker'
                     image 'chrisryancombs/docker_isis'
-                    args  '-v /scratch/krodriguez/isis3_data:/usgs/cpkgs/isis3'
+                    args  '-v /scratch/krodriguez/isis3_data/data:/usgs/cpkgs/isis3/data -v /scratch/krodriguez/isis3_data/testData:/usgs/cpkgs/isis3/testData'
                 }
             }
             steps {
                 sh """
-                    ls -la /usgs/cpkgs/isis3/
-                    ls -la /usgs/cpkgs/isis3/data/
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
