@@ -31,6 +31,7 @@ class StatsFunc_SimpleCubeTest : public ::testing::Test {
     }
 };
 
+
 class StatsFunc_FlatFileTest : public ::testing::Test {
   protected:
     Pvl testPvl;
@@ -97,6 +98,7 @@ TEST_F(StatsFunc_SimpleCubeTest, DefaultStats) {
   EXPECT_TRUE(band2Stats.findKeyword("HrsPixels").isEquivalent("1764"));
 }
 
+
 TEST_F(StatsFunc_SimpleCubeTest, ValidMinimum) {
   Pvl statsPvl = stats(testCube, 0.0, Isis::ValidMaximum);
 
@@ -114,6 +116,7 @@ TEST_F(StatsFunc_SimpleCubeTest, ValidMinimum) {
   EXPECT_TRUE(band1Stats.findKeyword("ValidPixels").isEquivalent("5292"));
   EXPECT_TRUE(band1Stats.findKeyword("UnderValidMinimumPixels").isEquivalent("1764"));
 }
+
 
 TEST_F(StatsFunc_SimpleCubeTest, ValidMaximum) {
   Pvl statsPvl = stats(testCube, Isis::ValidMinimum, 0.0);
@@ -133,6 +136,7 @@ TEST_F(StatsFunc_SimpleCubeTest, ValidMaximum) {
   EXPECT_TRUE(band1Stats.findKeyword("OverValidMaximumPixels").isEquivalent("3402"));
 }
 
+
 TEST_F(StatsFunc_FlatFileTest, FlatFile) {
   std::ostringstream *testStream = new std::ostringstream();
   writeStatsStream(testPvl, false, testStream);
@@ -141,6 +145,7 @@ TEST_F(StatsFunc_FlatFileTest, FlatFile) {
   delete testStream;
   testStream = NULL;
 }
+
 
 TEST_F(StatsFunc_FlatFileTest, FlatFileHeader) {
   std::ostringstream *testStream = new std::ostringstream();
