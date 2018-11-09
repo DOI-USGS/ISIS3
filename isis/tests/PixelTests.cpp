@@ -180,10 +180,22 @@ TEST(Pixel, ToFloat) {
 
 }
 
-class PixelSpecialTest : public ::testing::TestWithParam< std::pair<bool, double> > {
+class PixelSpecialFixture : public ::testing::TestWithParam< std::pair<bool, double> > {
+protected:
+  void PixelSetup(double pixelValue) {
+    pixel = new Pixel(1, 2, 3, pixelValue);
+  }
+  void SetUp() override {}
+  void TearDown() override {
+    if (pixel)
+      delete pixel;
+    pixel = nullptr;
+  }
+
+  Pixel *pixel;
 };
 
-TEST_P(PixelSpecialTest, IsSpecial) {
+TEST_P(PixelSpecialFixture, static_IsSpecial) {
   EXPECT_EQ(GetParam().first, Pixel::IsSpecial(GetParam().second));
 }
 std::vector< std::pair<bool, double> > specialVector{
@@ -195,8 +207,8 @@ std::vector< std::pair<bool, double> > specialVector{
   std::make_pair(false, Isis::ValidMaximum),
   std::make_pair(false, Isis::ValidMinimum)
 };
-INSTANTIATE_TEST_CASE_P(IsSpecial,
-                        PixelSpecialTest,
+INSTANTIATE_TEST_CASE_P(static_IsSpecial,
+                        PixelSpecialFixture,
                         ::testing::ValuesIn(specialVector));
 
 TEST(Pixel, static_IsSpecial) {
@@ -209,51 +221,14 @@ TEST(Pixel, static_IsSpecial) {
   EXPECT_FALSE(Pixel::IsSpecial(Isis::ValidMinimum));
 }
 
-class PixelSpecialFixture : public ::testing::TestWithParam< std::function<bool()> > {
-protected:
-  Pixel * PixelSetup(double pixelValue) {
-    pixel = new Pixel(1, 2, 3, pixelValue);
-    return pixel;
-  }
-  void SetUp() override {}
-  void TearDown() override {
-    delete pixel;
-    pixel = nullptr;
-  }
-
-  Pixel *pixel;
-};
-
-// std::vector< std::tuple<bool, void (Pixel::*)(), double> > specials{
-//   // std::make_tuple(true, &Pixel::IsSpecial, Isis::His),
-//   // std::make_pair(true, Isis::Hrs),
-//   // std::make_pair(true, Isis::Lis),
-//   // std::make_pair(true, Isis::Lrs),
-//   // std::make_pair(true, Isis::Null),
-//   // std::make_pair(false, Isis::ValidMaximum),
-//   // std::make_pair(false, Isis::ValidMinimum)
-// };
-
-// std::tuple<bool, void (Pixel::*)(), double> t;
-// t = std::make_tuple(true, &Pixel::IsSpecial, Isis::His);
-TEST_P(PixelSpecialFixture, IsSpecialParameterized) {
-  // PixelSetup(std::get<2>(GetParam()));
-  // EXPECT_EQ(GetParam().first, pixel->(GetParam().second));
+TEST_P(PixelSpecialFixture, IsSpecial) {
+  PixelSetup(GetParam().second);
+  EXPECT_EQ(GetParam().first, pixel->IsSpecial());
 }
-// INSTANTIATE_TEST_CASE_P(IsSpecialF,
-//                         PixelSpecialFixture,
-//                         ::testing::Values(
-//                           [] () {return false; }
-//                         ));
-INSTANTIATE_TEST_CASE_P(IsSpecialF,
+INSTANTIATE_TEST_CASE_P(IsSpecial,
                         PixelSpecialFixture,
-                        ::testing::Values(
-                          std::bind(&Pixel::IsSpecial, Pixel(1,2,3,4.0))
+                        ::testing::ValuesIn(specialVector
                         ));
-// TEST_F(PixelSpecialFixture, IsSpecial) {
-//   PixelSetup(Isis::His);
-//   EXPECT_TRUE(pixel->IsSpecial());
-// }
 
 TEST(Pixel, IsValid) {
   EXPECT_FALSE(Pixel::IsValid(Isis::His));
