@@ -57,4 +57,22 @@ TEST_F(StatsFunc_SimpleCubeTest, DefaultStats) {
 
   PvlGroup band2Stats = statsPvl.group(1);
   EXPECT_TRUE(band2Stats.findKeyword("Band").isEquivalent("2"));
+  EXPECT_TRUE(band2Stats.findKeyword("Average").isEquivalent("0.0"));
+  EXPECT_TRUE(band2Stats.findKeyword("StandardDeviation").isEquivalent("3.10108754392649e+19"));
+  EXPECT_TRUE(band2Stats.findKeyword("Variance").isEquivalent("9.61674395509603e+38"));
+  EXPECT_TRUE(band2Stats.findKeyword("Median").isEquivalent("1.52590222025006e+15"));
+  EXPECT_TRUE(band2Stats.findKeyword("Mode").isEquivalent("1.52590222025006e+15"));
+  EXPECT_TRUE(band2Stats.findKeyword("Skew").isEquivalent("-1.47616170001897e-04"));
+  EXPECT_TRUE(band2Stats.findKeyword("Minimum").isEquivalent("-1.00000002004088e+20"));
+  EXPECT_TRUE(band2Stats.findKeyword("Maximum").isEquivalent("1.00000002004088e+20"));
+  EXPECT_TRUE(band2Stats.findKeyword("Sum").isEquivalent("0.0"));
+  EXPECT_TRUE(band2Stats.findKeyword("TotalPixels").isEquivalent("15876"));
+  EXPECT_TRUE(band2Stats.findKeyword("ValidPixels").isEquivalent("7056"));
+  EXPECT_TRUE(band2Stats.findKeyword("OverValidMaximumPixels").isEquivalent("0"));
+  EXPECT_TRUE(band2Stats.findKeyword("UnderValidMinimumPixels").isEquivalent("0"));
+  EXPECT_TRUE(band2Stats.findKeyword("NullPixels").isEquivalent("1764"));
+  EXPECT_TRUE(band2Stats.findKeyword("LisPixels").isEquivalent("1764"));
+  EXPECT_TRUE(band2Stats.findKeyword("LrsPixels").isEquivalent("1764"));
+  EXPECT_TRUE(band2Stats.findKeyword("HisPixels").isEquivalent("1764"));
+  EXPECT_TRUE(band2Stats.findKeyword("HrsPixels").isEquivalent("1764"));
 }
