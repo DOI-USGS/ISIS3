@@ -43,7 +43,7 @@ bool cropper::m_propspice = false;
 
 
          CropApp::CropApp(QString &from, QString &to, int ssample,int nsamples,
-                          int sinc, int sline,int nlines,int linc,bool propspice,Cube *cube){
+                          int sinc, int sline,int nlines,int linc,bool propspice){
 
             m_fromCube =from;
             m_toCube = to;
@@ -65,7 +65,7 @@ bool cropper::m_propspice = false;
 
 
             cropper *crop = new cropper(ssample,nsamples,sinc,
-                                          sline,nlines,linc,propspice,to,m_cube);
+                                          sline,nlines,linc,propspice,to,from);
             crop->moveToThread(&cropThread);
             connect(&cropThread,SIGNAL(started()),crop,
                     SLOT(cropit()));
@@ -74,15 +74,13 @@ bool cropper::m_propspice = false;
 
             //connect(this, &CropApp::operate, crop, &cropper::cropit);
             connect(crop, &cropper::resultReady, this, &CropApp::handleResults);
-            cropThread.start();
+
 
          }
 
          void CropApp::start() {
 
-
-          emit (operate (m_fromCube,m_toCube,m_ssample,m_nsamples,
-                       m_sinc,m_sline,m_nlines,m_linc,m_propspice,m_cube));
+                 cropThread.start();
 
 
          }
@@ -95,9 +93,17 @@ bool cropper::m_propspice = false;
 
 
   cropper::cropper(int ssample,int nsamples,
-          int sinc, int sline,int nlines,int linc,bool propspice,QString to,Cube *cube){
+          int sinc, int sline,int nlines,int linc,bool propspice,QString to,QString from){
 
 
+
+
+    CubeAttributeInput inAtt(from);
+    m_cube = new Cube();
+    m_cube->setVirtualBands(inAtt.bands());
+    m_cube->open(from);
+
+    m_in = new LineManager(*m_cube);
 
           m_sline= sline;
           m_linc= linc;
@@ -106,9 +112,10 @@ bool cropper::m_propspice = false;
           m_osamples = nsamples;
           m_olines = nlines;
 
-          m_sinc=sinc;
-          m_cube=cube;
+          m_sinc=sinc;         
           m_outputCubeName=to;
+          qDebug()<<"to:" << to;
+          qDebug() << "from:" << from;
           m_propspice = propspice;
 
 
@@ -124,6 +131,7 @@ bool cropper::m_propspice = false;
           out[i] = (*m_in)[(m_ssample - 1) + i * m_sinc];
         }
 
+
         if(out.Line() == m_olines) m_sband++;
 
         }
@@ -131,6 +139,7 @@ bool cropper::m_propspice = false;
 
         void cropper::cropit() {
 
+          qDebug() << "cropit() started";
           ProcessByLine p;
 
           int origns = m_cube->sampleCount();
@@ -159,6 +168,12 @@ bool cropper::m_propspice = false;
           p.PropagateTables(false);
           CubeAttributeOutput outAtt(m_outputCubeName);
           Cube * ocube = p.SetOutputCube(m_outputCubeName,outAtt,m_osamples,m_olines,m_obands);
+
+
+          qDebug() <<"Output cube:" << ocube->fileName();
+          qDebug() << m_osamples;
+          qDebug() << m_olines;
+          qDebug() << m_obands;
 
           p.ClearInputCubes();
 
@@ -206,10 +221,10 @@ bool cropper::m_propspice = false;
         LineManager * m_in = new LineManager(*m_cube);
 
         // Crop the input cube
+
+        qDebug() << "SHAPOOPY 1";
         p.StartProcess(this->crop);
 
-        delete m_in;
-        m_in = NULL;
 
         // Construct a label with the results
         PvlGroup results("Results");
@@ -235,6 +250,11 @@ bool cropper::m_propspice = false;
 
         // Cleanup
         p.EndProcess();
+        qDebug() << "SHAPOOPY 2";
+
+        delete m_in;
+        m_in = NULL;
+
         m_cube->close();
         delete m_cube;
         m_cube = NULL;
@@ -250,6 +270,8 @@ bool cropper::m_propspice = false;
         void cropper::cropit(QString &from, QString &to, int ssample,int nsamples,
                       int sinc, int sline,
                       int nlines,int linc,bool propspice,Cube *cube) {
+
+
 
              ProcessByLine p;
 
@@ -278,6 +300,8 @@ bool cropper::m_propspice = false;
              CubeAttributeOutput outAtt(to);
              Cube * ocube = p.SetOutputCube(m_outputCubeName,outAtt,m_osamples,m_olines,m_obands);
 
+
+             qDebug() << "output cube:  " << ocube->fileName();
              p.ClearInputCubes();
 
            // propagate tables manually

@@ -456,8 +456,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
     bool haveInput = PrepProcessCubeInPlace(&cube, &brick);
 
     // Loop and let the app programmer work with the bricks
-    p_progress->SetMaximumSteps(brick->Bricks());
-    p_progress->CheckStatus();
+    //p_progress->SetMaximumSteps(brick->Bricks());
+    //p_progress->CheckStatus();
 
     for (brick->begin(); !brick->end(); (*brick)++) {
       if (haveInput) 
@@ -470,7 +470,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
         cube->write(*brick);
       }
 
-      p_progress->CheckStatus();
+      //p_progress->CheckStatus();
     }
 
     delete brick;

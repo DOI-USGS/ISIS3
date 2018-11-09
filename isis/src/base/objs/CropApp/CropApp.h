@@ -18,7 +18,7 @@ class CropApp: public QObject {
     public:
 
     CropApp(QString &from, QString &to, int ssample = 1, int nsamples = -1, int sinc=1,
-             int sline =1, int nlines=-1, int linc=1, bool propspice=true, Cube *cube=NULL);
+             int sline =1, int nlines=-1, int linc=1, bool propspice=true);
 
     public slots:
     void start();
@@ -68,8 +68,8 @@ public:
   static bool m_propspice;
   static LineManager *m_in;
 
-  cropper(int ssample,int nsamples,
-          int sinc, int sline,int nlines,int linc,bool propspice,QString to,Cube *cube);
+  cropper(int ssample, int nsamples,
+          int sinc, int sline, int nlines, int linc, bool propspice, QString to, QString from);
 
    static void crop(Buffer &out);
 

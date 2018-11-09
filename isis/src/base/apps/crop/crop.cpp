@@ -14,7 +14,7 @@ void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
   QString from = ui.GetAsString("FROM");
-  QString to = ui.GetAsString("FROM");
+  QString to = ui.GetAsString("TO");
   CubeAttributeInput inAtt(from);
   Cube *cube = new Cube();
   cube->setVirtualBands(inAtt.bands());
@@ -83,8 +83,8 @@ void IsisMain() {
   }
 
 
-  CropApp *capp = new CropApp(from,to,ss,ns,sinc,sl,nl,linc,propspice,cube);
-  //capp->start();
+  CropApp *capp = new CropApp(from,to,ss,ns,sinc,sl,nl,linc,propspice);
+  capp->start();
 
   // Write the results to the log
   //Application::Log(results);
