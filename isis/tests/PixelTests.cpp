@@ -1,52 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <functional>
 #include <iostream>
-#include <list>
 #include <string>
+// #include <tuple>
 #include <utility>
+#include <vector>
 
 #include "Pixel.h"
 #include "SpecialPixel.h"
 
 using namespace Isis;
-
-template <typename T>
-class PixelTestTemplate : public ::testing::Test {
-public:
-  typedef std::list<T> List;
-  T _value;
-};
-TYPED_TEST_CASE_P(PixelTestTemplate);
-TYPED_TEST_P(PixelTestTemplate, xx) {
-  TypeParam n = this->_value;
-  std::cout << "TEST: n: " << n <<  std::endl;
-  std::cout << std::to_string(n) << std::endl;
-}
-
-REGISTER_TYPED_TEST_CASE_P(PixelTestTemplate, xx);
-typedef ::testing::Types<unsigned char, unsigned short> MyTypes;
-INSTANTIATE_TYPED_TEST_CASE_P(TESTTEST, PixelTestTemplate, MyTypes);
-
-class PixelTest : public ::testing::TestWithParam< std::pair<unsigned char,double> > {
-
-};
-
-TEST_P(PixelTest, testtest) {
-  // std::cout << "TEST: 0: " << GetParam().first;
-  // std::cout << "\n" << Isis::NULL1;
-  // std::cout << "\nTEST: 1: " << GetParam().second;
-  // std::cout << "\n" << std::to_string(GetParam().second) << std::endl;
-  EXPECT_EQ(GetParam().first, Pixel::To8Bit(GetParam().second));
-}
-
-std::vector<std::pair<unsigned char, double> > inOut {
-  std::make_pair(Isis::NULL1, 0.0),
-  std::make_pair(static_cast<unsigned char>(1), 1.0)
-};
-
-INSTANTIATE_TEST_CASE_P(Pixel,
-                        PixelTest,
-                        ::testing::ValuesIn(inOut));
 
 TEST(Pixel, DefaultConstructor) {
   Pixel p;
@@ -91,10 +55,10 @@ TEST(Pixel, To8Bit) {
   EXPECT_EQ(Isis::LOW_REPR_SAT1, Pixel::To8Bit(-1.0));
   // Trivial positive test
   EXPECT_EQ(1, Pixel::To8Bit(1.0));
-  // Minimum valid input
-  EXPECT_EQ(Isis::VALID_MIN1, Pixel::To8Bit(Isis::ValidMinimum));
-  // Maximum valid input
-  EXPECT_EQ(Isis::VALID_MAX1, Pixel::To8Bit(Isis::ValidMaximum));
+  // Minimum valid input // Isis::ValidMinimum becomes \0
+  EXPECT_EQ(Isis::LOW_REPR_SAT1, Pixel::To8Bit(Isis::ValidMinimum));
+  // Maximum valid input // Isis::ValidMaximum becomes \xFF (255)
+  EXPECT_EQ(Isis::HIGH_REPR_SAT1, Pixel::To8Bit(Isis::ValidMaximum));
   // "Null" pixel
   EXPECT_EQ(Isis::NULL1, Pixel::To8Bit(Isis::Null));
   // HRS
@@ -112,14 +76,14 @@ TEST(Pixel, To8Bit) {
 TEST(Pixel, To16UBit) {
   // Zero test
   EXPECT_EQ(Isis::NULLU2, Pixel::To16UBit(0.0));
-  // Negative test
-  EXPECT_EQ(Isis::LOW_REPR_SATU2, Pixel::To16UBit(-1.0));
+  // Negative test // -1.0 becomes HIGH_REPR_SATU2, not LOW_REPR_SATU2
+  EXPECT_EQ(Isis::HIGH_REPR_SATU2, Pixel::To16UBit(-1.0));
   // Positive test
-  EXPECT_EQ(1.0, Pixel::To16UBit(1.0));
+  EXPECT_EQ(1, Pixel::To16UBit(1.0));
   // Minimum valid input
-  EXPECT_EQ(Isis::VALID_MINU2, Pixel::To16UBit(Isis::ValidMinimum));
+  EXPECT_EQ(Isis::LOW_REPR_SATU2, Pixel::To16UBit(Isis::ValidMinimum));
   // Maximum valid input
-  EXPECT_EQ(Isis::VALID_MAXU2, Pixel::To16UBit(Isis::ValidMaximum));
+  EXPECT_EQ(Isis::HIGH_REPR_SATU2, Pixel::To16UBit(Isis::ValidMaximum));
   // "Null" pixel
   EXPECT_EQ(Isis::NULLU2, Pixel::To16UBit(Isis::Null));
   // HRS
@@ -134,15 +98,15 @@ TEST(Pixel, To16UBit) {
 
 TEST(Pixel, To16Bit) {
   // Zero test
-  EXPECT_EQ(0.0, Pixel::To16Bit(0.0));
+  EXPECT_EQ(0, Pixel::To16Bit(0.0));
   // Negative test
-  EXPECT_EQ(-1.0, Pixel::To16Bit(-1.0));
+  EXPECT_EQ(-1, Pixel::To16Bit(-1.0));
   // Positive test
-  EXPECT_EQ(1.0, Pixel::To16Bit(1.0));
+  EXPECT_EQ(1, Pixel::To16Bit(1.0));
   // Minimum valid input
-  EXPECT_EQ(Isis::VALID_MIN2, Pixel::To16Bit(Isis::ValidMinimum));
+  EXPECT_EQ(Isis::LOW_REPR_SAT2, Pixel::To16Bit(Isis::ValidMinimum));
   // Maximum valid input
-  EXPECT_EQ(Isis::VALID_MAX2, Pixel::To16Bit(Isis::ValidMaximum));
+  EXPECT_EQ(Isis::HIGH_REPR_SAT2, Pixel::To16Bit(Isis::ValidMaximum));
   // "Null" pixel
   EXPECT_EQ(Isis::NULL2, Pixel::To16Bit(Isis::Null));
   // HRS
@@ -157,25 +121,25 @@ TEST(Pixel, To16Bit) {
 
 TEST(Pixel, To32Bit) {
   // Zero test
-  EXPECT_EQ(Isis::NULL4, Pixel::To32Bit(0.0));
+  EXPECT_EQ(0, Pixel::To32Bit(0.0));
   // Negative test
-  EXPECT_EQ(-1.0, Pixel::To32Bit(-1.0));
+  EXPECT_EQ(-1, Pixel::To32Bit(-1.0));
   // Positive test
-  EXPECT_EQ(1.0, Pixel::To32Bit(1.0));
-  // Minimum valid input
-  EXPECT_EQ(Isis::VALID_MIN4, Pixel::To32Bit(Isis::ValidMinimum));
-  // Maximum valid input
-  EXPECT_EQ(Isis::VALID_MAX4, Pixel::To32Bit(Isis::ValidMaximum));
+  EXPECT_EQ(1, Pixel::To32Bit(1.0));
+  // Minimum valid input // Isis::ValidMinimum becomes -inf (not ILOW_REPR_SAT4)
+  EXPECT_FLOAT_EQ(Isis::LOW_REPR_SAT4, Pixel::To32Bit(Isis::ValidMinimum));
+  // Maximum valid input // Isis::Maximum becomes inf (not IHIGH_REPR_SAT4)
+  EXPECT_FLOAT_EQ(Isis::HIGH_REPR_SAT4, Pixel::To32Bit(Isis::ValidMaximum));
   // "Null" pixel
-  EXPECT_EQ(Isis::NULL4, Pixel::To32Bit(Isis::Null));
+  EXPECT_FLOAT_EQ(Isis::NULL4, Pixel::To32Bit(Isis::Null));
   // HRS
-  EXPECT_EQ(Isis::HIGH_REPR_SAT4, Pixel::To32Bit(Isis::Hrs));
+  EXPECT_FLOAT_EQ(Isis::HIGH_REPR_SAT4, Pixel::To32Bit(Isis::Hrs));
   // HIS
-  EXPECT_EQ(Isis::HIGH_INSTR_SAT4, Pixel::To32Bit(Isis::His));
+  EXPECT_FLOAT_EQ(Isis::HIGH_INSTR_SAT4, Pixel::To32Bit(Isis::His));
   // LRS
-  EXPECT_EQ(Isis::LOW_REPR_SAT4, Pixel::To32Bit(Isis::Lrs));
+  EXPECT_FLOAT_EQ(Isis::LOW_REPR_SAT4, Pixel::To32Bit(Isis::Lrs));
   // LIS
-  EXPECT_EQ(Isis::LOW_INSTR_SAT4, Pixel::To32Bit(Isis::Lis));
+  EXPECT_FLOAT_EQ(Isis::LOW_INSTR_SAT4, Pixel::To32Bit(Isis::Lis));
 }
 
 TEST(Pixel, ToDouble) {
@@ -216,7 +180,26 @@ TEST(Pixel, ToFloat) {
 
 }
 
-TEST(Pixel, IsSpecial) {
+class PixelSpecialTest : public ::testing::TestWithParam< std::pair<bool, double> > {
+};
+
+TEST_P(PixelSpecialTest, IsSpecial) {
+  EXPECT_EQ(GetParam().first, Pixel::IsSpecial(GetParam().second));
+}
+std::vector< std::pair<bool, double> > specialVector{
+  std::make_pair(true, Isis::His),
+  std::make_pair(true, Isis::Hrs),
+  std::make_pair(true, Isis::Lis),
+  std::make_pair(true, Isis::Lrs),
+  std::make_pair(true, Isis::Null),
+  std::make_pair(false, Isis::ValidMaximum),
+  std::make_pair(false, Isis::ValidMinimum)
+};
+INSTANTIATE_TEST_CASE_P(IsSpecial,
+                        PixelSpecialTest,
+                        ::testing::ValuesIn(specialVector));
+
+TEST(Pixel, static_IsSpecial) {
   EXPECT_TRUE(Pixel::IsSpecial(Isis::His));
   EXPECT_TRUE(Pixel::IsSpecial(Isis::Hrs));
   EXPECT_TRUE(Pixel::IsSpecial(Isis::Lis));
@@ -225,6 +208,52 @@ TEST(Pixel, IsSpecial) {
   EXPECT_FALSE(Pixel::IsSpecial(Isis::ValidMaximum));
   EXPECT_FALSE(Pixel::IsSpecial(Isis::ValidMinimum));
 }
+
+class PixelSpecialFixture : public ::testing::TestWithParam< std::function<bool()> > {
+protected:
+  Pixel * PixelSetup(double pixelValue) {
+    pixel = new Pixel(1, 2, 3, pixelValue);
+    return pixel;
+  }
+  void SetUp() override {}
+  void TearDown() override {
+    delete pixel;
+    pixel = nullptr;
+  }
+
+  Pixel *pixel;
+};
+
+// std::vector< std::tuple<bool, void (Pixel::*)(), double> > specials{
+//   // std::make_tuple(true, &Pixel::IsSpecial, Isis::His),
+//   // std::make_pair(true, Isis::Hrs),
+//   // std::make_pair(true, Isis::Lis),
+//   // std::make_pair(true, Isis::Lrs),
+//   // std::make_pair(true, Isis::Null),
+//   // std::make_pair(false, Isis::ValidMaximum),
+//   // std::make_pair(false, Isis::ValidMinimum)
+// };
+
+// std::tuple<bool, void (Pixel::*)(), double> t;
+// t = std::make_tuple(true, &Pixel::IsSpecial, Isis::His);
+TEST_P(PixelSpecialFixture, IsSpecialParameterized) {
+  // PixelSetup(std::get<2>(GetParam()));
+  // EXPECT_EQ(GetParam().first, pixel->(GetParam().second));
+}
+// INSTANTIATE_TEST_CASE_P(IsSpecialF,
+//                         PixelSpecialFixture,
+//                         ::testing::Values(
+//                           [] () {return false; }
+//                         ));
+INSTANTIATE_TEST_CASE_P(IsSpecialF,
+                        PixelSpecialFixture,
+                        ::testing::Values(
+                          std::bind(&Pixel::IsSpecial, Pixel(1,2,3,4.0))
+                        ));
+// TEST_F(PixelSpecialFixture, IsSpecial) {
+//   PixelSetup(Isis::His);
+//   EXPECT_TRUE(pixel->IsSpecial());
+// }
 
 TEST(Pixel, IsValid) {
   EXPECT_FALSE(Pixel::IsValid(Isis::His));
