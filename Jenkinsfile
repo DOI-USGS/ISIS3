@@ -11,7 +11,7 @@ pipeline {
                 docker {
                     label 'docker'
                     image 'chrisryancombs/docker_isis'
-                    args  '-v /scratch/krodriguez/isis3_data/data:/usgs/cpkgs/isis3/data -v /scratch/krodriguez/isis3_data/testData:/usgs/cpkgs/isis3/testData'
+                    args  '-v /scratch/krodriguez/isis3_data/data:/data -v /scratch/krodriguez/isis3_data/testData:/testData'
                 }
             }
             steps {
@@ -20,8 +20,8 @@ pipeline {
                     source activate isis3
                     mkdir -p ./install ./build && cd build
                     export ISISROOT=\$(pwd)
-                    export ISIS3TESTDATA="/usgs/cpkgs/isis3/testData/"
-                    export ISIS3DATA="/usgs/cpkgs/isis3/data/"
+                    export ISIS3TESTDATA="/testData/"
+                    export ISIS3DATA="/data/"
                     cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
                     set +e
                     ninja -j8 && ninja install
