@@ -7,6 +7,7 @@
 #include <QPair>
 
 #include "BundleObservationSolveSettings.h"
+#include "BundleTargetBody.h"
 #include "IException.h"
 #include "MaximumLikelihoodWFunctions.h"
 
@@ -32,6 +33,20 @@ bool observationSettingsComparison(
         << m.instrumentId().toStdString() << " and "
         << n.instrumentId().toStdString() << ")";
 }
+
+class MockBundleTargetBody : public BundleTargetBody {
+  public:
+    MOCK_METHOD0(numberParameters, int());
+    MOCK_METHOD0(solvePoleRA, bool());
+    MOCK_METHOD0(solvePoleRAVelocity, bool());
+    MOCK_METHOD0(solvePoleDec, bool());
+    MOCK_METHOD0(solvePoleDecVelocity, bool());
+    MOCK_METHOD0(solvePM, bool());
+    MOCK_METHOD0(solvePMVelocity, bool());
+    MOCK_METHOD0(solvePMAcceleration, bool());
+    MOCK_METHOD0(solveTriaxialRadii, bool());
+    MOCK_METHOD0(solveMeanRadius, bool());
+};
 
 class BoolTest : public ::testing::TestWithParam<bool> {
   // Intentionally empty
@@ -339,3 +354,70 @@ TEST(BundleSettings, multipleMaximumLikelihoodModels) {
   EXPECT_EQ(MaximumLikelihoodWFunctions::Chen, functions[3].first);
   EXPECT_EQ(8.0, functions[3].second);
 }
+
+TEST(BundleSettings, OutputFilePrefix) {
+  BundleSettings testSettings;
+  QString testPrefix("test/file/prefix");
+  testSettings.setOutputFilePrefix(testPrefix);
+  EXPECT_EQ(testPrefix, testSettings.outputFilePrefix());
+}
+
+TEST(BundleSettings, setBundleTargetBody) {
+  BundleTargetBodyQsp testTarget(new BundleTargetBody);
+  BundleSettings testSettings;
+  testSettings.setBundleTargetBody(testTarget);
+  EXPECT_EQ(testTarget, testSettings.bundleTargetBody());
+}
+
+TEST(BundleSettings, BundleTargetBodyAccesors) {
+  MockBundleTargetBody *mockBody = new MockBundleTargetBody;
+  EXPECT_CALL(*mockBody, numberParameters())
+        .Times(3)
+        .WillOnce(::testing::Return(0))
+        .WillRepeatedly(::testing::Return(5));
+  EXPECT_CALL(*mockBody, solvePoleRA())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solvePoleRAVelocity())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solvePoleDec())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solvePoleDecVelocity())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solvePM())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solvePMVelocity())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solvePMAcceleration())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solveTriaxialRadii())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+  EXPECT_CALL(*mockBody, solveMeanRadius())
+        .Times(1)
+        .WillOnce(::testing::Return(true));
+
+  BundleSettings testSettings;
+  BundleTargetBodyQsp testTarget(mockBody);
+  testSettings.setBundleTargetBody(testTarget);
+  EXPECT_FALSE(testSettings.solveTargetBody());
+  EXPECT_TRUE(testSettings.solveTargetBody());
+  EXPECT_EQ(5, testSettings.numberTargetBodyParameters());
+  EXPECT_TRUE(testSettings.solvePoleRA());
+  EXPECT_TRUE(testSettings.solvePoleRAVelocity());
+  EXPECT_TRUE(testSettings.solvePoleDec());
+  EXPECT_TRUE(testSettings.solvePoleDecVelocity());
+  EXPECT_TRUE(testSettings.solvePM());
+  EXPECT_TRUE(testSettings.solvePMVelocity());
+  EXPECT_TRUE(testSettings.solvePMAcceleration());
+  EXPECT_TRUE(testSettings.solveTriaxialRadii());
+  EXPECT_TRUE(testSettings.solveMeanRadius());
+}
+
+// TODO test IPCE save method
