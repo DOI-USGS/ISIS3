@@ -19,6 +19,10 @@ class BoolTest : public ::testing::TestWithParam<bool> {
   // Intentionally empty
 };
 
+class CoordinateTypeTest : public ::testing::TestWithParam<SurfacePoint::CoordinateType> {
+  // Intentionally empty
+};
+
 TEST_P(BoolTest, validateNetwork) {
   BundleSettings testSettings;
   testSettings.setValidateNetwork(GetParam());
@@ -31,9 +35,47 @@ TEST_P(BoolTest, outlierRejection) {
   EXPECT_EQ(GetParam(), testSettings.outlierRejection());
 }
 
-INSTANTIATE_TEST_CASE_P(BundleSettings,
-                        BoolTest,
-                        ::testing::Bool());
+TEST_P(BoolTest, inverseMatrix) {
+  BundleSettings testSettings;
+  testSettings.setCreateInverseMatrix(GetParam());
+  EXPECT_EQ(GetParam(), testSettings.createInverseMatrix());
+}
+
+TEST_P(BoolTest, setBoolSolveOptions) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        GetParam(),
+        GetParam(),
+        GetParam(),
+        GetParam());
+  EXPECT_EQ(GetParam(), testSettings.solveObservationMode());
+  EXPECT_EQ(GetParam(), testSettings.updateCubeLabel());
+  EXPECT_EQ(GetParam(), testSettings.errorPropagation());
+  EXPECT_EQ(GetParam(), testSettings.solveRadius());
+}
+
+INSTANTIATE_TEST_CASE_P(
+      BundleSettings,
+      BoolTest,
+      ::testing::Bool());
+
+TEST_P(CoordinateTypeTest, setCoordinateTypeSolveOptions) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        false,
+        false,
+        false,
+        false,
+        GetParam(),
+        GetParam());
+  EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeReports());
+  EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeBundle());
+}
+
+INSTANTIATE_TEST_CASE_P(
+      BundleSettings,
+      CoordinateTypeTest,
+      ::testing::Values(SurfacePoint::Latitudinal, SurfacePoint::Rectangular));
 
 TEST(BundleSettings, outlierRejectionMultiplier) {
   BundleSettings testSettings;
