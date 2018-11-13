@@ -224,4 +224,81 @@ TEST(AngleOperators, Multiplication) {
 }
 
 
+TEST(Angle, wrapValue){
+  Isis::Angle angle(30., Isis::Angle::Degrees);
+  EXPECT_EQ(angle.unitWrapValue(Isis::Angle::Degrees), 360);
+  EXPECT_NEAR(angle.unitWrapValue(Isis::Angle::Radians), 6.28318531, TEST_EPSILON);
+}
+
+
+TEST(Angle, setAngleDegrees){
+  Isis::Angle angle(0.0, Isis::Angle::Degrees);
+  angle.setAngle(60.0, Isis::Angle::Degrees);
+  EXPECT_NEAR(angle.degrees(), 60.0, TEST_EPSILON);
+}
+
+
+TEST(Angle, setAngleRadians){
+  Isis::Angle angle(0.0, Isis::Angle::Radians);
+  angle.setAngle(0.5, Isis::Angle::Radians);
+  EXPECT_NEAR(angle.radians(), 0.5, TEST_EPSILON);
+}
+
+
+TEST(Angle, QStringConstructor){
+  Isis::Angle angle(QString("-70 15 30.125"));
+  EXPECT_STREQ(angle.toString().toLatin1(), "-70.258368055556 degrees");
+  Isis::Angle angle2(QString("  +70  30 11     "));
+  EXPECT_STREQ(angle2.toString().toLatin1(), "70.503055555556 degrees");
+  Isis::Angle angle3(QString("100 00 00"));
+  EXPECT_STREQ(angle3.toString().toLatin1(), "100.0 degrees"); 
+}
+
+
+TEST(AngleExceptions, InvalidInput){
+  try {
+    Isis::Angle angle(QString("100"));
+    angle.toString(); 
+
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** [100] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\".");
+   }
+   catch(...) {
+     FAIL() << "Expected IException."; 
+   }
+}
+
+
+TEST(AngleExceptions, InvalidInput2){
+  try {
+    Isis::Angle angle(QString("70 11"));
+    angle.toString(); 
+
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** [70 11] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\".");
+   }
+   catch(...) {
+     FAIL() << "Expected IException."; 
+   }
+}
+
+
+TEST(AngleExceptions, InvalidInput3){
+  try {
+    Isis::Angle angle(QString("this 79 should 00 fail 0.111"));
+    angle.toString(); 
+
+    FAIL() << "Expected an error";
+   }
+   catch(Isis::IException &e) {
+     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** [this 79 should 00 fail 0.111] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\".");
+   }
+   catch(...) {
+     FAIL() << "Expected IException."; 
+   }
+}
 
