@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "tnt/tnt_array2d.h"
 
 #include "Matrix.h"
 #include "IException.h"
@@ -8,9 +9,21 @@
 
 
 namespace Isis {
-  
-  TEST (MatrixTests, Constructor) {
+
+  TEST (MatrixTests, ConstructorWithDimensions) {
     Matrix A(2, 2, 2);
+    
+    ASSERT_EQ(2, A[0][0]);
+    ASSERT_EQ(2, A[0][1]);
+    ASSERT_EQ(2, A[1][0]);
+    ASSERT_EQ(2, A[1][1]);
+  }
+  
+  
+  TEST (MatrixTests, ConstructorWithTNTArray) {
+    TNT::Array2D<double> matrix = TNT::Array2D<double>(2, 2, 2);
+    Matrix A(matrix);
+    
     ASSERT_EQ(2, A[0][0]);
     ASSERT_EQ(2, A[0][1]);
     ASSERT_EQ(2, A[1][0]);
