@@ -124,21 +124,21 @@ TEST(FileName, isQuestionMarksNoExtensionVersioned) {
   QString test = "/testy/mc/test/face/test??????";
   FileName file(test);
   
-  EXPECT_EQ(true, file.isVersioned());
+  EXPECT_TRUE(file.isVersioned());
 }
 
 TEST(FileName, isQuestionMarksExtensionVersioned) {
   QString test = "/testy/mc/test/face/test??????.cub";
   FileName file(test);
   
-  EXPECT_EQ(true, file.isVersioned());
+  EXPECT_TRUE(file.isVersioned());
 }
 
 TEST(FileName, isDDMMMYYYVersioned) {
   QString test = "/testy/mc/test/face/test{ddMMMyyyy}..cub";
   FileName file(test);
   
-  EXPECT_EQ(true, file.isVersioned());
+  EXPECT_TRUE(file.isVersioned());
 }
 
 TEST(FileName, HighestVersion) {
@@ -173,14 +173,36 @@ TEST(FileName, NewVersion) {
   remove("test000003.cub");
 }
 
-// TEST(FileName, FileExists) {
-// }
+TEST(FileName, FileExists) {
+  std::ofstream fileStream;
+  fileStream.open("test000001.cub");
+  fileStream << "test";
+  fileStream.close();
+  
+  FileName realFile("test000001.cub");
+  EXPECT_TRUE(realFile.fileExists());
+  
+  FileName fakeFile("test.cub");
+  EXPECT_FALSE(fakeFile.fileExists());
+  
+  remove("test000001.cub");
+}
 
+//TODO Do we need to test this? All it does is call expanded, makes a QFileInfo and then make a QDir
+// We shouldn't be testing Qt
 // TEST(FileName, Dir) {
 // }
 
-// TEST(FileName, CreateTempFile) {
-// }
+TEST(FileName, CreateTempFile) {
+  FileName test("test.cub");
+  
+  FileName temp = test.createTempFile(test);
+  
+  EXPECT_EQ("cub", temp.extension());
+  EXPECT_TRUE(temp.fileExists());
+  
+  remove(temp.expanded().toLatin1());
+}
 
 TEST(FileName, ToString) {
   putenv("ISISTMPROOT=/testy/mc/test/face");
@@ -189,7 +211,6 @@ TEST(FileName, ToString) {
   EXPECT_EQ("/testy/mc/test/face/test.cub", file.toString());
 }
 
-// TODO Waiting for GMock
 TEST(FileName, AssignmentOperator) {
   FileName defaultFile("/testy/mc/test/face/test.cub");
   
