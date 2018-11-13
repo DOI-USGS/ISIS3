@@ -2,7 +2,12 @@
 
 #include <QString>
 
+#include <iostream>
+#include <fstream>
+#include <stdlib.h>
+
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 
 using namespace Isis;
@@ -19,9 +24,16 @@ class FileName_Fixture_NotVersioned : public ::testing::TestWithParam<const char
 TEST(FileName, DefaultConstructor) {
   FileName file;
   
-//   EXPECT_EQ("", file.originalPath());
-//   EXPECT_EQ("", file.path());
-//   EXPECT_EQ("", file.attributes());
+  EXPECT_EQ("", file.baseName());
+  EXPECT_EQ("", file.name());
+  EXPECT_EQ("", file.extension());
+}
+
+// The other constructors are being tested in the other tests so there is no need to duplicate them
+
+TEST(FileName, CopyConstructor) {
+  FileName file;
+  
   EXPECT_EQ("", file.baseName());
   EXPECT_EQ("", file.name());
   EXPECT_EQ("", file.extension());
@@ -74,10 +86,12 @@ TEST(FileName, Extension) {
   EXPECT_EQ("cub", file.extension());
 }
 
-//TODO Waiting for GMock
-
-// TEST(FileName, Expanded) {
-// }
+TEST(FileName, Expanded) {
+  putenv("ISISTMPROOT=/testy/mc/test/face");
+  FileName file("$ISISTMPROOT/test.cub");
+  
+  EXPECT_EQ("/testy/mc/test/face/test.cub", file.expanded());
+}
 
 TEST(FileName, Original) {
   QString test = "$ISISROOT/testy/mc/test/face/test.cub";
@@ -96,7 +110,6 @@ TEST(FileName, AddExtension) {
 TEST(FileName, RemoveExtension) {
   QString test = "/testy/mc/test/face/test.cub";
   FileName file(test);
-  std::cout << file.removeExtension().extension().toStdString() << std::endl;
   EXPECT_EQ("", file.removeExtension().extension());
 }
 
@@ -128,30 +141,79 @@ TEST(FileName, isDDMMMYYYVersioned) {
   EXPECT_EQ(true, file.isVersioned());
 }
 
-//TODO Waiting for GMock
+TEST(FileName, HighestVersion) {
+  std::ofstream fileStream;
+  fileStream.open("test000001.cub");
+  fileStream << "test";
+  fileStream.close();
+  fileStream.open("test000002.cub");
+  fileStream << "test";
+  fileStream.close();
+  
+  FileName file("test??????.cub");
+  EXPECT_EQ("./test000002.cub", file.highestVersion().expanded());
+  remove("test000001.cub");
+  remove("test000002.cub");
+  
+}
 
-// TEST(FileName, HighestVersion) {
+TEST(FileName, NewVersion) {
+  std::ofstream fileStream;
+  fileStream.open("test000001.cub");
+  fileStream << "test";
+  fileStream.close();
+  fileStream.open("test000002.cub");
+  fileStream << "test";
+  fileStream.close();
+  
+  FileName file("test??????.cub");
+  EXPECT_EQ("./test000003.cub", file.newVersion().expanded());
+  remove("test000001.cub");
+  remove("test000002.cub");
+  remove("test000003.cub");
+}
+
+// TEST(FileName, FileExists) {
 // }
 
-// TEST(FileName, NewVersion) {
+// TEST(FileName, Dir) {
 // }
 
-// TEST(FileName, Version) {
+// TEST(FileName, CreateTempFile) {
 // }
 
 TEST(FileName, ToString) {
-  QString test = "/testy/mc/test/face/test.cub";
-  FileName file(test);
+  putenv("ISISTMPROOT=/testy/mc/test/face");
+  FileName file("$ISISTMPROOT/test.cub");
   
   EXPECT_EQ("/testy/mc/test/face/test.cub", file.toString());
 }
 
 // TODO Waiting for GMock
-// TEST(FileName, EqualOperator) {
-// }
+TEST(FileName, AssignmentOperator) {
+  FileName defaultFile("/testy/mc/test/face/test.cub");
+  
+  FileName file;
+  file = defaultFile;
+  
+  EXPECT_EQ("test", file.baseName());
+  EXPECT_EQ("test.cub", file.name());
+  EXPECT_EQ("cub", file.extension());
+}
 
-// TEST(FileName, NotEqualOperator) {
-// }
+TEST(FileName, EqualOperator) {
+  FileName file1("/testy/mc/test/face/test.cub");
+  FileName file2("/testy/mc/test/face/test.cub");
+  
+  EXPECT_TRUE(file1 == file2);
+}
+
+TEST(FileName, NotEqualOperator) {
+  FileName file1("/testy/mc/test/face/test.cub");
+  FileName file2("/testy/mc/test/face/Peaks.cub");
+  
+  EXPECT_TRUE(file1 != file2);
+}
 
 TEST_P(FileName_Fixture_Versioned, IsVersioned) {
   FileName file(GetParam());
