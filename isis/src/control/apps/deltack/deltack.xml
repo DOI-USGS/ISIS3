@@ -195,6 +195,12 @@
       BundleSolutionInfo object. Am also deleting this pointer because jigsaw.cpp takes
       ownership from BundleAdjust.
     </change>    
+    <change name="Ken Edmundson" date="2018-11-13">
+      Modified call to observationSolveSettings.setInstrumentPositionSettings to relect
+      0 position segments, since we aren't solving for position. Also, for clarity,
+      modified the method call to explicitly show the argument values, whether or not
+      they are default. Made the comment above the call more clear.
+    </change>    
   </history>
 
   <groups>

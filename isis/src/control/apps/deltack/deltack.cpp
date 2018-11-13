@@ -364,22 +364,32 @@ BundleSettingsQsp bundleSettings() {
   QList<BundleObservationSolveSettings> observationSolveSettingsList;
   BundleObservationSolveSettings observationSolveSettings;
 
-  // use defaults
-  //       pointing option sigmas -1.0
-  //       ckDegree = ckSolveDegree = 2
+  // using defaults for all arguments
+  //       pointingSolveOption = BundleObservationSolveSettings::AnglesOnly
+  //       solveTwist = false
+  //       ckDegree = 2
+  //       ckSolveDegree = 2
+  //       pointingSegments = 1
   //       fitOverExisting = false
-  //       angle sigma = angular velocity sigma = angular acceleration sigma = -1.0
+  //       angle sigma = -1
+  //       angular velocity sigma = -1
+  //       angular acceleration sigma = -1
   observationSolveSettings.setInstrumentPointingSettings(
       BundleObservationSolveSettings::AnglesOnly, ui.GetBoolean("TWIST"));
-
+  
   // NOTE: no need to set position sigmas or solve degrees since we are not solving for any
-  // position factors
-  //       position option sigmas default to -1.0
-  //       spkDegree = spkSolveDegree = 2
-  //       solveOverHermiteSpline = false
-  //       position sigma = velocity sigma = acceleration sigma = -1.0
+  // position factors, here we are using default values for all argumnents except the number
+  // of position segments. The default is 1, here we use 0, since we aren't solving for position
+  //       positionSolveOption = BundleObservationSolveSettings::NoPositionFactors (default)
+  //       spkDegree = 2 (default)
+  //       spkSolveDegree = 2 (default)
+  //       positionSegments = 0 (default is 1)
+  //       solveOverHermiteSpline = false (default)
+  //       position sigma = -1 (default)
+  //       velocity sigma = -1 (default)
+  //       acceleration sigma = -1 (default)  
   observationSolveSettings.setInstrumentPositionSettings(
-      BundleObservationSolveSettings::NoPositionFactors);
+      BundleObservationSolveSettings::NoPositionFactors, 2, 2, 0, false, -1, -1, -1);  
 
   observationSolveSettingsList.append(observationSolveSettings);
   settings->setObservationSolveOptions(observationSolveSettingsList);
