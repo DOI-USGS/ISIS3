@@ -4,15 +4,33 @@
 
 #include <QString>
 #include <QList>
+#include <QPair>
 
 #include "BundleObservationSolveSettings.h"
+#include "IException.h"
+#include "MaximumLikelihoodWFunctions.h"
 
-#include <gtest/gtest.h>
+#include "gmock/gmock.h"
 
 bool observationSettingsComparison(
-      BundleObservationSolveSettings a,
-      BundleObservationSolveSettings b) {
-  return (a.instrumentId() == b.instrumentId());
+      BundleObservationSolveSettings m,
+      BundleObservationSolveSettings n
+) {
+  return (m.instrumentId() == n.instrumentId());
+}
+
+::testing::AssertionResult assertObservationSettingsEqual(
+      const char* m_expr,
+      const char* n_expr,
+      BundleObservationSolveSettings m,
+      BundleObservationSolveSettings n
+) {
+  if (observationSettingsComparison(m, n)) return ::testing::AssertionSuccess();
+
+  return ::testing::AssertionFailure() << m_expr << " and " << n_expr
+        << " are different because they have different InstrumentIds ("
+        << m.instrumentId().toStdString() << " and "
+        << n.instrumentId().toStdString() << ")";
 }
 
 class BoolTest : public ::testing::TestWithParam<bool> {
@@ -20,6 +38,14 @@ class BoolTest : public ::testing::TestWithParam<bool> {
 };
 
 class CoordinateTypeTest : public ::testing::TestWithParam<SurfacePoint::CoordinateType> {
+  // Intentionally empty
+};
+
+class ConvergenceCriteriaTest : public ::testing::TestWithParam<BundleSettings::ConvergenceCriteria> {
+  // Intentionally empty
+};
+
+class MaximumLikelihoodFunctionTest : public ::testing::TestWithParam<MaximumLikelihoodWFunctions::Model> {
   // Intentionally empty
 };
 
@@ -37,6 +63,12 @@ TEST_P(BoolTest, outlierRejection) {
 
 TEST_P(BoolTest, inverseMatrix) {
   BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        true,
+        testSettings.solveRadius()
+  );
   testSettings.setCreateInverseMatrix(GetParam());
   EXPECT_EQ(GetParam(), testSettings.createInverseMatrix());
 }
@@ -47,7 +79,8 @@ TEST_P(BoolTest, setBoolSolveOptions) {
         GetParam(),
         GetParam(),
         GetParam(),
-        GetParam());
+        GetParam()
+  );
   EXPECT_EQ(GetParam(), testSettings.solveObservationMode());
   EXPECT_EQ(GetParam(), testSettings.updateCubeLabel());
   EXPECT_EQ(GetParam(), testSettings.errorPropagation());
@@ -57,17 +90,19 @@ TEST_P(BoolTest, setBoolSolveOptions) {
 INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       BoolTest,
-      ::testing::Bool());
+      ::testing::Bool()
+);
 
 TEST_P(CoordinateTypeTest, setCoordinateTypeSolveOptions) {
   BundleSettings testSettings;
   testSettings.setSolveOptions(
-        false,
-        false,
-        false,
-        false,
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        testSettings.errorPropagation(),
+        testSettings.solveRadius(),
         GetParam(),
-        GetParam());
+        GetParam()
+  );
   EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeReports());
   EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeBundle());
 }
@@ -75,7 +110,63 @@ TEST_P(CoordinateTypeTest, setCoordinateTypeSolveOptions) {
 INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       CoordinateTypeTest,
-      ::testing::Values(SurfacePoint::Latitudinal, SurfacePoint::Rectangular));
+      ::testing::Values(SurfacePoint::Latitudinal, SurfacePoint::Rectangular)
+);
+
+TEST(BundleSettings, setGlobalSigmas) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+    testSettings.solveObservationMode(),
+    testSettings.updateCubeLabel(),
+    testSettings.errorPropagation(),
+    true,
+    testSettings.controlPointCoordTypeBundle(),
+    testSettings.controlPointCoordTypeReports(),
+    2.0,
+    8.0,
+    32.0
+  );
+
+  EXPECT_EQ(2.0, testSettings.globalPointCoord1AprioriSigma());
+  EXPECT_EQ(8.0, testSettings.globalPointCoord2AprioriSigma());
+  EXPECT_EQ(32.0, testSettings.globalPointCoord3AprioriSigma());
+}
+
+TEST(BundleSettings, setBadGlobalSigmas) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+    testSettings.solveObservationMode(),
+    testSettings.updateCubeLabel(),
+    testSettings.errorPropagation(),
+    true,
+    testSettings.controlPointCoordTypeBundle(),
+    testSettings.controlPointCoordTypeReports(),
+    -2.0,
+    -8.0,
+    -32.0
+  );
+
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord1AprioriSigma());
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord2AprioriSigma());
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord3AprioriSigma());
+}
+
+TEST(BundleSettings, setGlobalSigmasNoRadius) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+    testSettings.solveObservationMode(),
+    testSettings.updateCubeLabel(),
+    testSettings.errorPropagation(),
+    false,
+    testSettings.controlPointCoordTypeBundle(),
+    testSettings.controlPointCoordTypeReports(),
+    Isis::Null,
+    Isis::Null,
+    32.0
+  );
+
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord3AprioriSigma());
+}
 
 TEST(BundleSettings, outlierRejectionMultiplier) {
   BundleSettings testSettings;
@@ -96,7 +187,8 @@ TEST(BundleSettings, observationSolveSettings) {
   secondObsSettings.addObservationNumber(secondObservationNumber);
   QList<BundleObservationSolveSettings> optionsList = {
         firstObsSettings,
-        secondObsSettings};
+        secondObsSettings
+  };
 
   BundleSettings testSettings;
   testSettings.setObservationSolveOptions(optionsList);
@@ -106,11 +198,144 @@ TEST(BundleSettings, observationSolveSettings) {
         optionsList.begin(),
         optionsList.end(),
         testSettings.observationSolveSettings().begin(),
-        observationSettingsComparison));
-  EXPECT_TRUE(observationSettingsComparison(
+        observationSettingsComparison)
+  );
+  EXPECT_PRED_FORMAT2(
+        assertObservationSettingsEqual,
         testSettings.observationSolveSettings(secondObservationNumber),
-        secondObsSettings));
-  EXPECT_TRUE(observationSettingsComparison(
+        secondObsSettings
+  );
+  EXPECT_PRED_FORMAT2(
+        assertObservationSettingsEqual,
         testSettings.observationSolveSettings(1),
-        secondObsSettings));
+        secondObsSettings
+  );
+}
+
+TEST_P(ConvergenceCriteriaTest, convergenceCriteriaStrings) {
+  QString criteriaString = BundleSettings::convergenceCriteriaToString(GetParam());
+  BundleSettings::ConvergenceCriteria criteria =
+        BundleSettings::stringToConvergenceCriteria(criteriaString);
+  EXPECT_EQ(GetParam(), criteria);
+}
+
+TEST_P(ConvergenceCriteriaTest, convergenceCriteria) {
+  BundleSettings testSettings;
+  testSettings.setConvergenceCriteria(
+        GetParam(),
+        2.0,
+        50
+  );
+  EXPECT_EQ(GetParam(), testSettings.convergenceCriteria());
+  EXPECT_EQ(2.0, testSettings.convergenceCriteriaThreshold());
+  EXPECT_EQ(50, testSettings.convergenceCriteriaMaximumIterations());
+}
+
+INSTANTIATE_TEST_CASE_P(
+      BundleSettings,
+      ConvergenceCriteriaTest,
+      ::testing::Values(BundleSettings::Sigma0, BundleSettings::ParameterCorrections)
+);
+
+TEST(BundleSettings, maximumLikelihoodHuber) {
+  BundleSettings testSettings;
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Huber,
+        64.0
+  );
+  QList< QPair< MaximumLikelihoodWFunctions::Model, double > > functions =
+      testSettings.maximumLikelihoodEstimatorModels();
+  ASSERT_EQ(1, functions.size());
+  EXPECT_EQ(MaximumLikelihoodWFunctions::Huber, functions.front().first);
+  EXPECT_EQ(64.0, functions.front().second);
+}
+
+TEST(BundleSettings, maximumLikelihoodHuberModified) {
+  BundleSettings testSettings;
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::HuberModified,
+        64.0
+  );
+  QList< QPair< MaximumLikelihoodWFunctions::Model, double > > functions =
+      testSettings.maximumLikelihoodEstimatorModels();
+  ASSERT_EQ(1, functions.size());
+  EXPECT_EQ(MaximumLikelihoodWFunctions::HuberModified, functions.front().first);
+  EXPECT_EQ(64.0, functions.front().second);
+}
+
+// I am not sure why this throws an exceptions. Unforunately, the people who wrote
+// this are now gone and no one knows if they should throw or not without doing
+// more research. For now, we are testing existing functionality - JAM 2018/11/13
+TEST(BundleSettings, maximumLikelihoodWelsch) {
+  BundleSettings testSettings;
+  try {
+    testSettings.addMaximumLikelihoodEstimatorModel(
+          MaximumLikelihoodWFunctions::Welsch,
+          64.0
+    );
+    FAIL() << "Expected an exception";
+  }
+  catch (IException &e) {
+    EXPECT_THAT(
+          e.toString().toStdString(),
+          ::testing::HasSubstr("the first model must be of type HUBER or HUBER_MODIFIED.")
+    );
+  }
+  catch (...) {
+    FAIL() << "Expected an ISIS exception";
+  }
+}
+
+// I am not sure why this throws an exceptions. Unforunately, the people who wrote
+// this are now gone and no one knows if they should throw or not without doing
+// more research. For now, we are testing existing functionality - JAM 2018/11/13
+TEST(BundleSettings, maximumLikelihoodChen) {
+  BundleSettings testSettings;
+  try {
+    testSettings.addMaximumLikelihoodEstimatorModel(
+          MaximumLikelihoodWFunctions::Chen,
+          64.0
+    );
+    FAIL() << "Expected an exception";
+  }
+  catch (IException &e) {
+    EXPECT_THAT(
+          e.toString().toStdString(),
+          ::testing::HasSubstr("the first model must be of type HUBER or HUBER_MODIFIED.")
+    );
+  }
+  catch (...) {
+    FAIL() << "Expected an ISIS exception";
+  }
+}
+
+TEST(BundleSettings, multipleMaximumLikelihoodModels) {
+  BundleSettings testSettings;
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Huber,
+        64.0
+  );
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::HuberModified,
+        32.0
+  );
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Welsch,
+        16.0
+  );
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Chen,
+        8.0
+  );
+  QList< QPair< MaximumLikelihoodWFunctions::Model, double > > functions =
+      testSettings.maximumLikelihoodEstimatorModels();
+  ASSERT_EQ(4, functions.size());
+  EXPECT_EQ(MaximumLikelihoodWFunctions::Huber, functions[0].first);
+  EXPECT_EQ(64.0, functions[0].second);
+  EXPECT_EQ(MaximumLikelihoodWFunctions::HuberModified, functions[1].first);
+  EXPECT_EQ(32.0, functions[1].second);
+  EXPECT_EQ(MaximumLikelihoodWFunctions::Welsch, functions[2].first);
+  EXPECT_EQ(16.0, functions[2].second);
+  EXPECT_EQ(MaximumLikelihoodWFunctions::Chen, functions[3].first);
+  EXPECT_EQ(8.0, functions[3].second);
 }
