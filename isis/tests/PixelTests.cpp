@@ -180,36 +180,89 @@ TEST(Pixel, ToFloat) {
 
 }
 
-class PixelSpecialFixture : public ::testing::TestWithParam< std::pair<bool, double> > {
-protected:
-  void PixelSetup(double pixelValue) {
-    pixel = new Pixel(1, 2, 3, pixelValue);
-  }
-  void SetUp() override {}
-  void TearDown() override {
-    if (pixel)
-      delete pixel;
-    pixel = nullptr;
-  }
+// class PixelSpecialFixture : public ::testing::TestWithParam< std::vector<double> > {
+// protected:
+//   void PixelSetup(double pixelValue) {
+//     pixel = new Pixel(1, 2, 3, pixelValue);
+//   }
+//   void VectorSetup(std::vector<bool> expected) {
+//     ASSERT_EQ(expected.size(), specialVector.size());
+//     for (int i = 0; i < specialVector.size(); i++) {
+//       specialVector.at(i).first = expected.at(i);
+//     }
+//   }
+//   void SetUp() override {
+//     pixel = nullptr;
+//     specialVector = {
+//       Isis::His,
+//       Isis::Hrs,
+//       Isis::Lis,
+//       Isis::Lrs,
+//       Isis::Null,
+//       Isis::ValidMaximum,
+//       Isis::ValidMinimum
+//     };
+//   }
+//   void TearDown() override {
+//     if (pixel) {
+//       delete pixel;
+//       pixel = nullptr;
+//     }
+//   }
 
-  Pixel *pixel;
-};
+//   Pixel *pixel;
+//   std::vector<double> specialVector;
+// };
 
-TEST_P(PixelSpecialFixture, static_IsSpecial) {
-  EXPECT_EQ(GetParam().first, Pixel::IsSpecial(GetParam().second));
-}
-std::vector< std::pair<bool, double> > specialVector{
-  std::make_pair(true, Isis::His),
-  std::make_pair(true, Isis::Hrs),
-  std::make_pair(true, Isis::Lis),
-  std::make_pair(true, Isis::Lrs),
-  std::make_pair(true, Isis::Null),
-  std::make_pair(false, Isis::ValidMaximum),
-  std::make_pair(false, Isis::ValidMinimum)
-};
-INSTANTIATE_TEST_CASE_P(static_IsSpecial,
-                        PixelSpecialFixture,
-                        ::testing::ValuesIn(specialVector));
+// // namespace PixelTests {
+// // std::vector< std::pair<bool, double> > specialVector{
+// //   std::make_pair(true, Isis::His),
+// //   std::make_pair(true, Isis::Hrs),
+// //   std::make_pair(true, Isis::Lis),
+// //   std::make_pair(true, Isis::Lrs),
+// //   std::make_pair(true, Isis::Null),
+// //   std::make_pair(false, Isis::ValidMaximum),
+// //   std::make_pair(false, Isis::ValidMinimum)
+// // };
+// // }
+
+
+// TEST_P(PixelSpecialFixture, static_IsSpecial) {
+//   EXPECT_EQ(GetParam(), Pixel::IsSpecial(specialVector<));
+// }
+// INSTANTIATE_TEST_CASE_P(static_IsSpecial,
+//                         PixelSpecialFixture,
+//                         ::testing::ValuesIn(std::vector<bool>{
+//                           true,true,true,true,true,false,false
+//                         }));
+
+// TEST_P(PixelSpecialFixture, IsSpecial) {
+//   PixelSetup(GetParam().second);
+//   EXPECT_EQ(GetParam().first, pixel->IsSpecial());
+// }
+// INSTANTIATE_TEST_CASE_P(IsSpecial,
+//                         PixelSpecialFixture,
+//                         ::testing::ValuesIn(std::vector<bool>{
+//                           true,true,true,true,true,false,false
+//                         }));
+
+
+// specialVector.at(1).first = false;
+// specialVector.at(2).first = false;
+// specialVector.at(3).first = false;
+// specialVector.at(4).first = false;
+// specialVector.at(5).first = true;
+// specialVector.at(6).first = true;
+// TEST_P(PixelSpecialFixture, static_IsValid) {
+//   EXPECT_EQ(GetParam().first, Pixel::IsSpecial(GetParam().second));
+// }
+// INSTANTIATE_TEST_CASE_P(static_IsValid, PixelSpecialFixture, ::testing::ValuesIn(specialVector));
+
+// TEST_P(PixelSpecialFixture, IsValid) {
+//   PixelSetup(GetParam().second);
+//   EXPECT_EQ(GetParam().first, pixel->IsSpecial());
+// }
+// INSTANTIATE_TEST_CASE_P(IsSpecial, PixelSpecialFixture, ::testing::ValuesIn(specialVector));
 
 TEST(Pixel, static_IsSpecial) {
   EXPECT_TRUE(Pixel::IsSpecial(Isis::His));
@@ -221,16 +274,17 @@ TEST(Pixel, static_IsSpecial) {
   EXPECT_FALSE(Pixel::IsSpecial(Isis::ValidMinimum));
 }
 
-TEST_P(PixelSpecialFixture, IsSpecial) {
-  PixelSetup(GetParam().second);
-  EXPECT_EQ(GetParam().first, pixel->IsSpecial());
+TEST(Pixel, IsSpecial) {
+  EXPECT_TRUE(Pixel(1,2,3,Isis::His).IsSpecial());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Hrs).IsSpecial());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Lis).IsSpecial());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Lrs).IsSpecial());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Null).IsSpecial());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsSpecial());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsSpecial());
 }
-INSTANTIATE_TEST_CASE_P(IsSpecial,
-                        PixelSpecialFixture,
-                        ::testing::ValuesIn(specialVector
-                        ));
 
-TEST(Pixel, IsValid) {
+TEST(Pixel, static_IsValid) {
   EXPECT_FALSE(Pixel::IsValid(Isis::His));
   EXPECT_FALSE(Pixel::IsValid(Isis::Hrs));
   EXPECT_FALSE(Pixel::IsValid(Isis::Lis));
@@ -240,7 +294,17 @@ TEST(Pixel, IsValid) {
   EXPECT_TRUE(Pixel::IsValid(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsNull) {
+TEST(Pixel, IsValid) {
+  EXPECT_FALSE(Pixel(1,2,3,Isis::His).IsValid());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Hrs).IsValid());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lis).IsValid());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lrs).IsValid());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsValid());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::ValidMaximum).IsValid());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::ValidMinimum).IsValid());
+}
+
+TEST(Pixel, static_IsNull) {
   EXPECT_FALSE(Pixel::IsNull(Isis::His));
   EXPECT_FALSE(Pixel::IsNull(Isis::Hrs));
   EXPECT_FALSE(Pixel::IsNull(Isis::Lis));
@@ -250,9 +314,19 @@ TEST(Pixel, IsNull) {
   EXPECT_FALSE(Pixel::IsNull(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsHigh) {
-  EXPECT_TRUE(Pixel::IsHigh(Isis::His));
-  EXPECT_TRUE(Pixel::IsHigh(Isis::Hrs));
+TEST(Pixel, IsNull) {
+  EXPECT_FALSE(Pixel(1,2,3,Isis::His).IsNull());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Hrs).IsNull());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lis).IsNull());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lrs).IsNull());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Null).IsNull());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsNull());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsNull());
+}
+
+TEST(Pixel, static_IsHigh) {
+  EXPECT_TRUE (Pixel::IsHigh(Isis::His));
+  EXPECT_TRUE (Pixel::IsHigh(Isis::Hrs));
   EXPECT_FALSE(Pixel::IsHigh(Isis::Lis));
   EXPECT_FALSE(Pixel::IsHigh(Isis::Lrs));
   EXPECT_FALSE(Pixel::IsHigh(Isis::Null));
@@ -260,7 +334,17 @@ TEST(Pixel, IsHigh) {
   EXPECT_FALSE(Pixel::IsHigh(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsLow) {
+TEST(Pixel, IsHigh) {
+  EXPECT_TRUE(Pixel(1,2,3,Isis::His).IsHigh());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Hrs).IsHigh());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lis).IsHigh());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lrs).IsHigh());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsHigh());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsHigh());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsHigh());
+}
+
+TEST(Pixel, static_IsLow) {
   EXPECT_FALSE(Pixel::IsLow(Isis::His));
   EXPECT_FALSE(Pixel::IsLow(Isis::Hrs));
   EXPECT_TRUE(Pixel::IsLow(Isis::Lis));
@@ -270,7 +354,17 @@ TEST(Pixel, IsLow) {
   EXPECT_FALSE(Pixel::IsLow(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsHrs) {
+TEST(Pixel, IsLow) {
+  EXPECT_FALSE(Pixel(1,2,3,Isis::His).IsLow());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Hrs).IsLow());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Lis).IsLow());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Lrs).IsLow());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsLow());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsLow());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsLow());
+}
+
+TEST(Pixel, static_IsHrs) {
   EXPECT_FALSE(Pixel::IsHrs(Isis::His));
   EXPECT_TRUE(Pixel::IsHrs(Isis::Hrs));
   EXPECT_FALSE(Pixel::IsHrs(Isis::Lis));
@@ -280,7 +374,17 @@ TEST(Pixel, IsHrs) {
   EXPECT_FALSE(Pixel::IsHrs(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsHis) {
+TEST(Pixel, IsHrs) {
+  EXPECT_FALSE(Pixel(1,2,3,Isis::His).IsHrs());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Hrs).IsHrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lis).IsHrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lrs).IsHrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsHrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsHrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsHrs());
+}
+
+TEST(Pixel, static_IsHis) {
   EXPECT_TRUE(Pixel::IsHis(Isis::His));
   EXPECT_FALSE(Pixel::IsHis(Isis::Hrs));
   EXPECT_FALSE(Pixel::IsHis(Isis::Lis));
@@ -290,7 +394,17 @@ TEST(Pixel, IsHis) {
   EXPECT_FALSE(Pixel::IsHis(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsLis) {
+TEST(Pixel, IsHis) {
+  EXPECT_TRUE(Pixel(1,2,3,Isis::His).IsHis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Hrs).IsHis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lis).IsHis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lrs).IsHis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsHis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsHis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsHis());
+}
+
+TEST(Pixel, static_IsLis) {
   EXPECT_FALSE(Pixel::IsLis(Isis::His));
   EXPECT_FALSE(Pixel::IsLis(Isis::Hrs));
   EXPECT_TRUE(Pixel::IsLis(Isis::Lis));
@@ -300,7 +414,17 @@ TEST(Pixel, IsLis) {
   EXPECT_FALSE(Pixel::IsLis(Isis::ValidMinimum));
 }
 
-TEST(Pixel, IsLrs) {
+TEST(Pixel, IsLis) {
+  EXPECT_FALSE(Pixel(1,2,3,Isis::His).IsLis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Hrs).IsLis());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Lis).IsLis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lrs).IsLis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsLis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsLis());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsLis());
+}
+
+TEST(Pixel, static_IsLrs) {
   EXPECT_FALSE(Pixel::IsLrs(Isis::His));
   EXPECT_FALSE(Pixel::IsLrs(Isis::Hrs));
   EXPECT_FALSE(Pixel::IsLrs(Isis::Lis));
@@ -310,10 +434,19 @@ TEST(Pixel, IsLrs) {
   EXPECT_FALSE(Pixel::IsLrs(Isis::ValidMinimum));
 }
 
-TEST(Pixel, ToString) {
+TEST(Pixel, IsLrs) {
+  EXPECT_FALSE(Pixel(1,2,3,Isis::His).IsLrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Hrs).IsLrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Lis).IsLrs());
+  EXPECT_TRUE(Pixel(1,2,3,Isis::Lrs).IsLrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::Null).IsLrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMaximum).IsLrs());
+  EXPECT_FALSE(Pixel(1,2,3,Isis::ValidMinimum).IsLrs());
+}
+
+TEST(Pixel, static_ToString) {
   EXPECT_EQ(std::string("1"), Pixel::ToString(1.0));
   EXPECT_EQ(std::string("-1.2"), Pixel::ToString(-1.2));
-
   // Special pixels
   EXPECT_EQ(std::string("His"), Pixel::ToString(Isis::His));
   EXPECT_EQ(std::string("Hrs"), Pixel::ToString(Isis::Hrs));
@@ -321,4 +454,16 @@ TEST(Pixel, ToString) {
   EXPECT_EQ(std::string("Lrs"), Pixel::ToString(Isis::Lrs));
   EXPECT_EQ(std::string("Null"), Pixel::ToString(Isis::Null));
   EXPECT_EQ(std::string("Invalid"), Pixel::ToString(-1.0e+1000));
+}
+
+TEST(Pixel, ToString) {
+  EXPECT_EQ(std::string("1"), Pixel(1,2,3,1.0).ToString());
+  EXPECT_EQ(std::string("-1.2"), Pixel(1,2,3,-1.2).ToString());
+  // Special pixels
+  EXPECT_EQ(std::string("His"), Pixel(1,2,3,Isis::His).ToString());
+  EXPECT_EQ(std::string("Hrs"), Pixel(1,2,3,Isis::Hrs).ToString());
+  EXPECT_EQ(std::string("Lis"), Pixel(1,2,3,Isis::Lis).ToString());
+  EXPECT_EQ(std::string("Lrs"), Pixel(1,2,3,Isis::Lrs).ToString());
+  EXPECT_EQ(std::string("Null"), Pixel(1,2,3,Isis::Null).ToString());
+  EXPECT_EQ(std::string("Invalid"), Pixel(1,2,3,-1.0e+1000).ToString());
 }
