@@ -7,6 +7,5 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  std::vector<char*> args = ui.getArgs();
-  stats(args);
+  stats(ui);
 }

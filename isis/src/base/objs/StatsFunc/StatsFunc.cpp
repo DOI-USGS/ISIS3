@@ -16,9 +16,7 @@ using namespace std;
 using namespace Isis;
 
 namespace Isis {
-  void stats(std::vector<char*>& args) {
-    // TODO is this line bad?
-    UserInterface ui("/work/users/jmapel/ISIS3/isis/src/base/apps/stats/stats.xml", args);
+  void stats(UserInterface &ui) {
 
     Cube *inputCube = new Cube();
     CubeAttributeInput inAtt(ui.GetAsString("FROM"));
