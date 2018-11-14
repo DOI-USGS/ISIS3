@@ -2,9 +2,13 @@
 
 #include <algorithm>
 
+#include <QBuffer>
+#include <QByteArray>
 #include <QString>
 #include <QList>
 #include <QPair>
+#include <QDomDocument>
+#include <QXmlStreamWriter>
 
 #include "BundleObservationSolveSettings.h"
 #include "BundleTargetBody.h"
@@ -34,6 +38,46 @@ bool observationSettingsComparison(
         << n.instrumentId().toStdString() << ")";
 }
 
+QDomDocument saveToQDomDocument(BundleSettings &settings) {
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  settings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  return settingsDoc;
+}
+
+class BundleSettings_ObservationTest : public ::testing::Test {
+  protected:
+    BundleSettings testSettings;
+    QList<BundleObservationSolveSettings> optionsList;
+    QString firstInstrument;
+    QString secondInstrument;
+    QString firstObservationNumber;
+    QString secondObservationNumber;
+
+    void SetUp() override {
+      firstInstrument = "First Instrument";
+      secondInstrument = "Second Instrument";
+      firstObservationNumber = "First Observation";
+      secondObservationNumber = "Second Observation";
+      BundleObservationSolveSettings firstObsSettings;
+      BundleObservationSolveSettings secondObsSettings;
+      firstObsSettings.setInstrumentId(firstInstrument);
+      secondObsSettings.setInstrumentId(secondInstrument);
+      firstObsSettings.addObservationNumber(firstObservationNumber);
+      secondObsSettings.addObservationNumber(secondObservationNumber);
+      optionsList = {firstObsSettings, secondObsSettings};
+      testSettings.setObservationSolveOptions(optionsList);
+   }
+};
+
 class MockBundleTargetBody : public BundleTargetBody {
   public:
     MOCK_METHOD0(numberParameters, int());
@@ -60,20 +104,67 @@ class ConvergenceCriteriaTest : public ::testing::TestWithParam<BundleSettings::
   // Intentionally empty
 };
 
-class MaximumLikelihoodFunctionTest : public ::testing::TestWithParam<MaximumLikelihoodWFunctions::Model> {
-  // Intentionally empty
-};
-
 TEST_P(BoolTest, validateNetwork) {
   BundleSettings testSettings;
   testSettings.setValidateNetwork(GetParam());
   EXPECT_EQ(GetParam(), testSettings.validateNetwork());
 }
 
+TEST_P(BoolTest, saveValidateNetwork) {
+  BundleSettings testSettings;
+  testSettings.setValidateNetwork(GetParam());
+
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement validateNetwork = globalSettings.firstChildElement("validateNetwork");
+  ASSERT_FALSE(validateNetwork.isNull());
+  EXPECT_EQ("validateNetwork", validateNetwork.tagName());
+  EXPECT_EQ(toString(testSettings.validateNetwork()), validateNetwork.text());
+}
+
 TEST_P(BoolTest, outlierRejection) {
   BundleSettings testSettings;
   testSettings.setOutlierRejection(GetParam());
   EXPECT_EQ(GetParam(), testSettings.outlierRejection());
+}
+
+TEST_P(BoolTest, saveOutlierRejection) {
+  BundleSettings testSettings;
+  testSettings.setOutlierRejection(GetParam());
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement outlierRejectionOptions = globalSettings.firstChildElement("outlierRejectionOptions");
+  ASSERT_FALSE(outlierRejectionOptions.isNull());
+  QDomNamedNodeMap outlierRejectionOptionsAtts = outlierRejectionOptions.attributes();
+  EXPECT_EQ(
+        toString(testSettings.outlierRejection()),
+        outlierRejectionOptionsAtts.namedItem("rejection").nodeValue()
+  );
+  EXPECT_EQ(
+        (testSettings.outlierRejection() ?
+            toString(testSettings.outlierRejectionMultiplier()) : "N/A"),
+        outlierRejectionOptionsAtts.namedItem("multiplier").nodeValue()
+  );
 }
 
 TEST_P(BoolTest, inverseMatrix) {
@@ -102,6 +193,57 @@ TEST_P(BoolTest, setBoolSolveOptions) {
   EXPECT_EQ(GetParam(), testSettings.solveRadius());
 }
 
+TEST_P(BoolTest, saveSolveOptions) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        GetParam(),
+        GetParam(),
+        GetParam(),
+        GetParam()
+  );
+  testSettings.setCreateInverseMatrix(GetParam());
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement solveOptions = globalSettings.firstChildElement("solveOptions");
+  ASSERT_FALSE(solveOptions.isNull());
+  QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
+  EXPECT_EQ(
+        toString(testSettings.solveObservationMode()),
+        solveOptionAtts.namedItem("solveObservationMode").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.solveRadius()),
+        solveOptionAtts.namedItem("solveRadius").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.updateCubeLabel()),
+        solveOptionAtts.namedItem("updateCubeLabel").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.errorPropagation()),
+        solveOptionAtts.namedItem("errorPropagation").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.createInverseMatrix()),
+        solveOptionAtts.namedItem("createInverseMatrix").nodeValue()
+  );
+}
+
 INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       BoolTest,
@@ -122,6 +264,45 @@ TEST_P(CoordinateTypeTest, setCoordinateTypeSolveOptions) {
   EXPECT_EQ(GetParam(), testSettings.controlPointCoordTypeBundle());
 }
 
+TEST_P(BoolTest, saveCoordinateTypes) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        GetParam(),
+        GetParam(),
+        GetParam(),
+        GetParam()
+  );
+  testSettings.setCreateInverseMatrix(GetParam());
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement solveOptions = globalSettings.firstChildElement("solveOptions");
+  ASSERT_FALSE(solveOptions.isNull());
+  QDomNamedNodeMap solveOptionAtts = solveOptions.attributes();
+  EXPECT_EQ(
+        toString(testSettings.controlPointCoordTypeReports()),
+        solveOptionAtts.namedItem("controlPointCoordTypeReports").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.controlPointCoordTypeBundle()),
+        solveOptionAtts.namedItem("controlPointCoordTypeBundle").nodeValue()
+  );
+}
+
 INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       CoordinateTypeTest,
@@ -131,15 +312,15 @@ INSTANTIATE_TEST_CASE_P(
 TEST(BundleSettings, setGlobalSigmas) {
   BundleSettings testSettings;
   testSettings.setSolveOptions(
-    testSettings.solveObservationMode(),
-    testSettings.updateCubeLabel(),
-    testSettings.errorPropagation(),
-    true,
-    testSettings.controlPointCoordTypeBundle(),
-    testSettings.controlPointCoordTypeReports(),
-    2.0,
-    8.0,
-    32.0
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        testSettings.errorPropagation(),
+        true,
+        testSettings.controlPointCoordTypeBundle(),
+        testSettings.controlPointCoordTypeReports(),
+        2.0,
+        8.0,
+        32.0
   );
 
   EXPECT_EQ(2.0, testSettings.globalPointCoord1AprioriSigma());
@@ -150,15 +331,15 @@ TEST(BundleSettings, setGlobalSigmas) {
 TEST(BundleSettings, setBadGlobalSigmas) {
   BundleSettings testSettings;
   testSettings.setSolveOptions(
-    testSettings.solveObservationMode(),
-    testSettings.updateCubeLabel(),
-    testSettings.errorPropagation(),
-    true,
-    testSettings.controlPointCoordTypeBundle(),
-    testSettings.controlPointCoordTypeReports(),
-    -2.0,
-    -8.0,
-    -32.0
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        testSettings.errorPropagation(),
+        true,
+        testSettings.controlPointCoordTypeBundle(),
+        testSettings.controlPointCoordTypeReports(),
+        -2.0,
+        -8.0,
+        -32.0
   );
 
   EXPECT_EQ(Isis::Null, testSettings.globalPointCoord1AprioriSigma());
@@ -169,18 +350,112 @@ TEST(BundleSettings, setBadGlobalSigmas) {
 TEST(BundleSettings, setGlobalSigmasNoRadius) {
   BundleSettings testSettings;
   testSettings.setSolveOptions(
-    testSettings.solveObservationMode(),
-    testSettings.updateCubeLabel(),
-    testSettings.errorPropagation(),
-    false,
-    testSettings.controlPointCoordTypeBundle(),
-    testSettings.controlPointCoordTypeReports(),
-    Isis::Null,
-    Isis::Null,
-    32.0
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        testSettings.errorPropagation(),
+        false,
+        testSettings.controlPointCoordTypeBundle(),
+        testSettings.controlPointCoordTypeReports(),
+        Isis::Null,
+        Isis::Null,
+        32.0
   );
 
   EXPECT_EQ(Isis::Null, testSettings.globalPointCoord3AprioriSigma());
+}
+
+TEST(BundleSettings, saveGlobalSigmas) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        testSettings.errorPropagation(),
+        true,
+        testSettings.controlPointCoordTypeBundle(),
+        testSettings.controlPointCoordTypeReports(),
+        2.0,
+        8.0,
+        32.0
+  );
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement aprioriSigmas = globalSettings.firstChildElement("aprioriSigmas");
+  ASSERT_FALSE(aprioriSigmas.isNull());
+  QDomNamedNodeMap aprioriSigmasAtts = aprioriSigmas.attributes();
+  EXPECT_EQ(
+        toString(testSettings.globalPointCoord1AprioriSigma()),
+        aprioriSigmasAtts.namedItem("pointCoord1").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.globalPointCoord2AprioriSigma()),
+        aprioriSigmasAtts.namedItem("pointCoord2").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.globalPointCoord3AprioriSigma()),
+        aprioriSigmasAtts.namedItem("pointCoord3").nodeValue()
+  );
+}
+
+TEST(BundleSettings, saveBadGlobalSigmas) {
+  BundleSettings testSettings;
+  testSettings.setSolveOptions(
+        testSettings.solveObservationMode(),
+        testSettings.updateCubeLabel(),
+        testSettings.errorPropagation(),
+        true,
+        testSettings.controlPointCoordTypeBundle(),
+        testSettings.controlPointCoordTypeReports(),
+        -2.0,
+        -8.0,
+        -32.0
+  );
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement aprioriSigmas = globalSettings.firstChildElement("aprioriSigmas");
+  ASSERT_FALSE(aprioriSigmas.isNull());
+  QDomNamedNodeMap aprioriSigmasAtts = aprioriSigmas.attributes();
+  EXPECT_EQ(
+        "N/A",
+        aprioriSigmasAtts.namedItem("pointCoord1").nodeValue()
+  );
+  EXPECT_EQ(
+        "N/A",
+        aprioriSigmasAtts.namedItem("pointCoord2").nodeValue()
+  );
+  EXPECT_EQ(
+        "N/A",
+        aprioriSigmasAtts.namedItem("pointCoord3").nodeValue()
+  );
 }
 
 TEST(BundleSettings, outlierRejectionMultiplier) {
@@ -189,25 +464,7 @@ TEST(BundleSettings, outlierRejectionMultiplier) {
   EXPECT_EQ(8.0, testSettings.outlierRejectionMultiplier());
 }
 
-TEST(BundleSettings, observationSolveSettings) {
-  BundleObservationSolveSettings firstObsSettings;
-  BundleObservationSolveSettings secondObsSettings;
-  QString firstInstrument("First Instrument");
-  QString secondInstrument("Second Instrument");
-  QString firstObservationNumber("First Observation");
-  QString secondObservationNumber("Second Observation");
-  firstObsSettings.setInstrumentId(firstInstrument);
-  secondObsSettings.setInstrumentId(secondInstrument);
-  firstObsSettings.addObservationNumber(firstObservationNumber);
-  secondObsSettings.addObservationNumber(secondObservationNumber);
-  QList<BundleObservationSolveSettings> optionsList = {
-        firstObsSettings,
-        secondObsSettings
-  };
-
-  BundleSettings testSettings;
-  testSettings.setObservationSolveOptions(optionsList);
-
+TEST_F(BundleSettings_ObservationTest, observationSolveSettings) {
   EXPECT_EQ(testSettings.numberSolveSettings(), optionsList.size());
   EXPECT_TRUE(std::equal(
         optionsList.begin(),
@@ -218,13 +475,31 @@ TEST(BundleSettings, observationSolveSettings) {
   EXPECT_PRED_FORMAT2(
         assertObservationSettingsEqual,
         testSettings.observationSolveSettings(secondObservationNumber),
-        secondObsSettings
+        optionsList[1]
   );
   EXPECT_PRED_FORMAT2(
         assertObservationSettingsEqual,
         testSettings.observationSolveSettings(1),
-        secondObsSettings
+        optionsList[1]
   );
+}
+
+TEST_F(BundleSettings_ObservationTest, saveObservationSolveSettings) {
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+  QDomElement observationSolveSettingsList = root.firstChildElement("observationSolveSettingsList");
+  ASSERT_FALSE(observationSolveSettingsList.isNull());
+  EXPECT_EQ(testSettings.numberSolveSettings(), observationSolveSettingsList.childNodes().size());
 }
 
 TEST_P(ConvergenceCriteriaTest, convergenceCriteriaStrings) {
@@ -244,6 +519,48 @@ TEST_P(ConvergenceCriteriaTest, convergenceCriteria) {
   EXPECT_EQ(GetParam(), testSettings.convergenceCriteria());
   EXPECT_EQ(2.0, testSettings.convergenceCriteriaThreshold());
   EXPECT_EQ(50, testSettings.convergenceCriteriaMaximumIterations());
+}
+
+TEST_P(ConvergenceCriteriaTest, saveConvergenceCriteria) {
+  BundleSettings testSettings;
+  testSettings.setConvergenceCriteria(
+        GetParam(),
+        2.0,
+        50
+  );
+  testSettings.setCreateInverseMatrix(GetParam());
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement convergenceCriteriaOptions = globalSettings.firstChildElement("convergenceCriteriaOptions");
+  ASSERT_FALSE(convergenceCriteriaOptions.isNull());
+  QDomNamedNodeMap convergenceCriteriaOptionsAtts = convergenceCriteriaOptions.attributes();
+  EXPECT_EQ(
+        BundleSettings::convergenceCriteriaToString(testSettings.convergenceCriteria()),
+        convergenceCriteriaOptionsAtts.namedItem("convergenceCriteria").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.convergenceCriteriaThreshold()),
+        convergenceCriteriaOptionsAtts.namedItem("threshold").nodeValue()
+  );
+  EXPECT_EQ(
+        toString(testSettings.convergenceCriteriaMaximumIterations()),
+        convergenceCriteriaOptionsAtts.namedItem("maximumIterations").nodeValue()
+  );
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -355,11 +672,98 @@ TEST(BundleSettings, multipleMaximumLikelihoodModels) {
   EXPECT_EQ(8.0, functions[3].second);
 }
 
-TEST(BundleSettings, OutputFilePrefix) {
+TEST(BundleSettings, saveMaximumLikelyhoodModels) {
+  BundleSettings testSettings;
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Huber,
+        64.0
+  );
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::HuberModified,
+        32.0
+  );
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Welsch,
+        16.0
+  );
+  testSettings.addMaximumLikelihoodEstimatorModel(
+        MaximumLikelihoodWFunctions::Chen,
+        8.0
+  );
+  QList< QPair< MaximumLikelihoodWFunctions::Model, double > > functions =
+      testSettings.maximumLikelihoodEstimatorModels();
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement maximumLikelihoodEstimation = globalSettings.firstChildElement("maximumLikelihoodEstimation");
+  ASSERT_FALSE(maximumLikelihoodEstimation.isNull());
+
+  QDomNodeList modelNodes = maximumLikelihoodEstimation.childNodes();
+  ASSERT_EQ(functions.size(), modelNodes.size());
+  for(int modelIndex = 0; modelIndex < functions.size(); modelIndex++) {
+    QDomNode modelElement = modelNodes.at(modelIndex);
+    EXPECT_EQ("model", modelElement.nodeName());
+    QDomNamedNodeMap modelAtts = modelElement.attributes();
+    EXPECT_EQ(
+          MaximumLikelihoodWFunctions::modelToString(functions[modelIndex].first),
+          modelAtts.namedItem("type").nodeValue()
+    );
+    EXPECT_EQ(
+          toString(functions[modelIndex].second),
+          modelAtts.namedItem("quantile").nodeValue()
+    );
+  }
+}
+
+TEST(BundleSettings, outputFilePrefix) {
   BundleSettings testSettings;
   QString testPrefix("test/file/prefix");
   testSettings.setOutputFilePrefix(testPrefix);
   EXPECT_EQ(testPrefix, testSettings.outputFilePrefix());
+}
+
+TEST(BundleSettings, SaveOutputFilePrefix) {
+  BundleSettings testSettings;
+  QString testPrefix("test/file/prefix");
+  testSettings.setOutputFilePrefix(testPrefix);
+
+  QByteArray outputBytes;
+  QBuffer outputBuffer(&outputBytes);
+  outputBuffer.open(QIODevice::WriteOnly);
+  QXmlStreamWriter outputWriter(&outputBuffer);
+  testSettings.save(outputWriter, NULL);
+
+  outputBuffer.close();
+  outputBuffer.open(QIODevice::ReadOnly);
+  QDomDocument settingsDoc("settings_doc");
+  settingsDoc.setContent(&outputBuffer);
+
+  QDomElement root = settingsDoc.documentElement();
+
+  QDomElement globalSettings = root.firstChildElement("globalSettings");
+  ASSERT_FALSE(globalSettings.isNull());
+
+  QDomElement outputFileOptions = globalSettings.firstChildElement("outputFileOptions");
+  ASSERT_FALSE(outputFileOptions.isNull());
+  QDomNamedNodeMap outputFileOptionsAtts = outputFileOptions.attributes();
+  EXPECT_EQ(
+        testSettings.outputFilePrefix(),
+        outputFileOptionsAtts.namedItem("fileNamePrefix").nodeValue()
+  );
 }
 
 TEST(BundleSettings, setBundleTargetBody) {
@@ -419,5 +823,3 @@ TEST(BundleSettings, BundleTargetBodyAccesors) {
   EXPECT_TRUE(testSettings.solveTriaxialRadii());
   EXPECT_TRUE(testSettings.solveMeanRadius());
 }
-
-// TODO test IPCE save method
