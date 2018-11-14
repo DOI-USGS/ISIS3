@@ -45,15 +45,12 @@ else:
 os.popen('mkdir -p '+isisroot+'/etc/conda/activate.d')
 os.popen('mkdir -p '+isisroot+'/etc/conda/deactivate.d')
 
-os.popen('touch '+isisroot+'/etc/conda/activate.d/env_vars.sh')
-os.popen('touch '+isisroot+'/etc/conda/activate.d/env_vars.sh')
-
-os.popen("echo '#!/bin/sh' >> "+isisroot+ "/etc/conda/activate.d/env_vars.sh")
+os.popen("echo '#!/bin/sh' > "+isisroot+ "/etc/conda/activate.d/env_vars.sh")
 os.popen("echo 'export ISISROOT="+isisroot+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
 os.popen("echo 'export ISIS3DATA="+data_dir+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
 os.popen("echo 'export ISIS3TESTDATA="+testdata_dir+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
 
-os.popen("echo '#!/bin/sh' >> "+isisroot+ "/etc/conda/deactivate.d/env_vars.sh")
+os.popen("echo '#!/bin/sh' > "+isisroot+ "/etc/conda/deactivate.d/env_vars.sh")
 os.popen("echo 'unset ISISROOT' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
 os.popen("echo 'unset ISIS3DATA' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
 os.popen("echo 'unset ISIS3TESTDATA' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
