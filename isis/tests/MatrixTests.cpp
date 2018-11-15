@@ -31,6 +31,16 @@ namespace Isis {
   }
 
 
+  TEST (MatrixTests, IdentityMatrix) {
+    Matrix I = Matrix::Identity(2);
+    
+    ASSERT_EQ(1, I[0][0]);
+    ASSERT_EQ(0, I[0][1]);
+    ASSERT_EQ(0, I[1][0]);
+    ASSERT_EQ(1, I[1][1]);
+  }
+  
+  
   TEST (MatrixTests, SetValues) {
     Matrix A(2, 2);
     
@@ -43,16 +53,6 @@ namespace Isis {
     ASSERT_EQ(2, A[0][1]);
     ASSERT_EQ(3, A[1][0]);
     ASSERT_EQ(4, A[1][1]);
-  }
-
-
-  TEST (MatrixTests, IdentityMatrix) {
-    Matrix I = Matrix::Identity(2);
-    
-    ASSERT_EQ(1, I[0][0]);
-    ASSERT_EQ(0, I[0][1]);
-    ASSERT_EQ(0, I[1][0]);
-    ASSERT_EQ(1, I[1][1]);
   }
 
 
@@ -375,16 +375,7 @@ namespace Isis {
       FAIL() << "Expected error message: Unable to calculate eigenvectors, the matrix is not square.";
     }
   }
+  
+  
 }
-
-
-
-
-
-
-
-
-
-
-
 
