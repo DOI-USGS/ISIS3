@@ -82,7 +82,7 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
          and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
          for both of these optional values:
 
-         <strong>./$CONDA_PREFIX/scripts/isis3VarInit --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
+         <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
 
          
          Directions for running rsync to download ISIS3 data can be found <a href="#ISIS3DataDownload">here.</a>
