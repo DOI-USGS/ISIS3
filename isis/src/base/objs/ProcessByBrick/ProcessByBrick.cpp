@@ -20,8 +20,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "ProcessByBrick.h"
+#include <functional>
 
+#include "ProcessByBrick.h"
 #include "Brick.h"
 #include "Cube.h"
 
@@ -228,8 +229,8 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
 
   /**
-  * Sets the input and output bricks sizes to the given number of samples, 
-  * lines, and bands. 
+  * Sets the input and output bricks sizes to the given number of samples,
+  * lines, and bands.
   *
   * @param ns Number of samples
   *
@@ -363,9 +364,9 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
   }
 
   /**
-   * Create the output file. This method assumes that the output cube size 
-   * matches the input cube size. Therefore, SetInputCube() must be called 
-   * before this method. 
+   * Create the output file. This method assumes that the output cube size
+   * matches the input cube size. Therefore, SetInputCube() must be called
+   * before this method.
    *
    * @param parameter The output file name.
    *
@@ -441,7 +442,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
    * shaped brick through the cube. This method requires that exactly one input
    * cube be loaded. No output cubes are produced.
    *
-   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes 
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
    * @param funct (Buffer &in) Receive an nxm brick in the input buffer.
    *                                If n=1 and m=lines this will process by
    *                                columns. Likewise if n=samples and m=1 this
@@ -460,9 +461,50 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
     p_progress->CheckStatus();
 
     for (brick->begin(); !brick->end(); (*brick)++) {
-      if (haveInput) 
+      if (haveInput)
         cube->read(*brick);  // input only
-   
+
+      funct(*brick);
+
+      // output only or input/output
+      if ((!haveInput) || (cube->isReadWrite())) {
+        cube->write(*brick);
+      }
+
+      p_progress->CheckStatus();
+    }
+
+    delete brick;
+  }
+
+
+  /**
+   * Starts the systematic processing of the input cube by moving an arbitrary
+   * shaped brick through the cube. This method requires that exactly one input
+   * cube be loaded. No output cubes are produced.
+   *
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
+   * @param funct (Buffer &in) Receive an nxm brick in the input buffer.
+   *                                If n=1 and m=lines this will process by
+   *                                columns. Likewise if n=samples and m=1 this
+   *                                will process by lines.
+   *
+   * @throws iException::Programmer
+   */
+  void ProcessByBrick::StartProcess(std::function<void(Buffer &in)> funct ) {
+    Cube *cube = NULL;
+    Brick *brick = NULL;
+
+    bool haveInput = PrepProcessCubeInPlace(&cube, &brick);
+
+    // Loop and let the app programmer work with the bricks
+    p_progress->SetMaximumSteps(brick->Bricks());
+    p_progress->CheckStatus();
+
+    for (brick->begin(); !brick->end(); (*brick)++) {
+      if (haveInput)
+        cube->read(*brick);  // input only
+
       funct(*brick);
 
       // output only or input/output
@@ -483,7 +525,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
    * cube and one output cube be loaded using the SetInputCube and SetOutputCube
    * methods.
    *
-   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes 
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
    * @param funct (Buffer &in, Buffer &out) Receive an nxm brick in
    *              the input buffer and output the an nxm brick. If n=1 and
    *              m=lines this will process by columns. Likewise if n=samples
@@ -523,7 +565,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
    * shaped brick through the cube. This method allows multiple input and output
    * cubes.
    *
-   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes 
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
    * @param funct (vector<Buffer *> &in, vector<Buffer *> &out)
    *              Receive an nxm brick in the input buffer. If n=1 and m=lines
    *              this will process by columns.  Likewise if n=samples and m=1
@@ -756,7 +798,7 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
       *bricks = new Brick(**cube, p_outputBrickSamples[1],
           p_outputBrickLines[1], p_outputBrickBands[1], p_reverse);
     }
-    
+
     return haveInput;
   }
 
@@ -1017,4 +1059,3 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
     return *this;
   }
 } // end namespace isis
-
