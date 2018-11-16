@@ -306,9 +306,7 @@ namespace Isis {
    * @param status The DownsizeStatus enumeration value.
    */
   void SpiceRotation::MinimizeCache(DownsizeStatus status) {
-//    if (p_minimizeCache != DownsizeStatus::Fixed) {
-      p_minimizeCache = status; 
-//    }
+    p_minimizeCache = status; 
   }
 
 
@@ -609,9 +607,7 @@ namespace Isis {
       if (p_degree > 0 && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
       // Load the time cache first
-//      if (p_minimizeCache != Fixed) {
-        p_minimizeCache = No; 
-//      }
+      p_minimizeCache = No; 
       LoadTimeCache();
 
       if (p_fullCacheSize > 1) {
@@ -639,9 +635,7 @@ namespace Isis {
       p_cacheAv.clear();
 
       // Reload the time cache first
-//      if (p_minimizeCache != Fixed) {
-        p_minimizeCache = No; 
-//      }
+      p_minimizeCache = No; 
       LoadTimeCache();
 
       for (std::vector<double>::size_type pos = 0; pos < maxSize; pos++) {
@@ -721,9 +715,7 @@ namespace Isis {
 
       //std::cout << "Full cache size is " << p_cache.size() << endl;
       
-//      if (p_minimizeCache != Fixed) {
-        p_minimizeCache = Yes; 
-//      }
+      p_minimizeCache = Yes; 
       LoadTimeCache();
 
       //std::cout << "Minimized cache size is " << p_cache.size() << endl;
@@ -1941,7 +1933,6 @@ namespace Isis {
 
   // NEW: sets the cache time
   void SpiceRotation::SetCacheTime(std::vector<double> cacheTime) {
-//    MinimizeCache(DownsizeStatus::Fixed); // look at this later. Needed for VIRTIS-M 
     // Do not reset the cache times if they are already loaded. 
     if (p_cacheTime.size() <= 0) {
       p_cacheTime = cacheTime; 
@@ -2312,7 +2303,7 @@ namespace Isis {
     ktotal_c("ck", (SpiceInt *) &count);
 
     // Downsize the loaded cache
-    if ((p_source == Memcache) && p_minimizeCache == Yes) { // FIXME me (skip this if: minimizeCache == no)
+    if ((p_source == Memcache) && p_minimizeCache == Yes) { 
       // Multiple ck case, type 5 ck case, or PolyFunctionOverSpice
       //  final step -- downsize loaded cache and reload
 
@@ -2413,8 +2404,8 @@ namespace Isis {
         dafus_c(sum, (SpiceInt) 2, (SpiceInt) 6, dc, ic);
 
         // Don't read type 5 ck here
-        if (ic[2] == 5) break; // FIXME: ic[2] is the ck type
-//
+        if (ic[2] == 5) break;
+
         // Check times for type 3 ck segment if spacecraft matches
         if (ic[0] == spCode && ic[2] == 3) {
           sct2e_c((int) spCode / 1000, dc[0], &segStartEt);
@@ -2492,7 +2483,6 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // FIXME: this is the only place we can go with p_minimizeCache = No 
     // Load times according to cache size (body rotations) -- handle first round of type 5 ck case
     //   and multiple ck case --Load a time for every line scan line and downsize later
     if (! (timeLoaded || (p_cacheTime.size() > 1))) {
@@ -2503,8 +2493,7 @@ namespace Isis {
         p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope); 
       // could try to change the kernels: type, resample, something else? check on type 2 or 3, concerned about interpolation
       // it's already type 2 or 3... 
-      // FIXME
-      if (p_source == Nadir) { //&& (p_minimizeCache != Fixed)) {
+      if (p_source == Nadir) {
         p_minimizeCache = No;
       }
     }

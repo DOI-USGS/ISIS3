@@ -408,13 +408,17 @@ void IsisMain ()
     SpiceDouble etEnd;
     scs2e_c( (SpiceInt) -226, startScet.toLatin1().data(), &etStart);
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
-    QString startTime = iTime(etStart-16.0).UTC(); 
-    QString stopTime = iTime(etEnd-16.0).UTC(); 
+
+    PvlKeyword &frameParam = inst["FrameParameter"];
+    exposureTime = toDouble(frameParam[0]);
+
+    QString startTime = iTime(etStart-exposureTime).UTC(); 
+    QString stopTime = iTime(etEnd-exposureTime).UTC(); 
 
     SpiceChar startSclkString[50]; 
     SpiceChar endSclkString[50]; 
-    sce2s_c( (SpiceInt) -226, etStart-16.0, (SpiceInt) 50, startSclkString);
-    sce2s_c( (SpiceInt) -226, etEnd-16.0, (SpiceInt) 50, endSclkString);
+    sce2s_c( (SpiceInt) -226, etStart-exposureTime, (SpiceInt) 50, startSclkString);
+    sce2s_c( (SpiceInt) -226, etEnd-exposureTime, (SpiceInt) 50, endSclkString);
     
     inst.findKeyword("StartTime").setValue(startTime);
     inst.findKeyword("StopTime").setValue(stopTime); 

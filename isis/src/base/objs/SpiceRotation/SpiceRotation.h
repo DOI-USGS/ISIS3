@@ -281,7 +281,6 @@ namespace Isis {
         Yes,  //!< Downsize the cache
         Done, //!< Cache is downsized
         No,   //!< Do not downsize the cache
-        Fixed //!< Never downsize the cache
       };
 
       /**
