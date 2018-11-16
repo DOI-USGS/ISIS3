@@ -8,8 +8,6 @@
 
 #include <gtest/gtest.h>
 
-#define TEST_EPSILON 1e-8
-
 TEST(AngleTest, DefaultConstructor) {
   Isis::Angle angle;
   EXPECT_FALSE(angle.isValid());
@@ -21,7 +19,7 @@ TEST(AngleTest, DefaultConstructor) {
 
 TEST(AngleTest, NullInput_DegreeOutput) {
   Isis::Angle angle;
-  EXPECT_NEAR(angle.degrees(), Isis::Null, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), Isis::Null);
   EXPECT_FALSE(angle.isValid());
   EXPECT_STREQ(angle.toString().toLatin1(), ""); 
 }
@@ -29,7 +27,7 @@ TEST(AngleTest, NullInput_DegreeOutput) {
 
 TEST(AngleTest, DegreeInput_RadianOutput) {
   Isis::Angle angle(30., Isis::Angle::Degrees );
-  EXPECT_NEAR(angle.radians(), 30 * Isis::PI/180.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.radians(), 30 * Isis::PI/180.0);
   EXPECT_TRUE(angle.isValid()); 
   EXPECT_STREQ(angle.toString().toLatin1(), "30.0 degrees");  
 }
@@ -37,7 +35,7 @@ TEST(AngleTest, DegreeInput_RadianOutput) {
 
 TEST(AngleTest, RadianInput_DegreeOutput) {
   Isis::Angle angle(30. * Isis::PI / 180.0, Isis::Angle::Radians );
-  EXPECT_NEAR(angle.degrees(), 30.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), 30.0);
   EXPECT_STREQ(angle.toString(false).toLatin1(), "30.0");  
 }
 
@@ -45,32 +43,31 @@ TEST(AngleTest, RadianInput_DegreeOutput) {
 TEST(AngleTest, CopyConstructor) {
   Isis::Angle angle(30., Isis::Angle::Degrees );
   Isis::Angle angleCopy(angle);
-  EXPECT_NEAR(angleCopy.degrees(), 30.0,TEST_EPSILON); 
+  EXPECT_DOUBLE_EQ(angleCopy.degrees(), 30.0);
 }
 
 
 TEST(AngleTest, Mutators) {
   Isis::Angle angle(30.0, Isis::Angle::Degrees );
   angle.setDegrees(180);
-  EXPECT_NEAR(angle.degrees(), 180.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), 180.0);
   angle.setRadians(Isis::PI);
-  EXPECT_NEAR(angle.radians(), Isis::PI, TEST_EPSILON); 
+  EXPECT_DOUBLE_EQ(angle.radians(), Isis::PI);
 }
 
 TEST(AngleOperators, QDebug) {
-  // Stream qDebug output to a string and then do a string comparison?
-  Isis::Angle angle(45.0, Isis::Angle::Degrees);
+  Isis::Angle angle(0.0, Isis::Angle::Degrees);
   QString qdebug_output;
   QDebug debug(&qdebug_output);
   debug << angle;
-  EXPECT_STREQ(qdebug_output.toLatin1(), "0.785398 <radians> (45 <degrees>) "); 
+  EXPECT_STREQ(qdebug_output.toLatin1(), "0 <radians> (0 <degrees>) "); 
 }
 
 
 TEST(AngleOperators, Assignment) {
   Isis::Angle angle(30.0, Isis::Angle::Degrees );
   angle = Isis::Angle(45.0, Isis::Angle::Degrees);
-  EXPECT_NEAR(angle.degrees(), 45.0, TEST_EPSILON); 
+  EXPECT_DOUBLE_EQ(angle.degrees(), 45.0);
 }
 
 
@@ -78,26 +75,26 @@ TEST(AngleOperators, AddSubtract) {
   Isis::Angle angle1(30.0, Isis::Angle::Degrees );
   Isis::Angle angle2(60.0, Isis::Angle::Degrees );
   angle1 = angle1 + angle2;  
-  EXPECT_NEAR(angle1.degrees(), 90.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle1.degrees(), 90.0);
   angle1 += angle2;
-  EXPECT_NEAR(angle1.degrees(), 150.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle1.degrees(), 150.0);
   angle1 -= angle2;
-  EXPECT_NEAR(angle1.degrees(), 90.0, TEST_EPSILON);    
+  EXPECT_DOUBLE_EQ(angle1.degrees(), 90.0);
   angle1 = angle1 - angle2;
-  EXPECT_NEAR(angle1.degrees(), 30.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle1.degrees(), 30.0);
 }
 
 
 TEST(AngleOperators, MultiplyDivide) {
   Isis::Angle angle(30., Isis::Angle::Degrees );
   angle = 2. * angle;
-  EXPECT_NEAR(angle.degrees(), 60.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), 60.0);
   angle *= 2;
-  EXPECT_NEAR(angle.degrees(), 120.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), 120.0);
   angle /= 2;
-  EXPECT_NEAR(angle.degrees(), 60.0, TEST_EPSILON);    
+  EXPECT_DOUBLE_EQ(angle.degrees(), 60.0);
   angle = angle / 2;
-  EXPECT_NEAR(angle.degrees(), 30.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), 30.0);
 }  
 
 
@@ -115,8 +112,7 @@ TEST(AngleOperators, LessThan) {
   Isis::Angle angle2(45.0, Isis::Angle::Degrees );
   EXPECT_TRUE(angle1 < angle2);
   EXPECT_FALSE(angle2 < angle1);
-  Isis::Angle epsilon(1.1920929e-10, Isis::Angle::Degrees);
-  EXPECT_TRUE(angle1 < angle1 + epsilon); 
+  EXPECT_FALSE(angle1 < angle1); 
 }
 
 // Added good and consistent test for "greater than" 
@@ -125,8 +121,7 @@ TEST(AngleOperators, GreaterThan) {
   Isis::Angle angle2(45.0, Isis::Angle::Degrees );
   EXPECT_TRUE(angle2 > angle1);
   EXPECT_FALSE(angle1 > angle2); 
-  Isis::Angle epsilon(1.1920929e-10, Isis::Angle::Degrees);
-  EXPECT_TRUE(angle2 > angle2 - epsilon);
+  EXPECT_FALSE(angle2 > angle2); 
 }
   
 
@@ -147,10 +142,10 @@ TEST(AngleExceptions, LessThanNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator." );
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"));
    }
    catch(...) {
-     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator, but got something else "; 
+     FAIL() << "Expected IException";
    }
 }
     
@@ -162,10 +157,10 @@ TEST(AngleExceptions, NullAngleLessThan){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator." );
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"));
    }
    catch(...) {
-     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator, but got something else "; 
+     FAIL() << "Expected IException";
    }
 }
 
@@ -177,10 +172,10 @@ TEST(AngleExceptions, NullAngleLessThanOrEqual){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator." );
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator."));
    }
    catch(...) {
-     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator, but got something else "; 
+     FAIL() << "Expected IException";
    }
 }
 
@@ -193,10 +188,10 @@ TEST(AngleExceptions, GreaterThanNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator." );
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator"));
    }
    catch(...) {
-     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator, but got something else "; 
+     FAIL() << "Expected IException";
    }
 }
 
@@ -209,10 +204,10 @@ TEST(AngleExceptions, GreaterThanOrEqualToNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator." );
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator."));
    }
    catch(...) {
-     FAIL() << "Expected IException: **PROGRAMMER ERROR** Cannot compare a invalid angles with the > operator, but got something else "; 
+     FAIL() << "Expected IException";
    }
 }
 
@@ -220,38 +215,38 @@ TEST(AngleExceptions, GreaterThanOrEqualToNullAngle){
 TEST(AngleOperators, Multiplication) {
   Isis::Angle angle(30.0, Isis::Angle::Degrees );
   angle = 2.0 * angle; 
-  EXPECT_NEAR(angle.degrees(), 60.0, TEST_EPSILON); 
+  EXPECT_DOUBLE_EQ(angle.degrees(), 60.0);
 }
 
 
 TEST(Angle, wrapValue){
   Isis::Angle angle(30., Isis::Angle::Degrees);
   EXPECT_EQ(angle.unitWrapValue(Isis::Angle::Degrees), 360);
-  EXPECT_NEAR(angle.unitWrapValue(Isis::Angle::Radians), 6.28318531, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.unitWrapValue(Isis::Angle::Radians), 2*Isis::PI);
 }
 
 
 TEST(Angle, setAngleDegrees){
   Isis::Angle angle(0.0, Isis::Angle::Degrees);
   angle.setAngle(60.0, Isis::Angle::Degrees);
-  EXPECT_NEAR(angle.degrees(), 60.0, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.degrees(), 60.0);
 }
 
 
 TEST(Angle, setAngleRadians){
   Isis::Angle angle(0.0, Isis::Angle::Radians);
   angle.setAngle(0.5, Isis::Angle::Radians);
-  EXPECT_NEAR(angle.radians(), 0.5, TEST_EPSILON);
+  EXPECT_DOUBLE_EQ(angle.radians(), 0.5);
 }
 
 
 TEST(Angle, QStringConstructor){
   Isis::Angle angle(QString("-70 15 30.125"));
-  EXPECT_STREQ(angle.toString().toLatin1(), "-70.258368055556 degrees");
+  EXPECT_DOUBLE_EQ(angle.degrees(), -70.258368055556);
   Isis::Angle angle2(QString("  +70  30 11     "));
-  EXPECT_STREQ(angle2.toString().toLatin1(), "70.503055555556 degrees");
+  EXPECT_DOUBLE_EQ(angle2.degrees(), 70.503055555556);
   Isis::Angle angle3(QString("100 00 00"));
-  EXPECT_STREQ(angle3.toString().toLatin1(), "100.0 degrees"); 
+  EXPECT_DOUBLE_EQ(angle3.degrees, 100.0); 
 }
 
 
@@ -263,7 +258,7 @@ TEST(AngleExceptions, InvalidInput){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** [100] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\".");
+     EXPECT_TRUE(e.toString().contains("[100] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\"");
    }
    catch(...) {
      FAIL() << "Expected IException."; 
@@ -279,7 +274,7 @@ TEST(AngleExceptions, InvalidInput2){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** [70 11] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\".");
+     EXPECT_TRUE(e.toString().contains("[70 11] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\"");
    }
    catch(...) {
      FAIL() << "Expected IException."; 
