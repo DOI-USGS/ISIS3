@@ -1,0 +1,295 @@
+#include "Distance.h"
+#include "Displacement.h"
+#include "IException.h" 
+#include "SpecialPixel.h"
+
+#include <gtest/gtest.h>
+
+using namespace Isis;
+
+TEST(DistanceTests, DefaultConstructor) {
+	Distance dist;
+	EXPECT_EQ(dist.meters(), Null);
+	EXPECT_EQ(dist.kilometers(), Null);
+	EXPECT_EQ(dist.pixels(), Null);
+	EXPECT_EQ(dist.solarRadii(), Null);
+}
+
+
+TEST(DistanceTests, MetersConstructor) {
+	Distance dist(1500500, Distance::Meters);
+	EXPECT_EQ(dist.meters(), 1500500);
+	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
+	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+	EXPECT_EQ(dist.pixels(1), 1500500);
+}
+
+
+TEST(DistanceTests, KilometersConstructor) {
+	Distance dist(1500.5, Distance::Kilometers);
+	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
+	EXPECT_EQ(dist.meters(), 1500500);
+	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+	EXPECT_EQ(dist.pixels(1), 1500500);
+}
+
+
+TEST(DistanceTests, SolarRadiiConstructor) {
+	Distance dist(0.002155922, Distance::SolarRadii);
+	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+	EXPECT_FLOAT_EQ(dist.meters(), 1.5005e+06);
+	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
+	EXPECT_FLOAT_EQ(dist.pixels(1), 1.5005e+06);
+}
+
+
+TEST(DistanceTests, PixelsConstructor) {
+	Distance dist(1500500, Distance::Pixels);
+	EXPECT_EQ(dist.pixels(1), 1500500);
+	EXPECT_EQ(dist.meters(), 1500500);
+	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
+	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+}
+
+
+TEST(DistanceTests, PixelsPerMeterConstructor) {
+	Distance dist(1500500, 2);
+	EXPECT_EQ(dist.pixels(2), 1500500);
+	EXPECT_EQ(dist.meters(), 750250);
+	EXPECT_FLOAT_EQ(dist.kilometers(), 750.25);
+	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.0010779609);
+}
+
+
+TEST(DistanceTests, CopyConstructor) {
+	Distance origDist(1500.5, Distance::Meters);
+	Distance copiedDist(origDist);
+	ASSERT_FLOAT_EQ(copiedDist.meters(), 1500.5);
+}
+
+
+TEST(DistanceTests, SetMeters) {
+	Distance dist;
+	dist.setMeters(1500500);
+	ASSERT_EQ(dist.meters(), 1500500);
+}
+
+
+TEST(DistanceTests, SetKilometers) {
+	Distance dist;
+	dist.setKilometers(1500500);
+	ASSERT_EQ(dist.kilometers(), 1500500);
+}
+
+
+TEST(DistanceTests, SetSolarRadii) {
+	Distance dist;
+	dist.setSolarRadii(2);
+	ASSERT_EQ(dist.solarRadii(), 2);
+}
+
+
+TEST(DistanceTests, SetPixels) {
+	Distance dist;
+	dist.setPixels(1500500, 2);
+	ASSERT_EQ(dist.pixels(2), 1500500);
+}
+
+
+TEST(DistanceTests, SetNegativeDistance) {
+	try {
+		Distance dist;
+		dist.setMeters(-1);
+		FAIL() << "Expected error message: Negative distances are not supported";
+	}
+	catch(IException &e) {
+	    EXPECT_TRUE(e.toString().contains("Negative distances are not supported")) 
+	    									<< e.toString().toStdString();
+	}
+	catch(...) {
+	   	FAIL() << "Expected error message: Negative distances are not supported";
+	}
+}
+
+
+// TEST(DistanceTests, ToString) {
+// 	Distance dist(1500500, Distance::Meters);
+// 	ASSERT_EQ(dist.toString(), "1500500 meters");
+// }
+
+
+TEST(DistanceTests, IsValidTrue) {
+	Distance dist(1500500, Distance::Meters);
+	ASSERT_TRUE(dist.isValid());
+}
+
+
+TEST(DistanceTests, IsValidFalse) {
+	Distance dist;
+	ASSERT_FALSE(dist.isValid());
+}
+
+
+//should we do all units?
+TEST(DistanceTests, GreaterThanDifferent) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	EXPECT_TRUE(dist2 > dist1);
+	EXPECT_FALSE(dist1 > dist2);
+}
+
+
+TEST(DistanceTests, GreaterThanEqual) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(10, Distance::Meters);
+	EXPECT_FALSE(dist2 > dist1);
+	EXPECT_FALSE(dist1 > dist2);
+}
+
+
+TEST(DistanceTests, GreaterThanNull) {
+	try {
+		bool value = Distance() < Distance();
+		ASSERT_TRUE(value);
+		FAIL() << "Expected error message: Distance has not been initialized";
+	}
+	catch(IException &e) {
+	    EXPECT_TRUE(e.toString().contains("Distance has not been initialized")) 
+	    									<< e.toString().toStdString();
+	}
+	catch(...) {
+	   	FAIL() << "Expected error message: Distance has not been initialized";
+	}
+}
+
+
+TEST(DistanceTests, LessThanDifferent) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	EXPECT_TRUE(dist1 < dist2);
+	EXPECT_FALSE(dist2 < dist1);
+}
+
+
+TEST(DistanceTests, LessThanEqual) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(10, Distance::Meters);
+	EXPECT_FALSE(dist1 < dist2);
+	EXPECT_FALSE(dist2 < dist1);
+}
+
+
+TEST(DistanceTests, LessThanNull) {
+	try {
+		bool value = Distance() < Distance();
+		ASSERT_TRUE(value);
+		FAIL() << "Expected error message: Distance has not been initialized";
+	}
+	catch(IException &e) {
+	    EXPECT_TRUE(e.toString().contains("Distance has not been initialized")) 
+	    									<< e.toString().toStdString();
+	}
+	catch(...) {
+	   	FAIL() << "Expected error message: Distance has not been initialized";
+	}
+}
+
+
+TEST(DistanceTests, AssignDistance) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	dist1 = dist2;
+	EXPECT_EQ(dist1.meters(), 20);
+}
+
+
+TEST(DistanceTests, Add) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	Distance sum = dist1 + dist2;
+	EXPECT_EQ(sum.meters(), 30);
+}
+
+
+TEST(DistanceTests, SubtractPositive) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	Displacement difference = dist2 - dist1;
+	EXPECT_EQ(difference.meters(), 10);
+}
+
+
+TEST(DistanceTests, SubtractNegative) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	Displacement difference = dist1 - dist2;
+	EXPECT_EQ(difference.meters(), -10);
+}
+
+
+TEST(DistanceTests, DivideDistance) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	EXPECT_EQ(dist2 / dist1, 2);
+}
+
+
+TEST(DistanceTests, DivideDouble) {
+	Distance dist1(10, Distance::Meters);
+	Distance quotient = dist1 / 2;
+	EXPECT_EQ(quotient.meters(), 5);
+}
+
+
+TEST(DistanceTests, Multiply) {
+	Distance dist1(10, Distance::Meters);
+	Distance product = dist1 * 2;
+	EXPECT_EQ(product.meters(), 20);
+}
+
+
+TEST(DistanceTests, AddAssign) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(20, Distance::Meters);
+	dist1 += dist2;
+	EXPECT_EQ(dist1.meters(), 30);
+}
+
+
+TEST(DistanceTests, SubtractAssignPositive) {
+	Distance dist1(10, Distance::Meters);
+	Distance dist2(30, Distance::Meters);
+	dist2 -= dist1;
+	EXPECT_EQ(dist2.meters(), 20);
+}
+
+
+TEST(DistanceTests, SubtractAssignNegative) {
+	try {
+		Distance dist1(10, Distance::Meters);
+		Distance dist2(30, Distance::Meters);
+		dist1 -= dist2;
+		FAIL() << "Expected error message: Negative distances are not supported";
+	}
+	catch(IException &e) {
+	    EXPECT_TRUE(e.toString().contains("Negative distances are not supported")) 
+	    									<< e.toString().toStdString();
+	}
+	catch(...) {
+	   	FAIL() << "Expected error message: Negative distances are not supported";
+	}
+}
+
+
+TEST(DistanceTests, DivideAssign) {
+	Distance dist(10, Distance::Meters);
+	dist /= 2;
+	EXPECT_EQ(dist.meters(), 5);
+}
+
+
+TEST(DistanceTests, MultiplyAssign) {
+	Distance dist(10, Distance::Meters);
+	dist *= 2;
+	EXPECT_EQ(dist.meters(), 20);
+}
