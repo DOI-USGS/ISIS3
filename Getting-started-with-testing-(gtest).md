@@ -6,5 +6,8 @@
 1. Each test case (`TEST()`) should have the form `ClassName, MethodName` or `ClassName_Fixture, MethodName`
 
 Suggestion, when using this:
+
+```
    EXPECT_TRUE(e.toString().contains("PVL Keyword [CenterRingRadius] does not exist in "
                                       "[Group = Mapping]")) << e.toString().toStdString();
+```
