@@ -55,6 +55,7 @@ namespace Isis {
    *   @history 2014-08-21 Jeannie Backer - Modified isValid to utilize the IsValidPixel()
    *                           method in the SpecialPixel header. References #1659.
    *   @history 2017-07-03 Makayla Shepherd - Updated documentation. References #4807.
+   *   @history 2018-11-13 Kristin Berry - Made protected methods public as part of testing refactor.
    */
   class Angle {
 
@@ -260,8 +261,6 @@ namespace Isis {
     void setDegrees(double degrees) { setAngle(degrees, Degrees); }
 
     virtual QString toString(bool includeUnits = true) const;
-
-  protected:
     double unitWrapValue(const Units& unit) const;
     virtual double angle(const Units& unit) const;
     virtual void setAngle(const double &angle, const Units& unit);
