@@ -46,21 +46,21 @@ using namespace std;
 namespace Isis {
 
 /** Default constructor */
-SpkSegment::SpkSegment() : SpiceSegment() {
+SpkSegment::SpkSegment() : SpkSpiceSegment() {
   init();
 }
 
 /** Constructor from ISIS cube file by name of the cube */
-SpkSegment::SpkSegment(const QString &fname, const int spkType) : SpiceSegment() {
+SpkSegment::SpkSegment(const QString &fname, const int spkType) : SpkSpiceSegment() {
   init(spkType);
   Cube cube;
   cube.open(fname);
-  SpiceSegment::init(cube);
+  SpkSpiceSegment::init(cube);
   import(cube);
 }
 
 /** Constructor from ISIS cube object */
-SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpiceSegment(cube) {
+SpkSegment::SpkSegment(Cube &cube, const int spkType) : SpkSpiceSegment(cube) {
   init(spkType);
   import(cube);
 }
@@ -113,7 +113,7 @@ void SpkSegment::import(Cube &cube) {
       spkCache = camera->instrumentPosition()->LoadHermiteCache("SpkSegment");
     }
     else {
-      QString mess = "Unsupported SPK kernel type (" + 
+      QString mess = "Unsupported SPK kernel type (" +
                      QString::number(m_spkType) + ") - must be 9 or 13.";
       throw IException(IException::User, mess, _FILEINFO_);
     }
@@ -318,25 +318,25 @@ QString SpkSegment::getComment() const {
 }
 
 /**
- * @brief Determine if another SPK segment has common time/body coverage 
- *  
- * This method is used to determine if another SPK segment contains some of the 
- * same coverage information as this one.  This is typically a conflict when 
- * creating SPK kernels from a list of files. 
- *  
- * If the body and center codes of the two segments are not the same, this is 
- * allowed even if the times are the same as it indicates different position 
- * data.  If the codes are the same, then if any portion of the segements 
- * contain common times of coverage, then this would indicate one of them would 
- * be hidden in the resulting SPK kernel. 
- *  
- * Using this method, users can determine how to handle common times of 
- * coverage. 
- * 
+ * @brief Determine if another SPK segment has common time/body coverage
+ *
+ * This method is used to determine if another SPK segment contains some of the
+ * same coverage information as this one.  This is typically a conflict when
+ * creating SPK kernels from a list of files.
+ *
+ * If the body and center codes of the two segments are not the same, this is
+ * allowed even if the times are the same as it indicates different position
+ * data.  If the codes are the same, then if any portion of the segements
+ * contain common times of coverage, then this would indicate one of them would
+ * be hidden in the resulting SPK kernel.
+ *
+ * Using this method, users can determine how to handle common times of
+ * coverage.
+ *
  * @author 2014-03-26 Kris Becker
- * 
+ *
  * @param other  Other SpkSegment to check for common coverage
- * 
+ *
  * @return bool True if data represents the same coverage, false otherwise.
  */
 bool SpkSegment::overlaps(const SpkSegment &other) const {
@@ -410,7 +410,7 @@ SpkSegment::SMatrix SpkSegment::load(Table &table) {
 
 void SpkSegment::validateType(const int spktype) const {
   if ( !(( 9 == spktype ) || ( 13 == spktype )) ) {
-    QString mess = "Unsupported SPK kernel type (" + 
+    QString mess = "Unsupported SPK kernel type (" +
                    QString::number(spktype) + ") - must be 9 or 13.";
     throw IException(IException::User, mess, _FILEINFO_);
   }
@@ -418,4 +418,3 @@ void SpkSegment::validateType(const int spktype) const {
 }
 
 };  // namespace Isis
-
