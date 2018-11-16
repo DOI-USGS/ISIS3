@@ -15,9 +15,6 @@ function(add_isis_app folder libDependencies)
   # Get the source and header files
   file(GLOB sources "${folder}/main.cpp")
 
-  message(STATUS "NAME: ${appName}")
-  message(STATUS "APP SOURCE: ${sources}")
-
   # All the XML files need to be copied to the install directory
   # - They also need be put in the source folder for the app tests
   install(FILES ${xmlFiles} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/xml")
@@ -109,9 +106,6 @@ function(add_isis_obj folder reqLibs)
   file(GLOB plugins "${folder}/*.plugin")
 
   list(REMOVE_ITEM sources "${folder}/main.cpp")
-
-  message(STATUS "NAME: ${folderName}")
-  message(STATUS "LIB SOURCE: ${sources}")
 
   # Generate protobuf, ui, and moc files if needed.
   generate_protobuf_files(protoFiles ${folder})
@@ -227,7 +221,6 @@ function(add_isis_module name)
     set(tstFolders ${tstFolders} ${thisTstFolders})
 
   endforeach()
-  message(STATUS "OBJECT FOLDERS: ${objFolders}")
   # Now that we have the library info, call function to add it to the build!
   # - Base module depends on 3rd party libs, other libs also depend on base.
   # - Only the base module gets both a static and shared library.
