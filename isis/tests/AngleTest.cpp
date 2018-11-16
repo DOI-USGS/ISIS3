@@ -142,7 +142,8 @@ TEST(AngleExceptions, LessThanNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"));
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"))
+       << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException";
@@ -157,7 +158,8 @@ TEST(AngleExceptions, NullAngleLessThan){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"));
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"))
+          << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException";
@@ -172,7 +174,8 @@ TEST(AngleExceptions, NullAngleLessThanOrEqual){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator."));
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator."))
+       << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException";
@@ -188,7 +191,8 @@ TEST(AngleExceptions, GreaterThanNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator"));
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator"))
+       << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException";
@@ -204,7 +208,8 @@ TEST(AngleExceptions, GreaterThanOrEqualToNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator."));
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator."))
+       << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException";
@@ -242,11 +247,11 @@ TEST(Angle, setAngleRadians){
 
 TEST(Angle, QStringConstructor){
   Isis::Angle angle(QString("-70 15 30.125"));
-  EXPECT_DOUBLE_EQ(angle.degrees(), -70.258368055556);
+  EXPECT_DOUBLE_EQ(angle.degrees(), -70.25836805555555);
   Isis::Angle angle2(QString("  +70  30 11     "));
-  EXPECT_DOUBLE_EQ(angle2.degrees(), 70.503055555556);
+  EXPECT_DOUBLE_EQ(angle2.degrees(), 70.503055555555562);
   Isis::Angle angle3(QString("100 00 00"));
-  EXPECT_DOUBLE_EQ(angle3.degrees, 100.0); 
+  EXPECT_DOUBLE_EQ(angle3.degrees(), 100.0); 
 }
 
 
@@ -258,7 +263,9 @@ TEST(AngleExceptions, InvalidInput){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("[100] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\"");
+     EXPECT_TRUE(e.toString().contains(
+         "[100] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\""))
+         << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException."; 
@@ -274,7 +281,9 @@ TEST(AngleExceptions, InvalidInput2){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("[70 11] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\"");
+     EXPECT_TRUE(e.toString().contains(
+         "[70 11] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\""))
+         << e.toString().toStdString();
    }
    catch(...) {
      FAIL() << "Expected IException."; 
@@ -290,8 +299,10 @@ TEST(AngleExceptions, InvalidInput3){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_EQ(e.toString().toLatin1(), "**PROGRAMMER ERROR** [this 79 should 00 fail 0.111] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\".");
-   }
+     EXPECT_TRUE(e.toString().contains(
+         "[this 79 should 00 fail 0.111] is not a vaid input to Angle. It needs to be of the form: \"dd mm ss.ss\""))
+         << e.toString().toStdString();
+   } 
    catch(...) {
      FAIL() << "Expected IException."; 
    }
