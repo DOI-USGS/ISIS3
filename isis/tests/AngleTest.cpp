@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+
 TEST(AngleTest, DefaultConstructor) {
   Isis::Angle angle;
   EXPECT_FALSE(angle.isValid());
@@ -307,4 +308,3 @@ TEST(AngleExceptions, InvalidInput3){
      FAIL() << "Expected IException."; 
    }
 }
-
