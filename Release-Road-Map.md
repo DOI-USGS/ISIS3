@@ -1,17 +1,36 @@
-**DRAFT**
+# **DRAFT**
 
-*Road Map*
-Releases and development of ISIS3 follows a time based schedule with a new release occurring every three months. The creation of a release candidate and  
+# Road Map
 
-A new release will happen every three months. In the first two months, new development is taking place in the `dev` branch of our GitHub repository. In the last month, before a release, a feature freeze goes into effect, a release candidate is created from the current `dev` branch, and release / support efforts will focus on testing, release related bug fixes, and release preparation. In the month when the release is being prepared, new development can be occurring in the `dev` branch, but this development will not be included in the release that is being prepared.  At the conclusion of the freeze month, the ISIS3 version number will be incremented and the release will be pushed to our anaconda.org account.
+Releases and development of ISIS3 follows a time based schedule with a new release occurring every three months. Below, we illustrate a sample four month snapshot of software development.
 
-**Development Phase**
-The development phase is a bit of a misnomer as development of new features is always occurring. We identify a two 
+[[images/releaseplanning.png]]
 
-**Feature Freeze**
+At the start of Month 1, a Release Candidate (RC1) is created from the `dev` branch of our GitHub repository. This RC contains all development from the previous (not shown) three months. RC1 is made publicly available as both a labelled branch and via our Anaconda.org (conda) download page. During Month 1, we solicit input and testing from the broader community. Any issues identified in RC1 will be fixed during Month 1. At the conclusion of Month 1, the release is packaged and the next public ISIS3 is made available for the general public.
 
-**Release**
+During Month 1 through Month 3, we continue with new feature development for RC2. At the start of Month 4, we repeat the same release candidate and release process as described above.
 
-**Release Schedule**
+> **NOTE**: We are currently transitioning to this release cadence. For Fiscal Year 19 (Oct18 - Sept19), we will release 2-3 times. In FY20, we will fully adopt the above schedule.
 
-**Download Locations for Dev. and Beta Builds**
+### Feature Freeze
+When a Release Candidate is branch from the `dev` branch a feature freeze is put into effect. Any feature additions that occur after a release candidate has been branched will be included in a future RC (and release). In other words, features added prior to the creation of a RC will be included in the next release. The only instances where this may not hold true is if significant, previously unidentified issues are identified during the testing of a RC that are associated with a new feature addition.
+
+### Release
+As described above, we will release on a three month cadence. Releases will be labelled via GitHub for those users that wish to build from scratch. Additionally, releases will be uploaded to our Anaconda.org account for `conda` installation.
+
+### Release Schedule
+| Version # / Label | Type | Date | 
+|-------------------|------|------------|
+| 3.7.0_RC | Release Candidate | 4.1.19 |
+| 3.7.0 | Release | 4.30.19 |
+| 3.8.0_RC | Release Candidate | 7.1.19 |
+| 3.8.0 | Release | 7.31.19 |
+| 3.9.0_RC | Release Candidate | 10.1.19 |
+| 3.9.0 | Release | 10.31.19 |
+| 3.10.0_RC | Release Candidate | 1.1.20 |
+| 3.10.0 | Release | 1.31.20 |
+| 3.11.0_RC | Release Candidate | 4.1.20 |
+| 3.11.0 | Release | 4.30.20 |
+
+### Download Locations for Dev. and Beta Builds
+We are currently working to deploy continuous integration / continuous deploy (CI/CD) capabilities. Once these are deployed, we will provide download links for nightly and beta builds using our Anaconda.org account for `conda` installation.
