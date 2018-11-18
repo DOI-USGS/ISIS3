@@ -65,6 +65,33 @@ parser.add_argument('-t','--test-dir',
                     default=os.environ['CONDA_PREFIX']+'/testData',
                     help='ISIS3 Test Data Directory, default: %(default)s')
 args=parser.parse_args()
+<<<<<<< HEAD
+=======
+if (data_dir != args.data_dir):
+    os.system("mkdir -p "+args.data_dir)
+    data_dir = args.data_dir
+else:    
+    os.system("mkdir -p "+data_dir)
+
+if (testdata_dir != args.test_dir):
+    os.system("mkdir -p "+args.test_dir)
+    testdata_dir=args.test_dir
+else:
+    os.system("mkdir -p "+testdata_dir)
+
+os.popen('mkdir -p '+isisroot+'/etc/conda/activate.d')
+os.popen('mkdir -p '+isisroot+'/etc/conda/deactivate.d')
+
+os.popen("echo '#!/bin/sh' > "+isisroot+ "/etc/conda/activate.d/env_vars.sh")
+os.popen("echo 'export ISISROOT="+isisroot+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
+os.popen("echo 'export ISIS3DATA="+data_dir+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
+os.popen("echo 'export ISIS3TESTDATA="+testdata_dir+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
+
+os.popen("echo '#!/bin/sh' > "+isisroot+ "/etc/conda/deactivate.d/env_vars.sh")
+os.popen("echo 'unset ISISROOT' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
+os.popen("echo 'unset ISIS3DATA' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
+os.popen("echo 'unset ISIS3TESTDATA' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
+>>>>>>> upstream/dev
 
 # Create the data directories:
 mkdir( args.data_dir )
