@@ -39,16 +39,12 @@ bool observationSettingsComparison(
 }
 
 QDomDocument saveToQDomDocument(BundleSettings &settings) {
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  settings.save(outputWriter, NULL);
 
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
+  QString outputString;
+  QXmlStreamWriter outputWriter(&outputString);
+  settings.save(outputWriter, NULL);
   QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
+  settingsDoc.setContent(outputString);
 
   return settingsDoc;
 }
@@ -104,6 +100,12 @@ class ConvergenceCriteriaTest : public ::testing::TestWithParam<BundleSettings::
   // Intentionally empty
 };
 
+TEST(BundleSettings, DefaultConstructor) {
+  BundleSettings testSettings;
+
+  EXPECT_TRUE(testSettings.validateNetwork());
+}
+
 TEST_P(BoolTest, validateNetwork) {
   BundleSettings testSettings;
   testSettings.setValidateNetwork(GetParam());
@@ -115,7 +117,6 @@ TEST_P(BoolTest, saveValidateNetwork) {
   testSettings.setValidateNetwork(GetParam());
 
   QDomDocument settingsDoc = saveToQDomDocument(testSettings);
-
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -137,17 +138,7 @@ TEST_P(BoolTest, saveOutlierRejection) {
   BundleSettings testSettings;
   testSettings.setOutlierRejection(GetParam());
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -203,17 +194,7 @@ TEST_P(BoolTest, saveSolveOptions) {
   );
   testSettings.setCreateInverseMatrix(GetParam());
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -274,17 +255,7 @@ TEST_P(BoolTest, saveCoordinateTypes) {
   );
   testSettings.setCreateInverseMatrix(GetParam());
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -378,17 +349,7 @@ TEST(BundleSettings, saveGlobalSigmas) {
         32.0
   );
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -425,17 +386,7 @@ TEST(BundleSettings, saveBadGlobalSigmas) {
         -32.0
   );
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -485,17 +436,7 @@ TEST_F(BundleSettings_ObservationTest, observationSolveSettings) {
 }
 
 TEST_F(BundleSettings_ObservationTest, saveObservationSolveSettings) {
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
   QDomElement observationSolveSettingsList = root.firstChildElement("observationSolveSettingsList");
   ASSERT_FALSE(observationSolveSettingsList.isNull());
@@ -530,17 +471,7 @@ TEST_P(ConvergenceCriteriaTest, saveConvergenceCriteria) {
   );
   testSettings.setCreateInverseMatrix(GetParam());
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -693,17 +624,7 @@ TEST(BundleSettings, saveMaximumLikelyhoodModels) {
   QList< QPair< MaximumLikelihoodWFunctions::Model, double > > functions =
       testSettings.maximumLikelihoodEstimatorModels();
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
@@ -741,17 +662,7 @@ TEST(BundleSettings, SaveOutputFilePrefix) {
   QString testPrefix("test/file/prefix");
   testSettings.setOutputFilePrefix(testPrefix);
 
-  QByteArray outputBytes;
-  QBuffer outputBuffer(&outputBytes);
-  outputBuffer.open(QIODevice::WriteOnly);
-  QXmlStreamWriter outputWriter(&outputBuffer);
-  testSettings.save(outputWriter, NULL);
-
-  outputBuffer.close();
-  outputBuffer.open(QIODevice::ReadOnly);
-  QDomDocument settingsDoc("settings_doc");
-  settingsDoc.setContent(&outputBuffer);
-
+  QDomDocument settingsDoc = saveToQDomDocument(testSettings);
   QDomElement root = settingsDoc.documentElement();
 
   QDomElement globalSettings = root.firstChildElement("globalSettings");
