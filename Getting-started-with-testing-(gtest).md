@@ -3,7 +3,7 @@
 ## Creating a test suite for a class
 1. Create a new file `ClassNameTests.cpp` in `isis/tests/`.
 1. Add `#include <gtest/gtest.h>` to the file
-1. Each test case should have the form `TEST(ClassName, MethodName)`. This produces a ctest test called `ClassName.MethodName`
+1. Each test case should have the form `TEST(ClassName, MethodName)`. This produces a ctest test called `ClassName.MethodName`. For example, `TEST(BundleSettings, DefaultConstructor)` produces a ctest test called `BundleSettings.DefaultConstructor`.
 
 ## Test Fixtures
 Because each test case is a completely fresh environment, there is often set-up code that is shared between multiple test cases. You can use a test fixture to avoid copying and pasting this set-up code multiple times. See the [gtest documentation](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md#test-fixtures-using-the-same-data-configuration-for-multiple-tests) for how to create and use fixtures in gtest.
