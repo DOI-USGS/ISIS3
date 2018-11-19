@@ -15,7 +15,8 @@ For the rest of this document we will use `appname` as the name of the applicati
 1. In the `appname` folder create two new files, `AppNameFunc.cpp` and `AppNameFunc.h`. These files are where the application logic will live.
 1. In `AppNameFunc.h` and `AppNameFunc.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`.
 1. Copy the contents of `IsisMain` in `main.cpp` into the new function.
-1. Put all of the required includes in `AppNameFunc.cpp`. The only include in `AppNameFunc.h` should be `include "UserInterface.h"`.
+1. Copy any helper functions or global variables from `main.cpp` into `AppNameFunc.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols, forward declare any helper function in `AppNameFunc.cpp` and do not define them in `AppNameFunc.h`.
+1. Put all of the required includes in `AppNameFunc.cpp` and `AppNameFunc.h`.
 1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
 1. In `main.ccp`, put the following
 
@@ -54,3 +55,7 @@ void IsisMain() {
   }
 }
 ```
+
+## Creating a more complex callable function
+
+The basic interface that we've created so far is simply a mirror of the application command line interface. In order to further improve the testability of the application, we should break the application down into 
