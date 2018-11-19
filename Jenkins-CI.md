@@ -11,9 +11,11 @@ The labels above tell the Jenkins server that you want to create your agent usin
 
 These files are automatically pulled and built for DockerHub whenever new changes are made. Their images can be found here: [link](https://hub.docker.com/r/usgsastro/docker_linux_isisdeps/)
 
+These images are built with some system library dependencies of ISIS and an install of miniconda.
+
 # Jenkins Pipeline
 
-Most of the build process is specified in a groovy script: https://github.com/chrisryancombs/isis3_cmake/blob/cmake/isis/Jenkinsfile
+Most of the build process is specified in a groovy script: https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Jenkinsfile
 
 Refer to this for syntax: https://jenkins.io/doc/book/pipeline/syntax/
 
