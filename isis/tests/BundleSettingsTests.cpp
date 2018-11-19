@@ -74,6 +74,36 @@ class BundleSettings_ObservationTest : public ::testing::Test {
    }
 };
 
+class BundleSettings_NotDefault : public ::testing::Test {
+  protected:
+    BundleSettings testSettings;
+
+    void SetUp() override {
+      BundleSettings testSettings;
+      testSettings.setSolveOptions(
+            true, true, true, true,
+            SurfacePoint::Rectangular, SurfacePoint::Rectangular,
+            0.1,
+            0.25,
+            0.3);
+      testSettings.setValidateNetwork(true);
+      testSettings.setOutlierRejection(true, 5.0);
+      testSettings.setCreateInverseMatrix(true);
+      QList<BundleObservationSolveSettings> emptySolveSettings;
+      testSettings.setObservationSolveOptions(emptySolveSettings);
+      testSettings.setConvergenceCriteria(
+            BundleSettings::ParameterCorrections,
+            10,
+            5);
+      testSettings.addMaximumLikelihoodEstimatorModel(
+            MaximumLikelihoodWFunctions::Huber,
+            75.0);
+      BundleTargetBodyQsp testTarget(new BundleTargetBody);
+      testSettings.setBundleTargetBody(testTarget);
+      testSettings.setOutputFilePrefix("test/path");
+   }
+};
+
 class MockBundleTargetBody : public BundleTargetBody {
   public:
     MOCK_METHOD0(numberParameters, int());
@@ -104,6 +134,113 @@ TEST(BundleSettings, DefaultConstructor) {
   BundleSettings testSettings;
 
   EXPECT_TRUE(testSettings.validateNetwork());
+
+  EXPECT_FALSE(testSettings.createInverseMatrix());
+  EXPECT_FALSE(testSettings.solveObservationMode());
+  EXPECT_FALSE(testSettings.solveRadius());
+  EXPECT_FALSE(testSettings.updateCubeLabel());
+  EXPECT_FALSE(testSettings.errorPropagation());
+  EXPECT_FALSE(testSettings.outlierRejection());
+
+  EXPECT_EQ(3.0, testSettings.outlierRejectionMultiplier());
+
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord1AprioriSigma());
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord2AprioriSigma());
+  EXPECT_EQ(Isis::Null, testSettings.globalPointCoord3AprioriSigma());
+
+  EXPECT_EQ(BundleSettings::Sigma0, testSettings.convergenceCriteria());
+  EXPECT_EQ(1.0e-10, testSettings.convergenceCriteriaThreshold());
+  EXPECT_EQ(50, testSettings.convergenceCriteriaMaximumIterations());
+
+  EXPECT_TRUE(testSettings.maximumLikelihoodEstimatorModels().isEmpty());
+
+  EXPECT_FALSE(testSettings.solveTargetBody());
+  EXPECT_FALSE(testSettings.solvePoleRA());
+  EXPECT_FALSE(testSettings.solvePoleRAVelocity());
+  EXPECT_FALSE(testSettings.solvePoleDec());
+  EXPECT_FALSE(testSettings.solvePoleDecVelocity());
+  EXPECT_FALSE(testSettings.solvePM());
+  EXPECT_FALSE(testSettings.solvePMVelocity());
+  EXPECT_FALSE(testSettings.solvePMAcceleration());
+  EXPECT_FALSE(testSettings.solveTargetBody());
+  EXPECT_FALSE(testSettings.solveMeanRadius());
+  EXPECT_EQ(0, testSettings.numberTargetBodyParameters());
+
+  EXPECT_EQ(1, testSettings.numberSolveSettings());
+
+  EXPECT_EQ(SurfacePoint::Latitudinal, testSettings.controlPointCoordTypeReports());
+  EXPECT_EQ(SurfacePoint::Latitudinal, testSettings.controlPointCoordTypeBundle());
+
+  EXPECT_EQ("", testSettings.outputFilePrefix());
+}
+
+TEST_F(BundleSettings_NotDefault, CopyConstructor) {
+  BundleSettings copySettings(testSettings);
+
+  EXPECT_EQ(testSettings.validateNetwork(), copySettings.validateNetwork());
+
+  EXPECT_EQ(testSettings.createInverseMatrix(), copySettings.createInverseMatrix());
+  EXPECT_EQ(testSettings.solveObservationMode(), copySettings.solveObservationMode());
+  EXPECT_EQ(testSettings.solveRadius(), copySettings.solveRadius());
+  EXPECT_EQ(testSettings.updateCubeLabel(), copySettings.updateCubeLabel());
+  EXPECT_EQ(testSettings.errorPropagation(), copySettings.errorPropagation());
+  EXPECT_EQ(testSettings.outlierRejection(), copySettings.outlierRejection());
+
+  EXPECT_EQ(testSettings.outlierRejectionMultiplier(), copySettings.outlierRejectionMultiplier());
+
+  EXPECT_EQ(testSettings.globalPointCoord1AprioriSigma(), copySettings.globalPointCoord1AprioriSigma());
+  EXPECT_EQ(testSettings.globalPointCoord2AprioriSigma(), copySettings.globalPointCoord2AprioriSigma());
+  EXPECT_EQ(testSettings.globalPointCoord3AprioriSigma(), copySettings.globalPointCoord3AprioriSigma());
+
+  EXPECT_EQ(testSettings.convergenceCriteria(), copySettings.convergenceCriteria());
+  EXPECT_EQ(testSettings.convergenceCriteriaThreshold(), copySettings.convergenceCriteriaThreshold());
+  EXPECT_EQ(testSettings.convergenceCriteriaMaximumIterations(), copySettings.convergenceCriteriaMaximumIterations());
+
+  EXPECT_EQ(testSettings.maximumLikelihoodEstimatorModels(), copySettings.maximumLikelihoodEstimatorModels());
+
+  EXPECT_EQ(testSettings.numberSolveSettings(), copySettings.numberSolveSettings());
+
+  EXPECT_EQ(testSettings.controlPointCoordTypeReports(), copySettings.controlPointCoordTypeReports());
+  EXPECT_EQ(testSettings.controlPointCoordTypeBundle(), copySettings.controlPointCoordTypeBundle());
+
+  EXPECT_EQ(testSettings.outputFilePrefix(), copySettings.outputFilePrefix());
+
+  EXPECT_EQ(testSettings.bundleTargetBody(), copySettings.bundleTargetBody());
+}
+
+TEST_F(BundleSettings_NotDefault, Assignment) {
+  BundleSettings assignedSettings;
+  assignedSettings = testSettings;
+
+  EXPECT_EQ(testSettings.validateNetwork(), assignedSettings.validateNetwork());
+
+  EXPECT_EQ(testSettings.createInverseMatrix(), assignedSettings.createInverseMatrix());
+  EXPECT_EQ(testSettings.solveObservationMode(), assignedSettings.solveObservationMode());
+  EXPECT_EQ(testSettings.solveRadius(), assignedSettings.solveRadius());
+  EXPECT_EQ(testSettings.updateCubeLabel(), assignedSettings.updateCubeLabel());
+  EXPECT_EQ(testSettings.errorPropagation(), assignedSettings.errorPropagation());
+  EXPECT_EQ(testSettings.outlierRejection(), assignedSettings.outlierRejection());
+
+  EXPECT_EQ(testSettings.outlierRejectionMultiplier(), assignedSettings.outlierRejectionMultiplier());
+
+  EXPECT_EQ(testSettings.globalPointCoord1AprioriSigma(), assignedSettings.globalPointCoord1AprioriSigma());
+  EXPECT_EQ(testSettings.globalPointCoord2AprioriSigma(), assignedSettings.globalPointCoord2AprioriSigma());
+  EXPECT_EQ(testSettings.globalPointCoord3AprioriSigma(), assignedSettings.globalPointCoord3AprioriSigma());
+
+  EXPECT_EQ(testSettings.convergenceCriteria(), assignedSettings.convergenceCriteria());
+  EXPECT_EQ(testSettings.convergenceCriteriaThreshold(), assignedSettings.convergenceCriteriaThreshold());
+  EXPECT_EQ(testSettings.convergenceCriteriaMaximumIterations(), assignedSettings.convergenceCriteriaMaximumIterations());
+
+  EXPECT_EQ(testSettings.maximumLikelihoodEstimatorModels(), assignedSettings.maximumLikelihoodEstimatorModels());
+
+  EXPECT_EQ(testSettings.numberSolveSettings(), assignedSettings.numberSolveSettings());
+
+  EXPECT_EQ(testSettings.controlPointCoordTypeReports(), assignedSettings.controlPointCoordTypeReports());
+  EXPECT_EQ(testSettings.controlPointCoordTypeBundle(), assignedSettings.controlPointCoordTypeBundle());
+
+  EXPECT_EQ(testSettings.outputFilePrefix(), assignedSettings.outputFilePrefix());
+
+  EXPECT_EQ(testSettings.bundleTargetBody(), assignedSettings.bundleTargetBody());
 }
 
 TEST_P(BoolTest, validateNetwork) {
