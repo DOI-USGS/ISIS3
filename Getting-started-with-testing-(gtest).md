@@ -2,7 +2,8 @@
 
 ## Creating a test suite for a class
 1. Create a new file `ClassNameTests.cpp` in `isis/tests/`.
-1. Add `#include <gtest/gtest.h>` to the file
+1. Add `#include <gtest/gtest.h>` to the file.
+1. Write your test cases.
 1. Each test case should have the form `TEST(ClassName, MethodName)`. This produces a ctest test called `ClassName.MethodName`. For example, `TEST(BundleSettings, DefaultConstructor)` produces a ctest test called `BundleSettings.DefaultConstructor`.
 
 ## Test Fixtures
