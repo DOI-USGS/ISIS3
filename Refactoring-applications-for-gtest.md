@@ -18,6 +18,7 @@ For the rest of this document we will use `appname` as the name of the applicati
 1. Put all of the required includes in `AppNameFunc.cpp`. The only include in `AppNameFunc.h` should be `include "UserInterface.h"`.
 1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
 1. In `main.ccp`, put the following
+
 ```
 #include "Isis.h"
 
@@ -29,5 +30,27 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   appname(ui);
+}
+```
+
+### If your application uses `Application::Log()`
+Due to how the Application singleton works, calling `Application::Log()` outside of an actual ISIS application currently causes a segmentation fault. To avoid this, modify the new `appname` function to return a Pvl that contains all of the PvlGroups that need to be logged. Then, change your `main.cpp` to
+
+```
+#include "Isis.h"
+
+#include "Application.h"
+#include "Pvl.h"
+#include "UserInterface.h"
+#include "AppNameFunc.h"
+
+using namespace Isis;
+
+void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+  Pvl results = appname(ui);
+  for (int resultIndex = 0; resultIndex < results.groups(); resultIndex++) {
+    Application::Log(results.group(resultIndex));
+  }
 }
 ```
