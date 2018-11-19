@@ -1,10 +1,15 @@
-# Jenkins Job Config
+# Docker Container Specs
 
-Current Config: http://astro-ci.wr.usgs.gov/job/ISIS3_cmake/configure
+To specify a container for use in a Jenkins pipeline, label your agent with one of the following: 
 
-At the moment, we only use this to specify the repo settings.
+* isis-fedora-25
+* isis-ubuntu-1804
+* isis-debian-9
+* isis-centos-7
 
-Future plans: pull request builder, test data specifications
+The labels above tell the Jenkins server that you want to create your agent using a USGS-Astrogeology Docker image. We currently maintain containers specs for building isis on the systems listed above. Their Dockerfiles can be found here: [link](https://github.com/USGS-Astrogeology/docker_linux_isisdeps/tree/master/jenkins)
+
+These files are automatically pulled and built for DockerHub whenever new changes are made. Their images can be found here: [link](https://hub.docker.com/r/usgsastro/docker_linux_isisdeps/)
 
 # Jenkins Pipeline
 
@@ -25,12 +30,6 @@ Here are a few small details on its quirks:
 # Test Data Specifications
 
 Looking into this. Want to see if there is a good plugin to parse a pr's description, or just use some cleverness with git show: https://git-scm.com/docs/git-show
-
-# Incremental Builds
-
-At the moment, we can allow an early version of incremental builds by replacing the source directory then reconfiguring and and building. Cmake finds the dependency chains and builds them.
-
-There are plans to implement a better version of this using Maven in the future.
 
 # Adding Machines to the Swarm
 
