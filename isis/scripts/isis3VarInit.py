@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""This program builds shell scripts that define ISIS3 environment variables during conda environment activation and deactivation, and creates some directories."""
 
 import argparse
 import os
@@ -6,8 +7,10 @@ import sys
 
 ##########################################################################################################
 #
-#  This work is free of known copyright restrictions.  USGS-authored or produced data, 
-#  information, and software are in the public domain.
+#  This work is free and unencumbered software released into the public domain.
+#  In jurisdictions that recognize copyright laws, the author or authors
+#  of this software dedicate any and all copyright interest in the
+#  software to the public domain.
 #
 #
 #   Description:  This program builds the shell scripts that define the 
@@ -30,13 +33,10 @@ import sys
 #                     required anyway.
 #
 #       Author:  Ross Beyer
-#       Date:    2018-11-
+#       Date:    2018-11-19
 #       Description: Streamlined the program, improved documentation, and made the directory and
 #                    file creation more `pythonic' rather than using system calls.
-#       To the extent possible under law, Ross Beyer has waived all copyright and related or 
-#       neighboring rights to his contribution to this file.  This work is published from
-#       the United States.
-#   
+#
 #
 ##########################################################################################################
 
@@ -56,7 +56,7 @@ def mkdir( p ):
 
 
 # Set up and then parse the command line:
-parser = argparse.ArgumentParser( description='This program builds shell scripts that define ISIS3 environment variables during conda environment activation and deactivation, and creates some directories.' )
+parser = argparse.ArgumentParser( description=__doc__ )
 
 parser.add_argument('-d','--data-dir', 
                     default=os.environ['CONDA_PREFIX']+'/data',
@@ -65,33 +65,7 @@ parser.add_argument('-t','--test-dir',
                     default=os.environ['CONDA_PREFIX']+'/testData',
                     help='ISIS3 Test Data Directory, default: %(default)s')
 args=parser.parse_args()
-<<<<<<< HEAD
-=======
-if (data_dir != args.data_dir):
-    os.system("mkdir -p "+args.data_dir)
-    data_dir = args.data_dir
-else:    
-    os.system("mkdir -p "+data_dir)
 
-if (testdata_dir != args.test_dir):
-    os.system("mkdir -p "+args.test_dir)
-    testdata_dir=args.test_dir
-else:
-    os.system("mkdir -p "+testdata_dir)
-
-os.popen('mkdir -p '+isisroot+'/etc/conda/activate.d')
-os.popen('mkdir -p '+isisroot+'/etc/conda/deactivate.d')
-
-os.popen("echo '#!/bin/sh' > "+isisroot+ "/etc/conda/activate.d/env_vars.sh")
-os.popen("echo 'export ISISROOT="+isisroot+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
-os.popen("echo 'export ISIS3DATA="+data_dir+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
-os.popen("echo 'export ISIS3TESTDATA="+testdata_dir+"' >>"+isisroot+"/etc/conda/activate.d/env_vars.sh")
-
-os.popen("echo '#!/bin/sh' > "+isisroot+ "/etc/conda/deactivate.d/env_vars.sh")
-os.popen("echo 'unset ISISROOT' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
-os.popen("echo 'unset ISIS3DATA' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
-os.popen("echo 'unset ISIS3TESTDATA' >>"+isisroot+"/etc/conda/deactivate.d/env_vars.sh")
->>>>>>> upstream/dev
 
 # Create the data directories:
 mkdir( args.data_dir )
