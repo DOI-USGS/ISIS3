@@ -1,5 +1,3 @@
-:building_construction:
-
 ## Creating a test suite for a class
 1. Create a new file `ClassNameTests.cpp` in `isis/tests/`.
 1. Add `#include <gtest/gtest.h>` to the file.
