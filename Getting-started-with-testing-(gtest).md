@@ -51,7 +51,9 @@ We use gtest as our unit testing framework, but use ctest to actually run the te
 
 ### Parameterized tests
 ```
-TEST_P(Foo, Bar)
+TEST_P(Foo, Bar) {
+...
+}
 INSTANTIATE_TEST_CASE_P(
       Baz,
       Foo,
