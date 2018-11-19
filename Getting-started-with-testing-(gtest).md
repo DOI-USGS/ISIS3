@@ -30,6 +30,19 @@ Be sure to choose a substring of the exception message that will uniquely identi
 
 Normally, if the error message does not contain the substring, gtest will only output the the expression evaluated to false. To make the failure message more helpful, we add `<< e.toString().toStdString()` which outputs the full error message if the test fails.
 
+## Test parameterization
+If the same process needs to be run with several different inputs, it can be easily automated via [value-parameterized tests](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#value-parameterized-tests). In order to maintain test naming conventions, when you call the `INSTANTIATE_TEST_CASE_P` macro make sure the first parameter is. `ClassName`. For example
+
+```
+INSTANTIATE_TEST_CASE_P(
+      BundleSettings,
+      ConvergenceCriteriaTest,
+      ::testing::Values(BundleSettings::Sigma0, BundleSettings::ParameterCorrections)
+);
+```
+
+will ensure that the tests start with `BundleSettings`.
+
 ## Helpful documentation
 * [gtest primer](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md) : It is highly recommended that you read over the primer if you are not familiar with gtest.
 * [Advanced gtest](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md) : This document covers a wide range of advanced options for testing tricky logic and customizing test output.
