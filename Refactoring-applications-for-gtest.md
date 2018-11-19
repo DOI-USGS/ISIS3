@@ -13,7 +13,7 @@ This is a first step towards several places:
 For the rest of this document we will use `appname` as the name of the application that is being worked on. `AppName` will also be used as the upper camel case version of the application name.
 
 1. In the `appname` folder create two new files, `AppNameFunc.cpp` and `AppNameFunc.h`. These files are where the application logic will live.
-1. In `AppNameFunc.h` and `AppNameFunc.cpp` create a new method in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`.
+1. In `AppNameFunc.h` and `AppNameFunc.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`.
 1. Copy the contents of `IsisMain` in `main.cpp` into the new function.
 1. Put all of the required includes in `AppNameFunc.cpp`. The only include in `AppNameFunc.h` should be `include "UserInterface.h"`.
 1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
