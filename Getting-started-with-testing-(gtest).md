@@ -12,15 +12,24 @@ Because each test case is a completely fresh environment, there is often set-up 
 In order to conform to our test case naming conventions, all test fixtures need to be named `ClassName_FixtureName`. For example, a fixture that sets up a BundleSettings object in a not-default state for the BundleSettings unit test could be called `BundleSettings_NotDefault`.
 
 ## Testing exceptions
-
-1. For testing exceptions, use something like the following: 
+Testing for exception throws in gtest can be rather convoluted. Through testing and looking at what others have done, we have settled on using the following setup to test an exception throw:
 
 ```
-   EXPECT_TRUE(e.toString().contains("PVL Keyword [CenterRingRadius] does not exist in "
-                                      "[Group = Mapping]")) << e.toString().toStdString();
+try {
+  // Code that should throw an IException
+  FAIL() << "Expected an exception to be thrown";
+}
+catch(IException &e) {
+  EXPECT_TRUE(e.toString().toLatin1().contains("Substring of the expected exception message"));
+}
+catch(...) {
+  FAIL() << "Expected an IExcpetion with message message: \"The full expected exception message.\"";
+}
 ```
 
-The `<< e.toString().toStdString()` provides a more helpful error message if the test fails.
+Be sure to choose a substring of the exception message that will uniquely identify it, but only use parts of the string identified in the actual code. Anything like `**USER ERROR**` or `in IsisAml.cpp at 1613` that are added based on user preference settings should not be included in the substring. The IException and Preferences classes test that these are properly added onto the error messages.
+
+Normally, if the error message does not contain the substring, gtest will only output the the expression evaluated to false. To make the failure message more helpful, we add `<< e.toString().toStdString()` which outputs the full error message if the test fails.
 
 ## Helpful Documentation
 * [gtest primer](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md) : It is highly recommended that you read over the primer if you are not familiar with gtest.
