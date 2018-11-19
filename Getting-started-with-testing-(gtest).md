@@ -35,11 +35,32 @@ If the same process needs to be run with several different inputs, it can be eas
 INSTANTIATE_TEST_CASE_P(
       BundleSettings,
       ConvergenceCriteriaTest,
-      ::testing::Values(BundleSettings::Sigma0, BundleSettings::ParameterCorrections)
-);
+      ::testing::Values(BundleSettings::Sigma0, BundleSettings::ParameterCorrections));
 ```
 
 will ensure that the tests start with `BundleSettings`.
+
+## Test names
+We use gtest as our unit testing framework, but use ctest to actually run the tests. ctest will generate a test name from each test case defined in your unit test. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
+
+### Basic tests
+`TEST(Foo, Bar)` will produce the test `Foo.Bar`.
+
+### Test fixtures
+`TEST_F(Foo, Bar)` will also produce the test `Foo.Bar`.
+
+### Parameterized tests
+```
+TEST_P(Foo, Bar)
+INSTANTIATE_TEST_CASE_P(
+      Baz,
+      Foo,
+      ::testing::Values(T x, T y, T z));
+```
+will produce 3 different tests that are named
+1. `Baz/Foo.Bar/x`
+1. `Baz/Foo.Bar/y`
+1. `Baz/Foo.Bar/z`
 
 ## Helpful documentation
 * [gtest primer](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md) : It is highly recommended that you read over the primer if you are not familiar with gtest.
