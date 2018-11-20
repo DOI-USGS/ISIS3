@@ -134,6 +134,20 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
       <li>A quality graphics card</li>
     </ul>
 
+    <p>To build and compile ISIS3 requires following the instructions listed below, which are given on
+   the GitHub wiki page for the ISIS3 project:
+  <ul>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#getting-started-with-github">Getting Started With GitHub</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3">Building ISIS3 With cmake</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#new-environmental-variable-meanings">New ISIS3 environmental variables and their meanings</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#custom-data-and-test-data-directories">Custom data and test directories</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#cleaning-builds">Cleaning builds</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects">Building individual applications/objects</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation">Building ISIS3 documentation</a></li>
+    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems">What to do if you encounter any problems</a></li>
+  </ul>
+</p>
+
 
 <A NAME="RunningOnWindows"> </A>
 <h3>Running ISIS3 on Windows 10</h3>
@@ -190,19 +204,7 @@ is a popular choice and may be downloaded below.
    if you are only working with a particular target body.
    </p>
 
-<p>To build and compile ISIS3 requires following the instructions listed below, which are given on
-   the GitHub wiki page for the ISIS3 project:
-  <ul>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#getting-started-with-github">Getting Started With GitHub</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-isis3">Building ISIS3 With cmake</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#new-environmental-variable-meanings">New ISIS3 environmental variables and their meanings</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#custom-data-and-test-data-directories">Custom data and test directories</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#cleaning-builds">Cleaning builds</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-individual-isis3-applicationsobjects">Building individual applications/objects</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#building-isis3-documentation">Building ISIS3 documentation</a></li>
-    <li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Building-ISIS3-with-cmake#problems">What to do if you encounter any problems</a></li>
-  </ul>
-</p>
+
 
 <A NAME="ISIS3DataDownload"></A>
 <h3>Full ISIS3 Data Download</h3>
