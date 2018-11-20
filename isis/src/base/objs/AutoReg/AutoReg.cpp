@@ -671,9 +671,11 @@ namespace Isis {
     // Before we attempt to apply the reduction factor, we need to make sure
     // we won't produce a chip of a bad size.
     // ----------------------------------------------------------------------
-    if(gradientPatternChip.Samples() / p_reduceFactor < 2 || gradientPatternChip.Lines() / p_reduceFactor < 2) {
-      string msg = "Reduction factor is too large";
-      throw IException(IException::User, msg, _FILEINFO_);
+    if (p_reduceFactor != 1) {
+      if(gradientPatternChip.Samples() / p_reduceFactor < 2 || gradientPatternChip.Lines() / p_reduceFactor < 2) {
+        string msg = "Reduction factor is too large";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
     }
 
     // Establish the center search tack point as best pixel to start for the
@@ -852,15 +854,21 @@ namespace Isis {
       if (!window.IsValid(100.0 * 2.1 / 3.0)) {
         p_surfaceModelNotEnoughValidDataCount++;
         p_registrationStatus = SurfaceModelNotEnoughValidData;
+        p_chipSample = p_bestSamp;
+        p_chipLine = p_bestLine;
         return SurfaceModelNotEnoughValidData;
       }
 
       // Now that we know we have enough data to model the surface we call
       // SetSubpixelPosition() to get the sub-pixel accuracy we are looking for.
       bool computedSubPixel = SetSubpixelPosition(window);
-      if (!computedSubPixel)
-        return p_registrationStatus;
-
+      if (!computedSubPixel) {
+        p_chipSample = p_bestSamp;
+        p_chipLine = p_bestLine;
+        p_registrationStatus = SurfaceModelSolutionInvalid;
+        return SurfaceModelSolutionInvalid;
+      }
+      
       // See if the surface model solution moved too far from our whole pixel
       // solution
       p_sampMovement = fabs(p_bestSamp - p_chipSample);
@@ -870,18 +878,20 @@ namespace Isis {
 
         p_surfaceModelDistanceInvalidCount++;
         p_registrationStatus = SurfaceModelDistanceInvalid;
+        p_chipSample = p_bestSamp;
+        p_chipLine = p_bestLine;
         return SurfaceModelDistanceInvalid;
       }
 
       p_registrationStatus = SuccessSubPixel;
+      return SuccessSubPixel;
     }
     else {
       p_chipSample = p_bestSamp;
       p_chipLine = p_bestLine;
       p_registrationStatus = SuccessPixel;
+      return SuccessPixel;
     }
-
-    return p_registrationStatus;
   }
 
 
@@ -1320,3 +1330,4 @@ namespace Isis {
     return reg;
   }
 }
+

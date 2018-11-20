@@ -42,8 +42,8 @@ namespace Isis {
   class Target;
 
   /**
-   * This class is used to represent a target body in a bundle and how to solve for it. 
-   *  
+   * This class is used to represent a target body in a bundle and how to solve for it.
+   *
    * @ingroup ControlNetworks
    *
    * @author 2015-05-15 Ken Edmundson
@@ -59,6 +59,8 @@ namespace Isis {
    *   @history 2016-08-23 Ian Humphrey - The applyParameterCorrections() method now throws its
    *                           last exception. Updated unit test to test that exception.
    *                           Fixes #4153.
+   *   @history 2018-11-13 Jesse Mapel - Made methods used by BundleSettings virtual
+   *                           so they can be override by mock testing objects.
    */
   class BundleTargetBody {
 
@@ -67,13 +69,13 @@ namespace Isis {
       BundleTargetBody();                            // default
       BundleTargetBody(Target *target);
       BundleTargetBody(const BundleTargetBody &src); // copy
-      ~BundleTargetBody();
+      virtual ~BundleTargetBody();
 
       BundleTargetBody &operator=(const BundleTargetBody &src);
 
       //! Enumeration that defines how to solve for target radii.
       enum TargetRadiiSolveMethod {
-        None = 0,                  //!< Solve for none. 
+        None = 0,                  //!< Solve for none.
         Mean = 1,                  //!< Solve for mean radius.
         All  = 2                   //!< Solve for all radii.
       };
@@ -141,23 +143,23 @@ namespace Isis {
       QString formatWDotAdjustedSigmaString(int fieldWidth, int precision) const;
       QString formatRadiusAdjustedSigmaString(int fieldWidth, int precision) const;
 
-      bool solvePoleRA();
-      bool solvePoleRAVelocity();
-      bool solvePoleRAAcceleration();
-      bool solvePoleDec();
-      bool solvePoleDecVelocity();
-      bool solvePoleDecAcceleration();
-      bool solvePM();
-      bool solvePMVelocity();
-      bool solvePMAcceleration();
-      bool solveTriaxialRadii();
-      bool solveMeanRadius();
+      virtual bool solvePoleRA();
+      virtual bool solvePoleRAVelocity();
+      virtual bool solvePoleRAAcceleration();
+      virtual bool solvePoleDec();
+      virtual bool solvePoleDecVelocity();
+      virtual bool solvePoleDecAcceleration();
+      virtual bool solvePM();
+      virtual bool solvePMVelocity();
+      virtual bool solvePMAcceleration();
+      virtual bool solveTriaxialRadii();
+      virtual bool solveMeanRadius();
 
 //      int numberPoleParameters();
 //      int numberW0Parameters();
 //      int numberWDotParameters();
       int numberRadiusParameters();
-      int numberParameters();
+      virtual int numberParameters();
 
       void applyParameterCorrections(LinearAlgebra::Vector corrections);
 
