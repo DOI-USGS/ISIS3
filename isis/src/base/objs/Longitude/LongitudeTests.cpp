@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Longitude.h"
+#include "SpecialPixel.h" // grab this for isis null?
 
 using namespace Isis;
 
@@ -8,33 +9,33 @@ using namespace Isis;
 // Default constructor
 TEST(Longitude, DefaultConstructor) {
   Longitude lon;
-  EXPECT_EQ(Isis:Null, lon.degrees);    
+  EXPECT_EQ(Isis::Null, lon.degrees());    
 }
 
 // Constructor given a value in degrees
 TEST(Longitude, DegreesConstructor) {
   Longitude lon(180.0, Angle::Degrees);
-  EXPECT_EQ(180, lon.degrees);    
+  EXPECT_EQ(180, lon.degrees());    
 }
 
 // Constructor given a positive west value in degrees
 TEST(Longitude, PositiveWest) {
   Longitude lon(180.0, Angle::Degrees, Longitude::PositiveWest);
-  EXPECT_EQ(180, lon.degrees);    
+  EXPECT_EQ(180, lon.degrees());    
 }
 
 // Constructor given a positive west, -90 value in degrees
 TEST(Longitude, PWNegative90) {
   Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest, 
         Longitude::Domain180);
-  EXPECT_EQ(90, lon.degrees);    
+  EXPECT_EQ(90, lon.degrees());    
 }
 
 // Constructor given -90 degrees PW & 360 domain
 TEST(Longitude, PW360Domain) {
   Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest,
         Longitude::Domain360);
-  EXPECT_EQ(450, lon.degrees);
+  EXPECT_EQ(450, lon.degrees());
 }
 
 // Copy constructor
@@ -49,7 +50,7 @@ TEST(Longitude, CopyConstructor) {
 TEST(Longitude, Set90Degrees) {
   Longitude lon(270.0, Angle::Degrees);
   lon.setPositiveEast(90, Angle::Degrees);
-  EXPECT_EQ(90, lon.degrees);
+  EXPECT_EQ(90, lon.degrees());
 }
 
 // Set to 90 degrees PW
@@ -57,10 +58,10 @@ TEST(Longitude, Set90DegreesPW) {
   Longitude lon(270.0, Angle::Degrees);
   Longitude lonCopy(lon);
   lon.setPositiveWest(90, Angle::Degrees);
-  EXPECT_EQ(270, lon.degrees);
+  EXPECT_EQ(270, lon.degrees());
 
   lonCopy = lon;
-  EXPECT_EQ(270, lonCopy.degrees);
+  EXPECT_EQ(270, lonCopy.degrees());
 }
 
 // ----- Testing Get Methods -----
@@ -68,10 +69,10 @@ TEST(Longitude, Get90Degrees) {
   Longitude lon(90.0, Angle::Degrees);
 
   // degrees universal
-  EXPECT_EQ(90, lon.degrees);
+  EXPECT_EQ(90, lon.degrees());
 
   // degrees positive east
-  EXPECT_EQ(90, lon.positiveEast(Angle:Degrees));
+  EXPECT_EQ(90, lon.positiveEast(Angle::Degrees));
 
   // radians positive east
   EXPECT_EQ(0.5, lon.positiveEast(Angle::Radians) / PI);
@@ -87,10 +88,10 @@ TEST(Longitude, Get450Degrees) {
   Longitude lon(450.0, Angle::Degrees);
 
   // degrees universal
-  EXPECT_EQ(450, lon.degrees);
+  EXPECT_EQ(450, lon.degrees());
 
   // degrees positive east
-  EXPECT_EQ(450, lon.positiveEast(Angle:Degrees));
+  EXPECT_EQ(450, lon.positiveEast(Angle::Degrees));
 
   // radians positive east
   EXPECT_EQ(2.5, lon.positiveEast(Angle::Radians) / PI);
@@ -106,10 +107,10 @@ TEST(Longitude, GetNegative450Degrees) {
   Longitude lon(-450.0, Angle::Degrees);
 
   // degrees universal
-  EXPECT_EQ(-450, lon.degrees);
+  EXPECT_EQ(-450, lon.degrees());
 
   // degrees positive east
-  EXPECT_EQ(-450, lon.positiveEast(Angle:Degrees));
+  EXPECT_EQ(-450, lon.positiveEast(Angle::Degrees));
 
   // radians positive east
   EXPECT_EQ(-2.5, lon.positiveEast(Angle::Radians) / PI);
@@ -125,10 +126,10 @@ TEST(Longitude, GetNegative450DegreesPW) {
   Longitude lon(-450.0, Angle::Degrees, Longitude::PositiveWest);
 
   // degrees universal
-  EXPECT_EQ(810, lon.degrees);
+  EXPECT_EQ(810, lon.degrees());
 
   // degrees positive east
-  EXPECT_EQ(810, lon.positiveEast(Angle:Degrees));
+  EXPECT_EQ(810, lon.positiveEast(Angle::Degrees));
 
   // radians positive east
   EXPECT_EQ(4.5, lon.positiveEast(Angle::Radians) / PI);
@@ -162,14 +163,14 @@ TEST(Longitude, InRange) {
 
   Longitude lon(45.0, Angle::Degrees);
 
-  EXPECT_TRUE(lon.inRange(Longitude(0, Angle:Degrees), Longitude(360, Angle:Degrees)));
-  EXPECT_TRUE(lon.inRange(Longitude(360, Angle:Degrees), Longitude(0, Angle:Degrees)));
-  EXPECT_FALSE(lon.inRange(Longitude(350, Angle:Degrees), Longitude(355, Angle:Degrees)));
-  EXPECT_TRUE(lon.inRange(Longitude(0, Angle:Degrees), Longitude(160, Angle:Degrees)));
-  EXPECT_FALSE(lon.inRange(Longitude(0, Angle:Degrees), Longitude(44, Angle:Degrees)));
-  EXPECT_FALSE(lon.inRange(Longitude(46, Angle:Degrees), Longitude(90, Angle:Degrees)));
-  EXPECT_TRUE(lon.inRange(Longitude(0, Angle:Degrees), Longitude(45, Angle:Degrees)));
-  EXPECT_TRUE(lon.inRange(Longitude(45, Angle:Degrees), Longitude(90, Angle:Degrees)));
+  EXPECT_TRUE(lon.inRange(Longitude(0, Angle::Degrees), Longitude(360, Angle::Degrees)));
+  EXPECT_FALSE(lon.inRange(Longitude(360, Angle::Degrees), Longitude(0, Angle::Degrees)));
+  EXPECT_FALSE(lon.inRange(Longitude(350, Angle::Degrees), Longitude(355, Angle::Degrees)));
+  EXPECT_TRUE(lon.inRange(Longitude(0, Angle::Degrees), Longitude(160, Angle::Degrees)));
+  EXPECT_FALSE(lon.inRange(Longitude(0, Angle::Degrees), Longitude(44, Angle::Degrees)));
+  EXPECT_FALSE(lon.inRange(Longitude(46, Angle::Degrees), Longitude(90, Angle::Degrees)));
+  EXPECT_TRUE(lon.inRange(Longitude(0, Angle::Degrees), Longitude(45, Angle::Degrees)));
+  EXPECT_TRUE(lon.inRange(Longitude(45, Angle::Degrees), Longitude(90, Angle::Degrees)));
 }
 
 
