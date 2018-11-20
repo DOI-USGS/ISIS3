@@ -12,7 +12,7 @@
 # the Isis distribution
 #
 if [ ! "$ISISROOT" ]; then
-  ISISROOT=/usgs/pkgs/isis3/isis
+  ISISROOT=/usgs/pkgs/isis3/install
   export ISISROOT
 fi
 

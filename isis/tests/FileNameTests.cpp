@@ -85,10 +85,10 @@ TEST(FileName, Extension) {
 }
 
 TEST(FileName, Expanded) {
-  putenv("ISISTMPROOT=/testy/mc/test/face");
-  FileName file("$ISISTMPROOT/test.cub");
-
-  EXPECT_EQ("/testy/mc/test/face/test.cub", file.expanded());
+  QString relativeFileName("test.cub");
+  FileName file("$ISISROOT/" + relativeFileName);
+  QString isisRoot(getenv("ISISROOT"));
+  EXPECT_EQ(isisRoot + "/" + relativeFileName, file.expanded());
 }
 
 TEST(FileName, Original) {
@@ -186,11 +186,6 @@ TEST(FileName, FileExists) {
   remove("test000001.cub");
 }
 
-//TODO Do we need to test this? All it does is call expanded, makes a QFileInfo and then make a QDir
-// We shouldn't be testing Qt
-// TEST(FileName, Dir) {
-// }
-
 TEST(FileName, CreateTempFile) {
   FileName test("test.cub");
 
@@ -203,10 +198,10 @@ TEST(FileName, CreateTempFile) {
 }
 
 TEST(FileName, ToString) {
-  putenv("ISISTMPROOT=/testy/mc/test/face");
-  FileName file("$ISISTMPROOT/test.cub");
-
-  EXPECT_EQ("/testy/mc/test/face/test.cub", file.toString());
+  QString relativeFileName("test.cub");
+  FileName file("$ISISROOT/" + relativeFileName);
+  QString isisRoot(getenv("ISISROOT"));
+  EXPECT_EQ(isisRoot + "/" + relativeFileName, file.toString());
 }
 
 TEST(FileName, AssignmentOperator) {

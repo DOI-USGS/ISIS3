@@ -173,6 +173,12 @@ namespace Isis {
    *             give useful results due to the 2x2 matrix it uses.
    *    @history 2012-01-05 Travis Addair - Added separate variables for Whole
    *             Pixel Correlation and Subpixel Correlation.
+   *    @history 2018-07-27 Makayla Shepherd - Fixed a bug that made registration fail for
+   *                            one dimensional pattern chips. Fixes #5247.
+   *    @history 2018-07-27 Makayla Shepherd - Fixed a bug that upon sub-pixel registration failure
+   *                            caused the previous registration to be returned. If sub-pixel 
+   *                            registration fails now it will return to the whole pixel 
+   *                            registration values. Fixes #5248.
    */
   class AutoReg {
     public:

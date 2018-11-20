@@ -8,7 +8,6 @@
 
 #include "PixelOffset.h"
 #include "TextFile.h"
-#include "LineEquation.h"
 #include "LeastSquares.h"
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
