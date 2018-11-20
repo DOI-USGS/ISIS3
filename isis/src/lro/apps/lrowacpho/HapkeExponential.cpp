@@ -102,11 +102,11 @@ namespace Isis {
         double alpha = g;
 
         // Simple HapkeExponential photometric polynomial equation with exponential opposition
-        //  surge term.
+        // surge term.
 
-//        I   µ0 + µ
-//        m_ * m______  = A1 exp(B1 phase) + A2 ( µ0 + µ )exp(B2 phase) + A3 ( µ0 + µ ) + A4
-//        F    µ0
+        // I   µ0 + µ
+        // _ * ______  = A1 exp(B1 phase) + A2 ( µ0 + µ )exp(B2 phase) + A3 ( µ0 + µ ) + A4
+        // F    µ0
 
 
         double rcal = parms.aTerms[0]*exp(parms.bTerms[0] * alpha);
