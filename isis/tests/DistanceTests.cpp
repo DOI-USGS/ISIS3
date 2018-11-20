@@ -112,10 +112,10 @@ TEST(DistanceTests, SetNegativeDistance) {
 }
 
 
-// TEST(DistanceTests, ToString) {
-// 	Distance dist(1500500, Distance::Meters);
-// 	ASSERT_STREQ(dist.toString(), "1500500 meters");
-// }
+TEST(DistanceTests, ToString) {
+	Distance dist(1500500, Distance::Meters);
+	ASSERT_EQ(dist.toString(), "1500500.0 meters");
+}
 
 
 TEST(DistanceTests, IsValidTrue) {
