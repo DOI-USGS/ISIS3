@@ -6,13 +6,13 @@ Refer to this for syntax: https://jenkins.io/doc/book/pipeline/syntax/
 
 Here are a few small details on its quirks:
 
-* We can specify labels for which machines run the job: `label 'cmake'` These labels correspond the labels chosen when added to the swarm. At the moment, pepper is the only machine running with the cmake label.
+* We can specify labels for which machines run the job: `label 'cmake'` These labels correspond the labels chosen when a machine added to the swarm. They can also be used to specify a Docker container to build in.
 
 * Groovy interprets different sets of quotes differently. Triple double quotes ("""hi""") means to use a multiline string. More on this here: http://groovy-lang.org/syntax.html#all-strings
 
 * Each stage of the pipeline runs a fresh bash with -xe flags. We turn off the e flag to allow building/testing to continue when there are failures.
 
-* Varibles set in the environment stage will propagate through all stages
+* Variables set in the environment stage will propagate through all stages
 
 
 # Docker Container Specs
