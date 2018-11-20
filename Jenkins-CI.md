@@ -11,7 +11,7 @@ The labels above tell the Jenkins server that you want to create your agent usin
 
 These files are automatically pulled and built for DockerHub whenever new changes are made. Their images can be found here: [link](https://hub.docker.com/r/usgsastro/docker_linux_isisdeps/)
 
-These images are built with some system library dependencies of ISIS and an install of miniconda.
+These images are built with some system library dependencies of ISIS and an install of miniconda. They have the ISIS test data mounted in the /scratch directory.
 
 # Jenkins Pipeline
 
@@ -54,15 +54,6 @@ The traditional ISIS build strategy of building on progs vi hand-written bash sc
 
 Alternatively, we can setup 2 projects each with 1-D configs matrices.
  
-# Leveraging Previous Builds
-
-**Discarding old builds:** https://wiki.jenkins.io/display/JENKINS/Discard+Old+Build+plugin \
-**Permanently keeping builds:** https://wiki.jenkins.io/display/JENKINS/Build+Keeper+Plugin \
-**Artifacts:** https://wiki.jenkins.io/display/JENKINS/Copy+Artifact+Plugin
-
-We do not want to rebuild nor retest the entirety of ISIS for every single PR. Every combination of node and queue spot has it's own workspace that by default isn't deleted after a build, successful or otherwise. This means that each new build on a particular node has the changes pulled in from the last commit and the CMake command should naturally build only the differences. 
-
-There may exist possible complications by attempting new builds on top broken builds (merge conflicts and such). The Artifact copy plugin may be a better solution to copying over binaries to prevent building from scratch but also have control over what we keep form previous builds. There may exist some incentive to set a up a cleanup schedule for old builds that haven't been touched in a long time, even if the last build was successful. 
 
 # Triggering Builds From Github PRs
 
