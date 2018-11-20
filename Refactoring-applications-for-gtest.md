@@ -10,13 +10,13 @@ This is a first step towards several places:
 
 # Creating a basic callable function
 
-For the rest of this document we will use `appname` as the name of the application that is being worked on. `AppName` will also be used as the upper camel case version of the application name.
+For the rest of this document we will use `appname` as the name of the application that is being worked on.
 
-1. In the `appname` folder create two new files, `AppNameFunc.cpp` and `AppNameFunc.h`. These files are where the application logic will live.
-1. In `AppNameFunc.h` and `AppNameFunc.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`.
+1. In the `appname` folder create two new files, `appname.cpp` and `appname.h`. These files are where the application logic will live.
+1. In `appname.h` and `appname.cpp` create a new function in the `Isis` namespace with the following signature `void appname(UserInterface &ui)`.
 1. Copy the contents of `IsisMain` in `main.cpp` into the new function.
-1. Copy any helper functions or global variables from `main.cpp` into `AppNameFunc.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols, forward declare any helper function in `AppNameFunc.cpp` and do not define them in `AppNameFunc.h`.
-1. Put all of the required includes in `AppNameFunc.cpp` and `AppNameFunc.h`.
+1. Copy any helper functions or global variables from `main.cpp` into `appname.cpp`. So as to not pollute the `Isis` namespace and avoid redefining symbols, forward declare any helper function in `appname.cpp` and do not define them in `appname.h`.
+1. Put all of the required includes in `appname.cpp` and `appname.h`.
 1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
 1. In `main.ccp`, put the following
 
@@ -24,7 +24,7 @@ For the rest of this document we will use `appname` as the name of the applicati
 #include "Isis.h"
 
 #include "UserInterface.h"
-#include "AppNameFunc.h"
+#include "appname.h"
 
 using namespace Isis;
 
