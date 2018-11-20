@@ -3,6 +3,8 @@
 1. Add `#include <gtest/gtest.h>` to the file.
 1. Write your test cases.
 
+Note: If your tests require the use of ISIS' Null value, you will need to include SpecialPixel.h
+
 ## Testing exceptions
 Testing for exception throws in gtest can be rather convoluted. Through testing and looking at what others have done, we have settled on using the following setup to test an exception throw:
 
