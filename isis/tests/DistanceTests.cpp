@@ -19,7 +19,7 @@ TEST(DistanceTests, DefaultConstructor) {
 TEST(DistanceTests, MetersConstructor) {
 	Distance dist(1500500, Distance::Meters);
 	EXPECT_EQ(dist.meters(), 1500500);
-	EXPECT_DOUBLE_EQ(dist.kilometers(), 1500.5);
+	EXPECT_EQ(dist.kilometers(), 1500.5);
 	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1500500 / 6.9599e8);
 	EXPECT_EQ(dist.pixels(1), 1500500);
 }
@@ -27,7 +27,7 @@ TEST(DistanceTests, MetersConstructor) {
 
 TEST(DistanceTests, KilometersConstructor) {
 	Distance dist(1500.5, Distance::Kilometers);
-	EXPECT_DOUBLE_EQ(dist.kilometers(), 1500.5);
+	EXPECT_EQ(dist.kilometers(), 1500.5);
 	EXPECT_EQ(dist.meters(), 1500500);
 	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1500500 / 6.9599e8);
 	EXPECT_EQ(dist.pixels(1), 1500500);
@@ -36,7 +36,7 @@ TEST(DistanceTests, KilometersConstructor) {
 
 TEST(DistanceTests, SolarRadiiConstructor) {
 	Distance dist(1, Distance::SolarRadii);
-	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1);
+	EXPECT_EQ(dist.solarRadii(), 1);
 	EXPECT_DOUBLE_EQ(dist.meters(), 6.9599e8);
 	EXPECT_DOUBLE_EQ(dist.kilometers(), 6.9599e5);
 	EXPECT_DOUBLE_EQ(dist.pixels(1), 6.9599e8);
@@ -47,7 +47,7 @@ TEST(DistanceTests, PixelsConstructor) {
 	Distance dist(1500500, Distance::Pixels);
 	EXPECT_EQ(dist.pixels(1), 1500500);
 	EXPECT_EQ(dist.meters(), 1500500);
-	EXPECT_DOUBLE_EQ(dist.kilometers(), 1500.5);
+	EXPECT_EQ(dist.kilometers(), 1500.5);
 	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1500500 / 6.9599e8);
 }
 
@@ -56,7 +56,7 @@ TEST(DistanceTests, PixelsPerMeterConstructor) {
 	Distance dist(1500500, 2);
 	EXPECT_EQ(dist.pixels(2), 1500500);
 	EXPECT_EQ(dist.meters(), 750250);
-	EXPECT_DOUBLE_EQ(dist.kilometers(), 750.25);
+	EXPECT_EQ(dist.kilometers(), 750.25);
 	EXPECT_DOUBLE_EQ(dist.solarRadii(), 750250 / 6.9599e8);
 }
 
@@ -64,7 +64,7 @@ TEST(DistanceTests, PixelsPerMeterConstructor) {
 TEST(DistanceTests, CopyConstructor) {
 	Distance origDist(1500.5, Distance::Meters);
 	Distance copiedDist(origDist);
-	ASSERT_DOUBLE_EQ(copiedDist.meters(), 1500.5);
+	ASSERT_EQ(copiedDist.meters(), 1500.5);
 }
 
 
@@ -148,7 +148,8 @@ TEST(DistanceTests, GreaterThanEqual) {
 
 TEST(DistanceTests, GreaterThanNull) {
 	try {
-		Distance() < Distance();
+		bool value = Distance() > Distance();
+		ASSERT_TRUE(value);	// Added this line so we do not get an unused comparison build warning.
 		FAIL() << "Expected error message: Distance has not been initialized";
 	}
 	catch(IException &e) {
@@ -179,7 +180,8 @@ TEST(DistanceTests, LessThanEqual) {
 
 TEST(DistanceTests, LessThanNull) {
 	try {
-		Distance() < Distance();
+		bool value = Distance() < Distance();
+		ASSERT_TRUE(value);	// Added this line so we do not get an unused comparison build warning.
 		FAIL() << "Expected error message: Distance has not been initialized";
 	}
 	catch(IException &e) {
