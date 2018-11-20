@@ -1,18 +1,3 @@
-# Docker Container Specs
-
-To specify a container for use in a Jenkins pipeline, label your agent with one of the following: 
-
-* isis-fedora-25
-* isis-ubuntu-1804
-* isis-debian-9
-* isis-centos-7
-
-The labels above tell the Jenkins server that you want to create your agent using a USGS-Astrogeology Docker image. We currently maintain containers specs for building isis on the systems listed above. Their Dockerfiles can be found here: [link](https://github.com/USGS-Astrogeology/docker_linux_isisdeps/tree/master/jenkins)
-
-These files are automatically pulled and built for DockerHub whenever new changes are made. Their images can be found here: [link](https://hub.docker.com/r/usgsastro/docker_linux_isisdeps/)
-
-These images are built with some system library dependencies of ISIS and an install of miniconda. They have the ISIS test data mounted in the /scratch directory.
-
 # Jenkins Pipeline
 
 Most of the build process is specified in a groovy script: https://github.com/USGS-Astrogeology/ISIS3/blob/dev/Jenkinsfile
@@ -28,6 +13,22 @@ Here are a few small details on its quirks:
 * Each stage of the pipeline runs a fresh bash with -xe flags. We turn off the e flag to allow building/testing to continue when there are failures.
 
 * Varibles set in the environment stage will propagate through all stages
+
+
+# Docker Container Specs
+
+To specify a container for use in a Jenkins pipeline, label your agent with one of the following: 
+
+* isis-fedora-25
+* isis-ubuntu-1804
+* isis-debian-9
+* isis-centos-7
+
+The labels above tell the Jenkins server that you want to create your agent using a USGS-Astrogeology Docker image. We currently maintain containers specs for building isis on the systems listed above. Their Dockerfiles can be found here: [link](https://github.com/USGS-Astrogeology/docker_linux_isisdeps/tree/master/jenkins)
+
+These files are automatically pulled and built for DockerHub whenever new changes are made. Their images can be found here: [link](https://hub.docker.com/r/usgsastro/docker_linux_isisdeps/)
+
+These images are built with some system library dependencies of ISIS and an install of miniconda. They have the ISIS test data mounted in the /scratch directory.
 
 # Test Data Specifications
 
