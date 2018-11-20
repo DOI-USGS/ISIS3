@@ -50,6 +50,8 @@ will ensure that the tests start with `BundleSettings`.
 ## Test names
 We use gtest as our unit testing framework, but use ctest to actually run the tests. ctest will generate a test name from each test case defined in your unit test. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
 
+To run the gtests for a specific class, use `ctest -R ClassName`
+
 ### Basic tests
 `TEST(Foo, Bar)` will produce the test `Foo.Bar`.
 
