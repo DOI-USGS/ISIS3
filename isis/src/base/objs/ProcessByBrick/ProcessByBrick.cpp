@@ -562,6 +562,47 @@ void ProcessByBrick::SetOutputRequirements(int outputRequirements) {
 
   /**
    * Starts the systematic processing of the input cube by moving an arbitrary
+   * shaped brick through the cube. This method requires that exactly one input
+   * cube and one output cube be loaded using the SetInputCube and SetOutputCube
+   * methods.
+   *
+   * @deprecated Please use ProcessCubeInPlace, ProcessCube, or ProcessCubes
+   * @param funct (Buffer &in, Buffer &out) Receive an nxm brick in
+   *              the input buffer and output the an nxm brick. If n=1 and
+   *              m=lines this will process by columns. Likewise if n=samples
+   *              and m=1 this will process by lines.
+   *
+   * @throws iException::Programmer
+   */
+  void ProcessByBrick::StartProcess(std::function<void(Buffer &in, Buffer &out)> funct ) {
+    Brick *ibrick = NULL;
+    Brick *obrick = NULL;
+
+    int numBricks = PrepProcessCube(&ibrick, &obrick);
+
+    // Loop and let the app programmer work with the bricks
+    p_progress->SetMaximumSteps(numBricks);
+    p_progress->CheckStatus();
+
+    ibrick->begin();
+    obrick->begin();
+
+    for (int i = 0; i < numBricks; i++) {
+      InputCubes[0]->read(*ibrick);
+      funct(*ibrick, *obrick);
+      OutputCubes[0]->write(*obrick);
+      p_progress->CheckStatus();
+      (*ibrick)++;
+      (*obrick)++;
+    }
+
+    delete ibrick;
+    delete obrick;
+  }
+
+
+  /**
+   * Starts the systematic processing of the input cube by moving an arbitrary
    * shaped brick through the cube. This method allows multiple input and output
    * cubes.
    *

@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include "crop_func.h"
+#include "crop.h"
 
 using namespace std;
 using namespace Isis;

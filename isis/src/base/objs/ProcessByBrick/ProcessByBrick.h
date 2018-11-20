@@ -148,6 +148,7 @@ namespace Isis {
       using Isis::Process::StartProcess;  // make parents virtual function visable
       virtual void StartProcess(void funct(Buffer &in));
       virtual void StartProcess(std::function<void(Buffer &in)> funct );
+      virtual void StartProcess(std::function<void(Buffer &in, Buffer &out)> funct);
       virtual void StartProcess(void funct(Buffer &in, Buffer &out));
       virtual void StartProcess(void funct(std::vector<Buffer *> &in,
                                            std::vector<Buffer *> &out));
