@@ -3,7 +3,7 @@ To get started, you want a fresh copy of ISIS to work on. You first want to crea
 
 Next, you want to create a clone of your fork on your machine. Go to your fork of ISIS3 on the GitHub website, url should be `github.com/<username>/ISIS3`, and click on the "Clone or Download" green button on the right and copy the link that is displayed. Next, you are going to open a terminal, go to the directory you want to make a clone in, and in the terminal, type:
 
-`git clone <paste the link>`
+`git clone --recurse-submodules <paste the link>`
 
 This will copy all files in your fork to your current location in the terminal. Then, in your terminal, navigate to the ISIS3 directory by typing:
 
