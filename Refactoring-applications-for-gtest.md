@@ -43,7 +43,7 @@ Due to how the Application singleton works, calling `Application::Log()` outside
 #include "Application.h"
 #include "Pvl.h"
 #include "UserInterface.h"
-#include "AppNameFunc.h"
+#include "appname.h"
 
 using namespace Isis;
 
