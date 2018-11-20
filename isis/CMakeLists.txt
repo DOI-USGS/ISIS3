@@ -443,13 +443,13 @@ add_custom_target(clean_source COMMAND rm -rf "${CMAKE_BINARY_DIR}/*" "${CMAKE_I
 # Set up a few top level files for installation.
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/IsisPreferences   ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/scripts           ${CMAKE_BINARY_DIR})
-EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/license.txt       ${CMAKE_BINARY_DIR})
+EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/../LICENSE.txt    ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/version           ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/make              ${CMAKE_BINARY_DIR})
 
 # Copy the files on make install as well
 install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_SOURCE_DIR}/license.txt     DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.txt  DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 
