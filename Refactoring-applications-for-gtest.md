@@ -20,7 +20,7 @@ For the rest of this document we will use `appname` as the name of the applicati
 1. Remove the call to get the UserInterface; it usually looks like `UserInterface &ui = Application::GetUserInterface();`.
 1. In `main.ccp`, put the following
 
-```
+```C++
 #include "Isis.h"
 
 #include "UserInterface.h"
@@ -37,7 +37,7 @@ void IsisMain() {
 ## If your application uses `Application::Log()`
 Due to how the Application singleton works, calling `Application::Log()` outside of an actual ISIS application currently causes a segmentation fault. To avoid this, modify the new `appname` function to return a Pvl that contains all of the PvlGroups that need to be logged instead of calling `Application::Log()`. Then, change your `main.cpp` to
 
-```
+```C++
 #include "Isis.h"
 
 #include "Application.h"
@@ -81,4 +81,59 @@ Many ISIS3 applications make sure of the Process class and its sub-classes. Whil
 
 Many of the Process sub-classes use process functions to operate on cubes. These helper functions will need to be pushed into the ISIS3 library. There is a chance that there will be symbol conflicts due to multiple applications using functions with the same name. In this case, the function can simply have its name modified. This is also a natural point at which application logic can be segmented and tested separately.
 
-Because of how the Process sub-classes use process functions, many older ISIS3 applications use global variables to pass additional parameters to helper functions. This can cause serious issues because applications are no longer self-contained exectuables. To help with this, ProcessByBrick and ProcessByLine have been modified to use a [lambda function with captures](https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture) as the process function. All of the previously global variables can now be defined in the `appname` function and then captured in the lambda function.
+Because of how the Process sub-classes use process functions, many older ISIS3 applications use global variables to pass additional parameters to helper functions. This can cause serious issues because applications are no longer self-contained executables. To help with this, ProcessByBrick and ProcessByLine have been modified to use a [lambda function with captures](https://en.cppreference.com/w/cpp/language/lambda#Lambda_capture) as the process function. All of the previously global variables can now be defined in the `appname` function and then captured in the lambda function.
+
+For example, here's an app called checkerboard which generates an artificial cube with a checkerboard pattern. It requires access to the variable `size` to work but `ProcessByLine.StartProcess` only supports functions `Buffer` objects as input. Therefore, the app uses a global variable in order for the checkerboard function to have `size` in it's scope:
+```C++
+// original foo.cpp
+#include "Isis.h"
+
+// .. some other incs 
+
+int size;
+
+void do_process(Buffer &in, Buffer &out) {
+  // do stuff with in, out and size
+}
+
+void isismain() {
+  UserInterface &ui = Application::GetUserInterface();
+  size = ui.GetInteger("SIZE");
+  
+  ProcessByLine p;
+
+  p.SetInputCube("FROM");
+  p.SetOutputCube("TO");
+ 
+  p.StartProcess(do_process);
+}
+```
+
+can be refactored using a lambdas which captures the size variable: 
+
+```C++
+// callable foo.cpp
+#include "Isis.h"
+
+// .. some other incs 
+
+void IsisMain() {
+  UserInterface &ui = Application::GetUserInterface();
+
+  // int is defined in the scope of main
+  int size = ui.GetInteger("SIZE");
+  
+  // lambda equivalent of the checkerboard function, capture is set to get 
+  // all local variables by reference 
+  auto do_process = [&](Buffer &in, Buffer &out)->void {
+    // do stuff with in, out and size 
+  };  
+
+  ProcessByLine p;
+
+  p.SetInputCube("FROM");
+  p.SetOutputCube("TO");
+ 
+  p.StartProcess(do_process);
+}
+```
