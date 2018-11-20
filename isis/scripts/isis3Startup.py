@@ -12,7 +12,7 @@ def setisis():
 
   #... and if it's not give it a default value
   if ISISROOT is None:
-    ISISROOT = "/usgs/pkgs/isis3/isis"
+    ISISROOT = "/usgs/pkgs/isis3/install"
     os.environ['ISISROOT'] = ISISROOT
 
   #Check for the ISIS3DATA directory. If it does not exist use a default

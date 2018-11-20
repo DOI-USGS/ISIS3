@@ -24,6 +24,8 @@
 #                       to "/usgs/cpkgs/isis3/testData"
 #       SEP 08 2017 - Christopher Combs - Removed setting of QT_PLUGIN_PATH as
 #                       an environment variable. Fixes #4617
+#       NOV 15 2018 - Jesse Mapel - Changed default ISISROOT to new install
+#                       directory.
 #_VER   $Id: isis3Startup.csh,v 1.5 2010/03/16 19:40:22 ehyer Exp $
 #_END
 ################################################################################
@@ -34,7 +36,7 @@ set Platform = `uname -s`
 # Initialize the ISISROOT environment variable if it doesn't exist
 # TODO: Test is obsolete, fail if no isisroot is set
 if ($?ISISROOT == 0) then
-  setenv ISISROOT /usgs/pkgs/isis3/isis
+  setenv ISISROOT /usgs/pkgs/isis3/install
 endif
 
 # Initialize the ISIS3DATA environment variable
