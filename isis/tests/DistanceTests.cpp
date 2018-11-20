@@ -19,27 +19,27 @@ TEST(DistanceTests, DefaultConstructor) {
 TEST(DistanceTests, MetersConstructor) {
 	Distance dist(1500500, Distance::Meters);
 	EXPECT_EQ(dist.meters(), 1500500);
-	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
-	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+	EXPECT_DOUBLE_EQ(dist.kilometers(), 1500.5);
+	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1500500 / 6.9599e8);
 	EXPECT_EQ(dist.pixels(1), 1500500);
 }
 
 
 TEST(DistanceTests, KilometersConstructor) {
 	Distance dist(1500.5, Distance::Kilometers);
-	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
+	EXPECT_DOUBLE_EQ(dist.kilometers(), 1500.5);
 	EXPECT_EQ(dist.meters(), 1500500);
-	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1500500 / 6.9599e8);
 	EXPECT_EQ(dist.pixels(1), 1500500);
 }
 
 
 TEST(DistanceTests, SolarRadiiConstructor) {
-	Distance dist(0.002155922, Distance::SolarRadii);
-	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
-	EXPECT_FLOAT_EQ(dist.meters(), 1.5005e+06);
-	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
-	EXPECT_FLOAT_EQ(dist.pixels(1), 1.5005e+06);
+	Distance dist(1, Distance::SolarRadii);
+	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1);
+	EXPECT_DOUBLE_EQ(dist.meters(), 6.9599e8);
+	EXPECT_DOUBLE_EQ(dist.kilometers(), 6.9599e5);
+	EXPECT_DOUBLE_EQ(dist.pixels(1), 6.9599e8);
 }
 
 
@@ -47,8 +47,8 @@ TEST(DistanceTests, PixelsConstructor) {
 	Distance dist(1500500, Distance::Pixels);
 	EXPECT_EQ(dist.pixels(1), 1500500);
 	EXPECT_EQ(dist.meters(), 1500500);
-	EXPECT_FLOAT_EQ(dist.kilometers(), 1500.5);
-	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.002155922);
+	EXPECT_DOUBLE_EQ(dist.kilometers(), 1500.5);
+	EXPECT_DOUBLE_EQ(dist.solarRadii(), 1500500 / 6.9599e8);
 }
 
 
@@ -56,15 +56,15 @@ TEST(DistanceTests, PixelsPerMeterConstructor) {
 	Distance dist(1500500, 2);
 	EXPECT_EQ(dist.pixels(2), 1500500);
 	EXPECT_EQ(dist.meters(), 750250);
-	EXPECT_FLOAT_EQ(dist.kilometers(), 750.25);
-	EXPECT_FLOAT_EQ(dist.solarRadii(), 0.0010779609);
+	EXPECT_DOUBLE_EQ(dist.kilometers(), 750.25);
+	EXPECT_DOUBLE_EQ(dist.solarRadii(), 750250 / 6.9599e8);
 }
 
 
 TEST(DistanceTests, CopyConstructor) {
 	Distance origDist(1500.5, Distance::Meters);
 	Distance copiedDist(origDist);
-	ASSERT_FLOAT_EQ(copiedDist.meters(), 1500.5);
+	ASSERT_DOUBLE_EQ(copiedDist.meters(), 1500.5);
 }
 
 
@@ -84,8 +84,8 @@ TEST(DistanceTests, SetKilometers) {
 
 TEST(DistanceTests, SetSolarRadii) {
 	Distance dist;
-	dist.setSolarRadii(2);
-	ASSERT_EQ(dist.solarRadii(), 2);
+	dist.setSolarRadii(1);
+	ASSERT_EQ(dist.solarRadii(), 1);
 }
 
 
@@ -114,7 +114,7 @@ TEST(DistanceTests, SetNegativeDistance) {
 
 // TEST(DistanceTests, ToString) {
 // 	Distance dist(1500500, Distance::Meters);
-// 	ASSERT_EQ(dist.toString(), "1500500 meters");
+// 	ASSERT_STREQ(dist.toString(), "1500500 meters");
 // }
 
 
@@ -130,7 +130,6 @@ TEST(DistanceTests, IsValidFalse) {
 }
 
 
-//should we do all units?
 TEST(DistanceTests, GreaterThanDifferent) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
@@ -149,8 +148,7 @@ TEST(DistanceTests, GreaterThanEqual) {
 
 TEST(DistanceTests, GreaterThanNull) {
 	try {
-		bool value = Distance() < Distance();
-		ASSERT_TRUE(value);
+		Distance() < Distance();
 		FAIL() << "Expected error message: Distance has not been initialized";
 	}
 	catch(IException &e) {
@@ -181,8 +179,7 @@ TEST(DistanceTests, LessThanEqual) {
 
 TEST(DistanceTests, LessThanNull) {
 	try {
-		bool value = Distance() < Distance();
-		ASSERT_TRUE(value);
+		Distance() < Distance();
 		FAIL() << "Expected error message: Distance has not been initialized";
 	}
 	catch(IException &e) {
@@ -199,7 +196,7 @@ TEST(DistanceTests, AssignDistance) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
 	dist1 = dist2;
-	EXPECT_EQ(dist1.meters(), 20);
+	ASSERT_EQ(dist1.meters(), 20);
 }
 
 
@@ -207,7 +204,7 @@ TEST(DistanceTests, Add) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
 	Distance sum = dist1 + dist2;
-	EXPECT_EQ(sum.meters(), 30);
+	ASSERT_EQ(sum.meters(), 30);
 }
 
 
@@ -215,7 +212,7 @@ TEST(DistanceTests, SubtractPositive) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
 	Displacement difference = dist2 - dist1;
-	EXPECT_EQ(difference.meters(), 10);
+	ASSERT_EQ(difference.meters(), 10);
 }
 
 
@@ -223,28 +220,28 @@ TEST(DistanceTests, SubtractNegative) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
 	Displacement difference = dist1 - dist2;
-	EXPECT_EQ(difference.meters(), -10);
+	ASSERT_EQ(difference.meters(), -10);
 }
 
 
 TEST(DistanceTests, DivideDistance) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
-	EXPECT_EQ(dist2 / dist1, 2);
+	ASSERT_EQ(dist2 / dist1, 2);
 }
 
 
 TEST(DistanceTests, DivideDouble) {
 	Distance dist1(10, Distance::Meters);
 	Distance quotient = dist1 / 2;
-	EXPECT_EQ(quotient.meters(), 5);
+	ASSERT_EQ(quotient.meters(), 5);
 }
 
 
 TEST(DistanceTests, Multiply) {
 	Distance dist1(10, Distance::Meters);
 	Distance product = dist1 * 2;
-	EXPECT_EQ(product.meters(), 20);
+	ASSERT_EQ(product.meters(), 20);
 }
 
 
@@ -252,7 +249,7 @@ TEST(DistanceTests, AddAssign) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(20, Distance::Meters);
 	dist1 += dist2;
-	EXPECT_EQ(dist1.meters(), 30);
+	ASSERT_EQ(dist1.meters(), 30);
 }
 
 
@@ -260,7 +257,7 @@ TEST(DistanceTests, SubtractAssignPositive) {
 	Distance dist1(10, Distance::Meters);
 	Distance dist2(30, Distance::Meters);
 	dist2 -= dist1;
-	EXPECT_EQ(dist2.meters(), 20);
+	ASSERT_EQ(dist2.meters(), 20);
 }
 
 
@@ -284,12 +281,12 @@ TEST(DistanceTests, SubtractAssignNegative) {
 TEST(DistanceTests, DivideAssign) {
 	Distance dist(10, Distance::Meters);
 	dist /= 2;
-	EXPECT_EQ(dist.meters(), 5);
+	ASSERT_EQ(dist.meters(), 5);
 }
 
 
 TEST(DistanceTests, MultiplyAssign) {
 	Distance dist(10, Distance::Meters);
 	dist *= 2;
-	EXPECT_EQ(dist.meters(), 20);
+	ASSERT_EQ(dist.meters(), 20);
 }
