@@ -5,7 +5,9 @@
 
 Note: If your tests require the use of ISIS' Null value, you will need to include SpecialPixel.h
 
-## Testing exceptions
+## General Testing Tips
+
+### Testing exceptions
 Testing for exception throws in gtest can be rather convoluted. Through testing and looking at what others have done, we have settled on using the following setup to test an exception throw:
 
 ```
@@ -25,12 +27,15 @@ Be sure to choose a substring of the exception message that will uniquely identi
 
 Normally, if the error message does not contain the substring, gtest will only output the the expression evaluated to false. To make the failure message more helpful, we add `<< e.toString().toStdString()` which outputs the full error message if the test fails.
 
-## Test fixtures
+### Testing floating point numbers
+Comparison between floating point numbers is a common problem in both writing and testing software. Carefully choosing test data can help avoid comparisons that are likely to cause problems. Whenever possible, use test data such that output values can be exactly stored in a double-precision floating point number (c++ double). For example, if the function `doMath(double input)` takes the input and divides by $116$, a good input would be $232$ because $\frac{232}{116}=2$ which can be stored exactly in a double. Other input such as $1$ or $2$ cannot be precisely stored in a double and should be avoided. If a comparison between numbers that cannot be stored precisely is required, gtest provides [Special Assertions](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#floating-point-comparison) to make the comparisons more tolerant to different rounding.
+
+### Test fixtures
 Because each test case is a completely fresh environment, there is often set-up code that is shared between multiple test cases. You can use a test fixture to avoid copying and pasting this set-up code multiple times. See the [gtest documentation](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md#test-fixtures-using-the-same-data-configuration-for-multiple-tests) for how to create and use fixtures in gtest.
 
 In order to conform to our test case naming conventions, all test fixtures need to be named `ClassName_FixtureName`. For example, a fixture that sets up a BundleSettings object in a not-default state for the BundleSettings unit test could be called `BundleSettings_NotDefault`.
 
-## Test parameterization
+### Test parameterization
 If the same process needs to be run with several different inputs, it can be easily automated via [value-parameterized tests](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#value-parameterized-tests). In order to maintain test naming conventions, when you call the `INSTANTIATE_TEST_CASE_P` macro make sure the first parameter is. `ClassName`. For example
 
 ```
