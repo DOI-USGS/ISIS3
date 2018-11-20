@@ -52,6 +52,8 @@ We use gtest as our unit testing framework, but use ctest to actually run the te
 
 To run the gtests for a specific class, use `ctest -R ClassName`
 
+To run all gtests, use `ctest -R "\." -E "(_app_|_unit_)"`
+
 ### Basic tests
 `TEST(Foo, Bar)` will produce the test `Foo.Bar`.
 
