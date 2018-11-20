@@ -31,6 +31,7 @@ pipeline {
             }
         }
     }
+}
 //    post {
 //        success {
 //            sh 'pwd && ls'
@@ -44,4 +45,3 @@ pipeline {
 //            cleanWs()
 //        }
 //    }
-}
