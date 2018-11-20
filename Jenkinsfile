@@ -9,6 +9,7 @@ pipeline {
         stage('Fedora25') {
             agent {
                 docker {
+                    label "isis-fedora-25"
                     image 'chrisryancombs/docker_isis'
                     args  '-v /scratch/krodriguez/isis3_data/data:/data -v /scratch/krodriguez/isis3_data/testData:/testData'
                 }
