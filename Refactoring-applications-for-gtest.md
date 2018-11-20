@@ -67,11 +67,11 @@ All of the UserInterface parsing should be done in the `appname(UserInterface &u
 
 Once the `appname` function is defined, the `appname(UserInterface &ui)` function simply needs to call it with the appropriate parameters once it has parsed the UserInterface.
 
-### Separating I/O
+## Separating I/O
 
 Most ISIS3 applications were designed to read their inputs from files and then output their results to the command line and/or files. Unfortunately, gtest is very poorly setup to test against files and the command line. To work around this, it is necessary to remove as much file and command line output from the new `appname` functions as possible. Here are some examples of how outputs can be separated from the application logic:
 
 1. Anything that would be logged to the terminal should be simply returned. This way, it can be programmatically validated in gtest. This in fact already needs to be done because of [issues](#if-your-application-uses-applicationlog) with `Application::Log()`.
 1. Anything that writes to a text file should be moved into a new function. Then, instead of passing a filename and opening that file in the function, pass an `ostream` pointer. This way, in the `appname(UserInterface &ui)` function, the file can be opened and an `ofstream` object can be passed in, but for testing a `ostringstream` object can be passed.
 1. No input filenames should be passed as arguments. All files required by the program should be opened and converted into in-memory objects and then passed to the function. This will help eliminate the need for test data files in many applications. **Make sure that for Cubes the appropriate CubeAttributeInput and CubeAttributeOutput values are set!**
-1. Any complex objects needed by the function should be passed in as pointers. This allows for them to be mocked using gmock. This helps eliminate the need for test data files and better isolates the test. If the input object is broken somehow, a mock object will still operate for this test and instead of getting two failures, only the actually broken object's test will fail.
+1. Any complex objects needed by the function should be passed in as pointers. This allows for them to be mocked using [gmock](https://github.com/abseil/googletest/blob/master/googlemock/docs/ForDummies.md). This helps eliminate the need for test data files and better isolates the test. If the input object is broken somehow, a mock object will still operate for this test and instead of getting two failures, only the actually broken object's test will fail.
