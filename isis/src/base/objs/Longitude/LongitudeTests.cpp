@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Longitude.h"
-#include "SpecialPixel.h" // grab this for isis null?
+#include "SpecialPixel.h"
 
 using namespace Isis;
 
