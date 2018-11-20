@@ -10,6 +10,9 @@ cmake_minimum_required(VERSION 3.10)
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+# set(CMAKE_FIND_FRAMEWORK LAST)
+set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
+
 set(CMAKE_FIND_FRAMEWORK LAST)
 
 include(AddIsisModule)
@@ -247,6 +250,12 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
+
+
+# Im this case, we specify the version numbers being searched for in the non-traditional installs.
+if(APPLE)
+find_package(OpenGL REQUIRED)
+endif(APPLE)
 
 if(pybindings)
  find_package(Python REQUIRED)

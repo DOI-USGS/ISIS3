@@ -1,29 +1,29 @@
 #ifndef SpkSegment_h
 #define SpkSegment_h
-/**                                                                       
- * @file                                                                  
- * $Revision: 6314 $ 
+/**
+ * @file
+ * $Revision: 6314 $
  * $Date: 2015-08-12 15:30:27 -0700 (Wed, 12 Aug 2015) $
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
- *  
+ *
  *   $Id: SpkSegment.h 6314 2015-08-12 22:30:27Z jwbacker@GS.DOI.NET $
- */                                                                       
+ */
 
 #include <cmath>
 #include <string>
@@ -31,7 +31,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "SpiceSegment.h"
+#include "SpkSpiceSegment.h"
 #include "IString.h"
 #include "IException.h"
 
@@ -45,14 +45,14 @@ class PvlObject;
 
 /**
  * @brief Maintain a SPK SPICE kernel segment for conversions and export
- * 
+ *
  * This class is designed to read SPICE data from ISIS cube blobs and convert
- * them to proper formats for export to NAIF formatted SPK SPICE kernel files. 
- * This particular implementation supports NAIF SPK kernel types 9 and 13. 
- *  
- * @author 2011-02-12 Kris Becker 
- * @internal 
- *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+ * them to proper formats for export to NAIF formatted SPK SPICE kernel files.
+ * This particular implementation supports NAIF SPK kernel types 9 and 13.
+ *
+ * @author 2011-02-12 Kris Becker
+ * @internal
+ *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
  *                          coding standards. References #972.
  *   @history 2013-12-19 Kris Becker Add SPK kernel type parameter to
  *                          constructors; removed adjustTimes() method; modified
@@ -63,10 +63,10 @@ class PvlObject;
  *   @history 2015-07-21 Kristin Berry - Added NaifStatus::CheckErrors() to see if any NAIF errors
  *                          were signaled. References #2248.
  */
-class SpkSegment : public SpiceSegment {
+class SpkSegment : public SpkSpiceSegment {
   public:
-    typedef SpiceSegment::SVector SVector;
-    typedef SpiceSegment::SMatrix SMatrix;
+    typedef SpkSpiceSegment::SVector SVector;
+    typedef SpkSpiceSegment::SMatrix SMatrix;
 
     SpkSegment();
     SpkSegment(const QString &fname, const int spkType);
@@ -74,7 +74,7 @@ class SpkSegment : public SpiceSegment {
     virtual ~SpkSegment() { }
 
     void import(Cube &cube);
-    
+
     /** Returns the number of elements in the vectors */
     int size() const { return (size(m_states)); }
 
@@ -120,8 +120,8 @@ class SpkSegment : public SpiceSegment {
     template <class TNTSTORE> int size(const TNTSTORE &t) const { return (t.dim1()); }
 
     SMatrix load(Table &cache);
-    void getStates(Camera &camera, const SMatrix &spice, SMatrix &states, 
-                   SVector &epochs, bool &hasVV) const; 
+    void getStates(Camera &camera, const SMatrix &spice, SMatrix &states,
+                   SVector &epochs, bool &hasVV) const;
     SVector makeState(SpicePosition *position, const double &time0,
                       const SVector &stateT, const double &timeT) const;
     void validateType(const int spktype) const;
@@ -129,4 +129,3 @@ class SpkSegment : public SpiceSegment {
 
 };     // namespace Isis
 #endif
-
