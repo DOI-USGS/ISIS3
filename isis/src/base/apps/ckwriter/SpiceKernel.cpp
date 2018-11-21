@@ -60,20 +60,20 @@ void SpiceKernel::add(const QString &cfile) {
 }
 
 void SpiceKernel::add(Cube &cube) {
-  m_segments.push_back(SpiceSegment(cube));
+  m_segments.push_back(CkSpiceSegment(cube));
   return;
 }
-const SpiceSegment &SpiceKernel::operator[](const int i) const {
+const CkSpiceSegment &SpiceKernel::operator[](const int i) const {
  return (m_segments[i]);
 }
 
 
-bool CheckSegment(const SpiceSegment *s1, const SpiceSegment *s2) {
+bool CheckSegment(const CkSpiceSegment *s1, const CkSpiceSegment *s2) {
   return (s1->startTime() < s2->startTime());
 }
 
 QString SpiceKernel::getSummary(const QString &commfile) const {
-  vector<const SpiceSegment *> seglist;
+  vector<const CkSpiceSegment *> seglist;
   for ( int i = 0 ; i < size() ; i++) {
     seglist.push_back(&m_segments[i]);
   }
@@ -92,7 +92,7 @@ QString SpiceKernel::getSummary(const QString &commfile) const {
 
 bool SpiceKernel::validate() const {
 
- QVector<const SpiceSegment *> seglist;
+ QVector<const CkSpiceSegment *> seglist;
   for ( int i = 0 ; i < size() ; i++) {
     seglist.push_back(&m_segments[i]);
   }
@@ -124,13 +124,13 @@ bool SpiceKernel::validate() const {
      throw IException(IException::User, mess, _FILEINFO_);
   }
 
-  return (true); 
+  return (true);
 }
 
 
  void SpiceKernel::write(const QString &kname, const QString &comfile,
                          const int cktype) const {
-   vector<const SpiceSegment *> seglist;
+   vector<const CkSpiceSegment *> seglist;
    int comChars(0);
    for ( int i = 0 ; i < size() ; i++) {
      seglist.push_back(&m_segments[i]);
@@ -282,4 +282,3 @@ Segment (by file) Summary\n\
 }
 
 };  // namespace Isis
-

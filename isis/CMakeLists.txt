@@ -5,10 +5,13 @@
 
 # Specify the required version of CMake.  If your machine does not
 #  have this, it should be easy to build from https://cmake.org/download/
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10)
 
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+# set(CMAKE_FIND_FRAMEWORK LAST)
+set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
 
 set(CMAKE_FIND_FRAMEWORK LAST)
 
@@ -16,6 +19,8 @@ include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
+include(cmake/gtest.cmake)
+include(GoogleTest)
 
 #===============================================================================
 #===============================================================================
@@ -244,6 +249,13 @@ find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
+find_package(Threads)
+
+
+# Im this case, we specify the version numbers being searched for in the non-traditional installs.
+if(APPLE)
+find_package(OpenGL REQUIRED)
+endif(APPLE)
 
 if(pybindings)
  find_package(Python REQUIRED)
@@ -458,3 +470,9 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTA
 #   the end of this file containing a CMakeLists.txt file which includes all of
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
+option (BUILD_TESTS "Build tests" ON)
+if(BUILD_TESTS)
+  include(CTest)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

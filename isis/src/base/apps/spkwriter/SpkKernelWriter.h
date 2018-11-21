@@ -27,7 +27,7 @@
 #include <string>
 #include "SpiceKernel.h"
 #include "KernelWriter.h"
-#include "SpiceSegment.h"
+#include "SpkSpiceSegment.h"
 #include "SpkSegment.h"
 #include "FileName.h"
 namespace Isis {
@@ -60,8 +60,8 @@ typedef SpiceKernel<SpkSegment> SpkKernel;
  *
  * @author 2011-05-02 Kris Becker
  *
- * @internal 
- * @history 2013-12-19 Kris Becker Add user comments to header section rather 
+ * @internal
+ * @history 2013-12-19 Kris Becker Add user comments to header section rather
  *                                 than replace generic comments.
  */
 
@@ -199,5 +199,3 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
 }     // namespace Isis
 #endif
-
-

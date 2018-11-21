@@ -12,9 +12,8 @@ function(add_isis_app folder libDependencies)
   get_filename_component(appName ${folder}  NAME)
   set(internalAppName ${appName}_app)
 
-  # Get the source and header files
-  file(GLOB headers "${folder}/*.h" "${folder}/*.hpp")
-  file(GLOB sources "${folder}/*.c" "${folder}/*.cpp")
+  # Get the main and xml files
+  file(GLOB sources "${folder}/main.cpp")
   file(GLOB xmlFiles "${folder}/*.xml")
 
   # All the XML files need to be copied to the install directory
@@ -62,7 +61,10 @@ endfunction(add_isis_app)
 
 # Set up the lone unit test in an obj folder
 function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
-
+  if(NOT ${testFile})
+    # Skip if no unitest
+    return()
+  endif()
   # Get the object name (last folder part)
   get_filename_component(folder ${testFile} DIRECTORY)
   get_filename_component(filename ${folder} NAME)
@@ -99,9 +101,12 @@ function(add_isis_obj folder reqLibs)
 
   # Find the source and header files
   file(GLOB headers "${folder}/*.h" "${folder}/*.hpp")
+  # ignore app.cpp
   file(GLOB sources "${folder}/*.c" "${folder}/*.cpp")
   file(GLOB truths  "${folder}/*.truth")
   file(GLOB plugins "${folder}/*.plugin")
+
+  list(REMOVE_ITEM sources "${folder}/main.cpp")
 
   # Generate protobuf, ui, and moc files if needed.
   generate_protobuf_files(protoFiles ${folder})
@@ -203,8 +208,8 @@ function(add_isis_module name)
   foreach(f ${topFolders})
 
     # Folders: apps, lib, tests
-    set(objsDir "${CMAKE_CURRENT_LIST_DIR}/${f}/objs")
     set(appsDir "${CMAKE_CURRENT_LIST_DIR}/${f}/apps")
+    set(objsDir "${CMAKE_CURRENT_LIST_DIR}/${f}/objs")
     set(tstsDir "${CMAKE_CURRENT_LIST_DIR}/${f}/tsts")
 
     # Start with the objs folder
@@ -212,20 +217,19 @@ function(add_isis_module name)
     get_subdirectory_list(${appsDir} thisAppFolders)
     get_subdirectory_list(${tstsDir} thisTstFolders)
 
-    set(objFolders ${objFolders} ${thisObjFolders})
+    set(objFolders ${objFolders} ${thisObjFolders} ${thisAppFolders})
     set(appFolders ${appFolders} ${thisAppFolders})
     set(tstFolders ${tstFolders} ${thisTstFolders})
 
   endforeach()
-
   # Now that we have the library info, call function to add it to the build!
   # - Base module depends on 3rd party libs, other libs also depend on base.
   # - Only the base module gets both a static and shared library.
   if(${name} STREQUAL ${CORE_LIB_NAME})
-    set(reqLibs ${ALLLIBS})
+    set(reqLibs "${ALLLIBS};gtest;gmock;${CMAKE_THREAD_LIBS_INIT}")
     set(alsoStatic ON)
   else()
-    set(reqLibs "${CORE_LIB_NAME};${ALLLIBS}")
+    set(reqLibs "${CORE_LIB_NAME};${ALLLIBS};gtest;gmock;${CMAKE_THREAD_LIBS_INIT}")
     set(alsoStatic OFF)
   endif()
 
