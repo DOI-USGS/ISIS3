@@ -13,10 +13,10 @@ namespace Isis {
   TEST (MatrixTests, ConstructorWithDimensions) {
     Matrix A(2, 2, 2);
     
-    ASSERT_EQ(2, A[0][0]);
-    ASSERT_EQ(2, A[0][1]);
-    ASSERT_EQ(2, A[1][0]);
-    ASSERT_EQ(2, A[1][1]);
+    EXPECT_EQ(2, A[0][0]);
+    EXPECT_EQ(2, A[0][1]);
+    EXPECT_EQ(2, A[1][0]);
+    EXPECT_EQ(2, A[1][1]);
   }
   
   
@@ -24,20 +24,20 @@ namespace Isis {
     TNT::Array2D<double> matrix = TNT::Array2D<double>(2, 2, 2);
     Matrix A(matrix);
     
-    ASSERT_EQ(2, A[0][0]);
-    ASSERT_EQ(2, A[0][1]);
-    ASSERT_EQ(2, A[1][0]);
-    ASSERT_EQ(2, A[1][1]);
+    EXPECT_EQ(2, A[0][0]);
+    EXPECT_EQ(2, A[0][1]);
+    EXPECT_EQ(2, A[1][0]);
+    EXPECT_EQ(2, A[1][1]);
   }
 
 
   TEST (MatrixTests, IdentityMatrix) {
     Matrix I = Matrix::Identity(2);
     
-    ASSERT_EQ(1, I[0][0]);
-    ASSERT_EQ(0, I[0][1]);
-    ASSERT_EQ(0, I[1][0]);
-    ASSERT_EQ(1, I[1][1]);
+    EXPECT_EQ(1, I[0][0]);
+    EXPECT_EQ(0, I[0][1]);
+    EXPECT_EQ(0, I[1][0]);
+    EXPECT_EQ(1, I[1][1]);
   }
   
   
@@ -49,10 +49,10 @@ namespace Isis {
     A[1][0] = 3;
     A[1][1] = 4;
     
-    ASSERT_EQ(1, A[0][0]);
-    ASSERT_EQ(2, A[0][1]);
-    ASSERT_EQ(3, A[1][0]);
-    ASSERT_EQ(4, A[1][1]);
+    EXPECT_EQ(1, A[0][0]);
+    EXPECT_EQ(2, A[0][1]);
+    EXPECT_EQ(3, A[1][0]);
+    EXPECT_EQ(4, A[1][1]);
   }
 
 
@@ -61,17 +61,17 @@ namespace Isis {
     Matrix A(2, 2, 2);
     Matrix APopI = A + I;
     
-    ASSERT_EQ(3, APopI[0][0]);
-    ASSERT_EQ(2, APopI[0][1]);
-    ASSERT_EQ(2, APopI[1][0]);
-    ASSERT_EQ(3, APopI[1][1]);
+    EXPECT_EQ(3, APopI[0][0]);
+    EXPECT_EQ(2, APopI[0][1]);
+    EXPECT_EQ(2, APopI[1][0]);
+    EXPECT_EQ(3, APopI[1][1]);
     
     Matrix API = A.Add(I);
     
-    ASSERT_EQ(3, API[0][0]);
-    ASSERT_EQ(2, API[0][1]);
-    ASSERT_EQ(2, API[1][0]);
-    ASSERT_EQ(3, API[1][1]);
+    EXPECT_EQ(3, API[0][0]);
+    EXPECT_EQ(2, API[0][1]);
+    EXPECT_EQ(2, API[1][0]);
+    EXPECT_EQ(3, API[1][1]);
   }
 
 
@@ -80,17 +80,17 @@ namespace Isis {
     Matrix A(2, 2, 2);
     Matrix AMopI = A - I;
     
-    ASSERT_EQ(1, AMopI[0][0]);
-    ASSERT_EQ(2, AMopI[0][1]);
-    ASSERT_EQ(2, AMopI[1][0]);
-    ASSERT_EQ(1, AMopI[1][1]);
+    EXPECT_EQ(1, AMopI[0][0]);
+    EXPECT_EQ(2, AMopI[0][1]);
+    EXPECT_EQ(2, AMopI[1][0]);
+    EXPECT_EQ(1, AMopI[1][1]);
     
     Matrix AMI = A.Subtract(I);
     
-    ASSERT_EQ(1, AMI[0][0]);
-    ASSERT_EQ(2, AMI[0][1]);
-    ASSERT_EQ(2, AMI[1][0]);
-    ASSERT_EQ(1, AMI[1][1]);  
+    EXPECT_EQ(1, AMI[0][0]);
+    EXPECT_EQ(2, AMI[0][1]);
+    EXPECT_EQ(2, AMI[1][0]);
+    EXPECT_EQ(1, AMI[1][1]);  
   }
 
 
@@ -98,17 +98,17 @@ namespace Isis {
     Matrix A(2, 2, 2);
     Matrix AMSopI = A * 2;
     
-    ASSERT_EQ(4, AMSopI[0][0]);
-    ASSERT_EQ(4, AMSopI[0][1]);
-    ASSERT_EQ(4, AMSopI[1][0]);
-    ASSERT_EQ(4, AMSopI[1][1]);
+    EXPECT_EQ(4, AMSopI[0][0]);
+    EXPECT_EQ(4, AMSopI[0][1]);
+    EXPECT_EQ(4, AMSopI[1][0]);
+    EXPECT_EQ(4, AMSopI[1][1]);
     
     Matrix AMSI = A.Multiply(2);
     
-    ASSERT_EQ(4, AMSI[0][0]);
-    ASSERT_EQ(4, AMSI[0][1]);
-    ASSERT_EQ(4, AMSI[1][0]);
-    ASSERT_EQ(4, AMSI[1][1]);  
+    EXPECT_EQ(4, AMSI[0][0]);
+    EXPECT_EQ(4, AMSI[0][1]);
+    EXPECT_EQ(4, AMSI[1][0]);
+    EXPECT_EQ(4, AMSI[1][1]);  
   }
 
 
@@ -149,7 +149,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions")) 
+            << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Invalid matrix dimensions";
@@ -160,7 +161,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions")) 
+            << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Invalid matrix dimensions";
@@ -174,7 +176,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions")) 
+            << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Invalid matrix dimensions";
@@ -185,7 +188,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Invalid matrix dimensions")) 
+            << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Invalid matrix dimensions";
@@ -201,7 +205,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate the determinant, the matrix is not square"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate the determinant, the " 
+                                                   "matrix is not square")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Unable to calculate the determinant, the matrix is not square.";
@@ -217,7 +222,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate the trace, the matrix is not square"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate the trace, the matrix is "
+                                                   "not square")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Unable to calculate the trace, the matrix is not square.";
@@ -235,7 +241,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot add the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot add "
+                                                   "the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot add the matrices.";
@@ -246,7 +253,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot add the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot add "  
+                                                   "the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot add the matrices.";
@@ -264,7 +272,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot subtract the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot "  
+                                                   "subtract the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot subtract the matrices.";
@@ -275,7 +284,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot subtract the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot "  
+                                                   "subtract the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot subtract the matrices.";
@@ -292,7 +302,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot multiply the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot "  
+                                                   "multiply the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot multiply the matrices.";
@@ -310,7 +321,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot multiply the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot "  
+                                                   "multiply the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot multiply the matrices.";
@@ -321,7 +333,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot multiply the matrices"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Incompatible matrix dimensions, cannot "  
+                                                   "multiply the matrices")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Incompatible matrix dimensions, cannot multiply the matrices.";
@@ -337,7 +350,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate the inverse, the matrix is not square"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate the inverse, the matrix "  
+                                                   "is not square")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Unable to calculate the inverse, the matrix is not square.";
@@ -353,7 +367,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate eigenvalues, the matrix is not square"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate eigenvalues, the matrix "  
+                                                   "is not square")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Unable to calculate eigenvalues, the matrix is not square.";
@@ -369,7 +384,8 @@ namespace Isis {
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate eigenvectors, the matrix is not square"));
+      EXPECT_TRUE(e.toString().toLatin1().contains("Unable to calculate eigenvectors, the matrix "  
+                                                   "is not square")) << e.toString().toStdString();
     }
     catch(...) {
       FAIL() << "Expected error message: Unable to calculate eigenvectors, the matrix is not square.";
