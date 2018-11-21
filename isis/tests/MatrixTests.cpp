@@ -13,10 +13,19 @@ namespace Isis {
   TEST (MatrixTests, ConstructorWithDimensions) {
     Matrix A(2, 2, 2);
     
+<<<<<<< HEAD
     EXPECT_EQ(2, A[0][0]);
     EXPECT_EQ(2, A[0][1]);
     EXPECT_EQ(2, A[1][0]);
     EXPECT_EQ(2, A[1][1]);
+=======
+    ASSERT_EQ(2, A.Rows());
+    ASSERT_EQ(2, A.Columns());
+    EXPECT_EQ(2, A[0][0]);
+    EXPECT_EQ(2, A[0][1]);
+    ASSERT_EQ(2, A[1][0]);
+    ASSERT_EQ(2, A[1][1]);
+>>>>>>> fb067ae078613333d70412d288108580848d1a76
   }
   
   
