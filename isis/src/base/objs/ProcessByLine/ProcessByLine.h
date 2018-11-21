@@ -127,13 +127,15 @@ namespace Isis {
       void SetInputCube(Isis::Cube *inCube);
 
       void StartProcess(void funct(Isis::Buffer &inout));
+      virtual void StartProcess(std::function<void(Isis::Buffer &in)> funct );
+
       void StartProcess(void funct(Isis::Buffer &in, Isis::Buffer &out));
       void StartProcess(void
                         funct(std::vector<Isis::Buffer *> &in,
                               std::vector<Isis::Buffer *> &out));
 
       void SetBricks(IOCubes cn);
-      
+
       /**
        * Same functionality as StartProcess(void funct(Isis::Buffer &inout))
        * using Functors. The Functor operator(), takes the parameter

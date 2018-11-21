@@ -1,9 +1,9 @@
 Unit Test for TgoCassisCamera...
 FileName:  "CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub"
-CK Frame:  -143410
+Instrument Rotation Frame:  -143420
 
 Kernel IDs: 
-CK Frame ID =  -143410
+CK Frame ID =  -143000
 CK Reference ID =  1
 SPK Target ID =  -143
 SPK Reference ID =  1

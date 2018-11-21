@@ -10,6 +10,9 @@ cmake_minimum_required(VERSION 3.10)
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+# set(CMAKE_FIND_FRAMEWORK LAST)
+set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
+
 set(CMAKE_FIND_FRAMEWORK LAST)
 
 include(AddIsisModule)
@@ -30,16 +33,15 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.6.00.0")
+set(VERSION            "3.6.0.1")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2018-11-09")
-set(THIRD_PARTY_LIBS_VERSION  "v008")
-set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
+set(VERSION_DATE              "2018-10-26")
+set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
@@ -248,6 +250,12 @@ find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
 find_package(Threads)
+
+
+# Im this case, we specify the version numbers being searched for in the non-traditional installs.
+if(APPLE)
+find_package(OpenGL REQUIRED)
+endif(APPLE)
 
 if(pybindings)
  find_package(Python REQUIRED)

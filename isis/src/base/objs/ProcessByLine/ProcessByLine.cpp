@@ -158,7 +158,33 @@ namespace Isis {
    */
   void ProcessByLine::StartProcess(void funct(Isis::Buffer &inout)) {
     VerifyCubes(InPlace);
-    SetBricks(InPlace);    
+    SetBricks(InPlace);
+    ProcessByBrick::StartProcess(funct);
+  }
+
+
+  /**
+   * This method invokes the process by line operation over a single input or
+   * output cube. It will be an input cube if the method SetInputCube was
+   * invoked exactly one time before calling StartProcess. It will be an output
+   * cube if the SetOutputCube method was invoked exactly one time. Typically
+   * this method can be used to obtain statistics, histograms, or other
+   * information from an input cube.
+   *
+   * @deprecated Please use ProcessCubeInPlace()
+   * @param funct (Isis::Buffer &b) Name of your processing function
+   *
+   * @throws Isis::IException::Message
+   *
+   * @internal
+   *  @history 2005-02-28 Stuart Sides - Modified so cube that are opended
+   *                                     ReadWrite will be written. Before
+   *                                     only cube opened Write would be
+   *                                     written.
+   */
+  void ProcessByLine::StartProcess(std::function<void(Isis::Buffer &in)> funct ) {
+    VerifyCubes(InPlace);
+    SetBricks(InPlace);
     ProcessByBrick::StartProcess(funct);
   }
 
@@ -196,7 +222,7 @@ namespace Isis {
   void ProcessByLine::StartProcess(void funct(std::vector<Isis::Buffer *> &in,
                   std::vector<Isis::Buffer *> &out)) {
       VerifyCubes(InputOutputList);
-      SetBricks(InputOutputList);    
+      SetBricks(InputOutputList);
       ProcessByBrick::StartProcess(funct);
   }
 }
