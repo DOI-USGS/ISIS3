@@ -678,7 +678,7 @@ TEST(BundleSettings, maximumLikelihoodWelsch) {
   catch (IException &e) {
     EXPECT_THAT(
           e.toString().toStdString(),
-          ::testing::HasSubstr("the first model must be of type HUBER or HUBER_MODIFIED.")
+          ::testing::HasSubstr("the first model must be of type HUBER or HUBER_MODIFIED")
     );
   }
   catch (...) {
@@ -701,7 +701,7 @@ TEST(BundleSettings, maximumLikelihoodChen) {
   catch (IException &e) {
     EXPECT_THAT(
           e.toString().toStdString(),
-          ::testing::HasSubstr("the first model must be of type HUBER or HUBER_MODIFIED.")
+          ::testing::HasSubstr("the first model must be of type HUBER or HUBER_MODIFIED")
     );
   }
   catch (...) {

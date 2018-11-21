@@ -175,7 +175,7 @@ TEST(AngleExceptions, NullAngleLessThanOrEqual){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator."))
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the < operator"))
        << e.toString().toStdString();
    }
    catch(...) {
@@ -209,7 +209,7 @@ TEST(AngleExceptions, GreaterThanOrEqualToNullAngle){
     FAIL() << "Expected an error";
    }
    catch(Isis::IException &e) {
-     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator."))
+     EXPECT_TRUE(e.toString().contains("Cannot compare a invalid angles with the > operator"))
        << e.toString().toStdString();
    }
    catch(...) {
