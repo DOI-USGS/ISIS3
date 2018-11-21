@@ -23,15 +23,17 @@ namespace Isis {
         QString contents,
         int errorCode) {
     if ( !e.toString().contains(contents) ) {
-      return ::testing::AssertionFailure() << e_expr << "\'s error message ("
-          << e.toString().toStdString() << ") does not contain "
-          << contents_expr << " (" << contents.toStdString() << ").";
+      return ::testing::AssertionFailure() << "IException " << e_expr
+          << "\'s error message (" << e.toString().toStdString()
+          << ") does not contain " << contents_expr << " ("
+          << contents.toStdString() << ").";
     }
 
     if( e.errorType()!=errorCode ) {
-      return ::testing::AssertionFailure() << e_expr << "\'s error code ("
-          << std::to_string(e.errorType()) << ") does not equal "
-          << errorCode_expr << " (" << std::to_string(errorCode) << ").";
+      return ::testing::AssertionFailure() << "IException " << e_expr
+          << "\'s error code (" << std::to_string(e.errorType())
+          << ") does not equal " << errorCode_expr << " ("
+          << std::to_string(errorCode) << ").";
     }
 
     return ::testing::AssertionSuccess();
