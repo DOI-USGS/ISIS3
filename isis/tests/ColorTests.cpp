@@ -34,11 +34,14 @@ namespace Isis{
       FAIL() << "Expected an IException";
     }
     catch(IException &e) {
-      EXPECT_PRED_FORMAT3(
-            AssertIException,
+      EXPECT_PRED_FORMAT2(
+            AssertIExceptionMessage,
             e,
-            message,
-            IException::Unknown);
+            message);
+      EXPECT_PRED_FORMAT2(
+            AssertIExceptionError,
+            e,
+            IException::ErrorType::Unknown);
     }
     catch(...) {
       FAIL() << "Expected error message: \"" << message.toStdString() << "\"";
