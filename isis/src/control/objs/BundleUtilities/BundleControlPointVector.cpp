@@ -4,6 +4,7 @@
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 
+#include "BundleTargetBody.h"
 #include "IException.h"
 
 namespace Isis {
@@ -60,9 +61,10 @@ namespace Isis {
    *
    */
   void BundleControlPointVector::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                                           LinearAlgebra::Vector &imageSolution) {
+                                                           LinearAlgebra::Vector &imageSolution,
+                                                           const BundleTargetBodyQsp target) {
     for (int i = 0; i < size(); i++) {
-      at(i)->applyParameterCorrections(normalsMatrix, imageSolution);
+      at(i)->applyParameterCorrections(normalsMatrix, imageSolution, target);
     }
   }
 

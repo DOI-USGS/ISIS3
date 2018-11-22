@@ -143,10 +143,11 @@ namespace Isis {
    *
    */
   void BundleLidarControlPoint::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                                          LinearAlgebra::Vector &imageSolution) {
+                                                          LinearAlgebra::Vector &imageSolution,
+                                                          const BundleTargetBodyQsp target) {
 
     // call parent class version
-    BundleControlPoint::applyParameterCorrections(normalsMatrix, imageSolution);
+    BundleControlPoint::applyParameterCorrections(normalsMatrix, imageSolution, target);
 
     // update any lidar point range constraints
     for ( int i = 0; i < m_rangeConstraints.size(); i++) {

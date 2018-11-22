@@ -355,9 +355,9 @@ namespace Isis {
    * @param factor The unit conversion factor to use on lat and lon rad or x/y/z km.
    * @param target The BundleTargetBody.
    */
-  void BundleControlPoint::applyParameterCorrections(LinearAlgebra::Vector imageSolution,
-                                               SparseBlockMatrix &sparseNormals,
-                                               const BundleTargetBodyQsp target) {
+  void BundleControlPoint::applyParameterCorrections(SparseBlockMatrix &sparseNormals,
+                                                     LinearAlgebra::Vector imageSolution,
+                                                     const BundleTargetBodyQsp target) {
     if (!isRejected()) {
         
       // subtract product of Q and nj from NIC
@@ -1148,86 +1148,6 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
                                              Displacement(pointZ, Displacement::Meters));
       // Reset the point now that it has been updated
       setAdjustedSurfacePoint(surfacepoint);
-  }
-
-
-  /**
-   * Apply point parameter corrections for in Bundle Adjustment.
-   *
-   * @param normalsMatrix Normal equations matrix.
-   * @param imageSolution Current iteration solution vector for image parameters.
-   *
-   */
-  void BundleControlPoint::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                                     LinearAlgebra::Vector &imageSolution) {
-
-    // subtract product of Q and nj from NIC
-    productAlphaAV(-1.0, normalsMatrix, imageSolution);
-
-    SurfacePoint surfacepoint = adjustedSurfacePoint();
-
-    double pointLat = surfacepoint.GetLatitude().degrees();
-    double pointLon = surfacepoint.GetLongitude().degrees();
-    double pointRad = surfacepoint.GetLocalRadius().meters();
-
-    pointLat += RAD2DEG * m_nicVector(0);
-    pointLon += RAD2DEG * m_nicVector(1);
-
-    // Make sure updated values are still in valid range.
-    // TODO What is the valid lon range?
-    if (pointLat < -90.0) {
-      pointLat = -180.0 - pointLat;
-      pointLon = pointLon + 180.0;
-    }
-    if (pointLat > 90.0) {
-      pointLat = 180.0 - pointLat;
-      pointLon = pointLon + 180.0;
-    }
-    while (pointLon > 360.0) {
-      pointLon = pointLon - 360.0;
-    }
-    while (pointLon < 0.0) {
-      pointLon = pointLon + 360.0;
-    }
-
-    pointRad += 1000.*m_nicVector(2);
-
-    // sum and save corrections
-    m_corrections += m_nicVector;
-
-/*
-      // ken testing - if solving for target body mean radius, set radius to current
-      // mean radius value
-      // TODO: What if this point is FIXED or CONSTRAINED?
-      //       feels wrong in that case?
-      if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
-          || m_bundleTargetBody->solveTriaxialRadii())) {
-        if (m_bundleTargetBody->solveMeanRadius()) {
-          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                               Longitude(pointLon, Angle::Degrees),
-                                               m_bundleTargetBody->meanRadius());
-        }
-        else if (m_bundleTargetBody->solveTriaxialRadii()) {
-            Distance localRadius = m_bundleTargetBody->
-                                       localRadius(Latitude(pointLat, Angle::Degrees),
-                                                   Longitude(pointLon, Angle::Degrees));
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                                 Longitude(pointLon, Angle::Degrees),
-                                                 localRadius);
-        }
-      }
-      else {
-        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                             Longitude(pointLon, Angle::Degrees),
-                                             Distance(pointRad, Distance::Meters));
-      }
-*/
-
-    surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                         Longitude(pointLon, Angle::Degrees),
-                                         Distance(pointRad, Distance::Meters));
-
-    setAdjustedSurfacePoint(surfacepoint);
   }
 
 

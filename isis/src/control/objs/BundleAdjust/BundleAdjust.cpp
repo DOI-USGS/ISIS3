@@ -507,6 +507,11 @@ namespace Isis {
       }
     }
 
+    // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
+    // TODO!!! - should these initializations just be done when we add the new observation above?
+    m_bundleObservations.initializeExteriorOrientation();
+
+
     if (m_bundleSettings->solveTargetBody()) {
       m_bundleObservations.setBodyRotation();
     }
@@ -545,7 +550,8 @@ namespace Isis {
     if (m_lidarDataSet) {
       numLidarPoints = m_lidarDataSet->points().size();
     }
-    for (int i = 0; i < numLidarPoints; i++) {
+    for (int i =
+         0; i < numLidarPoints; i++) {
       LidarControlPointQsp lidarPoint = m_lidarDataSet->points().at(i);
       if (lidarPoint->IsIgnored()) {
         continue;
@@ -1431,7 +1437,7 @@ namespace Isis {
 
       // form N12 target portion
       N12.insertMatrixBlock(0, numTargetPartials, 3);
-      *N12[0] += prod(trans(coeffTarget), coeffPoint3D);;
+      *N12[0] += prod(trans(coeffTarget), coeffPoint3D);
 
       // contribution to n1 vector
       vector_range<LinearAlgebra::VectorCompressed >
@@ -1475,7 +1481,7 @@ namespace Isis {
     // solving for pointing
     if (pointingBlockIndex >= 0) {
 
-      // insert submatrix into normal equations at positionBlockIndex, positionBlockIndex
+      // insert submatrix into normal equations at pointingBlockIndex, pointingBlockIndex
       // if block is already there, no insertion is made
       m_sparseNormals.insertMatrixBlock(pointingBlockIndex, pointingBlockIndex,
                                         coeffImagePointing.size2(), coeffImagePointing.size2());
@@ -2533,7 +2539,8 @@ namespace Isis {
       }
     }
 
-    measure.parentBundleObservation()->computePartials(coeffImagePosition, coeffImagePointing);
+    measure.parentBundleObservation()->computePartials(coeffImagePosition, coeffImagePointing,
+                                                       *measureCamera);
 
     // Complete partials calculations for 3D point (latitudinal or rectangular)
     measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
@@ -2626,7 +2633,8 @@ namespace Isis {
         
     // Apply parameter corrections for control points
     // TODO: can we do this faster by threading with QtConcurrent::run?
-    m_bundleControlPoints.applyParameterCorrections(m_sparseNormals, m_imageSolution);
+    m_bundleControlPoints.applyParameterCorrections(m_sparseNormals, m_imageSolution,
+                                                    m_bundleTargetBody);
   }
 
 

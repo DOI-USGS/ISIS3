@@ -54,7 +54,9 @@ namespace Isis {
       BundleControlPointVector &operator=(const BundleControlPointVector &src);
 
       void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                     LinearAlgebra::Vector &imageSolution);
+                                     LinearAlgebra::Vector &imageSolution,
+                                     const BundleTargetBodyQsp target);
+
       void computeMeasureResiduals();
       double vtpvContribution();
       double vtpvMeasureContribution();
