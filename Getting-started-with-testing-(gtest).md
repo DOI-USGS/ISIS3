@@ -1,5 +1,5 @@
-## Creating a test suite for a class
-1. Create a new file `ClassNameTests.cpp` in `isis/tests/`.
+# Creating a new test suite
+1. Create a new file `ClassNameTests.cpp` in `isis/tests/`. For example, the tests for the Cube class should be in `CubeTests.cpp`.
 1. Add `#include <gtest/gtest.h>` to the file.
 1. Write your test cases.
 
