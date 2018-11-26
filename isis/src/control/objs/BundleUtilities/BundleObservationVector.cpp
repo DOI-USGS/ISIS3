@@ -141,7 +141,7 @@ namespace Isis {
       append(bundleObservation);
 
       // initialize exterior orientation (spice) for all BundleImages in BundleObservation
-      bundleObservation->initializeExteriorOrientation();
+//      bundleObservation->initializeExteriorOrientation();
 
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
@@ -278,15 +278,14 @@ namespace Isis {
   }
 
 
-  /**
-   * Initializes the exterior orientations for the contained BundleObservations.
-   *
-   * @return bool Returns true upon successful initialization
-   */
   bool BundleObservationVector::initializeExteriorOrientation() {
+    int normalsMatrixStartBlock = 0;
     int nObservations = size();
     for (int i = 0; i < nObservations; i++) {
       BundleObservationQsp observation = at(i);
+      observation->setNormalsMatrixStartBlock(normalsMatrixStartBlock);
+      normalsMatrixStartBlock += observation->numberPolynomialSegments();
+
       observation->initializeExteriorOrientation();
     }
 
