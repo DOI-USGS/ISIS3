@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id: hicalbeta.xml,v 1.15 2009/09/15 21:56:44 kbecker Exp $ -->
+<!-- $Id: hical.xml 3254 2011-09-19 05:11:01Z kbecker@GS.DOI.NET $ -->
 
-<application name="hicalbeta" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="hical" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Performs radiometric calibration of HiRISE channel images
@@ -9,7 +9,7 @@
 
   <description>
      <p>
-        <b>hicalbeta</b> appiles radiometric calibration correction to HiRISE 
+        <b>hical</b> appiles radiometric calibration correction to HiRISE 
         images.  This particular version is deemed experimental, thus the beta
         designation.  The radiometric calibration correction is performed on 
         each individual HiRISE channel file (EDR) correcting for drift,
@@ -56,7 +56,7 @@
                 equal the total number of image lines. <br/>
             </li>
         </ul>
-        Note that these data BLOBs are removed by <b>hicalbeta</b> in the output 
+        Note that these data BLOBs are removed by <b>hical</b> in the output 
         file so that repeated runs of this application are prevented.
     </p>
     <p>
@@ -144,7 +144,7 @@
             <p>
                 The real power of the configuration file is its use of named Profiles.
                 Profiles are groups of keywords that can be associated to a
-                unique definition.  The hicalbeta PVL configuration file 
+                unique definition.  The hical PVL configuration file 
                 consists of a single  <b>Hical</b> object with numerous named 
                 <b>Profile</b> groups.  Each of the Profile groups must contain 
                 a <b>Name</b> keyword that uniquely identifies it within the 
@@ -215,16 +215,16 @@
             <PRE>
 
 #  HiRISE Calibration Matricies configuration file
-#  See documentation for the hicalbeta application on the content and form of
+#  See documentation for the hical application on the content and form of
 #  this file.
 Object = Hical
 
-  Program = "hicalbeta"
+  Program = "hical"
 
   Name           = "HiMatrices"
   DefaultProfile = "HiMatrices"
 
-/* If you want to rerun hicalbeta, you must set PropagateTables to True.  Use */
+/* If you want to rerun hical, you must set PropagateTables to True.  Use */
 /* this in conjuction with Debug::SkipModule = True option for each module. */
   PropagateTables = False
 
@@ -338,21 +338,21 @@ Object = Hical
     Module = ZeroDark
 
 /* Define the B matrix file reference */
-    B = "$mro/calibration/matrices/beta/B_TDI{TDI}_BIN{BIN}_hicalbeta_????.cub"
+    B = "$mro/calibration/matrices/beta/B_TDI{TDI}_BIN{BIN}_hical_????.cub"
     SkipLines        = 1
-    Slope            = "$mro/calibration/matrices/beta/t_slope_CH{CHANNEL}_hicalbeta_????.csv"
-    Intercept        = "$mro/calibration/matrices/beta/t_intercept_CH{CHANNEL}_hicalbeta_????.csv"
+    Slope            = "$mro/calibration/matrices/beta/t_slope_CH{CHANNEL}_hical_????.csv"
+    Intercept        = "$mro/calibration/matrices/beta/t_intercept_CH{CHANNEL}_hical_????.csv"
 
 /* As of version 0020, 9 March 2010, we will be using the following names and formats */
 /* We are calling this the DarkCurrent now.  The filename will stay the same (with a .csv extension) */
-    DarkCurrent = "$mro/calibration/matrices/beta/B_TDI{TDI}_BIN{BIN}_hicalbeta_????.csv"
+    DarkCurrent = "$mro/calibration/matrices/beta/B_TDI{TDI}_BIN{BIN}_hical_????.csv"
     DarkCurrentColumnName = "{CCD}/{CHANNEL}"
 
 /* The slope and intercepts to the temperature-dependent correction to the dark current are given below. */
-    DarkSlope = "$mro/calibration/matrices/beta/B_Temperature_Slope_hicalbeta_????.csv"
+    DarkSlope = "$mro/calibration/matrices/beta/B_Temperature_Slope_hical_????.csv"
     DarkSlopeColumnName = "CH{CHANNEL}_TDI{TDI}"
 
-    DarkIntercept = "$mro/calibration/matrices/beta/B_Temperature_Intercept_hicalbeta_????.csv"
+    DarkIntercept = "$mro/calibration/matrices/beta/B_Temperature_Intercept_hical_????.csv"
     DarkInterceptColumnName = "CH{CHANNEL}_TDI{TDI}"
 
     /* Do filtering? */
@@ -366,7 +366,7 @@ Object = Hical
     Module = GainNonLinearity
   
 /* Define the nonlinearity correction coefficients */
-    NonLinearityGain = "$mro/calibration/matrices/beta/Gain_NonLinearity_BIN{BIN}_hicalbeta_????.csv"
+    NonLinearityGain = "$mro/calibration/matrices/beta/Gain_NonLinearity_BIN{BIN}_hical_????.csv"
     NonLinearityGainRowName  = "{CCD}_{CHANNEL}"
   End_Group
 
@@ -380,12 +380,12 @@ Object = Hical
     Module = GainLineDrift
 
     SkipLines            = 1
-/* Added "_hicalbeta" to filename as of 2008-04-02.  This is consistant with */
+/* Added "_hical" to filename as of 2008-04-02.  This is consistant with */
 /* naming convention used for the beta version of hical. */
-    GainLineCoefficients = "$mro/calibration/matrices/beta/line_correct_{BIN}_hicalbeta_????.csv"
+    GainLineCoefficients = "$mro/calibration/matrices/beta/line_correct_{BIN}_hical_????.csv"
 
 /* As of version 0020, 9 March 2010, these are more correctly, called the LineGainDrift correction*/
-    LineGainDrift = "$mro/calibration/matrices/beta/Line_Gain_Drift_BIN{BIN}_hicalbeta_????.csv"
+    LineGainDrift = "$mro/calibration/matrices/beta/Line_Gain_Drift_BIN{BIN}_hical_????.csv"
     LineGainDriftColumnHeader = True
     LineGainDriftRowName = "{CCD}/{CHANNEL}"
   End_Group
@@ -397,10 +397,10 @@ Object = Hical
     Module = GainChannelNormalize
 
 /* Define the G matrix file reference */
-    G = "$mro/calibration/matrices/beta/G_TDI{TDI}_BIN{BIN}_hicalbeta_????.cub"
+    G = "$mro/calibration/matrices/beta/G_TDI{TDI}_BIN{BIN}_hical_????.cub"
 
 /* As of version 0020, 9 March 2010, these coefficients have been renamed to Gains. */
-    Gains = "$mro/calibration/matrices/beta/Gains_hicalbeta_????.csv"
+    Gains = "$mro/calibration/matrices/beta/Gains_hical_????.csv"
     GainsRowName = "{BIN}"
     GainsColumnName = "{CCD}/{CHANNEL}"
   End_Group
@@ -412,11 +412,11 @@ Object = Hical
     Module = GainFlatField
 
 /* Define the A matrix file reference */
-     A = "$mro/calibration/matrices/beta/A_TDI{TDI}_BIN{BIN}_hicalbeta_????.cub"
+     A = "$mro/calibration/matrices/beta/A_TDI{TDI}_BIN{BIN}_hical_????.cub"
 
 /* As of version 0020, 9 March 2010, These have the same filename with a .csv extension.*/
 /* As of version 0020, 9 March 2010, These coefficients are now called Flats. */
-    Flats = "$mro/calibration/matrices/beta/A_TDI{TDI}_BIN{BIN}_hicalbeta_????.csv"
+    Flats = "$mro/calibration/matrices/beta/A_TDI{TDI}_BIN{BIN}_hical_????.csv"
     FlatsColumnName = "{CCD}/{CHANNEL}"
   End_Group
 
@@ -522,7 +522,7 @@ End_Object
                 <br><h1 align="center">Application Control Parameters</h1></br>
                 <TABLE BORDER="1">
                       <CAPTION>
-                        Description of main <b>hicalbeta</b> configuration 
+                        Description of main <b>hical</b> configuration 
                         parameters.  These parameters govern profile loading, 
                         filename pattern replacement and debugging operations.   
                         Note that keywords in this section are present in all 
@@ -566,12 +566,12 @@ End_Object
                          FROM file to the TO file when the file is completed.  
                          This has some interesting implications.  When False, 
                          all Table objects in the FROM file are removed in the 
-                         TO file, which in effect prevents hicalbeta from being 
+                         TO file, which in effect prevents hical from being 
                          able to run again.  However, because of debugging 
                          capabilities, one may want to select which calibration 
                          modules are run.  Setting this to True will propagate 
                          all Table objects (BLOBs) in the FROM file to the TO 
-                         file so that hicalbeta can be run again to apply other 
+                         file so that hical can be run again to apply other 
                          modules.
                        </TD>
                     </TR>
@@ -635,7 +635,7 @@ End_Object
                             the calibration process.   This is very useful for 
                             debugging and seeing how each module contributes.   
                             Be sure to set <b>ProgagateTables</b> to True if you 
-                            intend to perform subsequent runs of hicalbeta.
+                            intend to perform subsequent runs of hical.
                         </TD>
                     </TR>
                     <TR>
@@ -682,7 +682,7 @@ End_Object
                     </TR>
                 </TABLE>
       <p>
-          The following tables describe <b>hicalbeta</b> module processing 
+          The following tables describe <b>hical</b> module processing 
           overview.  A general description of the module processing steps and 
           configuration file parameters for the modules are provided.  Note that 
           each module contains a <b>Name</b> and <b>Module</b> parameter that 
@@ -696,7 +696,7 @@ End_Object
           profiles are modules.   Multiple profiles can be loaded to fully 
           define a set of module parameters.    The order of potential profiles 
           that are loaded in addition to the one requested directly in                                                      
-          <b>hicalbeta</b> application is specified by the                                 
+          <b>hical</b> application is specified by the                                 
           <i>ProfileOptions</i> keyword as described above.
       </p>
             <br><h1 align="center">ZeroBufferSmooth Module Parameters</h1> </br>
@@ -886,7 +886,7 @@ End_Object
                             component is determined.  The default file name is 
                             "ReverseClockStatistics.XXXX.conf" where "XXXX" is a 
                             version number.   Note that the contents of the 
-                            composed hicalbeta configuration profile is used to 
+                            composed hical configuration profile is used to 
                             provide initial values for the profile loaded out of 
                             this file.  
                           </CAPTION>
@@ -988,7 +988,7 @@ End_Object
                       because of the low number of in-flight dark frame images 
                       acquired--all bin modes were utilized to generate these 
                       linear fits. 
-                      <b>hicalbeta</b> does a rebin to expand or contract the 
+                      <b>hical</b> does a rebin to expand or contract the 
                       bin4 linear coefficients to bin8, bin2, or bin1, depending 
                       on the bin mode of the image being calibrated. 
                   </CAPTION>
@@ -1043,7 +1043,7 @@ End_Object
             <br><h1 align="center">GainLineDrift Module Parameters</h1> </br>
             <TABLE BORDER="1">
                   <CAPTION> 
-                      The GainLineDrift module in hicalbeta uses the line
+                      The GainLineDrift module in hical uses the line
                       correction coefficients which are contained in the file as 
                       patterned by the <i>LineGainDrift</i> as defined below.  
                       This file contains 4 parameters (C[1234]) and is applied 
@@ -1094,7 +1094,7 @@ End_Object
             <br><h1 align="center">GainNonLinearity Module Parameters</h1> </br>
             <TABLE BORDER="1">
                   <CAPTION> 
-                       The GainNonLinearity module in hicalbeta uses the 
+                       The GainNonLinearity module in hical uses the 
                        nonlinearity coefficients that are derived as a function 
                        of binning mode.  These coefficients are used in the 
                        following equations to correct for nonlinear gain 
@@ -1132,7 +1132,7 @@ End_Object
             <br><h1 align="center">GainChannelNormalize Module Parameters</h1> </br>
             <TABLE BORDER="1">
                   <CAPTION> 
-                      The GainChannelNormalize module in hicalbeta uses the 
+                      The GainChannelNormalize module in hical uses the 
                       bin, TDI, CCD, and Channel dependent coefficients 
                       described below in the equation "GCN = GCNc * 128 / (TDI 
                       * bin^2)" where GCNc is the normalization coefficient 
@@ -1270,7 +1270,7 @@ End_Object
                     <TD>
                         Specifies the filter dependent gain correction factor.  
                         Note that these values are found in the BG,  RED, and IR 
-                        profiles and <b>hicalbeta</b> relies on the profile 
+                        profiles and <b>hical</b> relies on the profile 
                         options to load the proper parameter at runtime. 
                     </TD>
                 </TR>
@@ -1407,6 +1407,9 @@ End_Object
        Renamed many of the modules to better reflect their function.  
        Extensively updated the program documentation. 
    </change>
+   <change name="Kris Becker" date="2011-09-18">
+       Merged hicalbeta changes into hical to make new release
+   </change>
   </history>
 
   <category>
@@ -1430,13 +1433,13 @@ End_Object
         <type>filename</type>
         <fileMode>input</fileMode>
         <defaultPath>$mro/calibration</defaultPath>
-        <default><item>$mro/calibration/hicalbeta.????.conf</item></default>   
+        <default><item>$mro/calibration/hical.????.conf</item></default>   
         <brief>
             File containing HiRISE calibration and matrix configuration parameters
         </brief>
 	    <filter>*.conf</filter>
         <description>
-            This file is critical to the proper functioning of hicalbeta.  It 
+            This file is critical to the proper functioning of hical.  It 
              contains parameters that are loaded to provide necessary data used 
              in the calibration of HiRISE CCD channels.  It is extensively 
              documented in the main documentation section of this application.
