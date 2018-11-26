@@ -61,7 +61,7 @@ endfunction(add_isis_app)
 
 # Set up the lone unit test in an obj folder
 function(make_obj_unit_test moduleName testFile truthFile reqLibs pluginLibs)
-  if(NOT ${testFile})
+  if(${testFile} STREQUAL "NOTFOUND")
     # Skip if no unitest
     return()
   endif()
