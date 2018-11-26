@@ -81,8 +81,9 @@ namespace Isis {
                                             LinearAlgebra::Vector& n2,
                                             BundleMeasureQsp measure);
 
-      virtual void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                             LinearAlgebra::Vector &imageSolution);
+      virtual void applyParameterCorrections(SparseBlockMatrix &sparseNormals,
+                                             LinearAlgebra::Vector &imageSolution,
+                                             const BundleTargetBodyQsp target);
 
       virtual double vtpvRangeContribution();
 

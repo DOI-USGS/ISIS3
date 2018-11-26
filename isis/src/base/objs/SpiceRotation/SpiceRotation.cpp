@@ -1681,6 +1681,8 @@ namespace Isis {
     // Otherwise, fit the polynomial.
     else {
       m_polynomial = fitPolynomial(p_degree, m_segments);
+      // TODO: ask Debbie about placement of next statement...
+      p_degreeApplied = true;
     }
 
     p_source = type;
@@ -2064,7 +2066,7 @@ namespace Isis {
     double derivative;
     double time = (p_et - p_baseTime) / p_timeScale;
 
-    if (coeffIndex > 0  && coeffIndex <= p_degree) {
+    if (coeffIndex > 0  && coeffIndex <= m_polynomial.degree()) {
       derivative = pow(time, coeffIndex);
     }
     else if (coeffIndex == 0) {
@@ -2074,7 +2076,7 @@ namespace Isis {
       QString msg = "Unable to evaluate the derivative of the SPICE rotation fit polynomial for "
                     "the given coefficient index [" + toString(coeffIndex) + "]. "
                     "Index is negative or exceeds degree of polynomial ["
-                    + toString(p_degree) + "]";
+                    + toString(m_polynomial.degree()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return derivative;
@@ -2277,6 +2279,8 @@ namespace Isis {
     // If polynomials have not been applied yet then simply set the degree and return
     if (!p_degreeApplied) {
       p_degree = degree;
+      // TODO: verify
+      m_polynomial.setDegree(degree);
     }
 
     // Otherwise adjust the degree.
@@ -2300,6 +2304,8 @@ namespace Isis {
 
       // Change the polynomial degree
       m_polynomial.setDegree(degree);
+// TODO: verify next line
+      p_degree = degree;
 
       // Reset the coefficients
       for (int i = 0; i < m_segments; i++) {

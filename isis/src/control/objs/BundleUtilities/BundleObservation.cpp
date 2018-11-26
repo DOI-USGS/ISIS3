@@ -15,6 +15,7 @@
 
 // Isis lib
 #include "BundleImage.h"
+#include "BundleMeasure.h"
 #include "BundlePolynomialContinuityConstraint.h"
 #include "BundleTargetBody.h"
 #include "Camera.h"
@@ -395,8 +396,6 @@ namespace Isis {
       return false;
     }
 
-    BundleImageQsp image = at(0);
-
     if (m_solveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
 
@@ -651,15 +650,16 @@ namespace Isis {
    *
    * @param coeffImagePosition Matrix of partial derivatives for position parameters.
    * @param coeffImagePointing Matrix of partial derivatives for pointing parameters.
+   * @param camera Camera. This will vary for each image in the observation.
    *
    */
 void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePosition,
-                                        LinearAlgebra::Matrix &coeffImagePointing) {
-    BundleImageQsp image = at(0);
+                                        LinearAlgebra::Matrix &coeffImagePointing,
+                                        Camera &camera) {
 
-    // get numbers of spk and ck coefficients being solved
-    int numCamPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
-    int numCamAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+  // get numbers of spk and ck coefficients being solved
+  int numCamPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
+  int numCamAngleCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
     // resize coeffImagePosition matrix if necessary
     if ((int) coeffImagePosition.size2() != positionSegmentSize()) {
@@ -679,7 +679,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
+        camera.GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, cameraCoef,
                                                     &coeffImagePosition(0, index),
                                                     &coeffImagePosition(1, index));
         index++;
@@ -687,7 +687,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
 
       // Add the partial for the y coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
+        camera.GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, cameraCoef,
                                                     &coeffImagePosition(0, index),
                                                     &coeffImagePosition(1, index));
         index++;
@@ -695,7 +695,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
 
       // Add the partial for the z coordinate of the position
       for (int cameraCoef = 0; cameraCoef < numCamPositionCoefficients; cameraCoef++) {
-        image->camera()->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
+        camera.GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, cameraCoef,
                                                     &coeffImagePosition(0, index),
                                                     &coeffImagePosition(1, index));
         index++;
@@ -709,7 +709,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
 
       // Add the partials for ra
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-        image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
+        camera.GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
                                                        cameraCoef, &coeffImagePointing(0, index),
                                                        &coeffImagePointing(1, index));
         index++;
@@ -717,7 +717,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
 
       // Add the partials for dec
       for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-        image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
+        camera.GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
                                                        cameraCoef, &coeffImagePointing(0, index),
                                                        &coeffImagePointing(1, index));
         index++;
@@ -726,7 +726,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
       // Add the partial for twist if necessary
       if (m_solveSettings->solveTwist()) {
         for (int cameraCoef = 0; cameraCoef < numCamAngleCoefficients; cameraCoef++) {
-          image->camera()->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
+          camera.GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
                                                          cameraCoef, &coeffImagePointing(0, index),
                                                          &coeffImagePointing(1, index));
           index++;
@@ -736,7 +736,7 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
   }
 
 
-  /**
+/**
    * Applies the parameter corrections 
    *
    * @param corrections Vector of corrections to apply

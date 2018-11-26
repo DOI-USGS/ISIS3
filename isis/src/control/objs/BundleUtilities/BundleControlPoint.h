@@ -136,8 +136,6 @@ namespace Isis {
       void setSigmaWeightFromGlobals(double gSigma, int index, double cFactor); 
       void zeroNumberOfRejectedMeasures();
       void productAlphaAV(double alpha, SparseBlockMatrix &sparseMatrix, LinearAlgebra::Vector &v1);
-      void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
-           SparseBlockMatrix &sparseNormals, const BundleTargetBodyQsp target);
 
       // accessors
       ControlPoint *rawControlPoint() const;
@@ -173,8 +171,9 @@ namespace Isis {
       QString formatCoordAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
                                                 bool errorPropagation) const;
 
-      virtual void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                             LinearAlgebra::Vector &imageSolution);
+      virtual void applyParameterCorrections(SparseBlockMatrix &sparseNormals,
+                                             LinearAlgebra::Vector imageSolution,
+                                             const BundleTargetBodyQsp target);
 
       virtual double measureSigma();
       virtual double measureWeight();

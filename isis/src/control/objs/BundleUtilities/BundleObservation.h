@@ -34,6 +34,7 @@
 namespace Isis {
   class BundleImage;
   class BundlePolynomialContinuityConstraint;
+  class Camera;
   class SpicePosition;
   class SpiceRotation;
 
@@ -179,7 +180,7 @@ namespace Isis {
       const BundleObservationSolveSettingsQsp solveSettings();
 
       void computePartials(LinearAlgebra::Matrix &coeffImagePosition,     //!< multi-segment version
-                           LinearAlgebra::Matrix &coeffImagePointing);
+                           LinearAlgebra::Matrix &coeffImagePointing, Camera &camera);
       bool applyParameterCorrections(LinearAlgebra::Vector corrections, bool updateBodyRotation=false);
 
       SparseBlockMatrix &continuityContraintSpkMatrix();
