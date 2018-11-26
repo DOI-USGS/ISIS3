@@ -5,9 +5,9 @@
 
 Note: If your tests require the use of ISIS' Null value, you will need to include SpecialPixel.h
 
-## General Testing Tips
+# General Testing Tips
 
-### Testing exceptions
+## Testing exceptions
 Testing for exception throws in gtest can be rather convoluted. Through testing and looking at what others have done, we have settled on using the following setup to test an exception throw:
 
 ```
@@ -27,15 +27,15 @@ Be sure to choose a substring of the exception message that will uniquely identi
 
 Normally, if the error message does not contain the substring, gtest will only output the the expression evaluated to false. To make the failure message more helpful, we add `<< e.toString().toStdString()` which outputs the full error message if the test fails.
 
-### Testing floating point numbers
+## Testing floating point numbers
 Comparison between floating point numbers is a common problem in both writing and testing software. Carefully choosing test data can help avoid comparisons that are likely to cause problems. Whenever possible, use test data such that output values can be exactly stored in a double-precision floating point number (c++ double). For example, if a function takes its input and divides it by 116, a good test input would be 232 because 232/116 = 2 which can be stored exactly in a double. On the other hand, 1 would be a poor test input because 1/116 cannot be precisely stored in a double. If a comparison between numbers that cannot be stored precisely is required, gtest provides [Special Assertions](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#floating-point-comparison) to make the comparisons more tolerant to different rounding.
 
-### Test fixtures
+## Test fixtures
 Because each test case is a completely fresh environment, there is often set-up code that is shared between multiple test cases. You can use a test fixture to avoid copying and pasting this set-up code multiple times. See the [gtest documentation](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md#test-fixtures-using-the-same-data-configuration-for-multiple-tests) for how to create and use fixtures in gtest.
 
 In order to conform to our test case naming conventions, all test fixtures need to be named `ClassName_FixtureName`. For example, a fixture that sets up a BundleSettings object in a not-default state for the BundleSettings unit test could be called `BundleSettings_NotDefault`.
 
-### Test parameterization
+## Test parameterization
 If the same process needs to be run with several different inputs, it can be easily automated via [value-parameterized tests](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md#value-parameterized-tests). In order to maintain test naming conventions, when you call the `INSTANTIATE_TEST_CASE_P` macro make sure the first parameter is. `ClassName`. For example
 
 ```
@@ -47,20 +47,20 @@ INSTANTIATE_TEST_CASE_P(
 
 will ensure that the tests start with `BundleSettings`.
 
-## Test names
+# Test names
 We use gtest as our unit testing framework, but use ctest to actually run the tests. ctest will generate a test name from each test case defined in your unit test. The documentation for how this works can be found in [cmake's documentation](https://cmake.org/cmake/help/v3.13/module/GoogleTest.html).
 
 To run the gtests for a specific class, use `ctest -R ClassName`
 
 To run all gtests, use `ctest -R "\." -E "(_app_|_unit_)"`
 
-### Basic tests
+## Basic tests
 `TEST(Foo, Bar)` will produce the test `Foo.Bar`.
 
-### Test fixtures
+## Test fixtures
 `TEST_F(Foo, Bar)` will also produce the test `Foo.Bar`.
 
-### Parameterized tests
+## Parameterized tests
 ```
 TEST_P(Foo, Bar) {
 ...
@@ -84,7 +84,7 @@ This is a first step towards several places:
 1. Reducing testData size
 1. Improving application test run time
 
-# Creating a basic callable function
+## Creating a basic callable function
 
 For the rest of this document we will use `appname` as the name of the application that is being worked on.
 
@@ -110,7 +110,7 @@ void IsisMain() {
 }
 ```
 
-## If your application uses `Application::Log()`
+### If your application uses `Application::Log()`
 Due to how the Application singleton works, calling `Application::Log()` outside of an actual ISIS application currently causes a segmentation fault. To avoid this, modify the new `appname` function to return a Pvl that contains all of the PvlGroups that need to be logged instead of calling `Application::Log()`. Then, change your `main.cpp` to
 
 ```C++
@@ -132,18 +132,18 @@ void IsisMain() {
 }
 ```
 
-# Creating a more complex callable function
+## Creating a more complex callable function
 
 The basic interface that we've created so far is simply a mirror of the application command line interface. In order to further improve the testability of the application, we should break the application down into functional components.
 
-## Separating parameter parsing
+### Separating parameter parsing
 The first step is to separate the UserInterface parsing from the program logic.
 
 All of the UserInterface parsing should be done in the `appname(UserInterface &ui)` function. Then, all of the actual program logic should be moved into another function also called `appname`. The signature for this function can be quite complex and intricate. Several tips for defining the `appname` function signature are in the next sections, but there is not perfect way to do this for every application.
 
 Once the `appname` function is defined, the `appname(UserInterface &ui)` function simply needs to call it with the appropriate parameters once it has parsed the UserInterface.
 
-## Separating I/O
+### Separating I/O
 
 Most ISIS3 applications were designed to read their inputs from files and then output their results to the command line and/or files. Unfortunately, gtest is very poorly setup to test against files and the command line. To work around this, it is necessary to remove as much file and command line output from the new `appname` functions as possible. Here are some examples of how outputs can be separated from the application logic:
 
@@ -152,7 +152,7 @@ Most ISIS3 applications were designed to read their inputs from files and then o
 1. No input filenames should be passed as arguments. All files required by the program should be opened and converted into in-memory objects and then passed to the function. This will help eliminate the need for test data files in many applications. **Make sure that for Cubes the appropriate CubeAttributeInput and CubeAttributeOutput values are set!**
 1. Any complex objects needed by the function should be passed in as pointers. This allows for them to be mocked using [gmock](https://github.com/abseil/googletest/blob/master/googlemock/docs/ForDummies.md). This helps eliminate the need for test data files and better isolates the test. If the input object is broken somehow, a mock object will still operate for this test and instead of getting two failures, only the actually broken object's test will fail.
 
-## Process, helper functions, and global variables
+### Process, helper functions, and global variables
 Many ISIS3 applications make sure of the Process class and its sub-classes. While these classes make file I/O easier, they also tightly couple it to the application logic! Some of them can take objects like cubes instead of filenames, but not all of them. They may need to be refactored to use objects instead of filenames. For now, where-ever possible use objects, but it is acceptable to use filenames if an object cannot be used.
 
 Many of the Process sub-classes use process functions to operate on cubes. These helper functions will need to be pushed into the ISIS3 library. There is a chance that there will be symbol conflicts due to multiple applications using functions with the same name. In this case, the function can simply have its name modified. This is also a natural point at which application logic can be segmented and tested separately.
@@ -214,7 +214,7 @@ void IsisMain() {
 }
 ```
 
-## Helpful documentation
+# Helpful documentation
 * [gtest primer](https://github.com/abseil/googletest/blob/master/googletest/docs/primer.md) : It is highly recommended that you read over the primer if you are not familiar with gtest.
 * [Advanced gtest](https://github.com/abseil/googletest/blob/master/googletest/docs/advanced.md) : This document covers a wide range of advanced options for testing tricky logic and customizing test output.
 * [gmock Introduction](https://github.com/abseil/googletest/blob/master/googlemock/docs/ForDummies.md) : A great introduction to how gmock can be used to remove dependencies from tests.
