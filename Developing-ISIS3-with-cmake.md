@@ -9,6 +9,12 @@ This will copy all files in your fork to your current location in the terminal. 
 
 `cd ISIS3`
 
+### How to initialize the gtest submodule in an old clone
+
+If your clone is older than November 26th 2018 and you update from dev, you will get the gtest submodule but it will be empty! This is because git does not initialize submodules by default. In order to initialize the gtest submodule run the following command at the root of the repository
+
+`git submodule update --init --recursive`
+
 
 ## Anaconda and ISIS3 Dependencies
 To start building ISIS3 with cmake, you first need anaconda installed. **If you are developing internally to USGS, please expand the `Details` drop-down for more information; otherwise, continue reading the instructions in this section**. 
