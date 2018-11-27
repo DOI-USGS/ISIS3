@@ -12,8 +12,9 @@ function(add_isis_app folder libDependencies)
   get_filename_component(appName ${folder}  NAME)
   set(internalAppName ${appName}_app)
 
-  # Get the source and header files
+  # Get the main and xml files
   file(GLOB sources "${folder}/main.cpp")
+  file(GLOB xmlFiles "${folder}/*.xml")
 
   # All the XML files need to be copied to the install directory
   # - They also need be put in the source folder for the app tests
