@@ -108,11 +108,11 @@ TEST(Statistics,SpecialPixels) {
     a[0] = 1.0;
     a[1] = 2.0;
     a[2] = 3.0;
-    a[3] = NULL8;
-    a[4] = HIGH_REPR_SAT8;
-    a[5] = LOW_REPR_SAT8;
-    a[6] = HIGH_INSTR_SAT8;
-    a[7] = LOW_INSTR_SAT8;
+    a[3] = Null;
+    a[4] = Hrs;
+    a[5] = Lrs;
+    a[6] = His;
+    a[7] = Lis;
     a[8] = 10.0;
     a[9] = -1.0;
 
