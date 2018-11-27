@@ -25,29 +25,40 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
   <h2>Overview</h2>
 
   <p>
-    This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda.  
+    This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda.
     If you are a developer, we refer you to our <a href="https://github.com/USGS-Astrogeology/ISIS3">GitHub repository.</a>
   </p>
 
 
   <h3>ISIS3 Installation With Conda</h3>
     <ol>
-      <li>Download either the Anaconda or Miniconda installation script for your OS platform.  Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large: 
+      <li>Download either the Anaconda or Miniconda installation script for your OS platform.  Anaconda is a much larger distribtion of packages supporting scientific python, while Miniconda is a minimal installation and not as large:
       <a href="https://www.anaconda.com/download">Anaconda installer</a>, <a href="https://conda.io/miniconda.html">Miniconda installer</a></li>
-      <li>If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands.  In this example, we chose to do a full install of Anaconda, and our OS is Linux-based.  Your file name may be different depending on your environment.</li>
+
+      <li>If you are running on some variant of Linux, open a terminal window in the directory where you downloaded the script, and run the following commands.  In this example, we chose to do a full install of Anaconda, and our OS is Linux-based.  Your file name may be different depending on your environment.
         <pre>
           <strong>chmod +x Anaconda3-5.2.0-Linux-x86_64.sh</strong>
-          <strong>./Anaconda3-5.2.0-Linux-x86_64.sh</strong>          
+          <strong>./Anaconda3-5.2.0-Linux-x86_64.sh</strong>
         </pre>
-       
-        This will start the Anaconda installer which will guide you through the installation process.
+
+        This will start the Anaconda installer which will guide you through the installation process.</li>
+
+      <li>If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86_64.pkg) will be downloaded.  Double-click on the file to start the installation process.</li>
+
       <li>After the installation has finished, open up a bash prompt in your terminal window.</li>
-       <li>If you are running Mac OS X, a pkg file (which looks similar to Anaconda3-5.3.0-MacOSX-x86_64.pkg) will be downloaded.  Double-click on the file to start the installation process.</li>
-      <li>Again from within a terminal window, create a new environment for your ISIS3 installation:
+
+      <li>Next setup your Anaconda environment for ISIS3. In the bash prompt, run the following commands:
         <pre>
-          <em>#Add the following channels to the Anaconda installation</em>
-          <strong>conda config --add channels conda-forge</strong>
-          <strong>conda config --add channels usgs-astrogeology</strong>
+          <em>#Create a new conda environment to install ISIS3 in</em>
+          <strong>conda create -n isis3 python=3.6</strong>
+
+          <em>#Activate the environment</em>
+          <em>#Depending on your OS, you may need to use conda activate isis3 instead</em>
+          <strong>source activate isis3</strong>
+
+          <em>#Add the following channels to the environment</em>
+          <strong>conda config --env --add channels conda-forge</strong>
+          <strong>conda config --env --add channels usgs-astrogeology</strong>
 
           #Verify you have the correct channels:
           <strong>conda config --show channels</strong>
@@ -55,57 +66,47 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           <em>#You should see:</em>
 
           <strong>channels:</strong>
-           <strong>   - usgs-astrogeology</strong>
-           <strong>   - conda-forge</strong>
-           <strong>   - defaults</strong>
+          <strong>   - usgs-astrogeology</strong>
+          <strong>   - conda-forge</strong>
+          <strong>   - defaults</strong>
 
-           <em>#The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:</em>
+          <em>#The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:</em>
 
-           <strong>conda config --add channels usgs-astrogeology</strong>
+          <strong>conda config --env --add channels usgs-astrogeology</strong>
+        </pre></li>
 
-
-          <em>#Create a new conda environment to install ISIS3 in.</em>
-          <strong>conda create -n isis3</strong>
-
-          <em>#Activate the environment</em>
-          <strong>source activate isis3</strong>
-
-          <em>#Download the ISIS3 version</em>
+      <li>The environment is now ready to download ISIS3 and its dependencies:
+        <pre>
           <strong>conda install -c usgs-astrogeology isis3</strong>
-          
+        </pre></li>
+
+      <li>Finally, setup the environment variables:
+        <pre>
           <em>#Execute the ISIS3 variable initialization script with default arguments.</em>
           <em>#This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA</em>
 
           <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
-
-         Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data, 
-         and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
-         for both of these optional values:
-
-         <strong>./$CONDA_PREFIX/scripts/isis3VarInit --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
-
-         
-         Directions for running rsync to download ISIS3 data can be found <a href="#ISIS3DataDownload">here.</a>
-
-
-          <em>#Run the source activate command a second time to process the changes:</em>
-
-          <strong>source activate isis3</strong>
-
-          To avoid having to do this every time you open a new terminal window, we suggest adding the following lines to the end of your .bashrc file 
-          (if running a variant of Linux) to ensure that conda is in your PATH variable.  If you are running Mac OS X, these lines would be appended
-          to the end of your .bash_profile file:
-
-          
-          <strong>source activate isis3</strong>
-          <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py</strong>
-          <strong>source activate isis3</strong>
-
-
-
         </pre>
-      </li>
+
+        Executing this script with no arguments will result in $ISIS3DATA=$CONDA_PREFIX/data,
+        and $ISIS3TESTDATA=$CONDA_PREFIX/testdata.  The user can specify different directories
+        for both of these optional values:
+        <pre>
+          <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
+        </pre>
+
+        Directions for running rsync to download ISIS3 data can be found <a href="#ISIS3DataDownload">here.</a>
+
+        Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA
+        will be set to the values passed to isis3VarInit.py. This does not happen retroactively,
+        re-activate the isis3 envionment with the following command:
+        <pre>
+          <em>#Depending on your OS, you may need to use conda activate isis3 instead</em>
+          <strong>source activate isis3</strong>
+        </pre></li>
     </ol>
+
+
   <h3>Operating System Requirements</h3>
   <p>ISIS3 runs on many UNIX variants. ISIS does not run natively on MS Windows,
      although it has been successfully run on Windows 10 using the Windows
@@ -115,14 +116,17 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
     The UNIX variants ISIS3 has been successfully built on are:</p>
     <ul>
       <li>Ubuntu 18.04 LTS</li>
-      <li>Mac OS X 10.13.6 High Sierra</li>     
+      <li>Mac OS X 10.13.6 High Sierra</li>
       <li>Fedora 28</li>
+      <li>CentOS 7.2</li>
     </ul>
 
 <p>
     ISIS3 may be run on other Linux or macOS operating systems then those listed above,
     but it has not been tested and is not supported.
 </p>
+
+
    <h3>Hardware Requirements</h3>
    <p>Here are the minimum hardware requirements</p>
     <ul>
@@ -220,7 +224,7 @@ is a popular choice and may be downloaded below.
     To download all ISIS3 data (approximately 180 GB), enter the following commands at the command prompt:
 
 </p>
-      <pre>      
+      <pre>
       cd $ISIS3DATA
       rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
       </pre>
