@@ -2,9 +2,13 @@
 
 [![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Table of Contents
+
+* [Installation](README.md##Installation)
+
 ## Installation
 
-This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda. If you are a developer, we refer you to our [GitHub repository.](https://github.com/USGS-Astrogeology/ISIS3)
+This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda.
 
 ### ISIS3 Installation With Conda
 
@@ -103,28 +107,6 @@ To build and compile ISIS3 requires following the instructions listed below, whi
 -   [Building individual applications/objects](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-individual-isis3-applicationsobjects)
 -   [Building ISIS3 documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
-
-<span id="RunningOnWindows"></span>
-
-### Running ISIS3 on Windows 10
-
--   [Installing the Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
--   [Instructions for using the Windows Subsystem for Linux (WSL) to run ISIS3](http://planetarygis.blogspot.com/2017/07/isis3-on-windows-10-bash.html)
-
-While the ISIS3 development team has not examined these instructions for correctness or completeness, they appear to have successfully worked for a number of ISIS3 users within the USGS who run Windows. Thanks for these instructions are directed towards Trent Hare who maintains an excellent and thoughtful blog on [Planetary GIS Science.](http://planetarygis.blogspot.com/)
-
-<span id="RunningOnWindowsWithSSH"></span>
-
-### Setting Up X11 forwarding on Windows with Putty and Xming
-
-Some ISIS3 users prefer to run ISIS3 in Windows, but SSH into a computer that is running ISIS3 and has enabled X11 forwarding. This requires the installation of an X server on Windows. Below are links to two popular choices in Astrogeology.
-
--   [Xming X server for Windows](https://sourceforge.net/projects/xming/)
--   [VcXsrv Windows X Server](https://sourceforge.net/projects/vcxsrv/)
-
-Additionally, a Windows SSH client is required to create an SSH connection. PuTTY is a popular choice and may be downloaded below.
-
--   [PuTTY - an SSH and telnet client for the Windows platform.](https://www.putty.org/)
 
 ### Mission Requirements
 
