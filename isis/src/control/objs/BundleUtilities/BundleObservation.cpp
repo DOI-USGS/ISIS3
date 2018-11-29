@@ -85,6 +85,8 @@ namespace Isis {
 
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
+// TODO: comment below is wrong I think, also, I don't like this form of if/then/else in terms of
+//       readability
       // if the image, camera, or instrument position/orientation is null, then set to null
       // these will be updated during the bundle adjustment
       m_instrumentPosition = (image->camera() ? 
@@ -173,15 +175,63 @@ namespace Isis {
    * If the pointer is valid, then the BundleImage and its serial number will be inserted into
    * the serial number to BundleImage map.
    * 
-   * @param value The BundleImage to be appended.
+   * @param image The BundleImage to be appended.
    * 
    * @see QVector::append()
    */
-  void BundleObservation::append(const BundleImageQsp &value) {
-    if (value) {
-      m_cubeSerialNumberToBundleImageMap.insert(value->serialNumber(), value);
+  void BundleObservation::append(const BundleImageQsp &image) {
+    if (!image) {
+      return;
     }
-    QVector<BundleImageQsp>::append(value);
+
+    // if this is a multi-image observation, we have to apply the observations exterior orientation
+    // to this new image
+    if (size() > 0) {
+
+      std::vector<double> poly1, poly2, poly3;
+
+      // update spice position of new image to match observations primary image
+      SpicePosition *spicePosition = image->camera()->instrumentPosition();
+
+      double positionBaseTime = m_instrumentPosition->GetBaseTime();
+      double positiontimeScale = m_instrumentPosition->GetTimeScale();
+      m_instrumentPosition->GetPolynomial(poly1, poly2, poly3);
+
+      // set number of position segments in images spice position
+      int spkPolynomialSegments = m_instrumentPosition->numPolynomialSegments();
+      spicePosition->setPolynomialSegments(spkPolynomialSegments);
+
+      // loop over position segments
+      for (int i = 0; i < spkPolynomialSegments; i++) {
+        spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
+        spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
+        spicePosition->SetPolynomial(poly1, poly2, poly3,
+                                     m_solveSettings->positionInterpolationType(),i);
+      }
+
+      // update spice rotation of new image to match observations primary image
+      SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
+
+      double rotationBaseTime = m_instrumentRotation->GetBaseTime();
+      double rotationtimeScale = m_instrumentRotation->GetTimeScale();
+      m_instrumentRotation->GetPolynomial(poly1, poly2, poly3);
+
+      // set number of rotation segments in images spice position
+      int ckPolynomialSegments = m_instrumentRotation->numPolynomialSegments();
+      spiceRotation->setPolynomialSegments(ckPolynomialSegments);
+
+      // loop over rotation segments
+      for (int i = 0; i < ckPolynomialSegments; i++) {
+        spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
+        spiceRotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
+        spiceRotation->SetPolynomial(poly1, poly2, poly3,
+                                     m_solveSettings->pointingInterpolationType(),i);
+      }
+    }
+
+    m_cubeSerialNumberToBundleImageMap.insert(image->serialNumber(), image);
+
+    QVector<BundleImageQsp>::append(image);
   }
 
 
@@ -387,126 +437,57 @@ namespace Isis {
 
 
   /**
-   * Initializes the exterior orientation 
+   * Initializes the BundleObservation's exterior orientation from the primary image in the
+   * observation. Currently this is by default considered to be the first image added to the
+   * observation.
    *
-   * @return bool Returns true upon successful intialization
+   * @return bool Returns true upon successful initialization
    */
   bool BundleObservation::initializeExteriorOrientation() {
-    if (size() == 0) {
+    if (size() != 1) {
       return false;
     }
 
     if (m_solveSettings->instrumentPositionSolveOption() !=
         BundleObservationSolveSettings::NoPositionFactors) {
 
-      double positionBaseTime = 0.0;
-      double positiontimeScale = 0.0;
-      std::vector<double> posPoly1, posPoly2, posPoly3;
-
       // number of position polynomial segments we're solving for this observation
       int spkPolynomialSegments = m_solveSettings->numberSpkPolySegments();
 
-      // loop over images in this observation
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        if ( !image->camera() ) {
-          return false;
-        }
-        SpicePosition *spicePosition = image->camera()->instrumentPosition();
+      // set number of position segments in images spice position
+      m_instrumentPosition->setPolynomialSegments(spkPolynomialSegments);
 
-        // set number of position segments in images spice position
-        spicePosition->setPolynomialSegments(spkPolynomialSegments);
+      // first, set degree of the spk polynomial to be fit for a priori values
+      m_instrumentPosition->SetPolynomialDegree(m_solveSettings->spkDegree());
 
-        // loop over position segments
-        for (int j = 0; j < spkPolynomialSegments; j++) {
-          // if there are more than one image in the observation (see note below)
-          if (i > 0) {
-            spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-            spicePosition->SetOverrideBaseTime(positionBaseTime, positiontimeScale);
-            spicePosition->SetPolynomial(posPoly1, posPoly2, posPoly3,
-                                         m_solveSettings->positionInterpolationType(),
-                                         j);
-          }
-          // for first image in the observation
-          // NOTE: Typically there is one image per observation.
-          //       When in "Observation Mode" however there may be multiple images in an
-          //       observation. Current examples where observation mode may be used include Lunar
-          //       Orbiter, HiRise, and Apollo Pan.
-          else {
-            // first, set the degree of the spk polynomial to be fit for a priori values
-            spicePosition->SetPolynomialDegree(m_solveSettings->spkDegree());
+      // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+      // function, or polynomial function over constant hermite spline)
+      // TODO: verify - think this actually performs the a priori fit
+      m_instrumentPosition->SetPolynomial(m_solveSettings->positionInterpolationType());
 
-            // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-            // function, or polynomial function over constant hermite spline)
-            // TODO: verify - I think this actually performs the a priori fit
-            spicePosition->SetPolynomial(m_solveSettings->positionInterpolationType());
-
-            // finally, set the degree of the spk polynomial actually used in the bundle adjustment
-            spicePosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
-
-            if (m_instrumentPosition) { // ??? TODO: why is this different from rotation code below???
-              positionBaseTime = m_instrumentPosition->GetBaseTime();
-              positiontimeScale = m_instrumentPosition->GetTimeScale();
-              m_instrumentPosition->GetPolynomial(posPoly1, posPoly2, posPoly3);
-            }
-          }
-        }
-      }
+      // finally, set the degree of the spk polynomial actually used in the bundle adjustment
+      m_instrumentPosition->SetPolynomialDegree(m_solveSettings->spkSolveDegree());
     }
 
     if (m_solveSettings->instrumentPointingSolveOption() !=
         BundleObservationSolveSettings::NoPointingFactors) {
 
-      double rotationBaseTime = 0.0;
-      double rotationtimeScale = 0.0;
-      std::vector<double> anglePoly1, anglePoly2, anglePoly3;
-
       // number of pointing polynomial segments we're solving for this observation
       int ckPolynomialSegments = m_solveSettings->numberCkPolySegments();
 
-      // loop over images in this observation
-      for (int i = 0; i < size(); i++) {
-        BundleImageQsp image = at(i);
-        if ( !image->camera() ) {
-          return false;
-        }
-        SpiceRotation *spiceRotation = image->camera()->instrumentRotation();
+      // set number of rotation segments in images spice position
+      m_instrumentRotation->setPolynomialSegments(ckPolynomialSegments);
 
-        // set number of rotation segments in images spice position
-        spiceRotation->setPolynomialSegments(ckPolynomialSegments);
+      // first, set the degree of the ck polynomial to be fit for a priori values
+      m_instrumentRotation->SetPolynomialDegree(m_solveSettings->ckDegree());
 
-        // loop over rotation segments
-        for (int j = 0; j < ckPolynomialSegments; j++) {
-          // if there are more than one image in the observation (see note below)
-          if (i > 0) {
-            spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-            spiceRotation->SetOverrideBaseTime(rotationBaseTime, rotationtimeScale);
-            spiceRotation->SetPolynomial(anglePoly1, anglePoly2, anglePoly3,
-                                         m_solveSettings->pointingInterpolationType(),j);
-          }
-          // for first image in the observation
-          // NOTE: Typically there is one image per observation.
-          //       When in "Observation Mode" however there may be multiple images in an
-          //       observation. Current examples where observation mode may be used include Lunar
-          //       Orbiter, HiRise, and Apollo Pan.
-          else {
-            // first, set the degree of the ck polynomial to be fit for a priori values
-            spiceRotation->SetPolynomialDegree(m_solveSettings->ckDegree());
+      // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
+      // function, or polynomial function over constant hermite spline)
+      // TODO: verify - I think this actually performs the a priori fit
+      m_instrumentRotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
 
-            // now, set what kind of interpolation to use (SPICE, memcache, hermitecache, polynomial
-            // function, or polynomial function over constant hermite spline)
-            // TODO: verify - I think this actually performs the a priori fit
-            spiceRotation->SetPolynomial(m_solveSettings->pointingInterpolationType());
-
-            // finally, set the degree of the ck polynomial actually used in the bundle adjustment
-            spiceRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
-
-            rotationBaseTime = spiceRotation->GetBaseTime();
-            rotationtimeScale = spiceRotation->GetTimeScale();
-            spiceRotation->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
-          }
-        }
-      }
+      // finally, set the degree of the ck polynomial actually used in the bundle adjustment
+      m_instrumentRotation->SetPolynomialDegree(m_solveSettings->ckSolveDegree());
     }
 
     return true;
@@ -524,8 +505,7 @@ namespace Isis {
     std::vector<Angle> pmCoefs = m_bundleTargetBody->pmCoefs();
 
     for (int i = 0; i < size(); i++) {
-      BundleImageQsp image = at(i);
-      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);      
+      at(i)->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
 
@@ -533,7 +513,7 @@ namespace Isis {
   /**
    * Initializes the parameter weights for solving
    * 
-   * @return bool Returns true upon successful intialization
+   * @return bool Returns true upon successful initialization
    *
    * @internal  
    *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.

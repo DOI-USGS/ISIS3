@@ -109,6 +109,8 @@ namespace Isis {
    *   @history 2018-02-12 Ken Edmundson - Removed method updateBodyRotation and renamed method
    *                           initializeBodyRotation to setBodyRotation. Modified method
    *                           applyParameterCorrections to take bool arg to updateBodyRotation.
+   *   @history 2018-11-29 Ken Edmundson - Modified append,initializeExteriorOrientation, and
+   *                           setBodyRotation methods.
    */
   class BundleObservation : public QVector<QSharedPointer<BundleImage> > {
 

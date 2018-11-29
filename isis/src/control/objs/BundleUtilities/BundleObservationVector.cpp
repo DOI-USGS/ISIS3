@@ -2,7 +2,9 @@
 
 #include <QDebug>
 
+#include "BundlePolynomialContinuityConstraint.h"
 #include "BundleObservation.h"
+#include "Camera.h"
 #include "IException.h"
 
 namespace Isis {
@@ -141,13 +143,33 @@ namespace Isis {
       append(bundleObservation);
 
       // initialize exterior orientation (spice) for all BundleImages in BundleObservation
-//      bundleObservation->initializeExteriorOrientation();
+      bundleObservation->initializeExteriorOrientation();
 
       // update observation number to observation ptr map
       m_observationNumberToObservationMap.insertMulti(observationNumber, bundleObservation);
 
       // update image serial number to observation ptr map
       m_imageSerialToObservationMap.insertMulti(bundleImage->serialNumber(), bundleObservation);
+    }
+
+    // set body rotation if solving for target body parameters
+    if (bundleSettings->solveTargetBody()) {
+      std::vector<Angle> raCoefs = bundleSettings->bundleTargetBody()->poleRaCoefs();
+      std::vector<Angle> decCoefs = bundleSettings->bundleTargetBody()->poleDecCoefs();
+      std::vector<Angle> pmCoefs = bundleSettings->bundleTargetBody()->pmCoefs();
+
+      bundleImage->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
+    }
+
+    // initialize piecewise polynomial continuity constraints for time-dependent sensors if
+    // necessary
+    if (bundleObservation->numberPolynomialPositionSegments() > 1 ||
+        bundleObservation->numberPolynomialPointingSegments() > 1) {
+
+      BundlePolynomialContinuityConstraintQsp polyConstraint =
+          BundlePolynomialContinuityConstraintQsp(
+            new BundlePolynomialContinuityConstraint(bundleObservation));
+      bundleObservation->setContinuityConstraints(polyConstraint);
     }
 
     return bundleObservation;
@@ -287,22 +309,6 @@ namespace Isis {
       normalsMatrixStartBlock += observation->numberPolynomialSegments();
 
       observation->initializeExteriorOrientation();
-    }
-
-    return true;
-  }
-
-
-  /**
-   * Initializes the body rotations for the contained BundleObservations.
-   *
-   * @return bool Returns true upon successful initialization
-   */
-  bool BundleObservationVector::setBodyRotation() {
-    int nObservations = size();
-    for (int i = 0; i < nObservations; i++) {
-      BundleObservationQsp observation = at(i);
-      observation->setBodyRotation();
     }
 
     return true;

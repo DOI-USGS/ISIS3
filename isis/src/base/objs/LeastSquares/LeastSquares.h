@@ -108,8 +108,9 @@ namespace Isis {
    *                            to reset all solution methods
    *   @history  2010-11-22 Debbie A. Cook - Merged with Ken Edmundson version
    *   @history  2013-12-29 Jeannie Backer - Improved error messages. Fixes #962.
-   *   @history  2019-09-05 Makayla Shepherd & Jesse Mapel - Changed sparse solution to use
+   *   @history  2018-09-05 Makayla Shepherd & Jesse Mapel - Changed sparse solution to use
    *                            Armadillo library's SuperLU interface instead of GMM.
+   *   @history  2018-11-29 Ken Edmundson - Removed output line in SolveSparse method.
    *
    */
   class LeastSquares {

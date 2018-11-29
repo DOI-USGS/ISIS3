@@ -455,22 +455,17 @@ namespace Isis {
     m_cholmodNormal = NULL;
     m_cholmodTriplet = NULL;
 
-    // should we initialize objects m_xResiduals, m_yResiduals, m_xyResiduals
+    // should we initialize objects m_xResiduals, m_yResiduals, m_xyResiduals?
 
-    // TESTING
-    // TODO: code below should go into a separate method???
     // set up BundleObservations and assign solve settings for each from BundleSettings class
-    int normalsMatrixStartBlock = 0;
     for (int i = 0; i < numImages; i++) {
-
       Camera *camera = m_controlNet->Camera(i);
       QString observationNumber = m_serialNumberList->observationNumber(i);
       QString instrumentId = m_serialNumberList->spacecraftInstrumentId(i);
       QString serialNumber = m_serialNumberList->serialNumber(i);
       QString fileName = m_serialNumberList->fileName(i);
 
-      // create a new BundleImage and add to new (or existing if observation mode is on)
-      // BundleObservation
+      // create a new BundleImage and add to new (or existing if observation mode) BundleObservation
       BundleImageQsp image = BundleImageQsp(new BundleImage(camera, serialNumber, fileName));
 
       if (!image) {
@@ -486,34 +481,6 @@ namespace Isis {
                       + observationNumber + "is null." + "\n";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-
-      // the observation stores the index to its associated SparseBlockColumnMatrix in
-      // m_sparseNormals
-      // TODO: I (Ken E.) think the individual segments should somehow be storing the index to
-      // their associated SparseBlockColumnMatrix
-      observation->setNormalsMatrixStartBlock(normalsMatrixStartBlock);
-      normalsMatrixStartBlock += observation->numberPolynomialSegments();
-
-      // initialize piecewise polynomial continuity constraints for time-dependent sensors if
-      // necessary
-      // TODO: can we let BundleObservation handle this?
-      if (observation->numberPolynomialPositionSegments() > 1
-          || observation->numberPolynomialPointingSegments() > 1) {
-
-        BundlePolynomialContinuityConstraintQsp polyConstraint =
-            BundlePolynomialContinuityConstraintQsp(
-              new BundlePolynomialContinuityConstraint(observation));
-        observation->setContinuityConstraints(polyConstraint);
-      }
-    }
-
-    // initialize exterior orientation (spice) for all BundleImages in all BundleObservations
-    // TODO!!! - should these initializations just be done when we add the new observation above?
-    m_bundleObservations.initializeExteriorOrientation();
-
-
-    if (m_bundleSettings->solveTargetBody()) {
-      m_bundleObservations.setBodyRotation();
     }
 
     // set up vector of BundleControlPoints
@@ -550,8 +517,7 @@ namespace Isis {
     if (m_lidarDataSet) {
       numLidarPoints = m_lidarDataSet->points().size();
     }
-    for (int i =
-         0; i < numLidarPoints; i++) {
+    for (int i = 0; i < numLidarPoints; i++) {
       LidarControlPointQsp lidarPoint = m_lidarDataSet->points().at(i);
       if (lidarPoint->IsIgnored()) {
         continue;
@@ -770,6 +736,8 @@ namespace Isis {
     }
 
     for (int i = 0; i < m_bundleObservations.size(); i++) {
+      m_bundleObservations.at(i)->setNormalsMatrixStartBlock(blockColumn);
+
       int positionParameters =
           m_bundleObservations.at(i)->numberPositionParametersPerSegment();
 
@@ -2433,12 +2401,7 @@ namespace Isis {
     // time dependent sensors.
     if (m_iteration == 1) {
       measure.setPolySegmentIndices();
-      if (m_bundleSettings->solveTargetBody()) {
-        measure.setNormalsBlockIndices(1);
-      }
-      else {
-        measure.setNormalsBlockIndices();
-      }
+      measure.setNormalsBlockIndices();
     }
 
     // Compute the look vector in instrument coordinates based on time of observation and apriori

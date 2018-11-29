@@ -74,6 +74,8 @@ namespace Isis {
    *                           implementation.
    *   @history 2018-06-27 Ken Edmundson - Added members m_measureSigma and m_measureWeightSqrt; and
    *                           corresponding accessors and mutators.
+   *   @history 2018-11-29 Ken Edmundson - Fixes to setNormalsBlockIndices method, also removed
+   *                           argument bool solveTargetBody.
    */
 
   class BundleMeasure {
@@ -95,7 +97,7 @@ namespace Isis {
 
       void setImage();
       void setPolySegmentIndices();
-      void setNormalsBlockIndices(int solveTargetBody=0);
+      void setNormalsBlockIndices();
       void setPolyPositionSegmentIndex(int index);
       void setPolyPointingSegmentIndex(int index);
       void setNormalsPositionBlockIndex(int index);
