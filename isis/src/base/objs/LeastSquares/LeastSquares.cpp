@@ -444,7 +444,6 @@ namespace Isis {
   int LeastSquares::SolveSparse() {
 
     // form "normal equations" matrix by multiplying ATA
-    std::cout << p_sparseA.n_rows << ", " << p_sparseA.n_cols << std::endl;
     p_normals = p_sparseA.t()*p_sparseA;
 
     // Create the right-hand-side column vector 'b'
