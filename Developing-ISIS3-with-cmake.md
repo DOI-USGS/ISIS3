@@ -332,3 +332,7 @@ If ggrep is installed, run the following commands:
 brew uninstall grep
 brew install grep -with-default-names
 ```
+
+## Setting Up an ISIS3 cmake Project in Your Integrated Development Environment (IDE)
+
+For Qt Creator:
