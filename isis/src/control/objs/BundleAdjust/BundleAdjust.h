@@ -349,6 +349,8 @@ namespace Isis {
    *                            which have been replaced with the local radius of a control
    *                            point for converting point sigmas to/from radians from/to meters.
    *                            References #4649 and #501.
+   *   @history 2018-11-29 Ken Edmundson - Modifed init, initializeNormalEquationsMatrix, and
+   *                           computePartials methods.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
