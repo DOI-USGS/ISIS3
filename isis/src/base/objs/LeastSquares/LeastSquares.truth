@@ -31,7 +31,6 @@ Number of Knowns = 7
   y =   1.43458		1.43458
 ---
 *** TEST 4:  SAME 3 POINTS, SPARSE ***
-3, 2
 Number of Knowns = 3
         SPARSE
   one = 3.08

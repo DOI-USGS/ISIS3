@@ -11,7 +11,7 @@ include $(ISISROOT)/make/isismake.os
 
 #APPLICATIONS = $(filter-out Makefile CVS $(wildcard *.*) , data/$(wildcard *))
 #DOCUMENTS    = $(filter-out Makefile $(wildcard *.*) , documents/$(wildcard *))
-DOCDIR = $(ISISROOT)/doc
+DOCDIR = $(ISISROOT)/docs
 USER = isis3mgr
 USERDEV = isis3mgr
 
@@ -147,13 +147,13 @@ wwwdoc: wwwschema
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "BEGIN SYNC: docs to public server"
-	rsync -vlHrt --delete --progress --rsh=ssh --exclude 'Schemas/*' --cvs-exclude $(ISISROOT)/doc/ $(USER)@isis-d:/var/www/html/htdocs/
+	rsync -vlHrt --delete --progress --rsh=ssh --exclude 'Schemas/*' --cvs-exclude $(ISISROOT)/docs/ $(USER)@isis-d:/var/www/html/htdocs/
 
 devdoc:  
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "BEGIN SYNC: docs to development server"
-	rsync -vlHrt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/ $(USERDEV)@astrodev:/var/www/html/htdocs/
+	rsync -vlHrt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/docs/ $(USERDEV)@astrodev:/var/www/html/htdocs/
 
 # copy Schemas to public www
 
@@ -161,8 +161,8 @@ wwwschema: schemas
 	echo " "
 	echo "_______________________________________________________________________________"
 	echo "SYNC: schemas to public server"
-	rsync -vlHrt --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/Schemas/ $(USER)@isis-d:/var/www/html/htdocs/Schemas/
-	rsync -vlHprt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/doc/assets $(USER)@isis-d:/var/www/html/htdocs/
+	rsync -vlHrt --progress --rsh=ssh --cvs-exclude $(ISISROOT)/docs/Schemas/ $(USER)@isis-d:/var/www/html/htdocs/Schemas/
+	rsync -vlHprt --delete --progress --rsh=ssh --cvs-exclude $(ISISROOT)/docs/assets $(USER)@isis-d:/var/www/html/htdocs/
 
 
 
@@ -182,4 +182,3 @@ syncdev:
 	echo "~                                  SYNC DEV                                   ~"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	$(MAKE) devdoc
-
