@@ -1,4 +1,5 @@
-//properties([pipelineTriggers([githubPush()])])
+properties([pipelineTriggers([githubPush()])])
+
 
 def nodes = [:]
 
@@ -8,6 +9,10 @@ nodes["isis-fedora-25"] = {
             stage ("Fedora 25") {
                 git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
                 sh """
+                    git clone https://github.com/abseil/googletest.git gtest
+                    sed -i "s|usgs-astrogeology|http://astro-bin.wr.usgs.gov/conda-usgs-astrogeology|" environment.yml
+                    sed -i "s|conda-forge|http://astro-bin.wr.usgs.gov/conda-forge|" environment.yml
+                    sed -i "s|defaults|http://astro-bin.wr.usgs.gov/conda|" environment.yml
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
@@ -30,6 +35,10 @@ nodes["isis-centos-7"] = {
             stage ("CentOS 7") {
                 git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
                 sh """
+                    git clone https://github.com/abseil/googletest.git gtest
+                    sed -i "s|usgs-astrogeology|http://astro-bin.wr.usgs.gov/conda-usgs-astrogeology|" environment.yml
+                    sed -i "s|conda-forge|http://astro-bin.wr.usgs.gov/conda-forge|" environment.yml
+                    sed -i "s|defaults|http://astro-bin.wr.usgs.gov/conda|" environment.yml
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
@@ -52,6 +61,10 @@ nodes["isis-debian-9"] = {
             stage ("Debian 9") {
                 git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
                 sh """
+                    git clone https://github.com/abseil/googletest.git gtest
+                    sed -i "s|usgs-astrogeology|http://astro-bin.wr.usgs.gov/conda-usgs-astrogeology|" environment.yml
+                    sed -i "s|conda-forge|http://astro-bin.wr.usgs.gov/conda-forge|" environment.yml
+                    sed -i "s|defaults|http://astro-bin.wr.usgs.gov/conda|" environment.yml
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
@@ -74,6 +87,10 @@ nodes["isis-ubuntu-1804"] = {
             stage ("Ubuntu 18.04") {
                 git branch: 'dev', url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
                 sh """
+                    git clone https://github.com/abseil/googletest.git gtest
+                    sed -i "s|usgs-astrogeology|http://astro-bin.wr.usgs.gov/conda-usgs-astrogeology|" environment.yml
+                    sed -i "s|conda-forge|http://astro-bin.wr.usgs.gov/conda-forge|" environment.yml
+                    sed -i "s|defaults|http://astro-bin.wr.usgs.gov/conda|" environment.yml
                     conda env create -n isis3 -f environment.yml
                     source activate isis3
                     mkdir -p ./install ./build && cd build
@@ -89,5 +106,6 @@ nodes["isis-ubuntu-1804"] = {
         }
     }
 }
+
 
 parallel nodes
