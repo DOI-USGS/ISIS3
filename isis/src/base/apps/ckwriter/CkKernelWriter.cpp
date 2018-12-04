@@ -37,7 +37,7 @@
 #include "IString.h"
 #include "NaifStatus.h"
 #include "Pvl.h"
-#include "SpiceSegment.h"
+#include "CkSpiceSegment.h"
 #include "TextFile.h"
 
 using namespace std;
@@ -105,7 +105,7 @@ namespace Isis {
    return;
  }
 
- void CkKernelWriter::write(const SpiceSegment &segment) const {
+ void CkKernelWriter::write(const CkSpiceSegment &segment) const {
    switch ( _ckType ) {
      case 1:
        writeCk1(segment);
@@ -175,10 +175,10 @@ namespace Isis {
    return;
  }
 
-  void CkKernelWriter::writeCk1(const SpiceSegment &segment) const {
+  void CkKernelWriter::writeCk1(const CkSpiceSegment &segment) const {
 
-    const SpiceSegment::SVector &sclks = segment.SCLKTimes();
-    const SpiceSegment::SMatrix &quats = segment.Quaternions();
+    const CkSpiceSegment::SVector &sclks = segment.SCLKTimes();
+    const CkSpiceSegment::SMatrix &quats = segment.Quaternions();
     ConstSpiceDouble *avvs(0);
     SpiceBoolean hasAvvs(SPICEFALSE);
     if ( segment.hasAngularVelocities() ) {
@@ -198,28 +198,28 @@ namespace Isis {
     return;
   }
 
-  void CkKernelWriter::writeCk2(const SpiceSegment &segment) const {
+  void CkKernelWriter::writeCk2(const CkSpiceSegment &segment) const {
 
     if ( !segment.hasAngularVelocities() ) {
       QString mess = "Type 2 CK kernels require angular velocities";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
-    const SpiceSegment::SVector &sclks = segment.SCLKTimes();
-    const SpiceSegment::SMatrix &quats = segment.Quaternions();
-    const SpiceSegment::SMatrix &avvs = segment.AngularVelocities();
+    const CkSpiceSegment::SVector &sclks = segment.SCLKTimes();
+    const CkSpiceSegment::SMatrix &quats = segment.Quaternions();
+    const CkSpiceSegment::SMatrix &avvs = segment.AngularVelocities();
 
     QString refFrame = segment.ReferenceFrame();
     QString segId = segment.Id();
 
     int nrecs = segment.size();
 
-    SpiceSegment::SVector stops(nrecs);
+    CkSpiceSegment::SVector stops(nrecs);
     for ( int i = 0 ; i < nrecs-1 ; i++) {
       stops[i] = sclks[i+1];
     }
     stops[nrecs-1] = sclks[nrecs-1];
-    SpiceSegment::SVector rates(nrecs, segment.TickRate());
+    CkSpiceSegment::SVector rates(nrecs, segment.TickRate());
     NaifStatus::CheckErrors();
     ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
              refFrame.toLatin1().data(), segId.toLatin1().data(), nrecs, &sclks[0],
@@ -229,10 +229,10 @@ namespace Isis {
   }
 
 
-  void CkKernelWriter::writeCk3(const SpiceSegment &segment) const {
+  void CkKernelWriter::writeCk3(const CkSpiceSegment &segment) const {
 
-    const SpiceSegment::SVector &sclks = segment.SCLKTimes();
-    const SpiceSegment::SMatrix &quats = segment.Quaternions();
+    const CkSpiceSegment::SVector &sclks = segment.SCLKTimes();
+    const CkSpiceSegment::SMatrix &quats = segment.Quaternions();
     ConstSpiceDouble *avvs(0);
     SpiceBoolean hasAvvs(SPICEFALSE);
     if ( segment.hasAngularVelocities() ) {
@@ -257,5 +257,3 @@ namespace Isis {
 
 
 };  // namespace Isis
-
-
