@@ -80,7 +80,7 @@
        to pass when not using the default data area. Fixes #4783.
      </change>
      <change name="Stuart Sides" date="2018-11-19">
-       Removed the tracking lable group if it exists in the output cube. Fixes #5533.
+       Removed the tracking label group if it exists in the output cube. Fixes #5533.
      </change>
      </history>
 
