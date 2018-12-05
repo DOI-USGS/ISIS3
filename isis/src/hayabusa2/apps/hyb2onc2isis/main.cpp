@@ -46,7 +46,6 @@ void IsisMain () {
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
-
   QString instid;
   QString missid;
   QString naifid;
@@ -131,10 +130,10 @@ void IsisMain () {
   }
 
   if (distortionCorrection) {
-    instGrp["DistortionCorrection"] = "1";
+    instGrp["DistortionCorrection"] = "yes";
   }
   else {
-     instGrp["DistortionCorrection"] = "0";
+     instGrp["DistortionCorrection"] = "no";
   }
 
 
