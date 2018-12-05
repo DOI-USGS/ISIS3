@@ -58,7 +58,7 @@ int main(void) {
     Cube c("$tgo/testData/CAS-MCO-2016-11-22T16.38.39.354-NIR-02036-00.cub", "r");
     TgoCassisCamera *cam = (TgoCassisCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
-    qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
+    qDebug() << "Instrument Rotation Frame: " << cam->instrumentRotation()->Frame();
     qDebug() << "";
 
     // Test kernel IDs

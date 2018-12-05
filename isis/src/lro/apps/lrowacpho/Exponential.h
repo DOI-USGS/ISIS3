@@ -63,7 +63,7 @@ namespace Isis {
             virtual ~Exponential () {}
 
             double photometry ( double i, double e, double g, int band = 1 ) const;
-            void Report ( PvlContainer &pvl );
+            void report ( PvlContainer &pvl );
 
         private:
             /**
@@ -92,8 +92,8 @@ namespace Isis {
                     int iProfile; //<! Profile index of this data
             };
 
-            std::vector<DbProfile> _profiles;
-            std::vector<Parameters> _bandpho;
+            std::vector<DbProfile> m_profiles;
+            std::vector<Parameters> m_bandpho;
 
             void init(PvlObject &pvl, Cube &cube);
 
@@ -107,4 +107,3 @@ namespace Isis {
 ;
 
 #endif
-

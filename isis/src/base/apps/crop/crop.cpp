@@ -1,35 +1,37 @@
-#include "Isis.h"
-
 #include <cmath>
 
-#include "Cube.h"
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
-#include "LineManager.h"
-#include "FileName.h"
-#include "IException.h"
-#include "Projection.h"
-#include "AlphaCube.h"
-#include "Table.h"
-#include "SubArea.h"
+#include "crop.h"
 
 using namespace std;
 using namespace Isis;
 
-// Globals and prototypes
-int ss, sl, sb;
-int ns, nl, nb;
-int sinc, linc;
-Cube *cube = NULL;
-LineManager *in = NULL;
+PvlGroup crop(UserInterface &ui) {
+  // Globals and prototypes
+  int ss, sl, sb;
+  int ns, nl, nb;
+  int sinc, linc;
 
-void crop(Buffer &out);
+  Cube *cube = NULL;
+  LineManager *in = NULL;
 
-void IsisMain() {
+  // Line processing routine
+  auto cropProccess = [&](Buffer &out)->void {
+    // Read the input line
+    int iline = sl + (out.Line() - 1) * linc;
+    in->SetLine(iline, sb);
+    cube->read(*in);
+
+    // Loop and move appropriate samples
+    for(int i = 0; i < out.size(); i++) {
+      out[i] = (*in)[(ss - 1) + i * sinc];
+    }
+
+    if(out.Line() == nl) sb++;
+  };
+
   ProcessByLine p;
 
   // Open the input cube
-  UserInterface &ui = Application::GetUserInterface();
   QString from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
   cube = new Cube();
@@ -170,7 +172,7 @@ void IsisMain() {
   in = new LineManager(*cube);
 
   // Crop the input cube
-  p.StartProcess(crop);
+  p.StartProcess(cropProccess);
 
   delete in;
   in = NULL;
@@ -204,20 +206,5 @@ void IsisMain() {
   cube = NULL;
 
   // Write the results to the log
-  Application::Log(results);
-}
-
-// Line processing routine
-void crop(Buffer &out) {
-  // Read the input line
-  int iline = sl + (out.Line() - 1) * linc;
-  in->SetLine(iline, sb);
-  cube->read(*in);
-
-  // Loop and move appropriate samples
-  for(int i = 0; i < out.size(); i++) {
-    out[i] = (*in)[(ss - 1) + i * sinc];
-  }
-
-  if(out.Line() == nl) sb++;
+  return results;
 }
