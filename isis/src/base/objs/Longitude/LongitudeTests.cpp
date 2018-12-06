@@ -18,6 +18,7 @@ TEST(Longitude, DegreesConstructor) {
   EXPECT_EQ(180, lon.degrees());    
 }
 
+
 // Constructor given a positive west value in degrees
 TEST(Longitude, PositiveWest) {
   Longitude lon(180.0, Angle::Degrees, Longitude::PositiveWest);
@@ -43,6 +44,10 @@ TEST(Longitude, CopyConstructor) {
   Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest,
         Longitude::Domain360);
   EXPECT_EQ(lon.degrees(), Longitude(lon).degrees());
+
+  Longitude lonCopy(lon);
+  lonCopy = lon;
+  EXPECT_EQ(270, lonCopy.degrees());
 }
 
 // ----- Testing Set Methods -----
@@ -56,12 +61,8 @@ TEST(Longitude, Set90Degrees) {
 // Set to 90 degrees PW
 TEST(Longitude, Set90DegreesPW) {
   Longitude lon(270.0, Angle::Degrees);
-  Longitude lonCopy(lon);
   lon.setPositiveWest(90, Angle::Degrees);
   EXPECT_EQ(270, lon.degrees());
-
-  lonCopy = lon;
-  EXPECT_EQ(270, lonCopy.degrees());
 }
 
 // ----- Testing Get Methods -----
@@ -172,22 +173,3 @@ TEST(Longitude, InRange) {
   EXPECT_TRUE(lon.inRange(Longitude(0, Angle::Degrees), Longitude(45, Angle::Degrees)));
   EXPECT_TRUE(lon.inRange(Longitude(45, Angle::Degrees), Longitude(90, Angle::Degrees)));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
