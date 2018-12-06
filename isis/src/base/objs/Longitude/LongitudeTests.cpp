@@ -41,13 +41,12 @@ TEST(Longitude, PW360Domain) {
 
 // Copy constructor
 TEST(Longitude, CopyConstructor) {
-  Longitude lon(-90.0, Angle::Degrees, Longitude::PositiveWest,
-        Longitude::Domain360);
+  Longitude lon(90.0, Angle::Degrees);
   EXPECT_EQ(lon.degrees(), Longitude(lon).degrees());
 
   Longitude lonCopy(lon);
   lonCopy = lon;
-  EXPECT_EQ(270, lonCopy.degrees());
+  EXPECT_EQ(90, lonCopy.degrees());
 }
 
 // ----- Testing Set Methods -----
