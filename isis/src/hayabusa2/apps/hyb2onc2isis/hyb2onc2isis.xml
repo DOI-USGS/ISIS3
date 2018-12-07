@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="hyb2onc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd"> 
-<!-- $Id: hyb2onc2isis.xml 6226 2017-07-05 20:46:13Z kewilliams@usgs.gov $ -->
+<application name="hyb2onc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS/FITS formatted Hayabusa2 image into ISIS cube</brief>
+  <brief>Import FITS formatted Hayabusa2 images into the ISIS cube format</brief>
 
   <description>
     <p>
-       This application will import and convert a Hayabusa2 Optical Navigation Camera (ONC) FITS image to an ISIS cube.
+       This application will import and convert a Hayabusa2 Optical Navigation Camera (ONC)
+       FIT image to an ISIS cube.
       
     </p>
     <br/>
@@ -50,74 +51,15 @@
     <h2>Instrument Overview</h2>
     <p>
        The ONC package consists of three cameras: the telescopic (ONC-T) camera and two wide-angle 
-       cameras (ONC-W1,ONC-W2). 
+       cameras (ONC-W1,ONC-W2).
     </p>
-    <p>
-       The wide-angle cameras each have a square 65.24 x 65.24 deg. field of view (FOV). The wide-angle 
-       camera ONC-W1 and ONC-W2 have focal lengths of
-       10.35 mm and 10.44 mm, respectively. The telescope camera 
-       has a 6.35 x 6.35 deg. FOV. The telescopic camera ONC-T has a focal length of 121.1 mm. 
-    </p>
+
     <p>
        The ONC package has a set of eight bandpass filters. Below is a table of 
        the filters and their specifications:
     </p>
     <br/>
-    <h2>ONC Filters</h2>
-    <p>
-       The following table provides the specifications for each of the six 
-       ONC-T bandpass filters. 
-    </p>
-      <TABLE BORDER="1">
-            <CAPTION>
-                ONC Filter Specifications
-              </CAPTION>
-          <TR>
-            <TH>Filter Number</TH>
-            <TH>Band center (nm)</TH>
-            <TH>FWHP Bandwidth (nm)</TH>
-          </TR>
-          <TR>
-              <TD>ul</TD>
-              <TD>390</TD>
-              <TD>40</TD>
-          </TR>
-          <TR>
-              <TD>Wide</TD>
-              <TD>775</TD>
-              <TD>850</TD>
-          </TR>
-          <TR>
-              <TD>v</TD>
-              <TD>550</TD>
-              <TD>30</TD>
-          </TR>
-          <TR>
-              <TD>w</TD>
-              <TD>700</TD>
-              <TD>30</TD>
-          </TR>
-          <TR>
-              <TD>x</TD>
-              <TD>860</TD>
-              <TD>40</TD>
-          </TR>
-          <TR>
-              <TD>Na</TD>
-              <TD>589.5</TD>
-              <TD>10</TD>
-          </TR>
-          <TR>
-              <TD>p</TD>
-              <TD>950</TD>
-              <TD>60</TD>
-          </TR>
-          <TR>
-              <TD>b</TD>
-              <TD>480</TD>
-              <TD>30</TD>
-          </TR>
-      </TABLE>
+
 
     <br/>
     <h2>Data Archive</h2>
@@ -129,12 +71,15 @@
     <h2>References</h2>
     <br/>
     <cite>
-      Suzuki, H. et al. (2017) Initial Inflight Calibration for Hayabusa2 Optical Navigation Camera (ONC) for Scientific Observations of Asteroid Ryugu (in review for Icarus). 
+      Suzuki, H. et al. (2017) Initial Inflight Calibration for Hayabusa2 Optical
+      Navigation Camera (ONC) for Scientific Observations of Asteroid Ryugu (in review for Icarus).
     </cite>
     <br/>
     <br/>
     <cite>
-        Kameda, S. et al. (2015) Detectability of hydrous minerals using ONC-T camera onboard the Hayabusa2 spacecraft, Advances in Space Research, Volume 56, Issue 7, Pages 1519-1524, ISSN 0273-1177, http://dx.doi.org/10.1016/j.asr.2015.06.037.
+        Kameda, S. et al. (2015) Detectability of hydrous minerals using ONC-T camera onboard
+        the Hayabusa2 spacecraft, Advances in Space Research, Volume 56, Issue 7, Pages 1519-1524,
+        ISSN 0273-1177, http://dx.doi.org/10.1016/j.asr.2015.06.037.
         (http://www.sciencedirect.com/science/article/pii/S0273117715004743)
     </cite>
     <br/>
@@ -149,6 +94,11 @@
     <change name="Kaj Williams and Ian Humphrey" date="2017-07-26">
       Added references and more text.
     </change>
+    <change name="Tyler Wilson" date="2018-11-30">
+      Updated the ingestion routine to handle new keywords, and retain the ability to
+      process FIT files using the old keywords.  Also set TARGET=RYUGU in the event the user
+      does not specify a target, and the target in the fit label is set to SKY.
+    </change>
   </history>
 
   <category>
@@ -161,17 +111,14 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input PDS formatted detached header file for ONC image.
+          Input fit file for ONC image.
         </brief>
         <description>
-           This file is the PDS label (ending in .lbl) to the image data.  The 
-           image data are stored in  FITS format with the detached .lbl file 
-           describing generic access to the data.  The program, 
-           <em>hyb2onc2isis</em>, will also read the FITS file and extract 
-           the header contained therein.  Some FITS label values are transferred 
+           The program, <em>hyb2onc2isis</em>, will read the FIT file and extract
+           the header contained therein.  Some FIT label values are transferred
            to the output ISIS files as well for completeness.
-        </description>
-        <filter>*.lbl *.LBL</filter>
+        </description>      
+        <filter>*.fit</filter>
       </parameter>
       
       <parameter name="TO">
@@ -202,7 +149,7 @@
                  projecting data to the celestial sphere. 
               </p>
             </description>
-            <internalDefault>Label Value</internalDefault> 
+            <internalDefault>SKY</internalDefault>
         </parameter>
     </group>
   </groups>

@@ -1,5 +1,6 @@
 #include "Isis.h"
 
+#include <QDebug>
 #include <QString>
 
 #include "FileName.h"
@@ -22,7 +23,8 @@ void IsisMain () {
   UserInterface &ui = Application::GetUserInterface();
   importFits.setFitsFile(FileName(ui.GetFileName("FROM")));
   importFits.setProcessFileStructure(0);
-
+  bool updatedKeywords = true;
+  bool distortionCorrection = true;
   Cube *outputCube = importFits.SetOutputCube("TO");
 
   // Get the directory where the Hayabusa translation tables are.
@@ -46,6 +48,9 @@ void IsisMain () {
 
   QString instid;
   QString missid;
+  QString naifid;
+  QString formatType;
+
   try {
     instid = fitsLabel.findGroup("FitsLabels").findKeyword("INSTRUME")[0];
     missid = fitsLabel.findGroup("FitsLabels").findKeyword ("SPCECRFT")[0]; 
@@ -55,6 +60,33 @@ void IsisMain () {
                   "from input file [" + FileName(ui.GetFileName("FROM")).expanded() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
+
+  try {
+    naifid = fitsLabel.findGroup("FitsLabels").findKeyword("NAIFID")[0];
+  }
+  catch(IException &e) {
+    updatedKeywords=false;
+  }
+
+  try {
+    formatType = fitsLabel.findGroup("FitsLabels").findKeyword("EXTNAME")[0];
+  }
+  catch(IException &e) {
+    QString msg = "Unable to read EXTNAME from input file ["
+        +FileName(ui.GetFileName("FROM")).expanded() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+  }
+
+  try {
+    naifid = fitsLabel.findGroup("FitsLabels").findKeyword("NAIFID")[0];
+  }
+  catch(IException &e) {
+    updatedKeywords=false;
+  }
+
+  if (formatType.contains("2a") || formatType.contains("2b"))
+    distortionCorrection = false;
+
 
   missid = missid.simplified().trimmed();
   if (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0) {
@@ -70,13 +102,42 @@ void IsisMain () {
   }
 
   // Translate the Instrument group
+
   FileName transFile(transDir + "hyb2oncInstrument.trn");
+
+  if (updatedKeywords) {
+    transFile = transDir+"hyb2oncInstrumentUpdated.trn";
+  }
   PvlToPvlTranslationManager instrumentXlater (fitsLabel, transFile.expanded());
   instrumentXlater.Auto(outputLabel);
-  
+
+
   //  Update target if user specifies it
   PvlGroup &instGrp = outputLabel.findGroup("Instrument",Pvl::Traverse);
   QString target;
+
+  instGrp.addKeyword(PvlKeyword("DistortionCorrection"));
+  try {
+    target = fitsLabel.findGroup("FitsLabels").findKeyword("TARGET")[0];
+  }
+  catch(IException &e) {
+    QString msg = "Unable to read TARGET from input file ["
+        +FileName(ui.GetFileName("FROM")).expanded() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+  }
+  if (target=="SKY") {
+    instGrp["TargetName"] = "RYUGU";
+  }
+
+  if (distortionCorrection) {
+    instGrp["DistortionCorrection"] = "yes";
+  }
+  else {
+     instGrp["DistortionCorrection"] = "no";
+  }
+
+
+  //If the user wants to specify a different target, overwrite this value
   if (ui.WasEntered("TARGET")) {
     instGrp["TargetName"] = ui.GetString("TARGET");
   }
@@ -84,7 +145,13 @@ void IsisMain () {
   outputCube->putGroup(instGrp);
 
   // Translate the BandBin group
+
   transFile = transDir + "hyb2oncBandBin.trn";
+  if (updatedKeywords) {
+    transFile = transDir + "hyb2oncBandBinUpdated.trn";
+  }
+
+
   PvlToPvlTranslationManager bandBinXlater (fitsLabel, transFile.expanded());
   bandBinXlater.Auto(outputLabel);
   PvlGroup &bandGrp = outputLabel.findGroup("BandBin",Pvl::Traverse);
@@ -95,7 +162,12 @@ void IsisMain () {
   outputCube->putGroup(outputLabel.findGroup("BandBin",Pvl::Traverse));
 
   // Translate the Archive group
+
   transFile = transDir + "hyb2oncArchive.trn";
+  if (updatedKeywords) {
+    transFile = transDir + "hyb2oncArchiveUpdated.trn";
+  }
+
   PvlToPvlTranslationManager archiveXlater (fitsLabel, transFile.expanded());
   archiveXlater.Auto(outputLabel);
   PvlGroup &archGrp = outputLabel.findGroup("Archive", Pvl::Traverse);
@@ -110,7 +182,13 @@ void IsisMain () {
 
 
   // Create a Kernels group
-  transFile = transDir + "hyb2oncKernels.trn";
+  if (updatedKeywords) {
+    transFile = transDir + "hyb2oncKernelsUpdated.trn";
+  }
+  else {
+    transFile = transDir + "hyb2oncKernels.trn";
+  }
+
   PvlToPvlTranslationManager kernelsXlater(fitsLabel, transFile.expanded());
   kernelsXlater.Auto(outputLabel);
   outputCube->putGroup(outputLabel.findGroup("Kernels", Pvl::Traverse));
