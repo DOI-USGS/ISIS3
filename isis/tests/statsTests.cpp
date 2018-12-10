@@ -1,4 +1,4 @@
-#include "StatsFunc.h"
+#include "stats.h"
 
 #include <iostream>
 
@@ -23,7 +23,7 @@ class MockCube : public Cube {
           QString msg));
 };
 
-class StatsFunc_FlatFileTest : public ::testing::Test {
+class stats_FlatFileTest : public ::testing::Test {
   protected:
     Pvl testPvl;
 
@@ -41,7 +41,7 @@ class StatsFunc_FlatFileTest : public ::testing::Test {
     }
 };
 
-class StatsFunc_MockHist : public ::testing::Test {
+class stats_MockHist : public ::testing::Test {
   protected:
     MockCube *mockCube;
 
@@ -92,7 +92,7 @@ class StatsFunc_MockHist : public ::testing::Test {
 };
 
 
-TEST_F(StatsFunc_MockHist, TestStats) {
+TEST_F(stats_MockHist, TestStats) {
   Pvl statsPvl = stats(
         mockCube,
         Isis::ValidMinimum,
@@ -136,7 +136,7 @@ TEST_F(StatsFunc_MockHist, TestStats) {
   EXPECT_EQ(1, (int) (band2Stats.findKeyword("HrsPixels")));
 }
 
-TEST(StatsFunc, ValidMinimum) {
+TEST(stats, ValidMinimum) {
   Histogram *testStats = new Histogram(-1000,1000);
 
   MockCube *mockCube = new MockCube();
@@ -163,7 +163,7 @@ TEST(StatsFunc, ValidMinimum) {
   // The histogram will be cleaned up in the stats function
 }
 
-TEST(StatsFunc, ValidMaximum) {
+TEST(stats, ValidMaximum) {
   Histogram *testStats = new Histogram(-1000,1000);
 
   MockCube *mockCube = new MockCube();
@@ -190,7 +190,7 @@ TEST(StatsFunc, ValidMaximum) {
   // The histogram will be cleaned up in the stats function
 }
 
-TEST_F(StatsFunc_FlatFileTest, FlatFile) {
+TEST_F(stats_FlatFileTest, FlatFile) {
   std::ostringstream *testStream = new std::ostringstream();
   writeStatsStream(testPvl, false, testStream);
   EXPECT_EQ(testStream->str(), "0.0,Hello\nstats here,stats here\n");
@@ -199,7 +199,7 @@ TEST_F(StatsFunc_FlatFileTest, FlatFile) {
   testStream = nullptr;
 }
 
-TEST_F(StatsFunc_FlatFileTest, FlatFileHeader) {
+TEST_F(stats_FlatFileTest, FlatFileHeader) {
   std::ostringstream *testStream = new std::ostringstream();
   writeStatsStream(testPvl, true, testStream);
   EXPECT_EQ(testStream->str(), "NumberKey,StringKey\n0.0,Hello\nstats here,stats here\n");

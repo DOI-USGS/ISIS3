@@ -443,7 +443,8 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
 # will be executed when running "ninja install"
 # On a clean build, all files will be copied over.
 add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
+  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.h ${CMAKE_BINARY_DIR}/inc)
 add_dependencies(isis3 incs)
 
 # Add a custom build target to clean out everything that gets added to the source

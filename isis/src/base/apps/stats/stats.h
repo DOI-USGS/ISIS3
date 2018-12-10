@@ -1,3 +1,6 @@
+#ifndef stats_h
+#define stats_h
+
 #include <iostream>
 #include <vector>
 
@@ -17,3 +20,5 @@ namespace Isis {
         bool writeHeader,
         std::ostream *stream);
 }
+
+#endif

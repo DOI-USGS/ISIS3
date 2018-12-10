@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "UserInterface.h"
-#include "StatsFunc.h"
+#include "stats.h"
 
 using namespace Isis;
 
