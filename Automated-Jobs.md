@@ -1,11 +1,11 @@
 As of 12/10/18 there are errors for automated processing to download kernels and do other maintenance operations.
 
 * Kernel downloads
-* * Example cron message: 
-* * * /usgs/cpkgs/isis3/isis3mgr_scripts/distributeData: line 142: /usgs/pkgs/isis3/install/install/scripts/isis3Startup.sh: No such file or directory
-** Fix
-*** A work around was done for LROC to resolve the duplicated /install directories.
-*** The bug is in /usgs/cpkgs/isis3/isis3mgr_scripts/distributeData's dependencies, resolving this issue will fix the multiple kernel download failures
+ * Example cron message: 
+  * /usgs/cpkgs/isis3/isis3mgr_scripts/distributeData: line 142: /usgs/pkgs/isis3/install/install/scripts/isis3Startup.sh: No such file or directory
+ * Fix
+  * A work around was done for LROC to resolve the duplicated /install directories.
+  * The bug is in /usgs/cpkgs/isis3/isis3mgr_scripts/distributeData's dependencies, resolving this issue will fix the multiple kernel download failures
 ** The rsync server which distributes these files is full, a set of no longer needed directories which will free up the needed space on the rsync server.
 * buildIsisCmakeAllSys
 ** There are multiple errors for documentation following the testing refactor work.  Is this keeping documentation from building at all?
