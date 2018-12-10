@@ -13,7 +13,7 @@ As of 12/10/18 there are errors for automated processing to download kernels and
 ** cleanupBuilds - this is leftover from the old makefile build system.  It needs to be replaced with a cmake cleanup solution
 * The real time backup system for the data area was failing, this may have resolved itself on 12/1/18.  Stuart will follow up to verify this is fixed.
 * Beta
-** The way /beta used to be done was linking to last Friday's build if all tests passed.  With CMake, this solution isn't working anymore.  
+** The way /beta used to be done was linking to last Friday's build if all tests passed.  With CMake, this solution isn't working anymore.
 *** /beta is pulling the dev branch.
 *** Should we have Friday's /nightly used as a candidate for /beta?
 *** Are we implying to users that /beta is more "reliable" than /nightly?
