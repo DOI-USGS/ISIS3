@@ -1,4 +1,4 @@
-As of 12/10/18 there are error for automated processing to download kernels and do other maintenance operations.
+As of 12/10/18 there are errors for automated processing to download kernels and do other maintenance operations.
 
 * Kernel downloads
 ** Example cron message: 
