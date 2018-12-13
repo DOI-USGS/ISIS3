@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cmath>
 
+#include <QDebug>
 #include <QFile>
 #include <QString>
 #include <QScopedPointer>
@@ -54,11 +55,13 @@ struct TemporaryCubeDeleter {
   }
 };
 
+enum InstrumentType{ONCW1,ONCW2,ONCT};
 
+InstrumentType g_instrument;
 //For subimage and binning mapping
 static AlphaCube *alpha(0);
 
-QString g_filter = "";
+static QString g_filter = "";
 static QString g_target ="";
 static Pvl g_configFile;
 
@@ -66,25 +69,46 @@ static Pvl g_configFile;
 static double g_b0(0);
 static double g_b1(0);
 static double g_b2(0);
+static double g_bae0(0);
+static double g_bae1(0);
 static double g_bias(0);
-static double g_AEtemperature(0);
+
+//Device (AE/CCD/ECT temps for ONC-T,ONC-W1,ONC-W2
+
+static double g_AEtemperature(0.0);
+
+static double g_CCD_T_temperature(0.0);
+static double g_ECT_T_temperature(0.0);
+
+
+static double g_CCD_W1_temperature(0.0);
+static double g_ECT_W1_temperature(0.0);
+
+
+static double g_CCD_W2_temperature(0.0);
+static double g_ECT_W2_temperature(0.0);
+
 
 static QString g_startTime;
 
 //Dark Current variables
 static double g_d0(0);
 static double g_d1(0);
-static double g_temp(0);
 static double g_darkCurrent(0);
+
+//Linearity correction variables
+static double g_L0(0);
+static double g_L1(0);
+static double g_L2(0);
 
 // TODO: we do not have the readout time (transfer period) for Hayabusa2 ONC.
 //Smear calculation variables
-// static double g_Tvct(0);       //!< Vertical charge-transfer period (in seconds).
-static double g_texp(1);       //!< Exposure time.
-// static double g_timeRatio(1.0);
+static bool g_onBoardSmearCorrection(false);
+static double g_Tvct(0);       // Vertical charge-transfer period (in seconds).
+static double g_texp(1);       // Exposure time.
+static double g_timeRatio(1.0);
 
 // Calibration parameters
-static int nsubImages(0);      //!< Number of sub images
 static int binning(1);         //!< The number of samples/lines which are binned
 static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for LOSSY
 
@@ -106,7 +130,7 @@ void IsisMain() {
   // g_iofCorrection = ui.GetString("UNITS");
 
   const QString hyb2cal_program = "hyb2onccal";
-  const QString hyb2cal_version = "1.0";
+  const QString hyb2cal_version = "1.1";
   const QString hyb2cal_revision = "$Revision$";
   QString hyb2cal_runtime = Application::DateTime();
 
@@ -123,9 +147,45 @@ void IsisMain() {
   PvlGroup &inst = icube->group("Instrument");
   PvlGroup &bandbin = icube->group("BandBin");
 
-  QString filter = bandbin["FilterName"];
+  try{
+    g_filter = bandbin["FilterName"][0];
+  }
 
-  g_filter = filter;
+  catch(IException &e) {
+    QString msg = "Unable to read FilterName keyword in the BandBin group "
+    "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+
+  }
+
+  QString instrument("");
+
+  try {
+    instrument = inst["InstrumentId"][0];
+  }
+  catch(IException &e) {
+    QString msg = "Unable to read InstrumentId keyword in the Instrument group "
+    "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+
+  }
+
+  if ( instrument=="ONC-W1" ) {
+    g_instrument = InstrumentType::ONCW1;
+  }
+  else if ( instrument=="ONC-W2" ) {
+    g_instrument = InstrumentType::ONCW2;
+  }
+  else if ( instrument == "ONC-T" ) {
+      g_instrument = InstrumentType::ONCT;
+  }
+  else {
+        QString msg = "Unidentified instrument key in the "
+                      "InstrumentId key of the Instrument Pvl group.";
+          throw IException(IException::Io,msg, _FILEINFO_);
+  }
+
+
 
   //Set up binning and image subarea mapping
   binning = inst["Binning"];
@@ -140,7 +200,7 @@ void IsisMain() {
   alpha = &myAlpha;
 
   try {
-    g_texp = inst["ExposureDuration"] ;
+    g_texp = inst["ExposureDuration"][0].toDouble();
   }
   catch(IException &e) {
     QString msg = "Unable to read [ExposureDuration] keyword in the Instrument group "
@@ -148,24 +208,63 @@ void IsisMain() {
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
-  QString instrumentId = inst["InstrumentId"];
-  QString oncCCDTemperature = "ONC";
+
   try {
-    oncCCDTemperature += instrumentId.section('-',1,1) + "CCDTemperature";
-    g_temp = inst[oncCCDTemperature];
+    g_AEtemperature = inst["ONCAETemperature"][0].toDouble();
   }
   catch(IException &e) {
-    QString msg = "Unable to read [" + oncCCDTemperature + "] keyword in the Instrument group "
+    QString msg = "Unable to read [ONCAETemperature] keyword in the Instrument group "
     "from input file [" + icube->fileName() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
 
   }
 
-  QString startTime = inst["SpacecraftClockStartCount"];
+  try {  
+    g_CCD_T_temperature = inst["ONCTCCDTemperature"][0].toDouble();
+  }
+  catch(IException &e) {
+    QString msg = "Unable to read [ONCTCCDTemperature] keyword in the Instrument group "
+    "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+  }
 
-  g_startTime = startTime;
+  try {
+    g_ECT_T_temperature = inst["ONCTElectricCircuitTemperature"][0].toDouble();
+  }
+  catch(IException &e) {
+    QString msg = "Unable to read [ONCTElectricCircuitTemperature] keyword in the Instrument group "
+    "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+  }
 
-  nsubImages = inst["SubImageCount"];  // If > 1, some correction is not needed/performed
+
+  try {
+
+    g_startTime=inst["SpacecraftClockStartCount"][0];
+  }
+
+  catch (IException &e) {
+    QString msg = "Unable to read [SpacecraftClockStartCount] keyword in the Instrument group "
+    "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+  }
+
+
+  QString smearCorrection;
+
+  try {
+    smearCorrection = inst["SmearCorrection"][0];
+  }
+
+  catch (IException &e) {
+    QString msg = "Unable to read [SmearCorrection] keyword in the Instrument group "
+    "from input file [" + icube->fileName() + "]";
+    throw IException(e, IException::Io,msg, _FILEINFO_);
+  }
+
+  if (smearCorrection=="ONBOARD") {
+    g_onBoardSmearCorrection=true;
+  }
 
   QString compmode = inst["Compression"];
   // TODO: verify that the compression factor/scale is actually 16 for compressed Hayabusa2 images.
@@ -177,7 +276,7 @@ void IsisMain() {
 
   // NOTE we do not have a valid flat-field for the W1 or W2 images.
   FileName flatfile = "NONE";
-  if (instrumentId == "ONC-T") {
+  if (g_instrument == InstrumentType::ONCT) {
     QScopedPointer<Cube, TemporaryCubeDeleter> flatcube;
     flatfile = DetermineFlatFieldFile(g_filter);
 
@@ -239,16 +338,11 @@ void IsisMain() {
   }
 
   Cube *ocube  = p.SetOutputCube("TO");
-  QString fname = ocube->fileName();
+  //QString fname = ocube->fileName();
 
   QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
 
-  // TODO: we do not have g_Tvct (readout time for the ccd). Once we know this value for Hayabusa2
-  // ONC and we know the smear model, we can correctly account for smear.
-  //g_timeRatio = g_Tvct/(g_texp + g_Tvct);
-
-  g_darkCurrent = g_d0 * exp(g_d1 *g_temp);
-  std::cout << "\ndark current: " << g_darkCurrent << std::endl;
+  g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
   g_iof = 1.0;  // Units of DN
 
@@ -295,14 +389,58 @@ void IsisMain() {
   calibrationLog.addKeyword(PvlKeyword("CompressionFactor", toString(g_compfactor, 2)));
 
   // Parameters
-  PvlKeyword key("Bias_Bn");
-  key.addValue(toString(g_b0, 8));
-  key.addValue(toString(g_b1, 8));
-  key.addValue(toString(g_b2, 8));
-  calibrationLog.addKeyword(key);
-  calibrationLog.addKeyword(PvlKeyword("Bias", toString(g_bias, 16), "DN"));
+  PvlKeyword bn("Bias_Bn");
+  bn.addValue(toString(g_b0, 8));
+  bn.addValue(toString(g_b1, 8));
+  bn.addValue(toString(g_b2, 8));
+  calibrationLog.addKeyword(bn);
 
-  // calibrationLog.addKeyword(PvlKeyword("Smear_Tvct", toString(g_Tvct, 16)));
+  PvlKeyword bnae("Bias_AECorrection");
+  bnae.addValue(toString(g_bae0, 8));
+  bnae.addValue(toString(g_bae1, 8));
+  calibrationLog.addKeyword(bnae);
+
+  PvlKeyword linearityCoefs("Linearity");
+  linearityCoefs.addValue(toString(g_L0,8));
+  linearityCoefs.addValue(toString(g_L1,8));
+  linearityCoefs.addValue(toString(g_L2,8));
+  calibrationLog.addKeyword(linearityCoefs);
+
+
+
+  static double g_AEtemperature(0.0);
+
+  static double g_CCD_T_temperature(0.0);
+  static double g_ECT_T_temperature(0.0);
+
+  calibrationLog.addKeyword(PvlKeyword("Bias_AETemp", toString(g_AEtemperature, 16)));
+
+
+  switch (g_instrument) {
+
+    case InstrumentType::ONCT:
+       calibrationLog.addKeyword(PvlKeyword("Bias_CCDTemp", toString(g_CCD_T_temperature, 16)));
+       calibrationLog.addKeyword(PvlKeyword("Bias_ECTTemp", toString(g_ECT_T_temperature, 16)));
+    break;
+
+    case InstrumentType::ONCW1:
+      calibrationLog.addKeyword(PvlKeyword("Bias_CCDTemp", toString(g_CCD_W1_temperature, 16)));
+      calibrationLog.addKeyword(PvlKeyword("Bias_ECTTemp", toString(g_ECT_W1_temperature, 16)));
+      break;
+
+    case InstrumentType::ONCW2:
+      calibrationLog.addKeyword(PvlKeyword("Bias_CCDTemp", toString(g_CCD_W2_temperature, 16)));
+      calibrationLog.addKeyword(PvlKeyword("Bias_ECTTemp", toString(g_ECT_W2_temperature, 16)));
+      break;
+  }
+
+
+
+  calibrationLog.addKeyword(PvlKeyword("Bias", toString(g_bias, 16), "DN"));
+  calibrationLog.addKeyword(PvlKeyword("Smear_Tvct", toString(g_Tvct, 16)));
+  calibrationLog.addKeyword(PvlKeyword("Smear_texp", toString(g_texp, 16)));
+
+
 
   calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
   calibrationLog.addKeyword(PvlKeyword("RadianceStandard", toString(g_v_standard, 16)));
@@ -343,8 +481,14 @@ FileName DetermineFlatFieldFile(const QString &filter) {
 /**
 * @brief Loads the calibration variables into the program.
 * @param config QString Name of the calibration file to load.
+*
+* Loads g_b0-g_b2,g_bae0-g_bae1,g_d0-g_d1
+*
+*
 */
 QString loadCalibrationVariables(const QString &config)  {
+
+
 
   //  UserInterface& ui = Application::GetUserInterface();
 
@@ -357,28 +501,59 @@ QString loadCalibrationVariables(const QString &config)  {
   // Load the groups
   PvlGroup &Bias = g_configFile.findGroup("Bias");
   PvlGroup &DarkCurrent = g_configFile.findGroup("DarkCurrent");
-  // PvlGroup &Smear = g_configFile.findGroup("SmearRemoval");
+  PvlGroup &Smear = g_configFile.findGroup("SmearRemoval");
   PvlGroup &solar = g_configFile.findGroup("SOLARFLUX");
+  PvlGroup &linearity = g_configFile.findGroup("Linearity");
   // PvlGroup &iof = g_configFile.findGroup("RAD");
 
   // Load Smear Removal Variables
-  // g_Tvct = Smear["Tvct"];
+  g_Tvct = Smear["Tvct"];
 
-  // Load DarkCurrent variables
+
+
+  // Load DarkCurrent variables and calculate the dark current
   g_d0 = DarkCurrent["D"][0].toDouble();
   g_d1 = DarkCurrent["D"][1].toDouble();
+  double CCDTemp(0.0);
+
+  switch (g_instrument) {
+    case InstrumentType::ONCT:
+      CCDTemp = g_CCD_T_temperature;
+    break;
+    case InstrumentType::ONCW1:
+      CCDTemp = g_CCD_W1_temperature;
+    break;
+    case InstrumentType::ONCW2:
+      CCDTemp = g_CCD_W2_temperature;
+    break;
+    default:
+      CCDTemp = g_CCD_T_temperature;
+  }
+
+   g_darkCurrent = g_texp*exp(0.10*CCDTemp+0.52);
 
   // Load Bias variables
   g_b0 = Bias["B"][0].toDouble();
   g_b1 = Bias["B"][1].toDouble();
   g_b2 = Bias["B"][2].toDouble();
+  g_bae0 = Bias["B_AE"][0].toDouble();
+  g_bae1 = Bias["B_AE"][1].toDouble();
+
+
 
   // Compute BIAS correction factor (it's a constant so do it once!)
-  g_bias = g_b0 + g_b1 * g_AEtemperature + g_b2 * (g_AEtemperature * g_AEtemperature);
-  std::cout << "bias: " << g_bias << std::endl;
+  g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
+  g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //correction factor
+  qDebug() << "Bias: " << g_bias;
 
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
+
+  //Load the linearity variables
+  g_L0 = linearity["L"][0].toDouble();
+  g_L1 = linearity["L"][1].toDouble();
+  g_L2 = linearity["L"][2].toDouble();
+
 
   // radiance = g_v_standard * g_iofScale
   // iof      = radiance * pi *dist_au^2
@@ -409,7 +584,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   int currentSample = imageIn.Sample();
   int alphaSample = alpha->AlphaSample(currentSample);
 
-  if ( (alphaSample <= pixelsToNull)  || (alphaSample >= (1024 - pixelsToNull ))) {
+  if ( (alphaSample <= pixelsToNull)  || (alphaSample >= (1024 - pixelsToNull ) ) ) {
 
     for (int i = 0; i < imageIn.size(); i++ ) {
       imageOut[i] = Isis::Null;
@@ -435,6 +610,10 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   //   }
   // }
 
+
+
+
+
   // Iterate over the line space
   for (int i = 0; i < imageIn.size(); i++) {
 
@@ -449,10 +628,16 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // Apply compression factor here to raise LOSSY dns to proper response
     imageOut[i] *= g_compfactor;
 
+
+
     // 1) BIAS Removal - Only needed if not on-board corrected
     // TODO: find image with > 1 subimages
-    if ( nsubImages <= 1 ) {
 
+
+
+    if ( !g_onBoardSmearCorrection ) {
+
+      //qDebug() << "DN:   " << imageOut[i];
       if ( (imageOut[i] - g_bias) <= 0.0) {
         imageOut[i] = Null;
         continue;
@@ -461,9 +646,12 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
         imageOut[i] = imageOut[i] - g_bias;
       }
     }
-
+#if 0
     // 2) DARK Current
     imageOut[i] = imageOut[i] - g_darkCurrent;
+
+
+
 
     // READOUT Smear Removal - Not needed if on-board corrected.  Binning is
     //    accounted for in computation of c1 before loop.
@@ -471,7 +659,22 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     //  imageOut[i] = c1*(imageOut[i] - smear);
     // }
 
-    // 3) FLATFIELD correction
+    double smear = 0;
+    for (int j=0;j < imageIn.size();j++) {
+      smear += (imageOut[j]/imageIn.size() );
+
+    }
+    smear*=g_timeRatio;
+    imageOut[i] = imageOut[i] - smear;
+
+    //Linearity Correction
+    //In the SIS this adjustment is made just after the bias, but
+    //in the Calibration paper it happens just before the flat field correction.
+    double linearCorrection;
+    linearCorrection = g_L0+g_L1*pow(imageOut[i],2.0)+g_L2*pow(imageOut[i],3.0);
+    imageOut[i]*=linearCorrection;
+
+    // FLATFIELD correction
     //  Check for any special pixels in the flat field (unlikely)
     // If we have only one input cube, that means that we do not have a flat-field (W1/W2).
     if (in.size() == 2) {
@@ -491,6 +694,9 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // For now, g_iof is 1, so output will be in DNs.
     // 7) I/F or Radiance Conversion (or g_iof might = 1, in which case the output will be in DNs)
     imageOut[i] *= g_iof;
+#endif
   }
+
+
   return;
 }
