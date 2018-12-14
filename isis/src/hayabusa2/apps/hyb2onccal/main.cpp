@@ -57,6 +57,8 @@ struct TemporaryCubeDeleter {
 
 enum InstrumentType{ONCW1,ONCW2,ONCT};
 
+static double g_bitDepth(12);
+
 InstrumentType g_instrument;
 //For subimage and binning mapping
 static AlphaCube *alpha(0);
@@ -191,11 +193,13 @@ void IsisMain() {
   binning = inst["Binning"];
   int startLine = inst["SelectedImageAreaY1"];
   int startSample = inst["SelectedImageAreaX1"];
-  int lastLine = inst["SelectedImageAreaY4"];
-  int lastSample = inst["SelectedImageAreaX4"];
+  int lastLine = inst["SelectedImageAreaY2"];
+  int lastSample = inst["SelectedImageAreaX2"];
 
   AlphaCube myAlpha(1024,1024,icube->sampleCount(), icube->lineCount(),
   startSample,startLine,lastSample,lastLine);
+
+  g_bitDepth = inst["BitDepth"];
 
   alpha = &myAlpha;
 
@@ -616,8 +620,10 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   // Iterate over the line space
   for (int i = 0; i < imageIn.size(); i++) {
+    //qDebug() << "imageIn:  " << imageIn[i];
+    imageOut[i] = imageIn[i]*pow(2.0,12-g_bitDepth);
+    //qDebug() << "imageIOut:  " << imageOut[i];
 
-    imageOut[i] = imageIn[i];
 
     // Check for special pixel in input image and pass through
     if ( IsSpecial(imageOut[i]) ) {
@@ -637,7 +643,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
     if ( !g_onBoardSmearCorrection ) {
 
-      //qDebug() << "DN:   " << imageOut[i];
+
       if ( (imageOut[i] - g_bias) <= 0.0) {
         imageOut[i] = Null;
         continue;
@@ -647,7 +653,14 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 #if 0
-    // 2) DARK Current
+    double linearCorrection;
+    linearCorrection = g_L0+g_L1*pow(imageOut[i],2.0)+g_L2*pow(imageOut[i],3.0);
+    imageOut[i]*=linearCorrection;
+
+#endif
+
+
+    // DARK Current
     imageOut[i] = imageOut[i] - g_darkCurrent;
 
 
@@ -658,21 +671,27 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // if (nsubImages <= 1) {
     //  imageOut[i] = c1*(imageOut[i] - smear);
     // }
+    if (g_onBoardSmearCorrection) {
+      double smear = 0;
+      for (int j=0;j < imageIn.size();j++) {
+        smear += (imageOut[j]/imageIn.size() );
+      }
+      smear*=g_timeRatio;
+      imageOut[i] = imageOut[i] - smear;
 
-    double smear = 0;
-    for (int j=0;j < imageIn.size();j++) {
-      smear += (imageOut[j]/imageIn.size() );
-
-    }
-    smear*=g_timeRatio;
-    imageOut[i] = imageOut[i] - smear;
+      }
 
     //Linearity Correction
     //In the SIS this adjustment is made just after the bias, but
     //in the Calibration paper it happens just before the flat field correction.
+
+#if 0
     double linearCorrection;
     linearCorrection = g_L0+g_L1*pow(imageOut[i],2.0)+g_L2*pow(imageOut[i],3.0);
+    qDebug() << "linearCorrection=" << linearCorrection;
     imageOut[i]*=linearCorrection;
+ #endif
+
 
     // FLATFIELD correction
     //  Check for any special pixels in the flat field (unlikely)
@@ -694,7 +713,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // For now, g_iof is 1, so output will be in DNs.
     // 7) I/F or Radiance Conversion (or g_iof might = 1, in which case the output will be in DNs)
     imageOut[i] *= g_iof;
-#endif
+
   }
 
 
