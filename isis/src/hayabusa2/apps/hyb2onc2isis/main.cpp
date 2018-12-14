@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QString>
 
+#include "AlphaCube.h"
 #include "FileName.h"
 #include "iTime.h"
 #include "OriginalLabel.h"
@@ -12,6 +13,7 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "PvlToPvlTranslationManager.h"
+
 #include "UserInterface.h"
 
 using namespace std;
@@ -34,6 +36,11 @@ void IsisMain () {
   // Create a PVL to store the translated labels in
   Pvl outputLabel;
 
+  //Uncropped # of samples/lines
+  int N = 1024;
+  int Nsl = 1;
+
+
   // Get the FITS label
   Pvl fitsLabel;
   fitsLabel.addGroup(importFits.fitsImageLabel(0));
@@ -46,7 +53,7 @@ void IsisMain () {
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
-
+  fitsLabel.write(FileName(ui.GetFileName("FROM")).expanded()+"fit.txt");
 
   QString instid;
   QString missid;
@@ -89,7 +96,6 @@ void IsisMain () {
   if (formatType.contains("2a") || formatType.contains("2b"))
     distortionCorrection = false;
 
-
   missid = missid.simplified().trimmed();
   if (QString::compare(missid, "HAYABUSA-2", Qt::CaseInsensitive) != 0) {
     QString msg = "Input file [" + FileName(ui.GetFileName("FROM")).expanded() + 
@@ -117,6 +123,22 @@ void IsisMain () {
   //  Update target if user specifies it
   PvlGroup &instGrp = outputLabel.findGroup("Instrument",Pvl::Traverse);
   QString target;
+
+  //Check for cropped image
+
+
+  int ss = instGrp["SelectedImageAreaX1"];
+  int sl = instGrp["SelectedImageAreaY1"];
+  int es = instGrp["SelectedImageAreaX2"];
+  int el = instGrp["SelectedImageAreaY2"];
+
+  if (ss > 1 || sl >1 || es < N || el < N) {
+
+    AlphaCube aCube(N, N, outputCube->sampleCount(), outputCube->lineCount(),
+                    ss-0.5, sl - 0.5, es - 0.5, el - 0.5);
+    aCube.UpdateGroup(*outputCube);
+
+  }
 
   instGrp.addKeyword(PvlKeyword("DistortionCorrection"));
   try {
