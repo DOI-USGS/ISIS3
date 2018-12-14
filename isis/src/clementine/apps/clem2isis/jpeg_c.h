@@ -1,3 +1,5 @@
+#ifndef jpeg_c_h
+#define jpeg_c_h
 
 /* Structure Definitions */
 enum FmodeDef { INPUT, OUTPUT };
@@ -57,3 +59,5 @@ extern void inithuffcode();
 extern void encode(short *, BitStream *);
 extern void decode(short *, BitStream *);
 extern void decomp(BitStream *bs, CHARH *Image, long rows, long cols);
+
+#endif
