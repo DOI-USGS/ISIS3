@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <QDebug>
 #include <QString>
 
 #include "CSVReader.h"
@@ -202,6 +203,8 @@ void mat2isis(Mat *matrix, QString cubeName) {
 
   }
 
+  ocube.close();
+
 }
 
 
@@ -215,18 +218,20 @@ void mat2isis(Mat *matrix, QString cubeName) {
  * @param cubeName The name of the ISIS::Cube that is being created.
  *
  */
-void  translate(Cube *flatField, int *transform, QString fname) {
+
+void  translate(Cube *flatField,double *transform, QString fname) {
+
 
   Mat * originalMat = isis2mat(flatField);
-  int scale = transform[0];
+  double scale = transform[0];
 
-  int startsample = transform[1];
-  int startline = transform[2];
-  int lastsample = transform[3];
-  int lastline = transform[4];
+  double startsample = transform[1];
+  double startline = transform[2];
+  double lastsample = transform[3];
+  double lastline = transform[4];
 
-  int width  = (lastsample-startsample);
-  int height = (lastline-startline);
+  double  width  = (lastsample-startsample);
+  double height = (lastline-startline);
 
   Size sz(flatField->lineCount()/scale,flatField->sampleCount()/scale);
 
@@ -235,10 +240,9 @@ void  translate(Cube *flatField, int *transform, QString fname) {
   Mat temp = *originalMat;
 
 
-  Mat originalCropped = temp(Rect(startsample,startline,width+1,height+1));
+  Mat originalCropped = temp(Rect(startsample,startline,width,height));
 
-
-  if (scale ==1) {   
+  if (scale ==1) {
     mat2isis(&originalCropped,fname);
   }
   else {
@@ -248,6 +252,17 @@ void  translate(Cube *flatField, int *transform, QString fname) {
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
 }
 
 #endif
