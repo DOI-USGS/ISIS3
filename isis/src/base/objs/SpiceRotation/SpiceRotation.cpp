@@ -306,7 +306,7 @@ namespace Isis {
    * @param status The DownsizeStatus enumeration value.
    */
   void SpiceRotation::MinimizeCache(DownsizeStatus status) {
-    p_minimizeCache = status; 
+    p_minimizeCache = status;
   }
 
 
@@ -607,7 +607,7 @@ namespace Isis {
       if (p_degree > 0 && p_cacheAv.size() > 1)  p_cacheAv.clear();
 
       // Load the time cache first
-      p_minimizeCache = No; 
+      p_minimizeCache = No;
       LoadTimeCache();
 
       if (p_fullCacheSize > 1) {
@@ -635,7 +635,7 @@ namespace Isis {
       p_cacheAv.clear();
 
       // Reload the time cache first
-      p_minimizeCache = No; 
+      p_minimizeCache = No;
       LoadTimeCache();
 
       for (std::vector<double>::size_type pos = 0; pos < maxSize; pos++) {
@@ -714,8 +714,7 @@ namespace Isis {
       LineCache(tableName);
 
       //std::cout << "Full cache size is " << p_cache.size() << endl;
-      
-      p_minimizeCache = Yes; 
+      p_minimizeCache = Yes;
       LoadTimeCache();
 
       //std::cout << "Minimized cache size is " << p_cache.size() << endl;
@@ -1931,7 +1930,6 @@ namespace Isis {
     return;
  }
 
-  // NEW: sets the cache time
   void SpiceRotation::SetCacheTime(std::vector<double> cacheTime) {
     // Do not reset the cache times if they are already loaded. 
     if (p_cacheTime.size() <= 0) {
@@ -2303,7 +2301,7 @@ namespace Isis {
     ktotal_c("ck", (SpiceInt *) &count);
 
     // Downsize the loaded cache
-    if ((p_source == Memcache) && p_minimizeCache == Yes) { 
+    if ((p_source == Memcache) && p_minimizeCache == Yes) {
       // Multiple ck case, type 5 ck case, or PolyFunctionOverSpice
       //  final step -- downsize loaded cache and reload
 
@@ -2486,13 +2484,11 @@ namespace Isis {
     // Load times according to cache size (body rotations) -- handle first round of type 5 ck case
     //   and multiple ck case --Load a time for every line scan line and downsize later
     if (! (timeLoaded || (p_cacheTime.size() > 1))) {
-      double cacheSlope = 0.0; 
+      double cacheSlope = 0.0;
       if (p_fullCacheSize > 1)
         cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
       for (int i = 0; i < p_fullCacheSize; i++)
         p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope); 
-      // could try to change the kernels: type, resample, something else? check on type 2 or 3, concerned about interpolation
-      // it's already type 2 or 3... 
       if (p_source == Nadir) {
         p_minimizeCache = No;
       }
@@ -3103,7 +3099,7 @@ namespace Isis {
                     (p_cacheTime[cacheIndex+1] - p_cacheTime[cacheIndex]);
       /*        Quaternion Q2 (p_cache[cacheIndex+1]);
                Quaternion Q1 (p_cache[cacheIndex]);*/
-      std::vector<double> CJ2(p_cache[cacheIndex+1]); 
+      std::vector<double> CJ2(p_cache[cacheIndex+1]);
       std::vector<double> CJ1(p_cache[cacheIndex]);
       SpiceDouble J2J1[3][3];
       mtxm_c((SpiceDouble( *)[3]) &CJ2[0], (SpiceDouble( *)[3]) &CJ1[0], J2J1);

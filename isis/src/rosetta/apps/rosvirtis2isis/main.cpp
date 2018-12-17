@@ -4,7 +4,6 @@
 #include <istream>
 #include <sstream>
 #include <cmath>
-#include <iomanip>
 
 #include <QString>
 #include <QFileInfo>
@@ -410,7 +409,7 @@ void IsisMain ()
     scs2e_c( (SpiceInt) -226, stopScet.toLatin1().data(), &etEnd);
 
     PvlKeyword &frameParam = inst["FrameParameter"];
-    exposureTime = toDouble(frameParam[0]);
+    double exposureTime = toDouble(frameParam[0]);
 
     QString startTime = iTime(etStart-exposureTime).UTC(); 
     QString stopTime = iTime(etEnd-exposureTime).UTC(); 

@@ -280,7 +280,7 @@ namespace Isis {
       enum DownsizeStatus {
         Yes,  //!< Downsize the cache
         Done, //!< Cache is downsized
-        No,   //!< Do not downsize the cache
+        No    //!< Do not downsize the cache
       };
 
       /**
