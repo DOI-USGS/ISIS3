@@ -38,7 +38,7 @@ void IsisMain () {
 
   //Uncropped # of samples/lines
   int N = 1024;
-  int Nsl = 1;
+
 
 
   // Get the FITS label
@@ -111,7 +111,7 @@ void IsisMain () {
 
   // Translate the Instrument group
 
-  FileName transFile(transDir + "hyb2oncInstrument.trn");
+  FileName transFile(transDir + "hyb2oncInstrument1.trn");
 
   if (updatedKeywords) {
     transFile = transDir+"hyb2oncInstrumentUpdated.trn";
@@ -135,8 +135,14 @@ void IsisMain () {
   if (ss > 1 || sl >1 || es < N || el < N) {
 
     AlphaCube aCube(N, N, outputCube->sampleCount(), outputCube->lineCount(),
-                    ss-0.5, sl - 0.5, es - 0.5, el - 0.5);
+                    ss-0.5, sl - 0.5, es + 0.5, el + 0.5);
     aCube.UpdateGroup(*outputCube);
+
+    instGrp["SelectedImageAreaX1"] = "1";
+    instGrp["SelectedImageAreaY1"] = "1";
+    instGrp["SelectedImageAreaX2"] = QString("%1").arg(N);
+    instGrp["SelectedImageAreaY2"] = QString("%1").arg(N);
+
 
   }
 
