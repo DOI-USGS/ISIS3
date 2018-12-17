@@ -292,20 +292,25 @@ namespace Isis {
    */
   void RosettaVirtisCamera::readSCET(const QString &filename) {
    //  Open the ISIS table object
+   std::vector<double> cacheTime; 
    Table hktable("VIRTISHouseKeeping", filename);
    m_lineRates.clear();
    int lineno(1);
+   double lineEndTime = 0;
    for (int i = 0; i < hktable.Records(); i++) {
      TableRecord &trec = hktable[i];
      QString scetString = trec["dataSCET"];
-     double lineMidTime = getClockTime(scetString, naifSpkCode()).Et();
+     lineEndTime = getClockTime(scetString, naifSpkCode()).Et();
      m_lineRates.push_back(LineRateChange(lineno,
-                                          lineStartTime(lineMidTime),
+                                          lineEndTime-exposureTime(),
                                           exposureTime()));
+     cacheTime.push_back(lineEndTime-exposureTime());
      lineno++;
    }
-    // Adjust the last time
-    LineRateChange lastR = m_lineRates.back();
+   cacheTime.push_back(lineEndTime);
+
+   // Adjust the last time
+   LineRateChange lastR = m_lineRates.back();
 
     // Normally the line rate changes would store the line scan rate instead of exposure time.
     // Storing the exposure time instead allows for better time calculations within a line.
@@ -321,6 +326,8 @@ namespace Isis {
     m_lineRates.back() = LineRateChange(lastR.GetStartLine(),
                                         lastR.GetStartEt(),
                                         exposureTime());
+
+    instrumentRotation()->SetCacheTime(cacheTime);
   }
 
 

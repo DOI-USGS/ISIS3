@@ -129,7 +129,7 @@ namespace Isis {
     try {
       project()->setActiveControl(controlList()->at(0)->displayProperties()->displayName());
     }
-    catch (IException e) {
+    catch (IException &e) {
       m_status = WorkOrderFinished;
       QMessageBox::critical(NULL, tr("Error"), tr(e.what()));
     }

@@ -1,4 +1,14 @@
+#ifndef mocuncompress_invfwht16x16_h
+#define mocuncompress_invfwht16x16_h
+
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17.
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -44,6 +54,8 @@ SCCSID @(#)invFwht16x16.h  1.1 10/04/99
 
 #define invFwht16x16_h
 
-extern void invFwht16x16(register int16 *in, register int16 *out);
+extern void invFwht16x16(int16 *in, int16 *out);
+
+#endif
 
 #endif

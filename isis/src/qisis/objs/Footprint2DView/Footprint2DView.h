@@ -106,6 +106,10 @@ namespace Isis {
    *                           onItemAdded. This allows the FootprintView to put all selected items
    *                           into the scene widget at once rather than individually which speeds
    *                           the display of footprints. Fixes #5296.
+   *   @history 2018-10-04 Tracie Sucharski - If adding Shape to footprint view, call Image new
+   *                           Image constructor which takes a footprint and id, so that the
+   *                           MosaicSceneWidget can properly serialize Shapes that have been added.
+   *                           Fixes #5495.
    *  
    */
   class Footprint2DView : public AbstractProjectItemView {

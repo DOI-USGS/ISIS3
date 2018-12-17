@@ -68,6 +68,8 @@ namespace Isis {
    *                           existence of graphics items.  Fixes #4984.
    *   @history 2018-07-12 Tracie Sucharski - Made the slot loadNetwork public so that ipce can
    *                           load a new network.
+   *   @history 2018-09-19 Tracie Sucharski - For the ipce application, update the control net file
+   *                           name in the toolbar when a new active control is set. Fixes #5518.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT

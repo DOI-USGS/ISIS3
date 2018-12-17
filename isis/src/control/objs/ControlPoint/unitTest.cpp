@@ -15,7 +15,7 @@ using namespace std;
 using namespace boost::numeric::ublas;
 using namespace Isis;
 
-void printPoint(ControlPoint &p);
+void printPoint(ControlPoint &p, bool = false);
 
 /**
   * @brief Test ControlPoint object for accuracy and correct behavior.
@@ -34,7 +34,7 @@ void printPoint(ControlPoint &p);
   * @history 2017-12-21 Kristin Berry - Added tests for newly added accessor methods.
   * @history 2018-01-04 Adam Goins - Replaced QDebug with std::cout. Removed commented out code for
   *                         Removed accessor methods.
-  */
+ */
 int main() {
   Preference::Preferences(true);
 
@@ -266,7 +266,7 @@ int main() {
   }
 }
 
-void printPoint(Isis::ControlPoint &p) {
+void printPoint(Isis::ControlPoint &p, bool testRect) {
   bool wasLocked = p.IsEditLocked();
   p.SetEditLock(false);
   p.SetChooserName("cnetref");
@@ -314,4 +314,19 @@ void printPoint(Isis::ControlPoint &p) {
   cout << "Printing point:\n" << tmp << "\nDone printing point." << std::endl;
   std::cout << std::endl;
   remove("./tmp.net");
+
+  // Add test with coordinate type set to Rectangular *** TBD *** Add test once
+  //  changes are made to the protocol buffer.
+  if (testRect) {
+    ControlNet recNet;
+    recNet.AddPoint(copyPoint);
+    recNet.SetNetworkId("Identifier");
+    recNet.SetCreatedDate("Yesterday");
+    recNet.SetModifiedDate("Yesterday");
+    recNet.Write("./tmpR.net", true);
+    Pvl tmpR("./tmpR.net");
+    cout << "Printing rectangular net point:\n" << tmp << "\nDone printing point."
+         << endl << endl;
+    remove("./tmpR.net");
+  }
 }

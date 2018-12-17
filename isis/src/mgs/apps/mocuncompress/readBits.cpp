@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -101,7 +108,7 @@ BITSTRUCT *initBits(uint8 *data, int len)
 }
 #endif
 
-uint32 readBits(register uint8 bitCount, register BITSTRUCT *bitStuff)
+uint32 readBits(uint8 bitCount, BITSTRUCT *bitStuff)
 {
 uint32 bitQueue;
 uint32 bitQueueCount;

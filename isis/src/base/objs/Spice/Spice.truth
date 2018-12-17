@@ -2,7 +2,7 @@ Unit test for Isis::Spice
 Testing unknown target ...
 **ERROR** Unable to look up NAIF body code for this Target.
 **I/O ERROR** Could not convert Target [Mard] to NAIF body code.
-**I/O ERROR** Can not find [BODY_FRAME_CODE] in text kernels.
+**I/O ERROR** Can not find [BODY_CODE] in text kernels.
 
 Creating Spice object ...
 BodyCode        = 499
@@ -592,6 +592,7 @@ Target Name = Mars
 
 Get Stored Naif Keywords...
 Object = NaifKeywords
+  BODY_CODE = 499
   BODY499_RADII = (3397.0, 3397.0, 3375.0)
   BODY_FRAME_CODE = 10014
   FRAME_MGS_MOC = -94031

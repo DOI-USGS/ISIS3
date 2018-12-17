@@ -103,15 +103,27 @@ namespace Isis {
    * signal and ignores the close event.
    *
    * @param event
+   *
+   *  @internal
+   *  @history 2018-04-24 Adam Goins - Added optional parameter QCloseEvent to
+   *                          the closeWindow() signal so that the close event can be caught
+   *                          and set to rejected by listening applications (such as qnet).
+   *                          Fixes an issue where closing qnet and clicking 'cancel' from the
+   *                          proceeding popup dialogue would still close the window but leave
+   *                          the application running. Fixes #4146.
    */
   void ViewportMainWindow::closeEvent(QCloseEvent *event) {
     if (p_workspace->confirmClose()) {
-      emit closeWindow();
-      MainWindow::closeEvent(event);
+      emit closeWindow(event);
+      if (event->isAccepted()) {
+        MainWindow::closeEvent(event);
+      }
+      else {
+        event->ignore();
+      }
     }
     else {
       event->ignore();
     }
   }
 }
-

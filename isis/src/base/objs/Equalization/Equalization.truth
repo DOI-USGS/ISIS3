@@ -1,47 +1,5 @@
 Create object using fromlist file (non-overlapping)
      Calculate statistics for contrast and brightness using QRD method...
-Calculating Statistics for Band 1 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 1 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 2 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 2 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 3 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 3 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 4 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 4 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 5 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 5 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 6 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 6 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 7 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 7 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 8 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 8 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 9 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 9 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 10 of 10 in Cube 1 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 10 of 10 in Cube 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Gathering Overlap Statisitcs for Cube 1 vs 2 of 2
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 **USER ERROR** There are input images that do not overlap with enough valid pixels. See application log or "NonOverlaps" keyword in output statistics file.
 Results:
 Group = General
@@ -60,72 +18,6 @@ End_Group
      Write results to file...
      Add hold list...
      Recalculating the statistics with all overlapping files now...
-Calculating Statistics for Band 1 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 1 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 1 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 2 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 2 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 2 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 3 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 3 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 3 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 4 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 4 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 4 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 5 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 5 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 5 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 6 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 6 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 6 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 7 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 7 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 7 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 8 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 8 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 8 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 9 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 9 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 9 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 10 of 10 in Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 10 of 10 in Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Calculating Statistics for Band 10 of 10 in Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Gathering Overlap Statisitcs for Cube 1 vs 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Gathering Overlap Statisitcs for Cube 1 vs 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Gathering Overlap Statisitcs for Cube 2 vs 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 Results:
 Group = General
   TotalOverlaps   = 20
@@ -192,8 +84,7 @@ Group = General
                      5.97723994078917e-05)
 End_Group
      Write results to file...
-Working
-0% Processedsample 45, line 45: 0.000351268332 => 0.000291894498
+sample 45, line 45: 0.000351268332 => 0.000291894498
 sample 46, line 46: 0.000345625071 => 0.000287365908
 sample 47, line 47: 0.000336533762 => 0.000280070338
 sample 48, line 48: 0.000333498669 => 0.000277634745
@@ -333,7 +224,7 @@ sample 30, line 358: 0.00040070148 => 0.000331563478
 sample 31, line 359: 0.000406345091 => 0.000336092348
 sample 32, line 360: 0.000420178461 => 0.000347193314
 sample 33, line 361: 0.000426772283 => 0.000352484707
-10% Processedsample 49, line 377: 0.00033769873 => 0.000281510821
+sample 49, line 377: 0.00033769873 => 0.000281510821
 sample 50, line 378: 0.000327600748 => 0.000273526758
 sample 51, line 379: 0.000324426801 => 0.000271017247
 sample 52, line 380: 0.000320445484 => 0.000267869382
@@ -473,7 +364,7 @@ sample 35, line 691: 0.00041334136 => 0.00034131837
 sample 36, line 692: 0.000402227684 => 0.000332531239
 sample 37, line 693: 0.000390052301 => 0.000322904658
 sample 38, line 694: 0.000392548012 => 0.000324877916
-20% Processedsample 71, line 727: 0.000364591979 => 0.000331182387
+sample 71, line 727: 0.000364591979 => 0.000331182387
 sample 72, line 728: 0.000391498295 => 0.000352335734
 sample 73, line 729: 0.000414402573 => 0.000370342738
 sample 74, line 730: 0.000416920288 => 0.000372322127
@@ -610,7 +501,7 @@ sample 15, line 1081: 0.000515304622 => 0.000449670432
 sample 16, line 1082: 0.000514662708 => 0.000449165769
 sample 17, line 1083: 0.000515415799 => 0.000449757838
 sample 18, line 1084: 0.000524252187 => 0.000456704876
-30% Processedsample 47, line 1113: 0.000370426045 => 0.000350946707
+sample 47, line 1113: 0.000370426045 => 0.000350946707
 sample 48, line 1114: 0.000367466651 => 0.000348551073
 sample 49, line 1115: 0.000366733584 => 0.000347957654
 sample 50, line 1116: 0.000367128872 => 0.00034827764
@@ -751,7 +642,7 @@ sample 33, line 1427: 0.000470817497 => 0.000432213741
 sample 34, line 1428: 0.000463700708 => 0.00042645269
 sample 35, line 1429: 0.000477536552 => 0.000437652827
 sample 36, line 1430: 0.000489252736 => 0.000447137096
-40% Processedsample 56, line 1450: 0.000379823323 => 0.000377499084
+sample 56, line 1450: 0.000379823323 => 0.000377499084
 sample 57, line 1451: 0.000391271838 => 0.000386961327
 sample 58, line 1452: 0.000391388312 => 0.000387057593
 sample 59, line 1453: 0.000399710669 => 0.000393936053
@@ -889,7 +780,7 @@ sample 38, line 1760: 0.000482738105 => 0.000462558555
 sample 39, line 1761: 0.000492680061 => 0.000470775621
 sample 3, line 1807: 0.000521840993 => 0.000494877246
 sample 4, line 1808: 0.00051620818 => 0.000490221703
-50% Processedsample 45, line 1849: 0.000427162158 => 0.000415505885
+sample 45, line 1849: 0.000427162158 => 0.000415505885
 sample 46, line 1850: 0.000432214525 => 0.000419675878
 sample 47, line 1851: 0.000433110312 => 0.00042041522
 sample 48, line 1852: 0.000432708708 => 0.000420083754
@@ -1030,7 +921,7 @@ sample 31, line 2163: 0.000558387779 => 0.000523813528
 sample 32, line 2164: 0.000544507813 => 0.000512357637
 sample 33, line 2165: 0.000552644779 => 0.000519073517
 sample 34, line 2166: 0.000552042096 => 0.000518576091
-60% Processedsample 49, line 2181: 0.000477178546 => 0.000451147503
+sample 49, line 2181: 0.000477178546 => 0.000451147503
 sample 50, line 2182: 0.000462104421 => 0.000438642692
 sample 51, line 2183: 0.000449487678 => 0.000428176413
 sample 52, line 2184: 0.000446294755 => 0.000425527709
@@ -1171,7 +1062,7 @@ sample 34, line 2494: 0.000561944791 => 0.00052146574
 sample 35, line 2495: 0.000563633454 => 0.000522866577
 sample 36, line 2496: 0.000531049154 => 0.000495836119
 sample 37, line 2497: 0.000541199115 => 0.000504256067
-70% Processedsample 77, line 2537: 0.000477642519 => 0.000441955162
+sample 77, line 2537: 0.000477642519 => 0.000441955162
 sample 78, line 2538: 0.000489208673 => 0.000451656844
 sample 79, line 2539: 0.000499683723 => 0.000460443309
 sample 80, line 2540: 0.000490265375 => 0.000452543205
@@ -1310,7 +1201,7 @@ sample 22, line 2892: 0.000586473616 => 0.000533242613
 sample 23, line 2893: 0.000588622992 => 0.000535045508
 sample 24, line 2894: 0.000584587629 => 0.000531660649
 sample 25, line 2895: 0.000580064836 => 0.000527866933
-80% Processedsample 47, line 2917: 0.000491997169 => 0.000446754828
+sample 47, line 2917: 0.000491997169 => 0.000446754828
 sample 48, line 2918: 0.000488422404 => 0.000443746687
 sample 49, line 2919: 0.000484033633 => 0.000440053567
 sample 50, line 2920: 0.000476966321 => 0.000434106472
@@ -1450,7 +1341,7 @@ sample 32, line 3230: 0.000538322318 => 0.000485737127
 sample 33, line 3231: 0.000550321187 => 0.000495834094
 sample 34, line 3232: 0.000552756828 => 0.000497883669
 sample 35, line 3233: 0.000551281322 => 0.000496642041
-90% Processedsample 62, line 3260: 0.000178040762 => 0.000119303493
+sample 62, line 3260: 0.000178040762 => 0.000119303493
 sample 63, line 3261: 0.000174913512 => 0.00011574935
 sample 64, line 3262: 0.000171941196 => 0.000112371291
 sample 65, line 3263: 0.000178040529 => 0.000119303228
@@ -1589,9 +1480,7 @@ sample 7, line 3615: 0.000147414743 => 8.44967995e-05
 sample 8, line 3616: 0.000147356128 => 8.4430183e-05
 sample 9, line 3617: 0.000149079497 => 8.63888041e-05
 sample 10, line 3618: 0.000145431666 => 8.22430183e-05
-100% Processed
-Working
-0% Processedsample 45, line 45: 0.000290619239 => 0.000290619239
+sample 45, line 45: 0.000290619239 => 0.000290619239
 sample 46, line 46: 0.00027536563 => 0.00027536563
 sample 47, line 47: 0.000284910842 => 0.000284910842
 sample 48, line 48: 0.000276024279 => 0.000276024279
@@ -1730,7 +1619,7 @@ sample 30, line 358: 0.000340305385 => 0.000340305385
 sample 31, line 359: 0.000336303987 => 0.000336303987
 sample 32, line 360: 0.000339195307 => 0.000339195307
 sample 33, line 361: 0.000346355722 => 0.000346355722
-10% Processedsample 49, line 377: 0.000286205031 => 0.000286205031
+sample 49, line 377: 0.000286205031 => 0.000286205031
 sample 50, line 378: 0.000266631891 => 0.000266631891
 sample 51, line 379: 0.000266020565 => 0.000266020565
 sample 52, line 380: 0.00026580703 => 0.00026580703
@@ -1870,7 +1759,7 @@ sample 34, line 690: 0.000318394857 => 0.000318394857
 sample 35, line 691: 0.000323348853 => 0.000323348853
 sample 36, line 692: 0.000333178352 => 0.000333178352
 sample 37, line 693: 0.00032398061 => 0.00032398061
-20% Processedsample 68, line 724: 0.000330440467 => 0.000330440467
+sample 68, line 724: 0.000330440467 => 0.000330440467
 sample 69, line 725: 0.000335332559 => 0.000335332559
 sample 70, line 726: 0.000323408312 => 0.000323408312
 sample 71, line 727: 0.000349924725 => 0.000349924725
@@ -2008,7 +1897,7 @@ sample 13, line 1079: 0.000384069222 => 0.000384069222
 sample 14, line 1080: 0.000367241882 => 0.000367241882
 sample 15, line 1081: 0.000411912159 => 0.000411912159
 sample 16, line 1082: 0.000410407927 => 0.000410407927
-30% Processedsample 47, line 1113: 0.000347713154 => 0.000347713154
+sample 47, line 1113: 0.000347713154 => 0.000347713154
 sample 48, line 1114: 0.000348245259 => 0.000348245259
 sample 49, line 1115: 0.00034509541 => 0.00034509541
 sample 50, line 1116: 0.000345106935 => 0.000345106935
@@ -2148,7 +2037,7 @@ sample 32, line 1426: 0.000446760125 => 0.000446760125
 sample 33, line 1427: 0.000450601685 => 0.000450601685
 sample 34, line 1428: 0.000450713007 => 0.000450713007
 sample 35, line 1429: 0.000435958151 => 0.000435958151
-40% Processedsample 52, line 1446: 0.000393217313 => 0.000393217313
+sample 52, line 1446: 0.000393217313 => 0.000393217313
 sample 53, line 1447: 0.000400495599 => 0.000400495599
 sample 54, line 1448: 0.000385479303 => 0.000385479303
 sample 55, line 1449: 0.000381387596 => 0.000381387596
@@ -2288,7 +2177,7 @@ sample 36, line 1758: 0.000474149303 => 0.000474149303
 sample 37, line 1759: 0.000462928263 => 0.000462928263
 sample 38, line 1760: 0.000460695795 => 0.000460695795
 sample 39, line 1761: 0.000479306938 => 0.000479306938
-50% Processedsample 44, line 1848: 0.000415760267 => 0.000415760267
+sample 44, line 1848: 0.000415760267 => 0.000415760267
 sample 45, line 1849: 0.000413297588 => 0.000413297588
 sample 46, line 1850: 0.000424661819 => 0.000424661819
 sample 47, line 1851: 0.000417667266 => 0.000417667266
@@ -2430,7 +2319,7 @@ sample 30, line 2162: 0.000518572342 => 0.000518572342
 sample 31, line 2163: 0.000510143524 => 0.000510143524
 sample 32, line 2164: 0.00051402289 => 0.00051402289
 sample 33, line 2165: 0.000526306918 => 0.000526306918
-60% Processedsample 48, line 2180: 0.00043400281 => 0.00043400281
+sample 48, line 2180: 0.00043400281 => 0.00043400281
 sample 49, line 2181: 0.000428732019 => 0.000428732019
 sample 50, line 2182: 0.000431211491 => 0.000431211491
 sample 51, line 2183: 0.000424356695 => 0.000424356695
@@ -2572,7 +2461,7 @@ sample 34, line 2494: 0.00052908744 => 0.00052908744
 sample 35, line 2495: 0.000526970718 => 0.000526970718
 sample 36, line 2496: 0.000524371339 => 0.000524371339
 sample 37, line 2497: 0.000529367593 => 0.000529367593
-70% Processedsample 70, line 2530: 0.000459257484 => 0.000459257484
+sample 70, line 2530: 0.000459257484 => 0.000459257484
 sample 71, line 2531: 0.000443657947 => 0.000443657947
 sample 72, line 2532: 0.000463619974 => 0.000463619974
 sample 73, line 2533: 0.000467699603 => 0.000467699603
@@ -2709,7 +2598,7 @@ sample 14, line 2884: 0.00046759934 => 0.00046759934
 sample 15, line 2885: 0.000499485235 => 0.000499485235
 sample 16, line 2886: 0.000519024557 => 0.000519024557
 sample 17, line 2887: 0.000523890718 => 0.000523890718
-80% Processedsample 46, line 2916: 0.000451731932 => 0.000451731932
+sample 46, line 2916: 0.000451731932 => 0.000451731932
 sample 47, line 2917: 0.000437886483 => 0.000437886483
 sample 48, line 2918: 0.00043894854 => 0.00043894854
 sample 49, line 2919: 0.000440035394 => 0.000440035394
@@ -2850,7 +2739,7 @@ sample 31, line 3229: 0.000537062588 => 0.000537062588
 sample 32, line 3230: 0.000507651654 => 0.000507651654
 sample 33, line 3231: 0.000500509748 => 0.000500509748
 sample 34, line 3232: 0.000507390243 => 0.000507390243
-90% Processedsample 53, line 3251: 0.000119596916 => 0.000119596916
+sample 53, line 3251: 0.000119596916 => 0.000119596916
 sample 54, line 3252: 0.000119865741 => 0.000119865741
 sample 55, line 3253: 0.000120113065 => 0.000120113065
 sample 56, line 3254: 0.000123207792 => 0.000123207792
@@ -2989,9 +2878,7 @@ sample 36, line 3562: 9.42921615e-05 => 9.42921615e-05
 sample 37, line 3563: 9.58979726e-05 => 9.58979726e-05
 sample 38, line 3564: 9.71553745e-05 => 9.71553745e-05
 sample 1, line 3609: 9.45375868e-05 => 9.45375868e-05
-100% Processed
-Working
-0% Processedsample 72, line 202: 0.000137360752 => 0.000292044568
+sample 72, line 202: 0.000137360752 => 0.000292044568
 sample 73, line 203: 0.000144011152 => 0.000304890585
 sample 74, line 204: 0.000142328878 => 0.000301641078
 sample 75, line 205: 0.000142455538 => 0.000301885736
@@ -3131,7 +3018,7 @@ sample 35, line 685: 0.00015074866 => 0.000317904861
 sample 36, line 686: 0.000147310901 => 0.000311264432
 sample 37, line 687: 0.000162874203 => 0.000341326752
 sample 38, line 688: 0.000145116661 => 0.000307026004
-10% Processedsample 90, line 870: -0.000162264827 => -0.000289890937
+sample 90, line 870: -0.000162264827 => -0.000289890937
 sample 91, line 871: 0.000154499226 => 0.000322203754
 sample 92, line 872: 0.000132517889 => 0.000279728417
 sample 93, line 873: 0.000138418967 => 0.000291131285
@@ -3264,7 +3151,7 @@ sample 46, line 1346: 0.000214465443 => 0.000438078652
 sample 3, line 1433: 0.000166279438 => 0.000344967085
 sample 4, line 1434: 0.000139802374 => 0.000293804492
 sample 5, line 1435: 0.000162388387 => 0.000337448266
-20% Processedsample 72, line 1632: 0.000200401861 => 0.000364343492
+sample 72, line 1632: 0.000200401861 => 0.000364343492
 sample 73, line 1633: 0.000208613841 => 0.000377811476
 sample 74, line 1634: 0.000200381561 => 0.000364310199
 sample 75, line 1635: 0.000195676577 => 0.000356593834
@@ -3405,7 +3292,7 @@ sample 35, line 2115: 0.000288772775 => 0.000509275406
 sample 36, line 2116: 0.000280453387 => 0.000495631269
 sample 37, line 2117: 0.000273423357 => 0.000484101732
 sample 38, line 2118: 0.000261742156 => 0.000464944085
-30% Processedsample 91, line 2301: 0.000174095912 => 0.000304202423
+sample 91, line 2301: 0.000174095912 => 0.000304202423
 sample 92, line 2302: 0.000220791859 => 0.000373368734
 sample 93, line 2303: 0.000225614887 => 0.000380512632
 sample 94, line 2304: 0.000236821841 => 0.000397112438
@@ -3543,7 +3430,7 @@ sample 8, line 2868: 0.000274836464 => 0.000453419921
 sample 9, line 2869: 0.000245205883 => 0.000409530931
 sample 10, line 2870: 0.000265710492 => 0.000439902478
 sample 11, line 2871: 0.000269167707 => 0.000445023325
-40% Processedsample 73, line 3063: 0.000258388493 => 0.000408786623
+sample 73, line 3063: 0.000258388493 => 0.000408786623
 sample 74, line 3064: 0.000270440272 => 0.000425303239
 sample 75, line 3065: 0.000248488912 => 0.000395219533
 sample 76, line 3066: 0.000262592512 => 0.00041454811
@@ -3684,7 +3571,7 @@ sample 35, line 3545: 0.000322109903 => 0.000496114977
 sample 36, line 3546: 0.000328466005 => 0.000504825831
 sample 37, line 3547: 0.000331821589 => 0.000509424563
 sample 38, line 3548: 0.000337171572 => 0.000516756559
-50% Processedsample 92, line 3732: 0.000267140043 => 0.000417893225
+sample 92, line 3732: 0.000267140043 => 0.000417893225
 sample 93, line 3733: 0.000282346067 => 0.000438212114
 sample 94, line 3734: 0.000293925696 => 0.00045368527
 sample 95, line 3735: 0.000296468759 => 0.000457083412
@@ -3829,7 +3716,7 @@ sample 14, line 4304: 0.000322850712 => 0.000492336019
 sample 15, line 4305: 0.000317202939 => 0.000484789242
 sample 16, line 4306: 0.000328796712 => 0.000500281298
 sample 17, line 4307: 0.000352717791 => 0.000532245588
-60% Processedsample 73, line 4493: 0.000296147424 => 0.000457581868
+sample 73, line 4493: 0.000296147424 => 0.000457581868
 sample 74, line 4494: 0.000304828165 => 0.000469113141
 sample 75, line 4495: 0.000298656756 => 0.000460915201
 sample 76, line 4496: 0.000295959588 => 0.000457332352
@@ -3970,7 +3857,7 @@ sample 36, line 4976: 0.000331538817 => 0.000504594882
 sample 37, line 4977: 0.00034080699 => 0.000516906485
 sample 38, line 4978: 0.000360763894 => 0.000543416721
 sample 39, line 4979: 0.000351163326 => 0.000530663574
-70% Processedsample 93, line 5163: 0.00028516067 => 0.000441829557
+sample 93, line 5163: 0.00028516067 => 0.000441829557
 sample 94, line 5164: 0.00031779104 => 0.000485210296
 sample 95, line 5165: 0.000301257649 => 0.000463229831
 sample 96, line 5166: 0.000316989375 => 0.000484144516
@@ -4122,7 +4009,7 @@ sample 21, line 5741: 0.000337464764 => 0.000511365705
 sample 22, line 5742: 0.000340270723 => 0.000515096112
 sample 23, line 5743: 0.000264998438 => 0.000415024698
 sample 24, line 5744: 0.00029076956 => 0.000449286347
-80% Processedsample 73, line 5923: 0.000308439223 => 0.000461542246
+sample 73, line 5923: 0.000308439223 => 0.000461542246
 sample 74, line 5924: 0.00031505138 => 0.000470178735
 sample 75, line 5925: 0.00030659046 => 0.000459127479
 sample 76, line 5926: 0.000285190239 => 0.000431175516
@@ -4264,7 +4151,7 @@ sample 36, line 6406: 0.00034337712 => 0.000507176484
 sample 37, line 6407: 0.000337612146 => 0.000499646546
 sample 38, line 6408: 0.000342766289 => 0.000506378645
 sample 39, line 6409: 0.000356714329 => 0.000524596919
-90% Processedsample 94, line 6594: 5.85257258e-05 => 0.000119657271
+sample 94, line 6594: 5.85257258e-05 => 0.000119657271
 sample 95, line 6595: 6.04473789e-05 => 0.000123676508
 sample 96, line 6596: 6.2983956e-05 => 0.000128981891
 sample 97, line 6597: 6.35451361e-05 => 0.000130155628
@@ -4420,17 +4307,9 @@ sample 27, line 7177: 5.01022805e-05 => 0.0001020392
 sample 28, line 7178: 5.17278677e-05 => 0.0001054392
 sample 29, line 7179: 5.41724548e-05 => 0.00011055218
 sample 30, line 7180: 4.99482994e-05 => 0.000101717141
-100% Processed
      Apply corrections to temporary output cubes...
-Equalizing Cube 1 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Equalizing Cube 2 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-Equalizing Cube 3 of 3
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
      Import statistics from results file...
-Working
-0% Processedsample 45, line 45: 0.000351268332 => 0.000291894498
+sample 45, line 45: 0.000351268332 => 0.000291894498
 sample 46, line 46: 0.000345625071 => 0.000287365908
 sample 47, line 47: 0.000336533762 => 0.000280070338
 sample 48, line 48: 0.000333498669 => 0.000277634745
@@ -4570,7 +4449,7 @@ sample 30, line 358: 0.00040070148 => 0.000331563478
 sample 31, line 359: 0.000406345091 => 0.000336092348
 sample 32, line 360: 0.000420178461 => 0.000347193314
 sample 33, line 361: 0.000426772283 => 0.000352484707
-10% Processedsample 49, line 377: 0.00033769873 => 0.000281510821
+sample 49, line 377: 0.00033769873 => 0.000281510821
 sample 50, line 378: 0.000327600748 => 0.000273526758
 sample 51, line 379: 0.000324426801 => 0.000271017247
 sample 52, line 380: 0.000320445484 => 0.000267869382
@@ -4710,7 +4589,7 @@ sample 35, line 691: 0.00041334136 => 0.00034131837
 sample 36, line 692: 0.000402227684 => 0.000332531239
 sample 37, line 693: 0.000390052301 => 0.000322904658
 sample 38, line 694: 0.000392548012 => 0.000324877916
-20% Processedsample 71, line 727: 0.000364591979 => 0.000331182387
+sample 71, line 727: 0.000364591979 => 0.000331182387
 sample 72, line 728: 0.000391498295 => 0.000352335734
 sample 73, line 729: 0.000414402573 => 0.000370342738
 sample 74, line 730: 0.000416920288 => 0.000372322127
@@ -4847,7 +4726,7 @@ sample 15, line 1081: 0.000515304622 => 0.000449670432
 sample 16, line 1082: 0.000514662708 => 0.000449165769
 sample 17, line 1083: 0.000515415799 => 0.000449757838
 sample 18, line 1084: 0.000524252187 => 0.000456704876
-30% Processedsample 47, line 1113: 0.000370426045 => 0.000350946707
+sample 47, line 1113: 0.000370426045 => 0.000350946707
 sample 48, line 1114: 0.000367466651 => 0.000348551073
 sample 49, line 1115: 0.000366733584 => 0.000347957654
 sample 50, line 1116: 0.000367128872 => 0.00034827764
@@ -4988,7 +4867,7 @@ sample 33, line 1427: 0.000470817497 => 0.000432213741
 sample 34, line 1428: 0.000463700708 => 0.00042645269
 sample 35, line 1429: 0.000477536552 => 0.000437652827
 sample 36, line 1430: 0.000489252736 => 0.000447137096
-40% Processedsample 56, line 1450: 0.000379823323 => 0.000377499084
+sample 56, line 1450: 0.000379823323 => 0.000377499084
 sample 57, line 1451: 0.000391271838 => 0.000386961327
 sample 58, line 1452: 0.000391388312 => 0.000387057593
 sample 59, line 1453: 0.000399710669 => 0.000393936053
@@ -5126,7 +5005,7 @@ sample 38, line 1760: 0.000482738105 => 0.000462558555
 sample 39, line 1761: 0.000492680061 => 0.000470775621
 sample 3, line 1807: 0.000521840993 => 0.000494877246
 sample 4, line 1808: 0.00051620818 => 0.000490221703
-50% Processedsample 45, line 1849: 0.000427162158 => 0.000415505885
+sample 45, line 1849: 0.000427162158 => 0.000415505885
 sample 46, line 1850: 0.000432214525 => 0.000419675878
 sample 47, line 1851: 0.000433110312 => 0.00042041522
 sample 48, line 1852: 0.000432708708 => 0.000420083754
@@ -5267,7 +5146,7 @@ sample 31, line 2163: 0.000558387779 => 0.000523813528
 sample 32, line 2164: 0.000544507813 => 0.000512357637
 sample 33, line 2165: 0.000552644779 => 0.000519073517
 sample 34, line 2166: 0.000552042096 => 0.000518576091
-60% Processedsample 49, line 2181: 0.000477178546 => 0.000451147503
+sample 49, line 2181: 0.000477178546 => 0.000451147503
 sample 50, line 2182: 0.000462104421 => 0.000438642692
 sample 51, line 2183: 0.000449487678 => 0.000428176413
 sample 52, line 2184: 0.000446294755 => 0.000425527709
@@ -5408,7 +5287,7 @@ sample 34, line 2494: 0.000561944791 => 0.00052146574
 sample 35, line 2495: 0.000563633454 => 0.000522866577
 sample 36, line 2496: 0.000531049154 => 0.000495836119
 sample 37, line 2497: 0.000541199115 => 0.000504256067
-70% Processedsample 77, line 2537: 0.000477642519 => 0.000441955162
+sample 77, line 2537: 0.000477642519 => 0.000441955162
 sample 78, line 2538: 0.000489208673 => 0.000451656844
 sample 79, line 2539: 0.000499683723 => 0.000460443309
 sample 80, line 2540: 0.000490265375 => 0.000452543205
@@ -5547,7 +5426,7 @@ sample 22, line 2892: 0.000586473616 => 0.000533242613
 sample 23, line 2893: 0.000588622992 => 0.000535045508
 sample 24, line 2894: 0.000584587629 => 0.000531660649
 sample 25, line 2895: 0.000580064836 => 0.000527866933
-80% Processedsample 47, line 2917: 0.000491997169 => 0.000446754828
+sample 47, line 2917: 0.000491997169 => 0.000446754828
 sample 48, line 2918: 0.000488422404 => 0.000443746687
 sample 49, line 2919: 0.000484033633 => 0.000440053567
 sample 50, line 2920: 0.000476966321 => 0.000434106472
@@ -5687,7 +5566,7 @@ sample 32, line 3230: 0.000538322318 => 0.000485737127
 sample 33, line 3231: 0.000550321187 => 0.000495834094
 sample 34, line 3232: 0.000552756828 => 0.000497883669
 sample 35, line 3233: 0.000551281322 => 0.000496642041
-90% Processedsample 62, line 3260: 0.000178040762 => 0.000119303493
+sample 62, line 3260: 0.000178040762 => 0.000119303493
 sample 63, line 3261: 0.000174913512 => 0.00011574935
 sample 64, line 3262: 0.000171941196 => 0.000112371291
 sample 65, line 3263: 0.000178040529 => 0.000119303228
@@ -5826,9 +5705,7 @@ sample 7, line 3615: 0.000147414743 => 8.44967995e-05
 sample 8, line 3616: 0.000147356128 => 8.4430183e-05
 sample 9, line 3617: 0.000149079497 => 8.63888041e-05
 sample 10, line 3618: 0.000145431666 => 8.22430183e-05
-100% Processed
-Working
-0% Processedsample 45, line 45: 0.000290619239 => 0.000290619239
+sample 45, line 45: 0.000290619239 => 0.000290619239
 sample 46, line 46: 0.00027536563 => 0.00027536563
 sample 47, line 47: 0.000284910842 => 0.000284910842
 sample 48, line 48: 0.000276024279 => 0.000276024279
@@ -5967,7 +5844,7 @@ sample 30, line 358: 0.000340305385 => 0.000340305385
 sample 31, line 359: 0.000336303987 => 0.000336303987
 sample 32, line 360: 0.000339195307 => 0.000339195307
 sample 33, line 361: 0.000346355722 => 0.000346355722
-10% Processedsample 49, line 377: 0.000286205031 => 0.000286205031
+sample 49, line 377: 0.000286205031 => 0.000286205031
 sample 50, line 378: 0.000266631891 => 0.000266631891
 sample 51, line 379: 0.000266020565 => 0.000266020565
 sample 52, line 380: 0.00026580703 => 0.00026580703
@@ -6107,7 +5984,7 @@ sample 34, line 690: 0.000318394857 => 0.000318394857
 sample 35, line 691: 0.000323348853 => 0.000323348853
 sample 36, line 692: 0.000333178352 => 0.000333178352
 sample 37, line 693: 0.00032398061 => 0.00032398061
-20% Processedsample 68, line 724: 0.000330440467 => 0.000330440467
+sample 68, line 724: 0.000330440467 => 0.000330440467
 sample 69, line 725: 0.000335332559 => 0.000335332559
 sample 70, line 726: 0.000323408312 => 0.000323408312
 sample 71, line 727: 0.000349924725 => 0.000349924725
@@ -6245,7 +6122,7 @@ sample 13, line 1079: 0.000384069222 => 0.000384069222
 sample 14, line 1080: 0.000367241882 => 0.000367241882
 sample 15, line 1081: 0.000411912159 => 0.000411912159
 sample 16, line 1082: 0.000410407927 => 0.000410407927
-30% Processedsample 47, line 1113: 0.000347713154 => 0.000347713154
+sample 47, line 1113: 0.000347713154 => 0.000347713154
 sample 48, line 1114: 0.000348245259 => 0.000348245259
 sample 49, line 1115: 0.00034509541 => 0.00034509541
 sample 50, line 1116: 0.000345106935 => 0.000345106935
@@ -6385,7 +6262,7 @@ sample 32, line 1426: 0.000446760125 => 0.000446760125
 sample 33, line 1427: 0.000450601685 => 0.000450601685
 sample 34, line 1428: 0.000450713007 => 0.000450713007
 sample 35, line 1429: 0.000435958151 => 0.000435958151
-40% Processedsample 52, line 1446: 0.000393217313 => 0.000393217313
+sample 52, line 1446: 0.000393217313 => 0.000393217313
 sample 53, line 1447: 0.000400495599 => 0.000400495599
 sample 54, line 1448: 0.000385479303 => 0.000385479303
 sample 55, line 1449: 0.000381387596 => 0.000381387596
@@ -6525,7 +6402,7 @@ sample 36, line 1758: 0.000474149303 => 0.000474149303
 sample 37, line 1759: 0.000462928263 => 0.000462928263
 sample 38, line 1760: 0.000460695795 => 0.000460695795
 sample 39, line 1761: 0.000479306938 => 0.000479306938
-50% Processedsample 44, line 1848: 0.000415760267 => 0.000415760267
+sample 44, line 1848: 0.000415760267 => 0.000415760267
 sample 45, line 1849: 0.000413297588 => 0.000413297588
 sample 46, line 1850: 0.000424661819 => 0.000424661819
 sample 47, line 1851: 0.000417667266 => 0.000417667266
@@ -6667,7 +6544,7 @@ sample 30, line 2162: 0.000518572342 => 0.000518572342
 sample 31, line 2163: 0.000510143524 => 0.000510143524
 sample 32, line 2164: 0.00051402289 => 0.00051402289
 sample 33, line 2165: 0.000526306918 => 0.000526306918
-60% Processedsample 48, line 2180: 0.00043400281 => 0.00043400281
+sample 48, line 2180: 0.00043400281 => 0.00043400281
 sample 49, line 2181: 0.000428732019 => 0.000428732019
 sample 50, line 2182: 0.000431211491 => 0.000431211491
 sample 51, line 2183: 0.000424356695 => 0.000424356695
@@ -6809,7 +6686,7 @@ sample 34, line 2494: 0.00052908744 => 0.00052908744
 sample 35, line 2495: 0.000526970718 => 0.000526970718
 sample 36, line 2496: 0.000524371339 => 0.000524371339
 sample 37, line 2497: 0.000529367593 => 0.000529367593
-70% Processedsample 70, line 2530: 0.000459257484 => 0.000459257484
+sample 70, line 2530: 0.000459257484 => 0.000459257484
 sample 71, line 2531: 0.000443657947 => 0.000443657947
 sample 72, line 2532: 0.000463619974 => 0.000463619974
 sample 73, line 2533: 0.000467699603 => 0.000467699603
@@ -6946,7 +6823,7 @@ sample 14, line 2884: 0.00046759934 => 0.00046759934
 sample 15, line 2885: 0.000499485235 => 0.000499485235
 sample 16, line 2886: 0.000519024557 => 0.000519024557
 sample 17, line 2887: 0.000523890718 => 0.000523890718
-80% Processedsample 46, line 2916: 0.000451731932 => 0.000451731932
+sample 46, line 2916: 0.000451731932 => 0.000451731932
 sample 47, line 2917: 0.000437886483 => 0.000437886483
 sample 48, line 2918: 0.00043894854 => 0.00043894854
 sample 49, line 2919: 0.000440035394 => 0.000440035394
@@ -7087,7 +6964,7 @@ sample 31, line 3229: 0.000537062588 => 0.000537062588
 sample 32, line 3230: 0.000507651654 => 0.000507651654
 sample 33, line 3231: 0.000500509748 => 0.000500509748
 sample 34, line 3232: 0.000507390243 => 0.000507390243
-90% Processedsample 53, line 3251: 0.000119596916 => 0.000119596916
+sample 53, line 3251: 0.000119596916 => 0.000119596916
 sample 54, line 3252: 0.000119865741 => 0.000119865741
 sample 55, line 3253: 0.000120113065 => 0.000120113065
 sample 56, line 3254: 0.000123207792 => 0.000123207792
@@ -7226,9 +7103,7 @@ sample 36, line 3562: 9.42921615e-05 => 9.42921615e-05
 sample 37, line 3563: 9.58979726e-05 => 9.58979726e-05
 sample 38, line 3564: 9.71553745e-05 => 9.71553745e-05
 sample 1, line 3609: 9.45375868e-05 => 9.45375868e-05
-100% Processed
-Working
-0% Processedsample 72, line 202: 0.000137360752 => 0.000292044568
+sample 72, line 202: 0.000137360752 => 0.000292044568
 sample 73, line 203: 0.000144011152 => 0.000304890585
 sample 74, line 204: 0.000142328878 => 0.000301641078
 sample 75, line 205: 0.000142455538 => 0.000301885736
@@ -7368,7 +7243,7 @@ sample 35, line 685: 0.00015074866 => 0.000317904861
 sample 36, line 686: 0.000147310901 => 0.000311264432
 sample 37, line 687: 0.000162874203 => 0.000341326752
 sample 38, line 688: 0.000145116661 => 0.000307026004
-10% Processedsample 90, line 870: -0.000162264827 => -0.000289890937
+sample 90, line 870: -0.000162264827 => -0.000289890937
 sample 91, line 871: 0.000154499226 => 0.000322203754
 sample 92, line 872: 0.000132517889 => 0.000279728417
 sample 93, line 873: 0.000138418967 => 0.000291131285
@@ -7501,7 +7376,7 @@ sample 46, line 1346: 0.000214465443 => 0.000438078652
 sample 3, line 1433: 0.000166279438 => 0.000344967085
 sample 4, line 1434: 0.000139802374 => 0.000293804492
 sample 5, line 1435: 0.000162388387 => 0.000337448266
-20% Processedsample 72, line 1632: 0.000200401861 => 0.000364343492
+sample 72, line 1632: 0.000200401861 => 0.000364343492
 sample 73, line 1633: 0.000208613841 => 0.000377811476
 sample 74, line 1634: 0.000200381561 => 0.000364310199
 sample 75, line 1635: 0.000195676577 => 0.000356593834
@@ -7642,7 +7517,7 @@ sample 35, line 2115: 0.000288772775 => 0.000509275406
 sample 36, line 2116: 0.000280453387 => 0.000495631269
 sample 37, line 2117: 0.000273423357 => 0.000484101732
 sample 38, line 2118: 0.000261742156 => 0.000464944085
-30% Processedsample 91, line 2301: 0.000174095912 => 0.000304202423
+sample 91, line 2301: 0.000174095912 => 0.000304202423
 sample 92, line 2302: 0.000220791859 => 0.000373368734
 sample 93, line 2303: 0.000225614887 => 0.000380512632
 sample 94, line 2304: 0.000236821841 => 0.000397112438
@@ -7780,7 +7655,7 @@ sample 8, line 2868: 0.000274836464 => 0.000453419921
 sample 9, line 2869: 0.000245205883 => 0.000409530931
 sample 10, line 2870: 0.000265710492 => 0.000439902478
 sample 11, line 2871: 0.000269167707 => 0.000445023325
-40% Processedsample 73, line 3063: 0.000258388493 => 0.000408786623
+sample 73, line 3063: 0.000258388493 => 0.000408786623
 sample 74, line 3064: 0.000270440272 => 0.000425303239
 sample 75, line 3065: 0.000248488912 => 0.000395219533
 sample 76, line 3066: 0.000262592512 => 0.00041454811
@@ -7921,7 +7796,7 @@ sample 35, line 3545: 0.000322109903 => 0.000496114977
 sample 36, line 3546: 0.000328466005 => 0.000504825831
 sample 37, line 3547: 0.000331821589 => 0.000509424563
 sample 38, line 3548: 0.000337171572 => 0.000516756559
-50% Processedsample 92, line 3732: 0.000267140043 => 0.000417893225
+sample 92, line 3732: 0.000267140043 => 0.000417893225
 sample 93, line 3733: 0.000282346067 => 0.000438212114
 sample 94, line 3734: 0.000293925696 => 0.00045368527
 sample 95, line 3735: 0.000296468759 => 0.000457083412
@@ -8066,7 +7941,7 @@ sample 14, line 4304: 0.000322850712 => 0.000492336019
 sample 15, line 4305: 0.000317202939 => 0.000484789242
 sample 16, line 4306: 0.000328796712 => 0.000500281298
 sample 17, line 4307: 0.000352717791 => 0.000532245588
-60% Processedsample 73, line 4493: 0.000296147424 => 0.000457581868
+sample 73, line 4493: 0.000296147424 => 0.000457581868
 sample 74, line 4494: 0.000304828165 => 0.000469113141
 sample 75, line 4495: 0.000298656756 => 0.000460915201
 sample 76, line 4496: 0.000295959588 => 0.000457332352
@@ -8207,7 +8082,7 @@ sample 36, line 4976: 0.000331538817 => 0.000504594882
 sample 37, line 4977: 0.00034080699 => 0.000516906485
 sample 38, line 4978: 0.000360763894 => 0.000543416721
 sample 39, line 4979: 0.000351163326 => 0.000530663574
-70% Processedsample 93, line 5163: 0.00028516067 => 0.000441829557
+sample 93, line 5163: 0.00028516067 => 0.000441829557
 sample 94, line 5164: 0.00031779104 => 0.000485210296
 sample 95, line 5165: 0.000301257649 => 0.000463229831
 sample 96, line 5166: 0.000316989375 => 0.000484144516
@@ -8359,7 +8234,7 @@ sample 21, line 5741: 0.000337464764 => 0.000511365705
 sample 22, line 5742: 0.000340270723 => 0.000515096112
 sample 23, line 5743: 0.000264998438 => 0.000415024698
 sample 24, line 5744: 0.00029076956 => 0.000449286347
-80% Processedsample 73, line 5923: 0.000308439223 => 0.000461542246
+sample 73, line 5923: 0.000308439223 => 0.000461542246
 sample 74, line 5924: 0.00031505138 => 0.000470178735
 sample 75, line 5925: 0.00030659046 => 0.000459127479
 sample 76, line 5926: 0.000285190239 => 0.000431175516
@@ -8501,7 +8376,7 @@ sample 36, line 6406: 0.00034337712 => 0.000507176484
 sample 37, line 6407: 0.000337612146 => 0.000499646546
 sample 38, line 6408: 0.000342766289 => 0.000506378645
 sample 39, line 6409: 0.000356714329 => 0.000524596919
-90% Processedsample 94, line 6594: 5.85257258e-05 => 0.000119657271
+sample 94, line 6594: 5.85257258e-05 => 0.000119657271
 sample 95, line 6595: 6.04473789e-05 => 0.000123676508
 sample 96, line 6596: 6.2983956e-05 => 0.000128981891
 sample 97, line 6597: 6.35451361e-05 => 0.000130155628
@@ -8657,7 +8532,6 @@ sample 27, line 7177: 5.01022805e-05 => 0.0001020392
 sample 28, line 7178: 5.17278677e-05 => 0.0001054392
 sample 29, line 7179: 5.41724548e-05 => 0.00011055218
 sample 30, line 7180: 4.99482994e-05 => 0.000101717141
-100% Processed
 
 Testing addHolds exception (1)...
 **USER ERROR** The list of identifiers to be held must be less than or equal to the total number of identitifers.

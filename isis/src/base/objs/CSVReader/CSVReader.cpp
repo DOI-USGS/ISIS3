@@ -156,7 +156,7 @@ namespace Isis {
   void CSVReader::read(const QString &csvfile) {
     ifstream ifile(csvfile.toLatin1().data(), ios::in);
     if(!ifile) {
-      QString mess = "Unable to open file " + csvfile;
+      QString mess = "Unable to open file [" + csvfile + "]";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -430,7 +430,7 @@ namespace Isis {
 
     if(!ifile.eof()) {
       ostringstream mess;
-      mess << "Error reading line " << (nlines + 1) << ends;
+      mess << "Error reading line [" << (nlines + 1) << "]" << ends;
       throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 

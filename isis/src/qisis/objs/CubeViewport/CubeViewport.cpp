@@ -97,6 +97,13 @@ namespace Isis {
       p_cubeId = p_cubeData->AddCube(p_cube);
     }
 
+    if(p_cube->hasGroup("Tracking")) {
+      setTrackingCube();
+    }
+    else {
+      p_trackingCube = NULL;
+    }
+
 
     connect(p_cubeData, SIGNAL(BrickChanged(int, const Isis::Brick *)),
             this, SLOT(cubeDataChanged(int, const Isis::Brick *)));
@@ -369,6 +376,9 @@ namespace Isis {
     }
 
     p_cube = NULL;
+    
+    delete p_trackingCube;
+    p_trackingCube = NULL;
 
     if(p_progressTimer) {
       delete p_progressTimer;
@@ -1121,7 +1131,7 @@ namespace Isis {
     if(p_blueBuffer && p_blueBuffer->working()){
       return;
     }
-    
+
     viewport()->repaint(rect);
   }
 
@@ -1776,7 +1786,7 @@ namespace Isis {
       e->accept();
     }
     else if ((e->key() == Qt::Key_C) &&
-             QApplication::keyboardModifiers() &&
+             QApplication::keyboardModifiers() &
              Qt::ControlModifier) {
 
       //QString fileName = p_cube->fileName();
@@ -1961,7 +1971,7 @@ namespace Isis {
     viewport()->repaint();
   }
 
-  
+
   void CubeViewport::forgetStretches() {
     for(int stretch = 0; stretch < p_knownStretches->size(); stretch++) {
       if((*p_knownStretches)[stretch]) {
@@ -2356,6 +2366,22 @@ namespace Isis {
     p_updatingBuffers = false;
 
     paintPixmapRects();
+  }
+
+
+/**
+ * Finds the Tracking group from p_cube and stores the tracking cube name
+ * so that we can grab it in AdvancedTrackTool and get mosaic information.
+ * This way, we are not opening the tracking cube every time the cursor is moved.
+ */
+  void CubeViewport::setTrackingCube() {
+    PvlGroup trackingGroup = p_cube->group("Tracking");
+    //Because the tracking group does not have a path, get the path from the main cube
+    FileName cubeName(p_cube->fileName());
+    QString trackingCubeName = trackingGroup.findKeyword("Filename")[0];
+    FileName trackingCubeFileName(cubeName.path() + "/" + trackingCubeName);
+    Cube *trackingCube = new Cube(trackingCubeFileName);
+    p_trackingCube = trackingCube;
   }
 
 

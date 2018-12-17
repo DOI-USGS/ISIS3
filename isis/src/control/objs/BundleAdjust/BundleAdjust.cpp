@@ -104,7 +104,8 @@ namespace Isis {
     m_cleanUp = true;
     m_cnetFileName = cnetFile;
     try {
-      m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress) );
+      m_controlNet = ControlNetQsp( new ControlNet(cnetFile, &progress,
+                                     bundleSettings->controlPointCoordTypeReports()) );
     }
     catch (IException &e) {
       throw;
@@ -367,8 +368,6 @@ namespace Isis {
     // JWB
     // - some of these not originally initialized.. better values???
     m_iteration = 0;
-    m_radiansToMeters = 0.0;
-    m_metersToRadians = 0.0;
     m_rank = 0;
     m_iterationSummary = "";
 
@@ -396,22 +395,6 @@ namespace Isis {
     m_cholmodTriplet = NULL;
 
     // should we initialize objects m_xResiduals, m_yResiduals, m_xyResiduals
-
-    // (must be a smarter way)
-    // get target body radii and body specific conversion factors between radians and meters.
-    // need validity checks and different conversion factors for lat and long
-    // initialize m_bodyRadii
-    m_bodyRadii[0] = m_bodyRadii[1] = m_bodyRadii[2] = Distance();
-    Camera *cnetCamera = m_controlNet->Camera(0);
-    if (cnetCamera) {
-      cnetCamera->radii(m_bodyRadii);  // meters
-
-      if (m_bodyRadii[0] >= Distance(0, Distance::Meters)) {
-        m_metersToRadians = 0.001 / m_bodyRadii[0].kilometers(); // at equator
-        m_radiansToMeters = 1.0 / m_metersToRadians;
-        m_bundleResults.setRadiansToMeters(m_radiansToMeters);
-      }
-     }
 
       // TESTING
       // TODO: code below should go into a separate method???
@@ -459,10 +442,9 @@ namespace Isis {
           continue;
         }
 
-        BundleControlPointQsp bundleControlPoint(new BundleControlPoint(point));
+        BundleControlPointQsp bundleControlPoint(new BundleControlPoint
+                            (m_bundleSettings, point));
         m_bundleControlPoints.append(bundleControlPoint);
-
-        bundleControlPoint->setWeights(m_bundleSettings, m_metersToRadians);
 
         // set parent observation for each BundleMeasure
 
@@ -727,7 +709,7 @@ namespace Isis {
   //      }
   //    }
 
-      // Compute the apriori lat/lons for each nonheld point
+      // Compute the apriori coordinates for each nonheld point
       m_controlNet->ComputeApriori(); // original location
 
       // ken testing - if solving for target mean radius, set point radius to current mean radius
@@ -744,7 +726,9 @@ namespace Isis {
         }
       }
 
-      if (m_bundleTargetBody && m_bundleTargetBody->solveTriaxialRadii()) {
+      // Only use target body solution options when using Latitudinal coordinates
+      if (m_bundleTargetBody && m_bundleTargetBody->solveTriaxialRadii()
+         && m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
         int numControlPoints = m_bundleControlPoints.size();
         for (int i = 0; i < numControlPoints; i++) {
           BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -758,6 +742,7 @@ namespace Isis {
         }
       }
 
+      // Beginning of iterations
       m_iteration = 1;
       double vtpv = 0.0;
       double previousSigma0 = 0.0;
@@ -787,7 +772,7 @@ namespace Isis {
           m_sparseNormals.zeroBlocks();
         }
 
-        // form normal equations
+        // form normal equations -- computePartials is called in here.
         if (!formNormalEquations()) {
           m_bundleResults.setConverged(false);
           break;
@@ -1309,6 +1294,7 @@ namespace Isis {
     Q.zeroBlocks();
 
     // weighting of 3D point parameters
+    // Make sure weights are in the units corresponding to the bundle coordinate type
     boost::numeric::ublas::bounded_vector<double, 3> &weights
         = bundleControlPoint->weights();
     boost::numeric::ublas::bounded_vector<double, 3> &corrections
@@ -1337,7 +1323,7 @@ namespace Isis {
 
     // save upper triangular covariance matrix for error propagation
     SurfacePoint SurfacePoint = bundleControlPoint->adjustedSurfacePoint();
-    SurfacePoint.SetSphericalMatrix(N22);
+    SurfacePoint.SetMatrix(m_bundleSettings->controlPointCoordTypeBundle(), N22);
     bundleControlPoint->setAdjustedSurfacePoint(SurfacePoint);
 
     // form Q (this is N22{-1} * N12{T})
@@ -1426,35 +1412,6 @@ namespace Isis {
     nj += n1;
 
     return true;
-  }
-
-
-  /**
-   * Perform the matrix multiplication v2 = alpha ( Q x v1 ).
-   *
-   * @param alpha A constant multiplier.
-   * @param v2 The output vector.
-   * @param Q A sparse block matrix.
-   * @param v1 A vector.
-   */
-  void BundleAdjust::productAlphaAV(double alpha, bounded_vector<double,3> &v2,
-                                    SparseBlockRowMatrix &Q,
-                                    vector<double> &v1) {
-
-    QMapIterator< int, LinearAlgebra::Matrix * > Qit(Q);
-
-    int subrangeStart, subrangeEnd;
-    
-    while ( Qit.hasNext() ) {
-      Qit.next();
-
-      int columnIndex = Qit.key();
-
-      subrangeStart = m_sparseNormals.at(columnIndex)->startColumn();
-      subrangeEnd = subrangeStart + Qit.value()->size2();
-      
-      v2 += alpha * prod(*(Qit.value()),subrange(v1,subrangeStart,subrangeEnd));
-    }
   }
 
 
@@ -1850,7 +1807,7 @@ namespace Isis {
    * with the different partial derivatives.
    *
    * @param coeffTarget A matrix that will contain target body
-   *                    pertial derivatives.
+   *                    partial derivatives.
    * @param coeffImage A matrix that will contain camera position and orientation
    *                   partial derivatives.
    * @param coeffPoint3D A matrix that will contain point lat, lon, and radius
@@ -1870,10 +1827,11 @@ namespace Isis {
                                      BundleMeasure &measure,
                                      BundleControlPoint &point) {
 
-    // additional vectors
-    std::vector<double> lookBWRTLat;
-    std::vector<double> lookBWRTLon;
-    std::vector<double> lookBWRTRad;
+    // These vectors are either body-fixed latitudinal (lat/lon/radius) or rectangular (x/y/z)
+    // depending on the value of coordinate type in SurfacePoint
+    std::vector<double> lookBWRTCoord1;
+    std::vector<double> lookBWRTCoord2;
+    std::vector<double> lookBWRTCoord3;
 
     Camera *measureCamera = NULL;
 
@@ -1909,8 +1867,10 @@ namespace Isis {
 
     // no need to call SetImage for framing camera ( CameraType  = 0 )
     if (measureCamera->GetCameraType() != 0) {
-      // Set the Spice to the measured point
-      // TODO - can we explain this better?
+      // Set the Spice to the measured point.  A framing camera exposes the entire image at one time.
+      // It will have a single set of Spice for the entire image.  Scanning cameras may populate a single
+      // image with multiple exposures, each with a unique set of Spice.  SetImage needs to be called
+      // repeatedly for these images to point to the Spice for the current pixel.
       measureCamera->SetImage(measure.sample(), measure.line());
     }
 
@@ -1927,13 +1887,12 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // partials for fixed point w/r lat, long, radius in Body-Fixed
-    lookBWRTLat = measureCamera->GroundMap()->PointPartial(point.adjustedSurfacePoint(),
-                                                           CameraGroundMap::WRT_Latitude);
-    lookBWRTLon = measureCamera->GroundMap()->PointPartial(point.adjustedSurfacePoint(),
-                                                           CameraGroundMap::WRT_Longitude);
-    lookBWRTRad = measureCamera->GroundMap()->PointPartial(point.adjustedSurfacePoint(),
-                                                           CameraGroundMap::WRT_Radius);
+    // Retrieve the coordinate type (latitudinal or rectangular) and compute the partials for
+    // the fixed point with respect to each coordinate in Body-Fixed
+    SurfacePoint::CoordinateType type = m_bundleSettings->controlPointCoordTypeBundle();
+    lookBWRTCoord1 = point.adjustedSurfacePoint().Partial(type, SurfacePoint::One);
+    lookBWRTCoord2 = point.adjustedSurfacePoint().Partial(type, SurfacePoint::Two);
+    lookBWRTCoord3 = point.adjustedSurfacePoint().Partial(type, SurfacePoint::Three);
 
     int index = 0;
     if (m_bundleSettings->solveTargetBody() && m_bundleSettings->solvePoleRA()) {
@@ -2083,14 +2042,14 @@ namespace Isis {
       }
     }
 
-    // partials for 3D point
-    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTLat,
+    // Complete partials calculations for 3D point (latitudinal or rectangular)
+    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord1,
                                              &coeffPoint3D(0, 0),
                                              &coeffPoint3D(1, 0));
-    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTLon,
+    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord2,
                                              &coeffPoint3D(0, 1),
                                              &coeffPoint3D(1, 1));
-    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTRad,
+    measureCamera->GroundMap()->GetdXYdPoint(lookBWRTCoord3,
                                              &coeffPoint3D(0, 2),
                                              &coeffPoint3D(1, 2));
 
@@ -2172,14 +2131,12 @@ namespace Isis {
 
       t += numParameters;
     }
-        
-    // TODO: Below code should move into BundleControlPoint->updateParameterCorrections
-    //       except, what about the productAlphaAV method?
+    // TODO - When BundleXYZ gets merged into dev, go with Ken's version of merging the updating of
+    //              of the adjusted surface point into BundleControlPoint.
     
-    // Update lat/lon for each control point
-    double latCorrection, lonCorrection, radCorrection;
     int pointIndex = 0;
     int numControlPoints = m_bundleControlPoints.size();
+    
     for (int i = 0; i < numControlPoints; i++) {
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
@@ -2188,78 +2145,8 @@ namespace Isis {
           continue;
       }
 
-      // get NIC, Q, and correction vector for this point
-      boost::numeric::ublas::bounded_vector< double, 3 > &NIC = point->nicVector();
-      SparseBlockRowMatrix &Q = point->cholmodQMatrix();
-      boost::numeric::ublas::bounded_vector< double, 3 > &corrections = point->corrections();
-      
-      // subtract product of Q and nj from NIC
-      productAlphaAV(-1.0, NIC, Q, m_imageSolution);
-
-      // get point parameter corrections
-      latCorrection = NIC(0);
-      lonCorrection = NIC(1);
-      radCorrection = NIC(2);
-
-      SurfacePoint surfacepoint = point->adjustedSurfacePoint();
-
-      double pointLat = surfacepoint.GetLatitude().degrees();
-      double pointLon = surfacepoint.GetLongitude().degrees();
-      double pointRad = surfacepoint.GetLocalRadius().meters();
-
-      pointLat += RAD2DEG * latCorrection;
-      pointLon += RAD2DEG * lonCorrection;
-
-      // Make sure updated values are still in valid range.
-      // TODO What is the valid lon range?
-      if (pointLat < -90.0) {
-        pointLat = -180.0 - pointLat;
-        pointLon = pointLon + 180.0;
-      }
-      if (pointLat > 90.0) {
-        pointLat = 180.0 - pointLat;
-        pointLon = pointLon + 180.0;
-      }
-      while (pointLon > 360.0) {
-        pointLon = pointLon - 360.0;
-      }
-      while (pointLon < 0.0) {
-        pointLon = pointLon + 360.0;
-      }
-
-      pointRad += 1000.*radCorrection;
-
-      // sum and save corrections
-      corrections(0) += latCorrection;
-      corrections(1) += lonCorrection;
-      corrections(2) += radCorrection;
-           
-      // ken testing - if solving for target body mean radius, set radius to current
-      // mean radius value
-      if (m_bundleTargetBody && (m_bundleTargetBody->solveMeanRadius()
-          || m_bundleTargetBody->solveTriaxialRadii())) {
-        if (m_bundleTargetBody->solveMeanRadius()) {
-          surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                               Longitude(pointLon, Angle::Degrees),
-                                               m_bundleTargetBody->meanRadius());
-        }
-        else if (m_bundleTargetBody->solveTriaxialRadii()) {
-            Distance localRadius = m_bundleTargetBody->
-                                       localRadius(Latitude(pointLat, Angle::Degrees),
-                                                   Longitude(pointLon, Angle::Degrees));
-            surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                                 Longitude(pointLon, Angle::Degrees),
-                                                 localRadius);
-        }
-      }
-      else {
-        surfacepoint.SetSphericalCoordinates(Latitude(pointLat, Angle::Degrees),
-                                             Longitude(pointLon, Angle::Degrees),
-                                             Distance(pointRad, Distance::Meters));
-      }
-
-      point->setAdjustedSurfacePoint(surfacepoint);
-
+      point->applyParameterCorrections(m_imageSolution, m_sparseNormals,
+                                       m_bundleTargetBody); 
       pointIndex++;
 
     } // end loop over point corrections
@@ -2325,7 +2212,7 @@ namespace Isis {
     }
 
     // add vtpv from constrained 3D points
-    int pointIndex = 0;
+    int pointIndex = 0;   // *** TODO *** This does not appear to be used.  Delete? DAC 07-14-2017
     for (int i = 0; i < numObjectPoints; i++) {
       BundleControlPointQsp bundleControlPoint = m_bundleControlPoints.at(i);
 
@@ -2685,6 +2572,12 @@ namespace Isis {
    *                           us to create the inverse matrix correlation file. References #4315.
    *   @history 2016-10-28 Ian Humphrey - Added extra newline between Error Propagation: Inverse
    *                           Blocking and Filling point covariance messages. References #4463.
+   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ 
+   *                            branch on (2018-05-31).  Moved productAlphaAV and control point 
+   *                            parameter correction code to BundleControlPoint.  Earlier revised 
+   *                            errorPropagation to compute the sigmas via the variance/ 
+   *                            covariance matrices instead of the sigmas.  This should produce 
+   *                            more accurate results.  References #4649 and #501.
    */
   bool BundleAdjust::errorPropagation() {
     emit(statusBarUpdate("Error Propagation"));
@@ -2693,8 +2586,8 @@ namespace Isis {
     cholmod_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
 
     LinearAlgebra::Matrix T(3, 3);
-    double sigmaLat, sigmaLon, sigmaRad;
-    double t;
+    // *** TODO *** 
+    // Can any of the control point specific code be moved to BundleControlPoint?
 
     double sigma0Squared = m_bundleResults.sigma0() * m_bundleResults.sigma0();
 
@@ -2942,6 +2835,7 @@ namespace Isis {
     outputBundleStatus("\n\n");
 
     // now loop over points again and set final covariance stuff
+    // *** TODO *** Can this loop go into BundleControlPoint
     int pointIndex = 0;
     for (j = 0; j < numObjectPoints; j++) {
 
@@ -2963,37 +2857,70 @@ namespace Isis {
       // get corresponding point covariance matrix
       boost::numeric::ublas::symmetric_matrix<double> &covariance = pointCovariances[pointIndex];
 
-      // Ask Ken what is happening here...Setting just the sigmas is not very accurate
-      // Shouldn't we be updating and setting the matrix???  TODO
+      // Update and reset the matrix
+      // Get the Limiting Error Propagation uncertainties:  sigmas for coordinate 1, 2, and 3 in meters
+      // 
       SurfacePoint SurfacePoint = point->adjustedSurfacePoint();
 
-      sigmaLat = SurfacePoint.GetLatSigma().radians();
-      sigmaLon = SurfacePoint.GetLonSigma().radians();
-      sigmaRad = SurfacePoint.GetLocalRadiusSigma().meters();
+      // Get the TEP by adding the corresponding members of pCovar and covariance      
+      boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> pCovar;
+      
+      if (m_bundleSettings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) {
+        pCovar = SurfacePoint.GetSphericalMatrix(SurfacePoint::Kilometers);
+      }
+      else {
+        // Assume Rectangular coordinates 
+        pCovar = SurfacePoint.GetRectangularMatrix(SurfacePoint::Kilometers);
+      }
+      pCovar += covariance;
+      pCovar *= sigma0Squared;
 
-      t = sigmaLat * sigmaLat + covariance(0, 0);
-      Distance latSigmaDistance(sqrt(sigma0Squared * t) * m_radiansToMeters, Distance::Meters);
-
-      t = sigmaLon * sigmaLon + covariance(1, 1);
-      t = sqrt(sigma0Squared * t) * m_radiansToMeters;
-      Distance lonSigmaDistance(
-          t * cos(point->adjustedSurfacePoint().GetLatitude().radians()),
-          Distance::Meters);
-
-      t = sigmaRad*sigmaRad + covariance(2, 2);
-      t = sqrt(sigma0Squared * t) * 1000.0;
-
-      SurfacePoint.SetSphericalSigmasDistance(latSigmaDistance, lonSigmaDistance,
-                                              Distance(t, Distance::Meters));
-
+      // debug lines
+      // if (j < 3) {
+      //   std::cout << " Adjusted surface point ..." << std::endl;
+      //   std:: cout << "     sigmaLat (radians) = " << sqrt(pCovar(0,0)) << std::endl;
+      //   std:: cout << "     sigmaLon (radians) = " << sqrt(pCovar(1,1)) << std::endl;
+      //   std:: cout << "     sigmaRad (km) = " << sqrt(pCovar(2,2)) << std::endl;
+      // std::cout <<  "      Adjusted matrix = " << std::endl;
+      // std::cout << "       " << pCovar(0,0) << "   " << pCovar(0,1) << "   "
+      //           << pCovar(0,2) << std::endl; 
+      // std::cout << "        " << pCovar(1,0) << "   " << pCovar(1,1) << "   "
+      //           << pCovar(1,2) << std::endl; 
+      // std::cout << "        " << pCovar(2,0) << "   " << pCovar(2,1) << "   "
+      //           << pCovar(2,2) << std::endl;
+      // }
+      // end debug
+      
+      // Distance units are km**2
+      SurfacePoint.SetMatrix(m_bundleSettings->controlPointCoordTypeBundle(),pCovar);
       point->setAdjustedSurfacePoint(SurfacePoint);
+      // // debug lines
+      // if (j < 3) {
+      //   boost::numeric::ublas::symmetric_matrix <double,boost::numeric::ublas::upper> recCovar;
+      //   recCovar = SurfacePoint.GetRectangularMatrix(SurfacePoint::Meters);
+      //   std:: cout << "     sigmaLat (meters) = " << 
+      //     point->adjustedSurfacePoint().GetSigmaDistance(SurfacePoint::Latitudinal,
+      //     SurfacePoint::One).meters() << std::endl;
+      //   std:: cout << "     sigmaLon (meters) = " <<
+      //     point->adjustedSurfacePoint().GetSigmaDistance(SurfacePoint::Latitudinal,
+      //     SurfacePoint::Two).meters() << std::endl;
+      //   std:: cout << "   sigmaRad (km) = " << sqrt(pCovar(2,2)) << std::endl;
+      //   std::cout << "Rectangular matrix with radius in meters" << std::endl;
+      //   std::cout << "       " << recCovar(0,0) << "   " << recCovar(0,1) << "   "
+      //           << recCovar(0,2) << std::endl; 
+      //   std::cout << "        " << recCovar(1,0) << "   " << recCovar(1,1) << "   "
+      //           << recCovar(1,2) << std::endl; 
+      //   std::cout << "        " << recCovar(2,0) << "   " << recCovar(2,1) << "   "
+      //           << recCovar(2,2) << std::endl;
+      // }
+      // // end debug
 
       pointIndex++;
     }
 
     return true;
   }
-
+  
 
   /**
    * Returns a pointer to the output control network.
@@ -3269,31 +3196,36 @@ namespace Isis {
 
     if (m_bundleSettings->errorPropagation()) {
 
-      // initialize lat/lon/rad boundaries
-      Distance minSigmaLatDist;
-      QString  minSigmaLatPointId = "";
+      // initialize body-fixed coordinate boundaries
 
-      Distance maxSigmaLatDist;
-      QString  maxSigmaLatPointId = "";
+      // Latitude or X
+      Distance minSigmaCoord1Dist;
+      QString  minSigmaCoord1PointId = "";
+      
+      Distance maxSigmaCoord1Dist;
+      QString  maxSigmaCoord1PointId = "";
+      
+      // Longitude or Y
+      Distance minSigmaCoord2Dist;
+      QString  minSigmaCoord2PointId = "";
 
-      Distance minSigmaLonDist;
-      QString  minSigmaLonPointId = "";
+      Distance maxSigmaCoord2Dist;
+      QString  maxSigmaCoord2PointId = "";
 
-      Distance maxSigmaLonDist;
-      QString  maxSigmaLonPointId = "";
+      // Radius or Z
+      Distance minSigmaCoord3Dist;
+      QString  minSigmaCoord3PointId = "";
 
-      Distance minSigmaRadDist;
-      QString  minSigmaRadPointId = "";
-
-      Distance maxSigmaRadDist;
-      QString  maxSigmaRadPointId = "";
-
+      Distance maxSigmaCoord3Dist;
+      QString  maxSigmaCoord3PointId = "";
+      
       // compute stats for point sigmas
-      Statistics sigmaLatStats;
-      Statistics sigmaLonStats;
-      Statistics sigmaRadStats;
+      Statistics sigmaCoord1Stats;
+      Statistics sigmaCoord2Stats;
+      Statistics sigmaCoord3Stats;
 
-      Distance sigmaLatDist, sigmaLonDist, sigmaRadDist;
+      Distance sigmaCoord1Dist, sigmaCoord2Dist, sigmaCoord3Dist;
+      SurfacePoint::CoordinateType type = m_bundleSettings->controlPointCoordTypeReports();
 
       int numPoints = m_bundleControlPoints.size();
       // initialize max and min values to those from first valid point
@@ -3301,23 +3233,27 @@ namespace Isis {
 
         const BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-        maxSigmaLatDist = point->adjustedSurfacePoint().GetLatSigmaDistance();;
-        minSigmaLatDist = maxSigmaLatDist;
+        maxSigmaCoord1Dist = point->adjustedSurfacePoint().GetSigmaDistance(type,
+                                                                            SurfacePoint::One);
+        minSigmaCoord1Dist = maxSigmaCoord1Dist;
 
-        maxSigmaLonDist = point->adjustedSurfacePoint().GetLonSigmaDistance();;
-        minSigmaLonDist = maxSigmaLonDist;
+        maxSigmaCoord2Dist = point->adjustedSurfacePoint().GetSigmaDistance(type,
+                                                                            SurfacePoint::Two);
+        minSigmaCoord2Dist = maxSigmaCoord2Dist;
 
-        maxSigmaLatPointId = point->id();
-        maxSigmaLonPointId = maxSigmaLatPointId;
-        minSigmaLatPointId = maxSigmaLatPointId;
-        minSigmaLonPointId = maxSigmaLatPointId;
+        maxSigmaCoord1PointId = point->id();
+        maxSigmaCoord2PointId = maxSigmaCoord1PointId;
+        minSigmaCoord1PointId = maxSigmaCoord1PointId;
+        minSigmaCoord2PointId = maxSigmaCoord1PointId;
 
-        if (m_bundleSettings->solveRadius()) {
-          maxSigmaRadDist = point->adjustedSurfacePoint().GetLocalRadiusSigma();
-          minSigmaRadDist = maxSigmaRadDist;
+        // Get stats for coordinate 3 if used
+        if (m_bundleSettings->solveRadius() || type == SurfacePoint::Rectangular) {
+          maxSigmaCoord3Dist = point->adjustedSurfacePoint().GetSigmaDistance(type,
+                                                                              SurfacePoint::Three);
+          minSigmaCoord3Dist = maxSigmaCoord3Dist;
 
-          maxSigmaRadPointId = maxSigmaLatPointId;
-          minSigmaRadPointId = maxSigmaLatPointId;
+          maxSigmaCoord3PointId = maxSigmaCoord1PointId;
+          minSigmaCoord3PointId = maxSigmaCoord1PointId;
         }
         break;
       }
@@ -3326,40 +3262,43 @@ namespace Isis {
 
         const BundleControlPointQsp point = m_bundleControlPoints.at(i);
 
-        sigmaLatDist = point->adjustedSurfacePoint().GetLatSigmaDistance();
-        sigmaLonDist = point->adjustedSurfacePoint().GetLonSigmaDistance();
-        sigmaRadDist = point->adjustedSurfacePoint().GetLocalRadiusSigma();
+        sigmaCoord1Dist = point->adjustedSurfacePoint().GetSigmaDistance(type,
+                                                                         SurfacePoint::One);
+        sigmaCoord2Dist = point->adjustedSurfacePoint().GetSigmaDistance(type,
+                                                                         SurfacePoint::Two);
+        sigmaCoord3Dist = point->adjustedSurfacePoint().GetSigmaDistance(type,
+                                                                         SurfacePoint::Three);
 
-        sigmaLatStats.AddData(sigmaLatDist.meters());
-        sigmaLonStats.AddData(sigmaLonDist.meters());
-        sigmaRadStats.AddData(sigmaRadDist.meters());
+        sigmaCoord1Stats.AddData(sigmaCoord1Dist.meters());
+        sigmaCoord2Stats.AddData(sigmaCoord2Dist.meters());
+        sigmaCoord3Stats.AddData(sigmaCoord3Dist.meters());
 
-        if (sigmaLatDist > maxSigmaLatDist) {
-          maxSigmaLatDist = sigmaLatDist;
-          maxSigmaLatPointId = point->id();
+        if (sigmaCoord1Dist > maxSigmaCoord1Dist) {
+          maxSigmaCoord1Dist = sigmaCoord1Dist;
+          maxSigmaCoord1PointId = point->id();
         }
-        if (sigmaLonDist > maxSigmaLonDist) {
-          maxSigmaLonDist = sigmaLonDist;
-          maxSigmaLonPointId = point->id();
+        if (sigmaCoord2Dist > maxSigmaCoord2Dist) {
+          maxSigmaCoord2Dist = sigmaCoord2Dist;
+          maxSigmaCoord2PointId = point->id();
         }
-        if (m_bundleSettings->solveRadius()) {
-          if (sigmaRadDist > maxSigmaRadDist) {
-            maxSigmaRadDist = sigmaRadDist;
-            maxSigmaRadPointId = point->id();
+        if (m_bundleSettings->solveRadius() || type == SurfacePoint::Rectangular) {
+          if (sigmaCoord3Dist > maxSigmaCoord3Dist) {
+            maxSigmaCoord3Dist = sigmaCoord3Dist;
+            maxSigmaCoord3PointId = point->id();
           }
         }
-        if (sigmaLatDist < minSigmaLatDist) {
-          minSigmaLatDist = sigmaLatDist;
-          minSigmaLatPointId = point->id();
+        if (sigmaCoord1Dist < minSigmaCoord1Dist) {
+          minSigmaCoord1Dist = sigmaCoord1Dist;
+          minSigmaCoord1PointId = point->id();
         }
-        if (sigmaLonDist < minSigmaLonDist) {
-          minSigmaLonDist = sigmaLonDist;
-          minSigmaLonPointId = point->id();
+        if (sigmaCoord2Dist < minSigmaCoord2Dist) {
+          minSigmaCoord2Dist = sigmaCoord2Dist;
+          minSigmaCoord2PointId = point->id();
         }
-        if (m_bundleSettings->solveRadius()) {
-          if (sigmaRadDist < minSigmaRadDist) {
-            minSigmaRadDist = sigmaRadDist;
-            minSigmaRadPointId = point->id();
+        if (m_bundleSettings->solveRadius() || type == SurfacePoint::Rectangular) {
+          if (sigmaCoord3Dist < minSigmaCoord3Dist) {
+            minSigmaCoord3Dist = sigmaCoord3Dist;
+            minSigmaCoord3PointId = point->id();
           }
         }
       }
@@ -3367,18 +3306,18 @@ namespace Isis {
       // update bundle results
       m_bundleResults.resizeSigmaStatisticsVectors(numberImages);
 
-      m_bundleResults.setSigmaLatitudeRange(minSigmaLatDist, maxSigmaLatDist,
-                                            minSigmaLatPointId, maxSigmaLatPointId);
+      m_bundleResults.setSigmaCoord1Range(minSigmaCoord1Dist, maxSigmaCoord1Dist,
+                                            minSigmaCoord1PointId, maxSigmaCoord1PointId);
 
-      m_bundleResults.setSigmaLongitudeRange(minSigmaLonDist, maxSigmaLonDist,
-                                             minSigmaLonPointId, maxSigmaLonPointId);
+      m_bundleResults.setSigmaCoord2Range(minSigmaCoord2Dist, maxSigmaCoord2Dist,
+                                             minSigmaCoord2PointId, maxSigmaCoord2PointId);
 
-      m_bundleResults.setSigmaRadiusRange(minSigmaRadDist, maxSigmaRadDist,
-                                          minSigmaRadPointId, maxSigmaRadPointId);
+      m_bundleResults.setSigmaCoord3Range(minSigmaCoord3Dist, maxSigmaCoord3Dist,
+                                          minSigmaCoord3PointId, maxSigmaCoord3PointId);
 
-      m_bundleResults.setRmsFromSigmaStatistics(sigmaLatStats.Rms(),
-                                                sigmaLonStats.Rms(),
-                                                sigmaRadStats.Rms());
+      m_bundleResults.setRmsFromSigmaStatistics(sigmaCoord1Stats.Rms(),
+                                                sigmaCoord2Stats.Rms(),
+                                                sigmaCoord3Stats.Rms());
     }
     m_bundleResults.setRmsImageResidualLists(rmsImageLineResiduals.toList(),
                                              rmsImageSampleResiduals.toList(),

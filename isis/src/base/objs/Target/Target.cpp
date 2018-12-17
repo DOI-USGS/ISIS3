@@ -196,19 +196,21 @@ namespace Isis {
     }
     catch (IException &e) {
       try {
+        // Get body code from Isis Naif object if it exists or Naif data pool
         if (m_spice) {
-          code = m_spice->getInteger("BODY_FRAME_CODE", 0);
+          code = m_spice->getInteger("BODY_CODE", 0);
           return code;
         }
+        // getInteger automatically calls Spice::readValue which looks in the NaifKeywords
         else if (lab.hasObject("NaifKeywords") 
-                 && lab.findObject("NaifKeywords").hasKeyword("BODY_FRAME_CODE") ) {
-          code = int(lab.findObject("NaifKeywords").findKeyword("BODY_FRAME_CODE"));
+                 && lab.findObject("NaifKeywords").hasKeyword("BODY_CODE") ) {
+          code = int(lab.findObject("NaifKeywords").findKeyword("BODY_CODE"));
           return code;
         }
         else {
           throw IException(e, 
                            IException::Unknown, 
-                           "BODY_FRAME_CODE not found for this Target.", 
+                           "BODY_CODE not found for this Target.", 
                            _FILEINFO_);
         }
       }
@@ -272,7 +274,7 @@ namespace Isis {
     }
  
     // If radii values are not in the given mapping group, we will get the target from the mapping
-    // group or cube label and attempt use NAIF routines to find the radii.
+    // group or cube label and attempt to use NAIF routines to find the radii.
     QString target = "";
     try {
       if (mapping.hasKeyword("TargetName")) {
@@ -313,15 +315,39 @@ namespace Isis {
       // If all previous attempts fail, look for the radii using the body frame
       // code in the NaifKeywords object.
       // Note: We will only look in the given label for the values after SPICELIB 
-      // routines have failed to preserve backwards compatibility (since this
+      // routines have failed, to preserve backwards compatibility (since this
       // label check is new).
       if (cubeLab.hasObject("NaifKeywords")) {
 
         PvlObject naifKeywords = cubeLab.findObject("NaifKeywords");
-
+        
+        // Try using the target bodycode_RADII keyword in the NaifKeywords PVL object
+        
         try {
+          
+          SpiceInt bodyCode = 0;
+          try {
+            // Try using the target bodycode_RADII keyword in the NaifKeywords PVL object
+            bodyCode = lookupNaifBodyCode(target);
+          }
+          catch (IException &e2) {
+            throw IException(e, IException::Unknown, e2.what(), _FILEINFO_);
+          }
+          QString radiiKeyword = "BODY" + toString(int(bodyCode)) + "_RADII";
 
-          // Try using the value of the BODY_FRAME_CODE keyword in the NaifKeywords PVL object
+          if (naifKeywords.hasKeyword(radiiKeyword)) {
+            PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword);
+            mapping.addKeyword( PvlKeyword("EquatorialRadius",
+                                           toString(toDouble(radii[0]) * 1000.0), "meters"),
+                                PvlContainer::Replace);
+            mapping.addKeyword( PvlKeyword("PolarRadius",
+                                           toString(toDouble(radii[2]) * 1000.0), "meters"),
+                                PvlContainer::Replace);
+            return mapping;
+          }
+        }
+        catch (IException &e) {
+        // Try using the value of the BODY_FRAME_CODE keyword in the NaifKeywords PVL object
           if (naifKeywords.hasKeyword("BODY_FRAME_CODE")) {
 
             PvlKeyword bodyFrame = naifKeywords.findKeyword("BODY_FRAME_CODE");
@@ -339,40 +365,6 @@ namespace Isis {
                                   PvlContainer::Replace);
               return mapping;
             }
-            // Try getting the radii using the BODY_FRAME_CODE with SPICELIB
-            else {
-              PvlGroup radiiGroup = Target::radiiGroup(toInt(bodyFrame[0]));
-              // Now APPEND the EquatorialRadius and PolorRadius
-              mapping.addKeyword( radiiGroup.findKeyword("EquatorialRadius"), PvlContainer::Replace);
-              mapping.addKeyword( radiiGroup.findKeyword("PolarRadius"),      PvlContainer::Replace);
-              return mapping;
-
-
-            }
-          }
-        }
-        catch (IException &e) {
-
-          // Try using the BODYbodycode_RADII keyword in the NaifKeywords PVL object
-          SpiceInt bodyCode = 0;
-          try {
-            bodyCode = lookupNaifBodyCode(target);
-          }
-          catch (IException &e2) {
-            throw IException(e, IException::Unknown, e2.what(), _FILEINFO_);
-          }
-
-          QString radiiKeyword = "BODY" + toString(int(bodyCode)) + "_RADII";
-
-          if (naifKeywords.hasKeyword(radiiKeyword)) {
-            PvlKeyword radii =  naifKeywords.findKeyword(radiiKeyword);
-            mapping.addKeyword( PvlKeyword("EquatorialRadius",
-                                           toString(toDouble(radii[0]) * 1000.0), "meters"),
-                                           PvlContainer::Replace);
-            mapping.addKeyword( PvlKeyword("PolarRadius",
-                                           toString(toDouble(radii[2]) * 1000.0), "meters"),
-                                           PvlContainer::Replace);
-            return mapping;
           }
         }
       }
@@ -414,9 +406,9 @@ namespace Isis {
     }
     else {
 
-      SpiceInt bodyFrame = 0;
+      SpiceInt bodyCode = 0;
       try {
-        bodyFrame = lookupNaifBodyCode(target);
+        bodyCode = lookupNaifBodyCode(target);
       }
       catch (IException &e) {
         QString msg = "Unable to find target radii for given target [" 
@@ -424,7 +416,7 @@ namespace Isis {
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
-      PvlGroup radiiGroup = Target::radiiGroup(int(bodyFrame));
+      PvlGroup radiiGroup = Target::radiiGroup(int(bodyCode));
       mapping += PvlKeyword("TargetName",  target);
       mapping += radiiGroup.findKeyword("EquatorialRadius");
       mapping += radiiGroup.findKeyword("PolarRadius");
@@ -437,7 +429,7 @@ namespace Isis {
 
   /**
    * Convenience method called by the public radii() methods to 
-   * compute the target radii using a body frame code recognized by NAIF. 
+   * compute the target radii using a body code recognized by NAIF. 
    *  
    * The PVL group contains only the EquatorialRadius and PolarRadius 
    * keywords. This group does not contain the Target keyword. 
@@ -446,7 +438,7 @@ namespace Isis {
    *  
    * @return PvlGroup containing EquatorialRadius and PolarRadius keywords. 
    */
-  PvlGroup Target::radiiGroup(int bodyFrameCode) {
+  PvlGroup Target::radiiGroup(int bodyCode) {
 
     // Load the most recent target attitude and shape kernel for NAIF
     static bool pckLoaded = false;
@@ -465,13 +457,13 @@ namespace Isis {
     // Get the radii from NAIF
     SpiceInt n;
     SpiceDouble radii[3];
-    bodvar_c(bodyFrameCode, "RADII", &n, radii);
+    bodvar_c(bodyCode, "RADII", &n, radii);
     
     try {
       NaifStatus::CheckErrors();
     }
     catch (IException &e) {
-      QString msg = "Unable to find radii for target code [" + toString(bodyFrameCode)
+      QString msg = "Unable to find radii for target code [" + toString(bodyCode)
                     + "]. Target code was not found in furnished kernels.";
     
       throw IException(e, IException::Unknown, msg, _FILEINFO_);

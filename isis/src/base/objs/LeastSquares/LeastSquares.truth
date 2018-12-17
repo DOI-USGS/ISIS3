@@ -29,5 +29,14 @@ Number of Knowns = 7
   tre = 1.88318		1.88318
   x =   1.65888		1.65888
   y =   1.43458		1.43458
+---
+*** TEST 4:  SAME 3 POINTS, SPARSE ***
+Number of Knowns = 3
+        SPARSE
+  one = 3.08
+  two = 0.94
+  tre = 1.9
+  x =   1.66
+  y =   1.42
 
 **ERROR** No solution available because no input data was provided.

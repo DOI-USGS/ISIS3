@@ -795,7 +795,8 @@ namespace Isis {
       //     longitude sigma        = 1000.0
       //     radius sigma           = Null since we are not solving for radius
       //     outlier rejection      = false
-      settings->setSolveOptions(false, false, false, false, 1000.0, 1000.0, Isis::Null);
+      settings->setSolveOptions(false, false, false, false, SurfacePoint::Latitudinal, 
+                                SurfacePoint::Latitudinal, 1000.0,1000.0, Isis::Null);
   //************************************************************************************************
       QList<BundleObservationSolveSettings> observationSolveSettingsList;
       BundleObservationSolveSettings observationSolveSettings;
