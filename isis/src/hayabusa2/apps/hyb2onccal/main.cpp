@@ -6,6 +6,7 @@
 #include <memory>
 #include <cstdio>
 #include <cmath>
+#include <cfloat>
 
 #include <QDebug>
 #include <QFile>
@@ -57,11 +58,12 @@ struct TemporaryCubeDeleter {
 
 enum InstrumentType{ONCW1,ONCW2,ONCT};
 
-static double g_bitDepth(12);
+static int g_bitDepth(12);
 
 InstrumentType g_instrument;
 //For subimage and binning mapping
 static AlphaCube *alpha(0);
+static bool g_cropped(true);
 
 static QString g_filter = "";
 static QString g_target ="";
@@ -199,7 +201,22 @@ void IsisMain() {
   AlphaCube myAlpha(1024,1024,icube->sampleCount(), icube->lineCount(),
   startSample,startLine,lastSample,lastLine);
 
-  g_bitDepth = inst["BitDepth"];
+  try {
+    g_bitDepth = inst["BitDepth"];
+  }
+  catch (IException &e) {
+    QString msg = "Unable to read [BitDepth] keyword in the Instrument group "
+    "from input file [" + icube->fileName() + "]";
+    //qDebug() << msg;
+    g_bitDepth = 12;
+
+  }
+
+
+
+  if (g_bitDepth < 0) {
+    g_bitDepth = 12;  //Correpsonds to no correction being done for bit depth
+  }
 
   alpha = &myAlpha;
 
@@ -215,6 +232,7 @@ void IsisMain() {
 
   try {
     g_AEtemperature = inst["ONCAETemperature"][0].toDouble();
+    qDebug() << "g_AEtemperature:  " << g_AEtemperature;
   }
   catch(IException &e) {
     QString msg = "Unable to read [ONCAETemperature] keyword in the Instrument group "
@@ -225,6 +243,7 @@ void IsisMain() {
 
   try {  
     g_CCD_T_temperature = inst["ONCTCCDTemperature"][0].toDouble();
+    qDebug() << "g_CCD_T_Temperature:  " << g_CCD_T_temperature;
   }
   catch(IException &e) {
     QString msg = "Unable to read [ONCTCCDTemperature] keyword in the Instrument group "
@@ -234,6 +253,7 @@ void IsisMain() {
 
   try {
     g_ECT_T_temperature = inst["ONCTElectricCircuitTemperature"][0].toDouble();
+    qDebug() << "g_ECT_T_temperature: " << g_ECT_T_temperature;
   }
   catch(IException &e) {
     QString msg = "Unable to read [ONCTElectricCircuitTemperature] keyword in the Instrument group "
@@ -280,14 +300,23 @@ void IsisMain() {
 
   // NOTE we do not have a valid flat-field for the W1 or W2 images.
   FileName flatfile = "NONE";
+  PvlGroup alphaCube;
+
   if (g_instrument == InstrumentType::ONCT) {
     QScopedPointer<Cube, TemporaryCubeDeleter> flatcube;
     flatfile = DetermineFlatFieldFile(g_filter);
-
     QString reducedFlat(flatfile.expanded());
 
+    try {
+      alphaCube = icube->group("AlphaCube");
+    }
+
+   catch(IException &e) {
+     g_cropped =false;
+    }
+
     // Image is not cropped
-    if (startLine == 1 && startSample == 1) {
+    if (!g_cropped) {
 
       // Determine if we need to subsample the flat field if pixel binning occurred
       // TODO: test a binned image (add test case).
@@ -309,8 +338,8 @@ void IsisMain() {
           remove(reducedFlat.toLatin1().data());
           throw ie;
         }
-        QScopedPointer<Cube, TemporaryCubeDeleter> reduced(new Cube(reducedFlat, "r"));
-        flatcube.swap( reduced );
+        //QScopedPointer<Cube, TemporaryCubeDeleter> reduced(new Cube(reducedFlat, "r"));
+        //flatcube.swap( reduced );
       }
 
       // Set up processing for flat field as a second input file
@@ -318,13 +347,22 @@ void IsisMain() {
       p.SetInputCube(reducedFlat, att);
     }
     else {
+
       // Image is cropped so we have to deal with it
       FileName transFlat =
       FileName::createTempFile("$TEMPORARY/" + flatfile.baseName() + "_translated.cub");
 
       Cube *flatOriginal = new Cube(flatfile.expanded() );
 
-      int transform[5] = {binning,startSample,startLine,lastSample,lastLine};
+      //int transform[5] = {binning,startSample,startLine,lastSample,lastLine};
+
+      double alphaStartSample = alphaCube["AlphaStartingSample"][0].toDouble();
+      double alphaStartLine = alphaCube["AlphaStartingLine"][0].toDouble();
+      double alphaEndSample = alphaCube["AlphaEndingSample"][0].toDouble();
+      double alphaEndLine = alphaCube["AlphaEndingLine"][0].toDouble();
+
+      //int transform[5] = {binning,startSample,startLine,lastSample,lastLine};
+      double transform[5] = {(double)binning,alphaStartSample,alphaStartLine,alphaEndSample,alphaEndLine};
 
       // Translates and scales the flatfield image.  Scaling
       // might be necessary in the event that the raw image was also binned.
@@ -334,12 +372,15 @@ void IsisMain() {
       QScopedPointer<Cube, TemporaryCubeDeleter> translated(new Cube(transFlat.expanded(), "r"));
       flatcube.swap(translated);
 
-      CubeAttributeInput att;
-      std::cout<<" before second setinputcube()...\n"<<std::endl;
+      CubeAttributeInput att;   
+
       p.SetInputCube(transFlat.expanded(),att);
-      std::cout<<" after second setinputcube()...\n"<<std::endl;
-    }
-  }
+
+  }  //Finished setting flatfield file for ONC-T
+
+ }
+
+
 
   Cube *ocube  = p.SetOutputCube("TO");
   //QString fname = ocube->fileName();
@@ -374,7 +415,7 @@ void IsisMain() {
 
   // Calibrate!
   try {
-    p.Progress()->SetText("Calibrating Hayabusa2 Cube");
+    p.Progress()->SetText("Calibrating Hayabusa2 Cube");   
     p.StartProcess(Calibrate);
   }
   catch (IException &ie) {
@@ -404,18 +445,15 @@ void IsisMain() {
   bnae.addValue(toString(g_bae1, 8));
   calibrationLog.addKeyword(bnae);
 
+#if 0
   PvlKeyword linearityCoefs("Linearity");
   linearityCoefs.addValue(toString(g_L0,8));
   linearityCoefs.addValue(toString(g_L1,8));
   linearityCoefs.addValue(toString(g_L2,8));
   calibrationLog.addKeyword(linearityCoefs);
 
+#endif
 
-
-  static double g_AEtemperature(0.0);
-
-  static double g_CCD_T_temperature(0.0);
-  static double g_ECT_T_temperature(0.0);
 
   calibrationLog.addKeyword(PvlKeyword("Bias_AETemp", toString(g_AEtemperature, 16)));
 
@@ -438,13 +476,9 @@ void IsisMain() {
       break;
   }
 
-
-
   calibrationLog.addKeyword(PvlKeyword("Bias", toString(g_bias, 16), "DN"));
   calibrationLog.addKeyword(PvlKeyword("Smear_Tvct", toString(g_Tvct, 16)));
   calibrationLog.addKeyword(PvlKeyword("Smear_texp", toString(g_texp, 16)));
-
-
 
   calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
   calibrationLog.addKeyword(PvlKeyword("RadianceStandard", toString(g_v_standard, 16)));
@@ -596,33 +630,10 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     return;
   }
 
-
-  // TODO: Once smear model and readout time are known, we can add smear correction.
-  // Compute smear component here as its a constant for the entire sample
-  // double t1 = g_timeRatio/imageIn.size();
-  // double b = binning;
-  // double c1(1.0);  //default if no binning
-  //
-  // if (binning > 1) {
-  //   c1 = 1.0/(1.0 + t1*((b -1.0)/(2.0*b) ) );
-  // }
-  //
-  // double smear = 0;
-  // for (int j = 0; j < imageIn.size(); j++ ) {
-  //   if ( !IsSpecial(imageIn[j]) ) {
-  //     smear += t1 * ( (imageIn[j] * g_compfactor) - g_bias);
-  //   }
-  // }
-
-
-
-
-
   // Iterate over the line space
-  for (int i = 0; i < imageIn.size(); i++) {
-    //qDebug() << "imageIn:  " << imageIn[i];
+  for (int i = 0; i < imageIn.size(); i++) { 
     imageOut[i] = imageIn[i]*pow(2.0,12-g_bitDepth);
-    //qDebug() << "imageIOut:  " << imageOut[i];
+
 
 
     // Check for special pixel in input image and pass through
@@ -635,10 +646,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     imageOut[i] *= g_compfactor;
 
 
-
     // 1) BIAS Removal - Only needed if not on-board corrected
-    // TODO: find image with > 1 subimages
-
 
 
     if ( !g_onBoardSmearCorrection ) {
@@ -652,6 +660,8 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
         imageOut[i] = imageOut[i] - g_bias;
       }
     }
+
+
 #if 0
     double linearCorrection;
     linearCorrection = g_L0+g_L1*pow(imageOut[i],2.0)+g_L2*pow(imageOut[i],3.0);
@@ -671,7 +681,8 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // if (nsubImages <= 1) {
     //  imageOut[i] = c1*(imageOut[i] - smear);
     // }
-    if (g_onBoardSmearCorrection) {
+    if (!g_onBoardSmearCorrection) {
+
       double smear = 0;
       for (int j=0;j < imageIn.size();j++) {
         smear += (imageOut[j]/imageIn.size() );
@@ -698,13 +709,14 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // If we have only one input cube, that means that we do not have a flat-field (W1/W2).
     if (in.size() == 2) {
       // Note that our current flat-fields to not have special pixel values.
-      if ( IsSpecial(flatField[i]) ) {
+      if ( IsSpecial(flatField[i])  || IsSpecial(imageOut[i]) )
+      {
         imageOut[i] = Isis::Null;
         continue;
       }
       else {
-        if (flatField[i] != 0) {
-          imageOut[i] /= flatField[i];
+        if (flatField[i] != 0) {                 
+          imageOut[i] /= flatField[i];  
         }
       }
     }
