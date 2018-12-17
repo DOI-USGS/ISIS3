@@ -2,8 +2,8 @@
 
 #include <functional>
 #include <iostream>
+#include <limits>
 #include <string>
-// #include <tuple>
 #include <utility>
 #include <vector>
 
@@ -465,7 +465,6 @@ TEST(Pixel, static_ToString) {
   EXPECT_EQ(std::string("Lis"), Pixel::ToString(Isis::Lis));
   EXPECT_EQ(std::string("Lrs"), Pixel::ToString(Isis::Lrs));
   EXPECT_EQ(std::string("Null"), Pixel::ToString(Isis::Null));
-  EXPECT_EQ(std::string("Invalid"), Pixel::ToString(-1.0e+1000));
 }
 
 TEST(Pixel, ToString) {
@@ -477,5 +476,4 @@ TEST(Pixel, ToString) {
   EXPECT_EQ(std::string("Lis"), Pixel(1,2,3,Isis::Lis).ToString());
   EXPECT_EQ(std::string("Lrs"), Pixel(1,2,3,Isis::Lrs).ToString());
   EXPECT_EQ(std::string("Null"), Pixel(1,2,3,Isis::Null).ToString());
-  EXPECT_EQ(std::string("Invalid"), Pixel(1,2,3,-1.0e+1000).ToString());
 }
