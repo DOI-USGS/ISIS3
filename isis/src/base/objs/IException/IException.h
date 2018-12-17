@@ -27,6 +27,8 @@
 #include <exception>
 #include <string>
 
+#include "FileName.h"
+
 template <typename T> class QList;
 
 class QString;
@@ -35,7 +37,7 @@ class QString;
  * Macro for the filename and line number. This is typically used for the last
  *   arguments to constructing an IException.
  */
-#define _FILEINFO_ __FILE__,__LINE__
+#define _FILEINFO_ Isis::FileName(__FILE__).name().toStdString().c_str(),__LINE__
 
 namespace Isis {
   class Pvl;
@@ -94,7 +96,13 @@ namespace Isis {
    *                           should (and must) be an empty string. This is
    *                           fixed -- fixes #755.
    *   @history 2012-07-30 Jeff Anderson - Updated internal documentation
-   *                           to improve backward compatibility 
+   *                           to improve backward compatibility
+   *   @history 2018-08-06 Kaitlyn Lee - With the new cmake system, we run unit tests from
+   *                           build/untiTest, while in the old make system, we ran unit tests
+   *                           directly from the object's directory. This change caused the c macro
+   *                           __FILE__ to include the full path of unitTest.cpp when it expands.
+   *                           Consequently, we have to strip the path from __FILE__ and put only
+   *                           the name of the file into _FILEINFO_.
    */
   class IException : public std::exception {
     public:
@@ -109,7 +117,7 @@ namespace Isis {
        /*
        * WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
        * If at all possible do not change the enumeration values for the
-       * error codes.  The reason why is it that will change the return 
+       * error codes.  The reason why is it that will change the return
        * status of error messages.  Ground data processing groups (e.g.,
        * HiRISE, LROC, Messenger) will sometime test on the error return
        * values in their scripts.  By keeping the enumerations the same
@@ -195,6 +203,7 @@ namespace Isis {
       void append(const IException &exceptionSource);
 
       ErrorType errorType() const;
+      static QString errorTypeToString(ErrorType t);
       void print() const;
       void print(bool printFileInfo) const;
       Pvl toPvl() const;
@@ -206,7 +215,6 @@ namespace Isis {
 
     private:
       static IException createStackTrace();
-      static QString errorTypeToString(ErrorType t);
       static ErrorType stringToErrorType(const QString &s);
       char *buildWhat() const;
       void deleteEmptyMemberStrings();
@@ -250,4 +258,3 @@ namespace Isis {
 };
 
 #endif
-

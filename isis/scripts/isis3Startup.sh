@@ -12,7 +12,7 @@
 # the Isis distribution
 #
 if [ ! "$ISISROOT" ]; then
-  ISISROOT=/usgs/pkgs/isis3/isis
+  ISISROOT=/usgs/pkgs/isis3/install
   export ISISROOT
 fi
 
@@ -37,7 +37,3 @@ else
   PATH="$ISISROOT/bin"
 fi
 export PATH
-
-# Create QT_PLUGIN_PATH env variable
-QT_PLUGIN_PATH="$ISISROOT/3rdParty/plugins"
-export QT_PLUGIN_PATH

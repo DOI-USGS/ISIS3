@@ -190,10 +190,3 @@ Incidence angle:  6.92945
 Testing errors
 
 
-ShapeModel with a bad file name
-[1;31m[pcl::io::load] Don't know how to handle file with extension [0;m**USER ERROR** Cannot create a EmbreeShape from NotADSKFile.
-**I/O ERROR** Failed creating an EmbreeTargetShape from [NotADSKFile].
-**I/O ERROR** Failed loading target shape file [NotADSKFile].
-[1;31m[pcl::io::load] Don't know how to handle file with extension [0;m**USER ERROR** Cannot create a EmbreeShape from NotADSKFile.
-**I/O ERROR** Failed creating an EmbreeTargetShape from [NotADSKFile].
-**I/O ERROR** Failed loading target shape file [NotADSKFile].

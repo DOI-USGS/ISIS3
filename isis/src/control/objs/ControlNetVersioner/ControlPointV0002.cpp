@@ -296,7 +296,7 @@ namespace Isis {
         try {
           value = toDouble(dataKeyword[0]);
         }
-        catch (IException e) {
+        catch (IException &e) {
           QString msg = "Invalid control measure log data value [" + dataKeyword[0] + "]";
           throw IException(e, IException::Io, msg, _FILEINFO_);
         }

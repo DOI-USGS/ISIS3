@@ -115,7 +115,7 @@ namespace Isis {
 
       // If its a unitTest then load with the unitTest preference file
       if(unitTest) {
-        p_preference->Load("$ISISROOT/src/base/objs/Preference/TestPreferences");
+        p_preference->Load("$ISISROOT/TestPreferences");
       }
       // Otherwise load the Isis system and personal preferences.
       else {
@@ -134,7 +134,7 @@ namespace Isis {
     else if(unitTest) {
       p_unitTest = unitTest;
       p_preference->clear();
-      p_preference->Load("$ISISROOT/src/base/objs/Preference/TestPreferences");
+      p_preference->Load("$ISISROOT/TestPreferences");
     }
 
     return *p_preference;

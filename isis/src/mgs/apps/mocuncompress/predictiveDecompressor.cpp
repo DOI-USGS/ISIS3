@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -62,7 +69,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 
 #include "predictiveDecompressor.h"
 
-void predictiveDecompressor(register uint8 *curLine, register uint8 *prevLine, register uint32 size, uint8 type, uint8 *code, uint8 *left, uint8 *right, uint16 sync, BITSTRUCT *bitStuff)
+void predictiveDecompressor(uint8 *curLine, uint8 *prevLine, uint32 size, uint8 type, uint8 *code, uint8 *left, uint8 *right, uint16 sync, BITSTRUCT *bitStuff)
 {
   /*
   * This function produces a single line of decompressed data from data

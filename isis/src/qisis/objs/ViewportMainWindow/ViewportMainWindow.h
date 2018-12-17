@@ -33,12 +33,18 @@ namespace Isis {
    *           when exception occured
    *  @history 2012-05-29 Steven Lambright - Updated closeEvent() to ask the user to save any
    *                          unsaved modifications to the opened cube. References #854.
+   *  @history 2018-04-24 Adam Goins - Added optional parameter QCloseEvent to
+   *                          the closeWindow() signal so that the close event can be caught
+   *                          and set to rejected by listening applications (such as qnet).
+   *                          Fixes an issue where closing qnet and clicking 'cancel' from the
+   *                          proceeding popup dialogue would still close the window but leave
+   *                          the application running. Fixes #4146.
    */
   class ViewportMainWindow : public MainWindow {
       Q_OBJECT
 
     signals:
-      void closeWindow(); //!< Signal called when the window receives a close event
+      void closeWindow(QCloseEvent *event = NULL); //!< Signal called when the window receives a close event
 
     public slots:
       void displayWarning(std::string &pStr, const std::string &pExStr);

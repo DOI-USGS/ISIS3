@@ -74,17 +74,17 @@ namespace Isis {
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      virtual QString Translate(QString nName, int inputIndex = 0);
+      virtual QString Translate(QString translationGroupName, int inputIndex = 0);
 
       // Translate all translation table groups which contain "Auto"
       void Auto(QDomDocument &outputLabel);
       void Auto(Pvl &inputLabel, QDomDocument &outputLabel);
 
       // Return the ith input value associated with a output name
-      virtual const PvlKeyword &InputKeyword(const QString nName) const;
+      virtual const PvlKeyword &InputKeyword(const QString translationGroupName) const;
 
       // Return true if the input lable contains the translated group and key names
-      virtual bool InputHasKeyword(const QString nName);
+      virtual bool InputHasKeyword(const QString translationGroupName);
 
       void SetLabel(Pvl &inputLabel);
       

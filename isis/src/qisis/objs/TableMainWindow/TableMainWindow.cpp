@@ -223,7 +223,6 @@ namespace Isis {
         destinationColumn = startCol + i;
         p_table->insertColumn(startCol + i);
       }
-
       QTableWidgetItem *header = new QTableWidgetItem(htext);
       if (insertAt >= 0) {
 
@@ -371,6 +370,10 @@ namespace Isis {
   /**
    * This method checks to see if the table has been created. If
    * not it calls the createTable method before calling show.
+   * 
+   * @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
+   *                        this->show() so that it hides the unselected columns appropriately.
+   *                        Fixes #5141.
    *
    * @history 2017-10-06 Adam Goins - showTable() now calls syncColumns() after it calls
    *                        this->show() so that it hides the unselected columns appropriately.
