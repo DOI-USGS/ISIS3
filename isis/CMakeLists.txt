@@ -5,10 +5,13 @@
 
 # Specify the required version of CMake.  If your machine does not
 #  have this, it should be easy to build from https://cmake.org/download/
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10)
 
 # Point cmake to our other CMake files.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+# set(CMAKE_FIND_FRAMEWORK LAST)
+set(CMAKE_FRAMEWORK_PATH /System/Library/Frameworks/)
 
 set(CMAKE_FIND_FRAMEWORK LAST)
 
@@ -16,6 +19,8 @@ include(AddIsisModule)
 include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
+include(cmake/gtest.cmake)
+include(GoogleTest)
 
 #===============================================================================
 #===============================================================================
@@ -28,16 +33,15 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.5.00.0")
+set(VERSION            "3.6.0.1")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2017-04-24")
-set(THIRD_PARTY_LIBS_VERSION  "v007")
-set(RELEASE_STAGE             "alpha") # (alpha, beta, stable)
+set(VERSION_DATE              "2018-10-26")
+set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
@@ -245,6 +249,13 @@ find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
+find_package(Threads)
+
+
+# In this case, we specify the version numbers being searched for in the non-traditional installs.
+if(APPLE)
+find_package(OpenGL REQUIRED)
+endif(APPLE)
 
 if(pybindings)
  find_package(Python REQUIRED)
@@ -432,7 +443,8 @@ add_custom_target(docs COMMAND ${CMAKE_COMMAND}
 # will be executed when running "ninja install"
 # On a clean build, all files will be copied over.
 add_custom_target(incs ALL COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp ${CMAKE_BINARY_DIR}/inc)
+  ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.h ${CMAKE_SOURCE_DIR}/src/*/objs/*/*.hpp
+  ${CMAKE_SOURCE_DIR}/src/*/apps/*/*.h ${CMAKE_BINARY_DIR}/inc)
 add_dependencies(isis3 incs)
 
 # Add a custom build target to clean out everything that gets added to the source
@@ -444,13 +456,13 @@ add_custom_target(clean_source COMMAND rm -rf "${CMAKE_BINARY_DIR}/*" "${CMAKE_I
 # Set up a few top level files for installation.
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/IsisPreferences   ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/scripts           ${CMAKE_BINARY_DIR})
-EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/license.txt       ${CMAKE_BINARY_DIR})
+EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/../LICENSE.txt    ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/version           ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/make              ${CMAKE_BINARY_DIR})
 
 # Copy the files on make install as well
 install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_SOURCE_DIR}/license.txt     DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.txt  DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 
@@ -459,3 +471,9 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTA
 #   the end of this file containing a CMakeLists.txt file which includes all of
 #   the desired post-install commands inside.
 add_subdirectory(cmake)
+option (BUILD_TESTS "Build tests" ON)
+if(BUILD_TESTS)
+  include(CTest)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

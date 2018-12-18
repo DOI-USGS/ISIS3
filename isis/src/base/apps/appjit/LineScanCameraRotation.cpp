@@ -8,7 +8,6 @@
 #include "Cube.h"
 #include "LineScanCameraRotation.h"
 #include "Quaternion.h"
-#include "LineEquation.h"
 #include "BasisFunction.h"
 #include "LeastSquares.h"
 #include "BasisFunction.h"
