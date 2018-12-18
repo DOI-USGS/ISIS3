@@ -106,8 +106,8 @@ xsi:noNamespaceSchemaLocation=
      <li><def link="Subsolar Ground Azimuth">SUBSOLARGROUNDAZIMUTH</def></li>
      <li>MORPHOLOGYRANK</li>
      <li>ALBEDORANK</li>
-     <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
      <li><def link="Body Fixed Coordinate">BODYFIXED</def></li>
+     <li>RADEC (<def link="Right Ascension">Right Ascension</def>, <def link="Declination">Declination</def> )</li>
      </ul>
 	The following options are available for Level2 images:
      <ul>
@@ -303,8 +303,8 @@ xsi:noNamespaceSchemaLocation=
       Renamed albedo to albedoRank, and morph (or morphology) to morphRank (or MorphologyRank). Ref #4008.
     </change>
     <change name="Kaitlyn Lee" date="2018-03-10">
-      If RA and declination are selected, the program will add the values to the
-      last two bands, regardless if the pixel is in outer space or not. Fixes #4446.
+      RA and decination are exported regardless if the point is not on the planet. RA and dec bands 
+      are now added last. Fixes #4446.
     </change>
   </history>
 
