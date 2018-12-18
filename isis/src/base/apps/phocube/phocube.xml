@@ -303,7 +303,7 @@ xsi:noNamespaceSchemaLocation=
       Renamed albedo to albedoRank, and morph (or morphology) to morphRank (or MorphologyRank). Ref #4008.
     </change>
     <change name="Kaitlyn Lee" date="2018-03-10">
-      RA and decination are exported regardless if the point is not on the planet. RA and dec bands 
+      RA and DEC are exported regardless if the point is not on the planet. RA and DEC bands 
       are now added last. Fixes #4446.
     </change>
   </history>
