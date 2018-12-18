@@ -11,7 +11,7 @@ dependencies:
   - bullet==2.86.1=0
   - bz2file==0.98
   - bzip2==1.0.6=1
-  - cmake==3.9.1=0
+  - cmake>=3.10
   - cspice==66=h470a237_3
   - curl==7.60.0=0
   - doxygen==1.8.14=0
@@ -30,7 +30,7 @@ dependencies:
   - krb5==1.14.2=0
   - libpng>=1.6.34
   - libprotobuf==3.5.2
-  - libtiff==4.0.9=0
+  - libtiff>=4.0.9
   - libxml2==2.9.7=0
   - make
   - mesalib==17.2.0=0
@@ -38,7 +38,7 @@ dependencies:
   - mysql-connector-c==6.1.6=0
   - nanoflann==1.2.2
   - ninja==1.7.2=0
-  - nn==1.86.0=2
+  - nn==1.86.0
   # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19=2
   - opencv

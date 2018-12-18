@@ -3,7 +3,7 @@
 ==================================================
 2018-OCT-19 Kaitlyn Lee - US Geological Survey
 
-Removed the register keyword because it is deprecated in C++17. 
+Removed the register keyword because it is deprecated in C++17.
 ==================================================
 
 NOTICE
@@ -56,7 +56,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 #include <stdlib.h>
 
 #include "fs.h"
-#include "limits.h"
+#include "mocuncompresslimits.h"
 #include "encodeCoefs.static.h"
 
 #include "initBlock.h"
@@ -91,7 +91,7 @@ uint32 i;
 static int compare(const void *v1, const void *v2)
 {
   BITTREE *e1 = (BITTREE *)v1;
-  BITTREE *e2 = (BITTREE *)v2; 
+  BITTREE *e2 = (BITTREE *)v2;
 uint32 c1, c2;
   c1 = e1->code;
   c2 = e2->code;
