@@ -203,6 +203,7 @@ namespace Isis {
       void append(const IException &exceptionSource);
 
       ErrorType errorType() const;
+      static QString errorTypeToString(ErrorType t);
       void print() const;
       void print(bool printFileInfo) const;
       Pvl toPvl() const;
@@ -214,7 +215,6 @@ namespace Isis {
 
     private:
       static IException createStackTrace();
-      static QString errorTypeToString(ErrorType t);
       static ErrorType stringToErrorType(const QString &s);
       char *buildWhat() const;
       void deleteEmptyMemberStrings();

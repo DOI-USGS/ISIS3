@@ -173,8 +173,6 @@ namespace Isis {
 
       FileName highestVersion() const;
       FileName newVersion() const;
-      FileName version(long versionNumber) const;
-      FileName version(QDate versionDate) const;
 
       bool fileExists() const;
       QDir dir() const;
@@ -201,7 +199,8 @@ namespace Isis {
 
 
     private:
-
+      FileName version(long versionNumber) const;
+      FileName version(QDate versionDate) const;
       QDate highestVersionDate() const;
       long highestVersionNum() const;
       void validateVersioningState() const;

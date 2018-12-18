@@ -2,11 +2,18 @@
 
 <application name="kaguyatc2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
-  <brief>Import PDS formatted Kaguya Terrain Camera level 2 image cube into Isis format cube</brief>
+  <brief>
+    Import L2B0 or L2B2 Kaguya TC image to ISIS3 cube.
+  </brief>
 
   <description>
-    This program will import a PDS formatted Kaguya Terrain Camera (TC) level 2  
-    image into an Isis cube. 
+    This program will import a Kaguya Terrain Camera (TC)   
+    file from a PDS3 formatted image to an ISIS3 formatted cube.
+    Note that not all TC images may be supported by this program.
+    Supported input images include radiometrically corrected
+    unprojected images, TC maps, or TC Ortho maps.
+    To verify, input image labels must have DATA_SET_ID matching
+    TC1_Level2B, TC2_Level2B, TC_MAP or TCO_MAP.
   </description>
 
   <history>
@@ -23,6 +30,9 @@
     </change>
     <change name="Janet Barrett" date="2014-02-11">
       Added check for TARGET_NAME keyword. Fixes #2036.
+    </change>
+    <change name="Jeannie Backer" date="2018-10-02">
+      Added support for Kaguya L2B0 (TC1_Level2B and TC2_Level2B) files. 
     </change>
   </history>
 

@@ -43,7 +43,7 @@ namespace Isis {
     p_solved = false;
     p_sparse = sparse;
     p_sigma0 = 0.;
-    
+
     p_sparseRows = sparseRows;
     p_sparseCols = sparseCols;
 
@@ -69,7 +69,7 @@ namespace Isis {
 
         p_parameterWeights.resize(sparseCols);
       }
-      
+
     }
     p_currentFillRow = -1;
   }
@@ -308,8 +308,8 @@ namespace Isis {
     if (coefs.dim1() < p_basis->Coefficients()) {
       QString msg = "Unable to solve least-squares using SVD method. No "
                     "solution available. Not enough knowns or knowns are "
-                    "co-linear ... [Unknowns = " 
-                    + toString(p_basis->Coefficients()) + "] [Knowns = " 
+                    "co-linear ... [Unknowns = "
+                    + toString(p_basis->Coefficients()) + "] [Knowns = "
                     + toString(coefs.dim1()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -444,7 +444,6 @@ namespace Isis {
   int LeastSquares::SolveSparse() {
 
     // form "normal equations" matrix by multiplying ATA
-    std::cout << p_sparseA.n_rows << ", " << p_sparseA.n_cols << std::endl;
     p_normals = p_sparseA.t()*p_sparseA;
 
     // Create the right-hand-side column vector 'b'
@@ -469,9 +468,9 @@ namespace Isis {
         p_ATb(i, 0) -= p_epsilonsSparse[i]*weight;
       }
     }
-    
+
     bool status = spsolve(p_xSparse, p_normals, p_ATb, "superlu");
-    
+
     if (status == false) {
       QString msg = "Could not solve sparse least squares problem.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
