@@ -39,7 +39,6 @@ dependencies:
   - nanoflann==1.2.2
   - ninja==1.7.2
   - nn==1.86.0
-  # - numpy==1.13.3=py36_blas_openblas_200
   - openblas==0.2.19
   - opencv
   - openssl==1.0.2n
@@ -47,7 +46,6 @@ dependencies:
   - pcl==1.8.1
   - pip==9.0.1
   - protobuf==3.5.2
-  # - pyqt==5.6.0
   - python==3.6
   - qhull==7.2.0=0
   - qt=5.9.6
