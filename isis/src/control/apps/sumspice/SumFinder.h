@@ -50,9 +50,9 @@ namespace Isis {
    * @internal
    *   @history 2016-09-14 Kris Becker - Original Version
    *   @history 2017-02-09 Jesse Mapel - Updated to ignore invalid
-   *                           SpacecraftClockStopCount values.
-   *   @history 2018-04-12 Kaitlyn Lee - Added the method writeHistory().
-   *                           This method will add a sumspice entry to
+   *                            SpacecraftClockStopCount values.
+   *   @history 2018-04-12 Kaitlyn Lee - Added method writeHistory()
+   *                           to add a sumspice entry to
    *                           m_cube's History blob. Fixes #4972.
    *
    */
