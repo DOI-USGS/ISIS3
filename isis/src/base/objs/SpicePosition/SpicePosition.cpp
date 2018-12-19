@@ -241,23 +241,28 @@ namespace Isis {
    */
   const std::vector<double> &SpicePosition::SetEphemerisTime(double et) {
     NaifStatus::CheckErrors();
+    // NOTES: SETS position and velocity, and returns position. Need to check if the
+    // stateful aspect is used. Or just replicate for now. 
+
 
     // Save the time
     if(et == p_et) return p_coordinate;
     p_et = et;
 
+
     // Read from the cache
     if(p_source == Memcache) {
-      SetEphemerisTimeMemcache();
+
+      SetEphemerisTimeMemcache(); // can replace these
     }
     else if(p_source == HermiteCache) {
-      SetEphemerisTimeHermiteCache();
+      SetEphemerisTimeHermiteCache(); // not yet implelemented in ALE
     }
     else if(p_source == PolyFunction) {
-      SetEphemerisTimePolyFunction();
+      SetEphemerisTimePolyFunction(); // can replace these
     }
     else if(p_source == PolyFunctionOverHermiteConstant) {
-      SetEphemerisTimePolyFunctionOverHermiteConstant();
+      SetEphemerisTimePolyFunctionOverHermiteConstant(); // not yet implemented in ALE
     }
     else {  // Read from the kernel
       SetEphemerisTimeSpice();
@@ -1216,6 +1221,11 @@ namespace Isis {
    *            method)
    */
   void SpicePosition::SetEphemerisTimeMemcache() {
+    // need to use the eal cube reader to get in the times and associated 
+    // load in cube somewhere above
+//    std::vector< std::vector<double> > tableData = ale::readPositionTable(tablesfromLabel, cubeFile); 
+//    std::vector<double> position = ale::getPosition(tableData[0], tableData[1], p_et, ale::interpolation::linear);
+
     // If the cache has only one position return it
     if(p_cache.size() == 1) {
       p_coordinate[0] = p_cache[0][0];
