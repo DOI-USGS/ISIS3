@@ -1,4 +1,5 @@
 channels:
+  - jessemapel
   - usgs-astrogeology
   - conda-forge
   - probcomp
@@ -6,7 +7,7 @@ channels:
 
 dependencies:
   - armadillo==8.200.0
-  - blas==1.1
+  - blas==1.1=openblas
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
@@ -37,7 +38,7 @@ dependencies:
   - mysql-connector-c==6.1.6
   - nanoflann==1.2.2
   - ninja==1.7.2
-  - conda-forge/label/gcc7::nn
+  - nn==1.86.0
   - openblas==0.2.19
   - opencv
   - openssl==1.0.2n

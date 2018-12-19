@@ -183,6 +183,13 @@ void IsisMain() {
     ocube->deleteBlob("Table", "InputImages");
   }
 
+  // Delete the Tracking group if it exists (3.6.0 and up)
+  // The tracking group could be transfered from the first input cube, but it does not
+  // represent the images used in any other band after cubeit.
+  if(ocube->hasGroup("Tracking")) {
+    ocube->deleteGroup("Tracking");
+  }
+
   p2.EndProcess();
 
  // Now loop and mosaic in each cube
