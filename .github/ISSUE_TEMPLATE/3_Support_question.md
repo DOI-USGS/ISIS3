@@ -6,7 +6,7 @@ Astrogeology Science Center software.
 ---
 
 We use GitHub issues only to discuss about ISIS3 bugs and new features. For
-this kind of questions about using ISIS3 or other ASC software, please use
+questions about using ISIS3 or other ASC software, please use
 any of the support alternatives: https://astrodiscuss.usgs.gov or https://gitter.im/USGS-Astrogeology/IAA
 
 Thanks!
