@@ -1,3 +1,3 @@
-3.6.1        # Public version number
+3.6.1_cassis # Public version number
 12-19-2018   # Release date
-stable       # release stage (alpha, beta, stable)
+beta         # release stage (alpha, beta, stable)

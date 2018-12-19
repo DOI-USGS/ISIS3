@@ -1,5 +1,5 @@
-{% set version = "3.6.1" %}
-{% set git_branch = "release" %}
+{% set version = "3.6.1_cassis" %}
+{% set git_branch = "cassis_release" %}
 {% set build_number = "0" %}
 
 package:
