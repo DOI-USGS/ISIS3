@@ -18,7 +18,7 @@ The ISIS3 user and developer documentation should be removed from the binary dis
 1. Make the HTML user and developer documentation available via https://usgs-astrogeology.github.io/isis3/<rest_of_the_url>. This can be fully automated in the CI environment and we could utilize [breathe](https://github.com/michaeljones/breathe) to maintain documentation for multiple versions in a manner similar to how the Python community does this.
 1. Use pandoc to take the printer friendly documentation and generate a PDF that would be made available via our standard data download mechanisms (perhaps Astropedia?). I would suggest that said document only exist for the user level docs at the present.
 
-# Drawback
+# Drawbacks
 Some users are accustomed to having local documentation that has historically been shipped with ISIS3. Having this documentation shipped alongside the released code is a convenience to these users.
 
 # Alternatives
