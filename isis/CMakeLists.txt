@@ -249,7 +249,9 @@ find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
+find_package(Ale               REQUIRED)
 find_package(Threads)
+
 
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.

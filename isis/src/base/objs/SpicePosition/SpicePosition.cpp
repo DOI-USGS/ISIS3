@@ -16,6 +16,7 @@
 #include "NumericalApproximation.h"
 #include "PolynomialUnivariate.h"
 #include "TableField.h"
+#include "ale/ale.h"
 
 namespace Isis {
   /**
@@ -241,7 +242,8 @@ namespace Isis {
    */
   const std::vector<double> &SpicePosition::SetEphemerisTime(double et) {
     NaifStatus::CheckErrors();
-    // NOTES: SETS position and velocity, and returns position. Need to check if the
+
+    // KLB NOTES: SETS position and velocity, and returns position. Need to check if the
     // stateful aspect is used. Or just replicate for now. 
 
 
@@ -249,10 +251,8 @@ namespace Isis {
     if(et == p_et) return p_coordinate;
     p_et = et;
 
-
     // Read from the cache
     if(p_source == Memcache) {
-
       SetEphemerisTimeMemcache(); // can replace these
     }
     else if(p_source == HermiteCache) {
@@ -1387,14 +1387,17 @@ namespace Isis {
     functionY.SetCoefficients(p_coefficients[1]);
     functionZ.SetCoefficients(p_coefficients[2]);
 
-    // Normalize the time
+    // Normalize the time -- why do we do this? Elsewhere we also have "scaled time" and "unscaled time" 
     double rtime;
     rtime = (p_et - p_baseTime) / p_timeScale;
 
     // Evaluate the polynomials at current et to get position;
-    p_coordinate[0] = functionX.Evaluate(rtime);
-    p_coordinate[1] = functionY.Evaluate(rtime);
-    p_coordinate[2] = functionZ.Evaluate(rtime);
+//    p_coordinate[0] = functionX.Evaluate(rtime);
+//    p_coordinate[1] = functionY.Evaluate(rtime);
+//    p_coordinate[2] = functionZ.Evaluate(rtime);
+
+    std::vector< std::vector<double> > tempCoeffs = {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
+    p_coordinate = ale::getPosition(tempCoeffs, rtime); // p_et makes more sense to me, but rtime must be used for tests to pass
 
     if(p_hasVelocity) {
 
@@ -1402,14 +1405,11 @@ namespace Isis {
         p_velocity = p_cacheVelocity[0];
       }
       else { 
+//        p_velocity = ale::getVelocity(tempCoeffs, rtime); // must use "unscaled time"? 
         p_velocity[0] = ComputeVelocityInTime(WRT_X);
         p_velocity[1] = ComputeVelocityInTime(WRT_Y);
         p_velocity[2] = ComputeVelocityInTime(WRT_Z);
       }
-        
-//         p_velocity[0] = functionX.DerivativeVar(rtime);
-//         p_velocity[1] = functionY.DerivativeVar(rtime);
-//         p_velocity[2] = functionZ.DerivativeVar(rtime);
     }
   }
 
