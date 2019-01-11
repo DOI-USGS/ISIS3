@@ -1,0 +1,104 @@
+#include "Isis.h"
+
+#include <fstream>
+#include <iostream>
+
+#include <QString>
+
+#include "Cube.h"
+#include "IException.h"
+#include "IString.h"
+#include "OriginalLabel.h"
+#include "ProcessBySample.h"
+#include "ProcessImportFits.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "UserInterface.h"
+
+using namespace std;
+using namespace Isis;
+
+void IsisMain() {
+
+  UserInterface &ui = Application::GetUserInterface();
+
+  ProcessImportFits importFits;
+
+
+  FileName from(ui.GetFileName("FROM"));
+  importFits.setFitsFile(from);
+
+  importFits.setProcessFileStructure(0);
+
+  Cube *output = importFits.SetOutputCube("TO");
+
+  QString target;
+  if(ui.WasEntered("TARGET")) {
+    target = ui.GetString("TARGET");
+  }
+
+  // Get the directory where the OSIRIS-REx translation tables are.
+  PvlGroup dataDir(Preference::Preferences().findGroup("DataDirectory"));
+  QString transDir = (QString) dataDir["OsirisRex"] + "/translations/";
+
+  // Temp storage of translated labels
+  Pvl outLabel;
+
+  // Get the FITS label
+  Pvl fitsLabel;
+  fitsLabel.addGroup(importFits.fitsImageLabel(0));
+
+    // Create an Archive group
+  FileName archTransFile(transDir + "tagcamsArchive_fit.trn");
+  PvlToPvlTranslationManager archXlater(fitsLabel, archTransFile.expanded());
+  archXlater.Auto(outLabel);
+  PvlGroup &archiveGrp(outLabel.findGroup("Archive", Pvl::Traverse));
+
+  // Add product id which is just the filename
+  QString prodid = from.baseName();
+  archiveGrp.addKeyword(PvlKeyword("ProductId", prodid), archiveGrp.begin());
+  output->putGroup(archiveGrp);
+
+  // Create an Instrument group
+  FileName insTransFile(transDir + "tagcamsInstrument_fit.trn");
+  PvlToPvlTranslationManager insXlater(fitsLabel, insTransFile.expanded());
+  insXlater.Auto(outLabel);
+  PvlGroup &instGrp(outLabel.findGroup("Instrument", Pvl::Traverse));
+
+  //  If the user specifed the target explicitly or it doesn't exist, create
+  //  something so the camera will always work
+  if(instGrp.findKeyword("TargetName").isNull() || (!target.isEmpty())) {
+    if(!target.isEmpty()) {
+      instGrp["TargetName"] = QString(target);
+    }
+    else {
+      instGrp["TargetName"] = QString("Sky");
+    }
+  }
+
+  output->putGroup(instGrp);
+
+
+  // Create a Band Bin group
+  FileName bandTransFile(transDir + "tagcamsBandBin_fit.trn");
+  PvlToPvlTranslationManager bandBinXlater(fitsLabel, bandTransFile.expanded());
+  bandBinXlater.Auto(outLabel);
+  output->putGroup(outLabel.findGroup("BandBin", Pvl::Traverse));
+
+  // Create a Kernels group
+  FileName kernelsTransFile(transDir + "tagcamsKernels_fit.trn");
+  PvlToPvlTranslationManager kernelsXlater(fitsLabel, kernelsTransFile.expanded());
+  kernelsXlater.Auto(outLabel);
+  output->putGroup(outLabel.findGroup("Kernels", Pvl::Traverse));
+
+  // Save the input FITS label in the Cube original labels
+  Pvl pvl;
+  pvl += importFits.fitsImageLabel(0);
+  OriginalLabel originals(pvl);
+  output->write(originals);
+
+  // Convert the image data
+  importFits.StartProcess();
+  importFits.Finalize();
+}

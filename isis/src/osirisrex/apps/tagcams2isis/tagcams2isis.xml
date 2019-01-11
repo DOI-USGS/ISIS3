@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="tagcams2isis" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
+    Import OSIRIS-REx TAGCAMS images into ISIS format
+  </brief>
+  <description>
+    <p>
+      This program will import FITS (Flexible Image Transport System) formatted files from the
+      OSIRIS-REx TAGCAMS instrument suite, NavCam, NFTCam and StowCam, into the ISIS format.
+    </p>
+  </description>
+
+  <history>
+    <change name="Kris Becker" date="2018-03-07">
+      Original version
+    </change>
+
+  </history>
+
+  <seeAlso>
+    <applications>
+      <item>fits2isis</item>
+    </applications>
+  </seeAlso>
+
+  <category>
+    <missionItem>OSIRIS-REx</missionItem>
+  </category>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          An OSIRIS-REx TAGCAMS FITS file to be converted to an ISIS cube
+        </brief>
+        <description>
+          Use this parameter to select the filename of an OSIRIS-REx tagcams
+          file to be converted to an ISIS cube. This is expected to be a
+          FITS formatted file.
+        </description>
+        <filter>
+          *.fits
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output ISIS cube file
+        </brief>
+        <description>
+          The output cube file that will contain the OSIRIS-REx TAGCAMS image in ISIS format.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Parameters">
+        <parameter name="TARGET">
+            <type>string</type>
+            <brief>Provide observation target if not in EDR</brief>
+            <description>
+                This parameter may be necessary as some FITS labels do not adequately defined
+                the TARGET keyword in the labels.  OSIRIS-REx takes a very long trip to 
+                finally arrive at Bennu orbit in 2018.  During cruise, several flybys occur.  The
+                proper specification of the TARGET is critical to valid instantiation of
+                ISIS camera models.  
+            </description>
+            <internalDefault>Label Value</internalDefault> 
+        </parameter>
+      </group>
+  </groups>
+
+</application>
