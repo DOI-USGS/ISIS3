@@ -1389,7 +1389,7 @@ namespace Isis {
 
     // Normalize the time -- why do we do this? Elsewhere we also have "scaled time" and "unscaled time" 
     double rtime;
-    rtime = (p_et - p_baseTime) / p_timeScale;
+    rtime = (p_et - p_baseTime) / p_timeScale; // this is the time that the polynomial is fit over
 
     // Evaluate the polynomials at current et to get position;
 //    p_coordinate[0] = functionX.Evaluate(rtime);

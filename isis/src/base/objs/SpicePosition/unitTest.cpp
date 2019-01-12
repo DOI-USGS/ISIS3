@@ -6,11 +6,26 @@
 #include "Preference.h"
 #include "SpicePosition.h"
 #include "Table.h"
+#include "/home/kberry/dev/ISIS3/ale/include/ale.h"
+#include <vector>
 
 using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
+  // before anything
+
+  cout << "test ale integration: " << endl;
+
+  vector<double> times = { -3, -2, -1,  0,  1,  2};
+  vector<vector<double>> data = {{ -3, -2, -1,  0,  1,  2},
+                                 {  9,  4,  1,  0,  1,  4},
+                                 {-27, -8, -1,  0,  1,  8}};
+
+  vector<double> coordinate = ale::getPosition(data, times, -1.5, ale::linear);
+
+  cout << coordinate[0] << endl; 
+
   Preference::Preferences(true);
 
   cout << setprecision(8);
