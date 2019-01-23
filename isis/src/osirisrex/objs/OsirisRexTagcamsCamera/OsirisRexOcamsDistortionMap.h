@@ -23,7 +23,10 @@
 #ifndef OsirisRexOcamsDistortionMap_h
 #define OsirisRexOcamsDistortionMap_h
 
+#include <QSharedPointer>
+
 #include "CameraDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
 
 namespace Isis {
   /** Distort/undistort focal plane coordinates for OSIRIS REx's cameras.
@@ -59,6 +62,10 @@ namespace Isis {
       double m_detectorOriginLine; //!< The origin of the detector's line coordinate.
       double m_distortionOriginSample; //!< The distortion's origin sample coordinate.
       double m_distortionOriginLine; //!< The distortion's origin line coordinate. 
+      double p_tolerance;            //!< Convergence tolerance
+      bool   p_debug;                //!< Debug the model
+
+      QSharedPointer<CameraFocalPlaneMap> m_focalMap;  // Local focal plane map
   };
 };
 #endif

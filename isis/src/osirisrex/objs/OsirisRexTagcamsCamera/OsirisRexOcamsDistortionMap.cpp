@@ -52,6 +52,19 @@ namespace Isis {
     m_detectorOriginSample = p_camera->FocalPlaneMap()->DetectorSampleOrigin();
     m_detectorOriginLine = p_camera->FocalPlaneMap()->DetectorLineOrigin();
     m_pixelPitch = p_camera->PixelPitch();
+    p_tolerance = 1.0E-6;
+    p_debug = false;
+
+    // Set up our own focal plane map from the camera model. NOTE!!!
+    // The CameraFocalPlaneMap must be set in the Camera object 
+    // prior to calling distortion model!!!
+    if ( !parent->FocalPlaneMap() ) {
+        QString mess = "FocalPlaneMap must be set in the Camera object prior to"
+                       " initiating this distortion model!";
+        throw IException(IException::Programmer, mess, _FILEINFO_);
+    }
+
+    m_focalMap.reset(new CameraFocalPlaneMap(*parent->FocalPlaneMap()));
   }
 
 
@@ -103,6 +116,12 @@ namespace Isis {
     odcenterkey = "INS" + toString(naifIkCode) + "_OD_CENTER";
     m_distortionOriginSample = p_camera->Spice::getDouble(odcenterkey, 0);
     m_distortionOriginLine =   p_camera->Spice::getDouble(odcenterkey, 1);
+
+    QString tolKey = "INS" + toString(naifIkCode) + "_TOLERANCE";
+    p_tolerance = p_camera->getDouble(tolKey, 0);
+
+    QString dbKey = "INS" + toString(naifIkCode) + "_DEBUG_MODEL";
+    p_debug       = toBool(p_camera->getString(dbKey, 0));
   }
 
 
@@ -119,8 +138,14 @@ namespace Isis {
    * @return if the conversion was successful
    */
   bool OsirisRexOcamsDistortionMap::SetFocalPlane(double dx, double dy) {
+    if ( p_debug )std::cout << "\nUndistorting at " << dx << ", " << dy << "\n";
     p_focalPlaneX = dx; 
     p_focalPlaneY = dy;
+
+    if ( p_debug ) {
+        std::cout << "Detector sample=" << p_camera->FocalPlaneMap()->DetectorSample() 
+                  << ", line=" << p_camera->FocalPlaneMap()->DetectorLine()<< "\n";
+    }
 
     // Only apply the distortion if we have the correct number of coefficients
     if (p_odk.size() < 2) {
@@ -131,6 +156,7 @@ namespace Isis {
 
     double x0 = (m_distortionOriginLine - m_detectorOriginSample) * m_pixelPitch; 
     double y0 = (m_distortionOriginSample - m_detectorOriginLine) * m_pixelPitch;
+    if ( p_debug ) std::cout << "x0=" << x0 << ", y0=" << y0 << "\n";
 
     double xt = dx;
     double yt = dy;
@@ -144,7 +170,7 @@ namespace Isis {
     xprevious = 1000000.0;
     yprevious = 1000000.0;
 
-    double tolerance = 0.000001;
+    double tolerance = p_tolerance;
 
     bool bConverged = false;
 
@@ -185,7 +211,16 @@ namespace Isis {
     if(bConverged) {
       p_undistortedFocalPlaneX = xdistorted;
       p_undistortedFocalPlaneY = ydistorted;
+      std::cout << "Converged ux=" << p_undistortedFocalPlaneX 
+                << ", uy=" << p_undistortedFocalPlaneY << "\n";
+      m_focalMap->SetFocalPlane(xdistorted, ydistorted);
+
+      if ( p_debug ) {
+          std::cout << "Detector sample=" << m_focalMap->DetectorSample() 
+                    << ", line=" << m_focalMap->DetectorLine()<< "\n";
+      }
     }
+    if ( p_debug ) std::cout << "We out!\n";
     return bConverged;
   }
 
@@ -206,8 +241,13 @@ namespace Isis {
    */
   bool OsirisRexOcamsDistortionMap::SetUndistortedFocalPlane(const double ux,
       const double uy) {
+    if ( p_debug ) std::cout << "\nDistorting at " << ux << ", " << uy << "\n";
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
+    if ( p_debug ) {
+        std::cout << "Detector sample=" << p_camera->FocalPlaneMap()->DetectorSample() 
+                  << ", line=" << p_camera->FocalPlaneMap()->DetectorLine()<< "\n";
+    }
 
     // Only apply the distortion if we have the correct number of coefficients.
     if (p_odk.size() < 2) {
@@ -238,6 +278,12 @@ namespace Isis {
 
     p_focalPlaneX = x + drOverR * (x-x0);
     p_focalPlaneY = y + drOverR * (y-y0); 
+    std::cout << "Final at " << p_focalPlaneX << ", " << p_focalPlaneY << "\n";
+    m_focalMap->SetFocalPlane(p_focalPlaneX, p_focalPlaneY);
+    if ( p_debug ) {
+        std::cout << "Detector sample=" << m_focalMap->DetectorSample() 
+                  << ", line=" << m_focalMap->DetectorLine()<< "\n";
+    }
     return true;
   }
 }
