@@ -34,7 +34,11 @@ namespace Isis {
    * @param cx X distortion center pixel location (pixels)
    * @param cy Y distortion center pixel location (pixels)
    * 
-   * @internal
+   * @internal 
+   * @history 2019-01-22 Kris Becker  Renamed model parameter names for 
+   *                       clarification of the OpenCV model
+   *                       documentation/description. Updated to add the k4-k6
+   *                       parameters.
    */
   OsirisRexTagcamsDistortionMap::OsirisRexTagcamsDistortionMap(Camera *parent,
                                                                int naifIkCode,
@@ -44,10 +48,10 @@ namespace Isis {
       // Define kernel keywords to fetch
     QString ikCode = toString(naifIkCode);
     QString odkKey = "INS" + ikCode + "_OPENCV_OD_K";
-    QString ppKey  = "INS" + ikCode + "_OPENCV_TANGENTIAL";
-    QString aoKey  = "INS" + ikCode + "_OPENCV_AXIS_ORIGIN";
-    QString flKey  = "INS" + ikCode + "_OPENCV_FOCAL_LENGTH";
-    QString tdKey  = "INS" + ikCode + "_OPENCV_TEMPERATURE_D";
+    QString ppKey  = "INS" + ikCode + "_OPENCV_OD_P";
+    QString flKey  = "INS" + ikCode + "_OPENCV_OD_F";
+    QString aoKey  = "INS" + ikCode + "_OPENCV_OD_C";
+    QString tdKey  = "INS" + ikCode + "_OPENCV_OD_A";
     QString tolKey = "INS" + ikCode + "_TOLERANCE";
     QString dbKey = "INS" + ikCode + "_DEBUG_MODEL";
 
@@ -55,6 +59,9 @@ namespace Isis {
     p_k1 = parent->getDouble(odkKey, 0);
     p_k2 = parent->getDouble(odkKey, 1);
     p_k3 = parent->getDouble(odkKey, 2);
+    p_k4 = parent->getDouble(odkKey, 3);
+    p_k5 = parent->getDouble(odkKey, 4);
+    p_k6 = parent->getDouble(odkKey, 5);
     p_p1 = parent->getDouble(ppKey, 0);
     p_p2 = parent->getDouble(ppKey, 1);
     p_fx = parent->getDouble(flKey, 0);
@@ -425,7 +432,8 @@ namespace Isis {
     double r6 = r2 * r4;
 
     //  dr is the radial distortion contribution
-    double dr = 1 + (p_k1 * r2) + (p_k2 * r4) + (p_k3 * r6);
+    double dr = ( 1.0 + (p_k1 * r2) + (p_k2 * r4) + (p_k3 * r6) ) /
+                ( 1.0 + (p_k4 * r2) + (p_k5 * r4) + (p_k6 * r6) );
 
     // Tangential contributions
     double dt_x = ( 2.0 * p_p1 * xp * yp ) + ( ( p_p2 * r2 ) + ( p_p2 * 2.0 * xp * xp ) );

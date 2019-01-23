@@ -67,7 +67,10 @@ namespace Isis {
        * @param parent Pointer to parent Camera object
        * @param k1 First coefficient of radial distortion
        * @param k2 Second coefficient of radial distortion
-       * @param k3 Third coefficient of radial distortion
+       * @param k3 Third coefficient of radial distortio 
+       * @param k4 Forth coefficient of radial distortion
+       * @param k5 Fifth coefficient of radial distortion
+       * @param k6 Sixth coefficient of radial distortion
        * @param p1 x tangential distortion component
        * @param p2 y tangential distortion compomen 
        * @param fx x focal length
@@ -147,6 +150,9 @@ namespace Isis {
       double p_k1;       //!< First coefficient of radial distortion.
       double p_k2;       //!< Second coefficient of radial distortion.
       double p_k3;       //!< Third coefficient of radial distortion.
+      double p_k4;       //!< Fourth coefficient of radial distortion.
+      double p_k5;       //!< Fifth coefficient of radial distortion.
+      double p_k6;       //!< Sixth coefficient of radial distortion.//!
       double p_p1;       //!< Tangential x-coordinate.
       double p_p2;       //!< Tangential y-coordinate.
       double p_fx;       //!< X focal plane length
