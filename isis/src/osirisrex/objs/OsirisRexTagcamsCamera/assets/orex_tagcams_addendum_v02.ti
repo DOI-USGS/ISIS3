@@ -1,0 +1,114 @@
+\begintext
+
+  This kernel is used by the ISIS software to supply required keywords for
+  the ISIS camera models. This kernel is furnished to the NAIF SPICE pool as 
+  one of the very last kernels. This allows it to overide keywords from other
+  kernels.
+
+  History:
+  v01:
+  2018-12-09 Kris Becker - Original version. Transformations from line/samp
+
+  v02:
+  2019-01-09 Kris Becker - Updated with new boresights, minor adjustments
+                           to focal lengths from distortion model. Added
+			   tangential distortion model.
+-------------------------------------------------------------------------------
+The coefficients below are for transforming focal plane X,Y (mm) to/from Line,
+Sample. The numbers are from the CCD pixel pitch.
+
+The following TRANS values are for ISIS cubes assuming no distortion
+First pixel in the input file is line 1 sample 1, second pixel in the input file
+is line 1 sample 2.
+
+There are three different distortion models to choose from for the TAGCAMS
+camera model:
+
+OCAMS - This one is based upon the OCAMS model but requires the OPENCV
+        parameters to be transformed into compatible parameters. Currentlty,
+	only the NFTCam camera has had this done.
+
+OPENCV - A direct implementation of the OPENCV stereo model as produced by
+         the stereo calibration OPENCV routines. This is a 10 parameter model
+	 but is limited to 7 since the focal length is provided in the API (and
+	 doesn't support focal lenghts for each axis) and the temperature
+	 dependent focal lengh is part of the camera model.
+
+NONE   - No distortion is applied.
+
+\begintext
+
+NAVCam (NCM) data
+---------------------------------------------
+
+\begindata
+
+INS-64081_TRANSY  = (0.0, 0.0, -0.00220)
+INS-64081_TRANSX  = (0.0, 0.00220, 0.0)
+INS-64081_ITRANSL = (0.0, 0.0, -454.5454545454)
+INS-64081_ITRANSS = (0.0, 454.5454545454, 0.0)
+
+INS-64081_FOCAL_LENGTH = 0.0076412391
+INS-64081_PIXEL_SIZE   = 2.2
+INS-64081_BORESIGHT   = ( 1439.5, 1025.5 )
+
+INS-64081_DISTORTION_MODEL = 'NONE'
+
+INS-64081_OD_CENTER  = (1275.9, 952.4 )
+INS-64081_OD_K = ( 0.0073, -0.0112,  0.0135, 0.0, 0.0 )
+
+INS-64081_OPENCV_AXIS_ORIGIN  = ( 1269.083, 950.746 )
+INS-64081_OPENCV_TANGENTIAL   = ( -2.416E-4, 9.101E-4 )
+INS-64081_OPENCV_OD_K          = ( -0.5378, 0.3760, -0.1833 )
+
+
+
+\begintext
+
+NAVCam2 (NFT) data
+---------------------------------------------
+
+\begindata
+
+INS-64082_TRANSX  = (0.0, 0.0, -0.00220)
+INS-64082_TRANSY  = (0.0, 0.00220, 0.0)
+INS-64082_ITRANSS = (0.0, 0.0, -454.5454545454)
+INS-64082_ITRANSL = (0.0, 454.5454545454, 0.0)
+
+INS-64082_FOCAL_LENGTH = 0.0076175462
+INS-64082_PIXEL_SIZE   = 2.2
+INS-64082_BORESIGHT   = ( 1440.5,  1026.5 )
+
+INS-64082_DISTORTION_MODEL = 'NONE'
+
+INS-64081_OD_CENTER  = (1295.5, 971.5 )
+INS-64081_OD_K = ( 0.0, 0.0, 0.0, 0.0, 0.0 )
+
+
+INS-64082_OPENCV_AXIS_ORIGIN   = ( 1310.530,  969.487)
+INS-64082_OPENCV_PP       = ( 6.387E4, -1.251E-4 )
+INS-64082_OPENCV_OD_K     = ( -0.5384, 0.3823, -0.2038 )
+
+\begintext
+
+StowCam (STO) data
+
+No information for the camera distortion model
+---------------------------------------------
+
+\begindata
+
+INS-64071_TRANSX  = (0.0, 0.0, -0.00220)
+INS-64071_TRANSY  = (0.0, 0.00220, 0.0)
+INS-64071_ITRANSS = (0.0, 0.0, -454.5454545454)
+INS-64071_ITRANSL = (0.0, 454.5454545454, 0.0)
+
+INS-64071_FOCAL_LENGTH = 0.00778
+INS-64071_PIXEL_SIZE   = 2.2
+INS-64071_BORESIGHT   = (1296.5,  972.5 )
+
+INS-64071_DISTORTION_MODEL = 'NONE'
+INS-64071_OPENCV_AXIS_ORIGIN  = ( 1296.5,  972.5 )
+INS-64071_OPENCV_PP       = ( 0.0, 0.0 )
+INS-64071_OPENCV_OD_K     = ( 0.0, 0.0, 0.0 )
+\begintext
