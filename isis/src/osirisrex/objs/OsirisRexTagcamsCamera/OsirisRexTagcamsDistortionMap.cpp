@@ -331,10 +331,6 @@ namespace Isis {
                                                          double *xpp, 
                                                          double *ypp) const {
 
-    // For normalizing the focal plane coordinates
-    double pixel_pitch  = p_camera->PixelPitch();
-    double focal_length = p_camera->FocalLength();
-
     // Get the current undistorted pixel coordinate
     m_focalMap->SetFocalPlane(ux, uy);
     *u = m_focalMap->DetectorSample();

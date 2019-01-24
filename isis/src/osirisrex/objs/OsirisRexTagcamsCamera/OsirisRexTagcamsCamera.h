@@ -36,6 +36,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2018-03-09 Kris Becker UA Original Version
+   *   @history 2019-01-24 Kris Becker - Removed unused variables to suppress
+   *                         warnings
    *
    */
   class OsirisRexTagcamsCamera : public FramingCamera {

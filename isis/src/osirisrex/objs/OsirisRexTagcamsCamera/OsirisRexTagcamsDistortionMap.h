@@ -56,7 +56,9 @@ namespace Isis {
    *  
    * @author 2019-01-08 Kris Becker
    * 
-   * @internal
+   * @internal 
+   *   @history 2019-01-24 Kris Becker - Removed unused variables to suppress
+   *                         warnings
    */
   class OsirisRexTagcamsDistortionMap : public CameraDistortionMap {
     public:

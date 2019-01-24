@@ -147,7 +147,7 @@ namespace Isis {
         dmap->SetDistortion(frameCode);
     } 
     else {
-        CameraDistortionMap *dMap = new CameraDistortionMap(this); 
+        new CameraDistortionMap(this); 
     }
 
     // Setup the ground and sky map
