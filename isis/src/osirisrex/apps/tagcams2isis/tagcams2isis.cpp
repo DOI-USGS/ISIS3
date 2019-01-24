@@ -11,7 +11,7 @@
 #include "Cube.h"
 #include "IException.h"
 #include "IString.h"
-#include "ITime.h"
+#include "iTime.h"
 #include "OriginalLabel.h"
 #include "ProcessBySample.h"
 #include "ProcessImportFits.h"
