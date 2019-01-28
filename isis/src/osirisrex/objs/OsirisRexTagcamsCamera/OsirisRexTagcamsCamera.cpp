@@ -28,7 +28,7 @@
 #include "OsirisRexTagcamsDistortionMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "CameraGroundMap.h"
+#include "IrregularBodyCameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "IString.h"
 #include "iTime.h"
@@ -42,7 +42,7 @@ namespace Isis {
    * Constructs an OSIRIS-REx Camera Model using the image labels. This model 
    * supportsNavigation cameras: NavCam, NFTCam, and StowCam 
    *  
-   * @param lab Pvl label from an Osiris Rex MapCam image. 
+   * @param lab Pvl label from an Osiris Rex TAGCAMS image. 
    */
   OsirisRexTagcamsCamera::OsirisRexTagcamsCamera(Cube &cube) : FramingCamera(cube) {
 
@@ -58,7 +58,7 @@ namespace Isis {
 
     if (frameCode == -64081) {
       m_instrumentNameLong = "Primary Optical Navigation (NCM) Camera";
-      m_instrumentNameShort = "NavCam";
+      m_instrumentNameShort = "NAVCam";
     }
     else if (frameCode == -64082) {
       m_instrumentNameLong = "Natural Feature Tracking (NFT) Camera";
@@ -123,11 +123,10 @@ namespace Isis {
     // Setup focal plane map using the general IK code for the given camera
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, frameCode);
 
-    // Set the boresight
-    double sampBsight = getDouble("INS" + ikCode + "_BORESIGHT", 0) + 1.0;
-    double lineBsight = getDouble("INS" + ikCode + "_BORESIGHT", 1) + 1.0;
+    // Set the center of the ccd (1-based pixel coordinates)
+    double sampBsight = getDouble("INS" + ikCode + "_CCD_CENTER", 0) + 1;
+    double lineBsight = getDouble("INS" + ikCode + "_CCD_CENTER", 1) + 1;
     focalMap->SetDetectorOrigin(sampBsight, lineBsight);
-
 
     // Setup distortion map
     // See what type of distortion model the IAK is configured to use
@@ -151,7 +150,7 @@ namespace Isis {
     }
 
     // Setup the ground and sky map
-    new CameraGroundMap(this);
+    new IrregularBodyCameraGroundMap(this);
     new CameraSkyMap(this);
 
     setTime(centerTime);
@@ -160,7 +159,7 @@ namespace Isis {
   }
 
 
-  //! Destroys the MapCamera object.
+  //! Destroys the TAGCAMS object.
   OsirisRexTagcamsCamera::~OsirisRexTagcamsCamera() {
   }
 

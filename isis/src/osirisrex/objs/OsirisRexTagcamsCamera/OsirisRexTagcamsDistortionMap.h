@@ -52,13 +52,17 @@ namespace Isis {
    *  
    * Other parameters that can be adjusted in the kernel are the convergence 
    * tolerance limit and invoking debugging output to help evaluate behavior. See 
-   * $ISIS3DATA/osirisrex/kernels/iak/orex_tagcams_addendum_v02.ti. 
+   * $ISIS3DATA/osirisrex/kernels/iak/orex_tagcams_addendum_v05.ti. 
    *  
    * @author 2019-01-08 Kris Becker
    * 
    * @internal 
    *   @history 2019-01-24 Kris Becker - Removed unused variables to suppress
    *                         warnings
+   *   @history 2019-01-28 Kris Becker - Cleaned up implementation: handle
+   *                         option/pointing boresight offsets from center of
+   *                         CCD; renamed conversion methods to more meaningful
+   *                         names.
    */
   class OsirisRexTagcamsDistortionMap : public CameraDistortionMap {
     public:
@@ -111,7 +115,7 @@ namespace Isis {
        *
        * @return whether the conversion was successful
        */
-      bool SetFocalPlane(const double dx, const double dy);
+      virtual bool SetFocalPlane(const double dx, const double dy);
       
       
       /**
@@ -126,35 +130,35 @@ namespace Isis {
        *
        * @return whether the conversion was successful
        */
-      bool SetUndistortedFocalPlane(const double ux, const double uy);
+      virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
 
     protected:
-        void normalize_detector_point(const double dx, const double dy,
+        void image_to_distortion_frame(const double dx, const double dy,
+                                       double *u, double *v,
+                                       double *xpp, double *ypp) const;
+        void distortion_to_pointing_frame(const double xp, const double yp,
+                                          double *x, double *y,
+                                          double *ux, double *uy) const;
+
+        void pointing_to_distortion_frame(const double ux, const double uy,
                                       double *x, double *y,
                                       double *xp, double *yp) const;
-        void scale_model_point(const double xpp, const double ypp,
-                               double *u, double *v,
-                               double *dx, double *dy) const;
-        void invert_model_point(const double ux, const double uy,
-                               double *u, double *v,
-                               double *xpp, double *ypp) const;
-        void model_to_isis(const double xp, const double yp,
-                           double *x, double *y,
-                           double *dx, double *dy) const;
+        void distortion_to_image_frame(const double xpp, const double ypp,
+                                       double *u, double *v,
+                                       double *dx, double *dy) const;
 
-        void apply_model(const double xp, const double yp,
-                         double *xpp, double *ypp) const;
+        void apply_distortion(const double xp, const double yp,
+                              double *xpp, double *ypp) const;
 
       
     private:  
       // parameters below are from camera calibration report
-
       double p_k1;       //!< First coefficient of radial distortion.
       double p_k2;       //!< Second coefficient of radial distortion.
       double p_k3;       //!< Third coefficient of radial distortion.
       double p_k4;       //!< Fourth coefficient of radial distortion.
       double p_k5;       //!< Fifth coefficient of radial distortion.
-      double p_k6;       //!< Sixth coefficient of radial distortion.//!
+      double p_k6;       //!< Sixth coefficient of radial distortion.
       double p_p1;       //!< Tangential x-coordinate.
       double p_p2;       //!< Tangential y-coordinate.
       double p_fx;       //!< X focal plane length
@@ -165,6 +169,9 @@ namespace Isis {
       double p_camTemp;  //!< Camera head temperature
       double p_tolerance; //!< Convergence tolerance
       bool   p_debug;     //!< Debug the model
+
+      double p_xoffset;   //!< Difference in CCD center X coordinate and boresight
+      double p_yoffset;   //!< Difference in CCD center Y coordinate and boresight
 
       QSharedPointer<CameraFocalPlaneMap> m_focalMap;  // Local focal plane map
 
