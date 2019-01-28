@@ -54,6 +54,9 @@ namespace Isis {
    * tolerance limit and invoking debugging output to help evaluate behavior. See 
    * $ISIS3DATA/osirisrex/kernels/iak/orex_tagcams_addendum_v05.ti. 
    *  
+   * Reference Document 
+   *   OIA_ORX_112_Distortion_Boresight_Memo.pdf (August 9, 2018) 
+   *  
    * @author 2019-01-08 Kris Becker
    * 
    * @internal 
