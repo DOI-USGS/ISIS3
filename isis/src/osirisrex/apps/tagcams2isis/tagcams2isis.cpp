@@ -43,6 +43,7 @@ void IsisMain() {
   // Collect some raw label values. If these fail, then its likely
   // this is not a TAGCAMS image
   int rawSamples, rawLines, summing, binning, rawcamT, tcmode;
+  QString instId;
   try {
     rawSamples = (int)flabel.findKeyword("NAXIS1", Pvl::Traverse);
     rawLines = (int) flabel.findKeyword("NAXIS2", Pvl::Traverse);
@@ -50,6 +51,7 @@ void IsisMain() {
     binning   = (int) flabel.findKeyword("TCSSMPL", Pvl::Traverse);
     rawcamT  = (int) flabel.findKeyword("TCCHTEMP", Pvl::Traverse);
     tcmode  = (int) flabel.findKeyword("TCMODE", Pvl::Traverse);
+    instId  = ((QString) flabel.findKeyword("INSTRUME", Pvl::Traverse)).simplified();
   } 
   catch (IException &ie) {
     QString msg = QObject::tr("Unable to retrieve expected TAGCAMS keywords."
@@ -155,8 +157,14 @@ void IsisMain() {
     }
   }
 
-  // Convert raw temp DN to celcius - from UA-SIS-9.4.4-322, Rev. 3.0
-  double camHeadTempC = 0.15259 * ((double) rawcamT) + (-273.14);
+  // Convert raw temp DN to celsius - from UA-SIS-9.4.4-322, Rev. 3.0
+  // Updated b values provided by NAV team.
+  double a = 0.15259;
+  double b = -273.14;
+  if ( "NCM" == instId ) b = -275.02;
+  if ( "NFT" == instId ) b = -273.43;
+
+  double camHeadTempC = a * ((double)rawcamT) + b;
   instGrp.addKeyword(PvlKeyword("CameraHeadTemperature", toString(camHeadTempC), "celsius"));
   output->putGroup(instGrp);
 

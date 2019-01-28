@@ -74,6 +74,10 @@
       are present in the input (raw L0) image. Compute inital camera head
       temperature for use in camera model. Add SourceProductId keyword.
     </change>
+    <change name="Kris Becker" date="2019-01-25">
+      Updated parameters for conversion of raw camera head temperature from
+      DNs to degrees Celsius as provided by NAV team.
+    </change>
   </history>
 
   <seeAlso>
