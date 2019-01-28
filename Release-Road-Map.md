@@ -31,6 +31,3 @@ As described above, we will release on a three month cadence. Releases will be l
 | 3.10.x | Release | 1.31.20 |
 | 3.11.0_RC | Release Candidate | 4.1.20 |
 | 3.11.x | Release | 4.30.20 |
-
-### Download Locations for Dev. and Beta Builds
-We are currently working to deploy continuous integration / continuous deploy (CI/CD) capabilities. Once these are deployed, we will provide download links for nightly and beta builds using our Anaconda.org account for `conda` installation.
