@@ -10,7 +10,7 @@
 This RFC is seeking feedback on proposed changes to how builds of ISIS are made available to internal Astrogeology Science Center (ASC) users. Starting with 3.7.0, the following changes are proposed:
 
 1. New versions of ISIS will be made internally available as environments on a global Anaconda install.
-1. New versions of ISIS will not be available in the `/usgs/pkgs` directory. Old versions will remain here.
+1. New versions of ISIS will **not** be available in the `/usgs/pkgs` directory. Old versions will remain here.
 1. Nightly builds will continue for automated testing purposes but they will **not** be supported for internal users.
 1. Weekly beta builds will stop.
 1. Once a bug fix is made, the bug fix will be released publicly according to [RF2](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process) and then an internal build will be made available according to #1.
