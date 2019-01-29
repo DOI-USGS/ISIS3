@@ -94,15 +94,15 @@ Because of how Anaconda works, there will be some number of additional executabl
 ## Sticking with the current system
 If we continue with the current system we will be distancing our internal users from external users. This can make accurate bug reporting and diagnosis challenging. Additionally, as we produce more internal builds we will have to manage an increasing number of environments to support them and will need another system to manage this relationship. We may as well have Anaconda manage that for us. There is also a greater possibility of an environment being changed and a build being accidentally impacted.
 
-## Letting everyone manage their own Anaconda environments and install the versions of ISIS they need.
-
-  - What other designs have been considered and what is the rationale for not choosing them?
-  - What is the impact of not doing this?
+## Having users manage their own Anaconda environments and install the versions of ISIS they need.
+This would create a large number of installs across our network file system. Even with just the developers having their own Anaconda install, we saw significant impacts on the backup times for the entire building. It is also more convenient for internal users to already have the versions staged and ready to go. This way, they can move to any version of ISIS they need without having to re-download it.
 
 # Unresolved Questions
-  - What parts of the design will be merged through the RFC process prior to merging?
-  - What parts of the RFC are expected to be addressed through implementation before stabilization?
-  - What related issues are out of scope for this RFC, but could be addressed in future RFCs?
+## Additional User Input
+This has been actively discussed within the ASC development team, but not with most of our internal users. There are potentially better options and drawbacks that internal users are aware of. More input from the end-users of this system is needed prior to roll out.
+
+## Custom Builds
+This will reduce the number of custom builds but won't eliminate all of them. Specifically for testing bug fixes and issues, there will still need to be custom builds shared between developers and internal users/testers. This RFC does not attempt to make the process simpler, but it does not make it more complex.
 
 # Future Possibilities
   - What future extensions could be made from this RFC?
