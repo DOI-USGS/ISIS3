@@ -10,7 +10,7 @@
 This RFC describes a release process and timetable for the ISIS3 code base covering scheduled releases, bug fix releases, and versioning. The goal of this RFC is to provide a standard set of expectations for all contributors and end-users. This RFC *does not* address the way in which ASC personnel `set isis' within the ASC system.
 
 # Motivation
-The ISIS3 release schedule and processes are not well codified in a way that contributors and consumers can make decisions with well defined bug fix, code freeze, and code release timelines. This causes friction within the development team and for external consumers of the code base (both API consumers and users). Additionally, we have identified a misalignment in expectations with respect to the ISIS3 'nightly' and 'beta' releases. This RFC seeks to provide mechanisms to align expectations regarding the creation of nightly builds and the generation of beta releases.
+The ISIS3 release schedule and processes are not well codified in a way that contributors and consumers can make decisions with well defined bug fix, code freeze, and code release timelines. This causes friction within the development team and for external consumers of the code base (both API consumers and users). Additionally, we have identified a misalignment in expectations with respect to when and how bug fixes and feature changes will be made available. This RFC seeks to provide mechanisms to align expectations regarding the availability of such changes.
 
 # Proposed Solution / Explanation
 Explain the proposal as if it were already included in the code base or in place. This may mean:
