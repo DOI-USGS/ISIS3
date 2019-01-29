@@ -34,7 +34,8 @@ In order to further isolate internal users from the volatile development environ
 Previously users would look in the `/usgs/pkgs` directory for the version of ISIS they would to use.
 ```
 ls /usgs/pkgs/
-
+```
+```
 isis3
 isis3.5.0
 isis3.5.1
@@ -46,7 +47,8 @@ isis3.6.1
 Under the proposed system, users would be able see all of the versions of ISIS available through Anaconda.
 ```
 conda info --envs
-
+```
+```
 base                  *  /work/users/jmapel/anaconda3
 csm_tests                /work/users/jmapel/anaconda3/envs/csm_tests
 jupyter                  /work/users/jmapel/anaconda3/envs/jupyter
