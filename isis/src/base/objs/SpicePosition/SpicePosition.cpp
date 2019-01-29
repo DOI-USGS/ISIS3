@@ -246,7 +246,6 @@ namespace Isis {
     // KLB NOTES: SETS position and velocity, and returns position. Need to check if the
     // stateful aspect is used. Or just replicate for now. 
 
-
     // Save the time
     if(et == p_et) return p_coordinate;
     p_et = et;
@@ -1375,37 +1374,40 @@ namespace Isis {
    * @see SetEphemerisTime()
    * @internal
    *   @history 2011-01-05 Debbie A. Cook - Original version
+   *   @history 2018 - temporary update to demonstrate use of ale in one function - Kristin Berry
    */
   void SpicePosition::SetEphemerisTimePolyFunction() {
-    // Create the empty functions
-    Isis::PolynomialUnivariate functionX(p_degree);
-    Isis::PolynomialUnivariate functionY(p_degree);
-    Isis::PolynomialUnivariate functionZ(p_degree);
-
-    // Load the coefficients to define the functions
-    functionX.SetCoefficients(p_coefficients[0]);
-    functionY.SetCoefficients(p_coefficients[1]);
-    functionZ.SetCoefficients(p_coefficients[2]);
-
     // Normalize the time -- why do we do this? Elsewhere we also have "scaled time" and "unscaled time" 
     double rtime;
     rtime = (p_et - p_baseTime) / p_timeScale; // this is the time that the polynomial is fit over
 
-    // Evaluate the polynomials at current et to get position;
-//    p_coordinate[0] = functionX.Evaluate(rtime);
-//    p_coordinate[1] = functionY.Evaluate(rtime);
-//    p_coordinate[2] = functionZ.Evaluate(rtime);
+    std::vector< std::vector<double> > positionCoeffs = 
+      {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
 
-    std::vector< std::vector<double> > tempCoeffs = {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
-    p_coordinate = ale::getPosition(tempCoeffs, rtime); // p_et makes more sense to me, but rtime must be used for tests to pass
+    // Evaluate the polynomials at current et to get position;
+    p_coordinate = ale::getPosition(positionCoeffs, rtime); // p_et makes more sense to me, but rtime must be used for tests to pass
 
     if(p_hasVelocity) {
-
       if( p_degree == 0) {
         p_velocity = p_cacheVelocity[0];
       }
-      else { 
-//        p_velocity = ale::getVelocity(tempCoeffs, rtime); // must use "unscaled time"? 
+      else {
+        std::cout << "Before: " << p_coefficients[0][0] << std::endl; 
+        std::vector< std::vector<double> > velocityCoefficients; 
+        for (unsigned int i=0; i < p_coefficients[0].size(); i++) {
+          std::cout << "wow";
+         //velocityCoefficients[0].push_back((i+1) * p_coefficients[0][i]/pow(p_timeScale, i+1));
+        }/*
+        for (unsigned int i=0; i < p_coefficients[1].size(); i++) {
+          velocityCoefficients[1].push_back((i+1) * p_coefficients[1][i]/pow(p_timeScale, i+1));
+        }
+        for (unsigned int i=0; i < p_coefficients[2].size(); i++) {
+          velocityCoefficients[2].push_back((i+1) * p_coefficients[2][i]/pow(p_timeScale, i+1));
+        }*/
+        std::cout << "After: " << p_coefficients[0][0] << std::endl; 
+//       std::vector< std::vector<double> > velocityCoeffs = 
+  //       {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
+       // p_velocity = ale::getVelocity(velocityCoeffs, p_et - p_timeScale); // must use "unscaled time"? 
         p_velocity[0] = ComputeVelocityInTime(WRT_X);
         p_velocity[1] = ComputeVelocityInTime(WRT_Y);
         p_velocity[2] = ComputeVelocityInTime(WRT_Z);
