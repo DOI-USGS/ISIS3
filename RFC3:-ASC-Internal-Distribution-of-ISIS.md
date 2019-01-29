@@ -28,7 +28,7 @@ Anaconda inherently provides a solution to the first two problems. We should sta
 
 In order to further isolate internal users from the volatile development environment, we should no longer nightly builds as "use at your own risk" for internal users. They need to continue to support nightly automated testing, but they should not be "used" to do any work. Similarly, weekly beta builds should be discontinued. They are inherently tied to the development environment because they are created outside of the release build environments. If an internal user needs a feature before it is publicly available they should work with the development team to get a custom build. It should be explicitly stated how long that custom build will be used for and what features are required. The development team, should be responsive to user requests for custom builds and provide them in a reasonable time frame.
 
-## How Would Things Change for Internal Users
+## What Changes for Internal Users
 
 ### Findings a specific version of ISIS
 Previously users would look in the `/usgs/pkgs` directory for the version of ISIS they would to use.
@@ -59,11 +59,43 @@ isis3.7.2                /usgs/cpkgs/anaconda3_linux/envs/isis3.7.2
 isis3.8.0                /usgs/cpkgs/anaconda3_linux/envs/isis3.8.0
 ```
 
+### Using a specific version of ISIS
+Previously users would set an alias in their cshrc/bashrc/bash_profile defining `setisis`. Then, users can use `setisis` to use different versions of ISIS.
+
+```
+setisis isis3.6.1
+```
+```
+ ISIS3 Setup In: /usgs/pkgs/isis3.6.1/install - Successful
+```
+
+Under the proposed system, users would activate the Anaconda environment of the version they want.
+```
+source activate isis3.6.1
+```
+
+### Version of ISIS prior to 3.7.0
+For versions prior to 3.7.0, nothing changes. They will remain in `/usgs/pkgs` and used via `setisis`.
+
 # Drawbacks
-Why should we *not* do this?
+## Moving from Unix tools to Anaconda
+The Unix tools that we use for managing different versions of ISIS are well documented, tested, and already known by the majority of internal users. Anaconda is a comparatively new tool that the majority of our users are not familiar with. Additional effort will be needed to train everyone on how to use Anaconda and provide support during/after roll out.
+
+## Managing a building-wide Anaconda installation
+Anaconda can support multiple user, multiple machine installations, but it requires careful management of permissions and conda config files. We already have experience managing a shared installation for development, but there will undoubtedly be some amount of bumps managing an installation for the entire building. Personal installations of Anaconda will not conflict with the building-wide installation.
+
+## Using ISIS in other Anaconda environments
+If an internal user wants to use ISIS in their own custom Anaconda environment, they will need to install ISIS into their own Anaconda environment. Simply adding the shared environment `bin` directory to their path could cause issues with Anaconda.
+
+## The anaconda environments will contain more than just ISIS
+Because of how Anaconda works, there will be some number of additional executables in the environment. The vast majority of these are not important, but Python is included. This will make using ISIS with python 2 more challenging.
 
 # Alternatives
-  - Why is this design or solution the best of all possible solutions?
+## Sticking with the current system
+If we continue with the current system we will be distancing our internal users from external users. This can make accurate bug reporting and diagnosis challenging. Additionally, as we produce more internal builds we will have to manage an increasing number of environments to support them and will need another system to manage this relationship. We may as well have Anaconda manage that for us. There is also a greater possibility of an environment being changed and a build being accidentally impacted.
+
+## Letting everyone manage their own Anaconda environments and install the versions of ISIS they need.
+
   - What other designs have been considered and what is the rationale for not choosing them?
   - What is the impact of not doing this?
 
