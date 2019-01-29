@@ -7,4 +7,5 @@
 # RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
   * [RFC1](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery)
+  * [RFC2](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process)
 # Planning & Design 
