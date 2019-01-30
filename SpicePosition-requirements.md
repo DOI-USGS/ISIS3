@@ -35,7 +35,7 @@ For large push broom images, a data point for every line can be a huge amount of
 * ReloadCache()
 * Memcache2HermiteCache(double tolerance)
 
-# Write and Read Polynomial or Cached Data From/To a Cube
+# Write/Read Polynomial or Cached Data From/To a Cube
 Currently this is done via an ISIS Table object, but it could be a generic BLOB.
 ## Relevant public methods
 * LoadCache(Table &table)
