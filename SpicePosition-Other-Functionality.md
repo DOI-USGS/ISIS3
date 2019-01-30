@@ -5,9 +5,9 @@ This is the companion to the core SpicePosition requirements [document](https://
 
 ## Time Bias
 * SetTimeBias(double timeBias)
-** Used by `MocNarrowAngleCamera` and `MocWideAngleCamera`
+    * Used by `MocNarrowAngleCamera` and `MocWideAngleCamera`
 * GetTimeBias() const
-** Only used within `SpicePosition`! 
+    * Only used within `SpicePosition`! 
 
 ## LightTime and Aberration Correction
 * SetAberrationCorrection(const QString &correction)
