@@ -7,7 +7,7 @@ This is the core functionality of SpicePosition. It is a part of the stateful IS
 ## Data sources
 SpicePosition needs to be able to use several different data sources.
 
-### SPIKE Kernels
+### SPICE Kernels
 SpicePosition is the part of ISIS that reads from SPKs. 99% of the time this only happens during spiceinit because it is immediately cached and saved to the cube file.
 
 ### Position and Velocity Cache
