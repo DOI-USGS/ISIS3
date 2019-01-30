@@ -1,7 +1,7 @@
-# What is this?
-This document outlines the critical components of the SpicePosition class.
+# What is this document?
+This document outlines the critical components of the SpicePosition class. This will help guide our refactor efforts by defining the limitations imposed by the rest of the ISIS code base.
 
-# Computing position and velocity
+# Compute Position and Velocity
 This is the core functionality of SpicePosition. It is a part of the stateful ISIS camera model so when the position and velocity are computed at a time, all three are stored internally. Then, there are three accessors for the stored values.
 
 ## Data sources
