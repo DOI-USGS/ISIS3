@@ -30,9 +30,6 @@ void hyb2onc2isis(UserInterface &ui) {
 
   QString fitsFileName = FileName(ui.GetFileName("FROM")).expanded();  
 
-
-
-
   QString outputCubeFileName = FileName(ui.GetFileName("TO")).expanded();
 
 
@@ -41,25 +38,26 @@ void hyb2onc2isis(UserInterface &ui) {
     target = ui.GetString("TARGET");
   }
 
-  // Create a PVL to store the translated labels in
-  hyb2onc2isis(fitsFileName,outputCubeFileName,target);
+  CubeAttributeOutput &att =
+    ui.GetOutputAttribute("TO");
 
+
+
+  // Create a PVL to store the translated labels in
+  hyb2onc2isis(fitsFileName,outputCubeFileName,att,target);
 
   return;
 
   }
 
 
-Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName,QString target) {
+Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttributeOutput att, QString target) {
 
   ProcessImportFits importFits;
   importFits.setFitsFile(FileName(fitsFileName));
   importFits.setProcessFileStructure(0);
   bool updatedKeywords = true;
   bool distortionCorrection = true;
-
-  CubeAttributeOutput &att =
-    Application::GetUserInterface().GetOutputAttribute("TO");
 
   Cube *outputCube = importFits.SetOutputCube(outputCubeFileName,att);
 
@@ -84,7 +82,6 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName,QString target
                   "] does not appear to be a Hayabusa2/ONC label file.";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
-
 
   QString instid;
   QString missid;
@@ -258,11 +255,13 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName,QString target
 
   // Convert the image data
   importFits.Progress()->SetText("Importing Hayabusa2 image");
+   Pvl finalLabel = *(outputCube->label() );
   importFits.StartProcess();
   importFits.Finalize();
 
 
   return outputLabel;
+
 
   }
 
