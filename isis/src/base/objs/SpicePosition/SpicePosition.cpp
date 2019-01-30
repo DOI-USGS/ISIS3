@@ -1377,40 +1377,47 @@ namespace Isis {
    *   @history 2018 - temporary update to demonstrate use of ale in one function - Kristin Berry
    */
   void SpicePosition::SetEphemerisTimePolyFunction() {
-    // Normalize the time -- why do we do this? Elsewhere we also have "scaled time" and "unscaled time" 
+    // This is the time that the polynomial is fit over
     double rtime;
-    rtime = (p_et - p_baseTime) / p_timeScale; // this is the time that the polynomial is fit over
+    rtime = (p_et - p_baseTime) / p_timeScale; 
 
     std::vector< std::vector<double> > positionCoeffs = 
       {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
 
-    // Evaluate the polynomials at current et to get position;
-    p_coordinate = ale::getPosition(positionCoeffs, rtime); // p_et makes more sense to me, but rtime must be used for tests to pass
+    // Evaluate the polynomials at current et to get position. 
+    p_coordinate = ale::getPosition(positionCoeffs, rtime); 
 
     if(p_hasVelocity) {
       if( p_degree == 0) {
         p_velocity = p_cacheVelocity[0];
       }
       else {
-        std::cout << "Before: " << p_coefficients[0][0] << std::endl; 
-        std::vector< std::vector<double> > velocityCoefficients; 
+
+        // The velocity is computed with respect to time, rather than scaled time, so update the 
+        // coefficients to be passed int othe ale::getVelocity function 
+        std::vector< std::vector<double> > velocityCoefficients;
+        std::vector<double> one;
+        std::vector<double> two;
+        std::vector<double> three;
+
+        velocityCoefficients.push_back(one);
+        velocityCoefficients.push_back(two);
+        velocityCoefficients.push_back(three);
+
         for (unsigned int i=0; i < p_coefficients[0].size(); i++) {
-          std::cout << "wow";
-         //velocityCoefficients[0].push_back((i+1) * p_coefficients[0][i]/pow(p_timeScale, i+1));
-        }/*
+          velocityCoefficients[0].push_back(p_coefficients[0][i]/pow(p_timeScale, i+1));
+        }
         for (unsigned int i=0; i < p_coefficients[1].size(); i++) {
-          velocityCoefficients[1].push_back((i+1) * p_coefficients[1][i]/pow(p_timeScale, i+1));
+          velocityCoefficients[1].push_back(p_coefficients[1][i]/pow(p_timeScale, i+1));
         }
         for (unsigned int i=0; i < p_coefficients[2].size(); i++) {
-          velocityCoefficients[2].push_back((i+1) * p_coefficients[2][i]/pow(p_timeScale, i+1));
-        }*/
-        std::cout << "After: " << p_coefficients[0][0] << std::endl; 
-//       std::vector< std::vector<double> > velocityCoeffs = 
-  //       {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
-       // p_velocity = ale::getVelocity(velocityCoeffs, p_et - p_timeScale); // must use "unscaled time"? 
-        p_velocity[0] = ComputeVelocityInTime(WRT_X);
-        p_velocity[1] = ComputeVelocityInTime(WRT_Y);
-        p_velocity[2] = ComputeVelocityInTime(WRT_Z);
+          velocityCoefficients[2].push_back(p_coefficients[2][i]/pow(p_timeScale, i+1));
+        }
+        std::reverse(velocityCoefficients[0].begin(), velocityCoefficients[0].end());
+        std::reverse(velocityCoefficients[1].begin(), velocityCoefficients[1].end());
+        std::reverse(velocityCoefficients[2].begin(), velocityCoefficients[2].end());
+
+        p_velocity = ale::getVelocity(velocityCoefficients, p_et - p_baseTime);
       }
     }
   }
