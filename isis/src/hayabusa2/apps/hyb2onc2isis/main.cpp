@@ -1,7 +1,8 @@
 #include "Isis.h"
+#include "UserInterface.h"
 
 #include "hyb2onc2isis.h"
-#include "UserInterface.h"
+
 
 using namespace std;
 using namespace Isis;

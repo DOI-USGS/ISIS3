@@ -10,7 +10,7 @@
 namespace Isis {
 
 extern void hyb2onc2isis(UserInterface &ui);
-extern Pvl * hyb2onc2isis(QString &fitsFileName,QString &outputCubeFileName,QString target="");
+extern Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName,QString target="");
 
 }
 

@@ -2,6 +2,7 @@
 
 #include "AlphaCube.h"
 #include "Application.h"
+#include "CubeAttribute.h"
 #include "FileName.h"
 #include "iTime.h"
 #include "OriginalLabel.h"
@@ -25,10 +26,15 @@ namespace Isis {
 
 void hyb2onc2isis(UserInterface &ui) {
 
-  ProcessImportFits importFits;
 
-  QString fitsFileName = FileName(ui.GetFileName("FROM")).expanded();
+
+  QString fitsFileName = FileName(ui.GetFileName("FROM")).expanded();  
+
+
+
+
   QString outputCubeFileName = FileName(ui.GetFileName("TO")).expanded();
+
 
   QString target("");
   if (ui.WasEntered("TARGET")) {
@@ -36,21 +42,26 @@ void hyb2onc2isis(UserInterface &ui) {
   }
 
   // Create a PVL to store the translated labels in
-  Pvl * outputLabel = hyb2onc2isis(fitsFileName,outputCubeFileName,target);
+  hyb2onc2isis(fitsFileName,outputCubeFileName,target);
+
 
   return;
 
   }
 
 
-Pvl * hyb2onc2isis(QString &fitsFileName, QString &outputCubeFileName, QString target) {
+Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName,QString target) {
 
   ProcessImportFits importFits;
   importFits.setFitsFile(FileName(fitsFileName));
   importFits.setProcessFileStructure(0);
   bool updatedKeywords = true;
   bool distortionCorrection = true;
-  Cube *outputCube = importFits.SetOutputCube(outputCubeFileName);
+
+  CubeAttributeOutput &att =
+    Application::GetUserInterface().GetOutputAttribute("TO");
+
+  Cube *outputCube = importFits.SetOutputCube(outputCubeFileName,att);
 
   // Get the directory where the Hayabusa translation tables are.
   PvlGroup dataDir (Preference::Preferences().findGroup("DataDirectory"));
@@ -250,7 +261,8 @@ Pvl * hyb2onc2isis(QString &fitsFileName, QString &outputCubeFileName, QString t
   importFits.StartProcess();
   importFits.Finalize();
 
-  return outputCube->label();
+
+  return outputLabel;
 
   }
 
