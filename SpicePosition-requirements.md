@@ -18,7 +18,6 @@ This is the data source used during and after bundle adjustment.
 
 ### Combination of Cache and Polynomial
 This is used for bundle adjustment of very jittery images. Mechanically, this is the sum of a low degree polynomial and a cubic hermite spline cache.
-
 ## Relevant public methods
 * SetEphemerisTime(double et)
 * EphemerisTime()
@@ -30,7 +29,6 @@ This is both a big part of regular ISIS usage and how the spice server works. Th
 
 ## Reducing Cache Size
 For large push broom images, a data point for every line can be a huge amount of data to store and work with. So, SpicePosition must able to reduce the cache size based on a given tolerance.
-
 ## Relevant public methods
 * LoadCache(double startTime, double endTime, int size)
 * LoadCache(double time)
@@ -39,7 +37,6 @@ For large push broom images, a data point for every line can be a huge amount of
 
 # Write and Read Polynomial or Cached Data From/To a Cube
 Currently this is done via an ISIS Table object, but it could be a generic BLOB.
-
 ## Relevant public methods
 * LoadCache(Table &table)
 * ReloadCache(Table &table)
@@ -49,12 +46,21 @@ Currently this is done via an ISIS Table object, but it could be a generic BLOB.
 
 # Fit Polynomial Coefficients over Cached Data
 This is how the polynomial coefficients are initialized at the beginning of bundle adjustment.
-
 ## Relevant public methods
 * SetPolynomial(const Source type)
 
+# Provide Access to Polynomial Coefficients
+The bundle adjustment needs access to these values in order to properly construct the normal equations.
+## Relevant public methods
+* GetPolynomial(std::vector<double>& XC, std::vector<double>& YC, std::vector<double>& ZC)
+
 # Take Adjustments to Polynomial Coefficients
 This is how the BundleAdjust applies its corrects each iteration.
+## Relevant public methods
+* SetPolynomial(const std::vector<double>& XC, const std::vector<double>& YC, const std::vector<double>& ZC, const Source type)
 
 # Compute the Partial Derivatives with Respect to a Polynomial Coefficient
 Mathematically these are something like d/db(at^2 + bt + c). These are needed for the bundle adjustment.
+## Relevant public methods
+* CoordinatePartial(SpicePosition::PartialType partialVar, int coeffIndex)
+* VelocityPartial(SpicePosition::PartialType partialVar, int coeffIndex)
