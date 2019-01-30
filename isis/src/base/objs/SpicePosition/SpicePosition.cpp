@@ -252,7 +252,7 @@ namespace Isis {
 
     // Read from the cache
     if(p_source == Memcache) {
-      SetEphemerisTimeMemcache(); // can replace these
+      SetEphemerisTimeMemcache(); // in theory can be replaced, but need to add cube-reading code
     }
     else if(p_source == HermiteCache) {
       SetEphemerisTimeHermiteCache(); // not yet implelemented in ALE
@@ -1220,8 +1220,7 @@ namespace Isis {
    *            method)
    */
   void SpicePosition::SetEphemerisTimeMemcache() {
-    // need to use the eal cube reader to get in the times and associated 
-    // load in cube somewhere above
+    // need to use the eal cube reader to get in the times and associated positions and velocities
 //    std::vector< std::vector<double> > tableData = ale::readPositionTable(tablesfromLabel, cubeFile); 
 //    std::vector<double> position = ale::getPosition(tableData[0], tableData[1], p_et, ale::interpolation::linear);
 
@@ -1379,7 +1378,7 @@ namespace Isis {
   void SpicePosition::SetEphemerisTimePolyFunction() {
     // This is the time that the polynomial is fit over
     double rtime;
-    rtime = (p_et - p_baseTime) / p_timeScale; 
+    rtime = (p_et - p_baseTime) / p_timeScale;
 
     std::vector< std::vector<double> > positionCoeffs = 
       {p_coefficients[0], p_coefficients[1], p_coefficients[2]};
