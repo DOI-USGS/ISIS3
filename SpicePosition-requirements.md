@@ -23,17 +23,39 @@ This is the data source used during and after bundle adjustment.
 ### Combination of Cache and Polynomial
 This is used for bundle adjustment of very jittery images. Mechanically, this is the sum of a low degree polynomial and a cubic hermite spline cache.
 
+## Relevant public methods
+* SetEphemerisTime(double et)
+* EphemerisTime()
+* Coordinate()
+* Velocity()
+
 # Create a Cache from SPICE Data for an Image
 This is both a big part of regular ISIS usage and how the spice server works. The spice server creates the cache and then ships it back over the wire.
 
 ## Reducing Cache Size
 For large push broom images, a data point for every line can be a huge amount of data to store and work with. So, SpicePosition must able to reduce the cache size based on a given tolerance.
 
+## Relevant public methods
+* LoadCache(double startTime, double endTime, int size)
+* LoadCache(double time)
+* ReloadCache()
+* Memcache2HermiteCache(double tolerance)
+
 # Write and Read Polynomial or Cached Data From/To a Cube
 Currently this is done via an ISIS Table object, but it could be a generic BLOB.
 
+## Relevant public methods
+* LoadCache(Table &table)
+* ReloadCache(Table &table)
+* Cache(const QString &tableName)
+* LineCache(const QString &tableName)
+* LoadHermiteCache(const QString &tableName)
+
 # Fit Polynomial Coefficients over Cached Data
 This is how the polynomial coefficients are initialized at the beginning of bundle adjustment.
+
+## Relevant public methods
+* SetPolynomial(const Source type)
 
 # Take Adjustments to Polynomial Coefficients
 This is how the BundleAdjust applies its corrects each iteration.
