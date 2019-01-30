@@ -6,7 +6,7 @@
 #include "Preference.h"
 #include "SpicePosition.h"
 #include "Table.h"
-#include "/home/kberry/dev/ISIS3/ale/include/ale.h"
+#include "ale/ale.h"
 #include <vector>
 
 using namespace Isis;
