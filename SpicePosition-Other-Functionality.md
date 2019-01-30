@@ -5,7 +5,8 @@ This is the companion to the core SpicePosition requirements [document](https://
 
 ## Time Bias
 * SetTimeBias(double timeBias)
-    * Used by `MocNarrowAngleCamera` and `MocWideAngleCamera`
+    * ~~Used by `MocNarrowAngleCamera` and `MocWideAngleCamera`~~
+    * NOT used. There is a function with this name used from `SpiceRotation`, but `SpicePosition`'s is not used.
 * GetTimeBias() const
     * Only used within `SpicePosition`! We could potentially eliminate this from the API, as it is only used within `SpicePosition`. 
 
