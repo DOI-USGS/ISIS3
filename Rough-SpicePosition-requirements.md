@@ -18,7 +18,25 @@ SpicePosition is the part of ISIS that reads from SPKs. 99% of the time this onl
 This is the data source most often used by ISIS. The data is interpolated by either a linear method or a cubic hermite spline.
 
 ### Polynomials
-This is the data source used during and after Bundle Adjustment.
+This is the data source used during and after bundle adjustment.
 
 ### Combination of Cache and Polynomial
 This is used for bundle adjustment of very jittery images. Mechanically, this is the sum of a low degree polynomial and a cubic hermite spline cache.
+
+# Create a Cache from SPICE Data for an Image
+This is both a big part of regular ISIS usage and how the spice server works. The spice server creates the cache and then ships it back over the wire.
+
+## Reducing Cache Size
+For large push broom images, a data point for every line can be a huge amount of data to store and work with. So, SpicePosition must able to reduce the cache size based on a given tolerance.
+
+# Write and Read Polynomial or Cached Data From/To a Cube
+Currently this is done via an ISIS Table object, but it could be a generic BLOB.
+
+# Fit Polynomial Coefficients over Cached Data
+This is how the polynomial coefficients are initialized at the beginning of bundle adjustment.
+
+# Take Adjustments to Polynomial Coefficients
+This is how the BundleAdjust applies its corrects each iteration.
+
+# Compute the Partial Derivatives with Respect to a Polynomial Coefficient
+Mathematically these are something like d/db(at^2 + bt + c). These are needed for the bundle adjustment.
