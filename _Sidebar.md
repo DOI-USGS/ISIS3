@@ -10,3 +10,4 @@
   * [RFC2](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process)
 # Planning & Design 
   * [Spice Position Requirements](https://github.com/USGS-Astrogeology/ISIS3/wiki/SpicePosition-requirements)
+  * [Spice Position Other Functionality](https://github.com/USGS-Astrogeology/ISIS3/wiki/SpicePosition-Other-Functionality/_edit)
