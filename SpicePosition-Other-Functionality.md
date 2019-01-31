@@ -24,7 +24,7 @@ This is the companion to the core SpicePosition requirements [document](https://
 
 ## HasVelocity
 * HasVelocity()
-    * Not Used
+    * Only used within `SpicePosition`
 
 ## IsCached
 * IsCached()
