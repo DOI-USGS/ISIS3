@@ -60,7 +60,7 @@ This is the companion to the core SpicePosition requirements [document](https://
 * GetTimeScale()
     * Used in `BundleObservation`
 
-## DPolynomial
+## DPolynomial 
 * DPolynomial(const int coeffIndex)
     * Only used within `SpicePosition`
 
