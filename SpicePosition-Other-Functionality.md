@@ -51,6 +51,8 @@ This is the companion to the core SpicePosition requirements [document](https://
 ## Base Time and Time Scaling
 * ComputeBaseTime()
     * Only used within `SpicePosition`
+    * Computes the base time based on the private variable p_override
+    * Adjust the p_basetime and p_timescale variables in SpicePosition when SetPolynomial is run or when memcache2hermitecache is run
 * GetBaseTime()
     * Used in `BundleObservation`
 * SetOverrideBaseTime(double baseTime, double timeScale)
