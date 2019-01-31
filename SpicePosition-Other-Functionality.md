@@ -3,7 +3,7 @@ This is the companion to the core SpicePosition requirements [document](https://
 
 # Methods
 
-## Time Bias
+## Time Bias (**Candidate For Removal**)
 * SetTimeBias(double timeBias)
     * ~~Used by `MocNarrowAngleCamera` and `MocWideAngleCamera`~~
     * NOT used. There is a function with this name used from `SpiceRotation`, but `SpicePosition`'s is not used.
@@ -26,7 +26,7 @@ This is the companion to the core SpicePosition requirements [document](https://
 
 ## HasVelocity
 * HasVelocity()
-    * ~~Only used within `SpicePosition`~~ Not used, the private variable is getting accessed directly from within `SpicePosition`
+    * Not used, the private variable is getting accessed directly from within `SpicePosition`
     * Returns the private variable p_hasVelocity from a SpicePosition object
     * Doesn't provide any functionality at the moment
 
