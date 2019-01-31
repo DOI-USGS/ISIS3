@@ -20,6 +20,7 @@ include(Utilities)
 include(TestSetup)
 include(InstallThirdParty)
 include(cmake/gtest.cmake)
+include(cmake/ale.cmake)
 include(GoogleTest)
 
 #===============================================================================
@@ -249,7 +250,6 @@ find_package(PNG               REQUIRED)
 find_package(Kakadu)
 find_package(Geos    3.5.0     REQUIRED)
 find_package(Armadillo         REQUIRED)
-find_package(Ale               REQUIRED)
 find_package(Threads)
 
 
