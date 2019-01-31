@@ -21,18 +21,26 @@ This is the companion to the core SpicePosition requirements [document](https://
 ## GetCenterCoordinate
 * GetCenterCoordinate()
     * Used by `BundleObservation`
+    * Gets the gets the mid point in time between the start and end of the cached position data, and returns that coordinate
+    * Used to get the center position of the instrument when looking at a section of ephemeris data
 
 ## HasVelocity
 * HasVelocity()
-    * Only used within `SpicePosition`
+    * ~~Only used within `SpicePosition`~~ Not used, the private variable is getting accessed directly from within `SpicePosition`
+    * Returns the private variable p_hasVelocity from a SpicePosition object
+    * Doesn't provide any functionality at the moment
 
 ## IsCached
 * IsCached()
     * Used by `Spice`
+    * Checks if there is something stored within the cache
+    * Used to determine whether or not to read/write from and to cache
 
 ## SetPolynomialDegree
 * SetPolynomialDegree(int degree)
     * Used by `BundleObservation`
+    * Sets the degree of the internal polynomial state
+    * Used to set and change the polynomials degree, consequently expanding or reducing the polynomial if the polynomials have been "applied"(?)
 
 ## GetSource
 * GetSource()
