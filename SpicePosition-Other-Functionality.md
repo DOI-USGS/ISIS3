@@ -55,6 +55,8 @@ This is the companion to the core SpicePosition requirements [document](https://
     * Adjust the p_basetime and p_timescale variables in SpicePosition when SetPolynomial is run or when memcache2hermitecache is run
 * GetBaseTime()
     * Used in `BundleObservation`
+    * Returns the private variable p_basetime
+    * Used to get the current base time for fit equations
 * SetOverrideBaseTime(double baseTime, double timeScale)
     * Used in `BundleObservation`
 * GetTimeScale()
