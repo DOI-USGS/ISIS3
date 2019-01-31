@@ -24,7 +24,7 @@ This is the companion to the core SpicePosition requirements [document](https://
     * Gets the gets the mid point in time between the start and end of the cached position data, and returns that coordinate
     * Used to get the center position of the instrument when looking at a section of ephemeris data
 
-## HasVelocity
+## HasVelocity (Candidate For Removal)
 * HasVelocity()
     * Not used, the private variable is getting accessed directly from within `SpicePosition`
     * Returns the private variable p_hasVelocity from a SpicePosition object
