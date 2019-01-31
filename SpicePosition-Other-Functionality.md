@@ -12,35 +12,50 @@ This is the companion to the core SpicePosition requirements [document](https://
 
 ## LightTime and Aberration Correction
 * SetAberrationCorrection(const QString &correction)
+    * Used by `SpacecraftPosition`, `Spice`, `gllssical/main`, `LoHighCamera`, `LoMediumCamera`, `Mariner10Camera`
 * QString GetAberrationCorrection()
+    * Not used anywhere (`SpacecraftPosition` has something similar and should probably use it but doesn't)
 * GetLightTime()
+    * Not used anywhere (`SpacecraftPosition` has something similar and should probably use it but doesn't)
 
 ## GetCenterCoordinate
 * GetCenterCoordinate()
+    * Used by `BundleObservation`
 
 ## HasVelocity
 * HasVelocity()
+    * Not Used
 
 ## IsCached
 * IsCached()
+    * Used by `Spice`
 
 ## SetPolynomialDegree
 * SetPolynomialDegree(int degree)
+    * Used by `BundleObservation`
 
 ## GetSource
 * GetSource()
+    * Used by `Spice`
 
 ## Base Time and Time Scaling
 * ComputeBaseTime()
+    * Only used within `SpicePosition`
 * GetBaseTime()
+    * Used in `BundleObservation`
 * SetOverrideBaseTime(double baseTime, double timeScale)
+    * Used in `BundleObservation`
 * GetTimeScale()
+    * Used in `BundleObservation`
 
 ## DPolynomial
 * DPolynomial(const int coeffIndex)
+    * Only used within `SpicePosition`
 
 ## Extrapolate
 * Extrapolate(double timeEt)
+    * Used in `SpkSegment`
 
 ## HermiteCoordinate()
 * HermiteCoordinate
+    * Not used
