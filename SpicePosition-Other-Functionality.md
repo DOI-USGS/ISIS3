@@ -69,10 +69,14 @@ This is the companion to the core SpicePosition requirements [document](https://
 ## DPolynomial 
 * DPolynomial(const int coeffIndex)
     * Only used within `SpicePosition`
+    * Takes the derivative of a polynomial in respect to a given coefficient index
+    * Used to compute partial derivatives in `SpicePosition`
 
 ## Extrapolate
 * Extrapolate(double timeEt)
     * Used in `SpkSegment`
+    * Extrapolate position for a given time assuming a constant velocity (From doc string)
+    * Used to extrapolate a new position based on a known position and assumed constant velocity
 
 ## HermiteCoordinate()
 * HermiteCoordinate
