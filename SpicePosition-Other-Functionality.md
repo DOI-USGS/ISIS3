@@ -59,8 +59,12 @@ This is the companion to the core SpicePosition requirements [document](https://
     * Used to get the current base time for fit equations
 * SetOverrideBaseTime(double baseTime, double timeScale)
     * Used in `BundleObservation`
+    * Sets the p_overrideBaseTime to the given baseTime, sets p_overrideTimeScale to the given time scale, and sets p_override to timeScale
+    * Used in LoadCache to set the above variables if p_source is not a PolyFunction
 * GetTimeScale()
     * Used in `BundleObservation`
+    * Returns the private variable p_timeScale
+    * Used to set a variable in `BundleObservation::initializeExteriorOrientation`
 
 ## DPolynomial 
 * DPolynomial(const int coeffIndex)
