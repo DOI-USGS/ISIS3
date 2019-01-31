@@ -45,6 +45,8 @@ This is the companion to the core SpicePosition requirements [document](https://
 ## GetSource
 * GetSource()
     * Used by `Spice`
+    * Returns the private variable p_source from a `SpicePosition` object
+    * Used to determine how the data in `SpicePosition` is stored
 
 ## Base Time and Time Scaling
 * ComputeBaseTime()
