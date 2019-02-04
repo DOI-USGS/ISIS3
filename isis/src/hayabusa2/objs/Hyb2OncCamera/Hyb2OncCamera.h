@@ -34,6 +34,11 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-07-07 Kristin Berry - Original version
+   *   @history 2018-07-05 Lucille Le Corre - Added support for sub-frame images
+   *   @history 2018-11-03 Stuart Sides - Changed sub-frame/cropped image support to use the
+   *                                      AlphaCube class. The ingestion program creates the
+   *                                      AlphaCube lable group when necessary. Modified to work
+   *                                      with L2c and L2d image (i.e., undistorted)
    *   
    */
   class Hyb2OncCamera : public FramingCamera {
