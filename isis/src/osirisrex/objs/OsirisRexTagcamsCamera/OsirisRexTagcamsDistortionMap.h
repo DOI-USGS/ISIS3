@@ -66,6 +66,8 @@ namespace Isis {
    *                         option/pointing boresight offsets from center of
    *                         CCD; renamed conversion methods to more meaningful
    *                         names.
+   *   @history 2019-02-04 Kris Becker Properly initialize distorted and
+   *                         undistorted parameters in respective methods
    */
   class OsirisRexTagcamsDistortionMap : public CameraDistortionMap {
     public:

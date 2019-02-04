@@ -53,6 +53,8 @@ namespace Isis {
    *                       documentation/description. Updated to add the k4-k6
    *                       parameters.
    * @history 2019-01-25 Kris Becker Updated documentation some 
+   * @history 2019-02-04 Kris Becker Properly initialize distortion/undistorted 
+   *                       parameters in respective methods. 
    */
   OsirisRexTagcamsDistortionMap::OsirisRexTagcamsDistortionMap(Camera *parent,
                                                                int naifIkCode,
@@ -140,8 +142,10 @@ namespace Isis {
     if ( p_debug ) cout << "\nUndistorting FP at " << dx << ", " << dy << "\n";
     // Handle degenerate case should convergence fail!! Adjust for center of
     // pointing boresight!
-    p_focalPlaneX = dx + p_xoffset;
-    p_focalPlaneY = dy + p_yoffset;
+    p_focalPlaneX = dx;
+    p_focalPlaneY = dy;
+    p_undistortedFocalPlaneX = dx + p_xoffset;
+    p_undistortedFocalPlaneY = dy + p_yoffset;
 
     double u, v, xpp, ypp;
     image_to_distortion_frame(dx, dy, &u, &v, &xpp, &ypp);
@@ -222,8 +226,11 @@ namespace Isis {
                                                                const double uy) {
     if ( p_debug )  cout << "\nDistorting FP at " << ux << ", " << uy << "\n";
     // image coordinates prior to introducing distortion
-    p_focalPlaneX = p_undistortedFocalPlaneX = ux - p_xoffset;
-    p_focalPlaneY = p_undistortedFocalPlaneY = uy - p_yoffset;
+    p_undistortedFocalPlaneX = ux;
+    p_undistortedFocalPlaneY = uy;
+
+    p_focalPlaneX = ux - p_xoffset;
+    p_focalPlaneY = uy - p_yoffset;
 
     double x, y, xp, yp;
     // Boresight alignment handled here
