@@ -1,10 +1,22 @@
-/** This is free and unencumbered software released into the public domain.
-
-The authors of ISIS do not claim copyright on the contents of this file.
-For more details about the LICENSE terms and the AUTHORS, you will
-find files of those names at the top level of this repository. **/
-
-/* SPDX-License-Identifier: CC0-1.0 */
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software
+ *   and related material nor shall the fact of distribution constitute any such
+ *   warranty, and no responsibility is assumed by the USGS in connection
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "Hyb2OncCamera.h"
 
@@ -74,14 +86,14 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-
-    // BORESIGHT SAMPLE AND LINE still need to be added to the IAK
+    
+    // Set the boresight sample and line
     double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
     double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
     focalMap->SetDetectorOrigin(bSamples, bLines);
-
-    // Setup detector map (use default for now)
+    
+    // Setup detector map (use default for now) 
     CameraDetectorMap *detMap = new CameraDetectorMap(this);
 
     // Handle summing
@@ -90,8 +102,17 @@ namespace Isis {
     detMap->SetDetectorSampleSumming(binning);
 
     // Setup distortion map (use default for now)
-    CameraDistortionMap *distortionMap = new Hyb2OncDistortionMap(this);
-    distortionMap->SetDistortion(naifIkCode());
+    // Level L2a and L2b images have not been corrected for optical distortion (false)
+    // Level L2d and up images have been corrected for optical distortion (true)
+    // Create an appropriate DistortionMap based on the processing level IDed in the ingestion app
+    if ((!inst.hasKeyword("DistortionCorrection")) ||
+        (inst.hasKeyword("DistortionCorrection")  &&  toBool(inst["DistortionCorrection"]) == false)) {
+      CameraDistortionMap *distortionMap = new Hyb2OncDistortionMap(this);
+      distortionMap->SetDistortion(naifIkCode());
+    }
+    else {
+      new CameraDistortionMap(this);
+    }
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -103,9 +124,9 @@ namespace Isis {
   }
 
 
-  /**
-   * Default Destructor
-   */
+  /** 
+   * Default Destructor 
+   */ 
   Hyb2OncCamera::~Hyb2OncCamera() {
   }
 
@@ -140,8 +161,8 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Frame ID
    */
-  int Hyb2OncCamera::CkFrameId() const {
-    return (-37000);
+  int Hyb2OncCamera::CkFrameId() const { 
+    return (-37000); 
   }
 
 
@@ -151,8 +172,8 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the "Camera-matrix"
    *         Kernel Reference ID
    */
-  int Hyb2OncCamera::CkReferenceId() const {
-    return (1);
+  int Hyb2OncCamera::CkReferenceId() const { 
+    return (1); 
   }
 
 
@@ -162,8 +183,8 @@ namespace Isis {
    * @return @b int The appropriate instrument code for the Spacecraft
    *         Kernel Reference ID
    */
-  int Hyb2OncCamera::SpkReferenceId() const {
-    return (1);
+  int Hyb2OncCamera::SpkReferenceId() const { 
+    return (1); 
   }
 }
 

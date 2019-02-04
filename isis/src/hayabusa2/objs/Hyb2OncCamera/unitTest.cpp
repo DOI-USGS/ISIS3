@@ -1,11 +1,22 @@
-/** This is free and unencumbered software released into the public domain.
-
-The authors of ISIS do not claim copyright on the contents of this file.
-For more details about the LICENSE terms and the AUTHORS, you will
-find files of those names at the top level of this repository. **/
-
-/* SPDX-License-Identifier: CC0-1.0 */
-
+/**
+ * @file
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are public
+ *   domain. See individual third-party library and package descriptions for 
+ *   intellectual property information,user agreements, and related information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or implied,
+ *   is made by the USGS as to the accuracy and functioning of such software 
+ *   and related material nor shall the fact of distribution constitute any such 
+ *   warranty, and no responsibility is assumed by the USGS in connection 
+ *   therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html in a browser or see 
+ *   the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 #include <QDebug>
 
 #include <iomanip>
@@ -23,8 +34,13 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 using namespace Isis;
 
-void testCamera(Cube &c, double knownLat, double knownLon);
+void testCamera(Cube &c, double knownLat, double knownLon,
+                double s1, double l1, 
+                double s2, double l2, 
+                double s3, double l3, 
+                double s4, double l4);
 void testLineSamp(Camera *cam, double sample, double line);
+
 
 /**
  * Unit Test for the Hayabusa2 ONC camera.
@@ -45,36 +61,47 @@ int main(void) {
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for Telecopic Camera...";
-    double knownLat = -54.63487131147738;
-    double knownLon = 40.43436155430055;
-    Cube c("$ISISTESTDATA/isis/src/hayabusa2/unitTestData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
-    testCamera(c, knownLat, knownLon);
+    double knownLat = -47.23506367622795;
+    double knownLon = 45.06713880290044;
+    Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
+    testCamera(c, knownLat, knownLon, 
+               512.5, 512.5, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
+//    362.0, 352.0, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W1 Camera...";
-    knownLat = -50.11857108654684;
-    knownLon = 91.03535388676204;
-    Cube w1("$ISISTESTDATA/isis/src/hayabusa2/unitTestData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
-    testCamera(w1, knownLat, knownLon);
+    knownLat = -50.66777190122887;
+    knownLon = 97.68522302461859;
+    Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
+    testCamera(w1, knownLat, knownLon,
+               21.0, 20.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
+//    16.0, 14.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W2 Camera...";
-    knownLat = 25.38911363842043;
-    knownLon = 90.86547761107917;
-    Cube w2("$ISISTESTDATA/isis/src/hayabusa2/unitTestData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
-    testCamera(w2, knownLat, knownLon);
+//    knownLat = 4.676892803564044;
+//    knownLon = -12.46121470106279;
+    knownLat = 30.06610722049293;
+    knownLon = 78.40416492096558;
+    Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
+    testCamera(w2, knownLat, knownLon,
+               51.0, 42.0, 173.0, 21.0, 54.0, 149.0, 174.0, 155.0);
 
   }
-  catch(IException &e) {
+  catch (IException &e) {
     e.print();
   }
 
 }
 
 
-void testCamera(Cube &c, double knownLat, double knownLon) {
+void testCamera(Cube &c, double knownLat, double knownLon,
+                double s1, double l1, 
+                double s2, double l2, 
+                double s3, double l3, 
+                double s4, double l4) {
   Hyb2OncCamera *cam = (Hyb2OncCamera *) CameraFactory::Create(c);
   qDebug() << "FileName: " << FileName(c.fileName()).name();
   qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
@@ -87,7 +114,7 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
   qDebug() << "SPK Target ID    = " << cam->SpkTargetId();
   qDebug() << "SPK Reference ID = " << cam->SpkReferenceId();
   qDebug() << "";
-
+  
   // Test name methods
   qDebug() << "Spacecraft Name Long:  " << cam->spacecraftNameLong();
   qDebug() << "Spacecraft Name Short: " << cam->spacecraftNameShort();
@@ -95,7 +122,7 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
   qDebug() << "Instrument Name Short: " << cam->instrumentNameShort();
   qDebug() << "";
 
-  // Test Shutter Open/Close
+  // Test Shutter Open/Close 
   const PvlGroup &inst = c.label()->findGroup("Instrument", Pvl::Traverse);
   double exposureDuration = ((double) inst["ExposureDuration"])/1000;
   QString stime = inst["StartTime"];
@@ -108,31 +135,31 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
 
   // Test all four corners to make sure the conversions are right
   qDebug() << "For upper left corner ...";
-  testLineSamp(cam, 1.0, 1.0);
+  testLineSamp(cam, s1, l1);
 
   qDebug() << "For upper right corner ...";
-  testLineSamp(cam, cam->Samples(), 1.0);
+  testLineSamp(cam, s2, l2);
 
   qDebug() << "For lower left corner ...";
-  testLineSamp(cam, 1.0, cam->Lines());
+  testLineSamp(cam, s3, l3);
 
   qDebug() << "For lower right corner ...";
-  testLineSamp(cam, cam->Samples(), cam->Lines());
+  testLineSamp(cam, s4, l4);
 
   qDebug() << "For center pixel position ...";
 
-  if(!cam->SetImage((cam->Samples()/2.0), (cam->Lines()/2.0))) {
+  if (!cam->SetImage((cam->Samples()/2.0), (cam->Lines()/2.0))) {
     throw IException(IException::Unknown, "ERROR setting image to known position.", _FILEINFO_);
   }
 
-  if(abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
+  if (abs(cam->UniversalLatitude() - knownLat) < 1E-10) {
     qDebug() << "Latitude OK";
   }
   else {
     qDebug() << "Latitude off by:  " << toString(cam->UniversalLatitude() - knownLat, 16);
   }
 
-  if(abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
+  if (abs(cam->UniversalLongitude() - knownLon) < 1E-10) {
     qDebug() << "Longitude OK";
   }
   else {
@@ -146,17 +173,28 @@ void testCamera(Cube &c, double knownLat, double knownLon) {
 void testLineSamp(Camera *cam, double sample, double line) {
   bool success = cam->SetImage(sample, line);
 
-  if(success) {
-    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
+  if (success) {
+    double lat = cam->UniversalLatitude();
+    double lon = cam->UniversalLongitude();
+    success = cam->SetUniversalGround(lat, lon);
+//    success = cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude());
   }
 
-  if(success) {
+  if (success) {
     double deltaSamp = sample - cam->Sample();
     double deltaLine = line - cam->Line();
-    if(fabs(deltaSamp) < 0.001) deltaSamp = 0;
-    if(fabs(deltaLine) < 0.001) deltaLine = 0;
-    qDebug() << "DeltaSample = " << deltaSamp;
-    qDebug() << "DeltaLine   = " << deltaLine;
+    if(fabs(deltaSamp) < 0.001) {
+      qDebug() << "Delta Sample less than 0.001";
+    }
+    else {
+      qDebug() << "Delta Sample larger than expected " << deltaSamp;
+    }
+    if(fabs(deltaLine) < 0.001) {
+      qDebug() << "Delta Line less than 0.001";
+    }
+    else {
+      qDebug() << "Delta Line larger than expected " << deltaLine;
+    }
     qDebug() << "";
   }
   else {
@@ -165,3 +203,4 @@ void testLineSamp(Camera *cam, double sample, double line) {
     qDebug() << "";
   }
 }
+
