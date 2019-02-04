@@ -1,0 +1,57 @@
+Object = IsisCube
+  Object = Core
+    StartByte   = 65537
+    Format      = Tile
+    TileSamples = 6
+    TileLines   = 29
+
+    Group = Dimensions
+      Samples = 6
+      Lines   = 29
+      Bands   = 5
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+
+  Group = BandBin
+    Center       = (600, 600, 600, 600, 600) <nm>
+    Width        = (300, 300, 300, 300, 300) <nm>
+    FilterNumber = (BroadBand, BroadBand, BroadBand, BroadBand, BroadBand)
+  End_Group
+
+  Group = Mapping
+    ProjectionName     = Sinusoidal
+    CenterLongitude    = 0
+    TargetName         = MOON
+    EquatorialRadius   = 1737400.0 <meters>
+    PolarRadius        = 1737400.0 <meters>
+    LatitudeType       = Planetocentric
+    LongitudeDirection = PositiveEast
+    LongitudeDomain    = 360
+    MinimumLatitude    = -0.16379197666067
+    MaximumLatitude    = 0.786557519556
+    MinimumLongitude   = 330.59167372255
+    MaximumLongitude   = 330.74632161436
+    UpperLeftCornerX   = 10023000.0
+    UpperLeftCornerY   = 24000.0
+    PixelResolution    = 1000.0 <meters/pixel>
+    Scale              = 30.323350424149 <pixels/degree>
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = 69121
+  Bytes     = 4244
+End_Object
+End
