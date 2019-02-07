@@ -10,7 +10,7 @@ In this step, we will carefully prepare the local repository to build from as we
 * Update the recipes/meta.yaml file to include proper version number, branch, and build number
   * The version should be the version of ISIS you are building.
   * The branch should be the branch from the remote repository that you would like to build from. This will usually be the "release" branch for public builds, but it is also possible to do special builds, for example for missions that require a specific build.
-  * The build number should be incremented for each build produced for a certain version number, for example when bug fixes are released.
+  * The build number should be incremented for each build produced for a certain version number, for example when bug fixes are released, and should always begin at 0 for each version.
 * Update the isis/version file to reflect the proper version number
 * Cherry-pick in all changes that need to go into the release 
 * Do a manual build and run the tests for all systems
