@@ -103,9 +103,8 @@ static double g_d1(0);
 static double g_darkCurrent(0);
 
 //Linearity correction variables
-static double g_L0(0);
-static double g_L1(0);
-static double g_L2(0);
+
+static double g_L[3] = {0.0,0.0,0.0};
 
 // TODO: we do not have the readout time (transfer period) for Hayabusa2 ONC.
 //Smear calculation variables
@@ -150,6 +149,40 @@ InstrumentType g_instrument;
 static AlphaCube *alpha(0);
 
 static Pvl g_configFile;
+
+double linearFun(double Iobs,double x, double g[3]) {
+  return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
+
+}
+
+double dFun(double x, double g[3]) {
+  return -g[0] - 2*g[1]*x -3*g[2]*pow(x,2.0);
+
+}
+
+
+bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
+
+   double x[2];
+   double dx = 1.0;
+   int iter = 0;
+   int maxIterations=500;
+   x[0] = x0;
+   while (dx > epsilon)  {
+
+     x[1]=x[0] - linearFun(Iobs,x[0],g)/dFun(x[0],g);
+     dx = fabs(x[1]-x[0]) ;
+     x[0]=x[1];
+     iter++;
+     if (iter > maxIterations) {
+
+       return false;
+     }
+   }
+   result = x[1];
+   return true;
+}
+
 
 
 /**
@@ -212,13 +245,14 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
-
-#if 0
+    double dn = imageOut[i];
     double linearCorrection;
-    linearCorrection = g_L0+g_L1*pow(imageOut[i],2.0)+g_L2*pow(imageOut[i],3.0);
-    imageOut[i]*=linearCorrection;
+    double result = 1.0;
+    double x0 = 1.0;
+    newton_rapheson(imageOut[i],x0, g_L,result );    
+    imageOut[i] = result;
 
-#endif
+    //qDebug() << dn << ","<< result;
 
 
     // DARK Current
@@ -246,13 +280,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     //Linearity Correction
     //In the SIS this adjustment is made just after the bias, but
     //in the Calibration paper it happens just before the flat field correction.
-
-#if 0
-    double linearCorrection;
-    linearCorrection = g_L0+g_L1*pow(imageOut[i],2.0)+g_L2*pow(imageOut[i],3.0);
-    qDebug() << "linearCorrection=" << linearCorrection;
-    imageOut[i]*=linearCorrection;
- #endif
 
 
     // FLATFIELD correction
@@ -594,9 +621,10 @@ QString loadCalibrationVariables(const QString &config)  {
   g_solarFlux = solar[g_filter.toLower()];
 
   //Load the linearity variables
-  g_L0 = linearity["L"][0].toDouble();
-  g_L1 = linearity["L"][1].toDouble();
-  g_L2 = linearity["L"][2].toDouble();
+  g_L[0] = linearity["L"][0].toDouble();
+  g_L[1] = linearity["L"][1].toDouble();
+  g_L[2] = linearity["L"][2].toDouble();
+
 
 
   // radiance = g_v_standard * g_iofScale
@@ -605,8 +633,6 @@ QString loadCalibrationVariables(const QString &config)  {
 
   return ( calibFile.original() );
 }
-
-
 
 
 
