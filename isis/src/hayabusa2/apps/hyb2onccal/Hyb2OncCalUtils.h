@@ -103,6 +103,7 @@ static double g_d1(0);
 static double g_darkCurrent(0);
 
 //Linearity correction variables
+
 static double g_L[3] = {0.0,0.0,0.0};
 
 // TODO: we do not have the readout time (transfer period) for Hayabusa2 ONC.
@@ -184,10 +185,6 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 
 
 
-
-
-
-
 /**
 * @brief Apply radiometric correction to each line of an AMICA image.
 * @author 2016-03-30 Kris Becker
@@ -248,13 +245,11 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
-
     double dn = imageOut[i];
     double linearCorrection;
     double result = 1.0;
     double x0 = 1.0;
-    newton_rapheson(imageOut[i],x0, g_L,result );
-    //linearCorrection = g_L[0]*dn+g_L[1]*pow(dn,2.0)+g_L[2]*pow(dn,3.0);
+    newton_rapheson(imageOut[i],x0, g_L,result );    
     imageOut[i] = result;
 
     //qDebug() << dn << ","<< result;
@@ -285,11 +280,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     //Linearity Correction
     //In the SIS this adjustment is made just after the bias, but
     //in the Calibration paper it happens just before the flat field correction.
-
-
-
-    //imageOut[i]*=linearCorrection;
-
 
 
     // FLATFIELD correction
@@ -636,21 +626,13 @@ QString loadCalibrationVariables(const QString &config)  {
   g_L[2] = linearity["L"][2].toDouble();
 
 
+
   // radiance = g_v_standard * g_iofScale
   // iof      = radiance * pi *dist_au^2
   // g_iofScale   = iof[g_filter];
 
   return ( calibFile.original() );
 }
-
-
-
-
-
-
-
-
-
 
 
 

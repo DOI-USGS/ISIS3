@@ -256,19 +256,13 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   // Convert the image data
   importFits.Progress()->SetText("Importing Hayabusa2 image");
    Pvl finalLabel = *(outputCube->label() );
-   //finalLabel.write("finalLabel.txt");
   importFits.StartProcess();
   importFits.Finalize();
 
-
   return finalLabel;
-
+  
 
   }
-
-
-
-
 
 }
 

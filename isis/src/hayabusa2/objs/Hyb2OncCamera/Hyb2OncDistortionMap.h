@@ -39,6 +39,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-07-11 Jeannie Backer and Ian Humphrey - Original version.
+   *  
+   *   @history 2018-12-11 Stuart Sides - Loop in
+   *            SetUndistortedFocalPlane was not being exicuted.
+   *            Modified to use both itteration and convergence.
    *
    */
   class Hyb2OncDistortionMap : public CameraDistortionMap {
