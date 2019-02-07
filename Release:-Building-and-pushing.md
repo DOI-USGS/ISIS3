@@ -1,6 +1,6 @@
 # Step-By-Step Instructions
 
-This document describes the process of building ISIS for a release and pushing the build to the anaconda cloud.
+This document describes the process of building ISIS for a release and pushing the build to Anaconda Cloud.
 
 ## Set Up the Local and Remote Repositories
 
