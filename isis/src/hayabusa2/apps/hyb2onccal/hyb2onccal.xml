@@ -315,7 +315,10 @@ values for each band for Hayabusa2 ONC.
            the parameters as needed.
         </description>
         <filter>*.trn</filter>
+        <!--
         <default><item>$hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
+        -->
+        <default><item>/usgs/cpkgs/isis3/datalocal/hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
       </parameter>
     </group>
 

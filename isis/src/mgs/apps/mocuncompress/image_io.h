@@ -1,3 +1,6 @@
+#ifndef mocuncompress_image_io_h
+#define mocuncompress_image_io_h
+
 /*
 NOTICE
 
@@ -48,3 +51,5 @@ struct image_header {
 #define IMAGE_HEADER_LENGTH 1024
 #define IMAGE_LABEL_OFFSET  24
 #define MAGIC 1659
+
+#endif
