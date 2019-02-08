@@ -61,29 +61,25 @@ int main(void) {
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for Telecopic Camera...";
-    double knownLat = -47.23506367622765;
-    double knownLon = 45.06713880290049;
-    Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
-    testCamera(c, knownLat, knownLon, 512.5, 512.5, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
-//    362.0, 352.0, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
+    double knownLat = -39.18374913423203;
+    double knownLon = 48.06875707620756;
+    Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.cub", "r");
+    testCamera(c, knownLat, knownLon, 357.0, 359.0, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W1 Camera...";
-    knownLat = -50.66776735460518;
-    knownLon = 97.6852428784443;
-    Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
+    knownLat = -54.25951996619505;
+    knownLon = 67.72017401996563;
+    Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a_crop.cub", "r");
     testCamera(w1, knownLat, knownLon, 21.0, 20.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
-//    16.0, 14.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W2 Camera...";
-//    knownLat = 4.676892803564044;
-//    knownLon = -12.46121470106279;
-    knownLat = 30.07287983392736;
-    knownLon = 78.39757897260512;
-    Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
+    knownLat = 29.68691258558313;
+    knownLon = 78.57599766268363;
+    Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a_crop.cub", "r");
     testCamera(w2, knownLat, knownLon, 51.0, 42.0, 173.0, 21.0, 54.0, 149.0, 174.0, 155.0);
 
   }
