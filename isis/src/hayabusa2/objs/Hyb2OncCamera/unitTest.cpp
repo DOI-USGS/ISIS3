@@ -61,21 +61,19 @@ int main(void) {
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for Telecopic Camera...";
-    double knownLat = -47.23506367622795;
-    double knownLon = 45.06713880290044;
+    double knownLat = -47.23506367622765;
+    double knownLon = 45.06713880290049;
     Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
-    testCamera(c, knownLat, knownLon, 
-               512.5, 512.5, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
+    testCamera(c, knownLat, knownLon, 512.5, 512.5, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
 //    362.0, 352.0, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W1 Camera...";
-    knownLat = -50.66777190122887;
-    knownLon = 97.68522302461859;
+    knownLat = -50.66776735460518;
+    knownLon = 97.6852428784443;
     Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
-    testCamera(w1, knownLat, knownLon,
-               21.0, 20.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
+    testCamera(w1, knownLat, knownLon, 21.0, 20.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
 //    16.0, 14.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
 
     qDebug() << "";
@@ -83,11 +81,10 @@ int main(void) {
     qDebug() << "Test for W2 Camera...";
 //    knownLat = 4.676892803564044;
 //    knownLon = -12.46121470106279;
-    knownLat = 30.06610722049293;
-    knownLon = 78.40416492096558;
+    knownLat = 30.07287983392736;
+    knownLon = 78.39757897260512;
     Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
-    testCamera(w2, knownLat, knownLon,
-               51.0, 42.0, 173.0, 21.0, 54.0, 149.0, 174.0, 155.0);
+    testCamera(w2, knownLat, knownLon, 51.0, 42.0, 173.0, 21.0, 54.0, 149.0, 174.0, 155.0);
 
   }
   catch (IException &e) {
@@ -97,7 +94,8 @@ int main(void) {
 }
 
 
-void testCamera(Cube &c, double knownLat, double knownLon,
+void testCamera(Cube &c,
+                double knownLat, double knownLon,
                 double s1, double l1, 
                 double s2, double l2, 
                 double s3, double l3, 
@@ -134,16 +132,16 @@ void testCamera(Cube &c, double knownLat, double knownLon,
   qDebug() << "";
 
   // Test all four corners to make sure the conversions are right
-  qDebug() << "For upper left corner ...";
+  qDebug() << "For upper left of target ...";
   testLineSamp(cam, s1, l1);
 
-  qDebug() << "For upper right corner ...";
+  qDebug() << "For upper right of target ...";
   testLineSamp(cam, s2, l2);
 
-  qDebug() << "For lower left corner ...";
+  qDebug() << "For lower left of target ...";
   testLineSamp(cam, s3, l3);
 
-  qDebug() << "For lower right corner ...";
+  qDebug() << "For lower right of target ...";
   testLineSamp(cam, s4, l4);
 
   qDebug() << "For center pixel position ...";
