@@ -118,11 +118,11 @@ namespace Isis {
     p_undistortedFocalPlaneY = uy;
 
 // TEMP GET IT COMPILING REMOVE BEFORE REAL WORK
-    if (1 == 1) {
-      p_focalPlaneX = ux;
-      p_focalPlaneY = uy;
-      return true;
-    }
+//    if (1 == 1) {
+//      p_focalPlaneX = ux;
+//      p_focalPlaneY = uy;
+//      return true;
+//    }
 
     double xt = ux;
     double yt = uy;
@@ -150,7 +150,7 @@ namespace Isis {
 
       // Radial distortion
       // dr is the radial distortion contribution
-      dr = p_odk[0] + p_odk[1] * rr + p_odk[2] * rrrr;
+      dr = (p_odk[0]-1.0) + p_odk[1] * rr + p_odk[2] * rrrr;
 
       // Distortion at the current point location
       xdistortion = xt * dr;
