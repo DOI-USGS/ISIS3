@@ -61,33 +61,26 @@ int main(void) {
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for Telecopic Camera...";
-    double knownLat = -47.23506367622795;
-    double knownLon = 45.06713880290044;
-    Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.fit.cub", "r");
-    testCamera(c, knownLat, knownLon, 
-               512.5, 512.5, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
-//    362.0, 352.0, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
+    double knownLat = -39.18374913423203;
+    double knownLon = 48.06875707620756;
+    Cube c("$hayabusa2/testData/hyb2_onc_20151204_041012_tbf_l2a.cub", "r");
+    testCamera(c, knownLat, knownLon, 357.0, 359.0, 602.0, 334.0, 378.0, 557.0, 594.0, 580.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W1 Camera...";
-    knownLat = -50.66777190122887;
-    knownLon = 97.68522302461859;
-    Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a.fit_crop.cub", "r");
-    testCamera(w1, knownLat, knownLon,
-               21.0, 20.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
-//    16.0, 14.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
+    knownLat = -54.25951996619505;
+    knownLon = 67.72017401996563;
+    Cube w1("$hayabusa2/testData/hyb2_onc_20151204_045429_w1f_l2a_crop.cub", "r");
+    testCamera(w1, knownLat, knownLon, 21.0, 20.0, 31.0, 11.0, 16.0, 29.0, 32.0, 28.0);
 
     qDebug() << "";
     qDebug() << "----------------------------------------------";
     qDebug() << "Test for W2 Camera...";
-//    knownLat = 4.676892803564044;
-//    knownLon = -12.46121470106279;
-    knownLat = 30.06610722049293;
-    knownLon = 78.40416492096558;
-    Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a.fit_crop.cub", "r");
-    testCamera(w2, knownLat, knownLon,
-               51.0, 42.0, 173.0, 21.0, 54.0, 149.0, 174.0, 155.0);
+    knownLat = 29.68691258558313;
+    knownLon = 78.57599766268363;
+    Cube w2("$hayabusa2/testData/hyb2_onc_20151203_072958_w2f_l2a_crop.cub", "r");
+    testCamera(w2, knownLat, knownLon, 51.0, 42.0, 173.0, 21.0, 54.0, 149.0, 174.0, 155.0);
 
   }
   catch (IException &e) {
@@ -97,7 +90,8 @@ int main(void) {
 }
 
 
-void testCamera(Cube &c, double knownLat, double knownLon,
+void testCamera(Cube &c,
+                double knownLat, double knownLon,
                 double s1, double l1, 
                 double s2, double l2, 
                 double s3, double l3, 
@@ -134,16 +128,16 @@ void testCamera(Cube &c, double knownLat, double knownLon,
   qDebug() << "";
 
   // Test all four corners to make sure the conversions are right
-  qDebug() << "For upper left corner ...";
+  qDebug() << "For upper left of target ...";
   testLineSamp(cam, s1, l1);
 
-  qDebug() << "For upper right corner ...";
+  qDebug() << "For upper right of target ...";
   testLineSamp(cam, s2, l2);
 
-  qDebug() << "For lower left corner ...";
+  qDebug() << "For lower left of target ...";
   testLineSamp(cam, s3, l3);
 
-  qDebug() << "For lower right corner ...";
+  qDebug() << "For lower right of target ...";
   testLineSamp(cam, s4, l4);
 
   qDebug() << "For center pixel position ...";

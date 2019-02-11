@@ -103,7 +103,7 @@ namespace Isis {
 
     // Setup distortion map (use default for now)
     // Level L2a and L2b images have not been corrected for optical distortion (false)
-    // Level L2d and up images have been corrected for optical distortion (true)
+    // Level L2c and L2d images have been corrected for optical distortion (true)
     // Create an appropriate DistortionMap based on the processing level IDed in the ingestion app
     if ((!inst.hasKeyword("DistortionCorrection")) ||
         (inst.hasKeyword("DistortionCorrection")  &&  toBool(inst["DistortionCorrection"]) == false)) {
