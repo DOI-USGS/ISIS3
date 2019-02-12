@@ -11,15 +11,20 @@ In this step, we will carefully prepare the local repository to build from as we
   * The version should be the version of ISIS you are building.
   * The branch should be the branch from the remote repository that you would like to build from. This will usually be the "release" branch for public builds, but it is also possible to do special builds, for example for missions that require a specific build.
   * The build number should be incremented for each build produced for a certain version number, for example when bug fixes are released, and should always begin at 0 for each version.
+  * Please note that this step is important as this is how versioning works in Anaconda Cloud and so you may overwrite an older uploaded file inadvertently.
 * Update the isis/version file to reflect the proper version number
-* Cherry-pick in all changes that need to go into the release 
+* Cherry-pick in all changes that need to go into the build
+  * For special builds, this will usually not be needed. This will pretty much always need to be done, however, for public releases.
 * Do a manual build and run the tests for all systems
   * This includes Linux 28 (prog29), Ubuntu 18.4 (prog28) and MacOS 10.13 (prog27).
-* Once tests are passing, push the changes back up to the release branch
+* Once tests are passing, push the changes back up to the designated branch
+  * For public releases, this will simply be the release branch.
+  * (This step is optional for special builds.)
 * Make a github release and tag for the build 
   * The release name should be the same as the version name. 
   * Mission and non-standard builds must be tagged as pre-release.
   * Mission release naming convention: version XX.YY.ZZ_mission (ex. 3.6.1_cassis)
+  * (This step is optional for special builds.)
 
 ## Create the Build for Anaconda Cloud
 
