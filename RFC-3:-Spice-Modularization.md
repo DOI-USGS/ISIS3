@@ -1,4 +1,3 @@
-﻿# RFC 3: Spice Refactor
 * Feature/Process Name: Spice Data
 * Start Date: Late July - Mid August
 * RFC PR: (empty until a PR is opened)
