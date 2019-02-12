@@ -60,7 +60,7 @@ ISIS3’s Spice class is the entry point for reading and managing all SPICE rela
    * Lose
       * A significant step toward modularizing ISIS
       * Single library for SPICE selection, load/unloading and both interior/exterior orientation data exploitable outside of ISIS. 
-      * Better testing for interior orientation generation along with spice data selection logic?
+      * Better testing for interior orientation generation along with spice data selection logic
       * Isolate SPICE to one location in an easier to develop language
 * Reduced scope refactor followed by larger refactor
    * It is possible to break the work into smaller tasks that can be done over a longer period of time. In considering this option, we rather not spend extra time from transitioning on/off the project leaving ISIS in intermediate states.
