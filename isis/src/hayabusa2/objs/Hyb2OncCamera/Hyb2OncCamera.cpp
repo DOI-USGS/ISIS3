@@ -87,7 +87,7 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     
-    // BORESIGHT SAMPLE AND LINE still need to be added to the IAK 
+    // Set the boresight sample and line
     double bLines = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_LINE");
     double bSamples = Spice::getDouble("INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE");
 
@@ -101,9 +101,18 @@ namespace Isis {
     detMap->SetDetectorLineSumming(binning);
     detMap->SetDetectorSampleSumming(binning);
 
-    // Setup distortion map (use default for now) 
-    CameraDistortionMap *distortionMap = new Hyb2OncDistortionMap(this);
-    distortionMap->SetDistortion(naifIkCode());
+    // Setup distortion map (use default for now)
+    // Level L2a and L2b images have not been corrected for optical distortion (false)
+    // Level L2d and up images have been corrected for optical distortion (true)
+    // Create an appropriate DistortionMap based on the processing level IDed in the ingestion app
+    if ((!inst.hasKeyword("DistortionCorrection")) ||
+        (inst.hasKeyword("DistortionCorrection")  &&  toBool(inst["DistortionCorrection"]) == false)) {
+      CameraDistortionMap *distortionMap = new Hyb2OncDistortionMap(this);
+      distortionMap->SetDistortion(naifIkCode());
+    }
+    else {
+      new CameraDistortionMap(this);
+    }
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
