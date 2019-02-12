@@ -9,7 +9,8 @@
 The part of ISIS3 that handles reading SPICE kernels and position/orientation calculations will be pulled out into an external library: the Abstraction Layer for Ephemerides (ALE) which implements a JSON based approach. ISIS will have minimal modifications to its Spice class API but internally will make calls to ALE. Backward, but not forwards compatibility will be maintained.
 
 This RFC is intended for our technical contributors and API consumers. A subsequent RFC will address the SPICE refactor at an application level.
-Motivation
+
+## Motivation
 
 SPICE kernels are one primary source of spacecraft ephemeris information necessary for parametrizing planetary sensor models. The primary source of ephemeris information for the ISIS3 library are SPICE kernels. There are other libraries within Astro, namely the ASC implementation of the Community Sensor Model API (usgscsm), that would like to parametrize sensor models from spice kernels as ISIS does. As other uses for camera models come up both within and outside of Astro, we would like to give the ability to easily read and extract data from spice kernels to others without the need for the entire ISIS code base.
 
