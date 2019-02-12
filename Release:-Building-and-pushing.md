@@ -9,7 +9,7 @@ In this step, we will carefully prepare the local repository to build from as we
 * Clone a fresh copy of the ISIS3 repository from GitHub
 * Update the recipes/meta.yaml file to include proper version number, branch, and build number
   * The version should be the version of ISIS you are building.
-  * The branch should be the branch from the remote repository that you would like to build from. This will usually be the "release" branch for public builds, but it is also possible to do special builds, for example for missions that require a specific build.
+  * The branch should be the branch from the remote repository that you would like to build from. This will usually be the "release" branch for public builds, but it is also possible to do special builds from other branches, like for missions that require a specific build.
   * The build number should be incremented for each build produced for a certain version number, for example when bug fixes are released, and should always begin at 0 for each version.
   * Please note that this step is important as this is how versioning works in Anaconda Cloud and so you may overwrite an older uploaded file inadvertently.
 * Update the isis/version file to reflect the proper version number
