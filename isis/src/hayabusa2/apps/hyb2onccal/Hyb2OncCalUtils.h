@@ -149,17 +149,45 @@ static AlphaCube *alpha(0);
 
 static Pvl g_configFile;
 
+
+/**
+ * @brief linearFun:  The linear correction function (used by the newton_rapheson method)
+ * @author 2019-02-12  Tyler Wilson
+ * @param Iobs:  The observed intensity
+ * @param x:  The ideal intensity.
+ * @param g:  The vector of empirically derived coefficients for the third-order polynomial
+ * modelling the linear correction (for DN values < 3400 DN)
+ * @return The value of the function at the point x.
+ */
 double linearFun(double Iobs,double x, double g[3]) {
   return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
 
 }
 
+/**
+ * @brief dFun:  The first-order derivative of linearFun
+ * @author 2019-02-12  Tyler Wilson
+ * @param x:  The ideal intensity.
+ * @param g:  The vector of empirically derived coefficients for the third-order polynomial
+ * modelling the linear correction (for DN values < 3400 DN)
+ * @return
+ */
 double dFun(double x, double g[3]) {
   return -g[0] - 2*g[1]*x -3*g[2]*pow(x,2.0);
 
 }
 
-
+/**
+ * @brief newton_rapheson
+ * @author 2019-02-12 Tyler Wilson
+ * @param Iobs:  The observed DN intensity
+ * @param x0:  The starting value for the Newton-Rapheson method
+ * @param g:  A vector of the coefficients for the linearity function.  It is a third-order
+ * polynomial.
+ * @param result:  The final approximation of the root of the equation.
+ * @param epsilon:  The tolerance on the final solution.
+ * @return A root of the linearity correction function, centered near the origin.
+ */
 bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
 
    double x[2];
@@ -195,6 +223,7 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 * @param out  Radometrically corrected image
 * @internal
 *   @history 2017-07-2017 Ian Humphrey & Kaj Williams - Adapted from amicacal.
+*   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
 */
 void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
@@ -231,6 +260,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
     // Apply compression factor here to raise LOSSY dns to proper response
     imageOut[i] *= g_compfactor;
+    qDebug() << "Compfactor:  "  <<g_compfactor;
 
 
     // 1) BIAS Removal - Only needed if not on-board corrected
@@ -249,11 +279,10 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     }
 
 
-    double dn = imageOut[i];
-    double linearCorrection;
+    double dn = imageOut[i];    
     double result = 1.0;
     double x0 = 1.0;
-    newton_rapheson(imageOut[i],x0, g_L,result );
+    newton_rapheson(dn,x0, g_L,result );
     //linearCorrection = g_L[0]*dn+g_L[1]*pow(dn,2.0)+g_L[2]*pow(dn,3.0);
     imageOut[i] = result;
 
@@ -271,6 +300,8 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // if (nsubImages <= 1) {
     //  imageOut[i] = c1*(imageOut[i] - smear);
     // }
+
+
     if (!g_onBoardSmearCorrection) {
 
       double smear = 0;
@@ -281,7 +312,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       imageOut[i] = imageOut[i] - smear;
 
       }
-
     //Linearity Correction
     //In the SIS this adjustment is made just after the bias, but
     //in the Calibration paper it happens just before the flat field correction.
@@ -312,7 +342,9 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     // TODO: once the radiance values are known for each band, we can correctly compute I/F.
     // For now, g_iof is 1, so output will be in DNs.
     // 7) I/F or Radiance Conversion (or g_iof might = 1, in which case the output will be in DNs)
-    imageOut[i] *= g_iof;
+    imageOut[i] *=g_iof;
+
+
 
   }
 
@@ -548,6 +580,7 @@ void  translate(Cube *flatField,double *transform, QString fname) {
 * @return FileName Path and name of flat file file
 * @internal
 *   @history 2017-07-27 Ian Humphrey & Kaj Williams - Adapted from amicacal.
+*   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
 */
 FileName DetermineFlatFieldFile(const QString &filter) {
 
@@ -625,7 +658,6 @@ QString loadCalibrationVariables(const QString &config)  {
   // Compute BIAS correction factor (it's a constant so do it once!)
   g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
   g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //correction factor
-  qDebug() << "Bias: " << g_bias;
 
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
@@ -642,15 +674,6 @@ QString loadCalibrationVariables(const QString &config)  {
 
   return ( calibFile.original() );
 }
-
-
-
-
-
-
-
-
-
 
 
 

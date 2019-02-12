@@ -151,7 +151,7 @@ void hyb2onccal(UserInterface &ui) {
 
   try {
     g_AEtemperature = inst["ONCAETemperature"][0].toDouble();
-    qDebug() << "g_AEtemperature:  " << g_AEtemperature;
+
   }
   catch(IException &e) {
     QString msg = "Unable to read [ONCAETemperature] keyword in the Instrument group "
@@ -162,7 +162,7 @@ void hyb2onccal(UserInterface &ui) {
 
   try {
     g_CCD_T_temperature = inst["ONCTCCDTemperature"][0].toDouble();
-    qDebug() << "g_CCD_T_Temperature:  " << g_CCD_T_temperature;
+
   }
   catch(IException &e) {
     QString msg = "Unable to read [ONCTCCDTemperature] keyword in the Instrument group "
@@ -172,7 +172,7 @@ void hyb2onccal(UserInterface &ui) {
 
   try {
     g_ECT_T_temperature = inst["ONCTElectricCircuitTemperature"][0].toDouble();
-    qDebug() << "g_ECT_T_temperature: " << g_ECT_T_temperature;
+
   }
   catch(IException &e) {
     QString msg = "Unable to read [ONCTElectricCircuitTemperature] keyword in the Instrument group "

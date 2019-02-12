@@ -270,6 +270,9 @@ values for each band for Hayabusa2 ONC.
     <change name="Ian Humphrey and Kaj Williams" date="2017-07-27">
       Original version. Adapted from amicacal.
     </change>
+    <change name="Tyler Wilson" date="2019-02-12">
+      Modified version to handle the updated calibration values/formulas.
+    </change>
   </history>
 
   <groups>
