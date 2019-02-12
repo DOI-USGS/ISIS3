@@ -70,7 +70,7 @@ ISIS3’s Spice class is the entry point for reading and managing all SPICE rela
 ## Unresolved Questions
                           
 What will the new JSON format for SPICE data look like? The ALE ISD format isn’t fully actualized. 
-How to handle kernel writers? An important part of ISIS3’s functionality is to write new adjusted kernels. This is out of scope for this RFC but to fully extract SPICE kernel IO from ISIS, we need to talk how to handle kernel writing in the future. 
+How to handle kernel writers? An important part of ISIS3’s functionality is to write new adjusted kernels. This is out of scope for this RFC but to fully extract SPICE kernel IO from ISIS, we need to talk about handling kernel writing in the future. 
 
 ## Future Possibilities
 
