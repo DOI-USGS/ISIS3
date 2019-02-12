@@ -1,4 +1,4 @@
-**This is simply a raw plain text dump of the internal document put together by ISIS developers to determine the spoce of changes required in the work proposed in RFC3**
+**This is simply a raw plain text dump of the internal document put together by ISIS developers to determine the scope of changes required in the work proposed in RFC3**
 
 ________________
 
