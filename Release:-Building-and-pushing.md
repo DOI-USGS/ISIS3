@@ -13,6 +13,8 @@ In this step, we will carefully prepare the local repository to build from as we
   * The build number should be incremented for each build produced for a certain version number, for example when bug fixes are released, and should always begin at 0 for each version.
   * Please note that this step is important as this is how versioning works in Anaconda Cloud and so you may overwrite an older uploaded file inadvertently if this step is missed.
 * Update the isis/version file to reflect the proper version number
+* Confirm that the ```ninja docs``` line from the recipe/build.sh file has been removed
+   * The documentation requires a lot of space and we are only allowed 5GB of space on Anaconda Cloud. For more information on this issue, visit the [RFC1](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery).
 * Cherry-pick in all changes that need to go into the build
   * For custom builds, this will usually not be needed. This will pretty much always need to be done, however, for public releases.
 * Do a manual build and run the tests for all systems
