@@ -465,9 +465,18 @@ namespace Isis {
     }
     //  Get some pertinent information from the label
     PvlObject &tabObj = label.findObject(tableName);
+    // The table description contains the actual "RECORD_BYTES"
     if (tabObj.hasKeyword("RECORD_BYTES")) {
       m_recordBytes = (int) tabObj.findKeyword("RECORD_BYTES");
     }
+    // The table description has "ROW_BYTES" and "ROW_SUFFIX_BYTES". These summed is the 
+    // record length. Can be for detached and attached labels
+    else if (tabObj.hasKeyword("ROW_BYTES") && tabObj.hasKeyword("ROW_SUFFIX_BYTES")) {
+      m_recordBytes = (int) tabObj.findKeyword("ROW_BYTES") +
+                      (int) tabObj.findKeyword("ROW_SUFFIX_BYTES");
+    }
+    // The table record length is defined by the file record
+    // length (i.e., table is in with the image)
     else {
       m_recordBytes = (int) label.findKeyword("RECORD_BYTES");
     }
