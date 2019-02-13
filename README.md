@@ -9,7 +9,7 @@
 
 ## Installation
 
-This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0)+ through conda.
+Follow the instructions in this installation guide to use conda to install ISIS3 (3.6.0)+.
 
 ### ISIS3 Installation With Conda
 
