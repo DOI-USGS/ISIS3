@@ -9,9 +9,9 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) FROM=$(INPUT)/PSP_009492_1280_RED.NOPROJ.lbl \
-	  to=$(OUTPUT)/uncompressed.cub > /dev/null;
+	  to=$(OUTPUT)/uncompressed_lbl.cub > /dev/null;
 	$(APPNAME) FROM=$(INPUT)/PSP_009492_1280_RED_COMPRESSED.NOPROJ.IMG \
-	  to=$(OUTPUT)/compressed.cub > /dev/null;
-	cubediff from=$(OUTPUT)/uncompressed.cub from2=$(OUTPUT)/compressed.cub \
+	  to=$(OUTPUT)/compressed_img.cub > /dev/null;
+	cubediff from=$(OUTPUT)/uncompressed_lbl.cub from2=$(OUTPUT)/compressed_img.cub \
 	  to=$(OUTPUT)/comparisonTruth.txt > /dev/null;
 
