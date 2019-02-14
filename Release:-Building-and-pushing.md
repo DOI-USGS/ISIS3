@@ -9,9 +9,11 @@ In this step, we will carefully prepare the local repository to build from as we
 * Clone a fresh copy of the ISIS3 repository from GitHub
 * Update the recipes/meta.yaml file to include proper version number, branch, and build number
   * The version should be the version of ISIS you are building.
+    * If you are building a Release Candidate, please include "-RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1-RC"
+    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1-cassis"
   * The branch should be the branch from the remote repository that you would like to build from. This will usually be the "release" branch for public builds, but it is also possible to do custom builds from other branches.
   * The build number should be incremented for each build produced for a certain version number, for example when bug fixes are released, and should always begin at 0 for each version.
-  * Please note that this step is important as this is how versioning works in Anaconda Cloud and so you may overwrite an older uploaded file inadvertently if this step is missed.
+  * Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.
 * Update the isis/version file to reflect the proper version number
 * Confirm that the ```ninja docs``` line from the recipe/build.sh file has been removed
    * The documentation requires a lot of space and we are only allowed 5GB of space on Anaconda Cloud. For more information on this issue, visit the [RFC1](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery).
