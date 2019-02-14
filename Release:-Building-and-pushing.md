@@ -34,6 +34,8 @@ In this step, we will carefully prepare the local repository to build from as we
 
 In this step, we will create the build(s) for Anaconda Cloud. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28), and one for Mac (built on prog27). (Missions may need certain builds and not others. Communicate with your team as to what they are going to need.) Repeat this and the upload process process for each necessary system.
 
+Please keep in mind that conda may be a little finicky when building for other systems. You must use an OS-specific version of the software, confirm that there exists only one version in your system PATH variable, and that all commands run use that version exclusively. Fortunately, much of the output from conda commands will state the path to the version it is using explicitly.
+
 * ssh into the prog machine that you are creating the build from
 * In your base Anaconda environment (just confirm no environments have been activated), run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
