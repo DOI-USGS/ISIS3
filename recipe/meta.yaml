@@ -24,6 +24,7 @@
 # the same version.
 {% set build_number = "0" %}
 
+package:
   name: isis3
   version: {{ version }}
 
