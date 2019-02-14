@@ -60,5 +60,5 @@ If, however, this is a custom build and/or you do not wish for this build to be 
 
 ```anaconda upload -u usgs-astrogeology -l cassis <path-to-the-.tar.bz2-file>```
 
-Remember to always ensure that special builds include a label flag or you may inadvertently overwrite the main-label build on Anaconda Cloud and users may receive a build not intended as a main release.
+Remember to always ensure that custom builds include a label flag or the file will be uploaded by default with the "main" tag on Anaconda Cloud and users may receive a build not intended as a main release by default.
 
