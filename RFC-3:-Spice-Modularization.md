@@ -1,7 +1,7 @@
 * Feature/Process Name: Spice Data
 * Start Date: Late July - Mid August
 * RFC PR: (empty until a PR is opened)
-* Issue: (link or create and link and associated issue for discussion)
+* Issue: https://github.com/USGS-Astrogeology/ISIS3/issues/2370
 * Authors: Kristin Berry, Jesse Mapel, Adam Paquette, Kelvin Rodriguez, Summer Stapleton
 
 ## Summary
