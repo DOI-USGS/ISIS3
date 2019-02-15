@@ -1,5 +1,27 @@
+# When building ISIS for a public release, be sure that these variables are properly set to reflect
+# your current build. Keep in mind that these values are how conda build names its .tar.bz2 build
+# file, and so must be unique to other builds sitting in the USGS-Astrogeology channel on Anaconda
+# Cloud, or they will be overwritten when you upload this current build. It is always a good idea to
+# confirm that you will not be overwriting a file that has already been uploaded by checking the
+# channel before building.
+
+# This is the version of ISIS that you are building. (Please refer to
+# RFC2 (https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process) if you are not sure
+# about what version you are building.)
+# Examples:
+#       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
+#       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
+#       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
 {% set version = "3.6.1" %}
+
+# This is the branch that conda build will pull from the ISIS repository. If you are building for a
+# general public release, leave the branch as "release". If you are building a custom build, like
+# for a mission for example, simply change the value to the branch of choice.
 {% set git_branch = "release" %}
+
+# This is the build number for the current version you are building. If this is the first build of
+# this version, the build number will be 0. It is incremented by 1 with every consecutive build of
+# the same version.
 {% set build_number = "0" %}
 
 package:
