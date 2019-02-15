@@ -302,9 +302,8 @@ xsi:noNamespaceSchemaLocation=
 		<change name="Kaj Williams" date="2017-06-09">
       Renamed albedo to albedoRank, and morph (or morphology) to morphRank (or MorphologyRank). Ref #4008.
     </change>
-    <change name="Kaitlyn Lee" date="2018-03-10">
-      RA and DEC are exported regardless if the point is not on the planet. RA and DEC bands 
-      are now added last. Fixes #4446.
+    <change name="Kaitlyn Lee" date="2019-02-15">
+      Allowed RA and DEC to be exported regardless if the pixel is off body. Fixes #4446.
     </change>
   </history>
 
