@@ -49,6 +49,8 @@ bool bodyFixedX;
 bool bodyFixedY;
 bool bodyFixedZ;
 
+int raBandNum;
+
 void phocubeDN(Buffer &in, Buffer &out);
 void phocube(Buffer &out);
 
@@ -134,6 +136,8 @@ void IsisMain() {
   bodyFixedX = false;
   bodyFixedY = false;
   bodyFixedZ = false;
+  raBandNum = 0;  // 0 based, if RA is 5th band, raBandNum will be 4
+
   if (!noCamera) {
     if ((phase = ui.GetBoolean("PHASE"))) nbands++;
     if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
@@ -152,11 +156,11 @@ void IsisMain() {
     if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
     if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
     if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
+    if ((ra = ui.GetBoolean("RADEC"))) nbands++;
+    if ((declination = ui.GetBoolean("RADEC"))) nbands++;
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
-    if ((ra = ui.GetBoolean("RADEC"))) nbands++;
-    if ((declination = ui.GetBoolean("RADEC"))) nbands++;
   }
   if ((dn = ui.GetBoolean("DN"))) nbands++;
   if ((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
@@ -184,32 +188,105 @@ void IsisMain() {
 
   // Create a bandbin group for the output label
   PvlKeyword name("Name");
-  if (dn) name += bname;
-  if (phase) name += "Phase Angle";
-  if (emission) name += "Emission Angle";
-  if (incidence) name += "Incidence Angle";
-  if (localEmission) name += "Local Emission Angle";
-  if (localIncidence) name += "Local Incidence Angle";
-  if (latitude) name += "Latitude";
-  if (longitude) name += "Longitude";
-  if (pixelResolution) name += "Pixel Resolution";
-  if (lineResolution) name += "Line Resolution";
-  if (sampleResolution) name += "Sample Resolution";
-  if (detectorResolution) name += "Detector Resolution";
-  if (obliqueDetectorResolution) name += "Oblique Detector Resolution";
-  if (northAzimuth) name += "North Azimuth";
-  if (sunAzimuth) name += "Sun Azimuth";
-  if (spacecraftAzimuth) name += "Spacecraft Azimuth";
-  if (offnadirAngle) name += "OffNadir Angle";
-  if (subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
-  if (subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
-  if (morphologyRank) name += "Morphology Rank";
-  if (albedoRank) name += "Albedo Rank";
-  if (bodyFixedX) name += "Body Fixed X";
-  if (bodyFixedY) name += "Body Fixed Y";
-  if (bodyFixedZ) name += "Body Fixed Z";
-  if (ra) name += "Right Ascension";
-  if (declination) name += "Declination";
+  if (dn) {
+    name += bname;
+    raBandNum++;
+  } 
+  if (phase) {
+    name += "Phase Angle";
+    raBandNum++;
+  } 
+  if (emission) {
+    name += "Emission Angle";
+    raBandNum++;
+  }
+  if (incidence) {
+    name += "Incidence Angle";
+    raBandNum++;
+  }
+  if (localEmission) {
+    name += "Local Emission Angle";
+    raBandNum++;
+  }
+  if (localIncidence) {
+    name += "Local Incidence Angle";
+    raBandNum++;
+  }
+  if (latitude) {
+    name += "Latitude";
+    raBandNum++;
+  }
+  if (longitude) {
+    name += "Longitude";
+    raBandNum++;
+  }
+  if (pixelResolution) {
+    name += "Pixel Resolution";
+    raBandNum++;
+  }
+  if (lineResolution) {
+    name += "Line Resolution";
+    raBandNum++;
+  }
+  if (sampleResolution) {
+    name += "Sample Resolution";
+    raBandNum++;
+  }
+  if (detectorResolution) {
+    name += "Detector Resolution";
+    raBandNum++;
+  }
+  if (obliqueDetectorResolution) {
+    name += "Oblique Detector Resolution";
+    raBandNum++;
+  }
+  if (northAzimuth) {
+    name += "North Azimuth";
+    raBandNum++;
+  }
+  if (sunAzimuth) {
+    name += "Sun Azimuth";
+    raBandNum++;
+  }
+  if (spacecraftAzimuth) {
+    name += "Spacecraft Azimuth";
+    raBandNum++;
+  }
+  if (offnadirAngle) {
+    name += "OffNadir Angle";
+    raBandNum++;
+  }
+  if (subSpacecraftGroundAzimuth) {
+    name += "Sub Spacecraft Ground Azimuth";
+    raBandNum++;
+  }
+  if (subSolarGroundAzimuth) {
+    name += "Sub Solar Ground Azimuth";
+    raBandNum++;
+  }
+  if (morphologyRank) {
+    name += "Morphology Rank";
+    raBandNum++;
+  }
+  if (albedoRank) {
+    name += "Albedo Rank";
+    raBandNum++;
+  }
+  if (ra) {
+    name += "Right Ascension";
+  }
+  if (declination) {
+    name += "Declination";
+  }
+  if (bodyFixedX) {
+    name += "Body Fixed X";
+  }
+  if (bodyFixedY) {
+    name += "Body Fixed Y";
+  }
+  if (bodyFixedZ) {
+    name += "Body Fixed Z";
+  }
 
   // Create the output cube.  Note we add the input cube to expedite propagation
   // of input cube elements (label, blobs, etc...).  It will be cleared
@@ -424,6 +501,16 @@ void phocube(Buffer &out) {
           index += 64 * 64;
         }
 
+        if (ra) {
+          out[index] = cam->RightAscension();
+          index += 64 * 64;
+        }
+
+        if (declination) {
+          out[index] = cam->Declination();
+          index += 64 * 64;
+        }
+
         if (!noCamera) {
           double pB[3];
           cam->Coordinate(pB);
@@ -443,32 +530,20 @@ void phocube(Buffer &out) {
         }
       }
 
-      // Trim outer space except last two bands when RA and declination are selected
-      // We always skip two because RA and declination are selected together.
+      // Trim outer space except RA and dec bands
       else {
-        int bandsToProcess;
-        if (ra && declination) {
-          bandsToProcess = nbands - 2;
-        }
-        else {
-          bandsToProcess = nbands;
-        }
-
-        for (int b = (skipDN) ? 1 : 0; b < bandsToProcess; b++) {
-          out[index] = Isis::NULL8;
+        for (int b = (skipDN) ? 1 : 0; b < nbands; b++) {
+          if(ra && b == raBandNum) {
+            out[index] = cam->RightAscension();
+          }
+          else if (declination && b == raBandNum + 1) {
+            out[index] = cam->Declination();
+          }
+          else {
+            out[index] = Isis::NULL8;
+          }
           index += 64 * 64;
         }
-      }
-
-      // Export the RA and declination regardless if the point is in outer space or not.
-      if (ra) {
-        out[index] = cam->RightAscension();
-        index += 64 * 64;
-      }
-
-      if (declination) {
-        out[index] = cam->Declination();
-        index += 64 * 64;
       }
     }
   }
