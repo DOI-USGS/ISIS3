@@ -21,7 +21,7 @@ Why on earth would we want to do this? We have heard from our users time and aga
 
 On compatibility: **The proposed change would be backward, but not forward compatible.** What does that mean? 
 
-Data created (`spiceinit` or `jigsaw` or ...) using ISIS3 would be usable in ISIS4. ISIS4 is backwards compatible with ISIS3. Data created (`spiceinit` or `ckwriter` or `jigsaw`) in ISIS4 would not be readable or usable (forward compatible) in ISIS3. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) is not proposing to deprecate any applications between ISIS3 and ISIS4. The proposed change is intentionally being kept away from the application API layer as much as possible to both normalize this type of semantic versioning with our user base and in order to provide us with a tractable problem scope (in RFC3).
+Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS3 would be usable in ISIS4. ISIS4 is backwards compatible with ISIS3. Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS4 would not be readable or usable (forward compatible) in ISIS3. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) is not proposing to deprecate any applications between ISIS3 and ISIS4. The proposed change is intentionally being kept away from the application API layer as much as possible to both normalize this type of semantic versioning with our user base and in order to provide us with a tractable problem scope (in RFC3).
 
 Anticipated application changes:
   - `spiceinit` - The arguments used to run spiceinit will
