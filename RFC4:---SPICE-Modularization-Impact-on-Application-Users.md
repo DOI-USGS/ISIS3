@@ -23,12 +23,16 @@ On compatibility: **The proposed change would be backward, but not forward compa
 
 Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS3 would be usable in ISIS4. ISIS4 is backwards compatible with ISIS3. Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS4 would not be readable or usable (forward compatible) in ISIS3. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) is not proposing to deprecate any applications between ISIS3 and ISIS4. The proposed change is intentionally being kept away from the application API layer as much as possible to both normalize this type of semantic versioning with our user base and in order to provide us with a tractable problem scope (in RFC3).
 
+It should be noted that only SPICE data required to perform camera operations will be affected by this change. SPICE data such as DSKs and data used for calibration will not be affected by this change. These data are queried outside of the camera model hierarchy and will continue to work as in ISIS3.
+
 ## Anticipated application level changes
   - `spiceinit` - The attach argument will be removed. SPICE Data will now always be attached.
   - Cubes created in ISIS3 with kernels selected but no SPICE attached will need to be updated in order to query the kernels and attach the SPICE data. This functionality will exist in the lower level ALE library and can be exposed by a separate utility or integrated into spiceinit.
 
 # Drawbacks
-Change is scary. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) describes the technical hurdles we anticipate with implementation. We also see a hurdle in communicating our goals and rationale to our non-developer user community. 
+Change is scary. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) describes the technical hurdles we anticipate with implementation. We also see a hurdle in communicating our goals and rationale to our non-developer user community.
+
+Processing that relies on working with SPICE data that is not attached to cube labels will no longer be supported.
 
 # Alternatives
   - We have explored maintaining both backwards and forwards compatibility. The cost of forwards compatibility is non-trivial.
