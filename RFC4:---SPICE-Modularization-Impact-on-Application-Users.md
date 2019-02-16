@@ -32,9 +32,10 @@ Change is scary. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-S
 
 # Alternatives
   - We have explored maintaining both backwards and forwards compatibility. The cost of forwards compatibility is non-trivial.
+  - Support Cubes creates in ISIS3 with selected kernels, but no attached SPICE data by loading kernels and querying when the cube is loaded. This would require additional interaction between the ALE IO code and increased complexity in the ISIS camera model hierarchy. Providing a one time update utility to handle these types of cubes will provide almost as much utility at greatly reduced complexity and maintenance overhead.
 
 # Unresolved Questions
   - We (ASC and the ISIS3 development team) continue to seek the best methods to communicate potential changes to ISIS3.
 
 # Future Possibilities
-  - None noted.
+  - Rewrite spkwriter and ckwriter functionality to be a part of the [ALE](https://github.com/USGS-Astrogeology/ale) library. This will allow for users to generate SPICE C and SP kernels either through ISIS4 or the more light weight ALE. This also creates a path for generating SPICE C and SP kernels using our [Community Sensor Model implementation](https://github.com/USGS-Astrogeology/usgscsm).
