@@ -23,9 +23,9 @@ On compatibility: **The proposed change would be backward, but not forward compa
 
 Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS3 would be usable in ISIS4. ISIS4 is backwards compatible with ISIS3. Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS4 would not be readable or usable (forward compatible) in ISIS3. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) is not proposing to deprecate any applications between ISIS3 and ISIS4. The proposed change is intentionally being kept away from the application API layer as much as possible to both normalize this type of semantic versioning with our user base and in order to provide us with a tractable problem scope (in RFC3).
 
-Anticipated application level changes:
+## Anticipated application level changes
   - `spiceinit` - The attach argument will be removed. SPICE Data will now always be attached.
-  - Cubes with kernels selected but no SPICE attached will need to be re-spiceinit'd in order to query the kernels and attach the SPICE data.
+  - Cubes created in ISIS3 with kernels selected but no SPICE attached will need to be re-spiceinit'd in order to query the kernels and attach the SPICE data.
 
 # Drawbacks
 Change is scary. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) describes the technical hurdles we anticipate with implementation. We also see a hurdle in communicating our goals and rationale to our non-developer user community. 
