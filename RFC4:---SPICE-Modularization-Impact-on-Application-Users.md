@@ -25,7 +25,7 @@ Data created (`spiceinit`) or adjusted (`jigsaw`, deltack, etc.) using ISIS3 wou
 
 ## Anticipated application level changes
   - `spiceinit` - The attach argument will be removed. SPICE Data will now always be attached.
-  - Cubes created in ISIS3 with kernels selected but no SPICE attached will need to be re-spiceinit'd in order to query the kernels and attach the SPICE data.
+  - Cubes created in ISIS3 with kernels selected but no SPICE attached will need to be updated in order to query the kernels and attach the SPICE data. This functionality will exist in the lower level ALE library and can be exposed by a separate utility or integrated into spiceinit.
 
 # Drawbacks
 Change is scary. [RFC3](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC-3:-Spice-Modularization) describes the technical hurdles we anticipate with implementation. We also see a hurdle in communicating our goals and rationale to our non-developer user community. 
