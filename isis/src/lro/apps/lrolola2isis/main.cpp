@@ -193,6 +193,9 @@ void IsisMain() {
   if (ui.GetString("OUTPUTTYPE") == "JSON") {
     lidarDataSet.write(ui.GetFileName("TO"), LidarData::Format::Json);
   }
+  else if (ui.GetString("OUTPUTTYPE") == "TEST") {
+    lidarDataSet.write(ui.GetFileName("TO"), LidarData::Format::Test);
+  }
   else {
     lidarDataSet.write(ui.GetFileName("TO"), LidarData::Format::Binary);
   }

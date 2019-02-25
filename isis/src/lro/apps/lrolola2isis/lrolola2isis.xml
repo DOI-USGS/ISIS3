@@ -41,6 +41,10 @@
       Changed internal default for lidar coordinate a priori uncertainties to "none", allowing FREE
       lidar points.
       </change>
+    <change name="Debbie A Cook" date="2019-02-23">
+      Added new file OUTPUTTYPE=TEST, to be used strictly for testing.
+      This option does a SLOW sort on the output data.
+      </change>
   </history>
 
   <category>
@@ -92,6 +96,9 @@
             </option>
             <option value="JSON">
               <brief> JSON output file (.json)</brief>
+            </option>
+            <option value="TEST">
+              <brief> DO NOT USE (only for tests) ordered JSON output file (.json) </brief>
             </option>
           </list>
         </parameter>
