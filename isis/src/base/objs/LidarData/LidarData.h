@@ -5,7 +5,6 @@
 #include <QList>
 #include <QMap>
 #include <QPointer>
-#include <QSharedPointer>
 #include <QString>
 #include <QVector>
 
@@ -19,7 +18,6 @@ class QJsonObject;
 namespace Isis {
   class Camera;
   class FileName;
-  //  class LidarControlPoint;
   class Progress;
   class SerialNumberList;
 

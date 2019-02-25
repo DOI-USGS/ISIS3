@@ -8,7 +8,7 @@
 #include <QJsonValue>
 #include <QList>
 #include <QRegExp>
-//#include <QSharedPointer>
+#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
@@ -20,7 +20,6 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
-//#include "LidarControlPoint.h"
 #include "Longitude.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
