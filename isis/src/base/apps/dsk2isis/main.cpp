@@ -32,7 +32,7 @@ void initialize(Buffer &out) {
 }
 
 void IsisMain() {
- 
+
   // We will be processing by line
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
@@ -63,7 +63,7 @@ void IsisMain() {
 
   QString method = ui.GetString("METHOD").toLower();
   bool useGridMethod = ( "grid" == method ) ? true : false;
- 
+
   // Get the real tile sizes and allocate the buffer accordingly
   PvlObject &core = ocube->label()->findObject("IsisCube").findObject("Core");
   int tsamps = core["TileSamples"];
@@ -91,23 +91,23 @@ void IsisMain() {
         double lat = tproj->UniversalLatitude();
         double lon = tproj->UniversalLongitude();
         double radius = tproj->LocalRadius(lat);
-  
-        point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees), 
+
+        point.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
                                       Longitude(lon, Angle::Degrees),
                                       Distance(radius, Distance::Meters));
 
         // Calculate the grid point intersection of the DEM
         if ( useGridMethod ) {  // ( "grid" == method )
           // Get the grid point (lat, lon) from the DEM
-          QScopedPointer<SurfacePoint> dempt(dsk.point(point.GetLatitude(), 
+          QScopedPointer<SurfacePoint> dempt(dsk.point(point.GetLatitude(),
                                                        point.GetLongitude()));
 
           pixels[i] = dempt->GetLocalRadius().meters();
         }
         else { // ( "ray" == method )
-          // Get the intercept of the position and look vector of point on the DEM 
+          // Get the intercept of the position and look vector of point on the DEM
           // by using the lat/lon coordinate in X/Y/Z.  This vector is scaled to
-          // be outside the body by 1.5 times.  The look vector is then 
+          // be outside the body by 1.5 times.  The look vector is then
           // determined by negating the vector and an intersection is computed.
           // Grid method winds up doing the same thing - this is the direct
           // computation.
@@ -122,12 +122,15 @@ void IsisMain() {
           NaifVector raydir(3);
           vminus_c(&observer[0], &raydir[0]);
           NaifStatus::CheckErrors();
-  
+
           // Check for valid intercept
-          NaifVertex xpt;
-          if ( dsk.isPlateIdValid(dsk.plateIdOfIntercept(observer, raydir, xpt)) ) { 
-            point.FromNaifArray(&xpt[0]);
+          try {
+            Intercept *intersection = dsk.intercept(observer, raydir);
+            point = intersection->location();
             pixels[i] = point.GetLocalRadius().meters();
+          }
+          catch(IException &e) {
+            // If the intersection errors, leave the pixel null
           }
         }
       }
@@ -139,4 +142,3 @@ void IsisMain() {
 
   p.EndProcess();
 }
-

@@ -23,9 +23,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <QMutex>
 #include <QSharedPointer>
 #include <QString>
+#include <QVector>
 
 #include "NaifDskApi.h"
 
@@ -61,6 +61,8 @@ namespace Isis {
    *   @history 2017-06-28 Kris Becker - Updated DSK includes for NAIF N0066 release that now
    *                           includes the DSK formally. The includes are now all in SpiceUsr.h.
    *                           Removed SPICE includes from the cpp file as well. Fixes #4947.
+   *   @history 2019-02-26 Jesse Mapel - Changed API and logic to account for multi-segment
+   *                           DSK files. Fixes #2632.
    */
   class NaifDskPlateModel {
 
@@ -78,14 +80,6 @@ namespace Isis {
 
       SurfacePoint *point(const Latitude &lat, const Longitude &lon) const;
       Intercept *intercept(const NaifVertex &vertex, const NaifVector &raydir) const;
-  //    Intercept *intercept(const SurfacePoint &pnt) const;
-
-      // Lower level I/O
-      bool     isPlateIdValid(const SpiceInt plateid) const;
-      SpiceInt plateIdOfIntercept(const NaifVertex &vertex,
-                                     const NaifVector &raydir,
-                                     NaifVertex &xpoint) const;
-      NaifTriangle plate(SpiceInt plateid) const;
 
       NaifDskPlateModel *clone() const;
 
@@ -98,37 +92,36 @@ namespace Isis {
                        NoThrow //!< Do not throw an exception if an error occurs.
       };
 
-    /**
-     * @brief NAIF DSK file descriptor
-     *
-     * This local class is designed to make the plate model object copyable, thread
-     * safe and inherently extensible.  The file remains open as long as the
-     * original NaifDskDescriptor has a reference.
-     *
-     * @author 2013-12-05 Kris Becker
-     * @internal
-     *   @history 2013-12-05 Kris Becker  Original Version
-     */
+      /**
+       * @brief NAIF DSK segment descriptor
+       *
+       * This class represents a segment from a NAIF DSK file.
+       *
+       * @author 2013-12-05 Kris Becker
+       * @internal
+       *   @history 2013-12-05 Kris Becker - Original Version
+       *   @history 2019-02-26 Jesse Mapel - Removed mutex
+       */
       class NaifDskDescriptor {
         public:
           NaifDskDescriptor();
           ~NaifDskDescriptor();
 
-          QString       m_dskfile;  //!< The NAIF DSK file representing this plate's shape model.
+          QString       m_dskfile;  //!< The NAIF DSK file the segment belongs to.
           SpiceInt      m_handle;   //!< The DAS file handle of the DSK file.
-          SpiceDLADescr m_dladsc;   /**< The DLA descriptor of the DSK segment representing the
-                                         target surface.*/
-          SpiceDSKDescr m_dskdsc;   //!< The DSK descriptor.
-          SpiceInt      m_plates;   //!< Number of Plates in the model.
-          SpiceInt      m_vertices; //!< Number of vertices defining the plate.
-          QMutex        m_mutex;    //!< Mutex for thread saftey
+          SpiceDLADescr m_dladsc;   //!< The DLA descriptor of the segment.
+          SpiceDSKDescr m_dskdsc;   //!< The DSK descriptor of the segment.
+          SpiceInt      m_plates;   //!< Number of Plates in the segment.
+          SpiceInt      m_vertices; //!< Number of vertices in the segment.
       };
 
       // Shared file descriptor supports copying of object
       typedef QSharedPointer<NaifDskDescriptor>  SharedNaifDskDescriptor;
-      SharedNaifDskDescriptor  m_dsk; //!< Shared pointer to the NaifDskDescriptor for this plate.
 
-      NaifDskDescriptor *openDSK(const QString &dskfile);
+      QVector<SharedNaifDskDescriptor>  m_dsk; //!< Shared pointer to the NaifDskDescriptor for this plate.
+
+      QVector<SharedNaifDskDescriptor> openDSK(const QString &dskfile);
+      NaifTriangle plate(SpiceInt plateid, SharedNaifDskDescriptor segment) const;
       bool verify(const bool &test, const QString &errmsg,
                   const ErrAction &action = Throw) const;
       SurfacePoint *makePoint(const NaifVertex &v) const;

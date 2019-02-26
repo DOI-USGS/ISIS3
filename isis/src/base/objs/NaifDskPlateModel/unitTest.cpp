@@ -101,8 +101,6 @@ int main(int argc, char *argv[]) {
     qDebug() << "Ray Dir:            " << rayDir;
     qDebug() << "Observer:           " << obsPos;
     qDebug() << "Intercept is null?  " << toString(intercept == NULL);
-    qDebug() << "intercept plateID?  "
-             << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
 
     // Find obs/rayDir with valid intercept
     obsPos[0]  = 1000.0;  obsPos[1]  = 0.0;   obsPos[2]  = 0.0;
@@ -119,17 +117,6 @@ int main(int argc, char *argv[]) {
     xpoint[1] = xp.GetY().meters();
     xpoint[2] = xp.GetZ().meters();
     qDebug() << "intercept surface point (location)   = " << xpoint << " meters";
-    qDebug() << "intercept plateID                    =  "
-             << naifPlateModelFromDSK.plateIdOfIntercept(obsPos, rayDir, xpoint);
-    qDebug() << "";
-
-    qDebug() << "Get plate info from id:";
-    qDebug() << "Is plate ID = 0 valid? " << naifPlateModelFromDSK.isPlateIdValid(0);
-    qDebug() << "Is plate ID = 1 valid? " << naifPlateModelFromDSK.isPlateIdValid(1);
-    qDebug() << "Is plate ID = 1 valid for invalid NaifDskPlateModel? "
-             << naifPlateModel.isPlateIdValid(1);
-    qDebug() << "Triangular Plate for ID = 1:";
-    qDebug() << naifPlateModelFromDSK.plate(1);
     qDebug() << "";
 
     // currently there is a clone() method prototype, but no implementation.
@@ -143,33 +130,6 @@ int main(int argc, char *argv[]) {
     // qDebug() << "";
 
     qDebug() << "================================= Error Throws ==================================";
-//  qDebug() << "Thrown from Constructor: Create object where openDSK() returns NULL.";
-//    try {
-//      FileName junkFile("");
-//      NaifDskPlateModel naifPlateModelFromDSK(junkFile.expanded());
-//    }
-//    catch (IException &e) {
-//      e.print();
-//    }
-//    qDebug() << "";
-    qDebug() << "Thrown from plateIdOfIntercept(): Get plate ID of intercept with invalid obsPos.";
-    try {
-      NaifVertex badObs(2);
-      badObs[0] = 0.0; badObs[1] = 0.0;
-      naifPlateModelFromDSK.plateIdOfIntercept(badObs, rayDir, xpoint);
-    }
-    catch (IException &e) {
-      e.print();
-    }
-    qDebug() << "";
-    qDebug() << "Thrown from plate(): Get plate from invalid plate ID.";
-    try {
-      naifPlateModelFromDSK.plate(0);
-    }
-    catch (IException &e) {
-      e.print();
-    }
-    qDebug() << "";
     qDebug() << "Thrown from openDSK(): Open DSK file that doesn't exist.";
     try {
       FileName junkFile("./junk.bds");
@@ -179,15 +139,6 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     qDebug() << "";
-//    qDebug() << "Thrown from openDSK(): Open DSK file with no segments.";
-//    try {
-//      FileName noSegmentsFile("");
-//      NaifDskPlateModel junkmodel(noSegmentsFile.expanded());
-//    }
-//    catch (IException &e) {
-//      e.print();
-//    }
-//    qDebug() << "";
     qDebug() << "~NaifDskDescriptor(): Unknown NAIF error has occured.";
     try {
       FileName junkFile("$base/kernels/spk/de405.bsp");
