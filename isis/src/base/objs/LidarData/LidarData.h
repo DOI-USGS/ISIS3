@@ -41,7 +41,7 @@ namespace Isis {
    *                           write methods. Ref #5343.
    *   @history 2018-06-14 Ken Edmundson - Added typedef for QSharedPointer to LidarData object.
    *   @history 2019-02-23 Debbie A. Cook - Added sorting option to points() method with default 
-   *                           being to not sort.
+   *                           being to not sort. References #5343.
    *
    */
   class LidarData {

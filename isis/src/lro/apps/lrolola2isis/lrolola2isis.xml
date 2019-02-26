@@ -43,7 +43,7 @@
       </change>
     <change name="Debbie A Cook" date="2019-02-23">
       Added new file OUTPUTTYPE=TEST, to be used strictly for testing.
-      This option does a SLOW sort on the output data.
+      This option does a SLOW sort on the output data. References #5343.
       </change>
   </history>
 

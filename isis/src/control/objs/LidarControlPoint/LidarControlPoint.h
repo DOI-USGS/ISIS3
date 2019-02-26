@@ -51,7 +51,7 @@ namespace Isis {
    *   @history 2018-03-18 Debbie A. Cook Added Simultaneous measures 
    *   @history 2019-02-23 Debbie A. Cook Added Functor Predicate struct to sort
    *                                        based on Id.  This is needed for getting consistent 
-   *                                        output for comparting test data.
+   *                                        output for comparing test data. References #5343.
    */
   
   class LidarControlPoint : public ControlPoint {

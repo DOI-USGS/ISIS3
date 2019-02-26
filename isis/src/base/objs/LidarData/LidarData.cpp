@@ -49,12 +49,20 @@ namespace Isis {
 
 
   /**
-   * Gets the list of Lidar data points.
+   * Gets the list of Lidar data points optionally sorted . 
    *
+   * @sort An option to sort the list.  The default is false (no sort).
    * @return @b QList<QSharedPointer<LidarControlPoint>> Returns list of Lidar control points.
+   * @internal
+   *   @history 2019-02-23 Debbie A Cook - Added optional argument to the points
+   *                           method to sort the list.  See LidarControlPoint for the sorting
+   *                           functor. The default behavior has not changed for backward
+   *                           compatability. References #5343.
    */
   QList< QSharedPointer<LidarControlPoint> > LidarData::points(bool sort) const {
     if (!sort) {
+      // This is the default behavior.  The list is coming from a QHash so the point order
+      // will vary.
       return m_points.values();
     }
     else {
