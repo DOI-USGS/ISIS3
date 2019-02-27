@@ -346,7 +346,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
     sumMode = "0";
   }
   else {
-    sumMode = (QString)archive["Window" + toString((int)archive["WindowCount"] + 1) + "Binning"];
+    sumMode = (QString)archive["Window" + (QString)archive["WindowCount"] + "Binning"];
   }
   PvlKeyword summingMode("SummingMode", sumMode);
   outputLabel->findGroup("Instrument", Pvl::Traverse).addKeyword(summingMode);
