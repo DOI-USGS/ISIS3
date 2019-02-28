@@ -368,6 +368,8 @@ namespace Isis {
       outputFile = outputFile.setExtension("json");
     }
     else if (format == Test) {
+      // Format is same as Json, but points are sorted instead of random so that
+      // output can be compared to truth data
       outputFile = outputFile.setExtension("json");
       sort = true;
     }
