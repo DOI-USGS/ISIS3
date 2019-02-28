@@ -11,12 +11,13 @@
 #include "boost/numeric/ublas/symmetric.hpp"
 #include "boost/numeric/ublas/io.hpp"
 
+#include "LidarControlPoint.h"
+
 class QJsonObject;
 
 namespace Isis {
   class Camera;
   class FileName;
-  class LidarControlPoint;
   class Progress;
   class SerialNumberList;
 
@@ -39,6 +40,8 @@ namespace Isis {
    *                           and adjusted variance/covariance matrix to the read and
    *                           write methods. Ref #5343.
    *   @history 2018-06-14 Ken Edmundson - Added typedef for QSharedPointer to LidarData object.
+   *   @history 2019-02-23 Debbie A. Cook - Added sorting option to points() method with default 
+   *                           being to not sort. References #5343.
    *
    */
   class LidarData {
@@ -47,21 +50,23 @@ namespace Isis {
       /** Enumerates the file formats for serializing the LidarData class. */
       enum Format {
         Binary, /**< Serializes to a binary (QByteArray) .dat file. */
-        Json    /**< Serializes to a JSON .json file. */
+        Json,    /**< Serializes to a JSON .json file. */
+        Test    /**< Serializes to an ordered JSON .json file for comparing to truth data. */
       };
 
       LidarData();
 
       void insert(QSharedPointer<LidarControlPoint> point);
-      QList< QSharedPointer<LidarControlPoint> > points() const;
+
+      QList< QSharedPointer<LidarControlPoint> > points(bool sort = false) const;
 
       void SetImages(SerialNumberList &list, Progress *progress = 0);
 
-      // Serialization methods or LidarData
+      // Serialization methods for LidarData
       void read(FileName);
       void write(FileName, Format);
-
-    private:
+    
+    private:    
       /** Hash of the LidarControlPoints this class contains. */
       QHash<QString, QSharedPointer <LidarControlPoint> > m_points;
 

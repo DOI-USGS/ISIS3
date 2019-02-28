@@ -20,7 +20,6 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
-#include "LidarControlPoint.h"
 #include "Longitude.h"
 #include "Progress.h"
 #include "SerialNumberList.h"
@@ -50,14 +49,32 @@ namespace Isis {
 
 
   /**
-   * Gets the list of Lidar data points.
+   * Gets the list of Lidar data points optionally sorted . 
    *
+   * @param sort An option to sort the list.  The default is false (no sort).
    * @return @b QList<QSharedPointer<LidarControlPoint>> Returns list of Lidar control points.
+   * @internal
+   *   @history 2019-02-23 Debbie A Cook - Added optional argument to the points
+   *                           method to sort the list.  See LidarControlPoint for the sorting
+   *                           functor. The default behavior has not changed for backward
+   *                           compatability. References #5343.
    */
-  QList< QSharedPointer<LidarControlPoint> > LidarData::points() const {
-    return m_points.values();
+  QList< QSharedPointer<LidarControlPoint> > LidarData::points(bool sort) const {
+    if (!sort) {
+      // This is the default behavior.  The list is coming from a QHash so the point order
+      // will vary.
+      return m_points.values();
+    }
+    else {
+      // Sort the points as recommended by QT with std::sort since qsort is deprecated 
+      QList< QSharedPointer<LidarControlPoint> > pointlist = points();
+      std::sort(pointlist.begin(), pointlist.end(),
+                LidarControlPoint::LidarControlPointLessThanFunctor());
+      return pointlist;
+    }
   }
 
+  
   /**
    * Creates the ControlNet's image camera's based on the list of Serial Numbers
    *
@@ -344,9 +361,17 @@ namespace Isis {
    * @throws IException::User Throws User exception if it cannot open the file for writing.
    */
   void LidarData::write(FileName outputFile, LidarData::Format format) {
+    bool sort = false;  // Default behavior
+    
     // Set up the output file
     if (format == Json) {
       outputFile = outputFile.setExtension("json");
+    }
+    else if (format == Test) {
+      // Format is same as Json, but points are sorted instead of random so that
+      // output can be compared to truth data
+      outputFile = outputFile.setExtension("json");
+      sort = true;
     }
     else {
       outputFile = outputFile.setExtension("dat");
@@ -362,7 +387,7 @@ namespace Isis {
     QJsonObject lidarDataObject;
     QJsonArray pointArray;
     // Serialize the LidarControlPoints it contains
-    foreach (QSharedPointer<LidarControlPoint> lcp, points()) {
+    foreach (QSharedPointer<LidarControlPoint> lcp, points(sort)) {
       // Serialize LidarControlPoint
       QJsonObject pointObject;
       pointObject["id"] = lcp->GetId();
@@ -458,7 +483,7 @@ namespace Isis {
 
     // Write the JSON to the file
     QJsonDocument lidarDataDoc(lidarDataObject);
-    if (format == Json) {
+    if (format == Json || format == Test) {
       saveFile.write(lidarDataDoc.toJson());
     }
     else {

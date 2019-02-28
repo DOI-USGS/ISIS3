@@ -24,6 +24,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <algorithm>
+#include <functional>
+
+#include <QPointer>
+#include <QSharedPointer>
+
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Cube.h"
@@ -43,6 +49,9 @@ namespace Isis {
    *   @history 2018-01-29 Makayla Shepherd Original version
    *   @history 2018-02-09 Ken Edmundson Added typedef forLidarControlPointQsp
    *   @history 2018-03-18 Debbie A. Cook Added Simultaneous measures 
+   *   @history 2019-02-23 Debbie A. Cook Added Functor Predicate struct to sort
+   *                                        based on Id.  This is needed for getting consistent 
+   *                                        output for comparing test data. References #5343.
    */
   
   class LidarControlPoint : public ControlPoint {
@@ -58,6 +67,17 @@ namespace Isis {
     ControlPoint::Status setTime(iTime time);
     ControlPoint::Status addSimultaneous(QString newSerial);
 
+    //  Functor predicate for sorting LidarControlPoints
+    struct LidarControlPointLessThanFunctor :
+      public std::binary_function<QSharedPointer<LidarControlPoint>,
+                                                      QSharedPointer<LidarControlPoint>,
+                                                      bool> {
+      bool operator() ( QSharedPointer<LidarControlPoint> lcp1,
+                                    QSharedPointer<LidarControlPoint> lcp2)
+          {
+           return (lcp1->GetId() < lcp2->GetId());
+          }
+    };
     double range();
     double sigmaRange();
     iTime time();
