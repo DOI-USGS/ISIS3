@@ -341,8 +341,9 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
 
   PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
 
+  // Calculate SummingMode keyword and add to label
   QString sumMode;
-  if ((int)outputLabel->findGroup("Instrument", Pvl::Traverse)["Expanded"] == 1) {
+  if (inst.hasKeyword("Expanded") && (int)inst.findKeyword("Expanded") == 1) {
     sumMode = "0";
   }
   else {
