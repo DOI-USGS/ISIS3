@@ -23,7 +23,7 @@ int nbands;
 bool noCamera;
 
 bool dn;
-bool phase; 
+bool phase;
 bool emission;
 bool incidence;
 bool localEmission;
@@ -49,13 +49,15 @@ bool bodyFixedX;
 bool bodyFixedY;
 bool bodyFixedZ;
 
+int raBandNum;
+
 void phocubeDN(Buffer &in, Buffer &out);
 void phocube(Buffer &out);
 
 
 // Function to create a keyword with same values of a specified count
-template <typename T> PvlKeyword makeKey(const QString &name, 
-                                         const int &nvals, 
+template <typename T> PvlKeyword makeKey(const QString &name,
+                                         const int &nvals,
                                          const T &value);
 
 // Structure containing new mosaic planes
@@ -68,7 +70,7 @@ struct MosData {
 // Computes the special MORPHOLOGYRANK and ALBEDORANK planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
-void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
+void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
                    const QString &default_value = "Null");
 
 
@@ -95,7 +97,7 @@ void IsisMain() {
       QString msg = "Mosaic files must contain mapping labels";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
-  } 
+  }
   else {
     try {
       cam = icube->camera();
@@ -134,6 +136,8 @@ void IsisMain() {
   bodyFixedX = false;
   bodyFixedY = false;
   bodyFixedZ = false;
+  raBandNum = 0;  // 0 based, if RA is 5th band, raBandNum will be 4
+
   if (!noCamera) {
     if ((phase = ui.GetBoolean("PHASE"))) nbands++;
     if ((emission = ui.GetBoolean("EMISSION"))) nbands++;
@@ -149,27 +153,27 @@ void IsisMain() {
     if ((offnadirAngle = ui.GetBoolean("OFFNADIRANGLE"))) nbands++;
     if ((subSpacecraftGroundAzimuth = ui.GetBoolean("SUBSPACECRAFTGROUNDAZIMUTH"))) nbands++;
     if ((subSolarGroundAzimuth = ui.GetBoolean("SUBSOLARGROUNDAZIMUTH"))) nbands++;
-    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++; 
-    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++; 
-    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++; 
+    if ((morphologyRank = ui.GetBoolean("MORPHOLOGYRANK"))) nbands++;
+    if ((albedoRank = ui.GetBoolean("ALBEDORANK"))) nbands++;
+    if ((northAzimuth = ui.GetBoolean("NORTHAZIMUTH"))) nbands++;
     if ((ra = ui.GetBoolean("RADEC"))) nbands++;
     if ((declination = ui.GetBoolean("RADEC"))) nbands++;
     if ((bodyFixedX = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedY = ui.GetBoolean("BODYFIXED"))) nbands++;
     if ((bodyFixedZ = ui.GetBoolean("BODYFIXED"))) nbands++;
   }
-  if((dn = ui.GetBoolean("DN"))) nbands++;
-  if((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
-  if((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
-  if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
+  if ((dn = ui.GetBoolean("DN"))) nbands++;
+  if ((latitude = ui.GetBoolean("LATITUDE"))) nbands++;
+  if ((longitude = ui.GetBoolean("LONGITUDE"))) nbands++;
+  if ((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
 
-  if(nbands < 1) {
+  if (nbands < 1) {
     QString message = "At least one photometry parameter must be entered"
                      "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  // If outputting a a dn band, retrieve the orignal values for the filter name from the input cube,
+  // If outputting a dn band, retrieve the orignal values for the filter name from the input cube,
   // if it exists.  Otherwise, the default will be "DN"
   QString bname = "DN";
   if ( dn && icube->hasGroup("BandBin") ) {
@@ -184,41 +188,113 @@ void IsisMain() {
 
   // Create a bandbin group for the output label
   PvlKeyword name("Name");
-  if (dn) name += bname;
-  if (phase) name += "Phase Angle";
-  if (emission) name += "Emission Angle";
-  if (incidence) name += "Incidence Angle";
-  if (localEmission) name += "Local Emission Angle";
-  if (localIncidence) name += "Local Incidence Angle";
-  if (latitude) name += "Latitude";
-  if (longitude) name += "Longitude";
-  if (pixelResolution) name += "Pixel Resolution";
-  if (lineResolution) name += "Line Resolution";
-  if (sampleResolution) name += "Sample Resolution";
-  if (detectorResolution) name += "Detector Resolution";
-  if (obliqueDetectorResolution) name += "Oblique Detector Resolution";
-  if (northAzimuth) name += "North Azimuth";
-  if (sunAzimuth) name += "Sun Azimuth";
-  if (spacecraftAzimuth) name += "Spacecraft Azimuth";
-  if (offnadirAngle) name += "OffNadir Angle";
-  if (subSpacecraftGroundAzimuth) name += "Sub Spacecraft Ground Azimuth";
-  if (subSolarGroundAzimuth) name += "Sub Solar Ground Azimuth";
-  if (morphologyRank) name += "Morphology Rank";
-  if (albedoRank) name += "Albedo Rank";
-  if (ra) name += "Right Ascension";
-  if (declination) name += "Declination";
-  if (bodyFixedX) name += "Body Fixed X";
-  if (bodyFixedY) name += "Body Fixed Y";
-  if (bodyFixedZ) name += "Body Fixed Z";
-
+  if (dn) {
+    name += bname;
+    raBandNum++;
+  } 
+  if (phase) {
+    name += "Phase Angle";
+    raBandNum++;
+  } 
+  if (emission) {
+    name += "Emission Angle";
+    raBandNum++;
+  }
+  if (incidence) {
+    name += "Incidence Angle";
+    raBandNum++;
+  }
+  if (localEmission) {
+    name += "Local Emission Angle";
+    raBandNum++;
+  }
+  if (localIncidence) {
+    name += "Local Incidence Angle";
+    raBandNum++;
+  }
+  if (latitude) {
+    name += "Latitude";
+    raBandNum++;
+  }
+  if (longitude) {
+    name += "Longitude";
+    raBandNum++;
+  }
+  if (pixelResolution) {
+    name += "Pixel Resolution";
+    raBandNum++;
+  }
+  if (lineResolution) {
+    name += "Line Resolution";
+    raBandNum++;
+  }
+  if (sampleResolution) {
+    name += "Sample Resolution";
+    raBandNum++;
+  }
+  if (detectorResolution) {
+    name += "Detector Resolution";
+    raBandNum++;
+  }
+  if (obliqueDetectorResolution) {
+    name += "Oblique Detector Resolution";
+    raBandNum++;
+  }
+  if (northAzimuth) {
+    name += "North Azimuth";
+    raBandNum++;
+  }
+  if (sunAzimuth) {
+    name += "Sun Azimuth";
+    raBandNum++;
+  }
+  if (spacecraftAzimuth) {
+    name += "Spacecraft Azimuth";
+    raBandNum++;
+  }
+  if (offnadirAngle) {
+    name += "OffNadir Angle";
+    raBandNum++;
+  }
+  if (subSpacecraftGroundAzimuth) {
+    name += "Sub Spacecraft Ground Azimuth";
+    raBandNum++;
+  }
+  if (subSolarGroundAzimuth) {
+    name += "Sub Solar Ground Azimuth";
+    raBandNum++;
+  }
+  if (morphologyRank) {
+    name += "Morphology Rank";
+    raBandNum++;
+  }
+  if (albedoRank) {
+    name += "Albedo Rank";
+    raBandNum++;
+  }
+  if (ra) {
+    name += "Right Ascension";
+  }
+  if (declination) {
+    name += "Declination";
+  }
+  if (bodyFixedX) {
+    name += "Body Fixed X";
+  }
+  if (bodyFixedY) {
+    name += "Body Fixed Y";
+  }
+  if (bodyFixedZ) {
+    name += "Body Fixed Z";
+  }
 
   // Create the output cube.  Note we add the input cube to expedite propagation
   // of input cube elements (label, blobs, etc...).  It will be cleared
   // prior to systematic processing only if the DN option is not selected.
-  // If DN is chosen by the user, then we propagate the input buffer with a 
+  // If DN is chosen by the user, then we propagate the input buffer with a
   // different function - one that accepts both input and output buffers.
   (void) p.SetInputCube("FROM", OneBand);
-  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(), 
+  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
                                 icube->lineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
 
@@ -238,7 +314,7 @@ void IsisMain() {
   // exists, remove all existing keywords and add the keywords for this app.
   // Otherwise, just put the group in.
   PvlObject &cobj = ocube->label()->findObject("IsisCube");
-  if(!cobj.hasGroup("BandBin")) {
+  if (!cobj.hasGroup("BandBin")) {
     cobj.addGroup(PvlGroup("BandBin"));
   }
 
@@ -283,8 +359,8 @@ void phocube(Buffer &out) {
   // function.  We must compute the offset to start at the second band.
   int skipDN = (dn) ? 64 * 64   :  0;
 
-  for(int i = 0; i < 64; i++) {
-    for(int j = 0; j < 64; j++) {
+  for (int i = 0; i < 64; i++) {
+    for (int j = 0; j < 64; j++) {
 
       MosData mosd, *p_mosd(0);  // For special mosaic angles
 
@@ -292,7 +368,8 @@ void phocube(Buffer &out) {
       double samp = out.Sample(index);
       double line = out.Line(index);
 
-      bool isGood=false;
+      // Checks to see if the point is in outer space
+      bool isGood = false;
       if (noCamera) {
         isGood = proj->SetWorld(samp, line);
       }
@@ -301,19 +378,20 @@ void phocube(Buffer &out) {
       }
 
       if (isGood) {
-        if(phase) {
+
+        if (phase) {
           out[index] = cam->PhaseAngle();
           index += 64 * 64;
         }
-        if(emission) {
+        if (emission) {
           out[index] = cam->EmissionAngle();
           index += 64 * 64;
         }
-        if(incidence) {
+        if (incidence) {
           out[index] = cam->IncidenceAngle();
           index += 64 * 64;
         }
-        if(localEmission || localIncidence) {
+        if (localEmission || localIncidence) {
           Angle phase;
           Angle incidence;
           Angle emission;
@@ -330,8 +408,8 @@ void phocube(Buffer &out) {
             index += 64 * 64;
           }
         }
-        if(latitude) {
-          if(noCamera) {
+        if (latitude) {
+          if (noCamera) {
             out[index] = proj->UniversalLatitude();
           }
           else {
@@ -339,8 +417,8 @@ void phocube(Buffer &out) {
           }
           index += 64 * 64;
         }
-        if(longitude) {
-          if(noCamera) {
+        if (longitude) {
+          if (noCamera) {
             out[index] = proj->UniversalLongitude();
           }
           else {
@@ -348,8 +426,8 @@ void phocube(Buffer &out) {
           }
           index += 64 * 64;
         }
-        if(pixelResolution) {
-          if(noCamera) {
+        if (pixelResolution) {
+          if (noCamera) {
             out[index] = proj->Resolution();
           }
           else {
@@ -357,39 +435,39 @@ void phocube(Buffer &out) {
           }
           index += 64 * 64;
         }
-        if(lineResolution) {
+        if (lineResolution) {
           out[index] = cam->LineResolution();
           index += 64 * 64;
         }
-        if(sampleResolution) {
+        if (sampleResolution) {
           out[index] = cam->SampleResolution();
           index += 64 * 64;
         }
-        if(detectorResolution) {
+        if (detectorResolution) {
           out[index] = cam->DetectorResolution();
           index += 64 * 64;
         }
-        if(obliqueDetectorResolution) {
+        if (obliqueDetectorResolution) {
           out[index] = cam->ObliqueDetectorResolution();
           index += 64 * 64;
         }
-        if(northAzimuth) {
+        if (northAzimuth) {
           out[index] = cam->NorthAzimuth();
           index += 64 * 64;
         }
-        if(sunAzimuth) {
+        if (sunAzimuth) {
           out[index] = cam->SunAzimuth();
           index += 64 * 64;
         }
-        if(spacecraftAzimuth) {
+        if (spacecraftAzimuth) {
           out[index] = cam->SpacecraftAzimuth();
           index += 64 * 64;
         }
-        if(offnadirAngle) {
+        if (offnadirAngle) {
           out[index] = cam->OffNadirAngle();
           index += 64 * 64;
         }
-        if(subSpacecraftGroundAzimuth) {
+        if (subSpacecraftGroundAzimuth) {
           double ssplat, ssplon;
           ssplat = ssplon = 0.0;
           cam->subSpacecraftPoint(ssplat, ssplon);
@@ -397,7 +475,7 @@ void phocube(Buffer &out) {
               cam->UniversalLongitude(), ssplat, ssplon);
           index += 64 * 64;
         }
-        if(subSolarGroundAzimuth) {
+        if (subSolarGroundAzimuth) {
           double sslat, sslon;
           sslat = sslon = 0.0;
           cam->subSolarPoint(sslat,sslon);
@@ -408,36 +486,39 @@ void phocube(Buffer &out) {
 
         // Special Mosaic indexes
         if (morphologyRank) {
-          if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
+          if (!p_mosd) {
+            p_mosd = getMosaicIndicies(*cam, mosd);
+          }
           out[index] = mosd.m_morph;
           index += 64 * 64;
         }
 
         if (albedoRank) {
-          if (!p_mosd) { p_mosd = getMosaicIndicies(*cam, mosd); }
+          if (!p_mosd) {
+            p_mosd = getMosaicIndicies(*cam, mosd);
+          }
           out[index] = mosd.m_albedo;
           index += 64 * 64;
         }
-        
+
         if (ra) {
           out[index] = cam->RightAscension();
           index += 64 * 64;
         }
-        
+
         if (declination) {
           out[index] = cam->Declination();
           index += 64 * 64;
         }
-        
-        
+
         if (!noCamera) {
           double pB[3];
           cam->Coordinate(pB);
           if (bodyFixedX) {
-          out[index] = pB[0];
-          index += 64 * 64;
+            out[index] = pB[0];
+            index += 64 * 64;
           }
-        
+
           if (bodyFixedY) {
             out[index] = pB[1];
             index += 64 * 64;
@@ -447,12 +528,20 @@ void phocube(Buffer &out) {
             index += 64 * 64;
           }
         }
-        
       }
-      // Trim outerspace
+
+      // Trim outer space except RA and dec bands
       else {
-        for(int b = (skipDN) ? 1 : 0; b < nbands; b++) {
-          out[index] = Isis::NULL8;
+        for (int b = (skipDN) ? 1 : 0; b < nbands; b++) {
+          if(ra && b == raBandNum) {
+            out[index] = cam->RightAscension();
+          }
+          else if (declination && b == raBandNum + 1) {
+            out[index] = cam->Declination();
+          }
+          else {
+            out[index] = Isis::NULL8;
+          }
           index += 64 * 64;
         }
       }
@@ -525,4 +614,3 @@ void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
   bb.addKeyword(makeKey(keyname, nvals, defVal), PvlContainer::Replace);
   return;
 }
-
