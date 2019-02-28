@@ -51,7 +51,7 @@ namespace Isis {
   /**
    * Gets the list of Lidar data points optionally sorted . 
    *
-   * @sort An option to sort the list.  The default is false (no sort).
+   * @param sort An option to sort the list.  The default is false (no sort).
    * @return @b QList<QSharedPointer<LidarControlPoint>> Returns list of Lidar control points.
    * @internal
    *   @history 2019-02-23 Debbie A Cook - Added optional argument to the points
@@ -361,12 +361,9 @@ namespace Isis {
    * @throws IException::User Throws User exception if it cannot open the file for writing.
    */
   void LidarData::write(FileName outputFile, LidarData::Format format) {
-    bool sort = false;
-    // Set up the output file
-
-    std::cout << "Formats are:  Json = " << Json << ", Binary = " << Binary << " and Test = " << Test << std::endl;
-    std::cout << "Current format = " << format << std::endl;
+    bool sort = false;  // Default behavior
     
+    // Set up the output file
     if (format == Json) {
       outputFile = outputFile.setExtension("json");
     }

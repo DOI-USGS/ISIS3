@@ -1,13 +1,10 @@
 APPNAME = lrolola2isis
 # This test exercises the ingestion of Lola data  the LRO mission.
-# This test is not complete.  The output still needs to be sorted by id and each point entry
-# (between {} needs to be moved as a unit.
+# The output is sorted by id to have consistent output for comparison
+# with the truth data.  Normal behavior fills the file from a hash so
+# the order varies.
 #
-# TODO
-# The pointid might need to be entered in single quotes to work ('Lidar????')
-# Will the cropped images be sufficient, or do we need the whole image?
-#
-# 2018-08-31 Debbie Cook - original skeleton of a test
+# 2018-08-31 Debbie A. Cook - original skeleton of a test
 
 include $(ISISROOT)/make/isismake.tsts
 
