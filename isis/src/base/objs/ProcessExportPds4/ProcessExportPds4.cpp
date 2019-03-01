@@ -1033,11 +1033,10 @@ namespace Isis {
       double maxLon = inputMapping.findKeyword("MaximumLongitude");
       double minLon = inputMapping.findKeyword("MinimumLongitude");
       xmlPath.clear();
-      xmlPath << "Product_Observational" 
+      xmlPath << "Product_Observational"
               << "Observation_Area" 
-              << "Discipline_Area" 
+              << "Discipline_Area"
               << "cart:Cartography" 
-              << "cart:Map_Projection" 
               << "cart:Spatial_Domain"
               << "cart:Bounding_Coordinates";
       QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
@@ -1046,18 +1045,16 @@ namespace Isis {
 
       // translation files currently handles Positive West case where east = min, west = max
       // so if positive east, swap min/max
-      if(QString::compare(lonDir, "Positive East", Qt::CaseInsensitive) == 0) {
+      if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
         // west min, east max
         PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
         PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
       }
     }
-
-
   }
 
 
- /**
+/**
   * Convenience method to get an element given a path and its parent. 
   * 
   * @param xmlPath The XML path to the element to retrieve, 
