@@ -75,6 +75,9 @@ namespace Isis {
    *                           attributes to elements. Matches pds validate tool specifations.
    *   @history 2018-06-12 Kristin Berry - Added schema associated with the img class when it is
    *                           used.
+   *   @history 2019-03-01 Kristin Berry - Added ability to set version_id and title, added
+   *                           Special_Constants to define ISIS special pixel values, fixed east/west
+   *                           bounding coordinates swap bug. Fixes git issue #2635.
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
