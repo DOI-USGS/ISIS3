@@ -108,6 +108,8 @@ namespace Isis {
       QDomElement getElement(QStringList xmlPath, QDomElement parent=QDomElement());
       void addHistory(QString description, QString date = "tbd", QString version = "1.0");
       void setLogicalId(QString lid);
+      void setVersionId(QString versionId);
+      void setTitle(QString title);
       void setSchemaLocation(QString schema);
       void setImageType(ImageType imageType);
 
@@ -131,6 +133,8 @@ namespace Isis {
       QDomDocument *m_domDoc;               //!< XML label.
       QString m_schemaLocation;             //!< QString with all schema locations required.
       QString m_lid;                        //!< QString with specified logical identifier.
+      QString m_versionId;                  //!< QString with specified version id.
+      QString m_title;                      //!< QString with specified title. 
       ImageType m_imageType;                //!< Type of image data to be written.
 
   };

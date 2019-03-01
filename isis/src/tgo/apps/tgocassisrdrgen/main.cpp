@@ -86,6 +86,16 @@ void IsisMain() {
   logicalId += productId[0];
   process.setLogicalId(logicalId);
 
+  // Set Title
+  if ( ui.WasEntered("TITLE") ) {
+    process.setTitle( ui.GetString("TITLE") );
+  }
+
+  // Set Version ID
+  if ( ui.WasEntered("VERSIONID") ) {
+    process.setVersionId( ui.GetString("VERSIONID") );
+  }
+
   // std PDS4 label
   process.StandardPds4Label();
 

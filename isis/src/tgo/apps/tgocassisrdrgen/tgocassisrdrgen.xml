@@ -89,6 +89,26 @@
           Update the default Product ID value. This value will be the last section of the PDS4 logical_identifier value.
         </description>
       </parameter>
+      <parameter name="TITLE">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Product ID value
+        </brief>
+        <description>
+          Update the default Title value. 
+        </description>
+      </parameter>
+      <parameter name="VERSIONID">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Product ID value
+        </brief>
+        <description>
+          Update the default Version ID value. 
+        </description>
+      </parameter>
     </group>
 
   </groups>

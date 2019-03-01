@@ -47,6 +47,9 @@ namespace Isis {
   ProcessExportPds4::ProcessExportPds4() {
 
     m_lid = "";
+    m_versionId = "";
+    m_title = "";
+
     m_imageType = StandardImage;
 
     qSetGlobalQHashSeed(1031); // hash seed to force consistent output
@@ -319,6 +322,19 @@ namespace Isis {
   }
 
 
+// FIXME docs needed
+   void ProcessExportPds4::setVersionId(QString versionId) {
+    m_versionId = versionId;
+  }
+
+   void ProcessExportPds4::setTitle(QString title) {
+    m_title = title;
+  }
+
+
+
+
+
   /**
    * Allows mission specific programs to use specified 
    * versions of dictionaries. 
@@ -365,6 +381,16 @@ namespace Isis {
 
     QDomElement lidElement = identificationElement.firstChildElement("logical_identifier");
     PvlToXmlTranslationManager::resetElementValue(lidElement, m_lid);
+
+    if (m_versionId != "") {
+      QDomElement versionElement = identificationElement.firstChildElement("version_id"); 
+      PvlToXmlTranslationManager::resetElementValue(versionElement, m_versionId);
+    }
+
+    if (m_title != "") {
+      QDomElement titleElement = identificationElement.firstChildElement("title"); 
+      PvlToXmlTranslationManager::resetElementValue(titleElement, m_title);
+    }
 
     // Get export history and add <Modification_History> element.
     // These regular expressions match the pipe followed by the date from
