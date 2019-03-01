@@ -47,6 +47,9 @@ namespace Isis {
   ProcessExportPds4::ProcessExportPds4() {
 
     m_lid = "";
+    m_versionId = "";
+    m_title = "";
+
     m_imageType = StandardImage;
 
     qSetGlobalQHashSeed(1031); // hash seed to force consistent output
@@ -61,10 +64,10 @@ namespace Isis {
     m_domDoc->appendChild(xmlHeader);
 
     // base pds4 schema location
-    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd"; 
+    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd"; 
 
     QString xmlModel;
-    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch\" ";
+    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch\" ";
     xmlModel += "schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
@@ -320,6 +323,39 @@ namespace Isis {
 
 
   /**
+   * Allows mission specific programs to set version_id
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * The input string should be colon separated string with 6 
+   * identifiers: 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param versiondId The version_id value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setVersionId(QString versionId) {
+    m_versionId = versionId;
+  }
+
+
+  /**
+   * Allows mission specific programs to set the title
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param title The title value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setTitle(QString title) {
+    m_title = title;
+  }
+
+
+  /**
    * Allows mission specific programs to use specified 
    * versions of dictionaries. 
    * 
@@ -366,6 +402,16 @@ namespace Isis {
     QDomElement lidElement = identificationElement.firstChildElement("logical_identifier");
     PvlToXmlTranslationManager::resetElementValue(lidElement, m_lid);
 
+    if (m_versionId != "") {
+      QDomElement versionElement = identificationElement.firstChildElement("version_id"); 
+      PvlToXmlTranslationManager::resetElementValue(versionElement, m_versionId);
+    }
+
+    if (m_title != "") {
+      QDomElement titleElement = identificationElement.firstChildElement("title"); 
+      PvlToXmlTranslationManager::resetElementValue(titleElement, m_title);
+    }
+
     // Get export history and add <Modification_History> element.
     // These regular expressions match the pipe followed by the date from
     // the Application::Version() return value.
@@ -386,18 +432,17 @@ namespace Isis {
    * the PDS4 labels. 
    */
   void ProcessExportPds4::displaySettings() {
+    // Add header info
+    addSchema("PDS4_DISP_1B00.sch", 
+              "PDS4_DISP_1B00.xsd",
+              "xmlns:disp", 
+              "http://pds.nasa.gov/pds4/disp/v1"); 
 
     Pvl *inputLabel = InputCubes[0]->label(); 
     FileName translationFileName;
     translationFileName = "$base/translations/pds4ExportDisplaySettings.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
-
-    // Add header info
-    addSchema("PDS4_DISP_1700.sch", 
-              "PDS4_DISP_1700.xsd",
-              "xmlns:disp", 
-              "http://pds.nasa.gov/pds4/disp/v1"); 
   }
 
   
@@ -409,8 +454,8 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label(); 
     if ( !inputLabel->findObject("IsisCube").hasGroup("BandBin") ) return;
     // Add header info
-    addSchema("PDS4_IMG_1900.sch", 
-              "PDS4_IMG_1900.xsd",
+    addSchema("PDS4_IMG_1A10_1510.sch", 
+              "PDS4_IMG_1A10_1510.xsd",
               "xmlns:img", 
               "http://pds.nasa.gov/pds4/img/v1"); 
     
@@ -754,6 +799,33 @@ namespace Isis {
                                                     toString(base));
         elementArrayElement.appendChild(offsetElement);
       }
+
+      // Add the Special_Constants class to define ISIS special pixel values: 
+
+      // Assume 32-bit/Real for CaSSIS
+      QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants");
+      arrayImageElement.insertAfter(specialConstantElement,
+                                    arrayImageElement.lastChildElement("Axis_Array"));
+
+      QDomElement nullElement = m_domDoc->createElement("missing_constant");
+      PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL8, 'g', 18)); //toString(NULL8));
+      specialConstantElement.appendChild(nullElement);
+
+      QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+      PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(highInstrumentSatElement);
+
+      QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+      PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(highRepresentationSatElement);
+
+      QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+      PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(lowInstrumentSatElement);
+
+      QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+      PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(lowRepresentationSatElement);
     }
   }
 
@@ -904,8 +976,8 @@ namespace Isis {
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
 
-    addSchema("PDS4_CART_1700.sch", 
-              "PDS4_CART_1700.xsd",
+    addSchema("PDS4_CART_1900.sch", 
+              "PDS4_CART_1900.xsd",
               "xmlns:cart", 
               "http://pds.nasa.gov/pds4/cart/v1"); 
 
@@ -980,11 +1052,10 @@ namespace Isis {
       double maxLon = inputMapping.findKeyword("MaximumLongitude");
       double minLon = inputMapping.findKeyword("MinimumLongitude");
       xmlPath.clear();
-      xmlPath << "Product_Observational" 
+      xmlPath << "Product_Observational"
               << "Observation_Area" 
-              << "Discipline_Area" 
+              << "Discipline_Area"
               << "cart:Cartography" 
-              << "cart:Map_Projection" 
               << "cart:Spatial_Domain"
               << "cart:Bounding_Coordinates";
       QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
@@ -993,18 +1064,16 @@ namespace Isis {
 
       // translation files currently handles Positive West case where east = min, west = max
       // so if positive east, swap min/max
-      if(QString::compare(lonDir, "Positive East", Qt::CaseInsensitive) == 0) {
+      if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
         // west min, east max
         PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
         PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
       }
     }
-
-
   }
 
 
- /**
+/**
   * Convenience method to get an element given a path and its parent. 
   * 
   * @param xmlPath The XML path to the element to retrieve, 

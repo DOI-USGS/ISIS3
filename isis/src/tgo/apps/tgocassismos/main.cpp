@@ -209,7 +209,8 @@ void IsisMain() {
     QString toMosaic = ui.GetFileName("TO");
     QString mosaicPriority = ui.GetString("PRIORITY");
 
-    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority;
+    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority 
+                          + " TRACK=TRUE";
 
     if (QString::compare(ui.GetString("GRANGE"), "USER", Qt::CaseInsensitive) == 0) {
       parameters += " GRANGE=USER";

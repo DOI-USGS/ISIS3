@@ -1,3 +1,6 @@
+#ifndef crop_h
+#define crop_h
+
 #include "Cube.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -11,3 +14,5 @@
 #include "UserInterface.h"
 
 extern Isis::PvlGroup crop(Isis::UserInterface &ui);
+
+#endif

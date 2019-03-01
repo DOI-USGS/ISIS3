@@ -41,6 +41,10 @@
     <change name="Kristin Berry" date="2018-06-12">
       Updated to use the tgoCassisExportMosaic.trn translation file when the input cube is a mosaic.
     </change>
+    <change name="Kristin Berry" date="2019-03-01">
+      Added TITLE and VERSIONID optional parameters to specify these values in the exported PDS4 label. 
+      Fixed bug that disabled reading of mosaics with Archive groups. 
+    </change>
   </history>
 
   <category>
@@ -87,6 +91,26 @@
         </brief>
         <description>
           Update the default Product ID value. This value will be the last section of the PDS4 logical_identifier value.
+        </description>
+      </parameter>
+      <parameter name="TITLE">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Product ID value
+        </brief>
+        <description>
+          Update the default Title value. 
+        </description>
+      </parameter>
+      <parameter name="VERSIONID">
+        <type>string</type>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Product ID value
+        </brief>
+        <description>
+          Update the default Version ID value. 
         </description>
       </parameter>
     </group>
