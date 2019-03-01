@@ -164,6 +164,7 @@ namespace Isis {
    *                           make sure we get absolute path.  Fixes #5276.
    *   @history 2018-01-18 Summer Stapleton - Updated error message in ::create() to address when
    *                           an IsisPreference file cannot be found. Fixes #5145.
+   *   @history 2018-11-16 Jesse Mapel - Made several methods virtual for mocking.
    */
   class Cube {
     public:
@@ -265,24 +266,24 @@ namespace Isis {
       void relocateDnData(FileName dnDataFile);
 //       static void relocateDnData(FileName externalLabelFile, FileName dnDataFile);
 
-      int bandCount() const;
+      virtual int bandCount() const;
       double base() const;
       ByteOrder byteOrder() const;
       Camera *camera();
       FileName externalCubeFileName() const;
-      QString fileName() const;
+      virtual QString fileName() const;
       Format format() const;
-      Histogram *histogram(const int &band = 1,
-                           QString msg = "Gathering histogram");
-      Histogram *histogram(const int &band, const double &validMin,
-                           const double &validMax,
-                           QString msg = "Gathering histogram");
+      virtual Histogram *histogram(const int &band = 1,
+                                   QString msg = "Gathering histogram");
+      virtual Histogram *histogram(const int &band, const double &validMin,
+                                   const double &validMax,
+                                   QString msg = "Gathering histogram");
       Pvl *label() const;
       int labelSize(bool actual = false) const;
       int lineCount() const;
       double multiplier() const;
       PixelType pixelType() const;
-      int physicalBand(const int &virtualBand) const;
+      virtual int physicalBand(const int &virtualBand) const;
       Projection *projection();
       int sampleCount() const;
       Statistics *statistics(const int &band = 1,

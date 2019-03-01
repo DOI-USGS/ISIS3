@@ -1,3 +1,6 @@
+#ifndef mocuncompress_msdp_h
+#define mocuncompress_msdp_h
+
 /*
 NOTICE
 
@@ -101,3 +104,5 @@ struct msdp_header {
 #define BYTE3(i) (((i)&0xff000000)>>24)
 
 #define STUFFSHORT(p,v) ((p)[0] = (v)&0xff, (p)[1] = (v)>>8)
+
+#endif
