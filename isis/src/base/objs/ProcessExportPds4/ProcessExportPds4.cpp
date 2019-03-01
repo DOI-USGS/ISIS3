@@ -754,6 +754,33 @@ namespace Isis {
                                                     toString(base));
         elementArrayElement.appendChild(offsetElement);
       }
+
+      // Add the Special_Constants class to define ISIS special pixel values: 
+
+      // Assume 32-bit/Real for CaSSIS
+      QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants");
+      arrayImageElement.insertAfter(specialConstantElement,
+                                    arrayImageElement.lastChildElement("Axis_Array"));
+
+      QDomElement nullElement = m_domDoc->createElement("missing_constant");
+      PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL8, 'g', 18)); //toString(NULL8));
+      specialConstantElement.appendChild(nullElement);
+
+      QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+      PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(highInstrumentSatElement);
+
+      QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+      PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(highRepresentationSatElement);
+
+      QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+      PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(lowInstrumentSatElement);
+
+      QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+      PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT8, 'g', 18));
+      specialConstantElement.appendChild(lowRepresentationSatElement);
     }
   }
 
