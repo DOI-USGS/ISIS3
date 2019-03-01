@@ -64,10 +64,10 @@ namespace Isis {
     m_domDoc->appendChild(xmlHeader);
 
     // base pds4 schema location
-    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd"; 
+    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd"; 
 
     QString xmlModel;
-    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch\" ";
+    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch\" ";
     xmlModel += "schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
@@ -432,18 +432,17 @@ namespace Isis {
    * the PDS4 labels. 
    */
   void ProcessExportPds4::displaySettings() {
+    // Add header info
+    addSchema("PDS4_DISP_1B00.sch", 
+              "PDS4_DISP_1B00.xsd",
+              "xmlns:disp", 
+              "http://pds.nasa.gov/pds4/disp/v1"); 
 
     Pvl *inputLabel = InputCubes[0]->label(); 
     FileName translationFileName;
     translationFileName = "$base/translations/pds4ExportDisplaySettings.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
-
-    // Add header info
-    addSchema("PDS4_DISP_1700.sch", 
-              "PDS4_DISP_1700.xsd",
-              "xmlns:disp", 
-              "http://pds.nasa.gov/pds4/disp/v1"); 
   }
 
   
@@ -455,8 +454,8 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label(); 
     if ( !inputLabel->findObject("IsisCube").hasGroup("BandBin") ) return;
     // Add header info
-    addSchema("PDS4_IMG_1900.sch", 
-              "PDS4_IMG_1900.xsd",
+    addSchema("PDS4_IMG_1A10_1510.sch", 
+              "PDS4_IMG_1A10_1510.xsd",
               "xmlns:img", 
               "http://pds.nasa.gov/pds4/img/v1"); 
     
@@ -977,8 +976,8 @@ namespace Isis {
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
 
-    addSchema("PDS4_CART_1700.sch", 
-              "PDS4_CART_1700.xsd",
+    addSchema("PDS4_CART_1900.sch", 
+              "PDS4_CART_1900.xsd",
               "xmlns:cart", 
               "http://pds.nasa.gov/pds4/cart/v1"); 
 

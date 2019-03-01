@@ -99,7 +99,7 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
-  process.addSchema("PDS4_PSA_1000.sch", 
+/*  process.addSchema("PDS4_PSA_1000.sch", 
                     "PDS4_PSA_1000.xsd",
                     "xmlns:psa", 
                     "http://psa.esa.int/psa/v1");
@@ -107,12 +107,12 @@ void IsisMain() {
   process.addSchema("PDS4_PSA_EM16_CAS_1000.sch", 
                     "PDS4_PSA_EM16_CAS_1000.xsd",
                     "xmlns",
-                    "http://psa.esa.int/psa/em16/cas/v1");
+                    "http://psa.esa.int/psa/em16/cas/v1");*/
 
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
-    process.addSchema("PDS4_GEOM_1900_1510.sch", 
-                      "PDS4_GEOM_1900_1510.xsd",
+    process.addSchema("PDS4_GEOM_1B00_1610.sch", 
+                      "PDS4_GEOM_1B00_1610.xsd",
                       "xmlns:geom",
                       "https://pds.jpl.nasa.gov/datastandards/schema/released/geom/v1");
   }
