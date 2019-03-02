@@ -1,7 +1,6 @@
 ---
 name: ⛔ Support Question
-about: See https://astrodiscuss.usgs.gov for questions about using ISIS3 and other
-Astrogeology Science Center software.
+about: See https://astrodiscuss.usgs.gov for questions about using ISIS3 and other Astrogeology Science Center software.
 
 ---
 
