@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id$ -->
 
-<application name="hyb2oncal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<application name="hyb2onccal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Calibrates Hayabusa 2 ONC-T images. Calibration includes bias and dark current correction as
@@ -66,91 +66,6 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
 
     </div>
   </p>
-
-<!--
-  <p>
-    <h1><a id="Smear">Step 2: Read-out smear:</a ></h1>
-    The ONC-T instrument is shuttered electronically.  Images are exposed for a certain
-    exposure time in addition to the vertical charge-transfer period. <strong>We could not determine
-    of locate this value. Additionally, note that on-board smear correction can be performed.
-    </strong>
-    It is during the charge-transfer period that a read-out smear in the vertical direction
-    is produced. The read-out smear brightness <strong>I<sub>smear</sub></strong>
-    for unbinned images is modeled from the observed images as follows:
-
-    <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
-    <br/><br/>
-    <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> -1) { [K*[(I<sub>raw</sub>(H,V) -
-    I<sub>sky</sub>(H,V)]/N<sub>v</sub>] } </strong></center>
-    <br/><br/>
-           <center>Where:  <strong>K = t<sub>VCT</sub>/(t<sub>VCT</sub>+t<sub>exp</sub>)
-           </strong></center>
-    <br/><br/>
-
-
-
-    For binned images a different formula is applied:
-
-
-     <center><strong>I<sub>smear</sub>(H) = SUM(H=0...N<sub>v</sub> - 1)
-     { [ K1*I<sub>raw</sub>(H,V) ] }</strong>
-     </center>
-
-    <br/><br/>
-           <center>Where:  <strong>K1 = (1/N<sub>v</sub>)*[t<sub>VCT</sub>/
-           (t<sub>VCT</sub>+t<sub>exp</sub>)]
-           </strong></center>
-
-    <br/><br/>
-
-    A correction factor is then applied after the smear component is subtracted
-    from the input image (I<sub>raw</sub>):
-
-    <center> <strong> I<sub>out</sub> = C*(I<sub>raw></sub> - I<sub>smear</sub>)</strong></center>
-    <br/><br/>
-
-    <center>Where:  <strong>C = 1/( 1 + K1 * ( (B - 1)/2*B ) ) </strong></center>
-
-    <br/><br/>
-
-    <center><table border = "1" cellpadding="5">
-    <tr>
-      <td>Variable</td><td>Description</td>
-    </tr>
-    <tr>
-      <td>I<sub>smear</sub></td><td>The read-out smear.</td>
-    </tr>
-    <tr>
-      <td>I<sub>raw</sub></td><td>The intensity of the raw data taken with exposure time
-      t<sub>exp</sub>.</td>
-    </tr>
-    <tr>
-      <td>I<sub>sky</sub></td><td>The sum of the bias and the dark current (~300 DN).</td>
-    </tr>
-
-    <tr>
-      <td>t<sub>VCT</sub></td><td>The vertical charge-transfer period (0.012288 microseconds).</td>
-    </tr>
-    <tr>
-      <td>t<sub>exp</sub></td><td>The exposure time (in microseconds).</td>
-    </tr>
-    <tr>
-      <td>N<sub>v</sub></td><td>The number of pixels along the V-direction (1024).</td>
-    </tr>
-    <tr>
-      <td>H</td><td>The line number of the pixel.</td>
-    </tr>
-    <tr>
-      <td>L</td><td>The sample number of the pixel.</td>
-    </tr>
-    <tr>
-      <td>B</td><td>The binning number.</td>
-    </tr>
-    </table></center>
-    </div>
-  </p>
--->
-
   <p>
     <h1><a id="Flatfield">Step 2: Flat-field correction:</a ></h1>
     Performs a correction for pixel-to-pixel variation in CCD response and vignetting
@@ -162,86 +77,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     pixel in the flat-field image.
   </p>
 
-<!-- We cannot correctly determine I/F or radiance output because we do not have the radiance
-values for each band for Hayabusa2 ONC.
-  <p>
-    <h1><a id="ConvertIOF">Step 3 (Optional): Convert output units to Radiance or I over F:</a ></h1>
-    This step is optional, and the formula used depends on the value of the UNITS user parameter.
-    <em>Note: we do not currently have the radiance values for the filters, so we cannot correctly
-    convert the output units to Radiance.
 
-    If UNITS=RADIANCE, the following formula will be used to convert the raw DN values to radiance
-    (W/m2/sr/µm):
 
-    <br/><br/>
-     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
-      <center><strong>R = Raw*RadianceStandard*RadianceScaleFactor</strong></center>
-      <br/><br/>
-      <center><table border="1" cellpadding="5">
-      <tr>
-          <td>Variable</td><td>Description</td>
-     </tr>
-     <tr>
-          <td>R</td><td>The calibrated radiance (w/m2/sr/µm). </td>
-     </tr>
-     <tr>
-          <td>Raw</td><td>The raw DN value. </td>
-     </tr>
-     <tr>
-          <td>RadianceStandard</td><td>The standard conversion factor from DNs to radiance. </td>
-     </tr>
-     <tr>
-          <td>RadianceScaleFactor</td><td>An adjustment factor for each filter.</td>
-     </tr>
-     </table></center>
-     </div>
-
-    If UNITS = IOF, first the above formula will be used to convert from raw DNs to calibrated Radiance, and then
-    the following formula will be used to convert the raw DN values to I/F (radiance) units:
-    <br/><br/>
-     <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
-      <center><strong>IoF = R*[pi*(R<sub>s</sub>)<sup>2</sup>]/F</strong></center>
-      <br/><br/>
-      <center><table border="1" cellpadding="5">
-      <tr>
-          <td>Variable</td><td>Description</td>
-     </tr>
-     <tr>
-          <td>IoF</td><td>The calibrated radiance in units of I over F.</td>
-     </tr>
-     <tr>
-          <td>R</td><td>The calibrated radiance (w/m2/sr/µm). </td>
-     </tr>
-     <tr>
-         <td>R<sub>s</sub></td><td>The distance in Astronomical Units (AU) between the Sun
-         and the target body.
-         </td>
-     </tr>
-     <tr>
-          <td>F</td><td>The solar flux (w/m2/µm) at 1 AU. </td>
-     </tr>
-     </table></center>
-     </div>
-
-    If UNITS=DN, no output conversion will be performed and the output units will be in raw DNs.
-  </p>
--->
-
-  <p>
-  <h1><a id="Notes">Notes</a></h1>
-  <ol>
-    <li>
-      Smear correction is not currently provided, as we do not have the readout time
-      (charge-transfer period) for the instrument.
-    </li>
-    <li>
-      Similarly, since no radiance values could be found for the instrument filters, the output
-      cannot be correctly converted to radiance or I/F.
-    </li>
-    <li>
-    </li>
-  </ol>
-  </p>
 
   <p>
     <h1><a id="References">References:</a></h1>
@@ -249,6 +86,13 @@ values for each band for Hayabusa2 ONC.
       <li>S. Kameda et al.  <i>"Preflight Calibration Test Results for Optical Navigation
       Camera Telescope (ONC-T) Onboard the Hayabusa2 Spacecraft"</i>.
       Space Sci Rev (2017) 208:17-31.</li>
+      <li>E. Tatsumi et al.  <i>"Updated Inflight Calibration of Hayabusa2’s Optical Navigation Camera (ONC) for
+      Scientific Observations during the Cruise Phase"</i>.
+      https://arxiv.org/abs/1810.11065 [astro-ph.IM] 25 Oct, 2018.
+      </li>
+      <li>H. Suzuki et al. <i>"Initial inflight calibration for Hayabusa2 optical navigation camera
+      (ONC) for science observations of asteroid Ryugu"</i>.
+      Icarus. 300. 10.1016/j.icarus.2017.09.011
     </ol>
 
   </p>
@@ -318,11 +162,14 @@ values for each band for Hayabusa2 ONC.
            the parameters as needed.
         </description>
         <filter>*.trn</filter>
-        <!--
-        <default><item>$hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
+         <!-->
+        <default><item>/scratch/isis3data/hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
         -->
+
         <default><item>/usgs/cpkgs/isis3/datalocal/hayabusa2/calibration/onc/hyb2oncCalibration????.trn</item></default>
+
       </parameter>
+      
     </group>
 
     <!-- Recall no radiance values have been provided for the filters, so radiance and i/f cannot be

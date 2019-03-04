@@ -39,9 +39,6 @@
 using namespace std;
 
 
-//void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
-
-//QString loadCalibrationVariables(const QString &config);
 
 
 
@@ -126,7 +123,6 @@ void hyb2onccal(UserInterface &ui) {
   catch (IException &e) {
     QString msg = "Unable to read [BitDepth] keyword in the Instrument group "
     "from input file [" + icube->fileName() + "]";
-    //qDebug() << msg;
     g_bitDepth = 12;
 
   }
@@ -208,10 +204,15 @@ void hyb2onccal(UserInterface &ui) {
   if (smearCorrection=="ONBOARD") {
     g_onBoardSmearCorrection=true;
   }
+  else {
+      qDebug() << icube->fileName();
+
+  }
 
   QString compmode = inst["Compression"];
   // TODO: verify that the compression factor/scale is actually 16 for compressed Hayabusa2 images.
   g_compfactor = ( "lossy" == compmode.toLower() ) ? 16.0 : 1.0;
+
 
   QString target = inst["TargetName"];
   g_target = target;
@@ -273,14 +274,12 @@ void hyb2onccal(UserInterface &ui) {
 
       Cube *flatOriginal = new Cube(flatfile.expanded() );
 
-      //int transform[5] = {binning,startSample,startLine,lastSample,lastLine};
 
       double alphaStartSample = alphaCube["AlphaStartingSample"][0].toDouble();
       double alphaStartLine = alphaCube["AlphaStartingLine"][0].toDouble();
       double alphaEndSample = alphaCube["AlphaEndingSample"][0].toDouble();
       double alphaEndLine = alphaCube["AlphaEndingLine"][0].toDouble();
 
-      //int transform[5] = {binning,startSample,startLine,lastSample,lastLine};
       double transform[5] = {(double)binning,alphaStartSample,alphaStartLine,alphaEndSample,alphaEndLine};
 
       // Translates and scales the flatfield image.  Scaling
@@ -302,13 +301,14 @@ void hyb2onccal(UserInterface &ui) {
 
 
   Cube *ocube  = p.SetOutputCube("TO");
-  //QString fname = ocube->fileName();
+
 
   QString calfile = loadCalibrationVariables(ui.GetAsString("CONFIG"));
 
+
+
   g_timeRatio = g_Tvct/(g_texp + g_Tvct);
 
-  g_iof = 1.0;  // Units of DN
 
   QString g_units = "DN";
   // if ( "radiance" == g_iofCorrection.toLower() ) {
@@ -350,7 +350,10 @@ void hyb2onccal(UserInterface &ui) {
   calibrationLog.addKeyword(PvlKeyword("CalibrationFile", calfile));
   calibrationLog.addKeyword(PvlKeyword("FlatFieldFile", flatfile.originalPath()
   + "/" + flatfile.name()));
-  calibrationLog.addKeyword(PvlKeyword("CompressionFactor", toString(g_compfactor, 2)));
+
+  PvlKeyword sensitivityFactor("SensitivityFactor");
+  sensitivityFactor.addValue(toString(g_sensitivity,16));
+  calibrationLog.addKeyword(sensitivityFactor);
 
   // Parameters
   PvlKeyword bn("Bias_Bn");
@@ -362,18 +365,7 @@ void hyb2onccal(UserInterface &ui) {
   PvlKeyword bnae("Bias_AECorrection");
   bnae.addValue(toString(g_bae0, 8));
   bnae.addValue(toString(g_bae1, 8));
-  calibrationLog.addKeyword(bnae);
-
-#if 0
-  PvlKeyword linearityCoefs("Linearity");
-  linearityCoefs.addValue(toString(g_L0,8));
-  linearityCoefs.addValue(toString(g_L1,8));
-  linearityCoefs.addValue(toString(g_L2,8));
-  calibrationLog.addKeyword(linearityCoefs);
-
-#endif
-
-
+  calibrationLog.addKeyword(bnae);  
   calibrationLog.addKeyword(PvlKeyword("Bias_AETemp", toString(g_AEtemperature, 16)));
 
 
@@ -400,12 +392,26 @@ void hyb2onccal(UserInterface &ui) {
   calibrationLog.addKeyword(PvlKeyword("Smear_texp", toString(g_texp, 16)));
 
   calibrationLog.addKeyword(PvlKeyword("CalibrationUnits", g_iofCorrection));
-  calibrationLog.addKeyword(PvlKeyword("RadianceStandard", toString(g_v_standard, 16)));
+
   calibrationLog.addKeyword(PvlKeyword("RadianceScaleFactor", toString(g_iofScale, 16)));
-  calibrationLog.addKeyword(PvlKeyword("SolarDistance", toString(g_solarDist, 16), "AU"));
-  calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));
-  calibrationLog.addKeyword(PvlKeyword("IOFFactor", toString(g_iof, 16)));
+  calibrationLog.addKeyword(PvlKeyword("SolarFlux", toString(g_solarFlux, 16)));  
   calibrationLog.addKeyword(PvlKeyword("Units", g_units));
+
+  PvlKeyword linearityCoefs("LinearityCoefficients");
+  linearityCoefs.addValue(toString(g_L[0],16));
+  linearityCoefs.addValue(toString(g_L[1],16));
+  linearityCoefs.addValue(toString(g_L[2],16));
+  calibrationLog.addKeyword(linearityCoefs);
+
+  PvlKeyword darkCurrentCoefs("DarkCurrentCoefficients");
+  darkCurrentCoefs.addValue(toString(g_d0,16));
+  darkCurrentCoefs.addValue(toString(g_d1,16));
+  calibrationLog.addKeyword(darkCurrentCoefs);
+
+  PvlKeyword darkCurrent("DarkCurrent");
+  darkCurrent.addValue(toString(g_darkCurrent,16));
+  calibrationLog.addKeyword(darkCurrent);
+
 
   // Write Calibration group to output file
   ocube->putGroup(calibrationLog);

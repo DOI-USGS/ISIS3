@@ -120,14 +120,12 @@ static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for
 static QString g_iofCorrection("IOF");  //!< Is I/F correction to be applied?
 
 //  I/F variables
-static double g_solarDist(1.0);  /**< Distance from the Sun to the target body
-(used to calculate g_iof) */
-static double g_iof(1.0);        //!< I/F conversion value
+
 static double g_iofScale(1.0);
 static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
-// TODO: we do not have this conversion factor for Hayabusa 2 ONC.
-static double g_v_standard(1.0);
-// static double g_v_standard(3.42E-3);//!< Base conversion for all filters (Tbl. 9)
+static double g_sensitivity(1.0);
+static double g_effectiveBandwidth(1.0);
+
 
 namespace Isis {
 
@@ -212,9 +210,8 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 }
 
 
-
 /**
-* @brief Apply radiometric correction to each line of an AMICA image.
+* @brief Apply radiometric correction to each line of a Hayabusa2 image.
 * @author 2016-03-30 Kris Becker
 * @param in   Raw image and flat field
 * @param out  Radometrically corrected image
@@ -247,8 +244,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
   for (int i = 0; i < imageIn.size(); i++) {
     imageOut[i] = imageIn[i]*pow(2.0,12-g_bitDepth);
 
-
-
     // Check for special pixel in input image and pass through
     if ( IsSpecial(imageOut[i]) ) {
       imageOut[i] = imageIn[i];
@@ -256,12 +251,9 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
     }
 
     // Apply compression factor here to raise LOSSY dns to proper response
-    imageOut[i] *= g_compfactor;
-    qDebug() << "Compfactor:  "  <<g_compfactor;
 
 
     // 1) BIAS Removal - Only needed if not on-board corrected
-
 
     if ( !g_onBoardSmearCorrection ) {
 
@@ -271,34 +263,22 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
         continue;
       }
       else {
+
         imageOut[i] = imageOut[i] - g_bias;
       }
     }
 
-
     double dn = imageOut[i];    
     double result = 1.0;
     double x0 = 1.0;
-    newton_rapheson(dn,x0, g_L,result );
-    //linearCorrection = g_L[0]*dn+g_L[1]*pow(dn,2.0)+g_L[2]*pow(dn,3.0);
+    newton_rapheson(dn,x0, g_L,result );   
     imageOut[i] = result;
 
-    //qDebug() << dn << ","<< result;
-
-
     // DARK Current
-    imageOut[i] = imageOut[i] - g_darkCurrent;
+    imageOut[i] = imageOut[i] - g_darkCurrent;    
 
 
-
-
-    // READOUT Smear Removal - Not needed if on-board corrected.  Binning is
-    //    accounted for in computation of c1 before loop.
-    // if (nsubImages <= 1) {
-    //  imageOut[i] = c1*(imageOut[i] - smear);
-    // }
-
-
+    //Smear correction
     if (!g_onBoardSmearCorrection) {
 
       double smear = 0;
@@ -309,9 +289,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       imageOut[i] = imageOut[i] - smear;
 
       }
-    //Linearity Correction
-    //In the SIS this adjustment is made just after the bias, but
-    //in the Calibration paper it happens just before the flat field correction.
+
 
 
     // FLATFIELD correction
@@ -326,18 +304,11 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
       else {
         if (flatField[i] != 0) {
-          imageOut[i] /= flatField[i];
+          imageOut[i] /= (flatField[i]*g_sensitivity*g_texp);
         }
       }
     }
 
-    // TODO: once the radiance values are known for each band, we can correctly compute I/F.
-    // For now, g_iof is 1, so output will be in DNs.
-    // 7) I/F or Radiance Conversion (or g_iof might = 1, in which case the output will be in DNs)
-    imageOut[i] *=g_iof;
-
-
-
   }
 
 
@@ -346,105 +317,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
 
 
-/**
- * @brief Load required NAIF kernels required for timing needs.
- *
- * This method maintains the loading of kernels for HAYABUSA timing and
- * planetary body ephemerides to support time and relative positions of planet
- * bodies.
- */
-/* Helper function for sunDistanceAu, don't need this until we have radiance calibration
-   parameters for Hayabusa2 ONC-T filters to calculate radiance and I/F
-static void loadNaifTiming() {
-  static bool naifLoaded = false;
-  if (!naifLoaded) {
 
-//  Load the NAIF kernels to determine timing data
-    Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
-    leapseconds = leapseconds.highestVersion();
-    Isis::FileName sclk("$hayabusa2/kernels/sclk/hyb2_20141203-20161231_v01.tsc");    
-    Isis::FileName pck1("$hayabusa2/kernels/tspk/de430.bsp");
-    Isis::FileName pck2("$hayabusa2/kernels/tspk/jup329.bsp");
-    Isis::FileName pck3("$hayabusa2/kernels/tspk/sat375.bsp");
-    Isis::FileName pck4("$hayabusa2/kernels/spk/hyb2_20141203-20141214_0001m_final_ver1.oem.bsp");
-    Isis::FileName pck5("$hayabusa2/kernels/spk/hyb2_20141203-20151231_0001h_final_ver1.oem.bsp");
-    Isis::FileName pck6("$hayabusa2/kernels/spk/hyb2_20151123-20151213_0001m_final_ver1.oem.bsp");
-
-//  Load the kernels
-    QString leapsecondsName(leapseconds.expanded());
-    QString sclkName(sclk.expanded());
-
-    QString pckName1(pck1.expanded());
-    QString pckName2(pck2.expanded());
-    QString pckName3(pck3.expanded());
-    QString pckName4(pck4.expanded());
-    QString pckName5(pck5.expanded());
-    QString pckName6(pck6.expanded());
-
-    furnsh_c(leapsecondsName.toLatin1().data());
-    furnsh_c(sclkName.toLatin1().data());
-
-    furnsh_c(pckName1.toLatin1().data());
-    furnsh_c(pckName2.toLatin1().data());
-    furnsh_c(pckName3.toLatin1().data());
-    furnsh_c(pckName4.toLatin1().data());
-    furnsh_c(pckName5.toLatin1().data());
-    furnsh_c(pckName6.toLatin1().data());
-
-
-//  Ensure it is loaded only once
-    naifLoaded = true;
-  }
-  return;
-}
-*/
-
-
-/**
- * @brief Computes the distance from the Sun to the observed body.
- *
- * This method requires the appropriate NAIK kernels to be loaded that
- * provides instrument time support, leap seconds and planet body ephemeris.
- *  
- * @return @b double Distance in AU between Sun and observed body.
- */
-/* commented out until we have radiance values (RAD/IOF group in calibration trn) for Hayabusa2.
- static bool sunDistanceAU(const QString &scStartTime,
-                          const QString &target,
-                          double &sunDist) {
-
-  //  Ensure NAIF kernels are loaded
-  loadNaifTiming();
-  sunDist = 1.0;
-
-  //  Determine if the target is a valid NAIF target
-  SpiceInt tcode;
-  SpiceBoolean found;
-  bodn2c_c(target.toLatin1().data(), &tcode, &found);
-
-  if (!found) return (false);
-
-  //  Convert starttime to et
-  double obsStartTime;
-  scs2e_c(-37, scStartTime.toLatin1().data(), &obsStartTime);
-
-  //  Get the vector from target to sun and determine its length
-  double sunv[3];
-  double lt;
-  spkpos_c(target.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
-                  sunv, &lt);
-  NaifStatus::CheckErrors();
-
-  double sunkm = vnorm_c(sunv);
-
-
-  //  Return in AU units
-  sunDist = sunkm / 1.49597870691E8;
-
-  //cout << "sunDist = " << sunDist << endl;
-  return (true);
-}
-*/
 
 
 /**
@@ -578,8 +451,10 @@ FileName DetermineFlatFieldFile(const QString &filter) {
 
   QString fileName = "$hayabusa2/calibration/flatfield/";
   // FileName consists of binned/notbinned, camera, and filter
-  fileName += "flat_" + filter.toLower() + ".cub";
+  fileName += "flat_" + filter.toLower() + "_norm.cub";
+
   FileName final(fileName);
+
   return final;
 }
 
@@ -609,6 +484,8 @@ QString loadCalibrationVariables(const QString &config)  {
   PvlGroup &DarkCurrent = g_configFile.findGroup("DarkCurrent");
   PvlGroup &Smear = g_configFile.findGroup("SmearRemoval");
   PvlGroup &solar = g_configFile.findGroup("SOLARFLUX");
+  PvlGroup &sensitivity = g_configFile.findGroup("SENSITIVITYFACTOR");
+  PvlGroup & effectiveBW = g_configFile.findGroup("EFFECTIVEBW");
   PvlGroup &linearity = g_configFile.findGroup("Linearity");
   // PvlGroup &iof = g_configFile.findGroup("RAD");
 
@@ -649,25 +526,21 @@ QString loadCalibrationVariables(const QString &config)  {
 
   // Compute BIAS correction factor (it's a constant so do it once!)
   g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
-  g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //correction factor
+  //double correction_factor = (g_bae0 + g_bae1*g_AEtemperature);
+  g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //bias correction factor
 
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
+  g_sensitivity = sensitivity[g_filter.toLower()];
+  g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
 
   //Load the linearity variables
   g_L[0] = linearity["L"][0].toDouble();
   g_L[1] = linearity["L"][1].toDouble();
   g_L[2] = linearity["L"][2].toDouble();
 
-
-
-  // radiance = g_v_standard * g_iofScale
-  // iof      = radiance * pi *dist_au^2
-  // g_iofScale   = iof[g_filter];
-
   return ( calibFile.original() );
 }
-
 
 
 }
