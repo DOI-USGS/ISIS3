@@ -43,6 +43,7 @@ namespace Isis {
    *   @history 2018-12-11 Stuart Sides - Loop in
    *            SetUndistortedFocalPlane was not being exicuted.
    *            Modified to use both itteration and convergence.
+   *            NOTE: A new iak was installed at the same time.
    *
    */
   class Hyb2OncDistortionMap : public CameraDistortionMap {
