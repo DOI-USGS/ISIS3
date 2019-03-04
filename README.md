@@ -111,19 +111,19 @@ To build and compile ISIS3 requires following the instructions listed below, whi
 
 ### Mission Requirements
 
-ISIS3 supports many planetary missions; in fact, over 40 different instruments including some flown as early as the 1960s. Ancillary data are required to process images from these instruments. For example, translation definition files to help convert from PDS format to ISIS cubes, dark current and flat file images for radiometric calibration, and large quantities of SPICE files (spacecraft pointing and position) for map projecting images. If you plan to work with data from all missions, then the download will require about 180 GB for all the ancillary data. However, most of this volume is taken up by SPICE files. We have a SPICE Web service that can be used in lieu of downloading all of the SPICE files which can reduce the download size to 10 GB. When downloading ISIS, you will have the option of choosing which mission data to acquire as well as if you only want the translation and calibration files and not SPICE files.
+ISIS3 supports many planetary missions; in fact, over 40 different instruments including some flown as early as the 1960s. Ancillary data are required to process images from these instruments. For example, translation definition files to help convert from PDS format to ISIS cubes, dark current and flat file images for radiometric calibration, and large quantities of SPICE files (spacecraft pointing and position) for map projecting images. If you plan to work with data from all missions, then the download will require about 530 GB for all the ancillary data. However, most of this volume is taken up by SPICE files. We have a SPICE Web service that can be used in lieu of downloading all of the SPICE files which can reduce the download size to 10 GB. When downloading ISIS, you will have the option of choosing which mission data to acquire as well as if you only want the translation and calibration files and not SPICE files.
 
 ### DTM Requirements
 
-The strength of ISIS3 lies in its capabilities for planetary cartography. The image orthorectification process is improved if a digital terrain model (DTM) is used. The DTMs can be quite large and take some time to download. They exist for many planetary bodies (e.g., the Moon, Mars, etc.). Therefore, there are options for selecting which DTMs to download if you are only working with a particular target body.
+The strength of ISIS3 lies in its capabilities for planetary cartography. The image orthorectification process requires a digital terrain model (DTM). The DTMs can be quite large and take some time to download. They exist for many planetary bodies (e.g., the Moon, Mars, etc.). Therefore, there are options for selecting which DTMs to download if you are only working with a particular target body.
 
 <span id="ISIS3DataDownload"></span>
 
 ### Full ISIS3 Data Download
 
-Mission data is hosted on rsync servers and not through conda channels like the ISIS3 distribution. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 130 GB of disk space. If you want to acquire only certain mission data [click here](#MissionSpecific). To download all ISIS3 data files, continue reading.
+Mission data is hosted on rsync servers and not through conda channels like the ISIS3 distribution. This requires using the rsync command from within a terminal window within your Unix distribution, or from within WSL if running Windows 10. Downloading all mission data requires over 520 GB of disk space. If you want to acquire only certain mission data [click here](#MissionSpecific). To download all ISIS3 data files, continue reading.
 
-To download all ISIS3 data (approximately 180 GB), enter the following commands at the command prompt:
+To download all ISIS3 data (approximately 520 GB), enter the following commands at the command prompt:
 
     cd $ISIS3DATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
@@ -150,7 +150,7 @@ ISIS can now use a service to retrieve the SPICE data for all instruments ISIS s
 
 For example: `rsync -azv **--exclude='kernels'** --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/`
 
-<span style="font-size:120%; color:red; font-weight:bold"> WARNING: Some instruments require mission data to be present for calibration, which may not be supported by the SPICE Web Server exclusively, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric callobration programs. </span> 
+<span style="font-size:120%; color:red; font-weight:bold"> WARNING: Some instruments require mission data to be present for radiometric calibration, which may not be supported by the SPICE Web Server exclusively, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric callobration programs. </span> 
 
 #### Apollo Mission (kernels can be excluded):
 
