@@ -109,6 +109,10 @@ void IsisMain() {
                     "xmlns",
                     "http://psa.esa.int/psa/em16/cas/v1");*/
 
+  process.addSchema("CASSIS_1010.sch", 
+                    "CASSIS_1010.xsd",
+                    "xmlns:cassis",
+                    "local");
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     process.addSchema("PDS4_GEOM_1B00_1610.sch", 
@@ -116,7 +120,6 @@ void IsisMain() {
                       "xmlns:geom",
                       "https://pds.jpl.nasa.gov/datastandards/schema/released/geom/v1");
   }
-
 
  /*
   * Add additional pds label data here
@@ -135,6 +138,7 @@ void IsisMain() {
   cubeLab.Auto(pdsLabel);
 
   ProcessExportPds4::translateUnits(pdsLabel);
+  process.reorder(); 
 
   QString outFile = ui.GetFileName("TO");
 
