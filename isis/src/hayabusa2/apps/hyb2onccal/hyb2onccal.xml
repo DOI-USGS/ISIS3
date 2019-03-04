@@ -85,7 +85,8 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     <ol>
       <li>S. Kameda et al.  <i>"Preflight Calibration Test Results for Optical Navigation
       Camera Telescope (ONC-T) Onboard the Hayabusa2 Spacecraft"</i>.
-      Space Sci Rev (2017) 208:17-31.</li>
+      Space Sci Rev (2017) 208:17-31.
+      </li>
       <li>E. Tatsumi et al.  <i>"Updated Inflight Calibration of Hayabusa2’s Optical Navigation Camera (ONC) for
       Scientific Observations during the Cruise Phase"</i>.
       https://arxiv.org/abs/1810.11065 [astro-ph.IM] 25 Oct, 2018.
@@ -93,6 +94,7 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
       <li>H. Suzuki et al. <i>"Initial inflight calibration for Hayabusa2 optical navigation camera
       (ONC) for science observations of asteroid Ryugu"</i>.
       Icarus. 300. 10.1016/j.icarus.2017.09.011
+      </li>
     </ol>
 
   </p>
