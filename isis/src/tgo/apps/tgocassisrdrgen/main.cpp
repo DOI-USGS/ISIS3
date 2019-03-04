@@ -113,7 +113,6 @@ void IsisMain() {
                     "CASSIS_1010.xsd",
                     "xmlns:cassis",
                     "local");
-
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     process.addSchema("PDS4_GEOM_1B00_1610.sch", 

@@ -7,4 +7,5 @@ commands:
 	$(APPNAME) fromlist=$(OUTPUT)/mosaic.lis \
 		   to=$(OUTPUT)/tgocassismos.cub >& /dev/null;
 	catlab from=$(OUTPUT)/tgocassismos.cub to=$(OUTPUT)/tgocassismos.pvl >& /dev/null;	
+	catlab from=$(OUTPUT)/tgocassismos_tracking.cub to=$(OUTPUT)/tgocassismos_tracking.pvl >& /dev/null;
 	$(RM) $(OUTPUT)/mosaic.lis;

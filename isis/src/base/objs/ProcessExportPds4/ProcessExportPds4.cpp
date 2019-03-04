@@ -413,7 +413,7 @@ namespace Isis {
   }
 
 
-  /**
+ /**
    * Allows mission specific programs to use specified 
    * versions of dictionaries. 
    * 
