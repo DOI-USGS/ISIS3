@@ -148,6 +148,40 @@ static AlphaCube *alpha(0);
 
 static Pvl g_configFile;
 
+double linearFun(double Iobs,double x, double g[3]) {
+  return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
+
+}
+
+double dFun(double x, double g[3]) {
+  return -g[0] - 2*g[1]*x -3*g[2]*pow(x,2.0);
+
+}
+
+
+bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
+
+   double x[2];
+   double dx = 1.0;
+   int iter = 0;
+   int maxIterations=500;
+   x[0] = x0;
+   while (dx > epsilon)  {
+
+     x[1]=x[0] - linearFun(Iobs,x[0],g)/dFun(x[0],g);
+     dx = fabs(x[1]-x[0]) ;
+     x[0]=x[1];
+     iter++;
+     if (iter > maxIterations) {
+
+       return false;
+     }
+   }
+   result = x[1];
+   return true;
+}
+
+
 
 /**
  * @brief linearFun:  The linear correction function (used by the newton_rapheson method)
@@ -268,11 +302,13 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
+
     double dn = imageOut[i];    
     double result = 1.0;
     double x0 = 1.0;
     newton_rapheson(dn,x0, g_L,result );   
     imageOut[i] = result;
+
 
     // DARK Current
     imageOut[i] = imageOut[i] - g_darkCurrent;    
@@ -289,7 +325,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       imageOut[i] = imageOut[i] - smear;
 
       }
-
 
 
     // FLATFIELD correction
@@ -314,9 +349,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   return;
 }
-
-
-
 
 
 
@@ -538,6 +570,7 @@ QString loadCalibrationVariables(const QString &config)  {
   g_L[0] = linearity["L"][0].toDouble();
   g_L[1] = linearity["L"][1].toDouble();
   g_L[2] = linearity["L"][2].toDouble();
+
 
   return ( calibFile.original() );
 }

@@ -260,6 +260,7 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
   importFits.StartProcess();
   importFits.Finalize();
 
+
   return outputLabel;
 
 
@@ -267,5 +268,4 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
 
 
 
-}
 
