@@ -12,18 +12,28 @@
 #include <sstream>
 
 #include <gtest/gtest.h>
-//#include "gmock/gmock.h"
+#include "gmock/gmock.h"
 
 using namespace Isis;
 using namespace std;
 
 
-//QString testDataPath("/usgs/cpkgs/isis3/testData/isis/src");
+class hyb2onc2isis_PvlComparison : public ::testing::Test {
+  protected:
+    Pvl finalPvl;
+    QString testDataPath;
 
-QString testDataPath=("/scratch/isis3hayabusa2/tsts");
+    void SetUp() override {
+     testDataPath="/scratch/isis3hayabusa2/tsts";
+     //"/usgs/cpkgs/isis3/testData/isis/src"
+    }
+};
 
 
-TEST(hyb2onc2isis,w1) {
+
+
+
+TEST_F(hyb2onc2isis_PvlComparison,w1) {
 
   //QString w1Fits(testDataPath+"/hayabusa2/apps/hyb2onc2isis/tsts/w1/input/hyb2_onc_20151204_041027_w1f_l2a.fit");
   QString w1Fits=(testDataPath+"/w1/input/hyb2_onc_20151204_041027_w1f_l2a.fit");
@@ -31,11 +41,18 @@ TEST(hyb2onc2isis,w1) {
 
   CubeAttributeOutput att;
   att.addAttribute("real");
-  Pvl outputLabel = hyb2onc2isis(w1Fits, outputCube,att);
+
+
+  finalPvl = hyb2onc2isis(w1Fits, outputCube,att);
+
+
 
 
   ofstream w1pvl;
-  w1pvl << outputLabel;
+  finalPvl.write("finalLabel.txt");
+
+  w1pvl << finalPvl;
+
 
   ifstream truthpvl(testDataPath.toStdString()+"/w1/truth/labels.pvl");
   stringstream buffer;
@@ -52,6 +69,9 @@ TEST(hyb2onc2isis,w1) {
   remove("temp.cub");
 
 
+  //cout << "w1pvlstr:" << w1pvlstr;
+  //cout << "********************************************************";
+  //cout  << "truthpvlstr:" << truthpvlstr;
   EXPECT_EQ(w1pvlstr,truthpvlstr);
 
 }

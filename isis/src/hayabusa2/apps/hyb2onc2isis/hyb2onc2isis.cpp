@@ -53,6 +53,7 @@ void hyb2onc2isis(UserInterface &ui) {
 
 Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttributeOutput att, QString target) {
 
+  Pvl finalPvl;
   ProcessImportFits importFits;
   importFits.setFitsFile(FileName(fitsFileName));
   importFits.setProcessFileStructure(0);
@@ -138,7 +139,7 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
 
   // Translate the Instrument group
 
-  FileName transFile(transDir + "hyb2oncInstrument1.trn");
+  FileName transFile(transDir + "hyb2oncInstrument.trn");
 
   if (updatedKeywords) {
     transFile = transDir+"hyb2oncInstrumentUpdated.trn";
@@ -255,14 +256,16 @@ Pvl hyb2onc2isis(QString fitsFileName, QString outputCubeFileName, CubeAttribute
 
   // Convert the image data
   importFits.Progress()->SetText("Importing Hayabusa2 image");
-   Pvl finalLabel = *(outputCube->label() );
+
   importFits.StartProcess();
   importFits.Finalize();
 
-  return finalLabel;
-  
+
+  return outputLabel;
+
 
   }
 
-}
+
+
 
