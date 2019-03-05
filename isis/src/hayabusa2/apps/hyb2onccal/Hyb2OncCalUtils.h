@@ -543,8 +543,6 @@ QString loadCalibrationVariables(const QString &config)  {
 
 
 
-
-
   //Load the linearity variables
   g_L[0] = linearity["L"][0].toDouble();
   g_L[1] = linearity["L"][1].toDouble();
