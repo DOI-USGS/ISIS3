@@ -120,11 +120,12 @@ static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for
 static QString g_iofCorrection("IOF");  //!< Is I/F correction to be applied?
 
 //  I/F variables
-
+//static double g_iof(1.0);
 static double g_iofScale(1.0);
 static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
 static double g_sensitivity(1.0);
 static double g_effectiveBandwidth(1.0);
+static double g_J(1.0);
 
 
 namespace Isis {
@@ -147,40 +148,6 @@ InstrumentType g_instrument;
 static AlphaCube *alpha(0);
 
 static Pvl g_configFile;
-
-double linearFun(double Iobs,double x, double g[3]) {
-  return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
-
-}
-
-double dFun(double x, double g[3]) {
-  return -g[0] - 2*g[1]*x -3*g[2]*pow(x,2.0);
-
-}
-
-
-bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
-
-   double x[2];
-   double dx = 1.0;
-   int iter = 0;
-   int maxIterations=500;
-   x[0] = x0;
-   while (dx > epsilon)  {
-
-     x[1]=x[0] - linearFun(Iobs,x[0],g)/dFun(x[0],g);
-     dx = fabs(x[1]-x[0]) ;
-     x[0]=x[1];
-     iter++;
-     if (iter > maxIterations) {
-
-       return false;
-     }
-   }
-   result = x[1];
-   return true;
-}
-
 
 
 /**
@@ -343,6 +310,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
         }
       }
     }
+
 
   }
 
@@ -558,13 +526,16 @@ QString loadCalibrationVariables(const QString &config)  {
 
   // Compute BIAS correction factor (it's a constant so do it once!)
   g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
-  //double correction_factor = (g_bae0 + g_bae1*g_AEtemperature);
   g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //bias correction factor
 
   // Load the Solar Flux for the specific filter
   g_solarFlux = solar[g_filter.toLower()];
   g_sensitivity = sensitivity[g_filter.toLower()];
   g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
+
+  g_J = g_solarFlux/(g_effectiveBandwidth*.0001);
+
+
 
   //Load the linearity variables
   g_L[0] = linearity["L"][0].toDouble();
