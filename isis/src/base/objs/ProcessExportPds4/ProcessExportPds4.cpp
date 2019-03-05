@@ -297,7 +297,7 @@ namespace Isis {
       QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
       if ( !obsAreaNode.isNull() ) {
 
-        // fix times, if needed
+        // fix times
         QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
         if (!timeNode.isNull()) {
           QDomElement startTime = timeNode.firstChildElement("start_date_time");
@@ -349,6 +349,7 @@ namespace Isis {
         }
 
         // reorder
+
         QDomElement investigationAreaNode = obsAreaNode.firstChildElement("Investigation_Area");
         obsAreaNode.insertAfter(investigationAreaNode, obsAreaNode.firstChildElement("Time_Coordinates"));
 
