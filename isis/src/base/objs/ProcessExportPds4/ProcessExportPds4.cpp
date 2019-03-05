@@ -52,8 +52,6 @@ namespace Isis {
 
     m_imageType = StandardImage;
 
-//    ProcessExport::setFormat(ExportFormat::BSQ); 
-
     qSetGlobalQHashSeed(1031); // hash seed to force consistent output
 
     m_domDoc = new QDomDocument("");
