@@ -217,7 +217,7 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 }
 
 
-/**
+
 * @brief Apply radiometric correction to each line of a Hayabusa2 image.
 * @author 2016-03-30 Kris Becker
 * @param in   Raw image and flat field
@@ -540,6 +540,7 @@ QString loadCalibrationVariables(const QString &config)  {
   g_effectiveBandwidth = effectiveBW[g_filter.toLower()];
 
   g_J = g_solarFlux/(g_effectiveBandwidth*.0001);
+
 
 
   //Load the linearity variables
