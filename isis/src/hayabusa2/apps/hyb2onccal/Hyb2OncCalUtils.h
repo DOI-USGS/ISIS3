@@ -116,18 +116,12 @@ static double g_compfactor(1.0);  // Default if OutputMode = LOSS-LESS; 16.0 for
 static QString g_iofCorrection("IOF");  //!< Is I/F correction to be applied?
 
 //  I/F variables
-
 //static double g_iof(1.0);
-
-
-
 static double g_iofScale(1.0);
 static double g_solarFlux(1.0);  //!< The solar flux (used to calculate g_iof).
 static double g_sensitivity(1.0);
 static double g_effectiveBandwidth(1.0);
-
 static double g_J(1.0);
-
 
 
 namespace Isis {
@@ -248,6 +242,7 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
     // DARK Current
     imageOut[i] = imageOut[i] - g_darkCurrent;    
+
 
     //Smear correction
     if (!g_onBoardSmearCorrection) {
@@ -452,7 +447,6 @@ QString loadCalibrationVariables(const QString &config)  {
 
   // Compute BIAS correction factor (it's a constant so do it once!)
   g_bias = g_b0+g_b1*g_CCD_T_temperature+g_b2*g_ECT_T_temperature;
-
   g_bias *= (g_bae0 + g_bae1*g_AEtemperature); //bias correction factor
 
   // Load the Solar Flux for the specific filter
