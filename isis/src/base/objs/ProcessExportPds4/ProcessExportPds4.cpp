@@ -348,8 +348,6 @@ namespace Isis {
           }
         }
 
-        // reorder
-
         QDomElement investigationAreaNode = obsAreaNode.firstChildElement("Investigation_Area");
         obsAreaNode.insertAfter(investigationAreaNode, obsAreaNode.firstChildElement("Time_Coordinates"));
 
