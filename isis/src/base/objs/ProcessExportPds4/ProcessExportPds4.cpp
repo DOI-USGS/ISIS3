@@ -430,6 +430,39 @@ namespace Isis {
 
 
   /**
+   * Allows mission specific programs to set version_id
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * The input string should be colon separated string with 6 
+   * identifiers: 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param versiondId The version_id value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setVersionId(QString versionId) {
+    m_versionId = versionId;
+  }
+
+
+  /**
+   * Allows mission specific programs to set the title
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param title The title value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setTitle(QString title) {
+    m_title = title;
+  }
+
+
+  /**
    * Allows mission specific programs to set the title
    * required for PDS4 labels. This value is added to the xml file 
    * by the identificationArea() method. 
