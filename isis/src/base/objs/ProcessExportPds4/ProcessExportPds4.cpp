@@ -235,7 +235,6 @@ namespace Isis {
             QString timeValue = stopTime.text();
             PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
           }
-      
         }
       
         QDomElement obsSysNode = obsAreaNode.firstChildElement("Observing_System");
@@ -277,14 +276,12 @@ namespace Isis {
       // move target to just below Observing_System. 
       QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
       obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
-
     }
     else if (inputLabel->findObject("IsisCube").hasGroup("Mapping")) {
 
       translationFileName = "$base/translations/pds4ExportTargetFromMapping.trn"; 
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
-
     }
     else {
       throw IException(IException::Unknown, "Unable to find a target in input cube.", _FILEINFO_);
@@ -292,10 +289,102 @@ namespace Isis {
   }
 
 
+ /**
+   * This method reorders the existing m_domDoc to follow PDS4 standards and fixes time formatting
+   * if needed.
+   */
+  void ProcessExportPds4::reorder() {
+      QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
+      if ( !obsAreaNode.isNull() ) {
+
+        // fix times
+        QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
+        if (!timeNode.isNull()) {
+          QDomElement startTime = timeNode.firstChildElement("start_date_time");
+          if (startTime.text() == "") {
+            startTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = startTime.text();
+            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
+          }
+          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
+          if (stopTime.text() == "") {
+            stopTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = stopTime.text();
+            PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
+          }
+
+          QStringList xmlPath;
+          xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "geom:Geometry"
+            << "geom:Geometry_Orbiter"
+            << "geom:geometry_reference_time_utc";
+
+          QDomElement baseElement = m_domDoc->documentElement();
+          QDomElement geomRefTime = getElement(xmlPath, baseElement);
+          if (geomRefTime.text() == "") {
+            geomRefTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = geomRefTime.text();
+            PvlToXmlTranslationManager::resetElementValue(geomRefTime, timeValue + "Z");
+          }
+        xmlPath.clear();
+          xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "geom:Geometry"
+            << "geom:Image_Display_Geometry"
+            << "geom:Object_Orientation_North_East"
+            << "geom:east_azimuth";
+          QDomElement eastAzimuth = getElement(xmlPath, baseElement);
+          if (eastAzimuth.text() != "") {
+            PvlToXmlTranslationManager::resetElementValue(eastAzimuth, eastAzimuth.text(), "deg");
+          }
+        }
+
+        QDomElement investigationAreaNode = obsAreaNode.firstChildElement("Investigation_Area");
+        obsAreaNode.insertAfter(investigationAreaNode, obsAreaNode.firstChildElement("Time_Coordinates"));
+
+        QDomElement obsSystemNode = obsAreaNode.firstChildElement("Observing_System");
+        obsAreaNode.insertAfter(obsSystemNode, obsAreaNode.firstChildElement("Investigation_Area"));
+
+        QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
+        obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
+
+        QDomElement missionAreaNode = obsAreaNode.firstChildElement("Mission_Area");
+        obsAreaNode.insertAfter(missionAreaNode, obsAreaNode.firstChildElement("Target_Identification"));
+
+        QDomElement disciplineAreaNode = obsAreaNode.firstChildElement("Discipline_Area");
+        obsAreaNode.insertAfter(disciplineAreaNode, obsAreaNode.firstChildElement("Mission_Area"));
+      }
+
+      QDomElement identificationAreaNode = m_domDoc->documentElement().firstChildElement("Identification_Area");
+      if ( !identificationAreaNode.isNull() ) {
+        QDomElement aliasListNode = identificationAreaNode.firstChildElement("Alias_List");
+        identificationAreaNode.insertAfter(aliasListNode, identificationAreaNode.firstChildElement("product_class"));
+      }
+
+      QDomElement fileAreaObservationalNode = m_domDoc->documentElement().firstChildElement("File_Area_Observational");
+      QDomElement array2DImageNode = fileAreaObservationalNode.firstChildElement("Array_2D_Image");
+      if ( !array2DImageNode.isNull() ) {
+        QDomElement descriptionNode = array2DImageNode.firstChildElement("description");
+        array2DImageNode.insertAfter(descriptionNode, array2DImageNode.firstChildElement("axis_index_order"));
+      }
+  }
+
   /**
    * Allows mission specific programs to set logical_identifier 
    * required for PDS4 labels. This value is added to the xml file 
    * by the identificationArea() method. 
+   *  
+   * The input value will be converted to all-lowercase if not already 
+   * in line with PDS4 requirements.  
    *  
    * The input string should be colon separated string with 6 
    * identifiers: 
@@ -318,7 +407,25 @@ namespace Isis {
    *            compliant labels.
    */
   void ProcessExportPds4::setLogicalId(QString lid) {
-    m_lid = lid;
+    m_lid = lid.toLower();
+  }
+
+
+  /**
+   * Allows mission specific programs to set version_id
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * The input string should be colon separated string with 6 
+   * identifiers: 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param versiondId The version_id value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setVersionId(QString versionId) {
+    m_versionId = versionId;
   }
 
 
