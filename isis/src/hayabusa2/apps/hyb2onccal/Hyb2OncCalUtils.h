@@ -1,15 +1,9 @@
 #ifndef Hyb2OncCalUtils_h
 #define Hyb2OncCalUtils_h
-
-
-
-
 #include "CSVReader.h"
 #include "IException.h"
 #include "LineManager.h"
 #include "NaifStatus.h"
-
-
 
 #include <string>
 #include <vector>
@@ -44,13 +38,8 @@
 #include "Statistics.h"
 #include "TextFile.h"
 
-
-
-
-
 // OpenCV libraries
 #include <opencv2/opencv.hpp>
-
 
 /**
  * @author 2016-04-04 Tyler Wilson
@@ -269,7 +258,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
       }
     }
 
-
     double dn = imageOut[i];    
     double result = 1.0;
     double x0 = 1.0;
@@ -317,8 +305,6 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   return;
 }
-
-
 
 /**
  * @brief Translates a 1-banded Isis::Cube to an OpenMat object
