@@ -536,7 +536,6 @@ QString loadCalibrationVariables(const QString &config)  {
   g_J = g_solarFlux/(g_effectiveBandwidth*.0001);
 
 
-
   //Load the linearity variables
   g_L[0] = linearity["L"][0].toDouble();
   g_L[1] = linearity["L"][1].toDouble();
