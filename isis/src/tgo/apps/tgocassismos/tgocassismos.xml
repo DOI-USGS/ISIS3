@@ -54,6 +54,10 @@
       Added the "tracking=true" parameter to tgocassismos' call to automos resulting in automatic
       tracking cube creation. 
     </change>
+    <change name="Kristin Berry" date="2019-03-01">
+      Added the StopTime keyword to the output Mosaic PVL group, as stop_date_time is required for 
+      PDS4 export. 
+    </change>
   </history>
 
   <groups>

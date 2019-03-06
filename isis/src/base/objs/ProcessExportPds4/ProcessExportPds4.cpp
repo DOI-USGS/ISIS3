@@ -297,7 +297,7 @@ namespace Isis {
       QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
       if ( !obsAreaNode.isNull() ) {
 
-        // fix start/stop times, if needed
+        // fix times
         QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
         if (!timeNode.isNull()) {
           QDomElement startTime = timeNode.firstChildElement("start_date_time");
@@ -316,7 +316,38 @@ namespace Isis {
             QString timeValue = stopTime.text();
             PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
           }
+
+          QStringList xmlPath;
+          xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "geom:Geometry"
+            << "geom:Geometry_Orbiter"
+            << "geom:geometry_reference_time_utc";
+
+          QDomElement baseElement = m_domDoc->documentElement();
+          QDomElement geomRefTime = getElement(xmlPath, baseElement);
+          if (geomRefTime.text() == "") {
+            geomRefTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = geomRefTime.text();
+            PvlToXmlTranslationManager::resetElementValue(geomRefTime, timeValue + "Z");
+          }
+        xmlPath.clear();
+          xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "geom:Geometry"
+            << "geom:Image_Display_Geometry"
+            << "geom:Object_Orientation_North_East"
+            << "geom:east_azimuth";
+          QDomElement eastAzimuth = getElement(xmlPath, baseElement);
+          if (eastAzimuth.text() != "") {
+            PvlToXmlTranslationManager::resetElementValue(eastAzimuth, eastAzimuth.text(), "deg");
+          }
         }
+
         QDomElement investigationAreaNode = obsAreaNode.firstChildElement("Investigation_Area");
         obsAreaNode.insertAfter(investigationAreaNode, obsAreaNode.firstChildElement("Time_Coordinates"));
 
