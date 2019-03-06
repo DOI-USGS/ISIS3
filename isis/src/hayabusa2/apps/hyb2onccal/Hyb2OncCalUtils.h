@@ -52,7 +52,11 @@
 #include <opencv2/opencv.hpp>
 
 
-
+/**
+ * @author 2016-04-04 Tyler Wilson
+ *
+ *
+ */
 using namespace cv;
 using namespace std;
 
@@ -146,19 +150,44 @@ static AlphaCube *alpha(0);
 static Pvl g_configFile;
 
 
-
+/**
+ * @brief linearFun:  The linear correction function (used by the newton_rapheson method)
+ * @author 2019-02-12  Tyler Wilson
+ * @param Iobs:  The observed intensity
+ * @param x:  The ideal intensity.
+ * @param g:  The vector of empirically derived coefficients for the third-order polynomial
+ * modelling the linear correction (for DN values < 3400 DN)
+ * @return The value of the function at the point x.
+ */
 double linearFun(double Iobs,double x, double g[3]) {
   return Iobs - g[0]*x -g[1]*pow(x,2.0) -g[2]*pow(x,3.0);
 
 }
 
-
+/**
+ * @brief dFun:  The first-order derivative of linearFun
+ * @author 2019-02-12  Tyler Wilson
+ * @param x:  The ideal intensity.
+ * @param g:  The vector of empirically derived coefficients for the third-order polynomial
+ * modelling the linear correction (for DN values < 3400 DN)
+ * @return
+ */
 double dFun(double x, double g[3]) {
   return -g[0] - 2*g[1]*x -3*g[2]*pow(x,2.0);
 
 }
 
-
+/**
+ * @brief newton_rapheson
+ * @author 2019-02-12 Tyler Wilson
+ * @param Iobs:  The observed DN intensity
+ * @param x0:  The starting value for the Newton-Rapheson method
+ * @param g:  A vector of the coefficients for the linearity function.  It is a third-order
+ * polynomial.
+ * @param result:  The final approximation of the root of the equation.
+ * @param epsilon:  The tolerance on the final solution.
+ * @return A root of the linearity correction function, centered near the origin.
+ */
 bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double epsilon=1e-6 )  {
 
    double x[2];
@@ -182,7 +211,15 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 }
 
 
-
+/**
+* @brief Apply radiometric correction to each line of a Hayabusa2 image.
+* @author 2016-03-30 Kris Becker
+* @param in   Raw image and flat field
+* @param out  Radometrically corrected image
+* @internal
+*   @history 2017-07-2017 Ian Humphrey & Kaj Williams - Adapted from amicacal.
+*   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
+*/
 void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
   Buffer& imageIn   = *in[0];
@@ -283,7 +320,15 @@ void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
 
 
 
-
+/**
+ * @brief Translates a 1-banded Isis::Cube to an OpenMat object
+ *
+ * @author 2016-04-19 Tyler Wilson
+ *
+ * @param icube A pointer to the input cube
+ *
+ * @return @b Mat A pointer to the OpenMat object
+ */
 Mat * isis2mat(Cube *icube) {
 
   int nlines = icube->lineCount();
@@ -307,7 +352,16 @@ return matrix;
 }
 
 
-
+/**
+ * @brief Translates an OpenMat object to an ISIS::Cube with one band
+ *
+ * @author 2016-04-19 Tyler Wilson
+ *
+ * @param matrix A pointer to the OpenMat object
+ *
+ * @param cubeName The name of the Isis::Cube that is being created.
+ *
+ */
 void mat2isis(Mat *matrix, QString cubeName) {
 
   int nlines = matrix->rows;
@@ -338,6 +392,16 @@ void mat2isis(Mat *matrix, QString cubeName) {
 }
 
 
+/**
+ * @brief Translates/scales a cube using Bilinear Interpolation
+ *
+ * @author 2016-04-19 Tyler Wilson
+ *
+ * @param matrix A pointer to the OpenMat object
+ *
+ * @param cubeName The name of the ISIS::Cube that is being created.
+ *
+ */
 
 void  translate(Cube *flatField,double *transform, QString fname) {
 
@@ -374,7 +438,15 @@ void  translate(Cube *flatField,double *transform, QString fname) {
 }
 
 
-
+/**
+* @brief Determine name of flat field file to apply
+* @author 2016-03-30 Kris Becker
+* @param filter  Name of ONC filter
+* @return FileName Path and name of flat file file
+* @internal
+*   @history 2017-07-27 Ian Humphrey & Kaj Williams - Adapted from amicacal.
+*   @history 2019-02-12 Tyler Wilson - Modified to support new calibration settings/formulas.
+*/
 FileName DetermineFlatFieldFile(const QString &filter) {
 
   QString fileName = "$hayabusa2/calibration/flatfield/";
@@ -387,7 +459,14 @@ FileName DetermineFlatFieldFile(const QString &filter) {
 }
 
 
-
+/**
+* @brief Loads the calibration variables into the program.
+* @param config QString Name of the calibration file to load.
+*
+* Loads g_b0-g_b2,g_bae0-g_bae1,g_d0-g_d1
+*
+*
+*/
 QString loadCalibrationVariables(const QString &config)  {
 
 
