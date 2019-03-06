@@ -217,7 +217,7 @@ bool newton_rapheson(double Iobs,double x0, double g[3],double &result, double e
 }
 
 
-
+/**
 * @brief Apply radiometric correction to each line of a Hayabusa2 image.
 * @author 2016-03-30 Kris Becker
 * @param in   Raw image and flat field
