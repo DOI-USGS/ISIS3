@@ -92,6 +92,7 @@ void IsisMain() {
     importer.EndProcess();
   }
   catch (IException &e) {
+
     QString msg = "Given file [" + xmlFileName.expanded() + "] does not appear to be a valid TGO CaSSIS label.";
       throw IException(e, IException::User, msg, _FILEINFO_);
   }
@@ -333,10 +334,20 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   // Remove trailing "Z" from PDS4 .xml (on re-ingestion) and create YearDoy keyword in Archive group
   PvlKeyword *startTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"];
   QString startTimeString = startTime[0];
-  if (QString::compare(startTimeString.at(startTimeString.size() - 1), "Z", Qt::CaseInsensitive) == 0){
-    startTimeString = startTimeString.left(startTimeString.length() - 1);
+  if (startTimeString.endsWith("Z", Qt::CaseInsensitive)) {
+    startTimeString.chop(2);
     startTime->setValue(startTimeString);
   }
+
+  if (outputLabel->hasGroup("StopTime")) {
+    PvlKeyword *stopTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StopTime"]; 
+    QString stopTimeString = stopTime[0];
+    if (stopTimeString.endsWith("Z", Qt::CaseInsensitive)){
+      stopTimeString.chop(2);
+      stopTime->setValue(stopTimeString);
+    }
+  }
+
   iTime stime(startTimeString);
 
   PvlGroup &archive = outputLabel->findGroup("Archive", Pvl::Traverse);
