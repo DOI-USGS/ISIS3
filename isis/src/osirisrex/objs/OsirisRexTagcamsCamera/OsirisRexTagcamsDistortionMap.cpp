@@ -142,8 +142,10 @@ namespace Isis {
     if ( p_debug ) cout << "\nUndistorting FP at " << dx << ", " << dy << "\n";
     // Handle degenerate case should convergence fail!! Adjust for center of
     // pointing boresight!
-    p_focalPlaneX = dx;
-    p_focalPlaneY = dy;
+    // Handle degenerate case should convergence fail!! Adjust for center of
+    // pointing boresight!
+    p_focalPlaneX = dx + p_xoffset;
+    p_focalPlaneY = dy + p_yoffset;
     p_undistortedFocalPlaneX = dx + p_xoffset;
     p_undistortedFocalPlaneY = dy + p_yoffset;
 
