@@ -1,4 +1,4 @@
-# **DRAFT**
+# **DRAFT** (See RFC 2 for an open request for comment about the release roadmap)
 
 # Road Map
 
