@@ -529,6 +529,7 @@ namespace Isis {
       bool IsValid() const;
       // Can we get rid of this? It doesn't appear to be used anywhere.  *** ToDo ***
       bool IsInvalid() const;
+      bool IsFree() const;
       bool IsFixed() const;
       bool HasAprioriCoordinates();
 
@@ -668,7 +669,7 @@ namespace Isis {
        * This stores the constraint status of the a priori SurfacePoint
        *   @todo Eventually add x, y, and z.  Instead we made generic coordinates
        */
-      std::bitset<6> constraintStatus;
+      std::bitset<3> constraintStatus;
 
       /**
        * This indicates if a program has explicitely set the reference in this
