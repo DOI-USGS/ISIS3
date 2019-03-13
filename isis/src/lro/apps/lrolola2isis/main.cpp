@@ -119,19 +119,19 @@ void IsisMain() {
       lidarPoint->setRange(range);
       lidarPoint->setSigmaRange(rangeSigma);
 
-      // Just set the point coordinates for now.  We need to wait until we set
-      // the target radii to be able to set the coordinate sigmas.  The sigmas
-      // will be converted to angles and the target radii are needed to do that.
+      // Set the point coordinates and their sigmas and add to the Lidar Control Point file
       SurfacePoint spoint(lat, lon, radius);
-      // lidarPoint->SetAprioriSurfacePoint(SurfacePoint(lat, lon, radius));
+      spoint.SetSphericalSigmasDistance(
+                                        Distance(latSigma, Distance::Units::Meters),
+                                        Distance(lonSigma, Distance::Units::Meters),
+                                        Distance(radiusSigma, Distance::Units::Meters));
+      lidarPoint->SetAprioriSurfacePoint(spoint);
     
-      bool setSurfacePointRadii = true;
-      
+      // Loop through images to set measures in the Lidar Control Point 
       for (int j = 0; j < images.size(); j++) {
         Cube *cube = cubeMgr.OpenCube(images[j].name.expanded());
         
         if (cube != NULL) {
-          
           Camera *camera = cube->camera();
           
           if (camera != NULL) {
@@ -141,27 +141,9 @@ void IsisMain() {
               
               if (samp > 0.5 - threshold   &&   line > 0.5 - threshold
                   && samp < camera->Samples() + .5  &&  line < camera->Lines() + .5) {
-        
                 ControlMeasure *measure = new ControlMeasure;
-
                 measure->SetCoordinate(camera->Sample(), camera->Line()); 
                 measure->SetCubeSerialNumber(images[j].sn);
-
-                if (setSurfacePointRadii) {
-                  // Get the radii and set the radii in the SurfacePoint
-                  std::vector<Distance>  targetRadii;
-                  targetRadii = camera->target()->radii();
-                  majorAx = targetRadii[0];
-                  minorAx = targetRadii[1];
-                  polarAx = targetRadii[2];
-                  setSurfacePointRadii = false;
-                  spoint.SetSphericalSigmasDistance(
-                                                    Distance(latSigma, Distance::Units::Meters),
-                                                    Distance(lonSigma, Distance::Units::Meters),
-                                                    Distance(radiusSigma, Distance::Units::Meters));
-                  lidarPoint->SetAprioriSurfacePoint(spoint);
-                }
-          
                 lidarPoint->Add(measure);
                 if (time >= images[j].startTime && time <= images[j].endTime) {
                   QString newSerial = measure->GetCubeSerialNumber();
