@@ -1,4 +1,4 @@
-#include "BundleControlPointVector.h"
+#include "BundleLidarPointVector.h"
 
 #include <QDebug>
 #include <QFutureWatcher>
@@ -10,18 +10,18 @@
 namespace Isis {
 
   /**
-   * Constructs an empty BundleControlPointVector.
+   * Constructs an empty BundleLidarPointVector.
    */
-  BundleControlPointVector::BundleControlPointVector() {
+  BundleLidarPointVector::BundleLidarPointVector() {
   }
 
 
   /**
    * Copy constructor.
    * 
-   * @param src A reference to the BundleControlPointVector to copy from.
+   * @param src A reference to the BundleLidarPointVector to copy from.
    */
-  BundleControlPointVector::BundleControlPointVector(const BundleControlPointVector &src)
+  BundleLidarPointVector::BundleLidarPointVector(const BundleLidarPointVector &src)
       :QVector<BundleControlPointQsp>(src) {
   }
 
@@ -31,7 +31,7 @@ namespace Isis {
    *
    * Contained BundleControlPoints will remain until all shared pointers to them are deleted.
    */
-  BundleControlPointVector::~BundleControlPointVector() {
+  BundleLidarPointVector::~BundleLidarPointVector() {
     clear();
   }
 
@@ -39,13 +39,13 @@ namespace Isis {
   /**
    * Assignment operator.
    * 
-   * Assigns the state of the source BundleControlPointVector to this BundleControlPointVector.
+   * Assigns the state of the source BundleLidarPointVector to this BundleLidarPointVector.
    * 
-   * @param src The BundleControlPointVector to assign from.
+   * @param src The BundleLidarPointVector to assign from.
    * 
-   * @return BundleControlPointVector& A reference to this BundleControlPointVector.
+   * @return BundleLidarPointVector& A reference to this BundleLidarPointVector.
    */
-  BundleControlPointVector &BundleControlPointVector::operator=(const BundleControlPointVector &src) {
+  BundleLidarPointVector &BundleLidarPointVector::operator=(const BundleLidarPointVector &src) {
     if (&src != this) {
       QVector<BundleControlPointQsp>::operator=(src);
     }
@@ -60,7 +60,7 @@ namespace Isis {
    * @param imageSolution Current iteration solution vector for image parameters.
    *
    */
-  void BundleControlPointVector::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
+  void BundleLidarPointVector::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
                                                            LinearAlgebra::Vector &imageSolution,
                                                            const BundleTargetBodyQsp target) {
     for (int i = 0; i < size(); i++) {
@@ -74,7 +74,7 @@ namespace Isis {
    *
    * @return double Weighted sum of squares of constrained point residuals.
    */
-  void BundleControlPointVector::computeMeasureResiduals() {
+  void BundleLidarPointVector::computeMeasureResiduals() {
 
     for (int i = 0; i < size(); i++) {
       at(i)->computeResiduals();
@@ -87,7 +87,7 @@ namespace Isis {
    *
    * @return double weighted sum of squares of measure residuals (vtpv).
    */
-  double BundleControlPointVector::vtpvMeasureContribution() {
+  double BundleLidarPointVector::vtpvMeasureContribution() {
     double vtpv = 0;
 
     for (int i = 0; i < size(); i++) {
@@ -103,7 +103,7 @@ namespace Isis {
    *
    * @return double Weighted sum of squares of constrained point residuals.
    */
-  double BundleControlPointVector::vtpvContribution() {
+  double BundleLidarPointVector::vtpvContribution() {
     double vtpvControl = 0;
 
     for (int i = 0; i < size(); i++) {
@@ -118,7 +118,7 @@ namespace Isis {
    *
    * @return double vtpv of lidar range constraints.
    */
-  double BundleControlPointVector::vtpvRangeContribution() {
+  double BundleLidarPointVector::vtpvRangeContribution() {
     double vtpv = 0;
 
     for (int i = 0; i < size(); i++) {
