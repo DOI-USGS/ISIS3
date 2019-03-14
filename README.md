@@ -30,8 +30,9 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         conda create -n isis3 python=3.6
 
         #Activate the environment
-        #Depending on your OS, you may need to use conda activate isis3 instead
-        source activate isis3
+        #Depending on your version of Anaconda use one of the following:
+          Anaconda 3.4 and up - conda activate isis3
+          prior to Anaconda 3.4 - source activate isis3
 
         #Add the following channels to the environment
         conda config --env --add channels conda-forge
@@ -70,11 +71,11 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
                 
 
-    Directions for running rsync to download ISIS3 data can be found [here.](#ISIS3DataDownload) Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis3 envionment with the following command:
+    Directions for running rsync to download ISIS3 data can be found [here.](#ISIS3DataDownload) Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis3 envionment with one of the following commands:
 
-        #Depending on your OS, you may need to use conda activate isis3 instead
-        source activate isis3
-                
+        for Anaconda 3.4 and up - conda activate isis3
+        prior to Anaconda 3.4 - source activate isis3
+        
 
 ### Operating System Requirements
 
@@ -140,7 +141,7 @@ The base data area is separate from the source code. This data area is crucial t
 
 ### Partial Download of Mission Specific Data
 
-There are many missions supported by ISIS. If you are only working with a few missions then you should download only those specific data areas. One way you can save time and space is to not download the SPICE data for the mission you need. If you chose download the SPICE data, read the next section about the SPICE Web Service that provides instructions for excluding the SPICE kernels. Otherwise [jump](README.md#ApolloMission) to the mission specific sections.
+There are many missions supported by ISIS. If you are only working with a few missions then you can save disk space by downloading only those specific data areas. If you want to limit the download even further, read the next section about the SPICE Web Service. Otherwise [jump](README.md#ApolloMission) to the mission specific sections.
 
 ### ISIS SPICE Web Service
 
