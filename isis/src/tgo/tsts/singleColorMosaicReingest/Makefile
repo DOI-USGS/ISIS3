@@ -69,4 +69,4 @@ commands:
 	$(RM) $(OUTPUT)/*.lis
 	$(RM) $(OUTPUT)/*equi*
 	$(RM) $(OUTPUT)/*B1.cub
-
+	$(RM) $(OUTPUT)/*_tracking*
