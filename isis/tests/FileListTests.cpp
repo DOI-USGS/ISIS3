@@ -11,8 +11,8 @@ TEST(FileList, NonExistantFileConstructor)
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Unable to open [FakeFile]."))
-      <<e.toString().toStdString();
+    EXPECT_TRUE( e.toString() .toLatin1() .contains("Unable to open [FakeFile].") )
+      << e.toString(). toStdString();
   }
   catch(...)
   {
@@ -38,10 +38,10 @@ TEST(FileList, FileNameConstructor)
   "\n"
   "FileList.h\n");
   std::ostringstream output;
-  std::string expectedOutput= "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.cpp\n"
+  std::string expectedOutput = "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.cpp\n"
      "/usgs/pkgs/isis3/isis/src/base/objs/FileList/FileList.h\n"
      "unitTest.cpp\n>This\n^is\nMakefile\nFileList.h\n";
   Isis::FileList fl1(input);
   fl1.write(output);
-  EXPECT_STREQ(expectedOutput.c_str(), output.str().c_str());
+  EXPECT_STREQ(expectedOutput.c_str(), output.str(). c_str());
 }
