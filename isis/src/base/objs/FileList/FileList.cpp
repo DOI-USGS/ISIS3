@@ -48,6 +48,15 @@ namespace Isis {
     read(listFile);
   }
 
+  /**
+   * Constructs a FileList from an istream.
+   *
+   * @param in the istream to read from
+   */
+  FileList::FileList(std::istream &in) {
+    read(in);
+  }
+
 
   /**
    * Opens and loads the list of files from a file.
