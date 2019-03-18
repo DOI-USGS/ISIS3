@@ -17,6 +17,7 @@
 
 # Archived RFCs
 <details>
+
   * [RFC1 - Documentation Delivery](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery)
 </details>
 # Planning & Design
