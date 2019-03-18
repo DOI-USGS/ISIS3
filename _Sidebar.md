@@ -16,8 +16,11 @@
   * [RFC3 - Impact on Application Users](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC3a:-SPICE-Modularization----Impact-on-Application-Users)
 
 # Archived RFCs
+
 <details>
 
   * [RFC1 - Documentation Delivery](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery)
+
 </details>
+
 # Planning & Design
