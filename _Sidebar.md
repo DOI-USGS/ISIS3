@@ -18,6 +18,7 @@
 # Archived RFCs
 
 <details>
+  <summary>Click to Expand</summary>
 
   * [RFC1 - Documentation Delivery](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery)
 
