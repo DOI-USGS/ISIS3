@@ -397,7 +397,7 @@ namespace Isis {
     // the ck solve degree entered is only used if we are solving for all coefficients
     // otherwise it defaults to 2.
     if (option == AllPointingCoefficients) {
-      // update spkDegree and spkSolveDegree
+      // update ckDegree and ckSolveDegree
       m_ckDegree = ckDegree;
       m_ckSolveDegree = ckSolveDegree;
 
@@ -406,7 +406,7 @@ namespace Isis {
       m_numberCamAngleCoefSolved = m_ckSolveDegree + 1;
     }
     else {
-      // let spkDegree and spkSolveDegree default to 2, 2
+      // let ckDegree and ckSolveDegree default to 2, 2
       m_ckDegree = 2;
       m_ckSolveDegree = 2;
 

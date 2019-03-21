@@ -111,47 +111,17 @@ namespace Isis {
 */
   }
 
-
   /**
+   * Computes the residuals for this BundleControlPoint.
    *
    */
-  double BundleLidarControlPoint::measureSigma() {
-    return 1.4 * 10.0 * at(0)->camera()->PixelPitch();
-  }
+  void BundleLidarControlPoint::computeResiduals() {
+    // test calling normal version of compute residuals
+    m_lidarControlPoint->ComputeResiduals();
 
-
-  /**
-   *
-   */
-  double BundleLidarControlPoint::measureWeight() {
-    double sigma = measureSigma();
-
-    double weight = 1.0/(sigma);
-
-    weight *= weight;
-
-    return weight;
-  }
-
-
-  /**
-   * Apply point parameter corrections for Bundle Adjustment and update any range constraints
-   * between image position and lidar point.
-   *
-   * @param normalsMatrix Normal equations matrix.
-   * @param imageSolution Current iteration solution vector for image parameters.
-   *
-   */
-  void BundleLidarControlPoint::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                                          LinearAlgebra::Vector &imageSolution,
-                                                          const BundleTargetBodyQsp target) {
-
-    // call parent class version
-    BundleControlPoint::applyParameterCorrections(normalsMatrix, imageSolution, target);
-
-    // update any lidar point range constraints
-    for ( int i = 0; i < m_rangeConstraints.size(); i++) {
-      m_rangeConstraints.at(i)->update();
+    // compute and store focal plane residuals in millimeters
+    for (int i = 0; i < size(); i++) {
+      at(i)->setFocalPlaneResidualsMillimeters();
     }
   }
 

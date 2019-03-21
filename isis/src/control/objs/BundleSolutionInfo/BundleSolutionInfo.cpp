@@ -606,6 +606,8 @@ namespace Isis {
       return false;
     }
 
+    LidarDataQsp lidarData = m_statisticsResults->outputLidarData();
+
     char buf[1056];
     int numObservations = m_statisticsResults->observations().size();
     int numImages = 0;
@@ -613,6 +615,12 @@ namespace Isis {
       numImages += m_statisticsResults->observations().at(i)->size();
     }
     int numValidPoints = m_statisticsResults->outputControlNet()->GetNumValidPoints();
+
+    int numValidLidarPoints = 0;
+    if (lidarData) {
+      numValidLidarPoints = lidarData->numberLidarPoints();
+    }
+
     int numInnerConstraints = 0;
     int numDistanceConstraints = 0;
     int numDegreesOfFreedom = m_statisticsResults->degreesOfFreedom();
@@ -955,6 +963,11 @@ namespace Isis {
     fpOut << buf;
     sprintf(buf, "\n                         Points: %6d",numValidPoints);
     fpOut << buf;
+
+    if (numValidLidarPoints > 0) {
+      sprintf(buf, "\n                   Lidar Points: %6d",numValidLidarPoints);
+      fpOut << buf;
+    }
 
     sprintf(buf, "\n                 Total Measures: %6d",
                   (m_statisticsResults->numberObservations()
@@ -1485,8 +1498,17 @@ namespace Isis {
 
       // Removed radiansToMeters argument 9/18/2018 DAC
       QString pointDetailString =
-          bundleControlPoint->formatBundleOutputDetailString(berrorProp,
-                                                           solveRadius);
+          bundleControlPoint->formatBundleOutputDetailString(berrorProp, solveRadius);
+      fpOut << (const char*)pointDetailString.toLatin1().data();
+    }
+
+    int nLidarPoints = m_statisticsResults->bundleLidarControlPoints().size();
+    for (int i = 0; i < nLidarPoints; i++) {
+      BundleLidarControlPointQsp bundleLidarControlPoint =
+          m_statisticsResults->bundleLidarControlPoints().at(i);
+
+      QString pointDetailString =
+          bundleLidarControlPoint->formatBundleOutputDetailString(berrorProp, solveRadius);
       fpOut << (const char*)pointDetailString.toLatin1().data();
     }
 
@@ -1626,7 +1648,7 @@ namespace Isis {
       return false;
     }
 
-    int numPoints = m_statisticsResults->bundleControlPoints().size();
+    int numPoints = m_statisticsResults->bundleLidarControlPoints().size();
 
     //                     measured   apriori   adjusted               adjusted
     //                      range      sigma     range      residual     sigma
@@ -1647,23 +1669,14 @@ namespace Isis {
 
     for (int i = 0; i < numPoints; i++) {
 
-      BundleControlPointQsp point = m_statisticsResults->bundleControlPoints().at(i);
+      BundleLidarControlPointQsp point = m_statisticsResults->bundleLidarControlPoints().at(i);
       if (!point || point->isRejected()) {
         continue;
       }
 
-      // NOTE (Edmundson): dynamicCast is likely to be costly, might be ok here since we're just
-      // writing out results after the bundle, but generally I suspect we want avoid this. Probably
-      // indicative of a not so good software design.
-      BundleLidarControlPointQsp lidarPoint = point.dynamicCast<BundleLidarControlPoint>();
-
-      if (!lidarPoint) {
-        continue;
-      }
-
-      int nRangeConstraints = lidarPoint->numberRangeConstraints();
+      int nRangeConstraints = point->numberRangeConstraints();
       for (int j = 0; j < nRangeConstraints; j++) {
-        BundleLidarRangeConstraintQsp rangeConstraint = lidarPoint->rangeConstraint(j);
+        BundleLidarRangeConstraintQsp rangeConstraint = point->rangeConstraint(j);
 
         QString str = rangeConstraint->formatBundleOutputString();
         fpOut << str;
@@ -1744,6 +1757,57 @@ namespace Isis {
         else {
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
                   bundleControlPoint->id().toLatin1().data(),
+                  bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
+                  bundleMeasure->cubeSerialNumber().toLatin1().data(),
+                  bundleMeasure->focalPlaneMeasuredX(),
+                  bundleMeasure->focalPlaneMeasuredY(),
+                  bundleMeasure->sample(),
+                  bundleMeasure->line(),
+                  bundleMeasure->sampleResidual(),
+                  bundleMeasure->lineResidual(),
+                  bundleMeasure->residualMagnitude());
+        }
+        fpOut << buf;
+      }
+    }
+
+    numPoints = m_statisticsResults->bundleLidarControlPoints().size();
+    numMeasures = 0;
+
+    BundleLidarControlPointQsp bundleLidarPoint;
+
+    for (int i = 0; i < numPoints; i++) {
+      bundleLidarPoint = m_statisticsResults->bundleLidarControlPoints().at(i);
+      numMeasures = bundleLidarPoint->size();
+
+      if (bundleLidarPoint->rawControlPoint()->IsIgnored()) {
+        continue;
+      }
+
+      for (int j = 0; j < numMeasures; j++) {
+        bundleMeasure = bundleLidarPoint->at(j);
+
+        Camera *measureCamera = bundleMeasure->camera();
+        if (!measureCamera) {
+          continue;
+        }
+
+        if (bundleMeasure->isRejected()) {
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
+                  bundleLidarPoint->id().toLatin1().data(),
+                  bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
+                  bundleMeasure->cubeSerialNumber().toLatin1().data(),
+                  bundleMeasure->focalPlaneMeasuredX(),
+                  bundleMeasure->focalPlaneMeasuredY(),
+                  bundleMeasure->sample(),
+                  bundleMeasure->line(),
+                  bundleMeasure->sampleResidual(),
+                  bundleMeasure->lineResidual(),
+                  bundleMeasure->residualMagnitude());
+        }
+        else {
+          sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
+                  bundleLidarPoint->id().toLatin1().data(),
                   bundleMeasure->parentBundleImage()->fileName().toLatin1().data(),
                   bundleMeasure->cubeSerialNumber().toLatin1().data(),
                   bundleMeasure->focalPlaneMeasuredX(),

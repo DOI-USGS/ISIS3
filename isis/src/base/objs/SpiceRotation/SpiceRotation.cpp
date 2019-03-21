@@ -2066,7 +2066,8 @@ namespace Isis {
     double derivative;
     double time = (p_et - p_baseTime) / p_timeScale;
 
-    if (coeffIndex > 0  && coeffIndex <= m_polynomial.degree()) {
+//    if (coeffIndex > 0  && coeffIndex <= m_polynomial.degree()) {
+    if (coeffIndex > 0  && coeffIndex <= p_degree) {
       derivative = pow(time, coeffIndex);
     }
     else if (coeffIndex == 0) {
@@ -2279,8 +2280,6 @@ namespace Isis {
     // If polynomials have not been applied yet then simply set the degree and return
     if (!p_degreeApplied) {
       p_degree = degree;
-      // TODO: verify
-      m_polynomial.setDegree(degree);
     }
 
     // Otherwise adjust the degree.
@@ -2304,8 +2303,6 @@ namespace Isis {
 
       // Change the polynomial degree
       m_polynomial.setDegree(degree);
-// TODO: verify next line
-      p_degree = degree;
 
       // Reset the coefficients
       for (int i = 0; i < m_segments; i++) {

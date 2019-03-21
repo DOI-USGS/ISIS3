@@ -169,26 +169,17 @@ namespace Isis {
       QString formatAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
                                         bool errorPropagation) const;
       QString formatCoordAdjustedSigmaString(SurfacePoint::CoordIndex, int fieldWidth, int precision,
-                                                bool errorPropagation) const;
+                                             bool errorPropagation) const;
 
-      virtual void applyParameterCorrections(SparseBlockMatrix &sparseNormals,
-                                             LinearAlgebra::Vector imageSolution,
-                                             const BundleTargetBodyQsp target);
-
-      virtual double measureSigma();
-      virtual double measureWeight();
-
-      virtual int applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
-                                            LinearAlgebra::MatrixUpperTriangular& N22,
-                                            SparseBlockColumnMatrix& N12,
-                                            LinearAlgebra::VectorCompressed& n1,
-                                            LinearAlgebra::Vector& n2,
-                                            BundleMeasureQsp measure);
-
-      virtual double vtpvRangeContribution();
-
+      void applyParameterCorrections(SparseBlockMatrix &sparseNormals,
+                                     LinearAlgebra::Vector &imageSolution,
+                                     const BundleTargetBodyQsp target);
       double vtpv();
       double vtpvMeasures();
+
+    protected:
+      //!< pointer to the control point object this represents
+      ControlPoint *m_controlPoint;
 
     private:
       // methods
@@ -196,7 +187,7 @@ namespace Isis {
       void updateAdjustedSurfacePointRectangularly();
       
       //!< pointer to the control point object this represents
-      ControlPoint *m_controlPoint;
+//      ControlPoint *m_controlPoint;
 
       //! corrections to point parameters
       boost::numeric::ublas::bounded_vector< double, 3 > m_corrections;

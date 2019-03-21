@@ -1066,7 +1066,8 @@ namespace Isis {
         cam->SetImage(m->GetSample(), m->GetLine());
       }
 
-      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+//      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      cam->GroundMap()->GetXY(adjustedSurfacePoint, &cudx, &cudy);
       m->SetFocalPlaneComputed(cudx, cudy);
 
 

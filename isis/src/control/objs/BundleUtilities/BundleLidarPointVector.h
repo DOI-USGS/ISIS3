@@ -28,7 +28,7 @@
 #include <QString>
 #include <QVector>
 
-#include "BundleControlPoint.h"
+#include "BundleLidarControlPoint.h"
 
 namespace Isis {
 
@@ -64,4 +64,4 @@ namespace Isis {
   };
 }
 
-#endif // BundleControlPointVector_h
+#endif // BundleLidarPointVector_h

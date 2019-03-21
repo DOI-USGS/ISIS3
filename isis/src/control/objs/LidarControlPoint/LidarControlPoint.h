@@ -58,6 +58,8 @@ namespace Isis {
     ControlPoint::Status setTime(iTime time);
     ControlPoint::Status addSimultaneous(QString newSerial);
 
+    ControlPoint::Status ComputeResiduals();
+
     double range();
     double sigmaRange();
     iTime time();

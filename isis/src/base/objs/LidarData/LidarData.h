@@ -15,6 +15,7 @@ class QJsonObject;
 
 namespace Isis {
   class Camera;
+  class ControlNet;
   class FileName;
   class LidarControlPoint;
   class Progress;
@@ -56,10 +57,16 @@ namespace Isis {
       QList< QSharedPointer<LidarControlPoint> > points() const;
 
       void SetImages(SerialNumberList &list, Progress *progress = 0);
+      void SetImages(ControlNet &controlNet, Progress *progress = 0);
 
       // Serialization methods or LidarData
       void read(FileName);
       void write(FileName, Format);
+
+      int numberLidarPoints();
+      int numberSimultaneousMeasures();
+      int numberAsynchronousMeasures();
+      int numberMeasures();
 
     private:
       /** Hash of the LidarControlPoints this class contains. */
@@ -70,6 +77,9 @@ namespace Isis {
       QMap<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
       //!  #rejected measures
       QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
+
+      int m_numSimultaneousMeasures;
+      int m_numAsynchronousMeasures;
   };
 
   // typedefs

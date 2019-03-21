@@ -456,11 +456,11 @@ namespace Isis {
                               LinearAlgebra::Matrix                &coeffPoint3D,
                               LinearAlgebra::Vector                &coeffRHS,
                               BundleMeasureQsp                     measure);
-      bool formPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
-                            SparseBlockColumnMatrix              &N12,
-                            LinearAlgebra::Vector                &n2,
-                            LinearAlgebra::Vector                &nj,
-                            BundleControlPointQsp                &point);
+      int formPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                           SparseBlockColumnMatrix              &N12,
+                           LinearAlgebra::Vector                &n2,
+                           LinearAlgebra::Vector                &nj,
+                           BundleControlPointQsp                &point);
       bool formWeightedNormals(LinearAlgebra::VectorCompressed  &n1,
                                LinearAlgebra::Vector            &nj);
       void applyPolynomialContinuityConstraints();

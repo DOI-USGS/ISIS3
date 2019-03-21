@@ -71,21 +71,16 @@ namespace Isis {
 
       void initializeRangeConstraints();
 
-      virtual double measureSigma();
-      virtual double measureWeight();
+      void computeResiduals();
 
-      virtual int applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
-                                            LinearAlgebra::MatrixUpperTriangular& N22,
-                                            SparseBlockColumnMatrix& N12,
-                                            LinearAlgebra::VectorCompressed& n1,
-                                            LinearAlgebra::Vector& n2,
-                                            BundleMeasureQsp measure);
+      int applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
+                                    LinearAlgebra::MatrixUpperTriangular& N22,
+                                    SparseBlockColumnMatrix& N12,
+                                    LinearAlgebra::VectorCompressed& n1,
+                                    LinearAlgebra::Vector& n2,
+                                    BundleMeasureQsp measure);
 
-      virtual void applyParameterCorrections(SparseBlockMatrix &sparseNormals,
-                                             LinearAlgebra::Vector &imageSolution,
-                                             const BundleTargetBodyQsp target);
-
-      virtual double vtpvRangeContribution();
+      double vtpvRangeContribution();
 
       int numberRangeConstraints() {return m_rangeConstraints.size();}
       BundleLidarRangeConstraintQsp rangeConstraint(int n) {return m_rangeConstraints.at(n);}

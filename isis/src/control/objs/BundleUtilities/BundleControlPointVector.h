@@ -60,7 +60,6 @@ namespace Isis {
       void computeMeasureResiduals();
       double vtpvContribution();
       double vtpvMeasureContribution();
-      double vtpvRangeContribution();
   };
 }
 

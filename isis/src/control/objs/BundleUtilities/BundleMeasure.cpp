@@ -398,8 +398,8 @@ namespace Isis {
    *
    * @return double measure sigma
    */
-  double BundleMeasure::measureSigma() const {
-    return m_measureSigma;
+  double BundleMeasure::sigma() const {
+    return m_sigma;
   }
 
 
@@ -408,8 +408,18 @@ namespace Isis {
    *
    * @return double sqrt of measure weight
    */
-  double BundleMeasure::measureWeightSqrt() const {
-    return m_measureWeightSqrt;
+  double BundleMeasure::weightSqrt() const {
+    return m_weightSqrt;
+  }
+
+
+  /**
+   * Accesses measure weight for bundle
+   *
+   * @return double measure weight
+   */
+  double BundleMeasure::weight() const {
+    return m_weightSqrt*m_weightSqrt;
   }
 
 
@@ -499,22 +509,22 @@ namespace Isis {
 
 
   /**
-   * Sets sigma (uncertainty) of raw measure in mm and sqrt of weight for bundle
+   * Sets sigma (i.e. standard deviation or uncertainty) of raw measure in mm and sqrt of weight for bundle
    *
    * @param double sigma
    *
    * TODO: what if camera has been subsampled, is pixel pitch computation still valid?
    *
    */
-  void BundleMeasure::setMeasureSigma(double sigmaMultiplier) {
-    m_measureSigma = sigmaMultiplier * m_controlMeasure->Camera()->PixelPitch();
+  void BundleMeasure::setSigma(double sigmaMultiplier) {
+    m_sigma = sigmaMultiplier * m_controlMeasure->Camera()->PixelPitch();
 
-    if (m_measureSigma <= 0.0) {
+    if (m_sigma <= 0.0) {
       QString msg = "In BundleMeasure::setMeasureSigma(): m_measureSigma must be positive\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    m_measureWeightSqrt = 1.0/m_measureSigma;
+    m_weightSqrt = 1.0/m_sigma;
   }
 
 

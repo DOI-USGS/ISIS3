@@ -107,14 +107,14 @@ namespace Isis {
     // establish camera model for this measure (the unpleasant statefulness thing)
     m_simultaneousMeasure->setImage();
 
-    // set time of current location of simultaneous measure
+    // record time of current location of simultaneous measure
     m_scaledTime = m_simultaneousMeasure->camera()->instrumentPosition()->scaledTime();
 
     // current body fixed XYZ coordinates of lidar control point
     SurfacePoint adjustedSurfacePoint = m_lidarControlPoint->GetAdjustedSurfacePoint();
-    m_pointBodyFixed[0]  = adjustedSurfacePoint.GetX().kilometers();
-    m_pointBodyFixed[1]  = adjustedSurfacePoint.GetY().kilometers();
-    m_pointBodyFixed[2]  = adjustedSurfacePoint.GetZ().kilometers();
+    m_pointBodyFixed[0] = adjustedSurfacePoint.GetX().kilometers();
+    m_pointBodyFixed[1] = adjustedSurfacePoint.GetY().kilometers();
+    m_pointBodyFixed[2] = adjustedSurfacePoint.GetZ().kilometers();
 
     // get spacecraft coordinates in J2000 reference system
     m_camPositionJ2K
@@ -137,11 +137,6 @@ namespace Isis {
       QString msg = "In BundleLidarRangeConstraint::update(): m_rangeComputed must be positive\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
-    // compute current contribution to vtpv from spacecraft-to-lidar point constraint equation
-    // vtpv is the weight sum of squares of the residuals
-    double t = m_rangeObserved - m_rangeComputed;
-    m_vtpv = t * t * m_rangeObservedWeightSqrt * m_rangeObservedWeightSqrt;
   }
 
 
@@ -189,6 +184,8 @@ namespace Isis {
     double m33 = m_matrixTargetToJ2K[8];
 
     // a1, a2, a3 are auxiliary values used in computation of partial derivatives below
+    // todo: is the first part of these equations = to dX, dY, dZ in method above? Think so.
+    //       if so, can improve efficiency
     double a1 = m11*m_camPositionJ2K[0] + m12*m_camPositionJ2K[1] + m13*m_camPositionJ2K[2]
               - m_pointBodyFixed[0];
     double a2 = m21*m_camPositionJ2K[0] + m22*m_camPositionJ2K[1] + m23*m_camPositionJ2K[2]
@@ -264,12 +261,16 @@ namespace Isis {
     // add range condition contribution to N12 portion of normal equations matrix
     *N12[positionBlockIndex] += prod(trans(coeff_range_image), coeff_range_point3D);
 
+//    qDebug() << n1;
+
     // contribution to n1 vector
     int startColumn = normalsMatrix.at(positionBlockIndex)->startColumn();
     vector_range<LinearAlgebra::VectorCompressed >
-        n1_range (n1, range (startColumn, coeff_range_image.size2()));
+        n1_range (n1, range (startColumn, startColumn+coeff_range_image.size2()));
 
     n1_range += prod(trans(coeff_range_image), coeff_range_RHS);
+
+//    qDebug() << n1;
 
     // form N22
     N22 += prod(trans(coeff_range_point3D), coeff_range_point3D);
@@ -288,6 +289,19 @@ namespace Isis {
    *
    */
   double BundleLidarRangeConstraint::vtpv() {
+
+    if (!m_lidarControlPoint->GetId().contains("Lidar7696")) {
+      return 0.0;
+    }
+
+    // first update the range constraint
+    update();
+
+    // compute current contribution to vtpv from spacecraft-to-lidar point constraint equation
+    // vtpv is the weight sum of squares of the residuals
+    double v = m_rangeObserved - m_rangeComputed;
+    m_vtpv = v * v * m_rangeObservedWeightSqrt * m_rangeObservedWeightSqrt;
+
     return m_vtpv;
   }
 

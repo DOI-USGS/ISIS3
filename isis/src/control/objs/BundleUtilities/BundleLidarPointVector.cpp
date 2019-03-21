@@ -22,7 +22,7 @@ namespace Isis {
    * @param src A reference to the BundleLidarPointVector to copy from.
    */
   BundleLidarPointVector::BundleLidarPointVector(const BundleLidarPointVector &src)
-      :QVector<BundleControlPointQsp>(src) {
+      :QVector<BundleLidarControlPointQsp>(src) {
   }
 
 
@@ -47,7 +47,7 @@ namespace Isis {
    */
   BundleLidarPointVector &BundleLidarPointVector::operator=(const BundleLidarPointVector &src) {
     if (&src != this) {
-      QVector<BundleControlPointQsp>::operator=(src);
+      QVector<BundleLidarControlPointQsp>::operator=(src);
     }
     return *this;
   }
@@ -61,9 +61,12 @@ namespace Isis {
    *
    */
   void BundleLidarPointVector::applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
-                                                           LinearAlgebra::Vector &imageSolution,
-                                                           const BundleTargetBodyQsp target) {
+                                                         LinearAlgebra::Vector &imageSolution,
+                                                         const BundleTargetBodyQsp target) {
     for (int i = 0; i < size(); i++) {
+      if (!at(i)->id().contains("Lidar7696")) {
+        continue;
+      }
       at(i)->applyParameterCorrections(normalsMatrix, imageSolution, target);
     }
   }
@@ -77,6 +80,10 @@ namespace Isis {
   void BundleLidarPointVector::computeMeasureResiduals() {
 
     for (int i = 0; i < size(); i++) {
+      if (!at(i)->id().contains("Lidar7696")) {
+        continue;
+      }
+
       at(i)->computeResiduals();
     }
   }
@@ -91,6 +98,10 @@ namespace Isis {
     double vtpv = 0;
 
     for (int i = 0; i < size(); i++) {
+      if (!at(i)->id().contains("Lidar7696")) {
+        continue;
+      }
+
       vtpv += at(i)->vtpvMeasures();
     }
 
@@ -107,6 +118,9 @@ namespace Isis {
     double vtpvControl = 0;
 
     for (int i = 0; i < size(); i++) {
+      if (!at(i)->id().contains("Lidar7696")) {
+        continue;
+      }
       vtpvControl += at(i)->vtpv();
     }
 
@@ -122,7 +136,9 @@ namespace Isis {
     double vtpv = 0;
 
     for (int i = 0; i < size(); i++) {
-      vtpv += at(i)->vtpvRangeContribution();
+      if (at(i)->id().contains("Lidar7696")) {
+        vtpv += at(i)->vtpvRangeContribution();
+      }
     }
 
     return vtpv;
