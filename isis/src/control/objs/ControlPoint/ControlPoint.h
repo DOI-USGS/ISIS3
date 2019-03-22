@@ -607,12 +607,15 @@ namespace Isis {
       void AddMeasure(ControlMeasure *measure);
       void PointModified();
 
+    protected:
+      //!< List of Control Measures
+      QHash< QString, ControlMeasure * > * measures;
 
     private:
       ControlNet *parentNetwork;
 
-      //!< List of Control Measures
-      QHash< QString, ControlMeasure * > * measures;
+//      //!< List of Control Measures
+//      QHash< QString, ControlMeasure * > * measures;
 
       QStringList *cubeSerials;
 

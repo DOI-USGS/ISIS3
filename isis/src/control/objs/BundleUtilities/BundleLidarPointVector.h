@@ -1,5 +1,5 @@
-#ifndef BundleControlPointVector_h
-#define BundleControlPointVector_h
+#ifndef BundleLidarPointVector_h
+#define BundleLidarPointVector_h
 /**
  * @file
  * $Revision: 1.20 $
@@ -28,30 +28,30 @@
 #include <QString>
 #include <QVector>
 
-#include "BundleControlPoint.h"
+#include "BundleLidarControlPoint.h"
 
 namespace Isis {
 
 
   /**
-   * This class is a container class for BundleControlPoints.
+   * This class is a container class for BundleLidarControlPoints.
    *
-   * Contained BundleControlPoints are stored as shared pointers, so are automatically deleted when
+   * Contained BundleLidarControlPoints are stored as shared pointers, so are automatically deleted when
    * all shared pointers are deleted.
    *
-   * @author 2014-05-22 Ken Edmundson
+   * @author 2019-03-13 Ken Edmundson
    *
    * @internal
-   *   @history 2018-04-16 Ken Edmundson - Original version.
+   *   @history 2019-03-13 Ken Edmundson - Original version.
    */
-  class BundleControlPointVector : public QVector<BundleControlPointQsp> {
+  class BundleLidarPointVector : public QVector<BundleLidarControlPointQsp> {
 
     public:
-      BundleControlPointVector();
-      BundleControlPointVector(const BundleControlPointVector &src);
-      ~BundleControlPointVector();
+      BundleLidarPointVector();
+      BundleLidarPointVector(const BundleLidarPointVector &src);
+      ~BundleLidarPointVector();
 
-      BundleControlPointVector &operator=(const BundleControlPointVector &src);
+      BundleLidarPointVector &operator=(const BundleLidarPointVector &src);
 
       void applyParameterCorrections(SparseBlockMatrix &normalsMatrix,
                                      LinearAlgebra::Vector &imageSolution,
@@ -60,7 +60,8 @@ namespace Isis {
       void computeMeasureResiduals();
       double vtpvContribution();
       double vtpvMeasureContribution();
+      double vtpvRangeContribution();
   };
 }
 
-#endif // BundleControlPointVector_h
+#endif // BundleLidarPointVector_h

@@ -103,7 +103,7 @@ namespace Isis {
       void setNormalsPositionBlockIndex(int index);
       void setNormalsPointingBlockIndex(int index);
       void setFocalPlaneResidualsMillimeters();
-      void setMeasureSigma(double sigma);
+      void setSigma(double sigma);
 
       bool isRejected() const;
       Camera *camera() const;
@@ -116,8 +116,9 @@ namespace Isis {
       double sampleResidual() const;
       double line() const;
       double lineResidual() const;
-      double measureSigma() const;
-      double measureWeightSqrt() const;
+      double sigma() const;
+      double weight() const;
+      double weightSqrt() const;
       double residualMagnitude() const;
       double xFocalPlaneResidual() const;
       double yFocalPlaneResidual() const;
@@ -150,8 +151,8 @@ namespace Isis {
       double m_xFocalPlaneResidual;    //!< x focal plane residual in mm
       double m_yFocalPlaneResidual;    //!< y focal plane residual in mm
 
-      double m_measureSigma;           //!< measure uncertainty in pixels
-      double m_measureWeightSqrt;      //!< sqrt of measure weight
+      double m_sigma;                  //!< measure uncertainty in mmm
+      double m_weightSqrt;             //!< sqrt of measure weight
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
   typedef QSharedPointer<BundleMeasure> BundleMeasureQsp;

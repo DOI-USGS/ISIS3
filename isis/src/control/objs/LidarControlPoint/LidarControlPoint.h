@@ -67,6 +67,8 @@ namespace Isis {
     ControlPoint::Status setTime(iTime time);
     ControlPoint::Status addSimultaneous(QString newSerial);
 
+    ControlPoint::Status ComputeResiduals();
+
     //  Functor predicate for sorting LidarControlPoints
     struct LidarControlPointLessThanFunctor :
       public std::binary_function<QSharedPointer<LidarControlPoint>,
@@ -78,6 +80,7 @@ namespace Isis {
            return (lcp1->GetId() < lcp2->GetId());
           }
     };
+
     double range();
     double sigmaRange();
     iTime time();

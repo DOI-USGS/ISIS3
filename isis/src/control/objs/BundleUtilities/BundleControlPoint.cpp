@@ -356,7 +356,7 @@ namespace Isis {
    * @param target The BundleTargetBody.
    */
   void BundleControlPoint::applyParameterCorrections(SparseBlockMatrix &sparseNormals,
-                                                     LinearAlgebra::Vector imageSolution,
+                                                     LinearAlgebra::Vector &imageSolution,
                                                      const BundleTargetBodyQsp target) {
     if (!isRejected()) {
         
@@ -1142,10 +1142,10 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
       pointY += 1000. * YCorrection;
       pointZ += 1000. * ZCorrection;
     
-      surfacepoint.SetRectangularCoordinates(
-                                             Displacement(pointX, Displacement::Meters),
+      surfacepoint.SetRectangularCoordinates(Displacement(pointX, Displacement::Meters),
                                              Displacement(pointY, Displacement::Meters),
                                              Displacement(pointZ, Displacement::Meters));
+
       // Reset the point now that it has been updated
       setAdjustedSurfacePoint(surfacepoint);
   }
@@ -1192,12 +1192,11 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
 
     for (int i = 0; i < size(); i++) {
       BundleMeasureQsp measure = at(i);
+      if (measure->isRejected()) {
+        continue;
+      }
 
-      weight = measureWeight();
-
-//      weight = 1.0 / weight;
-//      weight *= weight;
-
+      weight = measure->weight();
       vx = measure->focalPlaneMeasuredX() - measure->focalPlaneComputedX();
       vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
 
@@ -1214,7 +1213,6 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
    * @return double Weighted sum of squares of constrained point residuals.
    */
   double BundleControlPoint::vtpv() {
-
     double vtpv = 0.0;
 
     if ( m_weights(0) > 0.0 ) {
@@ -1229,59 +1227,4 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
 
     return vtpv;
   }
-
-
-  /**
-   *
-   */
-  double BundleControlPoint::measureSigma() {
-    return 1.4 * at(0)->camera()->PixelPitch();
-  }
-
-  /**
-   *
-   */
-  double BundleControlPoint::measureWeight() {
-    double sigma = measureSigma();
-
-    double weight = 1.0/sigma;
-
-    weight *= weight;
-
-    return weight;
-  }
-
-
-  /**
-   * Base class implementation does nothing.
-   */
-  int BundleControlPoint::applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
-                                                     LinearAlgebra::MatrixUpperTriangular& N22,
-                                                     SparseBlockColumnMatrix& N12,
-                                                     LinearAlgebra::VectorCompressed& n1,
-                                                     LinearAlgebra::Vector& n2,
-                                                     BundleMeasureQsp measure) {
-    return 0;
-  }
-
-
-  /**
-   * Base class implementation does nothing.
-   */
-  double BundleControlPoint::vtpvRangeContribution() {
-    return 0.0;
-  }
-
-
-  /**
-   * Base class implementation does nothing.
-   */
-//  void BundleControlPoint::applyLidarRangeConstraints(SparseBlockMatrix &normalsMatrix,
-//                                                     LinearAlgebra::MatrixUpperTriangular& N22,
-//                                                     SparseBlockColumnMatrix& N12,
-//                                                     LinearAlgebra::VectorCompressed& n1,
-//                                                     LinearAlgebra::Vector& n2,
-//                                                     int numberImagePartials) {
-//    return;
-//  }
 }

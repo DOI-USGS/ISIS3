@@ -170,10 +170,10 @@ int main(int argc, char *argv[]) {
     results.setRmsXYResiduals(4.0, 5.0, 6.0);
     results.setRejectionLimit(7.0);
     results.setNumberRejectedObservations(8);
-    results.setNumberObservations(9);
+    results.setNumberImageObservations(9);
     results.setNumberImageParameters(10);
-    results.resetNumberConstrainedPointParameters();
-    results.incrementNumberConstrainedPointParameters(11);
+    results.setNumberConstrainedPointParameters(11);
+    results.setNumberConstrainedLidarPointParameters(12);
     results.resetNumberConstrainedImageParameters();
     results.incrementNumberConstrainedImageParameters(10);
     results.resetNumberConstrainedTargetParameters();
@@ -373,8 +373,8 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Testing error throws...";
     try {
-      results.setNumberObservations(0);
-      results.resetNumberConstrainedPointParameters();
+      results.setNumberImageObservations(0);
+      results.setNumberConstrainedPointParameters(0);
       results.resetNumberConstrainedImageParameters();
       results.resetNumberConstrainedTargetParameters();
       results.setNumberUnknownParameters(1);
@@ -384,8 +384,8 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     try {
-      results.setNumberObservations(1);
-      results.resetNumberConstrainedPointParameters();
+      results.setNumberImageObservations(1);
+      results.setNumberConstrainedPointParameters(0);
       results.resetNumberConstrainedImageParameters();
       results.resetNumberConstrainedTargetParameters();
       results.setNumberUnknownParameters(1);

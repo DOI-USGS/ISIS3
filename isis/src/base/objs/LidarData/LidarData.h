@@ -17,6 +17,8 @@ class QJsonObject;
 
 namespace Isis {
   class Camera;
+  class ControlMeasure;
+  class ControlNet;
   class FileName;
   class Progress;
   class SerialNumberList;
@@ -61,20 +63,35 @@ namespace Isis {
       QList< QSharedPointer<LidarControlPoint> > points(bool sort = false) const;
 
       void SetImages(SerialNumberList &list, Progress *progress = 0);
+      void SetImages(ControlNet &controlNet, Progress *progress = 0);
 
       // Serialization methods for LidarData
       void read(FileName);
       void write(FileName, Format);
-    
-    private:    
-      /** Hash of the LidarControlPoints this class contains. */
-      QHash<QString, QSharedPointer <LidarControlPoint> > m_points;
 
-      QMap<QString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
-      QMap<QString, int> p_cameraValidMeasuresMap; //!< A map from serialnumber to #measures
-      QMap<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
-      //!  #rejected measures
-      QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
+      int numberLidarPoints();
+      int numberSimultaneousMeasures();
+      int numberAsynchronousMeasures();
+      int numberMeasures();
+
+      bool ValidateSerialNumber(QString serialNumber) const;
+      QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
+      QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
+      int GetNumberOfValidMeasuresInImage(const QString &serialNumber);
+      int GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber);
+
+    private:
+      QHash<QString, QSharedPointer <LidarControlPoint> > m_points; //!< hash of LidarControlPoints
+
+                                                                    //!< maps between serial# and...
+      QMap<QString, Isis::Camera *> p_cameraMap;                    //!< camera
+      QMap<QString, int> p_cameraValidMeasuresMap;                  //!< #measures
+      QMap<QString, int> p_cameraRejectedMeasuresMap;               //!< #rejected measures
+
+      QVector<Isis::Camera *> p_cameraList;                         //!< vector of image# to camera
+
+      int m_numSimultaneousMeasures;
+      int m_numAsynchronousMeasures;
   };
 
   // typedefs
