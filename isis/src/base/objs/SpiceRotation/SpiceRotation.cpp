@@ -2889,9 +2889,9 @@ namespace Isis {
 
 
   /**
-   * Return the full rotation TJ as a matrix
+   * Return the full rotation TJ as a matrix in row major order
    *
-   * @return @b vector<double> Returned matrix.
+   * @return @b vector<double> Returned matrix (as an array of rows).
    */
   std::vector<double> SpiceRotation::Matrix() {
     NaifStatus::CheckErrors();

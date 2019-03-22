@@ -944,7 +944,9 @@ namespace Isis {
         // testing
 
 //        clock_t computeResidualsClock1 = clock();
-        // compute residuals
+        // Compute residuals for all measures on all points for this iteration.
+        // The mm residuals are stored in each BundleMeasure and the pixel
+        // residuals are stored in each ControlMeasure.
         emit(statusBarUpdate("Computing Residuals"));
         m_bundleControlPoints.computeMeasureResiduals();
 //        clock_t computeResidualsClock2 = clock();
@@ -1886,7 +1888,7 @@ namespace Isis {
     double m32 = matrix_Target_to_J2K[7];
     double m33 = matrix_Target_to_J2K[8];
 
-    // partials w/r to image
+    // partials w/r to image camera position in J2K
     // auxiliaries
     double a1 = m11*xCameraJ2K + m12*yCameraJ2K + m13*zCameraJ2K - xPoint;
     double a2 = m21*xCameraJ2K + m22*yCameraJ2K + m23*zCameraJ2K - yPoint;
