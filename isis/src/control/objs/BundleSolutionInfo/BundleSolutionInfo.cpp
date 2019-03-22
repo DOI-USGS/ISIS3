@@ -1137,20 +1137,25 @@ namespace Isis {
 
         double rmsSampleResiduals = m_statisticsResults->
                                         rmsImageSampleResiduals()[imageIndex].Rms();
-        double rmsLineResiduals =   m_statisticsResults->
-                                        rmsImageLineResiduals()[imageIndex].Rms();
+        double rmsLineResiduals = m_statisticsResults->
+                                      rmsImageLineResiduals()[imageIndex].Rms();
         double rmsLandSResiduals =  m_statisticsResults->
                                         rmsImageResiduals()[imageIndex].Rms();
 
-        numMeasures =         m_statisticsResults->outputControlNet()->
-                                  GetNumberOfValidMeasuresInImage(
-                                      bundleImage->serialNumber());
+        numMeasures = m_statisticsResults->outputControlNet()->
+                          GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
+
+        numMeasures += m_statisticsResults->outputLidarData()->
+                           GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
 
         numRejectedMeasures = m_statisticsResults->outputControlNet()->
                                   GetNumberOfJigsawRejectedMeasuresInImage(
                                       bundleImage->serialNumber());
 
-        numUsed =             numMeasures - numRejectedMeasures;
+        numRejectedMeasures += m_statisticsResults->outputLidarData()->
+                           GetNumberOfJigsawRejectedMeasuresInImage(bundleImage->serialNumber());
+
+        numUsed = numMeasures - numRejectedMeasures;
 
         if (numUsed == numMeasures) {
           sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",

@@ -15,6 +15,7 @@ class QJsonObject;
 
 namespace Isis {
   class Camera;
+  class ControlMeasure;
   class ControlNet;
   class FileName;
   class LidarControlPoint;
@@ -68,15 +69,21 @@ namespace Isis {
       int numberAsynchronousMeasures();
       int numberMeasures();
 
-    private:
-      /** Hash of the LidarControlPoints this class contains. */
-      QHash<QString, QSharedPointer <LidarControlPoint> > m_points;
+      bool ValidateSerialNumber(QString serialNumber) const;
+      QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
+      QList< ControlMeasure * > GetValidMeasuresInCube(QString serialNumber);
+      int GetNumberOfValidMeasuresInImage(const QString &serialNumber);
+      int GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber);
 
-      QMap<QString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
-      QMap<QString, int> p_cameraValidMeasuresMap; //!< A map from serialnumber to #measures
-      QMap<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
-      //!  #rejected measures
-      QVector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
+    private:
+      QHash<QString, QSharedPointer <LidarControlPoint> > m_points; //!< hash of LidarControlPoints
+
+                                                                    //!< maps between serial# and...
+      QMap<QString, Isis::Camera *> p_cameraMap;                    //!< camera
+      QMap<QString, int> p_cameraValidMeasuresMap;                  //!< #measures
+      QMap<QString, int> p_cameraRejectedMeasuresMap;               //!< #rejected measures
+
+      QVector<Isis::Camera *> p_cameraList;                         //!< vector of image# to camera
 
       int m_numSimultaneousMeasures;
       int m_numAsynchronousMeasures;

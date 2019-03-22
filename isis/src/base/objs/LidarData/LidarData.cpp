@@ -576,4 +576,78 @@ namespace Isis {
       saveFile.write(lidarDataDoc.toBinaryData());
     }
   }
+
+  /**
+   * Does a check to ensure that the given serial number is contained within
+   * the network.
+   *
+   * @param serialNumber the cube serial number to validate
+   *
+   * @return @b bool If the serial number is contained in the network.
+   */
+  bool LidarData::ValidateSerialNumber(QString serialNumber) const {
+    return p_cameraMap.contains(serialNumber);
+  }
+
+
+  /**
+   * Return the number of measures in image specified by serialNumber
+   *
+   * @return Number of valid measures in image
+   *
+   * @history 2013-12-18 Tracie Sucharski - Renamed from GetNumberOfMeasuresInImage, it is
+   *                         returning a count of only valid measures (Ignore=False).
+   */
+  int LidarData::GetNumberOfValidMeasuresInImage(const QString &serialNumber) {
+    // If SetImage was called, use the map that has been populated with valid measures
+    if (p_cameraList.size() > 0) {
+      return p_cameraValidMeasuresMap[serialNumber];
+    }
+    return GetValidMeasuresInCube(serialNumber).size();
+  }
+
+
+  /**
+   * Return the number of jigsaw rejected measures in image specified by serialNumber
+   *
+   * @return Number of jigsaw rejected measures in image
+   */
+  int LidarData::GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber) {
+    return p_cameraRejectedMeasuresMap[serialNumber];
+  }
+
+  /**
+   * Get all the valid measures pertaining to a given cube serial number
+   *
+   * @returns A list of all valid measures which are in a given cube
+   */
+  QList< ControlMeasure * > LidarData::GetValidMeasuresInCube(QString serialNumber) {
+    QList< ControlMeasure * > validMeasures;
+
+    // Get measures in cube will validate this for us, so we don't need to re-check
+//    QList< ControlMeasure * > measureList = GetMeasuresInCube(serialNumber);
+    QList< ControlMeasure * > measureList;
+
+    foreach(ControlMeasure * measure, measureList) {
+      if (!measure->IsIgnored())
+        validMeasures.append(measure);
+    }
+
+    return validMeasures;
+  }
+
+  /**
+   * Get all the measures pertaining to a given cube serial number
+   *
+   * @returns A list of all measures which are in a given cube
+   */
+//  QList< ControlMeasure * > LidarData::GetMeasuresInCube(QString serialNumber) {
+//    if( !ValidateSerialNumber(serialNumber) ) {
+//      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+//          "the network";
+//      throw IException(IException::Programmer, msg, _FILEINFO_);
+
+//    }
+//    return m_controlGraph[m_vertexMap[serialNumber]].measures.values();
+//  }
 }

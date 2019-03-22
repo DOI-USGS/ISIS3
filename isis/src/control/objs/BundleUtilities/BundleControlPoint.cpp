@@ -1213,15 +1213,7 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
    * @return double Weighted sum of squares of constrained point residuals.
    */
   double BundleControlPoint::vtpv() {
-
     double vtpv = 0.0;
-
-    qDebug() << m_weights[0];
-    qDebug() << m_weights[1];
-    qDebug() << m_weights[2];
-    qDebug() << m_corrections[0];
-    qDebug() << m_corrections[1];
-    qDebug() << m_corrections[2];
 
     if ( m_weights(0) > 0.0 ) {
         vtpv += m_corrections(0) * m_corrections(0) * m_weights(0);
