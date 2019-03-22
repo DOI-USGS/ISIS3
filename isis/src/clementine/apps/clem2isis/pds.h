@@ -1,3 +1,5 @@
+#ifndef pds_h
+#define pds_h
 
 #if defined(__BORLANDC__) && !defined(__WIN32__)
 #define CHARH   unsigned char huge
@@ -19,3 +21,5 @@ typedef struct {
 //extern FILE     *qparm;          //removed qparm references BMG 2006-07-18
 
 extern PDSINFO *PDSR(char *fname, long *rows, long *cols);
+
+#endif

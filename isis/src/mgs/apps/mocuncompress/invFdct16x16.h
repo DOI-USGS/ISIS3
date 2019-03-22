@@ -1,3 +1,6 @@
+#ifndef mocuncompress_invfdct16x16_h
+#define mocuncompress_invfdct16x16_h
+
 /*
 NOTICE
 
@@ -45,5 +48,7 @@ SCCSID @(#)invFdct16x16.h  1.1 10/04/99
 #define invFdct16x16_h
 
 extern void invFdct16x16(int16 *in, int16 *out);
+
+#endif
 
 #endif

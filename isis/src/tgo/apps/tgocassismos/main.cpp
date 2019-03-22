@@ -13,7 +13,7 @@
 #include "ProgramLauncher.h"
 #include "TProjection.h"
 #include "UserInterface.h"
-
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -170,6 +170,8 @@ void IsisMain() {
     QString instrumentId;
     QString spacecraftName;
     QString observationId;
+    QString stopTime;
+    QString exposureDuration;
 
     for (int i = 0; i < (int)cubeList.size(); i++) {
       // himos used original label here.
@@ -184,17 +186,27 @@ void IsisMain() {
         observationId =  archiveGroup["ObservationId"][0];
         startTime =      instGroup["StartTime"][0];
         startClock =     instGroup["SpacecraftClockStartCount"][0];
+        stopTime   =     instGroup["StartTime"][0]; 
+        exposureDuration  = instGroup["ExposureDuration"][0]; 
       }
       else {
-        QString testStartTime = instGroup["StartTime"][0];
-        if (testStartTime < startTime) {
-          startTime = testStartTime;
+        iTime testStartTime = iTime(instGroup["StartTime"][0]);
+        iTime testStopTime = iTime(instGroup["StartTime"][0]);
+        if (testStartTime < iTime(startTime)) {
+          startTime = testStartTime.UTC();
           startClock = instGroup["SpacecraftClockStartCount"][0];
+        }
+        if (testStopTime > iTime(stopTime)) {
+          stopTime = testStopTime.UTC();
         }
       }
     }
 
-    // Get the blob of original labels from first image in list
+   iTime stopTimeValue = iTime(stopTime);
+   stopTimeValue = stopTimeValue + exposureDuration.toDouble(); 
+   stopTime = stopTimeValue.UTC(); 
+
+   // Get the blob of original labels from first image in list
    // Pvl *org = cubeList[0]->label();
 
     //close all cubes
@@ -209,7 +221,8 @@ void IsisMain() {
     QString toMosaic = ui.GetFileName("TO");
     QString mosaicPriority = ui.GetString("PRIORITY");
 
-    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority;
+    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + mosaicPriority 
+                          + " TRACK=TRUE";
 
     if (QString::compare(ui.GetString("GRANGE"), "USER", Qt::CaseInsensitive) == 0) {
       parameters += " GRANGE=USER";
@@ -229,6 +242,7 @@ void IsisMain() {
     mos += PvlKeyword("InstrumentId", instrumentId);
     mos += PvlKeyword("ObservationId ", observationId);
     mos += PvlKeyword("StartTime ", startTime);
+    mos += PvlKeyword("StopTime ", stopTime);
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
     mos += PvlKeyword("IncidenceAngle ", toString(incidenceAngle), "degrees");
     mos += PvlKeyword("EmissionAngle ", toString(emissionAngle), "degrees");

@@ -41,6 +41,16 @@
       Changed internal default for lidar coordinate a priori uncertainties to "none", allowing FREE
       lidar points.
       </change>
+    <change name="Debbie A Cook" date="2019-02-23">
+      Added new file OUTPUTTYPE=TEST, to be used strictly for testing.
+      This option does a SLOW sort on the output data. The resulting output file
+      is sorted by pointID, which allows testing software to compare
+      output with truth data.  References #5343.
+      </change>
+    <change name="Debbie A Cook" date="2019-03-11">
+      Added new input parameter FROMLIST to allow entering multiple input
+      Lidar CSV files.  All input points are written out into a single Lidar data file.
+      </change>
   </history>
 
   <category>
@@ -53,16 +63,44 @@
         <type>filename</type>
         <fileMode>input</fileMode>
         <brief>
-          Input LOLA Lidar CSV
+          Input LOLA Lidar RDR data in CSV format
         </brief>
         <description>
-          This file is a complied CSV with data from LOLA.
+          This file is downloaded from Washington University at
+          
+          "https://ode.rsl.wustl.edu/moon/indextools.aspx?displaypage=lolardr"
+          
+          It contains altimetry readings organized along the spacecraft orbit track.
+          
         </description>
+        <exclusions>
+           <item>FROMLIST</item>
+        </exclusions>
         <filter>
           *.csv
         </filter>
       </parameter>
 
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          Input LOLA Lidar CSV file list from which to generate the Lidar control point file
+        </brief>
+        <description>
+          This file contains a list of CSV files of LOLA Lidar RDR  that will be used to generate 
+          an Isis Lidar control point file.  Each file in FROMLIST is expected to be a CSV with
+          LOLA Lidar RDR data. See FROM for more information on the data.
+        </description>
+        <exclusions>
+           <item>FROM</item>
+        </exclusions>
+        <filter>
+          *.lis
+        </filter>
+      </parameter>
+      
       <parameter name="CUBES">
          <type>filename</type>
          <fileMode>input</fileMode>
@@ -92,6 +130,9 @@
             </option>
             <option value="JSON">
               <brief> JSON output file (.json)</brief>
+            </option>
+            <option value="TEST">
+              <brief> DO NOT USE (only for tests) ordered JSON output file (.json) </brief>
             </option>
           </list>
         </parameter>
