@@ -112,22 +112,6 @@ namespace Isis {
 
     return vtpvControl;
   }
-
-  /**
-   * Compute vtpv of lidar range constraints.
-   *
-   * @return double vtpv of lidar range constraints.
-   */
-  double BundleControlPointVector::vtpvRangeContribution() {
-    double vtpv = 0;
-
-    for (int i = 0; i < size(); i++) {
-      vtpv += at(i)->vtpvRangeContribution();
-    }
-
-    return vtpv;
-  }
-
 }
 
 

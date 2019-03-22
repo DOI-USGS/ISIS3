@@ -168,17 +168,19 @@ namespace Isis {
 #if 0
       bool flagOutliers(ControlNet *pCnet);
 #endif
+      void initializeNewIteration();
       void setNumberRejectedObservations(int numberObservations);
-      void setNumberObservations(int numberObservations);
+      void setNumberImageObservations(int numberObservations);
+      void setNumberLidarImageObservations(int numberLidarObservations);
       void setNumberImageParameters(int numberParameters); // ??? this is the same value an m_nRank
-      void resetNumberConstrainedPointParameters();
-      void incrementNumberConstrainedPointParameters(int incrementAmount);
+      void setNumberConstrainedPointParameters(int numberParameters);
+      void setNumberConstrainedLidarPointParameters(int numberParameters);
       void resetNumberConstrainedImageParameters();
       void incrementNumberConstrainedImageParameters(int incrementAmount);
       void resetNumberConstrainedTargetParameters();
       void incrementNumberConstrainedTargetParameters(int incrementAmount);
       void setNumberContinuityConstraintEquations(int numberContinuityConstraints);
-      void setNumberLidarRangeConstraintEquations(int numberLidarRangeConstraints);
+      void setNumberLidarRangeConstraints(int numberLidarRangeConstraints);
       void setNumberUnknownParameters(int numberParameters);
       void computeDegreesOfFreedom();
       void computeSigma0(double dvtpv, BundleSettings::ConvergenceCriteria criteria);
@@ -188,6 +190,7 @@ namespace Isis {
       void setElapsedTimeErrorProp(double time);
       void setConverged(bool converged); // or initialze method
       void setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints);
+      void setBundleLidarPoints(QVector<BundleLidarControlPointQsp> lidarPoints);
       void setOutputControlNet(ControlNetQsp outNet);
       void setOutputLidarData(LidarDataQsp outLidarData);
       void setIterations(int iterations);
@@ -229,6 +232,8 @@ namespace Isis {
       double rejectionLimit() const;
       int numberRejectedObservations() const;
       int numberObservations() const;
+      int numberImageObservations() const;
+      int numberLidarImageObservations() const;
 
       int numberImageParameters() const; // ??? this is the same value an m_nRank
       int numberConstrainedPointParameters() const;
@@ -243,6 +248,7 @@ namespace Isis {
       double elapsedTimeErrorProp() const;
       bool converged() const; // or initialze method
       QVector<BundleControlPointQsp> &bundleControlPoints();
+      QVector<BundleLidarControlPointQsp> &bundleLidarControlPoints();
       ControlNetQsp outputControlNet() const;
       LidarDataQsp outputLidarData() const;
       int iterations() const;
@@ -315,53 +321,67 @@ namespace Isis {
           QMap<QString, QStringList> m_xmlHandlerCorrelationMap;
       };
 
-      CorrelationMatrix *m_correlationMatrix; //!< The correlation matrix from the BundleAdjust.
+      CorrelationMatrix *m_correlationMatrix;      //!< Correlation matrix (define)
 
-      int m_numberFixedPoints;                //!< number of 'fixed' (ground) points (define)
-      // Currently set but unused
-      int m_numberIgnoredPoints;              //!< number of ignored points
-      int m_numberHeldImages;                 //!< number of 'held' images (define)
+      int m_numberFixedPoints;                     //!< # 'fixed' (ground) points (define)
 
-      // The following three members are set but unused.
-      double m_rmsXResiduals;                 //!< rms of x residuals
-      double m_rmsYResiduals;                 //!< rms of y residuals
-      double m_rmsXYResiduals;                //!< rms of all x and y residuals
+      // set but unused (verify)
+      int m_numberIgnoredPoints;                   //!< # ignored points
+      int m_numberHeldImages;                      //!< # 'held' images (define)
 
-      double m_rejectionLimit;                //!< current rejection limit
+      // set but unused (verify)
+      // (TODO) we should put them out to bundleout.txt under list if image residuals
+      double m_rmsXResiduals;                      //!< rms of x residuals
+      double m_rmsYResiduals;                      //!< rms of y residuals
+      double m_rmsXYResiduals;                     //!< rms of all x and y residuals
+
+      double m_rejectionLimit;                     //!< current rejection limit
+
       // TODO:??? reorder read/write data stream, init, copy constructor, operator=
-      int m_numberObservations;                  //!< # of image coordinate observations
-      int m_numberRejectedObservations;          //!< # of rejected image coordinate observations
-      int m_numberUnknownParameters;             //!< total # of parameters to solve for
-      int m_numberImageParameters;               //!< # image parameters
-      int m_numberConstrainedImageParameters;    //!< # constrained image parameters
-      int m_numberConstrainedPointParameters;    //!< # constrained point parameters
-      int m_numberConstrainedTargetParameters;   //!< # constrained target parameters
-      int m_numberContinuityConstraintEquations; //!< # continuity constraint equations
-      int m_numberLidarRangeConstraintEquations; //!< # lidar range constraint equations
-      int m_degreesOfFreedom;                    //!< degrees of freedom
-      double m_sigma0;                           //!< std deviation of unit weight
-      double m_elapsedTime;                      //!< elapsed time for bundle
-      double m_elapsedTimeErrorProp;             //!< elapsed time for error propagation
-      bool m_converged;
+                                                   //!< numbers of observations for...
+      int m_numberImageObservations;               //!< photogrammetry image coords. (2 per measure)
+      int m_numberLidarImageObservations;          //!< lidar image coords.          (2 per measure)
+      int m_numberRejectedObservations;            //!< rejected image coords.       (2 per measure)
+
+                                                   //!< numbers of...
+      int m_numberContinuityConstraintEquations;   //!< # continuity constraint equations
+      int m_numberLidarRangeConstraintEquations;   //!< # lidar range constraint equations
+
+      int m_numberUnknownParameters;               //!< total # of parameters in solution
+      int m_numberImageParameters;                 //!< # image parameters
+
+                                                   //!< numbers of constrained parameters for...
+      int m_numberConstrainedImageParameters;      //!< images
+      int m_numberConstrainedPointParameters;      //!< points
+      int m_numberConstrainedLidarPointParameters; //!< lidar points
+      int m_numberConstrainedTargetParameters;     //!< target body
+
+
+      int m_degreesOfFreedom;                      //!< degrees of freedom
+      double m_sigma0;                             //!< std deviation of unit weight
+      double m_elapsedTime;                        //!< elapsed time for bundle
+      double m_elapsedTimeErrorProp;               //!< elapsed time for error propagation
+      bool m_converged;                            //!< converged flag
       
       // Variables for output methods in BundleSolutionInfo
       
-      QVector<BundleControlPointQsp> m_bundleControlPoints; /**< The vector of BundleControlPoints
-                                                                 from BundleAdjust.  Equivalent to
-                                                                 the output control net minus
-                                                                 ignored points and measures.
-                                                                 The contained points and members
-                                                                 hold pointers to the points
-                                                                 and measures in the output
+      QVector<BundleControlPointQsp> m_bundleControlPoints; /**< Vector of BundleControlPoints from
+                                                                 BundleAdjust. Equivalent to the
+                                                                 output control net w/o ignored
+                                                                 points and measures. Contained
+                                                                 points and members hold pointers to
+                                                                 the points and measures in output
                                                                  control net.*/
-      ControlNetQsp m_outNet;                               /**< The output control net from
+
+      QVector<BundleLidarControlPointQsp> m_bundleLidarPoints;
+
+      ControlNetQsp m_outNet;                               /**< Output control net from
                                                                  BundleAdjust.*/
       LidarDataQsp m_outLidarData;                          /**< Output lidar data from
                                                                  BundleAdjust.*/
-      int m_iterations;                                     /**< The number of iterations taken
-                                                                 by BundleAdjust.*/
-      BundleObservationVector m_observations;               /**< The vector of BundleObservations
-                                                                 from BundleAdjust.*/
+      int m_iterations;                                     /**< # iterations in BundleAdjust.*/
+      BundleObservationVector m_observations;               /**< Vector of BundleObservations from
+                                                                 BundleAdjust.*/
 
 
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

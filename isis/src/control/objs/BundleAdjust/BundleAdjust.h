@@ -36,6 +36,7 @@
 // Isis lib
 #include "BundleControlPoint.h"
 #include "BundleControlPointVector.h"
+#include "BundleLidarPointVector.h"
 #include "BundleObservationSolveSettings.h"
 #include "BundleObservationVector.h"
 #include "BundleResults.h"
@@ -429,6 +430,7 @@ namespace Isis {
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();
+      void computeResiduals();
       double computeVtpv();
       bool computeRejectionLimit();
       bool flagOutliers();
@@ -436,16 +438,15 @@ namespace Isis {
       // normal equation matrices methods
 
       bool formNormalEquations();
-      bool formPhotoNormals();
-      bool formLidarNormals();
+      int formPhotoNormalEquations();
+      int formLidarNormalEquations();
 
       bool computePartials(LinearAlgebra::Matrix  &coeffTarget,          //!< multi-segment version
                            LinearAlgebra::Matrix  &coeffImagePosition,
                            LinearAlgebra::Matrix  &coeffImagePointing,
                            LinearAlgebra::Matrix  &coeffPoint3D,
                            LinearAlgebra::Vector  &coeffRHS,
-                           BundleMeasure          &measure,
-                           BundleControlPoint     &point);
+                           BundleMeasure          &measure);
       bool formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22, //!< multi-segment version
                               SparseBlockColumnMatrix              &N12,
                               LinearAlgebra::VectorCompressed      &n1,
@@ -456,11 +457,16 @@ namespace Isis {
                               LinearAlgebra::Matrix                &coeffPoint3D,
                               LinearAlgebra::Vector                &coeffRHS,
                               BundleMeasureQsp                     measure);
-      bool formPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
-                            SparseBlockColumnMatrix              &N12,
-                            LinearAlgebra::Vector                &n2,
-                            LinearAlgebra::Vector                &nj,
-                            BundleControlPointQsp                &point);
+      int formPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                           SparseBlockColumnMatrix              &N12,
+                           LinearAlgebra::Vector                &n2,
+                           LinearAlgebra::Vector                &nj,
+                           BundleControlPointQsp                &point);
+      int formLidarPointNormals(LinearAlgebra::MatrixUpperTriangular &N22,
+                                SparseBlockColumnMatrix              &N12,
+                                LinearAlgebra::Vector                &n2,
+                                LinearAlgebra::Vector                &nj,
+                                BundleLidarControlPointQsp           &point);
       bool formWeightedNormals(LinearAlgebra::VectorCompressed  &n1,
                                LinearAlgebra::Vector            &nj);
       void applyPolynomialContinuityConstraints();
@@ -490,7 +496,6 @@ namespace Isis {
       bool initializeCHOLMODLibraryVariables();
       bool freeCHOLMODLibraryVariables();
       bool loadCholmodTriplet();
-      bool wrapUp();
 
       // member variables
 
@@ -501,6 +506,7 @@ namespace Isis {
       QString m_cnetFileName;                                //!< The control net filename.
 
       BundleControlPointVector m_bundleControlPoints;        //!< Vector of control points.
+      BundleLidarPointVector m_bundleLidarControlPoints;     //!< Vector of lidar points.
 
       QString m_lidarFileName;                               //!< Input lidar point filename.
       LidarDataQsp m_lidarDataSet;                           //!< Output lidar data.
@@ -523,6 +529,7 @@ namespace Isis {
                                                                    the destructor.*/
       int m_rank;                                            //!< The rank of the system.
       int m_iteration;                                       //!< The current iteration.
+      double m_iterationTime;                                //!< Time for last iteration
       int m_numberOfImagePartials;                           //!< number of image-related partials.
       QList<ImageList *> m_imageLists;                        /**!< The lists of images used in the
                                                                    bundle.*/

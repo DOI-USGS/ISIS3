@@ -330,6 +330,7 @@ namespace Isis {
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
+      Isis::Camera *Camera(QString serialNumber);
       QString CreatedDate() const;
       QString Description() const;
       ControlPoint *FindClosest(QString serialNumber,

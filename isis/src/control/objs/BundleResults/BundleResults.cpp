@@ -84,21 +84,24 @@ namespace Isis {
         m_rmsYResiduals(src.m_rmsYResiduals),
         m_rmsXYResiduals(src.m_rmsXYResiduals),
         m_rejectionLimit(src.m_rejectionLimit),
-        m_numberObservations(src.m_numberObservations),
+        m_numberImageObservations(src.m_numberImageObservations),
+        m_numberLidarImageObservations(src.m_numberLidarImageObservations),
         m_numberRejectedObservations(src.m_numberRejectedObservations),
+        m_numberContinuityConstraintEquations(src.m_numberContinuityConstraintEquations),
+        m_numberLidarRangeConstraintEquations(src.m_numberLidarRangeConstraintEquations),
         m_numberUnknownParameters(src.m_numberUnknownParameters),
         m_numberImageParameters(src.m_numberImageParameters),
         m_numberConstrainedImageParameters(src.m_numberConstrainedImageParameters),
         m_numberConstrainedPointParameters(src.m_numberConstrainedPointParameters),
+        m_numberConstrainedLidarPointParameters(src.m_numberConstrainedLidarPointParameters),
         m_numberConstrainedTargetParameters(src.m_numberConstrainedTargetParameters),
-        m_numberContinuityConstraintEquations(src.m_numberContinuityConstraintEquations),
-        m_numberLidarRangeConstraintEquations(src.m_numberLidarRangeConstraintEquations),
         m_degreesOfFreedom(src.m_degreesOfFreedom),
         m_sigma0(src.m_sigma0),
         m_elapsedTime(src.m_elapsedTime),
         m_elapsedTimeErrorProp(src.m_elapsedTimeErrorProp),
         m_converged(src.m_converged),
         m_bundleControlPoints(src.m_bundleControlPoints),
+        m_bundleLidarPoints(src.m_bundleLidarPoints),
         m_outNet(src.m_outNet),
         m_outLidarData(src.m_outLidarData),
         m_iterations(src.m_iterations),
@@ -171,21 +174,24 @@ namespace Isis {
       m_rmsYResiduals = src.m_rmsYResiduals;
       m_rmsXYResiduals = src.m_rmsXYResiduals;
       m_rejectionLimit = src.m_rejectionLimit;
-      m_numberObservations = src.m_numberObservations;
+      m_numberImageObservations = src.m_numberImageObservations;
+      m_numberLidarImageObservations = src.m_numberLidarImageObservations;
       m_numberRejectedObservations = src.m_numberRejectedObservations;
+      m_numberContinuityConstraintEquations = src.m_numberContinuityConstraintEquations;
+      m_numberLidarRangeConstraintEquations = src.m_numberLidarRangeConstraintEquations;
       m_numberUnknownParameters = src.m_numberUnknownParameters;
       m_numberImageParameters = src.m_numberImageParameters;
       m_numberConstrainedImageParameters = src.m_numberConstrainedImageParameters;
       m_numberConstrainedPointParameters = src.m_numberConstrainedPointParameters;
+      m_numberConstrainedLidarPointParameters = src.m_numberConstrainedLidarPointParameters;
       m_numberConstrainedTargetParameters = src.m_numberConstrainedTargetParameters;
-      m_numberContinuityConstraintEquations = src.m_numberContinuityConstraintEquations;
-      m_numberLidarRangeConstraintEquations = src.m_numberLidarRangeConstraintEquations;
       m_degreesOfFreedom = src.m_degreesOfFreedom;
       m_sigma0 = src.m_sigma0;
       m_elapsedTime = src.m_elapsedTime;
       m_elapsedTimeErrorProp = src.m_elapsedTimeErrorProp;
       m_converged = src.m_converged;
       m_bundleControlPoints = src.m_bundleControlPoints;
+      m_bundleLidarPoints = src.m_bundleLidarPoints;
       m_outNet = src.m_outNet;
       m_outLidarData = src.m_outLidarData;
       m_iterations = src.m_iterations;
@@ -287,20 +293,25 @@ namespace Isis {
     // set by flag outliers
     m_numberRejectedObservations = 0;
 
+    // TODO: comment below outdated
     // set by formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
-    m_numberObservations = 0;
+    m_numberImageObservations = 0;
+    m_numberLidarImageObservations = 0;
     m_numberImageParameters = 0;
 
 // ??? unused variable ???    m_numberHeldPoints = 0;
 
+    // TODO: comment below outdated
     // set by formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or
     // setParameterWeights (i.e. solve)
     m_numberConstrainedPointParameters = 0;
+    m_numberConstrainedLidarPointParameters = 0;
     m_numberConstrainedImageParameters = 0;
     m_numberConstrainedTargetParameters = 0;
     m_numberContinuityConstraintEquations = 0;
     m_numberLidarRangeConstraintEquations = 0;
 
+    // TODO: comment below outdated
     // set by initialize, formNormalEquations_CHOLMOD, formNormalEquations_SPECIALK, or solve
     m_numberUnknownParameters = 0;
 
@@ -635,6 +646,16 @@ namespace Isis {
 
 
   /**
+   * Resets statistics in preparation for next bundle iteration.
+   */
+  void BundleResults::initializeNewIteration() {
+    m_numberImageObservations = 0;
+    m_numberConstrainedPointParameters = 0;
+    m_numberLidarRangeConstraintEquations = 0;
+  }
+
+
+  /**
    * Sets the number of rejected observations.
    *
    * @param numberRejectedObservations The number of rejected observations.
@@ -645,12 +666,25 @@ namespace Isis {
 
 
   /**
-   * Sets the number of observations.
+   * Sets the number of photogrammetric image observations. Note in this terminology an image
+   * measurement contributes two observations to the adjustment (i.e. sample/line).
    *
-   * @param numberObservations The number of observations.
+   * So, the number of observations divided by 2 should equal the number of image measures.
+   *
+   * @param numberObservations The number of photogrammetric image observations.
    */
-  void BundleResults::setNumberObservations(int numberObservations) {
-    m_numberObservations = numberObservations;
+  void BundleResults::setNumberImageObservations(int numberObservations) {
+    m_numberImageObservations = numberObservations;
+  }
+
+
+  /**
+   * Sets the number of lidar observations.
+   *
+   * @param numberLidarObservations The number of lidar observations.
+   */
+  void BundleResults::setNumberLidarImageObservations(int numberLidarObservations) {
+    m_numberLidarImageObservations = numberLidarObservations;
   }
 
 
@@ -665,20 +699,22 @@ namespace Isis {
 
 
   /**
-   * Resets the number of contrained point parameters to 0.
+   * Set number of contrained point parameters.
+   *
+   * @param numberParameters Number of contrained point parameters.
    */
-  void BundleResults::resetNumberConstrainedPointParameters() {
-    m_numberConstrainedPointParameters = 0;
+  void BundleResults::setNumberConstrainedPointParameters(int numberParameters) {
+    m_numberConstrainedPointParameters = numberParameters;
   }
 
 
   /**
-   * Increase the number of contrained point parameters.
+   * Set number of contrained point parameters.
    *
-   * @param incrementAmount The amount to increase by.
+   * @param numberParameters Number of contrained point parameters.
    */
-  void BundleResults::incrementNumberConstrainedPointParameters(int incrementAmount) {
-    m_numberConstrainedPointParameters += incrementAmount;
+  void BundleResults::setNumberConstrainedLidarPointParameters(int numberParameters) {
+    m_numberConstrainedLidarPointParameters = numberParameters;
   }
 
 
@@ -739,31 +775,40 @@ namespace Isis {
 
 
   /**
-   * Sets the total number of continuity constraint equations.
+   * Sets the total number of lidar range constraints.
    *
-   * @param numberContinuityConstraints The total number of continuity constraint equations.
+   * @param numberLidarRangeConstraints The total number of lidar range constraints.
    */
-  void BundleResults::setNumberLidarRangeConstraintEquations(int numberLidarRangeConstraints) {
+  void BundleResults::setNumberLidarRangeConstraints(int numberLidarRangeConstraints) {
     m_numberLidarRangeConstraintEquations = numberLidarRangeConstraints;
   }
 
 
   /**
-   * Computes the degrees of freedom of the bundle adjustment and stores it internally.
+   * Computes and stores the degrees of freedom of the bundle adjustment.
    */
   void BundleResults::computeDegreesOfFreedom() {
-    m_degreesOfFreedom = m_numberObservations
+    int fred=1;
+    m_degreesOfFreedom = m_numberImageObservations
+                         + m_numberLidarImageObservations
                          + m_numberConstrainedPointParameters
+                         + m_numberConstrainedLidarPointParameters
                          + m_numberConstrainedImageParameters
                          + m_numberConstrainedTargetParameters
                          + m_numberContinuityConstraintEquations
                          + m_numberLidarRangeConstraintEquations
                          - m_numberUnknownParameters;
+    fred=2;
   }
 
 
   /**
-   * Computes the sigma0 and stores it internally.
+   * Computes and stores sigma0 (or "sigma nought").
+   *
+   * Sigma0 is the standard deviation of an observation of unit weight. Sigma0^2 is the variance of
+   * an observation of unit weight (also reference variance or variance factor).
+   *
+   * Sigma0^2 = vtpv/degrees of freedom.
    *
    * @param dvtpv The weighted sum of the squares of the residuals.  Computed by
    *              V transpose * P * V, where
@@ -845,12 +890,22 @@ namespace Isis {
   /**
    * Sets the bundle control point vector.
    *
-   * @param controlPoints The vector of BundleControlPointQsps.
+   * @param controlPoints Vector of BundleControlPointQsps.
    */
   void BundleResults::setBundleControlPoints(QVector<BundleControlPointQsp> controlPoints) {
     m_bundleControlPoints = controlPoints;
   }
 
+
+  /**
+   * Sets the bundle lidar point vector.
+   *
+   * @param lidarPoints Vector of BundleLidarControlPointQsps.
+   */
+  void BundleResults::setBundleLidarPoints(QVector<BundleLidarControlPointQsp> lidarPoints) {
+    m_bundleLidarPoints = lidarPoints;
+    int fred=1;
+  }
 
   /**
    * Sets the output ControlNet.
@@ -1186,12 +1241,32 @@ namespace Isis {
 
 
   /**
-   * Returns the number of observations.
+   * Returns total number of observations.
    *
    * @return int The number of observations.
    */
   int BundleResults::numberObservations() const {
-    return m_numberObservations;
+    return m_numberImageObservations + m_numberLidarImageObservations;
+  }
+
+
+  /**
+   * Returns the number of observations.
+   *
+   * @return int The number of observations.
+   */
+  int BundleResults::numberImageObservations() const {
+    return m_numberImageObservations;
+  }
+
+
+  /**
+   * Returns the number of lidar observations.
+   *
+   * @return int The number of lidar observations.
+   */
+  int BundleResults::numberLidarImageObservations() const {
+    return m_numberLidarImageObservations;
   }
 
 
@@ -1326,6 +1401,16 @@ namespace Isis {
 
 
   /**
+   * Returns a reference to the BundleLidarControlPoint vector.
+   *
+   * @return QVector<BundleLidarControlPointQsp>& The BundleLidarControlPoint vector.
+   */
+  QVector<BundleLidarControlPointQsp> &BundleResults::bundleLidarControlPoints() {
+    return m_bundleLidarPoints;
+  }
+
+
+  /**
    * Returns a shared pointer to the output control network.
    *
    * @return ControlNetQsp A shared pointer to the output control network.
@@ -1350,11 +1435,11 @@ namespace Isis {
    * @throws IException::Programmer "Output LidarData object has not been set."
    */
   LidarDataQsp BundleResults::outputLidarData() const {
-    if (!m_outLidarData) {
-      throw IException(IException::Programmer,
-                       "Output LidarData object has not been set.",
-                       _FILEINFO_);
-    }
+//    if (!m_outLidarData) {
+//      throw IException(IException::Programmer,
+//                       "Output LidarData object has not been set.",
+//                       _FILEINFO_);
+//    }
     return m_outLidarData;
   }
 
@@ -2242,8 +2327,8 @@ namespace Isis {
       else if (qName == "numberRejectedObservations") {
         m_xmlHandlerBundleResults->m_numberRejectedObservations = toInt(m_xmlHandlerCharacters);
       }
-      else if (qName == "numberObservations") {
-        m_xmlHandlerBundleResults->m_numberObservations = toInt(m_xmlHandlerCharacters);
+      else if (qName == "numberImageObservations") {
+        m_xmlHandlerBundleResults->m_numberImageObservations = toInt(m_xmlHandlerCharacters);
       }
       else if (qName == "numberImageParameters") {
         m_xmlHandlerBundleResults->m_numberImageParameters = toInt(m_xmlHandlerCharacters);

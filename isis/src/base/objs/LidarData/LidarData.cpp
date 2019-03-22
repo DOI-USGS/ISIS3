@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QList>
+#include <QMapIterator>
 #include <QRegExp>
 #include <QSharedPointer>
 #include <QString>
@@ -15,6 +16,7 @@
 
 #include "Angle.h"
 #include "CameraFactory.h"
+#include "ControlNet.h"
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
@@ -34,7 +36,8 @@ namespace Isis {
    * Default constructor.
    */
   LidarData::LidarData() {
-
+    m_numSimultaneousMeasures = 0;
+    m_numAsynchronousMeasures = 0;
   }
 
 
@@ -74,7 +77,105 @@ namespace Isis {
     }
   }
 
-  
+
+  /**
+   * Returns number of Lidar data points.
+   *
+   * @return int Returns number of Lidar control points.
+   */
+  int LidarData::numberLidarPoints() {
+    return m_points.size();
+  }
+
+
+  /**
+   * Returns number of simultaneous lidar measures.
+   *
+   * @return int Returns number of simultaneous lidar measures.
+   */
+  int LidarData::numberSimultaneousMeasures() {
+    return m_numSimultaneousMeasures;
+  }
+
+  /**
+   * Returns number of non-simultaneous lidar measures.
+   *
+   * @return int Returns number of non-simultaneous lidar measures.
+   */
+  int LidarData::numberAsynchronousMeasures() {
+    return m_numAsynchronousMeasures;
+  }
+
+
+  /**
+   * Returns total number of lidar measures.
+   *
+   * @return int Returns total number of lidar measures.
+   */
+  int LidarData::numberMeasures() {
+    return m_numSimultaneousMeasures + m_numAsynchronousMeasures;
+  }
+
+
+  /**
+   * TODO: more detail below...
+   *
+   * Assigns Isis::Camera pointers to LidarControlPoint measures.
+   *
+   * @param controlNet Input ControlNet
+   * @param progress A pointer to the progress of creating the cameras
+   * @throws Isis::iException::User - "Lidar Control point measure does not have a cube with a
+   *         matching serial number"
+   * @internal
+   *   @history 2019-02-06 Ken Edmundson - initial version.
+   */
+  void LidarData::SetImages(ControlNet &controlNet, Progress *progress) {
+
+    // iterate over map between serial number and camera pointers
+    QMapIterator< QString, Isis::Camera *> it(p_cameraMap);
+    while (it.hasNext()) {
+      it.next();
+      QString serialNumber = it.key();
+
+      // get corresponding camera pointer from controlNet
+      Isis::Camera *cam = controlNet.Camera(serialNumber);
+      p_cameraMap[serialNumber] = cam;
+      p_cameraValidMeasuresMap[serialNumber] = 0;         // not sure if all this is needed
+      p_cameraRejectedMeasuresMap[serialNumber] = 0;
+      p_cameraList.push_back(cam);
+    }
+
+    // Loop through all measures and set the camera
+    QHashIterator< QString, QSharedPointer<LidarControlPoint> > p(m_points);
+    while (p.hasNext()) {
+      p.next();
+      LidarControlPointQsp curPoint = p.value();
+
+      QList< QString > serialNums = curPoint->getCubeSerialNumbers();
+      for (int m = 0; m < serialNums.size(); m++) {
+        ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
+
+        QString serialNumber = curMeasure->GetCubeSerialNumber();
+        Isis::Camera *cam = p_cameraMap[serialNumber];
+
+        if (cam == NULL) {
+          IString msg = "Lidar Control point [" + curPoint->GetId() +
+              "], measure [" + curMeasure->GetCubeSerialNumber() +
+              "] does not have a cube in the ISIS control net with a matching serial number";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+
+        curMeasure->SetCamera(cam);
+
+        // increment number of measures for this image (camera)
+        if (!curMeasure->IsIgnored()) {
+          p_cameraValidMeasuresMap[serialNumber]++;
+        }
+      }
+    }
+  }
+
+
   /**
    * Creates the ControlNet's image camera's based on the list of Serial Numbers
    *
@@ -177,6 +278,8 @@ namespace Isis {
     if (loadDoc.isNull()) {
       loadDoc = QJsonDocument::fromBinaryData(saveData);
     }
+
+    int totalMeasures = 0;
 
     // Unserialize LidarData
     QJsonObject lidarDataObject = loadDoc.object();
@@ -305,9 +408,10 @@ namespace Isis {
                 // Unserialize each simultaneous image serial number
                 newSerial =  simultaneousArray[simIndex].toString();
                 lcp->addSimultaneous(newSerial);
+                m_numSimultaneousMeasures++;
               }              
         }
-        
+
         // Unserialize ControlMeasures
         if (pointObject.contains("measures") && pointObject["measures"].isArray()) {
           QJsonArray measureArray = pointObject["measures"].toArray();
@@ -330,6 +434,10 @@ namespace Isis {
               serialNumber = measureObject["serialNumber"].toString();
             }
 
+            if (!p_cameraMap.contains(serialNumber)) {
+              p_cameraMap.insert(serialNumber, NULL);
+            }
+
             // QString type;
             // if (measureObject.contains("type") && measureObject["type"].isString()) {
             //   type = measureObject["type"].toString();
@@ -340,12 +448,14 @@ namespace Isis {
             measure->SetCubeSerialNumber(serialNumber);
             // measure->SetType(measure->StringToMeasureType(type));
             lcp->Add(measure);
+            totalMeasures++;
           }
         }
 
         insert(lcp);
       }
     }
+    m_numAsynchronousMeasures = totalMeasures - m_numSimultaneousMeasures;
   }
 
 
@@ -490,4 +600,78 @@ namespace Isis {
       saveFile.write(lidarDataDoc.toBinaryData());
     }
   }
+
+  /**
+   * Does a check to ensure that the given serial number is contained within
+   * the network.
+   *
+   * @param serialNumber the cube serial number to validate
+   *
+   * @return @b bool If the serial number is contained in the network.
+   */
+  bool LidarData::ValidateSerialNumber(QString serialNumber) const {
+    return p_cameraMap.contains(serialNumber);
+  }
+
+
+  /**
+   * Return the number of measures in image specified by serialNumber
+   *
+   * @return Number of valid measures in image
+   *
+   * @history 2013-12-18 Tracie Sucharski - Renamed from GetNumberOfMeasuresInImage, it is
+   *                         returning a count of only valid measures (Ignore=False).
+   */
+  int LidarData::GetNumberOfValidMeasuresInImage(const QString &serialNumber) {
+    // If SetImage was called, use the map that has been populated with valid measures
+    if (p_cameraList.size() > 0) {
+      return p_cameraValidMeasuresMap[serialNumber];
+    }
+    return GetValidMeasuresInCube(serialNumber).size();
+  }
+
+
+  /**
+   * Return the number of jigsaw rejected measures in image specified by serialNumber
+   *
+   * @return Number of jigsaw rejected measures in image
+   */
+  int LidarData::GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber) {
+    return p_cameraRejectedMeasuresMap[serialNumber];
+  }
+
+  /**
+   * Get all the valid measures pertaining to a given cube serial number
+   *
+   * @returns A list of all valid measures which are in a given cube
+   */
+  QList< ControlMeasure * > LidarData::GetValidMeasuresInCube(QString serialNumber) {
+    QList< ControlMeasure * > validMeasures;
+
+    // Get measures in cube will validate this for us, so we don't need to re-check
+//    QList< ControlMeasure * > measureList = GetMeasuresInCube(serialNumber);
+    QList< ControlMeasure * > measureList;
+
+    foreach(ControlMeasure * measure, measureList) {
+      if (!measure->IsIgnored())
+        validMeasures.append(measure);
+    }
+
+    return validMeasures;
+  }
+
+  /**
+   * Get all the measures pertaining to a given cube serial number
+   *
+   * @returns A list of all measures which are in a given cube
+   */
+//  QList< ControlMeasure * > LidarData::GetMeasuresInCube(QString serialNumber) {
+//    if( !ValidateSerialNumber(serialNumber) ) {
+//      IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
+//          "the network";
+//      throw IException(IException::Programmer, msg, _FILEINFO_);
+
+//    }
+//    return m_controlGraph[m_vertexMap[serialNumber]].measures.values();
+//  }
 }
