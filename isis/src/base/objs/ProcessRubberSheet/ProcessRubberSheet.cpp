@@ -816,9 +816,6 @@ namespace Isis {
                    InputCubes[0]->pixelType() ,
                    interp.HotSample(), interp.HotLine());
 
-    // Create a buffer for writing to the output file
-    Brick obrick(*OutputCubes[0],1,1,1);
-
     // Setup the progress meter
     int patchesPerBand = 0;
     for (int line = m_patchStartLine; line <= InputCubes[0]->lineCount();
@@ -865,7 +862,7 @@ namespace Isis {
               samp += m_patchSampleIncrement, p_progress->CheckStatus()) {
           transformPatch((double)samp, (double)(samp + m_patchSamples - 1),
                          (double)line, (double)(line + m_patchLines - 1),
-                         obrick, iportal, trans, interp);
+                         iportal, trans, interp);
         }
       }
     }
@@ -875,7 +872,7 @@ namespace Isis {
   // Private method to process a small patch of the input cube
   void ProcessRubberSheet::transformPatch(double ssamp, double esamp,
                                            double sline, double eline,
-                                           Brick &obrick, Portal &iportal,
+                                           Portal &iportal,
                                            Transform &trans,
                                            Interpolator &interp) {
     // Let's make sure our patch is contained in the input file
@@ -935,7 +932,7 @@ namespace Isis {
 
     // All four corners must be good.  If not break it down more
     if (isamps.size() < 4) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 
@@ -978,11 +975,11 @@ namespace Isis {
      */
 
     if (osampMax - osampMin + 1.0 > OutputCubes[0]->sampleCount() * 0.50) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
     if (olineMax - olineMin + 1.0 > OutputCubes[0]->lineCount() * 0.50) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 
@@ -1008,18 +1005,18 @@ namespace Isis {
       ilineLSQ.Solve(LeastSquares::QRD);
     }
     catch (IException &e) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 
     // If the fit at any corner isn't good enough break it down
     for (int i=0; i<isamps.size(); i++) {
       if (fabs(isampLSQ.Residual(i)) > 0.5) {
-        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
         return;
       }
       if (fabs(ilineLSQ.Residual(i)) > 0.5) {
-        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
         return;
       }
     }
@@ -1042,12 +1039,12 @@ namespace Isis {
       double err = (csamp - isamp) * (csamp - isamp) +
                    (cline - iline) * (cline - iline);
       if (err > 0.25) {
-        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
         return;
       }
     }
     else {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 #endif
@@ -1060,8 +1057,13 @@ namespace Isis {
     double E = ilineFunc.Coefficient(1);
     double F = ilineFunc.Coefficient(2);
 
-    // Now we can do our typical backwards geom.  Loop over the output cube
-    // coordinates and compute input cube coordinates writing pixels 1-by-1
+    // Now we can do our typical backwards geom. Loop over the output cube
+    // coordinates and compute input cube coordinates, writing pixels to buffer
+    // 1-by-1
+    Brick oBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
+    oBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
+    int brickIndex = 0;
+
     for (int oline = olineMin; oline <= olineMax; oline++) {
       double isamp = A * osampMin + B * oline + C;
       double iline = D * osampMin + E * oline + F;
@@ -1075,22 +1077,21 @@ namespace Isis {
         InputCubes[0]->read(iportal);
         double dn = interp.Interpolate(isamp, iline, iportal.DoubleBuffer());
 
-        // Write the output value at the appropriate location
-        if (dn != Null) {
-          obrick.SetBasePosition(osamp,oline,iportal.Band());
-          obrick[0] = dn;
-          OutputCubes[0]->write(obrick);
-        }
+        // Write the output value at the appropriate location in buffer
+        oBrick[brickIndex] = dn;
+        brickIndex++;
       }
     }
+
+    //Write filled buffer to cube
+    OutputCubes[0]->write(oBrick);
   }
 
 
   // Private method used to split up input patches if the patch is too big to
   // process
   void ProcessRubberSheet::splitPatch(double ssamp, double esamp,
-                                       double sline, double eline,
-                                       Brick &obrick, Portal &iportal,
+                                       double sline, double eline, Portal &iportal,
                                        Transform &trans, Interpolator &interp) {
 
     // Is the input patch too small to even worry about transforming?
@@ -1102,16 +1103,16 @@ namespace Isis {
 
     transformPatch(ssamp, midSamp,
                    sline, midLine,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
     transformPatch(midSamp, esamp,
                    sline, midLine,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
     transformPatch(ssamp, midSamp,
                    midLine, eline,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
     transformPatch(midSamp, esamp,
                    midLine, eline,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
 
     return;
   }
