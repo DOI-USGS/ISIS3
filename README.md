@@ -18,7 +18,7 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
         chmod +x Anaconda3-5.2.0-Linux-x86_64.sh
         ./Anaconda3-5.2.0-Linux-x86_64.sh
-                
+
 
     This will start the Anaconda installer which will guide you through the installation process.
 
@@ -51,12 +51,12 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         #The order is important.  If conda-forge is before usgs-astrogeology, you will need to run:
 
         conda config --env --add channels usgs-astrogeology
-                
+
 
 6.  The environment is now ready to download ISIS3 and its dependencies:
 
         conda install -c usgs-astrogeology isis3
-                
+
 
 7.  Finally, setup the environment variables:
 
@@ -64,18 +64,21 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         #This script prepares default values for:  $ISISROOT/$ISIS3DATA/$ISIS3TESTDATA
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py
-                
+
 
     Executing this script with no arguments will result in $ISIS3DATA=$CONDA\_PREFIX/data, and $ISIS3TESTDATA=$CONDA\_PREFIX/testdata. The user can specify different directories for both of these optional values:
 
         python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]
-                
+
 
     Directions for running rsync to download ISIS3 data can be found [here.](#ISIS3DataDownload) Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA will be set to the values passed to isis3VarInit.py. This does not happen retroactively, re-activate the isis3 envionment with one of the following commands:
 
         for Anaconda 3.4 and up - conda activate isis3
         prior to Anaconda 3.4 - source activate isis3
-        
+
+### Updating
+
+  To update to a new version of ISIS, simply run `conda update isis3`
 
 ### Operating System Requirements
 
@@ -128,7 +131,7 @@ To download all ISIS3 data (approximately 520 GB), enter the following commands 
 
     cd $ISIS3DATA
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
-          
+
 
 > Note: The above command downloads all ISIS data including the required base data area and all of the optional mission data areas.
 
@@ -151,56 +154,56 @@ ISIS can now use a service to retrieve the SPICE data for all instruments ISIS s
 
 For example: `rsync -azv **--exclude='kernels'** --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/`
 
-<span style="font-size:120%; color:red; font-weight:bold"> WARNING: Some instruments require mission data to be present for radiometric calibration, which may not be supported by the SPICE Web Server exclusively, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric callobration programs. </span> 
+<span style="font-size:120%; color:red; font-weight:bold"> WARNING: Some instruments require mission data to be present for radiometric calibration, which may not be supported by the SPICE Web Server exclusively, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric callobration programs. </span>
 
 #### Apollo Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo15 data/
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo16 data/
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo17 data/
-    
+
 
 <span id="CassiniMission"></span>
 
 Cassini Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
-            
+
 
 <span id="ChandrayaanMission"></span>
 
 Chandrayaan Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 data/
-            
+
 
 <span id="ClementineMission"></span>
 
 Clementine Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/clementine1 data/
-            
+
 
 <span id="DawnMission"></span>
 
 Dawn Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn data/
-            
+
 
 ExoMars Trace Gas Orbiter Mission (kernels can be excluded):
 
 <span id="TGOMission"></span>
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/tgo data/
-            
+
 
 Galileo Mission (kernels can be excluded):
 
 <span id="GalileoMission"></span>
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo data/
-    
+
 
 Hayabusa Mission (kernels can be excluded):
 
@@ -208,124 +211,124 @@ Hayabusa Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa data/
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa2 data/
-            
+
 
 Juno Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/juno data/
-            
+
 
 <span id="KaguyaMission"></span>
 
 Kaguya Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/kaguya data/
-            
+
 
 <span id="LunarOrbiterMission"></span>
 
 Lunar Orbiter Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lo data/
-            
+
 
 <span id="LunarReconnaissanceOrbiterMission"></span>
 
 Lunar Reconnaissance Orbiter Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
-            
+
 
 <span id="MarsExplorationRoverMission"></span>
 
 Mars Exploration Rover Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mer data/
-            
+
 
 <span id="Mariner10Mission"></span>
 
 Mariner10 Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mariner10 data/
-            
+
 
 <span id="MessengerMission"></span>
 
 Messenger Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/messenger data/
-            
+
 
 <span id="MarsExpressMission"></span>
 
 Mars Express Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mex data/
-            
+
 
 <span id="MarsGlobalSurveyorMission"></span>
 
 Mars Global Surveyor Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mgs data/
-            
+
 
 <span id="MarsReconnaissanceOrbiterMission"></span>
 
 Mars Reconnaissance Orbiter Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
-            
+
 
 <span id="MarsOdysseyMission"></span>
 
 Mars Odyssey Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
-            
+
 
 <span id="NearMission"></span>
 
 Near Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/near data/
-            
+
 
 New Horizons Mission (kernels can be excluded):
 
 <span id="NewHorizonsMission"></span>
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons data/
-            
+
 
 Odyssey Mission (kernels can be excluded):
 
 <span id="OdysseyMission"></span>
 
             rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
-            
+
 
 Rolo Mission (kernels can be excluded):
 
 <span id="RoloMission"></span>
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo data/
-            
+
 
 Rosetta Mission (kernels can be excluded):
 
 <span id="RosettaMission"></span>
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rosetta data/
-            
+
 
 Smart1 Mission (kernels can be excluded):
 
 <span id="Smart1Mission"></span>
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/smart1 data/
-            
+
 
 Viking Mission (kernels can be excluded):
 
@@ -333,7 +336,7 @@ Viking Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking1 data/
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking2 data/
-            
+
 
 Voyager Mission (kernels can be excluded):
 
@@ -341,7 +344,7 @@ Voyager Mission (kernels can be excluded):
 
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager1 data/
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 data/
-            
+
 
 Installing older versions of ISIS
 ---------------------------------
