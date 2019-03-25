@@ -33,7 +33,7 @@
 using namespace std;
 using namespace Isis;
 
-inline QString format(const double &d, const int &precision, 
+inline QString format(const double &d, const int &precision,
                       const QString &defValue = "NULL") {
   if ( IsSpecial(d) ) {
     return ( defValue );
@@ -52,11 +52,11 @@ void IsisMain() {
   const QString sumspice_version = "2.0";
   const QString sumspice_revision = "$Revision: 6565 $";
   const QString sumspice_runtime = Application::DateTime();
- 
+
   UserInterface &ui = Application::GetUserInterface();
 
 
-   
+
   //  Get the list of input cubes to be processed
   FileList cubeNameList;
   if ( ui.WasEntered("FROM") ) {
@@ -85,9 +85,9 @@ void IsisMain() {
 
   // Get the time as represented in the SUMFILE
   QString sumtime = ui.GetString("SUMTIME").toLower();
-  TimeStamp tstamp = ( "start"  == sumtime ) ? SumFinder::Start : 
+  TimeStamp tstamp = ( "start"  == sumtime ) ? SumFinder::Start :
                      ( "center" == sumtime)  ? SumFinder::Center :
-                                               SumFinder::Stop; 
+                                               SumFinder::Stop;
 
   // Load any meta kernels if provided by user
   Kernels meta;
@@ -111,7 +111,7 @@ void IsisMain() {
     if ( qFuzzyCompare( tdiff+1.0, 0.0+1.0) ) {
       PvlKeyword filePair("SumFilesWithDuplicateTimes", sumFiles[sumIndex-1]->name());
       filePair.addValue(sumFiles[sumIndex]->name());
-      duplicates += filePair; 
+      duplicates += filePair;
     }
   }
 
@@ -121,19 +121,19 @@ void IsisMain() {
 
   // Determine the update mode
   QString update = ui.GetString("UPDATE").toLower();
-  unsigned int options(0);  // == SumFinder::None
+  unsigned int options = 0;  // == SumFinder::None
   if ( "times"    == update ) options |= (unsigned int) SumFinder::Times;
   if ( "spice"    == update ) options |= (unsigned int) SumFinder::Spice;
   // These are unnecessary if UPDATE=SPICE!
   if ( "pointing" == update ) options |= (unsigned int) SumFinder::Pointing;
   if ( "position" == update ) options |= (unsigned int) SumFinder::Position;
   if ( "reset"    == update ) options |= (unsigned int) SumFinder::Reset;
- 
+
 
   // Determine observation time tolerances. Default is to find the closest one
   double tolerance = DBL_MAX;
   if ( ui.WasEntered("TIMEDIFF") ) {
-    tolerance = ui.GetDouble("TIMEDIFF"); 
+    tolerance = ui.GetDouble("TIMEDIFF");
   }
 
   // loop through the input cubes
@@ -150,15 +150,15 @@ void IsisMain() {
   QStringList warnings;
 
   for (int cubeIndex = 0; cubeIndex < cubeNameList.size(); cubeIndex++) {
-   
-    // Find the proper SUMFILE for the cube   
+
+    // Find the proper SUMFILE for the cube
     QString filename(cubeNameList[cubeIndex].expanded());
     SharedFinder cubesum( new SumFinder(filename, sumFiles, tolerance, tstamp) );
 
     // Format a warning and save it off for later
     if ( !cubesum->isFound() ) {
       QString mess = "No SUMFILE found for " + cubesum->name() +
-                      " - closest time: " + 
+                      " - closest time: " +
                       Isis::toString(cubesum->closest(), 10) +
                       " <seconds>";
       warnings <<  mess;
@@ -170,7 +170,9 @@ void IsisMain() {
       }
     }
 
-    // This will close the cube but retain all the pertinent info
+    // This will update the history blob and close the cube,
+    // but retain all the pertinent info
+    cubesum->writeHistory();
     cubesum->setCube();
     resultSet.append(cubesum);
     progress.CheckStatus();
@@ -192,7 +194,7 @@ void IsisMain() {
     FileName filename( ui.GetFileName("TOLOG") );
     bool exists = filename.fileExists();
     QFile logfile(filename.expanded());
-    if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Append | 
+    if ( !logfile.open(QIODevice::WriteOnly | QIODevice::Append |
                        QIODevice::Text | QIODevice::Unbuffered) ) {
       QString mess = "Unable to open/create log file " + filename.name();
       throw IException(IException::User, mess, _FILEINFO_);
@@ -209,24 +211,24 @@ void IsisMain() {
       lout << cubesum->name()<< ",";
 
       if ( !cubesum->isFound() ) {
-        lout << "NULL," << sumtime << "," << update << "," 
+        lout << "NULL," << sumtime << "," << update << ","
              << format(cubesum->closest(), 7) << ","
              << format(cubesum->exposureTime(), 7) << ","
-             << cubesum->cubeStartTime().UTC() << "," 
-             << cubesum->cubeCenterTime().UTC() << "," 
+             << cubesum->cubeStartTime().UTC() << ","
+             << cubesum->cubeCenterTime().UTC() << ","
              << cubesum->cubeStopTime().UTC() << ","
              << "NULL,NULL,NULL";
       }
       else {
-        lout << cubesum->sumfile()->name() << "," 
+        lout << cubesum->sumfile()->name() << ","
              << sumtime << "," << update << ","
              << format(cubesum->deltaT(), 7) << ","
              << format(cubesum->exposureTime(), 7) << ","
-             << cubesum->cubeStartTime().UTC() << "," 
-             << cubesum->cubeCenterTime().UTC() << "," 
+             << cubesum->cubeStartTime().UTC() << ","
+             << cubesum->cubeCenterTime().UTC() << ","
              << cubesum->cubeStopTime().UTC() << ","
-             << iTime(cubesum->sumStartTime()).UTC() << "," 
-             << iTime(cubesum->sumCenterTime()).UTC() << "," 
+             << iTime(cubesum->sumStartTime()).UTC() << ","
+             << iTime(cubesum->sumCenterTime()).UTC() << ","
              << iTime(cubesum->sumStopTime()).UTC();
       }
 

@@ -75,6 +75,9 @@ namespace Isis {
    *                           attributes to elements. Matches pds validate tool specifations.
    *   @history 2018-06-12 Kristin Berry - Added schema associated with the img class when it is
    *                           used.
+   *   @history 2019-03-01 Kristin Berry - Added ability to set version_id and title, added
+   *                           Special_Constants to define ISIS special pixel values, fixed east/west
+   *                           bounding coordinates swap bug. Fixes git issue #2635.
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
@@ -108,12 +111,14 @@ namespace Isis {
       QDomElement getElement(QStringList xmlPath, QDomElement parent=QDomElement());
       void addHistory(QString description, QString date = "tbd", QString version = "1.0");
       void setLogicalId(QString lid);
+      void setVersionId(QString versionId);
+      void setTitle(QString title);
       void setSchemaLocation(QString schema);
       void setImageType(ImageType imageType);
 
       static void translateUnits(QDomDocument &label,
                                  QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
-
+      void reorder();
       void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
     protected:
       void identificationArea();
@@ -131,6 +136,8 @@ namespace Isis {
       QDomDocument *m_domDoc;               //!< XML label.
       QString m_schemaLocation;             //!< QString with all schema locations required.
       QString m_lid;                        //!< QString with specified logical identifier.
+      QString m_versionId;                  //!< QString with specified version id.
+      QString m_title;                      //!< QString with specified title. 
       ImageType m_imageType;                //!< Type of image data to be written.
 
   };
