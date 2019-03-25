@@ -1,15 +1,16 @@
-#include "Application.h"
-#include "History.h"
 #include "Isis.h"
-#include "PvlGroup.h"
-#include "UserInterface.h"
-#include "Cube.h"
-#include "Chip.h"
-#include "Progress.h"
-#include "IException.h"
+
+#include "Application.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
 #include "Brick.h"
+#include "Chip.h"
+#include "Cube.h"
+#include "History.h"
+#include "IException.h"
+#include "Progress.h"
+#include "PvlGroup.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
