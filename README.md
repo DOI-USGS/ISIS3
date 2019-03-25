@@ -76,7 +76,7 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
         for Anaconda 3.4 and up - conda activate isis3
         prior to Anaconda 3.4 - source activate isis3
 
-> Updating: To update to a new version of ISIS, simply run `conda update isis`
+> Updating: To update to a new version of ISIS, simply run `conda update isis3`
 
 ### Operating System Requirements
 
