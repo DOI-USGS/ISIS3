@@ -42,7 +42,7 @@ import sys
 #
 #       Author:  Jesse Mapel
 #       Date:    2019-03-25
-#       Description: Added
+#       Description: Added C-Shell support.
 #
 #
 ##########################################################################################################
