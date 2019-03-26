@@ -77,8 +77,8 @@ namespace Isis {
     size_t num_triangles = 0;
 
     if (m_mesh) {
-      for(size_t i = 0; i < m_mesh.size(); i++) {
-        num_triangles += m_mesh->getIndexedMeshArray()[0].m_numTriangles;
+      for(size_t i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
+        num_triangles += m_mesh->getIndexedMeshArray()[i].m_numTriangles;
       }
     }
 
@@ -95,8 +95,8 @@ namespace Isis {
     size_t num_vertices = 0;
 
     if (m_mesh) {
-      for(size_t i = 0; i < m_mesh.size(); i++) {
-        num_vertices += m_mesh->getIndexedMeshArray()[0].m_numVertices;
+      for(size_t i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
+        num_vertices += m_mesh->getIndexedMeshArray()[i].m_numVertices;
       }
     }
 
@@ -133,7 +133,7 @@ namespace Isis {
    *                        vertex. The vertices are ordered counter-clockwise
    *                        around the surface normal of the triangle.
    */
-  btMatrix3x3 BulletDskShape::getTriangle(const int index, const int segment=0) const {
+  btMatrix3x3 BulletDskShape::getTriangle(const int index, const int segment) const {
     btAssert ( index >= 0 );
     btAssert ( index < getIndexedMeshArray()[segment].m_numTriangles );
 
