@@ -91,29 +91,37 @@ activate_vars_csh   =   activate_dir+'/env_vars.csh'
 deactivate_vars_csh = deactivate_dir+'/env_vars.csh'
 
 with open( activate_vars_sh, mode='w' ) as a:
-    a.write('#!/bin/sh\n')
-    a.write('export ISISROOT='+      os.environ['CONDA_PREFIX']+'\n')
-    a.write('export ISIS3DATA='+     args.data_dir +'\n')
-    a.write('export ISIS3TESTDATA='+ args.test_dir +'\n')
+    script = """#!/bin/sh
+export ISISROOT={}
+export ISIS3DATA={}
+export ISIS3TESTDATA={}
+""".format(os.environ['CONDA_PREFIX'], args.data_dir, args.test_dir)
+    a.write(script)
 print( 'Wrote '+activate_vars_sh )
 
 with open( deactivate_vars_sh, mode='w' ) as d:
-    d.write('#!/bin/sh\n')
-    d.write('unset ISISROOT\n')
-    d.write('unset ISIS3DATA\n')
-    d.write('unset ISIS3TESTDATA\n')
+    script = """#!/bin/sh
+unset ISISROOT
+unset ISIS3DATA
+unset ISIS3TESTDATA
+"""
+    d.write(script)
 print( 'Wrote '+deactivate_vars_sh )
 
 with open( activate_vars_csh, mode='w' ) as a:
-    a.write('#!/bin/csh\n')
-    a.write('setenv ISISROOT '+      os.environ['CONDA_PREFIX']+'\n')
-    a.write('setenv ISIS3DATA '+     args.data_dir +'\n')
-    a.write('setenv ISIS3TESTDATA '+ args.test_dir +'\n')
+    script = """#!/bin/csh
+setenv ISISROOT {}
+setenv ISIS3DATA {}
+setenv ISIS3TESTDATA {}
+""".format(os.environ['CONDA_PREFIX'], args.data_dir, args.test_dir)
+    a.write(script)
 print( 'Wrote '+activate_vars_csh )
 
 with open( deactivate_vars_csh, mode='w' ) as d:
-    d.write('#!/bin/csh\n')
-    d.write('unsetenv ISISROOT\n')
-    d.write('unsetenv ISIS3DATA\n')
-    d.write('unsetenv ISIS3TESTDATA\n')
+    script = """#!/bin/sh
+unsetenv ISISROOT
+unsetenv ISIS3DATA
+unsetenv ISIS3TESTDATA
+"""
+    d.write(script)
 print( 'Wrote '+deactivate_vars_csh )
