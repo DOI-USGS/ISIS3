@@ -198,8 +198,8 @@ namespace Isis {
     while(found) {
       dlafns_c(handle, &segments.back(), &segment, &found);
       NaifStatus::CheckErrors();
-
-      segments.push_back(segment);
+      if (found)
+        segments.push_back(segment);
     }
 
     // dskgd_c( v_handle, &v_dladsc, &v_dskdsc );
