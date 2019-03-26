@@ -13,8 +13,6 @@ contributors can be involved in decision making.
 
 * A **Contributor** is any individual creating or commenting on an issue or pull request.
 * A **Committer** is a subset of contributors who have been given write access to the repository.
-* A **TC (Technical Committee)** is a group of committers representing the required technical
-expertise to resolve rare disputes.
 
 # Logging Issues
 
@@ -45,11 +43,6 @@ In the case of an objection being raised in a pull request by another committer,
 committers should seek to arrive at a consensus by way of addressing concerns being expressed
 by discussion, compromise on the proposed change, or withdrawal of the proposed change.
 
-If a contribution is controversial and committers cannot agree about how to get it to land
-or if it should land then it should be escalated to the TC. TC members should regularly
-discuss pending contributions in order to find a resolution. It is expected that only a
-small minority of issues be brought to the TC for resolution and that discussion and
-compromise among committers be the default resolution mechanism.
 
 # Becoming a Committer
 
