@@ -65,7 +65,18 @@ namespace Isis {
   /**
    * Desctructor
    */
-  BulletDskShape::~BulletDskShape() { }
+  BulletDskShape::~BulletDskShape() {
+    // Bullet does not clean up the mesh automatically, so we need to delete it manually
+    if (m_mesh) {
+      for (int i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
+        btIndexedMesh &v_mesh = m_mesh->getIndexedMeshArray()[i];
+        delete[] v_mesh.m_triangleIndexBase;
+        v_mesh.m_triangleIndexBase = nullptr;
+        delete[] v_mesh.m_vertexBase;
+        v_mesh.m_vertexBase = nullptr;
+      }
+    }
+  }
 
 
   /**
