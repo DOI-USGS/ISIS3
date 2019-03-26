@@ -116,8 +116,8 @@ namespace Isis {
   *
   * @return @b btVector3 The local normal for the triangle.
   */
-  btVector3 BulletDskShape::getNormal(const int indexId) const {
-    btMatrix3x3 triangle = getTriangle(indexId);
+  btVector3 BulletDskShape::getNormal(const int indexId, const int segment) const {
+    btMatrix3x3 triangle = getTriangle(indexId, segment);
     btVector3 edge1 = triangle.getRow(1) - triangle.getRow(0);
     btVector3 edge2 = triangle.getRow(2) - triangle.getRow(0);
     return ( edge1.cross( edge2 ) );
@@ -136,6 +136,9 @@ namespace Isis {
   btMatrix3x3 BulletDskShape::getTriangle(const int index, const int segment) const {
     btAssert ( index >= 0 );
     btAssert ( index < getIndexedMeshArray()[segment].m_numTriangles );
+
+    btAssert ( segment >= 0 );
+    btAssert ( segment < getIndexedMeshArray().size());
 
      // Set up pointers to triangle indexes
     const btIndexedMesh &v_mesh = m_mesh->getIndexedMeshArray()[segment];

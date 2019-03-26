@@ -48,7 +48,7 @@ namespace Isis {
       int getNumTriangles() const;
       int getNumVertices() const;
 
-      virtual btVector3 getNormal(const int indexId) const;
+      virtual btVector3 getNormal(const int indexId, const int segment=0) const;
       virtual btMatrix3x3 getTriangle(const int index, const int segment=0) const;
 
     private:
