@@ -74,11 +74,15 @@ namespace Isis {
    * @return @b int The number of triangles. If nothing has been loaded, then 0 is returned.
    */
   int BulletDskShape::getNumTriangles() const {
+    size_t num_triangles = 0;
+
     if (m_mesh) {
-      return ( m_mesh->getIndexedMeshArray()[0].m_numTriangles );
+      for(size_t i = 0; i < m_mesh.size(); i++) {
+        num_triangles += m_mesh->getIndexedMeshArray()[0].m_numTriangles;
+      }
     }
 
-    return 0;
+    return num_triangles;
   }
 
 
@@ -88,11 +92,15 @@ namespace Isis {
    * @return @b int The number of verticies. If nothing has been loaded, then 0 is returned.
    */
   int BulletDskShape::getNumVertices() const {
+    size_t num_vertices = 0;
+
     if (m_mesh) {
-      return ( m_mesh->getIndexedMeshArray()[0].m_numVertices );
+      for(size_t i = 0; i < m_mesh.size(); i++) {
+        num_vertices += m_mesh->getIndexedMeshArray()[0].m_numVertices;
+      }
     }
 
-    return 0;
+    return num_vertices;
   }
 
 
@@ -125,12 +133,12 @@ namespace Isis {
    *                        vertex. The vertices are ordered counter-clockwise
    *                        around the surface normal of the triangle.
    */
-  btMatrix3x3 BulletDskShape::getTriangle(const int index) const {
+  btMatrix3x3 BulletDskShape::getTriangle(const int index, const int segment=0) const {
     btAssert ( index >= 0 );
-    btAssert ( index < getNumTriangles() );
+    btAssert ( index < getIndexedMeshArray()[segment].m_numTriangles );
 
      // Set up pointers to triangle indexes
-    const btIndexedMesh &v_mesh = m_mesh->getIndexedMeshArray()[0];
+    const btIndexedMesh &v_mesh = m_mesh->getIndexedMeshArray()[segment];
 
     const int *t_index = static_cast<int32_t *> ((void *) v_mesh.m_triangleIndexBase);
     int p_index = 3 * index;
