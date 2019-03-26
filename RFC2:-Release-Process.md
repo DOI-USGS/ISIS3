@@ -25,6 +25,8 @@ The ISIS3 code base will adopt the [semantic versioning](https://semver.org/) st
 
 For code contributors the above versioning requires that a distinction between `features` or `enhancements` and `bugs`. The former will be released in pre-compiled binaries (described below) at a regular cadence. The latter will be released as they are completed. Therefore, end users can expect to see new features at a regular cadence and bug fixes as they are completed.
 
+Versioning this way also means that the repository name should change from ISIS3 to simply ISIS as the major version number will change as we make API breaking changes.
+
 ## Release Roadmap
 Releases and development of ISIS3 follows a time based schedule with a new release occurring every three months. Below, we illustrate a sample four month snapshot of software development.
 
