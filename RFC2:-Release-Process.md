@@ -63,6 +63,9 @@ In isolation, the above release model would require that bug fixes be deployed o
   - each fix is applied in isolation.
   - past versions of uploaded binaries will be maintained on Anaconda.org in the cases where a rollback is required.
 
+## Mission Releases
+Periodically, we create a mission specific release for some contractual work. This generally occurs when a mission team has an enhancement in and they would like access to the enhancement outside the normal release cycle. These releases will be versioned `x.y.z-missionname` in a way identical to our release candidates.
+
 # Drawbacks
 The above introduces issues where users will have to rollback (for example, from version 3.7.11 to 3.7.10) as bug fixes can have cascading impacts. As a development team, we are working to improve testing quality to catch these cascading issues.
 
