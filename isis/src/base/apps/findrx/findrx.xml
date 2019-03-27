@@ -44,6 +44,10 @@
     <change name="Jeannie Walldren" date="2010-08-02">
         Updated to use new SearchChip SubchipValidPercent value from the template.
     </change>
+    <change name="Kaitlyn Lee" date="2019-03-25">
+        Added method writeHistory() to add an entry to the history blob of the input cube.
+        Updated code up to coding standards.
+    </change>
   </history>
 
   <groups>
