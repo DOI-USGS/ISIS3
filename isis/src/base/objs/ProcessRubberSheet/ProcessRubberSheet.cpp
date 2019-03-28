@@ -1058,8 +1058,8 @@ namespace Isis {
     double F = ilineFunc.Coefficient(2);
 
     // Now we can do our typical backwards geom. Loop over the output cube
-    // coordinates and compute input cube coordinates, writing pixels to buffer
-    // 1-by-1
+    // coordinates and compute input cube coordinates for the corners of the current
+    // buffer. The buffer is the same size as the patch size.
     Brick oBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
     oBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
     int brickIndex = 0;
