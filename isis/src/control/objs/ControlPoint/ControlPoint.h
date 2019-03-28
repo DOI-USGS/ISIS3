@@ -359,6 +359,10 @@ namespace Isis {
    *                           Fixes #5435.
    *   @history 2018-06-30 Debbie A. Cook Removed all calls to obsolete method
    *                           SurfacePoint::SetRadii.  References #5457.
+   *  @history 2019-03-10 Ken Edmundson - See history entry for ComputeApriori method (References
+   *                           #2591). Added check to IsConstrained() method to see if point type is
+   *                           Free, in which case we ignore stored a priori sigmas on the
+   *                           coordinates.
    */
   class ControlPoint : public QObject {
 
@@ -529,6 +533,7 @@ namespace Isis {
       bool IsValid() const;
       // Can we get rid of this? It doesn't appear to be used anywhere.  *** ToDo ***
       bool IsInvalid() const;
+      bool IsFree() const;
       bool IsFixed() const;
       bool HasAprioriCoordinates();
 
@@ -668,7 +673,7 @@ namespace Isis {
        * This stores the constraint status of the a priori SurfacePoint
        *   @todo Eventually add x, y, and z.  Instead we made generic coordinates
        */
-      std::bitset<6> constraintStatus;
+      std::bitset<3> constraintStatus;
 
       /**
        * This indicates if a program has explicitely set the reference in this
