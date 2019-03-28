@@ -359,6 +359,10 @@ namespace Isis {
    *                           Fixes #5435.
    *   @history 2018-06-30 Debbie A. Cook Removed all calls to obsolete method
    *                           SurfacePoint::SetRadii.  References #5457.
+   *  @history 2019-03-10 Ken Edmundson - See history entry for ComputeApriori method (References
+   *                           #2591). Added check to IsConstrained() method to see if point type is
+   *                           Free, in which case we ignore stored a priori sigmas on the
+   *                           coordinates.
    */
   class ControlPoint : public QObject {
 
