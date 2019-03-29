@@ -839,11 +839,18 @@ namespace Isis {
   }
 
 
-  /**
-   * This method computes the apriori lat/lon for a point.  It computes this
-   * by determining the average lat/lon of all the measures.  Note that this
-   * does not change ignored, or fixed points.  Also, it does not
-   * use unmeasured or ignored measures when computing the lat/lon.
+  /**    
+   * Computes a priori lat/lon/radius point coordinates by determining the average lat/lon/radius of
+   * all measures. Note that this does not change ignored, fixed or constrained points.
+   *
+   * Also, it does not use unmeasured or ignored measures when computing lat/lon/radius.
+   *
+   * (KLE) Note this not a rigorous triangulation considering outliers. A better way would be to...
+   *         a) use e.g. a closest approach algorithm to find intersection of all rays, regardless
+   *            of whether the intersection lies on the surface in question, then;
+   *         b) perform a rigorous triangulation with some sort outlier detection approach, a robust
+   *            estimation technique (perhaps RANSAC)
+   *
    * @internal
    *   @history 2008-06-18  Tracie Sucharski/Jeannie Walldren,
    *                               Changed error messages for
@@ -872,114 +879,88 @@ namespace Isis {
    *  @history 2017-04-25 Debbie A. Cook - change constraint status calls
    *                               to use generic coordinate names (Coord1, Coord2,
    *                               and Coord3).
+   *  @history 2019-03-10 Ken Edmundson - Fixed bug where focal plane measured x,y coordinates were
+   *                               not set if the cam->SetImage call failed. Setting the measured
+   *                               focal plane coordinates should not depend upon the success of the
+   *                               SetImage call (References #2591). Improved error messages.
+   *                               Cleaned up code. Added comments above to suggest a more rigorous
+   *                               approach to computing a priori point coordinates.
    *
    * @return Status Success or PointLocked
    */
   ControlPoint::Status ControlPoint::ComputeApriori() {
+    // TODO (KLE): where should call this go? Also, what's the point? The method has no description.
     PointModified();
 
-    // Don't goof with fixed points.  The lat/lon is what it is ... if
-    // it exists!
-    // 2013-11-12 KLE I think this check should include points with any
-    // number of constrained coordinates???  I agree DAC.  *** TODO ***
-    if (GetType() == Fixed) {
-      if (!aprioriSurfacePoint.Valid()) {
-        QString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
-        msg += "and requires an apriori x/y/z";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-      // Don't return until after the FocalPlaneMeasures have been set
-      //      return;
+    // if point is fixed or constrained, ensure valid a priori point coordinates exist
+    if ( (IsFixed() || IsConstrained()) &&  !aprioriSurfacePoint.Valid() ) {
+      QString msg = "In method ControlPoint::ComputeApriori(). ControlPoint [" + GetId() + "] is ";
+      msg += "fixed or constrained and requires a priori coordinates";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    double xB = 0.0;
-    double yB = 0.0;
-    double zB = 0.0;
-    double r2B = 0.0;
+    double xB = 0.0;  // body-fixed x
+    double yB = 0.0;  // body-fixed y
+    double zB = 0.0;  // body-fixed z
+    double r2B = 0.0; // radius squared in body-fixed
     int goodMeasures = 0;
+    double pB[3];
 
-    // Loop for each measure and compute the sum of the lat/lon/radii
-    for (int j = 0; j < cubeSerials->size(); j++) {
-      ControlMeasure *m = GetMeasure(j);
-
-      // The comment code was really checking for candidate measures
-      // Commented out 2011-03-24 by DAC
-//       if (!m->IsMeasured()) {
-//         // TODO: How do we deal with unmeasured measures
-//       }
-//       else if (m->IsIgnored()) {
+    // loop over measures to ...
+    // 1) set focal plane x,y coordinates for all unignored measures;
+    // 2) sum latitude, longitude, and radius coordinates in preparation for computing a priori
+    //    coordinates by averaging.
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      ControlMeasure *m = GetMeasure(i);
       if (m->IsIgnored()) {
-        // TODO: How do we deal with ignored measures
+        continue;
       }
-      else {
-        Camera *cam = m->Camera();
-        if (cam == NULL) {
-          QString msg = "The Camera must be set prior to calculating apriori";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
-        }
-        if (cam->SetImage(m->GetSample(), m->GetLine())) {
-          goodMeasures++;
-          double pB[3];
-          cam->Coordinate(pB);
-          xB += pB[0];
-          yB += pB[1];
-          zB += pB[2];
-          r2B += pB[0]*pB[0] + pB[1]*pB[1] + pB[2]*pB[2];
 
-          double x = cam->DistortionMap()->UndistortedFocalPlaneX();
-          double y = cam->DistortionMap()->UndistortedFocalPlaneY();
-          m->SetFocalPlaneMeasured(x, y);
-        }
-        else {
-          // JAA: Don't stop if we know the lat/lon.  The SetImage may fail
-          // but the FocalPlane measures have been set
-          if (GetType() == Fixed) {
-            continue;
-          }
+      Camera *cam = m->Camera();
+      if (cam == NULL) {
+        QString cubeSN = m->GetCubeSerialNumber();
+        QString msg = "in method ControlPoint::ComputeApriori(). Camera has not been set in ";
+        msg += "measure for cube serial number [" + cubeSN + "], Control Point id ";
+        msg += "[" + GetId() + "]. Camera must be set prior to calculating a priori coordinates";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
 
-          // TODO: What do we do
-//          QString msg = "Cannot compute lat/lon/radius (x/y/z) for "
-//              "ControlPoint [" + GetId() + "], measure [" +
-//              m->GetCubeSerialNumber() + "]";
-//          throw IException(IException::User, msg, _FILEINFO_);
+      bool setImageSuccess = cam->SetImage(m->GetSample(), m->GetLine());
+      m->SetFocalPlaneMeasured(cam->DistortionMap()->UndistortedFocalPlaneX(),
+                               cam->DistortionMap()->UndistortedFocalPlaneY());
 
-          // m->SetFocalPlaneMeasured(?,?);
-        }
+      // TODO: Seems like we should be able to skip this computation if point is fixed or
+      // constrained in any coordinate. Currently we are always summing coordinates here. We could
+      // save time by not doing this for fixed or constrained points.
+      if (setImageSuccess) {
+        goodMeasures++;
+        cam->Coordinate(pB);
+        xB += pB[0];
+        yB += pB[1];
+        zB += pB[2];
+        r2B += pB[0]*pB[0] + pB[1]*pB[1] + pB[2]*pB[2];
       }
     }
 
-    // Don't update the apriori x/y/z for fixed points  TODO This needs a closer look
-    if (GetType() == Free ) {
-      // point can be tagged as "Free" but still have constrained coordinates
-      // if tagged "Free" we want to compute approximate a priori coordinates
-    }
-    // if point is "Fixed" or otherwise constrained in one, two, or all three
-    // coordinates, then we use the a priori surface point coordinates that
-    // have been given via other means (e.g. through qnet or cneteditor)
-    // 2013-11-12 KLE Is the next check better as "if Fixed or if # of
-    // constrained coordinates > 1" ???
-    else if (GetType() == Fixed
-        || NumberOfConstrainedCoordinates() == 3
-        || IsCoord1Constrained()
-        || IsCoord2Constrained()
-        || IsCoord3Constrained()) {
-
-      // Initialize the adjusted x/y/z to the a priori coordinates
+    // if point is Fixed or Constrained in any number of coordinates, initialize adjusted surface
+    // point to a priori coordinates (set in e.g. qnet or cneteditor) and exit
+    if( IsFixed() || IsConstrained()) {
       adjustedSurfacePoint = aprioriSurfacePoint;
-
       return Success;
     }
 
-    // Beyond this point, we assume the point is free ***TODO*** confirm this
-    // Did we have any measures?
+    // if point is Free, we continue to compute a priori coordinates
+
+    // if no good measures, we're done
+    // TODO: is the message true/meaningful?
     if (goodMeasures == 0) {
-      QString msg = "ControlPoint [" + GetId() + "] has no measures which "
-          "project to lat/lon/radius (x/y/z)";
+      QString msg = "in method ControlPoint::ComputeApriori(). ControlPoint [" + GetId() + "] has ";
+      msg += "no measures which project to the body";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Compute the averages if all coordinates are free
-    //if (NumberOfConstrainedCoordinates() == 0) {
+    // TODO: confirm if this "if" statement is necessary
     if (GetType() == Free || NumberOfConstrainedCoordinates() == 0) {
       double avgX = xB / goodMeasures;
       double avgY = yB / goodMeasures;
@@ -1553,11 +1534,6 @@ namespace Isis {
   }
 
 
-  bool ControlPoint::IsFixed() const {
-    return (type == Fixed);
-  }
-
-
   SurfacePoint ControlPoint::GetAprioriSurfacePoint() const {
     return aprioriSurfacePoint;
   }
@@ -1581,22 +1557,78 @@ namespace Isis {
    }
 
 
+   /**
+    * Return bool indicating if point is Free or not.
+    *
+    * @return bool indicating if point is Free or not.
+    */
+   bool ControlPoint::IsFree() const {
+     return (type != Fixed && type != Constrained);
+   }
+
+
+   /**
+    * Return bool indicating if point is Fixed or not.
+    *
+    * @return bool indicating if point is Fixed or not.
+    */
+   bool ControlPoint::IsFixed() const {
+     return (type == Fixed);
+   }
+
+
+   /**
+    * Return bool indicating if point is Constrained or not.
+    *
+    * @return bool indicating if point is Constrained or not.
+    */
   bool ControlPoint::IsConstrained() {
+    // if point type is Free, we ignore any a priori sigmas on the coordinates
+    if (type == Free) {
+      return false;
+    }
+
     return constraintStatus.any();
   }
 
+
+  /**
+   * Return bool indicating if 1st coordinate is Constrained or not. This corresponds to Latitude
+   *   for a Latitudinal solution or X for a Rectangular solution.
+   *
+   * @return bool indicating if 1st coordinate is Constrained or not.
+   */
   bool ControlPoint::IsCoord1Constrained() {
     return constraintStatus[Coord1Constrained];
   }
 
+
+  /**
+   * Return bool indicating if 2nd coordinate is Constrained or not. This corresponds to Longitude
+   *   for a Latitudinal solution or Y for a Rectangular solution.
+   *
+   * @return bool indicating if 2nd coordinate is Constrained or not.
+   */
   bool ControlPoint::IsCoord2Constrained() {
     return constraintStatus[Coord2Constrained];
   }
 
+  /**
+   * Return bool indicating if 3rd coordinate is Constrained or not. This corresponds to Radius
+   *   for a Latitudinal solution or Z for a Rectangular solution.
+   *
+   * @return bool indicating if 3rd coordinate is Constrained or not.
+   */
   bool ControlPoint::IsCoord3Constrained() {
     return constraintStatus[Coord3Constrained];
   }
 
+
+  /**
+   * Return bool indicating if point is Constrained or not.
+   *
+   * @return bool indicating if point is Constrained or not.
+   */
   int ControlPoint::NumberOfConstrainedCoordinates() {
     return constraintStatus.count();
   }
@@ -1615,6 +1647,7 @@ namespace Isis {
   QString ControlPoint::GetAprioriRadiusSourceFile() const {
     return aprioriRadiusSourceFile;
   }
+
 
   ControlPoint::SurfacePointSource::Source
   ControlPoint::GetAprioriSurfacePointSource() const {
@@ -1990,6 +2023,10 @@ namespace Isis {
   }
 
 
+  /**
+   * What the heck is the point of this?
+   *
+   */
   void ControlPoint::PointModified() {
     dateTime = "";
   }

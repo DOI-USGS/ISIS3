@@ -44,25 +44,29 @@ namespace Isis {
 
   /**
    * Container class for the sums.
-   * 
+   *
    * @author 2016-09-14 Kris Becker
-   * 
-   * @internal 
+   *
+   * @internal
    *   @history 2016-09-14 Kris Becker - Original Version
    *   @history 2017-02-09 Jesse Mapel - Updated to ignore invalid
-   *                           SpacecraftClockStopCount values.
+   *                            SpacecraftClockStopCount values.
+   *   @history 2018-04-12 Kaitlyn Lee - Added method writeHistory()
+   *                           to add a sumspice entry to
+   *                           m_cube's History blob. Fixes #4972.
+   *
    */
   class SumFinder {
     public:
-      enum Options   { None = 0, Times = 1, Spice = 2, Pointing = 4, 
+      enum Options   { None = 0, Times = 1, Spice = 2, Pointing = 4,
                        Position = 8, Reset = 16};
       enum TimeStamp { Start, Center, Stop };
 
       SumFinder();
       SumFinder(const QString &cubename, const TimeStamp &tstamp = Center);
       SumFinder(const QString &cubename, const SumFileList &sumlist,
-                const double &tolerance = DBL_MAX, 
-                const TimeStamp &tstamp = Center);  
+                const double &tolerance = DBL_MAX,
+                const TimeStamp &tstamp = Center);
       SumFinder(const QString &cubename, const SharedSumFile &sumfile,
                 const TimeStamp &tstamp = Center);
       virtual ~SumFinder();
@@ -97,11 +101,13 @@ namespace Isis {
 
       bool update(const unsigned int options);
 
+      void writeHistory();
+
    protected:
-      virtual bool calculateTimes(Cube &cube, 
-                                  iTime &startTime, 
+      virtual bool calculateTimes(Cube &cube,
+                                  iTime &startTime,
                                   iTime &centerTime,
-                                  iTime &stopTime, 
+                                  iTime &stopTime,
                                   double &exposureTime,
                                   double &exposureDelay);
 
@@ -113,7 +119,7 @@ namespace Isis {
     private:
       QScopedPointer<Cube>    m_cube;
       QScopedPointer<Kernels> m_kernels;
-      QString                 m_cubename; 
+      QString                 m_cubename;
 
       SharedSumFile           m_sumfile;  ///!< Pointer to SumFile if found
       TimeStamp               m_timestamp;
@@ -136,38 +142,38 @@ namespace Isis {
       bool deleteKeyword(const QString &keyword, PvlContainer &keys) const;
       int disableSpice(Pvl &label) const;
 
-      template <class T> 
+      template <class T>
         bool confirmValidity(const T &target, const QString &errmess,
-                             const bool &throwIfInvalid = true) 
+                             const bool &throwIfInvalid = true)
                              const;
   };
 
 
 /**
- * @brief Provides a check of a shared pointer and manage error 
+ * @brief Provides a check of a shared pointer and manage error
  *        condition
- *  
+ *
  *  class T must define an isNull() method that returns true when the container
  *  possesses a valid (pointer) element.
- *  
+ *
  *  This method is designed to take a QSharedPointer, QScopedPointer and
  *  QPointer objects and potentially others that have the isNull() method.
- * 
+ *
  * @param target     Pointer container to check
- * @param errmess    Error message to throw when null and thow 
+ * @param errmess    Error message to throw when null and thow
  *                   is enabled
- * @param throwIfInvalid True if throwing an exception if 
+ * @param throwIfInvalid True if throwing an exception if
  *                       non-valid condition.
- * 
- * @return bool True if container content is valid, false if 
+ *
+ * @return bool True if container content is valid, false if
  *              error
- * 
+ *
  * @author 2016-09-14 Kris Becker
- * 
+ *
  * @internal
  *   @history 2016-09-14 Kris Becker - Original Version
  */
-  template <class T> 
+  template <class T>
      bool SumFinder::confirmValidity(const T &target, const QString &errmess,
                                      const bool &throwIfInvalid) const {
 
