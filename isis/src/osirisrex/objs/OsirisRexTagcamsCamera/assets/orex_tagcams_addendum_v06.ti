@@ -57,7 +57,7 @@ OCAMS - This one is based upon the OCAMS model but requires the OPENCV
 
 OPENCV - A direct implementation of the OPENCV stereo model as produced by
          the stereo calibration OPENCV routines. This is a 10 parameter model
-	 where a single focal length is provided in the API (SIS3 doesn't
+	 where a single focal length is provided in the API (ISIS3 doesn't
 	 support focal lengths for each axis) and the temperature is
 	 provided by the camera model as derived from data stored in 
 	 the label.
