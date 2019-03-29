@@ -501,15 +501,13 @@ namespace Isis {
                                    "pixels");
         }
 
-        if ( controlMeasure.GetSampleResidual() != Isis::Null
-             && controlMeasure.GetSampleResidual() != 0. ) {
+        if ( controlMeasure.GetSampleResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("SampleResidual",
                                    toString(controlMeasure.GetSampleResidual()),
                                    "pixels");
         }
 
-        if ( controlMeasure.GetLineResidual() != Isis::Null
-             && controlMeasure.GetLineResidual() != 0. ) {
+        if ( controlMeasure.GetLineResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
         }
@@ -1675,7 +1673,7 @@ namespace Isis {
          pointByteTotal += writeFirstPoint(&output);
       }
 
-      // // Insert header at the beginning of the file once writing is done.
+      // Insert header at the beginning of the file once writing is done.
       ControlNetFileHeaderV0005 protobufHeader;
 
       protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
