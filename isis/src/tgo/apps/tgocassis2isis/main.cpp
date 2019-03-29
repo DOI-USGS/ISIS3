@@ -335,7 +335,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   PvlKeyword *startTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StartTime"];
   QString startTimeString = startTime[0];
   if (startTimeString.endsWith("Z", Qt::CaseInsensitive)) {
-    startTimeString.chop(2);
+    startTimeString.chop(1);
     startTime->setValue(startTimeString);
   }
 
@@ -343,7 +343,7 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
     PvlKeyword *stopTime = &outputLabel->findGroup("Instrument", Pvl::Traverse)["StopTime"]; 
     QString stopTimeString = stopTime[0];
     if (stopTimeString.endsWith("Z", Qt::CaseInsensitive)){
-      stopTimeString.chop(2);
+      stopTimeString.chop(1);
       stopTime->setValue(stopTimeString);
     }
   }
