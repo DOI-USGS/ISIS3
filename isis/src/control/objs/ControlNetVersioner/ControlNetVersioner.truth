@@ -36,21 +36,25 @@ Object = ControlNetwork
     End_Group
 
     Group = ControlMeasure
-      SerialNumber = M1
-      MeasureType  = Candidate
-      ChooserName  = Unknown
-      DateTime     = 2018-01-09
-      Sample       = 1.0
-      Line         = 1.0
+      SerialNumber   = M1
+      MeasureType    = Candidate
+      ChooserName    = Unknown
+      DateTime       = 2018-01-09
+      Sample         = 1.0
+      Line           = 1.0
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
     End_Group
 
     Group = ControlMeasure
-      SerialNumber = M2
-      MeasureType  = Candidate
-      ChooserName  = Unknown
-      DateTime     = 2018-01-09
-      Sample       = 1.0
-      Line         = 1.0
+      SerialNumber   = M2
+      MeasureType    = Candidate
+      ChooserName    = Unknown
+      DateTime       = 2018-01-09
+      Sample         = 1.0
+      Line           = 1.0
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
     End_Group
   End_Object
 End_Object
@@ -80,31 +84,37 @@ Object = ControlNetwork
     DateTime    = 2018-01-19
 
     Group = ControlMeasure
-      SerialNumber = Cassini-Huygens/ISSNA/1/1467436709.122
-      MeasureType  = RegisteredPixel
-      ChooserName  = Unknown
-      DateTime     = 2018-01-19
-      Sample       = 893.0
-      Line         = 616.0
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467436709.122
+      MeasureType    = RegisteredPixel
+      ChooserName    = Unknown
+      DateTime       = 2018-01-19
+      Sample         = 893.0
+      Line           = 616.0
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
     End_Group
 
     Group = ControlMeasure
-      SerialNumber = Cassini-Huygens/ISSNA/1/1467443189.122
-      MeasureType  = RegisteredPixel
-      ChooserName  = Unknown
-      DateTime     = 2018-01-19
-      Sample       = 799.25
-      Line         = 701.21
-      Reference    = True
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467443189.122
+      MeasureType    = RegisteredPixel
+      ChooserName    = Unknown
+      DateTime       = 2018-01-19
+      Sample         = 799.25
+      Line           = 701.21
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
+      Reference      = True
     End_Group
 
     Group = ControlMeasure
-      SerialNumber = Cassini-Huygens/ISSNA/1/1467454012.125
-      MeasureType  = RegisteredPixel
-      ChooserName  = Unknown
-      DateTime     = 2018-01-19
-      Sample       = 569.01
-      Line         = 807.23
+      SerialNumber   = Cassini-Huygens/ISSNA/1/1467454012.125
+      MeasureType    = RegisteredPixel
+      ChooserName    = Unknown
+      DateTime       = 2018-01-19
+      Sample         = 569.01
+      Line           = 807.23
+      SampleResidual = 0.0 <pixels>
+      LineResidual   = 0.0 <pixels>
     End_Group
   End_Object
 End_Object

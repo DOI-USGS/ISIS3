@@ -304,17 +304,10 @@ namespace Isis {
           if (startTime.text() == "") {
             startTime.setAttribute("xsi:nil", "true");
           }
-          else {
-            QString timeValue = startTime.text();
-            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
-          }
+
           QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
           if (stopTime.text() == "") {
             stopTime.setAttribute("xsi:nil", "true");
-          }
-          else {
-            QString timeValue = stopTime.text();
-            PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
           }
 
           QStringList xmlPath;
