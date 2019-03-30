@@ -330,6 +330,12 @@ xsi:noNamespaceSchemaLocation=
       Added solar illumination mask backplane (SUNILLUMINATIONMASK).
       Originally added to UofA 2018-01-25.
     </change>
+    <change name="UA/OSIRIS-REx IPWG Team" date="2019-03-14">
+      Added SurfaceObliqueDetectorResoluton plane. This one is in addition to the
+      existing ObliqueDetectorResolution. The difference is ObliqueDetectorResolution
+      uses the local emission angle and SurfaceObliqueDetectorResolution uses the
+      emission angle calculated from the ellipsoid.
+    </change>
   </history>
 
   <category>
@@ -423,6 +429,7 @@ xsi:noNamespaceSchemaLocation=
               <item>BODYFIXED</item>
               <item>LOCALTIME</item>
               <item>SUNILLUMINATIONMASK</item>
+              <item>SURFACEOBLIQUEDETECTORRESOLUTION</item>
             </exclusions>
           </option>
         </list>
@@ -887,8 +894,23 @@ xsi:noNamespaceSchemaLocation=
                 the <b>local</b> incidence backplane where the angles are greater
                 than 90 degrees.
             </p>
-	 </description>
+	      </description>
        </parameter>
+       <parameter name="SURFACEOBLIQUEDETECTORRESOLUTION">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>Create the surface oblique detector resolution band</brief>
+        <description>
+          If this parameter is true, the <def>Surface Oblique Detector Resolution</def>
+          will be computed for every pixel and placed in a band in the output cube. This
+          value differs from the Oblique Detector Resolution due to use of the local
+          emission angle for that data. This value is computed using the emission angle
+          computed from the ellipsoid, which will produce a smoother data plane. 
+          The output cube labels will contain "Surface Oblique Detector Resolution"
+          in the BandBin group, in band sequence of the output file.  
+          SurfaceObliqueDetectorResolution is in millimeters.
+        </description>
+      </parameter>
     </group>
   </groups>
 

@@ -1,3 +1,11 @@
+/** This is free and unencumbered software released into the public domain.
+
+The authors of ISIS do not claim copyright on the contents of this file.
+For more details about the LICENSE terms and the AUTHORS, you will
+find files of those names at the top level of this repository. **/
+
+/* SPDX-License-Identifier: CC0-1.0 */
+
 #include "phocube.h"
 
 #include "Angle.h"
@@ -583,7 +591,6 @@ namespace Isis {
                 out[index] = pB[0];
                 index += 64 * 64;
               }
-
               if (bodyFixedY) {
                 out[index] = pB[1];
                 index += 64 * 64;
@@ -592,23 +599,35 @@ namespace Isis {
                 out[index] = pB[2];
                 index += 64 * 64;
               }
+              
+              // Compute the solar illumination mask
+              if ( sunilluminationmask ) {
+                  vector<double> sB(3), pB(3);
+                  cam->sunPosition(&sB[0]);
+                  cam->Coordinate(&pB[0]);
+
+                  // Look direction is the sun position to the surface point
+                  // in body-fixed
+                  vector<double> slookdir(3);
+                  vsub_c(&pB[0], &sB[0], &slookdir[0]);
+
+                  out[index]= (int) cam->target()->shape()->isVisibleFrom(sB, slookdir);
+                  index += 64 * 64;
+              }
+              
+              // Compute surface oblique detector resolution
+              if ( surfaceobliquedetectorresolution ) {
+                  double emission = cam->EmissionAngle() * DEG2RAD;
+                  if ( emission < HALFPI ) {
+                      out[index] = cam->DetectorResolution() / cos(emission);
+                  }
+                  index += 64 * 64;
+              }
             }
+
             if (localSolarTime) {
               out[index] = cam->LocalSolarTime();
               index += 64 * 64;
-            }
-            if ( sunilluminationmask ) {
-                vector<double> sB(3), pB(3);
-                cam->sunPosition(&sB[0]);
-                cam->Coordinate(&pB[0]);
-
-                // Look direction is the sun position to the surface point
-                // in body-fixed
-                vector<double> slookdir(3);
-                vsub_c(&pB[0], &sB[0], &slookdir[0]);
-
-                out[index]= (int) cam->target()->shape()->isVisibleFrom(sB, slookdir);
-                index += 64 * 64;
             }
           }
 
