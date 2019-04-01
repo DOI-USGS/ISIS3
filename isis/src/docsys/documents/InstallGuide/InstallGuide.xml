@@ -544,10 +544,6 @@ is a popular choice and may be downloaded below.
     <categoryItem>technicaldoc</categoryItem>
   </category>
 
-  <audience>
-    <target>administrator</target>
-  </audience>
-
   <history>
     <change name="Kristin Berry" date="2018-08-28">Original Version</change>
     <change name ="Tyler Wilson along with the ASC Development Team" date="2018-09-26">Updated version to incorporate installation through Conda</change>

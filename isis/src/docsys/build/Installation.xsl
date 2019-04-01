@@ -104,7 +104,7 @@ Deborah Lee Soltesz
         </table>
 
       <p>
-      See the <a href="../documents/InstallGuide/index.html">ISIS 3 Installation Guide</a>
+      See the <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">ISIS 3 Installation Guide</a>
       for instructions on downloading and installing ISIS 3.
       </p>
 
