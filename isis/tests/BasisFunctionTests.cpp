@@ -16,7 +16,7 @@ TEST(BasisFunction, Initialization)
 TEST(BasisFunction, Evaluation)
 {
   Isis::BasisFunction testBasis("basis", 3, 3);
-  double expectedOutput = 2.5*3.0 + 3.2 + 2.0;
+  double expectedOutput = 12.7;
   double output;
   std::vector <double> vars;
   std::vector <double> coefs;
@@ -37,7 +37,7 @@ TEST(BasisFunction, Evaluation)
   vars[1] = 1.2;
   vars[2] = 10.8;
 
-  expectedOutput = 2.5 * 3.5 + 3.2 * 1.2 + 10.8;
+  expectedOutput = 23.39;
   output = testBasis.Evaluate(vars);
   EXPECT_DOUBLE_EQ(output, expectedOutput);
 }
@@ -131,7 +131,7 @@ TEST(BasisFunction, NonVectorVariable)
 {
   Isis::BasisFunction testBasis("basis", 1, 1);
   double var = 1.2;
-  double expectedOutput = 1.2 * 2.5;
+  double expectedOutput = 3.0;
   double output;
   std::vector <double> coefs;
 
