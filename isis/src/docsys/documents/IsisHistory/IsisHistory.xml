@@ -471,9 +471,7 @@
       or two.  Experience suggests that this pace strikes the right balance 
       between stability and timely improvements to ISIS 3.  It should be noted 
       that the data ISIS uses (e.g., SPICE) are frequently updated and small 
-      patches are sometimes put out in between the scheduled releases.  The 
-      latest version of ISIS 3 can be found here 
-      <a href="http://isis.astrogeology.usgs.gov/documents/InstallGuide/index.html">ISIS 3</a>.  
+      patches are sometimes put out in between the scheduled releases.  
       </p>
 
       </body>
@@ -510,5 +508,6 @@
     <change date="2003-04-02" name="Kimberly Sides">Photographs of computer systems, scans of historical photographs</change>
     <change date="2003-04-07" name="Deborah Lee Soltesz">Dressed up formatting, embedded images</change>
     <change date="2013-11-22" name="Ella Mae Lee">Removed Current Events and updated History sections</change>
+    <change date="2019-03-29" name="Adam Paquette">Removed link to Isis install page</change>
   </history>
 </documentation>

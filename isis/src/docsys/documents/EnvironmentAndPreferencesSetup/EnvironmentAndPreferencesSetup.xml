@@ -16,7 +16,7 @@
 
         <p>
           Assuming ISIS 3 has been successful installed on your computer (see
-          <a href="../InstallGuide/index.html">ISIS Download and Installation Guide</a>),
+          <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">ISIS Download and Installation Guide</a>),
           you will need to add a few commands to your startup file.  For the
           C-shell, add the following commands to the $HOME/.login file or the equivalent system-wide
           startup file:

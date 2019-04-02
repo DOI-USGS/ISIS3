@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="trackextract" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Removes the tracking band from a mosaic and places it into a new tracking cube.
+  </brief>
+
+  <description>
+    <p>
+      Updates a mosaic cube with tracking information that was created using older versions of ISIS
+      (prior to 3.6.0) to be up to date with ISIS version 3.6.0 and above. Removes the tracking
+      band and the InputImages table from the input mosaic cube and places them into a separate
+      tracking cube. A reference to the tracking cube is then added to the mosaic label. In the
+      copying process, if a pixel in the tracking band of the input mosaic is not associated with
+      any of the original input images, a NULL value is written to that pixel in the tracking cube.
+      The mosaic cube's bit type remains the same, but the tracking cube's bit type will always be
+      unsigned integer. 
+    </p>
+    <p>
+      <b>Please Note: This application only works for 32-bit ("Real") mosaics as both 8-bit and
+      16-bit mosaics created prior to ISIS version 3.6.0 are considered to be corrupted.</b>
+    </p>
+    
+  </description>
+
+  <category>
+    <categoryItem>Utility</categoryItem>
+  </category>
+
+  <history>
+    <change name="Kaitlyn Lee" date="2018-07-20">
+      Original version
+    </change>
+    <change name="Summer Stapleton" date="2018-09-06">
+      Updated code to throw user error if input mosaic is anything other than 32-bit ("Real") as
+      it has been decided that 8-bit and 16-bit mosaics are corrupted. Updated documentation for
+      this. Also fixed the NULL value being written to the tracking cube as LRS was originally
+      being written instead.
+    </change>
+    <change name="Kaitlyn Lee" date="2018-10-16">
+      Removed FLOAT_MAX because it was not being used in the code and was causing build warnings 
+      on MacOS 10.13. References #5520.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube with tracking band
+        </brief>
+        <description>
+          The mosaic created prior to ISIS version 3.6.0 that contains the tracking band
+          and InputImages table to be extracted. <b>Please Note: This mosaic cube must be of
+          bit-type "Real" as both 8-bit and 16-bit mosaics created before ISIS version 3.6.0 are
+          considered to be corrupted.</b>
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output mosaic and tracking cube
+        </brief>
+        <description>
+          The output mosaic cube name that will be up to date with isis version 3.6.0 and above. 
+          This cube will no longer have the tracking band or the InputImages table, but a tracking
+          cube will be created in the same location with this information. This tracking cube will
+          have the same base name as the mosaic, but will end in "_tracking.cub".
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

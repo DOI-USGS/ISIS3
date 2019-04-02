@@ -319,6 +319,7 @@ namespace Isis {
 
         if ( aprioriCovarianceMatrix.size1() > 0 ) {
 
+          // Matrix units are meters squared
           PvlKeyword matrix("AprioriCovarianceMatrix");
           matrix += toString(aprioriCovarianceMatrix(0, 0));
           matrix += toString(aprioriCovarianceMatrix(0, 1));
@@ -327,6 +328,8 @@ namespace Isis {
           matrix += toString(aprioriCovarianceMatrix(1, 2));
           matrix += toString(aprioriCovarianceMatrix(2, 2));
 
+          // *** TODO *** What do we do in the case of bundled in rectangular coordinates?
+          // For now we do nothing.
           if ( aprioriSurfacePoint.GetLatSigmaDistance().meters() != Isis::Null
                && aprioriSurfacePoint.GetLonSigmaDistance().meters() != Isis::Null
                && aprioriSurfacePoint.GetLocalRadiusSigma().meters() != Isis::Null ) {
@@ -354,15 +357,17 @@ namespace Isis {
         }
       }
 
-      if ( controlPoint->IsLatitudeConstrained() ) {
+      // Deal with the generalization here.  *** TODO ***
+      // Once we have a coordinate type in the header, we should specify the correct coordinate
+      if ( controlPoint->IsCoord1Constrained() ) {
         pvlPoint += PvlKeyword("LatitudeConstrained", "True");
       }
 
-      if ( controlPoint->IsLongitudeConstrained() ) {
+      if ( controlPoint->IsCoord2Constrained() ) {
         pvlPoint += PvlKeyword("LongitudeConstrained", "True");
       }
 
-      if ( controlPoint->IsRadiusConstrained() ) {
+      if ( controlPoint->IsCoord2Constrained() ) {
         pvlPoint += PvlKeyword("RadiusConstrained", "True");
       }
 
@@ -496,15 +501,13 @@ namespace Isis {
                                    "pixels");
         }
 
-        if ( controlMeasure.GetSampleResidual() != Isis::Null
-             && controlMeasure.GetSampleResidual() != 0. ) {
+        if ( controlMeasure.GetSampleResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("SampleResidual",
                                    toString(controlMeasure.GetSampleResidual()),
                                    "pixels");
         }
 
-        if ( controlMeasure.GetLineResidual() != Isis::Null
-             && controlMeasure.GetLineResidual() != 0. ) {
+        if ( controlMeasure.GetLineResidual() != Isis::Null ) {
           pvlMeasure += PvlKeyword("LineResidual", toString(controlMeasure.GetLineResidual()),
                                    "pixels");
         }
@@ -1670,7 +1673,7 @@ namespace Isis {
          pointByteTotal += writeFirstPoint(&output);
       }
 
-      // // Insert header at the beginning of the file once writing is done.
+      // Insert header at the beginning of the file once writing is done.
       ControlNetFileHeaderV0005 protobufHeader;
 
       protobufHeader.set_networkid(m_header.networkID.toLatin1().data());
@@ -1798,10 +1801,7 @@ namespace Isis {
           pointType = ControlPointFileEntryV0002_PointType_Fixed;
           break;
         default:
-          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str())
-                        + "] from file. Type enumeration ["
-                        + toString((int)(controlPoint->GetType())) + "] is invalid.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+          pointType = ControlPointFileEntryV0002_PointType_Free;
           break;
       }
       protoPoint.set_type(pointType);
@@ -1847,11 +1847,7 @@ namespace Isis {
                            ControlPointFileEntryV0002_AprioriSource_BundleSolution);
           break;
         default:
-          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str())
-                        + "] from file. Type enumeration ["
-                        + toString((int)(controlPoint->GetAprioriSurfacePointSource()))
-                        + "] is invalid.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+          protoPoint.set_apriorisurfpointsource(ControlPointFileEntryV0002_AprioriSource_None);
           break;
       }
 
@@ -1878,11 +1874,7 @@ namespace Isis {
           protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_DEM);
           break;
         default:
-          QString msg = "Unable to create ProtoPoint [" + toString(protoPoint.id().c_str())
-                        + "] from file. Type enumeration ["
-                        + toString((int)(controlPoint->GetAprioriRadiusSource()))
-                        + "] is invalid.";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+          protoPoint.set_aprioriradiussource(ControlPointFileEntryV0002_AprioriSource_None);
           break;
       }
 
@@ -1913,14 +1905,15 @@ namespace Isis {
         }
       }
       // this might be redundant... determined by covariance matrix???
-      if ( controlPoint->IsLatitudeConstrained() ) {
-        protoPoint.set_latitudeconstrained(controlPoint->IsLatitudeConstrained());
+      // *** TODO *** Address the generalized coordinates and the constraint differences
+      if ( controlPoint->IsCoord1Constrained() ) {
+        protoPoint.set_latitudeconstrained(controlPoint->IsCoord1Constrained());
       }
-      if ( controlPoint->IsLongitudeConstrained() ) {
-        protoPoint.set_longitudeconstrained(controlPoint->IsLongitudeConstrained());
+      if ( controlPoint->IsCoord2Constrained() ) {
+        protoPoint.set_longitudeconstrained(controlPoint->IsCoord2Constrained());
       }
-      if ( controlPoint->IsRadiusConstrained() ) {
-        protoPoint.set_radiusconstrained(controlPoint->IsRadiusConstrained());
+      if ( controlPoint->IsCoord3Constrained() ) {
+        protoPoint.set_radiusconstrained(controlPoint->IsCoord3Constrained());
       }
 
       SurfacePoint adjustedSurfacePoint = controlPoint->GetAdjustedSurfacePoint();

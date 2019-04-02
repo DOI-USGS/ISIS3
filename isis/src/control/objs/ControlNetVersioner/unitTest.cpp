@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 
   // No target                                                  
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork2_PvlV0001.net", 
-              testProgress);               
+              testProgress, false); // no print network here because the datetimes will change
 
   // Really odd keywords with target                            
   TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork3_PvlV0001.net", 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
               false);    
 
   // Network with rejected jigsaw points                        
-  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork4_PvlV0003.pvl", 
+  TestNetwork("$control/testData/unitTest_ControlNetVersioner_PvlNetwork8_PvlV0005.pvl", 
               testProgress, 
               true, 
               true);   

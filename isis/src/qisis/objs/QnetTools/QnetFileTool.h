@@ -24,6 +24,7 @@
  */
 
 #include "FileTool.h"
+#include <QCloseEvent>
 
 class QString;
 class QWidget;
@@ -71,14 +72,21 @@ namespace Isis {
    *                           signals.
    *   @history 2011-07-07 Tracie Sucharski - Disable Open Ground and Open Dem
    *                           until list & net open.
-   *   @history 2011-11-01 Tracie Sucharski - Added save slot. 
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2011-11-01 Tracie Sucharski - Added save slot.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards. References #972.
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets
    *                           #775 and #1114.
    *   @history 2016-04-22 Jeannie Backer - Modified to use cube labels to set
    *                           ControlNet's target instead of the TargetName.
    *                           References #3892
+   *  @history 2018-04-24 Adam Goins - Added QCloseEvent optional parameter to slot "exit()" to
+   *                          set the CloseEvent triggered by an onwindowclose
+   *                          to ignore the event if the 'cancel' option was selected
+   *                          after clicking the close button of the viewport window.
+   *                          This fixes an issue where clicking the close button and then clicking
+   *                          'cancel' from the QMessageBox would close the window but keep the
+   *                          application running. Fixes #4146.
    *
    */
 
@@ -103,7 +111,7 @@ namespace Isis {
 
     public slots:
       virtual void open();
-      virtual void exit();
+      virtual void exit(QCloseEvent *event = NULL);
       virtual void save();
       virtual void saveAs();
       void loadPointImages(ControlPoint *point);

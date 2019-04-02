@@ -108,6 +108,8 @@ namespace Isis {
    *                           coding standards. Added padding to control
    *                           statements. References #1169.
    *   @history 2017-08-30 Summer Stapleton - Updated documentation. References #4807.
+   *   @history 2018-07-20 Tyler Wilson - Overloaded the int2Double function so it can handle
+   *                       special pixel types for 4-byte unsigned integers.  References #971.
    */
   class Blobber {
     public:
@@ -262,6 +264,7 @@ namespace Isis {
 //  Low/level I/O and conversion methods
       void loadDouble(Table &tbl);
       void loadInteger(Table &tbl);
+      double int2ToDouble(unsigned int value) const;
       double int2ToDouble(int value) const;
   };
 };

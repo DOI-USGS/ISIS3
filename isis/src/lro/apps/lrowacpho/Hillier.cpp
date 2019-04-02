@@ -59,12 +59,12 @@ namespace Isis {
      */
     double Hillier::photometry ( double i, double e, double g, int band ) const {
         // Test for valid band
-        if ((band <= 0) || (band > (int) _bandpho.size())) {
+        if ((band <= 0) || (band > (int) m_bandpho.size())) {
             std::string mess = "Provided band " + IString(band) + " out of range.";
             throw IException(IException::Programmer, mess, _FILEINFO_);
         }
-        double ph = photometry(_bandpho[band - 1], i, e, g);
-        return (_bandpho[band - 1].phoStd / ph);
+        double ph = photometry(m_bandpho[band - 1], i, e, g);
+        return (m_bandpho[band - 1].phoStd / ph);
     }
 
     /**
@@ -120,7 +120,7 @@ namespace Isis {
      *
      * @param pvl Output PVL container write keywords
      */
-    void Hillier::Report ( PvlContainer &pvl ) {
+    void Hillier::report ( PvlContainer &pvl ) {
         pvl.addComment("I/F = mu0/(mu0+mu) * F(phase)");
                 pvl.addComment(" where:");
                 pvl.addComment("  mu0 = cos(incidence)");
@@ -128,9 +128,9 @@ namespace Isis {
                 pvl.addComment("  F(phase) = B0*exp(-B1*phase) + A0 + A1*phase + A2*phase^2 + A3*phase^3 + A4*phase^4");
 
                 pvl += PvlKeyword("Algorithm", "Hillier");
-                pvl += PvlKeyword("IncRef", toString(_iRef), "degrees");
-                pvl += PvlKeyword("EmaRef", toString(_eRef), "degrees");
-                pvl += PvlKeyword("PhaRef", toString(_gRef), "degrees");
+                pvl += PvlKeyword("IncRef", toString(m_iRef), "degrees");
+                pvl += PvlKeyword("EmaRef", toString(m_eRef), "degrees");
+                pvl += PvlKeyword("PhaRef", toString(m_gRef), "degrees");
                 PvlKeyword units("HillierUnits");
                 PvlKeyword phostd("PhotometricStandard");
                 PvlKeyword bbc("BandBinCenter");
@@ -143,8 +143,8 @@ namespace Isis {
                 PvlKeyword a2("A2");
                 PvlKeyword a3("A3");
                 PvlKeyword a4("A4");
-                for (unsigned int i = 0; i < _bandpho.size(); i++) {
-                    Parameters &p = _bandpho[i];
+                for (unsigned int i = 0; i < m_bandpho.size(); i++) {
+                    Parameters &p = m_bandpho[i];
                     units.addValue(p.units);
                     phostd.addValue(toString(p.phoStd));
                     bbc.addValue(toString(p.wavelength));
@@ -193,8 +193,8 @@ namespace Isis {
              *         not found, a value of iProfile = -1 is returned.
              */
             Hillier::Parameters Hillier::findParameters ( const double wavelength ) const {
-                for (unsigned int i = 0; i < _profiles.size(); i++) {
-                    const DbProfile &p = _profiles[i];
+                for (unsigned int i = 0; i < m_profiles.size(); i++) {
+                    const DbProfile &p = m_profiles[i];
                     if (p.exists("BandBinCenter")) {
                         double p_center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
                         double tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(1.0E-6)));
@@ -258,21 +258,21 @@ namespace Isis {
              */
             void Hillier::init ( PvlObject &pvl, Cube &cube ) {
                 //  Make it reentrant
-                _profiles.clear();
-                _bandpho.clear();
+                m_profiles.clear();
+                m_bandpho.clear();
 
                 //  Interate over all Photometric groups
-                _normProf = DbProfile(pvl.findObject("NormalizationModel").findGroup("Algorithm", Pvl::Traverse));
-                _iRef = toDouble(ConfKey(_normProf, "IncRef", toString(30.0)));
-                _eRef = toDouble(ConfKey(_normProf, "EmaRef", toString(0.0)));
-                _gRef = toDouble(ConfKey(_normProf, "PhaRef", toString(_iRef)));
+                m_normProf = DbProfile(pvl.findObject("NormalizationModel").findGroup("Algorithm", Pvl::Traverse));
+                m_iRef = toDouble(ConfKey(m_normProf, "IncRef", toString(30.0)));
+                m_eRef = toDouble(ConfKey(m_normProf, "EmaRef", toString(0.0)));
+                m_gRef = toDouble(ConfKey(m_normProf, "PhaRef", toString(m_iRef)));
 
                 PvlObject &phoObj = pvl.findObject("PhotometricModel");
                 DbProfile phoProf = DbProfile(phoObj);
                 PvlObject::PvlGroupIterator algo = phoObj.beginGroup();
                 while (algo != phoObj.endGroup()) {
                     if (algo->name().toLower() == "algorithm") {
-                        _profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
+                        m_profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
                     }
                     ++algo;
                 }
@@ -285,8 +285,8 @@ namespace Isis {
                     if (parms.IsValid()) {
                         parms.band = i + 1;
                         //_camera->SetBand(i + 1);
-                        parms.phoStd = photometry(parms, _iRef, _eRef, _gRef);
-                        _bandpho.push_back(parms);
+                        parms.phoStd = photometry(parms, m_iRef, m_eRef, m_gRef);
+                        m_bandpho.push_back(parms);
                     }
                     else { // Appropriate photometric parameters not found
                         ostringstream mess;
@@ -307,5 +307,3 @@ namespace Isis {
             }
 
         } // namespace Isis
-
-

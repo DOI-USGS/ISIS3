@@ -1,0 +1,48 @@
+Unit test for TrackingTable
+
+
+Testing default constructor ...
+Record added: fileName1.cub, 1
+
+Testing constructor with a Table object ...
+Constructing Table ...
+First record : fileName1.cub, 1234567890
+Second record: fileName2.cub, 123
+Third record : fileName3.dat, 456789
+TrackingTable object created
+
+Testing the pixelToFileName method ...
+FileName with pixel value 2: FileName with pixel value 2 does not exist and an exception is thrown.
+**PROGRAMMER ERROR** Cannot convert pixel [2] to a filename, pixel is below valid minimum [3].
+FileName with pixel value 3: fileName1.cub
+FileName with pixel value 4: fileName2.cub
+FileName with pixel value 5: fileName3.dat
+FileName with pixel value 6: FileName with pixel value 6 does not exist and an exception is thrown.
+**PROGRAMMER ERROR** Cannot convert pixel [6] to a filename, pixel is above valid maximum [6].
+
+Testing the fileNameToPixel method ...
+Pixel value of FileName fileName1.cub: 3
+Pixel value of FileName fileName2.cub: 4
+Pixel value of FileName fileName3.cub: 5
+Pixel value of the non-existent FileName fileName4.cub (demonstrating its addition): 6
+
+Testing the toTable method ...
+First record : fileName1.cub, 1234567890, 3
+Second record: fileName2.cub, 123, 4
+Third record : fileName3.dat, 456789, 5
+Fourth record: fileName4.cub, 12345678901234567890, 6
+
+Creating a new TrackingTable object with the table returned from toTable method ...
+New TrackingTable object created
+
+Verifying that the pixel values are the same ...
+Pixel value of FileName fileName1.cub: 3
+Pixel value of FileName fileName2.cub: 4
+Pixel value of FileName fileName3.cub: 5
+Pixel value of FileName fileName4.cub: 6
+
+Testing that the Table returned from toTable on new TrackingTable matches ...
+First record : fileName1.cub, 1234567890, 3
+Second record: fileName2.cub, 123, 4
+Third record : fileName3.dat, 456789, 5
+Fourth record: fileName4.cub, 12345678901234567890, 6

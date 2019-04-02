@@ -471,16 +471,16 @@ namespace Isis {
     m_ui->maximumIterationsLineEdit->setText(toString(settings->convergenceCriteriaMaximumIterations()));
 
     // weighting tab
-    if ( !IsNullPixel(settings->globalLatitudeAprioriSigma()) ) {
-      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalLatitudeAprioriSigma()));
+    if ( !IsNullPixel(settings->globalPointCoord1AprioriSigma()) ) {
+      m_ui->pointLatitudeSigmaLineEdit->setText(toString(settings->globalPointCoord1AprioriSigma()));
       m_ui->pointLatitudeSigmaLineEdit->setModified(true);
     }
-    if ( !IsNullPixel(settings->globalLongitudeAprioriSigma()) ) {
-      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalLongitudeAprioriSigma()));
+    if ( !IsNullPixel(settings->globalPointCoord2AprioriSigma()) ) {
+      m_ui->pointLongitudeSigmaLineEdit->setText(toString(settings->globalPointCoord2AprioriSigma()));
       m_ui->pointLongitudeSigmaLineEdit->setModified(true);
     }
-    if ( !IsNullPixel(settings->globalRadiusAprioriSigma()) ) {
-      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalRadiusAprioriSigma()));
+    if ( !IsNullPixel(settings->globalPointCoord3AprioriSigma()) ) {
+      m_ui->pointRadiusSigmaLineEdit->setText(toString(settings->globalPointCoord3AprioriSigma()));
       m_ui->pointRadiusSigmaLineEdit->setModified(true);
 
     }
@@ -529,11 +529,14 @@ namespace Isis {
     if (m_ui->pointRadiusSigmaLineEdit->isModified()) {
       radiusSigma = m_ui->pointRadiusSigmaLineEdit->text().toDouble();
     }
+    // Stick with the default coordinate types for the bundle and reports until
+    // a gui is added to get the settings
     settings->setSolveOptions(m_ui->observationModeCheckBox->isChecked(),
                               false,
                               // m_ui->updateCubeLabelCheckBox->isChecked(),
                               m_ui->errorPropagationCheckBox->isChecked(),
                               m_ui->pointRadiusSigmaCheckBox->isChecked(),
+                              SurfacePoint::Latitudinal, SurfacePoint::Latitudinal,
                               latitudeSigma,
                               longitudeSigma,
                               radiusSigma);

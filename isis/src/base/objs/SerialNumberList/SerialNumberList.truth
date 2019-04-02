@@ -75,8 +75,7 @@ Possible SerialNumbers for Observation Number: Unknown
 
 
 Creating SerialNumberList(QString, bool, Progress)
-Creating Isis 3 serial numbers from list file.
-0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed1
+1
   FileName from index                  = ab102401.cub
   FileName from SerialNumber           = ab102401.cub
   FileName index from FileName         = 0

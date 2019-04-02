@@ -1,26 +1,26 @@
-/**                                                                       
- * @file                                                                  
+/**
+ * @file
  * $Revision: 6565 $
  * $Date: 2016-02-10 17:15:35 -0700 (Wed, 10 Feb 2016) $
  * $Id: SumFile.cpp 6565 2016-02-11 00:15:35Z kbecker@GS.DOI.NET $
- * 
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */ 
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 #include "SumFinder.h"
 
@@ -44,6 +44,8 @@
 #include "Kernels.h"
 #include "NaifStatus.h"
 #include "Progress.h"
+#include "History.h"
+#include "Application.h"
 
 
 using namespace std;
@@ -52,28 +54,28 @@ namespace Isis {
 
 
   SumFinder::SumFinder() : m_cube(), m_kernels(), m_cubename(),
-                           m_sumfile(), m_timestamp(Center), m_sumtime(), 
+                           m_sumfile(), m_timestamp(Center), m_sumtime(),
                            m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
-                           m_cubeExposureTime(0), m_exposureDelay(0.0), 
+                           m_cubeExposureTime(0), m_exposureDelay(0.0),
                            m_timeDiff(0.0), m_closest(DBL_MAX) {
   }
 
   SumFinder::SumFinder(const QString &cubename, const TimeStamp &tstamp) :
-                       m_cube(), m_kernels(), m_cubename(), 
-                       m_sumfile(), m_timestamp(tstamp), m_sumtime(), 
-                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(), 
-                       m_cubeExposureTime(0), m_exposureDelay(0.0), 
+                       m_cube(), m_kernels(), m_cubename(),
+                       m_sumfile(), m_timestamp(tstamp), m_sumtime(),
+                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
+                       m_cubeExposureTime(0), m_exposureDelay(0.0),
                        m_timeDiff(0.0), m_closest(DBL_MAX) {
 
     setCube(cubename);
   }
 
   SumFinder::SumFinder(const QString &cubename, const SumFileList &sumlist,
-                       const double &tolerance, const TimeStamp &tstamp) : 
-                       m_cube(), m_kernels(), m_cubename(cubename), 
+                       const double &tolerance, const TimeStamp &tstamp) :
+                       m_cube(), m_kernels(), m_cubename(cubename),
                        m_sumfile(), m_timestamp(tstamp), m_sumtime(),
                        m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
-                       m_cubeExposureTime(0), m_exposureDelay(0.0), 
+                       m_cubeExposureTime(0), m_exposureDelay(0.0),
                        m_timeDiff(0.0), m_closest(DBL_MAX) {
 
     setCube(cubename);
@@ -81,11 +83,11 @@ namespace Isis {
   }
 
   SumFinder::SumFinder(const QString &cubename, const SharedSumFile &sumfile,
-                       const TimeStamp &tstamp) : 
-                       m_cube(), m_kernels(), m_cubename(cubename), 
-                       m_sumfile(sumfile), m_timestamp(tstamp), m_sumtime(), 
-                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),  
-                       m_cubeExposureTime(0), m_exposureDelay(0.0), 
+                       const TimeStamp &tstamp) :
+                       m_cube(), m_kernels(), m_cubename(cubename),
+                       m_sumfile(sumfile), m_timestamp(tstamp), m_sumtime(),
+                       m_cubeStartTime(), m_cubeCenterTime(), m_cubeStopTime(),
+                       m_cubeExposureTime(0), m_exposureDelay(0.0),
                        m_timeDiff(0.0), m_closest(DBL_MAX) {
 
     setCube(cubename);
@@ -102,7 +104,7 @@ namespace Isis {
 
   bool SumFinder::isValid() const {
     if ( m_cubename.isEmpty() ) { return ( false ); }
-    return ( isFound() ); 
+    return ( isFound() );
   }
 
   bool SumFinder::isFound() const {
@@ -184,7 +186,7 @@ namespace Isis {
     if ( Stop   == m_timestamp ) { return ( m_cubeStopTime );  }
     return ( m_cubeCenterTime );
   }
- 
+
 
   double SumFinder::deltaT() const {
     return ( m_timeDiff );
@@ -198,8 +200,8 @@ namespace Isis {
 
     // Always close out the kernels and cubes.
     m_kernels.reset();
-    m_cube.reset(); 
-     
+    m_cube.reset();
+
     // Empty string clears cube from state
     if ( name.isEmpty() ) {   return;  }
 
@@ -210,7 +212,7 @@ namespace Isis {
     m_kernels.reset( new Kernels(*m_cube) );
     m_kernels->Load();
 
-    calculateTimes(*m_cube, m_cubeStartTime, m_cubeCenterTime, m_cubeStopTime, 
+    calculateTimes(*m_cube, m_cubeStartTime, m_cubeCenterTime, m_cubeStopTime,
                    m_cubeExposureTime, m_exposureDelay);
     return;
   }
@@ -226,17 +228,17 @@ namespace Isis {
 
   /**
    * @brief Find SUMFILE for the given cube file
-    *  
-   * This method will find the appropriate SUMFILE associated with a Cube object 
-   * given a list of SumFile objects. The time the image was observed is compared 
-   * to the time of a SUMFILE. The SumFile that matches the cube is the one with 
-   * the time closest to the Cube observation time. 
-   * 
+    *
+   * This method will find the appropriate SUMFILE associated with a Cube object
+   * given a list of SumFile objects. The time the image was observed is compared
+   * to the time of a SUMFILE. The SumFile that matches the cube is the one with
+   * the time closest to the Cube observation time.
+   *
    * @param Cube       Cube object to find a SumFile for.
    * @param sumFiles   List of SharedSumFile objects to search, sorted in ascending order.
-   * @param deltaT     Maximum time difference in ISIS cube file time and 
+   * @param deltaT     Maximum time difference in ISIS cube file time and
    *                   SumFile time.
-   * 
+   *
    * @return SharedSumFile Pointer to SumFile for ISIS cube
    */
   bool SumFinder::seek(const SumFileList &sumFiles, const double &tolerance ) {
@@ -253,7 +255,7 @@ namespace Isis {
 
     // Otherwise, find the sum file with start ET closest to the
     // cube's ET Note that the sum files are already sorted by ET...
-    for ( int index = 0 ; index < sumFiles.size() ; index++) {
+    for (int index = 0 ; index < sumFiles.size() ; index++) {
       double tdiff = fabs( sumFiles[index]->et() - timeT().Et() );
       m_closest = qMin( m_closest, tdiff );  // Only done here
       if ( tdiff <= tolerance ) {
@@ -262,7 +264,7 @@ namespace Isis {
         }
       }
     }
-    
+
     // Return results
     return ( isFound() );
   }
@@ -282,21 +284,21 @@ namespace Isis {
 
 
 /**
- * @brief Calculate start, end and exposure time from an ISIS Cube file  
- * 
+ * @brief Calculate start, end and exposure time from an ISIS Cube file
+ *
  * @author 2016-07-26 Kris Becker
- * 
+ *
  * @param cube         Cube to extract times from
  * @param startTime    Start time of observation
  * @param stopTime     Stop time of observation
  * @param exposureTime Exposure time of observation
- * 
+ *
  * @return @b bool True if successful, false if failed
  */
-  bool SumFinder::calculateTimes(Cube &cube, 
-                                 iTime &startTime, 
+  bool SumFinder::calculateTimes(Cube &cube,
+                                 iTime &startTime,
                                  iTime &centerTime,
-                                 iTime &stopTime, 
+                                 iTime &stopTime,
                                  double &exposureTime,
                                  double &exposureDelay) {
 
@@ -306,7 +308,7 @@ namespace Isis {
     double stopDelay = stopExposureDelay(cube);
 
     // Exposure and center time is determined. (Assumes its a framing camera!)
-    exposureTime  = getExposureTime(cube);
+    exposureTime = getExposureTime(cube);
     centerTime = cube.camera()->time();
 
 
@@ -315,7 +317,7 @@ namespace Isis {
     PvlGroup &instGrp = cubeLabels->findGroup("Instrument", Pvl::Traverse);
 
     // Compute real start time. We are going to trust the SCLK values in the
-    // label 
+    // label
     startTime = centerTime - (exposureTime / 2.0 );
     if ( instGrp.hasKeyword("SpacecraftClockStartCount") ) {
       PvlKeyword startSClock = instGrp["SpacecraftClockStartCount"];
@@ -341,12 +343,12 @@ namespace Isis {
 
 
 /**
- * @brief Get the exposure time from the Cube label 
- * 
+ * @brief Get the exposure time from the Cube label
+ *
  * @author 2016-08-23 Kris Becker
- * 
+ *
  * @param cube   Cube to extract expousure time from
- * 
+ *
  * @return double Provides the expousure time in seconds
  */
   double SumFinder::getExposureTime(const Cube &cube) const {
@@ -355,7 +357,7 @@ namespace Isis {
     PvlGroup &instGrp = cubeLabels->findGroup("Instrument", Pvl::Traverse);
     PvlKeyword exptime = instGrp["ExposureDuration"];
     QString units = exptime.unit(0).toLower();
-    double etime(toDouble(exptime[0]));
+    double etime = toDouble(exptime[0]);
 
     // Convert to seconds if indicated
     if ( "milliseconds" == units) etime /= 1000.0;
@@ -369,18 +371,18 @@ namespace Isis {
 
 /**
  * @brief Update requested items based upon bit mask of options
- * 
+ *
  * @author 2016-07-26 Kris Becker
- * 
+ *
  * @param options Bit mask of processing Options
- * 
- * @return bool   True if all operations were successful, false 
+ *
+ * @return bool   True if all operations were successful, false
  *                if a failure occured
  */
   bool SumFinder::update(const unsigned int options)  {
     confirmValidity(m_cube,"Valid Cube (and SUMFILE) required for updates!");
 
-    bool good(true);
+    bool good = true;
 
     // Reset timing to original times just needs a cube file.
     if ( options & Reset) {
@@ -409,32 +411,31 @@ namespace Isis {
       }
     }
 
-
     return (good);
   }
 
 /**
  * @brief Determine delay at start time to beginning of exposure
- *  
- * This method determines the delay from the start time to the begining of the 
- * exposure if it exists. This is not typically but is usually determined in the 
- * camera model. 
- *  
+ *
+ * This method determines the delay from the start time to the begining of the
+ * exposure if it exists. This is not typically but is usually determined in the
+ * camera model.
+ *
  * @author 2016-09-13 Kris Becker
- * 
+ *
  * @param cube  ISIS image cube to determine delay
- * 
+ *
  * @return double Returns the exposure start time delay in seconds if exists
  */
   double SumFinder::startExposureDelay(const Cube &cube) const {
-    
+
     Pvl *cubeLabel = cube.label();
     PvlGroup &instGrp = cubeLabel->findGroup("Instrument", Pvl::Traverse);
 
     QString scname = instGrp["SpacecraftName"];
     if ( scname.toLower() != "dawn" ) { return (0.0); }
 
-    QString instname = instGrp["InstrumentId"]; 
+    QString instname = instGrp["InstrumentId"];
     if ( instname.toLower() == "fc1") { return (0.193); }
     if ( instname.toLower() == "fc2") { return (0.193); }
 
@@ -449,13 +450,13 @@ namespace Isis {
 
 
 /**
- * @brief Update start/end times in the label of an ISIS cube 
- *  
- * This method will update the start and end times in the label of an ISIS cube 
- * file with the contents of the SUMSPICE. The contents of the 
- * SpacecraftStartClockTime/SpacecraftEndClockTimes with the contents the lines 
- * of the UTC contained in the SUMFILE 
- * 
+ * @brief Update start/end times in the label of an ISIS cube
+ *
+ * This method will update the start and end times in the label of an ISIS cube
+ * file with the contents of the SUMSPICE. The contents of the
+ * SpacecraftStartClockTime/SpacecraftEndClockTimes with the contents the lines
+ * of the UTC contained in the SUMFILE
+ *
  * @param cube    An intialized ISIS Cube object
  * @return bool   True if succesful, false if the operation fails
  */
@@ -470,7 +471,7 @@ namespace Isis {
     PvlGroup &instGrp = cubeLabel->findGroup("Instrument", Pvl::Traverse);
     PvlGroup sumtime("SumTimeHistory");
     PvlGroup *sumtPtr = &sumtime;
-    bool addSumGroup(true);  // Assume the object doesn't exist!
+    bool addSumGroup = true;  // Assume the object doesn't exist!
 
     // Some monkey business for Sumtime history object (see below)
     PvlObject &isiscube = cubeLabel->findObject("IsisCube");
@@ -488,7 +489,7 @@ namespace Isis {
 
     // Find relevant archive keywords
     PvlKeyword sumtStartClock = findKeyword("SpacecraftClockStartCount", sumtGrp);
-    PvlKeyword sumtStopClock  = findKeyword("SpacecraftClockStopCount", sumtGrp); 
+    PvlKeyword sumtStopClock  = findKeyword("SpacecraftClockStopCount", sumtGrp);
     PvlKeyword sumtStartTime  = findKeyword("StartTime", sumtGrp);
     PvlKeyword sumtStopTime   = findKeyword("StopTime", sumtGrp);
 
@@ -512,14 +513,14 @@ namespace Isis {
     PvlKeyword sumtFileKeyword = findKeyword("SUMFILE", sumtGrp);
     if (sumtFileKeyword.size() == 0) {
       sumtFileKeyword.addComment("SUMFILE(s) used to update the SCLK timing "
-                                 "in the instrument group (SPC)."); 
+                                 "in the instrument group (SPC).");
     }
     sumtFileKeyword.addValue(m_sumfile->name());
     setKeyword(sumtFileKeyword, sumtGrp);
 
     // Compute new values for existing keywords if we got them
     Camera *camera = m_cube->camera();
-    
+
     iTime newStartClock(sumStartTime() - startExposureDelay(*m_cube));
     iTime newStopClock(sumStopTime()   + stopExposureDelay(*m_cube));
 
@@ -527,7 +528,7 @@ namespace Isis {
     if ( origStartClock.size() > 0 ) {
       NaifStatus::CheckErrors();
       char newSCLK[256];
-      sce2s_c(camera->naifSclkCode(), newStartClock.Et(), 
+      sce2s_c(camera->naifSclkCode(), newStartClock.Et(),
               sizeof(newSCLK), newSCLK);
       NaifStatus::CheckErrors();
 
@@ -543,7 +544,7 @@ namespace Isis {
     if ( origStopClock.size() > 0 ) {
       NaifStatus::CheckErrors();
       char newSCLK[256];
-      sce2s_c(camera->naifSclkCode(), newStopClock.Et(), 
+      sce2s_c(camera->naifSclkCode(), newStopClock.Et(),
               sizeof(newSCLK), newSCLK);
       NaifStatus::CheckErrors();
 
@@ -609,7 +610,7 @@ namespace Isis {
 
     // Find relevant archive keywords
     PvlKeyword sumtStartClock = findKeyword("SpacecraftClockStartCount", sumtGrp);
-    PvlKeyword sumtStopClock  = findKeyword("SpacecraftClockStopCount", sumtGrp); 
+    PvlKeyword sumtStopClock  = findKeyword("SpacecraftClockStopCount", sumtGrp);
     PvlKeyword sumtStartTime  = findKeyword("StartTime", sumtGrp);
     PvlKeyword sumtStopTime   = findKeyword("StopTime", sumtGrp);
 
@@ -647,7 +648,7 @@ namespace Isis {
 
 
 
-  PvlKeyword SumFinder::findKeyword(const QString &name, 
+  PvlKeyword SumFinder::findKeyword(const QString &name,
                                     const PvlContainer &keys) const {
     if ( keys.hasKeyword(name) ) {
       return ( keys.findKeyword(name) );
@@ -657,13 +658,13 @@ namespace Isis {
   }
 
 
-  void SumFinder::setKeyword(const PvlKeyword &keyword, 
+  void SumFinder::setKeyword(const PvlKeyword &keyword,
                              PvlContainer &keys) const {
     keys.addKeyword(keyword, PvlContainer::Replace);
     return;
   }
 
-  bool SumFinder::deleteKeyword(const QString &keyword, 
+  bool SumFinder::deleteKeyword(const QString &keyword,
                                 PvlContainer &keys) const {
     if ( keys.hasKeyword(keyword) ) {
       keys.deleteKeyword(keyword);
@@ -674,19 +675,19 @@ namespace Isis {
   }
 
   int SumFinder::disableSpice(Pvl &label) const {
-    int ndeleted(0);
+    int ndeleted = 0;
 
     if ( label.hasObject("IsisCube") ) {
       PvlObject &iCube = label.findObject("IsisCube");
       if ( iCube.hasGroup("Kernels") ) {
-        PvlGroup &kernGrp = iCube.findGroup("Kernels", Pvl::Traverse); 
+        PvlGroup &kernGrp = iCube.findGroup("Kernels", Pvl::Traverse);
 
         // Known Kernels group keywords
         QStringList kernkeys;
-        kernkeys << "LeapSecond" << "TargetAttitudeShape" << "TargetPosition" 
+        kernkeys << "LeapSecond" << "TargetAttitudeShape" << "TargetPosition"
                  << "InstrumentPointing" << "Instrument" << "SpacecraftClock"
                  << "InstrumentPosition" << "InstrumentAddendum" << "ShapeModel"
-                 << "Extra" << "InstrumentPositionQuality" 
+                 << "Extra" << "InstrumentPositionQuality"
                  << "InstrumentPointingQuality" << "SpacecraftPointing"
                  << "SpacecraftPosition" << "ElevationModel" << "Frame"
                  << "StartPadding" << "EndPadding" << "CameraVersion";
@@ -703,7 +704,27 @@ namespace Isis {
     return (ndeleted);
   }
 
+  /**
+   * Writes out the History blob to m_cube
+   */
+  void SumFinder::writeHistory() {
+    bool addedHist = false;
+    Isis::Pvl &inlab = *m_cube->label();
+    for (int i = 0; i < inlab.objects(); i++) {
+      if ( inlab.object(i).isNamed("History") && Isis::iApp != NULL ) {
+        Isis::History h( (QString) inlab.object(i)["Name"] );
+        m_cube->read(h);
+        h.AddEntry();
+        m_cube->write(h);
+        addedHist = true;
+      }
+    }
+
+    if (!addedHist && Isis::iApp != NULL) {
+      Isis::History h("IsisCube");
+      h.AddEntry();
+      m_cube->write(h);
+    }
+  }
 }
 // namespace Isis
-
-

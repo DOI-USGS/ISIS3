@@ -103,6 +103,36 @@ namespace Isis {
 
 
   /**
+   * @brief Create an image from a cube file on disk including the footprint
+   * @param imageFileName The name of a cube on disk - /work/users/.../blah.cub 
+   * @param footprint The calculated footprint
+   * @param parent The Qt-relationship parent
+   */
+  Image::Image(Cube *imageCube, geos::geom::MultiPolygon *footprint, QString id, QObject *parent) :
+      QObject(parent) {
+    m_fileName = imageCube->fileName();
+
+    m_bodyCode = NULL;
+    m_cube = imageCube;
+    m_displayProperties = NULL;
+    m_id = NULL;
+
+    m_aspectRatio = Null;
+    m_resolution = Null;
+    m_lineResolution = Null;
+    m_sampleResolution = Null;
+
+    initCamStats();
+
+    m_footprint = footprint;
+
+    m_displayProperties = new ImageDisplayProperties(FileName(m_fileName).name(), this);
+
+    setId(id);
+  }
+
+
+  /**
    * @brief Construct this image from XML.
    * @param imageFolder Where this image XML resides - /work/.../projectRoot/images/import1
    * @param xmlReader An XML reader that's up to an <image/> tag.
@@ -351,7 +381,7 @@ namespace Isis {
    * @param id The id tjat overrides the automatically generated id.
    */
   void Image::setId(QString id) {
-    *m_id = QUuid(QString("{%1}").arg(id));
+    m_id = new QUuid(id);
   }
 
 
