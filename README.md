@@ -57,6 +57,9 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
         conda install -c usgs-astrogeology isis3
 
+6.a If you would like to work with our latest Release Candidate:
+        
+        conda install -c usgs-astrogeology/label/RC isis3
 
 7.  Finally, setup the environment variables:
 
@@ -79,6 +82,8 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 ### Updating
 
   To update to a new version of ISIS, simply run `conda update isis3`
+  
+  To update to our latest release candidate, run `conda update -c usgs-astrogeology/label/RC isis3`
 
 ### Operating System Requirements
 
