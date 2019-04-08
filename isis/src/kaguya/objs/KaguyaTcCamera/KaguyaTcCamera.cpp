@@ -18,6 +18,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "KaguyaTcCamera.h"
+#include "KaguyaTcCameraDistortionMap.h"
 
 #include <QString>
 
@@ -76,7 +77,7 @@ namespace Isis {
                        "_BORESIGHT_LINE"));
 */
     // Setup distortion map
-    new CameraDistortionMap(this);
+    new KaguyaTcCameraDistortionMap(this, naifIkCode());
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
