@@ -44,9 +44,9 @@ namespace Isis {
    */
   KaguyaTcCameraDistortionMap::KaguyaTcCameraDistortionMap(Camera *parent, int naifIkCode)
       : CameraDistortionMap(parent) {
-    QString odtxkey = "INS-" + toString(naifIkCode) + "_DISTORTION_COEF_X";
-    QString odtykey = "INS-" + toString(naifIkCode) + "_DISTORTION_COEF_X";
-
+    QString odtxkey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_X";
+    QString odtykey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_Y";
+    
     for(int i = 0; i < 4; ++i) {
       p_odkx.push_back(p_camera->getDouble(odtxkey, i));
       p_odky.push_back(p_camera->getDouble(odtykey, i));
@@ -86,18 +86,9 @@ namespace Isis {
     double x = dx;
     double y = dy;
 
-    // NEEDED? 
-    // 
-    // Get the distance from the focal plane center and if we are close
-    // then skip the distortion (this prevents division by zero)
-    double r = (x * x) + (y * y);
-    double r2 = r*r;
-    double r3 = r2*r;
-    if (r <= 1.0E-6) {
-      p_undistortedFocalPlaneX = dx;
-      p_undistortedFocalPlaneY = dy;
-      return true;
-    }
+    double r2 = x*x + y*y;
+    double r = qSqrt(r2); 
+    double r3 = r2 * r; 
 
     // Apply distortion correction
     // see: SEL_TC_V01.TI
@@ -118,11 +109,12 @@ namespace Isis {
   //          +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
   //   v[Z] = INS<INSTID>BORESIGHT[Z] .
 
+
     double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3;
     double dr_y = p_odky[0] + p_odky[1] * r + p_odky[2] * r2 + p_odky[3] * r3;
 
-    p_undistortedFocalPlaneX = dr_x * x;
-    p_undistortedFocalPlaneY = dr_y * y;
+    p_undistortedFocalPlaneX = x + dr_x; 
+    p_undistortedFocalPlaneY = y + dr_y;
 
     return true;
   }
@@ -149,6 +141,7 @@ namespace Isis {
    */
   bool KaguyaTcCameraDistortionMap::SetUndistortedFocalPlane(const double ux,
       const double uy) {
+
     p_undistortedFocalPlaneX = ux;
     p_undistortedFocalPlaneY = uy;
 
@@ -182,8 +175,8 @@ namespace Isis {
       dr_y = p_odky[0] + p_odky[1] * r + p_odky[2] * rr + p_odky[3] * rrr; // why did hayabusa have a -1
 
       // Distortion at the current point location
-      xdistortion = xt * dr_x;
-      ydistortion = yt * dr_y;
+      xdistortion = dr_x;
+      ydistortion = dr_y;
 
       // updated image coordinates
       xt = ux - xdistortion;
