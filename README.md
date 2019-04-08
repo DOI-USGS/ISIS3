@@ -302,11 +302,6 @@ rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.u
     rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons .
 
 
-**Odyssey Mission (kernels can be excluded):**
-
-    rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey .
-
-
 **Rolo Mission (kernels can be excluded):**
 
     cd $ISIS3DATA
