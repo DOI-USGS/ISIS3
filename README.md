@@ -348,4 +348,4 @@ If you are looking for ISIS2, please [refer to the ISIS 2 Installation Guide](ht
 
 ### How do I install ISIS3.5.2 or earlier?
 
-If you are looking for a version of ISIS3 prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](../../documents/LegacyInstallGuide/index.html) for instructions on downloading and installing ISIS3, versions prior to 3.6.0.
+If you are looking for a version of ISIS3 prior to 3.6.0, please [refer to the Legacy ISIS3 Installation Guide](https://isis.astrogeology.usgs.gov/documents/LegacyInstallGuide/index.htmll) for instructions on downloading and installing ISIS3, versions prior to 3.6.0.
