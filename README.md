@@ -164,8 +164,10 @@ ISIS can now use a service to retrieve the SPICE data for all instruments ISIS s
 
 For example:
 
-    cd $ISIS3DATA
-    rsync -azv **--exclude='kernels'** --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini .
+<pre>
+cd $ISIS3DATA
+rsync -azv <b>--exclude='kernels'</b> --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini .
+</pre>
 
 **WARNING:** Some instruments require mission data to be present for radiometric calibration, which may not be supported by the SPICE Web Server exclusively, and some programs that are designed to run an image from ingestion through the mapping phase do not have an option to use the SPICE Web Service. For information specific to an instrument, see the documentation for radiometric callobration programs.
 
