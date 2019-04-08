@@ -28,8 +28,8 @@ DeltaSample =  0
 DeltaLine =  0
 
 For center pixel position ...
-Latitude OK
-Longitude OK
+Latitude off by:  -9.37449768301235054e-05
+Longitude off by:  -5.93533007986479788e-05
 
 
 Testing TC1 s L2B0 image...
@@ -61,5 +61,5 @@ DeltaSample =  0
 DeltaLine =  0
 
 For center pixel position ...
-Latitude OK
-Longitude OK
+Latitude off by:  0.000266978116243876684
+Longitude off by:  0.000317664115719651363
