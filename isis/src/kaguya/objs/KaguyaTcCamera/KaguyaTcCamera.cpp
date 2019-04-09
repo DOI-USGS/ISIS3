@@ -22,7 +22,7 @@
 
 #include <QString>
 
-#include "CameraDetectorMap.h"
+#include "LineScanCameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
@@ -61,14 +61,18 @@ namespace Isis {
     double time = iTime((QString)inst["StartTime"]).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
+    // needed? 
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
 
     // Setup detector map
-    new CameraDetectorMap(this);
+    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
+
+    new LineScanCameraDetectorMap(this, time, lineRate);
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, Lines() / 2.0 + 0.5);
+//    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, 1.0); //Lines() / 2.0 + 0.5);
+    focalMap->SetDetectorOrigin( Samples() / 2.0 + Lines() / 2.0 + 0.5);
 /*
     focalMap->SetDetectorOrigin(
       Spice::getDouble("INS" + toString(naifIkCode()) +
