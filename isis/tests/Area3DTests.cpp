@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
+#include <QString>
+
 #include "Area3D.h"
 #include "Displacement.h"
 #include "Distance.h"
 #include "IException.h"
+#include "TestUtilities.h"
+
 
 TEST(Area3D, DefaultConstructor)
 {
@@ -122,7 +126,6 @@ TEST(Area3D, Intersect)
   dim1.setMeters(0.5);
   Isis::Area3D area3(start2, start2, start2, dim1, dim1, dim1);
   EXPECT_TRUE(area1.intersect(area2) == area3);
-  EXPECT_DOUBLE_EQ(area3.getEndX().meters(), 1);
 }
 
 TEST(Area3D, NoOverlapIntersect)
@@ -215,10 +218,19 @@ TEST(Area3D, Operators)
   area1.setStartX(start);
   EXPECT_FALSE(area1 == area2);
   EXPECT_TRUE(area1 != area2);
+
+  Isis::Area3D area3 = area2;
+  EXPECT_DOUBLE_EQ(area3.getStartX().meters(), 5);
+  EXPECT_DOUBLE_EQ(area3.getStartY().meters(), 5);
+  EXPECT_DOUBLE_EQ(area3.getStartZ().meters(), 5);
+  EXPECT_DOUBLE_EQ(area3.getEndX().meters(), 10);
+  EXPECT_DOUBLE_EQ(area3.getEndY().meters(), 10);
+  EXPECT_DOUBLE_EQ(area3.getEndZ().meters(), 10);
 }
 
 TEST(Area3D, InvertedXError)
 {
+  QString message = "Cannot have a 3D area with inverted X";
   Isis::Displacement d1(-1, Isis::Displacement::Meters);
   Isis::Displacement d2(1, Isis::Displacement::Meters);
   try
@@ -227,19 +239,18 @@ TEST(Area3D, InvertedXError)
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Cannot have a 3D area with "
-    "inverted X")) << e.toString().toStdString();
+    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
   catch(...)
   {
     FAIL() << "Expected an IException with message \""
-    "Cannot have a 3D area with inverted X coordinates of [1 meters] "
-    "to [-1 meters].\"";
+    << message.toStdString() <<"\"";
   }
 }
 
 TEST(Area3D, InvertedYError)
 {
+  QString message = "Cannot have a 3D area with inverted Y";
   Isis::Displacement d1(-1, Isis::Displacement::Meters);
   Isis::Displacement d2(1, Isis::Displacement::Meters);
   try
@@ -248,19 +259,18 @@ TEST(Area3D, InvertedYError)
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Cannot have a 3D area with "
-    "inverted Y")) << e.toString().toStdString();
+    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
   catch(...)
   {
     FAIL() << "Expected an IException with message \""
-    "Cannot have a 3D area with inverted Y coordinates of [1 meters] "
-    "to [-1 meters].\"";
+    << message.toStdString() <<"\"";
   }
 }
 
 TEST(Area3D, InvertedZError)
 {
+  QString message = "Cannot have a 3D area with inverted Z";
   Isis::Displacement d1(-1, Isis::Displacement::Meters);
   Isis::Displacement d2(1, Isis::Displacement::Meters);
   try
@@ -269,13 +279,11 @@ TEST(Area3D, InvertedZError)
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Cannot have a 3D area with "
-    "inverted Z")) << e.toString().toStdString();
+    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
   catch(...)
   {
     FAIL() << "Expected an IException with message \""
-    "Cannot have a 3D area with inverted Z coordinates of [1 meters] "
-    "to [-1 meters].\"";
+    << message.toStdString() <<"\"";
   }
 }
