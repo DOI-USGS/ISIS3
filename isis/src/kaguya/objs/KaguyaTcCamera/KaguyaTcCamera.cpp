@@ -25,8 +25,8 @@
 #include "LineScanCameraDetectorMap.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
-#include "CameraGroundMap.h"
-#include "CameraSkyMap.h"
+#include "LineScanCameraGroundMap.h"
+#include "LineScanCameraSkyMap.h"
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
@@ -71,8 +71,8 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-//    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, 1.0); //Lines() / 2.0 + 0.5);
-    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, Lines() / 2.0 + 0.5);
+    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, 1.0); //Lines() / 2.0 + 0.5);
+//    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, Lines() / 2.0 + 0.5);
 /*
     focalMap->SetDetectorOrigin(
       Spice::getDouble("INS" + toString(naifIkCode()) +
@@ -84,8 +84,8 @@ namespace Isis {
     new KaguyaTcCameraDistortionMap(this, naifIkCode());
 
     // Setup the ground and sky map
-    new CameraGroundMap(this);
-    new CameraSkyMap(this);
+    new LineScanCameraGroundMap(this);
+    new LineScanCameraSkyMap(this);
 
     setTime(time);
     LoadCache();
