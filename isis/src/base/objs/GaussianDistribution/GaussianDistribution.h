@@ -51,7 +51,7 @@ namespace Isis {
    *                                       lowCutoff and highCutoff.
    *   @history 2019-04-12 Kaitlyn Lee - Removed method Probability() because it was not being used 
    *                           and was not actually calculating the probability. The method was 
-   *                           plugging in a value into the pdf, not cdf.
+   *                           plugging in a value into the pdf, instead of the cdf.
    */
   class GaussianDistribution : public Isis::Statistics {
     public:
