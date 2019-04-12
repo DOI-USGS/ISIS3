@@ -8,14 +8,12 @@
 #include "TestUtilities.h"
 
 
-TEST(Area3D, DefaultConstructor)
-{
+TEST(Area3D, DefaultConstructor) {
   Isis::Area3D area;
   EXPECT_FALSE(area.isValid());
 }
 
-TEST(Area3D, DisplacementConstructor)
-{
+TEST(Area3D, DisplacementConstructor) {
   Isis::Displacement disp(10, Isis::Displacement::Units::Meters);
   Isis::Area3D area(disp, disp, disp, disp, disp, disp);
   EXPECT_TRUE(area.isValid());
@@ -30,8 +28,7 @@ TEST(Area3D, DisplacementConstructor)
   EXPECT_DOUBLE_EQ(area.getDepth().meters(), 0);
 }
 
-TEST(Area3D, DistanceConstructor)
-{
+TEST(Area3D, DistanceConstructor) {
   Isis::Displacement disp(10, Isis::Displacement::Meters);
   Isis::Distance distance(15, Isis::Distance::Meters);
   Isis::Area3D area(disp, disp, disp, distance, distance, distance);
@@ -47,8 +44,7 @@ TEST(Area3D, DistanceConstructor)
   EXPECT_TRUE(area.getDepth() == distance);
 }
 
-TEST(Area3D, CopyConstructor)
-{
+TEST(Area3D, CopyConstructor) {
   Isis::Displacement disp(10, Isis::Displacement::Meters);
   Isis::Distance distance(15, Isis::Distance::Meters);
   Isis::Area3D area1(disp, disp, disp, distance, distance, distance);
@@ -65,8 +61,7 @@ TEST(Area3D, CopyConstructor)
   EXPECT_TRUE(area2.getDepth() == area1.getDepth());
 }
 
-TEST(Area3D, InvalidInputConstructor)
-{
+TEST(Area3D, InvalidInputConstructor) {
   Isis::Displacement d1(0, Isis::Displacement::Meters);
   Isis::Distance d2(0, Isis::Distance::Meters);
   Isis::Area3D area1(Isis::Displacement(), d1, d1, d1, d1, d1);
@@ -75,8 +70,7 @@ TEST(Area3D, InvalidInputConstructor)
   EXPECT_FALSE(area2.isValid());
 }
 
-TEST(Area3D, EndPointCalculations)
-{
+TEST(Area3D, EndPointCalculations) {
   Isis::Displacement x(10, Isis::Displacement::Meters);
   Isis::Displacement y(-15, Isis::Displacement::Meters);
   Isis::Displacement z(20, Isis::Displacement::Meters);
@@ -89,8 +83,7 @@ TEST(Area3D, EndPointCalculations)
   EXPECT_DOUBLE_EQ(area.getEndZ().meters(), 25);
 }
 
-TEST(Area3D, DimensionCalculations)
-{
+TEST(Area3D, DimensionCalculations) {
   Isis::Displacement x0(-10, Isis::Displacement::Meters);
   Isis::Displacement y0(0, Isis::Displacement::Meters);
   Isis::Displacement z0(-1, Isis::Displacement::Meters);
@@ -103,8 +96,7 @@ TEST(Area3D, DimensionCalculations)
   EXPECT_DOUBLE_EQ(area.getDepth().meters(), 100);
 }
 
-TEST(Area3D, Intersect)
-{
+TEST(Area3D, Intersect) {
   Isis::Displacement start1(0, Isis::Displacement::Meters);
   Isis::Distance dim1(1, Isis::Distance::Meters);
   Isis::Displacement start2(0, Isis::Displacement::Meters);
@@ -128,8 +120,7 @@ TEST(Area3D, Intersect)
   EXPECT_TRUE(area1.intersect(area2) == area3);
 }
 
-TEST(Area3D, NoOverlapIntersect)
-{
+TEST(Area3D, NoOverlapIntersect) {
   Isis::Displacement start1(0, Isis::Displacement::Meters);
   Isis::Displacement end1(1, Isis::Displacement::Meters);
   Isis::Displacement start2(2, Isis::Displacement::Meters);
@@ -140,8 +131,7 @@ TEST(Area3D, NoOverlapIntersect)
   EXPECT_FALSE(area3.isValid());
 }
 
-TEST(Area3D, Setters)
-{
+TEST(Area3D, Setters) {
   Isis::Area3D area1;
   Isis::Displacement start(0, Isis::Displacement::Meters);
   Isis::Displacement end(10, Isis::Displacement::Meters);
@@ -204,8 +194,7 @@ TEST(Area3D, Setters)
   EXPECT_DOUBLE_EQ(area1.getStartY().meters(), 0);
  }
 
-TEST(Area3D, Operators)
-{
+TEST(Area3D, Operators) {
   Isis::Displacement start(5, Isis::Displacement::Meters);
   Isis::Displacement end(10, Isis::Displacement::Meters);
   Isis::Distance dim(5, Isis::Distance::Meters);
@@ -228,61 +217,49 @@ TEST(Area3D, Operators)
   EXPECT_DOUBLE_EQ(area3.getEndZ().meters(), 10);
 }
 
-TEST(Area3D, InvertedXError)
-{
+TEST(Area3D, InvertedXError) {
   QString message = "Cannot have a 3D area with inverted X";
   Isis::Displacement d1(-1, Isis::Displacement::Meters);
   Isis::Displacement d2(1, Isis::Displacement::Meters);
-  try
-  {
+  try {
     Isis::Area3D area(d2, d1, d1, d1, d2, d2);
   }
-  catch(Isis::IException &e)
-  {
+  catch(Isis::IException &e) {
     EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
-  catch(...)
-  {
+  catch(...) {
     FAIL() << "Expected an IException with message \""
     << message.toStdString() <<"\"";
   }
 }
 
-TEST(Area3D, InvertedYError)
-{
+TEST(Area3D, InvertedYError) {
   QString message = "Cannot have a 3D area with inverted Y";
   Isis::Displacement d1(-1, Isis::Displacement::Meters);
   Isis::Displacement d2(1, Isis::Displacement::Meters);
-  try
-  {
+  try {
     Isis::Area3D area(d1, d2, d1, d2, d1, d2);
   }
-  catch(Isis::IException &e)
-  {
+  catch(Isis::IException &e) {
     EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
-  catch(...)
-  {
+  catch(...) {
     FAIL() << "Expected an IException with message \""
     << message.toStdString() <<"\"";
   }
 }
 
-TEST(Area3D, InvertedZError)
-{
+TEST(Area3D, InvertedZError) {
   QString message = "Cannot have a 3D area with inverted Z";
   Isis::Displacement d1(-1, Isis::Displacement::Meters);
   Isis::Displacement d2(1, Isis::Displacement::Meters);
-  try
-  {
+  try {
     Isis::Area3D area(d1, d1, d2, d2, d2, d1);
   }
-  catch(Isis::IException &e)
-  {
+  catch(Isis::IException &e) {
     EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
   }
-  catch(...)
-  {
+  catch(...) {
     FAIL() << "Expected an IException with message \""
     << message.toStdString() <<"\"";
   }
