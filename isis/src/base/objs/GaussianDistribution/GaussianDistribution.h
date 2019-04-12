@@ -49,13 +49,15 @@ namespace Isis {
    *                                       GaussianDistribution.cpp file. The
    *                                       variables were also renamed to
    *                                       lowCutoff and highCutoff.
+   *   @history 2019-04-12 Kaitlyn Lee - Removed method Probability() because it was not being used 
+   *                           and was not actually calculating the probability. The method was 
+   *                           plugging in a value into the pdf, not cdf.
    */
   class GaussianDistribution : public Isis::Statistics {
     public:
       GaussianDistribution(const double mean = 0.0, const double standardDeviation = 1.0) ;
       ~GaussianDistribution() {};
 
-      double Probability(const double value);
       double CumulativeDistribution(const double value);
       double InverseCumulativeDistribution(const double percent);
 

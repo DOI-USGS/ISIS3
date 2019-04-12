@@ -25,7 +25,22 @@ TEST(GaussianDistribution, Constructor) {
 }
 
 
-TEST_P(DoubleTest, CumulativeDistribution) {
+TEST(GaussianDistribution, InvalidPercentage) {
+  Isis::GaussianDistribution dist;
+  QString message = "Argument percent outside of the range 0 to 100";
+  try {
+    dist.InverseCumulativeDistribution(110);
+  }
+  catch(Isis::IException &e) {
+    EXPECT_PRED_FORMAT2(Isis::AssertIExceptionMessage, e, message);
+  }
+  catch(...) {
+    FAIL() << "Expected error message: \"" << message.toStdString() << "\"";
+  }
+}
+
+
+TEST_P(DoubleTest, Distributions) {
   Isis::GaussianDistribution dist;
   EXPECT_NEAR(dist.CumulativeDistribution(GetParam().first), GetParam().second, .000000000000000001);
   EXPECT_NEAR(dist.InverseCumulativeDistribution(GetParam().second), GetParam().first, .000001);
