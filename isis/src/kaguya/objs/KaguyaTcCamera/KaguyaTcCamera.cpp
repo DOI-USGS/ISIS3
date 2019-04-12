@@ -57,29 +57,37 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    // set variables startTime and exposureDuration
+    // StartTime is used, rather than SpacecraftClockStartCount because the format of 
+    // SpaceCraftClockStart count is incompatible with getClockTime
     double time = iTime((QString)inst["StartTime"]).Et();
 
-    // divide exposure duration keyword value by 1000 to convert to seconds
-    // needed? 
-    double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
-
     // Setup detector map
-    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
+    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0; // ALE uses the ExposureDuration
+    
+    // Convert between parent image coordinates and detector coordinates (detector coordinate line, detector coordinate sample)   
+    LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time, lineRate);
 
-    new LineScanCameraDetectorMap(this, time, lineRate);
+    // Detetermine what to set the starting detector sample to, based on swath mode
+    QString swathMode = inst["SwathModeId"];
 
-    // Setup focal plane map
+    double startingDetectorSample = 1; 
+    if (swathMode.compare("FULL") == 0) {
+      startingDetectorSample = 1; 
+    }
+    else if (swathMode.compare("NOMINAL") == 0) {
+      startingDetectorSample = 297; 
+    }
+    else if (swathMode.compare("HALF") == 0) {
+      startingDetectorSample = 1172;
+    }
+
+    detectorMap->SetStartingDetectorSample(startingDetectorSample);
+    
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
-    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, 1.0); //Lines() / 2.0 + 0.5);
-//    focalMap->SetDetectorOrigin( Samples() / 2.0 + 0.5, Lines() / 2.0 + 0.5);
-/*
-    focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + toString(naifIkCode()) +
-                       "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + toString(naifIkCode()) +
-                       "_BORESIGHT_LINE"));
-*/
+
+    // This is the same, no matter the swath mode
+    focalMap->SetDetectorOrigin(4096.0/2.0 + 0.5, 1.0); 
+
     // Setup distortion map
     new KaguyaTcCameraDistortionMap(this, naifIkCode());
 
