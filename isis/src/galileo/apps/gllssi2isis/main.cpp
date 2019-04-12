@@ -28,7 +28,6 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube);
 void fixPvl(QString fileName);
 
 void IsisMain() {
-
   //initialize globals
   summed = false;
   summedOutput = NULL;
@@ -110,21 +109,15 @@ void IsisMain() {
     p.StartProcess();
   }
   else {
-    summedOutput = new Cube();
-    summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
-    summedOutput->setPixelType(p.PixelType());
-    summedOutput->create(ui.GetFileName("TO"));
-    p.StartProcess(translateData);
+    Isis::CubeAttributeOutput &att = Application::GetUserInterface().GetOutputAttribute("TO");
+    att.setPixelType(p.PixelType());
+    summedOutput = p.SetOutputCube("TO", att, p.Samples() / 2, p.Lines() / 2, p.Bands());
     ocube = summedOutput;
+    p.StartProcess(translateData);
   }
 
   translateLabels(pdsLabel, ocube);
   p.EndProcess();
-
-  if (summed) {
-    summedOutput->close();
-    delete summedOutput;
-  }
 
   return;
 }
@@ -182,7 +175,7 @@ void fixPvl(QString fileName){
 
 
 
-void translateData(Buffer &inData) {
+void translateData(Isis::Buffer &inData) {
   summedOutput->write(inData);
 }
 

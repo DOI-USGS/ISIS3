@@ -1199,7 +1199,6 @@ namespace Isis {
     }
   }
 
-
   /**
    * Create the output file. Note that all the appropiate calls to at least
    * SetDimensions and SetPixelType should be made prior to calling this method.
@@ -1210,10 +1209,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Message "Unsupported pixel type."
    */
-  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
-    CubeAttributeOutput &att =
-      Application::GetUserInterface().GetOutputAttribute(parameter);
-
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter, CubeAttributeOutput &att, const int ns, const int nl, const int nb) {
     if (att.propagateMinimumMaximum()) {
       double min, max;
       if ((p_pixelType == Isis::Double) ||
@@ -1264,7 +1260,24 @@ namespace Isis {
       }
     }
 
-    return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
+    return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, ns, nl, nb);
+  }
+
+
+  /**
+   * Create the output file. Note that all the appropiate calls to at least
+   * SetDimensions and SetPixelType should be made prior to calling this method.
+   *
+   * @param parameter The parameter name that holds the output file name.
+   *
+   * @return @b Isis::Cube Output cube.
+   *
+   * @throws Isis::iException::Message "Unsupported pixel type."
+   */
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
+    CubeAttributeOutput &att =
+      Application::GetUserInterface().GetOutputAttribute(parameter);
+    return ProcessImport::SetOutputCube(parameter, att, p_ns, p_nl, p_nb);
   }
 
 
@@ -1977,7 +1990,7 @@ namespace Isis {
               break;
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int(&in[bufferIndex]);
-              break;            
+              break;
           case Isis::UnsignedInteger:
             (*out)[samp] = (double)swapper.Uint32_t(&in[bufferIndex]);
             break;
