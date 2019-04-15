@@ -109,8 +109,8 @@ void IsisMain() {
     p.StartProcess();
   }
   else {
-    // CubeAttributeOutput att = ui.GetOutputAttribute("TO");
-    summedOutput = p.SetOutputCube("TO", p.Samples() / 2, p.Lines() / 2, p.Bands());
+    p.SetDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
+    summedOutput = p.SetOutputCube("TO");
     ocube = summedOutput;
     p.StartProcess(translateData);
   }
