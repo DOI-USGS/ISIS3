@@ -1200,10 +1200,19 @@ namespace Isis {
   }
 
   /**
-   * Create the output file. Note that all the appropiate calls to at least
-   * SetDimensions and SetPixelType should be made prior to calling this method.
+   * Create the output file. This method will use the cube attribute object
+   * passed in to populate the pixel type and pass the desired samples, lines,
+   * and band numbers into the process setOutputCube method.
    *
    * @param parameter The parameter name that holds the output file name.
+   *
+   * @param att The CubeAttributeOutput object with defined attributes
+   *
+   * @param ns The number of samples in the output cube
+   *
+   * @param nl The number of lines in the output cube
+   *
+   * @param nb The number of bands in the output cube
    *
    * @return @b Isis::Cube Output cube.
    *
@@ -1271,8 +1280,6 @@ namespace Isis {
    * @param parameter The parameter name that holds the output file name.
    *
    * @return @b Isis::Cube Output cube.
-   *
-   * @throws Isis::iException::Message "Unsupported pixel type."
    */
   Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
     CubeAttributeOutput &att =
@@ -1291,6 +1298,7 @@ namespace Isis {
    *            output cube.
    *
    * @return @b Isis::Cube Output cube.
+   *
    * @throws Isis::iException::Message "File is not in a supported
    *             organization."
    */
@@ -1328,6 +1336,7 @@ namespace Isis {
    * @param funct Method that accepts Isis::Buffer as an input
    *              parameter, processes the image, and has no
    *              return value.
+   *
    * @throws Isis::iException::Message "File is not a supported
    *             organization."
    */
