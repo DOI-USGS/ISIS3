@@ -1199,27 +1199,21 @@ namespace Isis {
     }
   }
 
+
   /**
-   * Create the output file. This method will use the cube attribute object
-   * passed in to populate the pixel type and pass the desired samples, lines,
-   * and band numbers into the process setOutputCube method.
+   * Create the output file. Note that all the appropiate calls to at least
+   * SetDimensions and SetPixelType should be made prior to calling this method.
    *
    * @param parameter The parameter name that holds the output file name.
-   *
-   * @param ns The number of samples in the output cube
-   *
-   * @param nl The number of lines in the output cube
-   *
-   * @param nb The number of bands in the output cube
    *
    * @return @b Isis::Cube Output cube.
    *
    * @throws Isis::iException::Message "Unsupported pixel type."
    */
-  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter, const int ns, const int nl, const int nb) {
-    FileName fname = Application::GetUserInterface().GetFileName(parameter);
-    CubeAttributeOutput att =
+  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
+    CubeAttributeOutput &att =
       Application::GetUserInterface().GetOutputAttribute(parameter);
+
     if (att.propagateMinimumMaximum()) {
       double min, max;
       if ((p_pixelType == Isis::Double) ||
@@ -1270,20 +1264,7 @@ namespace Isis {
       }
     }
 
-    return Process::SetOutputCube(fname.expanded(), att, ns, nl, nb);
-  }
-
-
-  /**
-   * Create the output file. Note that all the appropiate calls to at least
-   * SetDimensions and SetPixelType should be made prior to calling this method.
-   *
-   * @param parameter The parameter name that holds the output file name.
-   *
-   * @return @b Isis::Cube Output cube.
-   */
-  Isis::Cube *ProcessImport::SetOutputCube(const QString &parameter) {
-    return ProcessImport::SetOutputCube(parameter, p_ns, p_nl, p_nb);
+    return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
   }
 
 
@@ -1297,7 +1278,6 @@ namespace Isis {
    *            output cube.
    *
    * @return @b Isis::Cube Output cube.
-   *
    * @throws Isis::iException::Message "File is not in a supported
    *             organization."
    */
@@ -1335,7 +1315,6 @@ namespace Isis {
    * @param funct Method that accepts Isis::Buffer as an input
    *              parameter, processes the image, and has no
    *              return value.
-   *
    * @throws Isis::iException::Message "File is not a supported
    *             organization."
    */
@@ -1998,7 +1977,7 @@ namespace Isis {
               break;
             case Isis::SignedInteger:
               (*out)[samp] = (double)swapper.Int(&in[bufferIndex]);
-              break;
+              break;            
           case Isis::UnsignedInteger:
             (*out)[samp] = (double)swapper.Uint32_t(&in[bufferIndex]);
             break;
