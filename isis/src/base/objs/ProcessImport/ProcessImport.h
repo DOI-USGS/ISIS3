@@ -201,7 +201,7 @@ namespace Isis {
 
       using Isis::Process::SetOutputCube;  // make parent functions visable
       Isis::Cube *SetOutputCube(const QString &parameter);
-      Isis::Cube *SetOutputCube(const QString &parameter, CubeAttributeOutput &att, const int ns, const int nl, const int nb);
+      Isis::Cube *SetOutputCube(const QString &parameter, const int ns, const int nl, const int nb);
       virtual Isis::Cube *SetOutputCube(const QString &fname,
                                 Isis::CubeAttributeOutput &att);
 

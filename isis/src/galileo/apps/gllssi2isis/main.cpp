@@ -35,7 +35,7 @@ void IsisMain() {
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
   FileName inFile = ui.GetFileName("FROM");
-  FileName out = ui.GetFileName("TO");
+  FileName outFile = ui.GetFileName("TO");
 
 
 
@@ -109,9 +109,8 @@ void IsisMain() {
     p.StartProcess();
   }
   else {
-    Isis::CubeAttributeOutput &att = Application::GetUserInterface().GetOutputAttribute("TO");
-    att.setPixelType(p.PixelType());
-    summedOutput = p.SetOutputCube("TO", att, p.Samples() / 2, p.Lines() / 2, p.Bands());
+    // CubeAttributeOutput att = ui.GetOutputAttribute("TO");
+    summedOutput = p.SetOutputCube("TO", p.Samples() / 2, p.Lines() / 2, p.Bands());
     ocube = summedOutput;
     p.StartProcess(translateData);
   }
