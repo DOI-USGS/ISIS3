@@ -109,7 +109,7 @@ void IsisMain() {
     summedOutput = new Cube();
     summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
     summedOutput->setPixelType(p.PixelType());
-    summedOutput->create(ui.GetFileName("TO"));
+    summedOutput->create(outFile.expanded());
 
     p.StartProcess(translateData);
     translateLabels(pdsLabel, summedOutput);
