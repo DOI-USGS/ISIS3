@@ -64,7 +64,7 @@
       Changed documentation to have the correct link to the Planetary Science Data
       Dictionary Document.  Fixes #3867
     </change>
-    <change name="Adam Paquette", date="2019-04-16">
+    <change name="Adam Paquette" date="2019-04-16">
       Fixed original label not being written to cubes ingested using the summed
       option. Fixes #3207
     </change>
