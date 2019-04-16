@@ -22,7 +22,7 @@ In this step, we will carefully prepare the local repository to build from as we
   * For public releases, this will simply be the "dev" branch and will require someone else merge for you.
   * (This step is optional for custom builds.)
 * Make a github release and tag for the build 
-  * The release "Tag version" should be the <version>_<build_number> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0 and your build_number was 2, you should set your Release/Tag "Tag version" to 3.6.0_2
+  * The release "Tag version" should be the \<version\>_<build_number> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0 and your build_number was 2, you should set your Release/Tag "Tag version" to 3.6.0_2
   * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
   * Mission release "Tag version" convention: version XX.YY.ZZ_mission_build (ex. 3.6.1_cassis_2)
 
