@@ -86,10 +86,19 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // This is the same, no matter the swath mode
-    focalMap->SetDetectorOrigin(4096.0/2.0 + 0.5, 1.0); 
+    // This set the origin of the detector (not image samp,line). It is zero bassed.
+    // The detector offsets are 0,0 because the borsight is in the center of the array
+    QString key;
+    key = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
+    double sampleBoreSight = getDouble(key);
+
+    key = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
+    double lineBoreSight = getDouble(key);
+    focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight); 
 
     // Setup distortion map
     new KaguyaTcCameraDistortionMap(this, naifIkCode());
+//    new CameraDistortionMap(this);
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
