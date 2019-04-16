@@ -31,8 +31,12 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
         #Activate the environment
         #Depending on your version of Anaconda use one of the following:
-          Anaconda 3.4 and up - conda activate isis3
-          prior to Anaconda 3.4 - source activate isis3
+        
+        #Anaconda 3.4 and up:
+        conda activate isis3
+        
+        #Prior to Anaconda 3.4:
+        source activate isis3
 
         #Add the following channels to the environment
         conda config --env --add channels conda-forge
