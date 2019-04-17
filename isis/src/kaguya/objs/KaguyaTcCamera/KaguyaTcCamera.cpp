@@ -59,8 +59,11 @@ namespace Isis {
 
     // StartTime is used, rather than SpacecraftClockStartCount because the format of 
     // SpaceCraftClockStart count is incompatible with getClockTime
-    double time = iTime((QString)inst["StartTime"]).Et();
-
+    double oldTime = iTime((QString)inst["StartTime"]).Et();
+    std::cout << "old time: " << iTime(oldTime).UTC() << std::endl; 
+    QString clockCount = inst["SpacecraftClockStartCount"];
+    double time = getClockTime(clockCount, -1, true).Et();
+    std::cout << "new time: " << iTime(time).UTC() << std::endl; 
     // Setup detector map
     double lineRate = (double) inst["LineSamplingInterval"] / 1000.0; // ALE uses the ExposureDuration
     
