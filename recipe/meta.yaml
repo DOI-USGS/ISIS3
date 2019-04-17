@@ -38,7 +38,9 @@ source:
   git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
   git_branch: {{ git_branch }}
   # url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}_{{ build_number }}.tar.gz'
-  # # You can obtain this hash by downloading the .tar.gz file from the Release/Tag on the ISIS3 repo and running ????
+  # # sha256 is the prefered checksum -- you can get it for a file with:
+  # # `openssl sha256 <file name>`. Simply run this command with the .tar.gz
+  # # file specified in the "url" tag above.
   # sha256: ''
 
 build:
