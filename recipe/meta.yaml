@@ -5,14 +5,20 @@
 # confirm that you will not be overwriting a file that has already been uploaded by checking the
 # channel before building.
 
+# Also keep in mind that there must already be a Release or a Tag by the name <version>_<build_number>
+# on the USGS-Astrogeology/ISIS3 repo before invoking the conda build system as this will pull the
+# tar.gz of that name to build. After pushing changes for a release build (so as to
+# include these changes in the release), but before building using the conda build system, be
+# sure to create this Release or Tag.
+
 # This is the version of ISIS that you are building. (Please refer to
 # RFC2 (https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process) if you are not sure
-# about what version you are building.)
+# about what version you are building.) 
 # Examples:
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "3.7.0_RC" %}
+{% set version = "3.7.0_RC2" %}
 
 # This is the branch that conda build will pull from the ISIS repository. If you are building for a
 # general public release, leave the branch as "release". If you are building a custom build, like
@@ -31,6 +37,11 @@ package:
 source:
   git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
   git_branch: {{ git_branch }}
+  # url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}_{{ build_number }}.tar.gz'
+  # # sha256 is the prefered checksum -- you can get it for a file with:
+  # # `openssl sha256 <file name>`. Simply run this command with the .tar.gz
+  # # file specified in the "url" tag above.
+  # sha256: ''
 
 build:
   number: {{ build_number }}
