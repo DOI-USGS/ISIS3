@@ -967,11 +967,14 @@ namespace Isis {
 
   /**
    * This converts the spacecraft clock ticks value (clockValue) to an iTime.
-   *
+   *  
+   * If the clock ticks value is provided directly, rather than the spacecraft 
+   * clock string, set clockTicks=true.  
+   *  
    * Use this when possible because naif calls (such as scs2e_c) cannot be
    *   called when not using naif.
    */
-  iTime Spice::getClockTime(QString clockValue, int sclkCode) {
+  iTime Spice::getClockTime(QString clockValue, int sclkCode, bool clockTicks) {
     if (sclkCode == -1) {
       sclkCode = naifSclkCode();
     }
@@ -984,7 +987,12 @@ namespace Isis {
     if (storedClockTime.isNull()) {
       SpiceDouble timeOutput;
       NaifStatus::CheckErrors();
-      scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput);
+      if (clockTicks) {
+        sct2e_c(sclkCode, (SpiceDouble) clockValue.toDouble(), &timeOutput); 
+      }
+      else {
+        scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput); 
+      }
       NaifStatus::CheckErrors();
       storedClockTime = timeOutput;
       storeResult(key, SpiceDoubleType, timeOutput);

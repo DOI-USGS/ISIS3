@@ -57,15 +57,11 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    // StartTime is used, rather than SpacecraftClockStartCount because the format of 
-    // SpaceCraftClockStart count is incompatible with getClockTime
-    double oldTime = iTime((QString)inst["StartTime"]).Et();
-    std::cout << "old time: " << iTime(oldTime).UTC() << std::endl; 
     QString clockCount = inst["SpacecraftClockStartCount"];
     double time = getClockTime(clockCount, -1, true).Et();
-    std::cout << "new time: " << iTime(time).UTC() << std::endl; 
+
     // Setup detector map
-    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0; // ALE uses the ExposureDuration
+    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
     
     // Convert between parent image coordinates and detector coordinates (detector coordinate line, detector coordinate sample)   
     LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time, lineRate);
@@ -89,10 +85,20 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // This is the same, no matter the swath mode
-    focalMap->SetDetectorOrigin(4096.0/2.0 + 0.5, 1.0); 
+
+    // This set the origin of the detector (not image samp,line). It is zero bassed.
+    // The detector offsets are 0,0 because the borsight is in the center of the array
+    QString key;
+    key = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
+    double sampleBoreSight = getDouble(key);
+
+    key = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
+    double lineBoreSight = getDouble(key);
+    focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight); 
 
     // Setup distortion map
     new KaguyaTcCameraDistortionMap(this, naifIkCode());
+//    new CameraDistortionMap(this);
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
