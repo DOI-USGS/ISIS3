@@ -57,12 +57,11 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup inst = lab.findGroup("Instrument", Pvl::Traverse);
 
-    // StartTime is used, rather than SpacecraftClockStartCount because the format of 
-    // SpaceCraftClockStart count is incompatible with getClockTime
-    double time = iTime((QString)inst["StartTime"]).Et();
+    QString clockCount = inst["SpacecraftClockStartCount"];
+    double time = getClockTime(clockCount, -1, true).Et();
 
     // Setup detector map
-    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0; // ALE uses the ExposureDuration
+    double lineRate = (double) inst["LineSamplingInterval"] / 1000.0;
     
     // Convert between parent image coordinates and detector coordinates (detector coordinate line, detector coordinate sample)   
     LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, time, lineRate);
@@ -86,6 +85,7 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // This is the same, no matter the swath mode
+
     // This set the origin of the detector (not image samp,line). It is zero bassed.
     // The detector offsets are 0,0 because the borsight is in the center of the array
     QString key;
