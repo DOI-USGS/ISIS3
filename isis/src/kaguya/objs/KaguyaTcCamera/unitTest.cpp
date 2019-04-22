@@ -51,8 +51,8 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = 59.0972605733461691;
-    double knownLon = 311.467742700096323;
+    double knownLat = 58.3498029142273396;
+    double knownLon = 311.458498980458671;
 
     qDebug() << "Testing TC2 w L2B0 image...";
     Cube c("$kaguya/testData/TC2W2B0_01_02735N583E3115.cub", "r");
@@ -114,8 +114,8 @@ int main(void) {
     qDebug() << "";
     qDebug() << "";
     qDebug() << "Testing TC1 s L2B0 image...";
-    knownLat = -81.2150653963736175;
-    knownLon = 47.1989499604665284;
+    knownLat = -82.0214347373044603;
+    knownLon = 46.4180177580203335;
 
     Cube c2("$kaguya/testData/TC1S2B0_01_06691S820E0465.cub", "r");
     KaguyaTcCamera *cam2 = (KaguyaTcCamera *) CameraFactory::Create(c2);
