@@ -211,7 +211,9 @@ End
     the ISIS 3 documentation glossary including: <def><b>SubSpacecraftLatitude</b></def>,
     <def><b>SubSpacecraftLongitude</b></def>, <def><b>SubSolarLatitude</b></def>,
     <def><b>SubSolarLongitude</b></def>, <def><b>NorthAzimuth</b></def>, 
-    <def><b>SpacecraftAzimuth</b></def>, and <def><b>SubSolarAzimuth</b></def>, 
+    <def><b>SpacecraftAzimuth</b></def>, <def><b>SubSolarAzimuth</b></def>, 
+    <def><b>ObliqueLineResolution</b></def>, <def><b>ObliqueSampleResolution</b></def>,
+    <def><b>ObliquePixelResolution</b></def>, and <def><b>ObliqueDetectorResolution</b></def>
   </p>
   </description>
 

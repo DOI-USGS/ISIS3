@@ -98,8 +98,8 @@ namespace Isis {
    *  @history 2019-04-22 Kaitlyn Lee - Added column for oblique pixel resolution. Added
    *                          checkBoxItems and loop to add elments to the AdvancedTrackTool,
    *                          instead of hardcoded method calls. Instead of using the enum,
-   *                          I added a method getIndex() that calculates what column the 
-   *                          element should be added to. Fixes #4100.
+   *                          added a method getIndex() that calculates what column the 
+   *                          element should be added to. Fixes #2205.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
