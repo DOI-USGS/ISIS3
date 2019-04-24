@@ -30,13 +30,12 @@
 #include "TableMainWindow.h"
 #include "Target.h"
 #include "TProjection.h"
-using namespace std;
+#include "TrackingTable.h"
 
 namespace Isis {
 
   // For mosaic tracking
 #define FLOAT_MIN         -16777215
-#define TABLE_MOSAIC_SRC  "InputImages"
 
   /**
    * Constructs an AdvancedTrackTool object
@@ -581,16 +580,18 @@ namespace Isis {
     }
 
     // Track the Mosaic Origin -  Index (Zero based) and FileName
-    int iMosaicOrigin = -1;
-    QString sSrcFileName = "";
-    QString sSrcSerialNum = "";
-    TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
-    p_tableWin->table()->item(row, getIndex("Track Mosaic Index"))->
-                         setText(QString::number(iMosaicOrigin));
-    p_tableWin->table()->item(row, getIndex("Track Mosaic FileName"))->
-                         setText(QString(sSrcFileName));
-    p_tableWin->table()->item(row, getIndex("Track Mosaic Serial Number"))->
-                         setText(QString(sSrcSerialNum));
+    if (cvp->cube()->hasTable("InputImages") || cvp->cube()->hasGroup("Tracking")) {
+      int iMosaicOrigin = -1;
+      QString sSrcFileName = "";
+      QString sSrcSerialNum = "";
+      TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
+      p_tableWin->table()->item(row, getIndex("Track Mosaic Index"))->
+                           setText(QString::number(iMosaicOrigin));
+      p_tableWin->table()->item(row, getIndex("Track Mosaic FileName"))->
+                           setText(QString(sSrcFileName));
+      p_tableWin->table()->item(row, getIndex("Track Mosaic Serial Number"))->
+                           setText(QString(sSrcSerialNum));
+    }
   }
 
 
@@ -617,21 +618,50 @@ namespace Isis {
         Cube *cCube = cvp->cube();
         int iTrackBand = -1;
 
-        if (cCube->hasTable(TABLE_MOSAIC_SRC)) {
+        // This is a mosaic in the new format or the external tracking cube itself
+        if(cCube->hasGroup("Tracking") || 
+                (cCube->hasTable(trackingTableName) && cCube->bandCount() == 1)) {
+          Cube *trackingCube;
+          if(cCube->hasGroup("Tracking")) {
+            trackingCube = cvp->trackingCube();
+          }
+          else {
+            trackingCube = cCube;
+          }
+          
+          // Read the cube DN value from TRACKING cube at location (piLine, piSample)
+          Portal trackingPortal(trackingCube->sampleCount(), 1, trackingCube->pixelType());
+          trackingPortal.SetPosition(piSample, piLine, 1);
+          trackingCube->read(trackingPortal);
+
+          unsigned int currentPixel = trackingPortal[0];
+          if (currentPixel != NULLUI4) {  // If from an image
+            Table table(trackingTableName); // trackingTableName from TrackingTable
+            trackingCube->read(table);
+            TrackingTable trackingTable(table);
+
+            FileName trackingFileName = trackingTable.pixelToFileName(currentPixel);
+            psSrcFileName = trackingFileName.name();
+            psSrcSerialNum = trackingTable.pixelToSN(currentPixel);
+            piOrigin = trackingTable.fileNameToIndex(trackingFileName, psSrcSerialNum);
+          }
+        }
+        // Backwards compatability. Have this tool work with attached TRACKING bands
+        else if(cCube->hasTable(trackingTableName)) {
           Pvl *cPvl = cCube->label();
           PvlObject cObjIsisCube = cPvl->findObject("IsisCube");
           PvlGroup cGrpBandBin = cObjIsisCube.findGroup("BandBin");
-          for (int i = 0; i < cGrpBandBin.keywords(); i++) {
+          for(int i = 0; i < cGrpBandBin.keywords(); i++) {
             PvlKeyword &cKeyTrackBand = cGrpBandBin[i];
-            for (int j = 0; j < cKeyTrackBand.size(); j++) {
-              if (cKeyTrackBand[j] == "TRACKING") {
+            for(int j = 0; j < cKeyTrackBand.size(); j++) {
+              if(cKeyTrackBand[j] == "TRACKING") {
                 iTrackBand = j;
                 break;
               }
             }
           }
 
-          if (iTrackBand > 0 && iTrackBand <= cCube->bandCount()) {
+          if(iTrackBand > 0 && iTrackBand <= cCube->bandCount()) {
             Portal cOrgPortal(cCube->sampleCount(), 1,
                               cCube->pixelType());
             cOrgPortal.SetPosition(piSample, piLine, iTrackBand + 1); // 1 based
@@ -652,20 +682,24 @@ namespace Isis {
             }
 
             // Get the input file name and serial number
-            Table cFileTable(TABLE_MOSAIC_SRC);
+            Table cFileTable(trackingTableName);
             cCube->read(cFileTable);
             int iRecs =   cFileTable.Records();
-            if (piOrigin >= 0 && piOrigin < iRecs) {
+            if(piOrigin >= 0 && piOrigin < iRecs) {
               psSrcFileName = QString(cFileTable[piOrigin][0]);
               psSrcSerialNum = QString(cFileTable[piOrigin][1]);
             }
           }
+        } 
+        
+        if (piOrigin == -1) { // If not from an image, display N/A
+          psSrcFileName = "N/A";
+          psSrcSerialNum = "N/A";
         }
       }
       catch (IException &e) {
           QMessageBox::warning((QWidget *)parent(), "Warning", e.toString());
       }
-
   }
 
 

@@ -489,10 +489,6 @@
             <LI>LineResolution</LI>
             <LI>PixelResolution</LI>
             <LI>MeanGroundResolution</LI>
-            <LI>ObliqueSampleResolution</LI>
-            <LI>ObliqueLineResolution</LI>
-            <LI>ObliquePixelResolution</LI>
-            <LI>ObliqueDetectorResolution</LI>
             <LI>SubSolarAzimuth</LI>
             <LI>SubSolarGroundAzimuth</LI>
             <LI>SubSolarLatitude</LI>
@@ -508,6 +504,10 @@
             <LI>HasLongitudeBoundary</LI>
             <LI>HasNorthPole</LI>
             <LI>HasSouthPole</LI>
+            <LI>ObliqueSampleResolution</LI>
+            <LI>ObliqueLineResolution</LI>
+            <LI>ObliquePixelResolution</LI>
+            <LI>ObliqueDetectorResolution</LI>
           </UL>
 
         </description>
@@ -588,6 +588,8 @@
             <LI>MaximumIncidence</LI>
             <LI>MinimumLocalTime</LI>
             <LI>MaximumLocalTime</LI>
+            <LI>MinimumObliqueResolution</LI>
+            <LI>MaximumObliqueResolution</LI>
           </UL>
         </description>
         <inclusions>

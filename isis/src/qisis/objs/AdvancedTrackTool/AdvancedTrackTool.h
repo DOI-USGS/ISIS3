@@ -26,7 +26,6 @@
 #include "Tool.h"
 #include <QList>
 #include <QString>
-using namespace std;
 
 class QAction;
 
@@ -85,7 +84,17 @@ namespace Isis {
    *                          before it attempts to record a point so that a table is created
    *                          to record the point into so that the first recorded point is drawn.
    *                          Fixes #5143.
-   *  @history 2018-05-22 Kaitlyn Lee - Added column for oblique pixel resolution. Added
+   *  @history 2018-07-18 Kristin Berry and Kaitlyn Lee - Updated TrackMosaicOrigin to work with
+   *                          an external tracking cube.
+   *  @history 2018-07-31 Kaitlyn Lee - Updated TrackMosaicOrigin to use a TrackingTable object
+   *                          to get the file name, serial number, and index of the image associated
+   *                          with the current pixel. Moved code opening the tracking cube to
+   *                          CubeViewport. If the cursor is over a pixel with no tracking info,
+   *                          file name and serial number display N/A now.
+   *  @history 2018-08-13 Summer Stapleton - Added logic to trackingMosaicOrigin() for the tracking
+   *                          cube (in addition to the mosaic cube) and added logic to track the
+   *                          serial number of all other cubes. Fixes #4899
+   *  @history 2019-04-22 Kaitlyn Lee - Added column for oblique pixel resolution. Added
    *                          checkBoxItems and loop to add elments to the AdvancedTrackTool,
    *                          instead of hardcoded method calls. Instead of using the enum,
    *                          I added a method getIndex() that calculates what column the 
@@ -99,7 +108,6 @@ namespace Isis {
       void addTo(QMenu *menu);
       void addToPermanent(QToolBar *perm);
       bool eventFilter(QObject *o, QEvent *e);
-      int getIndex(QString keyword);
 
     public slots:
       virtual void mouseMove(QPoint p);
@@ -131,6 +139,7 @@ namespace Isis {
       void readSettings();
       void writeSettings();
       QString settingsFilePath() const;
+      int getIndex(QString keyword);
 
       // Used to store information about each check box to later add to the table
       // New entries can be added anywhere in the QList.

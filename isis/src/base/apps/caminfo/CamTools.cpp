@@ -215,7 +215,7 @@ namespace Isis {
         g.sampRes = camera.SampleResolution();
         g.lineRes = camera.LineResolution();
 
-        g.obliqueSampRes = camera.ObliqueSampleResolution();
+        g.SampRes = camera.ObliqueSampleResolution();
         g.obliqueLineRes = camera.ObliqueLineResolution();
         g.obliquePixelRes = camera.ObliquePixelResolution();
         g.obliqueDetectorRes = camera.ObliqueDetectorResolution();
@@ -423,11 +423,6 @@ namespace Isis {
     pband += ValidateKey("PixelResolution", aveRes);
     pband += ValidateKey("MeanGroundResolution", g.grRes);
 
-    pband += ValidateKey("ObliqueSampleResolution", g.obliqueSampRes);
-    pband += ValidateKey("ObliqueLineResolution", g.obliqueLineRes);
-    pband += ValidateKey("ObliquePixelResolution", g.obliquePixelRes);
-    pband += ValidateKey("ObliqueDetectorResolution", g.obliqueDetectorRes);
-
     pband += ValidateKey("SubSolarAzimuth", g.subSolarAzimuth);
     pband += ValidateKey("SubSolarGroundAzimuth", g.subSolarGroundAzimuth);
     pband += ValidateKey("SubSolarLatitude", g.subSolarLatitude);
@@ -467,6 +462,11 @@ namespace Isis {
     else {
       pband += PvlKeyword("HasSouthPole", "FALSE");
     }
+
+    pband += ValidateKey("ObliqueSampleResolution", g.obliqueSampRes);
+    pband += ValidateKey("ObliqueLineResolution", g.obliqueLineRes);
+    pband += ValidateKey("ObliquePixelResolution", g.obliquePixelRes);
+    pband += ValidateKey("ObliqueDetectorResolution", g.obliqueDetectorRes);
 
     return;
   }
