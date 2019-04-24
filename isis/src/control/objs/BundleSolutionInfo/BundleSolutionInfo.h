@@ -27,6 +27,7 @@
 #include <QString>
 
 #include "BundleSettings.h"
+#include "SurfacePoint.h"
 
 #include "XmlStackedHandler.h"
 
@@ -36,6 +37,7 @@ class QXmlStreamWriter;
 
 namespace Isis {
   class BundleResults;
+  class Control;
   class FileName;
   class ImageList;
   class Project;  //TODO does xml stuff need project???
@@ -44,8 +46,14 @@ namespace Isis {
 
   /**
    * @brief Container class for BundleAdjustment results.
+   *
    * This class includes the settings used to run the bundle adjustment, the resulting statistics
    * values, and the name of the control network used.
+   *  NOTE: BundleSolutionInfo is derived from QObject as it has one slot (perhaps more signals
+   *       and slots in the future? As a child of QObject it should have no copy constructor or
+   *       assignment operator. See for example...
+   *
+   *       http://doc.qt.io/qt-5/qobject.html#no-copy-constructor
    *
    * @ingroup ControlNetworks
    *
@@ -119,6 +127,34 @@ namespace Isis {
    *   @history 2018-01-17 Tracie Sucharski - Added conditional code to check for null project in
    *                           xml serialization to allow the unitTest to use xml serialization
    *                           without having a project. References #5104.
+   *   @history 2018-03-21 Ken Edmundson - Added...
+   *                           1) member variable m_inputControlNetFileName, accessor method, and
+   *                              serialization support. Also added input control net filename to
+   *                              constructor.
+   *                           2) member variable m_outputControl, associated mutator/accessor, and
+   *                              serialization support.
+   *                           3) member variable m_txtBundleOutputFilename and associated accessor
+   *                              for bundleout.txt file.
+   *   @history 2018-03-23 Ken Edmundson - modified...
+   *                           1) removed serialization of output control filename
+   *                           2) serialization of output control to be more robust, ensuring that
+   *                              the control's id is added to project upon reading back in. Also
+   *                              ensures that an open cneteditor widget containing a
+   *                              bundlesolutioninfo's output control is serialized properly.
+   *   @history 2018-03-26 Ken Edmundson - modified save method to properly save output control
+   *                           network file.
+   *   @history 2018-05-22 Ken Edmundson - changed default and copy constructors and assignment
+   *                           operator to private to prevent developer from calling them. Done
+   *                           because BundleSolutionInfo is derived from QObject (see comment
+   *                           below). Removed copy constructor and assignment operator from cpp
+   *                           file.
+   *   @history 2018-06-01 Debbie A. Cook - ( Added 2018-02-21 to BundleXYZ branch) Added
+   *                           coordinate types to report and appropriate headings for columns based
+   *                           on the coordinate type.  Also added a utility method to return the
+   *                           coordinate name based on coordinate type and coordinate index.
+   *                           References #4649 and #501.
+   *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References
+   *                           #4649 and #501
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT
@@ -131,22 +167,26 @@ namespace Isis {
       BundleSolutionInfo(Project *project,
                     XmlStackedHandlerReader *xmlReader,
                     QObject *parent = 0);  //TODO does xml stuff need project???
-      BundleSolutionInfo(const BundleSolutionInfo &src);
-      ~BundleSolutionInfo();
-      BundleSolutionInfo &operator=(const BundleSolutionInfo &src);
+      BundleSolutionInfo() = default;
 
+      ~BundleSolutionInfo();
+
+      QString savedBundleOutputFilename();
       QString savedImagesFilename();
       QString savedPointsFilename();
       QString savedResidualsFilename();
 
       void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
+      void setOutputControl(Control *outputControl);
       void setRunTime(QString runTime);
       void setName(QString name);
 
       QList<ImageList *> adjustedImages() const;
       QString id() const;
-      QString controlNetworkFileName() const;
+      QString inputControlNetFileName() const;
+      QString outputControlNetFileName() const;
+      Control *control() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -162,6 +202,9 @@ namespace Isis {
       bool outputResiduals();
 
       void save(QXmlStreamWriter &stream, const Project *project, FileName newProjectRoot) const;
+
+      QString surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                    SurfacePoint::CoordIndex coordInx) const;
 
     public slots:
       void updateFileName(Project *);
@@ -188,6 +231,8 @@ namespace Isis {
           virtual bool characters(const QString &ch);
           virtual bool endElement(const QString &namespaceURI, const QString &localName,
                                     const QString &qName);
+          QString surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                        SurfacePoint::CoordIndex coordIdx) const;
 
         private:
           Q_DISABLE_COPY(XmlHandler);
@@ -198,27 +243,27 @@ namespace Isis {
       };
 
     private:
-      BundleSolutionInfo();
 
       //! A unique ID for this BundleSolutionInfo object (useful for others to reference this
       //! object when saving to disk).
       QUuid              *m_id;
-      QString             m_name; //!< The name of the bundle. Defaults to the id
-      QString             m_runTime; //!< The run time of the bundle adjust
-      FileName           *m_controlNetworkFileName; //!< The name of the control network
-      BundleSettingsQsp   m_settings; //!< The settings from the bundle adjust
-      BundleResults      *m_statisticsResults; //!< The results of the bundle adjust
-      QList<ImageList *> *m_images; //!< The list of images as input to the bundle
-      QList<ImageList *> *m_adjustedImages; //!< The list of images that were adjsuted
+      QString             m_name;                        //!< Name of the bundle. Defaults to the id
+      QString             m_runTime;                     //!< Run time of the bundle adjustment
+      FileName           *m_inputControlNetFileName;     //!< Input control network file name
+      Control            *m_outputControl;               //!< Output control
+      BundleSettingsQsp   m_settings;                    //!< Bundle settings
+      BundleResults      *m_statisticsResults;           //!< Bundle statistical results
+      QList<ImageList *> *m_images;                      //!< Input image list
+      QList<ImageList *> *m_adjustedImages;              //!< Adjusted image list
 
-      // In theory the path in the BundlesSettings can change while running.  So we save the
+      // In theory the path in the BundleSettings can change while running. So we save the
       // filenames actually used when the most recent save of the file was done.
+      QString m_txtBundleOutputFilename;
       QString m_csvSavedImagesFilename;
       QString m_csvSavedPointsFilename;
       QString m_csvSavedResidualsFilename;
 
   }; // end BundleSolutionInfo class
-
 
   void setStringAttribute(int locationId, QString locationName,
                           QString attributeName, QString attributeValue);

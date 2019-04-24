@@ -536,10 +536,14 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
     </change>
     <change name="Jeannie Backer" date="2017-11-28 ">
        Updated radiance calibration to divide by exposure duration, as done with reflectance. 
-       Updated amicaCalibration????.trn file with latest radiance scale factor for sz 
-       (value provided by L. LeCorre, PSI).
+       Updated amicaCalibration????.trn file with latest radiance scale factor for zs
+       (value provided by L. Le Corre, PSI).
        Updated to use filter V solar flux on all calculations. 
        Brought code closer to ISIS3 coding standards. Fixes #5243
+    </change>
+    <change name="Lucille Le Corre" date="2018-01-30">
+        Added DN/S as an output option. Apply dark current current as it was disabled
+        in earlier versions.
     </change>
   </history>
 
@@ -638,6 +642,15 @@ xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Applica
               Convert to DN units 
             </brief> 
             <description>
+            </description>
+          </option>
+
+          <option value="DN/S">
+            <brief>
+              Convert to DN/S units 
+            </brief> 
+            <description>
+                Raw DNs are divided by the exposure time, in seconds.
             </description>
           </option>
 

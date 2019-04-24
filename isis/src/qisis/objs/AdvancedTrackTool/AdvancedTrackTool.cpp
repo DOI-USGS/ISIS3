@@ -3,6 +3,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QLabel>
+#include <QListIterator>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -13,7 +14,6 @@
 #include <QTableWidgetItem>
 #include <QToolBar>
 #include <QVBoxLayout>
-#include <QListIterator>
 
 #include "Angle.h"
 #include "Camera.h"
@@ -61,7 +61,7 @@ namespace Isis {
     connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(raise()));
     connect(p_action, SIGNAL(triggered()), p_tableWin, SLOT(syncColumns()));
     p_tableWin->installEventFilter(this);
-
+    
     // Adds each item of checkBoxItems to the table.
     // If a tool tip is specified, we cannot skip parameters, so -1 and
     // Qt::Horizontal are specified.
@@ -88,14 +88,14 @@ namespace Isis {
       }
     }
 
-    // This variable will keep track of how many times
+    //This variable will keep track of how many times
     // the user has issued the 'record' command.
     p_id = 0;
 
     // Setup 10 blank rows in the table
-    for (int r = 0; r < 10; r++) {
+    for(int r = 0; r < 10; r++) {
       p_tableWin->table()->insertRow(r);
-      for (int c = 0; c < p_tableWin->table()->columnCount(); c++) {
+      for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
         QTableWidgetItem *item = new QTableWidgetItem("");
         p_tableWin->table()->setItem(r, c, item);
       }
@@ -134,7 +134,7 @@ namespace Isis {
    * @return bool
    */
   bool AdvancedTrackTool::eventFilter(QObject *o, QEvent *e) {
-    if (e->type() == QEvent::Show) {
+    if(e->type() == QEvent::Show) {
       activate(true);
       if (m_showHelpOnStart) {
         helpDialog();
@@ -142,7 +142,7 @@ namespace Isis {
         writeSettings();
       }
     }
-    else if (e->type() == QEvent::Hide) {
+    else if(e->type() == QEvent::Hide) {
       activate(false);
     }
     return Tool::eventFilter(o, e);
@@ -185,8 +185,8 @@ namespace Isis {
    */
   void AdvancedTrackTool::mouseLeave() {
 
-    if (cubeViewport()->isLinked()) {
-      for (int i = 0; i < p_numRows; i++) {
+    if(cubeViewport()->isLinked()) {
+      for(int i = 0; i < p_numRows; i++) {
         p_tableWin->clearRow(i + p_tableWin->currentRow());
       }
     }
@@ -203,26 +203,27 @@ namespace Isis {
    */
   void AdvancedTrackTool::updateRow(QPoint p) {
     MdiCubeViewport *cvp = cubeViewport();
-    if (cvp == NULL) {
+    if(cvp == NULL) {
       p_tableWin->clearRow(p_tableWin->currentRow());
       return;
     }
 
-    if (!cubeViewport()->isLinked()) {
+    if(!cubeViewport()->isLinked()) {
       updateRow(cvp, p, p_tableWin->currentRow());
       p_numRows = 1;
     }
     else {
       p_numRows = 0;
-      for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
+      for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
         MdiCubeViewport *d = (*(cubeViewportList()))[i];
-        if (d->isLinked()) {
+        if(d->isLinked()) {
           updateRow(d, p, p_tableWin->currentRow() + p_numRows);
           p_numRows++;
         }
       }
     }
   }
+
 
     /**
      * This method finds the index of the header in checkBoxItems by looping
@@ -251,7 +252,7 @@ namespace Isis {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  /**
+
    * This method updates the row given with data from the viewport cvp at point p.
    *
    * @param cvp CubeViewPort that contains p
@@ -267,34 +268,35 @@ namespace Isis {
 
     /*if there are linked cvp's then we want to highlight (select)
     the row of the active cvp.*/
-    if (cvp->isLinked()) {
+    if(cvp->isLinked()) {
 
-      if (cvp == cubeViewport()) {
+      if(cvp == cubeViewport()) {
         p_tableWin->table()->selectRow(row);
       }
 
     }
 
+
     // Do we need more rows?
-    if (row + 1 > p_tableWin->table()->rowCount()) {
+    if(row + 1 > p_tableWin->table()->rowCount()) {
       p_tableWin->table()->insertRow(row);
-      for (int c = 0; c < p_tableWin->table()->columnCount(); c++) {
+      for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
         QTableWidgetItem *item = new QTableWidgetItem("");
         p_tableWin->table()->setItem(row, c, item);
-        if (c == 0) p_tableWin->table()->scrollToItem(item);
+        if(c == 0) p_tableWin->table()->scrollToItem(item);
       }
     }
 
     // Blank out the row to remove stuff left over from previous cvps
-    for (int c = 0; c < p_tableWin->table()->columnCount(); c++) {
+    for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
       p_tableWin->table()->item(row, c)->setText("");
     }
 
     // Don't write anything if we are outside the cube
-    if (sample < 0.5) return;
-    if (line < 0.5) return;
-    if (sample > cvp->cubeSamples() + 0.5) return;
-    if (line > cvp->cubeLines() + 0.5) return;
+    if(sample < 0.5) return;
+    if(line < 0.5) return;
+    if(sample > cvp->cubeSamples() + 0.5) return;
+    if(line > cvp->cubeLines() + 0.5) return;
 
     // Write cols 0-2 (id, sample, line)
     p_tableWin->table()->item(row, getIndex("ID"))->setText(QString::number(p_id));
@@ -315,17 +317,19 @@ namespace Isis {
     QString fnameName = fname.name();
     p_tableWin->table()->item(row, getIndex("Path"))->setText(fnamePath);
     p_tableWin->table()->item(row, getIndex("FileName"))->setText(fnameName);
-    //p_tableWin->table()->item(row,34)->setText(SerialNumber::Compose(*cvp->cube()).c_str());
+    if (!cvp->cube()->hasGroup("Tracking") && !cvp->cube()->hasTable("InputImages")){
+      p_tableWin->table()->item(row, getIndex("Serial Number"))->setText(SerialNumber::Compose(*cvp->cube()));
+    }
 
     // If we are outside of the image then we are done
-    if ((sample < 0.5) || (line < 0.5) ||
+    if((sample < 0.5) || (line < 0.5) ||
         (sample > cvp->cubeSamples() + 0.5) ||
         (line > cvp->cubeLines() + 0.5)) {
       return;
     }
 
     // Otherwise write out col 4 (Pixel value)
-    if (cvp->isGray()) {
+    if(cvp->isGray()) {
       QString grayPixel = PixelToString(cvp->grayPixel(isample, iline));
       QString p = grayPixel;
       p_tableWin->table()->item(row, getIndex("Pixel"))->setText(p);
@@ -337,8 +341,8 @@ namespace Isis {
     }
 
     // Do we have a camera model?
-    if (cvp->camera() != NULL) {
-      if (cvp->camera()->SetImage(sample, line)) {
+    if(cvp->camera() != NULL) {
+      if(cvp->camera()->SetImage(sample, line)) {
         // Write columns ocentric lat/lon, and radius, only if set image succeeds
         double lat = cvp->camera()->UniversalLatitude();
         double lon = cvp->camera()->UniversalLongitude();
@@ -357,7 +361,7 @@ namespace Isis {
 
         // Write out the planetographic and positive west values, only if set image succeeds
         lon = -lon;
-        while (lon < 0.0) lon += 360.0;
+        while(lon < 0.0) lon += 360.0;
         Distance radii[3];
         cvp->camera()->radii(radii);
         lat = TProjection::ToPlanetographic(lat, radii[0].meters(), radii[2].meters());
@@ -409,9 +413,9 @@ namespace Isis {
         // Calculates the angles local to the slope for the DEMs, compare against
         // the incidence and emission angles calculated for the sphere
         Angle phaseAngle, incidenceAngle, emissionAngle;
-        bool bSuccess = false;
+        bool bSucces = false;
         cvp->camera()->LocalPhotometricAngles(phaseAngle, incidenceAngle, emissionAngle, bSuccess);
-        if (bSuccess) {
+        if(bSuccess) {
           p_tableWin->table()->item(row, getIndex("LocalIncidence"))->
                                setText(QString::number(incidenceAngle.degrees()));
           p_tableWin->table()->item(row, getIndex("LocalEmission"))->
@@ -453,7 +457,6 @@ namespace Isis {
         }
 
         // Write out columns solar lon, slant distance, local solar time
-        double solarLon = cvp->camera()->solarLongitude().degrees();
         p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
                              setText(QString::number(solarLon));
         double slantDistance = cvp->camera()->SlantDistance();
@@ -494,7 +497,7 @@ namespace Isis {
       // Always write out columns et and utc, regardless of whether set image succeeds
       iTime time(cvp->camera()->time());
       p_tableWin->table()->item(row, getIndex("Ephemeris Time"))->
-                           setText(QString::number(time.Et(), 'f', 15));
+                           setText(QString::number(time.Et(), 'f', 15));      
       QString time_utc = time.UTC();
       p_tableWin->table()->item(row, getIndex("UTC"))->setText(time_utc);
 
@@ -518,7 +521,7 @@ namespace Isis {
 
           double glat = tproj->ToPlanetographic(lat);
           double wlon = -lon;
-          while (wlon < 0.0) wlon += 360.0;
+          while(wlon < 0.0) wlon += 360.0;
           if (tproj->IsSky()) {
             lon = tproj->Longitude();
             p_tableWin->table()->item(row, getIndex("Right Ascension"))->
@@ -542,6 +545,7 @@ namespace Isis {
                                  setText(QString::number(TProjection::To180Domain(wlon), 'f', 15));
             p_tableWin->table()->item(row, getIndex("Local Radius"))->setText(QString::number(radius, 'f', 15));
           }
+          }
         }
         else { // RingPlane
           RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
@@ -549,7 +553,7 @@ namespace Isis {
           double lon = rproj->UniversalRingLongitude();
 
           double wlon = -lon;
-          while (wlon < 0.0) wlon += 360.0;
+          while(wlon < 0.0) wlon += 360.0;
           double radius = lat;
           p_tableWin->table()->item(row, getIndex("Planetocentric Latitude"))->setText("0.0");
           p_tableWin->table()->item(row, getIndex("Planetographic Latitude"))->setText("0.0");
@@ -568,8 +572,8 @@ namespace Isis {
     }
 
     //If there is a projection add the Projected X and Y coords to the table
-    if (cvp->projection() != NULL) {
-      if (cvp->projection()->SetWorld(sample, line)) {
+    if(cvp->projection() != NULL) {
+      if(cvp->projection()->SetWorld(sample, line)) {
         double projX = cvp->projection()->XCoord();
         double projY = cvp->projection()->YCoord();
         p_tableWin->table()->item(row, getIndex("Projected X"))->
@@ -761,18 +765,18 @@ namespace Isis {
    *
    */
   void AdvancedTrackTool::record() {
-    if (p_tableWin->table()->isHidden()) return;
-    if (p_tableWin->table()->item(p_tableWin->currentRow(), 0)->text() == "") return;
+    if(p_tableWin->table()->isHidden()) return;
+    if(p_tableWin->table()->item(p_tableWin->currentRow(), 0)->text() == "") return;
 
     int row = 0;
     p_tableWin->setCurrentRow(p_tableWin->currentRow() + p_numRows);
     p_tableWin->setCurrentIndex(p_tableWin->currentIndex() + p_numRows);
-    while (p_tableWin->currentRow() >= p_tableWin->table()->rowCount()) {
+    while(p_tableWin->currentRow() >= p_tableWin->table()->rowCount()) {
 
       row = p_tableWin->table()->rowCount();
 
       p_tableWin->table()->insertRow(row);
-      for (int c = 0; c < p_tableWin->table()->columnCount(); c++) {
+      for(int c = 0; c < p_tableWin->table()->columnCount(); c++) {
         QTableWidgetItem *item = new QTableWidgetItem("");
         p_tableWin->table()->setItem(row, c, item);
       }
@@ -818,12 +822,10 @@ namespace Isis {
    */
   void AdvancedTrackTool::updateID() {
     //Check if the current row is 0
-    if (p_tableWin->currentRow() == 0) {
+    if(p_tableWin->currentRow() == 0)
       p_id = 0;
-    }
-    else {
-      p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, getIndex("ID"))->text().toInt() + 1;
-    }
+    else
+      p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, ID)->text().toInt() + 1;
   }
 
 

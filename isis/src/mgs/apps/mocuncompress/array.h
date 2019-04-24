@@ -1,3 +1,6 @@
+#ifndef mocuncompress_array_h
+#define mocuncompress_array_h
+
 /*
 NOTICE
 
@@ -52,3 +55,5 @@ extern int array_len(Array *a);
 extern char *array_data(Array *a);
 extern void array_free(Array *a);
 extern int array_slot_delete(Array *a, int slot, int len);
+
+#endif

@@ -2,19 +2,24 @@
 
 #include "APrioriLatitudeFilter.h"
 
+#include <QPair>
+#include <QString>
+
+#include "ControlMeasure.h"
+#include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Latitude.h"
 
 
 namespace Isis {
   APrioriLatitudeFilter::APrioriLatitudeFilter(
-    AbstractFilter::FilterEffectivenessFlag flag,
-    int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
+        AbstractFilter::FilterEffectivenessFlag flag,
+        int minimumForSuccess) : AbstractNumberFilter(flag, minimumForSuccess) {
   }
 
 
-  APrioriLatitudeFilter::APrioriLatitudeFilter(
-    const APrioriLatitudeFilter &other) : AbstractNumberFilter(other) {
+  APrioriLatitudeFilter::APrioriLatitudeFilter(const APrioriLatitudeFilter &other)
+        : AbstractNumberFilter(other) {
   }
 
 
@@ -22,20 +27,18 @@ namespace Isis {
   }
 
 
-  bool APrioriLatitudeFilter::evaluate(
-    const ControlCubeGraphNode *node) const {
-    return evaluateImageFromPointFilter(node);
+  bool APrioriLatitudeFilter::evaluate(const QPair<QString, ControlNet *> *imageAndNet) const {
+    return evaluateImageFromPointFilter(imageAndNet);
   }
 
 
   bool APrioriLatitudeFilter::evaluate(const ControlPoint *point) const {
     return AbstractNumberFilter::evaluate(
-        point->GetAprioriSurfacePoint().GetLatitude().degrees());
+          point->GetAprioriSurfacePoint().GetLatitude().degrees());
   }
 
 
-  bool APrioriLatitudeFilter::evaluate(
-    const ControlMeasure *measure) const {
+  bool APrioriLatitudeFilter::evaluate(const ControlMeasure *measure) const {
     return true;
   }
 
@@ -64,4 +67,3 @@ namespace Isis {
         descriptionSuffix();
   }
 }
-

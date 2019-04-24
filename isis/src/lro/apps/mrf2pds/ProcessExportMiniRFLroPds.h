@@ -1,3 +1,6 @@
+#ifndef processexportminirflropds_h
+#define processexportminirflropds_h
+
 /**
  *   Unless noted otherwise, the portions of Isis written by the
  *   USGS are public domain. See individual third-party library
@@ -49,3 +52,5 @@ namespace Isis {
       virtual void CreateImageLabel(void);
   };
 }
+
+#endif

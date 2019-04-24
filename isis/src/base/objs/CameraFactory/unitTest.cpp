@@ -14,13 +14,9 @@ void doit(Cube &cube);
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
 
-  // Get system's Camera.plugin file and add two new cameras of the same name to the bottom of 
+  // Get system's Camera.plugin file and add two new cameras of the same name to the bottom of
   // Camera.plugin with different version numbers
   Pvl pluginFile;
-  FileName systemFile("$ISISROOT/lib/Camera.plugin");
-  if (systemFile.fileExists()) {
-    pluginFile.read(systemFile.expanded());
-  }
   PvlGroup oldCamera = PvlGroup("BOGUS/BOGUS");
   PvlGroup newCamera = PvlGroup("BOGUS/BOGUS");
   oldCamera += PvlKeyword("Version", "1");
@@ -28,7 +24,7 @@ int main(int argc, char *argv[]) {
   pluginFile.addGroup(oldCamera);
   pluginFile.addGroup(newCamera);
   pluginFile.write("Camera.plugin");
-  
+
   cerr << "Unit test for CameraFactory" << endl;
   cerr << "Testing missing Instrument Group ..." << endl;
   Cube dummyCube("$base/testData/isisTruth.cub", "r");
@@ -89,7 +85,3 @@ void doit(Cube &cube) {
 
   cerr << endl;
 }
-
-
-
-

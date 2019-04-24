@@ -136,9 +136,9 @@ namespace Isis {
    *   @history 2009-08-24 Kris Becker - Added ability to disable use of shape
    *                           model when creating polygons that contains a limb
    *   @history 2011-02-17 Jai Rideout - Replaced pixinc with sinc and linc.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis 
    *                          tickets #775 and #1114.
    *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
    *                           instead of Projection.  References #775.
@@ -146,8 +146,6 @@ namespace Isis {
    *                          parallaxy, shadowx, shadowy.  Fixes #1296
    *   @history 2013-02-22 Janet Barrett, Modified the CamTools::collect method to allow a
    *                          footprint blob option. Fixes #1452.
-   *   @history 2018-03-30 Kaitlyn Lee, Added oblique sample, line, pixel,
-   *                          and detector resolutions. Fixes #4100.
    */
   class BandGeometry {
 
@@ -203,8 +201,7 @@ namespace Isis {
           centroidLatitude(Null), centroidLongitude(Null),
           centroidLine(Null), centroidSample(Null), centroidRadius(Null),
           surfaceArea(Null), phase(Null), emi(Null), inc(Null),
-          sampRes(Null), lineRes(Null), grRes(Null), obliqueSampRes(Null),
-          obliqueLineRes(Null), obliquePixelRes(Null), obliqueDetectorRes(Null),
+          sampRes(Null), lineRes(Null), grRes(Null),
           solarLongitude(Null), northAzimuth(Null), offNader(Null),
           subSolarAzimuth(Null), subSolarGroundAzimuth(Null),
           subSpacecraftAzimuth(Null), subSpacecraftGroundAzimuth(Null),
@@ -233,7 +230,6 @@ namespace Isis {
         double centroidRadius, surfaceArea;
         double phase, emi, inc;
         double sampRes, lineRes, grRes;
-        double obliqueSampRes, obliqueLineRes, obliquePixelRes, obliqueDetectorRes;
         double solarLongitude, northAzimuth, offNader;
         double subSolarAzimuth, subSolarGroundAzimuth;
         double subSpacecraftAzimuth, subSpacecraftGroundAzimuth;

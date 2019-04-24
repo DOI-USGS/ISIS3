@@ -34,13 +34,13 @@
       Added parameter allowing user to enter in projection type to use in seeding process.
     </change>
     <change name="Travis Addair" date="2009-09-14">
-      Changed means of entering projection type to be a map file so as to allow 
+      Changed means of entering projection type to be a map file so as to allow
       for more customization and accepted projection types.
     </change>
     <change name="Travis Addair" date="2009-09-24">
-      Added option to use lat/lon spacing when seeding points; fixed bug causing 
-      points to be seeded outside the lat/lon range; added a default projection 
-      type and reinstated the TARGET parameter so the user does not need to edit 
+      Added option to use lat/lon spacing when seeding points; fixed bug causing
+      points to be seeded outside the lat/lon range; added a default projection
+      type and reinstated the TARGET parameter so the user does not need to edit
       a projection file in order to run the program.
     </change>
     <change name="Travis Addair" date="2010-06-07">
@@ -66,10 +66,14 @@
       Cleaned up duplicate code. Added error message to alert to the user when the program fails
       to find TargetRadii. Added errors appTest. References #3892
     </change>
+    <change name="Jesse Mapel" date="2018-07-06">
+      Changed to get the target radii directly from the Target class instead of the control network
+      because the control network no longer has them. Fixes #5457.
+    </change>
   </history>
 
   <groups>
-    <group name="Target/Range"> 
+    <group name="Target/Range">
       <parameter name="TARGET">
         <type>string</type>
         <brief>
@@ -84,7 +88,7 @@
           the program will throw an error.
         </description>
         <internalDefault>From MAP file</internalDefault>
-      </parameter>                                                   
+      </parameter>
 
       <parameter name="MAP">
         <type>filename</type>
@@ -97,8 +101,8 @@
         <description>
           A file containing the mapping parameters in PVL form.  This file can
           be a simple PVL file or an existing cube label that contains a
-          Mapping group.  By default, the program will use a 
-          standard map template for a Sinusoidal projection.  If the keyword 
+          Mapping group.  By default, the program will use a
+          standard map template for a Sinusoidal projection.  If the keyword
           TargetName is not in this mapping file, then the user must specify
           a value for the TARGET parameter. You can produce map files using the
           <a href="../maptemplate/maptemplate.html"
@@ -167,14 +171,14 @@
       <parameter name="SPACING">
         <type>string</type>
         <brief>
-          Whether the generated control points should be spaced by meter 
+          Whether the generated control points should be spaced by meter
           increment, or by latitude/longitude increment
         </brief>
         <description>
-            This option allows the user to specify the type of spacing the 
-            program will use when generating the control points.  Selecting 
-            METER spacing will use a projection to attempt to place control 
-            points every XSTEP meters within the longitude range, and every 
+            This option allows the user to specify the type of spacing the
+            program will use when generating the control points.  Selecting
+            METER spacing will use a projection to attempt to place control
+            points every XSTEP meters within the longitude range, and every
             YSTEP meters within the latitude range.  Conversely, LATLON spacing
             will simply place control points every LATSTEP and LONSTEP within
             the range.
@@ -186,10 +190,10 @@
                    Space control points in the range by meter increments.
                 </brief>
                 <description>
-                    This option will space control points in the range by a 
-                    specified XSTEP and YSTEP given in meters on the planet's 
-                    surface.  If this option is selected, the user must also 
-                    specify a MAP file, but not necessarily a value for 
+                    This option will space control points in the range by a
+                    specified XSTEP and YSTEP given in meters on the planet's
+                    surface.  If this option is selected, the user must also
+                    specify a MAP file, but not necessarily a value for
                     TARGET if the projection contains the TargetName keyword.
                 </description>
                 <inclusions>
@@ -204,12 +208,12 @@
             </option>
             <option value="LATLON">
                 <brief>
-                    Space control points in the range by latitude and longitude 
+                    Space control points in the range by latitude and longitude
                     increments.
                 </brief>
                 <description>
-                    This option will space control points in the range by a 
-                    specified LATSTEP and LONSTEP, given in terms of the 
+                    This option will space control points in the range by a
+                    specified LATSTEP and LONSTEP, given in terms of the
                     planet's degrees latitude and longitude, respectively. If
                     this option is selected, the user must specify a TARGET
                     name, but not a MAP file. The lat/lon coordinates are in

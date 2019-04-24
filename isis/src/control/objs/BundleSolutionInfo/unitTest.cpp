@@ -76,8 +76,11 @@ namespace Isis {
  * @internal
  *   @history 2015-09-03 Jeannie Backer - Commented out xml code test until we determine whether
  *                           we will keep this code.
- *   @history 2016-10-13 Ian Humphrey - Changed addnew call to addNew(). References #4293.
- *   @history 2017-04-24 Ian Humphrey - Replaced pvlObject() with XML save(). Fixes #4797.
+ *   @history 2016-10-13 Ian Humphrey -  Changed addnew call to addNew(). References #4293.
+ *   @history 2017-04-24 Ian Humphrey -  Replaced pvlObject() with XML save(). Fixes #4797.
+ *   @history 2018-05-24 Ken Edmundson - Removed testing for copy constructor and assignment
+ *                                       operator because these have been removed from
+ *                                       BundleSolutionInfo.
  */
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -90,6 +93,8 @@ int main(int argc, char *argv[]) {
 
     // create default settings and statistics objects to pass into results object
     BundleSettingsQsp settings = BundleSettingsQsp(new BundleSettings);
+    qDebug() << "Created new BundleSettings...";
+
     settings->setOutputFilePrefix("");
     FileName cnetFile("cnetfile.net");
     BundleResults statistics;
@@ -117,14 +122,18 @@ int main(int argc, char *argv[]) {
     ControlNet outNet;
     outNet.AddPoint(freePoint);
     outNet.AddPoint(fixedPoint);
-    BundleControlPointQsp freeBundleControlPoint(new BundleControlPoint(freePoint));
-    BundleControlPointQsp fixedBundleControlPoint(new BundleControlPoint(fixedPoint));
+    // Obsolete argument - now using local radius.
+    // double metersToRadians = 1./23.68;  // Use what BundleResults used
+    BundleControlPointQsp freeBundleControlPoint(
+                                                 new BundleControlPoint(settings, freePoint));
+    BundleControlPointQsp fixedBundleControlPoint(
+                                     new BundleControlPoint(settings, fixedPoint));
     QVector<BundleControlPointQsp> bundleControlPointVector;
     bundleControlPointVector.append(freeBundleControlPoint);
     bundleControlPointVector.append(fixedBundleControlPoint);
     Camera *camera = NULL;
     BundleImage bundleImage(camera,
-                            "TestImageSerialNumber",
+                            "Ignored",
                             "TestImageFileName");
     BundleObservationVector observationVector;
     QObject *parent = NULL;
@@ -132,15 +141,12 @@ int main(int argc, char *argv[]) {
                              "ObservationNumber1",
                              "Instrument1",
                              BundleSettingsQsp(new BundleSettings));
-
     statistics.setBundleControlPoints(bundleControlPointVector);
     statistics.setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     statistics.setObservations(observationVector);
     QList<ImageList *> imgList;
     BundleSolutionInfo results(settings, cnetFile, statistics, imgList, parent);
-
     printXml(results);
-
 
     qDebug() << "";
     qDebug() << "Testing XML serialization 1: round trip serialization of BundleSolution object...";
@@ -165,25 +171,11 @@ int main(int argc, char *argv[]) {
     qDebug() << "Testing XML: reading serialized BundleResults back in...";
     XmlStackedHandlerReader reader1;
     BundleSolutionInfoXmlHandlerTester bsFromXml1(project, &reader1, xmlFile1);
+    // Now manually set the control net in BundleSolutionInfo's BundleResults to
+    //  complete its initialization.  This seems awkward.
+    bsFromXml1.bundleResults().setOutputControlNet(ControlNetQsp(new ControlNet(outNet)));
     qDebug() << "Testing XML: Object deserialized as (should match object above):";
     printXml(bsFromXml1);  // Save comparison output to log file
-
-
-
-    qDebug() << "Testing copy constructor...";
-
-    BundleSolutionInfo copySolutionInfo(results);
-    printXml(copySolutionInfo);
-
-    qDebug() << "Testing assignment operator to set this equal to itself...";
-    results = results;
-    printXml(results);
-
-    qDebug() << "Testing assignment operator to create a new results object...";
-
-    BundleSolutionInfo assignmentOpSolutionInfo = results;
-    assignmentOpSolutionInfo = results;
-    printXml(assignmentOpSolutionInfo);
 
     qDebug() << "Testing mutator methods...";
     statistics.setRejectionLimit(0.5);
@@ -211,8 +203,6 @@ int main(int argc, char *argv[]) {
       e.print();
     }
     qDebug() << "";
-
-
 
     Statistics rmsStats;
     rmsStats.SetValidRange(0, 100);

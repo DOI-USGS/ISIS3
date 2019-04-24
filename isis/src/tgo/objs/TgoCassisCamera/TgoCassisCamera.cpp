@@ -66,7 +66,7 @@ namespace Isis {
     const PvlGroup &inst    = lab.findGroup("Instrument", Pvl::Traverse);
 
     // Set up the camera characteristics
-    instrumentRotation()->SetFrame( CkFrameId() );
+    instrumentRotation()->SetFrame(-143420);
     SetFocalLength();
     SetPixelPitch();
 
@@ -165,7 +165,7 @@ namespace Isis {
    *                Kernel Frame ID.
    */
   int TgoCassisCamera::CkFrameId() const {
-    return (-143420);
+    return (-143000);
   }
 
 

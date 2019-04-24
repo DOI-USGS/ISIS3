@@ -11,7 +11,7 @@
     and generates the settings file for input to USGSAstro SOCET SET program 'import_frame.' <br/>
     <br/>
     The input cube must be a "level1" image <b>with SPICE data attached to the label</b> (see
-    spiceinit). <br/> 
+    spiceinit). <br/>
     <br/>
     The following are supported instruments:
     <pre>
@@ -70,6 +70,14 @@
       Added support for OSIRIS-REx instrument and updated documentation to reflect the
       changes. Fixes #3898.
     </change>
+    <change name="Brian Carcich" date="2018-03-07">
+      Fixed rotations for OSIRIS-REX instruments. Added documentation and cleaned up
+      variable names. References #5235.
+    </change>
+    <change name="Jesse Mapel" date="2018-10-11">
+      Changes to better match coding standards and clarify
+      documentation. Added OREX test cases. References #5235.
+    </change>
 
 </history>
 
@@ -83,7 +91,7 @@
         </brief>
         <description>
           Level 1 input Framing Camera cube with SPICE data attached. Supported instruments are
-          CASSINI SSI, CLEMENTINE 1 UVVIS, GALILEO ISS, MESSENGER NAC, MESSENGER WAC, 
+          CASSINI SSI, CLEMENTINE 1 UVVIS, GALILEO ISS, MESSENGER NAC, MESSENGER WAC,
           OSIRIS-REX MapCam, OSIRIS-REX PolyCam, and VIKING ORBITER.
         </description>
         <filter>
@@ -104,7 +112,7 @@
       </parameter>
 
     </group>
-    
+
     <group name="SOCET SET Parameters">
 
       <parameter name="SS_PROJECT">
@@ -116,7 +124,7 @@
           SS_PROJECT=TEST.
         </description>
       </parameter>
-      
+
       <parameter name="SS_IMG_LOC">
         <type>string</type>
         <brief>
@@ -144,7 +152,7 @@
           Entering the file path delimiters (forward slash for UNIX systems, backslash for Windows
           systems) is straight forward when entering your path into the dialog box. However, special
           handling is required when running this program at the command line or in processing
-          scripts. 
+          scripts.
           <pre>
           For SOCET SET running on Windows, an example input path would be
 
@@ -157,7 +165,7 @@
 
           To enter a path on the command line, or in a script, use the escape character (which is a
           backslash) to pass the delimiters to the program.  For this example, enter
-          
+
           SS_INPUT_PATH=E:\\IMAGES\\TEST\\ </pre>
         </description>
       </parameter>
@@ -182,7 +190,7 @@
 
           To enter a path on the command line, or in a script, use the escape character (which is a
           backslash) to pass the delimiters to the program.  For this example, enter
-          
+
           SS_CAM_CALIB_PATH=C:\\SOCET_SET_5.6.0\\internal_dbs\\CAM\\ </pre>
         </description>
       </parameter>

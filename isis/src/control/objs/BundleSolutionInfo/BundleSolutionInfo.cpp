@@ -10,6 +10,7 @@
 #include <QXmlStreamWriter>
 
 #include "BundleResults.h"
+#include "ControlList.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -39,25 +40,19 @@ namespace Isis {
                                          QList<ImageList *> imgList,
                                          QObject *parent) : QObject(parent) {
     m_id = new QUuid(QUuid::createUuid());
-
     m_runTime = "";
-
     m_name = m_runTime;
-
-    m_controlNetworkFileName = new FileName(controlNetworkFileName);
-
+    m_inputControlNetFileName = new FileName(controlNetworkFileName);
+    m_outputControl = NULL;
     m_settings = inputSettings;
-
     m_statisticsResults = new BundleResults(outputStatistics);
-
     m_images = new QList<ImageList *>(imgList);
-
     m_adjustedImages = new QList<ImageList *>;
   }
 
 
   /**
-   * Constructor. Creates a BundleSolutionInfo.
+   * Constructor. Creates a BundleSolutionInfo from disk.
    *
    * @param project The current project
    * @param xmlReader An XML reader that's up to an <bundleSettings/> tag.
@@ -70,7 +65,8 @@ namespace Isis {
     m_id = new QUuid(QUuid::createUuid());
     m_runTime = "";
     m_name = m_runTime;
-    m_controlNetworkFileName = NULL;
+    m_inputControlNetFileName = NULL;
+    m_outputControl = NULL;
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -82,33 +78,16 @@ namespace Isis {
 
 
   /**
-   * Constructor. Creates a BundleSolutionInfo.
-   *
-   * @param src BundleSolutionInfo where the settings and BundleResults are read from.
-   */
-  BundleSolutionInfo::BundleSolutionInfo(const BundleSolutionInfo &src)
-      : m_id(new QUuid(QUuid::createUuid())),
-        m_name(src.m_name),
-        m_runTime(src.m_runTime),
-        m_controlNetworkFileName(new FileName(src.m_controlNetworkFileName->expanded())),
-        m_settings(new BundleSettings(*src.m_settings)),
-        m_statisticsResults(new BundleResults(*src.m_statisticsResults)),
-        m_images(new QList<ImageList *>(*src.m_images)),
-        m_adjustedImages(new QList<ImageList *>(*src.m_adjustedImages)),
-        m_csvSavedImagesFilename(src.m_csvSavedImagesFilename),
-        m_csvSavedPointsFilename(src.m_csvSavedPointsFilename),
-        m_csvSavedResidualsFilename(src.m_csvSavedResidualsFilename) {
-  }
-
-
-  /**
    * Destructor
    */
   BundleSolutionInfo::~BundleSolutionInfo() {
     delete m_id;
 
-    delete m_controlNetworkFileName;
-    m_controlNetworkFileName = NULL;
+    delete m_inputControlNetFileName;
+    m_inputControlNetFileName = NULL;
+
+    delete m_outputControl;
+    m_outputControl = NULL;
 
     delete m_statisticsResults;
     m_statisticsResults = NULL;
@@ -128,53 +107,40 @@ namespace Isis {
 
 
   /**
-   * Creates an equal operator for BundleSolutionInfos.
+   * Returns bundleout text filename.
    *
-   * @param src the BundleSolutionInfo that we are comparing the current BundleSolutionInfo to.
-   *
-   * @return @b BundleSolutionInfo Reference to the current BundleSolutionInfo
+   * @return QString Bundleout text filename.
    */
-  BundleSolutionInfo &BundleSolutionInfo::operator=(const BundleSolutionInfo &src) {
-
-    if (&src != this) {
-
-      delete m_id;
-      m_id = new QUuid(QUuid::createUuid());
-
-      m_runTime = src.m_runTime;
-
-      if (src.m_name == "" || src.m_name == src.m_runTime) {
-        m_name = m_runTime;
-      }
-      else {
-        m_name = src.m_name;
-      }
-
-      delete m_controlNetworkFileName;
-      m_controlNetworkFileName = new FileName(src.m_controlNetworkFileName->expanded());
-
-      m_settings = src.m_settings;
-
-      delete m_statisticsResults;
-      m_statisticsResults = new BundleResults(*src.m_statisticsResults);
-
-      delete m_images;
-      m_images = new QList<ImageList *>(*src.m_images);
-
-      delete m_adjustedImages;
-      m_adjustedImages = new QList<ImageList *>(*src.m_adjustedImages);
-    }
-    return *this;
+  QString BundleSolutionInfo::savedBundleOutputFilename() {
+    return m_txtBundleOutputFilename;
   }
 
+
+  /**
+   * Returns filename of output bundle images csv file.
+   *
+   * @return QString filename of output bundle images csv file.
+   */
   QString BundleSolutionInfo::savedImagesFilename() {
     return m_csvSavedImagesFilename;
   }
 
+
+  /**
+   * Returns filename of output bundle points csv file.
+   *
+   * @return QString filename of output bundle points csv file.
+   */
   QString BundleSolutionInfo::savedPointsFilename() {
     return m_csvSavedPointsFilename;
   }
 
+
+  /**
+   * Returns filename of output bundle residuals csv file.
+   *
+   * @return QString filename of output bundle residuals csv file.
+   */
   QString BundleSolutionInfo::savedResidualsFilename() {
     return m_csvSavedResidualsFilename;
   }
@@ -203,6 +169,8 @@ namespace Isis {
 
 
   /**
+   * TODO: change description below to something more like english.
+   *
    * Change the on-disk file name for the control network used to be where the control network
    * ought to be in the given project.
    *
@@ -216,10 +184,19 @@ namespace Isis {
 
     //TODO do we need to close anything here?
 
-    FileName oldFileName(*m_controlNetworkFileName);
-    FileName newName(project->cnetRoot() + "/" +
-                     oldFileName.dir().dirName() + "/" + oldFileName.name());
-    *m_controlNetworkFileName = newName.expanded();
+    FileName oldInputFileName(*m_inputControlNetFileName);
+    FileName newInputFileName(project->cnetRoot() + "/" +
+                     oldInputFileName.dir().dirName() + "/" + oldInputFileName.name());
+    *m_inputControlNetFileName = newInputFileName.expanded();
+
+    FileName oldOutputFileName(m_outputControl->fileName());
+    FileName newOutputFileName(project->cnetRoot() + "/" +
+                     oldOutputFileName.dir().dirName() + "/" + oldOutputFileName.name());
+
+    if (m_outputControl) {
+      delete m_outputControl;
+    }
+    m_outputControl = new Control(newOutputFileName.expanded());
   }
 
 
@@ -277,19 +254,49 @@ namespace Isis {
 
 
   /**
-   * Returns the name of the control network.
+   * Returns the name of the input control network.
    *
-   * @return @b QString The name of the control network.
+   * @return @b QString The name of the input control network.
    */
-  QString BundleSolutionInfo::controlNetworkFileName() const {
-    return m_controlNetworkFileName->expanded();
+  QString BundleSolutionInfo::inputControlNetFileName() const {
+    return m_inputControlNetFileName->expanded();
   }
 
 
   /**
-   * Returns the bundle settings.
+   * Returns the name of the output control network.
    *
-   * @return @b BundleSettingsQsp The bundle settings.
+   * @return @b QString The name of the output control network.
+   */
+  QString BundleSolutionInfo::outputControlNetFileName() const {
+    return m_outputControl->fileName();
+  }
+
+
+  /**
+   * Returns the name of the output control network.
+   *
+   * @return @b QString The name of the output control network.
+   */
+  void BundleSolutionInfo::setOutputControl(Control *outputControl) {
+    m_outputControl = outputControl;
+  }
+
+
+  /**
+   * Returns bundle output Control object.
+   *
+   * @return Control* Pointer to bundle output Control object.
+   */
+  Control *BundleSolutionInfo::control() const {
+    return m_outputControl;
+  }
+
+
+  /**
+   * Returns bundle settings.
+   *
+   * @return BundleSettingsQsp Bundle settings.
    */
   BundleSettingsQsp BundleSolutionInfo::bundleSettings() {
     return m_settings;
@@ -538,7 +545,7 @@ namespace Isis {
                   Isis::iTime::CurrentLocalTime().toLatin1().data());
     fpOut << buf;
     sprintf(buf, "\n               Network Filename: %s",
-                  m_controlNetworkFileName->expanded().toLatin1().data());
+                  m_inputControlNetFileName->expanded().toLatin1().data());
     fpOut << buf;
     sprintf(buf, "\n                     Network Id: %s",
                   m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
@@ -581,6 +588,16 @@ namespace Isis {
       sprintf(buf, "\n              ERROR PROPAGATION: OFF");
     fpOut << buf;
 
+    (m_settings->controlPointCoordTypeReports() == SurfacePoint::Latitudinal) ?
+      sprintf(buf, "\n  CONTROL POINT COORDINATE TYPE FOR REPORTS: LATITUDINAL"):
+      sprintf(buf, "\n  CONTROL POINT COORDINATE TYPE FOR REPORTS: RECTANGULAR");
+    fpOut << buf;
+
+    (m_settings->controlPointCoordTypeBundle() == SurfacePoint::Latitudinal) ?
+      sprintf(buf, "\n  CONTROL POINT COORDINATE TYPE FOR BUNDLE: LATITUDINAL"):
+      sprintf(buf, "\n  CONTROL POINT COORDINATE TYPE FOR BUNDLE: RECTANGULAR");
+    fpOut << buf;
+
     if (m_settings->outlierRejection()) {
       sprintf(buf, "\n              OUTLIER REJECTION: ON");
       fpOut << buf;
@@ -595,6 +612,14 @@ namespace Isis {
       sprintf(buf, "\n           REJECTION MULTIPLIER: N/A");
       fpOut << buf;
     }
+
+    // Added April 5, 2017
+    sprintf(buf, "\n              CONTROL POINT COORDINATE TYPE FOR REPORTS:  %s",
+       SurfacePoint::coordinateTypeToString(m_settings->controlPointCoordTypeReports()).toLatin1().data());
+
+    // Added July 4, 2017
+    sprintf(buf, "\n              CONTROL POINT COORDINATE TYPE FOR BUNDLE:  %s",
+       SurfacePoint::coordinateTypeToString(m_settings->controlPointCoordTypeBundle()).toLatin1().data());
 
     sprintf(buf, "\n\nMAXIMUM LIKELIHOOD ESTIMATION\n============================\n");
     fpOut << buf;
@@ -711,21 +736,45 @@ namespace Isis {
     fpOut << buf;
 
     sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
+    QString coord1Str;
+    QString coord2Str;
+    QString coord3Str;
+    switch (m_settings->controlPointCoordTypeReports()) {
+      case SurfacePoint::Latitudinal:
+        coord1Str = "LATITUDE";
+        coord2Str = "LONGITUDE";
+        coord3Str = "RADIUS";  
+        break;
+      case SurfacePoint::Rectangular:
+        coord1Str = "       X";
+        coord2Str = "        Y";
+        coord3Str = "     Z";
+        break;
+      default:
+         IString msg ="Unknown surface point coordinate type enum ["
+           + toString(m_settings->controlPointCoordTypeReports()) + "]." ;
+         throw IException(IException::Programmer, msg, _FILEINFO_);
+        break;
+    }
+
+    // Coordinate 1 (latitude or point X)
     fpOut << buf;
-    (m_settings->globalLatitudeAprioriSigma() == Isis::Null) ?
-        sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
-        sprintf(buf,"\n               POINT LATITUDE SIGMA: %lf (meters)",
-                m_settings->globalLatitudeAprioriSigma());
+    (m_settings->globalPointCoord1AprioriSigma()  == Isis::Null) ?
+      sprintf(buf,"\n               POINT %s SIGMA: N/A", coord1Str.toLatin1().data()):
+      sprintf(buf,"\n               POINT %s SIGMA: %lf (meters)", coord1Str.toLatin1().data(),
+              m_settings->globalPointCoord1AprioriSigma());
+    // Coordinate 2 (longitude or point Y)
     fpOut << buf;
-    (m_settings->globalLongitudeAprioriSigma() == Isis::Null) ?
-        sprintf(buf,"\n              POINT LONGITUDE SIGMA: N/A"):
-        sprintf(buf,"\n              POINT LONGITUDE SIGMA: %lf (meters)",
-                m_settings->globalLongitudeAprioriSigma());
+    (m_settings->globalPointCoord2AprioriSigma() == Isis::Null) ?
+      sprintf(buf,"\n              POINT %s SIGMA: N/A", coord2Str.toLatin1().data()):
+      sprintf(buf,"\n              POINT %s SIGMA: %lf (meters)", coord2Str.toLatin1().data(),
+                m_settings->globalPointCoord2AprioriSigma());
+    // Coordinate 3 (radius or point Z)
     fpOut << buf;
-    (m_settings->globalRadiusAprioriSigma() == Isis::Null) ?
-        sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
-        sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",
-                m_settings->globalRadiusAprioriSigma());
+    (m_settings->globalPointCoord3AprioriSigma() == Isis::Null) ?
+      sprintf(buf,"\n                 POINT %s SIGMA: N/A", coord3Str.toLatin1().data()):
+      sprintf(buf,"\n                 POINT %s SIGMA: %lf (meters)", coord3Str.toLatin1().data(),
+                m_settings->globalPointCoord3AprioriSigma());
     fpOut << buf;
     (positionSolveDegree < 1 || positionSigmas[0] == Isis::Null) ?
         sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A"):
@@ -1116,6 +1165,8 @@ namespace Isis {
       return false;
     }
 
+    m_txtBundleOutputFilename = ofname;
+
     char buf[1056];
     BundleObservationQsp observation;
 
@@ -1196,39 +1247,52 @@ namespace Isis {
     if (berrorProp) {
       sprintf(buf, "\n\n\nPOINTS UNCERTAINTY SUMMARY\n==========================\n\n");
       fpOut << buf;
-      sprintf(buf, " RMS Sigma Latitude(m)%20.8lf\n",
-              m_statisticsResults->sigmaLatitudeStatisticsRms());
+
+      // Coordinate 1 (latitude or point x) summary
+      QString
+        coordName = surfacePointCoordName(m_settings->controlPointCoordTypeReports(),
+                                          SurfacePoint::One);
+      sprintf(buf, "RMS Sigma %s(m)%20.8lf\n", coordName.toLatin1().data(),
+              m_statisticsResults->sigmaCoord1StatisticsRms());
       fpOut << buf;
-      sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
-              m_statisticsResults->minSigmaLatitudeDistance().meters(),
-              m_statisticsResults->minSigmaLatitudePointId().toLatin1().data());
+      sprintf(buf, "MIN Sigma %s(m)%20.8lf at %s\n", coordName.toLatin1().data(),
+              m_statisticsResults->minSigmaCoord1Distance().meters(),
+              m_statisticsResults->minSigmaCoord1PointId().toLatin1().data());
       fpOut << buf;
-      sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
-              m_statisticsResults->maxSigmaLatitudeDistance().meters(),
-              m_statisticsResults->maxSigmaLatitudePointId().toLatin1().data());
+      sprintf(buf, "MAX Sigma %s(m)%20.8lf at %s\n\n", coordName.toLatin1().data(),
+              m_statisticsResults->maxSigmaCoord1Distance().meters(),
+              m_statisticsResults->maxSigmaCoord1PointId().toLatin1().data());
       fpOut << buf;
-      sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n",
-              m_statisticsResults->sigmaLongitudeStatisticsRms());
+
+      // Coordinate 2 (longitude or point y) summary
+      coordName = surfacePointCoordName(m_settings->controlPointCoordTypeReports(),
+                                        SurfacePoint::Two);
+      sprintf(buf, "RMS Sigma %s(m)%20.8lf\n", coordName.toLatin1().data(),
+              m_statisticsResults->sigmaCoord2StatisticsRms());
       fpOut << buf;
-      sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
-              m_statisticsResults->minSigmaLongitudeDistance().meters(),
-              m_statisticsResults->minSigmaLongitudePointId().toLatin1().data());
+      sprintf(buf, "MIN Sigma %s(m)%20.8lf at %s\n", coordName.toLatin1().data(),
+              m_statisticsResults->minSigmaCoord2Distance().meters(),
+              m_statisticsResults->minSigmaCoord2PointId().toLatin1().data());
       fpOut << buf;
-      sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
-              m_statisticsResults->maxSigmaLongitudeDistance().meters(),
-              m_statisticsResults->maxSigmaLongitudePointId().toLatin1().data());
+      sprintf(buf, "MAX Sigma %s(m)%20.8lf at %s\n\n", coordName.toLatin1().data(),
+              m_statisticsResults->maxSigmaCoord2Distance().meters(),
+              m_statisticsResults->maxSigmaCoord2PointId().toLatin1().data());
       fpOut << buf;
+
+      // Coordinate 3 (radius or point z) summary
+      coordName = surfacePointCoordName(m_settings->controlPointCoordTypeReports(),
+                                        SurfacePoint::Three);
       if ( m_settings->solveRadius() ) {
-        sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
-                m_statisticsResults->sigmaRadiusStatisticsRms());
+        sprintf(buf, "RMS Sigma %s(m)%20.8lf\n", coordName.toLatin1().data(),
+                m_statisticsResults->sigmaCoord3StatisticsRms());
         fpOut << buf;
-        sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
-                m_statisticsResults->minSigmaRadiusDistance().meters(),
-                m_statisticsResults->minSigmaRadiusPointId().toLatin1().data());
+        sprintf(buf, "MIN Sigma %s(m)%20.8lf at %s\n", coordName.toLatin1().data(),
+                m_statisticsResults->minSigmaCoord3Distance().meters(),
+                m_statisticsResults->minSigmaCoord3PointId().toLatin1().data());
         fpOut << buf;
-        sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
-                m_statisticsResults->maxSigmaRadiusDistance().meters(),
-                m_statisticsResults->maxSigmaRadiusPointId().toLatin1().data());
+        sprintf(buf, "MAX Sigma %s(m)%20.8lf at %s\n", coordName.toLatin1().data(),
+                m_statisticsResults->maxSigmaCoord3Distance().meters(),
+                m_statisticsResults->maxSigmaCoord3PointId().toLatin1().data());
         fpOut << buf;
       }
       else {
@@ -1242,11 +1306,20 @@ namespace Isis {
     }
 
     // output point summary data header
-    sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n%103s"
+    if (m_settings->controlPointCoordTypeReports() == SurfacePoint::Latitudinal) {
+      sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n%103s"
             "Sigma          Sigma              Sigma\n"
             "           Label         Status     Rays    RMS"
             "        Latitude       Longitude          Radius"
             "        Latitude       Longitude          Radius\n", "");
+    }
+    else {  // Must be Rectangular
+      sprintf(buf, "\n\nPOINTS SUMMARY\n==============\n%103s"
+            "Sigma          Sigma              Sigma\n"
+            "           Label         Status     Rays    RMS"
+            "         Point X            Point Y          Point Z"
+            "         Point X            Point Y          Point Z\n", "");
+    }
     fpOut << buf;
 
     int nPoints = m_statisticsResults->bundleControlPoints().size();
@@ -1267,9 +1340,9 @@ namespace Isis {
     for (int i = 0; i < nPoints; i++) {
       BundleControlPointQsp bundleControlPoint = m_statisticsResults->bundleControlPoints().at(i);
 
+      // Removed radiansToMeters argument 9/18/2018 DAC
       QString pointDetailString =
           bundleControlPoint->formatBundleOutputDetailString(berrorProp,
-                                                           m_statisticsResults->radiansToMeters(),
                                                            solveRadius);
       fpOut << (const char*)pointDetailString.toLatin1().data();
     }
@@ -1311,19 +1384,16 @@ namespace Isis {
 
     // print column headers
     if (m_settings->errorPropagation()) {
-      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,Sigma,"
-              "Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
-              "Coordinate,Coordinate\nID,,,,,Latitude,Longitude,Radius,"
-              "Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\n"
-              "Label,Status,Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),"
-              "(m),(m),(m),(km),(km),(km)\n");
+      sprintf(buf, ",,,,,3-d,3-d,3-d,Sigma,Sigma,Sigma,Correction,Correction,Correction,Coordinate,"
+              "Coordinate,Coordinate\nPoint,Point,Accepted,Rejected,Residual,Latitude,Longitude,"
+              "Radius,Latitude,Longitude,Radius,Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,"
+              "Measures,Measures,RMS,(dd),(dd),(km),(m),(m),(m),(m),(m),(m),(km),(km),(km)\n");
     }
     else {
-      sprintf(buf, "Point,Point,Accepted,Rejected,Residual,3-d,3-d,3-d,"
-              "Correction,Correction,Correction,Coordinate,Coordinate,"
-              "Coordinate\n,,,,,Latitude,Longitude,Radius,Latitude,"
-              "Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,"
-              "RMS,(dd),(dd),(km),(m),(m),(m),(km),(km),(km)\n");
+      sprintf(buf, ",,,,,3-d,3-d,3-d,Correction,Correction,Correction,Coordinate,Coordinate,"
+              "Coordinate\nPoint,Point,Accepted,Rejected,Residual,Latitude,Longitude,Radius,"
+              "Latitude,Longitude,Radius,X,Y,Z\nLabel,Status,Measures,Measures,RMS,(dd),(dd),(km),"
+              "(m),(m),(m),(km),(km),(km)\n");
     }
     fpOut << buf;
 
@@ -1351,8 +1421,9 @@ namespace Isis {
       // point corrections and initial sigmas
       boost::numeric::ublas::bounded_vector< double, 3 > corrections = bundlecontrolpoint->
                                                                            corrections();
-      cor_lat_m = corrections[0]*m_statisticsResults->radiansToMeters();
-      cor_lon_m = corrections[1]*m_statisticsResults->radiansToMeters()*cos(dLat*Isis::DEG2RAD);
+      // Now use the local radius to convert radians to meters instead of the target body equatorial radius
+      cor_lat_m = bundlecontrolpoint->adjustedSurfacePoint().LatitudeToMeters(corrections[0]);
+      cor_lon_m = bundlecontrolpoint->adjustedSurfacePoint().LongitudeToMeters(corrections[1]);
       cor_rad_m  = corrections[2]*1000.0;
 
       if (bundlecontrolpoint->type() == ControlPoint::Fixed) {
@@ -1379,7 +1450,7 @@ namespace Isis {
                 numMeasures, numRejectedMeasures, dResidualRms, dLat, dLon, dRadius, dSigmaLat,
                 dSigmaLong, dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
-      else
+      else 
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,"
                      "%16.8lf,%16.8lf\n",
                 bundlecontrolpoint->id().toLatin1().data(), strStatus.toLatin1().data(),
@@ -1502,7 +1573,10 @@ namespace Isis {
   void BundleSolutionInfo::save(QXmlStreamWriter &stream, const Project *project,
                                 FileName newProjectRoot) const {
 
+    // TODO: comment below not clear, why is this done?
     // This is done for unitTest which has no Project
+    // SHOULD WE BE CREATING A SERIALIZED PROJECT AS INPUT TO THIS UNIT TEST?
+    QString relativePath;
     QString relativeBundlePath;
     FileName bundleSolutionInfoRoot;
 
@@ -1521,14 +1595,20 @@ namespace Isis {
                              .arg(bundleSolutionInfoRoot.path()),
                            _FILEINFO_);
         }
-        QString oldFile = oldPath + "/" + m_controlNetworkFileName->name();
-        QString newFile = newPath + "/" + m_controlNetworkFileName->name();
-        //QString outputControlFile = m_statisticsResults->outputControlNet()->
+        QString oldFile = oldPath + "/" + FileName(m_outputControl->fileName()).name();
+        QString newFile = newPath + "/" + FileName(m_outputControl->fileName()).name();
         if (!QFile::copy(oldFile, newFile)) {
           throw IException(IException::Io,
                            QString("Failed to copy file [%1] to new file [%2]")
-                             .arg(m_controlNetworkFileName->name()).arg(newFile),
-                           _FILEINFO_);        
+                             .arg(m_outputControl->fileName()).arg(newFile),
+                           _FILEINFO_);
+        }
+        newFile = newPath + "/" + FileName(m_txtBundleOutputFilename).name();
+        if (!QFile::copy(m_txtBundleOutputFilename, newFile)) {
+          throw IException(IException::Io,
+                           QString("Failed to copy file [%1] to new file [%2]")
+                             .arg(m_txtBundleOutputFilename).arg(newFile),
+                           _FILEINFO_);
         }
         newFile = newPath + "/" + FileName(m_csvSavedImagesFilename).name();
         if (!QFile::copy(m_csvSavedImagesFilename, newFile)) {
@@ -1553,7 +1633,14 @@ namespace Isis {
         }
       }
 
-      // Create relative path for bundleSolutionInfo
+      // Create relativePath
+      relativePath = m_inputControlNetFileName->expanded().remove(project->newProjectRoot());
+      // Get rid of any preceding "/" , but add on ending "/"
+      if (relativePath.startsWith("/")) {
+        relativePath.remove(0,1);
+      }
+
+      // Create relativeBundlePath for bundleSolutionInfo
       relativeBundlePath = newPath.remove(project->newProjectRoot());
       // Get rid of any preceding "/" , but add on ending "/"
       if (relativeBundlePath.startsWith("/")) {
@@ -1562,14 +1649,19 @@ namespace Isis {
       relativeBundlePath += "/";
     }
 
+    // TODO: so, we can do the stuff below if project is NULL?
+
     stream.writeStartElement("bundleSolutionInfo");
     // save ID, cnet file name, and run time to stream
     stream.writeStartElement("generalAttributes");
     stream.writeTextElement("id", m_id->toString());
     stream.writeTextElement("name", m_name);
     stream.writeTextElement("runTime", runTime());
-    stream.writeTextElement("fileName",
-                            relativeBundlePath + m_controlNetworkFileName->name());
+
+    stream.writeTextElement("inputFileName",
+                            relativePath);
+    stream.writeTextElement("bundleOutTXT",
+                            relativeBundlePath + FileName(m_txtBundleOutputFilename).name());
     stream.writeTextElement("imagesCSV",
                             relativeBundlePath + FileName(m_csvSavedImagesFilename).name());
     stream.writeTextElement("pointsCSV",
@@ -1593,7 +1685,13 @@ namespace Isis {
         }
         stream.writeEndElement();
       }
+
+      // save output control
+      stream.writeStartElement("outputControl");
+      m_outputControl->save(stream, project, relativeBundlePath);
+      stream.writeEndElement();
     }
+
     stream.writeEndElement(); //end bundleSolutionInfo
   }
 
@@ -1660,9 +1758,14 @@ namespace Isis {
                                                                                 reader());
       }
       else if (localName == "imageList") {
-        // m_xmlHandlerBundleSolutionInfo->m_images->append(new ImageList(m_xmlHandlerProject, reader()));
         m_xmlHandlerBundleSolutionInfo->m_adjustedImages->append(
             new ImageList(m_xmlHandlerProject, reader()));
+      }
+      else if (localName == "outputControl") {
+        FileName outputControlPath = FileName(m_xmlHandlerProject->bundleSolutionInfoRoot() + "/"
+                                              + m_xmlHandlerBundleSolutionInfo->runTime());
+
+        m_xmlHandlerBundleSolutionInfo->m_outputControl = new Control(outputControlPath, reader());
       }
     }
     return true;
@@ -1699,10 +1802,14 @@ namespace Isis {
     else if (localName == "runTime") {
       m_xmlHandlerBundleSolutionInfo->m_runTime = m_xmlHandlerCharacters;
     }
-    else if (localName == "fileName") {
-      assert(m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName == NULL);
-      m_xmlHandlerBundleSolutionInfo->m_controlNetworkFileName = new FileName(
+    else if (localName == "inputFileName") {
+      assert(m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName == NULL);
+      m_xmlHandlerBundleSolutionInfo->m_inputControlNetFileName = new FileName(
         projectRoot + m_xmlHandlerCharacters);
+    }
+    else if (localName == "bundleOutTXT") {
+      m_xmlHandlerBundleSolutionInfo->m_txtBundleOutputFilename =
+        projectRoot + m_xmlHandlerCharacters;
     }
     else if (localName == "imagesCSV") {
       m_xmlHandlerBundleSolutionInfo->m_csvSavedImagesFilename = 
@@ -1719,5 +1826,63 @@ namespace Isis {
 
     m_xmlHandlerCharacters = "";
     return XmlStackedHandler::endElement(namespaceURI, localName, qName);
+  }
+
+
+  /**
+   * Determine the control point coordinate name.
+   *
+   * @param type The control point coordinate type (see SurfacePoint.h)
+   * @param coordIdx The coordinate index (see SurfacePoint.h)
+   *
+   * @return @b QString Coordinate name
+   */
+  QString BundleSolutionInfo::surfacePointCoordName(SurfacePoint::CoordinateType type,
+                                                 SurfacePoint::CoordIndex coordIdx) const {
+    QString coordName;
+    switch (m_settings->controlPointCoordTypeReports()) {
+      case SurfacePoint::Latitudinal:
+        switch (coordIdx) {
+          case SurfacePoint::One:
+            coordName = " Latitude";
+            break;
+          case SurfacePoint::Two:
+            coordName = "Longitude";
+            break;
+          case SurfacePoint::Three:
+            coordName = "   Radius";
+            break;
+          default:
+            IString msg = "Unknown surface point index enum ["
+              + toString(coordIdx) + "].";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+            break;
+        }
+        break;
+      case SurfacePoint::Rectangular:
+        switch (coordIdx) {
+          case SurfacePoint::One:
+            coordName = "POINT X";
+            break;
+          case SurfacePoint::Two:
+            coordName = "POINT Y";
+            break;
+          case SurfacePoint::Three:
+            coordName = "POINT Z";
+            break;
+          default:
+            IString msg = "Unknown surface point index enum ["
+              + toString(coordIdx) + "].";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+            break;
+        }
+        break;
+    default:
+      IString msg = "Unknown surface point coordinate type enum ["
+        + toString(m_settings->controlPointCoordTypeReports()) + "].";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+      break;
+    }
+    return coordName;
   }
 }

@@ -30,6 +30,7 @@
 class QAction;
 
 namespace Isis {
+
   class TableMainWindow;
   class MdiCubeViewport;
 
@@ -196,7 +197,6 @@ namespace Isis {
       int p_id;                            //!< The record id
       TableMainWindow *p_tableWin;         //!< The table window
       bool m_showHelpOnStart;              //!< True to show dialog When tool is started
-
   };
 };
 

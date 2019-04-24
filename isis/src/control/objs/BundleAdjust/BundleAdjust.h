@@ -269,7 +269,7 @@ namespace Isis {
    *                           there is no longer a -Wformat-security warning.
    *   @history 2017-05-01 Makayla Shepherd - Added imageLists() to track and return the images
    *                           bundled. Fixes #4818.
-   *   @history 2017-05-09 Tracie Sucharski - Fixed an empty pointer in ::imgeLists method. 
+   *   @history 2017-05-09 Tracie Sucharski - Fixed an empty pointer in ::imgeLists method.
    *   @history 2017-05-09 Ken Edmundson - Speed improvements and error propagation bug fix.
    *                           Separated initializations for Normal Equations matrix out of
    *                           ::initializeCholmodLibraryVariables() into
@@ -285,6 +285,44 @@ namespace Isis {
    *   @history 2017-08-09 Summer Stapleton - Added a try/catch around the m_controlNet assignment
    *                           in each of the constructors to verify valid control net input.
    *                           Fixes #5068.
+   *   @history 2017-09-01 Debbie A. Cook - Added BundleSettingsQsp as argument to
+   *                            BundleControlPoint constructor and moved setWeights call from
+   *                            BundleAdjust::init to BundleControlPoint constructor.  Don't allow
+   *                            solving for triaxial radii when coordinate type is not Latitudinal.
+   *                            Added new optional argument controlPointCoordType to ControlNet
+   *                            constructor call.  References #4649 and #501.
+   *   @history 2018-05-31 Debbie A. Cook - Moved productAlphaAV and control point parameter
+   *                            correction code to BundleControlPoint.  Earlier revised errorPropagation to
+   *                            compute the sigmas via the variance/covariance matrices instead of the sigmas.
+   *                            This should produce more accurate results.  References #4649 and #501.
+   *   @history 2018-05-22 Ken Edmundson - Modified methods bundleSolveInformation() and
+   *                           solveCholeskyBR() to return raw pointers to a BundleSolutionInfo object.
+   *                           Also modified resultsReady signal to take a raw pointer to a
+   *                           BundleSolutionInfo object. This was done to avoid using a copy
+   *                           constructor in the BundleSolutionInfo class because it is derived
+   *                           from QObject. Note that we ultimately want to return a QSharedPointer
+   *                           instead of a raw pointer.
+   *   @history 2018-06-14 Christopher Combs - Added getter method to tell if a bundle adjust was
+   *                           aborted. Added emits for status updates to the run widget.
+   *   @history 2018-06-18 Makayla Shepherd - Stopped command line output for ipce BundleAdjust.
+   *                           Fixes #4171.
+   *   @history 2018-09-06 Debbie A. Cook - (added to BundleXYZ branch on 2017-09-01)
+   *                            Added BundleSettingsQsp as argument to BundleControlPoint constructor
+   *                            and moved setWeights call from BundleAdjust::init to BundleControlPoint
+   *                            constructor.  Don't allow solving for triaxial radii when coordinate type
+   *                            is not Latitudinal. Added new optional argument controlPointCoordType
+   *                            to ControlNet constructor call.  References #4649 and #501.
+   *   @history 2018-09-06 Debbie A. Cook and Ken Edmundson - (added to BundleXYZ
+   *                            branch on (2018-05-31).  Moved productAlphaAV and control point
+   *                            parameter correction code to BundleControlPoint.  Earlier revised
+   *                            errorPropagation to compute the sigmas via the variance/
+   *                            covariance matrices instead of the sigmas.  This should produce
+   *                            more accurate results.  References #4649 and #501.
+   *   @history 2018-09-06 Debbie A. Cook - Removed obsolete member variables:
+   *                            m_radiansToMeters, m_metersToRadians, and m_bodyRadii
+   *                            which have been replaced with the local radius of a control
+   *                            point for converting point sigmas to/from radians from/to meters.
+   *                            References #4649 and #501.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -314,9 +352,10 @@ namespace Isis {
                    QList<ImageList *> imgList,
                    bool printSummary);
       ~BundleAdjust();
-      BundleSolutionInfo    solveCholeskyBR();
+      BundleSolutionInfo*    solveCholeskyBR();
 
       QList<ImageList *> imageLists();
+      bool isAborted();
 
     public slots:
       bool solveCholesky();
@@ -338,7 +377,9 @@ namespace Isis {
     signals:
       void statusUpdate(QString);
       void error(QString);
-      void iterationUpdate(int, double);
+      void iterationUpdate(int);
+      void pointUpdate(int);
+      void statusBarUpdate(QString);
       void resultsReady(BundleSolutionInfo *bundleSolveInformation);
       void finished();
 
@@ -350,7 +391,7 @@ namespace Isis {
       bool validateNetwork();
       bool solveSystem();
       void iterationSummary();
-      BundleSolutionInfo bundleSolveInformation();
+      BundleSolutionInfo* bundleSolveInformation();
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();
@@ -433,7 +474,6 @@ namespace Isis {
       SerialNumberList *m_serialNumberList;                  //!< List of image serial numbers.
       BundleTargetBodyQsp m_bundleTargetBody;                /**!< Contains information about the
                                                                    target body.*/
-      Distance m_bodyRadii[3];                               //!< Triaxial body radii in meters.
       bool m_abort;                                          //!< If the bundle should abort.
       QString m_iterationSummary;                            /**!< Summary of the most recently
                                                                    completed iteration.*/
@@ -446,10 +486,6 @@ namespace Isis {
       int m_rank;                                            //!< The rank of the system.
       int m_iteration;                                       //!< The current iteration.
       int m_numberOfImagePartials;                           //!< number of image-related partials.
-      double m_radiansToMeters;                              /**!< The body specific radians to
-                                                                   meters conversion factor.*/
-      double m_metersToRadians;                              /**!< The body specific meters to
-                                                                   radians conversion factor.*/
       QList<ImageList *> m_imageLists;                        /**!< The lists of images used in the
                                                                    bundle.*/
 
@@ -490,7 +526,7 @@ namespace Isis {
                                                                    cholmod_factorize.*/
       LinearAlgebra::Vector m_imageSolution;                 /**!< The image parameter solution
                                                                    vector.*/
-                                                                   
+
       int m_previousNumberImagePartials;                     /**!< used in ::computePartials method
                                                                    to avoid unnecessary resizing
                                                                    of the coeffImage matrix.*/

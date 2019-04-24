@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "geos/geom/Point.h"
 #include "geos/geom/MultiPolygon.h"
@@ -66,13 +67,13 @@ namespace Isis {
       virtual ~PolygonSeeder();
 
       /**
-       * Pure virtual seed method. 
-       *  
-       * @param mp The MultiPolygon object from the geos::geom library. 
-       * @return @b std::vector<geos::geom::Point*> A vector of Point objects 
+       * Pure virtual seed method.
+       *
+       * @param mp The MultiPolygon object from the geos::geom library.
+       * @return @b std::vector<geos::geom::Point*> A vector of Point objects
        *                from the geos::geom library.
        */
-      virtual std::vector<geos::geom::Point *> 
+      virtual std::vector<geos::geom::Point *>
           Seed(const geos::geom::MultiPolygon *mp) = 0;
 
       double MinimumThickness();
@@ -90,20 +91,20 @@ namespace Isis {
                                 const geos::geom::Envelope *polyBoundBox);
 
     protected:
-      Pvl *invalidInput; /**< The Pvl passed in by the constructor minus what 
+      Pvl *invalidInput; /**< The Pvl passed in by the constructor minus what
                               was used.*/
 
     private:
       QString p_algorithmName; /**< The value for the 'Name' Keyword in the
                                         PolygonSeederAlgorithm group of the Pvl
                                         that is passed into the constructor.*/
-      double p_minimumThickness;   /**< The value for the 'MinimumThickness' 
-                                        Keyword in the PolygonSeederAlgorithm 
-                                        group of the Pvl that is passed into 
+      double p_minimumThickness;   /**< The value for the 'MinimumThickness'
+                                        Keyword in the PolygonSeederAlgorithm
+                                        group of the Pvl that is passed into
                                         the constructor*/
-      double p_minimumArea;        /**< The value for the 'MinimumArea' Keyword 
-                                        in the PolygonSeederAlgorithm group of 
-                                        the Pvl that is passed into the 
+      double p_minimumArea;        /**< The value for the 'MinimumArea' Keyword
+                                        in the PolygonSeederAlgorithm group of
+                                        the Pvl that is passed into the
                                         constructor*/
 
   };

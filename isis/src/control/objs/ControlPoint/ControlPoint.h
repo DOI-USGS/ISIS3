@@ -29,6 +29,7 @@
 #include <QObject>
 #include <QString>
 
+#include "ControlMeasure.h"
 #include "SurfacePoint.h"
 
 template< typename A, typename B > class QHash;
@@ -36,7 +37,6 @@ template< typename A, typename B > class QHash;
 class QStringList;
 
 namespace Isis {
-  class ControlMeasure;
   class ControlNet;
   class ControlPointFileEntryV0002;
   class Latitude;
@@ -335,6 +335,9 @@ namespace Isis {
    *   @history 2015-11-05 Kris Becker - invalid flag was not properly
    *                           initialized in ControlPointFileEntryV0002
    *                           constructor (Merged by Kristin Berry. Fixes #2392)
+   *   @history 2017-05-25 Debbie A. Cook - coordType to SetPrioriSurfacePoint with a default of
+   *                            Latitudinal.  Changed LatitudeConstrained to Coord1Constrained, etc.
+   *                            References #4649 and #501.
    *   @history 2017-12-18 Kristin Berry - Added convenience methods:
    *                            HasAprioriSurfacePointSourceFile(), HasAprioriRadiusSourceFile(),
    *                            HasRefMeasure().
@@ -343,6 +346,23 @@ namespace Isis {
    *   @history 2018-01-05 Adam Goins - Added HasDateTime() and HasChooserName() methods to allow
    *                           to allow the value of these variables to be read without being
    *                           overriden if they're empty. (Getters override if they're empty).
+   *   @history 2018-06-06 Jesse Mapel - Modified setIgnored to use new pointIgnored and
+   *                           pointUnIgnored methods. References #5434.
+   *   @history 2018-06-15 Adam Goins & Jesse Mapel - Added the ModType enum, as well as a series
+   *                           of calls to parentNetwork()->emitPointModified() whenever a change
+   *                           is made to a Control Point or any of it's measures. This is done
+   *                           to allow for communication between the ControlNetVitals class
+   *                           and changes made to the Control Network that it is observing.
+   *                           Fixes #5435.
+   *  @history 2018-06-29 Adam Goins - Modified to operator= method to use setters when copying
+   *                           one Control Point to another so that the proper signals get called.
+   *                           Fixes #5435.
+   *   @history 2018-06-30 Debbie A. Cook Removed all calls to obsolete method
+   *                           SurfacePoint::SetRadii.  References #5457.
+   *  @history 2019-03-10 Ken Edmundson - See history entry for ComputeApriori method (References
+   *                           #2591). Added check to IsConstrained() method to see if point type is
+   *                           Free, in which case we ignore stored a priori sigmas on the
+   *                           coordinates.
    */
   class ControlPoint : public QObject {
 
@@ -406,18 +426,25 @@ namespace Isis {
        * coordinates in the SurfacePoint
        */
       enum ConstraintStatus {
-        /**
-         * This is the status of constrained coordinates in the SurfacePoint.
-         * @todo We will eventually need to deal with rectangular
-         *             coordinates as well, but for now BundleAdjust uses spherical
-         *             coordinates only.
-         */
-        LatitudeConstrained = 0,
-        LongitudeConstrained = 1,
-        RadiusConstrained = 2,
-//      XConstrained = 3,
-//      YConstrained = 4,
-//      ZConstrained = 5;
+        Coord1Constrained = 0,
+        Coord2Constrained = 1,
+        Coord3Constrained = 2
+      };
+
+      /**
+       *  @brief Control Point Modification Types
+       *
+       *  This enum is designed to represent the different types of modifications that can be
+       *  made to a ControlPoint.
+       *
+       *  EditLockModified means that the Control Point had it's edit lock flag changed.
+       *  IgnoredModified means that the Control Measure had it's ignored flag changed.
+       *  TypeModified means that the ControlPoint::PointType for this control point was modified.
+       */
+      enum ModType {
+        EditLockModified,
+        IgnoredModified,
+        TypeModified
       };
 
       // This stuff input to jigsaw
@@ -504,14 +531,16 @@ namespace Isis {
       QString GetId() const;
       bool IsIgnored() const;
       bool IsValid() const;
+      // Can we get rid of this? It doesn't appear to be used anywhere.  *** ToDo ***
       bool IsInvalid() const;
+      bool IsFree() const;
       bool IsFixed() const;
       bool HasAprioriCoordinates();
 
       bool IsConstrained();
-      bool IsLatitudeConstrained();
-      bool IsLongitudeConstrained();
-      bool IsRadiusConstrained();
+      bool IsCoord1Constrained();
+      bool IsCoord2Constrained();
+      bool IsCoord3Constrained();
       int NumberOfConstrainedCoordinates();
 
       static QString PointTypeToString(PointType type);
@@ -546,6 +575,9 @@ namespace Isis {
       int IndexOfRefMeasure() const;
       bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
+      void emitMeasureModified(ControlMeasure *measure, ControlMeasure::ModType modType, QVariant oldValue, QVariant newValue);
+
+
 
       Statistics GetStatistic(double(ControlMeasure::*statFunc)() const) const;
       Statistics GetStatistic(long dataType) const;
@@ -639,9 +671,9 @@ namespace Isis {
 
       /**
        * This stores the constraint status of the a priori SurfacePoint
-       *   @todo Eventually add x, y, and z
+       *   @todo Eventually add x, y, and z.  Instead we made generic coordinates
        */
-      std::bitset<6> constraintStatus;
+      std::bitset<3> constraintStatus;
 
       /**
        * This indicates if a program has explicitely set the reference in this

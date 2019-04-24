@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format"
     exclude-result-prefixes="xmlns fo">
 
 <!--
@@ -15,8 +15,8 @@ Deborah Lee Soltesz
 -->
 
 
-  <xsl:output 
-    media-type="text/html" 
+  <xsl:output
+    media-type="text/html"
     doctype-public="-//W3C//DTD HTML 4.01 Transitional//EN"
     doctype-system="http://www.w3.org/TR/html4/loose.dtd"
     indent="yes"
@@ -69,7 +69,7 @@ Deborah Lee Soltesz
               var s = document.getElementsByTagName('script')[0];
               s.parentNode.insertBefore(usgsAnalytics, s);
             }
-          })(); 
+          })();
           ]]></xsl:comment>
         <xsl:text>&#xa;</xsl:text>
         </script>
@@ -129,9 +129,20 @@ Deborah Lee Soltesz
             ISIS Workshop</a>
           </th>
           <td>
-          Interactive and hands-on tutorials designed to guide users through the basics of using ISIS 
+          Interactive and hands-on tutorials designed to guide users through the basics of using ISIS
 	  to advanced processing techniques for creating mosaics from mission data,
           correcting and enhancing problem data, and other techniques.
+          </td>
+        </tr>
+        <tr valign="top">
+          <th style="width:25%">
+            <a href="../documents/EnvironmentAndPreferencesSetup/EnvironmentAndPreferencesSetup.html">
+            Environment and Preference Setup</a>
+          </th>
+          <td>
+          A guide on how to setup your Unix environment in order to run ISIS.
+          It also discusses the ISIS Preference files, which gives the user the
+          ability to customize the operation of ISIS.
           </td>
         </tr>
 
@@ -408,4 +419,3 @@ Deborah Lee Soltesz
 
 
 </xsl:stylesheet>
-

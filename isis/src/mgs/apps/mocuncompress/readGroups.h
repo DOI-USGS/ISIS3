@@ -1,4 +1,11 @@
 /*
+
+==================================================
+2018-OCT-19 Kaitlyn Lee - US Geological Survey
+
+Removed the register keyword because it is deprecated in C++17. 
+==================================================
+
 NOTICE
 
 The software accompanying this notice (the "Software") is provided to you
@@ -44,6 +51,6 @@ SCCSID @(#)readGroups.h  1.1 10/04/99
 
 #define readGroups_h
 
-extern uint32 *readGroups(register uint32 numBlocks, register BITSTRUCT *bitStuff);
+extern uint32 *readGroups(uint32 numBlocks, BITSTRUCT *bitStuff);
 
 #endif

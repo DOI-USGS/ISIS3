@@ -23,12 +23,14 @@
 #include "Directory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "Image.h"
 #include "ImageTreeWidget.h"
 #include "ImageTreeWidgetItem.h"
 #include "IString.h"
 #include "ProgressBar.h"
 #include "Project.h"
 #include "PvlObject.h"
+#include "Shape.h"
 #include "TextFile.h"
 #include "XmlStackedHandlerReader.h"
 
@@ -215,15 +217,6 @@ namespace Isis {
     }
 
     return output;
-  }
-
-  /**
-   * This method pushes a new XmlHandler into the parser stack.
-   *
-   * @param xmlReader This is the parser stack.
-   */
-  void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
-    xmlReader->pushContentHandler(new XmlHandler(this));
   }
 
   /**
@@ -611,6 +604,17 @@ namespace Isis {
     return result;
   }
 
+
+  /**
+   * This method pushes a new XmlHandler into the parser stack.
+   *
+   * @param xmlReader This is the parser stack.
+   */
+  void ImageFileListWidget::load(XmlStackedHandlerReader *xmlReader) {
+    xmlReader->pushContentHandler(new XmlHandler(this));
+  }
+
+
   /**
    * This method saves the FootprintColumns in the project and the settings associated
    * with every column.
@@ -621,10 +625,12 @@ namespace Isis {
    */
   void ImageFileListWidget::save(QXmlStreamWriter &stream, Project *project,
                                  FileName newProjectRoot) const {
+
     stream.writeStartElement("imageFileList");
+    stream.writeAttribute("objectName", objectName());
 
     // Write QSettings
-    stream.writeStartElement("widgetGeometry");
+//  stream.writeStartElement("widgetGeometry");
 //  QString geom = saveGeometry();
 //  //qDebug()<<"ImageFileListWidget::save   geometry = "<<geom;
 //  stream.writeAttribute("value", saveGeometry());
@@ -671,6 +677,7 @@ namespace Isis {
 
     stream.writeEndElement();
   }
+
 
   /**
    * This method saves the QTreeWidgetItem and the settings associated with the QTreeWidgetItem
@@ -758,7 +765,7 @@ namespace Isis {
   bool ImageFileListWidget::XmlHandler::startElement(const QString &namespaceURI,
       const QString &localName, const QString &qName, const QXmlAttributes &atts) {
     bool result = XmlStackedHandler::startElement(namespaceURI, localName, qName, atts);
-  /*  //tjw
+
     if (result) {
 
 //    if (localName == "geometry") {
@@ -822,11 +829,18 @@ namespace Isis {
 
       else if (localName == "image" && m_currentGroup) {
         Image *image = m_fileList->m_directory->project()->image(atts.value("id"));
-        m_currentGroup->addChild(m_fileList->m_tree->prepCube(m_currentImageList, image));
+        // If Image for id doesn't exist, check shapes.  If corresponds to Shape, new Image will
+        // need to be created.
+        if (!image) {
+          Shape *shape = m_fileList->m_directory->project()->shape(atts.value("id"));
+          if (shape) {
+            image = new Image(shape->cube(), shape->footprint(), atts.value("id"));
+          }
+        }
+        m_currentGroup->addChild(m_fileList->m_tree->prepCube(m_currentImageList, image)); 
       }
 
     }
-    */
 
     return result;
   }
@@ -905,6 +919,4 @@ namespace Isis {
       }
     }
   }
-
-
 }

@@ -143,8 +143,8 @@ namespace Isis {
    *                          being propagated.
    *  @history 2012-02-24 Steven Lambright - Added Finalize() method and
    *                          deprecated EndProcess()
-   *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several 
-   *                                           functions to ensure successful 
+   *  @history 2015-01-15 Sasha Brownsberger - Added virtual keyword to several
+   *                                           functions to ensure successful
    *                                           inheritance between Process and its
    *                                           child classes.  Fixes #2215.
    *  @history 2016-04-21 Makayla Shepherd - Added UnsignedWord pixel type handling.
@@ -153,6 +153,7 @@ namespace Isis {
    *                          PropagateTables(QString, QList<QString>). A default value of an
    *                          empty QList is provided to this parameter which will propagate all
    *                          tables. Updated unitTest to test this change. References #4433.
+   *  @history 2018-07-27 Kaitlyn Lee - Added unsigned/signed integer pixel type handling.
    */
   class Process {
     protected:
@@ -252,7 +253,7 @@ namespace Isis {
       void ClearCubes();
       void ClearInputCubes();
       void ClearOutputCubes();
- 
+
       void PropagateLabels(const bool prop);
       void PropagateLabels(const QString &cube);
       void PropagateTables(const bool prop);

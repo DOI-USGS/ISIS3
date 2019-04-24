@@ -3,13 +3,15 @@
 #
 # @history 2018-02-22 Adam Goins - Original version, many things borrowed from
 #                             uncontrolled single-color cat test.
+#          2018-06-18 Kristin Berry - Updated to use defaultrange=map for the cam2map call so that
+#                             cubeit will get input cubes all of the same size. 
 #
 
 INGEST = tgocassis2isis
 SPICE = spiceinit
 MAPFILE = mosrange
 PROJECT = cam2map
-MOSAIC = automos
+MOSAIC = tgocassismos
 EXPORT = isis2pds
 GETKEY = getkey
 CUBEIT = cubeit
@@ -17,7 +19,7 @@ CUBEIT = cubeit
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-  # Ingest Red
+        # Ingest Red
 	$(LS) $(INPUT)/*-RED-*.xml > $(OUTPUT)/redInputs.lis;
 	$(SED) 's/^.*input\///g' $(OUTPUT)/redInputs.lis > $(OUTPUT)/redRelative.lis;
 	$(SED) 's/\.xml//g' $(OUTPUT)/redRelative.lis > $(OUTPUT)/redBasenames.lis;
@@ -67,75 +69,68 @@ commands:
 	# MOSAICS
 	# Create Red Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_redEqui.cub \
-            map=$(OUTPUT)/equi.map \
+            map=$(OUTPUT)/equi.map defaultrange=map \
             pixres=mpp resolution=200 -batchlist=$(OUTPUT)/redBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*redEqui.cub > $(OUTPUT)/redMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/redMosaic.lis \
-    mosaic=$(OUTPUT)/redCassisMosaic.cub grange='USER' \
-    MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-    MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-    MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-    MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	    to=$(OUTPUT)/redCassisMosaic.cub > /dev/null;
 
-# Create Blu Mosaic
+        # Create Blu Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_bluEqui.cub \
-             map=$(OUTPUT)/equi.map \
+             map=$(OUTPUT)/equi.map defaultrange=map \
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/bluBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*bluEqui.cub > $(OUTPUT)/bluMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/bluMosaic.lis \
-    mosaic=$(OUTPUT)/bluCassisMosaic.cub grange='USER' \
-    MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-    MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-    MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-    MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	    to=$(OUTPUT)/bluCassisMosaic.cub > /dev/null;
 
-# Create Pan Mosaic
+        # Create Pan Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_panEqui.cub \
-            map=$(OUTPUT)/equi.map \
+            map=$(OUTPUT)/equi.map defaultrange=map \
             pixres=mpp resolution=200 -batchlist=$(OUTPUT)/panBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*panEqui.cub > $(OUTPUT)/panMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/panMosaic.lis \
-   mosaic=$(OUTPUT)/panCassisMosaic.cub grange='USER' \
-   MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-   MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-   MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-   MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	   to=$(OUTPUT)/panCassisMosaic.cub > /dev/null;
 
-# Create Nir Mosaic
+        # Create Nir Mosaic
 	$(PROJECT) $(TSTARGS) from=$(OUTPUT)/$\$$\1.cub to=$(OUTPUT)/$\$$\1_nirEqui.cub \
-             map=$(OUTPUT)/equi.map \
+             map=$(OUTPUT)/equi.map defaultrange=map \
              pixres=mpp resolution=200 -batchlist=$(OUTPUT)/nirBasenames.lis > /dev/null;
 	$(LS) $(OUTPUT)/*nirEqui.cub > $(OUTPUT)/nirMosaic.lis;
 	$(MOSAIC) $(TSTSARGS) fromlist=$(OUTPUT)/nirMosaic.lis \
-    mosaic=$(OUTPUT)/nirCassisMosaic.cub grange='USER' \
-    MAXLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLatitude grpname=Mapping`  \
-    MINLAT = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLatitude grpname=Mapping`  \
-    MAXLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MaximumLongitude grpname=Mapping` \
-    MINLON = `$(GETKEY) from=$(OUTPUT)/equi.map keyword=MinimumLongitude grpname=Mapping` > /dev/null;
+	    to=$(OUTPUT)/nirCassisMosaic.cub > /dev/null;
 
-# Create full color mos
+        # Create full color mos
 	$(LS) $(OUTPUT)/*CassisMosaic.cub > $(OUTPUT)/mosaicList.lis;
 	$(CUBEIT) fromlist=$(OUTPUT)/mosaicList.lis to=$(OUTPUT)/coloredMosaic.cub > /dev/null;
 	$(EXPORT) $(TSTSARGS) from=$(OUTPUT)/coloredMosaic.cub to=$(OUTPUT)/coloredMosaic \
              pdsversion=pds4 > /dev/null;
 	$(SED) 's+\Product_Observational.*>+\Product_Observational>+' \
-            $(OUTPUT)/coloredMosaic.xml > $(OUTPUT)/coloredMosaic1.txt;
+               $(OUTPUT)/coloredMosaic.xml \
+	       > $(OUTPUT)/tempLabel1.txt;
 	$(SED) 's+\FSW_HEADER.*>+\FSW_HEADER>+' \
-            $(OUTPUT)/coloredMosaic1.txt > $(OUTPUT)/coloredMosaic2.txt;
+	       $(OUTPUT)/tempLabel1.txt \
+	       > $(OUTPUT)/tempLabel2.txt;
 	$(SED) 's+\PEHK_HEADER.*>+\PEHK_HEADER>+' \
-            $(OUTPUT)/coloredMosaic2.txt > $(OUTPUT)/coloredMosaic3.txt;
-	$(SED) 's+\Modification_Detail.*>+\Modification_Detail>+' \
-            $(OUTPUT)/coloredMosaic3.txt > $(OUTPUT)/coloredMosaic.txt;
+	       $(OUTPUT)/tempLabel2.txt \
+	       > $(OUTPUT)/tempLabel3.txt;
+	$(SED) 's+\modification_date.*>+\modification_date>+' \
+	       $(OUTPUT)/tempLabel3.txt \
+	       > $(OUTPUT)/tempLabel4.txt;
+	$(SED) 's+\ISIS version.*<+\ISIS version.<+' \
+	       $(OUTPUT)/tempLabel4.txt \
+               > $(OUTPUT)/coloredMosaic.xmlLabel.txt;
 
 	# Cleanup
 	$(RM) $(OUTPUT)/coloredMosaic.xml;
-	$(RM) $(OUTPUT)/coloredMosaic1.txt;
-	$(RM) $(OUTPUT)/coloredMosaic2.txt;
-	$(RM) $(OUTPUT)/coloredMosaic3.txt;
+	$(RM) $(OUTPUT)/tempLabel1.txt;
+	$(RM) $(OUTPUT)/tempLabel2.txt;
+	$(RM) $(OUTPUT)/tempLabel3.txt;
+	$(RM) $(OUTPUT)/tempLabel4.txt;
 	$(RM) $(OUTPUT)/*.lis;
 	$(RM) $(OUTPUT)/CAS-MCO*.cub;
 	$(RM) $(OUTPUT)/bluCassisMosaic.cub;
 	$(RM) $(OUTPUT)/nirCassisMosaic.cub;
 	$(RM) $(OUTPUT)/panCassisMosaic.cub;
 	$(RM) $(OUTPUT)/redCassisMosaic.cub;
-	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl
+	$(RM) $(OUTPUT)/*_tracking*.cub;
+	$(MV) $(OUTPUT)/equi.map $(OUTPUT)/equi.pvl;

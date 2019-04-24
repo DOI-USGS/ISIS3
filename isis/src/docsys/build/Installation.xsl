@@ -103,10 +103,14 @@ Deborah Lee Soltesz
           </tr>
         </table>
 
+      <p>
+      See the <a href="https://github.com/USGS-Astrogeology/ISIS3#installation">ISIS 3 Installation Guide</a>
+      for instructions on downloading and installing ISIS 3.
+      </p>
 
       <p>
-      See the <a href="../documents/InstallGuide/index.html">ISIS 3 Installation Guide</a>
-      for instructions on downloading and installing ISIS 3.
+      See the <a href="../documents/LegacyInstallGuide/index.html">Legacy ISIS 3 Installation Guide</a>
+      for instructions on downloading and installing versions of ISIS3 3.5.2 and earlier. 
       </p>
 
       <p>
