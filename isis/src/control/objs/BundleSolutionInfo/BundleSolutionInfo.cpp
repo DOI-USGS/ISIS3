@@ -24,6 +24,8 @@
 #include "StatCumProbDistDynCalc.h"
 #include "XmlStackedHandlerReader.h"
 
+
+
 namespace Isis {
 
   /**
@@ -1009,6 +1011,39 @@ namespace Isis {
     int numUsed;
     int imageIndex = 0;
 
+    char imgMeasuresH1[] = "Measures";
+    char imgMeasuresH2[] = "|Accepted    |    Total|";
+    char imgMeasuresH3[] = "RMS(pixels)";
+    char imgMeasuresH4[] = "|Samples    |    Lines    |    Total|";
+
+
+
+    //int h1 = (int)(sizeof(imgMeasuresH1)/sizeof(char) );
+    int h2 = (int)(sizeof(imgMeasuresH2)/sizeof(char) );
+    //int h3 = (int)(sizeof(imgMeasuresH3)/sizeof(char) );
+    int h4 = (int)(sizeof(imgMeasuresH4)/sizeof(char) );
+
+
+
+    int firstColumnWidth
+        = m_statisticsResults->observations().at(0)->at(0)->fileName().toLatin1().length();
+    //Find the maximum file name length for the first image (length of first column)
+    for (int i = 1; i < numObservations;i++) {
+      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+      for (int j = 1; j < numImagesInObservation; j++ ) {
+        int l = m_statisticsResults->observations().at(0)->at(0)->fileName().toLatin1().length();
+        if (l > firstColumnWidth)
+          firstColumnWidth = l;
+      }
+    }
+
+    //Header 1
+    sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH1,h4,imgMeasuresH3);
+    fpOut<< buf;
+    //Header 2
+    sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH2,h4,imgMeasuresH4);
+    fpOut<< buf;
+
     for (int i = 0; i < numObservations; i++) {
 
       int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
@@ -1034,18 +1069,14 @@ namespace Isis {
 
         numUsed =             numMeasures - numRejectedMeasures;
 
-        if (numUsed == numMeasures) {
-          sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                  bundleImage->fileName().toLatin1().data(),
-                  (numMeasures-numRejectedMeasures), numMeasures,
-                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-        }
-        else {
-          sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                  bundleImage->fileName().toLatin1().data(),
-                  (numMeasures-numRejectedMeasures), numMeasures,
-                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-        }
+
+        sprintf(buf,"%*s",firstColumnWidth,bundleImage->fileName().toLatin1().data());
+        fpOut << buf;
+        sprintf(buf,"%*d              %*d",5,numUsed,5,numMeasures);
+        fpOut << buf;
+        sprintf(buf,"     %-6.3lf         %-6.3lf         %-6.3lf \n",
+                rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+
         fpOut << buf;
         imageIndex++;
       }
@@ -1229,7 +1260,7 @@ namespace Isis {
         QString observationString =
             observation->formatBundleOutputString(berrorProp);
         fpOut << (const char*)observationString.toLatin1().data();
-
+        qDebug() << "observation string:  " << observationString.toLatin1();
         // Build list of images and parameters for correlation matrix.
         foreach ( QString image, observation->imageNames() ) {
           imagesAndParameters.insert( image, observation->parameterList() );
