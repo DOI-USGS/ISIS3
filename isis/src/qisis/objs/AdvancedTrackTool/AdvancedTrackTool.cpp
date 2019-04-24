@@ -252,7 +252,7 @@ namespace Isis {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-
+  /**
    * This method updates the row given with data from the viewport cvp at point p.
    *
    * @param cvp CubeViewPort that contains p
@@ -413,7 +413,7 @@ namespace Isis {
         // Calculates the angles local to the slope for the DEMs, compare against
         // the incidence and emission angles calculated for the sphere
         Angle phaseAngle, incidenceAngle, emissionAngle;
-        bool bSucces = false;
+        bool bSuccess = false;
         cvp->camera()->LocalPhotometricAngles(phaseAngle, incidenceAngle, emissionAngle, bSuccess);
         if(bSuccess) {
           p_tableWin->table()->item(row, getIndex("LocalIncidence"))->
@@ -457,6 +457,7 @@ namespace Isis {
         }
 
         // Write out columns solar lon, slant distance, local solar time
+        double solarLon = cvp->camera()->solarLongitude().degrees();
         p_tableWin->table()->item(row, getIndex("Solar Longitude"))->
                              setText(QString::number(solarLon));
         double slantDistance = cvp->camera()->SlantDistance();
@@ -544,7 +545,6 @@ namespace Isis {
             p_tableWin->table()->item(row, getIndex("180 Positive East Longitude"))->
                                  setText(QString::number(TProjection::To180Domain(wlon), 'f', 15));
             p_tableWin->table()->item(row, getIndex("Local Radius"))->setText(QString::number(radius, 'f', 15));
-          }
           }
         }
         else { // RingPlane
@@ -825,7 +825,7 @@ namespace Isis {
     if(p_tableWin->currentRow() == 0)
       p_id = 0;
     else
-      p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, ID)->text().toInt() + 1;
+      p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, getIndex("ID"))->text().toInt() + 1;
   }
 
 

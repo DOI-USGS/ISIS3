@@ -215,7 +215,7 @@ namespace Isis {
         g.sampRes = camera.SampleResolution();
         g.lineRes = camera.LineResolution();
 
-        g.SampRes = camera.ObliqueSampleResolution();
+        g.obliqueSampRes = camera.ObliqueSampleResolution();
         g.obliqueLineRes = camera.ObliqueLineResolution();
         g.obliquePixelRes = camera.ObliquePixelResolution();
         g.obliqueDetectorRes = camera.ObliqueDetectorResolution();
@@ -694,6 +694,10 @@ namespace Isis {
       pixelRes.AddData(b->sampRes);
       pixelRes.AddData(b->lineRes);
       groundRes.AddData(b->grRes);
+      pixelRes.AddData(b->obliqueLineRes);
+      pixelRes.AddData(b->obliqueSampRes);
+      pixelRes.AddData(b->obliquePixelRes);
+      pixelRes.AddData(b->obliqueDetectorRes);
     }
 
     double res = groundRes.Average();
