@@ -60,6 +60,22 @@ Single means only one camera was enabled, double means both TC1 and TC2 were ena
 There is a difference between the `.sl2` files stored under `/work/projects` and images obtained from the Jaxa's product search (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#). Images in Jaxa's product search use slightly different labels (e.g. Line exposure duration is a scalar in the `.sl2` files and a one element list in the Jaxa product search labels). The product search images also have detached labels compared to the `.sl2` files which have attached labels. This basically means we need to use slightly different processes depending on where the image originated from. 
 
 # Processing Kaguya TC images in ISIS
+<Insert what we know about the file naming conventions >
+
+The archive files we have available locally are in:
+    /work/projects/jaxa0[1234]
+NOTE: These files are not in the same format as those downloaded from the JAXA site.
+< Kelvin and Lisa may be able to add more about this >
+
+The example Kaguya TC files below was pulled from:
+    /work/projects/jaxa01/TC_w_Level2B0/01/2008/12/07/TC1W2B0_01_05188N259E0020.sl2 
+Each observation is stored in a "tar" file with the extension "sl2" instead of "tar". The tar contains the following files:
+* TC1W2B0_01_05188N259E0020 - This is the image file with an attached PDS3 like PVL label. Traditionally this would have an extension of ".img". So far, the ISIS3 PVL has been able to parse these labels and image data. NOTE: Comments below about flipping and mirroring do NOT apply to this image.
+* TC1W2B0_01_05188N259E0020.jpg - This is a browse image of the observation possibly flipped and mirrored to put north up.
+* TC1W2B0_01_05188N259E0020.ctg - Catalog file containing basic information about the observation.
+* TC1W2B0_01_05188N259E0020.lbl - The label file for the observation (i.e., not just the image)
+
+
 
 The standard workflow for processing Kaguya TC images in ISIS is as follows: 
 
