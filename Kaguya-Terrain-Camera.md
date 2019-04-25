@@ -69,7 +69,7 @@ NOTE: These files are not in the same format as those downloaded from the JAXA s
 
 < Kelvin and Lisa may be able to add more about this >
 
-The example Kaguya TC file below was pulled from:
+The example Kaguya TC file used in the examples below was pulled from:
     /work/projects/jaxa01/TC_w_Level2B0/01/2008/12/07/TC1W2B0_01_05188N259E0020.sl2 
 
 Each observation is stored in a "tar" file with the extension "sl2" instead of "tar". The tar contains the following files:
