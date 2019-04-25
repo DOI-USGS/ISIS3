@@ -69,6 +69,24 @@ The standard workflow for processing Kaguya TC images in ISIS is as follows:
 
 ```spiceinit fr=image.cub```
 
-< insert information about how new Goddard kernels will automatically get picked up for images taken during the time range the kernel covers> 
+The new SPK from Goddard, `SEL_MAIN_GRGM900C_L270_DIRALT_2019-02-13_TYPE13.bsp` will be automatically used if 
+the image was acquired within any of the following time ranges: 
+
+```
+    Time = ("2008 DEC 27 05:31:05.183794 TDB",
+            "2009 JAN 01 04:01:05.183936 TDB")
+    Time = ("2009 JAN 01 04:01:06.183936 TDB",
+            "2009 FEB 20 20:01:06.185240 TDB")
+    Time = ("2009 FEB 20 23:46:06.185243 TDB",
+            "2009 MAR 19 18:01:06.185602 TDB")
+    Time = ("2009 MAR 19 22:01:06.185603 TDB",
+            "2009 APR 16 19:01:06.185615 TDB")
+    Time = ("2009 APR 16 21:31:06.185614 TDB",
+            "2009 JUN 08 12:31:06.184717 TDB")
+    Time = ("2009 JUN 08 12:37:36.184717 TDB",
+            "2009 JUN 10 19:31:06.184658 TDB")
+
+```
+and spiceinit is run with `spksmithed=true`
 
 ```cam2map```
