@@ -117,6 +117,7 @@ NOTE: The updated Goddard SPK covers the following times:
             "2009 JUN 10 19:31:06.184658 TDB")
 
 ```
-and spiceinit is run with `spksmithed=true`
 
-```cam2map```
+Project the data to a map projections:
+
+```cam2map from=TCxxxxx_xx_xxxxxNxxxExxxx.cub to=TCxxxxx_xx_xxxxxNxxxExxxx_Proj.cub map=Some_Map_Projection_Template pixres=mpp res=X```
