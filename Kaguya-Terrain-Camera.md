@@ -93,8 +93,11 @@ gunzip TCxxxxx_xx_xxxxxNxxxExxxx.gz
 * Add SPICE data to the cube. By default spiceinit uses only reconstructed CK and SPK SPICE data. The ISIS3 data area for kaguya contains a smithed CK file from Goddard: SEL_MAIN_GRGM900C_L270_DIRALT_2019-02-13_TYPE13.bsp. This SPK contains updated spacecraft position information for the extended part of the mission (2009). 
 
 To use the default SPK data:
+
 ```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub```
+
 To use the updated SPK data:
+
 ```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub spksmithed=TRUE```
 
 NOTE: The updated Goddard SPK covers the following times:
