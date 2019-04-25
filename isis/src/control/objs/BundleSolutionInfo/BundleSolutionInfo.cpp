@@ -1011,9 +1011,11 @@ namespace Isis {
     int numUsed;
     int imageIndex = 0;
 
-    char imgMeasuresH1[] = "Measures";
+    char imgMeasuresH1[] = "        Measures        ";
+    char imgMeasuresH1a[]= "************************";
     char imgMeasuresH2[] = "|Accepted    |    Total|";
-    char imgMeasuresH3[] = "RMS(pixels)";
+    char imgMeasuresH3[] = "             RMS(pixels)             ";
+    char imgMeasuresH3a[] ="*************************************";
     char imgMeasuresH4[] = "|Samples    |    Lines    |    Total|";
 
 
@@ -1040,6 +1042,8 @@ namespace Isis {
     //Header 1
     sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH1,h4,imgMeasuresH3);
     fpOut<< buf;
+    sprintf(buf,"%*s  %s \n",firstColumnWidth+h2,imgMeasuresH1a,imgMeasuresH3a);
+    fpOut<<buf;
     //Header 2
     sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH2,h4,imgMeasuresH4);
     fpOut<< buf;
@@ -1250,17 +1254,26 @@ namespace Isis {
         fpOut << buf;
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
-
+#if 0
         sprintf(buf, "\n    Image         Initial              Total               "
                      "Final             Initial           Final\n"
                      "Parameter         Value              Correction            "
                      "Value             Accuracy          Accuracy\n");
+
+#endif
+        sprintf(buf,"\n    Image         Initial              Total               "
+                "Final                            Accuracy                   \n"
+                "                                                                 "
+                "            ***************************************\n"
+                "Parameter         Value              Correction            "
+                 "Value             Initial           Final           Units\n");
+
+
         fpOut << buf;
 
         QString observationString =
             observation->formatBundleOutputString(berrorProp);
         fpOut << (const char*)observationString.toLatin1().data();
-        qDebug() << "observation string:  " << observationString.toLatin1();
         // Build list of images and parameters for correlation matrix.
         foreach ( QString image, observation->imageNames() ) {
           imagesAndParameters.insert( image, observation->parameterList() );

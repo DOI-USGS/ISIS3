@@ -806,7 +806,7 @@ namespace Isis {
     std::vector<double> coefZ;
     std::vector<double> coefRA;
     std::vector<double> coefDEC;
-    std::vector<double> coefTWI;
+    std::vector<double> coefTWI;   
 
     int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
     int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -875,52 +875,141 @@ namespace Isis {
 
     if (!imageCSV) {
 
-      QString str("%1(t%2)");
+      QString str("%1(%2)  ");
 
       if (nPositionCoefficients > 0) {
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefX[i]);
           if (i == 0)
-            parameterNamesList.append( str.arg("  X  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+            parameterNamesList.append( str.arg("  X  ").arg("km") );
+          else {
+            switch(i) {
+            case 1:
+              parameterNamesList.append( str.arg("     ").arg("km/s") );
+              break;
+            case 2:
+              parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+              break;
+            case 3:
+              parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+              break;
+            default:
+                parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+            }
+          }
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefY[i]);
           if (i == 0)
-            parameterNamesList.append( str.arg("  Y  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+            parameterNamesList.append( str.arg("  Y  ").arg("km") );
+          else {
+
+            switch(i) {
+
+            case 1:
+              parameterNamesList.append( str.arg("     ").arg("km/s") );
+              break;
+            case 2:
+              parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+              break;
+            case 3:
+              parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+              break;
+            default:
+                parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+            }
+
+          }
+
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefZ[i]);
           if (i == 0)
-            parameterNamesList.append( str.arg("  Z  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+            parameterNamesList.append( str.arg("  Z  ").arg("km") );
+          else {
+
+            switch(i) {
+
+            case 1:
+              parameterNamesList.append( str.arg("     ").arg("km/s") );
+              break;
+            case 2:
+              parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+              break;
+            case 3:
+              parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+              break;
+            default:
+                parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+            }
+
+          }
+
         }
       }
       if (nPointingCoefficients > 0) {
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefRA[i] * RAD2DEG);
           if (i == 0)
-            parameterNamesList.append( str.arg(" RA  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+            parameterNamesList.append( str.arg(" RA  ").arg("dd") );
+          else {
+            switch(i) {
+
+            case 1:
+              parameterNamesList.append( str.arg("     ").arg("dd/s") );
+              break;
+            case 2:
+              parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+              break;
+            case 3:
+              parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+              break;
+            default:
+                parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+            }
+          }
         }
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
           if (i == 0)
-            parameterNamesList.append( str.arg("DEC  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+            parameterNamesList.append( str.arg("DEC  ").arg("dd") );
+          else {
+
+            switch(i) {
+
+            case 1:
+              parameterNamesList.append( str.arg("     ").arg("dd/s") );
+              break;
+            case 2:
+              parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+              break;
+            case 3:
+              parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+              break;
+            default:
+                parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+            }
+          }
         }
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
           if (i == 0)
-            parameterNamesList.append( str.arg("TWI  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+            parameterNamesList.append( str.arg("TWI  ").arg("dd") );
+          else {
+            switch(i) {
+            case 1:
+              parameterNamesList.append( str.arg("     ").arg("dd/s") );
+              break;
+            case 2:
+              parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+              break;
+            case 3:
+              parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+              break;
+            default:
+                parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+            }
+          }
         }
       }
 
