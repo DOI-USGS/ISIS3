@@ -12,6 +12,9 @@ Some keys have an original and corrected version. The corrected version must be 
 
 Using the non-corrected data will give you an incorrect camera model. For example, `LINE_EXPOSURE_DURATION` is, in some images, almost half of what `CORRECTED_SAMPLING_INTERVAL` evaluates to. The resulting computed image would be scaled incorrectly in the line direction. It is not known why there this discrepancy exists. 
 
+## Image Start Time discrepancy 
+`CORRECTED_SC_CLOCK_START_COUNT` and `CORRECTED_START_TIME` would in theory be the same value for a given image, but in practice differ on the order of hundredths of a second (0.001,) which corresponds to n lines. `CORRECTED_SC_CLOCK_START_COUNT` was selected to be used as the Start Time for the sensor model in both ISIS and ALE, based on a history of spacecraft clock counts being more accurate in other missions.
+
 # Kaguya TC's many IKIDs
 
 Kaguya seems to have many different IK's depending on combinations of operating modes (stereo vs mono operation, compression type, and swath mode). From Kaguya's IK kernel:
