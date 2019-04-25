@@ -94,6 +94,7 @@ To use the updated SPK data:
 ```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub spksmithed=TRUE```
 
 NOTE: The updated Goddard SPK covers the following times:
+
 ```
     Time = ("2008 DEC 27 05:31:05.183794 TDB",
             "2009 JAN 01 04:01:05.183936 TDB")
