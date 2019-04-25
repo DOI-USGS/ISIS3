@@ -66,12 +66,13 @@ There is a difference between the `.sl2` files stored under `/work/projects` and
 The archive files we have available locally are in:
     /work/projects/jaxa0[1234]
 NOTE: These files are not in the same format as those downloaded from the JAXA site.
+
 < Kelvin and Lisa may be able to add more about this >
 
 The example Kaguya TC files below was pulled from:
     /work/projects/jaxa01/TC_w_Level2B0/01/2008/12/07/TC1W2B0_01_05188N259E0020.sl2 
 Each observation is stored in a "tar" file with the extension "sl2" instead of "tar". The tar contains the following files:
-* TC1W2B0_01_05188N259E0020 - This is the image file with an attached PDS3 like PVL label. Traditionally this would have an extension of ".img". So far, the ISIS3 PVL and Import classes have been able to parse these labels and image data. NOTE: Comments below about flipping and mirroring do NOT apply to this image data.
+* TC1W2B0_01_05188N259E0020.igz - This is a GNU zipped image file with an attached PDS3 like PVL label. Traditionally this would have an extension of "gz". Linux gunzip complains about the "igz" extension. The file can be renamed with an extension of "gz, and then unzipped using gunzip. Once unzipped, the ISIS3 PVL and Import classes have been able to parse these labels and image data. NOTE: Comments below about flipping and mirroring do NOT apply to this image data.
 * TC1W2B0_01_05188N259E0020.jpg - This is a browse image of the observation possibly flipped and mirrored to put north up.
 * TC1W2B0_01_05188N259E0020.ctg - Catalog file containing basic information about the observation.
 * TC1W2B0_01_05188N259E0020.lbl - The label file for the observation (i.e., not just the image)
