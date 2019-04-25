@@ -50,7 +50,7 @@ Kaguya seems to have many different IK's depending on combinations of operating 
         LISM_TC2_STH  (Single Through Half)    1172  2923      -131383
         LISM_TC2_SSH  (Single SP_support Half) 1172  2921      -131384
 
-Single means only one camera was enabled, double means both TC1 and TC2 were enabled. All images are decompressed so compression mode is a non-issue. Nominal, Full and Half refer to the different swatch modes. According to the Jaxa team, the modes do not really impact the camera model with the exception of the swatch mode which determines the starting sample. 
+Single means only one camera was enabled, double means both TC1 and TC2 were enabled. All images are decompressed so compression mode is a non-issue. Nominal, Full and Half refer to the different swatch modes. According to the Jaxa team, the modes do not really impact the camera model with the exception of the swatch mode which determines the starting sample. For many `gdpool` calls (focal lengths, pixel size, CCD center, distortion coefficients), the `LISM_TC1` and `LISM_TC2` should be used as these do not vary with the different operating modes, including swatch mode. 
 
 # Discrepancies in Archived Data 
 
