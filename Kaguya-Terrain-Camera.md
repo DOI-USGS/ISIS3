@@ -81,12 +81,14 @@ Each observation is stored in a "tar" file with the extension "sl2" instead of "
 
 The standard workflow for processing Kaguya TC images in ISIS is as follows:
 * Un-tar and decompress the data set:
-```tar xvf TCxxxxx_xx_xxxxxNxxxExxxx.sl2
+```
+tar xvf TCxxxxx_xx_xxxxxNxxxExxxx.sl2
 mv TCxxxxx_xx_xxxxxNxxxExxxx.igz TCxxxxx_xx_xxxxxNxxxExxxx.gz
-gunzip TCxxxxx_xx_xxxxxNxxxExxxx.gz```
+gunzip TCxxxxx_xx_xxxxxNxxxExxxx.gz
+```
 * Convert the image to an ISIS3 cube
 ```kaguyatc2isis from=TCxxxxx_xx_xxxxxNxxxExxxx.lbl to=TCxxxxx_xx_xxxxxNxxxExxxx.cub```
-* Add SPICE data to the cube. By default spiceinit uses only reconstructed CK and SPK SPICE data. The ISIS3 data area for kaguya contains a smithed CK file from Goddard: SEL_MAIN_GRGM900C_L270_DIRALT_2019-02-13_TYPE13.bsp. This SPK contains a updated spacecraft position information for the extended part of the mission (2009). 
+* Add SPICE data to the cube. By default spiceinit uses only reconstructed CK and SPK SPICE data. The ISIS3 data area for kaguya contains a smithed CK file from Goddard: SEL_MAIN_GRGM900C_L270_DIRALT_2019-02-13_TYPE13.bsp. This SPK contains updated spacecraft position information for the extended part of the mission (2009). 
 
 To use the default SPK data:
 ```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub```
