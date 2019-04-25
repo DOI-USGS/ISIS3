@@ -14,7 +14,7 @@ Using the non-corrected data will give you an incorrect camera model. For exampl
 
 # Kaguya TC's many IKIDs
 
-Kaguya seems to have many different IK's depending on combinations of operating modes (stereo vs mono operation, compression type, and swath mode). From Kaguya IK kernel:
+Kaguya seems to have many different IK's depending on combinations of operating modes (stereo vs mono operation, compression type, and swath mode). From Kaguya's IK kernel:
 
                                                      End
                                                Start Pixel
