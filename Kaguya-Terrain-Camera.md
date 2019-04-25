@@ -2,7 +2,7 @@
 
 # Corrected Values 
 
-Some keys have a corrected version that must be preferred over the original keys. 
+Some keys have an original and corrected version. The corrected version must be preferred over the original keys. 
 
 * `CORRECTED_SC_CLOCK_START_COUNT` vs `SPACECRAFT_CLOCK_START_COUNT`
 * `CORRECTED_SC_CLOCK_STOP_COUNT` vs `SPACECRAFT_CLOCK_STOP_COUNT`
