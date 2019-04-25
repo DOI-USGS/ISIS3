@@ -63,6 +63,8 @@ There is a difference between the `.sl2` files stored under `/work/projects` and
 
 The standard workflow for processing Kaguya TC images in ISIS is as follows: 
 
-`kaguyatc2isis from=image.LBL to=image.cub`
-`spiceinit fr=image.cub`
+<insert information about renaming and un-taring / gzipping files>
+
+```kaguyatc2isis from=image.LBL to=image.cub```
+```spiceinit fr=image.cub```
 ...
