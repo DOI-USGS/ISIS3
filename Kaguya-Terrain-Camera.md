@@ -68,4 +68,5 @@ The standard workflow for processing Kaguya TC images in ISIS is as follows:
 ```kaguyatc2isis from=image.LBL to=image.cub```
 
 ```spiceinit fr=image.cub```
-...
+
+```cam2map```
