@@ -10,7 +10,7 @@ Some keys have an original and corrected version. The corrected version must be 
 * `CORRECTED_STOP_TIME` vs `STOP_TIME`            
 * `CORRECTED_SAMPLING_INTERVAL` vs `LINE_EXPOSURE_DURATION`
 
-Using the non-corrected data will give you an incorrect camera model. For example, `LINE_EXPOSURE_DURATION` is, in some images, almost half of what `CORRECTED_SAMPLING_INTERVAL` evaluates to. The resulting computed image would be scaled incorrectly in the line direction. 
+Using the non-corrected data will give you an incorrect camera model. For example, `LINE_EXPOSURE_DURATION` is, in some images, almost half of what `CORRECTED_SAMPLING_INTERVAL` evaluates to. The resulting computed image would be scaled incorrectly in the line direction. It is not known why there this discrepancy exists. 
 
 # Kaguya TC's many IKIDs
 
