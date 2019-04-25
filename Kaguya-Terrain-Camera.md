@@ -1,4 +1,4 @@
-
+< Thoughts: should we rename this as: Kaguya Terrain Camera development notes and have another page for the standard pipeline. Two different audiences >
 
 # Corrected Values 
 
