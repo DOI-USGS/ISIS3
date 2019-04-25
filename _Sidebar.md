@@ -1,3 +1,5 @@
+# Instrument Workflows
+* [Kaguya Terrain Camera](https://github.com/USGS-Astrogeology/ISIS3/wiki/Kaguya-Terrain-Camera)
 # Development References
 * [Building](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
 * [Writing Tests](https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest)
