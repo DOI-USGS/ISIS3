@@ -58,6 +58,7 @@ Single means only one camera was enabled, double means both TC1 and TC2 were ena
 # Discrepancies in Archived Data 
 
 There is a difference between the `.sl2` files stored under `/work/projects` and images obtained from the Jaxa's product search (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#). Images in Jaxa's product search use slightly different labels (e.g. Line exposure duration is a scalar in the `.sl2` files and a one element list in the Jaxa product search labels). The product search images also have detached labels compared to the `.sl2` files which have attached labels. This basically means we need to use slightly different processes depending on where the image originated from. 
+< Do either/both CSM or ISIS handle both?? >
 
 # Processing Kaguya TC images in ISIS
 <Insert what we know about the file naming conventions >
