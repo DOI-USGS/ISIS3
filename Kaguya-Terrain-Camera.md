@@ -69,8 +69,9 @@ NOTE: These files are not in the same format as those downloaded from the JAXA s
 
 < Kelvin and Lisa may be able to add more about this >
 
-The example Kaguya TC files below was pulled from:
+The example Kaguya TC file below was pulled from:
     /work/projects/jaxa01/TC_w_Level2B0/01/2008/12/07/TC1W2B0_01_05188N259E0020.sl2 
+
 Each observation is stored in a "tar" file with the extension "sl2" instead of "tar". The tar contains the following files:
 * TC1W2B0_01_05188N259E0020.igz - This is a GNU zipped image file with an attached PDS3 like PVL label. Traditionally this would have an extension of "gz". Linux gunzip complains about the "igz" extension. The file can be renamed with an extension of "gz, and then unzipped using gunzip. Once unzipped, the ISIS3 PVL and Import classes have been able to parse these labels and image data. NOTE: Comments below about flipping and mirroring do NOT apply to this image data.
 * TC1W2B0_01_05188N259E0020.jpg - This is a browse image of the observation possibly flipped and mirrored to put north up.
@@ -78,18 +79,21 @@ Each observation is stored in a "tar" file with the extension "sl2" instead of "
 * TC1W2B0_01_05188N259E0020.lbl - The label file for the observation (i.e., not just the image)
 
 
+The standard workflow for processing Kaguya TC images in ISIS is as follows:
+* Un-tar and decompress the data set:
+```tar xvf TCxxxxx_xx_xxxxxNxxxExxxx.sl2
+mv TCxxxxx_xx_xxxxxNxxxExxxx.igz TCxxxxx_xx_xxxxxNxxxExxxx.gz
+gunzip TCxxxxx_xx_xxxxxNxxxExxxx.gz```
+* Convert the image to an ISIS3 cube
+```kaguyatc2isis from=TCxxxxx_xx_xxxxxNxxxExxxx.lbl to=TCxxxxx_xx_xxxxxNxxxExxxx.cub```
+* Add SPICE data to the cube. By default spiceinit uses only reconstructed CK and SPK SPICE data. The ISIS3 data area for kaguya contains a smithed CK file from Goddard: SEL_MAIN_GRGM900C_L270_DIRALT_2019-02-13_TYPE13.bsp. This SPK contains a updated spacecraft position information for the extended part of the mission (2009). 
 
-The standard workflow for processing Kaguya TC images in ISIS is as follows: 
+To use the default SPK data:
+```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub```
+To use the updated SPK data:
+```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub spksmithed=TRUE```
 
-<insert information about renaming and un-taring / gzipping files>
-
-```kaguyatc2isis from=image.LBL to=image.cub```
-
-```spiceinit fr=image.cub```
-
-The new SPK from Goddard, `SEL_MAIN_GRGM900C_L270_DIRALT_2019-02-13_TYPE13.bsp` will be automatically used if 
-the image was acquired within any of the following time ranges: 
-
+NOTE: The updated Goddard SPK covers the following times:
 ```
     Time = ("2008 DEC 27 05:31:05.183794 TDB",
             "2009 JAN 01 04:01:05.183936 TDB")
