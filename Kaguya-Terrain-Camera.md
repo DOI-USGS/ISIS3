@@ -66,5 +66,6 @@ The standard workflow for processing Kaguya TC images in ISIS is as follows:
 <insert information about renaming and un-taring / gzipping files>
 
 ```kaguyatc2isis from=image.LBL to=image.cub```
+
 ```spiceinit fr=image.cub```
 ...
