@@ -96,7 +96,7 @@ To use the default SPK data:
 
 ```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub```
 
-To use the updated SPK data:
+To use the updated SPK data for observations covered by the times ranges in the smithed SPK:
 
 ```spiceinit fr=TCxxxxx_xx_xxxxxNxxxExxxx.cub spksmithed=TRUE```
 
