@@ -53,8 +53,16 @@ Kaguya seems to have many different IK's depending on combinations of operating 
         LISM_TC2_STH  (Single Through Half)    1172  2923      -131383
         LISM_TC2_SSH  (Single SP_support Half) 1172  2921      -131384
 
-Single means only one camera was enabled, double means both TC1 and TC2 were enabled. All images are decompressed so compression mode is a non-issue. Nominal, Full and Half refer to the different swatch modes. According to the Jaxa team, the modes do not really impact the camera model with the exception of the swatch mode which determines the starting sample. For many `gdpool` calls (focal lengths, pixel size, CCD center, distortion coefficients), the `LISM_TC1` and `LISM_TC2` IKIDs should be used as these do not vary with the different operating modes, including swatch mode. 
+Single means only one camera was enabled, double means both TC1 and TC2 were enabled. All images are decompressed so compression mode is a non-issue. Nominal, Full and Half refer to the different swath modes. According to the Jaxa team, the modes do not really impact the camera model with the exception of the swath mode which determines the starting sample. For many SPICE `gdpool` calls (focal lengths, pixel size, CCD center, distortion coefficients), the `LISM_TC1` and `LISM_TC2` IKIDs should be used as these do not vary with the different operating modes, including swath mode. 
 
 # Discrepancies in Archived Data 
 
 There is a difference between the `.sl2` files stored under `/work/projects` and images obtained from the Jaxa's product search (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#). Images in Jaxa's product search use slightly different labels (e.g. Line exposure duration is a scalar in the `.sl2` files and a one element list in the Jaxa product search labels). The product search images also have detached labels compared to the `.sl2` files which have attached labels. This basically means we need to use slightly different processes depending on where the image originated from. 
+
+# Processing Kaguya TC images in ISIS
+
+The standard workflow for processing Kaguya TC images in ISIS is as follows: 
+
+`kaguyatc2isis from=image.LBL to=image.cub`
+`spiceinit fr=image.cub`
+...
