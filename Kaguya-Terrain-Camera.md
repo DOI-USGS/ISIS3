@@ -69,4 +69,6 @@ The standard workflow for processing Kaguya TC images in ISIS is as follows:
 
 ```spiceinit fr=image.cub```
 
+< insert information about how new Goddard kernels will automatically get picked up for images taken during the time range the kernel covers> 
+
 ```cam2map```
