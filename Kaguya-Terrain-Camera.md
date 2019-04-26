@@ -110,6 +110,11 @@ There were a couple of what appear to be transcription errors in distortion equa
             +b0 +b1*r +b2*r^2 +b3*r^3 ,
      v[Z] = INS<INSTID>BORESIGHT[Z] .
 ```
+It was assumed that:
+
+* The use of X coefficients (a0, a1, a2, a3) for the Y equation, rather than the Y coefficients (b0, b1, b2, b3) was a transcription error
+
+* The addition of `+r` in the `V[Y]` equation was also a transcription error. The Y-coordinate is already added to the equation on the previous line. Due to the relative size of the coefficients and `r`, adding `r` would dominate the equation and produce an unrealistically large correction.
 
 The same distortion equation is used in both the ISIS and ALE/CSM sensor models.
 
