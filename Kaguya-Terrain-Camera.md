@@ -55,6 +55,64 @@ Kaguya seems to have many different IK's depending on combinations of operating 
 
 Single means only one camera was enabled, double means both TC1 and TC2 were enabled. All images are decompressed so compression mode is a non-issue. Nominal, Full and Half refer to the different swath modes. According to the Jaxa team, the modes do not really impact the camera model with the exception of the swath mode which determines the starting sample. For many SPICE `gdpool` calls (focal lengths, pixel size, CCD center, distortion coefficients), the `LISM_TC1` and `LISM_TC2` IKIDs should be used as these do not vary with the different operating modes, including swath mode. 
 
+# Kaguya TC's Distortion Model
+
+The equation to be used for the Kaguya TC distortion model and associated coefficients were located in the instrument kernel `SEL_TC_V01.TI`:
+
+```
+Distortion information
+---------------------------------------------------------------------------
+  Line-of-sight vector of pixel no. n can be expressed as below.
+
+   Distortion coefficients information:
+     INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+     INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+
+   Distance r from the center:
+     r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+
+   Line-of-sight vector v is calculated as
+     v[X] = INS<INSTID>BORESIGHT[X]
+            +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Y] = INS<INSTID>BORESIGHT[Y]
+            +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Z] = INS<INSTID>BORESIGHT[Z] .
+
+
+   \begindata
+
+      INS-131351_DISTORTION_COEF_X  = (
+                                      -9.6499e-4,  9.8441e-4,
+                                       8.5773e-6, -3.7438e-6
+                                      )
+      INS-131351_DISTORTION_COEF_Y  = (
+                                      -1.3796e-3,  1.3502e-5,
+                                       2.7251e-6, -6.1938e-6
+                                      )
+      INS-131371_DISTORTION_COEF_X  = (
+                                       2.9786e-3, 7.7836e-5,
+                                       3.9265e-6, -4.4088e-6
+                                      )
+      INS-131371_DISTORTION_COEF_Y  = (
+                                       9.2410e-4, -1.1994e-4,
+                                       2.9281e-5, -3.7239e-7
+                                      )
+
+```
+
+There were a couple of what appear to be transcription errors in distortion equations from the IK above, so a slightly edited IK,`SEL_TC_V02.TI`, was created as part of this work. The actual distortion equations used are: 
+
+```
+   Line-of-sight vector v is calculated as
+     v[X] = INS<INSTID>BORESIGHT[X]
+            +a0 +a1*r +a2*r^2 +a3*r^3 ,
+     v[Y] = INS<INSTID>BORESIGHT[Y]
+            +b0 +b1*r +b2*r^2 +b3*r^3 ,
+     v[Z] = INS<INSTID>BORESIGHT[Z] .
+```
+
+The same distortion equation is used in both the ISIS and ALE/CSM sensor models.
+
 # Discrepancies in Archived Data 
 
 There is a difference between the `.sl2` files stored under `/work/projects` and images obtained from the Jaxa's product search (https://darts.isas.jaxa.jp/planet/pdap/selene/product_search.html#). Images in Jaxa's product search use slightly different labels (e.g. Line exposure duration is a scalar in the `.sl2` files and a one element list in the Jaxa product search labels). The product search images also have detached labels compared to the `.sl2` files which have attached labels. This basically means we need to use slightly different processes depending on where the image originated from. 
