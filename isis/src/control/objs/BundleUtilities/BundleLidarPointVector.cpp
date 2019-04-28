@@ -64,9 +64,6 @@ namespace Isis {
                                                          LinearAlgebra::Vector &imageSolution,
                                                          const BundleTargetBodyQsp target) {
     for (int i = 0; i < size(); i++) {
-      if (!at(i)->id().contains("Lidar7696")) {
-        continue;
-      }
       at(i)->applyParameterCorrections(normalsMatrix, imageSolution, target);
     }
   }
@@ -80,10 +77,6 @@ namespace Isis {
   void BundleLidarPointVector::computeMeasureResiduals() {
 
     for (int i = 0; i < size(); i++) {
-      if (!at(i)->id().contains("Lidar7696")) {
-        continue;
-      }
-
       at(i)->computeResiduals();
     }
   }
@@ -95,13 +88,9 @@ namespace Isis {
    * @return double weighted sum of squares of measure residuals (vtpv).
    */
   double BundleLidarPointVector::vtpvMeasureContribution() {
-    double vtpv = 0;
+    double vtpv = 0.0;
 
     for (int i = 0; i < size(); i++) {
-      if (!at(i)->id().contains("Lidar7696")) {
-        continue;
-      }
-
       vtpv += at(i)->vtpvMeasures();
     }
 
@@ -115,33 +104,29 @@ namespace Isis {
    * @return double Weighted sum of squares of constrained point residuals.
    */
   double BundleLidarPointVector::vtpvContribution() {
-    double vtpvControl = 0;
+    double vtpvControl = 0.0;
 
     for (int i = 0; i < size(); i++) {
-      if (!at(i)->id().contains("Lidar7696")) {
-        continue;
-      }
       vtpvControl += at(i)->vtpv();
     }
 
     return vtpvControl;
   }
 
+
   /**
    * Compute vtpv of lidar range constraints.
    *
-   * @return double vtpv of lidar range constraints.
+   * @return double vtpvRange of lidar range constraints.
    */
   double BundleLidarPointVector::vtpvRangeContribution() {
-    double vtpv = 0;
+    double vtpvRange = 0.0;
 
     for (int i = 0; i < size(); i++) {
-      if (at(i)->id().contains("Lidar7696")) {
-        vtpv += at(i)->vtpvRangeContribution();
-      }
+        vtpvRange += at(i)->vtpvRangeContribution();
     }
 
-    return vtpv;
+    return vtpvRange;
   }
 
 }

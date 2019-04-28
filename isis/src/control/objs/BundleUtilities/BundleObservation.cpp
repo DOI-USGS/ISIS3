@@ -98,8 +98,6 @@ namespace Isis {
                                   image->camera()->instrumentRotation() : NULL)
                                : NULL);
 
-      int fred=1;
-
       // set the observations target body spice rotation object from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null

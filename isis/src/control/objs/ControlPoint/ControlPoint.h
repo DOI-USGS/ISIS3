@@ -362,6 +362,8 @@ namespace Isis {
    *                           Fixes #5435.
    *   @history 2018-06-30 Debbie A. Cook Removed all calls to obsolete method
    *                           SurfacePoint::SetRadii.  References #5457.
+   *   @history 2019-04-28 Ken Edmundson Moved PointModified method to protected status to be able
+   *                           to use directly with derived LidarControlPoint class.
    */
   class ControlPoint : public QObject {
 
@@ -605,9 +607,9 @@ namespace Isis {
       void SetExplicitReference(ControlMeasure *measure);
       void ValidateMeasure(QString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
-      void PointModified();
 
     protected:
+      void PointModified();
       //!< List of Control Measures
       QHash< QString, ControlMeasure * > * measures;
 

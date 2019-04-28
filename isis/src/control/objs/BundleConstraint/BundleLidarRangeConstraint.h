@@ -70,12 +70,16 @@ namespace Isis {
                            LinearAlgebra::MatrixUpperTriangular& N22,
                            SparseBlockColumnMatrix& N12,
                            LinearAlgebra::VectorCompressed& n1,
-                           LinearAlgebra::Vector& n2,
-                           BundleMeasureQsp measure);
+                           LinearAlgebra::Vector& n2);
 
-      void update();
       double vtpv();
       void errorPropagation();
+
+      void computeRange();
+      double rangeObserved();
+      double rangeComputed();
+      double rangeObservedSigma();
+      double rangeAdjustedSigma();
 
       QString formatBundleOutputString(bool errorProp=false);
 
@@ -83,28 +87,26 @@ namespace Isis {
       LidarControlPointQsp m_lidarControlPoint;       //!< Parent lidar control point
       BundleObservationQsp m_bundleObservation;       //!< BundleObservation associated with measure
 
-      BundleMeasureQsp m_simultaneousMeasure;         /**! Point in image acquired simultaneously
-                                                           with a lidar observation. NOTE this point
-                                                           is a fictitious "measurement". A priori
+      BundleMeasureQsp m_simultaneousMeasure;         /**! 2D image point corresponding to 3D lidar
+                                                           point on surface. The image has been
+                                                           acquired simultaneously with the lidar
+                                                           observation. NOTE this point is a
+                                                           fictitious "measurement". A priori
                                                            coordinates are obtained by back
-                                                           projection of the lidar 3D point into the
-                                                           image using the image's current exterior
-                                                           orientation (SPICE). The "measure" is
+                                                           projection of the lidar point into the
+                                                           image using the current exterior
+                                                           orientation (EO-SPICE). This "measure" is
                                                            corrected in each iteration of the bundle
                                                            adjustment by it's residuals.*/
 
-      std::vector<double> m_pointBodyFixed;          //!< Body fixed coordinates of lidar point
-      std::vector<double> m_camPositionJ2K;          //!< J2K coordinates of camera
-      std::vector<double> m_camPositionBodyFixed;    //!< Body fixed coordinates of camera
-      std::vector<double> m_matrixTargetToJ2K;       //!< Rotates spacecraft from J2K to body-fixed
-
-      double m_scaledTime;                           //!< Current time for simultaneous measure
+      double m_dX, m_dY, m_dZ;                       /**! deltas between spacecraft & lidar point
+                                                          in body-fixed coordinates */
       double m_rangeObserved;                        //!< Observed range from lidar input data
       double m_rangeComputed;                        //!< Computed range from distance condition
       double m_rangeObservedSigma;                   //!< Uncertainty of observed range
       double m_rangeObservedWeightSqrt;              //!< Square-root of observed range weight
-      double m_adjustedSigma;                        //!< Uncertainty of range after adjustment
-      double m_vtpv;                                 //!< weighted sum-of-squares of residual
+      double m_adjustedSigma;                        //!< Adjusted uncertainty of range
+      double m_vtpv;                                 //!< Weighted sum-of-squares of residual
   };
 
   //! Typdef for BundleLidarRangeConstraint QSharedPointer.

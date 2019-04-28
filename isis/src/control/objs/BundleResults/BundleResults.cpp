@@ -109,6 +109,9 @@ namespace Isis {
         m_rmsImageSampleResiduals(src.m_rmsImageSampleResiduals),
         m_rmsImageLineResiduals(src.m_rmsImageLineResiduals),
         m_rmsImageResiduals(src.m_rmsImageResiduals),
+        m_rmsLidarImageSampleResiduals(src.m_rmsLidarImageSampleResiduals),
+        m_rmsLidarImageLineResiduals(src.m_rmsLidarImageLineResiduals),
+        m_rmsLidarImageResiduals(src.m_rmsLidarImageResiduals),
         m_rmsImageXSigmas(src.m_rmsImageXSigmas),
         m_rmsImageYSigmas(src.m_rmsImageYSigmas),
         m_rmsImageZSigmas(src.m_rmsImageZSigmas),
@@ -199,6 +202,9 @@ namespace Isis {
       m_rmsImageSampleResiduals = src.m_rmsImageSampleResiduals;
       m_rmsImageLineResiduals = src.m_rmsImageLineResiduals;
       m_rmsImageResiduals = src.m_rmsImageResiduals;
+      m_rmsLidarImageSampleResiduals = src.m_rmsLidarImageSampleResiduals;
+      m_rmsLidarImageLineResiduals = src.m_rmsLidarImageLineResiduals;
+      m_rmsLidarImageResiduals = src.m_rmsLidarImageResiduals;
       m_rmsImageXSigmas = src.m_rmsImageXSigmas;
       m_rmsImageYSigmas = src.m_rmsImageYSigmas;
       m_rmsImageZSigmas = src.m_rmsImageZSigmas;
@@ -256,6 +262,9 @@ namespace Isis {
     m_rmsImageSampleResiduals.clear();
     m_rmsImageLineResiduals.clear();
     m_rmsImageResiduals.clear();
+    m_rmsLidarImageSampleResiduals.clear();
+    m_rmsLidarImageLineResiduals.clear();
+    m_rmsLidarImageResiduals.clear();
     m_rmsImageXSigmas.clear();
     m_rmsImageYSigmas.clear();
     m_rmsImageZSigmas.clear();
@@ -376,6 +385,22 @@ namespace Isis {
     m_rmsImageLineResiduals = rmsImageLineResiduals;
     m_rmsImageSampleResiduals = rmsImageSampleResiduals;
     m_rmsImageResiduals = rmsImageResiduals;
+  }
+
+
+  /**
+   * Sets the root mean square lidar image residual Statistics lists.
+   *
+   * @param rmsLidarImageLineResiduals The new image line residuals list.
+   * @param rmsLidarImageSampleResiduals The new image sample residuals list.
+   * @param rmsLidarImageResiduals The new image residuals list.
+   */
+  void BundleResults::setRmsLidarImageResidualLists(QList<Statistics> rmsLidarImageLineResiduals,
+                                               QList<Statistics> rmsLidarImageSampleResiduals,
+                                               QList<Statistics> rmsLidarImageResiduals) {
+    m_rmsLidarImageLineResiduals = rmsLidarImageLineResiduals;
+    m_rmsLidarImageSampleResiduals = rmsLidarImageSampleResiduals;
+    m_rmsLidarImageResiduals = rmsLidarImageResiduals;
   }
 
 
@@ -788,7 +813,6 @@ namespace Isis {
    * Computes and stores the degrees of freedom of the bundle adjustment.
    */
   void BundleResults::computeDegreesOfFreedom() {
-    int fred=1;
     m_degreesOfFreedom = m_numberImageObservations
                          + m_numberLidarImageObservations
                          + m_numberConstrainedPointParameters
@@ -798,7 +822,6 @@ namespace Isis {
                          + m_numberContinuityConstraintEquations
                          + m_numberLidarRangeConstraintEquations
                          - m_numberUnknownParameters;
-    fred=2;
   }
 
 
@@ -904,7 +927,6 @@ namespace Isis {
    */
   void BundleResults::setBundleLidarPoints(QVector<BundleLidarControlPointQsp> lidarPoints) {
     m_bundleLidarPoints = lidarPoints;
-    int fred=1;
   }
 
   /**
@@ -977,6 +999,36 @@ namespace Isis {
    */
   QList<Statistics> BundleResults::rmsImageResiduals() const {
     return m_rmsImageResiduals;
+  }
+
+
+  /**
+   * Returns the list of RMS image lidar sample residuals statistics.
+   *
+   * @return QList<Statistics> The RMS image lidar sample residual statistics.
+   */
+  QList<Statistics> BundleResults::rmsLidarImageSampleResiduals() const {
+    return m_rmsLidarImageSampleResiduals;
+  }
+
+
+  /**
+   * Returns the list of RMS image lidar line residuals statistics.
+   *
+   * @return QList<Statistics> The RMS image lidar line residual statistics.
+   */
+  QList<Statistics> BundleResults::rmsLidarImageLineResiduals() const {
+    return m_rmsLidarImageLineResiduals;
+  }
+
+
+  /**
+   * Returns the list of RMS image lidar residuals statistics.
+   *
+   * @return QList<Statistics> The RMS image lidar residual statistics.
+   */
+  QList<Statistics> BundleResults::rmsLidarImageResiduals() const {
+    return m_rmsLidarImageResiduals;
   }
 
 

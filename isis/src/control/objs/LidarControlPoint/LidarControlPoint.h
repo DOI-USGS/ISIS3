@@ -52,6 +52,9 @@ namespace Isis {
    *   @history 2019-02-23 Debbie A. Cook Added Functor Predicate struct to sort
    *                                        based on Id.  This is needed for getting consistent 
    *                                        output for comparing test data. References #5343.
+   *   @history 2019-04-28 Ken Edmundson Modified ComputeResiduals method to correct lidar measure
+   *                                        by it's residuals, i.e. by simply moving the measure to
+   *                                        it's current, back-projected location in the image.
    */
   
   class LidarControlPoint : public ControlPoint {
