@@ -371,7 +371,7 @@ namespace Isis {
    * @return conversion was successful
    */
   bool RadarGroundMap::GetXY(const SurfacePoint &spoint, double *cudx,
-                             double *cudy) {
+                             double *cudy, bool test) {
 
     // Get the ground point in rectangular body-fixed coordinates (X)
     double X[3];
@@ -405,6 +405,11 @@ namespace Isis {
     p_groundDopplerFreq = 2. / p_waveLength / p_groundSlantRange * vdot_c(&p_lookB[0], &VsB[0]);
     *cudx = p_groundSlantRange * 1000.0 / p_rangeSigma;  // to meters, then to focal plane coord
     *cudy = p_groundDopplerFreq / p_dopplerSigma;   // htx to focal plane coord
+
+    if (test == true) {
+      QString msg = "Back of planet test is not enabled for Radar images";
+       throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
 
     return true;
   }

@@ -159,12 +159,14 @@ namespace Isis {
    * class value for m_lookJ is set by this method.
    *
    * @param point Surface point (ground position) 
-   * @param cudx [out] Pointer to computed undistored x focal plane coordinate
-   * @param cudy [out] Pointer to computed undistored y focal plane coordinate
+   * @param cudx [out] Pointer to computed undistorted x focal plane coordinate
+   * @param cudy [out] Pointer to computed undistorted y focal plane coordinate
+   * @param test Optional parameter to indicate whether to do the back-of-planet test.
    *
    * @return @b bool If conversion was successful
    */
-  bool CameraGroundMap::GetXY(const SurfacePoint &point, double *cudx, double *cudy) {
+  bool CameraGroundMap::GetXY(const SurfacePoint &point, double *cudx, 
+                              double *cudy, bool test) {
 
     vector<double> pB(3);
     pB[0] = point.GetX().kilometers();
@@ -193,28 +195,42 @@ namespace Isis {
     // Save pB for target body partial derivative calculations NEW *** DAC 8-14-2015
     m_pB = pB;
     
+    // During iterations in the bundle adjustment do not do the back-of-planet test.
+    // Failures are expected to happen during the bundle adjustment due to bad camera
+    // pointing or position, poor a priori points, or inaccurate target body information.  For
+    // instance, control points near the limb of an image often fail the test.  The hope is
+    // that during the bundle adjustment, any variables causing points to fail the test will
+    // be corrected.  If not, the point residuals will likely be large on a point that fails the
+    // test.  The back-of-planet test is still a valid check for a control net diagnostic
+    // program, but not for the bundle adjustment.
+    // 
+    // TODO It might be useful to have a separate diagnostic program test all points in a 
+    //            control net to see if any of the control points fail the back-of-planet test on 
+    //            any of the images.
+
     // Check for point on back of planet by checking to see if surface point is viewable 
     //   (test emission angle)
-    // During iterations, we may not want to do the back of planet test???
-    vector<double> lookB = bodyRot->ReferenceVector(lookJ);
-    double upsB[3], upB[3], dist;
-    vminus_c((SpiceDouble *) &lookB[0], upsB);
-    unorm_c(upsB, upsB, &dist);
-    unorm_c((SpiceDouble *) &pB[0], upB, &dist);
-    double angle = vdot_c(upB, upsB);
-    double emission;
-    if (angle > 1) {
-      emission = 0;
-    }
-    else if (angle < -1) {
-      emission = 180.;
-    }
-    else {
-      emission = acos(angle) * 180.0 / Isis::PI;
-    }
+    if (test == true) {
+      vector<double> lookB = bodyRot->ReferenceVector(lookJ);
+      double upsB[3], upB[3], dist;
+      vminus_c((SpiceDouble *) &lookB[0], upsB);
+      unorm_c(upsB, upsB, &dist);
+      unorm_c((SpiceDouble *) &pB[0], upB, &dist);
+      double cosangle = vdot_c(upB, upsB);
+      double emission;
+      if (cosangle > 1) {
+        emission = 0;
+      }
+      else if (cosangle < -1) {
+        emission = 180.;
+      }
+      else {
+        emission = acos(cosangle) * 180.0 / Isis::PI;
+      }
 
-    if (fabs(emission) > 90.) {
-      return false;
+      if (fabs(emission) > 90.) {
+        return false;
+      }
     }
 
     // Get the look vector in the camera frame and the instrument rotation
@@ -254,6 +270,7 @@ namespace Isis {
     SurfacePoint spoint(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(radius, Distance::Meters));
+    // This is called by the application socetlinescankeywords
     return GetXY(spoint, cudx, cudy);
   }
 

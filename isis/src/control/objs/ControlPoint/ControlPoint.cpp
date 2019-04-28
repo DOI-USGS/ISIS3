@@ -1092,7 +1092,7 @@ namespace Isis {
         double scalingY;
 
         // Step 3.
-        cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY);
+        cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY, false);
         double deltaLine;
 
         if (computedY < 0) {
@@ -1197,7 +1197,7 @@ namespace Isis {
         cam->SetImage(m->GetSample(), m->GetLine());
       }
 
-      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy);
+      cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy, false);
       // double mudx = m->GetFocalPlaneMeasuredX();
       // double mudy = m->GetFocalPlaneMeasuredY();
 

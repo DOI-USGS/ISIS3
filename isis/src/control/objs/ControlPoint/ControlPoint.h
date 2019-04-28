@@ -363,6 +363,16 @@ namespace Isis {
    *                           #2591). Added check to IsConstrained() method to see if point type is
    *                           Free, in which case we ignore stored a priori sigmas on the
    *                           coordinates.
+   *  @history 2019-04-15 Debbie A. Cook Revised how free points without any measures 
+   *                           that project to the target are handled.  No points coordinates can
+   *                           be calculated if all measures fail to project.  In this case the a priori
+   *                           coordinates will be used, if they exist in the control net. Otherwise
+   *                           an error will be thrown.  Also the call to CameraGroundMap::GetXY
+   *                           was changed to not test for points on the back side of the planet.
+   *                           during bundle adjustment.  The instrument coordinates will be
+   *                           calculated and returned in either case.  In the future, a diagnostic
+   *                           application may be helpful to check for non-visable points after
+   *                           bundle adjustment. Referenced #2591.
    */
   class ControlPoint : public QObject {
 
