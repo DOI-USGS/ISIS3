@@ -45,4 +45,4 @@ The sensor model specifies what is contained in the `NaifKeywords` group. Keywor
 * _storeResult_
 * _storeValue_
 
-The sensor model and its maps use these methods to get any keyword values they need from the SPICE kernel pool.
+The sensor model and its maps use these methods to get any keyword values they need from the SPICE kernel pool. The keyword and its values are then stored in the `NaifKeywords` group and any future calls to access them query the `NaifKeywords` group instead of the SPICE kernel pool.
