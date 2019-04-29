@@ -358,18 +358,6 @@ namespace Isis {
 
 
   /**
-   * Accesses the sample residual for this control measure
-   *
-   * @see ControlMeasure::GetSampleResidual()
-   *
-   * @return double Returns the sample residual
-   */
-  double BundleMeasure::sampleResidual() const {
-    return m_controlMeasure->GetSampleResidual();
-  }
-
-
-  /**
    * Accesses the current line measurement for this control measure
    *
    * @see ControlMeasure::GetLine()
@@ -382,14 +370,46 @@ namespace Isis {
 
 
   /**
-   * Accesses the line residual for this control measure
+   * Accesses the sample residual in pixels for this control measure
+   *
+   * @see ControlMeasure::GetSampleResidual()
+   *
+   * @return double Returns the sample residual in pixels
+   */
+  double BundleMeasure::sampleResidual() const {
+    return m_controlMeasure->GetSampleResidual();
+  }
+
+
+  /**
+   * Accesses the line residual in pixels for this control measure
    *
    * @see ControlMeasure::GetLineResidual()
    *
-   * @return double Returns the line residual
+   * @return double Returns the line residual in pixels
    */
   double BundleMeasure::lineResidual() const {
     return m_controlMeasure->GetLineResidual();
+  }
+
+
+  /**
+   * Accesses the focal plane x-coordinate residual in millimeters
+   *
+   * @return double Returns the focal plane x-coordinate residual in millimeters
+   */
+  double BundleMeasure::xFocalPlaneResidual() const {
+    return m_xFocalPlaneResidual;
+  }
+
+
+  /**
+   * Accesses the focal plane y-coordinate residual in millimeters
+   *
+   * @return double Returns the focal plane y-coordinate residual in millimeters
+   */
+  double BundleMeasure::yFocalPlaneResidual() const {
+    return m_yFocalPlaneResidual;
   }
 
 

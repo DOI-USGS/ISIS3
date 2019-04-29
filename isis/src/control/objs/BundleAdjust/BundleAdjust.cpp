@@ -511,7 +511,7 @@ namespace Isis {
 
         measure->setParentObservation(observation);
         measure->setParentImage(image);
-        measure->setSigma(1.4);
+        measure->setSigma(0.3);
       }
 
       point->ComputeApriori();
@@ -525,10 +525,6 @@ namespace Isis {
     for (int i = 0; i < numLidarPoints; i++) {
       LidarControlPointQsp lidarPoint = m_lidarDataSet->points().at(i);
       if (lidarPoint->IsIgnored()) {
-        continue;
-      }
-
-      if (!lidarPoint->GetId().contains("Lidar7696")) {
         continue;
       }
 
@@ -548,7 +544,7 @@ namespace Isis {
 
         measure->setParentObservation(observation);
         measure->setParentImage(image);
-        measure->setSigma(30.0*1.4);
+        measure->setSigma(30.0);
       }
 
       // WHY ARE WE CALLING COMPUTE APRIORI FOR LIDAR POINTS?
@@ -556,10 +552,10 @@ namespace Isis {
       // line 916 in ControlPoint.Constrained_Point_Parameters
       // This really stinks, maybe we should be setting the focal plane measures here, as part of
       // the BundleAdjust::init method? Or better yet as part of the BundleControlPoint constructor?
-      // right now we have a kluge in the ControlPoint::setApriori method to not update the coordinates
-      // of lidar points
-      // Also, maybe we could address Brents constant complaint about points where we can't get a lat or
-      // lon due to bad SPICE causing the bundle to fail
+      // Currently have a kluge in the ControlPoint::setApriori method to not update the coordinates
+      // of lidar points.
+      // Also, maybe we could address Brents constant complaint about points where we can't get a
+      // lat or lon due to bad SPICE causing the bundle to fail.
       lidarPoint->ComputeApriori();
 
       // initialize range constraints
@@ -1217,16 +1213,8 @@ namespace Isis {
 
 //        clock_t computePartialsClock1 = clock();
 
-        // segment solution
-//        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
-//            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
-
           bool status = computePartials(coeffTarget, coeffImagePosition, coeffImagePointing,
                                    coeffPoint3D, coeffRHS, *measure);
-//        }
-//        else {
-//          status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, measure);
-//        }
 
 //        clock_t computePartialsClock2 = clock();
 //        cumulativeComputePartialsTime += (computePartialsClock2 - computePartialsClock1)
@@ -1243,17 +1231,8 @@ namespace Isis {
 
 //        clock_t formMeasureNormalsClock1 = clock();
 
-        // segment solution
-//        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
-//            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
-
         formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImagePosition, coeffImagePointing,
                            coeffPoint3D, coeffRHS, measure);
-//        }
-//        else {
-//          formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
-//                             measure);
-//        }
 
 //        clock_t formMeasureNormalsClock2 = clock();
 //        cumulativeFormMeasureNormalsTime += (formMeasureNormalsClock2 - formMeasureNormalsClock1)
@@ -1288,10 +1267,6 @@ namespace Isis {
       emit(pointUpdate(i+1));
       BundleLidarControlPointQsp point = m_bundleLidarControlPoints.at(i);
 
-      if (!point->id().contains("Lidar7696")) {
-        continue;
-      }
-
       if (point->isRejected()) {
         numRejectedLidarPoints++;
 
@@ -1316,16 +1291,8 @@ namespace Isis {
 
 //        clock_t computePartialsClock1 = clock();
 
-        // segment solution
-//        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
-//            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
-
-          bool status = computePartials(coeffTarget, coeffImagePosition, coeffImagePointing,
-                                   coeffPoint3D, coeffRHS, *measure);
-//        }
-//        else {
-//          status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, measure);
-//        }
+        bool status = computePartials(coeffTarget, coeffImagePosition, coeffImagePointing,
+                                      coeffPoint3D, coeffRHS, *measure);
 
 //        clock_t computePartialsClock2 = clock();
 //        cumulativeComputePartialsTime += (computePartialsClock2 - computePartialsClock1)
@@ -1342,28 +1309,16 @@ namespace Isis {
 
 //        clock_t formMeasureNormalsClock1 = clock();
 
-        // segment solution
-//        if (measure->parentBundleObservation()->numberPolynomialPositionSegments() > 1 ||
-//            measure->parentBundleObservation()->numberPolynomialPointingSegments() > 1) {
-
         formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImagePosition, coeffImagePointing,
                            coeffPoint3D, coeffRHS, measure);
-//        }
-//        else {
-//          formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
-//                             measure);
-//        }
 
 //        clock_t formMeasureNormalsClock2 = clock();
 //        cumulativeFormMeasureNormalsTime += (formMeasureNormalsClock2 - formMeasureNormalsClock1)
 //            / (double)CLOCKS_PER_SEC;
 
-//        if (point->id().contains("Lidar7696")) {
-//          m_numLidarConstraints += point->applyLidarRangeConstraint(m_sparseNormals, N22, N12, n1,
-//                                                                    n2, measure);
-//        }
-
       } // end loop over this points measures
+
+      m_numLidarConstraints += point->applyLidarRangeConstraints(m_sparseNormals, N22, N12, n1, n2);
 
 //      clock_t formPointNormalsClock1 = clock();
       numConstrainedCoordinates += formLidarPointNormals(N22, N12, n2, m_RHS, point);
@@ -1377,9 +1332,9 @@ namespace Isis {
       numGoodLidarPoints++;
     } // end loop over lidar 3D points
 
+    m_bundleResults.setNumberLidarRangeConstraints(m_numLidarConstraints);
     m_bundleResults.setNumberConstrainedLidarPointParameters(numConstrainedCoordinates);
     m_bundleResults.setNumberLidarImageObservations(numObservations);
-
 
   // form the reduced normal equations
 //  clock_t formWeightedNormalsClock1 = clock();
@@ -1411,57 +1366,8 @@ namespace Isis {
 
 
   /**
-   * Form the least-squares normal equations matrix.
+   * NOTE: not currently used
    *
-   * TODO: comments below belong in documentation for BundleControlPoint, not here
-   *
-   * Each BundleControlPoint stores its Q matrix and NIC vector.
-   * Limiting error portion of each points covariance matrix is stored in its adjusted surface
-   * point.
-   *
-   * @return bool
-   *
-   * @see formPhotoNormalEquations()
-   * @see formLidarNormalEquations()
-   * @see formMeasureNormals()
-   * @see formPointNormals()
-   * @see formWeightedNormals()
-   */
-/*
-  bool BundleAdjust::formNormalEquations() {
-    emit(statusBarUpdate("Forming Normal Equations"));
-
-    // reset statistics for next iteration
-    m_bundleResults.initializeNewIteration();
-
-    outputBundleStatus("\n\n");
-
-    int numGoodPhotoPoints = 0;
-    int numGoodLidarPoints = 0;
-
-    // process photogrammetric points
-    numGoodPhotoPoints = formPhotoNormalEquations();
-    if (numGoodPhotoPoints <= 0) {
-      return false;
-    }
-
-    // process lidar points, if any
-    if (!m_bundleLidarControlPoints.isEmpty() ) {
-      emit(statusBarUpdate("Lidar Point Contribution to Normal Equations"));
-      numGoodLidarPoints = formLidarNormalEquations();
-      if (numGoodLidarPoints <= 0) {
-        return false;
-      }
-    }
-
-    // update number of unknown parameters
-    m_bundleResults.setNumberUnknownParameters(m_rank + 3*(numGoodPhotoPoints+numGoodLidarPoints));
-
-    return true;
-  }
-*/
-
-  /**
    * Contribution to the normal equations matrix from photogrammetric points.
    *
    * @return bool
@@ -1640,6 +1546,8 @@ namespace Isis {
 
 
   /**
+   * NOTE: not currently used
+   *
    * Contribution to normal equations matrix from lidar points.
    *
    * For simultaneously acquired image and lidar observations includes range constraint between the
@@ -1686,10 +1594,6 @@ namespace Isis {
     for (int i = 0; i < numLidarPoints; i++) {
       emit(pointUpdate(i+1));
       BundleLidarControlPointQsp point = m_bundleLidarControlPoints.at(i);
-
-      if (!point->id().contains("Lidar7696")) {
-        continue;
-      }
 
       if (point->isRejected()) {
         numRejectedLidarPoints++;
@@ -1759,11 +1663,6 @@ namespace Isis {
 //        cumulativeFormMeasureNormalsTime += (formMeasureNormalsClock2 - formMeasureNormalsClock1)
 //            / (double)CLOCKS_PER_SEC;
 
-//        if (point->id().contains("Lidar7696")) {
-//          m_numLidarConstraints += point->applyLidarRangeConstraint(m_sparseNormals, N22, N12, n1,
-//                                                                    n2, measure);
-//        }
-
       } // end loop over this points measures
 
 //      clock_t formPointNormalsClock1 = clock();
@@ -1819,15 +1718,15 @@ namespace Isis {
   /**
    * Form the auxiliary normal equation matrices N22, N12, n1, and n2 for a measure.
    *
-   * @param N22 The normal equation matrix for the point on the body.
-   * @param N12 The normal equation matrix for the camera and the target body.
-   * @param n1 The right hand side vector for the camera and the target body.
-   * @param n2 The right hand side vector for the point on the body.
+   * @param N22 The normal equation matrix for the point.
+   * @param N12 The normal equation matrix between images or target body and a point.
+   * @param n1 Right hand side vector for the images and target body.
+   * @param n2 Right hand side vector for the point.
    * @param coeffTarget Target body partial derivative matrix.
    * @param coeffImagePosition Camera position partial derivative matrix.
-   * @param coeffImagePointing Camera orientation partial derivatives matrix.
-   * @param coeffPoint3D Control point lat, lon, and radius partial derivative matrix.
-   * @param coeffRHS Measure right hand side vector.
+   * @param coeffImagePointing Camera orientation partial derivative matrix.
+   * @param coeffPoint3D Control point partial derivative matrix.
+   * @param coeffRHS Measure right hand side vector (observed - computed).
    * @param measure QSharedPointer to current measure.
    *
    * @return bool If the matrices were successfully formed.
@@ -2014,13 +1913,6 @@ namespace Isis {
     boost::numeric::ublas::bounded_vector<double, 3> &corrections
         = bundleControlPoint->corrections();
 
-//    qDebug() << weights[0];
-//    qDebug() << weights[1];
-//    qDebug() << weights[2];
-//    qDebug() << corrections[0];
-//    qDebug() << corrections[1];
-//    qDebug() << corrections[2];
-
     if (weights(0) > 0.0) {
       N22(0,0) += weights(0);
       n2(0) += (-weights(0) * corrections(0));
@@ -2100,13 +1992,6 @@ namespace Isis {
         = bundleLidarControlPoint->weights();
     boost::numeric::ublas::bounded_vector<double, 3> &corrections
         = bundleLidarControlPoint->corrections();
-
-    qDebug() << weights[0];
-    qDebug() << weights[1];
-    qDebug() << weights[2];
-    qDebug() << corrections[0];
-    qDebug() << corrections[1];
-    qDebug() << corrections[2];
 
     if (weights(0) > 0.0) {
       N22(0,0) += weights(0);
@@ -2361,205 +2246,6 @@ namespace Isis {
 
       continuityRHS.clear();
     }
-  }
-
-
-  /**
-   *
-   * Adding range constraint between laser altimeter ground point and camera station
-   *
-   * @author 2018-04-12 Ken Edmundson
-   *
-   * @internal
-   *   @history 2018-04-12 Ken Edmundson - Original version
-   */
-  bool BundleAdjust::applyLidarRangeConstraint(LinearAlgebra::MatrixUpperTriangular& N22,
-                                               SparseBlockColumnMatrix& N12,
-                                               LinearAlgebra::VectorCompressed& n1,
-                                               LinearAlgebra::Vector& n2,
-                                               int numberImagePartials,
-                                               BundleMeasureQsp measure,
-                                               BundleControlPointQsp point) {
-    int i;
-
-    if (!point->id().contains("Lidar")) {
-      return false;
-    }
-
-    QString cubeSerialNumber = measure->cubeSerialNumber();
-
-    if (!((LidarControlPoint*)point->rawControlPoint())->isSimultaneous(cubeSerialNumber)) {
-      return false;
-    }
-
-    double range = ((LidarControlPoint*)point->rawControlPoint())->range();
-    double sigmaRange = ((LidarControlPoint*)point->rawControlPoint())->sigmaRange();
-
-    int imageIndex = measure->positionNormalsBlockIndex();
-
-    LinearAlgebra::Matrix coeff_range_image(1,numberImagePartials);
-    LinearAlgebra::Matrix coeff_range_point3D(1,3);
-    LinearAlgebra::Vector coeff_range_RHS(1);
-
-    coeff_range_image.clear();
-    coeff_range_point3D.clear();
-    coeff_range_RHS.clear();
-
-//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
-//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
-//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
-
-    // compute partial derivatives for camstation-to-range point condition
-
-    // get ground point in body-fixed coordinates
-    SurfacePoint adjustedSurfacePoint =
-        measure->parentControlPoint()->rawControlPoint()->GetAdjustedSurfacePoint();
-    double xPoint  = adjustedSurfacePoint.GetX().kilometers();
-    double yPoint  = adjustedSurfacePoint.GetY().kilometers();
-    double zPoint  = adjustedSurfacePoint.GetZ().kilometers();
-
-    // get spacecraft position in J2000 coordinates
-    std::vector<double> CameraJ2KXYZ(3);
-    CameraJ2KXYZ = measure->camera()->instrumentPosition()->Coordinate();
-    double xCameraJ2K  = CameraJ2KXYZ[0];
-    double yCameraJ2K  = CameraJ2KXYZ[1];
-    double zCameraJ2K  = CameraJ2KXYZ[2];
-
-    // get spacecraft position in body-fixed coordinates
-    std::vector<double> CameraBodyFixedXYZ(3);
-
-    // "InstrumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
-    // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
-    CameraBodyFixedXYZ = measure->camera()->bodyRotation()->ReferenceVector(CameraJ2KXYZ);
-    double xCamera  = CameraBodyFixedXYZ[0];
-    double yCamera  = CameraBodyFixedXYZ[1];
-    double zCamera  = CameraBodyFixedXYZ[2];
-
-    // computed distance between spacecraft and point
-    double dX = xCamera - xPoint;
-    double dY = yCamera - yPoint;
-    double dZ = zCamera - zPoint;
-    double computed_distance = sqrt(dX*dX+dY*dY+dZ*dZ);
-
-    // observed distance - computed distance
-    double observed_computed = range - computed_distance;
-
-    // get matrix that rotates spacecraft from J2000 to body-fixed
-    std::vector<double> matrix_Target_to_J2K;
-    matrix_Target_to_J2K = measure->camera()->bodyRotation()->Matrix();
-
-    double m11 = matrix_Target_to_J2K[0];
-    double m12 = matrix_Target_to_J2K[1];
-    double m13 = matrix_Target_to_J2K[2];
-    double m21 = matrix_Target_to_J2K[3];
-    double m22 = matrix_Target_to_J2K[4];
-    double m23 = matrix_Target_to_J2K[5];
-    double m31 = matrix_Target_to_J2K[6];
-    double m32 = matrix_Target_to_J2K[7];
-    double m33 = matrix_Target_to_J2K[8];
-
-    // partials w/r to image
-    // auxiliaries
-    double a1 = m11*xCameraJ2K + m12*yCameraJ2K + m13*zCameraJ2K - xPoint;
-    double a2 = m21*xCameraJ2K + m22*yCameraJ2K + m23*zCameraJ2K - yPoint;
-    double a3 = m31*xCameraJ2K + m32*yCameraJ2K + m33*zCameraJ2K - zPoint;
-
-    coeff_range_image(0,0) = (m11*a1 + m21*a2 + m31*a3)/computed_distance;
-    coeff_range_image(0,1) = (m12*a1 + m22*a2 + m32*a3)/computed_distance;
-    coeff_range_image(0,2) = (m13*a1 + m23*a2 + m33*a3)/computed_distance;
-
-//    std::cout << coeff_range_image << std::endl;
-
-    // partials w/r to point
-    double lat    = adjustedSurfacePoint.GetLatitude().radians();
-    double lon    = adjustedSurfacePoint.GetLongitude().radians();
-    double radius = adjustedSurfacePoint.GetLocalRadius().kilometers();
-
-    double sinlat = sin(lat);
-    double coslat = cos(lat);
-    double sinlon = sin(lon);
-    double coslon = cos(lon);
-
-    coeff_range_point3D(0,0) = radius*(sinlat*coslon*a1 + sinlat*sinlon*a2 - coslat*a3)/computed_distance;
-    coeff_range_point3D(0,1) = radius*(coslat*sinlon*a1 - coslat*coslon*a2)/computed_distance;
-    coeff_range_point3D(0,2) = -(coslat*coslon*a1 + coslat*sinlon*a2 + sinlat*a3)/computed_distance;
-
-    // right hand side
-    coeff_range_RHS(0) = observed_computed;
-
-    // multiply coefficients by observation weight
-    double dObservationWeight = 1.0/(sigmaRange*0.001); // converting sigma from meters to km
-    coeff_range_image   *= dObservationWeight;
-    coeff_range_point3D *= dObservationWeight;
-    coeff_range_RHS     *= dObservationWeight;
-
-    // form matrices to be added to normal equation auxiliaries
-    static vector<double> n1_image(numberImagePartials);
-    n1_image.clear();
-
-    // form N11 for the condition partials for image
-//    static symmetric_matrix<double, upper> N11(numberImagePartials);
-//    N11.clear();
-
-//    std::cout << "N11" << std::endl << N11 << std::endl;
-
-//    std::cout << "image" << std::endl << coeff_range_image << std::endl;
-//    std::cout << "point" << std::endl << coeff_range_point3D << std::endl;
-//    std::cout << "rhs" << std::endl << coeff_range_RHS << std::endl;
-
-//    N11 = prod(trans(coeff_range_image), coeff_range_image);
-
-//    std::cout << "N11" << std::endl << N11 << std::endl;
-
-    int t = numberImagePartials * imageIndex;
-
-    // insert submatrix at column, row
-//    m_sparseNormals.insertMatrixBlock(imageIndex, imageIndex, numberImagePartials,
-//                                      numberImagePartials);
-
-    (*(*m_sparseNormals[imageIndex])[imageIndex])
-        += prod(trans(coeff_range_image), coeff_range_image);
-
-//    std::cout << (*(*m_sparseNormals[imageIndex])[imageIndex]) << std::endl;
-
-    // form N12_Image
-//    static matrix<double> N12_Image(numberImagePartials, 3);
-//    N12_Image.clear();
-
-//    N12_Image = prod(trans(coeff_range_image), coeff_range_point3D);
-
-//    std::cout << "N12_Image" << std::endl << N12_Image << std::endl;
-
-    // insert N12_Image into N12
-//    N12.insertMatrixBlock(imageIndex, numberImagePartials, 3);
-    *N12[imageIndex] += prod(trans(coeff_range_image), coeff_range_point3D);
-
-//  printf("N12\n");
-//  std::cout << N12 << std::endl;
-
-    // form n1
-    n1_image = prod(trans(coeff_range_image), coeff_range_RHS);
-
-//  std::cout << "n1_image" << std::endl << n1_image << std::endl;
-
-    // insert n1_image into n1
-    for (i = 0; i < numberImagePartials; i++)
-      n1(i + t) += n1_image(i);
-
-    // form N22
-    N22 += prod(trans(coeff_range_point3D), coeff_range_point3D);
-
-//  std::cout << "N22" << std::endl << N22 << std::endl;
-//  std::cout << "n2" << std::endl << n2 << std::endl;
-
-    // form n2
-    n2 += prod(trans(coeff_range_point3D), coeff_range_RHS);
-
-//  std::cout << "n2" << std::endl << n2 << std::endl;
-
-    m_numLidarConstraints++;
-
-    return true;
   }
 
 
@@ -3217,8 +2903,8 @@ namespace Isis {
       vtpvTargetBody =
           m_bundleTargetBody->vtpv();                          // constrained target body parameters
     }
-//    vtpvRangeConstraints =
-//        m_bundleLidarControlPoints.vtpvRangeContribution();    // lidar point range constraints
+    vtpvRangeConstraints =
+        m_bundleLidarControlPoints.vtpvRangeContribution();    // lidar point range constraints
 
     vtpv = vtpvPhotoMeasures
          + vtpvLidarMeasures
@@ -3228,19 +2914,18 @@ namespace Isis {
          + vtpvRangeConstraints
          + vtpvTargetBody;
 
-    qDebug() << "\n";
-    qDebug() << "                        vtpv";
-    qDebug() << "             Photo Residuals: " << vtpvPhotoMeasures;
-    qDebug() << "             Lidar Residuals: " << vtpvLidarMeasures;
-    qDebug() << "               Photo Control: " << vtpvPhotoControl;
-    qDebug() << "               Lidar Control: " << vtpvLidarControl;
-    qDebug() << "Constrained Image Parameters: " << vtpvImage;
-    if ( m_bundleTargetBody) {
-      qDebug() << "                  TargetBody: " << vtpvTargetBody;
-    }
-    qDebug() << "     Lidar Range Constraints: " << vtpvRangeConstraints;
-    qDebug() << "                       Total: " << vtpv;
-
+//    qDebug() << "\n";
+//    qDebug() << "                             vtpv";
+//    qDebug() << " Photogrammetry Measure Residuals: " << vtpvPhotoMeasures;
+//    qDebug() << "          Lidar Measure Residuals: " << vtpvLidarMeasures;
+//    qDebug() << "Photogrammetry Constrained Points: " << vtpvPhotoControl;
+//    qDebug() << "         Lidar Constrained Points: " << vtpvLidarControl;
+//    qDebug() << "     Constrained Image Parameters: " << vtpvImage;
+//    if ( m_bundleTargetBody) {
+//      qDebug() << "                     TargetBody: " << vtpvTargetBody;
+//    }
+//    qDebug() << "          Lidar Range Constraints: " << vtpvRangeConstraints;
+//    qDebug() << "                            Total: " << vtpv;
 
     // Compute rms for all image coordinate residuals
     // separately for x, y, then x and y together
@@ -4003,8 +3688,6 @@ namespace Isis {
 
     PvlGroup summaryGroup(iterationNumber);
 
-    summaryGroup += PvlKeyword("Elapsed_Time",
-                               toString( m_iterationTime ) );
     summaryGroup += PvlKeyword("Sigma0",
                                toString( m_bundleResults.sigma0() ) );
     summaryGroup += PvlKeyword("Observations",
@@ -4043,6 +3726,10 @@ namespace Isis {
                                    toString( m_bundleResults.elapsedTimeErrorProp() ) );
       }
     }
+    else {
+      summaryGroup += PvlKeyword("Elapsed_Time",
+                                 toString( m_iterationTime ) );
+    }
 
     std::ostringstream ostr;
     ostr << summaryGroup << std::endl;
@@ -4050,9 +3737,6 @@ namespace Isis {
     if (m_printSummary) {
       Application::Log(summaryGroup);
     }
-
-    // emit summary group to screen
-    outputBundleStatus(QString::fromStdString(ostr.str()));
   }
 
 
@@ -4066,7 +3750,7 @@ namespace Isis {
   }
 
 
-    /**
+  /**
    * Returns if the BundleAdjust has been aborted.
    *
    * @return @b bool If the BundleAdjust was aborted.
@@ -4182,6 +3866,11 @@ namespace Isis {
       }
     }
 
+    QVector<Statistics> rmsLidarImageSampleResiduals(numberImages);
+    QVector<Statistics> rmsLidarImageLineResiduals(numberImages);
+    QVector<Statistics> rmsLidarImageResiduals(numberImages);
+
+
     int numLidarPoints = m_bundleLidarControlPoints.size();
     for (int i = 0; i < numLidarPoints; i++) {
 
@@ -4207,10 +3896,10 @@ namespace Isis {
         int imageIndex = m_serialNumberList->serialNumberIndex(measure->cubeSerialNumber());
 
         // add residual data to the statistics object at the appropriate serial number index
-        rmsImageSampleResiduals[imageIndex].AddData(sampleResidual);
-        rmsImageLineResiduals[imageIndex].AddData(lineResidual);
-        rmsImageResiduals[imageIndex].AddData(lineResidual);
-        rmsImageResiduals[imageIndex].AddData(sampleResidual);
+        rmsLidarImageSampleResiduals[imageIndex].AddData(sampleResidual);
+        rmsLidarImageLineResiduals[imageIndex].AddData(lineResidual);
+        rmsLidarImageResiduals[imageIndex].AddData(lineResidual);
+        rmsLidarImageResiduals[imageIndex].AddData(sampleResidual);
       }
     }
 
@@ -4343,6 +4032,9 @@ namespace Isis {
                                              rmsImageSampleResiduals.toList(),
                                              rmsImageResiduals.toList());
 
+    m_bundleResults.setRmsLidarImageResidualLists(rmsLidarImageLineResiduals.toList(),
+                                             rmsLidarImageSampleResiduals.toList(),
+                                             rmsLidarImageResiduals.toList());
     return true;
   }
 

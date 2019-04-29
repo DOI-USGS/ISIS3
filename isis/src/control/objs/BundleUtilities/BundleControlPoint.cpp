@@ -18,10 +18,11 @@ namespace Isis {
 
 
   /**
-   * Constructs a BundleControlPoint object from a ControlPoint. Only the 
-   * non-ignored measures are added to the BundleControlPoint. 
-   * @param controlPoint Pointer to a ControlPoint that will be used to 
-   *                     construct this BundleControlPoint.
+   * Constructs BundleControlPoint utility class wrapping an ISIS ControlPoint. Only non-ignored
+   * measures are added.
+   *
+   * @param bundleSettings QSharedPointer to BundleSettings object.
+   * @param controlPoint Pointer to ISIS ControlPoint wrapped by this BundleControlPoint.
    */
   BundleControlPoint::BundleControlPoint(const BundleSettingsQsp bundleSettings,
                                          ControlPoint *controlPoint) {
@@ -1197,8 +1198,8 @@ QString BundleControlPoint::formatCoordAprioriSigmaString(SurfacePoint::CoordInd
       }
 
       weight = measure->weight();
-      vx = measure->focalPlaneMeasuredX() - measure->focalPlaneComputedX();
-      vy = measure->focalPlaneMeasuredY() - measure->focalPlaneComputedY();
+      vx = measure->xFocalPlaneResidual();
+      vy = measure->yFocalPlaneResidual();
 
       vtpv += vx * vx * weight + vy * vy * weight;
     }

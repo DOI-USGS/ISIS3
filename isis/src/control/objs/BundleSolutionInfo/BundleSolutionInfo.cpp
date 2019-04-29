@@ -1122,55 +1122,117 @@ namespace Isis {
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
 
-    int numMeasures;
-    int numRejectedMeasures;
-    int numUsed;
+    if (m_statisticsResults->outputLidarData()) {
+      sprintf(buf, "%*s%s%*s%s\n",72,"","Standard",32,"","Lidar");
+      fpOut << buf;
+    }
+
+    int numMeasures, numLidarMeasures;
+    int numRejectedMeasures, numLidarRejectedMeasures;
+    int numUsed, numLidarUsed;
     int imageIndex = 0;
 
-    for (int i = 0; i < numObservations; i++) {
+    if (m_statisticsResults->outputLidarData()) {
+      for (int i = 0; i < numObservations; i++) {
 
-      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+        int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
 
-      for (int j = 0; j < numImagesInObservation; j++) {
+        for (int j = 0; j < numImagesInObservation; j++) {
 
-        BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
+          BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
 
-        double rmsSampleResiduals = m_statisticsResults->
-                                        rmsImageSampleResiduals()[imageIndex].Rms();
-        double rmsLineResiduals = m_statisticsResults->
-                                      rmsImageLineResiduals()[imageIndex].Rms();
-        double rmsLandSResiduals =  m_statisticsResults->
-                                        rmsImageResiduals()[imageIndex].Rms();
+          // for photogrammtric measures
+          double rmsSampleResiduals = m_statisticsResults->
+                                          rmsImageSampleResiduals()[imageIndex].Rms();
+          double rmsLineResiduals = m_statisticsResults->
+                                        rmsImageLineResiduals()[imageIndex].Rms();
+          double rmsLandSResiduals =  m_statisticsResults->
+                                          rmsImageResiduals()[imageIndex].Rms();
 
-        numMeasures = m_statisticsResults->outputControlNet()->
-                          GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
+          numMeasures = m_statisticsResults->outputControlNet()->
+                            GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
 
-        numMeasures += m_statisticsResults->outputLidarData()->
-                           GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
+          numRejectedMeasures = m_statisticsResults->outputControlNet()->
+                                    GetNumberOfJigsawRejectedMeasuresInImage(
+                                        bundleImage->serialNumber());
 
-        numRejectedMeasures = m_statisticsResults->outputControlNet()->
-                                  GetNumberOfJigsawRejectedMeasuresInImage(
-                                      bundleImage->serialNumber());
+          numUsed = numMeasures - numRejectedMeasures;
 
-        numRejectedMeasures += m_statisticsResults->outputLidarData()->
-                           GetNumberOfJigsawRejectedMeasuresInImage(bundleImage->serialNumber());
+          // for lidar measures
+          double rmsLidarSampleResiduals = m_statisticsResults->
+                                          rmsLidarImageSampleResiduals()[imageIndex].Rms();
+          double rmsLidarLineResiduals = m_statisticsResults->
+                                        rmsLidarImageLineResiduals()[imageIndex].Rms();
+          double rmsLidarLandSResiduals =  m_statisticsResults->
+                                          rmsLidarImageResiduals()[imageIndex].Rms();
 
-        numUsed = numMeasures - numRejectedMeasures;
+          numLidarMeasures = m_statisticsResults->outputLidarData()->
+                             GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
 
-        if (numUsed == numMeasures) {
-          sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                  bundleImage->fileName().toLatin1().data(),
-                  (numMeasures-numRejectedMeasures), numMeasures,
-                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+          numLidarRejectedMeasures = m_statisticsResults->outputLidarData()->
+                             GetNumberOfJigsawRejectedMeasuresInImage(bundleImage->serialNumber());
+
+
+          if (numUsed == numMeasures) {
+            sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
+                    bundleImage->fileName().toLatin1().data(),
+                    (numMeasures-numRejectedMeasures), numMeasures,
+                    rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals,
+                    (numLidarMeasures-numLidarRejectedMeasures), numLidarMeasures,
+                    rmsLidarSampleResiduals, rmsLidarLineResiduals, rmsLidarLandSResiduals);
+          }
+          else {
+            sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
+                    bundleImage->fileName().toLatin1().data(),
+                    (numMeasures-numRejectedMeasures), numMeasures,
+                    rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+          }
+          fpOut << buf;
+          imageIndex++;
         }
-        else {
-          sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                  bundleImage->fileName().toLatin1().data(),
-                  (numMeasures-numRejectedMeasures), numMeasures,
-                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+      }
+    }
+    else {
+
+      for (int i = 0; i < numObservations; i++) {
+
+        int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+
+        for (int j = 0; j < numImagesInObservation; j++) {
+
+          BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
+
+          double rmsSampleResiduals = m_statisticsResults->
+                                          rmsImageSampleResiduals()[imageIndex].Rms();
+          double rmsLineResiduals = m_statisticsResults->
+                                        rmsImageLineResiduals()[imageIndex].Rms();
+          double rmsLandSResiduals =  m_statisticsResults->
+                                          rmsImageResiduals()[imageIndex].Rms();
+
+          numMeasures = m_statisticsResults->outputControlNet()->
+                            GetNumberOfValidMeasuresInImage(bundleImage->serialNumber());
+
+          numRejectedMeasures = m_statisticsResults->outputControlNet()->
+                                    GetNumberOfJigsawRejectedMeasuresInImage(
+                                        bundleImage->serialNumber());
+
+          numUsed = numMeasures - numRejectedMeasures;
+
+          if (numUsed == numMeasures) {
+            sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
+                    bundleImage->fileName().toLatin1().data(),
+                    (numMeasures-numRejectedMeasures), numMeasures,
+                    rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+          }
+          else {
+            sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
+                    bundleImage->fileName().toLatin1().data(),
+                    (numMeasures-numRejectedMeasures), numMeasures,
+                    rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
+          }
+          fpOut << buf;
+          imageIndex++;
         }
-        fpOut << buf;
-        imageIndex++;
       }
     }
 
@@ -1492,6 +1554,16 @@ namespace Isis {
       fpOut << (const char*)pointSummaryString.toLatin1().data();
     }
 
+    int nLidarPoints = m_statisticsResults->bundleLidarControlPoints().size();
+    for (int i = 0; i < nLidarPoints; i++) {
+      BundleLidarControlPointQsp lidarControlPoint
+          = m_statisticsResults->bundleLidarControlPoints().at(i);
+
+      QString pointSummaryString =
+          lidarControlPoint->formatBundleOutputSummaryString(berrorProp);
+      fpOut << (const char*)pointSummaryString.toLatin1().data();
+    }
+
     // output point detail data header
     sprintf(buf, "\n\nPOINTS DETAIL\n=============\n\n");
     fpOut << buf;
@@ -1507,7 +1579,6 @@ namespace Isis {
       fpOut << (const char*)pointDetailString.toLatin1().data();
     }
 
-    int nLidarPoints = m_statisticsResults->bundleLidarControlPoints().size();
     for (int i = 0; i < nLidarPoints; i++) {
       BundleLidarControlPointQsp bundleLidarControlPoint =
           m_statisticsResults->bundleLidarControlPoints().at(i);
@@ -1661,9 +1732,9 @@ namespace Isis {
 
     // print column headers
     if (m_settings->errorPropagation()) {
-      sprintf(buf, ",,measured,a priori,adjusted,,adjusted/n"
-              "point,image,range,sigma,range,residual,sigma\n"
-              "id,name,(km),(km),(km),(km)\n");
+      sprintf(buf, ",,measured,a priori,adjusted,adjusted\n"
+              "point,image,range,sigma,range,sigma,residual\n"
+              "id,name,(km),(km),(km),(km),(km)\n");
     }
     else {
       sprintf(buf, ",,measured,a priori,adjusted\n"
@@ -1683,7 +1754,7 @@ namespace Isis {
       for (int j = 0; j < nRangeConstraints; j++) {
         BundleLidarRangeConstraintQsp rangeConstraint = point->rangeConstraint(j);
 
-        QString str = rangeConstraint->formatBundleOutputString();
+        QString str = rangeConstraint->formatBundleOutputString(m_settings->errorPropagation());
         fpOut << str;
       }
     }

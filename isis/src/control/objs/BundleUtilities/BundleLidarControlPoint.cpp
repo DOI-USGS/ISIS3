@@ -66,8 +66,8 @@ namespace Isis {
 
 
   /**
-   * Copy constructor. Constructs a BundleLidarControlPoint object from an existing
-   * BundleLidarControlPoint.
+   * TODO: implement?
+   * Copy constructor.
    *  
    * @param src The BundleLidarControlPoint to be copied.
    */
@@ -78,7 +78,7 @@ namespace Isis {
 
 
   /**
-   * Destructor for BundleLidarControlPoint.
+   * Destructor.
    */
   BundleLidarControlPoint::~BundleLidarControlPoint() {
   }
@@ -92,31 +92,14 @@ namespace Isis {
   void BundleLidarControlPoint::copy(const BundleLidarControlPoint &src) {
 
     BundleControlPoint::copy((BundleControlPoint) src);
-/*
-    // sanity check
-    clear();
-
-    m_controlPoint = src.m_controlPoint;
-
-    int numMeasures = src.size();
-
-    for (int i = 0; i < numMeasures; i++)
-      append(BundleMeasureQsp( new BundleMeasure(*(src.at(i))) ));
-
-    m_corrections = src.m_corrections;
-    m_aprioriSigmas = src.m_aprioriSigmas;
-    m_adjustedSigmas = src.m_adjustedSigmas;
-    m_weights = src.m_weights;
-    m_nicVector = src.m_nicVector;
-*/
   }
 
+
   /**
-   * Computes the residuals for this BundleControlPoint.
+   * Computes the residuals for this BundleLidarControlPoint.
    *
    */
   void BundleLidarControlPoint::computeResiduals() {
-    // test calling normal version of compute residuals
     m_lidarControlPoint->ComputeResiduals();
 
     // compute and store focal plane residuals in millimeters
@@ -128,18 +111,25 @@ namespace Isis {
 
   /**
    * Applies range constraint between image and lidar point acquired simultaneously.
+   *
+   * @param normalsMatrix Bundle Adjustment normal equations matrix.
+   * @param N22 Normal equation matrix for the point.
+   * @param N12 Normal equations block between image and point.
+   * @param n1 Right hand side vector for the images and target body.
+   * @param n2 Right hand side vector for the point.
+   *
+   * @return int Number of constraints successfully applied.
    */
-  int BundleLidarControlPoint::applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
+  int BundleLidarControlPoint::applyLidarRangeConstraints(SparseBlockMatrix &normalsMatrix,
                                                          LinearAlgebra::MatrixUpperTriangular& N22,
                                                          SparseBlockColumnMatrix& N12,
                                                          LinearAlgebra::VectorCompressed& n1,
-                                                         LinearAlgebra::Vector& n2,
-                                                         BundleMeasureQsp measure) {
+                                                         LinearAlgebra::Vector& n2) {
     int constraintsApplied = 0;
 
     // loop over range constraints
     for (int i = 0; i < m_rangeConstraints.size(); i++) {
-      if (m_rangeConstraints.at(i)->applyConstraint(normalsMatrix, N22, N12, n1, n2, measure)) {
+      if (m_rangeConstraints.at(i)->applyConstraint(normalsMatrix, N22, N12, n1, n2)) {
         constraintsApplied++;
       }
     }
@@ -149,6 +139,9 @@ namespace Isis {
 
 
   /**
+   * Returns Weighted sum of squares of range residuals for this point.
+   *
+   * @return double Weighted sum of squares of range residuals for this point.
    *
    */
   double BundleLidarControlPoint::vtpvRangeContribution() {
@@ -158,5 +151,51 @@ namespace Isis {
     }
 
     return vtpv;
+  }
+
+
+  /**
+   * Returns number of range constraints between this lidar point & images acquired simultaneously.
+   *
+   * @return int Number of range constraints
+   *
+   */
+  int BundleLidarControlPoint::numberRangeConstraints() {
+    return m_rangeConstraints.size();
+  }
+
+
+  /**
+   * Returns range constraint at index n.
+   *
+   * @param int Index of range constraint to return.
+   *
+   * @return BundleLidarRangeConstraintQsp QSharedPointer to range constraint at index n.
+   *
+   */
+  BundleLidarRangeConstraintQsp BundleLidarControlPoint::rangeConstraint(int n) {
+    return m_rangeConstraints.at(n);
+  }
+
+
+  /**
+   * Returns range between this point and ???
+   *
+   * @return double range.
+   *
+   */
+  double BundleLidarControlPoint::range() {
+    return m_lidarControlPoint->range();
+  }
+
+
+  /**
+   * Returns sigma of observed range.
+   *
+   * @return double Sigma of observed range.
+   *
+   */
+  double BundleLidarControlPoint::sigmaRange() {
+    return m_lidarControlPoint->sigmaRange();
   }
 }

@@ -151,7 +151,7 @@ namespace Isis {
       double m_xFocalPlaneResidual;    //!< x focal plane residual in mm
       double m_yFocalPlaneResidual;    //!< y focal plane residual in mm
 
-      double m_sigma;                  //!< measure uncertainty in mmm
+      double m_sigma;                  //!< measure uncertainty in mm
       double m_weightSqrt;             //!< sqrt of measure weight
   };
   //! Definition for BundleMeasureQsp, a shared pointer to a BundleMeasure.
