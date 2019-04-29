@@ -3,7 +3,7 @@
 Running the [spiceinit](https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html) application with `attach=true` will attach all of the SPICE data required by the camera model directly to the Cube. There are 6 locations information is added to the Cube:
 
 * The Kernels group
-* The NaifKeywords group
+* The NaifKeywords object
 * The InstrumentPointing Table
 * The InstrumentPosition Table
 * The BodyRotation Table
@@ -32,13 +32,13 @@ All of the kernels used will be added to the Kernels group under the following k
 
 If a shapemodel is is used, then that shapemodel will also be specified by the `ShapeModel` keyword. The `InstrumentPositionQuality` and `InstrumentPointingQuality` keywords will specify the quality of the kernels used for the InstrumentPositon and InstrumentPointing Tables. Finally, the `CameraVersion` keyword specifies the version of the camera model that the Cube will now work with.
 
-# The NaifKeywords Group
+# The NaifKeywords Object
 
-The NaifKeywords group is not a part of the Cube prior to spiceinit being run. After spiceinit, the group is located at the very end of the Cube label.
+The NaifKeywords object is a PVL object that contains values queried from SPICE text kernels. It is not a part of the Cube prior to spiceinit being run. After spiceinit, the group is located at the very end of the Cube label.
 
-This group contains all of the keywords and values collected from the [SPICE kernel pool](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/kernel.html#Text%20Kernels%20and%20the%20Kernel%20Pool). Some examples what is usually contained in the NaifKeywords group are the target body radii, the instrument focal length, distortion model coefficients, and the transformations between image pixels and detector pixels.
+This object contains all of the keywords and values collected from the [SPICE kernel pool](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/kernel.html#Text%20Kernels%20and%20the%20Kernel%20Pool). Some examples what is usually contained in the NaifKeywords object are the target body radii, the instrument focal length, distortion model coefficients, and the transformations between image pixels and detector pixels.
 
-The sensor model specifies what is contained in the `NaifKeywords` group. Keywords and values are added to the `NaifKeywords` group by the following Spice class methods (methods in italics are protected):
+The sensor model specifies what is contained in the `NaifKeywords` object. Keywords and values are added to the `NaifKeywords` object the following Spice class methods (methods in italics are protected):
 
 * getDouble
 * getInteger
@@ -47,7 +47,7 @@ The sensor model specifies what is contained in the `NaifKeywords` group. Keywor
 * _storeResult_
 * _storeValue_
 
-The sensor model and its maps use these methods to get any keyword values they need from the SPICE kernel pool. The keyword and its values are then stored in the `NaifKeywords` group as a keyword, value pair. For example, if getDouble was called with the NAIF keyword `INS-131371_FOCAL_LENGTH`, then `INS-131371_FOCAL_LENGTH` would be added to the NaifKeywords group as a PVL keyword whose values is the value returned by the NAIF SPICE ToolKit. Any future calls to access keyword values that have been stored use the `NaifKeywords` group instead of the SPICE kernel pool.
+The sensor model and its maps use these methods to get any keyword values they need from the SPICE kernel pool. The keyword and its values are then stored in the `NaifKeywords` object as a keyword, value pair. For example, if getDouble was called with the NAIF keyword `INS-131371_FOCAL_LENGTH`, then `INS-131371_FOCAL_LENGTH` would be added to the NaifKeywords ovject as a PVL keyword whose values is the value returned by the NAIF SPICE ToolKit. Any future calls to access keyword values that have been stored use the `NaifKeywords` object instead of the SPICE kernel pool.
 
 # ISIS Tables
 
@@ -83,3 +83,5 @@ After spiceinit, the InstrumentPointing Table binary data is always a quaternion
 ### Coefficients
 
 During bundle adjustment (the jigsaw application mostly), the InstrumentPointing is converted to polynomials equations for Euler angles. After this point, the InstrumentPointing Table binary data contains coefficients, precisely stored time scaling vlaues, and the polynomial degree. The first record in the table contains the 0th degree coefficients, the second record in the table contains the 1st degree coefficients, and so on through the second to last record. The final record of the table contains the time scaling offset in the first field, the time scale in the second field, and the polynomial degree in the third field. ISIS uses the 3, 1, 3 axis order for Euler angles. The only exception to this is the appjit application uses 1, 2, 3 axis order.
+
+# The InstrumentPosition Table
