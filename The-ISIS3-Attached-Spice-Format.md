@@ -2,12 +2,12 @@
 
 Running the [spiceinit](https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html) application with `attach=true` will attach all of the SPICE data required by the camera model directly to the Cube. There are 6 locations information is added to the Cube:
 
-* The Kernels group
-* The NaifKeywords object
-* The InstrumentPointing Table
-* The InstrumentPosition Table
-* The BodyRotation Table
-* The SunPosition Table
+* [The Kernels Group](#The-Kernels-Group)
+* [The NaifKeywords Object](#The-NaifKeywords-Object)
+* [The InstrumentPointing Table](#The-InstrumentPointing-Table)
+* [The InstrumentPosition Table](#The-InstrumentPosition-Table)
+* [The BodyRotation Table](#The-BodyRotation-Table)
+* [The SunPosition Table](#The-SunPosition-Table)
 
 The following sections outline what is stored in each of these locations. The [spiceinit application documentation](https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html) shows what textual information is added to these locations.
 
