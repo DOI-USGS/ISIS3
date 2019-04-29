@@ -30,4 +30,8 @@ All of the kernels used will be added to the `Kernels` group under the following
 * `InstrumentPosition`
 * `InstrumentAddendum`
 
-If a shapemodel is is used, then that shapemodel will also be specified by the `ShapeModel` keyword. The `InstrumentPositionQuality` and `InstrumentPointingQuality` keywords will specify the quality of the kernels used for the `InstrumentPositon` and `InstrumentPointing` Tables.
+If a shapemodel is is used, then that shapemodel will also be specified by the `ShapeModel` keyword. The `InstrumentPositionQuality` and `InstrumentPointingQuality` keywords will specify the quality of the kernels used for the `InstrumentPositon` and `InstrumentPointing` Tables. Finally, the `CameraVersion` keyword specifies the version of the camera model that the Cube will now work with.
+
+# The NaifKeywords Group
+
+The `NaifKeywords` group is not a part of the Cube prior to spiceinit being run. After spiceinit, the group is located at the very end of the Cube label. This group contains all of the keywords and values collected from the SPICE kernel pool by the [gdpool_c](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/gdpool_c.html), [gcpool_c](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/gcpool_c.html), [gipool_c](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/gipool_c.html), and [stpool_c](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/stpool_c.html) NAIF Toolkit methods.
