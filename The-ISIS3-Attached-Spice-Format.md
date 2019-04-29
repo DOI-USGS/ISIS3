@@ -79,3 +79,7 @@ The InstrumentPointing Table's binary data contains the rotations from the start
 ### Quaternion Cache
 
 After spiceinit, the InstrumentPointing Table binary data is always a quaternion cache. Each record contains, a rotation quaternion, the time for that quaternion, and optionally the 3-element rotational velocity. The quaternions use [NAIF's format](ftp://naif.jpl.nasa.gov/pub/naif/misc/Quaternion_White_Paper/Quaternions_White_Paper.pdf) which is not the same as the standard quaternion format. NAIF stores the quaternion as (w, x, y, z). Most other tools and libraries store the quaternion as (x, y, z, w).
+
+### Coefficients
+
+During bundle adjustment (the jigsaw application mostly), the InstrumentPointing is converted to polynomials equations for Euler angles. After this point, the InstrumentPointing Table binary data contains coefficients, precisely stored time scaling vlaues, and the polynomial degree. The first record in the table contains the 0th degree coefficients, the second record in the table contains the 1st degree coefficients, and so on through the second to last record. The final record of the table contains the time scaling offset in the first field, the time scale in the second field, and the polynomial degree in the third field. ISIS uses the 3, 1, 3 axis order for Euler angles. The only exception to this is the appjit application uses 1, 2, 3 axis order.
