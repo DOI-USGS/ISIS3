@@ -735,8 +735,6 @@ void BundleObservation::computePartials(LinearAlgebra::Matrix &coeffImagePositio
   bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections,
                                                     bool updateBodyRotation) {
 
-//    qDebug() << corrections;
-
     int index = 0;
 
     try {

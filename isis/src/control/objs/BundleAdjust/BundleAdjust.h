@@ -352,9 +352,7 @@ namespace Isis {
    *                            References #4649 and #501.
    *   @history 2018-11-29 Ken Edmundson - Modifed init, initializeNormalEquationsMatrix, and
    *                           computePartials methods.
-   *   @history 2019-04-29 Ken Edmundson - Modifications for bundle with lidar. Note: all piecewise
-   *                           polynomial functionality has been disabled here to get the lidar
-   *                           working.
+   *   @history 2019-04-29 Ken Edmundson - Modifications for bundle with lidar.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
@@ -473,16 +471,8 @@ namespace Isis {
       bool formWeightedNormals(LinearAlgebra::VectorCompressed  &n1,
                                LinearAlgebra::Vector            &nj);
       void applyPolynomialContinuityConstraints();
-      bool applyLidarRangeConstraint(LinearAlgebra::MatrixUpperTriangular& N22,
-                                     SparseBlockColumnMatrix& N12,
-                                     LinearAlgebra::VectorCompressed& n1,
-                                     LinearAlgebra::Vector& n2,
-                                     int numberImagePartials,
-                                     BundleMeasureQsp measure,
-                                     BundleControlPointQsp point);
 
       // dedicated matrix functions
-
       void productAB(SparseBlockColumnMatrix &A,
                      SparseBlockRowMatrix    &B);
       void accumProductAlphaAB(double                alpha,

@@ -194,7 +194,7 @@ namespace Isis {
     int positionBlockIndex = m_simultaneousMeasure->positionNormalsBlockIndex();
 
     // resize coeff_range_image matrix if necessary
-    int numPositionParameters = m_bundleObservation->numberPositionParameters();
+    int numPositionParameters = m_bundleObservation->numberPositionParametersPerSegment();
     if ((int) coeff_range_image.size2() != numPositionParameters) {
       coeff_range_image.resize(1, numPositionParameters, false);
     }
