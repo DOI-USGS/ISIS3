@@ -420,9 +420,3 @@ namespace Isis {
     return outstr;
   }
 }
-
-
-
-
-
-
