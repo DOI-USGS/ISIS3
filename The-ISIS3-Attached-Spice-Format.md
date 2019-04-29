@@ -57,10 +57,12 @@ The `InstrumentPointing` Table, `InstrumentPosition` Table, `BodyRotation` Table
 
 The labels for all of the Tables in a Cube file are located in the Cube label after the `IsisCube` object. Each label is an object called `Table`, each Table is identified by the values of its `Name` keyword. So, the InstrumentPointing Table label is the `Table` object whose `Name` keyword has a value of `InstrumentPointing`. The Table label also contains information about where the binary data is stored in the `StartByte` and `Bytes` keywords. The format of the table is defined by the `Records`` and ByteOrder` keywords and the `Field` groups. The `Records` keyword specifies how many records, or rows, there are in the Table. Each `Field` group describes a field, or column, in the table. Each `Field` group contains a `Name` keyword that describes the field's name, a `Type` keyword that describes what type of binary data that field contains, and a `Size` keyword that describes how many pieces of binary data are stored in that field.
 
+## ISIS Table Binary Data
+
+The binary data for ISIS Tables are stored as contiguous blocks of binary data at the end of the Cube file. Each record, or row, in the Table is stored contiguously starting with the first record. Within a record, the values for each field, or column, are stored in the order that the `Field` groups are stored in the Table Label.
+
 # The InstrumentPointing Table
 
 The InstrumentPointing Table is not a part of the Cube prior to spiceinit being run. After spiceinit, the label for the Table is located after the `IsisCube` object in the Cube label and the binary table data is located at the end of the file.
 
-## The InstrumentPointing Table Label
-
-The Table label is a PVL object that contains information about the binary table data and some additional rotational data. The location and format of the binary data is described by the `StartByte`, `Bytes`, `Records`, and `ByteOrder` keywords
+The InstrumentPointing Table's label contains all of the information described in 
