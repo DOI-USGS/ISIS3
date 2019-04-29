@@ -49,6 +49,10 @@ The sensor model specifies what is contained in the `NaifKeywords` group. Keywor
 
 The sensor model and its maps use these methods to get any keyword values they need from the SPICE kernel pool. The keyword and its values are then stored in the `NaifKeywords` group and any future calls to access them query the `NaifKeywords` group instead of the SPICE kernel pool.
 
+# ISIS Tables
+
+The `InstrumentPointing` Table, `InstrumentPosition` Table, `BodyRotation` Table, and `SunPosition` Table are ISIS Tables. These are tables of binary information stored on the Cube file. Each Table consists of two parts; the label, and the binary data. The labels for all of the Tables in a Cube file are located in the Cube label after the `IsisCube` object. Each label is an object called `Table`, each Table is identified by the values of its `Name` keyword. So, the `InstrumentPointing` Table label is the `Table` object whose `Name` keyword has a value of `InstrumentPointing`.
+
 # The InstrumentPointing Table
 
 The `InstrumentPointing` Table is not a part of the Cube prior to spiceinit being run. After spiceinit, the label for the Table is located after the `IsisCube` object in the Cube label and the binary table data is located at the end of the file.
