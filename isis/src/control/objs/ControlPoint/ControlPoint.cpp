@@ -838,6 +838,156 @@ namespace Isis {
     return Success;
   }
 
+  /**
+   * Computes a priori lat/lon/radius point coordinates by determining the average lat/lon/radius of
+   * all measures. Note that this does not change ignored, fixed or constrained points.
+   *
+   * Also, it does not use unmeasured or ignored measures when computing lat/lon/radius.
+   *
+   * (KLE) Note this not a rigorous triangulation considering outliers. A better way would be to...
+   *         a) use e.g. a closest approach algorithm to find intersection of all rays, regardless
+   *            of whether the intersection lies on the surface in question, then;
+   *         b) perform a rigorous triangulation with some sort outlier detection approach, a robust
+   *            estimation technique (perhaps RANSAC)
+   *
+   * @internal
+   *   @history 2008-06-18  Tracie Sucharski/Jeannie Walldren,
+   *                               Changed error messages for
+   *                               Held/Ground points.
+   *   @history 2009-10-13 Jeannie Walldren - Added detail to
+   *                               error message.
+   *   @history 2010-11-29 Tracie Sucharski - Remove call to ControlMeasure::
+   *                               SetMeasuredEphemerisTime, the values were
+   *                               never used. so these methods were removed
+   *                               from ControlMeasure and the call was removed
+   *                               here.
+   *   @history 2010-12-02 Debbie A. Cook - Added units to SetRectangular
+   *                               calls since default is meters and units
+   *                               are km.
+   *   @history 2011-03-17 Debbie A. Cook - Added initialization of
+   *                               adjustedSurfacePoint to aprioriSurfacePoint
+   *                               and set test for empty covariance matrix
+   *                               to use 0. instead of nulls.
+   *   @history 2011-03-24 Debbie A. Cook - Removed IsMeasured check since it
+   *                               was really checking for Candidate measures.
+   *   @history 2011-07-12 Debbie A. Cook - Removed editLock test.  Users agreed
+   *                               editLock was only for fixed and constrained
+   *                               points, which are already left unchanged by
+   *                               ComputeApriori. If a free point is editLocked
+   *                               the editLock will be ignored by this method.
+   *  @history 2017-04-25 Debbie A. Cook - change constraint status calls
+   *                               to use generic coordinate names (Coord1, Coord2,
+   *                               and Coord3).
+   *  @history 2019-03-10 Ken Edmundson - Fixed bug where focal plane measured x,y coordinates were
+   *                               not set if the cam->SetImage call failed. Setting the measured
+   *                               focal plane coordinates should not depend upon the success of the
+   *                               SetImage call (References #2591). Improved error messages.
+   *                               Cleaned up code. Added comments above to suggest a more rigorous
+   *                               approach to computing a priori point coordinates.
+   *
+   * @return Status Success or PointLocked
+   */
+  ControlPoint::Status ControlPoint::ComputeApriori() {
+    // TODO (KLE): where should call this go? Also, what's the point? The method has no description.
+    PointModified();
+
+    // if point is fixed or constrained, ensure valid a priori point coordinates exist
+    if ( (IsFixed() || IsConstrained()) &&  !aprioriSurfacePoint.Valid() ) {
+      QString msg = "In method ControlPoint::ComputeApriori(). ControlPoint [" + GetId() + "] is ";
+      msg += "fixed or constrained and requires a priori coordinates";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    double xB = 0.0;  // body-fixed x
+    double yB = 0.0;  // body-fixed y
+    double zB = 0.0;  // body-fixed z
+    double r2B = 0.0; // radius squared in body-fixed
+    int goodMeasures = 0;
+    double pB[3];
+    bool computeApriori = false;
+
+    // loop over measures to ...
+    // 1) set focal plane x,y coordinates for all unignored measures;
+    // 2) sum latitude, longitude, and radius coordinates in preparation for computing a priori
+    //    coordinates by averaging.
+    for (int i = 0; i < cubeSerials->size(); i++) {
+      ControlMeasure *m = GetMeasure(i);
+      if (m->IsIgnored()) {
+        continue;
+      }
+
+      Camera *cam = m->Camera();
+      if (cam == NULL) {
+        QString cubeSN = m->GetCubeSerialNumber();
+        QString msg = "in method ControlPoint::ComputeApriori(). Camera has not been set in ";
+        msg += "measure for cube serial number [" + cubeSN + "], Control Point id ";
+        msg += "[" + GetId() + "]. Camera must be set prior to calculating a priori coordinates";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+
+      bool setImageSuccess = cam->SetImage(m->GetSample(), m->GetLine());
+      m->SetFocalPlaneMeasured(cam->DistortionMap()->UndistortedFocalPlaneX(),
+                               cam->DistortionMap()->UndistortedFocalPlaneY());
+
+      // TODO: Seems like we should be able to skip this computation if point is fixed or
+      // constrained in any coordinate. Currently we are always summing coordinates here. We could
+      // save time by not doing this for fixed or constrained points.
+      if (!IsFixed() && !IsConstrained() && !id.contains("Lidar")) {
+        computeApriori = true;
+        if (setImageSuccess) {
+          goodMeasures++;
+          cam->Coordinate(pB);
+          xB += pB[0];
+          yB += pB[1];
+          zB += pB[2];
+          r2B += pB[0]*pB[0] + pB[1]*pB[1] + pB[2]*pB[2];
+        }
+      }
+    }
+
+    // if we don't have to compute the a priori coordinates, i.e.
+    // if point is Fixed or Constrained in any number of coordinates, or is a lidar point,
+    // then just initialize adjustedSurfacePoint to a priori coordinates (set in e.g. qnet or
+    // cneteditor) and exit
+    if (!computeApriori) {
+      adjustedSurfacePoint = aprioriSurfacePoint;
+      return Success;
+    }
+
+    // if point is Free, we continue to compute a priori coordinates
+
+    // if no good measures, we're done
+    // TODO: is the message true/meaningful?
+    if (goodMeasures == 0) {
+      QString msg = "in method ControlPoint::ComputeApriori(). ControlPoint [" + GetId() + "] has ";
+      msg += "no measures which project to the body";
+      throw IException(IException::User, msg, _FILEINFO_);
+//      adjustedSurfacePoint = aprioriSurfacePoint;
+//      return Success;
+    }
+
+    // Compute the averages if all coordinates are free
+    // TODO: confirm if this "if" statement is necessary
+    if (GetType() == Free || NumberOfConstrainedCoordinates() == 0) {
+      double avgX = xB / goodMeasures;
+      double avgY = yB / goodMeasures;
+      double avgZ = zB / goodMeasures;
+      double avgR2 = r2B / goodMeasures;
+      double scale = sqrt(avgR2/(avgX*avgX+avgY*avgY+avgZ*avgZ));
+
+      aprioriSurfacePoint.SetRectangular(
+        Displacement((avgX*scale), Displacement::Kilometers),
+        Displacement((avgY*scale), Displacement::Kilometers),
+        Displacement((avgZ*scale), Displacement::Kilometers));
+    }
+
+    adjustedSurfacePoint = aprioriSurfacePoint;
+    SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);
+    SetAprioriRadiusSource(RadiusSource::AverageOfMeasures);
+
+    return Success;
+  }
+
 
   /**
    * This method computes the apriori lat/lon for a point.  It computes this
@@ -875,6 +1025,7 @@ namespace Isis {
    *
    * @return Status Success or PointLocked
    */
+/*
   ControlPoint::Status ControlPoint::ComputeApriori() {
     PointModified();
 
@@ -998,8 +1149,9 @@ namespace Isis {
     SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);
     SetAprioriRadiusSource(RadiusSource::AverageOfMeasures);
 
-    return Success;
+    return Success;    
   }
+*/
 
 
   /**

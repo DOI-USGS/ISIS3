@@ -62,31 +62,19 @@ namespace Isis {
       BundleLidarControlPoint &operator=(const BundleLidarControlPoint &src);// ??? not implemented
       void copy(const BundleLidarControlPoint &src);
 
-      // mutators
-
-      // accessors
-//      LidarControlPoint *rawLidarControlPoint() const;
-
-      // string format methods
-
       void initializeRangeConstraints();
-
-      void computeResiduals();
-
-      int applyLidarRangeConstraint(SparseBlockMatrix &normalsMatrix,
+      int applyLidarRangeConstraints(SparseBlockMatrix &normalsMatrix,
                                     LinearAlgebra::MatrixUpperTriangular& N22,
                                     SparseBlockColumnMatrix& N12,
                                     LinearAlgebra::VectorCompressed& n1,
-                                    LinearAlgebra::Vector& n2,
-                                    BundleMeasureQsp measure);
+                                    LinearAlgebra::Vector& n2);
+      void computeResiduals();
 
+      BundleLidarRangeConstraintQsp rangeConstraint(int n);
       double vtpvRangeContribution();
-
-      int numberRangeConstraints() {return m_rangeConstraints.size();}
-      BundleLidarRangeConstraintQsp rangeConstraint(int n) {return m_rangeConstraints.at(n);}
-
-      double range() {return m_lidarControlPoint->range();}
-      double sigmaRange() {return m_lidarControlPoint->sigmaRange();}
+      int numberRangeConstraints();
+      double range();
+      double sigmaRange();
 
     private:
       LidarControlPointQsp m_lidarControlPoint;
@@ -94,7 +82,7 @@ namespace Isis {
   };
 
   // typedefs
-  //! Definition a shared pointer to a BundleLidarControlPoint.
+  //! QSharedPointer to a BundleLidarControlPoint.
   typedef QSharedPointer<BundleLidarControlPoint> BundleLidarControlPointQsp;
 }
 

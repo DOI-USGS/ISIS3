@@ -104,6 +104,10 @@ namespace Isis {
    *   @history 2018-09-30 Debbie A. Cook - Removed methods setRadiansToMeters and 
    *                            radiansToMeters and member variable m_radiansToMeters.  References #4649 
    *                            and #501.
+   *   @history 2019-04-28 Ken Edmundson - Added QList<Statistics> members for lidar residuals -
+   *                            m_rmsLidarImageSampleResiduals, m_rmsLidarImageLineResiduals,
+   *                            m_rmsLidarImageResiduals. Also added accessors for these lists and a
+   *                            method to set them (setRmsLidarImageResidualLists).
    */
   class BundleResults {
     public:
@@ -123,6 +127,9 @@ namespace Isis {
       void setRmsImageResidualLists(QVector<Statistics> rmsImageLineResiduals,
                                     QVector<Statistics> rmsImageSampleResiduals,
                                     QVector<Statistics> rmsImageResiduals);
+      void setRmsLidarImageResidualLists(QList<Statistics> rmsLidarImageLineResiduals,
+                                    QList<Statistics> rmsLidarImageSampleResiduals,
+                                    QList<Statistics> rmsLidarImageResiduals);
       void setSigmaCoord1Range(Distance minCoord1Dist, Distance maxCoord1Dist,
                                  QString minCoord1PointId, QString maxCoord1PointId);
       void setSigmaCoord2Range(Distance minCoord2Dist, Distance maxCoord2Dist,
@@ -200,6 +207,9 @@ namespace Isis {
       QList<Statistics> rmsImageSampleResiduals() const;
       QList<Statistics> rmsImageLineResiduals() const;
       QList<Statistics> rmsImageResiduals() const;
+      QList<Statistics> rmsLidarImageSampleResiduals() const;
+      QList<Statistics> rmsLidarImageLineResiduals() const;
+      QList<Statistics> rmsLidarImageResiduals() const;
       QVector<Statistics> rmsImageXSigmas() const;       // currently unused ???
       QVector<Statistics> rmsImageYSigmas() const;       // currently unused ???
       QVector<Statistics> rmsImageZSigmas() const;       // currently unused ???
@@ -394,6 +404,13 @@ namespace Isis {
                                                        for each image in the bundle  */
       QList<Statistics> m_rmsImageResiduals;      /**< RMS image sample and line residual statistics
                                                        for each image in the bundle  */
+
+      QList<Statistics> m_rmsLidarImageSampleResiduals; /**< List of RMS lidar sample residual stats
+                                                             for each image in the bundle  */
+      QList<Statistics> m_rmsLidarImageLineResiduals;   /**< List of RMS lidar line residual stats
+                                                             for each image in the bundle  */
+      QList<Statistics> m_rmsLidarImageResiduals;       /**< RMS image lidar sample & line residual
+                                                             stats for each image in the bundle  */
 
       //!< The root mean square image x sigmas.
       QVector<Statistics> m_rmsImageXSigmas;     // unset and unused ???
