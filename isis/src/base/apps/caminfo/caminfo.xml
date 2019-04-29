@@ -63,7 +63,7 @@ Object = Caminfo
     MaximumIncidence          = 58.235714475896
     LocalTimeMinimum          = 9.7555337547863
     LocalTimeMaximum          = 10.575853979758
-    ObliqueResolutionMinimum, = 235.23505597394
+    ObliqueResolutionMinimum = 235.23505597394
     ObliqueResolutionMaximum  = 243.18035398447
   End_Object
 
