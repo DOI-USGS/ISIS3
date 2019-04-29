@@ -63,6 +63,19 @@ The binary data for ISIS Tables are stored as contiguous blocks of binary data a
 
 # The InstrumentPointing Table
 
-The InstrumentPointing Table is not a part of the Cube prior to spiceinit being run. After spiceinit, the label for the Table is located after the `IsisCube` object in the Cube label and the binary table data is located at the end of the file.
+The InstrumentPointing Table contains information needed to rotate from the J2000 reference frame to the sensor reference frame. It is not a part of the Cube prior to spiceinit being run. After spiceinit, the label for the Table is located after the `IsisCube` object in the Cube label and the binary table data is located at the end of the file.
 
-The InstrumentPointing Table's label contains all of the information described in [ISIS Table Labels](#ISIS-Table-Labels) along some additional keywords.
+## The InstrumentPointing Table Label
+
+The InstrumentPointing Table's label contains all of the information described in [ISIS Table Labels](#ISIS-Table-Labels) along some additional keywords. The `TimeDependentFrames` and `ConstantFrames` keywords contain the NAIF codes of the reference frames that are rotated through. These keywords should be read right to left, so the start frame is last in the value array and the final frame is first in the value array. The `ConstantRotation` keyword contains a 3x3 rotation matrix that rotates from the last time dependent frame to the final frame, that is the frames in the `ConstantFrames` keyword. The rotations through the frames in the `TimeDependentFrames` are stored in the binary portion of the InstrumentPointing Table. The `CkTableStartTime` and `CkTableEndTime` keywords contain the valid time range for the rotation information in the InstrumentPointing Table. The `CkTableOriginalSize` keyword describes how many records were in the InstrumentPointing Table prior to any reduction steps. The `FrameTypeCode` keyword describes what type of NAIF SPICE C Kernel the rotation information came from. The `Kernels` keyword contains the SPICE Kernels the rotation information came from.
+
+## The InstrumentPointing Table Binary Data
+
+The InstrumentPointing Table's binary data contains the rotations from the starting frame (always J2000) to the last time dependent frame (usually the spacecraft). This data can be stored in two formats:
+
+* A quaternion cache
+* coefficients for Euler angles 
+
+### Quaternion Cache
+
+After spiceinit, the InstrumentPointing Table binary data is always a quaternion cache. Each record contains, a rotation quaternion, the time for that quaternion, and optionally the 3-element rotational velocity. The quaternions use [NAIF's format](ftp://naif.jpl.nasa.gov/pub/naif/misc/Quaternion_White_Paper/Quaternions_White_Paper.pdf) which is not the same as the standard quaternion format. NAIF stores the quaternion as (w, x, y, z). Most other tools and libraries store the quaternion as (x, y, z, w).
