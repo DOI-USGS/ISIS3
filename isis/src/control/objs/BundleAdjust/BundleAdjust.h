@@ -352,6 +352,9 @@ namespace Isis {
    *                            References #4649 and #501.
    *   @history 2018-11-29 Ken Edmundson - Modifed init, initializeNormalEquationsMatrix, and
    *                           computePartials methods.
+   *   @history 2019-04-29 Ken Edmundson - Modifications for bundle with lidar. Note: all piecewise
+   *                           polynomial functionality has been disabled here to get the lidar
+   *                           working.
    */
   class BundleAdjust : public QObject {
       Q_OBJECT
