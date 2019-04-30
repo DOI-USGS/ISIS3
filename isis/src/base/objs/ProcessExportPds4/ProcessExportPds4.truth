@@ -2,14 +2,14 @@ Testing ProcessExportPds4
 
 Testing default object
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational/>
 
 Testing default CaSSIS export
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -28,13 +28,20 @@ Testing default CaSSIS export
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -53,6 +60,13 @@ Testing default CaSSIS export
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
@@ -61,9 +75,9 @@ Testing xml input
 
 Testing export pixel types
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -82,15 +96,22 @@ Testing export pixel types
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -104,17 +125,24 @@ Testing export pixel types
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -128,19 +156,26 @@ Testing export pixel types
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -154,21 +189,28 @@ Testing export pixel types
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -182,23 +224,30 @@ Testing export pixel types
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -212,15 +261,22 @@ Testing export pixel types
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 
 Testing missing start and end times
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -239,6 +295,13 @@ Testing missing start and end times
     <elements>254</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
@@ -246,9 +309,9 @@ Testing missing start and end times
 Testing exporting a map projected product
 
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1700.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/cart/v1/PDS4_CART_1900.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <Product_Observational>0</offset>
    <axes>2</axes>
    <axis_index_order>Last Index Fastest</axis_index_order>
@@ -267,6 +330,13 @@ Testing exporting a map projected product
     <elements>2371</elements>
     <sequence_number>2</sequence_number>
    </Axis_Array>
+   <Special_Constants>
+    <missing_constant>-1.79769313486231491e+308</missing_constant>
+    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
+    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
+    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
+    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+   </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>

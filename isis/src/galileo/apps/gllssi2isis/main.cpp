@@ -5,6 +5,7 @@
 #include "IException.h"
 #include "iTime.h"
 #include "ProcessImportPds.h"
+#include "OriginalLabel.h"
 #include "UserInterface.h"
 
 #include <cstdio>
@@ -12,9 +13,6 @@
 #include <QByteArray>
 #include <QFileInfo>
 #include <QFile>
-
-
-
 
 
 using namespace std;
@@ -28,7 +26,6 @@ void translateLabels(Pvl &pdsLabel, Cube *ocube);
 void fixPvl(QString fileName);
 
 void IsisMain() {
-
   //initialize globals
   summed = false;
   summedOutput = NULL;
@@ -36,17 +33,12 @@ void IsisMain() {
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
   FileName inFile = ui.GetFileName("FROM");
-  FileName out = ui.GetFileName("TO");
+  FileName outFile = ui.GetFileName("TO");
 
-
-
+  // Apply a fix to the gallileo pds labels so they can be read
   fixPvl(inFile.toString());
 
-
-
-
   // Make sure it is a Galileo SSI image
-
   Pvl lab(inFile.expanded());
 
   //Checks if in file is rdr
@@ -102,34 +94,33 @@ void IsisMain() {
   Pvl pdsLabel;
   p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
-  //Set up the output file
-  Cube *ocube;
-
+  // If summed handle the image similarly to pds2isis
+  // with an extra translation step
   if (!summed) {
-    ocube = p.SetOutputCube("TO");
+    Cube *ocube = p.SetOutputCube("TO");
     p.StartProcess();
+    translateLabels(pdsLabel, ocube);
+    p.EndProcess();
   }
   else {
+  // Otherwise the dimensions of the cube need to be cut in half before
+  // processsing. Since we didn't set the output cube we need to take care
+  // of writting the original label ourselves
     summedOutput = new Cube();
     summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
     summedOutput->setPixelType(p.PixelType());
-    summedOutput->create(ui.GetFileName("TO"));
+    summedOutput->create(outFile.expanded());
+
     p.StartProcess(translateData);
-    ocube = summedOutput;
-  }
+    translateLabels(pdsLabel, summedOutput);
 
-  translateLabels(pdsLabel, ocube);
-  p.EndProcess();
-
-  if (summed) {
+    OriginalLabel ol(Pvl(inFile.expanded()));
+    summedOutput->write(ol);
     summedOutput->close();
     delete summedOutput;
   }
-
   return;
 }
-
-
 
 /**
   * This fixes a problem with some of the Pvl files where a comment
@@ -141,9 +132,6 @@ void IsisMain() {
   *     being checked
   *
   */
-
-
-
 void fixPvl(QString fileName){
 
     QFile pvlFile;
@@ -174,15 +162,7 @@ void fixPvl(QString fileName){
 
 }
 
-
-
-
-
-
-
-
-
-void translateData(Buffer &inData) {
+void translateData(Isis::Buffer &inData) {
   summedOutput->write(inData);
 }
 

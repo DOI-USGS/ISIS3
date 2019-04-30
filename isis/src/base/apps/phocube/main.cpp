@@ -18,7 +18,7 @@ using namespace Isis;
 
 // Global variables
 Camera *cam;
-TProjection *projection;
+TProjection *tproj;
 int nbands;
 bool noCamera;
 
@@ -91,7 +91,7 @@ void IsisMain() {
 
   if(noCamera) {
     try {
-      projection = (TProjection *) icube->projection();
+      tproj = (TProjection *) icube->projection();
     }
     catch(IException &e) {
       QString msg = "Mosaic files must contain mapping labels";
@@ -371,7 +371,7 @@ void phocube(Buffer &out) {
       // Checks to see if the point is in outer space
       bool isGood = false;
       if (noCamera) {
-        isGood = projection->SetWorld(samp, line);
+        isGood = tproj->SetWorld(samp, line);
       }
       else {
         isGood = cam->SetImage(samp, line);
@@ -410,7 +410,7 @@ void phocube(Buffer &out) {
         }
         if (latitude) {
           if (noCamera) {
-            out[index] = projection->UniversalLatitude();
+            out[index] = tproj->UniversalLatitude();
           }
           else {
             out[index] = cam->UniversalLatitude();
@@ -419,7 +419,7 @@ void phocube(Buffer &out) {
         }
         if (longitude) {
           if (noCamera) {
-            out[index] = projection->UniversalLongitude();
+            out[index] = tproj->UniversalLongitude();
           }
           else {
             out[index] = cam->UniversalLongitude();
@@ -428,7 +428,7 @@ void phocube(Buffer &out) {
         }
         if (pixelResolution) {
           if (noCamera) {
-            out[index] = projection->Resolution();
+            out[index] = tproj->Resolution();
           }
           else {
             out[index] = cam->PixelResolution();

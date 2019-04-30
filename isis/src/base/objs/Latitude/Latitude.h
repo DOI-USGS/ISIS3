@@ -57,6 +57,8 @@ namespace Isis {
    *                           instead of the Isis::toString(double) method.
    *   @history 2017-04-10 Jesse Mapel - Added an accessor and mutator for ErrorChecking member.
    *                           Fixes #4766.
+   *   @history 2019-03-11 Kaitlyn Lee - Added comment in SetPlanetographic() about passing in
+   *                            special pixels.
    */
   class Latitude : public Angle {
     public:
