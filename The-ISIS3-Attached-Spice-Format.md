@@ -95,15 +95,16 @@ The InstrumentPosition Table's label contains all of the information described i
 
 ## The InstrumentPosition Table Binary Data
 
-The InstrumentPointing Table's binary data contains the position and optionally the velocity of the sensor relative to the target body in the J2000 reference frame. The format of the Table depends on the value of the `CacheType` keyword in the Table label.
+The InstrumentPosition Table's binary data contains the position and optionally the velocity of the sensor relative to the target body in the J2000 reference frame. The format of the Table depends on the value of the `CacheType` keyword in the Table label.
 
 ### Linear
 
-Each record in the InstrumentPointing Table contains the sensor position and potentially velocity at a specific time. If there is a single record, that postion and velocity will be used for any time within the valid time range. If there are multiple records, then the position and velocity are linearly interpolated between times.
+Each record in the InstrumentPosition Table contains the sensor position and potentially velocity at a specific time. If there is a single record, that postion and velocity will be used for any time within the valid time range. If there are multiple records, then the position and velocity are linearly interpolated between times.
 
 ### HermiteSpline
 
-Each record in the InstrumentPointing Table contains the sensor position and velocity at a specific time. Unlike the Linear case, velocity is required for every time. Position and velocity are interpolated from a hermite spline fit over all of the times.
+Each record in the InstrumentPosition Table contains the sensor position and velocity at a specific time. Unlike the Linear case, velocity is required for every time. Position and velocity are interpolated from a hermite spline fit over all of the times.
 
 ### PolyFunction
 
+During bundle adjustment (the jigsaw application mostly), the InstrumentPosition is converted to polynomials equations for the sensor position. After this point, the InstrumentPosition Table binary data contains coefficients, precisely stored time scaling vlaues, and the polynomial degree. The first record in the table contains the 0th degree coefficients, the second record in the table contains the 1st degree coefficients, and so on through the second to last record. The final record of the table contains the time scaling offset in the first field, the time scale in the second field, and the polynomial degree in the third field.
