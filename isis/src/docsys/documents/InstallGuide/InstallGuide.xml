@@ -95,7 +95,8 @@ you must <em>not</em> upgrade the ISIS Data Files!!!
           <strong>python $CONDA_PREFIX/scripts/isis3VarInit.py --data-dir=[path to data directory]  --test-dir=[path to test data directory]</strong>
         </pre>
 
-        Directions for running rsync to download ISIS3 data can be found <a href="#ISIS3DataDownload">here.</a>
+        More information about the ISIS3DATA environment variable and the ISIS3 Data Area
+        can be found <a href="#ISIS3DataDownload">here.</a>
 
         Now everytime the isis3 environment is activated, $ISISROOT, $ISIS3DATA, and $ISIS3TESTDATA
         will be set to the values passed to isis3VarInit.py. This does not happen retroactively,
@@ -188,312 +189,331 @@ is a popular choice and may be downloaded below.
     <li><a href="https://www.putty.org/">PuTTY - an SSH and telnet client for the Windows platform.</a></li>
 </ul>
 
-   <h3>Mission Requirements</h3>
-   <p>ISIS3 supports many planetary missions; in fact, over 40 different instruments including some
-   flown as early as the 1960s.  Ancillary data are required to process images from these instruments.  For example, translation
-   definition files to help convert from PDS format to ISIS cubes, dark current and flat file images for radiometric
-   calibration, and large quantities of SPICE files (spacecraft pointing and position) for map projecting images.
-   If you plan to work with data from all missions, then the download will require about 180 GB for all the ancillary data.
-   However, most of this volume is taken up by SPICE files.  We have a SPICE Web service that can be used in lieu of downloading all of the
-   SPICE files which can reduce the download size to 10 GB.  When downloading ISIS, you will have the option of
-   choosing which mission data to acquire as well as if you only want the translation and calibration files and not
-   SPICE files.
+<A NAME="ISIS3DataArea"></A>
+<h2>The ISIS3 Data Area</h2>
+
+<h3>Ancillary Data</h3>
+   <p>Many ISIS3 applications require ancillary data. For example, ingestion applications require
+   translation tables to convert labels, calibration applications require flat files to do
+   flat field correct, and map projection applications require DTMs to accurately compute intersections.
+   Due to its size, this data is stored in a separate directory called the ISIS3 Data Area. Any
+   location can be used for the ISIS3 Data Area, the software simply requires that the ISIS3DATA
+   environment variable is set to its location.
    </p>
 
-   <h3>DTM Requirements</h3>
-   <p>The strength of ISIS3 lies in its capabilities for planetary cartography.
-   The image orthorectification process is improved if a digital
-   terrain model (DTM) is used.  The DTMs can be quite large and take some time to download.  They exist for
-   many planetary bodies (e.g., the Moon, Mars, etc.). Therefore, there are options for selecting which DTMs to download
-   if you are only working with a particular target body.
+<h3>Structure of the ISIS3 Data Area</h3>
+   <p>Under the root directory of the ISIS3 Data Area pointed to by the ISIS3DATA environment
+   variable are a variety of sub-directories. Each mission supported by ISIS3 has a sub-directory
+   that contains mission specific processing data such as flat files and mission specific SPICE.
+   There are also data areas used by more generic applications. These sub-directories contain
+   everything from templates to test data.
    </p>
 
-
+<h3>Size of the ISIS3 Data Area</h3>
+   <p>If you plan to work with data from all missions, then the download will require about 520 GB
+   for all the ancillary data. However, most of this volume is taken up by SPICE files. We have a
+   <a href="#SPICEWebService">SPICE Web service</a> that can be used in lieu of downloading all of
+   the SPICE files. This reduces the total download size to about 10 GB.
+   </p>
 
 <A NAME="ISIS3DataDownload"></A>
-<h3>Full ISIS3 Data Download</h3>
+<h3>Full ISIS3 Data Area Download</h3>
 
-<p>
-    Mission data is hosted on rsync servers and not through conda channels like the ISIS3 distribution.
-    This requires using the rsync command from within a terminal window within your Unix distribution, or
-    from within WSL if running Windows 10.   Downloading all mission data requires over 130 GB of disk space.
-    If you want to acquire only certain mission data <a href="#MissionSpecific">click here</a>.
-    To download all ISIS3 data files, continue reading.
-</p>
-<p>
-    To download all ISIS3 data (approximately 180 GB), enter the following commands at the command prompt:
+   <p>The ISIS3 Data Area is hosted on rsync servers and not through conda channels like the
+   ISIS3 binaries. This requires using the rsync command from within a terminal window within
+   your Unix distribution, or from within WSL if running Windows 10.  Downloading all mission
+   data requires over 520 GB of disk space. If you want to acquire only certain mission data
+   <a href="#MissionSpecific">click here</a>. To download all ISIS3 data files, continue reading.
+   </p>
 
-</p>
+   <p>To download all ISIS3 data, enter the following commands in the location where you want
+   to install the ISIS3 Data Area:
+   </p>
+
       <pre>
       cd $ISIS3DATA
-      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ .
       </pre>
-<p>
- Note:  The above command downloads all ISIS data including the required base data area and all of the optional mission
- data areas.
-</p>
+
+   <p><em>Note: The above command downloads all ISIS data including the required base data area
+   and all of the optional missiondata areas.
+   </em></p>
 
 
- <A NAME="MissionSpecific"> </A>
+<A NAME="MissionSpecific"> </A>
+<h3>Partial Download of ISIS3 Base Data (Required)</h3>
+   <p>The base data area is separate from the source code. This data area is crucial to ISIS3 and
+   must be downloaded.
+   </p>
 
-        <h3>Partial Download of ISIS3 Base Data (Required)</h3>
-        <p>
-            The base data area is separate from the source code. This data area is
-            crucial to ISIS3 and must be downloaded.
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
-</pre>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base .
+      </pre>
 
 <h3>Partial Download of Mission Specific Data</h3>
 
 
-        <p>
-          There are many missions supported by ISIS.  If you are only working with a few missions
-          then you should download only those specific data areas.    One way you can save time and space is to not download the SPICE data
-          for the mission you need.  If you chose download the SPICE data, read the next section about the SPICE Web Service that
-          provides instructions for excluding the SPICE kernels.  Otherwise <a href="#ApolloMission">jump</a> to the mission
-          specific sections.
-         </p>
+   <p>There are many missions supported by ISIS. If you are only working with a few missions
+   then you should download only those specific sub-directories of the ISIS3 Data Area. One way
+   you can save time and space is to not download the SPICE data for the mission you need.
+   If you choose to not download the SPICE data, read the next section about the SPICE Web Service
+   that provides instructions for excluding the SPICE kernels. Otherwise
+   <a href="#ApolloMission">jump</a> to the mission specific sections.
+   </p>
 
 
+<A NAME="SPICEWebService"> </A>
 <h3>ISIS SPICE Web Service</h3>
 
-<p>
-  ISIS can now use a service to retrieve the SPICE data for all instruments ISIS supports
-  via the internet. To use this service instead of your local SPICE data, click the WEB check box in
-  the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE Web
-  Service will significantly reduce the size of the downloads from our data area.
+   <p>ISIS can now use a service to retrieve the SPICE data for all instruments ISIS supports
+   via the internet. To use this service instead of your local SPICE data, click the WEB check box
+   in the spiceinit program GUI or type spiceinit web=yes at the command line. Using the ISIS SPICE
+   Web Service will significantly reduce the size of the downloads from our data area.
 
-  If you want to use this new service, without having to download all the SPICE data, add the
-  following argument to the mission-specific rsync command:
- </p>
-<pre>
-            --exclude='kernels'
-</pre>
-        <p>
-          For example: rsync -azv <strong>--exclude='kernels'</strong> --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
-        </p>
+   If you want to use this service, without having to download all the SPICE data, add the
+   following argument to the mission-specific rsync command:
+   </p>
 
-        <span style="font-size:120%; color:red; font-weight:bold">
-          WARNING: Some instruments require mission data to be present for calibration, which may
-          not be supported by the SPICE Web Server exclusively, and some programs that are designed
-          to run an image from ingestion through the mapping phase do not have an option to use the
-          SPICE Web Service. For information specific to an instrument, see the documentation for
-          radiometric callobration programs.
-        </span>
+      <pre>
+      --exclude='kernels'
+      </pre>
+   <p>For example, the following command will download the Cassini mission data except for SPICE kernels:
+   </p>
 
-          <A NAME="ApolloMission"> </A>
-<p>
-  Apollo Mission (kernels can be excluded):
-</p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv <strong>--exclude='kernels'</strong> --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini .
+      </pre>
+
+   <span style="font-size:120%; color:red; font-weight:bold">
+      WARNING: Some instruments require mission data to be present for calibration, which may
+      not be supported by the SPICE Web Server exclusively, and some programs that are designed
+      to run an image from ingestion through the mapping phase do not have an option to use the
+      SPICE Web Service. For information specific to an instrument, see the documentation for
+      radiometric callobration programs.
+   </span>
+
+<A NAME="ApolloMission"> </A>
+   <p>Apollo Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo15 .
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo16 .
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo17 .
+      </pre>
+
+<A NAME="CassiniMission"> </A>
+   <p>Cassini Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini .
+      </pre>
+
+<A NAME="ChandrayaanMission"> </A>
+   <p>Chandrayaan Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 .
+      </pre>
+
+<A NAME="ClementineMission"> </A>
+   <p>Clementine Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/clementine1 .
+      </pre>
+
+<A NAME="DawnMission"> </A>
+   <p>Dawn Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn .
+      </pre>
+
+<A NAME="TGOMission"> </A>
+   <p>ExoMars Trace Gas Orbiter Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/tgo .
+      </pre>
+
+<A NAME="GalileoMission"> </A>
+   <p>Galileo Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo .
+      </pre>
+
+<A NAME="HayabusaMission"> </A>
+   <p>Hayabusa Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa .
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa2 .
+      </pre>
+
+<A NAME="JunoMission"> </A>
+   <p>Juno Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/juno .
+      </pre>
+
+<A NAME="KaguyaMission"> </A>
+   <p>Kaguya Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/kaguya .
+      </pre>
+
+<A NAME="LunarOrbiterMission"> </A>
+   <p>Lunar Orbiter Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lo .
+      </pre>
+
+<A NAME="LunarReconnaissanceOrbiterMission"> </A>
+   <p>Lunar Reconnaissance Orbiter Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lro .
+      </pre>
+
+<A NAME="MarsExplorationRoverMission"> </A>
+  <p>Mars Exploration Rover Mission (kernels can be excluded):
+  </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mer .
+      </pre>
+
+<A NAME="Mariner10Mission"> </A>
+   <p>Mariner10 Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mariner10 .
+      </pre>
+
+<A NAME="MessengerMission"> </A>
+   <p>Messenger Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/messenger .
+      </pre>
+
+<A NAME="MarsExpressMission"> </A>
+   <p>Mars Express Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mex .
+      </pre>
+
+<A NAME="MarsGlobalSurveyorMission"> </A>
+   <p>Mars Global Surveyor Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mgs .
+      </pre>
+
+<A NAME="MarsReconnaissanceOrbiterMission"> </A>
+   <p>Mars Reconnaissance Orbiter Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro .
+      </pre>
+
+<A NAME="MarsOdysseyMission"> </A>
+   <p>Mars Odyssey Mission (kernels can be excluded):
+   </p>
         <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo15 data/
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo16 data/
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo17 data/
+        cd $ISIS3DATA
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey .
         </pre>
 
-        <A NAME="CassiniMission"> </A>
-<p>
-  Cassini Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
-        </pre>
-        <A NAME="ChandrayaanMission"> </A>
-<p>
-  Chandrayaan Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chandrayaan1 data/
-        </pre>
+<A NAME="NearMission"> </A>
+   <p>Near Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/near .
+      </pre>
 
-        <A NAME="ClementineMission"> </A>
-<p>
-  Clementine Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/clementine1 data/
-        </pre>
+<A NAME="NewHorizonsMission"> </A>
+   <p>New Horizons Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons .
+      </pre>
 
-          <A NAME="DawnMission"> </A>
-<p>
-  Dawn Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn data/
-        </pre>
-<p>
-  ExoMars Trace Gas Orbiter Mission (kernels can be excluded):
-</p>
-        <A NAME="TGOMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/tgo data/
-        </pre>
-<p>
-  Galileo Mission (kernels can be excluded):
-</p>
-        <A NAME="GalileoMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo data/
-        </pre>
-<p>
-  Hayabusa Mission (kernels can be excluded):
-</p>
-        <A NAME="HayabusaMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa data/
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/hayabusa2 data/
-        </pre>
+<A NAME="OdysseyMission"> </A>
+   <p>Odyssey Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey .
+      </pre>
 
-<p>
-  Juno Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/juno data/
-        </pre>
+<A NAME="RoloMission"> </A>
+   <p>Rolo Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo .
+      </pre>
 
-        <A NAME="KaguyaMission"> </A>
-<p>
-  Kaguya Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/kaguya data/
-        </pre>
+<A NAME="RosettaMission"> </A>
+   <p>Rosetta Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rosetta .
+      </pre>
 
-        <A NAME="LunarOrbiterMission"> </A>
-<p>
-  Lunar Orbiter Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lo data/
-        </pre>
-        <A NAME="LunarReconnaissanceOrbiterMission"> </A>
-<p>
-  Lunar Reconnaissance Orbiter Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
-        </pre>
+<A NAME="Smart1Mission"> </A>
+   <p>Smart1 Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/smart1 .
+      </pre>
 
-        <A NAME="MarsExplorationRoverMission"> </A>
-<p>
-  Mars Exploration Rover Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mer data/
-        </pre>
-        <A NAME="Mariner10Mission"> </A>
+<A NAME="VikingMission"> </A>
+   <p>Viking Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking1 .
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking2 .
+      </pre>
 
-<p>
-  Mariner10 Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mariner10 data/
-        </pre>
-
-        <A NAME="MessengerMission"> </A>
-
-<p>
-  Messenger Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/messenger data/
-        </pre>
-
-        <A NAME="MarsExpressMission"> </A>
-
-<p>
-  Mars Express Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mex data/
-        </pre>
-
-        <A NAME="MarsGlobalSurveyorMission"> </A>
-
-<p>
-  Mars Global Surveyor Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mgs data/
-        </pre>
-
-        <A NAME="MarsReconnaissanceOrbiterMission"> </A>
-
-<p>
-  Mars Reconnaissance Orbiter Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
-        </pre>
-
-        <A NAME="MarsOdysseyMission"> </A>
-<p>
-  Mars Odyssey Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
-        </pre>
-
-        <A NAME="NearMission"> </A>
-<p>
-  Near Mission (kernels can be excluded):
-</p>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/near data/
-        </pre>
-<p>
-  New Horizons Mission (kernels can be excluded):
-</p>
-        <A NAME="NewHorizonsMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/newhorizons data/
-        </pre>
-<p>
-  Odyssey Mission (kernels can be excluded):
-</p>
-        <A NAME="OdysseyMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
-        </pre>
-<p>
-  Rolo Mission (kernels can be excluded):
-</p>
-        <A NAME="RoloMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo data/
-        </pre>
-<p>
-  Rosetta Mission (kernels can be excluded):
-</p>
-       <A NAME="RosettaMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rosetta data/
-        </pre>
-<p>
-  Smart1 Mission (kernels can be excluded):
-</p>
-        <A NAME="Smart1Mission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/smart1 data/
-        </pre>
-<p>
-  Viking Mission (kernels can be excluded):
-</p>
-        <A NAME="VikingMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking1 data/
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking2 data/
-        </pre>
-<p>
-  Voyager Mission (kernels can be excluded):
-</p>
-        <A NAME="VoyagerMission"> </A>
-        <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager1 data/
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 data/
-        </pre>
+<A NAME="VoyagerMission"> </A>
+   <p>Voyager Mission (kernels can be excluded):
+   </p>
+      <pre>
+      cd $ISIS3DATA
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager1 .
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 .
+      </pre>
 
 <h2>Installing older versions of ISIS</h2>
     <h3>How do I install ISIS2?</h3>
@@ -523,10 +543,6 @@ is a popular choice and may be downloaded below.
   <category>
     <categoryItem>technicaldoc</categoryItem>
   </category>
-
-  <audience>
-    <target>administrator</target>
-  </audience>
 
   <history>
     <change name="Kristin Berry" date="2018-08-28">Original Version</change>
