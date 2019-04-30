@@ -13,6 +13,7 @@
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
+#include "Control.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -57,6 +58,7 @@ void IsisMain() {
   // retrieve settings from jigsaw gui
   
   BundleSettingsQsp settings = bundleSettings(ui);
+  settings->setCubeList(cubeList);
   BundleAdjust *bundleAdjustment = NULL;
   try {
     // Get the held list if entered and prep for bundle adjustment
@@ -81,7 +83,8 @@ void IsisMain() {
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();
-    
+    Control *outputControlNet = new Control(ui.GetFileName("ONET"));
+    bundleSolution->setOutputControl( outputControlNet);
     cout << "\nGenerating report files\n" << endl;
 
     // write output files
@@ -382,6 +385,8 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
     // Check that the held images are present in the input image list
     QString heldList = ui.GetFileName("HELDLIST");
     QString fromList = ui.GetFileName("FROMLIST");
+
+
     SerialNumberList heldSNs(heldList);
     SerialNumberList cubeSNs(fromList);
     checkImageList(heldSNs, cubeSNs);

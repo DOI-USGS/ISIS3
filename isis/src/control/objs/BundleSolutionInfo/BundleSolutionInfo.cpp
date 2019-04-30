@@ -22,6 +22,7 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "StatCumProbDistDynCalc.h"
+#include "Statistics.h"
 #include "XmlStackedHandlerReader.h"
 
 
@@ -546,21 +547,34 @@ namespace Isis {
     sprintf(buf, "\n                       Run Time: %s",
                   Isis::iTime::CurrentLocalTime().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n               Network Filename: %s",
+    sprintf(buf, "\n                       Network Filename: %s",
                   m_inputControlNetFileName->expanded().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n                     Network Id: %s",
+    sprintf(buf, "\n                       Output Network Filename: %s",
+                              outputControlNetFileName().toStdString().c_str() );
+    fpOut << buf;
+    sprintf(buf,"\n                       Output File Prefix: %s",
+                m_settings->outputFilePrefix().toStdString().c_str() );
+    fpOut <<buf;
+
+    sprintf(buf,"\n                       Cube List: %s",
+                m_settings->cubeList().toStdString().c_str() );
+
+    fpOut << buf;
+
+
+    sprintf(buf, "\n                       Network Id: %s",
                   m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n            Network Description: %s",\
+    sprintf(buf, "\n                       Network Description: %s",\
                   m_statisticsResults->outputControlNet()->Description().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n                         Target: %s",
+    sprintf(buf, "\n                       Target: %s",
                   m_statisticsResults->outputControlNet()->GetTarget().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n\n                   Linear Units: kilometers");
+    sprintf(buf, "\n\n                       Linear Units: kilometers");
     fpOut << buf;
-    sprintf(buf, "\n                  Angular Units: decimal degrees");
+    sprintf(buf, "\n                       Angular Units: decimal degrees");
     fpOut << buf;
     sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
     fpOut << buf;
@@ -934,7 +948,7 @@ namespace Isis {
 
     if (m_statisticsResults->iterations() >= m_settings->convergenceCriteriaMaximumIterations()) {
       sprintf(buf, "(Maximum reached)");
-      fpOut << buf;
+     fpOut << buf;
     }
 
     sprintf(buf, "\n                         Sigma0: %30.20lf\n", m_statisticsResults->sigma0());
@@ -1047,7 +1061,7 @@ namespace Isis {
     //Header 2
     sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH2,h4,imgMeasuresH4);
     fpOut<< buf;
-
+    Statistics rmsSamplesTotal,rmsLinesTotal,rmsTotals;
     for (int i = 0; i < numObservations; i++) {
 
       int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
@@ -1062,6 +1076,9 @@ namespace Isis {
                                         rmsImageLineResiduals()[imageIndex].Rms();
         double rmsLandSResiduals =  m_statisticsResults->
                                         rmsImageResiduals()[imageIndex].Rms();
+        rmsSamplesTotal.AddData(rmsSampleResiduals);
+        rmsLinesTotal.AddData(rmsLineResiduals);
+        rmsTotals.AddData(rmsLandSResiduals);
 
         numMeasures =         m_statisticsResults->outputControlNet()->
                                   GetNumberOfValidMeasuresInImage(
@@ -1085,6 +1102,16 @@ namespace Isis {
         imageIndex++;
       }
     }
+
+     sprintf(buf,"%*s",firstColumnWidth,"\nTotal RMS:");
+     fpOut << buf;
+     sprintf(buf,"                        ");
+     fpOut << buf;
+     sprintf(buf,"     %-6.3lf         %-6.3lf         %-6.3lf \n",
+     rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
+     fpOut << buf;
+     
+
 
     return true;
   }
@@ -1219,9 +1246,9 @@ namespace Isis {
       sprintf(buf, "\nTARGET BODY\n==========================\n");
       fpOut << buf;
 
-      sprintf(buf, "\n   Target         Initial              Total               "
-                   "Final             Initial           Final\n"
-                   "Parameter         Value              Correction           "
+      sprintf(buf, "\n   Target         Initial            Total               "
+                   "Final           Initial           Final\n"
+                   "Parameter         Value            Correction           "
                    "Value             Accuracy          Accuracy\n");
       fpOut << buf;
 
@@ -1254,19 +1281,12 @@ namespace Isis {
         fpOut << buf;
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
-#if 0
-        sprintf(buf, "\n    Image         Initial              Total               "
-                     "Final             Initial           Final\n"
-                     "Parameter         Value              Correction            "
-                     "Value             Accuracy          Accuracy\n");
-
-#endif
-        sprintf(buf,"\n    Image         Initial              Total               "
+        sprintf(buf,"\n    Image         Initial            Total               "
                 "Final                            Accuracy                   \n"
                 "                                                                 "
                 "            ***************************************\n"
-                "Parameter         Value              Correction            "
-                 "Value             Initial           Final           Units\n");
+                "Parameter         Value              Correction          "
+                 "Value               Initial           Final           Units\n");
 
 
         fpOut << buf;

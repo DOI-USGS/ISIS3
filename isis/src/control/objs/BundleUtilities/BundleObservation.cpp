@@ -872,6 +872,7 @@ namespace Isis {
     // for convenience, create vectors of parameters names and values in the correct sequence
     std::vector<double> finalParameterValues;
     QStringList parameterNamesList;
+    QStringList correctionUnitList;
 
     if (!imageCSV) {
 
@@ -880,43 +881,56 @@ namespace Isis {
       if (nPositionCoefficients > 0) {
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefX[i]);
-          if (i == 0)
+          if (i == 0) {
             parameterNamesList.append( str.arg("  X  ").arg("km") );
+            correctionUnitList.append("m");
+          }
           else {
             switch(i) {
             case 1:
               parameterNamesList.append( str.arg("     ").arg("km/s") );
+              correctionUnitList.append("m/s");
               break;
             case 2:
               parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+              correctionUnitList.append("m/s^2");
               break;
             case 3:
               parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+              correctionUnitList.append("m/s^3");
               break;
             default:
                 parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+                correctionUnitList.append("m/s^"+toString(i));
             }
           }
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefY[i]);
-          if (i == 0)
+          if (i == 0) {
             parameterNamesList.append( str.arg("  Y  ").arg("km") );
+            correctionUnitList.append("m");
+
+          }
           else {
 
             switch(i) {
 
             case 1:
               parameterNamesList.append( str.arg("     ").arg("km/s") );
+              correctionUnitList.append("m/s");
               break;
             case 2:
               parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+              correctionUnitList.append("m/s^2");
               break;
             case 3:
               parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+              correctionUnitList.append("m/s^3");
               break;
             default:
                 parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+                correctionUnitList.append("m/s^"+toString(i));
             }
 
           }
@@ -924,23 +938,29 @@ namespace Isis {
         }
         for (int i = 0; i < nPositionCoefficients; i++) {
           finalParameterValues.push_back(coefZ[i]);
-          if (i == 0)
+          if (i == 0) {
             parameterNamesList.append( str.arg("  Z  ").arg("km") );
+            correctionUnitList.append("m");
+          }
           else {
 
             switch(i) {
 
             case 1:
               parameterNamesList.append( str.arg("     ").arg("km/s") );
+              correctionUnitList.append("m/s");
               break;
             case 2:
               parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+              correctionUnitList.append("m/s^2");
               break;
             case 3:
               parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+              correctionUnitList.append("m/s^3");
               break;
             default:
                 parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+                correctionUnitList.append("m/s^"+toString(i));
             }
 
           }
@@ -950,64 +970,86 @@ namespace Isis {
       if (nPointingCoefficients > 0) {
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-          if (i == 0)
+          if (i == 0) {
             parameterNamesList.append( str.arg(" RA  ").arg("dd") );
+            correctionUnitList.append("dd");
+          }
           else {
             switch(i) {
 
             case 1:
               parameterNamesList.append( str.arg("     ").arg("dd/s") );
+              correctionUnitList.append("dd");
               break;
             case 2:
               parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+              correctionUnitList.append("dd/s^2");
               break;
             case 3:
               parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+              correctionUnitList.append("dd/s^3");
               break;
             default:
                 parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+                correctionUnitList.append("dd/s^"+toString(i));
+
             }
           }
         }
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-          if (i == 0)
+          if (i == 0) {
             parameterNamesList.append( str.arg("DEC  ").arg("dd") );
+            correctionUnitList.append("dd");
+
+          }
           else {
 
             switch(i) {
 
             case 1:
               parameterNamesList.append( str.arg("     ").arg("dd/s") );
+              correctionUnitList.append("dd/s");
               break;
             case 2:
               parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+              correctionUnitList.append("dd/s^2");
               break;
             case 3:
               parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+              correctionUnitList.append("dd/s^3");
               break;
             default:
                 parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+                correctionUnitList.append("dd/s^"+toString(i) );
+
             }
           }
         }
         for (int i = 0; i < nPointingCoefficients; i++) {
           finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-          if (i == 0)
+          if (i == 0) {
             parameterNamesList.append( str.arg("TWI  ").arg("dd") );
+            correctionUnitList.append("dd");
+            }            
           else {
             switch(i) {
             case 1:
               parameterNamesList.append( str.arg("     ").arg("dd/s") );
+              correctionUnitList.append("dd/s");
               break;
             case 2:
               parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+              correctionUnitList.append("dd/s^2");
               break;
             case 3:
               parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+              correctionUnitList.append("dd/s^3");
               break;
             default:
                 parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+                correctionUnitList.append("dd/s^"+toString(i) );
+
             }
           }
         }
@@ -1063,22 +1105,25 @@ namespace Isis {
           sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
         }
         if (errorPropagation) {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg(finalParameterValues[i] - correction, 17, 'f', 8).
-          arg(correction, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg(adjustedSigma, 18);
+          qStr = QString("%1%2  %3%4       %5%6%7\n").
+          arg( parameterNamesList.at(i),15 ).
+          arg(finalParameterValues[i] - correction, 15, 'f', 2).
+          arg(correction, 15, 'f', 8).
+          arg(finalParameterValues[i], 15, 'f', 2).
+          arg(sigma,10).
+          arg(adjustedSigma, 10).
+          arg(correctionUnitList.at(i), 10 );
         }
         else {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg(finalParameterValues[i] - correction, 17, 'f', 8).
-          arg(correction, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg("N/A", 18);
+          qStr = QString("%1%2  %3%4       %5%6%7\n").
+          arg( parameterNamesList.at(i),15 ).
+          arg(finalParameterValues[i] - correction, 15, 'f', 2).
+          arg(correction, 15, 'f', 8).
+          arg(finalParameterValues[i], 15, 'f', 2).
+          arg(sigma, 10).
+          arg("N/A", 10).
+          arg(correctionUnitList.at(i),10 );
+          
         }
         finalqStr += qStr;
       }
@@ -1115,22 +1160,25 @@ namespace Isis {
           sigma = "N/A";
         }
         if (errorPropagation) {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg( (finalParameterValues[i] - correction * RAD2DEG), 17, 'f', 8).
-          arg(correction * RAD2DEG, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg(adjustedSigma, 18);
+          qStr = QString("%1%2  %3%4       %5%6%7\n").
+          arg( parameterNamesList.at(i),-15 ).
+          arg( (finalParameterValues[i] - correction * RAD2DEG), 15, 'f', 2).
+          arg(correction * RAD2DEG, 15, 'f', 8).
+          arg(finalParameterValues[i], 15, 'f', 8).
+          arg(sigma, 10).
+          arg(adjustedSigma, 10).
+          arg( correctionUnitList.at(i),10 );
+
         }
         else {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg( (finalParameterValues[i] - correction * RAD2DEG), 17, 'f', 8).
-          arg(correction * RAD2DEG, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg("N/A", 18);
+          qStr = QString("%1%2  %3%4       %5%6%7\n").
+          arg( parameterNamesList.at(i),-15 ).
+          arg( (finalParameterValues[i] - correction * RAD2DEG), 15, 'f', 2).
+          arg(correction * RAD2DEG, 15, 'f', 8).
+          arg(finalParameterValues[i], 15, 'f', 8).
+          arg(sigma, 10).
+          arg("N/A", 10).
+          arg( correctionUnitList.at(i),10 );
         }
         finalqStr += qStr;
       }

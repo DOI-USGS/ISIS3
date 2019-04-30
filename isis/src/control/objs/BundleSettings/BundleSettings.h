@@ -294,6 +294,8 @@ namespace Isis {
       void setOutputFilePrefix(QString outputFilePrefix);
       void setSCPVLFilename(QString SCParamFilename);
       QString outputFilePrefix() const;
+      void setCubeList(QString fileName);
+      QString cubeList() const;
       QString SCPVLFilename() const;
 
       void save(QXmlStreamWriter &stream, const Project *project) const;
@@ -353,6 +355,7 @@ namespace Isis {
       };
 
       bool m_validateNetwork; //!< Indicates whether the network should be validated.
+      QString m_cubeList;
       bool m_solveObservationMode; //!< Indicates whether to solve for observation mode.
       bool m_solveRadius; //!< Indicates whether to solve for point radii.
       bool m_updateCubeLabel; //!< Indicates whether to update cubes.
