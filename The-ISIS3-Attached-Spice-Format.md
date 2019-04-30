@@ -108,3 +108,7 @@ Each record in the InstrumentPosition Table contains the sensor position and vel
 ### PolyFunction
 
 During bundle adjustment (the jigsaw application mostly), the InstrumentPosition is converted to polynomials equations for the sensor position. After this point, the InstrumentPosition Table binary data contains coefficients, precisely stored time scaling vlaues, and the polynomial degree. The first record in the table contains the 0th degree coefficients, the second record in the table contains the 1st degree coefficients, and so on through the second to last record. The final record of the table contains the time scaling offset in the first field, the time scale in the second field, and the polynomial degree in the third field.
+
+# The BodyRotation Table
+
+# The SunPosition Table
