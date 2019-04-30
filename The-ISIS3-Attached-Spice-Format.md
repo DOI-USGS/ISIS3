@@ -113,10 +113,15 @@ During bundle adjustment (the jigsaw application mostly), the InstrumentPosition
 
 The BodyRotation Table contains the rotation information between the J2000 reference frame and the target body reference frame. It is not a part of the Cube prior to spiceinit being run. After spiceinit, the label for the Table is located after the `IsisCube` object in the Cube label and the binary table data is located at the end of the file.
 
-Depending on what type of PCK was used to create the BodyRotation table, it will have a very different format.
+Depending on what type of PCK was used to create the BodyRotation table, it will have a different format.
 
 ## Binary PCK BodyRotation Table
 
 When a binary PCK is used, the BodyRotation Table has the same format as the [InstrumentPointing Table](#The-InstrumentPointing-Table) except it has the rotation from J2000 to the target body reference frame and it always has a [quaternion cache](#Quaternion-Cache).
+
+
+## Text PCK BodyRotation Table
+
+When a text PCK is used, the BodyRotation Table contains coefficients for polynomials that define the rotation from the J2000 reference frame to the target body reference frame. Similar to the [InstrumentPointing Table Label](#The-InstrumentPointing-Table-Label), The BodyRotation Table label will have the `TimeDependentFrames`, `CkTableStartTime`, `CkTableEndTime`, `CkTableOriginalSize`, `FrameTypeCode`, and `Kernels` keywords. Unlike, the [InstrumentPointing Table Label](#The-InstrumentPointing-Table-Label), it will not have the `ConstantFrames` or `ConstantRotation` keywords because the rotation is handled by a single time dependent rotation, hence the `TimeDependentFrames` keyword will have only the target body reference frame ID and the J2000 reference frame ID (1) in it. The coefficients for the rotation polynomials are stored in the `PoleRa`, `PoleDec`, and `PrimeMeridian` keywords. These polynomials have a slighlty different format than other polynomials, see the [NAIF documentation](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/pck.html#Models%20for%20the%20Sun,%20Planets,%20and%20some%20Minor%20Bodies%20in%20Text%20PCK%20Kernels) for a detailed description. There may also be `PoleRaNutPrec`, `PoleDecNutPrec`, `PmNutPrec`, `SysNutPrec0`, and/or `SysNutPrec1` keywords. These keywords contain the nutation precession angles, again see the [NAIF documentation](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/pck.html#Models%20for%20Satellites%20in%20Text%20PCK%20Kernels) for how to use these values.
 
 # The SunPosition Table
