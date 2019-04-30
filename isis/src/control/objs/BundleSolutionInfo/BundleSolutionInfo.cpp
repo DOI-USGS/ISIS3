@@ -1129,7 +1129,7 @@ namespace Isis {
 
     int numMeasures, numLidarMeasures;
     int numRejectedMeasures, numLidarRejectedMeasures;
-    int numUsed, numLidarUsed;
+    int numUsed;
     int imageIndex = 0;
 
     if (m_statisticsResults->outputLidarData()) {

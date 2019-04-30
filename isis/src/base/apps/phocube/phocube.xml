@@ -305,11 +305,6 @@ xsi:noNamespaceSchemaLocation=
     <change name="Kaitlyn Lee" date="2019-02-15">
       Allowed RA and DEC to be exported regardless if the pixel is off body. Fixes #4446.
     </change>
-    <change name="Debbie A. Cook" date="2019-03-06">
-      Changed global variable name proj to projection, as Jesse Maple had done for the 
-      Piecewise branch, due to a conflict with the std complex library and includes used in 
-      piecewise branch.  References #5343.
-    </change>
   </history>
 
   <category>

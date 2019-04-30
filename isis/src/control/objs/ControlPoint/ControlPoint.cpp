@@ -1028,7 +1028,6 @@ namespace Isis {
 /*
   ControlPoint::Status ControlPoint::ComputeApriori() {
     PointModified();
-
     // Don't goof with fixed points.  The lat/lon is what it is ... if
     // it exists!
     // 2013-11-12 KLE I think this check should include points with any
@@ -1042,17 +1041,14 @@ namespace Isis {
       // Don't return until after the FocalPlaneMeasures have been set
       //      return;
     }
-
     double xB = 0.0;
     double yB = 0.0;
     double zB = 0.0;
     double r2B = 0.0;
     int goodMeasures = 0;
-
     // Loop for each measure and compute the sum of the lat/lon/radii
     for (int j = 0; j < cubeSerials->size(); j++) {
       ControlMeasure *m = GetMeasure(j);
-
       // The comment code was really checking for candidate measures
       // Commented out 2011-03-24 by DAC
 //       if (!m->IsMeasured()) {
@@ -1076,7 +1072,6 @@ namespace Isis {
           yB += pB[1];
           zB += pB[2];
           r2B += pB[0]*pB[0] + pB[1]*pB[1] + pB[2]*pB[2];
-
           double x = cam->DistortionMap()->UndistortedFocalPlaneX();
           double y = cam->DistortionMap()->UndistortedFocalPlaneY();
           m->SetFocalPlaneMeasured(x, y);
@@ -1087,18 +1082,15 @@ namespace Isis {
           if (GetType() == Fixed) {
             continue;
           }
-
           // TODO: What do we do
 //          QString msg = "Cannot compute lat/lon/radius (x/y/z) for "
 //              "ControlPoint [" + GetId() + "], measure [" +
 //              m->GetCubeSerialNumber() + "]";
 //          throw IException(IException::User, msg, _FILEINFO_);
-
           // m->SetFocalPlaneMeasured(?,?);
         }
       }
     }
-
     // Don't update the apriori x/y/z for fixed points  TODO This needs a closer look
     if (GetType() == Free && !id.contains("Lidar")) {  // TODO: temporary kluge for lidar points
       // point can be tagged as "Free" but still have constrained coordinates
@@ -1115,13 +1107,10 @@ namespace Isis {
         || IsCoord2Constrained()
         || IsCoord3Constrained()
         || id.contains("Lidar")) { // TODO: temporary kluge for lidar points
-
       // Initialize the adjusted x/y/z to the a priori coordinates
       adjustedSurfacePoint = aprioriSurfacePoint;
-
       return Success;
     }
-
     // Beyond this point, we assume the point is free ***TODO*** confirm this
     // Did we have any measures?
     if (goodMeasures == 0) {
@@ -1129,7 +1118,6 @@ namespace Isis {
           "project to lat/lon/radius (x/y/z)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-
     // Compute the averages if all coordinates are free
     //if (NumberOfConstrainedCoordinates() == 0) {
     if (GetType() == Free || NumberOfConstrainedCoordinates() == 0) {
@@ -1138,17 +1126,14 @@ namespace Isis {
       double avgZ = zB / goodMeasures;
       double avgR2 = r2B / goodMeasures;
       double scale = sqrt(avgR2/(avgX*avgX+avgY*avgY+avgZ*avgZ));
-
       aprioriSurfacePoint.SetRectangular(
         Displacement((avgX*scale), Displacement::Kilometers),
         Displacement((avgY*scale), Displacement::Kilometers),
         Displacement((avgZ*scale), Displacement::Kilometers));
     }
-
     adjustedSurfacePoint = aprioriSurfacePoint;
     SetAprioriSurfacePointSource(SurfacePointSource::AverageOfMeasures);
     SetAprioriRadiusSource(RadiusSource::AverageOfMeasures);
-
     return Success;    
   }
 */
