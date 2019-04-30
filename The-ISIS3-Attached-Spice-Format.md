@@ -111,4 +111,12 @@ During bundle adjustment (the jigsaw application mostly), the InstrumentPosition
 
 # The BodyRotation Table
 
+The BodyRotation Table contains the rotation information between the J2000 reference frame and the target body reference frame. It is not a part of the Cube prior to spiceinit being run. After spiceinit, the label for the Table is located after the `IsisCube` object in the Cube label and the binary table data is located at the end of the file.
+
+Depending on what type of PCK was used to create the BodyRotation table, it will have a very different format.
+
+## Binary PCK BodyRotation Table
+
+When a binary PCK is used, the BodyRotation Table has the same format as the [InstrumentPointing Table](#The-InstrumentPointing-Table) except it has the rotation from J2000 to the target body reference frame and it always has a [quaternion cache](#Quaternion-Cache).
+
 # The SunPosition Table
