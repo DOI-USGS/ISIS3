@@ -792,7 +792,6 @@ namespace Isis {
       std::vector<double> coefX;
       std::vector<double> coefY;
       std::vector<double> coefZ;
-
       std::vector<double> coefRA;
       std::vector<double> coefDEC;
       std::vector<double> coefTWI;
@@ -803,331 +802,472 @@ namespace Isis {
       // Indicate if we need to obtain default position or pointing values
       bool useDefaultPosition = false;
       bool useDefaultPointing = false;
-      //Indicate if we need to use default values when not solving twist
+      // Indicate if we need to use default values when not solving twist
       bool useDefaultTwist = !(m_solveSettings->solveTwist());
-      
-      //If we aren't solving for position, set the number of coefficients to 1 so we can output the
-      //instrumentPosition's center coordinate values for X, Y, and Z
+
+      // If we aren't solving for position, set the number of coefficients to 1 so we can output the
+      // instrumentPosition's center coordinate values for X, Y, and Z
       if (nPositionCoefficients == 0) {
         nPositionCoefficients = 1;
         useDefaultPosition = true;
       }
-      //If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
-      //instrumentPointing's center angles for RA, DEC, and TWI
+      // If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
+      // instrumentPointing's center angles for RA, DEC, and TWI
       if (nPointingCoefficients == 0) {
-          nPointingCoefficients = 1;
-          useDefaultPointing = true;
+        nPointingCoefficients = 1;
+        useDefaultPointing = true;
       }
-      
-     //Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
-     //so we can always output a value for them
-     int nPositionParameters = 3 * nPositionCoefficients;
-     int nPointingParameters = 3 * nPointingCoefficients;
-     int nParameters = nPositionParameters + nPointingParameters;
-     
-     coefX.resize(nPositionCoefficients);
-     coefY.resize(nPositionCoefficients);
-     coefZ.resize(nPositionCoefficients);
-     coefRA.resize(nPointingCoefficients);
-     coefDEC.resize(nPointingCoefficients);
-     coefTWI.resize(nPointingCoefficients);
 
-     if (m_instrumentPosition) {
-         if (!useDefaultPosition) {
-           m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
-         }
-    //Use the position's center coordinate if not solving for spacecraft position
+      // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
+      // so we can always output a value for them
+      int nPositionParameters = 3 * nPositionCoefficients;
+      int nPointingParameters = 3 * nPointingCoefficients;
+      int nParameters = nPositionParameters + nPointingParameters;
+
+      coefX.resize(nPositionCoefficients);
+      coefY.resize(nPositionCoefficients);
+      coefZ.resize(nPositionCoefficients);
+      coefRA.resize(nPointingCoefficients);
+      coefDEC.resize(nPointingCoefficients);
+      coefTWI.resize(nPointingCoefficients);
+
+      if (m_instrumentPosition) {
+        if (!useDefaultPosition) {
+          m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
+        }
+        // Use the position's center coordinate if not solving for spacecraft position
         else {
-               const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
-               coefX[0] = centerCoord[0];
-               coefY[0] = centerCoord[1];
-               coefZ[0] = centerCoord[2];
-             }
-       }
+          const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
+          coefX[0] = centerCoord[0];
+          coefY[0] = centerCoord[1];
+          coefZ[0] = centerCoord[2];
+        }
+      }
 
       if (m_instrumentRotation) {
-             if (!useDefaultPointing) {
-                 m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-                 // Use the pointing's center angles if not solving for pointing (rotation)
-             }
-             else {
-                      
-                 const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
-                 coefRA[0] = centerAngles[0];
-                 coefDEC[0] = centerAngles[1];
-                 coefTWI[0] = centerAngles[2];
-             }
-    }    
+        if (!useDefaultPointing) {
+          m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+        }
+        // Use the pointing's center angles if not solving for pointing (rotation)
+        else {
+          const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
+          coefRA[0] = centerAngles[0];
+          coefDEC[0] = centerAngles[1];
+          coefTWI[0] = centerAngles[2];
+        }
+      }
+
       // for convenience, create vectors of parameters names and values in the correct sequence
       std::vector<double> finalParameterValues;
       QStringList parameterNamesList;
       QStringList correctionUnitList;
 
-      QString str("%1(%2)  ");
+      if (!imageCSV) {
 
-      
-      if (nPositionCoefficients > 0) {
-         for (int i = 0; i < nPositionCoefficients; i++) {
-              finalParameterValues.push_back(coefX[i]);
-              if (i == 0) {
-                          parameterNamesList.append( str.arg("  X  ").arg("km") );
-                          correctionUnitList.append("m");
-                          }
-              else {
-                     switch(i) {
-                                 case 1:
-                                        parameterNamesList.append( str.arg("     ").arg("km/s") );                                                     correctionUnitList.append("m/s");
-                                                                                                                                                       break;
-                                 case 2:
-                                       parameterNamesList.append( str.arg("     ").arg("km/s^2") );
-                                       correctionUnitList.append("m/s^2");
-                                      
-                                       break;
-                                       
-                                 case 3:
-                                 
-                                       parameterNamesList.append( str.arg("     ").arg("km/s^3") );                                       
-                                       correctionUnitList.append("m/s^3");
-                                       
-                                       break;
+        QString str("%1(%2)  ");
 
-                                       
-                                 default:
-                                      parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
-                                      
-                                      correctionUnitList.append("m/s^"+toString(i));                     
-                                  }
-                              }
-                          }
-                      }
-
-  if (nPointingCoefficients > 0) {
-          for (int i = 0; i < nPointingCoefficients; i++) {
-               finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-               if (i == 0) {
-                       parameterNamesList.append( str.arg(" RA  ").arg("dd") );
-                       correctionUnitList.append("dd");                                                                    
-                }
-                else {                    
-                    switch(i) {
-                        case 1:                                                                                                               
-                            parameterNamesList.append( str.arg("     ").arg("dd/s") );
-                            correctionUnitList.append("dd");
-                     
-                            break;
-                                                                                                                                          case 2:
-                            
-                            parameterNamesList.append( str.arg("     ").arg("dd/s^2") );                            
-                            correctionUnitList.append("dd/s^2");
-                                                                                       
-                            break;
-                            
-                                                                                                                                          case 3:
-                                                                                                                                          
-                            parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
-                            
-                            correctionUnitList.append("dd/s^3");
-                            
-                            break;
-                           
-                                                                                                                                          default:
-                                                                                                                                          
-                            parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
-                            
-                            correctionUnitList.append("dd/s^"+toString(i));                            
-                    }                    
-                }                
-          }
-
-
-          
-          for (int i = 0; i < nPointingCoefficients; i++) {
-          
-              finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-              
-              if (i == 0) {
-              
-                  parameterNamesList.append( str.arg("DEC  ").arg("dd") );
-                  
-               
-                  correctionUnitList.append("dd");                                                                            }
-
-              else {
-                  
-                  switch(i) {
-
-                    
-                      case 1:
-
-                          parameterNamesList.append( str.arg("     ").arg("dd/s") );
-                          
-                          correctionUnitList.append("dd/s");
-                        
-                          break;
-                          
-                      case 2:
-                      
-                          parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
-                          
-                          correctionUnitList.append("dd/s^2");
-                          
-                          break;
-                          
-                      case 3:
-                      
-                          parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
-                          
-                          correctionUnitList.append("dd/s^3");
-                          
-                          break;
-                          
-                      default:
-
-                          parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );                          
-
-                          correctionUnitList.append("dd/s^"+toString(i) );                                                                                                                                                                         }                                            
-              }              
-          }
-          
-          for (int i = 0; i < nPointingCoefficients; i++) {
-          
-              finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-              
-              if (i == 0) {
-              
-                  parameterNamesList.append( str.arg("TWI  ").arg("dd") );
-                  
-                  correctionUnitList.append("dd");
-                  
-              }            
-              
-              else {
-              
-                  switch(i) {
-                  
-                      case 1:
-                      
-                          parameterNamesList.append( str.arg("     ").arg("dd/s") );
-                          
-                          correctionUnitList.append("dd/s");
-                          
-                          break;
-                          
-                      case 2:
-                      
-                          parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
-                          
-                          correctionUnitList.append("dd/s^2");
-                          
-                          break;
-                          
-                      case 3:
-                      
-                          parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
-                          
-                          correctionUnitList.append("dd/s^3");
-                          
-                          break;
-                          
-                      default:
-                      
-                          parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
-                          
-                          correctionUnitList.append("dd/s^"+toString(i) );
-                  }
-                  
+        if (nPositionCoefficients > 0) {
+          for (int i = 0; i < nPositionCoefficients; i++) {
+            finalParameterValues.push_back(coefX[i]);
+            if (i == 0) {
+              parameterNamesList.append( str.arg("  X  ").arg("km") );
+              correctionUnitList.append("m");
+            }
+            else {
+              switch(i) {
+              case 1:
+                parameterNamesList.append( str.arg("     ").arg("km/s") );
+                correctionUnitList.append("m/s");
+                break;
+              case 2:
+                parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+                correctionUnitList.append("m/s^2");
+                break;
+              case 3:
+                parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+                correctionUnitList.append("m/s^3");
+                break;
+              default:
+                  parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+                  correctionUnitList.append("m/s^"+toString(i));
               }
-              
+            }
           }
-          
-       }
+          for (int i = 0; i < nPositionCoefficients; i++) {
+            finalParameterValues.push_back(coefY[i]);
+            if (i == 0) {
+              parameterNamesList.append( str.arg("  Y  ").arg("km") );
+              correctionUnitList.append("m");
 
+            }
+            else {
 
-         // Save the list of parameter names we've accumulated above
-              m_parameterNamesList = parameterNamesList;
-         
-              QString finalqStr = "";
-              QString qStr = "";
-         
-         //Set up default values when we are using default position
-             QString sigma = "N/A";
-             QString adjustedSigma = "N/A";
-             double correction = 0.0;
+              switch(i) {
 
-             for (int i = 0; i < nPositionParameters; i++) {
-                 if (!useDefaultPosition) {
-                     correction = m_corrections(i);                                        
-                     adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-                     sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
-                 }//end if
-
-                 if (errorPropagation) {
-                          
-                       //fpOut 
-
-                 }//end if
-
-                 else {
-                  
-                     //fpOut
-
-                 }//end else
-
-                }//end for
-
-              int offset = 0;
-
-              if (useDefaultPosition) {              
-                  offset = 3;
+              case 1:
+                parameterNamesList.append( str.arg("     ").arg("km/s") );
+                correctionUnitList.append("m/s");
+                break;
+              case 2:
+                parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+                correctionUnitList.append("m/s^2");
+                break;
+              case 3:
+                parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+                correctionUnitList.append("m/s^3");
+                break;
+              default:
+                  parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+                  correctionUnitList.append("m/s^"+toString(i));
               }
 
-              for (int i = nPositionParameters; i < nParameters; i++) {
-                          if (!useDefaultPointing) {
-                              if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {                                              correction = 0.0;                                  
-                                  adjustedSigma = "N/A";                                                                                         sigma = "N/A";                                                                                             }
-                         
-                              else {                          
-                             
-                             correction = m_corrections(i - offset);                             
-                             adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-                             sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" : toString(m_aprioriSigmas[i-offset], 8) );
-                             
-                         }  
-                         
-                      }//end if
-                      else {
-                         
-                          correction = m_corrections(i - offset);                         
-                          adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);                                 sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" : toString(m_aprioriSigmas[i-offset], 8) );
-                          
-                      }//end else
+            }
 
+          }
+          for (int i = 0; i < nPositionCoefficients; i++) {
+            finalParameterValues.push_back(coefZ[i]);
+            if (i == 0) {
+              parameterNamesList.append( str.arg("  Z  ").arg("km") );
+              correctionUnitList.append("m");
+            }
+            else {
+
+              switch(i) {
+
+              case 1:
+                parameterNamesList.append( str.arg("     ").arg("km/s") );
+                correctionUnitList.append("m/s");
+                break;
+              case 2:
+                parameterNamesList.append( str.arg("     ").arg("km/s^2") );
+                correctionUnitList.append("m/s^2");
+                break;
+              case 3:
+                parameterNamesList.append( str.arg("     ").arg("km/s^3") );
+                correctionUnitList.append("m/s^3");
+                break;
+              default:
+                  parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(i) ) );
+                  correctionUnitList.append("m/s^"+toString(i));
               }
 
-                     else {
-                            correction = 0.0;
-                            adjustedSigma = "N/A";
-                            sigma = "N/A";
-                          }
+            }
 
-                     if (errorPropagation) {
+          }
+        }
+        if (nPointingCoefficients > 0) {
+          for (int i = 0; i < nPointingCoefficients; i++) {
+            finalParameterValues.push_back(coefRA[i] * RAD2DEG);
+            if (i == 0) {
+              parameterNamesList.append( str.arg(" RA  ").arg("dd") );
+              correctionUnitList.append("dd");
+            }
+            else {
+              switch(i) {
 
-                        //fpOut
-                           
-                     }
+              case 1:
+                parameterNamesList.append( str.arg("     ").arg("dd/s") );
+                correctionUnitList.append("dd");
+                break;
+              case 2:
+                parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+                correctionUnitList.append("dd/s^2");
+                break;
+              case 3:
+                parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+                correctionUnitList.append("dd/s^3");
+                break;
+              default:
+                  parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+                  correctionUnitList.append("dd/s^"+toString(i));
+
+              }
+            }
+          }
+          for (int i = 0; i < nPointingCoefficients; i++) {
+            finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
+            if (i == 0) {
+              parameterNamesList.append( str.arg("DEC  ").arg("dd") );
+              correctionUnitList.append("dd");
+
+            }
+            else {
+
+              switch(i) {
+
+              case 1:
+                parameterNamesList.append( str.arg("     ").arg("dd/s") );
+                correctionUnitList.append("dd/s");
+                break;
+              case 2:
+                parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+                correctionUnitList.append("dd/s^2");
+                break;
+              case 3:
+                parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+                correctionUnitList.append("dd/s^3");
+                break;
+              default:
+                  parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+                  correctionUnitList.append("dd/s^"+toString(i) );
+
+              }
+            }
+          }
+          for (int i = 0; i < nPointingCoefficients; i++) {
+            finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+            if (i == 0) {
+              parameterNamesList.append( str.arg("TWI  ").arg("dd") );
+              correctionUnitList.append("dd");
+              }
+            else {
+              switch(i) {
+              case 1:
+                parameterNamesList.append( str.arg("     ").arg("dd/s") );
+                correctionUnitList.append("dd/s");
+                break;
+              case 2:
+                parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
+                correctionUnitList.append("dd/s^2");
+                break;
+              case 3:
+                parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
+                correctionUnitList.append("dd/s^3");
+                break;
+              default:
+                  parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(i) ) );
+                  correctionUnitList.append("dd/s^"+toString(i) );
+
+              }
+            }
+          }
+        }
+
+      }// end if(!imageCSV)
+  #if 0
+      else {
+        if (nPositionCoefficients > 0) {
+          for (int i = 0; i < nPositionCoefficients; i++) {
+            finalParameterValues.push_back(coefX[i]);
+          }
+          for (int i = 0; i < nPositionCoefficients; i++) {
+            finalParameterValues.push_back(coefY[i]);
+          }
+          for (int i = 0; i < nPositionCoefficients; i++) {
+            finalParameterValues.push_back(coefZ[i]);
+          }
+        }
+        if (nPointingCoefficients > 0) {
+          for (int i = 0; i < nPointingCoefficients; i++) {
+            finalParameterValues.push_back(coefRA[i] * RAD2DEG);
+          }
+          for (int i = 0; i < nPointingCoefficients; i++) {
+            finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
+          }
+          for (int i = 0; i < nPointingCoefficients; i++) {
+            finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+          }
+        }
+      }//end else
+  #endif
+      // Save the list of parameter names we've accumulated above
+      m_parameterNamesList = parameterNamesList;
+
+      QString finalqStr = "";
+      QString qStr = "";
+
+      // Set up default values when we are using default position
+      QString sigma = "N/A";
+      QString adjustedSigma = "N/A";
+      double correction = 0.0;
+
+      // this implies we're writing to bundleout.txt
+
+        // position parameters
+        for (int i = 0; i < nPositionParameters; i++) {
+          // If not using the default position, we can correctly access sigmas and corrections
+          // members
+          if (!useDefaultPosition) {
+            correction = m_corrections(i);
+            adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+            sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+          }
+          if (errorPropagation) {
+            #if 0
+            qStr = QString("%1%2  %3%4       %5%6%7\n").
+            arg( parameterNamesList.at(i),15 ).
+            arg(finalParameterValues[i] - correction, 15, 'f', 2).
+            arg(correction, 15, 'f', 8).
+            arg(finalParameterValues[i], 15, 'f', 2).
+            arg(sigma,10).
+            arg(adjustedSigma, 10).
+            arg(correctionUnitList.at(i), 10 );
+            #endif
+
+          }
+          else {
+            #if 0
+            qStr = QString("%1%2  %3%4       %5%6%7\n").
+            arg( parameterNamesList.at(i),15 ).
+            arg(finalParameterValues[i] - correction, 15, 'f', 2).
+            arg(correction, 15, 'f', 8).
+            arg(finalParameterValues[i], 15, 'f', 2).
+            arg(sigma, 10).
+            arg("N/A", 10).
+            arg(correctionUnitList.at(i),10 );
+            #endif
+
+          }
+
+        }
+
+        // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
+        // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
+        // according to which parameters are solved
+        int offset = 0;
+        if (useDefaultPosition) {
+          offset = 3;
+        }
+        // pointing parameters
+        for (int i = nPositionParameters; i < nParameters; i++) {
+          if (!useDefaultPointing) {
+            // If solving camera and not solving for twist, provide default values for twist to
+            // prevent bad indexing into m_corrections and m_*sigmas
+            // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
+            if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+              correction = 0.0;
+              adjustedSigma = "N/A";
+              sigma = "N/A";
+            }
+            else {
+              correction = m_corrections(i - offset);
+              adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+              sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
+                      toString(m_aprioriSigmas[i-offset], 8) );
+            }
+          }
+          // We are using default pointing, so provide default correction and sigma values to output
+          else {
+            correction = 0.0;
+            adjustedSigma = "N/A";
+            sigma = "N/A";
+          }
+          if (errorPropagation) {
+
+            #if 0
+            qStr = QString("%1%2  %3%4       %5%6%7\n").
+            arg( parameterNamesList.at(i),-15 ).
+            arg( (finalParameterValues[i] - correction * RAD2DEG), 15, 'f', 2).
+            arg(correction * RAD2DEG, 15, 'f', 8).
+            arg(finalParameterValues[i], 15, 'f', 8).
+            arg(sigma, 10).
+            arg(adjustedSigma, 10).
+            arg( correctionUnitList.at(i),10 );
+            #endif
+
+          }
+          else {
+
+            #if 0
+            qStr = QString("%1%2  %3%4       %5%6%7\n").
+            arg( parameterNamesList.at(i),-15 ).
+            arg( (finalParameterValues[i] - correction * RAD2DEG), 15, 'f', 2).
+            arg(correction * RAD2DEG, 15, 'f', 8).
+            arg(finalParameterValues[i], 15, 'f', 8).
+            arg(sigma, 10).
+            arg("N/A", 10).
+            arg( correctionUnitList.at(i),10 );
+            #endif
+          }
+
+        }
 
 
-                     else{
+      // this implies we're writing to images.csv
+#if 0
+      else {
+        // position parameters
+        for (int i = 0; i < nPositionParameters; i++) {
+          if (!useDefaultPosition) {
+            correction = m_corrections(i);
+            adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+            sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+          }
+          // Provide default values for position if not solving position
+          else {
+            correction = 0.0;
+            adjustedSigma = "N/A";
+            sigma = "N/A";
+          }
+          qStr = "";
+          if (errorPropagation) {
+            qStr += toString(finalParameterValues[i] - correction) + ",";
+            qStr += toString(correction) + ",";
+            qStr += toString(finalParameterValues[i]) + ",";
+            qStr += sigma + ",";
+            qStr += adjustedSigma + ",";
+          }
+          else {
+            qStr += toString(finalParameterValues[i] - correction) + ",";
+            qStr += toString(correction) + ",";
+            qStr += toString(finalParameterValues[i]) + ",";
+            qStr += sigma + ",";
+            qStr += "N/A,";
+          }
+          finalqStr += qStr;
+        }
 
-                      //fpOut
+        // If not solving position, we need to offset access to correction and sigma members by -3
+        // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
+        // solved
+        int offset = 0;
+        if (useDefaultPosition) {
+          offset = 3;
+        }
+        // pointing parameters
+        for (int i = nPositionParameters; i < nParameters; i++) {
+          if (!useDefaultPointing) {
+            // Use default values if solving camera but not solving for TWIST to prevent bad indexing
+            // into m_corrections and m_*sigmas
+            if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+              correction = 0.0;
+              adjustedSigma = "N/A";
+              sigma = "N/A";
+            }
+            else {
+              correction = m_corrections(i - offset);
+              adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+              sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
+                  toString(m_aprioriSigmas[i-offset], 8) );
+            }
+          }
+          // Provide default values for pointing if not solving pointing
+          else {
+            correction = 0.0;
+            adjustedSigma = "N/A";
+            sigma = "N/A";
+          }
+          qStr = "";
+          if (errorPropagation) {
+            qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+            qStr += toString(correction * RAD2DEG) + ",";
+            qStr += toString(finalParameterValues[i]) + ",";
+            qStr += sigma + ",";
+            qStr += adjustedSigma + ",";
+          }
+          else {
+            qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+            qStr += toString(correction * RAD2DEG) + ",";
+            qStr += toString(finalParameterValues[i]) + ",";
+            qStr += sigma + ",";
+            qStr += "N/A,";
+          }
+          finalqStr += qStr;
+        }
+      }
+#endif
 
-                     }
-               
 
-                }
-
-               
- 
 
   }
 
