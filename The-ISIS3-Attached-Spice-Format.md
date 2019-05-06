@@ -132,4 +132,4 @@ TBD
 
 # The SunPosition Table
 
-The SunPosition Table contains the position of the Sun relative to the target body in the J2000 reference frame. The SunPosition Table has the same format as the [the InstrumentPosition Table](#The-InstrumentPosition-Table) except it always has a [linear cache](#Linear).
+The SunPosition Table contains the position of the Sun relative to the target body in the J2000 reference frame. The SunPosition Table has the same format as the [the InstrumentPosition Table](#The-InstrumentPosition-Table) except it always has a [linear cache](#Linear). The Position is in kilometers and the Velocity is in kilometers per second.
