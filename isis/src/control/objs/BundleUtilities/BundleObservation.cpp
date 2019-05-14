@@ -784,10 +784,18 @@ namespace Isis {
 
 
 
+  /**
+   * @brief Takes in an open std::ofstream and writes out information which goes into the
+   * bundleout.txt file.
+   * @param fpOut The open std::ofstream object which is passed in from
+   * BundleSolutionInfo::outputText()
+   * @param errorPropagation Boolean indicating whether or not to attach more information
+   *     (corrections, sigmas, adjusted sigmas...) to the output.
+   */
 
-  void BundleObservation::bundleOutput(std::ofstream &fpOut,bool errorPropagation, bool imageCCSV) {
+  void BundleObservation::bundleOutput(std::ofstream &fpOut, bool errorPropagation) {
 
-      char buf[1056];
+      char buf[105600];
 
       std::vector<double> coefX;
       std::vector<double> coefY;
@@ -861,8 +869,6 @@ namespace Isis {
       std::vector<double> finalParameterValues;
       QStringList parameterNamesList;
       QStringList correctionUnitList;
-
-      if (!imageCSV) {
 
         QString str("%1(%2)  ");
 
@@ -1043,33 +1049,8 @@ namespace Isis {
           }
         }
 
-      }// end if(!imageCSV)
-  #if 0
-      else {
-        if (nPositionCoefficients > 0) {
-          for (int i = 0; i < nPositionCoefficients; i++) {
-            finalParameterValues.push_back(coefX[i]);
-          }
-          for (int i = 0; i < nPositionCoefficients; i++) {
-            finalParameterValues.push_back(coefY[i]);
-          }
-          for (int i = 0; i < nPositionCoefficients; i++) {
-            finalParameterValues.push_back(coefZ[i]);
-          }
-        }
-        if (nPointingCoefficients > 0) {
-          for (int i = 0; i < nPointingCoefficients; i++) {
-            finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-          }
-          for (int i = 0; i < nPointingCoefficients; i++) {
-            finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-          }
-          for (int i = 0; i < nPointingCoefficients; i++) {
-            finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-          }
-        }
-      }//end else
-  #endif
+
+
       // Save the list of parameter names we've accumulated above
       m_parameterNamesList = parameterNamesList;
 
@@ -1093,29 +1074,52 @@ namespace Isis {
             sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
           }
           if (errorPropagation) {
-            #if 0
-            qStr = QString("%1%2  %3%4       %5%6%7\n").
-            arg( parameterNamesList.at(i),15 ).
-            arg(finalParameterValues[i] - correction, 15, 'f', 2).
-            arg(correction, 15, 'f', 8).
-            arg(finalParameterValues[i], 15, 'f', 2).
-            arg(sigma,10).
-            arg(adjustedSigma, 10).
-            arg(correctionUnitList.at(i), 10 );
-            #endif
+
+            sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
+            fpOut << buf;
+            sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
+            fpOut << buf;
+            sprintf(buf,"%15.2lf    ",correction);
+            fpOut << buf;
+            sprintf(buf,"%15.2lf",finalParameterValues[i]);
+            fpOut << buf;
+            sprintf(buf,"             ");
+            fpOut << buf;
+            sprintf(buf,"%*s",7,sigma.toStdString().c_str());
+            fpOut << buf;
+            sprintf(buf,"           ");
+            fpOut << buf;
+            sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+            fpOut<<buf;
+            sprintf(buf,"     ");
+            fpOut<<buf;           
+            sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
+            fpOut<<buf;
+
 
           }
           else {
-            #if 0
-            qStr = QString("%1%2  %3%4       %5%6%7\n").
-            arg( parameterNamesList.at(i),15 ).
-            arg(finalParameterValues[i] - correction, 15, 'f', 2).
-            arg(correction, 15, 'f', 8).
-            arg(finalParameterValues[i], 15, 'f', 2).
-            arg(sigma, 10).
-            arg("N/A", 10).
-            arg(correctionUnitList.at(i),10 );
-            #endif
+
+            sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
+            fpOut << buf;
+            sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
+            fpOut << buf;
+            sprintf(buf,"%15.2lf             ",correction);
+            fpOut << buf;
+            sprintf(buf,"%15.2lf",finalParameterValues[i]);
+            fpOut << buf;
+            sprintf(buf,"             ");
+            fpOut << buf;
+            sprintf(buf,"%*s",7,sigma.toStdString().c_str());
+            fpOut << buf;
+            sprintf(buf,"            ");
+            fpOut << buf;
+            sprintf(buf,"                       %s","N/A");
+            fpOut<<buf;
+            sprintf(buf,"           ");
+            fpOut<<buf;
+            sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
+            fpOut<<buf;
 
           }
 
@@ -1153,121 +1157,56 @@ namespace Isis {
             sigma = "N/A";
           }
           if (errorPropagation) {
-
-            #if 0
-            qStr = QString("%1%2  %3%4       %5%6%7\n").
-            arg( parameterNamesList.at(i),-15 ).
-            arg( (finalParameterValues[i] - correction * RAD2DEG), 15, 'f', 2).
-            arg(correction * RAD2DEG, 15, 'f', 8).
-            arg(finalParameterValues[i], 15, 'f', 8).
-            arg(sigma, 10).
-            arg(adjustedSigma, 10).
-            arg( correctionUnitList.at(i),10 );
-            #endif
+            sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
+            fpOut << buf;
+            sprintf(buf,"%15.2f",finalParameterValues[i] - correction*RAD2DEG);
+            fpOut << buf;
+            sprintf(buf,"%15.2lf    ",correction*RAD2DEG);
+            fpOut << buf;
+            sprintf(buf,"%15.2lf",finalParameterValues[i]);
+            fpOut << buf;
+            sprintf(buf,"                 ");
+            fpOut << buf;            
+            sprintf(buf,"%s",sigma.toStdString().c_str() );
+            fpOut << buf;
+            sprintf(buf,"           ");
+            fpOut << buf;
+            sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+            fpOut<<buf;
+            sprintf(buf,"     ");
+            fpOut<<buf;
+            sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
+            fpOut<<buf;
 
           }
           else {
 
-            #if 0
-            qStr = QString("%1%2  %3%4       %5%6%7\n").
-            arg( parameterNamesList.at(i),-15 ).
-            arg( (finalParameterValues[i] - correction * RAD2DEG), 15, 'f', 2).
-            arg(correction * RAD2DEG, 15, 'f', 8).
-            arg(finalParameterValues[i], 15, 'f', 8).
-            arg(sigma, 10).
-            arg("N/A", 10).
-            arg( correctionUnitList.at(i),10 );
-            #endif
+
+            sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
+            fpOut << buf;
+            sprintf(buf,"%15.2f ",finalParameterValues[i] - correction*RAD2DEG);
+            fpOut << buf;
+            sprintf(buf,"%+12.2lf            ",correction*RAD2DEG);
+            fpOut << buf;
+            sprintf(buf,"%+12.2lf",finalParameterValues[i]);
+            fpOut << buf;
+            sprintf(buf,"               ");
+            fpOut << buf;
+            //sprintf(buf,"%*s",7,sigma.toStdString().c_str());
+            sprintf(buf,"%s",sigma.toStdString().c_str() );
+            fpOut << buf;
+            //sprintf(buf,"  ");
+            //fpOut << buf;
+            sprintf(buf,"              %s","N/A");
+            fpOut<<buf;
+            sprintf(buf,"     ");
+            fpOut<<buf;
+            sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
+            fpOut<<buf;
+
           }
 
         }
-
-
-      // this implies we're writing to images.csv
-#if 0
-      else {
-        // position parameters
-        for (int i = 0; i < nPositionParameters; i++) {
-          if (!useDefaultPosition) {
-            correction = m_corrections(i);
-            adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-            sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
-          }
-          // Provide default values for position if not solving position
-          else {
-            correction = 0.0;
-            adjustedSigma = "N/A";
-            sigma = "N/A";
-          }
-          qStr = "";
-          if (errorPropagation) {
-            qStr += toString(finalParameterValues[i] - correction) + ",";
-            qStr += toString(correction) + ",";
-            qStr += toString(finalParameterValues[i]) + ",";
-            qStr += sigma + ",";
-            qStr += adjustedSigma + ",";
-          }
-          else {
-            qStr += toString(finalParameterValues[i] - correction) + ",";
-            qStr += toString(correction) + ",";
-            qStr += toString(finalParameterValues[i]) + ",";
-            qStr += sigma + ",";
-            qStr += "N/A,";
-          }
-          finalqStr += qStr;
-        }
-
-        // If not solving position, we need to offset access to correction and sigma members by -3
-        // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
-        // solved
-        int offset = 0;
-        if (useDefaultPosition) {
-          offset = 3;
-        }
-        // pointing parameters
-        for (int i = nPositionParameters; i < nParameters; i++) {
-          if (!useDefaultPointing) {
-            // Use default values if solving camera but not solving for TWIST to prevent bad indexing
-            // into m_corrections and m_*sigmas
-            if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
-              correction = 0.0;
-              adjustedSigma = "N/A";
-              sigma = "N/A";
-            }
-            else {
-              correction = m_corrections(i - offset);
-              adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-              sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
-                  toString(m_aprioriSigmas[i-offset], 8) );
-            }
-          }
-          // Provide default values for pointing if not solving pointing
-          else {
-            correction = 0.0;
-            adjustedSigma = "N/A";
-            sigma = "N/A";
-          }
-          qStr = "";
-          if (errorPropagation) {
-            qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
-            qStr += toString(correction * RAD2DEG) + ",";
-            qStr += toString(finalParameterValues[i]) + ",";
-            qStr += sigma + ",";
-            qStr += adjustedSigma + ",";
-          }
-          else {
-            qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
-            qStr += toString(correction * RAD2DEG) + ",";
-            qStr += toString(finalParameterValues[i]) + ",";
-            qStr += sigma + ",";
-            qStr += "N/A,";
-          }
-          finalqStr += qStr;
-        }
-      }
-#endif
-
-
 
   }
 
@@ -1288,6 +1227,7 @@ namespace Isis {
    *                           not being solved. Fixes #4464.
    */
   QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
+
 
     std::vector<double> coefX;
     std::vector<double> coefY;

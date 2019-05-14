@@ -155,6 +155,11 @@ namespace Isis {
    *                           References #4649 and #501.
    *   @history 2018-09-18 Debbie A. Cook - Removed radiansToMeters argument.   References
    *                           #4649 and #501
+   *   @history 2019-05-14 Tyler Wilson - Replaced call to
+   *                           BundleObservation::formatBundeOutputString(...) in outputText()
+   *                           file to a new function:  BundleObservation::bundleOutput
+   *                           which takes as an argument the std::ostream.
+   *
    */
   class BundleSolutionInfo : public QObject {
     Q_OBJECT

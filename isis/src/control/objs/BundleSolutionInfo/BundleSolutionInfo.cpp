@@ -550,18 +550,18 @@ namespace Isis {
     sprintf(buf, "\n                       Network Filename: %s",
                   m_inputControlNetFileName->expanded().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n                       Output Network Filename: %s",
-                              outputControlNetFileName().toStdString().c_str() );
-    fpOut << buf;
-    sprintf(buf,"\n                       Output File Prefix: %s",
-                m_settings->outputFilePrefix().toStdString().c_str() );
-    fpOut <<buf;
 
     sprintf(buf,"\n                       Cube List: %s",
                 m_settings->cubeList().toStdString().c_str() );
 
     fpOut << buf;
 
+    sprintf(buf, "\n                       Output Network Filename: %s",
+                              outputControlNetFileName().toStdString().c_str() );
+    fpOut << buf;
+    sprintf(buf,"\n                       Output File Prefix: %s",
+                m_settings->outputFilePrefix().toStdString().c_str() );
+    fpOut <<buf;   
 
     sprintf(buf, "\n                       Network Id: %s",
                   m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
@@ -1105,9 +1105,9 @@ namespace Isis {
 
      sprintf(buf,"%*s",firstColumnWidth,"\nTotal RMS:");
      fpOut << buf;
-     sprintf(buf,"                        ");
+     sprintf(buf,"                                             ");
      fpOut << buf;
-     sprintf(buf,"     %-6.3lf         %-6.3lf         %-6.3lf \n",
+     sprintf(buf,"     %-6.3lf        %-6.3lf          %-6.3lf \n",
      rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
      fpOut << buf;
      
@@ -1190,8 +1190,12 @@ namespace Isis {
         fpOut << buf;
 
 
+
         QString observationString =
             observation->formatBundleOutputString(errorProp,true);
+
+
+        //observation->bundleOutput(fpOut,errorProp,true);
 
         //Removes trailing commas
         if (observationString.right(1)==",") {
@@ -1199,6 +1203,7 @@ namespace Isis {
         }
 
         fpOut << (const char*) observationString.toLatin1().data();
+
         sprintf(buf,"\n");
         fpOut << buf;
         imgIndex++;
@@ -1254,6 +1259,8 @@ namespace Isis {
 
       QString targetString =
           m_settings->bundleTargetBody()->formatBundleOutputString(berrorProp);
+
+
       fpOut << (const char*)targetString.toLatin1().data();
     }
 
@@ -1283,17 +1290,13 @@ namespace Isis {
         fpOut << buf;
         sprintf(buf,"\n    Image         Initial            Total               "
                 "Final                            Accuracy                   \n"
-                "                                                                 "
-                "            ***************************************\n"
-                "Parameter         Value              Correction          "
-                 "Value               Initial           Final           Units\n");
+                "Parameter         Value              Correction          Value               Initial           Final           Units\n"
 
+                "                                                                             ***************************************\n");
 
         fpOut << buf;
 
-        QString observationString =
-            observation->formatBundleOutputString(berrorProp);
-        fpOut << (const char*)observationString.toLatin1().data();
+        observation->bundleOutput(fpOut,berrorProp);
         // Build list of images and parameters for correlation matrix.
         foreach ( QString image, observation->imageNames() ) {
           imagesAndParameters.insert( image, observation->parameterList() );

@@ -77,6 +77,14 @@ namespace Isis {
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
    *                            parameters when writing images.csv. 
+   *   @history 2019-05-14 Tyler Wilson  Added the bundleOutput(std::ofstream &fpOut,
+   *                            bool errorPropagation) function which is called by
+   *                            BundleSolutionInfo::outputText(). This function is a refactor of
+   *                            the formatBundleOutputString and uses the traditional C function
+   *                            sprintf instead of QString arg chaining because it's easier to
+   *                            make the output columns to align nicely.  Also, it maintains
+   *                            consistency with text output in BundleSolutionInfo.
+   *
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
@@ -132,7 +140,7 @@ namespace Isis {
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
       void updateBodyRotation();
-      void bundleOutput(std::ofstream &fpOut,bool errorPropagation, bool imageCSV=false); 
+      void bundleOutput(std::ofstream &fpOut,bool errorPropagation);
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();
