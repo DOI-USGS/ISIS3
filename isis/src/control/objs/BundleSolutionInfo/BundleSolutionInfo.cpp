@@ -10,6 +10,7 @@
 #include <QXmlStreamWriter>
 
 #include "BundleResults.h"
+#include "Control.h"
 #include "ControlList.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -281,10 +282,18 @@ namespace Isis {
    *
    * @return @b QString The name of the output control network.
    */
-  void BundleSolutionInfo::setOutputControl(Control *outputControl) {
+  void BundleSolutionInfo::setOutputControl(Control * outputControl) {
     m_outputControl = outputControl;
   }
+    
+  void BundleSolutionInfo::setOutputControlName(QString name) {
 
+            m_outputControlName = name;
+  }
+  QString BundleSolutionInfo::outputControlName() const {
+
+      return m_outputControlName;
+  }
 
   /**
    * Returns bundle output Control object.
@@ -557,7 +566,7 @@ namespace Isis {
     fpOut << buf;
 
     sprintf(buf, "\n                       Output Network Filename: %s",
-                              outputControlNetFileName().toStdString().c_str() );
+                              outputControlName().toStdString().c_str() );
     fpOut << buf;
     sprintf(buf,"\n                       Output File Prefix: %s",
                 m_settings->outputFilePrefix().toStdString().c_str() );

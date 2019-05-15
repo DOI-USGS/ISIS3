@@ -83,8 +83,9 @@ void IsisMain() {
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
     BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();
-    Control *outputControlNet = new Control(ui.GetFileName("ONET"));
-    bundleSolution->setOutputControl( outputControlNet);
+    //Control *outputControlNet = new Control(ui.GetFileName("ONET").expanded() );
+    //bundleSolutionInfo->setOutputControl(outputControlNet);
+    bundleSolution->setOutputControlName( FileName(ui.GetFileName("ONET")).expanded() );
     cout << "\nGenerating report files\n" << endl;
 
     // write output files

@@ -183,7 +183,8 @@ namespace Isis {
 
       void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
-      void setOutputControl(Control *outputControl);
+      void setOutputControl(Control * outputControl);
+      void setOutputControlName(QString name);
       void setRunTime(QString runTime);
       void setName(QString name);
 
@@ -192,6 +193,7 @@ namespace Isis {
       QString inputControlNetFileName() const;
       QString outputControlNetFileName() const;
       Control *control() const;
+      QString outputControlName() const;
       BundleSettingsQsp bundleSettings();
       BundleResults bundleResults();
       QList<ImageList *> imageList();
@@ -255,7 +257,8 @@ namespace Isis {
       QString             m_name;                        //!< Name of the bundle. Defaults to the id
       QString             m_runTime;                     //!< Run time of the bundle adjustment
       FileName           *m_inputControlNetFileName;     //!< Input control network file name
-      Control            *m_outputControl;               //!< Output control
+      Control *           m_outputControl;               //!< Output control name
+      QString             m_outputControlName;
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results
       QList<ImageList *> *m_images;                      //!< Input image list
