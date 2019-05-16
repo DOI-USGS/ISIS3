@@ -23,7 +23,20 @@
 #include "LineScanCamera.h"
 
 namespace Isis {
-
+  /**
+   * This is the camera model for the Kaguya Terrain Cameras TC1 and TC2 
+   *
+   * @internal
+   *   @history 2018-10-01 Adam Goins and Jeannie Backer - Original Version
+   *  
+   *   @history 2019-04-26 Stuart Sides and Kristin Berry - Updates to Kaguya TC camera model
+   *                        including updating to use LineScanCamera detector and ground maps, adding
+   *                        detector offsets for swath modes, setting the focal plane map center to
+   *                        the center of the detector, regardless of swath mode, and using the
+   *                        spacecraft clock start count, rather than the StartTime for image timing.
+   *                        See Git issue #3215 for more information.
+   *                             
+   */
   class KaguyaTcCamera : public LineScanCamera {
     public:
       KaguyaTcCamera(Cube &cube);
