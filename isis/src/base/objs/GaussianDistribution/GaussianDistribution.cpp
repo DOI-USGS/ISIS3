@@ -38,18 +38,6 @@ namespace Isis {
     p_stdev = standardDeviation;
   }
 
-  /**
-   * Computes and returns the probability of the specified value
-   * on the gaussian distribution.
-   *
-   * @param value The input value
-   *
-   * @returns The PDF evaluated at the specified value
-   */
-  double GaussianDistribution::Probability(const double value) {
-    // P(x) = 1/(sqrt(2*pi)*sigma)*e^(-1/2*((x-mu)/sigma)^2)
-    return std::exp(-0.5 * std::pow((value - p_mean) / p_stdev, 2)) / (std::sqrt(2 * PI) * p_stdev);
-  }
 
   /**
    * Computes and returns the cumulative distribution up to the
