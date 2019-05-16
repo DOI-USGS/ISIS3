@@ -23,7 +23,6 @@
 #include <QString>
 
 #include "LineScanCameraDetectorMap.h"
-#include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
@@ -84,10 +83,9 @@ namespace Isis {
     
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    // This is the same, no matter the swath mode
-
-    // This set the origin of the detector (not image samp,line). It is zero bassed.
+    // This sets the origin of the detector (not image samp,line). It is zero bassed.
     // The detector offsets are 0,0 because the borsight is in the center of the array
+    // The origin of the detector does not depend on swath mode. 
     QString key;
     key = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(key);
@@ -98,7 +96,6 @@ namespace Isis {
 
     // Setup distortion map
     new KaguyaTcCameraDistortionMap(this, naifIkCode());
-//    new CameraDistortionMap(this);
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
