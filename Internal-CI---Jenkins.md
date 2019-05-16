@@ -23,6 +23,8 @@ The build containers are all stored on GitHub in the [jenkins](https://github.co
 ### Updating containers
 When a container should be updated, we can simply push/merge the change to the [jenkins](https://github.com/USGS-Astrogeology/jenkins) repository. A web hook has already been set up to have the pushed changes built on [Docker Hub](https://cloud.docker.com/u/usgsastro/repository/list). The CI will pull the newest version of the container that is available on Docker Hub at the start of each build.
 
+As of 5.16.19: The jenkins repository has been restructured so that each container is located within its own branch. This allows containers to be built individually only when _they_ are modified, rather than all containers being rebuilt when _any_ of them are modified.
+
 ### Data directories
 The containers all mount the standard path to the ISIS3 test data area. The `ISISROOT` is set to the current build directory inside of the checked out repo.
 
