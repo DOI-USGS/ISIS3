@@ -106,7 +106,7 @@ namespace Isis {
  *   @history 2016-10-05 Ian Humphrey & Makayla Shepherd - Changed headers to OpenCV2.
  *   @history 2019-05-16 Aaron Giroux & Eric Gault - Added a regular expression to
  *                           formatSpecifications method to allow for pathnames to be entered
- *                           using the @savepath parameter
+ *                           using the savepath parameter. Fixes 2474.
  */
 class FeatureAlgorithmFactory  {
   public:
