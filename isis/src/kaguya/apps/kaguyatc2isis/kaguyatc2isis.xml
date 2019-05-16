@@ -54,7 +54,7 @@
         </brief>
         <description>
           Use this parameter to select the Kaguya Terrain
-	  Camera filename. This file must contain the PDS 
+          Camera filename. This file must contain the PDS 
           labels.
         </description>
         <filter>
