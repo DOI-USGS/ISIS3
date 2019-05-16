@@ -1,4 +1,4 @@
-This document explains both the release process for Official Releases as well as Release Candidates.
+This document explains both the release process for Official Releases as well as Release Candidates. In addition, it describes the process for custom builds (for missions, for example).
 
 # Step-By-Step Instructions
 
@@ -71,16 +71,81 @@ If, however, this is a custom build and/or a Release Candidate, you will need to
 
 Remember to always ensure that custom builds include a label flag or the file will be uploaded by default with the "main" tag on Anaconda Cloud and users may receive a build not intended as a main release by default.
 
-## Step 4: Update Data Area on rsync Servers
+## Step 4: Update Data and TestData Areas on rsync Servers
 
-This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS.
+This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes.
 
-Should not be done for custom mission builds. If special data needed for their build, communicate a way of getting them access to the files they need.
+***Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc). Adding a `-n` flag to your rsync command can be useful to see what files would be copied over without actually copying them to ensure your command is correct.***
+
+The rsync command for the local and remote servers are:
+
+```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```
+
+and
+
+```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/```
+
+***This entire step will be outdated with the upcoming migration to GitLab for our external data storage and CI integration.***
 
 ## Step 5: Create Internal Builds/Installs for Astro
 
-This would include installing ISIS into a new conda environment and (possibly) creating builds in /usgs/pkgs/ (Though this may be deprecated...?).
+This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus. 
+
+The builds should be created for each of the prog machines (prog24, prog26, prog28 and prog29) and should be saved in /usgs/pkgs/. The process can be handled with the same script that the current nightly builds use. The script can be found at /usgs/cpkgs/isis3/isis3mgr_scripts and is entitled buildIsisCmakeAllSys. It is best to run this script from a screen session so as not to have it interrupted by any network issues. Run these commands as isis3mgr from one of the prog machines:
+
+```screen -RD```
+
+This starts your screen session. You can exit screen by holding <cntrl><A><D>, and return to the same screen session with the previous command. 
+
+```buildIsisCmakeAllSys -t <tag version> --no-test /usgs/pkgs/<isis version>```
+
+This command will run the script, building on all of the prog machines at once. The <tag version> value should be whatever Tag Version you set for the release on the GitHub repository, and the <isis version> value should be the version of ISIS you are building. (The <isis version> will generally be the same as your <tag version>.)
+
+Keep in mind that this script will build on prog24, so the build will be accessible via the astrovms as well.
+
+***While we are in the process of getting Astro caught-up with the process of using conda for our internal builds of ISIS, this building process still needs to be maintained until we officially make the official switch.***
+
+Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Not that this will need to be done once for Linux, and once for Debian.
+
+Ensure that you have the proper build of conda set-up. For Linux:
+
+```source /usgs/cpkgs/anaconda3_linux/etc/profile.d/conda.sh```
+
+For MacOS (Debian):
+
+```source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh```
+
+Then run the following commands:
+
+```
+   conda create -n <isis version> python=3.6
+
+   conda activate isis3
+
+   conda config --env --add channels conda-forge
+
+   conda config --env --add channels usgs-astrogeology
+
+   # For Public Releases
+   conda install -c usgs-astrogeology isis3
+
+   # For Release Candidates
+   conda install -c usgs-astrogeology/label/RC isis3
+
+   # For Custom Builds, simply use the same label that you used to upload to Anaconda
+   conda install -c usgs-astrogeology/label/<label> isis3
+
+   python $CONDA_PREFIX/scripts/isis3VarInit.py -d /usgs/cpkgs/isis3/data -t /usgs/cpkgs/isis3/testData
+```
+
+Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running a simple application of your choice.
+
+***Don't forget to go back and do the other OS!***
 
 ## Step 6: Communicate Availability of Build
 
-Both internally via email and externally via AstroDiscuss
+You will now need to communicate with both the internal as well as the external users about a new version being available. (Feel free to use past announcements as a template.)
+
+For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. It may be a good idea to encourage internal users to try to use conda to access the binaries/applications. 
+
+The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement. 
