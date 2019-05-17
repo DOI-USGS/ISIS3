@@ -1,45 +1,48 @@
+#ifndef trans2d3p_h
+#define trans2d3p_h
+
 #include "Cube.h"
 #include "Transform.h"
 #include <math.h>
 
-/**                                                                       
- * @file                                                                  
- * $Revision: 1.7 $                                                             
- * $Date: 2005/10/03 22:43:39 $                                                                 
- *                                                                        
- *   Unless noted otherwise, the portions of Isis written by the USGS are 
- *   public domain. See individual third-party library and package descriptions 
- *   for intellectual property information, user agreements, and related  
- *   information.                                                         
- *                                                                        
- *   Although Isis has been used by the USGS, no warranty, expressed or   
- *   implied, is made by the USGS as to the accuracy and functioning of such 
- *   software and related material nor shall the fact of distribution     
+/**
+ * @file
+ * $Revision: 1.7 $
+ * $Date: 2005/10/03 22:43:39 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.                                        
- *                                                                        
- *   For additional information, launch                                   
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.                                    
- */                                                                       
+ *   http://www.usgs.gov/privacy.html.
+ */
 
 
 using namespace Isis;
 
-/**                                                                       
+/**
  * @brief Brief coming soon
- *                                                                        
+ *
  * Description coming soon
- *                                                                        
+ *
  * @author 2011-09-19 Orrin Thomas
- *                                                                        
- * @internal                                                              
+ *
+ * @internal
  *   @history 2011-09-19 Orrin Thomas - Original version
- */        
+ */
 class Trans2d3p : public Transform {
-public: 
+public:
   Trans2d3p(double theta, double sampOffset, double lineOffset,int samples, int lines) {
     m_lines = lines;
     m_samples = samples;
@@ -74,3 +77,5 @@ private:
   int m_lines;
   int m_samples;
 };
+
+#endif

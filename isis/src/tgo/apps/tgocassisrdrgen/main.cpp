@@ -69,15 +69,15 @@ void IsisMain() {
   }
   else {
     // Get the observationId from the Archive Group, or the Mosaic group, if the input is a mosaic
-    QString observationId; 
+    QString observationId;
 
-    if(label->findObject("IsisCube").hasGroup("Archive")){
-      PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
-      observationId = archiveGroup.findKeyword("ObservationId")[0];
-    }
-    else if (label->findObject("IsisCube").hasGroup("Mosaic")) {
+    if (label->findObject("IsisCube").hasGroup("Mosaic")) {
       PvlGroup mosaicGroup = label->findObject("IsisCube").findGroup("Mosaic");
       observationId = mosaicGroup.findKeyword("ObservationId")[0];
+    }
+    else if(label->findObject("IsisCube").hasGroup("Archive")){
+      PvlGroup archiveGroup = label->findObject("IsisCube").findGroup("Archive");
+      observationId = archiveGroup.findKeyword("ObservationId")[0];
     }
     productId.setValue(observationId);
   }
@@ -86,10 +86,20 @@ void IsisMain() {
   logicalId += productId[0];
   process.setLogicalId(logicalId);
 
+  // Set Title
+  if ( ui.WasEntered("TITLE") ) {
+    process.setTitle( ui.GetString("TITLE") );
+  }
+
+  // Set Version ID
+  if ( ui.WasEntered("VERSIONID") ) {
+    process.setVersionId( ui.GetString("VERSIONID") );
+  }
+
   // std PDS4 label
   process.StandardPds4Label();
 
-  process.addSchema("PDS4_PSA_1000.sch", 
+/*  process.addSchema("PDS4_PSA_1000.sch", 
                     "PDS4_PSA_1000.xsd",
                     "xmlns:psa", 
                     "http://psa.esa.int/psa/v1");
@@ -97,16 +107,19 @@ void IsisMain() {
   process.addSchema("PDS4_PSA_EM16_CAS_1000.sch", 
                     "PDS4_PSA_EM16_CAS_1000.xsd",
                     "xmlns",
-                    "http://psa.esa.int/psa/em16/cas/v1");
+                    "http://psa.esa.int/psa/em16/cas/v1");*/
 
+  process.addSchema("CASSIS_1010.sch", 
+                    "CASSIS_1010.xsd",
+                    "xmlns:cassis",
+                    "local");
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
-    process.addSchema("PDS4_GEOM_1900_1510.sch", 
-                      "PDS4_GEOM_1900_1510.xsd",
+    process.addSchema("PDS4_GEOM_1B00_1610.sch", 
+                      "PDS4_GEOM_1B00_1610.xsd",
                       "xmlns:geom",
                       "https://pds.jpl.nasa.gov/datastandards/schema/released/geom/v1");
   }
-
 
  /*
   * Add additional pds label data here
@@ -125,6 +138,7 @@ void IsisMain() {
   cubeLab.Auto(pdsLabel);
 
   ProcessExportPds4::translateUnits(pdsLabel);
+  process.reorder(); 
 
   QString outFile = ui.GetFileName("TO");
 

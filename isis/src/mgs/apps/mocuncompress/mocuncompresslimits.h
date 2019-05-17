@@ -40,9 +40,9 @@ SCCSID @(#)limits.h  1.1 10/04/99
 */
 /* SCCShid @(#)limits.h (limits.h) 1.4 */
 
-#ifndef limits_h
+#ifndef mocuncompress_limits_h
 
-#define limits_h
+#define mocuncompress_limits_h
 
 /*
 * The transform block size.  IMPORTANT NOTE:  If changed to another number

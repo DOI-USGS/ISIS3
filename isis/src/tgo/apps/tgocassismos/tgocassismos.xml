@@ -7,14 +7,19 @@
 
   <description>
     <p>
-  If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.
-  This program produces a mosaic and adds keywords to the label group "Mosaic". <br/>
+    If the final product wil not be an RDR, mapmos or automos can be used to produce a mosaic.
+    This program produces a mosaic and adds keywords to the label group "Mosaic". <br/>
 
-  The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>
+    The  input cubes  to this program must be from the same observation, same filter, and map projected.<br/>
 
-   A new label group, required by tgocassisrdrgen, called "Mosaic"  is added to the image labels of
-   the output cube.  The original label blob is also propagated from the first file in the input list.<br/>
-   </p>
+    A new label group, required by tgocassisrdrgen, called "Mosaic"  is added to the image labels of
+    the output cube.  The original label blob is also propagated from the first file in the input list.<br/>
+    
+    This application will produce two cubes. The first cube (that you set with the "TO" parameter) 
+    will be your mosaic. A tracking cube will also be created at the same level with tracking
+    information for the original cubes (that you set with the "FROMLIST" parameter). This cube will
+    have the same base name as the mosaic, but will end in "_tracking.cub".<br/>
+    </p>
 
 <p>
   <b> processing sequence for single filter products that will become RDRs </b><br/>
@@ -44,6 +49,14 @@
     </change>
     <change name="Jeannie Backer" date="2018-08-10">
       Added option to allow user to choose ground range. 
+    </change>
+    <change name="Summer Stapleton-Greig" date="2019-02-28">
+      Added the "tracking=true" parameter to tgocassismos' call to automos resulting in automatic
+      tracking cube creation. 
+    </change>
+    <change name="Kristin Berry" date="2019-03-01">
+      Added the StopTime keyword to the output Mosaic PVL group, as stop_date_time is required for 
+      PDS4 export. 
     </change>
   </history>
 

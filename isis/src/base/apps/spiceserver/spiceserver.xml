@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="spiceserver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="spiceserver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Spiceinit Server
   </brief>
@@ -49,6 +50,10 @@
     </change>
     <change name="Makayla Shepherd" date="2015-09-08">
       Modified to open the temporary cube correctly. Fixes #2213.
+    </change>
+    <change name="Tyler Wilson" date="2019-02-11">
+      Modified the version check.  Now all versions of ISIS3 >= 3.5.*.* will be acceptable
+      to the application.
     </change>
   </history>
 
