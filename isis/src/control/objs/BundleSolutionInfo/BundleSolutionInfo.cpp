@@ -48,6 +48,7 @@ namespace Isis {
     m_name = m_runTime;
     m_inputControlNetFileName = new FileName(controlNetworkFileName);
     m_outputControl = NULL;
+    m_outputControlName="";
     m_settings = inputSettings;
     m_statisticsResults = new BundleResults(outputStatistics);
     m_images = new QList<ImageList *>(imgList);
@@ -71,6 +72,7 @@ namespace Isis {
     m_name = m_runTime;
     m_inputControlNetFileName = NULL;
     m_outputControl = NULL;
+    m_outputControlName="";
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -201,6 +203,7 @@ namespace Isis {
       delete m_outputControl;
     }
     m_outputControl = new Control(newOutputFileName.expanded());
+    m_outputControlName = newOutputFileName.expanded();
   }
 
 
@@ -273,7 +276,12 @@ namespace Isis {
    * @return @b QString The name of the output control network.
    */
   QString BundleSolutionInfo::outputControlNetFileName() const {
-    return m_outputControl->fileName();
+
+    if (m_outputControl)
+      return m_outputControl->fileName();
+    else
+      return
+          m_outputControlName;
   }
 
 
@@ -1198,13 +1206,8 @@ namespace Isis {
         sprintf(buf,",");
         fpOut << buf;
 
-
-
         QString observationString =
             observation->formatBundleOutputString(errorProp,true);
-
-
-        //observation->bundleOutput(fpOut,errorProp,true);
 
         //Removes trailing commas
         if (observationString.right(1)==",") {
@@ -1243,7 +1246,7 @@ namespace Isis {
 
     m_txtBundleOutputFilename = ofname;
 
-    char buf[1056];
+    char buf[4096];
     BundleObservationQsp observation;
 
     int nObservations = m_statisticsResults->observations().size();
@@ -1305,7 +1308,7 @@ namespace Isis {
 
         fpOut << buf;
 
-        observation->bundleOutput(fpOut,berrorProp);
+        observation->bundleOutputString(fpOut,berrorProp);
         // Build list of images and parameters for correlation matrix.
         foreach ( QString image, observation->imageNames() ) {
           imagesAndParameters.insert( image, observation->parameterList() );

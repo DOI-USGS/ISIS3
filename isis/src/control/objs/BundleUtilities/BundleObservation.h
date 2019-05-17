@@ -141,6 +141,7 @@ namespace Isis {
       void initializeBodyRotation();
       void updateBodyRotation();
       void bundleOutput(std::ofstream &fpOut,bool errorPropagation);
+      void bundleOutputString(std::ofstream &fpOut,bool errorPropagation);
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();

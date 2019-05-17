@@ -2,7 +2,6 @@
 
 #include <QDataStream>
 #include <QDebug>
-//#include <QFile> currently only used in commented code
 #include <QList>
 #include <QString>
 #include <QtGlobal> // qMax()
@@ -11,7 +10,7 @@
 #include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
-#include "FileName.h"
+//#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Project.h" // currently used for xml handler

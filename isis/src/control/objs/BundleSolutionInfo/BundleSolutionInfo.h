@@ -257,7 +257,7 @@ namespace Isis {
       QString             m_name;                        //!< Name of the bundle. Defaults to the id
       QString             m_runTime;                     //!< Run time of the bundle adjustment
       FileName           *m_inputControlNetFileName;     //!< Input control network file name
-      Control *           m_outputControl;               //!< Output control name
+      Control *           m_outputControl;               //!< Output control
       QString             m_outputControlName;
       BundleSettingsQsp   m_settings;                    //!< Bundle settings
       BundleResults      *m_statisticsResults;           //!< Bundle statistical results

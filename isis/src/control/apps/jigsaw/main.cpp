@@ -13,7 +13,6 @@
 #include "BundleResults.h"
 #include "BundleSettings.h"
 #include "BundleSolutionInfo.h"
-#include "Control.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
@@ -82,9 +81,7 @@ void IsisMain() {
 
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
-    BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();
-    //Control *outputControlNet = new Control(ui.GetFileName("ONET").expanded() );
-    //bundleSolutionInfo->setOutputControl(outputControlNet);
+    BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();    
     bundleSolution->setOutputControlName( FileName(ui.GetFileName("ONET")).expanded() );
     cout << "\nGenerating report files\n" << endl;
 
