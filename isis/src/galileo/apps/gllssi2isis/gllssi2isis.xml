@@ -68,6 +68,10 @@
       Fixed original label not being written to cubes ingested using the summed
       option. Fixes #3207
     </change>
+    <change name="Aaron Giroux" date="2019-05-17">
+      Changed FixPVl method to account for files which do not have write
+      permissions. Fixes #3199
+    </change>
 
 
   </history>

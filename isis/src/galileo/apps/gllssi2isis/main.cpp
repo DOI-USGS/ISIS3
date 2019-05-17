@@ -139,6 +139,11 @@ void fixPvl(QString fileName){
     pvlFile.setFileName(fileName);
     pvlFile.open(QFile::ReadWrite | QFile::Text);
 
+    // File cannot be written to - so return without doing anything
+    if ( pvlFile.error() == 5 )
+    {
+      return;
+    }
     //Read the Pvl file into a byte array
     QByteArray fileData = pvlFile.readAll();
 
