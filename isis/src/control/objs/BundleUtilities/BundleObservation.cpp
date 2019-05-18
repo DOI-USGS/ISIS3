@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QString>
 #include <QStringList>
+#include <QVector>
 
 #include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
@@ -1224,8 +1225,7 @@ namespace Isis {
     std::vector<double> coefDEC;
     std::vector<double> coefTWI;
 
-    QStringList imagePosParams = {"  X  ","  Y  ","  Z  "};
-    QStringList imagePointingParams = {" RA  ","DEC  ","TWI  "};
+    QVector<double> finalParameterValues;
 
     int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
     int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
@@ -1291,103 +1291,129 @@ namespace Isis {
     }
 
     // for convenience, create vectors of parameters names and values in the correct sequence
-    std::vector<vector<double> > finalParameterValues;
-    QStringList parameterNamesList;
-    QStringList correctionUnitList;
+
+    QStringList parameterNamesListX,parameterNamesListY,parameterNamesListZ,
+        parameterNamesListRA,parameterNamesListDEC,parameterNamesListTWI,
+        parameterNamesList;
+    QStringList correctionUnitListX,correctionUnitListY,correctionUnitListZ,
+        correctionUnitListRA,correctionUnitListDEC,correctionUnitListTWI,
+        correctionUnitList;
 
     QString str("%1(%2)  ");
 
-    finalParameterValues.push_back(coefX);
-    finalParameterValues.push_back(coefY);
-    finalParameterValues.push_back(coefZ);
-    for (int i = 0; i < imagePosParams.size(); i++) {
+    finalParameterValues.append(QVector<double>::fromStdVector(coefX));
+    finalParameterValues.append(QVector<double>::fromStdVector(coefY));
+    finalParameterValues.append(QVector<double>::fromStdVector(coefZ));
+
+    parameterNamesListX.append("  X  ");
+    parameterNamesListY.append("  Y  ");
+    parameterNamesListZ.append("  Z  ");
+
+    parameterNamesListRA.append(" RA  ");
+    parameterNamesListDEC.append("DEC  ");
+    parameterNamesListTWI.append("TWI  ");
+
           if (nPositionCoefficients > 0) {
           for (int j = 0; j < nPositionCoefficients;j++) {
             if (j == 0) {
-              parameterNamesList.append(str.arg(imagePosParams[i]).arg("km"));
-              correctionUnitList.append("m");
+              parameterNamesListX.append(str.arg("     ").arg("km"));
+              parameterNamesListY.append(str.arg("     ").arg("km"));
+              parameterNamesListZ.append(str.arg("     ").arg("km"));
+              correctionUnitListX.append("m");
+              correctionUnitListY.append("m");
+              correctionUnitListZ.append("m");
             } //end inner-if
 
             else {
               switch(j) {
               case 1:
-                parameterNamesList.append( str.arg("     ").arg("km/s") );
-                correctionUnitList.append("m/s");
-                break;
-              case 2:
-                parameterNamesList.append( str.arg("     ").arg("km/s^2") );
-                correctionUnitList.append("m/s^2");
-                break;
-              case 3:
-                parameterNamesList.append( str.arg("     ").arg("km/s^3") );
-                correctionUnitList.append("m/s^3");
+                parameterNamesListX.append( str.arg("     ").arg("km/s") );
+                parameterNamesListY.append( str.arg("     ").arg("km/s") );
+                parameterNamesListZ.append( str.arg("     ").arg("km/s") );
+                correctionUnitListX.append("m/s");
+                correctionUnitListY.append("m/s");
+                correctionUnitListZ.append("m/s");
                 break;
               default:
-                parameterNamesList.append(str.arg("     ").arg("km/s^"+toString(j) ) );
-                correctionUnitList.append("m/s^"+toString(j));
+                parameterNamesListX.append(str.arg("     ").arg("km/s^"+toString(j) ) );
+                parameterNamesListY.append(str.arg("     ").arg("km/s^"+toString(j) ) );
+                parameterNamesListZ.append(str.arg("     ").arg("km/s^"+toString(j) ) );
+                correctionUnitListX.append("m/s^"+toString(j));
+                correctionUnitListY.append("m/s^"+toString(j));
+                correctionUnitListZ.append("m/s^"+toString(j));
             } //end switch-case
           }  //end inner-else
 
-        }//end inner-for
+        }//end for
 
-      }// end outer-for
+      }//end outer-if
 
-     } //end outer-outer for
 
+     //Convert pointing coefficients from radians to degrees
      for (int i = 0; i < nPointingCoefficients; i++) {
         coefRA[i]*=RAD2DEG;
         coefDEC[i]*=RAD2DEG;
         coefTWI[i]*=RAD2DEG;
      }
 
-     finalParameterValues.push_back(coefRA);
-     finalParameterValues.push_back(coefDEC);
-     finalParameterValues.push_back(coefTWI);
+     finalParameterValues.append(QVector<double>::fromStdVector(coefRA));
+     finalParameterValues.append(QVector<double>::fromStdVector(coefDEC));
+     finalParameterValues.append(QVector<double>::fromStdVector(coefTWI));
 
 
-
-     for (int i = 0; i < imagePointingParams.size(); i++) {
-           if (nPointingCoefficients > 0) {
-           for (int j = 0; j < nPointingCoefficients;j++) {
+     if (nPointingCoefficients > 0) {
+        for (int j = 0; j < nPointingCoefficients;j++) {
              if (j == 0) {
-               parameterNamesList.append(str.arg(imagePointingParams[i]).arg("dd"));
-               correctionUnitList.append("dd");
+               parameterNamesListRA.append(str.arg("     ").arg("dd"));
+               parameterNamesListDEC.append(str.arg("     ").arg("dd"));
+               parameterNamesListTWI.append(str.arg("     ").arg("dd"));
+               correctionUnitListRA.append("dd");
+               correctionUnitListDEC.append("dd");
+               correctionUnitListTWI.append("dd");
              } //end inner-if
 
              else {
                switch(j) {
                case 1:
-                 parameterNamesList.append( str.arg("     ").arg("dd/s") );
-                 correctionUnitList.append("dd/s");
-                 break;
-               case 2:
-                 parameterNamesList.append( str.arg("     ").arg("dd/s^2") );
-                 correctionUnitList.append("dd/s^2");
-                 break;
-               case 3:
-                 parameterNamesList.append( str.arg("     ").arg("dd/s^3") );
-                 correctionUnitList.append("dd/s^3");
+                 parameterNamesListRA.append( str.arg("     ").arg("dd/s") );
+                 parameterNamesListDEC.append( str.arg("     ").arg("dd/s") );
+                 parameterNamesListTWI.append( str.arg("     ").arg("dd/s") );
+                 correctionUnitListRA.append("dd/s");
+                 correctionUnitListDEC.append("dd/s");
+                 correctionUnitListTWI.append("dd/s");
                  break;
                default:
-                 parameterNamesList.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
-                 correctionUnitList.append("dd/s^"+toString(j));
+                 parameterNamesListRA.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
+                 parameterNamesListDEC.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
+                 parameterNamesListTWI.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
+                 correctionUnitListRA.append("dd/s^"+toString(j));
+                 correctionUnitListDEC.append("dd/s^"+toString(j));
+                 correctionUnitListTWI.append("dd/s^"+toString(j));
+
              } //end switch-case
            }  //end inner-else
 
-         }//end inner-for
+         }//end for
 
-       }// end outer-for
-
-      } //end outer-outer for
+       }// end outer-if
 
 
-     std::vector<double> finalParameterValuesSingleVector;
+     //Put all of the parameter names together into one QStringList
+      parameterNamesList.append(parameterNamesListX);
+      parameterNamesList.append(parameterNamesListY);
+      parameterNamesList.append(parameterNamesListZ);
+      parameterNamesList.append(parameterNamesListRA);
+      parameterNamesList.append(parameterNamesListDEC);
+      parameterNamesList.append(parameterNamesListTWI);
 
-     for (unsigned int i = 0;i < finalParameterValues.size();i ++) {
-       for (unsigned int j = 0; j < finalParameterValues[i].size(); j++) {
-          finalParameterValuesSingleVector.push_back(finalParameterValues[i][j]);
-       }
-     }//end outer-for
+    //Put all of the correction unit names together into one QStringList
+      correctionUnitList.append(correctionUnitListX);
+      correctionUnitList.append(correctionUnitListY);
+      correctionUnitList.append(correctionUnitListZ);
+      correctionUnitList.append(correctionUnitListDEC);
+      correctionUnitList.append(correctionUnitListRA);
+      correctionUnitList.append(correctionUnitListTWI);
+
 
     // Save the list of parameter names we've accumulated above
     m_parameterNamesList = parameterNamesList;
@@ -1410,11 +1436,11 @@ namespace Isis {
 
           sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f",finalParameterValuesSingleVector[i] - correction);
+          sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
           fpOut << buf;
           sprintf(buf,"%15.2lf    ",correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValuesSingleVector[i]);
+          sprintf(buf,"%15.2lf",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"             ");
           fpOut << buf;
@@ -1434,11 +1460,11 @@ namespace Isis {
 
           sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f",finalParameterValuesSingleVector[i] - correction);
+          sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
           fpOut << buf;
           sprintf(buf,"%15.2lf             ",correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValuesSingleVector[i]);
+          sprintf(buf,"%15.2lf",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"             ");
           fpOut << buf;
@@ -1491,11 +1517,11 @@ namespace Isis {
         if (errorPropagation) {
           sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f",finalParameterValuesSingleVector[i] - correction*RAD2DEG);
+          sprintf(buf,"%15.2f",finalParameterValues[i] - correction*RAD2DEG);
           fpOut << buf;
           sprintf(buf,"%15.2lf    ",correction*RAD2DEG);
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValuesSingleVector[i]);
+          sprintf(buf,"%15.2lf",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"                 ");
           fpOut << buf;
@@ -1514,11 +1540,11 @@ namespace Isis {
         else {
           sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f ",finalParameterValuesSingleVector[i] - correction*RAD2DEG);
+          sprintf(buf,"%15.2f ",finalParameterValues[i] - correction*RAD2DEG);
           fpOut << buf;
           sprintf(buf,"%+12.2lf            ",correction*RAD2DEG);
           fpOut << buf;
-          sprintf(buf,"%+12.2lf",finalParameterValuesSingleVector[i]);
+          sprintf(buf,"%+12.2lf",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"               ");
           fpOut << buf;
@@ -1530,11 +1556,8 @@ namespace Isis {
           fpOut<<buf;
           sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
           fpOut<<buf;
-
         }
-
       }
-
   }
 
 

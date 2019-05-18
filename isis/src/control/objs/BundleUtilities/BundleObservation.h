@@ -77,7 +77,7 @@ namespace Isis {
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
    *                            parameters when writing images.csv. 
-   *   @history 2019-05-14 Tyler Wilson  Added the bundleOutput(std::ofstream &fpOut,
+   *   @history 2019-05-14 Tyler Wilson  Added the bundleOutputString(std::ofstream &fpOut,
    *                            bool errorPropagation) function which is called by
    *                            BundleSolutionInfo::outputText(). This function is a refactor of
    *                            the formatBundleOutputString and uses the traditional C function

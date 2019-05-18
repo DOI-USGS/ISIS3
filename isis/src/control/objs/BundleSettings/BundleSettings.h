@@ -121,6 +121,8 @@ namespace Isis {
    *                           accessor methods, CoordTypeReports() & CoordTypeBundle()
    *                           for the new coordinate type members.
    *                           References #4649 and #501.
+   *   @history 2019-05-17 Tyler Wilson - Added QString m_cubeList member function as well
+   *                           as get/set member functions.  References #3267.
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
