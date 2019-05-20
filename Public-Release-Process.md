@@ -36,7 +36,7 @@ In this step, we will carefully prepare the local repository to build from as we
     * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
-  * Now that the meta.yaml has been updated, go ahead and push the updated meta.yaml to the dev branch.
+  * Now that the meta.yaml has been updated, go ahead and PR the updated meta.yaml to the dev branch.
 
 ## Step 3: Create the Builds for Anaconda Cloud
 
