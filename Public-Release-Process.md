@@ -21,19 +21,24 @@ In this step, we will carefully prepare the local repository to build from as we
   * For public releases or Release Candidates, this will simply be the "dev" branch and will require someone else merge for you.
   * (This step is optional for custom builds.)
 * Make a github release and tag for the build 
-  * The release "Tag version" should be the \<version\>_<build_number> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0 and your build_number was 2, you should set your Release/Tag "Tag version" to 3.6.0_2
+  * The release "Tag version" should be the \<version\> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0, you should set your Release/Tag "Tag version" to 3.6.0 (**note**: no 'v' prefix to the version number.)
     * ***Please note that the recipe/build.sh file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
   * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
   * Release Candidate or mission-specific release "Tag version" convention: version XX.YY.ZZ_<mission/"RC"><release> (ex. 3.6.1_cassis2 or 3.6.1_RC3)
-
-* Update the recipes/meta.yaml file within the repo to include proper version number so that the tarball created in step 2 is being targeted. Also, check the build number. This number should be `0` with a new version being release). The build number may need to increment if the version number is staying the same and a new  and build number
+* Download the release zip file to some location
+* Get the metadata necessary for a release (meta.yaml file):
+  * sha256 hash: `openssl sha256 *.zip`
+  * version: from the tag created above
+  * build number: should be set to 0
+* Update the recipes/meta.yaml file within the repo to include proper version number so that the tarball created in step 2 is being targeted. Update the sha256 and check the build number. This number should be `0` with a new version being release). The build number may need to increment if the version number is staying the same and a new  and build number
   * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
     * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
     * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
+  * Now that the meta.yaml has been updated, go ahead and push the updated meta.yaml to the dev branch.
 
-## Step 2: Create the Builds for Anaconda Cloud
+## Step 3: Create the Builds for Anaconda Cloud
 
 In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28), and one for Mac (built on prog27). (Missions may need certain builds and not others. Communicate with your team as to what they are going to need.) Repeat this and the upload process process for each necessary system.
 
