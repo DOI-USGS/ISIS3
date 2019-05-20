@@ -2,17 +2,24 @@ This document explains both the release process for Official Releases as well as
 
 # Step-By-Step Instructions
 
-## Step 1: Set Up the Local and Remote Repositories
+## Step 1: Check current false positive test failures
+
+In this step, we check the currently failing tests. This is primarily an issue on the Mac OS where the timeout on the test execution is being hit. This is currently a judgement call on whether or not the tests are false-positives. This decision should be made by 2+ developers on the development team.
+
+
+# Step 2: Tag a release
+
+In this step, a release is tagged on GitHub.
+
+## Step 3: Set Up the Local and Remote Repositories
 
 In this step, we will carefully prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
 * Clone a fresh copy of the ISIS3 repository from GitHub
-* Update the recipes/meta.yaml file within the repo to include proper version number, branch, and build number
-  * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
-    * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
-    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
-  * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
-  * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
+
+
+
+
 * Update the isis/version file to reflect the proper version number and release stage. 
 * Confirm that the ```ninja docs``` line from the recipe/build.sh file has been removed.
    * The documentation requires a lot of space and we are only allowed 5GB of space on Anaconda Cloud. For more information on this issue, visit the [RFC1](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery).
@@ -27,6 +34,13 @@ In this step, we will carefully prepare the local repository to build from as we
     * ***Please note that the recipe/build.sh file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
   * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
   * Release Candidate or mission-specific release "Tag version" convention: version XX.YY.ZZ_<mission/"RC"><release> (ex. 3.6.1_cassis2 or 3.6.1_RC3)
+
+* Update the recipes/meta.yaml file within the repo to include proper version number so that the tarball created in step 2 is being targeted. Also, check the build number. This number should be `0` with a new version being release). The build number may need to increment if the version number is staying the same and a new  and build number
+  * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
+    * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
+    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
+  * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
+  * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
 
 ## Step 2: Create the Builds for Anaconda Cloud
 
