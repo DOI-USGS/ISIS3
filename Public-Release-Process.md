@@ -6,20 +6,11 @@ This document explains both the release process for Official Releases as well as
 
 In this step, we check the currently failing tests. This is primarily an issue on the Mac OS where the timeout on the test execution is being hit. This is currently a judgement call on whether or not the tests are false-positives. This decision should be made by 2+ developers on the development team.
 
-
-# Step 2: Tag a release
-
-In this step, a release is tagged on GitHub.
-
-## Step 3: Set Up the Local and Remote Repositories
+## Step 2: Set Up the Local and Remote Repositories
 
 In this step, we will carefully prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
 * Clone a fresh copy of the ISIS3 repository from GitHub
-
-
-
-
 * Update the isis/version file to reflect the proper version number and release stage. 
 * Confirm that the ```ninja docs``` line from the recipe/build.sh file has been removed.
    * The documentation requires a lot of space and we are only allowed 5GB of space on Anaconda Cloud. For more information on this issue, visit the [RFC1](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery).
