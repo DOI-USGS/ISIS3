@@ -279,6 +279,13 @@
     <change name="Ken Edmundson" date="2018-06-22">
       Added output of lidar adjusted csv file and output of adjusted lidar data file.
     </change>
+    <change name="Debbie A. Cook" date="2019-05-10">
+      Added exclusions to SPSOLVE NONE option for LIDARDATA and
+      OLIDARDATA to prevent any attempt to run with lidar points and not 
+      solve for spacecraft position.  The lidar solution includes a constraint  
+      on the range, which requires spacecraft position to be part of
+      the bundle adjustment.  References #3053.
+    </change>
   </history>
 
   <groups>
@@ -355,11 +362,13 @@
         <internalDefault>none</internalDefault>
         <fileMode>input</fileMode>
         <brief>
-          Input Lidar Point File
+          Input Lidar Point File - requires SPSOLVE to be turned on
         </brief>
         <description>
         This file is a <def>lidar point data</def> generated from <b>lrolola2isis.cpp</b>.
         It contains <def>lidar control point</def>s and associated measures for simultaneous images.
+        If <def>lidar point data</def> are used, SPSOLVE must be turned on (anything besides NONE)
+        
         </description>
         <exclusions>
         </exclusions>
@@ -373,7 +382,7 @@
         <internalDefault>none</internalDefault>
         <fileMode>output</fileMode>
         <brief>
-          Output lidar data file
+          Output lidar data file - requires SPSOLVE to be turned on
         </brief>
         <description>
           This output file contains the adjusted <def>lidar data</def> with
@@ -1028,6 +1037,8 @@
               No spacecraft position parameters will be adjusted.
             </description>
             <exclusions>
+              <item>LIDARDATA</item>
+              <item>OLIDARDATA</item>
               <item>SPKDEGREE</item>
               <item>SPKSOLVEDEGREE</item>
               <item>POSITIONSEGMENTS</item>
