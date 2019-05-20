@@ -279,7 +279,7 @@
     <change name="Ken Edmundson" date="2018-06-22">
       Added output of lidar adjusted csv file and output of adjusted lidar data file.
     </change>
-    <change name="Debbie A. Cook" date="2019-05-10">
+    <change name="Debbie A. Cook" date="2019-05-20">
       Added exclusions to SPSOLVE NONE option for LIDARDATA and
       OLIDARDATA to prevent any attempt to run with lidar points and not 
       solve for spacecraft position.  The lidar solution includes a constraint  
