@@ -323,7 +323,7 @@ namespace Isis {
    *                            which have been replaced with the local radius of a control
    *                            point for converting point sigmas to/from radians from/to meters.
    *                            References #4649 and #501.
-   *  @history 2019-04-15 Debbie A. Cook - The call to CameraGroundMap::GetXY in method
+   *  @history 2019-05-15 Debbie A. Cook - The call to CameraGroundMap::GetXY in method
    *                            ComputePartials was modified to not check for points on the back side 
    *                            of the planet when computing instrument coordinates during the bundle
    *                            adjustment.  In the future a control net diagnostic program might be 

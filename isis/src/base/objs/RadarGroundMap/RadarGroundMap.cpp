@@ -366,6 +366,10 @@ namespace Isis {
    * without resetting the current point values for lat/lon/radius/x/y and
    * related radar parameter p_slantRange.
    *
+   *  @history 2019-05-15 Debbie A. Cook - Added optional bool argument to match parent GetXY 
+   *                          method to allow the bundle adjustment to skip the back of planet test during 
+   *                          iterations. References #2591.
+   *
    * @param spoint
    *
    * @return conversion was successful

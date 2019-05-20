@@ -1001,8 +1001,14 @@ namespace Isis {
    *                            BundleAdjust to compute residuals for
    *                            editLocked points
    * @history 2012-01-18 Debbie A. Cook, Revised to call
-   *                            ComputeResidualsMillimeters() to avoid
-   *                            duplication of code
+   *                            ComputeResidualsMillimeters() to avoid duplication of code.
+   * @history 2019-05-16 Debbie A. Cook, The calls to CameraGroundMap::GetXY
+   *                           were changed to allow not testing for points on the back side of the 
+   *                           planet during bundle adjustment.  Now, the instrument coordinates 
+   *                           will be calculated and returned always to this method. In the future,
+   *                           a separate diagnostic tool may be helpful to check for non-visable  
+   *                           points in a control net AFTER bundle adjustment. References #2591.
+   *                            
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
     if (IsIgnored()) {
@@ -1092,6 +1098,8 @@ namespace Isis {
         double scalingY;
 
         // Step 3.
+        // The default bool value will come from CameraGroundMap instead of
+        // RadarGroundMap so be explicit to turn off back-of-planet test.
         cam->GroundMap()->GetXY(sp, &focalplaneX, &scalingY, false);
         double deltaLine;
 
@@ -1197,6 +1205,7 @@ namespace Isis {
         cam->SetImage(m->GetSample(), m->GetLine());
       }
 
+      // The default bool value is true.  Turn back-of-planet test off for bundle adjustment.
       cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy, false);
       // double mudx = m->GetFocalPlaneMeasuredX();
       // double mudy = m->GetFocalPlaneMeasuredY();
