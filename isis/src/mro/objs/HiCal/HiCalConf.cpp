@@ -331,7 +331,7 @@ bool HiCalConf::_naifLoaded = false;
     (void) spkpos_c(targetName.toLatin1().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors();
     //  Return in AU units
     return (sunkm/1.49597870691E8);
   }
@@ -419,14 +419,19 @@ void HiCalConf::loadNaifTiming( ) {
     Isis::FileName pck("$base/kernels/spk/de???.bsp");
     pck = pck.highestVersion();
 
+    Isis::FileName sat("$base/kernels/spk/mar???.bsp");
+    sat = sat.highestVersion();
+
 //  Load the kernels
     QString lsk = leapseconds.expanded();
     QString sClock = sclk.expanded();
     QString pConstants = pck.expanded();
+    QString satConstants = sat.expanded();
     furnsh_c(lsk.toLatin1().data());
     furnsh_c(sClock.toLatin1().data());
     furnsh_c(pConstants.toLatin1().data());
-    NaifStatus::CheckErrors(); 
+    furnsh_c(satConstants.toLatin1().data());
+    NaifStatus::CheckErrors();
 
 //  Ensure it is loaded only once
     _naifLoaded = true;
@@ -605,4 +610,3 @@ QString HiCalConf::parser(const QString &s, const ValueList &vlist,
 }
 
 }  // namespace Isis
-

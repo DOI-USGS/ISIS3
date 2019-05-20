@@ -41,7 +41,6 @@ dependencies:
   - openblas==0.2.19
   - opencv
   - openssl==1.0.2n
-  - patchelf==0.9
   - pcl==1.8.1
   - pip==9.0.1
   - protobuf==3.5.2
