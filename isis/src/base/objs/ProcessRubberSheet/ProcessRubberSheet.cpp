@@ -1063,6 +1063,7 @@ namespace Isis {
     Brick oBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
     oBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
     int brickIndex = 0;
+    bool foundNull = false;
 
     for (int oline = olineMin; oline <= olineMax; oline++) {
       double isamp = A * osampMin + B * oline + C;
@@ -1078,12 +1079,32 @@ namespace Isis {
         double dn = interp.Interpolate(isamp, iline, iportal.DoubleBuffer());
 
         // Write the output value at the appropriate location in buffer
+        if (dn == Null) {
+          foundNull = true;
+        }
         oBrick[brickIndex] = dn;
         brickIndex++;
       }
     }
 
-    //Write filled buffer to cube
+    // If there are any special pixel Null values in this output brick, we may be
+    // up against an edge of the input image where the interpolaters get Nulls from 
+    // outside the image. Since the patches have some overlap due to finding the 
+    // rectangular area (bounding box, min/max line/samp) of the four points input pints
+    // projected into the output space, this causes valid DNs
+    // from a previously processed patch to be replaced with Null DNs from this patch.
+    if (foundNull) {
+     Brick readBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
+     readBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
+     OutputCubes[0]->read(readBrick);
+     for (brickIndex = 0; brickIndex<(osampMax-osampMin+1)*(olineMax-olineMin+1); brickIndex++) {
+       if (readBrick[brickIndex] != Null) {
+         oBrick[brickIndex] = readBrick[brickIndex];
+       }
+     }
+    }
+
+    // Write filled buffer to cube
     OutputCubes[0]->write(oBrick);
   }
 
