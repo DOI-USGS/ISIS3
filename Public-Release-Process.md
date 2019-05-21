@@ -12,6 +12,7 @@ In this step, we will carefully prepare the local repository to build from as we
 
 * Clone a fresh copy of the ISIS3 repository from GitHub
 * Update the isis/version file to reflect the proper version number and release stage. 
+* Update the isis/CMakeLists.txt file to reflect the proper version number, release data, and release stage.
 * Confirm that the ```ninja docs``` line from the recipe/build.sh file has been removed.
    * The documentation requires a lot of space and we are only allowed 5GB of space on Anaconda Cloud. For more information on this issue, visit the [RFC1](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC1:-Documentation-Delivery).
 * Do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds).
