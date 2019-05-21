@@ -37,8 +37,8 @@ Funded  developmemnt for ISIS is generally aligned by named projects. We organiz
   - Investigate how to write app tests. Rationale as above.
   - [x] investigate and deploy a testing framework; GTest.
   - investigate and deploy a CI environment to remove hand crafted build/test scripts. The goal is to reduce the number of false positive build fails due to tooling.
-  - :muscles: Transition all unit tests to GTest
-  - :muscles: Migrate 1+ app tests using the identified framework.
+  - :muscle: Transition all unit tests to GTest
+  - :muscle: Migrate 1+ app tests using the identified framework.
 
 ### Sensor Models (CSM/ISIS)
   - [x] Finalize Image Support Data Specification
@@ -48,7 +48,7 @@ Funded  developmemnt for ISIS is generally aligned by named projects. We organiz
   - [x] Implement Dawn FC sensor model
   - :runner: Verify GXP functionality
   - Implement CSM HiRISE sensor model
-  - :muscles: CSM/ISIS integration
+  - :muscle: CSM/ISIS integration
 
 ### SPICE / Architecture / ALE
   - :runner: Begin ISIS rearchitecture by refactoring SpicePosition and SpiceRotation classes
