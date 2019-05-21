@@ -1,5 +1,3 @@
-# Release Schedule
-
 Releases and development of ISIS3 follows a time based schedule with a new release occurring every three months. Below, we illustrate a sample four month snapshot of software development.
 
 [[images/releaseplanning.png]]
