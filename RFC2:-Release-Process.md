@@ -3,6 +3,7 @@
 - RFC PR: (empty until a PR is opened)
 - Issue: https://github.com/USGS-Astrogeology/ISIS3/issues/684
 - Author: jlaura
+- **Status: This RFC has been adopted as the release cadence.**
 
 <!-- This is a comment block that is not visible. We provide some instructions in here. When submitting an RFC please copy this template into a new wiki page titled RFC#:Title, where the number is the next incrementing number. If you would like to submit an RFC, but are unable to edit the wiki, please open an issue and we will assist you in getting your RFC posted. Please fill in, to the largest extent possible, the template below describing your RFC. After that, be active on the associated issue and we can move the RFC through the process.-->
 
