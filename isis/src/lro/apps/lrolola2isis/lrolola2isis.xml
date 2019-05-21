@@ -49,7 +49,8 @@
       </change>
     <change name="Debbie A Cook" date="2019-03-11">
       Added new input parameter FROMLIST to allow entering multiple input
-      Lidar CSV files.  All input points are written out into a single Lidar data file.
+      Lidar CSV files.  All input points are written out into a single Lidar data 
+      file.  References #5343.
       </change>
   </history>
 

@@ -217,6 +217,8 @@ namespace Isis {
    *                           The current example is the comet 67P/CHURYUMOV-GERASIMENKO
    *                           imaged by Rosetta. Some future comet/astroid missions are expected
    *                           to use a CK defined body fixed reference frame. Fixes #5408.
+   *  @history 2019-03-20 Debbie A. Cook - Added documentation to the Matrix() method.
+   *                           References #5343.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    *  @todo Consider making this a base class with child classes based on frame type or

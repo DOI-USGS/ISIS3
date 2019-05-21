@@ -119,7 +119,7 @@ void IsisMain() {
       lidarPoint->setRange(range);
       lidarPoint->setSigmaRange(rangeSigma);
 
-      // Set the point coordinates and their sigmas and add to the Lidar Control Point file
+      // Set the point coordinates and their sigmas and add to the Lidar Control Point 
       SurfacePoint spoint(lat, lon, radius);
       spoint.SetSphericalSigmasDistance(
                                         Distance(latSigma, Distance::Units::Meters),
