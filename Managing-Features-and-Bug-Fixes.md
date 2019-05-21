@@ -123,6 +123,10 @@ For each other supported branch
 1. Make changes as neede
 1. PR into supported branch
 
+### The data/testdata area
+
+For right now, we will keep the same structure and workflow in the data/testdata repository.
+
 ## The future
 
 With Continuous Deployment we no longer have release branches for each minor version. We instead have release branches for major versions. I.E. 5 is out, 4 is supported, and dev is on 5.2. We have dev and 4 as supported branches.
