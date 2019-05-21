@@ -7,10 +7,7 @@
 * [Continuous Integration](https://github.com/USGS-Astrogeology/ISIS3/wiki/Internal-CI---Jenkins)
 # Project Management
 * [Roadmap](https://github.com/USGS-Astrogeology/ISIS3/wiki/FY19-Roadmap)
-* Release
-  - [Release RoadMap](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Road-Map)
-  - [Setting up the environment](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release:-Setting-up-the-environment)
-  - [Building and pushing](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release:-Building-and-pushing)
+* [Release Schedule](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Road-Map)
 # Open RFCs
   * [RFC Template](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC%23:-Template)
   * [RFC2 - ISIS3 Release Policy](https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process)
