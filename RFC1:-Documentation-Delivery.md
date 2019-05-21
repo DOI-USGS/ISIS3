@@ -3,6 +3,7 @@
 - RFC PR: (empty until a PR is opened)
 - Issue: https://github.com/USGS-Astrogeology/ISIS3/issues/674#issuecomment-449488114
 - Author: jlaura
+- **Status: This RFC has been adopted. Documentation is no longer shipped with the ISIS binaries.**
 
 # Summary
 The ISIS3 user and developer documentation is currently being shipping in the binary, installable tarballs. This is causing the Linux download to be over 400MB in size and the OSX download to be over 200MB in size. In reality, the binary code is < 100MB for both operating systems.
