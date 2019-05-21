@@ -1,6 +1,6 @@
 # Project Management
 * [Roadmap](https://github.com/USGS-Astrogeology/ISIS3/wiki/FY19-Roadmap)
-* [Release Schedule](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Road-Map)
+* [Release Schedule](https://github.com/USGS-Astrogeology/ISIS3/wiki/Release-Schedule)
 
 # Development References
 * [Building](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
