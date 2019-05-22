@@ -1,7 +1,7 @@
 # Roadmap 2019 (DRAFT)
-In 2019 ASC has a number of different software targets. These are largely focused on our core software packages: ISIS, the Community Sensor Model toolchain, plio, PyHAT, and AutoCNet.  Additionally, we have tools and processes which rely on these core tools such as the Universal Planetary Coordinates database, Map-A-Planet 2 and Map Projection on the Web which all utilize ISIS.
+In 2019 ASC has several different software targets. These are primarily focused on our core software packages: ISIS, the Community Sensor Model toolchain, plio, PyHAT, and AutoCNet.  Additionally, we have tools and processes which rely on these core tools such as the Universal Planetary Coordinates database, Map-A-Planet 2 and Map Projection on the Web, which all utilize ISIS.
 
-We have labelled some tasks as investigations in order to identify those places where we need additional information before we can estimate the full complexity and scope of a task. These tasks can lead to future work, a decision to defer, or a decision that additional information is required. 
+We have labeled some tasks as investigations to identify those places where we need additional information before we can estimate the full complexity and scope of a task. These tasks can lead to future work, a decision to defer, or a decision that additional information is required. 
 
 Tasks on this roadmap are living. They may move ahead to future years, be identified as being completed, or be identified as not needed. Our ultimate goal is to engage the user community to identify where we can add value.
 
@@ -15,12 +15,12 @@ Tasks status is identified using the following shorthand:
 | :muscle: | stretch goal |
 
 ## Themes
-Funded  developmemnt for ISIS is generally aligned by named projects. We organize the roadmap thematically due to the amount of synergy between projects. In FY19 (October 1, 2018 - September 30, 2019), we are working in the following thematic areas:
+Funded  development for ISIS is generally aligned by named projects. We organize the roadmap thematically due to the amount of synergy between projects. In FY19 (October 1, 2018 - September 30, 2019), we are working in the following thematic areas:
 
 - Streamline the build, test, deploy trains
 - Begin improving the ISIS testing infrastructure
 - Reduce friction for external development on projects
-- (Re-)Build the online community around our software packages; all types of contributors.
+- (Re-)Build the online community around our software packages, all types of contributors.
 - Operationalize ASC Community Sensor Model
 - Begin re-architecture of ISIS
 
@@ -28,15 +28,15 @@ Funded  developmemnt for ISIS is generally aligned by named projects. We organiz
   - [x] Transition to CMake and anaconda deploys (binaries)
   - :runner: Transition data area from rsync to version controlled solution
   - [x] Adopt versioning standard. This allows us to alert users to enhancements and breaking changes.
-  * Separate source/deploy a la conda-forge in order to reduce the release friction.
-  - :runner: Move to 4 releases per year and immediate bug fix releases in order to get new code out to users at the fastest reasonable cadence.
-  - :muscle: Unpin version on 1+ current dependencies in order to make installation of ISIS alongside other libraries easier.
+  * Separate source/deploy a la conda-forge to reduce the release friction.
+  - :runner: Move to 4 releases per year and immediate bug fix releases to get new code out to users at the fastest reasonable cadence.
+  - :muscle: Unpin version on 1+ current dependencies to make installation of ISIS alongside other libraries easier.
 
 ### Testing
-  - [x] Ingestigate methodology to write unit tests in a testing framework. The goal is to reduce test data volumes and the number of false positive failures.
-  - Investigate how to write app tests. Rationale as above.
+  - [x] Investigate methodology to write unit tests in a testing framework. The goal is to reduce test data volumes and the number of false positive failures.
+  - Investigate how to write app tests. The rationale as above.
   - [x] investigate and deploy a testing framework; GTest.
-  - investigate and deploy a CI environment to remove hand crafted build/test scripts. The goal is to reduce the number of false positive build fails due to tooling.
+  - Investigate and deploy a CI environment to remove handcrafted build/test scripts. The goal is to reduce the number of false positive build fails due to tooling.
   - :muscle: Transition all unit tests to GTest
   - :muscle: Migrate 1+ app tests using the identified framework.
 
@@ -89,4 +89,4 @@ Funded  developmemnt for ISIS is generally aligned by named projects. We organiz
   * [x] Map Projection on the Web (POW) - uses ISIS to create map projected products from level 1 PDS products on demand from a web interface
 
 ## Summary
-Above a high level overview of the tasks targeted for ASC FY19 development have been enumerated. We are focusing heavily on addressing technical debt, engaging our user base, and making external development more viable. We anticipate that these tasks will continue into FY20 as we transition to a true open source project. We solicit any and all engagement from that users that we seek to serve.
+Above a high-level overview of the tasks targeted for ASC FY19 development have been enumerated. We are focusing heavily on addressing technical debt, engaging our user base, and making external development more viable. We anticipate that these tasks will continue into FY20 as we transition to a true open source project. We solicit any engagement from those users that we seek to serve.
