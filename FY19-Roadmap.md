@@ -1,5 +1,5 @@
 # Roadmap 2019 (DRAFT)
-In 2019 ASC has a number of different software targets. These are largely focused on our core software packages: ISIS, the Community Sensor Model toolchain, plio, PyHAT, and AutoCNet.
+In 2019 ASC has a number of different software targets. These are largely focused on our core software packages: ISIS, the Community Sensor Model toolchain, plio, PyHAT, and AutoCNet.  Additionally, we have tools and processes which rely on these core tools such as the Universal Planetary Coordinates database, Map-A-Planet 2 and Map Projection on the Web which all utilize ISIS.
 
 We have labelled some tasks as investigations in order to identify those places where we need additional information before we can estimate the full complexity and scope of a task. These tasks can lead to future work, a decision to defer, or a decision that additional information is required. 
 
@@ -81,6 +81,12 @@ Funded  developmemnt for ISIS is generally aligned by named projects. We organiz
     - :muscle: Identify how to stream new images into a project
   * Plio
     - :muscle: Solidify deploy train via conda-forge
+
+## Dependent Software
+  * Universal Planetary Coordinates (UPC) database
+    - :runner: Redesigning the database schema to improve search times and enable level 2 products to be included in the database
+  * [x] Map-A-Planet 2 - uses ISIS to create map projected products from derived products on demand for users from a web interface
+  * [x] Map Projection on the Web (POW) - uses ISIS to create map projected products from level 1 PDS products on demand from a web interface
 
 ## Summary
 Above a high level overview of the tasks targeted for ASC FY19 development have been enumerated. We are focusing heavily on addressing technical debt, engaging our user base, and making external development more viable. We anticipate that these tasks will continue into FY20 as we transition to a true open source project. We solicit any and all engagement from that users that we seek to serve.
