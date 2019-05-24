@@ -13,7 +13,7 @@
 
 # This is the version of ISIS that you are building. (Please refer to
 # RFC2 (https://github.com/USGS-Astrogeology/ISIS3/wiki/RFC2:-Release-Process) if you are not sure
-# about what version you are building.) 
+# about what version you are building.)
 # Examples:
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
@@ -30,13 +30,13 @@ package:
   version: {{ version }}
 
 source:
-  # git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-  # git_branch: {{ git_branch }}
-  url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}.tar.gz'
+  git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
+  git_tag: '3.7.1'
+  # url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}.tar.gz'
   # sha256 is the prefered checksum -- you can get it for a file with:
   # `openssl sha256 <file name>`. Simply run this command with the .tar.gz
   # file specified in the "url" tag above.
-  sha256: '62b88bec88471588feb581e28afc2aa9248bd4e165ad83c448a4c5fa7b59a6e1'
+  # sha256: '62b88bec88471588feb581e28afc2aa9248bd4e165ad83c448a4c5fa7b59a6e1'
 
 build:
   number: {{ build_number }}
