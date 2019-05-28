@@ -104,7 +104,7 @@ The builds should be created for each of the prog machines (prog24, prog26, prog
 
 ```screen -RD```
 
-This starts your screen session. You can exit screen by holding <cntrl><A><D>, and return to the same screen session with the previous command. 
+This starts your screen session. You can exit screen by holding `<cntrl><A><D>`, and return to the same screen session with the previous command. 
 
 ```buildIsisCmakeAllSys -t <tag version> --no-test /usgs/pkgs/<isis version>```
 
