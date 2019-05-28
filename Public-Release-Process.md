@@ -21,7 +21,7 @@ In this step, we will carefully prepare the local repository to build from as we
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
 
-* Do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds).
+* As isis3mgr, do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds).
   * This includes all systems tested nightly: Linux 28 (prog29), Ubuntu 18.4 (prog28), prog24, and MacOS 10.13 (prog27).
   * (This step should no longer be necessary once Jenkins has been properly set-up as tests will run before each merge)
 * Once tests are passing, push the changes back up to the designated branch.
