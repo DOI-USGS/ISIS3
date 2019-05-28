@@ -13,6 +13,14 @@ In this step, we will carefully prepare the local repository to build from as we
 * Clone a fresh copy of the ISIS3 repository from GitHub
 * Update the isis/version file to reflect the proper version number and release stage. 
 * Update the isis/CMakeLists.txt file to reflect the proper version number, release data, and release stage.
+* Until the build process is updated to pull from github tarballs, update the `meta.yaml` at this stage as well: 
+    * build number: should be set to 0
+    * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
+    * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
+    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
+  * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
+  * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
+
 * Do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds).
   * This includes all systems tested nightly: Linux 28 (prog29), Ubuntu 18.4 (prog28), prog24, and MacOS 10.13 (prog27).
   * (This step should no longer be necessary once Jenkins has been properly set-up as tests will run before each merge)
@@ -24,6 +32,9 @@ In this step, we will carefully prepare the local repository to build from as we
     * ***Please note that the recipe/meta.yaml file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
   * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
   * Release Candidate or mission-specific release "Tag version" convention: version XX.YY.ZZ_<mission/"RC"><release> (ex. 3.6.1_cassis2 or 3.6.1_RC3)
+
+### The following section will apply after building from the release tarball is functioning: 
+
 * Download the release zip file to some location
 * Get the metadata necessary for a release (meta.yaml file):
   * sha256 hash: `openssl sha256 *.zip`
