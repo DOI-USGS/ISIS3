@@ -14,7 +14,7 @@ In this step, we will carefully prepare the local repository to build from as we
 * Update the isis/version file to reflect the proper version number and release stage. 
 * Update the isis/CMakeLists.txt file to reflect the proper version number, release data, and release stage.
 * Do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds).
-  * This includes Linux 28 (prog29), Ubuntu 18.4 (prog28) and MacOS 10.13 (prog27).
+  * This includes all systems tested nightly: Linux 28 (prog29), Ubuntu 18.4 (prog28), prog24, and MacOS 10.13 (prog27).
   * (This step should no longer be necessary once Jenkins has been properly set-up as tests will run before each merge)
 * Once tests are passing, push the changes back up to the designated branch.
   * For public releases or Release Candidates, this will simply be the "dev" branch and will require someone else merge for you.
