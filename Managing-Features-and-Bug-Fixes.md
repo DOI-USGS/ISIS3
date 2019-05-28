@@ -120,7 +120,7 @@ For each other supported branch
 1. Checkout new branch from supported branch
 1. Cherry pick changes from base branch into your new branch
 1. Test to make sure bug is still fixed.
-1. Make changes as neede
+1. Make changes as needed
 1. PR into supported branch
 
 ### The data/testdata area
