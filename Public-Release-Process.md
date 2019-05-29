@@ -50,7 +50,7 @@ In this step, we will carefully prepare the local repository to build from as we
 
 ## Step 3: Create the Builds for Anaconda Cloud
 
-In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28), and one for Mac (built on prog26). (Missions may need certain builds and not others. Communicate with your team as to what they are going to need.) Repeat this and the upload process process for each necessary system.
+In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28), and one for Mac (built on prog26). (Missions may need certain builds and not others. Communicate with your team as to what they are going to need.) Repeat this and the upload process process for each necessary system. You will need to be isis3mgr for this step since prog26 needs /jessetest in the PATH.
 
 Please keep in mind that conda may be a little finicky when building for other systems. You must use an OS-specific version of the software, confirm that there exists only one version in your system PATH variable, and that all commands run use that version exclusively. Fortunately, much of the output from conda commands will state the path to the version it is using explicitly.
 
