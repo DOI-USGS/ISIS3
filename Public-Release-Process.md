@@ -119,13 +119,13 @@ This starts your screen session. You can exit screen by holding `<cntrl><A><D>`,
 
 ```buildIsisCmakeAllSys -t <tag version> -b <branch name> --no-test /usgs/pkgs/<isis version>```
 
-This command will run the script, building on all of the prog machines at once. The <tag version> value should be whatever Tag Version you set for the release on the GitHub repository, and the <isis version> value should be the version of ISIS you are building. (The <isis version> will generally be the same as your <tag version>.)
+This command will run the script, building on all of the prog machines at once. The `<tag version>` value should be whatever Tag Version you set for the release on the GitHub repository, and the `<isis version>` value should be the version of ISIS you are building. (The `<isis version>` will generally be the same as your `<tag version>`.)
 
 Keep in mind that this script will build on prog24, so the build will be accessible via the astrovms as well.
 
 ***While we are in the process of getting Astro caught-up with the process of using conda for our internal builds of ISIS, this building process still needs to be maintained until we officially make the official switch.***
 
-Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Not that this will need to be done once for Linux, and once for Debian.
+Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Note that this will need to be done once for Linux, and once for Debian.
 
 Ensure that you have the proper build of conda set-up. For Linux:
 
