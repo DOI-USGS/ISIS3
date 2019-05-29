@@ -117,7 +117,7 @@ The builds should be created for each of the prog machines (prog24, prog26, prog
 
 This starts your screen session. You can exit screen by holding `<cntrl><A><D>`, and return to the same screen session with the previous command. 
 
-```buildIsisCmakeAllSys -t <tag version> --no-test /usgs/pkgs/<isis version>```
+```buildIsisCmakeAllSys -t <tag version> -b <branch name> --no-test /usgs/pkgs/<isis version>```
 
 This command will run the script, building on all of the prog machines at once. The <tag version> value should be whatever Tag Version you set for the release on the GitHub repository, and the <isis version> value should be the version of ISIS you are building. (The <isis version> will generally be the same as your <tag version>.)
 
