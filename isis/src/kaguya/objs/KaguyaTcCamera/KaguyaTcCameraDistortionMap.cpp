@@ -92,23 +92,24 @@ namespace Isis {
 
 
 
-    // This function implements the following distortion correction from the IK for the terrain camera,
-    // see: SEL_TC_V01.TI
-    // 
-    // r2 = x^2 + y^2
-    //  Distortion coefficients information:
-    //   INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
-    //   INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
-    //
-    // Distance r from the center:
-    //   r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
-    //
-    // Line-of-sight vector v is calculated as
-    //   v[X] = INS<INSTID>BORESIGHT[X]
-    //          +a0 +a1*r +a2*r^2 +a3*r^3 ,
-    //   v[Y] = INS<INSTID>BORESIGHT[Y]
-    //          +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
-    //   v[Z] = INS<INSTID>BORESIGHT[Z] .
+    /** This implements the following distortion correction from the IK for the terrain camera,
+     see: SEL_TC_V01.TI
+     
+     r2 = x^2 + y^2
+      Distortion coefficients information:
+       INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+       INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+    
+     Distance r from the center:
+       r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+    
+     Line-of-sight vector v is calculated as
+       v[X] = INS<INSTID>BORESIGHT[X]
+              +a0 +a1*r +a2*r^2 +a3*r^3 ,
+       v[Y] = INS<INSTID>BORESIGHT[Y]
+              +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
+       v[Z] = INS<INSTID>BORESIGHT[Z] .
+    */
 
     // Apply distortion correction
     double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3;
