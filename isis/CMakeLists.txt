@@ -40,7 +40,7 @@ set(PACKAGE_VERSION    ${VERSION})
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2019-05-29")
+set(VERSION_DATE              "2019-05-30")
 set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
