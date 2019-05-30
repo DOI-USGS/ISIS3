@@ -185,3 +185,4 @@ Run the following command:
 ```
 source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh
 ```
+This problem occurs because we are building ISIS with the shared anaconda on cpkgs instead of /jessetest/miniconda3 (which is the version of anaconda being sourced in .bashrc). You may also do a conda activate with a full path to the environment instead of running the above source command.
