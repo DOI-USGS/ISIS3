@@ -127,7 +127,11 @@ void IsisMain() {
       }
     }
     outcube->putGroup(otherLabels.findGroup("Instrument"));
-/*
+/* 
+    // This code is not needed now, but is included here commented-out in case it becomes necessary
+    // to support the swath modes by setting their NaifFrameCodes in the future. The swath mode
+    // setting is currently handled entirely via the camera model. 
+ 
     // add kernels group
     QString instId = inst["InstrumentId"];
     QString encoding = inst["EncodingType"];

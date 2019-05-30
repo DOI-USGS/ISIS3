@@ -113,6 +113,8 @@ with open( activate_vars_csh, mode='w' ) as a:
 setenv ISISROOT {}
 setenv ISIS3DATA {}
 setenv ISIS3TESTDATA {}
+
+source $CONDA_PREFIX/scripts/tabCompletion.csh
 """.format(os.environ['CONDA_PREFIX'], args.data_dir, args.test_dir)
     a.write(script)
 print( 'Wrote '+activate_vars_csh )
