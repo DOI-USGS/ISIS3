@@ -454,7 +454,7 @@ PIPELINE -------> unitTest5 <------- PIPELINE
 input=$ISIS3DATA/odyssey/testData/I00831002RDR.cub
 PIPELINE -------> unitTest6 <------- PIPELINE
 noisefilter FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="0" LINES="0"
-lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" -PREFERENCE="$ISISROOT/TestPreferences" SAMPLES="3" LINES="3"
+lowpass FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.cub" SAMPLES="3" LINES="3" -PREFERENCE="$ISISROOT/TestPreferences"
 PIPELINE -------> unitTest6 <------- PIPELINE
 
 **ERROR** Running Isis program [noisefilter] failed with return status [2].
