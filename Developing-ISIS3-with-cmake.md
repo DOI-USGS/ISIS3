@@ -27,18 +27,18 @@ You will need to modify your `~/.bashrc` as follows:
 (Linux)
 ```bash
 echo -e "\n# Adding shared /usgs/cpkgs/ anaconda3 environment" >> ~/.bashrc
-echo 'export PATH=/usgs/cpkgs/anaconda3_linux/bin:$PATH' >> ~/.bashrc
+echo 'source /usgs/cpkgs/anaconda3_linux/etc/profile.d/conda.sh' >> ~/.bashrc
 ```
 
 (macOS)
 ```bash
 echo -e "\n# Adding shared /usgs/cpkgs/ anaconda3 environment" >> ~/.bashrc
-echo 'export PATH=/usgs/cpkgs/anaconda3_macOS/bin:$PATH' >> ~/.bashrc
+echo 'source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh' >> ~/.bashrc
 ```
 
 You will then need to `source ~/.bashrc` or open a new `bash` terminal to get the anaconda3 binaries added to your path.
 
-To activate the isis3.6.0 environment and start developing, you can run:
+To activate the isis3 environment and start developing, you can run:
 ```bash
 source activate isis3
 ```
