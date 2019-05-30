@@ -173,3 +173,15 @@ You will now need to communicate with both the internal as well as the external 
 For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. It may be a good idea to encourage internal users to try to use conda to access the binaries/applications. 
 
 The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement. 
+
+## Problems
+If you test the conda environment you created for the ISIS build, i.e., isis3.7.1, on prog26 as isis3mgr and get the following warning:
+```
+Could not find conda environment: <isis version>
+You can list all discoverable environments with `conda info --envs`.
+```
+
+Run the following command:
+```
+source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh
+```
