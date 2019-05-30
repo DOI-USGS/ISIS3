@@ -55,7 +55,7 @@ In this step, we will create the build(s) for Anaconda Cloud using the conda-bui
 Please keep in mind that conda may be a little finicky when building for other systems. You must use an OS-specific version of the software, confirm that there exists only one version in your system PATH variable, and that all commands run use that version exclusively. Fortunately, much of the output from conda commands will state the path to the version it is using explicitly.
 
 * ssh into the prog machine that you are creating the build from and ensure you are using a bash shell.
-* Ensure you have a version of conda setup, and if not, set it up. Keep in mind that there exists versions for use building-wide in /usgs/cpkgs/ (though for the Debian system, you will probably want to use the version in /jessetest/miniconda/).
+* Ensure you have a version of conda setup, and if not, set it up. Keep in mind that there exists versions for use building-wide in /usgs/cpkgs/ (though for the Mac system, you will probably want to use the version in /jessetest/miniconda/).
   * Run the command ```conda env list```. If conda is setup properly, this will display a list of available conda environments. If instead you see a ```Command not found``` error or the active base environment (noted by an asterisk) is not the version of conda you are wanting to use, you will need to setup the version of conda you wish to use by running the command ```source /<path-to-anaconda-version>/etc/profile.d/conda.sh```.
 * In your base Anaconda environment (just confirm no environments have been activated), run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build
 * Activate the base environment: ```conda activate```
@@ -129,13 +129,13 @@ Keep in mind that this script will build on prog24, so the build will be accessi
 
 ***While we are in the process of getting Astro caught-up with the process of using conda for our internal builds of ISIS, this building process still needs to be maintained until we officially make the official switch.***
 
-Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Note that this will need to be done once for Linux, and once for Debian.
+Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Note that this will need to be done once for Linux, and once for Mac.
 
 Ensure that you have the proper build of conda set-up. For Linux:
 
 ```source /usgs/cpkgs/anaconda3_linux/etc/profile.d/conda.sh```
 
-For MacOS (Debian):
+For MacOS:
 
 ```source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh```
 
