@@ -71,6 +71,9 @@ Please keep in mind that conda may be a little finicky when building for other s
 
 In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. The location of the .tar.bz2 file to be uploaded should have been displayed at the end of the ```conda build``` command from above. In case you missed this message, you may also run this command to see the location: ```conda build recipe/ --output```. Keep in mind that this does not confirm that the file actually exists - only where it _would_ be saved with a successful build.
 
+Before uploading the build, run the command:
+```conda install anaconda-client```
+
 Though uploading the files involves only one command each, the command will be slightly different depending on how you would like to distribute the build and should be repeated for all builds that were produced.
 
 If this is not a special release, but is instead a standard public release, you will use the command:
@@ -140,7 +143,7 @@ Then run the following commands:
 ```
    conda create -n <isis version> python=3.6
 
-   conda activate isis3
+   conda activate <isis version>
 
    conda config --env --add channels conda-forge
 
