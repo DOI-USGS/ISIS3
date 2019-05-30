@@ -74,7 +74,6 @@ In this step, we will upload the build(s) that we just created into the Anaconda
 
 Before uploading the build, make sure the base environment is still activated. If not, run: ```conda activate```
 
-
 Though uploading the files involves only one command each, the command will be slightly different depending on how you would like to distribute the build and should be repeated for all builds that were produced.
 
 If this is not a special release, but is instead a standard public release, you will use the command:
