@@ -16,7 +16,7 @@ void PipeContinue();
 
 void IsisMain() {
   Preference::Preferences(true);
-  
+
   UserInterface &ui = Application::GetUserInterface();
   ui.PutFileName("FROM",  "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
   ui.PutFileName("FROM2", "$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub");
@@ -50,14 +50,14 @@ void IsisMain() {
   ui.PutFileName("FROM", "unitTest.lis");
   std::cerr << "Testing listing methods" << std::endl;
   PipeListed();
-  
+
   ui.Clear("FROM");
   ui.Clear("TO");
   ui.PutAsString("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
   ui.PutFileName("TO", "./out.cub");
   std::cerr << "*** Branching Pipe with a branch disabled ***" << std::endl;
   PipeBranchDisabled();
-  
+
   ui.Clear("TO");
   ui.PutFileName("TO",   "./out.cub");
   std::cerr << "\n*** Continue option ***" << endl;
@@ -292,7 +292,7 @@ void PipeListed() {
 
 /**
  * Unittest pipeline with branch disabled
- * 
+ *
  * @author sprasad (12/20/2010)
  */
 void PipeBranchDisabled(void)
@@ -304,7 +304,7 @@ void PipeBranchDisabled(void)
   p.AddOriginalBranch("lpf");
   p.AddOriginalBranch("hpf");
   p.KeepTemporaryFiles(false);
-  
+
   p.AddToPipeline("lowpass");
   p.Application("lowpass").SetInputParameter("FROM", false);
   p.Application("lowpass").SetOutputParameter("TO", "lowpass");
@@ -312,9 +312,9 @@ void PipeBranchDisabled(void)
   p.Application("lowpass").AddConstParameter("lpf", "LINES", "3");
   p.Application("lowpass").EnableBranch("lpf", true);
   p.Application("lowpass").EnableBranch("hpf", false);
-  
+
   //std::cerr << p;
-    
+
   p.AddToPipeline("highpass");
   p.Application("highpass").SetInputParameter("FROM", false);
   p.Application("highpass").SetOutputParameter("TO", "highpass");
@@ -322,15 +322,15 @@ void PipeBranchDisabled(void)
   p.Application("highpass").AddConstParameter("hpf", "LINES", "3");
   p.Application("highpass").EnableBranch("lpf", false);
   p.Application("highpass").EnableBranch("hpf", true);
-  
+
   //std::cerr << p;
-  
+
   p.AddToPipeline("fx");
   p.Application("fx").SetInputParameter("FROMLIST", PipelineApplication::LastAppOutputList, false);
   p.Application("fx").SetOutputParameter("TO", "add");
   p.Application("fx").AddConstParameter("MODE", "LIST");
   p.Application("fx").AddConstParameter("EQUATION", "f1+f2");
-  
+
   std::cerr << p;
 }
 
@@ -338,33 +338,34 @@ void PipeContinue(void)
 {
   // Pipeline level "continue"
   Pipeline pc1("unitTest6");
-  
+
   pc1.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
   pc1.SetOutputFile("TO");
   pc1.SetContinue(true);
   pc1.KeepTemporaryFiles(false);
-  
+
   pc1.AddToPipeline("noisefilter");
   // Intentionally broken parameters
-  pc1.Application("noisefilter").SetInputParameter("FROM",     false);
-  pc1.Application("noisefilter").SetOutputParameter("TO",      "");
-  pc1.Application("noisefilter").AddConstParameter("SAMPLES",  "0");
-  pc1.Application("noisefilter").AddConstParameter("LINES",    "0");
-  
+  pc1.Application("noisefilter").SetInputParameter("FROM", false);
+  pc1.Application("noisefilter").SetOutputParameter("TO", "");
+  pc1.Application("noisefilter").AddConstParameter("SAMPLES", "0");
+  pc1.Application("noisefilter").AddConstParameter("LINES", "0");
+
   pc1.AddToPipeline("lowpass");
+  pc1.Application("lowpass").AddConstParameter("-PREFERENCE", "$ISISROOT/TestPreferences");
   pc1.Application("lowpass").SetInputParameter ("FROM", false);
   pc1.Application("lowpass").SetOutputParameter("TO", "lowpass");
   pc1.Application("lowpass").AddConstParameter ("SAMPLES", "3");
   pc1.Application("lowpass").AddConstParameter ("LINES", "3");
-  
+
   cerr << pc1 << endl;
-  
+
   pc1.Run();
-  
+
 
   cerr << "\n*** Application level continue option ***\n";
   Pipeline pc2("unitTest7");
-  
+
   pc2.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
   pc2.SetOutputFile("TO");
   pc2.KeepTemporaryFiles(false);
@@ -376,15 +377,16 @@ void PipeContinue(void)
   pc2.Application("nf1").SetOutputParameter("TO",      "");
   pc2.Application("nf1").AddConstParameter("SAMPLES",  "0");
   pc2.Application("nf1").AddConstParameter("LINES",    "0");
-  
+
   pc2.AddToPipeline("lowpass", "lpf1");
   pc2.Application("lpf1").SetInputParameter ("FROM", false);
   pc2.Application("lpf1").SetOutputParameter("TO", "lpf1");
   pc2.Application("lpf1").AddConstParameter ("SAMPLES", "3");
   pc2.Application("lpf1").AddConstParameter ("LINES", "3");
-  
+  pc2.Application("lpf1").AddConstParameter("-PREFERENCE", "$ISISROOT/TestPreferences");
+
   cerr << pc2 << endl;
-  
+
   pc2.Run();
   remove("./out.cub");
 }
