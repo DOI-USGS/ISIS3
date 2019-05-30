@@ -796,7 +796,7 @@ namespace Isis {
 
   void BundleObservation::bundleOutput(std::ofstream &fpOut, bool errorPropagation) {
 
-      char buf[105600];
+      char buf[4096];
 
       std::vector<double> coefX;
       std::vector<double> coefY;
@@ -873,7 +873,7 @@ namespace Isis {
 
         QString str("%1(%2)  ");
 
-        qDebug() <<"nPositionCoefficients = " << nPositionCoefficients;
+
         if (nPositionCoefficients > 0) {
           for (int i = 0; i < nPositionCoefficients; i++) {
             finalParameterValues.push_back(coefX[i]);
@@ -1077,6 +1077,8 @@ namespace Isis {
           }
           if (errorPropagation) {
 
+
+
             sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
             fpOut << buf;
             sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
@@ -1102,6 +1104,7 @@ namespace Isis {
           }
           else {
 
+            qDebug() << "Parameter:  " << parameterNamesList.at(i);
             sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
             fpOut << buf;
             sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
@@ -1305,20 +1308,14 @@ namespace Isis {
     finalParameterValues.append(QVector<double>::fromStdVector(coefY));
     finalParameterValues.append(QVector<double>::fromStdVector(coefZ));
 
-    parameterNamesListX.append("  X  ");
-    parameterNamesListY.append("  Y  ");
-    parameterNamesListZ.append("  Z  ");
 
-    parameterNamesListRA.append(" RA  ");
-    parameterNamesListDEC.append("DEC  ");
-    parameterNamesListTWI.append("TWI  ");
 
           if (nPositionCoefficients > 0) {
           for (int j = 0; j < nPositionCoefficients;j++) {
             if (j == 0) {
-              parameterNamesListX.append(str.arg("     ").arg("km"));
-              parameterNamesListY.append(str.arg("     ").arg("km"));
-              parameterNamesListZ.append(str.arg("     ").arg("km"));
+              parameterNamesListX.append(str.arg("  X  ").arg("km"));
+              parameterNamesListY.append(str.arg("  Y  ").arg("km"));
+              parameterNamesListZ.append(str.arg("  Z  ").arg("km"));
               correctionUnitListX.append("m");
               correctionUnitListY.append("m");
               correctionUnitListZ.append("m");
@@ -1364,9 +1361,9 @@ namespace Isis {
      if (nPointingCoefficients > 0) {
         for (int j = 0; j < nPointingCoefficients;j++) {
              if (j == 0) {
-               parameterNamesListRA.append(str.arg("     ").arg("dd"));
-               parameterNamesListDEC.append(str.arg("     ").arg("dd"));
-               parameterNamesListTWI.append(str.arg("     ").arg("dd"));
+               parameterNamesListRA.append(str.arg(" RA  ").arg("dd"));
+               parameterNamesListDEC.append(str.arg("DEC  ").arg("dd"));
+               parameterNamesListTWI.append(str.arg("TWI  ").arg("dd"));
                correctionUnitListRA.append("dd");
                correctionUnitListDEC.append("dd");
                correctionUnitListTWI.append("dd");
@@ -1434,6 +1431,7 @@ namespace Isis {
         }
         if (errorPropagation) {
 
+
           sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
           sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
@@ -1457,6 +1455,7 @@ namespace Isis {
 
         }
         else {
+
 
           sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
