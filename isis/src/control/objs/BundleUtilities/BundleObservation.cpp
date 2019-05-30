@@ -1432,9 +1432,10 @@ namespace Isis {
         if (errorPropagation) {
 
 
-          sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
+
+          sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
+          sprintf(buf,"%15.2lf",finalParameterValues[i] - correction);
           fpOut << buf;
           sprintf(buf,"%15.2lf    ",correction);
           fpOut << buf;
@@ -1457,25 +1458,25 @@ namespace Isis {
         else {
 
 
-          sprintf(buf,"%-*s",10,parameterNamesList.at(i).toStdString().c_str() );
+          sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f",finalParameterValues[i] - correction);
+          sprintf(buf,"%15.2lf\t",finalParameterValues[i] - correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf             ",correction);
+          sprintf(buf,"%15.2lf\t",correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValues[i]);
+          sprintf(buf,"%15.2lf\t",finalParameterValues[i]);
           fpOut << buf;
-          sprintf(buf,"             ");
+          sprintf(buf,"\t\t\t");
           fpOut << buf;
-          sprintf(buf,"%*s",7,sigma.toStdString().c_str());
+          sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
           fpOut << buf;
-          sprintf(buf,"            ");
+          sprintf(buf,"\t\t\t\t");
           fpOut << buf;
-          sprintf(buf,"                       %s","N/A");
+          sprintf(buf,"%s","N/A");
           fpOut<<buf;
-          sprintf(buf,"           ");
+          sprintf(buf,"\t\t\t\t");
           fpOut<<buf;
-          sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
+          sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
           fpOut<<buf;
 
         }
@@ -1537,23 +1538,25 @@ namespace Isis {
 
         }
         else {
-          sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
+          sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f ",finalParameterValues[i] - correction*RAD2DEG);
+          sprintf(buf,"%15.2lf\t",finalParameterValues[i] - correction);
           fpOut << buf;
-          sprintf(buf,"%+12.2lf            ",correction*RAD2DEG);
+          sprintf(buf,"%15.2lf\t",correction);
           fpOut << buf;
-          sprintf(buf,"%+12.2lf",finalParameterValues[i]);
+          sprintf(buf,"%15.2lf\t",finalParameterValues[i]);
           fpOut << buf;
-          sprintf(buf,"               ");
+          sprintf(buf,"\t\t\t");
           fpOut << buf;
-          sprintf(buf,"%s",sigma.toStdString().c_str() );
+          sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
           fpOut << buf;
-          sprintf(buf,"              %s","N/A");
+          sprintf(buf,"\t\t\t\t");
+          fpOut << buf;
+          sprintf(buf,"%s","N/A");
           fpOut<<buf;
-          sprintf(buf,"     ");
+          sprintf(buf,"\t\t\t\t");
           fpOut<<buf;
-          sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
+          sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
           fpOut<<buf;
         }
       }

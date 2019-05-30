@@ -1122,14 +1122,12 @@ namespace Isis {
 
      sprintf(buf,"%*s",firstColumnWidth,"\nTotal RMS:");
      fpOut << buf;
-     sprintf(buf,"                                             ");
+     sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
      fpOut << buf;
-     sprintf(buf,"     %-6.3lf        %-6.3lf          %-6.3lf \n",
+     sprintf(buf,"%-6.3lf\t\t\t%-6.3lf\t\t\t%-6.3lf \n",
      rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
      fpOut << buf;
      
-
-
     return true;
   }
 
