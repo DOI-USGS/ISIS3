@@ -119,7 +119,7 @@ namespace Isis {
    */
   int KaguyaTcCamera::CkFrameId() const {
      return (-131000);
-    }
+  }
 
   /**
    * CK Reference ID - J2000
