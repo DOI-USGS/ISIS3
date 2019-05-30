@@ -58,6 +58,7 @@ Please keep in mind that conda may be a little finicky when building for other s
 * Ensure you have a version of conda setup, and if not, set it up. Keep in mind that there exists versions for use building-wide in /usgs/cpkgs/ (though for the Debian system, you will probably want to use the version in /jessetest/miniconda/).
   * Run the command ```conda env list```. If conda is setup properly, this will display a list of available conda environments. If instead you see a ```Command not found``` error or the active base environment (noted by an asterisk) is not the version of conda you are wanting to use, you will need to setup the version of conda you wish to use by running the command ```source /<path-to-anaconda-version>/etc/profile.d/conda.sh```.
 * In your base Anaconda environment (just confirm no environments have been activated), run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build
+* Activate the base environment: ```conda activate```
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda verify -h```, respectively.
 * From the root of the ISIS3 repo run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
@@ -71,9 +72,8 @@ Please keep in mind that conda may be a little finicky when building for other s
 
 In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. The location of the .tar.bz2 file to be uploaded should have been displayed at the end of the ```conda build``` command from above. In case you missed this message, you may also run this command to see the location: ```conda build recipe/ --output```. Keep in mind that this does not confirm that the file actually exists - only where it _would_ be saved with a successful build.
 
-Before uploading the build, run the command:
+Before uploading the build, make sure the base environment is still activated. If not, run: ```conda activate```
 
-```conda install anaconda-client```
 
 Though uploading the files involves only one command each, the command will be slightly different depending on how you would like to distribute the build and should be repeated for all builds that were produced.
 
