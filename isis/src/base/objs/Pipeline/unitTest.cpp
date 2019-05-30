@@ -352,16 +352,15 @@ void PipeContinue(void)
   pc1.Application("noisefilter").AddConstParameter("LINES", "0");
 
   pc1.AddToPipeline("lowpass");
-  pc1.Application("lowpass").AddConstParameter("-PREFERENCE", "$ISISROOT/TestPreferences");
   pc1.Application("lowpass").SetInputParameter ("FROM", false);
   pc1.Application("lowpass").SetOutputParameter("TO", "lowpass");
   pc1.Application("lowpass").AddConstParameter ("SAMPLES", "3");
   pc1.Application("lowpass").AddConstParameter ("LINES", "3");
+  pc1.Application("lowpass").AddConstParameter("-PREFERENCE", "$ISISROOT/TestPreferences");
 
   cerr << pc1 << endl;
 
   pc1.Run();
-
 
   cerr << "\n*** Application level continue option ***\n";
   Pipeline pc2("unitTest7");
