@@ -183,7 +183,7 @@ namespace Isis {
 
       void addAdjustedImages(ImageList *images);
       void setOutputStatistics(BundleResults statisticsResults);
-      void setOutputControl(Control * outputControl);
+      void setOutputControl(Control *outputControl);
       void setOutputControlName(QString name);
       void setRunTime(QString runTime);
       void setName(QString name);

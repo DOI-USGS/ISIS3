@@ -280,8 +280,7 @@ namespace Isis {
     if (m_outputControl)
       return m_outputControl->fileName();
     else
-      return
-          m_outputControlName;
+      return m_outputControlName;
   }
 
 
@@ -965,7 +964,7 @@ namespace Isis {
 
     if (m_statisticsResults->iterations() >= m_settings->convergenceCriteriaMaximumIterations()) {
       sprintf(buf, "(Maximum reached)");
-     fpOut << buf;
+      fpOut << buf;
     }
 
     sprintf(buf, "\n                         Sigma0: %30.20lf\n", m_statisticsResults->sigma0());
@@ -1036,49 +1035,22 @@ namespace Isis {
 
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMeasures\t\t\t\t\t\t\t\tRMS(pixels)\n");
+    fpOut << buf;
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t******************************  "
+                "**************************************************\n");
+    fpOut << buf;
+
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|Accepted\t\t|\t\tTotal|\t|Samples\t\t|\t\t"
+                "Lines\t\t|\t\tTotal|\n");
+    fpOut << buf;
 
     int numMeasures;
     int numRejectedMeasures;
     int numUsed;
     int imageIndex = 0;
-
-    char imgMeasuresH1[] = "        Measures        ";
-    char imgMeasuresH1a[]= "************************";
-    char imgMeasuresH2[] = "|Accepted    |    Total|";
-    char imgMeasuresH3[] = "             RMS(pixels)             ";
-    char imgMeasuresH3a[] ="*************************************";
-    char imgMeasuresH4[] = "|Samples    |    Lines    |    Total|";
-
-
-
-    //int h1 = (int)(sizeof(imgMeasuresH1)/sizeof(char) );
-    int h2 = (int)(sizeof(imgMeasuresH2)/sizeof(char) );
-    //int h3 = (int)(sizeof(imgMeasuresH3)/sizeof(char) );
-    int h4 = (int)(sizeof(imgMeasuresH4)/sizeof(char) );
-
-
-
-    int firstColumnWidth
-        = m_statisticsResults->observations().at(0)->at(0)->fileName().toLatin1().length();
-    //Find the maximum file name length for the first image (length of first column)
-    for (int i = 1; i < numObservations;i++) {
-      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
-      for (int j = 1; j < numImagesInObservation; j++ ) {
-        int l = m_statisticsResults->observations().at(0)->at(0)->fileName().toLatin1().length();
-        if (l > firstColumnWidth)
-          firstColumnWidth = l;
-      }
-    }
-
-    //Header 1
-    sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH1,h4,imgMeasuresH3);
-    fpOut<< buf;
-    sprintf(buf,"%*s  %s \n",firstColumnWidth+h2,imgMeasuresH1a,imgMeasuresH3a);
-    fpOut<<buf;
-    //Header 2
-    sprintf(buf,"%*s %*s \n",firstColumnWidth+h2,imgMeasuresH2,h4,imgMeasuresH4);
-    fpOut<< buf;
     Statistics rmsSamplesTotal,rmsLinesTotal,rmsTotals;
+
     for (int i = 0; i < numObservations; i++) {
 
       int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
@@ -1097,22 +1069,21 @@ namespace Isis {
         rmsLinesTotal.AddData(rmsLineResiduals);
         rmsTotals.AddData(rmsLandSResiduals);
 
-        numMeasures =         m_statisticsResults->outputControlNet()->
-                                  GetNumberOfValidMeasuresInImage(
-                                      bundleImage->serialNumber());
+        numMeasures = m_statisticsResults->outputControlNet()->GetNumberOfValidMeasuresInImage
+            (bundleImage->serialNumber());
 
         numRejectedMeasures = m_statisticsResults->outputControlNet()->
-                                  GetNumberOfJigsawRejectedMeasuresInImage(
-                                      bundleImage->serialNumber());
+            GetNumberOfJigsawRejectedMeasuresInImage(bundleImage->serialNumber());
 
-        numUsed =             numMeasures - numRejectedMeasures;
+        numUsed = numMeasures - numRejectedMeasures;
 
-
-        sprintf(buf,"%*s",firstColumnWidth,bundleImage->fileName().toLatin1().data());
+        sprintf(buf,"%-*s\t\t\t\t\t",45,bundleImage->fileName().toLatin1().data());
         fpOut << buf;
-        sprintf(buf,"%*d              %*d",5,numUsed,5,numMeasures);
+
+        sprintf(buf,"%*d\t\t\t%*d\t\t\t",5,numUsed,5,numMeasures);
         fpOut << buf;
-        sprintf(buf,"     %-6.3lf         %-6.3lf         %-6.3lf \n",
+
+        sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf \n",
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
 
         fpOut << buf;
@@ -1120,14 +1091,14 @@ namespace Isis {
       }
     }
 
-     sprintf(buf,"%*s",firstColumnWidth,"\nTotal RMS:");
-     fpOut << buf;
-     sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
-     fpOut << buf;
-     sprintf(buf,"%-6.3lf\t\t\t%-6.3lf\t\t\t%-6.3lf \n",
-     rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
-     fpOut << buf;
-     
+    sprintf(buf,"\nTotal RMS:");
+    fpOut << buf;
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+    fpOut << buf;
+    sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf\n",
+    rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
+    fpOut << buf;
+
     return true;
   }
 

@@ -128,19 +128,15 @@ namespace Isis {
      
       LinearAlgebra::Vector &parameterWeights();
       LinearAlgebra::Vector &parameterCorrections();
-//    LinearAlgebra::Vector &parameterSolution();
       LinearAlgebra::Vector &aprioriSigmas();
       LinearAlgebra::Vector &adjustedSigmas();
       
       const BundleObservationSolveSettingsQsp solveSettings();
 
-//    QStringList serialNumbers();
-
       bool applyParameterCorrections(LinearAlgebra::Vector corrections);
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
       void updateBodyRotation();
-      void bundleOutput(std::ofstream &fpOut,bool errorPropagation);
       void bundleOutputString(std::ofstream &fpOut,bool errorPropagation);
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
