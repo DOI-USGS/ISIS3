@@ -71,13 +71,31 @@ namespace Isis {
    * implementation uses a polynomial distortion if the SetDistortion method
    * is invoked.  After calling this method, you can obtain the undistorted
    * x/y via the UndistortedFocalPlaneX and UndistortedFocalPlaneY methods
+   *  
+   * This implements the following distortion correction from the IK for the terrain camera,
+   * see: SEL_TC_V01.TI
+   *  
+   * r2 = x^2 + y^2 
+   *  
+   * Distortion coefficients information:
+   *  INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
+   *  INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
+   *
+   * Distance r from the center:
+   *   r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
+   *
+   * Line-of-sight vector v is calculated as
+   *  v[X] = INS<INSTID>BORESIGHT[X]
+   *         +a0 +a1*r +a2*r^2 +a3*r^3 ,
+   *  v[Y] = INS<INSTID>BORESIGHT[Y]
+   *        +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
+   *  v[Z] = INS<INSTID>BORESIGHT[Z] .
    *
    * @param dx distorted focal plane x in millimeters
    * @param dy distorted focal plane y in millimeters
    *
    * @return if the conversion was successful
    * @see SetDistortion
-   * @todo Generalize polynomial equation
    */
   bool KaguyaTcCameraDistortionMap::SetFocalPlane(double dx, double dy) {
     p_focalPlaneX = dx;
@@ -89,27 +107,6 @@ namespace Isis {
     double r2 = x*x + y*y;
     double r = qSqrt(r2); 
     double r3 = r2 * r; 
-
-
-
-    /** This implements the following distortion correction from the IK for the terrain camera,
-     see: SEL_TC_V01.TI
-     
-     r2 = x^2 + y^2
-      Distortion coefficients information:
-       INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
-       INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
-    
-     Distance r from the center:
-       r = - (n - INS<INSTID>_CENTER) * INS<INSTID>_PIXEL_SIZE.
-    
-     Line-of-sight vector v is calculated as
-       v[X] = INS<INSTID>BORESIGHT[X]
-              +a0 +a1*r +a2*r^2 +a3*r^3 ,
-       v[Y] = INS<INSTID>BORESIGHT[Y]
-              +r +a0 +a1*r +a2*r^2 +a3*r^3 ,
-       v[Z] = INS<INSTID>BORESIGHT[Z] .
-    */
 
     // Apply distortion correction
     double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3;
