@@ -1269,12 +1269,17 @@ namespace Isis {
         fpOut << buf;
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
-        sprintf(buf,"\n    Image         Initial            Total               "
-                "Final                            Accuracy                   \n"
-                "Parameter         Value              Correction          Value               Initial           Final           Units\n"
 
-                "                                                                             ***************************************\n");
+        sprintf(buf,"Image         Initial                     Total                  "
+                    "Final                                      Accuracy\n");
+        fpOut << buf;
+        sprintf(buf,"Parameter         Value                       Correction"
+                    "             Value                      Initial           "
+                    "Final           Units\n");
+        fpOut << buf;
 
+        sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+                    "***************************************\n");
         fpOut << buf;
 
         observation->bundleOutputString(fpOut,berrorProp);

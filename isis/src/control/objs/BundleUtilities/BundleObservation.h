@@ -82,7 +82,7 @@ namespace Isis {
    *                            BundleSolutionInfo::outputText(). This function is a refactor of
    *                            the formatBundleOutputString and uses the traditional C function
    *                            sprintf instead of QString arg chaining because it's easier to
-   *                            make the output columns to align nicely.  Also, it maintains
+   *                            make the output columns align nicely.  Also, it maintains
    *                            consistency with text output in BundleSolutionInfo.
    *
    */
@@ -137,7 +137,25 @@ namespace Isis {
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
       void updateBodyRotation();
+
+      std::vector<double> coefX;
+      std::vector<double> coefY;
+      std::vector<double> coefZ;
+
+      std::vector<double> coefRA;
+      std::vector<double> coefDEC;
+      std::vector<double> coefTWI;
+
+
+      void bundleOutputFetchData(QVector<double> &coefX, QVector<double> &coefY,
+                            QVector<double> &coefZ, QVector<double> &coefRA,
+                            QVector<double> &coefDEC, QVector<double> &coefTWI,
+                            QVector<double> &finalParameterValues,
+                            int &nPositionCoefficients, int &nPointingCoefficients,
+                            bool &useDefaultPosition, bool &useDefaultPointing,
+                            bool &useDefaultTwist);
       void bundleOutputString(std::ofstream &fpOut,bool errorPropagation);
+      QString bundleOutputCSV(bool errorPropagation);
       QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();

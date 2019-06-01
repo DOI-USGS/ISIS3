@@ -787,6 +787,95 @@ namespace Isis {
 
 
 
+  void BundleObservation::bundleOutputFetchData(QVector<double> &coefX,
+                          QVector<double> &coefY, QVector<double> &coefZ,
+                          QVector<double> &coefRA, QVector<double> &coefDEC,
+                          QVector<double> &coefTWI,QVector<double> &finalParameterValues,
+                          int &nPositionCoefficients, int &nPointingCoefficients,
+                          bool &useDefaultPosition,
+                          bool &useDefaultPointing, bool &useDefaultTwist) {
+
+    std::vector<double> cx,cy,cz,cra,cdec,ctwi;
+    nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
+    nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+    // Indicate if we need to obtain default position or pointing values
+    useDefaultPosition = false;
+    useDefaultPointing = false;
+    // Indicate if we need to use default values when not solving twist
+    useDefaultTwist = !(m_solveSettings->solveTwist());
+
+    // If we aren't solving for position, set the number of coefficients to 1 so we can output the
+    // instrumentPosition's center coordinate values for X, Y, and Z
+    if (nPositionCoefficients == 0) {
+      nPositionCoefficients = 1;
+      useDefaultPosition = true;
+      }
+
+    // If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
+    // instrumentPointing's center angles for RA, DEC, and TWI
+    if (nPointingCoefficients == 0) {
+        nPointingCoefficients = 1;
+        useDefaultPointing = true;
+      }
+
+    // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
+    // so we can always output a value for them
+
+    coefX.resize(nPositionCoefficients);
+    coefY.resize(nPositionCoefficients);
+    coefZ.resize(nPositionCoefficients);
+    coefRA.resize(nPointingCoefficients);
+    coefDEC.resize(nPointingCoefficients);
+    coefTWI.resize(nPointingCoefficients);
+
+    if (m_instrumentPosition) {
+      if (!useDefaultPosition) {
+        m_instrumentPosition->GetPolynomial(cx,cy,cz);
+        coefX = QVector<double>::fromStdVector(cx);
+        coefY = QVector<double>::fromStdVector(cy);
+        coefZ = QVector<double>::fromStdVector(cz);
+      }
+      // Use the position's center coordinate if not solving for spacecraft position
+      else {
+        const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
+        coefX[0] = centerCoord[0];
+        coefY[0] = centerCoord[1];
+        coefZ[0] = centerCoord[2];
+      }
+    }
+
+    if (m_instrumentRotation) {
+      if (!useDefaultPointing) {
+        m_instrumentRotation->GetPolynomial(cra,cdec,ctwi);
+        coefRA = QVector<double>::fromStdVector(cra);
+        coefDEC = QVector<double>::fromStdVector(cdec);
+        coefTWI = QVector<double>::fromStdVector(ctwi);
+      }
+      // Use the pointing's center angles if not solving for pointing (rotation)
+      else {
+        const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
+        coefRA[0] = centerAngles[0];
+        coefDEC[0] = centerAngles[1];
+        coefTWI[0] = centerAngles[2];
+      }
+    }
+
+    //Convert pointing coefficients from radians to degrees
+    for (int i = 0; i < nPointingCoefficients; i++) {
+       coefRA[i]*=RAD2DEG;
+       coefDEC[i]*=RAD2DEG;
+       coefTWI[i]*=RAD2DEG;
+    }
+
+   finalParameterValues.append(coefX);
+   finalParameterValues.append(coefY);
+   finalParameterValues.append(coefZ);
+   finalParameterValues.append(coefRA);
+   finalParameterValues.append(coefDEC);
+   finalParameterValues.append(coefTWI);
+
+  }
 
 
   /**
@@ -801,78 +890,17 @@ namespace Isis {
 
     char buf[4096];
 
-    std::vector<double> coefX;
-    std::vector<double> coefY;
-    std::vector<double> coefZ;
+    QVector<double> coefX,coefY,coefZ,coefRA,coefDEC,coefTWI,finalParameterValues;
+    int nPositionCoefficients, nPointingCoefficients;
+    bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
 
-    std::vector<double> coefRA;
-    std::vector<double> coefDEC;
-    std::vector<double> coefTWI;
+    bundleOutputFetchData(coefX,coefY,coefZ,coefRA,coefDEC,coefTWI,finalParameterValues,
+                          nPositionCoefficients,nPointingCoefficients,
+                          useDefaultPosition,useDefaultPointing,useDefaultTwist);
 
-    QVector<double> finalParameterValues;
-
-    int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
-    int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
-
-    // Indicate if we need to obtain default position or pointing values
-    bool useDefaultPosition = false;
-    bool useDefaultPointing = false;
-    // Indicate if we need to use default values when not solving twist
-    bool useDefaultTwist = !(m_solveSettings->solveTwist());
-
-    // If we aren't solving for position, set the number of coefficients to 1 so we can output the
-    // instrumentPosition's center coordinate values for X, Y, and Z
-    if (nPositionCoefficients == 0) {
-      nPositionCoefficients = 1;
-      useDefaultPosition = true;
-    }
-    // If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
-    // instrumentPointing's center angles for RA, DEC, and TWI
-    if (nPointingCoefficients == 0) {
-      nPointingCoefficients = 1;
-      useDefaultPointing = true;
-    }
-
-    // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
-    // so we can always output a value for them
     int nPositionParameters = 3 * nPositionCoefficients;
     int nPointingParameters = 3 * nPointingCoefficients;
     int nParameters = nPositionParameters + nPointingParameters;
-
-    coefX.resize(nPositionCoefficients);
-    coefY.resize(nPositionCoefficients);
-    coefZ.resize(nPositionCoefficients);
-    coefRA.resize(nPointingCoefficients);
-    coefDEC.resize(nPointingCoefficients);
-    coefTWI.resize(nPointingCoefficients);
-
-    if (m_instrumentPosition) {
-      if (!useDefaultPosition) {
-        m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
-      }
-      // Use the position's center coordinate if not solving for spacecraft position
-      else {
-        const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
-        coefX[0] = centerCoord[0];
-        coefY[0] = centerCoord[1];
-        coefZ[0] = centerCoord[2];
-      }
-    }
-
-    if (m_instrumentRotation) {
-      if (!useDefaultPointing) {
-        m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
-
-      }
-      // Use the pointing's center angles if not solving for pointing (rotation)
-      else {
-        const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
-        coefRA[0] = centerAngles[0];
-        coefDEC[0] = centerAngles[1];
-        coefTWI[0] = centerAngles[2];
-
-      }
-    }
 
     // for convenience, create vectors of parameters names and values in the correct sequence
 
@@ -885,24 +913,18 @@ namespace Isis {
 
     QString str("%1(%2)  ");
 
-    finalParameterValues.append(QVector<double>::fromStdVector(coefX));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefY));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefZ));
+    if (nPositionCoefficients > 0) {
+      for (int j = 0; j < nPositionCoefficients;j++) {
+        if (j == 0) {
+          parameterNamesListX.append(str.arg("  X  ").arg("km"));
+          parameterNamesListY.append(str.arg("  Y  ").arg("km"));
+          parameterNamesListZ.append(str.arg("  Z  ").arg("km"));
+          correctionUnitListX.append("m");
+          correctionUnitListY.append("m");
+          correctionUnitListZ.append("m");
+        } //end inner-if
 
-
-
-          if (nPositionCoefficients > 0) {
-          for (int j = 0; j < nPositionCoefficients;j++) {
-            if (j == 0) {
-              parameterNamesListX.append(str.arg("  X  ").arg("km"));
-              parameterNamesListY.append(str.arg("  Y  ").arg("km"));
-              parameterNamesListZ.append(str.arg("  Z  ").arg("km"));
-              correctionUnitListX.append("m");
-              correctionUnitListY.append("m");
-              correctionUnitListZ.append("m");
-            } //end inner-if
-
-            else {
+        else {
               switch(j) {
               case 1:
                 parameterNamesListX.append( str.arg("     ").arg("km/s") );
@@ -926,31 +948,18 @@ namespace Isis {
 
       }//end outer-if
 
+    if (nPointingCoefficients > 0) {
+      for (int j = 0; j < nPointingCoefficients;j++) {
+        if (j == 0) {
+          parameterNamesListRA.append(str.arg(" RA  ").arg("dd"));
+          parameterNamesListDEC.append(str.arg("DEC  ").arg("dd"));
+          parameterNamesListTWI.append(str.arg("TWI  ").arg("dd"));
+          correctionUnitListRA.append("dd");
+          correctionUnitListDEC.append("dd");
+          correctionUnitListTWI.append("dd");
+          } //end inner-if
 
-     //Convert pointing coefficients from radians to degrees
-     for (int i = 0; i < nPointingCoefficients; i++) {
-        coefRA[i]*=RAD2DEG;
-        coefDEC[i]*=RAD2DEG;
-        coefTWI[i]*=RAD2DEG;
-     }
-
-     finalParameterValues.append(QVector<double>::fromStdVector(coefRA));
-     finalParameterValues.append(QVector<double>::fromStdVector(coefDEC));
-     finalParameterValues.append(QVector<double>::fromStdVector(coefTWI));
-
-
-     if (nPointingCoefficients > 0) {
-        for (int j = 0; j < nPointingCoefficients;j++) {
-             if (j == 0) {
-               parameterNamesListRA.append(str.arg(" RA  ").arg("dd"));
-               parameterNamesListDEC.append(str.arg("DEC  ").arg("dd"));
-               parameterNamesListTWI.append(str.arg("TWI  ").arg("dd"));
-               correctionUnitListRA.append("dd");
-               correctionUnitListDEC.append("dd");
-               correctionUnitListTWI.append("dd");
-             } //end inner-if
-
-             else {
+        else {
                switch(j) {
                case 1:
                  parameterNamesListRA.append( str.arg("     ").arg("dd/s") );
@@ -992,7 +1001,6 @@ namespace Isis {
       correctionUnitList.append(correctionUnitListRA);
       correctionUnitList.append(correctionUnitListTWI);
 
-
     // Save the list of parameter names we've accumulated above
     m_parameterNamesList = parameterNamesList;
 
@@ -1012,15 +1020,13 @@ namespace Isis {
         }
         if (errorPropagation) {
 
-
-
           sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValues[i] - correction);
+          sprintf(buf,"%20.8lf",finalParameterValues[i] - correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf    ",correction);
+          sprintf(buf,"%20.8lf    ",correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValues[i]);
+          sprintf(buf,"%20.8lf",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"             ");
           fpOut << buf;
@@ -1038,14 +1044,13 @@ namespace Isis {
         }
         else {
 
-
           sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2lf\t",finalParameterValues[i] - correction);
+          sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf\t",correction);
+          sprintf(buf,"%20.8lf\t",correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf\t",finalParameterValues[i]);
+          sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"\t\t\t");
           fpOut << buf;
@@ -1059,9 +1064,7 @@ namespace Isis {
           fpOut<<buf;
           sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
           fpOut<<buf;
-
         }
-
       }
 
       // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
@@ -1072,6 +1075,7 @@ namespace Isis {
         offset = 3;
       }
       // pointing parameters
+
       for (int i = nPositionParameters; i < nParameters; i++) {
         if (!useDefaultPointing) {
           // If solving camera and not solving for twist, provide default values for twist to
@@ -1098,11 +1102,11 @@ namespace Isis {
         if (errorPropagation) {
           sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2f",finalParameterValues[i] - correction*RAD2DEG);
+          sprintf(buf,"%20.8lf",finalParameterValues[i] - correction*RAD2DEG);
           fpOut << buf;
-          sprintf(buf,"%15.2lf    ",correction*RAD2DEG);
+          sprintf(buf,"%20.8lf    ",correction*RAD2DEG);
           fpOut << buf;
-          sprintf(buf,"%15.2lf",finalParameterValues[i]);
+          sprintf(buf,"%20.8lf",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"                 ");
           fpOut << buf;
@@ -1121,11 +1125,11 @@ namespace Isis {
         else {
           sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
           fpOut << buf;
-          sprintf(buf,"%15.2lf\t",finalParameterValues[i] - correction);
+          sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf\t",correction);
+          sprintf(buf,"%20.8lf\t",correction);
           fpOut << buf;
-          sprintf(buf,"%15.2lf\t",finalParameterValues[i]);
+          sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
           fpOut << buf;
           sprintf(buf,"\t\t\t");
           fpOut << buf;
@@ -1141,7 +1145,123 @@ namespace Isis {
           fpOut<<buf;
         }
       }
+
   }
+
+
+  QString BundleObservation::bundOutputCSV(bool errorPropagation){
+
+    QVector<double> coefX,coefY,coefZ,coefRA,coefDEC,coefTWI,finalParameterValues;
+    int nPositionCoefficients, nPointingCoefficients;
+    bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
+
+    bundleOutputFetchData(coefX,coefY,coefZ,coefRA,coefDEC,coefTWI,finalParameterValues,
+                          nPositionCoefficients,nPointingCoefficients,
+                          useDefaultPosition,useDefaultPointing,useDefaultTwist);
+
+    int nPositionParameters = 3 * nPositionCoefficients;
+    int nPointingParameters = 3 * nPointingCoefficients;
+    int nParameters = nPositionParameters + nPointingParameters;
+
+    QStringList parameterNamesList;
+    QStringList correctionUnitList;
+
+
+
+  // Save the list of parameter names we've accumulated above
+  //m_parameterNamesList = parameterNamesList;
+
+  QString finalqStr = "";
+  QString qStr = "";
+
+  // Set up default values when we are using default position
+  QString sigma = "N/A";
+  QString adjustedSigma = "N/A";
+  double correction = 0.0;
+
+  // position parameters
+  for (int i = 0; i < nPositionParameters; i++) {
+    if (!useDefaultPosition) {
+      correction = m_corrections(i);
+      adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+      sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+    }
+    // Provide default values for position if not solving position
+    else {
+      correction = 0.0;
+      adjustedSigma = "N/A";
+      sigma = "N/A";
+    }
+    qStr = "";
+    if (errorPropagation) {
+      qStr += toString(finalParameterValues[i] - correction) + ",";
+      qStr += toString(correction) + ",";
+      qStr += toString(finalParameterValues[i]) + ",";
+      qStr += sigma + ",";
+      qStr += adjustedSigma + ",";
+    }
+    else {
+      qStr += toString(finalParameterValues[i] - correction) + ",";
+      qStr += toString(correction) + ",";
+      qStr += toString(finalParameterValues[i]) + ",";
+      qStr += sigma + ",";
+      qStr += "N/A,";
+    }
+    finalqStr += qStr;
+  }
+
+  // If not solving position, we need to offset access to correction and sigma members by -3
+  // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
+  // solved
+  int offset = 0;
+  if (useDefaultPosition) {
+    offset = 3;
+  }
+  // pointing parameters
+  for (int i = nPositionParameters; i < nParameters; i++) {
+    if (!useDefaultPointing) {
+      // Use default values if solving camera but not solving for TWIST to prevent bad indexing
+      // into m_corrections and m_*sigmas
+      if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+      else {
+        correction = m_corrections(i - offset);
+        adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
+            toString(m_aprioriSigmas[i-offset], 8) );
+      }
+    }
+    // Provide default values for pointing if not solving pointing
+    else {
+      correction = 0.0;
+      adjustedSigma = "N/A";
+      sigma = "N/A";
+    }
+    qStr = "";
+    if (errorPropagation) {
+      qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+      qStr += toString(correction * RAD2DEG) + ",";
+      qStr += toString(finalParameterValues[i]) + ",";
+      qStr += sigma + ",";
+      qStr += adjustedSigma + ",";
+    }
+    else {
+      qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+      qStr += toString(correction * RAD2DEG) + ",";
+      qStr += toString(finalParameterValues[i]) + ",";
+      qStr += sigma + ",";
+      qStr += "N/A,";
+    }
+    finalqStr += qStr;
+  }
+
+  return finalqStr;
+
+  }
+
 
 
   /**
