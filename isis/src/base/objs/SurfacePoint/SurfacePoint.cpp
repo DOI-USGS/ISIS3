@@ -1261,6 +1261,11 @@ namespace Isis {
    * @param lonLength The delta longitude distance in meters  to convert to radians
    * @return @b LonDistAngle The converted delta length in radians
    *
+   * @internal
+   *   @history  2019-05-29 Debbie A. Cook  Changed test constant from DBL_EPSILON
+   *                                            to 1.0e-50 to fix possible false errors from reasonably 
+   *                                            small distances on fixed or tightly constrained points 
+   *                                            occurring during error propagation in jigsaw.
    */
   double SurfacePoint::MetersToLongitude(double deltaLonMeters) {
     
@@ -1269,7 +1274,7 @@ namespace Isis {
       double deltaLonRadians;
 
       // Convert angle displacement to radians relative to longitude of SurfacePoint.      
-      if (convFactor > DBL_EPSILON) {             
+      if (convFactor > 1.0e-50) {             
         deltaLonRadians = deltaLonMeters / (convFactor*GetLocalRadius().meters());
       }
       else {
@@ -1726,11 +1731,17 @@ namespace Isis {
   /**
    * Return the latitude sigma as a Distance
    *
+   * @internal
+   *   @history  2019-05-29 Debbie A. Cook  Changed test constant from DBL_EPSILON
+   *                                            to 1.0e-50 to fix possible false errors from reasonably 
+   *                                            small distances on fixed or tightly constrained points 
+   *                                            occurring during error propagation in jigsaw.
+   *
    */
   Distance SurfacePoint::GetLatSigmaDistance() const {
     double d = LatitudeToMeters(GetLatSigma().radians());
 
-    if (d > DBL_EPSILON)  {
+    if (d > 1.0e-50)  {
       return Distance(d,  Distance::Meters);
     }
     else {

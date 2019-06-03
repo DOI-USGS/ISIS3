@@ -139,6 +139,9 @@ namespace Isis {
    *                           coordinates.  References #4649 and #501.
    *   @history 2018-10-12 Debbie A. Cook - Initialized local radius in 
    *                           SetRectangularCoordinates 
+   *   @history  2019-05-29 Debbie A. Cook  Changed test constant from DBL_EPSILON to
+   *                           1.0e-50 to avoid false positives and negatives in MetersToLongitude, 
+   *                           GetLatSigmaDistance, and GetLonSigmaDistance.
    *                                                    
    */
 
