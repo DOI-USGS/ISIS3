@@ -1176,7 +1176,8 @@ namespace Isis {
         fpOut << buf;
 
         QString observationString =
-            observation->formatBundleOutputString(errorProp,true);
+            //observation->formatBundleOutputString(errorProp,true);
+            observation->bundleOutputCSV(errorProp);
 
         //Removes trailing commas
         if (observationString.right(1)==",") {

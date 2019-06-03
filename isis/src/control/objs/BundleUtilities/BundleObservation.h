@@ -84,6 +84,11 @@ namespace Isis {
    *                            sprintf instead of QString arg chaining because it's easier to
    *                            make the output columns align nicely.  Also, it maintains
    *                            consistency with text output in BundleSolutionInfo.
+   *  @history 2019-06-03  Tyler Wilson  Deleted the formatBundleOutputString and added the
+   *                            functions bundleOutputCSV/bundleOutputFetchData.  Combined
+   *                            with bundleOutputString these three functions will fulfill
+   *                            the same functional role formerly occuped by
+   *                            formatBundleOutputString but with reduced code duplication.
    *
    */
   class BundleObservation : public QVector<BundleImageQsp> {
@@ -156,7 +161,6 @@ namespace Isis {
                             bool &useDefaultTwist);
       void bundleOutputString(std::ofstream &fpOut,bool errorPropagation);
       QString bundleOutputCSV(bool errorPropagation);
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();
 

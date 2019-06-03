@@ -442,19 +442,19 @@ int main(int argc, char *argv[]) {
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(false);
+    //qDebug().noquote() << bo2.formatBundleOutputString(false);
+    //qDebug().noquote() << bo2.formatBundleOutputString(true);
     qDebug() << "    Set solve settings using with TWIST=FALSE...";
     bo2.setSolveSettings(bossToFill);
     bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo2.formatBundleOutputString(false);
-    qDebug().noquote() << bo2.formatBundleOutputString(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(true);
+    qDebug().noquote() << bo2.bundleOutputCSV(true);
+    //qDebug().noquote() << bo2.formatBundleOutputString(false);
+    //qDebug().noquote() << bo2.formatBundleOutputString(true);
 
 
 
@@ -503,9 +503,9 @@ int main(int argc, char *argv[]) {
     // bo3.initializeBodyRotation(); //Seg fault
 
     qDebug() << "    output bundle observation...";
-    qDebug().noquote() << bo3.formatBundleOutputString(false,true);
-    qDebug().noquote() << bo3.formatBundleOutputString(false);
-    qDebug().noquote() << bo3.formatBundleOutputString(true,true);
+    qDebug().noquote() << bo3.bundleOutputCSV(false);
+    //qDebug().noquote() << bo3.formatBundleOutputString(false);
+    qDebug().noquote() << bo3.bundleOutputCSV(true);
     qDebug() << "init exterior orientiation successful?  "
              << toString(bo3.initializeExteriorOrientation());
     //TODO: We should not have to catch an exception here, we need to use an observation
@@ -1114,7 +1114,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     qDebug() << "";
     BundleTargetBody btb1;
 
-    qDebug().noquote() << btb1.formatBundleOutputString(false);
+    //qDebug().noquote() << btb1.formatBundleOutputString(false);
 
     //TODO test creating a BundleTargetBody from a target
 
@@ -1183,9 +1183,9 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
         Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
         Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
         Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
-    qDebug().noquote() << btb1.formatBundleOutputString(false);
+    //qDebug().noquote() << btb1.formatBundleOutputString(false);
     qDebug() << "";
-    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    //qDebug().noquote() << btb1.formatBundleOutputString(true);
     LinearAlgebra::Vector btb1Weights = btb1.parameterWeights();
     QString btb1WString;
     for (size_t i = 0; i < btb1Weights.size(); i++) {
@@ -1216,7 +1216,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
       btb1Corrections[i] = pow(-0.7, i);
     }
     btb1.applyParameterCorrections(btb1Corrections);
-    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    //qDebug().noquote() << btb1.formatBundleOutputString(true);
     btb1Weights = btb1.parameterWeights();
     btb1WString.clear();
     for (size_t i = 0; i < btb1Weights.size(); i++) {
@@ -1241,7 +1241,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
       btb1Corrections[i] = pow(1.1, i);
     }
     btb1.applyParameterCorrections(btb1Corrections);
-    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    //qDebug().noquote() << btb1.formatBundleOutputString(true);
     btb1Weights = btb1.parameterWeights();
     btb1WString.clear();
     for (size_t i = 0; i < btb1Weights.size(); i++) {
@@ -1345,7 +1345,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     qDebug() << "Test copy constructor";
     qDebug() << "";
     BundleTargetBody btb3(btb1);
-    qDebug().noquote() << btb3.formatBundleOutputString(true);
+    //qDebug().noquote() << btb3.formatBundleOutputString(true);
 
     qDebug() << "Switch free and valid sigmas";
     qDebug() << "";
@@ -1371,7 +1371,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
         Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
         Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
         Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
-    qDebug().noquote() << btb1.formatBundleOutputString(true);
+    //qDebug().noquote() << btb1.formatBundleOutputString(true);
     btb1Weights = btb1.parameterWeights();
     btb1WString.clear();
     for (size_t i = 0; i < btb1Weights.size(); i++) {
@@ -1387,10 +1387,10 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     qDebug() << "";
     qDebug() << "Self assignment";
     btb3 = btb3;
-    qDebug().noquote() << btb3.formatBundleOutputString(true);
+    //qDebug().noquote() << btb3.formatBundleOutputString(true);
     qDebug() << "Assignment to other";
     btb3 = btb1;
-    qDebug().noquote() << btb3.formatBundleOutputString(true);
+    //qDebug().noquote() << btb3.formatBundleOutputString(true);
 
     qDebug() << "Setup a BundleTargetBody that solves for only mean radius";
     qDebug() << "";
@@ -1410,7 +1410,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
         Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
         Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
         Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
-    qDebug().noquote() << btb2.formatBundleOutputString(true);
+    //qDebug().noquote() << btb2.formatBundleOutputString(true);
     LinearAlgebra::Vector btb2Weights = btb2.parameterWeights();
     QString btb2WString;
     for (size_t i = 0; i < btb2Weights.size(); i++) {
@@ -1439,7 +1439,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
         Distance(bRadius, Distance::Kilometers),   Distance(bRadiusSigma, Distance::Kilometers),
         Distance(cRadius, Distance::Kilometers),   Distance(cRadiusSigma, Distance::Kilometers),
         Distance(meanRadius ,Distance::Kilometers),Distance(meanRadiusSigma, Distance::Kilometers));
-    qDebug().noquote() << btb2.formatBundleOutputString(true);
+    //qDebug().noquote() << btb2.formatBundleOutputString(true);
     btb2Weights = btb2.parameterWeights();
     btb2WString.clear();
     for (size_t i = 0; i < btb2Weights.size(); i++) {
@@ -1485,7 +1485,7 @@ settings->setSolveOptions(false, false, false, false, SurfacePoint::Rectangular,
     goodBTBObject += goodPMGroup;
     goodBTBObject += goodRadiiGroup;
     btb3.readFromPvl(goodBTBObject);
-    qDebug().noquote() << btb3.formatBundleOutputString(true);
+    //qDebug().noquote() << btb3.formatBundleOutputString(true);
 
     qDebug() << "Test error throws";
     qDebug() << "";
