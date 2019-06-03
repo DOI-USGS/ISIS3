@@ -468,7 +468,7 @@ SharedRobustMatcher FeatureAlgorithmFactory::make(const QString &definition) con
   if ( formattedSpecs[2].isEmpty() ) {
     // std::cout << "Creating matcher from extractor with " <<  formattedSpecs[1]<< "\n";
     matcher = createMatcher(extractor);
-    fullspec += ("/" + matcher->config()); 
+    fullspec += ("/" + matcher->config());
   }
 
   // Make the algorithms container
@@ -478,7 +478,7 @@ SharedRobustMatcher FeatureAlgorithmFactory::make(const QString &definition) con
   // Check for validity of matcher that has just been created
   try {
    falgo->validate(true);
-  } 
+  }
   catch (IException &ie) {
     QString mess = "MatcherAlgorithms were not created successfully!";
     ie.append(IException(IException::User, mess, _FILEINFO_));
@@ -492,15 +492,15 @@ SharedRobustMatcher FeatureAlgorithmFactory::make(const QString &definition) con
 
 /**
  * @brief Parses a full specification string for a set of algorithms.
- * 
+ *
  * Parses a full specification string for a set of algorithms and checks formatting.
  * The specifications will be returned as a QStringList containing, in order: the detector
- * specification, the extractor specification, the matcher specification, and the 
+ * specification, the extractor specification, the matcher specification, and the
  * parameters specification.  If the matcher and/or parameters are not specified they
- * will be a null QString. 
- *  
- * Upon return, you can expect the following conditions: 
- *  
+ * will be a null QString.
+ *
+ * Upon return, you can expect the following conditions:
+ *
  *   1) All strings have content meaning the specification contained all
  *      four (detector, extractor, matcher, parameters) algorithm specifications
  *   2) Only one of detector *or* extractor was specified and it is a fully
@@ -511,8 +511,14 @@ SharedRobustMatcher FeatureAlgorithmFactory::make(const QString &definition) con
  *      createMatcher(extractor))..
  */
 QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification) const {
-  QStringList parts = specification.split("/", QString::SkipEmptyParts);
-
+  QStringList parts;
+  if ( specification.contains(QRegularExpression("@savepath", QRegularExpression::CaseInsensitiveOption)) ) {
+    QRegularExpression sep("/(?=(.*(@savepath)))",QRegularExpression::CaseInsensitiveOption);
+    parts = specification.split(sep, QString::SkipEmptyParts);
+  }
+  else {
+    parts = specification.split("/", QString::SkipEmptyParts);
+  }
   // Componenet specifications
   QString feature2dSpec;
   QString detectorSpec;
@@ -521,7 +527,7 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
   QString parametersSpec;
 
   QStringList remains;
-  // Within each part are the values between /'s (i.e., detector, extractor, 
+  // Within each part are the values between /'s (i.e., detector, extractor,
   // matcher and parameters.
   for (int i = 0 ; i < parts.size() ; i++) {
     QString part = parts[i].trimmed();  // Remove leading/trailing whitespace
@@ -586,7 +592,7 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
     }
     else {
       // std::cout << "Setting algorithm[" << i << "] to " << part << "\n";
-      // Can't safely check for ill-formed qualifier, so let the allocation 
+      // Can't safely check for ill-formed qualifier, so let the allocation
       if ( detectorSpec.isEmpty() ) {
         detectorSpec = part;
       }
@@ -597,9 +603,9 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
         matcherSpec = part;
       }
       else {
-        // Should have had parameter already so there are too many parts of 
-        // the specification and its invalid. 
-        QString mess = "Invalid algorithm/part at or near \"" + part + 
+        // Should have had parameter already so there are too many parts of
+        // the specification and its invalid.
+        QString mess = "Invalid algorithm/part at or near \"" + part +
                        "\" - too many or invalid algorithm specs detected in specification: "
                        + specification;
         throw IException(IException::User, mess, _FILEINFO_);
@@ -624,14 +630,14 @@ QStringList FeatureAlgorithmFactory::formatSpecifications(QString specification)
   formattedSpecs.append(extractorSpec);
   formattedSpecs.append(matcherSpec);
   formattedSpecs.append(parametersSpec);
-  
+
   return ( formattedSpecs );
 }
 
 
 /**
  * @brief Allocate a BruteForceMatcher algorithm based upon descriptor extractor
- * 
+ *
  * See the OpenCV 3.1 BFMatcher documentation
  * http://docs.opencv.org/3.1.0/d3/da1/classcv_1_1BFMatcher.html
  * for details on this implementation.

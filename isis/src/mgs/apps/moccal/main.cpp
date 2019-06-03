@@ -133,6 +133,8 @@ void IsisMain() {
   // Astronomical Units (AU)
   QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
   furnsh_c(bspKernel.toLatin1().data());
+  QString satKernel = p.MissionData("base", "/kernels/spk/mar???.bsp", true);
+  furnsh_c(satKernel.toLatin1().data());
   QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
   furnsh_c(pckKernel.toLatin1().data());
   double sunpos[6], lt;
@@ -141,6 +143,7 @@ void IsisMain() {
   double kmPerAU = 1.4959787066E8;
   double sunAU = dist / kmPerAU;
   unload_c(bspKernel.toLatin1().data());
+  unload_c(satKernel.toLatin1().data());
   unload_c(pckKernel.toLatin1().data());
 
   // See if the user wants counts/ms or i/f but if w0 is 0 then
