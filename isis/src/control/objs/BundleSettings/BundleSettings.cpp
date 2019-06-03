@@ -49,7 +49,6 @@ namespace Isis {
     m_errorPropagation     = false;
     m_createInverseMatrix  = false;
     m_cubeList             =    "";
-
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 3.0;
 
@@ -225,10 +224,7 @@ namespace Isis {
        *
        */
   void BundleSettings::setCubeList(QString cubeList)    {
-
         m_cubeList = cubeList;
-
-
       }
 
 
@@ -237,9 +233,7 @@ namespace Isis {
         * @return QString The name/path of the cube list.
         */
       QString BundleSettings::cubeList() const {
-
         return m_cubeList;
-
       }
 
 
