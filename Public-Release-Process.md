@@ -170,9 +170,15 @@ Confirm that the environment has been set-up properly by deactivating it, reacti
 
 You will now need to communicate with both the internal as well as the external users about a new version being available. (Feel free to use past announcements as a template.)
 
-For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. It may be a good idea to encourage internal users to try to use conda to access the binaries/applications. 
+For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. Also inform users that the isis3 symlink will be updated a week after the public release. It may be a good idea to encourage internal users to try to use conda to access the binaries/applications. 
 
-The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement. 
+The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement.
+
+## Step 7: Update isis3 symlink
+
+After a week, if there are no critical issues with the public build, update the internal symlink for isis3 to the new internal build.
+
+As isis3mgr update the `isis3` symlink in `/usgs/pkgs/` to point to the latest public version on the following systems: astrovm4, prog26, prog28, and prog29.
 
 ## Problems
 If you test the conda environment you created for the ISIS build, i.e., isis3.7.1, on prog26 as isis3mgr and get the following warning:
