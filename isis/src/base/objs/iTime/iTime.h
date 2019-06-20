@@ -125,7 +125,7 @@ namespace Isis {
       int Hour() const;
       QString MinuteString() const;
       int Minute() const;
-      QString SecondString() const;
+      QString SecondString(int precision=8) const;
       double Second() const;
       QString DayOfYearString() const;
       int DayOfYear() const;
@@ -138,7 +138,7 @@ namespace Isis {
         return p_et;
       }
 
-      QString UTC() const;
+      QString UTC(int precision=8) const;
       static QString CurrentGMT();
       static QString CurrentLocalTime();
 

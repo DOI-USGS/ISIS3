@@ -22,7 +22,7 @@ void IsisMain() {
 
   // Check if input file is indeed, a cube
   if (ui.GetFileName("FROM").right(3) != "cub") {
-    QString msg = "Input file [" + ui.GetFileName("FROM") +
+  QString msg = "Input file [" + ui.GetFileName("FROM") +
                 "] does not appear to be a cube";
     throw  IException(IException::User, msg, _FILEINFO_);
   }
@@ -34,7 +34,7 @@ void IsisMain() {
   PvlObject *label= icube->label();
 
   PvlGroup targetGroup;
-  QString logicalId = "urn:esa:psa:em16_tgo_frd:";
+  QString logicalId = "urn:esa:psa:em16_tgo_cas:";
 
   if ( label->findObject("IsisCube").hasGroup("Instrument") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Instrument");
@@ -96,6 +96,8 @@ void IsisMain() {
     process.setVersionId( ui.GetString("VERSIONID") );
   }
 
+  process.setPixelDescription("Pixel values are in units of I/F (intensity/flux). I/F is defined as the ratio of the observed radiance and the radiance of a 100% lambertian reflector with the sun and camera orthogonal to the observing surface.");
+
   // std PDS4 label
   process.StandardPds4Label();
 
@@ -111,8 +113,9 @@ void IsisMain() {
 
   process.addSchema("CASSIS_1010.sch", 
                     "CASSIS_1010.xsd",
-                    "xmlns:cassis",
+                    "xmlns:cas",
                     "local");
+
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     process.addSchema("PDS4_GEOM_1B00_1610.sch", 

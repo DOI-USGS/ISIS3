@@ -304,12 +304,19 @@ namespace Isis {
           if (startTime.text() == "") {
             startTime.setAttribute("xsi:nil", "true");
           }
+          else {
+            QString timeValue = startTime.text();
+            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
+          }
 
           QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
           if (stopTime.text() == "") {
             stopTime.setAttribute("xsi:nil", "true");
           }
-
+          else {
+            QString timeValue = stopTime.text();
+            PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
+          }
           QStringList xmlPath;
           xmlPath << "Product_Observational"
             << "Observation_Area"
@@ -779,6 +786,15 @@ namespace Isis {
     
   }
 
+ /**
+  * Sets the description string which describes the pixel vales in 
+  * File_Area_Observational 
+  *  
+  * @param description 
+  */
+  void ProcessExportPds4::setPixelDescription(QString description) {
+    m_pixelDescription = description;
+  }
 
   /**
    * Create and internalize an image output label from the input 
@@ -880,6 +896,14 @@ namespace Isis {
         PvlToXmlTranslationManager::setElementValue(offsetElement,
                                                     toString(base));
         elementArrayElement.appendChild(offsetElement);
+
+        // correct location?
+        if (!m_pixelDescription.isEmpty()) {
+          QDomElement descriptionElement = m_domDoc->createElement("description"); 
+          PvlToXmlTranslationManager::setElementValue(descriptionElement,
+                                                      m_pixelDescription);
+          elementArrayElement.appendChild(descriptionElement);
+        }
       }
 
       // Add the Special_Constants class to define ISIS special pixel values: 
@@ -890,23 +914,24 @@ namespace Isis {
                                     arrayImageElement.lastChildElement("Axis_Array"));
 
       QDomElement nullElement = m_domDoc->createElement("missing_constant");
-      PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL8, 'g', 18)); //toString(NULL8));
+
+      PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL4, 'g', 18));
       specialConstantElement.appendChild(nullElement);
 
       QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
-      PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT8, 'g', 18));
+      PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT4, 'g', 18));
       specialConstantElement.appendChild(highInstrumentSatElement);
 
       QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
-      PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT8, 'g', 18));
+      PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT4, 'g', 18));
       specialConstantElement.appendChild(highRepresentationSatElement);
 
       QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
-      PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT8, 'g', 18));
+      PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT4, 'g', 18));
       specialConstantElement.appendChild(lowInstrumentSatElement);
 
       QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
-      PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT8, 'g', 18));
+      PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
       specialConstantElement.appendChild(lowRepresentationSatElement);
     }
   }

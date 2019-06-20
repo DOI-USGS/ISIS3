@@ -115,7 +115,7 @@ namespace Isis {
       void setTitle(QString title);
       void setSchemaLocation(QString schema);
       void setImageType(ImageType imageType);
-
+      void setPixelDescription(QString description); 
       static void translateUnits(QDomDocument &label,
                                  QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
       void reorder();
@@ -139,6 +139,7 @@ namespace Isis {
       QString m_versionId;                  //!< QString with specified version id.
       QString m_title;                      //!< QString with specified title. 
       ImageType m_imageType;                //!< Type of image data to be written.
+      QString m_pixelDescription;           //!< Description of pixel values.
 
   };
 }
