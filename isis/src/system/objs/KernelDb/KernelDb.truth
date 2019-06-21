@@ -271,7 +271,7 @@ $mro/kernels/spk/kernels.????.db
 $mro/kernels/iak/kernels.????.db
 
 TargetPosition Kernels: 
-$base/kernels/spk/de405.bsp
+$base/kernels/spk/de430.bsp
 
 SpacecraftPointing Kernels: 
 $mro/kernels/ck/mro_sc_psp_080108_080114.bc
@@ -381,7 +381,7 @@ $mro/kernels/spk/kernels.????.db
 $mro/kernels/iak/kernels.????.db
 
 TargetPosition Kernels: 
-$base/kernels/spk/de405.bsp
+$base/kernels/spk/de430.bsp
 
 SpacecraftPointing Kernels: 
 $mro/kernels/ck/mro_sc_psp_080108_080114.bc
