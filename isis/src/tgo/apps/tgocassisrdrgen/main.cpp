@@ -101,16 +101,33 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
-/*  process.addSchema("PDS4_PSA_1000.sch", 
-                    "PDS4_PSA_1000.xsd",
-                    "xmlns:psa", 
-                    "http://psa.esa.int/psa/v1");
-
-  process.addSchema("PDS4_PSA_EM16_CAS_1000.sch", 
+/*  process.addSchema("PDS4_PSA_EM16_CAS_1000.sch", 
                     "PDS4_PSA_EM16_CAS_1000.xsd",
                     "xmlns",
                     "http://psa.esa.int/psa/em16/cas/v1");*/
 
+
+  // needed?
+/*  "PDS4_PSA_EM16_1000.xsd"
+  "PDS4_PSA_EM16_1000.sch"
+  "http://psa.esa.int/psa/em16/v1/" */
+
+
+
+
+  // Add PSA-specific schema
+  process.addSchema("PDS4_PSA_1000.sch",
+                    "PDS4_PSA_1000.xsd",
+                    "xmlns:psa",
+                    "http://psa.esa.int/psa/v1");
+
+  // Add CaSSIS-specific schema
+  process.addSchema("PDS4_PSA_EM16_CAS_1000.sch",
+                    "PDS4_PSA_EM16_CAS_1000.xsd",
+                    "xmlns:cas",
+                    "http://psa.esa.int/psa/em16/cas/v1");
+ 
+  // should be removed 
   process.addSchema("CASSIS_1010.sch", 
                     "CASSIS_1010.xsd",
                     "xmlns:cas",
