@@ -210,7 +210,7 @@ namespace Isis {
 
     // Check for point on back of planet by checking to see if surface point is viewable 
     //   (test emission angle)
-    if (test == true) {
+    if (test) {
       vector<double> lookB = bodyRot->ReferenceVector(lookJ);
       double upsB[3], upB[3], dist;
       vminus_c((SpiceDouble *) &lookB[0], upsB);
@@ -264,13 +264,14 @@ namespace Isis {
    * @param cudy [out] Pointer to computed undistored y focal plane coordinate
    *
    * @return @b bool If conversion was successful
+   *
+   * @see the application socetlinescankeywords
    */
   bool CameraGroundMap::GetXY(const double lat, const double lon,
                               const double radius, double *cudx, double *cudy) {
     SurfacePoint spoint(Latitude(lat, Angle::Degrees),
                         Longitude(lon, Angle::Degrees),
                         Distance(radius, Distance::Meters));
-    // This is called by the application socetlinescankeywords
     return GetXY(spoint, cudx, cudy);
   }
 
