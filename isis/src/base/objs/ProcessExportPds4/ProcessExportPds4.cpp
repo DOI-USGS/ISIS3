@@ -1151,13 +1151,20 @@ namespace Isis {
       }
     }
 
+
+    // TODO: change here: 
     // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
     QString lonDir = isisLonDir[0];
     lonDir = lonDir.toUpper();
     if (inputMapping.hasKeyword("MaximumLongitude") && inputMapping.hasKeyword("MinimumLongitude")) {
-      double maxLon = inputMapping.findKeyword("MaximumLongitude");
-      double minLon = inputMapping.findKeyword("MinimumLongitude");
+      //double maxLon = inputMapping.findKeyword("MaximumLongitude");
+      //double minLon = inputMapping.findKeyword("MinimumLongitude");
+    
+      double maxLon, minLon, maxLat, minLat; 
+      InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon); 
+
+      // convert lon to 180 if needed
       xmlPath.clear();
       xmlPath << "Product_Observational"
               << "Observation_Area" 
@@ -1168,7 +1175,8 @@ namespace Isis {
       QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
       QDomElement eastElement = boundingCoordElement.firstChildElement("cart:east_bounding_coordinate");
       QDomElement westElement = boundingCoordElement.firstChildElement("cart:west_bounding_coordinate");
-
+      QDomElement northElement = boundingCoordElement.firstChildElement("cart:north_bounding_coordinate");
+      QDomElement southElement = boundingCoordElement.firstChildElement("cart:south_bounding_coordinate");
       // translation files currently handles Positive West case where east = min, west = max
       // so if positive east, swap min/max
       if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
@@ -1176,7 +1184,50 @@ namespace Isis {
         PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
         PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
       }
+      else {
+        PvlToXmlTranslationManager::resetElementValue(eastElement, toString(minLon), "deg");
+        PvlToXmlTranslationManager::resetElementValue(westElement, toString(maxLon), "deg");
+      }
+
+      PvlToXmlTranslationManager::resetElementValue(northElement, toString(maxLat), "deg");
+      PvlToXmlTranslationManager::resetElementValue(southElement, toString(minLat), "deg");
     }
+
+    // also make longitude_of_central_meridian and latitude_of_projection_origin floats if they aren't already
+    xmlPath.clear();
+    xmlPath << "Product_Observational"
+      << "Observation_Area" 
+      << "Discipline_Area"
+      << "cart:Cartography" 
+      << "cart:Spatial_Reference_Information"
+      << "cart:Horizontal_Coordinate_System_Definition"
+      << "cart:Planar"
+      << "cart:Map_Projection";
+
+
+    // UPDATING THIS DEPENDS ON WHICH PROJECTION WE ARE IN!!! Is the above "good enough"? 
+    // HERE
+    QDomElement projectionElement = getElement(xmlPath, baseElement);
+    QDomElement tempElement = projectionElement.firstChildElement();
+    QDomElement nameElement = tempElement.nextSiblingElement();
+    std::cout << "NAME: " << nameElement.tagName() << std::endl; 
+    QDomElement longitudeElement = nameElement.firstChildElement("cart:longitude_of_central_meridian"); 
+    QDomElement originElement = nameElement.firstChildElement("cart:latitude_of_projection_origin");
+    std::cout << "LONELT: " << longitudeElement.tagName() << std::endl;
+    std::cout << "ORIELT: " << originElement.tagName() << std::endl;
+    double longitudeElementValue = longitudeElement.text().toDouble(); 
+    double originElementValue = originElement.text().toDouble(); 
+    QString toset1 = QString::number(longitudeElementValue, 'g');
+    QString toset2 = QString::number(originElementValue, 'g'); 
+    if (!toset1.contains('.')) {
+      toset1 = toset1 + ".0";
+    }
+    if (!toset2.contains('.')) {
+      toset2 = toset2 + ".0"; 
+    }
+    PvlToXmlTranslationManager::resetElementValue(longitudeElement, toset1, "deg"); 
+    // update .trn of LatitudeOfProjectionOrigin to 0.0 in every mapping .trn
+    PvlToXmlTranslationManager::resetElementValue(originElement, toset2, "deg");
   }
 
 

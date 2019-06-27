@@ -49,6 +49,7 @@
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "TProjection.h"
 
 using namespace std;
 
@@ -2133,6 +2134,91 @@ namespace Isis {
   }
 
 
+  /**
+   * TEST CUBE LABEL 
+   */
+  void Cube::latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude, double &
+                         maxLongitude) {
+    Camera *cam;
+    TProjection *proj;
+
+    bool isGood = false;
+    bool noCamera = true; // fixme? 
+
+    // setup camera or proj
+    if (noCamera) {
+     try {
+       proj = (TProjection *) projection();
+     }
+     catch(IException &e) {
+       QString msg = "Mosaic files must contain mapping labels";
+       throw IException(e, IException::User, msg, _FILEINFO_);
+     }
+    }
+    else {
+      try {
+      cam = camera();
+      }
+      catch(IException &e) {
+      QString msg = "option is set to PROJECTION";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // Iterate over all samp/line combos in cube
+    minLatitude = 99999;
+    minLongitude = 99999;
+    maxLatitude = -99999;
+    maxLongitude = -99999;
+
+    for (int sample = 0; sample < sampleCount(); sample++) {
+    // Checks to see if the point is in outer space
+      for (int line = 0; line < lineCount(); line++) {
+        if (noCamera) {
+          isGood = proj->SetWorld(sample, line);
+        }
+        else {
+          isGood = cam->SetImage(sample, line);
+        }
+      
+        double lat, lon;
+        if (isGood) {
+          if (noCamera) {
+            lat = proj->UniversalLatitude();
+            lon = proj->UniversalLongitude();
+          }
+          else {
+            lat = cam->UniversalLatitude(); 
+            lon = cam->UniversalLongitude(); 
+          }
+        
+          // update mix/max lat/lons
+          // FIXME: what units/direction are longitudes / latitudes in? (180 360) 
+          if (lat < minLatitude) {
+            minLatitude = lat;
+          }
+          else if (lat > maxLatitude) {
+            maxLatitude = lat;
+          }
+          
+          if (lon < minLongitude) {
+            minLongitude = lon;
+          }
+          else if (lon > maxLongitude) {
+            maxLongitude = lon; 
+          }
+        }
+        else{
+          std::cout << "Do nothing" << std::endl; 
+        }
+      }
+    }
+    std::cout << "max latitude: " << maxLatitude << std::endl;
+    std::cout << "min latitude: " << minLatitude << std::endl;
+    std::cout << "max longitude: " << maxLongitude << std::endl;
+    std::cout << "min longitude: " << minLongitude << std::endl;
+  }
+  
   /**
    * Write the Pvl labels to the cube's label file. Excess data in the attached
    *   labels is set to 0.

@@ -301,6 +301,8 @@ namespace Isis {
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
       void putGroup(const PvlGroup &group);
+      void latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude, 
+                       double &maxLongitude); 
 
     private:
       void applyVirtualBandsToLabel();
