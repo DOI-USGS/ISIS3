@@ -714,7 +714,6 @@ namespace Isis {
       LineCache(tableName);
 
       //std::cout << "Full cache size is " << p_cache.size() << endl;
-
       p_minimizeCache = Yes;
       LoadTimeCache();
 
@@ -1929,8 +1928,14 @@ namespace Isis {
     p_overrideTimeScale = timeScale;
     p_noOverride = false;
     return;
-  }
+ }
 
+  void SpiceRotation::SetCacheTime(std::vector<double> cacheTime) {
+    // Do not reset the cache times if they are already loaded. 
+    if (p_cacheTime.size() <= 0) {
+      p_cacheTime = cacheTime; 
+    }
+  }
 
   /**
    * Evaluate the derivative of the fit polynomial defined by the
@@ -2398,7 +2403,7 @@ namespace Isis {
 
         // Don't read type 5 ck here
         if (ic[2] == 5) break;
-//
+
         // Check times for type 3 ck segment if spacecraft matches
         if (ic[0] == spCode && ic[2] == 3) {
           sct2e_c((int) spCode / 1000, dc[0], &segStartEt);
@@ -2478,13 +2483,15 @@ namespace Isis {
 
     // Load times according to cache size (body rotations) -- handle first round of type 5 ck case
     //   and multiple ck case --Load a time for every line scan line and downsize later
-    if (!timeLoaded) {
+    if (! (timeLoaded || (p_cacheTime.size() > 1))) {
       double cacheSlope = 0.0;
       if (p_fullCacheSize > 1)
         cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
       for (int i = 0; i < p_fullCacheSize; i++)
-        p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope);
-      if (p_source == Nadir) p_minimizeCache = No;
+        p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope); 
+      if (p_source == Nadir) {
+        p_minimizeCache = No;
+      }
     }
     NaifStatus::CheckErrors();
   }

@@ -93,43 +93,51 @@ namespace Isis {
 
     // Get other info from labels
     PvlKeyword &frameParam = inst["FrameParameter"];
-    m_exposureTime = toDouble(frameParam[0]);
+
+    // convert milliseconds to seconds
+
+    m_exposureTime = toDouble(frameParam[0]) * 0.001;
     m_summing  = toDouble(frameParam[1]);
     m_scanRate = toDouble(frameParam[2]);
 
     // Setup detector map
     //  Get the line scan rates/times
-    readHouseKeeping(lab.fileName(), m_scanRate);
+
+    if (!m_is1BCalibrated) {
+      readHouseKeeping(lab.fileName(), m_scanRate); 
+    }
+    else {
+      readSCET(lab.fileName());
+    }
+
     new VariableLineScanCameraDetectorMap(this, m_lineRates);
     DetectorMap()->SetDetectorSampleSumming(m_summing);
 
     // Setup focal plane map
     new CameraFocalPlaneMap(this, naifIkCode());
-
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
     ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
-
     FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
     // Setup distortion map
     new CameraDistortionMap(this);
-
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
-
     // Set initial start time always (label start time is inaccurate)
-    setTime(iTime(startTime())); 
+
+    if (!m_is1BCalibrated){
+      setTime(iTime(startTime())); 
+    }
 
     //  Now check to determine if we have a cache already.  If we have a cache
     //  table, we are beyond spiceinit and have already computed the proper
     //  point table from the housekeeping data or articulation kernel.
-    if (!instrumentRotation()->IsCached() && !hasArtCK) {
-
+    if (!instrumentRotation()->IsCached() && !hasArtCK && !m_is1BCalibrated) {
       // Create new table here prior to creating normal caches
       Table quats = getPointingTable(frameId, virFrame);
 
@@ -229,7 +237,7 @@ namespace Isis {
    * @return @b double The et time at the start of the line's exposure.
    */
   double RosettaVirtisCamera::lineStartTime(const double midExpTime) const {
-    return (midExpTime-(exposureTime()/2.0));
+    return (midExpTime - (exposureTime() / 2.0)); 
   }
 
 
@@ -274,7 +282,57 @@ namespace Isis {
 
 
   /**
-   * @brief Read the VIR houskeeping table from cube
+   * @brief For calibrated VIRTIS-M images, read the SCET values from the cube
+   *
+   * 
+   * @param filename The filename of the cube with the house keeping table.
+   * @param linerate The linerate for the cube.
+   *
+   * @history 2011-07-22 Kris Becker
+   */
+  void RosettaVirtisCamera::readSCET(const QString &filename) {
+   //  Open the ISIS table object
+   std::vector<double> cacheTime; 
+   Table hktable("VIRTISHouseKeeping", filename);
+   m_lineRates.clear();
+   int lineno(1);
+   double lineEndTime = 0;
+   for (int i = 0; i < hktable.Records(); i++) {
+     TableRecord &trec = hktable[i];
+     QString scetString = trec["dataSCET"];
+     lineEndTime = getClockTime(scetString, naifSpkCode()).Et();
+     m_lineRates.push_back(LineRateChange(lineno,
+                                          lineEndTime-exposureTime(),
+                                          exposureTime()));
+     cacheTime.push_back(lineEndTime-exposureTime());
+     lineno++;
+   }
+   cacheTime.push_back(lineEndTime);
+
+   // Adjust the last time
+   LineRateChange lastR = m_lineRates.back();
+
+    // Normally the line rate changes would store the line scan rate instead of exposure time.
+    // Storing the exposure time instead allows for better time calculations within a line.
+    // In order for the VariableLineScanCameraDetectorMap to work correctly with this change,
+    // every line in the cube must have a LineRateChange object.  This is because determining
+    // the start time for one line based on another line requires the line scan rate.  Having
+    // a LineRateChange for every line means never needing to calculate the start time for a line
+    // because the start time is stored in that line's LineRateChange.  So, the detector map only
+    // calculates times within a given line.
+    // See VariableLineScanCameraDetectorMap::exposureDuration() for a description of the
+    // difference between exposure time and line scan rate.
+
+    m_lineRates.back() = LineRateChange(lastR.GetStartLine(),
+                                        lastR.GetStartEt(),
+                                        exposureTime());
+
+    instrumentRotation()->SetCacheTime(cacheTime);
+  }
+
+
+  /**
+   * @brief Read the VIRTIS houskeeping table from cube
    *
    * This method reads an ISIS Table object from the cube.  This table named,
    * "VIRHouseKeeping", contains four fields: ScetTimeClock, ShutterStatus,
