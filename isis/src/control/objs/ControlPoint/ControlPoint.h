@@ -363,6 +363,8 @@ namespace Isis {
    *                           #2591). Added check to IsConstrained() method to see if point type is
    *                           Free, in which case we ignore stored a priori sigmas on the
    *                           coordinates.
+   *  @history 2019-05-16 Debbie A. Cook  See history entry for ComputeResiduals.  Modified call to 
+   *                           CameraGroundMap to not do back-of-planet test. References #2591.
    */
   class ControlPoint : public QObject {
 
