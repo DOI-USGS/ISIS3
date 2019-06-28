@@ -392,6 +392,7 @@ namespace Isis {
       double GetTimeScale();
 
       void SetOverrideBaseTime(double baseTime, double timeScale);
+      void SetCacheTime(std::vector<double> cacheTime); 
 
       // Derivative methods
       double DPolynomial(const int coeffIndex);
