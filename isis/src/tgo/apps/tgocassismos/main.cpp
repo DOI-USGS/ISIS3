@@ -211,6 +211,9 @@ void IsisMain() {
 
    // Get the blob of original labels from first image in list
    // Pvl *org = cubeList[0]->label();
+   // Get the archiveGroup from the first cube in the list
+
+    PvlGroup archiveGroup = cubeList[0]->label()->findGroup("Archive", Pvl::Traverse);
 
     //close all cubes
     for (int i = 0; i < (int)cubeList.size(); i++) {
@@ -257,6 +260,8 @@ void IsisMain() {
     mosCube.open(ui.GetFileName("TO"), "rw");
     PvlObject &lab = mosCube.label()->findObject("IsisCube");
     lab.addGroup(mos);
+
+    lab.addGroup(archiveGroup);
     //add orginal label blob to the output cube
 //    mosCube.write(org);
     mosCube.close();

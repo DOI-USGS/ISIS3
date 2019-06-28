@@ -47,7 +47,7 @@ void IsisMain() {
   }
   else if ( label->findObject("IsisCube").hasGroup("Mosaic") ) {
     targetGroup = label->findObject("IsisCube").findGroup("Mosaic");
-    logicalId += "data_mosaic:";
+    logicalId += "data_derived:";
   }
 
   // Check if the cube is able to be translated into a CaSSIS xml file
@@ -128,17 +128,17 @@ void IsisMain() {
                     "http://psa.esa.int/psa/em16/cas/v1");
  
   // should be removed 
-  process.addSchema("CASSIS_1010.sch", 
+  /*process.addSchema("CASSIS_1010.sch", 
                     "CASSIS_1010.xsd",
                     "xmlns:cas",
-                    "local");
+                    "local");*/
 
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     process.addSchema("PDS4_GEOM_1B00_1610.sch", 
                       "PDS4_GEOM_1B00_1610.xsd",
                       "xmlns:geom",
-                      "https://pds.jpl.nasa.gov/datastandards/schema/released/geom/v1");
+                      "http://pds.nasa.gov/pds4/geom/v1");
   }
 
  /*

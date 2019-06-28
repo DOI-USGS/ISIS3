@@ -896,14 +896,6 @@ namespace Isis {
         PvlToXmlTranslationManager::setElementValue(offsetElement,
                                                     toString(base));
         elementArrayElement.appendChild(offsetElement);
-
-        // correct location?
-        if (!m_pixelDescription.isEmpty()) {
-          QDomElement descriptionElement = m_domDoc->createElement("description"); 
-          PvlToXmlTranslationManager::setElementValue(descriptionElement,
-                                                      m_pixelDescription);
-          elementArrayElement.appendChild(descriptionElement);
-        }
       }
 
       // Add the Special_Constants class to define ISIS special pixel values: 
@@ -933,6 +925,13 @@ namespace Isis {
       QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
       PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
       specialConstantElement.appendChild(lowRepresentationSatElement);
+      // correct location?
+      if (!m_pixelDescription.isEmpty()) {
+        QDomElement descriptionElement = m_domDoc->createElement("description"); 
+        PvlToXmlTranslationManager::setElementValue(descriptionElement,
+                                                    m_pixelDescription);
+        arrayImageElement.insertAfter(descriptionElement, arrayImageElement.lastChildElement());
+      }
     }
   }
 
