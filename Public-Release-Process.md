@@ -14,7 +14,7 @@ In this step, we will carefully prepare the local repository to build from as we
 * Update the isis/version file to reflect the proper version number and release stage.
     * alpha-from dev, beta-release candidate RC, stable-stable public release 
 * Update the isis/CMakeLists.txt file to reflect the proper version number, release data, and release stage.
-* Until the build process is updated to pull from github tarballs, update the `meta.yaml` at this stage as well: 
+* Until the build process is updated to pull from github tarballs, update the recipe/meta.yaml at this stage as well: 
     * build number: should be set to 0
     * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
     * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
