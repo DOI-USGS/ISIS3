@@ -61,7 +61,15 @@ void IsisMain ()
 
   p.SetPdsFile(pdsLabel, inFile.expanded());
   p.SetOrganization(Isis::ProcessImport::BIP);
-  p.SaveDataSuffix(); 
+
+  // Processing level 2 = uncalibrated
+  // Processing level 3 = calibrated
+  int procLevel = (int) pdsLabel.findKeyword("PROCESSING_LEVEL_ID");
+
+  // only save data suffix if proclevel = 3
+  if (procLevel == 3) {
+    p.SaveDataSuffix(); 
+  }
 
   // NULL pixels are set to 65535 in the input QUB
   p.SetNull(65535, 65535);
@@ -92,10 +100,6 @@ void IsisMain ()
                  "DAWN Visual and InfraRed Mapping Spectrometer (VIR) EDR or RDR file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-
-  // Processing level 2 = uncalibrated
-  // Processing level 3 = calibrated
-  int procLevel = (int) pdsLabel.findKeyword("PROCESSING_LEVEL_ID");
 
   // Override default DataTrailerBytes constructed from PDS header
   // Will this number ever change? Where did this # come from?
