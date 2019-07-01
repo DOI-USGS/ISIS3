@@ -17,7 +17,7 @@ In this step, we will carefully prepare the local repository to build from as we
 * Until the build process is updated to pull from github tarballs, update the recipe/meta.yaml at this stage as well: 
     * build number: should be set to 0
     * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
-    * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
+    * If you are building a Release Candidate, please include "_RCx". For example, for the first ISIS3.6.1 release candidate, it would be: "3.6.1_RC1". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC1), but the conda build system requires an underscore.
     * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
@@ -25,6 +25,7 @@ In this step, we will carefully prepare the local repository to build from as we
 * As isis3mgr, do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds). This may be done using the buildIsisCmakeAllSys script. Make sure you are building in /usgs/pkgs or in another area that is unique to each machine, otherwise the builds will be overwritten. 
   * This includes all systems tested nightly: Linux 28 (prog29), Ubuntu 18.4 (prog28), CcetnOS (prog24), and MacOS 10.13 (prog27).
   * (This step should no longer be necessary once Jenkins has been properly set-up as tests will run before each merge)
+`buildIsisCmakeAllSys -b dev /usgs/pkgs/isis3.8.0_RC1-test`
 * Once tests are passing, push the changes back up to the designated branch.
   * For public releases or Release Candidates, this will simply be the "dev" branch and will require someone else merge for you.
   * (This step is optional for custom builds.)
