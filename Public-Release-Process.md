@@ -11,7 +11,8 @@ In this step, we check the currently failing tests. This is primarily an issue o
 In this step, we will carefully prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
 * Clone a fresh copy of the ISIS3 repository from GitHub
-* Update the isis/version file to reflect the proper version number and release stage. 
+* Update the isis/version file to reflect the proper version number and release stage.
+** alpha-from dev, beta-release candidate RC, stable-stable public release 
 * Update the isis/CMakeLists.txt file to reflect the proper version number, release data, and release stage.
 * Until the build process is updated to pull from github tarballs, update the `meta.yaml` at this stage as well: 
     * build number: should be set to 0
