@@ -32,7 +32,7 @@ In this step, we will carefully prepare the local repository to build from as we
   * The release "Tag version" should be the \<version\> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0, you should set your Release/Tag "Tag version" to 3.6.0 (**note**: no 'v' prefix to the version number.)
     * ***Please note that the recipe/meta.yaml file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
   * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
-  * Release Candidate or mission-specific release "Tag version" convention: version XX.YY.ZZ_<mission/"RC"><release> (ex. 3.6.1_cassis2 or 3.6.1_RC3)
+  * Release Candidate or mission-specific release "Tag version" convention: version XX.YY.ZZ_<mission#/"RC#"><release> (ex. 3.6.1_cassis2 or 3.6.1_RC3)
 
 ### The following section will apply after building from the release tarball is functioning: 
 
