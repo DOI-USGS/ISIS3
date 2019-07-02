@@ -18,7 +18,7 @@ In this step, we will carefully prepare the local repository to build from as we
     * build number: should be set to 0
     * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
     * If you are building a Release Candidate, please include "_RCx". For example, for the first ISIS3.6.1 release candidate, it would be: "3.6.1_RC1". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC1), but the conda build system requires an underscore.
-    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
+    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis1".
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
 
