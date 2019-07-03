@@ -1,4 +1,4 @@
-This document explains both the release process for Official Releases as well as Release Candidates. In addition, it describes the process for custom builds (for missions, for example).
+This document explains the release process for Official Releases, Release Candidates and custom builds (for example: missions).
 
 # Step-By-Step Instructions
 
@@ -8,11 +8,13 @@ In this step, we check the currently failing tests. This is primarily an issue o
 
 ## Step 2: Set Up the Local and Remote Repositories
 
-In this step, we will carefully prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
+In this step, we will prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
 * Clone a fresh copy of the ISIS3 repository from GitHub
 * Update the isis/version file to reflect the proper version number and release stage.
-    * alpha-from dev, beta-release candidate RC, stable-stable public release 
+    * alpha-from the dev branch (not yet available)
+    * beta-release candidate RC
+    * stable-stable public release 
 * Update the isis/CMakeLists.txt file to reflect the proper version number, release data, and release stage.
 * Until the build process is updated to pull from github tarballs, update the recipe/meta.yaml at this stage as well: 
     * build number: should be set to 0
