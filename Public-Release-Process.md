@@ -61,9 +61,9 @@ Please keep in mind that conda may be a little finicky when building for other s
 * Ensure you have a version of conda setup, and if not, set it up. Keep in mind that there exists versions for use building-wide in /usgs/cpkgs/ (though for the Mac system, you will probably want to use the version in /jessetest/miniconda/).
   * Run the command ```conda env list```. If conda is setup properly, this will display a list of available conda environments. If instead you see a ```Command not found``` error or the active base environment (noted by an asterisk) is not the version of conda you are wanting to use, you will need to setup the version of conda you wish to use by running the command ```source /<path-to-anaconda-version>/etc/profile.d/conda.sh```.
 * In your base Anaconda environment (just confirm no environments have been activated), run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build
-* Activate the base environment: ```conda activate```
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda verify -h```, respectively.
+* If this fails, try activating the base environment: ```conda activate```
 * From the root of the ISIS3 repo run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
