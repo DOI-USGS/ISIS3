@@ -10,7 +10,7 @@ In this step, we check the currently failing tests. This is primarily an issue o
 
 In this step, we will prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
-* Clone a fresh copy of the ISIS3 repository from GitHub
+* Clone a fresh copy of the ISIS3 repository from GitHub as isis3mgr
 * Update the isis/version file to reflect the proper version number and release stage.
     * alpha - from the dev branch (not yet available)
     * beta - release candidate RC
@@ -169,7 +169,19 @@ Confirm that the environment has been set-up properly by deactivating it, reacti
 
 ***Don't forget to go back and do the other OS!***
 
-## Step 6: Communicate Availability of Build
+## Step 6: Update Documentation
+
+***This step only need-be done with official public releases***
+
+This step will update the ISIS documentation on our external web site for our users worldwide. Be sure that this is the current version of ISIS to be released.
+
+* As isis3mgr, setisis to the build directory in one of the clones you were working with earlier
+* Run the ```ninja docs``` command from this build directory to build the documentation for this version of the code.
+* cd into the isis/src/docsys directory that is at the same level as your build/ directory and run the command ```make wwwdoc```.
+
+You may run into permission issues if isis3mgr does not own these files (you were not isis3mgr when you originally pulled this version of the repo). Additionally, you may be asked to provide credentials if you run the ```make wwwdoc``` command as anyone other than isis3mgr.
+
+## Step 7: Communicate Availability of Build
 
 You will now need to communicate with both the internal as well as the external users about a new version being available. (Feel free to use past announcements as a template.)
 
@@ -177,7 +189,7 @@ For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <
 
 The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement.
 
-## Step 7: Update isis3 symlink
+## Step 8: Update isis3 symlink
 
 After a week, if there are no critical issues with the public build, update the internal symlink for isis3 to the new internal build.
 
