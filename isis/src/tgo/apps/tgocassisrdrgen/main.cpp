@@ -116,14 +116,12 @@ void IsisMain() {
 
 
   // Add PSA-specific schema
-  process.addSchema("PDS4_PSA_1000.sch",
-                    "PDS4_PSA_1000.xsd",
+  process.addSchema("PDS4_PSA_1000.xsd",
                     "xmlns:psa",
                     "http://psa.esa.int/psa/v1");
 
   // Add CaSSIS-specific schema
-  process.addSchema("PDS4_PSA_EM16_CAS_1000.sch",
-                    "PDS4_PSA_EM16_CAS_1000.xsd",
+  process.addSchema("PDS4_PSA_EM16_CAS_1000.xsd",
                     "xmlns:cas",
                     "http://psa.esa.int/psa/em16/cas/v1");
  
@@ -154,11 +152,22 @@ void IsisMain() {
     exportTranslationFile = "$tgo/translations/tgoCassisExportMosaic.trn";
   }
 
-  PvlToXmlTranslationManager cubeLab(*(icube->label()), exportTranslationFile);
+  Pvl *labelPvl = icube->label();
+
+  PvlToXmlTranslationManager cubeLab(*labelPvl, exportTranslationFile);
   cubeLab.Auto(pdsLabel);
 
   ProcessExportPds4::translateUnits(pdsLabel);
   process.reorder(); 
+  
+  // just go ahead and hand-remove the units here:
+  QDomDocument &pdsLabelNext = process.GetLabel();
+  QDomElement observationNode = pdsLabelNext.documentElement().firstChildElement("Observation_Area");
+  QDomElement missionNode = observationNode.firstChildElement("Mission_Area");
+  QDomElement cassisNode = missionNode.firstChildElement("cas:CASSIS_Data");
+  QDomElement telescopeNode = cassisNode.firstChildElement("cas:telescope_information");
+  QDomElement focalLengthNode = telescopeNode.firstChildElement("cas:focal_length");
+  focalLengthNode.removeAttribute("unit");
 
   QString outFile = ui.GetFileName("TO");
 
