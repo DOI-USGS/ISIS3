@@ -29,6 +29,7 @@ namespace Isis {
       Longitude lonMin, Longitude lonMax) {
     setZValue(DBL_MAX);
 
+
     if (latInc > Angle(0.0, Angle::Degrees) && lonInc > Angle(0.0, Angle::Degrees)) {
       // Walk the grid, creating a QGraphicsLineItem for each line segment.
       Projection *proj = projectionSrc->getProjection();
@@ -42,6 +43,12 @@ namespace Isis {
         Latitude maxLat;
         Latitude startLat;
         Latitude endLat;
+
+      if (mappingGroup["LongitudeDirection"][0] == "PositiveWest") {
+        Longitude temp = lonMin;
+        lonMin = lonMax;
+        lonMax = temp;
+      }
 
         if (mappingGroup["LatitudeType"][0] == "Planetographic") {
 
@@ -121,6 +128,7 @@ namespace Isis {
             endLat = Latitude(90.0, mappingGroup, Angle::Degrees);
         }
 
+        // only does wrap-around for positive east 
         Longitude minLon(lonMin.degrees(), mappingGroup,
                         Angle::Degrees);
         Longitude maxLon(lonMax.degrees(), mappingGroup,
