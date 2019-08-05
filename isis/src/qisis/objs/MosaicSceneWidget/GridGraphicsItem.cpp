@@ -128,7 +128,6 @@ namespace Isis {
             endLat = Latitude(90.0, mappingGroup, Angle::Degrees);
         }
 
-        // only does wrap-around for positive east 
         Longitude minLon(lonMin.degrees(), mappingGroup,
                         Angle::Degrees);
         Longitude maxLon(lonMax.degrees(), mappingGroup,
