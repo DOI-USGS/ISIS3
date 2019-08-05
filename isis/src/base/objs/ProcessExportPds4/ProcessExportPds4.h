@@ -119,7 +119,9 @@ namespace Isis {
       static void translateUnits(QDomDocument &label,
                                  QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
       void reorder();
-      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
+      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI);
+      void addSchema(QString xsd, QString xmlns, QString xmlnsURI);
+
     protected:
       void identificationArea();
       void standardInstrument();

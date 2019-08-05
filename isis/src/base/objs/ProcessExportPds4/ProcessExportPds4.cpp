@@ -193,6 +193,8 @@ namespace Isis {
       QString msg = "Unable to translate and export standard image information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
+    // fixme: reorder here? idea = each "section" takes care of order within the section, 
+    // separate reorder reorders the whole sections? 
   }
 
 
@@ -273,7 +275,7 @@ namespace Isis {
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
 
-      // move target to just below Observing_System. 
+      // Move target to just below Observing_System. 
       QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
       obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
     }
@@ -937,6 +939,30 @@ namespace Isis {
 
 
   /**
+   * Adds necessary information to the xml header for a pds4 class for schema which lack 
+   * schematron files (.sch) 
+   * 
+   * @param xsd Schema filename without path
+   * @param xmlns The xml namespace used 
+   * @param xmlnsURI Full URL to the xml namespace URI. Also used as the location of the sch and xsd
+   */
+  void ProcessExportPds4::addSchema(QString xsd, QString xmlns, QString xmlnsURI) {
+    // Add xmlns
+    QDomElement root = m_domDoc->documentElement();
+    root.setAttribute(xmlns, xmlnsURI);
+
+    // Add to xsi:schemaLocation
+    m_schemaLocation += " "; 
+    m_schemaLocation += xmlnsURI;
+    m_schemaLocation += " ";
+    m_schemaLocation += xmlnsURI;
+    m_schemaLocation += "/";
+    m_schemaLocation += xsd;
+    root.setAttribute("xsi:schemaLocation", m_schemaLocation);
+  }
+
+  //todo: pull off second half of function call 3 arg version
+  /**
    * Adds necessary information to the xml header for a pds4 class. 
    * 
    * @param sch Schematron filename without path
@@ -957,17 +983,7 @@ namespace Isis {
     m_domDoc->insertAfter(header, m_domDoc->firstChild());
 
     // Add xmlns
-    QDomElement root = m_domDoc->documentElement();
-    root.setAttribute(xmlns, xmlnsURI);
-
-    // Add to xsi:schemaLocation
-    m_schemaLocation += " "; 
-    m_schemaLocation += xmlnsURI;
-    m_schemaLocation += " ";
-    m_schemaLocation += xmlnsURI;
-    m_schemaLocation += "/";
-    m_schemaLocation += xsd;
-    root.setAttribute("xsi:schemaLocation", m_schemaLocation);
+    addSchema(xsd, xmlns, xmlnsURI);
   }
 
 
@@ -1209,11 +1225,11 @@ namespace Isis {
     QDomElement projectionElement = getElement(xmlPath, baseElement);
     QDomElement tempElement = projectionElement.firstChildElement();
     QDomElement nameElement = tempElement.nextSiblingElement();
-    std::cout << "NAME: " << nameElement.tagName() << std::endl; 
+//    std::cout << "NAME: " << nameElement.tagName() << std::endl; 
     QDomElement longitudeElement = nameElement.firstChildElement("cart:longitude_of_central_meridian"); 
     QDomElement originElement = nameElement.firstChildElement("cart:latitude_of_projection_origin");
-    std::cout << "LONELT: " << longitudeElement.tagName() << std::endl;
-    std::cout << "ORIELT: " << originElement.tagName() << std::endl;
+//    std::cout << "LONELT: " << longitudeElement.tagName() << std::endl;
+//    std::cout << "ORIELT: " << originElement.tagName() << std::endl;
     double longitudeElementValue = longitudeElement.text().toDouble(); 
     double originElementValue = originElement.text().toDouble(); 
     QString toset1 = QString::number(longitudeElementValue, 'g');
@@ -1448,8 +1464,14 @@ namespace Isis {
         }
       }
     }
-
-    return transMap;
+    
+    // debug
+    QMapIterator<QString, QString> i(transMap);
+    while (i.hasNext()) {
+      i.next();
+//      cout << i.key() << ": " << i.value() << endl;
+    }
+    return transMap; 
   }
 
 
