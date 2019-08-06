@@ -159,7 +159,7 @@ namespace Isis {
    *                           BundleObservation::formatBundeOutputString(...) in outputText()
    *                           file to a new function:  BundleObservation::bundleOutput
    *                           which takes as an argument the std::ostream.
-   *  @history 2019-06-03 Tyler Wilson - Replaced all calls to
+   *   @history 2019-06-03 Tyler Wilson - Replaced all calls to
    *                           BundleObservation::formatBundleOutputString where it outputs a
    *                           csv file with BundleObservation::bundleOutputCSV.
    *                           BundleObservation::formatBundleOutputString was removed

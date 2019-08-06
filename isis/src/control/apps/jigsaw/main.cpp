@@ -383,8 +383,6 @@ QList<BundleObservationSolveSettings> observationSolveSettings(UserInterface &ui
     // Check that the held images are present in the input image list
     QString heldList = ui.GetFileName("HELDLIST");
     QString fromList = ui.GetFileName("FROMLIST");
-
-
     SerialNumberList heldSNs(heldList);
     SerialNumberList cubeSNs(fromList);
     checkImageList(heldSNs, cubeSNs);

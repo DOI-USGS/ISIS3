@@ -26,8 +26,6 @@
 #include "Statistics.h"
 #include "XmlStackedHandlerReader.h"
 
-
-
 namespace Isis {
 
   /**
@@ -289,17 +287,28 @@ namespace Isis {
    *
    * @return @b QString The name of the output control network.
    */
-  void BundleSolutionInfo::setOutputControl(Control * outputControl) {
+  void BundleSolutionInfo::setOutputControl(Control *outputControl) {
     m_outputControl = outputControl;
   }
     
+  
+  /**
+   * Sets m_outputControlName
+   *
+   * @param name QString of the new value
+   */
   void BundleSolutionInfo::setOutputControlName(QString name) {
-
-            m_outputControlName = name;
+    m_outputControlName = name;
   }
+  
+  
+  /**
+   * Returns m_outputControlName
+   *
+   * @returns QString of the value
+   */
   QString BundleSolutionInfo::outputControlName() const {
-
-      return m_outputControlName;
+    return m_outputControlName;
   }
 
   /**
@@ -1176,7 +1185,6 @@ namespace Isis {
         fpOut << buf;
 
         QString observationString =
-            //observation->formatBundleOutputString(errorProp,true);
             observation->bundleOutputCSV(errorProp);
 
         //Removes trailing commas
@@ -1196,7 +1204,6 @@ namespace Isis {
     fpOut.close();
     return true;
   }
-
 
 
   /**
@@ -1241,8 +1248,6 @@ namespace Isis {
 
       QString targetString =
           m_settings->bundleTargetBody()->formatBundleOutputString(berrorProp);
-
-
       fpOut << (const char*)targetString.toLatin1().data();
     }
 

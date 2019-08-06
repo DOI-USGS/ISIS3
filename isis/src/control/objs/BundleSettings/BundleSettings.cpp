@@ -10,7 +10,6 @@
 #include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
-//#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
 #include "Project.h" // currently used for xml handler
@@ -218,23 +217,25 @@ namespace Isis {
   }
 
 
-      /**
-       * @brief BundleSettings::setCubeList
-       * @param cubeList
-       *
-       */
+  /**
+   * @brief BundleSettings::setCubeList
+   *
+   * @param cubeList
+   *
+   */
   void BundleSettings::setCubeList(QString cubeList)    {
-        m_cubeList = cubeList;
-      }
+    m_cubeList = cubeList;
+  }
 
 
-      /**
-        * @brief BundleSettings::cubeList
-        * @return QString The name/path of the cube list.
-        */
-      QString BundleSettings::cubeList() const {
-        return m_cubeList;
-      }
+  /**
+  * @brief BundleSettings::cubeList
+  *
+  * @return QString The name/path of the cube list.
+  */
+  QString BundleSettings::cubeList() const {
+    return m_cubeList;
+  }
 
 
   // =============================================================================================//
