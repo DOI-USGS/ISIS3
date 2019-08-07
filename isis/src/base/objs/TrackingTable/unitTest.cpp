@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
              << trackingTable2.pixelToFileName(i).name() << endl;
       }
       catch (IException &e) {
-        cout << "FileName with pixel value " << i << ": " 
-             << " does not exist and an exception is thrown." << endl;
+        cout << "FileName with pixel value " << i 
+             << ": does not exist and an exception is thrown." << endl;
         e.print();
       }
     }
