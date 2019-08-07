@@ -803,7 +803,7 @@ namespace Isis {
     std::vector<double> coefX,coefY,coefZ,coefRA,coefDEC,coefTWI;
     nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
     nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
-
+    
     // Indicate if we need to obtain default position or pointing values
     useDefaultPosition = false;
     useDefaultPointing = false;
@@ -824,15 +824,6 @@ namespace Isis {
       useDefaultPointing = true;
     }
 
-    // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
-    // so we can always output a value for them
-    coefX.resize(nPositionCoefficients);
-    coefY.resize(nPositionCoefficients);
-    coefZ.resize(nPositionCoefficients);
-    coefRA.resize(nPointingCoefficients);
-    coefDEC.resize(nPointingCoefficients);
-    coefTWI.resize(nPointingCoefficients);
-
     if (m_instrumentPosition) {
       if (!useDefaultPosition) {
         m_instrumentPosition->GetPolynomial(coefX,coefY,coefZ);
@@ -840,9 +831,9 @@ namespace Isis {
       // Use the position's center coordinate if not solving for spacecraft position
       else {
         const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
-        coefX[0] = centerCoord[0];
-        coefY[0] = centerCoord[1];
-        coefZ[0] = centerCoord[2];
+        coefX.push_back(centerCoord[0]);
+        coefY.push_back(centerCoord[1]);
+        coefZ.push_back(centerCoord[2]);
       }
     }
 
@@ -853,25 +844,31 @@ namespace Isis {
       // Use the pointing's center angles if not solving for pointing (rotation)
       else {
         const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
-        coefRA[0] = centerAngles[0];
-        coefDEC[0] = centerAngles[1];
-        coefTWI[0] = centerAngles[2];
+        coefRA.push_back(centerAngles[0]);
+        coefDEC.push_back(centerAngles[1]);
+        coefTWI.push_back(centerAngles[2]);
       }
     }
 
-    //Convert pointing coefficients from radians to degrees
-    for (int i = 0; i < nPointingCoefficients; i++) {
-      coefRA[i]*=RAD2DEG;
-      coefDEC[i]*=RAD2DEG;
-      coefTWI[i]*=RAD2DEG;
+    // Combine all vectors into one
+    for (int i=0; i < nPositionCoefficients; i++) {
+      finalParameterValues.append(coefX[i]);
     }
-
-    finalParameterValues.append(QVector<double>::fromStdVector(coefX));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefY));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefZ));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefRA));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefDEC));
-    finalParameterValues.append(QVector<double>::fromStdVector(coefTWI));
+    for (int i=0; i < nPositionCoefficients; i++) {
+      finalParameterValues.append(coefY[i]);
+    }
+    for (int i=0; i < nPositionCoefficients; i++) {
+      finalParameterValues.append(coefZ[i]);
+    }
+    for (int i=0; i < nPointingCoefficients; i++) {
+      finalParameterValues.append(coefRA[i]);
+    }
+    for (int i=0; i < nPointingCoefficients; i++) {
+      finalParameterValues.append(coefDEC[i]);
+    }
+    for (int i=0; i < nPointingCoefficients; i++) {
+      finalParameterValues.append(coefTWI[i]);
+    }
 
   }
 
@@ -974,20 +971,20 @@ namespace Isis {
     }// end outer-if
 
      //Put all of the parameter names together into one QStringList
-      parameterNamesList.append(parameterNamesListX);
-      parameterNamesList.append(parameterNamesListY);
-      parameterNamesList.append(parameterNamesListZ);
-      parameterNamesList.append(parameterNamesListRA);
-      parameterNamesList.append(parameterNamesListDEC);
-      parameterNamesList.append(parameterNamesListTWI);
+    parameterNamesList.append(parameterNamesListX);
+    parameterNamesList.append(parameterNamesListY);
+    parameterNamesList.append(parameterNamesListZ);
+    parameterNamesList.append(parameterNamesListRA);
+    parameterNamesList.append(parameterNamesListDEC);
+    parameterNamesList.append(parameterNamesListTWI);
 
     //Put all of the correction unit names together into one QStringList
-      correctionUnitList.append(correctionUnitListX);
-      correctionUnitList.append(correctionUnitListY);
-      correctionUnitList.append(correctionUnitListZ);
-      correctionUnitList.append(correctionUnitListDEC);
-      correctionUnitList.append(correctionUnitListRA);
-      correctionUnitList.append(correctionUnitListTWI);
+    correctionUnitList.append(correctionUnitListX);
+    correctionUnitList.append(correctionUnitListY);
+    correctionUnitList.append(correctionUnitListZ);
+    correctionUnitList.append(correctionUnitListDEC);
+    correctionUnitList.append(correctionUnitListRA);
+    correctionUnitList.append(correctionUnitListTWI);
 
     // Save the list of parameter names we've accumulated above
     m_parameterNamesList = parameterNamesList;
@@ -1084,14 +1081,15 @@ namespace Isis {
         adjustedSigma = "N/A";
         sigma = "N/A";
       }
+
       if (errorPropagation) {
         sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
         fpOut << buf;
-        sprintf(buf,"%20.8lf",finalParameterValues[i] - correction*RAD2DEG);
+        sprintf(buf,"%20.8lf",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
         fpOut << buf;
-        sprintf(buf,"%20.8lf    ",correction*RAD2DEG);
+        sprintf(buf,"%20.8lf    ",(correction*RAD2DEG));
         fpOut << buf;
-        sprintf(buf,"%20.8lf",finalParameterValues[i]);
+        sprintf(buf,"%20.8lf",(finalParameterValues[i]*RAD2DEG));
         fpOut << buf;
         sprintf(buf,"                 ");
         fpOut << buf;
@@ -1109,11 +1107,11 @@ namespace Isis {
       else {
         sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
         fpOut << buf;
-        sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
+        sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
         fpOut << buf;
-        sprintf(buf,"%20.8lf\t",correction);
+        sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
         fpOut << buf;
-        sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
+        sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
         fpOut << buf;
         sprintf(buf,"\t\t\t");
         fpOut << buf;
@@ -1226,16 +1224,16 @@ namespace Isis {
       }
       qStr = "";
       if (errorPropagation) {
-        qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+        qStr += toString(finalParameterValues[i]*RAD2DEG - correction * RAD2DEG) + ",";
         qStr += toString(correction * RAD2DEG) + ",";
-        qStr += toString(finalParameterValues[i]) + ",";
+        qStr += toString(finalParameterValues[i]*RAD2DEG) + ",";
         qStr += sigma + ",";
         qStr += adjustedSigma + ",";
       }
       else {
-        qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+        qStr += toString(finalParameterValues[i]*RAD2DEG - correction * RAD2DEG) + ",";
         qStr += toString(correction * RAD2DEG) + ",";
-        qStr += toString(finalParameterValues[i]) + ",";
+        qStr += toString(finalParameterValues[i]*RAD2DEG) + ",";
         qStr += sigma + ",";
         qStr += "N/A,";
       }
