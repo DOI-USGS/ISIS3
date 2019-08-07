@@ -1,6 +1,6 @@
 RECORD_TYPE = FIXED_LENGTH
 RECORD_BYTES = 18
-^TABLE = lsb_pds_binary_table.data
+^TABLE = lsb_pds_binary_table.dat
 
 Object = TABLE
   INTERCHANGE_FORMAT = BINARY
