@@ -28,6 +28,7 @@
 #include <QDate>
 #include <QDebug>
 #include <QDir>
+#include <QLocale>
 #include <QPair>
 #include <QString>
 #include <QTemporaryFile>
@@ -622,8 +623,7 @@ namespace Isis {
                     foundFile.mid(truncateRange.second + 1);
 
       }
-
-      QDate fileDate = QDate::fromString(foundFile, fileQDatePattern);
+      QDate fileDate = QLocale().toDate(foundFile, fileQDatePattern);
 
       if (fileDate.isValid()) {
         // No missions before Sputnik 1, so we must be in the new millenium

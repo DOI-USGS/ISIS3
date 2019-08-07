@@ -40,6 +40,7 @@ extern int errno;
 
 #include <QApplication>
 #include <QCoreApplication>
+#include <QLocale>
 #include <QLocalSocket>
 #include <QString>
 #include <QTime>
@@ -96,6 +97,7 @@ namespace Isis {
 
     // try to use US locale for numbers so we don't end up printing "," instead
     //   of "." where it might count.
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
     setlocale(LC_ALL, "en_US");
 
     char env[1024];
@@ -141,12 +143,14 @@ namespace Isis {
           new QApplication(argc, argv);
           // When QApplication is initialized, it will reset the locale to the shells locale. As a result
           // the locale needs to be reset after QApplications initialization.
+          QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
           setlocale(LC_ALL, "en_US");
         }
         else {
           new QCoreApplication(argc, argv);
           // When QCoreApplication is initialized, it will reset the locale to the shells locale. As a result
           // the locale needs to be reset after QCoreApplications initialization.
+          QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
           setlocale(LC_ALL, "en_US");
         }
 

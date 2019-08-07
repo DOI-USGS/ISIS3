@@ -100,19 +100,21 @@ namespace Isis {
    *   @history 2011-07-12 Sharmila Prasad - Fixed bug in "ExecutionDateTime"
    *                           keyword
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
-   *                          $temporary variable instead of /tmp
-   *                          directory.  Added some documentation to
-   *                          methods.
+   *                           $temporary variable instead of /tmp
+   *                           directory.  Added some documentation to
+   *                           methods.
    *   @history 2013-02-28 Janet Barrett - Needed to instantiate a QApplication
-   *                          in the constructor instead of a QCoreApplication
-   *                          so that Qt Gui is accessible by the command line.
-   *                          Also needed to define a compiler directive,
-   *                          USE_GUI_QAPP, to bypass a problem the Macs have
-   *                          with using QApplication. References #575.
+   *                           in the constructor instead of a QCoreApplication
+   *                           so that Qt Gui is accessible by the command line.
+   *                           Also needed to define a compiler directive,
+   *                           USE_GUI_QAPP, to bypass a problem the Macs have
+   *                           with using QApplication. References #575.
    *   @history 2016-08-15 Adam Paquette - Reset locale after QApplication or
-   *                          QCoreApplication are instantiated. Fixes #3908.
+   *                           QCoreApplication are instantiated. Fixes #3908.
    *   @history 2017-06-08 Christopher Combs - Changed object used to calculate
-   *                          connectTime from  a time_t to a QTime. Fixes #4618.
+   *                           connectTime from  a time_t to a QTime. Fixes #4618.
+   *   @history 2019-08-07 Jesse Mapel - Set the default QLocale to en_US to ensure
+   *                           QT always uses the correct locale. Fixes #3340.
    */
   class Application : public Environment {
     public:
