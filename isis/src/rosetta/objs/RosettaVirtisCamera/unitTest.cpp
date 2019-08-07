@@ -34,6 +34,7 @@ using namespace std;
 using namespace Isis;
 
 void TestLineSamp(Camera *cam, double samp, double line);
+int TestCamera(Camera *cam, Cube c, double lines, double knownLat, double knownLon); 
 
 /**
  *
@@ -44,6 +45,8 @@ void TestLineSamp(Camera *cam, double samp, double line);
  * @internal
  *   @history 2018-08-28 Kris Becker - Initial unit test for Rosetta VIRTIS
  *            instrument
+ *   @history 2019-07-02 Krisitn Berry - Update to test only level 3 (calibrated) images, as only
+ *            calibrated images are currently supported by the camera model. 
  */  
 int main(void) {
   Preference::Preferences(true);
@@ -53,78 +56,94 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -13.317366927129520;
-    double knownLon = 125.530724158825336;
+    double knownLat = 55.0877030799486249;
+    double knownLon = 9.3721561274843133;
 
-    Cube c("$ISIS3DATA/rosetta/testData/I1_00237395857.cub", "r");
-//    Cube c("./I1_00237395857.cub", "r");
-    RosettaVirtisCamera *cam = (RosettaVirtisCamera *) CameraFactory::Create(c);
-    cout << "FileName: " << FileName(c.fileName()).name() << endl;
-    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
-    cout.setf(std::ios::fixed);
-    cout << setprecision(9);
+    cout << endl << "Teting Level 3 (Calibrated) VIRTIS-M-VIS Cube ..." << endl;
+    Cube visCube("$ISIS3DATA/rosetta/testData/V1_00388238556.cub", "r");
+    double lines = 100.0;
+    RosettaVirtisCamera *cam = (RosettaVirtisCamera *) CameraFactory::Create(visCube);
+    TestCamera(cam, visCube, lines, knownLat, knownLon);
 
-    // Test kernel IDs
-    cout << "Kernel IDs: " << endl;
-    cout << "CK Frame ID = " << cam->CkFrameId() << endl;
-    cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
-    cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
-    cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
-    
-    // Test name methods
-    cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
-    cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
-    cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
-    cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
-
-    // Test Shutter Open/Close 
-    //const PvlGroup &inst = p.findGroup("Instrument", Pvl::Traverse);
-    std::pair< double, double > imgTimes = cam->StartEndEphemerisTimes();
-    cout << "Start Time: " << imgTimes.first << "\n";
-    cout << "End Time:   " << imgTimes.second << "\n";
-    // Test all four corners to make sure the conversions are right
-#if 1
-    // Note - The limited data available at the time/scope this camera model
-    // was developed (2017-08-28) does not fully support this test!!
-    cout << "For upper left corner ..." << endl;
-    TestLineSamp(cam, 119.0, 4.0);
-
-    cout << "For upper right corner ..." << endl;
-    TestLineSamp(cam, 135.0, 4.0);
-
-    cout << "For lower left corner ..." << endl;
-    TestLineSamp(cam, 122.0, 9.0);
-
-    cout << "For lower right corner ..." << endl;
-    TestLineSamp(cam, 130.0, 9.0);
-#endif
-
-    double samp = 128.0;
-    double line = 8.0;
-    cout << "For center pixel position ..." << endl;
-
-    if(!cam->SetImage(samp, line)) {
-      cout << "ERROR" << endl;
-      return 0;
-    }
-
-    if(abs(cam->UniversalLatitude() - knownLat) < 6E-12) {
-      cout << "Latitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
-    }
-
-    if(abs(cam->UniversalLongitude() - knownLon) < 6E-12) {
-      cout << "Longitude OK" << endl;
-    }
-    else {
-      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
-    }
+    cout << endl << "Teting Level 3 (Calibrated) VIRTIS-M-IR Cube ..." << endl;
+    knownLat = 29.1974649731145028;
+    knownLon = 346.8749209987247468;
+    lines = 67; 
+    Cube irCube("$ISIS3DATA/rosetta/testData/I1_00382172310.cub", "r");
+    RosettaVirtisCamera *cam2 = (RosettaVirtisCamera *) CameraFactory::Create(irCube);
+    TestCamera(cam2, irCube, lines, knownLat, knownLon);
   }
   catch(IException &e) {
     e.print();
   }
+}
+
+int TestCamera(Camera *cam, Cube c, double lines, double knownLat, double knownLon) {
+  cout << "FileName: " << FileName(c.fileName()).name() << endl;
+  cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
+  cout.setf(std::ios::fixed);
+  cout << setprecision(9);
+  
+  // Test kernel IDs
+  cout << "Kernel IDs: " << endl;
+  cout << "CK Frame ID = " << cam->CkFrameId() << endl;
+  cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
+  cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
+  cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+  
+  // Test name methods
+  cout << "Spacecraft Name Long: " << cam->spacecraftNameLong() << endl;
+  cout << "Spacecraft Name Short: " << cam->spacecraftNameShort() << endl;
+  cout << "Instrument Name Long: " << cam->instrumentNameLong() << endl;
+  cout << "Instrument Name Short: " << cam->instrumentNameShort() << endl << endl;
+  
+  // Test Shutter Open/Close 
+  std::pair< double, double > imgTimes = cam->StartEndEphemerisTimes();
+  cout << "Start Time: " << imgTimes.first << "\n";
+  cout << "End Time:   " << imgTimes.second << "\n";
+  
+  // Test all four corners to make sure the conversions are right
+  // For Rosetta, could not find images with the comet at all 4 corners, so these are 
+  // actually corners of the comet, not the image. Values were chosen to approximate
+  // the corners on two different images (VIS and IR). 
+  
+  // good.
+  cout << "For upper left corner ..." << endl;
+  TestLineSamp(cam, 138.0, 10.0);
+  
+  cout << "For upper right corner ..." << endl;
+  TestLineSamp(cam, 165.0, 19.0);
+  
+  // fixme? 
+  cout << "For lower left corner ..." << endl;
+  TestLineSamp(cam, 138.0, 55.0);
+  
+  cout << "For lower right corner ..." << endl;
+  TestLineSamp(cam, 130.0, 55.0);
+
+  double samp = 128.0;
+  double line = lines/2.0;
+  cout << "For center pixel position ..." << endl;
+  
+  if(!cam->SetImage(samp, line)) {
+    cout << "ERROR" << endl;
+    return 0;
+  }
+  
+  if(abs(cam->UniversalLatitude() - knownLat) < 6E-12) {
+    cout << "Latitude OK" << endl;
+  }
+  else {
+    cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - knownLat << endl;
+  }
+  
+  if(abs(cam->UniversalLongitude() - knownLon) < 6E-12) {
+    cout << "Longitude OK" << endl;
+  }
+  else {
+    cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon << endl;
+  }
+  return 0;
 }
 
 void TestLineSamp(Camera *cam, double samp, double line) {
