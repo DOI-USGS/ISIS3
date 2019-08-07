@@ -49,8 +49,8 @@ TEST(BulletDskShapeTests, MutiSegment) {
   EXPECT_EQ(multiseg.name(), "");
   EXPECT_DOUBLE_EQ(multiseg.maximumDistance(), 7.3484692283495345);
   EXPECT_TRUE((bool) multiseg.body());
-  EXPECT_EQ(multiseg.getNumTriangles(), 14);
-  EXPECT_EQ(multiseg.getNumVertices(), 13);
+  EXPECT_EQ(multiseg.getNumTriangles(), 28);
+  EXPECT_EQ(multiseg.getNumVertices(), 26);
 
   btMatrix3x3 truthTriangle(0, 0, 6,
                             0, 6, 1,

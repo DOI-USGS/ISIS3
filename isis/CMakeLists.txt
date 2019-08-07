@@ -33,18 +33,18 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.6.0.1")
+set(VERSION            "3.8.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2018-10-26")
+set(VERSION_DATE              "2019-07-01")
 set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
-set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
+set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
 
 # Main website associated with the software package
 set(PACKAGE_URL        "https://isis.astrogeology.usgs.gov/")
@@ -231,7 +231,7 @@ find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
 find_package(GMM       5.0     REQUIRED)
-find_package(GSL       19      REQUIRED)
+find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
