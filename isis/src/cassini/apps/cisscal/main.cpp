@@ -132,6 +132,7 @@ void IsisMain() {
 
   // Add the radiometry group
   gbl::calgrp.setName("Radiometry");
+  gbl::calgrp += PvlKeyword("CisscalVersion", "3.8");
 
   // The first ProcessByLine pass will either compute bitweight values or copy input values
 
