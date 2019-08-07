@@ -1090,9 +1090,11 @@ namespace Isis {
     // If there are any special pixel Null values in this output brick, we may be
     // up against an edge of the input image where the interpolaters get Nulls from 
     // outside the image. Since the patches have some overlap due to finding the 
-    // rectangular area (bounding box, min/max line/samp) of the four points input pints
-    // projected into the output space, this causes valid DNs
-    // from a previously processed patch to be replaced with Null DNs from this patch.
+    // rectangular area (bounding box, min/max line/samp) of the four corner points
+    // projected into the output space and then squaring that 
+    // possibly rotated patch in the output space by finding the min/max line/samp. 
+    // This overlap causes valid DNs from a previously processed patch to be replaced with 
+    // Null DNs from this patch.
     if (foundNull) {
      Brick readBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
      readBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
