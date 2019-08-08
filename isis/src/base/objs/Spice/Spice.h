@@ -285,6 +285,11 @@ namespace Isis {
    *                           PCK to define the new body, including its body code.  This PCK is only
    *                           loaded in spiceinit so the code needs to be saved so that the radii 
    *                           keyword can be created to retrieve the target radii.
+   *  @history 2019-04-16 Kristin Berry - Added a parameter to getClockTime called clockTicks which
+   *                           defaults to false. When set to true, this indicates that the input value
+   *                           is in encoded clock ticks, rather than a full spacecraft clock time
+   *                           string. As such, when used sct2e_c is used to convert to an ET rather
+   *                           than scs2e_c. 
    */
   class Spice {
     public:
@@ -320,7 +325,8 @@ namespace Isis {
       QString targetName() const;
 
       iTime getClockTime(QString clockValue,
-                         int sclkCode = -1);
+                         int sclkCode = -1, 
+                         bool clockTicks=false);
       SpiceDouble getDouble(const QString &key, int index = 0);
       SpiceInt getInteger(const QString &key,   int index = 0);
       QString getString(const QString &key,     int index = 0);
