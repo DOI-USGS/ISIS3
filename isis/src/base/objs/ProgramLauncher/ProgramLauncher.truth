@@ -30,25 +30,9 @@ Group = Results
   HrsPixels               = 0
 End_Group
 
-Testing malformed command... 
-NOTE: The exit code for this test differs on each OS.
-That is the reason for the OS specific truth files. Please ignore the exit codes.
-
-sh: 1: Syntax error: Unterminated quoted string
-**PROGRAMMER ERROR** Executing command [ls -l * | grep Program | sed 's/\(.*\)\(ProgramLauncher.*\)/\2/] failed with return status [512].
-
 Testing non-existant Isis 3 program... 
 
 **ERROR** Program [chocolatelab] does not appear to be a valid Isis 3 program.
-
-Testing using Isis 3 program as a system program... 
-NOTE: The exit code for this test differs on each OS.
-That is the reason for the OS specific truth files. Please ignore the exit codes.
-
-terminate called after throwing an instance of 'Isis::IException'
-  what():  **ERROR** This process (program) was executed by an existing Isis 3 process. However, we failed to establish a communication channel with the parent (launcher) process. The parent process has a PID of [999].
-Aborted (core dumped)
-**PROGRAMMER ERROR** Executing command [$ISISROOT/bin/stats from=\$base/testData/ab102401_ideal.cub -pid=999 -preference=\$ISISROOT/TestPreferences] failed with return status [34304].
 
 Testing using Isis 3 program as a system program without pid... 
 

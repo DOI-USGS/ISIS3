@@ -32,40 +32,11 @@ void IsisMain() {
         "-preference=$ISISROOT/TestPreferences");
 
   cerr << endl;
-  cerr << "Testing malformed command... " << endl;
-  cerr << "NOTE: The exit code for this test differs on each OS." << endl;
-  cerr << "That is the reason for the OS specific truth files. Please ignore the exit codes." << endl;
-  cerr << endl;
-  try {
-    ProgramLauncher::RunSystemCommand("ls -l * | grep Program | "
-        "sed 's/\\(.*\\)\\(ProgramLauncher.*\\)/\\2/");
-  }
-  catch(IException &e) {
-    e.print();
-  }
-
-
-  cerr << endl;
   cerr << "Testing non-existant Isis 3 program... " << endl;
   cerr << endl;
   try {
     ProgramLauncher::RunIsisProgram("chocolatelab",
                                     "from=$base/testData/ab102401_ideal.cub");
-  }
-  catch(IException &e) {
-    e.print();
-  }
-
-
-  cerr << endl;
-  cerr << "Testing using Isis 3 program as a system program... " << endl;
-  cerr << "NOTE: The exit code for this test differs on each OS." << endl;
-  cerr << "That is the reason for the OS specific truth files. Please ignore the exit codes." << endl;
-  cerr << endl;
-  try {
-    ProgramLauncher::RunSystemCommand("$ISISROOT/bin/stats "
-        "from=\\$base/testData/ab102401_ideal.cub -pid=999 "
-        "-preference=\\$ISISROOT/TestPreferences");
   }
   catch(IException &e) {
     e.print();
