@@ -224,7 +224,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
       //find the correct coverage window
       if (currFile == "SPK") {
-        SPICEDOUBLE_CELL(cover, 50000);
+        SPICEDOUBLE_CELL(cover, 200000);
         ssize_c(0, &cover);
         ssize_c(200000, &cover);
         spkcov_c(tmp.toLatin1().data(), body, &cover);
