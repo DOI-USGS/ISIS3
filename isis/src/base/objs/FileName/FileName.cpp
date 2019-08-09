@@ -623,7 +623,7 @@ namespace Isis {
                     foundFile.mid(truncateRange.second + 1);
 
       }
-      QDate fileDate = QLocale().toDate(foundFile, fileQDatePattern);
+      QDate fileDate = QLocale(QLocale::English, QLocale::UnitedStates).toDate(foundFile, fileQDatePattern);
 
       if (fileDate.isValid()) {
         // No missions before Sputnik 1, so we must be in the new millenium
