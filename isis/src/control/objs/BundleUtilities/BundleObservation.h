@@ -147,7 +147,7 @@ namespace Isis {
                             int &nPositionCoefficients, int &nPointingCoefficients,
                             bool &useDefaultPosition, bool &useDefaultPointing,
                             bool &useDefaultTwist);
-      void bundleOutputString(std::ofstream &fpOut,bool errorPropagation);
+      void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
       QString bundleOutputCSV(bool errorPropagation);
       
       QStringList parameterList();

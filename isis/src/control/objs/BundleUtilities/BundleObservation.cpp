@@ -823,6 +823,13 @@ namespace Isis {
       nPointingCoefficients = 1;
       useDefaultPointing = true;
     }
+    
+    coefX.resize(nPositionCoefficients);
+    coefY.resize(nPositionCoefficients);
+    coefZ.resize(nPositionCoefficients);
+    coefRA.resize(nPointingCoefficients);
+    coefDEC.resize(nPointingCoefficients);
+    coefTWI.resize(nPointingCoefficients);
 
     if (m_instrumentPosition) {
       if (!useDefaultPosition) {
@@ -851,23 +858,27 @@ namespace Isis {
     }
 
     // Combine all vectors into one
-    for (int i=0; i < nPositionCoefficients; i++) {
-      finalParameterValues.append(coefX[i]);
+    if (nPositionCoefficients > 0) {
+      for (int i=0; i < nPositionCoefficients; i++) {
+        finalParameterValues.append(coefX[i]);
+      }
+      for (int i=0; i < nPositionCoefficients; i++) {
+        finalParameterValues.append(coefY[i]);
+      }
+      for (int i=0; i < nPositionCoefficients; i++) {
+        finalParameterValues.append(coefZ[i]);
+      }
     }
-    for (int i=0; i < nPositionCoefficients; i++) {
-      finalParameterValues.append(coefY[i]);
-    }
-    for (int i=0; i < nPositionCoefficients; i++) {
-      finalParameterValues.append(coefZ[i]);
-    }
-    for (int i=0; i < nPointingCoefficients; i++) {
-      finalParameterValues.append(coefRA[i]);
-    }
-    for (int i=0; i < nPointingCoefficients; i++) {
-      finalParameterValues.append(coefDEC[i]);
-    }
-    for (int i=0; i < nPointingCoefficients; i++) {
-      finalParameterValues.append(coefTWI[i]);
+    if (nPointingCoefficients > 0) {
+      for (int i=0; i < nPointingCoefficients; i++) {
+        finalParameterValues.append(coefRA[i]);
+      }
+      for (int i=0; i < nPointingCoefficients; i++) {
+        finalParameterValues.append(coefDEC[i]);
+      }
+      for (int i=0; i < nPointingCoefficients; i++) {
+        finalParameterValues.append(coefTWI[i]);
+      }
     }
 
   }
@@ -882,7 +893,7 @@ namespace Isis {
    * @param errorPropagation Boolean indicating whether or not to attach more information
    *     (corrections, sigmas, adjusted sigmas...) to the output.
    */
-  void BundleObservation::bundleOutputString(std::ofstream &fpOut, bool errorPropagation) {
+  void BundleObservation::bundleOutputString(std::ostream &fpOut, bool errorPropagation) {
 
     char buf[4096];
 
@@ -965,9 +976,7 @@ namespace Isis {
           correctionUnitListDEC.append("dd/s^"+toString(j));
           correctionUnitListTWI.append("dd/s^"+toString(j));
         }
-
       }//end for
-
     }// end outer-if
 
      //Put all of the parameter names together into one QStringList
@@ -1127,6 +1136,7 @@ namespace Isis {
         fpOut<<buf;
       }
     }
+    
   }
 
   /**
@@ -1161,6 +1171,7 @@ namespace Isis {
     QString adjustedSigma = "N/A";
     double correction = 0.0;
 
+    // Position parameters
     for (int i = 0; i < nPositionParameters; i++) {
       if (!useDefaultPosition) {
         correction = m_corrections(i);
@@ -1239,6 +1250,7 @@ namespace Isis {
       }
       finalqStr += qStr;
     }
+    
     return finalqStr;
   }
 
