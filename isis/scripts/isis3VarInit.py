@@ -159,7 +159,7 @@ set -gx ISIS3TESTDATA {}
     a.write(script)
 print("Wrote " + activate_vars_fish)
 
-with open(deactivate_vars_csh, mode="w") as d:
+with open(deactivate_vars_fish, mode="w") as d:
     script = """#!/bin/sh
 set -e ISISROOT
 set -e ISIS3DATA
