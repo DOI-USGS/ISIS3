@@ -442,10 +442,6 @@ int main(int argc, char *argv[]) {
     BundleObservationSolveSettings bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    // qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    // qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    // qDebug().noquote() << bo2.formatBundleOutputString(false);
-    // qDebug().noquote() << bo2.formatBundleOutputString(true);
     qDebug().noquote() << bo2.bundleOutputCSV(true);
     qDebug().noquote() << bo2.bundleOutputCSV(false);
     std::stringstream fpOut1;
@@ -460,10 +456,6 @@ int main(int argc, char *argv[]) {
     bossFromBo = *bo2.solveSettings();
     printXml(bossFromBo);
     qDebug() << "    output bundle observation...";
-    // qDebug().noquote() << bo2.formatBundleOutputString(true,true);
-    // qDebug().noquote() << bo2.formatBundleOutputString(false,true);
-    // qDebug().noquote() << bo2.formatBundleOutputString(false);
-    // qDebug().noquote() << bo2.formatBundleOutputString(true);
     qDebug().noquote() << bo2.bundleOutputCSV(true);
     qDebug().noquote() << bo2.bundleOutputCSV(false);
     std::stringstream fpOut3;
@@ -517,9 +509,6 @@ int main(int argc, char *argv[]) {
     // bo3.initializeBodyRotation(); //Seg fault
 
     qDebug() << "    output bundle observation...";
-    // qDebug().noquote() << bo3.formatBundleOutputString(false,true);
-    // qDebug().noquote() << bo3.formatBundleOutputString(false);
-    // qDebug().noquote() << bo3.formatBundleOutputString(true,true);
     qDebug().noquote() << bo3.bundleOutputCSV(false);
     std::stringstream fpOut5;
     bo3.bundleOutputString(fpOut5, false);

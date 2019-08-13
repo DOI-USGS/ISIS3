@@ -838,9 +838,9 @@ namespace Isis {
       // Use the position's center coordinate if not solving for spacecraft position
       else {
         const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
-        coefX[0] = (centerCoord[0]);
-        coefY[0] = (centerCoord[1]);
-        coefZ[0] = (centerCoord[2]);
+        coefX[0] = centerCoord[0];
+        coefY[0] = centerCoord[1];
+        coefZ[0] = centerCoord[2];
       }
     }
 
@@ -851,9 +851,9 @@ namespace Isis {
       // Use the pointing's center angles if not solving for pointing (rotation)
       else {
         const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
-        coefRA[0] = (centerAngles[0]);
-        coefDEC[0] = (centerAngles[1]);
-        coefTWI[0] = (centerAngles[2]);
+        coefRA[0] = centerAngles[0];
+        coefDEC[0] = centerAngles[1];
+        coefTWI[0] = centerAngles[2];
       }
     }
 
