@@ -138,8 +138,8 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
  *                  the database. For example, "Reconstructed".
  *
  * @param fileList  The list of files to create a database for. The files must
- *                  be ordered in the desired priority. That is, if two kernels
- *                  cover the same time period, the kernel earlier in the file
+ *                  be ordered in ascending priority. That is, if two kernels
+ *                  cover the same time period, the kernel later in the file
  *                  will be used.
  *
  * @return PvlObject
