@@ -256,13 +256,6 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         random
                                         wserialization)
 
-
-#message(STATUS "Boost lib dir: ${Boost_LIBRARY_DIRS}")
-
-set (BOOST_LIBRARYDIRi "${Boost_LIBRARY_DIRS}")
-set (Boost_LIBRARY_DIR_DEBUG "Boost_LIBRARY_DIRS")
-set (Boost_LIBRARY_DIR_RELEASE "Boost_LIBRARY_DIRS")
-
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
@@ -334,10 +327,6 @@ endforeach()
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
-
-
-message("IN CMAKELISTS: ${ALLLIBS}")
-
 
 #===============================================================================
 #===============================================================================
