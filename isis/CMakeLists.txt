@@ -219,13 +219,6 @@ find_package(Qt5 COMPONENTS
                 # Search this path explicitly for MacOS OpenGL Framework
                 PATHS /System/Library/Frameworks/ REQUIRED)
 
-
-set(Boost_USE_DEBUG_LIBS OFF)
-
-# Some of these will have non-traditional installs with version numbers in the paths in v007
-# For these, we pass in a version number, and use it in the path suffix
-# This only applies to v007, and outside of the building, we should only expect standard installs
-# The v007-specific installs are listed beside their find_package calls below:
 find_package(Boost 1.59.0 REQUIRED atomic
                                         log
                                         regex
