@@ -219,11 +219,50 @@ find_package(Qt5 COMPONENTS
                 # Search this path explicitly for MacOS OpenGL Framework
                 PATHS /System/Library/Frameworks/ REQUIRED)
 
+
+set(Boost_USE_DEBUG_LIBS OFF)
+
 # Some of these will have non-traditional installs with version numbers in the paths in v007
 # For these, we pass in a version number, and use it in the path suffix
 # This only applies to v007, and outside of the building, we should only expect standard installs
 # The v007-specific installs are listed beside their find_package calls below:
-find_package(Boost     1.59.0  REQUIRED)
+find_package(Boost 1.59.0 REQUIRED atomic
+                                        log
+                                        regex
+                                        log_setup
+                                        serialization
+                                        chrono
+                                        math_c99
+                                        signals
+                                        container
+                                        math_c99f
+                                        context
+                                        math_c99l
+                                        system
+                                        math_tr1
+                                        math_tr1f
+                                        math_tr1l
+                                        test_exec_monitor
+                                        date_time
+                                        thread
+                                        exception
+                                        timer
+                                        filesystem
+                                        prg_exec_monitor
+                                        program_options
+                                        unit_test_framework
+                                        iostreams
+                                        wave
+                                        random
+                                        wserialization)
+
+
+#message(STATUS "Boost lib dir: ${Boost_LIBRARY_DIRS}")
+
+set (BOOST_LIBRARYDIRi "${Boost_LIBRARY_DIRS}")
+set (Boost_LIBRARY_DIR_DEBUG "Boost_LIBRARY_DIRS")
+set (Boost_LIBRARY_DIR_RELEASE "Boost_LIBRARY_DIRS")
+
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
@@ -271,7 +310,6 @@ set(ALLINCDIRS "")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})
-#message("VAR=${_variableName}")
    if (_variableName MATCHES ".+_INCLUDE_DIR$")
      list(APPEND ALLINCDIRS "${${_variableName}}")
    elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
@@ -283,9 +321,6 @@ endforeach()
 foreach (_variableName ${_variableNames})
    get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
    if (_variableName MATCHES "^CMAKE+")
-   elseif (_variableName MATCHES ".+_LIB$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
    elseif (_variableName MATCHES ".+_LIBRARY$")
      list(APPEND ALLLIBDIRS "${LIBDIR}")
      list(APPEND ALLLIBS "${${_variableName}}")
@@ -299,6 +334,10 @@ endforeach()
 list(REMOVE_DUPLICATES ALLLIBDIRS)
 list(REMOVE_DUPLICATES ALLLIBS)
 list(REMOVE_DUPLICATES ALLINCDIRS)
+
+
+message("IN CMAKELISTS: ${ALLLIBS}")
+
 
 #===============================================================================
 #===============================================================================
