@@ -71,7 +71,7 @@ Building ISIS requires that the anaconda environment be activated. Activate your
   * There should now be a build/ install/ and isis/ directory.
 
 * cd into the build directory and configure your build:
-  * `cmake -DCMAKE_INSTALL_PREFIX=<install directory> -Disis3Data=<path-to-isis3-data> -Disis3TestData=<path-to-isis3-test-data> -DJP2KFLAG=OFF -Dpybindings=OFF -GNinja <source directory>`
+  * `cmake -Disis3Data=<path-to-isis3-data> -Disis3TestData=<path-to-isis3-test-data> -DJP2KFLAG=OFF -DCMAKE_BUILD_TYPE=RELEASE -GNinja <source directory>`
   * \<source directory\> is the root `isis` directory of the ISIS source tree, i.e. `/scratch/this_is_an_example/ISIS3/isis`. From the build directory, this is `../isis`
 
 * Set your ISISROOT to `/the/path/to/your/build`:
