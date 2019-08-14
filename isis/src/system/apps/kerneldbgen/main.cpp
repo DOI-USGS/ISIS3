@@ -140,10 +140,12 @@ void IsisMain() {
   }
 
   //if (filter == ""){
-  if (!ui.WasEntered("PREDICTFILTER") && !ui.WasEntered("RECONFILTER") &&
-      !ui.WasEntered("SMITHEDFILTER")) {
+  if (!(ui.WasEntered("PREDICTFILTER") || ui.WasEntered("PREDICTLIST")) &&
+      !(ui.WasEntered("RECONFILTER")   || ui.WasEntered("RECONLIST")) &&
+      !(ui.WasEntered("SMITHEDFILTER") || ui.WasEntered("SMITHEDLIST"))) {
     QString message =
-      "You must enter a filter AND directory for at least one type of kernel";
+      "No kernel selection arguments were entered. A directory and filter or a "
+      "list must be entered for at least one quality of kernel.";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
