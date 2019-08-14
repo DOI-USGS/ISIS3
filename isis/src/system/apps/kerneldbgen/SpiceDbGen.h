@@ -61,7 +61,8 @@ class SpiceDbGen {
     SpiceDbGen(QString type);
     Isis::PvlObject Direct(QString quality, QString location,
                            std::vector<QString> & filter, double startOffset, double endOffset);
-    Isis::PvlObject Direct(QString quality, FileList fileList, double startOffset, double endOffset);
+    Isis::PvlObject Direct(QString quality, Isis::FileList fileList,
+                           double startOffset, double endOffset);
     void FurnishDependencies(QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
                              QList<Isis::FileName> extras);
     void setCoverageLevel(QString level);
