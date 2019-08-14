@@ -74,7 +74,6 @@ SpiceDbGen::SpiceDbGen(QString type) {
 PvlObject SpiceDbGen::Direct(QString quality, QString location,
                              std::vector<QString> &filter, double startOffset, double endOffset) {
   PvlObject result;
-  QString type = "none";
 
   for (unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
@@ -104,26 +103,21 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
     if (grp->name() == "No coverage" || grp->name() == "Null") {
       result.deleteGroup(grp->name());
     }
-    // This is used for the first time thru the while loop
-    // DO NOT increment grp here
-    else if (type == "none") {
-      type = grp->name();
-    }
-    else if (grp->name() == type) {
+    else if (grp->name() == p_type) {
       grp->setName("Selection");
       grp++;
     }
     else {
-      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + type + "]" ;
+      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
   }
 
-  if (type == "SPK") {
+  if (p_type == "SPK") {
     result.setName("SpacecraftPosition");
   }
-  else if (type == "CK") {
+  else if (p_type == "CK") {
     result.setName("SpacecraftPointing");
   }
 
@@ -152,7 +146,6 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
 PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
                              double startOffset, double endOffset) {
   PvlObject result;
-  QString type = "none";
 
   // Throw an error if no files are being added to this database for
   // this filter/regex
@@ -176,26 +169,21 @@ PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
     if (grp->name() == "No coverage" || grp->name() == "Null") {
       result.deleteGroup(grp->name());
     }
-    // This is used for the first time thru the while loop
-    // DO NOT increment grp here
-    else if (type == "none") {
-      type = grp->name();
-    }
-    else if (grp->name() == type) {
+    else if (grp->name() == p_type) {
       grp->setName("Selection");
       grp++;
     }
     else {
-      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + type + "]" ;
+      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
   }
 
-  if (type == "SPK") {
+  if (p_type == "SPK") {
     result.setName("SpacecraftPosition");
   }
-  else if (type == "CK") {
+  else if (p_type == "CK") {
     result.setName("SpacecraftPointing");
   }
 
