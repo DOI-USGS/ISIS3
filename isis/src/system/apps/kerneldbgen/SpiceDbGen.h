@@ -53,6 +53,8 @@
  *                            now select spice "time intervals" at the level specified. This is
  *                            either a SPICE Segment (coarse) or a SPICE interval (fine.)
  *                            Fixes #5410.
+ *   @history 2019-08-13 Jesse Mapel - Added the ability to pass an explicit lsit
+ *                           of files to the Direct method. Fixes #3390.
  *
  */
 class SpiceDbGen {
