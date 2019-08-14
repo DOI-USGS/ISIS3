@@ -1,26 +1,26 @@
-/**
- * @file
+/**                                                                       
+ * @file                                                                  
  * $Revision$
  * $Date$
  * $Id$
- *
- *   Unless noted otherwise, the portions of Isis written by the USGS are
- *   public domain. See individual third-party library and package descriptions
- *   for intellectual property information, user agreements, and related
- *   information.
- *
- *   Although Isis has been used by the USGS, no warranty, expressed or
- *   implied, is made by the USGS as to the accuracy and functioning of such
- *   software and related material nor shall the fact of distribution
+ * 
+ *   Unless noted otherwise, the portions of Isis written by the USGS are 
+ *   public domain. See individual third-party library and package descriptions 
+ *   for intellectual property information, user agreements, and related  
+ *   information.                                                         
+ *                                                                        
+ *   Although Isis has been used by the USGS, no warranty, expressed or   
+ *   implied, is made by the USGS as to the accuracy and functioning of such 
+ *   software and related material nor shall the fact of distribution     
  *   constitute any such warranty, and no responsibility is assumed by the
- *   USGS in connection therewith.
- *
- *   For additional information, launch
- *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   USGS in connection therewith.                                        
+ *                                                                        
+ *   For additional information, launch                                   
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html                
  *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
- *   http://www.usgs.gov/privacy.html.
- */
+ *   http://www.usgs.gov/privacy.html.                                    
+ */ 
 
 
 #include <string>
@@ -52,13 +52,13 @@
 
 namespace Isis {
 
-MatchMaker::MatchMaker() : QLogger(), m_name("MatchMaker"),
-                           m_parameters(), m_query(),  m_trainers(),
+MatchMaker::MatchMaker() : QLogger(), m_name("MatchMaker"), 
+                           m_parameters(), m_query(),  m_trainers(), 
                            m_geomFlag(None) { }
 
 MatchMaker::MatchMaker(const QString &name,const PvlFlatMap &parameters,
-                       const QLogger &logger) : QLogger(logger),
-                       m_name(name), m_parameters(parameters),
+                       const QLogger &logger) : QLogger(logger), 
+                       m_name(name), m_parameters(parameters), 
                        m_query(), m_trainers(), m_geomFlag(None)  { }
 
 
@@ -118,7 +118,7 @@ MatchImage MatchMaker::getGeometrySource() const {
     QString mess = "Cannot choose Train image as geometry source when matching "
                    "more than one train image to match";
     throw IException(IException::Programmer, mess, _FILEINFO_);
-  }
+  }  
 
   if ( Query == m_geomFlag )  return ( query() );
   if ( Train == m_geomFlag )  return ( train() );
@@ -129,53 +129,47 @@ MatcherSolution *MatchMaker::match(const SharedRobustMatcher &matcher) {
 
   // Pass along logging status
   matcher->setDebugLogger( stream(), isDebug() );
-  MatchImage query_copy = m_query.clone();
-  QList<MatchImage> trainer_copy;
-  for (int i = 0; i < m_trainers.size(); i++)
-  {
-    trainer_copy.append(m_trainers[i].clone());
-  }
 
   MatcherSolution *m(0);
   if ( m_trainers.size() == 1 ) {
     // Run a pair only matcher
     m = new MatcherSolution(matcher,
-                            matcher->match(query_copy, trainer_copy[0]),
-                            *this /* MatchMaker and/or QLogger */ );
+                            matcher->match(m_query, m_trainers[0]), 
+                            *this /* MatchMaker and/or QLogger */ ); 
   }
   else {
     // Run the multi-matcher
     m = new MatcherSolution(matcher,
-                            matcher->match(query_copy, trainer_copy),
+                            matcher->match(m_query, m_trainers), 
                             *this /* MatchMaker and/or QLogger */ );
   }
-  return ( m );
+  return ( m ); 
 }
 
 MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
   // Thread here!!!!
   MatcherSolutionList solutions;
   for (int i = 0 ; i < matchers.size() ; i++) {
-    solutions.push_back(SharedMatcherSolution( match(matchers[i]) ));
+    solutions.push_back(SharedMatcherSolution( match(matchers[i]) )); 
   }
   return ( solutions );
 }
 
 
- PvlGroup MatchMaker::network(ControlNet &cnet, const MatcherSolution &solution,
+ PvlGroup MatchMaker::network(ControlNet &cnet, const MatcherSolution &solution, 
                               ID &pointMaker) const {
 
 
    PvlGroup cnetinfo("ControlNetInfo");
   if ( isDebug() ) {
-    logger() << "Entering MatchMaker::network(cnet, solution, pointmaker)...\n";
+    logger() << "Entering MatchMaker::network(cnet, solution, pointmaker)...\n"; 
     logger().flush();
   }
 
   cnetinfo += PvlKeyword("SolutionSize", toString(solution.size()) );
-  if ( solution.size() <= 0 ) {
+  if ( solution.size() <= 0 ) { 
     cnetinfo += PvlKeyword("Error", "No matches, no network!!");
-    return (cnetinfo);
+    return (cnetinfo); 
   }
 
   MatchImage v_query = (*solution.begin()).query();
@@ -187,8 +181,8 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
     if ( v_pair->size() > 0 ) { nImages++; }
     for (int m = 0 ; m < v_pair->size() ; m++) {
       int index = v_pair->match(m).queryIdx;
-      nMeasures += addMeasure(&points[index], *v_pair,
-                              (*v_pair).match(m), solution);
+      nMeasures += addMeasure(&points[index], *v_pair, 
+                              (*v_pair).match(m), solution); 
     }
   }
 
@@ -203,7 +197,7 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
   for (int i = 0 ; i < points.size() ; i++) {
     if ( points[i] != 0 ) {
       if ( points[i]->GetNumValidMeasures() > 1 ) {
-        pointStats.AddData((double)points[i]->GetNumValidMeasures());
+        pointStats.AddData((double)points[i]->GetNumValidMeasures()); 
         points[i]->SetId(pointMaker.Next());
         cnet.AddPoint(points[i]);
         points[i] = 0;
@@ -233,7 +227,7 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
 
   if ( pointStats.ValidPixels() > 0 ) {
     cnetinfo += PvlKeyword("MinimumMeasures", toString(pointStats.Minimum()) );
-    cnetinfo += PvlKeyword("MaximumMeasures", toString(pointStats.Maximum()) );
+    cnetinfo += PvlKeyword("MaximumMeasures", toString(pointStats.Maximum()) ); 
     cnetinfo += PvlKeyword("StdDevMeasures", toString(pointStats.StandardDeviation()) );
     if ( isDebug() ) {
       logger() << "  MinimumMeasures:       " << pointStats.Minimum() << "\n";
@@ -247,26 +241,26 @@ MatcherSolutionList MatchMaker::match(const RobustMatcherList &matchers) {
 }
 
 
-int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
-                           const cv::DMatch &point,
+int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair, 
+                           const cv::DMatch &point, 
                            const MatcherSolution &solution) const {
 
   int nMade(0);
-  Q_ASSERT ( ( point.queryIdx >= 0) &&
+  Q_ASSERT ( ( point.queryIdx >= 0) && 
              ( point.queryIdx < mpair.query().size() ) );
-  Q_ASSERT ( ( point.trainIdx >= 0) &&
+  Q_ASSERT ( ( point.trainIdx >= 0) && 
              ( point.trainIdx < mpair.train().size()) );
 
   // If no point created at this query keypoint, create a ControlPoint and add
   // the query keypoint as the reference
   if ( !(*cpt) ) {
     // std::cout << "\nMaking new ControlPoint...\n";
-    *cpt = new ControlPoint();
+    *cpt = new ControlPoint(); 
     (*cpt)->SetDateTime(Application::DateTime());
-    ControlMeasure *reference = makeMeasure(mpair.query(), point.queryIdx,
+    ControlMeasure *reference = makeMeasure(mpair.query(), point.queryIdx, 
                                             solution.matcher()->name());
     reference->SetType(ControlMeasure::Candidate);
-    //std::cout << "  Image Coordinate: " << reference->GetSample() << ", "
+    //std::cout << "  Image Coordinate: " << reference->GetSample() << ", " 
     //                                    << reference->GetLine() << "\n";
 
     (*cpt)->Add(reference);
@@ -277,13 +271,13 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
       // What to do when it fails??
       (void) setAprioriLatLon(*(*cpt), *reference, mpair.query());
     }
-    nMade++;
+    nMade++; 
   }
 
   // Add a measure to the existing control point std::cout << "Adding new
   // ControlMeasure...\n";
-  QScopedPointer<ControlMeasure> trainpt(makeMeasure(mpair.train(),
-                                                     point.trainIdx,
+  QScopedPointer<ControlMeasure> trainpt(makeMeasure(mpair.train(), 
+                                                     point.trainIdx, 
                                                      solution.matcher()->name() ) );
 
   trainpt->SetType(ControlMeasure::RegisteredSubPixel);
@@ -291,7 +285,7 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
   const cv::KeyPoint &query = mpair.query().keypoint(point.queryIdx);
   const cv::KeyPoint &train = mpair.train().keypoint(point.trainIdx);
 
-  // Compute the estimated point using the homography and the translation
+  // Compute the estimated point using the homography and the translation 
   // chain from matched image to source image coordintes
   cv::Point2f est = mpair.train().imageToSource(mpair.forward(query.pt));
 
@@ -325,10 +319,10 @@ int MatchMaker::addMeasure(ControlPoint **cpt, const MatchPair &mpair,
   return (nMade);
 }
 
-ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
-                                        const int &keyindex,
-                                        const QString &name) const {
-  QScopedPointer<ControlMeasure> v_measure(new ControlMeasure());
+ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image, 
+                                        const int &keyindex, 
+                                        const QString &name) const { 
+  QScopedPointer<ControlMeasure> v_measure(new ControlMeasure()); 
   v_measure->SetChooserName(name);
   v_measure->SetCubeSerialNumber(image.id());
 
@@ -342,26 +336,26 @@ ControlMeasure *MatchMaker::makeMeasure(const MatchImage &image,
   return ( v_measure.take() );
 }
 
-bool MatchMaker::setAprioriLatLon(ControlPoint &point,
-                                  const ControlMeasure &measure,
+bool MatchMaker::setAprioriLatLon(ControlPoint &point, 
+                                  const ControlMeasure &measure, 
                                   const MatchImage &image) const {
   // Check if the source has geometry
   if ( !image.source().hasGeometry() ) { return (false); }
 
   // Compute lat/lon
-  double samp = measure.GetSample();
+  double samp = measure.GetSample(); 
   double line = measure.GetLine();
   SurfacePoint latlon = image.source().getLatLon(line,samp);
 
-  // std::cout << "  Lat/Lon Coordinate: " << latlon.GetLatitude().degrees() << ", "
+  // std::cout << "  Lat/Lon Coordinate: " << latlon.GetLatitude().degrees() << ", " 
   //           << latlon.GetLongitude().degrees() << "\n";
-  point.SetAprioriSurfacePoint(latlon);
+  point.SetAprioriSurfacePoint(latlon);  
   return ( latlon.Valid() );
 }
 
 
-double MatchMaker::getParameter(const QString &name,
-                                const PvlFlatMap &parameters,
+double MatchMaker::getParameter(const QString &name, 
+                                const PvlFlatMap &parameters, 
                                 const double &defaultParm) const {
   double parm(defaultParm);
   if ( parameters.count(name) > 0 ) {
@@ -374,7 +368,7 @@ double MatchMaker::getParameter(const QString &name,
   return ( parm );
 }
 
-double MatchMaker::goodnessOfFit(const cv::KeyPoint &query,
+double MatchMaker::goodnessOfFit(const cv::KeyPoint &query, 
                                  const cv::KeyPoint &train) const {
  return ( (query.response + train.response) / 2.0 );
 }
