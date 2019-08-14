@@ -69,14 +69,27 @@ namespace Isis {
    *   @history 2016-10-26 Ian Humphrey - Modified formatBundleOutputString() to provided default
    *                           values for all solve parameters, whether they are being solved for
    *                           or not. Fixes #4464.
-   *   @history 2016-10-27 Tyler Wilson Modified formatBundleOutputString to change N/A to FREE 
+   *   @history 2016-10-27 Tyler Wilson - Modified formatBundleOutputString to change N/A to FREE 
    *                           in the output under POINTS DETAIL when no lat/lon sigmas were entered.
    *                           Fixes #4317.
-   *   @history 2016-11-14 Ken Edmundson Modified the following...
+   *   @history 2016-11-14 Ken Edmundson - Modified the following...
    *                           -changed adjustedSigma from 0.0 to N/A if error propagation is off
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
    *                            parameters when writing images.csv. 
+   *   @history 2019-05-14 Tyler Wilson - Added the bundleOutputString(std::ofstream &fpOut,
+   *                            bool errorPropagation) function which is called by
+   *                            BundleSolutionInfo::outputText(). This function is a refactor of
+   *                            the formatBundleOutputString and uses the traditional C function
+   *                            sprintf instead of QString arg chaining because it's easier to
+   *                            make the output columns align nicely.  Also, it maintains
+   *                            consistency with text output in BundleSolutionInfo.
+   *   @history 2019-06-03  Tyler Wilson - Deleted the formatBundleOutputString and added the
+   *                            functions bundleOutputCSV/bundleOutputFetchData. Combined
+   *                            with bundleOutputString these three functions will fulfill
+   *                            the same functional role formerly occuped by
+   *                            formatBundleOutputString but with reduced code duplication.
+   *
    */
   class BundleObservation : public QVector<BundleImageQsp> {
 
@@ -120,20 +133,23 @@ namespace Isis {
      
       LinearAlgebra::Vector &parameterWeights();
       LinearAlgebra::Vector &parameterCorrections();
-//    LinearAlgebra::Vector &parameterSolution();
       LinearAlgebra::Vector &aprioriSigmas();
       LinearAlgebra::Vector &adjustedSigmas();
       
       const BundleObservationSolveSettingsQsp solveSettings();
-
-//    QStringList serialNumbers();
 
       bool applyParameterCorrections(LinearAlgebra::Vector corrections);
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
       void updateBodyRotation();
 
-      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
+      void bundleOutputFetchData(QVector<double> &finalParameterValues,
+                            int &nPositionCoefficients, int &nPointingCoefficients,
+                            bool &useDefaultPosition, bool &useDefaultPointing,
+                            bool &useDefaultTwist);
+      void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
+      QString bundleOutputCSV(bool errorPropagation);
+      
       QStringList parameterList();
       QStringList imageNames();
 
