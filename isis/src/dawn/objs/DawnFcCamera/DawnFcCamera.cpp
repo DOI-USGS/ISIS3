@@ -70,7 +70,7 @@ namespace Isis {
       msg += "(" + QString::number(ikCode) + " is not a Dawn FC instrument code)";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    
+
     // The focal length is dependent on wave length.  The NAIF code set
     // in the ISIS labels will read the correct focal length from the
     // Instrument kernel (IK)
@@ -99,7 +99,6 @@ namespace Isis {
     // to be given
     if ((ParentLines() != 1024) || (ParentSamples() != 1024)) {
       string msg = "The ISIS Dawn FC model expects the image size to be 1024x1024";
-      msg += "Please contact Jeff Anderson (janderson@usgs.gov) with the Dawn FC PDS filename for further testing.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     CameraDetectorMap *detectorMap = new CameraDetectorMap(this);
@@ -145,7 +144,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
-  
+
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
