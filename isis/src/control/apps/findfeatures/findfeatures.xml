@@ -3,42 +3,42 @@
 <application name="findfeatures" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-      Feature-based matching algorithms used to create ISIS control networks 
+      Feature-based matching algorithms used to create ISIS control networks
   </brief>
 
   <description>
       <h3>Introduction</h3>
       <p>
-        <i>findfeatures</i> was developed to provide an alternative approach to 
-        create image-based ISIS control point networks.  Traditional ISIS 
-        control networks are typically created using equally spaced grids and 
-        area-based image matching (ABM) techniques. Control points are at the 
-        center of these grids and they are not necessarily associated with any 
+        <i>findfeatures</i> was developed to provide an alternative approach to
+        create image-based ISIS control point networks.  Traditional ISIS
+        control networks are typically created using equally spaced grids and
+        area-based image matching (ABM) techniques. Control points are at the
+        center of these grids and they are not necessarily associated with any
         particular feature or interest point.
-        <i>findfeatures</i> applies  feature-based matching (FBM) algorihms using 
+        <i>findfeatures</i> applies  feature-based matching (FBM) algorihms using
         the full suite of <a href="http://opencv.org/">OpenCV</a>
         <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
-        detection and descriptor extraction algorithms</a> and 
+        detection and descriptor extraction algorithms</a> and
         <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
-        descriptor matchers</a>. The points detected by these 
-        algorithms are associated with special surface features identified by 
-        the type of detector algorithm designed to identify certain  
-        charcteristics. Feature based matching has a 
+        descriptor matchers</a>. The points detected by these
+        algorithms are associated with special surface features identified by
+        the type of detector algorithm designed to identify certain
+        charcteristics. Feature based matching has a
         <a href="http://www.computervisionblog.com/2015/01/from-feature-descriptors-to-deep.html">
-        twenty year history</a> in computer vision and continues to benefit 
-        from improvements and advancements to make development of applications 
-        like this possible. 
+        twenty year history</a> in computer vision and continues to benefit
+        from improvements and advancements to make development of applications
+        like this possible.
       </p>
       <p>
-        This application offers alternatives to traditional image matching options 
-        such as <i>autoseed</i>, <i>seedgrid</i> and <i>coreg</i>. Applications 
-        like <i>coreg</i> and <i>pointreg</i> are area-based matching, 
-        <i>findfeatures</i> utilizes feature-based matching techniques.  The 
-        <a href="http://opencv.org/">OpenCV</a> feature matching framework is used 
-        extensively in this application to implement  the concepts contained in  a 
+        This application offers alternatives to traditional image matching options
+        such as <i>autoseed</i>, <i>seedgrid</i> and <i>coreg</i>. Applications
+        like <i>coreg</i> and <i>pointreg</i> are area-based matching,
+        <i>findfeatures</i> utilizes feature-based matching techniques.  The
+        <a href="http://opencv.org/">OpenCV</a> feature matching framework is used
+        extensively in this application to implement  the concepts contained in  a
         <a href="https://www.packtpub.com/books/content/opencv-estimating-projective-relations-images">
-        robust feature matching algorithm</a> 
-        applied to overlapping single pairs or multiple overlapping image sets. 
+        robust feature matching algorithm</a>
+        applied to overlapping single pairs or multiple overlapping image sets.
       </p>
       <h3>Overview</h3>
       <p>
@@ -112,7 +112,7 @@
       <h3>Supported Image Formats</h3>
       <p>
         <i>findfeatures</i> is designed to support many different image
-        formats. However, ISIS cubes with camera models provide the greatest 
+        formats. However, ISIS cubes with camera models provide the greatest
         flexibility when using this feature matcher. ISIS cubes with  geometry
         can be effectively and efficiently matched by applying fast  geometric
         transforms that project all overlapping candidate images (referred to
@@ -121,15 +121,15 @@
         terminology). This single feature allows users to apply virtually all
         OpenCV detector and extractor, including algorithms that are not scale
         and rotation invariant. Other popular image formats are supported using
-        OpenCV 
+        OpenCV
         <a href="http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html">
-        imread()</a> image reader API. Images supported here can be provided as 
-        the image input files. However, these images will not have geometric 
-        functionality so  support for the fast geometric option is not 
-        available to these images. As a consequence, FBM algorithms that are 
-        not scale and rotation invarant are not recommended for these images 
-        unless they are relatively spatially consistent. Nor can the point 
-        geometries be provided - only line/sample coorelations will be 
+        imread()</a> image reader API. Images supported here can be provided as
+        the image input files. However, these images will not have geometric
+        functionality so  support for the fast geometric option is not
+        available to these images. As a consequence, FBM algorithms that are
+        not scale and rotation invarant are not recommended for these images
+        unless they are relatively spatially consistent. Nor can the point
+        geometries be provided - only line/sample coorelations will be
         computed in these cases.
       </p>
       <p>
@@ -235,7 +235,7 @@
         but the computation time and/or output control network quality will
         suffer. <i>findfeatures</i> supports all of the OpenCV 3.1
         <a href="http://docs.opencv.org/3.1.0/d0/d13/classcv_1_1Feature2D.html">
-        detectors, extractors</a>, and 
+        detectors, extractors</a>, and
         <a href="http://docs.opencv.org/3.1.0/db/d39/classcv_1_1DescriptorMatcher.html">
         matchers</a>. Some algorithms work well in a wide range of scenarios
         (SURF and SIFT are both well tested and very robust), while others are
@@ -296,7 +296,7 @@
         descriptors (SIFT, SURF, etc.). If your images are from very different
         sensors (a spot spectrometer and a highly distorted framing camera, a
         low resolution framing camera and a high resolution push broom camera,
-        etc.) or under very different conditions (very oblique and nadir, 
+        etc.) or under very different conditions (very oblique and nadir,
         opposing sun angles, etc.) then using an extractor with a more robust
         descriptor will take longer but will be significantly more accurate
         than using an extractor with a smaller descriptor.
@@ -362,8 +362,8 @@
         <CAPTION>
           <h4>
               <a name="MatcherParameters">Robust Matcher Parameters</a>
-          </h4> 
-        </CAPTION> 
+          </h4>
+        </CAPTION>
         <TR>
           <TH>Keyword</TH>
           <TH>Default</TH>
@@ -373,12 +373,12 @@
           <TD>SaveRenderedImages</TD>
           <TD>False</TD>
           <TD>
-              Option to save the images that are matched 
-              after all transforms (e.g., fast geom, filtered, etc...) 
-              have been applied. The query (MATCH) image will have 
-              "_query" will be appended to the base name. All 
-              FROM/FROMLIST images will have "_train" appended to their 
-              names. They are saved as PNG images in the directory 
+              Option to save the images that are matched
+              after all transforms (e.g., fast geom, filtered, etc...)
+              have been applied. The query (MATCH) image will have
+              "_query" will be appended to the base name. All
+              FROM/FROMLIST images will have "_train" appended to their
+              names. They are saved as PNG images in the directory
               specifed by the SavePath parameter.
           </TD>
         </TR>
@@ -386,7 +386,7 @@
           <TD>SavePath</TD>
           <TD>$PWD</TD>
           <TD>
-              Specify the directory path to save all transform rendered 
+              Specify the directory path to save all transform rendered
               images if SaveRenderedImages=TRUE.
           </TD>
         </TR>
@@ -394,17 +394,17 @@
           <TD>RootSift</TD>
           <TD>False</TD>
           <TD>
-              Apply the 
+              Apply the
               <a href="https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf">
-              RootSift</a> algorithm to the descriptors that 
-              normalizes SIFT-type of descriptors. A good description of 
-              the application of this algorithm is described in 
+              RootSift</a> algorithm to the descriptors that
+              normalizes SIFT-type of descriptors. A good description of
+              the application of this algorithm is described in
               <a href="http://www.pyimagesearch.com/2015/04/13/implementing-rootsift-in-python-and-opencv/">
-              this article</a>. In general, SIFT descriptors histograms are 
-              compared in Euclidean space. RootSift applies a Hellinger 
-              kernel to the descriptor histograms that greatly improve 
-              performance and still allows Euclidean distances in its 
-              evaluation. Be sure to use this for SIFT-type descriptors 
+              this article</a>. In general, SIFT descriptors histograms are
+              compared in Euclidean space. RootSift applies a Hellinger
+              kernel to the descriptor histograms that greatly improve
+              performance and still allows Euclidean distances in its
+              evaluation. Be sure to use this for SIFT-type descriptors
               only.
           </TD>
         </TR>
@@ -412,9 +412,9 @@
           <TD>MinimumFundamentalPoints</TD>
           <TD>8</TD>
           <TD>
-              The Epipolar algorithm in OpenCV requires a minimim of 8 
-              points in order to properly compute the fundamental matrix. 
-              This parameter allows the user to specify the minimum number 
+              The Epipolar algorithm in OpenCV requires a minimim of 8
+              points in order to properly compute the fundamental matrix.
+              This parameter allows the user to specify the minimum number
               of points allowed.
           </TD>
         </TR>
@@ -422,10 +422,10 @@
           <TD>RefineFundamentalMatrix</TD>
           <TD>True</TD>
           <TD>
-              A single computation of the fundamental matrix is performed 
-              unless this parameter is set to true. In this case, a new 
-              fundmental matrix is computed after outlier are detected and 
-              removed. This will improve the matrix since outliers are 
+              A single computation of the fundamental matrix is performed
+              unless this parameter is set to true. In this case, a new
+              fundmental matrix is computed after outlier are detected and
+              removed. This will improve the matrix since outliers are
               removed and the matrix is recomputed.
           </TD>
       </TR>
@@ -433,9 +433,9 @@
         <TD>MinimumHomographyPoints</TD>
         <TD>8</TD>
         <TD>
-            As in the Epipolar fundamental matrix, a minimum number of 8 
-            points is required to compute the homography matrix for 
-            outlier detection. This parameter allows the user to specify 
+            As in the Epipolar fundamental matrix, a minimum number of 8
+            points is required to compute the homography matrix for
+            outlier detection. This parameter allows the user to specify
             a new minimum.
         </TD>
       </TR>
@@ -444,8 +444,8 @@
       <CAPTION>
         <h4>
             <a name="Algorithms">Algorithms</a>
-        </h4> 
-      </CAPTION> 
+        </h4>
+      </CAPTION>
       <TR>
         <TH>Name</TH>
         <TH>Algorithm Type</TH>
@@ -908,19 +908,19 @@
       <h3>Using Debugging to Diagnose Behavior</h3>
       <p>
           An additional feature of <i>findfeatures</i> is a detailed debugging
-          report of processing behavior in real time for all matching and 
-          outlier detection  algorithms. The data produced by this option is 
-          very useful to identify the exact processing step where some matching 
-          operations may result in failed matching operations. In turn, this 
-          will allow users to alter parameters to address these issues to lead 
+          report of processing behavior in real time for all matching and
+          outlier detection  algorithms. The data produced by this option is
+          very useful to identify the exact processing step where some matching
+          operations may result in failed matching operations. In turn, this
+          will allow users to alter parameters to address these issues to lead
           to successful matches that would otherwise not be able to achieve.
        </p>
        <p>
-           To invoke this option, users set DEBUG=TRUE and provide an optional 
-           output file (DEBUGLOG=filename) where the debug data is written. If 
-           no file is specified, output defaults to the terminal device. Here is 
-           an example (see the example section for details) of a debug session 
-           with line numbers added for reference of the description that 
+           To invoke this option, users set DEBUG=TRUE and provide an optional
+           output file (DEBUGLOG=filename) where the debug data is written. If
+           no file is specified, output defaults to the terminal device. Here is
+           an example (see the example section for details) of a debug session
+           with line numbers added for reference of the description that
            follows:
        </p>
     <PRE>
@@ -930,16 +930,16 @@
   4 Revision:       $Revision: 7311 $
   5 RunTime:        2017-01-03T16:59:01
   6 OpenCV_Version: 3.1.0
-  7 
+  7
   8 System Environment...
   9 Number available CPUs:     4
  10 Number default threads:    4
  11 Total threads:             4
- 12 
+ 12
  13 Total Algorithms to Run:     1
- 14 
+ 14
  15 @@ matcher-pair started on 2017-01-03T16:59:02
- 16 
+ 16
  17 +++++++++++++++++++++++++++++
  18 Entered RobustMatcher::match(MatchImage &amp;query, MatchImage &amp;trainer)...
  19   Specification:   surf@hessianThreshold:100/surf/BFMatcher@NormType:NORM_L2@CrossCheck:false
@@ -957,7 +957,7 @@
  31 --> Extracting descriptors...
  32   Processing Time(s):         0.9
  33   Processing Descriptors/Sec: 26457.8
- 34 
+ 34
  35 *Removing outliers from image pairs
  36 Entered RobustMatcher::removeOutliers(Mat &amp;query, vector&lt;Mat&gt; &amp;trainer)...
  37 --> Matching 2 nearest neighbors for ratio tests..
@@ -1017,115 +1017,115 @@
  91 %% match-pair complete in 5.589 seconds!
     </PRE>
     <p>
-        In the above example, lines 2-13 provide general information about the 
-        program and compute environment. If MAXTHREADS were set to a value less 
-        than 4, number of total threads (line 11) would reflect this number. 
-        Line 15 specifies the precise time the matcher algorithm was invoked. 
-        Line 18-25 shows the algorithm string specification, names of query 
-        (MATCH) and train (FROM) images and the full and rendered sizes of 
-        images. Lines 27 and 28 show the total number of keypoints or features 
-        that were detected by the SURF detector for both the query (11823) and 
-        train (11989) images.  Lines 31-33 indicate the descriptors of all the 
-        feature keypoints are being extracted. Extraction of keypoint 
-        descriptors can be costly under some conditions. Users can restrict the 
-        number of features detected by using the MAXPOINTS parameter specify the 
-        maximum numnber of points to save. The values in brackets in lines 27 
-        and 28  will show the total amount of features detected if MAXPOINTS 
+        In the above example, lines 2-13 provide general information about the
+        program and compute environment. If MAXTHREADS were set to a value less
+        than 4, number of total threads (line 11) would reflect this number.
+        Line 15 specifies the precise time the matcher algorithm was invoked.
+        Line 18-25 shows the algorithm string specification, names of query
+        (MATCH) and train (FROM) images and the full and rendered sizes of
+        images. Lines 27 and 28 show the total number of keypoints or features
+        that were detected by the SURF detector for both the query (11823) and
+        train (11989) images.  Lines 31-33 indicate the descriptors of all the
+        feature keypoints are being extracted. Extraction of keypoint
+        descriptors can be costly under some conditions. Users can restrict the
+        number of features detected by using the MAXPOINTS parameter specify the
+        maximum numnber of points to save. The values in brackets in lines 27
+        and 28  will show the total amount of features detected if MAXPOINTS
         are used.
     </p>
     <p>
-        Outlier detection begins at line 35. The Ratio test is performed first. 
-        Here the matcher algorithm is invoked for each match pair, regardless 
-        of the number of train (FROMLIST) images provided. For each keypoint in 
-        the query image, the two nearest matches in the train image are 
-        computed and the results are reported in lines 39-42. Then the 
-        bi-directional matches are computed in lines 43-46.  A bi-directional 
-        ratio test is computed for the query->train matches in lines 47-54 and 
-        then train->query in lines 55-62. You can see here that a significant 
-        number of matches are removed in this step. Users can adjust this 
-        behavior, retaining more points by setting the RATIO parameter closer to 
-        1.0. The symmetry test, ensuring matches from query->train have the same 
-        match as train->query, is reported in lines 63-67. In lines 68-74, the 
-        homography matrix is computed and outliers are removed where the 
-        tolerance exceeds HMGTOLERANCE. Lines 75-83 shows the results of the 
-        epipolar fundamental matrix computation and outlier detection. Matching 
-        is completed in lines 84-90 which report the final spatial homography 
-        computations to produce the final transformation matrix between the 
-        query and train images. Line 89 shows the final number of control 
-        measures computed between the image pairs.  Lines 35-90 are repeated for 
-        each query/train image pair (with perhaps slight formatting 
-        differences).  Line 91 shows the total processing time for the matching 
+        Outlier detection begins at line 35. The Ratio test is performed first.
+        Here the matcher algorithm is invoked for each match pair, regardless
+        of the number of train (FROMLIST) images provided. For each keypoint in
+        the query image, the two nearest matches in the train image are
+        computed and the results are reported in lines 39-42. Then the
+        bi-directional matches are computed in lines 43-46.  A bi-directional
+        ratio test is computed for the query->train matches in lines 47-54 and
+        then train->query in lines 55-62. You can see here that a significant
+        number of matches are removed in this step. Users can adjust this
+        behavior, retaining more points by setting the RATIO parameter closer to
+        1.0. The symmetry test, ensuring matches from query->train have the same
+        match as train->query, is reported in lines 63-67. In lines 68-74, the
+        homography matrix is computed and outliers are removed where the
+        tolerance exceeds HMGTOLERANCE. Lines 75-83 shows the results of the
+        epipolar fundamental matrix computation and outlier detection. Matching
+        is completed in lines 84-90 which report the final spatial homography
+        computations to produce the final transformation matrix between the
+        query and train images. Line 89 shows the final number of control
+        measures computed between the image pairs.  Lines 35-90 are repeated for
+        each query/train image pair (with perhaps slight formatting
+        differences).  Line 91 shows the total processing time for the matching
         process.
     </p>
      <h3>Evaluation of Matcher Algorithm Performance</h3>
       <p>
-        <i>findfeatures</i> provides users with many features and options to 
-         create unique algorithms that are suitable for many of the diverse 
-         image matching conditions that naturally occur during a spacecraft 
-         mission. Some are more suited for certain conditions that others. But 
-         how does one determine which algorithm combination performs the best 
-         for an image pair? By computing standard performance metrics, one can 
+        <i>findfeatures</i> provides users with many features and options to
+         create unique algorithms that are suitable for many of the diverse
+         image matching conditions that naturally occur during a spacecraft
+         mission. Some are more suited for certain conditions that others. But
+         how does one determine which algorithm combination performs the best
+         for an image pair? By computing standard performance metrics, one can
          make a determination as to which algorithm performs best.
       </p>
     <p>
-        Using the ALGOSPECFILE parameter, users can specify one or more 
-        algorithms to apply to a given image matching process. Each algorithm 
-        specified, one per line in the input file, results in a the creation of 
-        a unique robust matcher algorithm thatis applied to the input files in 
-        succession. The performance of each algorithm is computed for each of 
-        the matcher from a standard set of metrics described in a thesis titled 
+        Using the ALGOSPECFILE parameter, users can specify one or more
+        algorithms to apply to a given image matching process. Each algorithm
+        specified, one per line in the input file, results in a the creation of
+        a unique robust matcher algorithm thatis applied to the input files in
+        succession. The performance of each algorithm is computed for each of
+        the matcher from a standard set of metrics described in a thesis titled
         <a href="http://elib.uni-stuttgart.de/opus/volltexte/2012/7617/">
-        Efficient matching of robust features for embedded SLAM</a>.  From the 
-        metrics described in this paper, a single metric that measures the 
-        abilities of the whole matching process is computed that are relevant to 
-        all three FBM steps: detection, description and matching. This 
-        metric is called <em>Efficiency</em>. The <em>Efficiency</em> metric is 
-        computed from two other metrics called <em>Repeatability</em> and 
+        Efficient matching of robust features for embedded SLAM</a>.  From the
+        metrics described in this paper, a single metric that measures the
+        abilities of the whole matching process is computed that are relevant to
+        all three FBM steps: detection, description and matching. This
+        metric is called <em>Efficiency</em>. The <em>Efficiency</em> metric is
+        computed from two other metrics called <em>Repeatability</em> and
         <em>Recall</em>.
     </p>
     <p>
-        <em>Repeatability</em> represents the ability to detect the same point 
-        in the scene under viewpoint and lighting changes and subject to 
+        <em>Repeatability</em> represents the ability to detect the same point
+        in the scene under viewpoint and lighting changes and subject to
         noise. The value of Repeatability is calculated as:
       <code>
            Repeatability = |correspondences| / |query keypoints|
       </code>
-      Here, correspondences are the total number of matches that were made after 
-      all FBM processing including outlier detection. <em>Repeatability</em> is 
-      only relevant to the feature detector, and nothing about feature 
-      descriptor or descriptor matcher. The higher value of 
+      Here, correspondences are the total number of matches that were made after
+      all FBM processing including outlier detection. <em>Repeatability</em> is
+      only relevant to the feature detector, and nothing about feature
+      descriptor or descriptor matcher. The higher value of
       <em>Repeatability</em>, the better performance of feature detector.
     </p>
     <p>
-        <em>Recall</em> represents the ability to find the correct 
-        matches based on the description of detected features, The value of 
+        <em>Recall</em> represents the ability to find the correct
+        matches based on the description of detected features, The value of
         <em>Recall</em> is calculated as:
       <code>
            Recall = |correct matches| / |correspondences|
       </code>
-      Because the detected features are already determined, <em>Recall</em> only 
-      shows the performance of the feature descriptor and descriptor matcher. 
-      The higher value of <em>Recall</em>, the better performance of descriptor 
+      Because the detected features are already determined, <em>Recall</em> only
+      shows the performance of the feature descriptor and descriptor matcher.
+      The higher value of <em>Recall</em>, the better performance of descriptor
       and matcher.
     </p>
     <p>
-        <em>Efficiency</em> combines the <em>Repeatability</em> and 
+        <em>Efficiency</em> combines the <em>Repeatability</em> and
         <em>Recall</em>. It is defined as:
        <code>
-           Efficiency  = Repeatability * Recall = |correct matches| / |query 
-      keypoints| 
+           Efficiency  = Repeatability * Recall = |correct matches| / |query
+      keypoints|
        </code>
-       <em>Efficiency</em> measures the ability of the whole image matching 
-       process, it is relevant to all three steps: detection, description and 
-       matching. The higher value of <em>Efficiency</em> , the more accurate 
-       the image matching. The three metrics <em>Repeatability</em>, 
-       <em>Recall</em> and <em>Efficiency</em> are also called a quality 
-       measure. 
+       <em>Efficiency</em> measures the ability of the whole image matching
+       process, it is relevant to all three steps: detection, description and
+       matching. The higher value of <em>Efficiency</em> , the more accurate
+       the image matching. The three metrics <em>Repeatability</em>,
+       <em>Recall</em> and <em>Efficiency</em> are also called a quality
+       measure.
     </p>
     <p>
-      <i>findfeatures</i> computes the <em>Efficiency</em> for each algorithm 
-      and selects the matcher algorithm combination with the highest value.  
-      This value is reported at the end of the run of application in the 
+      <i>findfeatures</i> computes the <em>Efficiency</em> for each algorithm
+      and selects the matcher algorithm combination with the highest value.
+      This value is reported at the end of the run of application in the
       MatchSolution group. Here is an example:
       <pre>
 Group = MatchSolution
@@ -1140,27 +1140,27 @@ Group = MatchSolution
   <category>
     <categoryItem>Registration and Pattern Matching</categoryItem>
     <categoryItem>Control Networks</categoryItem>
-  </category>  
+  </category>
 
   <history>
     <change name="Kris Becker" date="2015-08-28">
       Original Version.
     </change>
     <change name="Kris Becker" date="2015-09-29">
-      Throws an error when no control points are created if user opts to create 
-      a network file. Line/Samp coordinate was transposed when determining the 
+      Throws an error when no control points are created if user opts to create
+      a network file. Line/Samp coordinate was transposed when determining the
       apriori laitude/longitude.
     </change>
     <change name="Kris Becker" date="2015-11-13">
-      Apply the RANSAC homography outlier detection before fundamental epipolar 
-      outlier detection followed by final refined point transform homography 
-      matrix - addresses a false positive issue. 
-    </change> 
-    <change name="Kris Becker" date="2016-02-10"> 
-      Updated the ImageSource class for proper use of the Histogram class for 
-      conversion to 8-bit. 
+      Apply the RANSAC homography outlier detection before fundamental epipolar
+      outlier detection followed by final refined point transform homography
+      matrix - addresses a false positive issue.
     </change>
-    <change name="Kris Becker" date="2016-04-15"> 
+    <change name="Kris Becker" date="2016-02-10">
+      Updated the ImageSource class for proper use of the Histogram class for
+      conversion to 8-bit.
+    </change>
+    <change name="Kris Becker" date="2016-04-15">
        Completed documentation
     </change>
      <change name="Kris Becker, Jesse Mapel, Kristin Berry, Jeannie Backer" date="2016-12-27">
@@ -1168,30 +1168,35 @@ Group = MatchSolution
        Different feature detection, feature extraction, and matching algorithms are available in OpenCV3
        than in version 2, therefore some have been added and some have been removed. References #4556.
      </change>
-    <change name="Kris Becker" date="2017-01-03"> 
+    <change name="Kris Becker" date="2017-01-03">
        Corrected a bug in creation of the matcher algorithm if not provided by the user;
        updated some additional elements of the documentation to be consistent with OpenCV3;
-       added additional code to allow for spaces in some areas of the user algorithm string specification; 
+       added additional code to allow for spaces in some areas of the user algorithm string specification;
        changed the program version to 1.0 from 0.1.
        References #4556.
     </change>
-    <change name="Jesse Mapel" date="2017-04-14"> 
+    <change name="Jesse Mapel" date="2017-04-14">
        Corrected a bug where keypoints and descriptors were being overwritten
        when using multiple algorithm specificiations. Added a new clone()
        method to MatchImage and made the MatchImages used by each algorithm
        specification independent. Fixes #4765.
     </change>
-    <change name="Jesse Mapel" date="2017-06-22"> 
+    <change name="Jesse Mapel" date="2017-06-22">
        Modified the Sobel and Scharr filters to create a deep copy of the image
        before being applied. This corrects repeated applications of a Gaussian
        filter when using these filters with multiple algorithm specifications.
        Fixes #4904.
     </change>
-    <change name="Jesse Mapel" date="2017-06-23"> 
+    <change name="Jesse Mapel" date="2017-06-23">
        Corrected several errors in documentation. Fixed the MSER algorithm name.
        Fixed AKAZE being flagged as only an extractor. Fixes #4950.
     </change>
-  </history> 
+    <change name="Aaron Giroux" date="2019-08-14">
+      Updated match method in MatchMaker.cpp to use the MatchImage clone()
+      method to pass in clones of query and trainers. This avoids pointer issues
+      which were mixing up data and causing failures. Fixes #3341.
+    </change>
+  </history>
 
   <groups>
     <group name="Files">
@@ -1202,10 +1207,10 @@ Group = MatchSolution
           Input Image to be Translated
         </brief>
         <description>
-          This cube/image (train) will be translated to register to the MATCH 
-          (query) cube/image. This application supports other common image 
-          formats such as PNG, TIFF or JPEG. Essentially any image that can be 
-          read by OpenCV's 
+          This cube/image (train) will be translated to register to the MATCH
+          (query) cube/image. This application supports other common image
+          formats such as PNG, TIFF or JPEG. Essentially any image that can be
+          read by OpenCV's
           <a href="http://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html?highlight=imread#imread">
           imread()</a>routine is supported. All input images are converted to
           8-bit when they are read.
@@ -1227,7 +1232,7 @@ Group = MatchSolution
           Use this parameter to select a filename which contains a list of
           cube filenames. The cubes identified inside this file will be used
           to create the control network. All input images are converted to
-          8-bit when they are read. The following is an example of the 
+          8-bit when they are read. The following is an example of the
           contents of a typical FROMLIST file:
           </p>
           <pre>
@@ -1255,8 +1260,8 @@ Group = MatchSolution
           The input reference image (query)
         </brief>
         <description>
-            Name of the image to match to. This will be the reference image in 
-            the output control network. It is also referred to as the query 
+            Name of the image to match to. This will be the reference image in
+            the output control network. It is also referred to as the query
             image in OpenCV documentation. All input images are converted to
             8-bit when they are read.
         </description>
@@ -1271,8 +1276,8 @@ Group = MatchSolution
           <fileMode>output</fileMode>
           <brief>Output ControlNet network file of matched features</brief>
           <description>
-               This file will contain the Control Point network results of 
-               findfeatures in a binary format.  There will be no false or 
+               This file will contain the Control Point network results of
+               findfeatures in a binary format.  There will be no false or
                failed matches in the output control network file. Using this
                control network and TOLIST in the qnet application, the results
                of findfeatures can be visually assessed.
@@ -1286,12 +1291,12 @@ Group = MatchSolution
         <parameter name="TOLIST">
           <type>filename</type>
           <fileMode>output</fileMode>
-          <brief>Output list of ControlNet network cube files</brief> 
+          <brief>Output list of ControlNet network cube files</brief>
           <description>
-             This file will contain the list of (cube) files in the control 
-             network. For multi-image matching, some files may not have matches 
-             detected. These files will not be written to TOLIST. The MATCH file 
-             is always added first and all other images that have matches are 
+             This file will contain the list of (cube) files in the control
+             network. For multi-image matching, some files may not have matches
+             detected. These files will not be written to TOLIST. The MATCH file
+             is always added first and all other images that have matches are
              added to TOLIST. Using this list and the ONET in the qnet
              application, the results of findfeatures can be visually assessed.
           </description>
@@ -1303,17 +1308,17 @@ Group = MatchSolution
           <type>filename</type>
           <fileMode>output</fileMode>
           <brief>
-              Output list of FROM/FROMLIST cube files that were not 
-              successfully matched 
-          </brief> 
+              Output list of FROM/FROMLIST cube files that were not
+              successfully matched
+          </brief>
           <description>
               <p>
-                 This file will contain the list of (cube) files that were not 
-                 successfully matched. This can be used to run through individually 
+                 This file will contain the list of (cube) files that were not
+                 successfully matched. This can be used to run through individually
                  with more specifically tailored matcher algorithm specifications.
               </p>
               <p>
-                  NOTE this file is appended to so that continual runs will               
+                  NOTE this file is appended to so that continual runs will
               accumulate failures making it easier to handle failed runs.
               </p>
           </description>
@@ -1327,11 +1332,11 @@ Group = MatchSolution
             <type>string</type>
             <brief>
                Provide one or more algorithm specifications to apply
-            </brief> 
+            </brief>
             <description>
-                This parameter provides user control over selecting a wide 
-                variety of feature detectors, extractors and matcher 
-                combinations.  This parameter also provides a mechanism to set 
+                This parameter provides user control over selecting a wide
+                variety of feature detectors, extractors and matcher
+                combinations.  This parameter also provides a mechanism to set
                 any of the valid parameters of the algoritms.
             </description>
             <internalDefault>None</internalDefault>
@@ -1341,14 +1346,14 @@ Group = MatchSolution
             <type>filename</type>
             <brief>
                Provide one or more algorithms in a text file
-            </brief> 
+            </brief>
             <description>
-               To accomodate a potentially large set of feature algorithms, 
-               you can provide them in a file.  This format is the same as the 
-               ALGORITHM format, but each unique algorithm must be specifed  
-               on a seperate line.  Thoeretically, the number you specify is 
-               unlimited. This option is particularly useful to generate a 
-               series of algorithms that vary parameters for any of the 
+               To accomodate a potentially large set of feature algorithms,
+               you can provide them in a file.  This format is the same as the
+               ALGORITHM format, but each unique algorithm must be specifed
+               on a seperate line.  Thoeretically, the number you specify is
+               unlimited. This option is particularly useful to generate a
+               series of algorithms that vary parameters for any of the
                elements of the feature algorithm.
             </description>
             <internalDefault>None</internalDefault>
@@ -1359,7 +1364,7 @@ Group = MatchSolution
             <type>boolean</type>
             <brief>
                List result of ALGORITHM specification
-            </brief> 
+            </brief>
             <description>
               If true, information about the detector, extractor, matcher, and
               parameters specified in the ALGORITHM or ALGOSPECFILE parameters
@@ -1373,9 +1378,9 @@ Group = MatchSolution
             <type>boolean</type>
             <brief>
                List all OpenCV algorithms irregardles of origin
-            </brief> 
+            </brief>
             <description>
-              This parameter will retrieve all the registered OpenCV 
+              This parameter will retrieve all the registered OpenCV
               algorithms  available that can created by name.
             </description>
            <default><item>No</item></default>
@@ -1385,27 +1390,27 @@ Group = MatchSolution
             <type>filename</type>
             <brief>
                Optional output file/device to write information requests to
-            </brief> 
+            </brief>
             <description>
               <p>
-                When an information option is requested (LISTSPEC), 
-                the user can provide the name of an output file here where the 
-                information, in the form of a PVL structure, will be written.  
-                If any of those options are selected by the user, and 
-                a file is not provided in this option, the output is written 
+                When an information option is requested (LISTSPEC),
+                the user can provide the name of an output file here where the
+                information, in the form of a PVL structure, will be written.
+                If any of those options are selected by the user, and
+                a file is not provided in this option, the output is written
                 to the screen or GUI.
               </p>
               <p>
-                One very nifty option that works well is to specify the 
-                terminal device as the output file.  This will list the 
-                results to the screen so that your input can be quickly 
-                checked for accuracy.  Here is an example using the algorithm 
-                listing option and the result: 
+                One very nifty option that works well is to specify the
+                terminal device as the output file.  This will list the
+                results to the screen so that your input can be quickly
+                checked for accuracy.  Here is an example using the algorithm
+                listing option and the result:
                 <br/><br/>
                 <b>
-                     findfeatures listspec=true 
-                     algorithm=detector.Blob@minrepeatability:1/orb 
-                     toinfo=/dev/tty 
+                     findfeatures listspec=true
+                     algorithm=detector.Blob@minrepeatability:1/orb
+                     toinfo=/dev/tty
                 </b>
                 <PRE>
 Object = FeatureAlgorithms
@@ -1514,15 +1519,15 @@ End
             </description>
           <default><item>/dev/tty</item></default>
         </parameter>
-       
+
       <parameter name= "DEBUG">
             <type>boolean</type>
             <brief>Print debugging statements of the matcher algorithm</brief>
             <description>
-              At times, things go wrong. By setting DEBUG=TRUE, information is 
-              printed as elements of the matching algorithm are executed. This 
-              option is very helpful to monitor the entire matching and outlier 
-              detection processing to determine where adjustments in the 
+              At times, things go wrong. By setting DEBUG=TRUE, information is
+              printed as elements of the matching algorithm are executed. This
+              option is very helpful to monitor the entire matching and outlier
+              detection processing to determine where adjustments in the
               parameters can be made to produce better results.
             </description>
           <default><item>false</item></default>
@@ -1530,31 +1535,31 @@ End
 
       <parameter name= "DEBUGLOG">
             <type>filename</type>
-            <brief>File to write (append) debugging information  to</brief> 
+            <brief>File to write (append) debugging information  to</brief>
             <description>
-                Provide a file that will have all the debugging content appended 
-                as it is generated in the processing steps. This file can be 
-                very useful to determine, for example, where in the matching and 
-                or outlier detection most of the matches are being rejected. The 
-                output can be lengthy and detailed, but is critical in the 
-                determination where adjustments to the parameters can be made to 
+                Provide a file that will have all the debugging content appended
+                as it is generated in the processing steps. This file can be
+                very useful to determine, for example, where in the matching and
+                or outlier detection most of the matches are being rejected. The
+                output can be lengthy and detailed, but is critical in the
+                determination where adjustments to the parameters can be made to
                 provide better results.
             </description>
           <internalDefault>None</internalDefault>
-          <filter>*.log</filter> 
-        </parameter> 
+          <filter>*.log</filter>
+        </parameter>
 
       <parameter name= "PARAMETERS">
             <type>filename</type>
             <brief>File containing special algorithm parameters</brief>
             <description>
-                This file can contain specialized parameters that will modify 
-                certain  behaviors in the robust matcher algorithm. They can 
-                vary over time and are documented in the application 
+                This file can contain specialized parameters that will modify
+                certain  behaviors in the robust matcher algorithm. They can
+                vary over time and are documented in the application
                 descriptions.
             </description>
           <internalDefault>None</internalDefault>
-          <filter>*.conf</filter>  
+          <filter>*.conf</filter>
       </parameter>
 
 
@@ -1562,15 +1567,15 @@ End
             <type>integer</type>
           <brief>Maximum number of keypoints to detect</brief>
             <description>
-                Specifies the maximum number of keypoints to save in the 
-                detection phase. If a value is not provided for this 
-                parameter, there will be no restriction set on the number of 
-                keypoints that will be used to match. If specified, then 
-                approximately MAXPOINTS keypoints with the highest/best detector 
-                response values are retained and passed on to the extractor and 
-                matcher algorithms. This parameter is useful for detectors that 
-                produce a high number of features. A large number of features 
-                will cause the matching phase and outlier detection to become 
+                Specifies the maximum number of keypoints to save in the
+                detection phase. If a value is not provided for this
+                parameter, there will be no restriction set on the number of
+                keypoints that will be used to match. If specified, then
+                approximately MAXPOINTS keypoints with the highest/best detector
+                response values are retained and passed on to the extractor and
+                matcher algorithms. This parameter is useful for detectors that
+                produce a high number of features. A large number of features
+                will cause the matching phase and outlier detection to become
                 costly and inefficient.
             </description>
           <default><item>0</item></default>
@@ -1586,19 +1591,19 @@ End
               Specify the maximum distance allowed between ratio test points
            </brief>
            <description>
-               For each feature point, we have two candidate matches 
-               in the other image. These are the two best ones based on the 
-               distance between their descriptors. If this measured distance is 
-               very low for the best match, and much larger for the second best 
-               match, we can safely accept the first match as a good one since 
-               it is unambiguously the best choice. Reciprocally, if the two 
-               best matches are relatively close in distance, then there exists 
-               a possibility that we make an error if we select one or the 
-               other. In this case, we should reject both matches. Here, we 
-               perform this test by verifying that the ratio of the distance of 
-               the best match over the distance of the second best match is not 
-               greater than a given RATIO threshold. Most of the matches will be 
-               removed by this test. The farther from 1.0, the more matches will 
+               For each feature point, we have two candidate matches
+               in the other image. These are the two best ones based on the
+               distance between their descriptors. If this measured distance is
+               very low for the best match, and much larger for the second best
+               match, we can safely accept the first match as a good one since
+               it is unambiguously the best choice. Reciprocally, if the two
+               best matches are relatively close in distance, then there exists
+               a possibility that we make an error if we select one or the
+               other. In this case, we should reject both matches. Here, we
+               perform this test by verifying that the ratio of the distance of
+               the best match over the distance of the second best match is not
+               greater than a given RATIO threshold. Most of the matches will be
+               removed by this test. The farther from 1.0, the more matches will
                be rejected.
            </description>
            <default><item>0.65</item></default>
@@ -1610,8 +1615,8 @@ End
                   Specifes tolerance for determining good epipolar points
               </brief>
               <description>
-                   The tolerance specifies the maximum distance in pixels that 
-                   feature may deviate from the Epipolar lines for each matching 
+                   The tolerance specifies the maximum distance in pixels that
+                   feature may deviate from the Epipolar lines for each matching
                    feature.
               </description>
             <default><item>3.0</item></default>
@@ -1623,8 +1628,8 @@ End
                   Specifes the level of confidence required in epipolar quality
               </brief>
               <description>
-                   This parameter indicates the confidence level of the epipolar 
-                   determination ratio. A value of 1.0 requires that all pixels 
+                   This parameter indicates the confidence level of the epipolar
+                   determination ratio. A value of 1.0 requires that all pixels
                    be valid in the epipolar computation.
               </description>
             <default><item>0.99</item></default>
@@ -1637,22 +1642,22 @@ End
               </brief>
               <description>
                 <p>
-                    If we consider the special case where two views of a scene are 
-                    separated by a pure rotation, then it can be observed that the 
-                    fourth column of the extrinsic matrix will be made of all 0s 
-                    (that is, translation is null). As a result, the projective 
-                    relation in this special case becomes a 3x3 matrix. This 
-                    matrix is called a homography and it implies that, under 
-                    special circumstances (here, a pure rotation), the image of a 
-                    point in one view is related to the image of the same point in 
+                    If we consider the special case where two views of a scene are
+                    separated by a pure rotation, then it can be observed that the
+                    fourth column of the extrinsic matrix will be made of all 0s
+                    (that is, translation is null). As a result, the projective
+                    relation in this special case becomes a 3x3 matrix. This
+                    matrix is called a homography and it implies that, under
+                    special circumstances (here, a pure rotation), the image of a
+                    point in one view is related to the image of the same point in
                     another by a linear relation.
                 </p>
                 <p>
-                     The parameter is used as a tolerance in the computation of 
-                     the distance between keypoints using the homography matrix 
-                     relationship between the MATCH image and each FROM/FROMLIST 
-                     image.  This will throw points out that are (dist >   
-                     TOLERANCE * min_dist), the smallest distance between 
+                     The parameter is used as a tolerance in the computation of
+                     the distance between keypoints using the homography matrix
+                     relationship between the MATCH image and each FROM/FROMLIST
+                     image.  This will throw points out that are (dist >
+                     TOLERANCE * min_dist), the smallest distance between
                      points.
                 </p>
               </description>
@@ -1665,10 +1670,10 @@ End
               Specify the maximum threads to use
            </brief>
            <description>
-               This parameter allows users to control the number of threads to 
-               use for image matching. A default is to use all available threads 
+               This parameter allows users to control the number of threads to
+               use for image matching. A default is to use all available threads
                on system. If MAXTHREADS is specified, the maximum number of CPUs
-               are used if it exceeds the number of CPUs physically available 
+               are used if it exceeds the number of CPUs physically available
                on the system or no more than MAXTHREADS will be used.
            </description>
            <default><item>0</item></default>
@@ -1680,14 +1685,14 @@ End
             <type>boolean</type>
             <brief>Perform fast geometry image transform</brief>
             <description>
-               When TRUE, this option will perform a fast geometric linear 
-               transformation that <em>projects</em> each FROM/FROMLIST image to 
-               the camera space of the MATCH image. Note this option 
-              <em>theoretically</em> is not needed for scale/rotation invariant 
-              feature matchers such as SIFT and SURF but there are limitations as 
-              to the invariance of these matchers. For matchers that are not scale 
-              and rotation invariant, this (or something like it) will be required 
-              to orient each images to similar spatial consistency. Users should 
+               When TRUE, this option will perform a fast geometric linear
+               transformation that <em>projects</em> each FROM/FROMLIST image to
+               the camera space of the MATCH image. Note this option
+              <em>theoretically</em> is not needed for scale/rotation invariant
+              feature matchers such as SIFT and SURF but there are limitations as
+              to the invariance of these matchers. For matchers that are not scale
+              and rotation invariant, this (or something like it) will be required
+              to orient each images to similar spatial consistency. Users should
               determine the capabilities of the matchers used.
             </description>
           <default><item>false</item></default>
@@ -1696,8 +1701,8 @@ End
        <parameter name="FASTGEOMPOINTS">
            <type>integer</type>
            <brief>
-              Specify the maximum number of geometry points used to compute the 
-              fast geometry reprojection 
+              Specify the maximum number of geometry points used to compute the
+              fast geometry reprojection
            </brief>
            <description>
            </description>
@@ -1709,20 +1714,20 @@ End
         <default><item>CAMERA</item></default>
         <brief>Type of fast geom mapping to apply</brief>
         <description>
-           Provide options as to how FASTGEOM projects data in the FROM (train) 
+           Provide options as to how FASTGEOM projects data in the FROM (train)
            image to the MATCH (query) image space.
         </description>
         <list>
            <option value="CAMERA">
                <brief>
-                  Fastgeom will project the FROM image into the MATCH space 
+                  Fastgeom will project the FROM image into the MATCH space
                </brief>
                <description>
-                   This option projects the image in the same manner as cam2map. 
-                   The common area of the FROM image is projected into an image 
-                   of the same size as the MATCH image. This is comparable to 
-                   cam2map in that it projects the FROM image into the camera 
-                   space of the MATCH image. Features should be located at the 
+                   This option projects the image in the same manner as cam2map.
+                   The common area of the FROM image is projected into an image
+                   of the same size as the MATCH image. This is comparable to
+                   cam2map in that it projects the FROM image into the camera
+                   space of the MATCH image. Features should be located at the
                    same general line and sample location in both images.
                </description>
            </option>
@@ -1731,25 +1736,25 @@ End
                   Fastgeom will crop the FROM image to common area of MATCH
                </brief>
                <description>
-                  Fastgeom will crop the FROM image to common area of MATCH and 
-                  retain on the approximate size of the cropped region. This 
-                  option is useful to limit features to be identified in the 
-                  common region in both images. 
+                  Fastgeom will crop the FROM image to common area of MATCH and
+                  retain on the approximate size of the cropped region. This
+                  option is useful to limit features to be identified in the
+                  common region in both images.
                </description>
            </option>
 
            <option value="MAP">
                <brief>
-                   Fastgeom will fully map project all of the FROM image                    
+                   Fastgeom will fully map project all of the FROM image
                </brief>
                <description>
-                   Fastgeom will preserve all of the FROM image using the  
-                   translation computed from common space. This is comparable 
-                   to map2map in that the whole from is projected using the 
-                   MATCH geometry. The size of the image is determined by 
-                   projecting the corners of the FROM image using the MATCH 
-                   geometry. Images can be quite large or small if there is a 
-                   large resolution difference. 
+                   Fastgeom will preserve all of the FROM image using the
+                   translation computed from common space. This is comparable
+                   to map2map in that the whole from is projected using the
+                   MATCH geometry. The size of the image is determined by
+                   projecting the corners of the FROM image using the MATCH
+                   geometry. Images can be quite large or small if there is a
+                   large resolution difference.
                </description>
            </option>
         </list>
@@ -1760,9 +1765,9 @@ End
         <default><item>None</item></default>
         <brief>Image filtering options for enhanced matching</brief>
         <description>
-           Apply an image filter to both images before matching. These filters 
-           are typically used in cases of low emission or incidence angles are 
-           present. They are intended to remove albedo and highlight edges and 
+           Apply an image filter to both images before matching. These filters
+           are typically used in cases of low emission or incidence angles are
+           present. They are intended to remove albedo and highlight edges and
            are well-suited for these types of feature detectors.
         </description>
         <list>
@@ -1771,7 +1776,7 @@ End
                    No filters will be applied
                 </brief>
                 <description>
-                    The default condition is that no filters will be applied to 
+                    The default condition is that no filters will be applied to
                     the images.
                 </description>
             </option>
@@ -1782,26 +1787,26 @@ End
                </brief>
                <description>
                   The <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#sobel ">
-                  Sobel</a> filter to both the FROM and MATCH images for 
-                  enhanced edge detection. The 8-bit images are first scaled to 
-                  16-bit and a Gaussian Blur noise reduction filter is applied 
-                  before the 3x3 Sobel filter is applied. The BORDER_REFLECT 
+                  Sobel</a> filter to both the FROM and MATCH images for
+                  enhanced edge detection. The 8-bit images are first scaled to
+                  16-bit and a Gaussian Blur noise reduction filter is applied
+                  before the 3x3 Sobel filter is applied. The BORDER_REFLECT
                   option is used for pixel extrapolation at the edges.
                </description>
            </option>
 
            <option value="SCHARR">
                <brief>
-                  Apply  Scharr filtering to both FROM and MATCH images for 
+                  Apply  Scharr filtering to both FROM and MATCH images for
                   enhanced edges.
                </brief>
                <description>
                  A <a href="http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=sobel#scharr">
-                  Scharr</a> filtering to both FROM and MATCH images for 
-                  enhanced edge detection. The 8-bit images are first scaled to 
-                  16-bit and a 3x3 Gaussian Blur noise reduction filter is 
-                  applied before the 3x3 Scharr filter is applied. The 
-                  BORDER_REFLECT option is used for pixel extrapolation at the 
+                  Scharr</a> filtering to both FROM and MATCH images for
+                  enhanced edge detection. The 8-bit images are first scaled to
+                  16-bit and a 3x3 Gaussian Blur noise reduction filter is
+                  applied before the 3x3 Scharr filter is applied. The
+                  BORDER_REFLECT option is used for pixel extrapolation at the
                   edges.
                </description>
            </option>
@@ -1845,11 +1850,11 @@ End
           <p>
             Note: Make sure there are enough "?"s for all the control
             points that might be created during this run. If all the possible
-            point IDs are exhausted the program will exit with an error, and 
+            point IDs are exhausted the program will exit with an error, and
             will not produce an output control network file. The number of
-            control points created depends on the size and quantity of 
+            control points created depends on the size and quantity of
             image overlaps and the density of control points as defined
-            by the DEFFILE parameter. 
+            by the DEFFILE parameter.
           </p>
           <p>
             Examples of POINTID:
@@ -1867,9 +1872,9 @@ End
           <type>integer</type>
           <brief>Start numerical POINTID index with this number</brief>
           <description>
-              This parameter can be used to specify the starting POINTID index 
-              number to assist in the creation of unique control point 
-              identifiers. Users must determine the highest used index and use 
+              This parameter can be used to specify the starting POINTID index
+              number to assist in the creation of unique control point
+              identifiers. Users must determine the highest used index and use
               the next number in the sequence to provide unique point ids.
           </description>
         <default><item>1</item></default>
@@ -1882,9 +1887,9 @@ End
         </brief>
         <description>
             A text description of the contents of the output control network.
-            The text can contain anything the user wants. For example it 
+            The text can contain anything the user wants. For example it
             could be used to describe the area of interest the control network
-            is being made for. 
+            is being made for.
         </description>
         <default><item>Find features in image pairs or list</item></default>
       </parameter>
@@ -1893,11 +1898,11 @@ End
             <type>string</type>
             <brief>Specify type of control network to create</brief>
             <description>
-               There are two types of control network files that can be created             
-               in this application: IMAGE and GROUND.  For IMAGE types, the pair 
-               is assumed to be overlapping pairs where control measures for 
-               both images are created.  For NETTYPE=GROUND, only the FROM file 
-               measure is recorded for purposes of dead reckoning of the image 
+               There are two types of control network files that can be created
+               in this application: IMAGE and GROUND.  For IMAGE types, the pair
+               is assumed to be overlapping pairs where control measures for
+               both images are created.  For NETTYPE=GROUND, only the FROM file
+               measure is recorded for purposes of dead reckoning of the image
                using jigsaw.
             </description>
             <default><item>IMAGE</item></default>
@@ -1907,32 +1912,32 @@ End
                        Create control network using both images
                     </brief>
                     <description>
-                        Create a control network of image pairs that have been 
-                        measured for both to be controlled. 
+                        Create a control network of image pairs that have been
+                        measured for both to be controlled.
                     </description>
                 </option>
                <option value="GROUND">
                     <brief>
-                        Only create a ground network file for dead reckoning 
+                        Only create a ground network file for dead reckoning
                     </brief>
                     <description>
-                       Create a control network with only the FROM image so that 
+                       Create a control network with only the FROM image so that
                        only its pointing will be updated.
                     </description>
                 </option>
             </list>
-        </parameter>        
+        </parameter>
 
        <parameter name="GEOMSOURCE">
             <type>string</type>
-            <brief>Specify which input file provides lat/lons for control 
+            <brief>Specify which input file provides lat/lons for control
               point</brief>
             <description>
-               For input files that provide geometry, specify which one provides 
-               the latitude/longitude values for each control point.  NONE is 
-               an acceptable option for which there is no geometry available.  
-               Otherwise, the user must choose FROM or MATCH as the cube file 
-               that wil provide geometry. 
+               For input files that provide geometry, specify which one provides
+               the latitude/longitude values for each control point.  NONE is
+               an acceptable option for which there is no geometry available.
+               Otherwise, the user must choose FROM or MATCH as the cube file
+               that wil provide geometry.
             </description>
             <default><item>MATCH</item></default>
             <list>
@@ -1941,51 +1946,51 @@ End
                         Neither image provides geometry
                     </brief>
                     <description>
-                        Use this option if geometry is not available in either 
-                        the FROM or MATCH image 
+                        Use this option if geometry is not available in either
+                        the FROM or MATCH image
                     </description>
                 </option>
                 <option value="FROM">
                     <brief>
-                       Use the FROM file to compute geometries for control points 
+                       Use the FROM file to compute geometries for control points
                     </brief>
                     <description>
-                        Selection of the FROM option indicates use of the FROM 
-                        file to compute the latitude and longitude of each 
-                        control point.   Note this option cannot be used when 
-                        there are more than one FROM (via FROMLIST) is given. 
+                        Selection of the FROM option indicates use of the FROM
+                        file to compute the latitude and longitude of each
+                        control point.   Note this option cannot be used when
+                        there are more than one FROM (via FROMLIST) is given.
                         Must use MATCH for these cases.
                     </description>
                 </option>
                <option value="MATCH">
                     <brief>
-                       Use the MATCH file to compute geometries for control 
-                    points 
+                       Use the MATCH file to compute geometries for control
+                    points
                     </brief>
                     <description>
-                        Selection of the MATCH option indicates use of the MATCH 
-                        file to compute the latitude and longitude of each 
+                        Selection of the MATCH option indicates use of the MATCH
+                        file to compute the latitude and longitude of each
                         control point.
                     </description>
                 </option>
             </list>
-        </parameter> 
- 
-          
+        </parameter>
+
+
         <parameter name="TARGET">
           <type>string</type>
           <brief>
               Target parameter for the control network
           </brief>
           <description>
-             This parameter is optional and not neccessary if using Level 1 ISIS 
-             cube files. It specifies the name of the target body that the input 
-             images are acquired of. If the input images are ISIS images, this 
-             value is retrieved from the camera model or map projection. 
+             This parameter is optional and not neccessary if using Level 1 ISIS
+             cube files. It specifies the name of the target body that the input
+             images are acquired of. If the input images are ISIS images, this
+             value is retrieved from the camera model or map projection.
           </description>
           <internalDefault>None</internalDefault>
         </parameter>
-             
+
     </group>
   </groups>
 
@@ -1995,8 +2000,8 @@ End
           Run matcher on pair of MESSENGER images
       </brief>
       <description>
-          This example shows the results of matching two overlapping messenger 
-          images of  different scales.  The following command was used to 
+          This example shows the results of matching two overlapping messenger
+          images of  different scales.  The following command was used to
           produce the output network:
         <PRE>
 findfeatures algorithm="surf@hessianThreshold:100/surf" \
@@ -2010,10 +2015,10 @@ findfeatures algorithm="surf@hessianThreshold:100/surf" \
              debuglog=EW0211981114G.log
         </PRE>
         <p>
-             Note that the fast geom option is not used for this example because 
-             the SURF algorithm is scale and rotation invariant.  Here is the 
-             algorithm information for the specification of the matcher 
-             parameters: 
+             Note that the fast geom option is not used for this example because
+             the SURF algorithm is scale and rotation invariant.  Here is the
+             algorithm information for the specification of the matcher
+             parameters:
                 <br/><br/>
                 <b>
                      findfeatures algorithm="surf@hessianThreshold:100/surf" listspec=true
@@ -2105,8 +2110,8 @@ End_Object
 End
         </PRE>
         <p>
-             The output debug log file and a line-by-line description of the  
-             result is shown in the main application documention. And here is 
+             The output debug log file and a line-by-line description of the
+             result is shown in the main application documention. And here is
              the screen shot of qnet for the resulting network:
         </p>
         <img src='assets/qnet.png' alt='qnet result of first control point' width='984' height='604' />
@@ -2117,7 +2122,7 @@ End
         Show all the available algorithms and their default parameters
       </brief>
       <description>
-This provides a reference for all the current algorithms and their default parameters. This list may not include all the available OpenCV algorithms nor may all algorithms be applicable. Users should rerun this command to get the current options available on your system as they may differ. 
+This provides a reference for all the current algorithms and their default parameters. This list may not include all the available OpenCV algorithms nor may all algorithms be applicable. Users should rerun this command to get the current options available on your system as they may differ.
           <p>
 	  <b>
                findfeatures listall=yes
