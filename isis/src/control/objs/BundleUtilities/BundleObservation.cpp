@@ -1012,50 +1012,33 @@ namespace Isis {
         adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
         sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
       }
+      
+      sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",correction);
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
       if (errorPropagation) {
-        sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
-        fpOut << buf;
-        sprintf(buf,"%20.8lf",finalParameterValues[i] - correction);
-        fpOut << buf;
-        sprintf(buf,"%20.8lf    ",correction);
-        fpOut << buf;
-        sprintf(buf,"%20.8lf",finalParameterValues[i]);
-        fpOut << buf;
-        sprintf(buf,"             ");
-        fpOut << buf;
-        sprintf(buf,"%*s",7,sigma.toStdString().c_str());
-        fpOut << buf;
-        sprintf(buf,"           ");
-        fpOut << buf;
         sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
-        fpOut<<buf;
-        sprintf(buf,"     ");
-        fpOut<<buf;
-        sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
-        fpOut<<buf;
       }
       else {
-        sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
-        fpOut << buf;
-        sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
-        fpOut << buf;
-        sprintf(buf,"%20.8lf\t",correction);
-        fpOut << buf;
-        sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
-        fpOut << buf;
-        sprintf(buf,"\t\t\t");
-        fpOut << buf;
-        sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
-        fpOut << buf;
-        sprintf(buf,"\t\t\t\t");
-        fpOut << buf;
         sprintf(buf,"%s","N/A");
-        fpOut<<buf;
-        sprintf(buf,"\t\t\t\t");
-        fpOut<<buf;
-        sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
-        fpOut<<buf;
       }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
     }
 
     // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
@@ -1090,51 +1073,33 @@ namespace Isis {
         adjustedSigma = "N/A";
         sigma = "N/A";
       }
-
+      
+      sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
       if (errorPropagation) {
-        sprintf(buf,"%*s",10,parameterNamesList.at(i).toStdString().c_str() );
-        fpOut << buf;
-        sprintf(buf,"%20.8lf",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
-        fpOut << buf;
-        sprintf(buf,"%20.8lf    ",(correction*RAD2DEG));
-        fpOut << buf;
-        sprintf(buf,"%20.8lf",(finalParameterValues[i]*RAD2DEG));
-        fpOut << buf;
-        sprintf(buf,"                 ");
-        fpOut << buf;
-        sprintf(buf,"%s",sigma.toStdString().c_str() );
-        fpOut << buf;
-        sprintf(buf,"           ");
-        fpOut << buf;
         sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
-        fpOut<<buf;
-        sprintf(buf,"     ");
-        fpOut<<buf;
-        sprintf(buf,"%*s\n",7,correctionUnitList.at(i).toStdString().c_str() );
-        fpOut<<buf;
       }
       else {
-        sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
-        fpOut << buf;
-        sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
-        fpOut << buf;
-        sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
-        fpOut << buf;
-        sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
-        fpOut << buf;
-        sprintf(buf,"\t\t\t");
-        fpOut << buf;
-        sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
-        fpOut << buf;
-        sprintf(buf,"\t\t\t\t");
-        fpOut << buf;
         sprintf(buf,"%s","N/A");
-        fpOut<<buf;
-        sprintf(buf,"\t\t\t\t");
-        fpOut<<buf;
-        sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
-        fpOut<<buf;
       }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
     }
     
   }
@@ -1164,7 +1129,6 @@ namespace Isis {
     int nParameters = nPositionParameters + nPointingParameters;
 
     QString finalqStr = "";
-    QString qStr = "";
 
     // Set up default values when we are using default position
     QString sigma = "N/A";
@@ -1184,22 +1148,18 @@ namespace Isis {
         adjustedSigma = "N/A";
         sigma = "N/A";
       }
-      qStr = "";
+      
+      finalqStr += toString(finalParameterValues[i] - correction) + ",";
+      finalqStr += toString(correction) + ",";
+      finalqStr += toString(finalParameterValues[i]) + ",";
+      finalqStr += sigma + ",";
       if (errorPropagation) {
-        qStr += toString(finalParameterValues[i] - correction) + ",";
-        qStr += toString(correction) + ",";
-        qStr += toString(finalParameterValues[i]) + ",";
-        qStr += sigma + ",";
-        qStr += adjustedSigma + ",";
+        finalqStr += adjustedSigma + ",";
       }
       else {
-        qStr += toString(finalParameterValues[i] - correction) + ",";
-        qStr += toString(correction) + ",";
-        qStr += toString(finalParameterValues[i]) + ",";
-        qStr += sigma + ",";
-        qStr += "N/A,";
+        finalqStr += "N/A,";
       }
-      finalqStr += qStr;
+
     }
 
     // If not solving position, we need to offset access to correction and sigma members by -3
@@ -1233,22 +1193,18 @@ namespace Isis {
         adjustedSigma = "N/A";
         sigma = "N/A";
       }
-      qStr = "";
+      
+      finalqStr += toString(finalParameterValues[i]*RAD2DEG - correction * RAD2DEG) + ",";
+      finalqStr += toString(correction * RAD2DEG) + ",";
+      finalqStr += toString(finalParameterValues[i]*RAD2DEG) + ",";
+      finalqStr += sigma + ",";
       if (errorPropagation) {
-        qStr += toString(finalParameterValues[i]*RAD2DEG - correction * RAD2DEG) + ",";
-        qStr += toString(correction * RAD2DEG) + ",";
-        qStr += toString(finalParameterValues[i]*RAD2DEG) + ",";
-        qStr += sigma + ",";
-        qStr += adjustedSigma + ",";
+        finalqStr += adjustedSigma + ",";
       }
       else {
-        qStr += toString(finalParameterValues[i]*RAD2DEG - correction * RAD2DEG) + ",";
-        qStr += toString(correction * RAD2DEG) + ",";
-        qStr += toString(finalParameterValues[i]*RAD2DEG) + ",";
-        qStr += sigma + ",";
-        qStr += "N/A,";
+        finalqStr += "N/A,";
       }
-      finalqStr += qStr;
+
     }
     
     return finalqStr;
