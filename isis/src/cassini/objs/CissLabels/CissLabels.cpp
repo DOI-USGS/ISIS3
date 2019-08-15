@@ -73,6 +73,7 @@ namespace Isis {
     p_readoutCycleIndex     = (QString) inst["ReadoutCycleIndex"];       //valid values: Unknown or integers 0-15
     p_readoutOrder          = (int)    inst["ReadoutOrder"];            //valid values: 0 or 1
     p_shutterModeId         = (QString) inst["ShutterModeId"];           //valid values: BothSim, NacOnly, WacOnly
+    p_shutterStateId         = (QString) inst["ShutterStateId"];           //valid values: Enabled or Disabled
     p_summingMode           = (int)    inst["SummingMode"];             //valid values: 1, 2, 4
     p_frontOpticsTemp       = toDouble(inst["OpticsTemperature"][0]);  //valid values: real numbers
     p_imageTime             = (QString) inst["ImageTime"];
