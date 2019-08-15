@@ -186,6 +186,11 @@ endif()
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
+ if(NOT CMAKE_BUILD_TYPE)
+     set(CMAKE_BUILD_TYPE "RELEASE")
+ endif()
+
+ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -OG")
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)
