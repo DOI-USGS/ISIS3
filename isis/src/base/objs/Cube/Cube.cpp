@@ -2138,10 +2138,10 @@ namespace Isis {
  * Returns the latitude and longitude range for the Cube. More accurate than the minimum and 
  * maximum latitude and longitude from the mapping group. 
  * 
- * @param minLatitude minimum latitude of the cube
- * @param maxLatitude maximum latitude present in the cube
- * @param minLongitude minimum longitude present in the cube
- * @param maxLongitude maximum longitude present in the cube
+ * @param[out] minLatitude minimum latitude present in the cube
+ * @param[out] maxLatitude maximum latitude present in the cube
+ * @param[out] minLongitude minimum longitude present in the cube
+ * @param[out] maxLongitude maximum longitude present in the cube
  */
   void Cube::latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude, double &
                          maxLongitude) {
@@ -2149,17 +2149,14 @@ namespace Isis {
     TProjection *proj;
 
     bool isGood = false;
-    bool noCamera;
+    bool useProj = true;
 
     if (hasGroup("Instrument")) {
-      noCamera = false;
-    }
-    else {
-      noCamera = true;
+      useProj = false;
     }
 
     // setup camera or projection
-    if (noCamera) {
+    if (useProj) {
      try {
        proj = (TProjection *) projection();
      }
@@ -2184,10 +2181,10 @@ namespace Isis {
     maxLatitude = -99999;
     maxLongitude = -99999;
 
-    for (int sample = 0; sample < sampleCount(); sample++) {
+    for (int sample = 0.5; sample < sampleCount() + 0.5; sample++) {
     // Checks to see if the point is in outer space
-      for (int line = 0; line < lineCount(); line++) {
-        if (noCamera) {
+      for (int line = 0.5; line < lineCount() + 0.5; line++) {
+        if (useProj) {
           isGood = proj->SetWorld(sample, line);
         }
         else {
@@ -2196,7 +2193,7 @@ namespace Isis {
       
         double lat, lon;
         if (isGood) {
-          if (noCamera) {
+          if (useProj) {
             lat = proj->UniversalLatitude();
             lon = proj->UniversalLongitude();
           }
@@ -2221,6 +2218,11 @@ namespace Isis {
           }
         }
       }
+    }
+    if ( (minLatitude == 99999) || (minLongitude == 99999) || (maxLatitude == -99999) || 
+    (maxLongitude == -99999) ) {
+      QString msg = "Unable to calculate a minimum or maximum latitutde or longitude.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   

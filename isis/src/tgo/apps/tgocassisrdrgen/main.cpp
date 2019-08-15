@@ -96,7 +96,10 @@ void IsisMain() {
     process.setVersionId( ui.GetString("VERSIONID") );
   }
 
-  process.setPixelDescription("Pixel values are in units of I/F (intensity/flux). I/F is defined as the ratio of the observed radiance and the radiance of a 100% lambertian reflector with the sun and camera orthogonal to the observing surface.");
+  process.setPixelDescription("Pixel values are in units of I/F (intensity/flux). I/F is defined as"
+                              "the ratio of the observed radiance and the radiance of a 100% "
+                              "lambertian reflector with the sun and camera orthogonal to the "
+                              "observing surface.");
 
   // std PDS4 label
   process.StandardPds4Label();
@@ -151,7 +154,10 @@ void IsisMain() {
           << "cas:telescope_information"
           << "cas:focal_length";
   QDomElement focalLengthNode = process.getElement(xmlPath, observationNode);
-  focalLengthNode.removeAttribute("unit");
+
+  if (focalLengthNode.hasAttribute("unit")) {
+    focalLengthNode.removeAttribute("unit"); 
+  }
 
   QString outFile = ui.GetFileName("TO");
 

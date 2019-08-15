@@ -209,11 +209,8 @@ void IsisMain() {
    iTime stopTimeValue = lastStartTimeValue + exposureDuration.toDouble(); 
    stopTime = stopTimeValue.UTC(3);
 
-   // Get the blob of original labels from first image in list
-   // Pvl *org = cubeList[0]->label();
    // Get the archiveGroup from the first cube in the list
-
-    PvlGroup archiveGroup = cubeList[0]->label()->findGroup("Archive", Pvl::Traverse);
+    PvlGroup archiveGroup = cubeList[0]->group("Archive");
 
     //close all cubes
     for (int i = 0; i < (int)cubeList.size(); i++) {
