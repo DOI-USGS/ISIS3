@@ -1,5 +1,44 @@
 Unit Test for RosettaVirtisCamera...
-FileName: I1_00237395857.cub
+
+Teting Level 3 (Calibrated) VIRTIS-M-VIS Cube ...
+FileName: V1_00388238556.cub
+CK Frame: -226211
+
+Kernel IDs: 
+CK Frame ID = -226000
+CK Reference ID = 1
+SPK Target ID = -226
+SPK Reference ID = 1
+
+Spacecraft Name Long: Rosetta
+Spacecraft Name Short: Rosetta
+Instrument Name Long: Visual and Infrared Thermal Imaging Spectrometer
+Instrument Name Short: VIRTIS
+
+Start Time: 482889934.995558500
+End Time:   482891995.079238355
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = -0.010806839
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = -0.011730711
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+Teting Level 3 (Calibrated) VIRTIS-M-IR Cube ...
+FileName: I1_00382172310.cub
 CK Frame: -226213
 
 Kernel IDs: 
@@ -13,23 +52,23 @@ Spacecraft Name Short: Rosetta
 Instrument Name Long: Visual and Infrared Thermal Imaging Spectrometer
 Instrument Name Short: VIRTIS
 
-Start Time: 332047165.140102983
-End Time:   332047289.497766495
+Start Time: 476823679.937990844
+End Time:   476825050.406471491
 For upper left corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.262132577
+DeltaLine = -0.038726648
 
 For upper right corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.428036996
+DeltaLine = -0.057422638
 
 For lower left corner ...
-DeltaSample = -0.030325205
-DeltaLine = 1.142735209
+DeltaSample = 0.000000000
+DeltaLine = 1.101867835
 
 For lower right corner ...
 DeltaSample = 0.000000000
-DeltaLine = 1.162544983
+DeltaLine = 1.209474087
 
 For center pixel position ...
 Latitude OK

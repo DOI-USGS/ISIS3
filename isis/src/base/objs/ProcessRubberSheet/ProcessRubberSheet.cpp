@@ -816,9 +816,6 @@ namespace Isis {
                    InputCubes[0]->pixelType() ,
                    interp.HotSample(), interp.HotLine());
 
-    // Create a buffer for writing to the output file
-    Brick obrick(*OutputCubes[0],1,1,1);
-
     // Setup the progress meter
     int patchesPerBand = 0;
     for (int line = m_patchStartLine; line <= InputCubes[0]->lineCount();
@@ -845,13 +842,13 @@ namespace Isis {
     //
     // We use the variables m_patchStartLine and m_patchStartSample to define
     // where to start in the cube.  In almost all cases these should be (1,1).
-    // An expection would be for PushFrameCameras which which need to have
+    // An expection would be for PushFrameCameras which need to have
     // a different starting line for the even framed cubes
     //
     // We use the variables m_patchLineIncrement and m_patchSampleIncrement
     // to skip to the next patch.  Typically these are one less than the
     // patch size which guarantees a pixel of overlap in the patches.  An
-    // expection would be for PushFrameCameras which should increment lines by
+    // exception would be for PushFrameCameras which should increment lines by
     // twice the framelet height.
 
     for (int band=1; band <= InputCubes[0]->bandCount(); band++) {
@@ -865,7 +862,7 @@ namespace Isis {
               samp += m_patchSampleIncrement, p_progress->CheckStatus()) {
           transformPatch((double)samp, (double)(samp + m_patchSamples - 1),
                          (double)line, (double)(line + m_patchLines - 1),
-                         obrick, iportal, trans, interp);
+                         iportal, trans, interp);
         }
       }
     }
@@ -874,10 +871,10 @@ namespace Isis {
 
   // Private method to process a small patch of the input cube
   void ProcessRubberSheet::transformPatch(double ssamp, double esamp,
-                                           double sline, double eline,
-                                           Brick &obrick, Portal &iportal,
-                                           Transform &trans,
-                                           Interpolator &interp) {
+                                          double sline, double eline,
+                                          Portal &iportal,
+                                          Transform &trans,
+                                          Interpolator &interp) {
     // Let's make sure our patch is contained in the input file
     // TODO:  Think about the image edges should I be adding 0.5
     if (esamp > InputCubes[0]->sampleCount()) {
@@ -890,6 +887,7 @@ namespace Isis {
     }
 
     // Use these to build a list of four corner control points
+    // If any corner doesn't trasform, split the patch into for smaller patches
     QVector<double> isamps;
     QVector<double> ilines;
     QVector<double> osamps;
@@ -903,6 +901,10 @@ namespace Isis {
       osamps.push_back(tsamp);
       olines.push_back(tline);
     }
+    else {
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
+      return;
+    }
 
     // Upper right control point
     if (trans.Xform(tsamp,tline,esamp,sline)) {
@@ -910,6 +912,10 @@ namespace Isis {
       ilines.push_back(sline);
       osamps.push_back(tsamp);
       olines.push_back(tline);
+    }
+    else {
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
+      return;
     }
 
     // Lower left control point
@@ -919,6 +925,10 @@ namespace Isis {
       osamps.push_back(tsamp);
       olines.push_back(tline);
     }
+    else {
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
+      return;
+    }
 
     // Lower right control point
     if (trans.Xform(tsamp,tline,esamp,eline)) {
@@ -927,19 +937,12 @@ namespace Isis {
       osamps.push_back(tsamp);
       olines.push_back(tline);
     }
-
-    // If no points we are lost in space.  It's possible a very small
-    // target could be completely contained in the patch.  Unlikely and if
-    // so why would we be projecting it??
-    if (isamps.size() == 0) return;
-
-    // All four corners must be good.  If not break it down more
-    if (isamps.size() < 4) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+    else {
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 
-    // Get the min/max output line/sample patch
+    // Get the min/max output line/sample patch (bounding box of the transformed output samp,line)
     int osampMin = (int) osamps[0];
     int osampMax = (int) (osamps[0] + 0.5);
     int olineMin = (int) olines[0];
@@ -958,7 +961,7 @@ namespace Isis {
     if (osampMin > OutputCubes[0]->sampleCount()) return;
     if (olineMin > OutputCubes[0]->lineCount()) return;
 
-    // Adjust our output patch if it extends outside the output cube
+    // Adjust our output patch if it extends outside the output cube (overlaps cube boundry)
     if (osampMin < 1) osampMin = 1;
     if (olineMin < 1) olineMin = 1;
     if (osampMax > OutputCubes[0]->sampleCount()) {
@@ -978,11 +981,11 @@ namespace Isis {
      */
 
     if (osampMax - osampMin + 1.0 > OutputCubes[0]->sampleCount() * 0.50) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
     if (olineMax - olineMin + 1.0 > OutputCubes[0]->lineCount() * 0.50) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 
@@ -1008,18 +1011,18 @@ namespace Isis {
       ilineLSQ.Solve(LeastSquares::QRD);
     }
     catch (IException &e) {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 
     // If the fit at any corner isn't good enough break it down
     for (int i=0; i<isamps.size(); i++) {
       if (fabs(isampLSQ.Residual(i)) > 0.5) {
-        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
         return;
       }
       if (fabs(ilineLSQ.Residual(i)) > 0.5) {
-        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
         return;
       }
     }
@@ -1042,12 +1045,12 @@ namespace Isis {
       double err = (csamp - isamp) * (csamp - isamp) +
                    (cline - iline) * (cline - iline);
       if (err > 0.25) {
-        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
         return;
       }
     }
     else {
-      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }
 #endif
@@ -1060,37 +1063,62 @@ namespace Isis {
     double E = ilineFunc.Coefficient(1);
     double F = ilineFunc.Coefficient(2);
 
-    // Now we can do our typical backwards geom.  Loop over the output cube
-    // coordinates and compute input cube coordinates writing pixels 1-by-1
+    // Now we can do our typical backwards geom. Loop over the output cube
+    // coordinates and compute input cube coordinates for the corners of the current
+    // buffer. The buffer is the same size as the current patch size.
+    Brick oBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
+    oBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
+
+    int brickIndex = 0;
+    bool foundNull = false;
     for (int oline = olineMin; oline <= olineMax; oline++) {
       double isamp = A * osampMin + B * oline + C;
       double iline = D * osampMin + E * oline + F;
       double isampChangeWRTosamp = A;
       double ilineChangeWRTosamp = D;
-      for (int osamp = osampMin; osamp <= osampMax; osamp++,
-           isamp += isampChangeWRTosamp, iline += ilineChangeWRTosamp) {
-
+      for (int osamp = osampMin; osamp <= osampMax;
+            osamp++, isamp += isampChangeWRTosamp, iline += ilineChangeWRTosamp) {
         // Now read the data around the input coordinate and interpolate a DN
         iportal.SetPosition(isamp, iline, iportal.Band());
         InputCubes[0]->read(iportal);
         double dn = interp.Interpolate(isamp, iline, iportal.DoubleBuffer());
+        oBrick[brickIndex] = dn;
+        if (dn == Null) foundNull = true;
+        brickIndex++;
+      }
+    }
 
-        // Write the output value at the appropriate location
-        if (dn != Null) {
-          obrick.SetBasePosition(osamp,oline,iportal.Band());
-          obrick[0] = dn;
-          OutputCubes[0]->write(obrick);
+    // If there are any special pixel Null values in this output brick, we may be
+    // up against an edge of the input image where the interpolaters get Nulls from 
+    // outside the image. Since the patches have some overlap due to finding the 
+    // rectangular area (bounding box, min/max line/samp) of the four points input points
+    // projected into the output space, this causes valid DNs
+    // from a previously processed patch to be replaced with Null DNs from this patch.
+    // NOTE: A different method of accomplishing this fixing of Nulls was tested. We read
+    // the buffer from the output and tested each pixel values before overwriting it
+    // This resulted in a slighly slower run for the test. A concern was found in the
+    // asynchronous write of buffers to the cube, where a race condition may have generated
+    // different dns, not bad, but making testing more difficult.
+    if (foundNull) {
+      Brick readBrick(*OutputCubes[0], osampMax-osampMin+1, olineMax-olineMin+1, 1);
+      readBrick.SetBasePosition(osampMin, olineMin, iportal.Band());
+      OutputCubes[0]->read(readBrick);
+      for (brickIndex = 0; brickIndex<(osampMax-osampMin+1)*(olineMax-olineMin+1); brickIndex++) {
+        if (readBrick[brickIndex] != Null) {
+          oBrick[brickIndex] = readBrick[brickIndex];
         }
       }
     }
+
+    // Write filled buffer to cube
+    OutputCubes[0]->write(oBrick);
   }
 
 
   // Private method used to split up input patches if the patch is too big to
   // process
   void ProcessRubberSheet::splitPatch(double ssamp, double esamp,
-                                       double sline, double eline,
-                                       Brick &obrick, Portal &iportal,
+                                       double sline, double eline, Portal &iportal,
                                        Transform &trans, Interpolator &interp) {
 
     // Is the input patch too small to even worry about transforming?
@@ -1102,16 +1130,16 @@ namespace Isis {
 
     transformPatch(ssamp, midSamp,
                    sline, midLine,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
     transformPatch(midSamp, esamp,
                    sline, midLine,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
     transformPatch(ssamp, midSamp,
                    midLine, eline,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
     transformPatch(midSamp, esamp,
                    midLine, eline,
-                   obrick, iportal, trans, interp);
+                   iportal, trans, interp);
 
     return;
   }

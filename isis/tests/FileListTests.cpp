@@ -11,12 +11,12 @@ TEST(FileList, NonExistantFileConstructor)
   }
   catch(Isis::IException &e)
   {
-    EXPECT_TRUE(e.toString().toLatin1().contains("Unable to open [FakeFile]."))
+    EXPECT_TRUE(e.toString().toLatin1().contains("Unable to open [FakeFile]"))
       << e.toString().toStdString();
   }
   catch(...)
   {
-    FAIL() << "Expected an IException\"Unable to open [FakeFile].\"";
+    FAIL() << "Expected an IException\"Unable to open [FakeFile]\"";
   }
 }
 
