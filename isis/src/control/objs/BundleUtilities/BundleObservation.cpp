@@ -787,8 +787,8 @@ namespace Isis {
  * @brief Creates and returns a formatted QString representing the bundle coefficients and
  * parameters
  *
- * @depricated This function is depricated as of ISIS 3.8.1/3.9 and will be removed
- * on ISIS 4.0 release
+ * @depricated The function formatBundleOutputString is depricated as of ISIS 3.8.1/3.9
+ * and will be removed in ISIS 4.0
  *
  * @param errorPropagation Boolean indicating whether or not to attach more information
  *     (corrections, sigmas, adjusted sigmas...) to the output QString
@@ -804,8 +804,7 @@ namespace Isis {
  */
 QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
 
-  std::cerr << "This function is depricated as of ISIS 3.8.1/3.9 and will be removed \
-  * on ISIS 4.0 release" << std:: endl;
+  std::cerr << "The function formatBundleOutputString is depricated as of ISIS 3.8.1/3.9 and will be removed in ISIS 4.0" << std::endl;
 
   std::vector<double> coefX;
   std::vector<double> coefY;
