@@ -31,7 +31,7 @@
 #include "BundleTargetBody.h"
 #include "LinearAlgebra.h"
 
-namespace Isis {  
+namespace Isis {
   class BundleObservationSolveSettings;
   class SpicePosition;
   class SpiceRotation;
@@ -41,7 +41,7 @@ namespace Isis {
    *
    * This class is used for creating a bundle observation. Contained BundleImages are stored as
    * shared pointers, so they will be automatically deleted when all shared pointers are deleted.
-   *  
+   *
    * @ingroup ControlNetworks
    *
    * @author 2014-07-09 Ken Edmundson
@@ -69,14 +69,14 @@ namespace Isis {
    *   @history 2016-10-26 Ian Humphrey - Modified formatBundleOutputString() to provided default
    *                           values for all solve parameters, whether they are being solved for
    *                           or not. Fixes #4464.
-   *   @history 2016-10-27 Tyler Wilson - Modified formatBundleOutputString to change N/A to FREE 
+   *   @history 2016-10-27 Tyler Wilson - Modified formatBundleOutputString to change N/A to FREE
    *                           in the output under POINTS DETAIL when no lat/lon sigmas were entered.
    *                           Fixes #4317.
    *   @history 2016-11-14 Ken Edmundson - Modified the following...
    *                           -changed adjustedSigma from 0.0 to N/A if error propagation is off
    *                            when writing bundleout.txt OR images.csv.
    *                           -changed sigma default from -1.0 to N/A for position and pointing
-   *                            parameters when writing images.csv. 
+   *                            parameters when writing images.csv.
    *   @history 2019-05-14 Tyler Wilson - Added the bundleOutputString(std::ofstream &fpOut,
    *                            bool errorPropagation) function which is called by
    *                            BundleSolutionInfo::outputText(). This function is a refactor of
@@ -106,36 +106,36 @@ namespace Isis {
 
       // destructor
       ~BundleObservation();
-      
+
       // equals operator
       BundleObservation &operator=(const BundleObservation &src);
-      
+
       // copy method
       void copy(const BundleObservation &src);
 
       void append(const BundleImageQsp &value);
 
       BundleImageQsp imageByCubeSerialNumber(QString cubeSerialNumber);
-      
+
       bool setSolveSettings(BundleObservationSolveSettings solveSettings);
-      
+
       void setIndex(int n);
       int index();
-      
+
       int numberPositionParameters();
       int numberPointingParameters();
       int numberParameters();
-      
+
       QString instrumentId();
-      
+
       SpiceRotation *spiceRotation();
       SpicePosition *spicePosition();
-     
+
       LinearAlgebra::Vector &parameterWeights();
       LinearAlgebra::Vector &parameterCorrections();
       LinearAlgebra::Vector &aprioriSigmas();
       LinearAlgebra::Vector &adjustedSigmas();
-      
+
       const BundleObservationSolveSettingsQsp solveSettings();
 
       bool applyParameterCorrections(LinearAlgebra::Vector corrections);
@@ -149,7 +149,8 @@ namespace Isis {
                             bool &useDefaultTwist);
       void bundleOutputString(std::ostream &fpOut,bool errorPropagation);
       QString bundleOutputCSV(bool errorPropagation);
-      
+
+      QString formatBundleOutputString(bool errorPropagation, bool imageCSV=false);
       QStringList parameterList();
       QStringList imageNames();
 
@@ -190,7 +191,7 @@ namespace Isis {
       //! A posteriori (adjusted) parameter sigmas.
       LinearAlgebra::Vector m_aprioriSigmas;
       //! A posteriori (adjusted) parameter sigmas.
-      LinearAlgebra::Vector m_adjustedSigmas; 
+      LinearAlgebra::Vector m_adjustedSigmas;
   };
 
   //! Typdef for BundleObservation QSharedPointer.
