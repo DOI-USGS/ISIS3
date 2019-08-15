@@ -72,6 +72,8 @@ namespace Isis {
    *           were signaled. References #2248.
    *  @history 2018-03-15 Adam Goins - Removed deprecated function iTime::UnloadLeapSecondKernel().
    *                          Fixes #5325.
+   *  @history 2019-06-15 Kristin Berry - Added a precision option to UTC to specify the precision
+   *           of the output value. The default (old) precision is used if no argument is specified.
    */
   class iTime {
     public:

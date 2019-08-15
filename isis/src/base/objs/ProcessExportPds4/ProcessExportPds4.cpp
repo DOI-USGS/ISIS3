@@ -1464,13 +1464,6 @@ namespace Isis {
         }
       }
     }
-    
-    // debug
-    QMapIterator<QString, QString> i(transMap);
-    while (i.hasNext()) {
-      i.next();
-//      cout << i.key() << ": " << i.value() << endl;
-    }
     return transMap; 
   }
 

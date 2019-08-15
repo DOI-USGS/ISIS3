@@ -144,10 +144,13 @@ void IsisMain() {
   // have units, so remove the units from cas:focal length. 
   QDomDocument &pdsLabelNext = process.GetLabel();
   QDomElement observationNode = pdsLabelNext.documentElement().firstChildElement("Observation_Area");
-  QDomElement missionNode = observationNode.firstChildElement("Mission_Area");
-  QDomElement cassisNode = missionNode.firstChildElement("cas:CASSIS_Data");
-  QDomElement telescopeNode = cassisNode.firstChildElement("cas:telescope_information");
-  QDomElement focalLengthNode = telescopeNode.firstChildElement("cas:focal_length");
+  QStringList xmlPath;
+  xmlPath << "Observation_Area"
+          << "Mission_Area"
+          << "cas:CASSIS_Data"
+          << "cas:telescope_information"
+          << "cas:focal_length";
+  QDomElement focalLengthNode = process.getElement(xmlPath, observationNode);
   focalLengthNode.removeAttribute("unit");
 
   QString outFile = ui.GetFileName("TO");
