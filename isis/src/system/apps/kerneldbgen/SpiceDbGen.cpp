@@ -74,12 +74,10 @@ SpiceDbGen::SpiceDbGen(QString type) {
 PvlObject SpiceDbGen::Direct(QString quality, QString location,
                              std::vector<QString> &filter, double startOffset, double endOffset) {
   PvlObject result;
-  QString type = "none";
 
   for (unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
     QStringList files = GetFiles(FileName(location), filter[i]);
-    PvlObject pvlKernel("change");
 
     // Throw an error if no files are being added to this database for
     // this filter/regex
@@ -105,31 +103,93 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
     if (grp->name() == "No coverage" || grp->name() == "Null") {
       result.deleteGroup(grp->name());
     }
-    // This is used for the first time thru the while loop
-    // DO NOT increment grp here
-    else if (type == "none") {
-      type = grp->name();
-    }
-    else if (grp->name() == type) {
+    else if (grp->name() == p_type) {
       grp->setName("Selection");
       grp++;
     }
     else {
-      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + type + "]" ;
+      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
   }
 
-  if (type == "SPK") {
+  if (p_type == "SPK") {
     result.setName("SpacecraftPosition");
   }
-  else if (type == "CK") {
+  else if (p_type == "CK") {
     result.setName("SpacecraftPointing");
   }
 
   return result;
 }
+
+
+/**
+ * Creates a Pvl object that stores all of the kernels specified by a list
+ *
+ * @param quality   The quality of the kernels that are being filtered into
+ *                  the database. For example, "Reconstructed".
+ *
+ * @param fileList  The list of files to create a database for. The files must
+ *                  be ordered in ascending priority. That is, if two kernels
+ *                  cover the same time period, the kernel later in the file
+ *                  will be used.
+ *
+ * @return PvlObject
+ *
+ * @internal
+ *   @history 2019-08-13 Jesse Mapel Created method that takes a file list.
+ *
+ * @throws Isis::iException::Message
+*/
+PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
+                             double startOffset, double endOffset) {
+  PvlObject result;
+
+  // Throw an error if no files are being added to this database for
+  // this filter/regex
+  if (fileList.empty()) {
+    QString message = "Input filelist is empty!";
+    throw IException(IException::User, message, _FILEINFO_);
+  }
+
+  for (int fileNum = 0 ; fileNum < fileList.size() ; fileNum++) {
+    FileName currFile = fileList[fileNum];
+    PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
+    selection += PvlKeyword("Type", quality);
+    result.addGroup(selection);
+  }
+
+  // Check each group to make sure it is the same type as others
+  PvlObject::PvlGroupIterator grp = result.beginGroup();
+
+  while (grp != result.endGroup()) {
+    // The kernel did not have any time coverage, so ignore it
+    if (grp->name() == "No coverage" || grp->name() == "Null") {
+      result.deleteGroup(grp->name());
+    }
+    else if (grp->name() == p_type) {
+      grp->setName("Selection");
+      grp++;
+    }
+    else {
+      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
+      throw IException(IException::Programmer, message, _FILEINFO_);
+      break;
+    }
+  }
+
+  if (p_type == "SPK") {
+    result.setName("SpacecraftPosition");
+  }
+  else if (p_type == "CK") {
+    result.setName("SpacecraftPointing");
+  }
+
+  return result;
+}
+
 
 /**
   * Essenetially a method call to the underlying QDir class which will filter
@@ -157,13 +217,13 @@ QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
 
 
 /**
- * Sets the desired time coverage level of the Spice database. 
- * 
- * @param level The desired time coverage level. May be either Segment or 
- *              Interval.  
+ * Sets the desired time coverage level of the Spice database.
+ *
+ * @param level The desired time coverage level. May be either Segment or
+ *              Interval.
  */
 void SpiceDbGen::setCoverageLevel(QString level) {
-  m_coverageLevel = level; 
+  m_coverageLevel = level;
 }
 
 
@@ -241,7 +301,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
         // A SPICE SEGMENT is composed of SPICE INTERVALS
         if (QString::compare(m_coverageLevel, "SEGMENT", Qt::CaseInsensitive) == 0 ) {
-          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover); 
+          ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
         }
         else {
           ckcov_c(tmp.toLatin1().data(), body, SPICEFALSE, "INTERVAL", 0.0, "TDB", &cover);
@@ -283,7 +343,7 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
     end += endOffset;
     timout_c(begin, calForm, 35, begStr);
     timout_c(end, calForm, 35, endStr);
-    
+
     result += PvlKeyword("Time", "(\"" + (QString)begStr +
                          "\", \"" + (QString)endStr + "\")");
   }
