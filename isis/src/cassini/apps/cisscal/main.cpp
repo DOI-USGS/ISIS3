@@ -564,7 +564,7 @@ FileName gbl::FindBitweightFile() {
  *   @history 2009-05-27 Jeannie Walldren - Commented out table
  *            if-statement as done idl cisscal version 3.6.
  *   @history 2019-08-14 Kaitlyn Lee - Added check for a corrupt
- *            bias strip mean to match ciscal version 3.9.
+ *            bias strip mean to match cisscal version 3.9.
  */
 void gbl::ComputeBias() {
   gbl::calgrp += PvlKeyword("BiasSubtractionPerformed", "Yes");
@@ -833,7 +833,7 @@ void gbl::Linearize() {
  *            labels.
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
  *            ShutterStateId to disable dust ring correction.
- *            Matches ciscal version 3.9.
+ *            Matches cisscal version 3.9.
  */
 void gbl::FindDustRingParameters() {
   //  No dustring or mottle correction for WAC
@@ -1071,7 +1071,7 @@ void gbl::FindDustRingParameters() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
  *            ShutterStateId to disable flat field correction.
- *            Matches ciscal version 3.9.
+ *            Matches cisscal version 3.9.
  */
 FileName gbl::FindFlatFile() {
   // Disable flat field correction if ShutterStateId is Disabled
@@ -1316,7 +1316,7 @@ void gbl::FindShutterOffset() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
  *            ShutterStateId. Updated solid angle and optics 
- *            area values. Matches ciscal version 3.9.
+ *            area values. Matches cisscal version 3.9.
  */
 void gbl::DivideByAreaPixel() {
   // Disable flat field correction if ShutterStateId is Disabled
@@ -1392,7 +1392,7 @@ void gbl::DivideByAreaPixel() {
  *            efficiency factor for intensity units.  Now, the
  *            method is not far off from the I/F method.
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
- *            ShutterStateId. Matches ciscal version 3.9.
+ *            ShutterStateId. Matches cisscal version 3.9.
  */
 
 void gbl::FindEfficiencyFactor(QString fluxunits) {
