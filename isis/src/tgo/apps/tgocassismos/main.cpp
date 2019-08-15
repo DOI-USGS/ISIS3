@@ -262,10 +262,7 @@ void IsisMain() {
     lab.addGroup(mos);
 
     lab.addGroup(archiveGroup);
-    //add orginal label blob to the output cube
-//    mosCube.write(org);
     mosCube.close();
-
   }
   catch(IException &e) {
     e.print();

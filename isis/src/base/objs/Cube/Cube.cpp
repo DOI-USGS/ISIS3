@@ -2134,34 +2134,47 @@ namespace Isis {
   }
 
 
-  /**
-   * TEST CUBE LABEL 
-   */
+/**
+ * Returns the latitude and longitude range for the Cube. More accurate than the minimum and 
+ * maximum latitude and longitude from the mapping group. 
+ * 
+ * @param minLatitude minimum latitude of the cube
+ * @param maxLatitude maximum latitude present in the cube
+ * @param minLongitude minimum longitude present in the cube
+ * @param maxLongitude maximum longitude present in the cube
+ */
   void Cube::latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude, double &
                          maxLongitude) {
     Camera *cam;
     TProjection *proj;
 
     bool isGood = false;
-    bool noCamera = true; // fixme? 
+    bool noCamera;
 
-    // setup camera or proj
+    if (hasGroup("Instrument")) {
+      noCamera = false;
+    }
+    else {
+      noCamera = true;
+    }
+
+    // setup camera or projection
     if (noCamera) {
      try {
        proj = (TProjection *) projection();
      }
      catch(IException &e) {
-       QString msg = "Mosaic files must contain mapping labels";
+       QString msg = "Cannot calculate lat/lon range without a camera or projection";
        throw IException(e, IException::User, msg, _FILEINFO_);
      }
     }
     else {
       try {
-      cam = camera();
+        cam = camera();
       }
       catch(IException &e) {
-      QString msg = "option is set to PROJECTION";
-      throw IException(e, IException::User, msg, _FILEINFO_);
+        QString msg = "Unable to create camera when calculating a lat/lon range.";
+        throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
 
@@ -2193,7 +2206,6 @@ namespace Isis {
           }
         
           // update mix/max lat/lons
-          // FIXME: what units/direction are longitudes / latitudes in? (180 360) 
           if (lat < minLatitude) {
             minLatitude = lat;
           }
@@ -2208,15 +2220,8 @@ namespace Isis {
             maxLongitude = lon; 
           }
         }
-        else{
-          std::cout << "Do nothing" << std::endl; 
-        }
       }
     }
-    std::cout << "max latitude: " << maxLatitude << std::endl;
-    std::cout << "min latitude: " << minLatitude << std::endl;
-    std::cout << "max longitude: " << maxLongitude << std::endl;
-    std::cout << "min longitude: " << minLongitude << std::endl;
   }
   
   /**

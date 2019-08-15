@@ -22,7 +22,7 @@ void IsisMain() {
 
   // Check if input file is indeed, a cube
   if (ui.GetFileName("FROM").right(3) != "cub") {
-  QString msg = "Input file [" + ui.GetFileName("FROM") +
+    QString msg = "Input file [" + ui.GetFileName("FROM") +
                 "] does not appear to be a cube";
     throw  IException(IException::User, msg, _FILEINFO_);
   }
@@ -101,20 +101,6 @@ void IsisMain() {
   // std PDS4 label
   process.StandardPds4Label();
 
-/*  process.addSchema("PDS4_PSA_EM16_CAS_1000.sch", 
-                    "PDS4_PSA_EM16_CAS_1000.xsd",
-                    "xmlns",
-                    "http://psa.esa.int/psa/em16/cas/v1");*/
-
-
-  // needed?
-/*  "PDS4_PSA_EM16_1000.xsd"
-  "PDS4_PSA_EM16_1000.sch"
-  "http://psa.esa.int/psa/em16/v1/" */
-
-
-
-
   // Add PSA-specific schema
   process.addSchema("PDS4_PSA_1000.xsd",
                     "xmlns:psa",
@@ -125,12 +111,6 @@ void IsisMain() {
                     "xmlns:cas",
                     "http://psa.esa.int/psa/em16/cas/v1");
  
-  // should be removed 
-  /*process.addSchema("CASSIS_1010.sch", 
-                    "CASSIS_1010.xsd",
-                    "xmlns:cas",
-                    "local");*/
-
   // Add geometry schema for mosaics
   if (label->findObject("IsisCube").hasGroup("Mosaic")) {
     process.addSchema("PDS4_GEOM_1B00_1610.sch", 
@@ -143,7 +123,6 @@ void IsisMain() {
   * Add additional pds label data here
   */
   QDomDocument &pdsLabel = process.GetLabel();
-
 
   // The default translation for for non-mosaicked output
   QString exportTranslationFile = "$tgo/translations/tgoCassisExport.trn"; 
@@ -160,7 +139,9 @@ void IsisMain() {
   ProcessExportPds4::translateUnits(pdsLabel);
   process.reorder(); 
   
-  // just go ahead and hand-remove the units here:
+  // Units are automatically translated for the focal length, and there is no way at this time to
+  // turn it off, but the cas:CASSIS_Data standard specifies that the focal-length output may not
+  // have units, so remove the units from cas:focal length. 
   QDomDocument &pdsLabelNext = process.GetLabel();
   QDomElement observationNode = pdsLabelNext.documentElement().firstChildElement("Observation_Area");
   QDomElement missionNode = observationNode.firstChildElement("Mission_Area");

@@ -165,6 +165,7 @@ namespace Isis {
    *   @history 2018-01-18 Summer Stapleton - Updated error message in ::create() to address when
    *                           an IsisPreference file cannot be found. Fixes #5145.
    *   @history 2018-11-16 Jesse Mapel - Made several methods virtual for mocking.
+   *   @history 2019-06-15 Kristin Berry - Added latLonRange method to return the valid lat/lon rage of the cube. The values in the mapping group are not sufficiently accurate for some purposes. 
    */
   class Cube {
     public:
