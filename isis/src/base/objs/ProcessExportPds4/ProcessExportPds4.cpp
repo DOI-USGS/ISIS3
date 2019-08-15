@@ -193,8 +193,6 @@ namespace Isis {
       QString msg = "Unable to translate and export standard image information.";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
-    // fixme: reorder here? idea = each "section" takes care of order within the section, 
-    // separate reorder reorders the whole sections? 
   }
 
 
@@ -792,7 +790,7 @@ namespace Isis {
   * Sets the description string which describes the pixel vales in 
   * File_Area_Observational 
   *  
-  * @param description 
+  * @param description Description of pixel values to use.
   */
   void ProcessExportPds4::setPixelDescription(QString description) {
     m_pixelDescription = description;
@@ -900,34 +898,35 @@ namespace Isis {
         elementArrayElement.appendChild(offsetElement);
       }
 
-      // Add the Special_Constants class to define ISIS special pixel values: 
+      // Add the Special_Constants class to define ISIS special pixel values if pixel type is
+      // Real 
+      if (p_pixelType == Isis::Real) {
+        QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants"); 
+        arrayImageElement.insertAfter(specialConstantElement,
+                                      arrayImageElement.lastChildElement("Axis_Array"));
 
-      // Assume 32-bit/Real for CaSSIS
-      QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants");
-      arrayImageElement.insertAfter(specialConstantElement,
-                                    arrayImageElement.lastChildElement("Axis_Array"));
+        QDomElement nullElement = m_domDoc->createElement("missing_constant");
 
-      QDomElement nullElement = m_domDoc->createElement("missing_constant");
+        PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL4, 'g', 18));
+        specialConstantElement.appendChild(nullElement);
 
-      PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL4, 'g', 18));
-      specialConstantElement.appendChild(nullElement);
+        QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+        PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT4, 'g', 18));
+        specialConstantElement.appendChild(highInstrumentSatElement);
 
-      QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
-      PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT4, 'g', 18));
-      specialConstantElement.appendChild(highInstrumentSatElement);
+        QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+        PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT4, 'g', 18));
+        specialConstantElement.appendChild(highRepresentationSatElement);
 
-      QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
-      PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT4, 'g', 18));
-      specialConstantElement.appendChild(highRepresentationSatElement);
+        QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+        PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT4, 'g', 18));
+        specialConstantElement.appendChild(lowInstrumentSatElement);
 
-      QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
-      PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT4, 'g', 18));
-      specialConstantElement.appendChild(lowInstrumentSatElement);
+        QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+        PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
+        specialConstantElement.appendChild(lowRepresentationSatElement);
+      }
 
-      QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
-      PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
-      specialConstantElement.appendChild(lowRepresentationSatElement);
-      // correct location?
       if (!m_pixelDescription.isEmpty()) {
         QDomElement descriptionElement = m_domDoc->createElement("description"); 
         PvlToXmlTranslationManager::setElementValue(descriptionElement,
@@ -961,7 +960,7 @@ namespace Isis {
     root.setAttribute("xsi:schemaLocation", m_schemaLocation);
   }
 
-  //todo: pull off second half of function call 3 arg version
+
   /**
    * Adds necessary information to the xml header for a pds4 class. 
    * 
@@ -1166,70 +1165,61 @@ namespace Isis {
       }
     }
 
-
-    // TODO: change here: 
-    // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
     QString lonDir = isisLonDir[0];
     lonDir = lonDir.toUpper();
-    if (inputMapping.hasKeyword("MaximumLongitude") && inputMapping.hasKeyword("MinimumLongitude")) {
-      //double maxLon = inputMapping.findKeyword("MaximumLongitude");
-      //double minLon = inputMapping.findKeyword("MinimumLongitude");
     
-      double maxLon, minLon, maxLat, minLat; 
-      InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon); 
-
-      // convert lon to 180 if needed
-      xmlPath.clear();
-      xmlPath << "Product_Observational"
-              << "Observation_Area" 
-              << "Discipline_Area"
-              << "cart:Cartography" 
-              << "cart:Spatial_Domain"
-              << "cart:Bounding_Coordinates";
-      QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
-      QDomElement eastElement = boundingCoordElement.firstChildElement("cart:east_bounding_coordinate");
-      QDomElement westElement = boundingCoordElement.firstChildElement("cart:west_bounding_coordinate");
-      QDomElement northElement = boundingCoordElement.firstChildElement("cart:north_bounding_coordinate");
-      QDomElement southElement = boundingCoordElement.firstChildElement("cart:south_bounding_coordinate");
-      // translation files currently handles Positive West case where east = min, west = max
-      // so if positive east, swap min/max
-      if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
-        // west min, east max
-        PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
-        PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
-      }
-      else {
-        PvlToXmlTranslationManager::resetElementValue(eastElement, toString(minLon), "deg");
-        PvlToXmlTranslationManager::resetElementValue(westElement, toString(maxLon), "deg");
-      }
-
-      PvlToXmlTranslationManager::resetElementValue(northElement, toString(maxLat), "deg");
-      PvlToXmlTranslationManager::resetElementValue(southElement, toString(minLat), "deg");
-    }
-
-    // also make longitude_of_central_meridian and latitude_of_projection_origin floats if they aren't already
+    // Add Lat/Lon range
+    double maxLon, minLon, maxLat, minLat; 
+    InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon); 
+    
     xmlPath.clear();
     xmlPath << "Product_Observational"
-      << "Observation_Area" 
-      << "Discipline_Area"
-      << "cart:Cartography" 
-      << "cart:Spatial_Reference_Information"
-      << "cart:Horizontal_Coordinate_System_Definition"
-      << "cart:Planar"
-      << "cart:Map_Projection";
+            << "Observation_Area" 
+            << "Discipline_Area"
+            << "cart:Cartography" 
+            << "cart:Spatial_Domain"
+            << "cart:Bounding_Coordinates";
+    QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
+    QDomElement eastElement = boundingCoordElement.firstChildElement("cart:east_bounding_coordinate");
+    QDomElement westElement = boundingCoordElement.firstChildElement("cart:west_bounding_coordinate");
+    QDomElement northElement = boundingCoordElement.firstChildElement("cart:north_bounding_coordinate");
+    QDomElement southElement = boundingCoordElement.firstChildElement("cart:south_bounding_coordinate");
 
+    // Translation files currently handles Positive West case where east = min, west = max
+    // so if positive east, swap min/max
+    if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
+      // west min, east max
+      PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
+      PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
+    }
+    else {
+      PvlToXmlTranslationManager::resetElementValue(eastElement, toString(minLon), "deg");
+      PvlToXmlTranslationManager::resetElementValue(westElement, toString(maxLon), "deg");
+    }
 
-    // UPDATING THIS DEPENDS ON WHICH PROJECTION WE ARE IN!!! Is the above "good enough"? 
-    // HERE
+    PvlToXmlTranslationManager::resetElementValue(northElement, toString(maxLat), "deg");
+    PvlToXmlTranslationManager::resetElementValue(southElement, toString(minLat), "deg");
+
+    // longitude_of_central_meridian and latitude_of_projection_origin need to be converted to floats.
+    xmlPath.clear();
+    xmlPath << "Product_Observational"
+            << "Observation_Area" 
+            << "Discipline_Area"
+            << "cart:Cartography" 
+            << "cart:Spatial_Reference_Information"
+            << "cart:Horizontal_Coordinate_System_Definition"
+            << "cart:Planar"
+            << "cart:Map_Projection";
+
+    // The following is necessary because the full xmlPath differs depending on the projection used.
     QDomElement projectionElement = getElement(xmlPath, baseElement);
     QDomElement tempElement = projectionElement.firstChildElement();
     QDomElement nameElement = tempElement.nextSiblingElement();
-//    std::cout << "NAME: " << nameElement.tagName() << std::endl; 
+
     QDomElement longitudeElement = nameElement.firstChildElement("cart:longitude_of_central_meridian"); 
     QDomElement originElement = nameElement.firstChildElement("cart:latitude_of_projection_origin");
-//    std::cout << "LONELT: " << longitudeElement.tagName() << std::endl;
-//    std::cout << "ORIELT: " << originElement.tagName() << std::endl;
+
     double longitudeElementValue = longitudeElement.text().toDouble(); 
     double originElementValue = originElement.text().toDouble(); 
     QString toset1 = QString::number(longitudeElementValue, 'g');
@@ -1241,7 +1231,6 @@ namespace Isis {
       toset2 = toset2 + ".0"; 
     }
     PvlToXmlTranslationManager::resetElementValue(longitudeElement, toset1, "deg"); 
-    // update .trn of LatitudeOfProjectionOrigin to 0.0 in every mapping .trn
     PvlToXmlTranslationManager::resetElementValue(originElement, toset2, "deg");
   }
 
