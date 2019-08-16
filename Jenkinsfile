@@ -5,7 +5,7 @@ node {
             sh 'git clone https://github.com/abseil/googletest.git gtest'
         }
 
-        stage ("Build) {
+        stage ("Build") {
             conda config --prepend channels anaconda
             conda config --append channels conda-forge
             conda config --append channels usgs-astrogeology
