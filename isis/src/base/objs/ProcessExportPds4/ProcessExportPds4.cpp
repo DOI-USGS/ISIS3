@@ -225,7 +225,7 @@ namespace Isis {
           }
           else {
             QString timeValue = startTime.text();
-            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
+            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z"); 
           }
           QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
           if (stopTime.text() == "") {
@@ -306,7 +306,9 @@ namespace Isis {
           }
           else {
             QString timeValue = startTime.text();
-            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
+            if (!timeValue.contains("Z")) {
+              PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z"); 
+            }
           }
 
           QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
@@ -315,7 +317,9 @@ namespace Isis {
           }
           else {
             QString timeValue = stopTime.text();
-            PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
+            if (!timeValue.contains("Z")) {
+              PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z"); 
+            }
           }
           QStringList xmlPath;
           xmlPath << "Product_Observational"
