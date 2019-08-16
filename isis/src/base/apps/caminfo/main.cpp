@@ -63,6 +63,12 @@ void IsisMain() {
   Process p;
   Cube *incube = p.SetInputCube("FROM");
 
+  if (incube->hasGroup("Mapping")) {
+    QString msg = "Caminfo expects a level 1 input cube. For more information, see:\n"
+    "https://isis.astrogeology.usgs.gov/documents/Glossary/Glossary.html#Level1";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
   // General data gathering
   general = new QList< QPair<QString, QString> >;
   general->append(MakePair("Program",     caminfo_program));
@@ -248,7 +254,7 @@ void IsisMain() {
         bandGeom->setMaxEmission(maxema);
       }
     }
-    
+
     bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
 
     // Check if the user requires valid image center geometry
@@ -427,7 +433,7 @@ void GenerateCSVOutput(Cube *incube,
   if (not appending) {
     keys.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
     outFile << keys << endl;
-  } 
+  }
   values.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
   outFile << values << endl;
   outFile.close();

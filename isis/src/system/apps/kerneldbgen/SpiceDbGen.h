@@ -31,6 +31,7 @@
 #include <SpiceUsr.h>
 
 #include "FileName.h"
+#include "FileList.h"
 #include "IException.h"
 #include "IString.h"
 #include "KernelDb.h"
@@ -51,7 +52,9 @@
  *                            to this class: m_coverageLevel, setCoverageLevel, and this class will
  *                            now select spice "time intervals" at the level specified. This is
  *                            either a SPICE Segment (coarse) or a SPICE interval (fine.)
- *                            Fixes #5410. 
+ *                            Fixes #5410.
+ *   @history 2019-08-13 Jesse Mapel - Added the ability to pass an explicit lsit
+ *                           of files to the Direct method. Fixes #3390.
  *
  */
 class SpiceDbGen {
@@ -60,9 +63,11 @@ class SpiceDbGen {
     SpiceDbGen(QString type);
     Isis::PvlObject Direct(QString quality, QString location,
                            std::vector<QString> & filter, double startOffset, double endOffset);
+    Isis::PvlObject Direct(QString quality, Isis::FileList fileList,
+                           double startOffset, double endOffset);
     void FurnishDependencies(QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
                              QList<Isis::FileName> extras);
-    void setCoverageLevel(QString level); 
+    void setCoverageLevel(QString level);
 
   private:
     QStringList GetFiles(Isis::FileName location, QString filter);

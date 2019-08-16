@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QString>
 #include <QStringList>
+#include <QVector>
 
 #include "BundleImage.h"
 #include "BundleObservationSolveSettings.h"
@@ -40,7 +41,7 @@ namespace Isis {
    * Constructs a BundleObservation from an BundleImage, an instrument id, an observation
    * number to assign to this BundleObservation, and a target body.
    *
-   * @param image QSharedPointer to the primary image in the observation  
+   * @param image QSharedPointer to the primary image in the observation
    * @param observationNumber Observation number of the observation
    * @param instrumentId Id of the instrument for the observation
    * @param bundleTargetBody QSharedPointer to the target body of the observation
@@ -75,11 +76,11 @@ namespace Isis {
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
-      m_instrumentPosition = (image->camera() ? 
+      m_instrumentPosition = (image->camera() ?
                                (image->camera()->instrumentPosition() ?
                                  image->camera()->instrumentPosition() : NULL)
                                : NULL);
-      m_instrumentRotation = (image->camera() ? 
+      m_instrumentRotation = (image->camera() ?
                                (image->camera()->instrumentRotation() ?
                                   image->camera()->instrumentRotation() : NULL)
                                : NULL);
@@ -156,9 +157,9 @@ namespace Isis {
    * Appends a BundleImage shared pointer to the BundleObservation.
    * If the pointer is valid, then the BundleImage and its serial number will be inserted into
    * the serial number to BundleImage map.
-   * 
+   *
    * @param value The BundleImage to be appended.
-   * 
+   *
    * @see QVector::append()
    */
   void BundleObservation::append(const BundleImageQsp &value) {
@@ -172,9 +173,9 @@ namespace Isis {
   /**
    * Returns the BundleImage shared pointer associated with the given serial number.
    * If no BundleImage with that serial number is contained a NULL pointer is returned.
-   * 
+   *
    * @param cubeSerialNumber The serial number of the cube to be returned.
-   * 
+   *
    * @return @b BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
    */
   BundleImageQsp BundleObservation::imageByCubeSerialNumber(QString cubeSerialNumber) {
@@ -196,7 +197,7 @@ namespace Isis {
    * @return @b bool Returns true if settings were successfully set
    *
    * @internal
-   *   @todo initParameterWeights() doesn't return false, so this methods always 
+   *   @todo initParameterWeights() doesn't return false, so this methods always
    *         returns true.
    */
   bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
@@ -255,7 +256,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the instrument's spice position 
+   * Accesses the instrument's spice position
    *
    * @return @b SpicePosition* Returns the SpicePosition for this observation
    */
@@ -266,7 +267,7 @@ namespace Isis {
 
   /**
    * Accesses the solve parameter weights
-   * 
+   *
    * @return @b LinearAlgebra::Vector Returns the parameter weights for solving
    */
   LinearAlgebra::Vector &BundleObservation::parameterWeights() {
@@ -275,7 +276,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the parameter corrections 
+   * Accesses the parameter corrections
    *
    * @return @b LinearAlgebra::Vector Returns the parameter corrections
    */
@@ -286,7 +287,7 @@ namespace Isis {
 
   /**
    * @internal
-   *   @todo 
+   *   @todo
    */
 //  LinearAlgebra::Vector &BundleObservation::parameterSolution() {
 //    return m_solution;
@@ -304,7 +305,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the adjusted sigmas 
+   * Accesses the adjusted sigmas
    *
    * @return @b LinearAlgebra::Vector Returns the adjusted sigmas
    */
@@ -319,13 +320,13 @@ namespace Isis {
    * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
    *                                                    settings for this BundleObservation
    */
-  const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() { 
+  const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() {
     return m_solveSettings;
   }
 
 
   /**
-   * Initializes the exterior orientation 
+   * Initializes the exterior orientation
    *
    * @return @b bool Returns true upon successful intialization
    *
@@ -413,7 +414,7 @@ namespace Isis {
 
 
   /**
-   * Intializes the body rotation 
+   * Intializes the body rotation
    *
    * @todo check to make sure m_bundleTargetBody is valid
    */
@@ -424,13 +425,13 @@ namespace Isis {
 
     for (int i = 0; i < size(); i++) {
       BundleImageQsp image = at(i);
-      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);      
+      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
 
 
   /**
-   * Updates the body rotation 
+   * Updates the body rotation
    *
    * @internal
    *   @todo Is this a duplicate of initializeBodyRotation?
@@ -497,10 +498,10 @@ namespace Isis {
 
   /**
    * Initializes the paramater weights for solving
-   * 
+   *
    * @return @b bool Returns true upon successful intialization
    *
-   * @internal  
+   * @internal
    *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
    *         By the way, this seems klunky to me, would like to come up with a better way.
    *         Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
@@ -600,11 +601,11 @@ namespace Isis {
 
 
   /**
-   * Applies the parameter corrections 
+   * Applies the parameter corrections
    *
    * @param corrections Vector of corrections to apply
    *
-   * @throws IException::Unknown "Instrument position is NULL, but position solve option is 
+   * @throws IException::Unknown "Instrument position is NULL, but position solve option is
    *                              [not NoPositionFactors]"
    * @throws IException::Unknown "Instrument position is NULL, but pointing solve option is
    *                              [not NoPointingFactors]"
@@ -614,7 +615,7 @@ namespace Isis {
    *
    * @internal
    *   @todo always returns true?
-   */  
+   */
   bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
 
     int index = 0;
@@ -716,7 +717,7 @@ namespace Isis {
       // update corrections
       m_corrections += corrections;
 
-    } 
+    }
     catch (IException &e) {
       QString msg = "Unable to apply parameter corrections to BundleObservation.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -782,59 +783,401 @@ namespace Isis {
     return m_index;
   }
 
+  /**
+ * @brief Creates and returns a formatted QString representing the bundle coefficients and
+ * parameters
+ *
+ * @depricated The function formatBundleOutputString is depricated as of ISIS 3.9
+ * and will be removed in ISIS 4.0
+ *
+ * @param errorPropagation Boolean indicating whether or not to attach more information
+ *     (corrections, sigmas, adjusted sigmas...) to the output QString
+ * @param imageCSV Boolean which is set to true if the function is being
+ *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
+ *     for backwards compatibility.
+ *
+ * @return @b QString Returns a formatted QString representing the BundleObservation
+ *
+ * @internal
+ *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
+ *                           not being solved. Fixes #4464.
+ */
+QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
+
+  std::cerr << "The function formatBundleOutputString is depricated as of ISIS 3.9"
+               "and will be removed in ISIS 4.0" << std::endl;
+
+  std::vector<double> coefX;
+  std::vector<double> coefY;
+  std::vector<double> coefZ;
+  std::vector<double> coefRA;
+  std::vector<double> coefDEC;
+  std::vector<double> coefTWI;
+
+  int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
+  int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+
+  // Indicate if we need to obtain default position or pointing values
+  bool useDefaultPosition = false;
+  bool useDefaultPointing = false;
+  // Indicate if we need to use default values when not solving twist
+  bool useDefaultTwist = !(m_solveSettings->solveTwist());
+
+  // If we aren't solving for position, set the number of coefficients to 1 so we can output the
+  // instrumentPosition's center coordinate values for X, Y, and Z
+  if (nPositionCoefficients == 0) {
+    nPositionCoefficients = 1;
+    useDefaultPosition = true;
+  }
+  // If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
+  // instrumentPointing's center angles for RA, DEC, and TWI
+  if (nPointingCoefficients == 0) {
+    nPointingCoefficients = 1;
+    useDefaultPointing = true;
+  }
+
+  // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
+  // so we can always output a value for them
+  int nPositionParameters = 3 * nPositionCoefficients;
+  int nPointingParameters = 3 * nPointingCoefficients;
+  int nParameters = nPositionParameters + nPointingParameters;
+
+  coefX.resize(nPositionCoefficients);
+  coefY.resize(nPositionCoefficients);
+  coefZ.resize(nPositionCoefficients);
+  coefRA.resize(nPointingCoefficients);
+  coefDEC.resize(nPointingCoefficients);
+  coefTWI.resize(nPointingCoefficients);
+
+  if (m_instrumentPosition) {
+    if (!useDefaultPosition) {
+      m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
+    }
+    // Use the position's center coordinate if not solving for spacecraft position
+    else {
+      const std::vector<double> centerCoord = m_instrumentPosition->GetCenterCoordinate();
+      coefX[0] = centerCoord[0];
+      coefY[0] = centerCoord[1];
+      coefZ[0] = centerCoord[2];
+    }
+  }
+
+  if (m_instrumentRotation) {
+    if (!useDefaultPointing) {
+      m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+    }
+    // Use the pointing's center angles if not solving for pointing (rotation)
+    else {
+      const std::vector<double> centerAngles = m_instrumentRotation->GetCenterAngles();
+      coefRA[0] = centerAngles[0];
+      coefDEC[0] = centerAngles[1];
+      coefTWI[0] = centerAngles[2];
+    }
+  }
+
+  // for convenience, create vectors of parameters names and values in the correct sequence
+  std::vector<double> finalParameterValues;
+  QStringList parameterNamesList;
+
+  if (!imageCSV) {
+
+    QString str("%1(t%2)");
+
+    if (nPositionCoefficients > 0) {
+      for (int i = 0; i < nPositionCoefficients; i++) {
+        finalParameterValues.push_back(coefX[i]);
+        if (i == 0)
+          parameterNamesList.append( str.arg("  X  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
+      }
+      for (int i = 0; i < nPositionCoefficients; i++) {
+        finalParameterValues.push_back(coefY[i]);
+        if (i == 0)
+          parameterNamesList.append( str.arg("  Y  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
+      }
+      for (int i = 0; i < nPositionCoefficients; i++) {
+        finalParameterValues.push_back(coefZ[i]);
+        if (i == 0)
+          parameterNamesList.append( str.arg("  Z  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
+      }
+    }
+    if (nPointingCoefficients > 0) {
+      for (int i = 0; i < nPointingCoefficients; i++) {
+        finalParameterValues.push_back(coefRA[i] * RAD2DEG);
+        if (i == 0)
+          parameterNamesList.append( str.arg(" RA  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
+      }
+      for (int i = 0; i < nPointingCoefficients; i++) {
+        finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
+        if (i == 0)
+          parameterNamesList.append( str.arg("DEC  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
+      }
+      for (int i = 0; i < nPointingCoefficients; i++) {
+        finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+        if (i == 0)
+          parameterNamesList.append( str.arg("TWI  ").arg("0") );
+        else
+          parameterNamesList.append( str.arg("     ").arg(i) );
+      }
+    }
+
+  }// end if(!imageCSV)
+
+  else {
+    if (nPositionCoefficients > 0) {
+      for (int i = 0; i < nPositionCoefficients; i++) {
+        finalParameterValues.push_back(coefX[i]);
+      }
+      for (int i = 0; i < nPositionCoefficients; i++) {
+        finalParameterValues.push_back(coefY[i]);
+      }
+      for (int i = 0; i < nPositionCoefficients; i++) {
+        finalParameterValues.push_back(coefZ[i]);
+      }
+    }
+    if (nPointingCoefficients > 0) {
+      for (int i = 0; i < nPointingCoefficients; i++) {
+        finalParameterValues.push_back(coefRA[i] * RAD2DEG);
+      }
+      for (int i = 0; i < nPointingCoefficients; i++) {
+        finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
+      }
+      for (int i = 0; i < nPointingCoefficients; i++) {
+        finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
+      }
+    }
+  }//end else
+
+  // Save the list of parameter names we've accumulated above
+  m_parameterNamesList = parameterNamesList;
+
+  QString finalqStr = "";
+  QString qStr = "";
+
+  // Set up default values when we are using default position
+  QString sigma = "N/A";
+  QString adjustedSigma = "N/A";
+  double correction = 0.0;
+
+  // this implies we're writing to bundleout.txt
+  if (!imageCSV) {
+    // position parameters
+    for (int i = 0; i < nPositionParameters; i++) {
+      // If not using the default position, we can correctly access sigmas and corrections
+      // members
+      if (!useDefaultPosition) {
+        correction = m_corrections(i);
+        adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+      }
+      if (errorPropagation) {
+        qStr = QString("%1%2%3%4%5%6\n").
+        arg( parameterNamesList.at(i) ).
+        arg(finalParameterValues[i] - correction, 17, 'f', 8).
+        arg(correction, 21, 'f', 8).
+        arg(finalParameterValues[i], 20, 'f', 8).
+        arg(sigma, 18).
+        arg(adjustedSigma, 18);
+      }
+      else {
+        qStr = QString("%1%2%3%4%5%6\n").
+        arg( parameterNamesList.at(i) ).
+        arg(finalParameterValues[i] - correction, 17, 'f', 8).
+        arg(correction, 21, 'f', 8).
+        arg(finalParameterValues[i], 20, 'f', 8).
+        arg(sigma, 18).
+        arg("N/A", 18);
+      }
+      finalqStr += qStr;
+    }
+
+    // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
+    // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
+    // according to which parameters are solved
+    int offset = 0;
+    if (useDefaultPosition) {
+      offset = 3;
+    }
+    // pointing parameters
+    for (int i = nPositionParameters; i < nParameters; i++) {
+      if (!useDefaultPointing) {
+        // If solving camera and not solving for twist, provide default values for twist to
+        // prevent bad indexing into m_corrections and m_*sigmas
+        // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
+        if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+          correction = 0.0;
+          adjustedSigma = "N/A";
+          sigma = "N/A";
+        }
+        else {
+          correction = m_corrections(i - offset);
+          adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
+                  toString(m_aprioriSigmas[i-offset], 8) );
+        }
+      }
+      // We are using default pointing, so provide default correction and sigma values to output
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+      if (errorPropagation) {
+        qStr = QString("%1%2%3%4%5%6\n").
+        arg( parameterNamesList.at(i) ).
+        arg( (finalParameterValues[i] - correction * RAD2DEG), 17, 'f', 8).
+        arg(correction * RAD2DEG, 21, 'f', 8).
+        arg(finalParameterValues[i], 20, 'f', 8).
+        arg(sigma, 18).
+        arg(adjustedSigma, 18);
+      }
+      else {
+        qStr = QString("%1%2%3%4%5%6\n").
+        arg( parameterNamesList.at(i) ).
+        arg( (finalParameterValues[i] - correction * RAD2DEG), 17, 'f', 8).
+        arg(correction * RAD2DEG, 21, 'f', 8).
+        arg(finalParameterValues[i], 20, 'f', 8).
+        arg(sigma, 18).
+        arg("N/A", 18);
+      }
+      finalqStr += qStr;
+    }
+
+  }
+  // this implies we're writing to images.csv
+  else {
+    // position parameters
+    for (int i = 0; i < nPositionParameters; i++) {
+      if (!useDefaultPosition) {
+        correction = m_corrections(i);
+        adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+      }
+      // Provide default values for position if not solving position
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+      qStr = "";
+      if (errorPropagation) {
+        qStr += toString(finalParameterValues[i] - correction) + ",";
+        qStr += toString(correction) + ",";
+        qStr += toString(finalParameterValues[i]) + ",";
+        qStr += sigma + ",";
+        qStr += adjustedSigma + ",";
+      }
+      else {
+        qStr += toString(finalParameterValues[i] - correction) + ",";
+        qStr += toString(correction) + ",";
+        qStr += toString(finalParameterValues[i]) + ",";
+        qStr += sigma + ",";
+        qStr += "N/A,";
+      }
+      finalqStr += qStr;
+    }
+
+    // If not solving position, we need to offset access to correction and sigma members by -3
+    // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
+    // solved
+    int offset = 0;
+    if (useDefaultPosition) {
+      offset = 3;
+    }
+    // pointing parameters
+    for (int i = nPositionParameters; i < nParameters; i++) {
+      if (!useDefaultPointing) {
+        // Use default values if solving camera but not solving for TWIST to prevent bad indexing
+        // into m_corrections and m_*sigmas
+        if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
+          correction = 0.0;
+          adjustedSigma = "N/A";
+          sigma = "N/A";
+        }
+        else {
+          correction = m_corrections(i - offset);
+          adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
+              toString(m_aprioriSigmas[i-offset], 8) );
+        }
+      }
+      // Provide default values for pointing if not solving pointing
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+      qStr = "";
+      if (errorPropagation) {
+        qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+        qStr += toString(correction * RAD2DEG) + ",";
+        qStr += toString(finalParameterValues[i]) + ",";
+        qStr += sigma + ",";
+        qStr += adjustedSigma + ",";
+      }
+      else {
+        qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
+        qStr += toString(correction * RAD2DEG) + ",";
+        qStr += toString(finalParameterValues[i]) + ",";
+        qStr += sigma + ",";
+        qStr += "N/A,";
+      }
+      finalqStr += qStr;
+    }
+  }
+
+  return finalqStr;
+}
+
 
   /**
-   * @brief Creates and returns a formatted QString representing the bundle coefficients and
-   * parameters
-   *
-   * @param errorPropagation Boolean indicating whether or not to attach more information
-   *     (corrections, sigmas, adjusted sigmas...) to the output QString
-   * @param imageCSV Boolean which is set to true if the function is being
-   *     called from BundleSolutionInfo::outputImagesCSV().  It is set to false by default
-   *     for backwards compatibility.
-   *
-   * @return @b QString Returns a formatted QString representing the BundleObservation
-   *
-   * @internal
-   *   @history 2016-10-26 Ian Humphrey - Default values are now provided for parameters that are
-   *                           not being solved. Fixes #4464.
-   */
-  QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool imageCSV) {
+  * @brief Fetches data for the log file output methods.
+  *
+  * @param finalParameterValues Reference to QVector<double> of calculated
+  * position and pointing
+  * @param nPositionCoefficients Reference to int of the number of position coefficients
+  * @param nPointingCoefficients Reference to int of the number of pointing coefficients
+  * @param useDefaultPosition Reference to boolean of whether to use default position
+  * @param useDefaultPointing Reference to boolean of whether to use default pointing
+  * @param useDefaultTwist Reference to bollean of whether to use defualt twist
+  */
+  void BundleObservation::bundleOutputFetchData(QVector<double> &finalParameterValues,
+                          int &nPositionCoefficients, int &nPointingCoefficients,
+                          bool &useDefaultPosition,
+                          bool &useDefaultPointing, bool &useDefaultTwist) {
 
-    std::vector<double> coefX;
-    std::vector<double> coefY;
-    std::vector<double> coefZ;
-    std::vector<double> coefRA;
-    std::vector<double> coefDEC;
-    std::vector<double> coefTWI;
-
-    int nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
-    int nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
+    std::vector<double> coefX,coefY,coefZ,coefRA,coefDEC,coefTWI;
+    nPositionCoefficients = m_solveSettings->numberCameraPositionCoefficientsSolved();
+    nPointingCoefficients = m_solveSettings->numberCameraAngleCoefficientsSolved();
 
     // Indicate if we need to obtain default position or pointing values
-    bool useDefaultPosition = false;
-    bool useDefaultPointing = false;
+    useDefaultPosition = false;
+    useDefaultPointing = false;
     // Indicate if we need to use default values when not solving twist
-    bool useDefaultTwist = !(m_solveSettings->solveTwist());
+    useDefaultTwist = !(m_solveSettings->solveTwist());
 
-    // If we aren't solving for position, set the number of coefficients to 1 so we can output the
-    // instrumentPosition's center coordinate values for X, Y, and Z
+    // If we aren't solving for position, set the number of coefficients to 1 so we
+    // can output the instrumentPosition's center coordinate values for X, Y, and Z
     if (nPositionCoefficients == 0) {
       nPositionCoefficients = 1;
       useDefaultPosition = true;
     }
-    // If we arent' solving for pointing, set the number of coefficients to 1 so we can output the
-    // instrumentPointing's center angles for RA, DEC, and TWI
+
+    // If we arent' solving for pointing, set the number of coefficients to 1 so we
+    // can output the instrumentPointing's center angles for RA, DEC, and TWI
     if (nPointingCoefficients == 0) {
       nPointingCoefficients = 1;
       useDefaultPointing = true;
     }
-
-    // Force number of position and pointing parameters to each be 3 (X,Y,Z; RA,DEC,TWI)
-    // so we can always output a value for them
-    int nPositionParameters = 3 * nPositionCoefficients;
-    int nPointingParameters = 3 * nPointingCoefficients;
-    int nParameters = nPositionParameters + nPointingParameters;
 
     coefX.resize(nPositionCoefficients);
     coefY.resize(nPositionCoefficients);
@@ -845,7 +1188,7 @@ namespace Isis {
 
     if (m_instrumentPosition) {
       if (!useDefaultPosition) {
-        m_instrumentPosition->GetPolynomial(coefX, coefY, coefZ);
+        m_instrumentPosition->GetPolynomial(coefX,coefY,coefZ);
       }
       // Use the position's center coordinate if not solving for spacecraft position
       else {
@@ -858,7 +1201,7 @@ namespace Isis {
 
     if (m_instrumentRotation) {
       if (!useDefaultPointing) {
-        m_instrumentRotation->GetPolynomial(coefRA, coefDEC, coefTWI);
+        m_instrumentRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
       }
       // Use the pointing's center angles if not solving for pointing (rotation)
       else {
@@ -869,264 +1212,354 @@ namespace Isis {
       }
     }
 
+    // Combine all vectors into one
+    if (nPositionCoefficients > 0) {
+      for (int i=0; i < nPositionCoefficients; i++) {
+        finalParameterValues.append(coefX[i]);
+      }
+      for (int i=0; i < nPositionCoefficients; i++) {
+        finalParameterValues.append(coefY[i]);
+      }
+      for (int i=0; i < nPositionCoefficients; i++) {
+        finalParameterValues.append(coefZ[i]);
+      }
+    }
+    if (nPointingCoefficients > 0) {
+      for (int i=0; i < nPointingCoefficients; i++) {
+        finalParameterValues.append(coefRA[i]);
+      }
+      for (int i=0; i < nPointingCoefficients; i++) {
+        finalParameterValues.append(coefDEC[i]);
+      }
+      for (int i=0; i < nPointingCoefficients; i++) {
+        finalParameterValues.append(coefTWI[i]);
+      }
+    }
+
+  }
+
+
+  /**
+   * @brief Takes in an open std::ofstream and writes out information which goes into the
+   * bundleout.txt file.
+   *
+   * @param fpOut The open std::ofstream object which is passed in from
+   * BundleSolutionInfo::outputText()
+   * @param errorPropagation Boolean indicating whether or not to attach more information
+   *     (corrections, sigmas, adjusted sigmas...) to the output.
+   */
+  void BundleObservation::bundleOutputString(std::ostream &fpOut, bool errorPropagation) {
+
+    char buf[4096];
+
+    QVector<double> finalParameterValues;
+    int nPositionCoefficients, nPointingCoefficients;
+    bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
+
+    bundleOutputFetchData(finalParameterValues,
+                          nPositionCoefficients,nPointingCoefficients,
+                          useDefaultPosition,useDefaultPointing,useDefaultTwist);
+
+    int nPositionParameters = 3 * nPositionCoefficients;
+    int nPointingParameters = 3 * nPointingCoefficients;
+    int nParameters = nPositionParameters + nPointingParameters;
+
     // for convenience, create vectors of parameters names and values in the correct sequence
-    std::vector<double> finalParameterValues;
-    QStringList parameterNamesList;
+    QStringList parameterNamesListX,parameterNamesListY,parameterNamesListZ,
+        parameterNamesListRA,parameterNamesListDEC,parameterNamesListTWI,
+        parameterNamesList;
+    QStringList correctionUnitListX,correctionUnitListY,correctionUnitListZ,
+        correctionUnitListRA,correctionUnitListDEC,correctionUnitListTWI,
+        correctionUnitList;
 
-    if (!imageCSV) {
+    QString str("%1(%2)  ");
 
-      QString str("%1(t%2)");
+    if (nPositionCoefficients > 0) {
+      for (int j = 0; j < nPositionCoefficients;j++) {
+        if (j == 0) {
+          parameterNamesListX.append(str.arg("  X  ").arg("km"));
+          parameterNamesListY.append(str.arg("  Y  ").arg("km"));
+          parameterNamesListZ.append(str.arg("  Z  ").arg("km"));
+          correctionUnitListX.append("m");
+          correctionUnitListY.append("m");
+          correctionUnitListZ.append("m");
+        } //end inner-if
 
-      if (nPositionCoefficients > 0) {
-        for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefX[i]);
-          if (i == 0)
-            parameterNamesList.append( str.arg("  X  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+        else if (j==1) {
+          parameterNamesListX.append( str.arg("     ").arg("km/s") );
+          parameterNamesListY.append( str.arg("     ").arg("km/s") );
+          parameterNamesListZ.append( str.arg("     ").arg("km/s") );
+          correctionUnitListX.append("m/s");
+          correctionUnitListY.append("m/s");
+          correctionUnitListZ.append("m/s");
         }
-        for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefY[i]);
-          if (i == 0)
-            parameterNamesList.append( str.arg("  Y  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
+        else {
+          parameterNamesListX.append(str.arg("     ").arg("km/s^"+toString(j) ) );
+          parameterNamesListY.append(str.arg("     ").arg("km/s^"+toString(j) ) );
+          parameterNamesListZ.append(str.arg("     ").arg("km/s^"+toString(j) ) );
+          correctionUnitListX.append("m/s^"+toString(j));
+          correctionUnitListY.append("m/s^"+toString(j));
+          correctionUnitListZ.append("m/s^"+toString(j));
         }
-        for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefZ[i]);
-          if (i == 0)
-            parameterNamesList.append( str.arg("  Z  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-      }
-      if (nPointingCoefficients > 0) {
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-          if (i == 0)
-            parameterNamesList.append( str.arg(" RA  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-          if (i == 0)
-            parameterNamesList.append( str.arg("DEC  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-          if (i == 0)
-            parameterNamesList.append( str.arg("TWI  ").arg("0") );
-          else
-            parameterNamesList.append( str.arg("     ").arg(i) );
-        }
-      }
+      }//end for
+    }//end outer-if
 
-    }// end if(!imageCSV)
+    if (nPointingCoefficients > 0) {
+      for (int j = 0; j < nPointingCoefficients;j++) {
+        if (j == 0) {
+          parameterNamesListRA.append(str.arg(" RA  ").arg("dd"));
+          parameterNamesListDEC.append(str.arg("DEC  ").arg("dd"));
+          parameterNamesListTWI.append(str.arg("TWI  ").arg("dd"));
+          correctionUnitListRA.append("dd");
+          correctionUnitListDEC.append("dd");
+          correctionUnitListTWI.append("dd");
+        } //end inner-if
 
-    else {
-      if (nPositionCoefficients > 0) {
-        for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefX[i]);
+        else if (j==1) {
+          parameterNamesListRA.append( str.arg("     ").arg("dd/s") );
+          parameterNamesListDEC.append( str.arg("     ").arg("dd/s") );
+          parameterNamesListTWI.append( str.arg("     ").arg("dd/s") );
+          correctionUnitListRA.append("dd/s");
+          correctionUnitListDEC.append("dd/s");
+          correctionUnitListTWI.append("dd/s");
         }
-        for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefY[i]);
+        else {
+          parameterNamesListRA.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
+          parameterNamesListDEC.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
+          parameterNamesListTWI.append(str.arg("     ").arg("dd/s^"+toString(j) ) );
+          correctionUnitListRA.append("dd/s^"+toString(j));
+          correctionUnitListDEC.append("dd/s^"+toString(j));
+          correctionUnitListTWI.append("dd/s^"+toString(j));
         }
-        for (int i = 0; i < nPositionCoefficients; i++) {
-          finalParameterValues.push_back(coefZ[i]);
-        }
-      }
-      if (nPointingCoefficients > 0) {
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefRA[i] * RAD2DEG);
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefDEC[i] * RAD2DEG);
-        }
-        for (int i = 0; i < nPointingCoefficients; i++) {
-          finalParameterValues.push_back(coefTWI[i] * RAD2DEG);
-        }
-      }
-    }//end else
+      }//end for
+    }// end outer-if
+
+     //Put all of the parameter names together into one QStringList
+    parameterNamesList.append(parameterNamesListX);
+    parameterNamesList.append(parameterNamesListY);
+    parameterNamesList.append(parameterNamesListZ);
+    parameterNamesList.append(parameterNamesListRA);
+    parameterNamesList.append(parameterNamesListDEC);
+    parameterNamesList.append(parameterNamesListTWI);
+
+    //Put all of the correction unit names together into one QStringList
+    correctionUnitList.append(correctionUnitListX);
+    correctionUnitList.append(correctionUnitListY);
+    correctionUnitList.append(correctionUnitListZ);
+    correctionUnitList.append(correctionUnitListDEC);
+    correctionUnitList.append(correctionUnitListRA);
+    correctionUnitList.append(correctionUnitListTWI);
 
     // Save the list of parameter names we've accumulated above
     m_parameterNamesList = parameterNamesList;
-
-    QString finalqStr = "";
-    QString qStr = "";
 
     // Set up default values when we are using default position
     QString sigma = "N/A";
     QString adjustedSigma = "N/A";
     double correction = 0.0;
 
-    // this implies we're writing to bundleout.txt
-    if (!imageCSV) {
-      // position parameters
-      for (int i = 0; i < nPositionParameters; i++) {
-        // If not using the default position, we can correctly access sigmas and corrections
-        // members
-        if (!useDefaultPosition) {
-          correction = m_corrections(i);
-          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
-        }
-        if (errorPropagation) {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg(finalParameterValues[i] - correction, 17, 'f', 8).
-          arg(correction, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg(adjustedSigma, 18);
-        }
-        else {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg(finalParameterValues[i] - correction, 17, 'f', 8).
-          arg(correction, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg("N/A", 18);
-        }
-        finalqStr += qStr;
+    // position parameters
+    for (int i = 0; i < nPositionParameters; i++) {
+      // If not using the default position, we can correctly access sigmas and corrections
+      // members
+      if (!useDefaultPosition) {
+        correction = m_corrections(i);
+        adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
       }
 
-      // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
-      // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
-      // according to which parameters are solved
-      int offset = 0;
-      if (useDefaultPosition) {
-        offset = 3;
+      sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",correction);
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
+      if (errorPropagation) {
+        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
       }
-      // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {
-        if (!useDefaultPointing) {
-          // If solving camera and not solving for twist, provide default values for twist to
-          // prevent bad indexing into m_corrections and m_*sigmas
-          // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
-          if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
-            correction = 0.0;
-            adjustedSigma = "N/A";
-            sigma = "N/A";
-          }
-          else {
-            correction = m_corrections(i - offset);
-            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-            sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
-                    toString(m_aprioriSigmas[i-offset], 8) );
-          }
-        }
-        // We are using default pointing, so provide default correction and sigma values to output
-        else {
+      else {
+        sprintf(buf,"%s","N/A");
+      }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
+    }
+
+    // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
+    // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
+    // according to which parameters are solved
+    int offset = 0;
+    if (useDefaultPosition) {
+      offset = 3;
+    }
+
+    // pointing parameters
+    for (int i = nPositionParameters; i < nParameters; i++) {
+      if (!useDefaultPointing) {
+        // If solving camera and not solving for twist, provide default values for twist to
+        // prevent bad indexing into m_corrections and m_*sigmas
+        // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
+        if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
           correction = 0.0;
           adjustedSigma = "N/A";
           sigma = "N/A";
         }
-        if (errorPropagation) {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg( (finalParameterValues[i] - correction * RAD2DEG), 17, 'f', 8).
-          arg(correction * RAD2DEG, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg(adjustedSigma, 18);
-        }
         else {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg( (finalParameterValues[i] - correction * RAD2DEG), 17, 'f', 8).
-          arg(correction * RAD2DEG, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg("N/A", 18);
+          correction = m_corrections(i - offset);
+          adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
+                  toString(m_aprioriSigmas[i-offset], 8) );
         }
-        finalqStr += qStr;
+      }
+      // We are using default pointing, so provide default correction and sigma values to output
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+
+      sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
+      if (errorPropagation) {
+        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+      }
+      else {
+        sprintf(buf,"%s","N/A");
+      }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
+    }
+
+  }
+
+  /**
+   * @brief Creates and returns a formatted QString representing the bundle coefficients and
+   * parameters in csv format.
+   *
+   * @param errorPropagation Boolean indicating whether or not to attach more information
+   *     (corrections, sigmas, adjusted sigmas...) to the output QString
+   *
+   * @return @b QString Returns a formatted QString representing the BundleObservation in
+   * csv format
+   */
+  QString BundleObservation::bundleOutputCSV(bool errorPropagation) {
+
+    QVector<double> finalParameterValues;
+    int nPositionCoefficients, nPointingCoefficients;
+    bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
+
+    bundleOutputFetchData(finalParameterValues,
+                          nPositionCoefficients,nPointingCoefficients,
+                          useDefaultPosition,useDefaultPointing,useDefaultTwist);
+
+    int nPositionParameters = 3 * nPositionCoefficients;
+    int nPointingParameters = 3 * nPointingCoefficients;
+    int nParameters = nPositionParameters + nPointingParameters;
+
+    QString finalqStr = "";
+
+    // Set up default values when we are using default position
+    QString sigma = "N/A";
+    QString adjustedSigma = "N/A";
+    double correction = 0.0;
+
+    // Position parameters
+    for (int i = 0; i < nPositionParameters; i++) {
+      if (!useDefaultPosition) {
+        correction = m_corrections(i);
+        adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+      }
+      // Provide default values for position if not solving position
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+
+      finalqStr += toString(finalParameterValues[i] - correction) + ",";
+      finalqStr += toString(correction) + ",";
+      finalqStr += toString(finalParameterValues[i]) + ",";
+      finalqStr += sigma + ",";
+      if (errorPropagation) {
+        finalqStr += adjustedSigma + ",";
+      }
+      else {
+        finalqStr += "N/A,";
       }
 
     }
-    // this implies we're writing to images.csv
-    else {
-      // position parameters
-      for (int i = 0; i < nPositionParameters; i++) {
-        if (!useDefaultPosition) {
-          correction = m_corrections(i);
-          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
-        }
-        // Provide default values for position if not solving position
-        else {
+
+    // If not solving position, we need to offset access to correction and sigma members by -3
+    // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
+    // solved
+    int offset = 0;
+    if (useDefaultPosition) {
+      offset = 3;
+    }
+
+    // pointing parameters
+    for (int i = nPositionParameters; i < nParameters; i++) {
+      if (!useDefaultPointing) {
+        // Use default values if solving camera but not solving for TWIST to prevent bad indexing
+        // into m_corrections and m_*sigmas
+        if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
           correction = 0.0;
           adjustedSigma = "N/A";
           sigma = "N/A";
         }
-        qStr = "";
-        if (errorPropagation) {
-          qStr += toString(finalParameterValues[i] - correction) + ",";
-          qStr += toString(correction) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
-          qStr += sigma + ",";
-          qStr += adjustedSigma + ",";
+        else {
+          correction = m_corrections(i - offset);
+          adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
+          sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
+              toString(m_aprioriSigmas[i-offset], 8) );
         }
-        else {       
-          qStr += toString(finalParameterValues[i] - correction) + ",";
-          qStr += toString(correction) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
-          qStr += sigma + ",";
-          qStr += "N/A,";
-        }
-        finalqStr += qStr;
+      }
+      // Provide default values for pointing if not solving pointing
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
       }
 
-      // If not solving position, we need to offset access to correction and sigma members by -3
-      // (X,Y,Z) since m_corrections and m_*sigmas are populated according to which parameters are
-      // solved
-      int offset = 0;
-      if (useDefaultPosition) {
-        offset = 3;
+      finalqStr += toString(finalParameterValues[i]*RAD2DEG - correction * RAD2DEG) + ",";
+      finalqStr += toString(correction * RAD2DEG) + ",";
+      finalqStr += toString(finalParameterValues[i]*RAD2DEG) + ",";
+      finalqStr += sigma + ",";
+      if (errorPropagation) {
+        finalqStr += adjustedSigma + ",";
       }
-      // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {        
-        if (!useDefaultPointing) {
-          // Use default values if solving camera but not solving for TWIST to prevent bad indexing
-          // into m_corrections and m_*sigmas
-          if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
-            correction = 0.0;
-            adjustedSigma = "N/A";
-            sigma = "N/A";
-          }
-          else {
-            correction = m_corrections(i - offset);
-            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-            sigma = ( IsSpecial(m_aprioriSigmas[i-offset]) ? "FREE" :
-                toString(m_aprioriSigmas[i-offset], 8) );
-          }
-        }
-        // Provide default values for pointing if not solving pointing
-        else {
-          correction = 0.0;
-          adjustedSigma = "N/A";
-          sigma = "N/A";
-        }
-        qStr = "";
-        if (errorPropagation) {        
-          qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
-          qStr += toString(correction * RAD2DEG) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
-          qStr += sigma + ",";
-          qStr += adjustedSigma + ",";
-        }
-        else {
-          qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
-          qStr += toString(correction * RAD2DEG) + ",";
-          qStr += toString(finalParameterValues[i]) + ",";
-          qStr += sigma + ",";
-          qStr += "N/A,";
-        }
-        finalqStr += qStr;
+      else {
+        finalqStr += "N/A,";
       }
+
     }
 
     return finalqStr;
