@@ -72,6 +72,8 @@ namespace Isis {
    *           were signaled. References #2248.
    *  @history 2018-03-15 Adam Goins - Removed deprecated function iTime::UnloadLeapSecondKernel().
    *                          Fixes #5325.
+   *  @history 2019-06-15 Kristin Berry - Added a precision option to UTC to specify the precision
+   *           of the output value. The default (old) precision is used if no argument is specified.
    */
   class iTime {
     public:
@@ -125,7 +127,7 @@ namespace Isis {
       int Hour() const;
       QString MinuteString() const;
       int Minute() const;
-      QString SecondString() const;
+      QString SecondString(int precision=8) const;
       double Second() const;
       QString DayOfYearString() const;
       int DayOfYear() const;
@@ -138,7 +140,7 @@ namespace Isis {
         return p_et;
       }
 
-      QString UTC() const;
+      QString UTC(int precision=8) const;
       static QString CurrentGMT();
       static QString CurrentLocalTime();
 
