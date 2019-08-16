@@ -2,7 +2,6 @@
 
 #include <QDataStream>
 #include <QDebug>
-//#include <QFile> currently only used in commented code
 #include <QList>
 #include <QString>
 #include <QtGlobal> // qMax()
@@ -11,7 +10,6 @@
 #include <QXmlInputSource>
 
 #include "BundleObservationSolveSettings.h"
-//#include "FileName.h"currently only used in commented code
 #include "IException.h"
 #include "IString.h"
 #include "Project.h" // currently used for xml handler
@@ -49,7 +47,7 @@ namespace Isis {
     m_updateCubeLabel      = false;
     m_errorPropagation     = false;
     m_createInverseMatrix  = false;
-
+    m_cubeList             =    "";
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 3.0;
 
@@ -117,6 +115,7 @@ namespace Isis {
    */
   BundleSettings::BundleSettings(const BundleSettings &other)
       : m_validateNetwork(other.m_validateNetwork),
+        m_cubeList(other.m_cubeList),
         m_solveObservationMode(other.m_solveObservationMode),
         m_solveRadius(other.m_solveRadius),
         m_updateCubeLabel(other.m_updateCubeLabel),
@@ -162,6 +161,7 @@ namespace Isis {
   BundleSettings &BundleSettings::operator=(const BundleSettings &other) {
     if (&other != this) {
       m_validateNetwork = other.m_validateNetwork;
+      m_cubeList = other.m_cubeList;
       m_solveObservationMode = other.m_solveObservationMode;
       m_solveRadius = other.m_solveRadius;
       m_updateCubeLabel = other.m_updateCubeLabel;
@@ -214,6 +214,27 @@ namespace Isis {
    */
   bool BundleSettings::validateNetwork() const {
     return m_validateNetwork;
+  }
+
+
+  /**
+   * @brief BundleSettings::setCubeList
+   *
+   * @param cubeList
+   *
+   */
+  void BundleSettings::setCubeList(QString cubeList)    {
+    m_cubeList = cubeList;
+  }
+
+
+  /**
+  * @brief BundleSettings::cubeList
+  *
+  * @return QString The name/path of the cube list.
+  */
+  QString BundleSettings::cubeList() const {
+    return m_cubeList;
   }
 
 
