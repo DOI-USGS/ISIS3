@@ -17,13 +17,6 @@ commands:
 	line2=8264.78 \
 	lat2=-0.3270664209085 \
 	lon2=355.70986410595 > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  | sed 's/\-0.00000/ 0.00000/' \
-	  | sed 's/PLIER:  /PLIER: /' \
-	  > $(OUTPUT)/bundleout.txt
 	# The above command uses sed to do the following (in order):
 	# 1. remove cube filename paths
 	# 2. remove digits beyond the fifth decimal place of decimal numbers
