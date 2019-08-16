@@ -121,6 +121,8 @@ namespace Isis {
    *                           accessor methods, CoordTypeReports() & CoordTypeBundle()
    *                           for the new coordinate type members.
    *                           References #4649 and #501.
+   *   @history 2019-05-17 Tyler Wilson - Added QString m_cubeList member function as well
+   *                           as get/set member functions.  References #3267.
    *  
    *   @todo Determine which XmlStackedHandlerReader constructor is preferred
    *   @todo Determine which XmlStackedHandler needs a Project pointer (see constructors)
@@ -294,6 +296,8 @@ namespace Isis {
       void setOutputFilePrefix(QString outputFilePrefix);
       void setSCPVLFilename(QString SCParamFilename);
       QString outputFilePrefix() const;
+      void setCubeList(QString fileName);
+      QString cubeList() const;
       QString SCPVLFilename() const;
 
       void save(QXmlStreamWriter &stream, const Project *project) const;
@@ -353,6 +357,7 @@ namespace Isis {
       };
 
       bool m_validateNetwork; //!< Indicates whether the network should be validated.
+      QString m_cubeList;
       bool m_solveObservationMode; //!< Indicates whether to solve for observation mode.
       bool m_solveRadius; //!< Indicates whether to solve for point radii.
       bool m_updateCubeLabel; //!< Indicates whether to update cubes.

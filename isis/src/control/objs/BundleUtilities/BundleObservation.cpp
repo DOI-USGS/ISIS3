@@ -1455,6 +1455,32 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
       fpOut<<buf;
 
+      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
+      if (errorPropagation) {
+        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+      }
+      else {
+        sprintf(buf,"%s","N/A");
+      }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
     }
 
   }
