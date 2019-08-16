@@ -4,7 +4,7 @@ about: See https://astrodiscuss.usgs.gov for questions about using ISIS3 and oth
 
 ---
 
-We use GitHub issues only to discuss about ISIS3 bugs and new features. 
+We use Github issues solely for discussing bugs, documentation issues, and new features. 
 
 For
 questions about using ISIS3 or other ASC software, please use
