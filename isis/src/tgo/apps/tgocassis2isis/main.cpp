@@ -77,7 +77,9 @@ void IsisMain() {
       }
     }
 
-    convertUniqueIdToObservationId(*outputLabel);
+    if (!outputCube->group("Archive").hasKeyword("ObservationId")){
+      convertUniqueIdToObservationId(*outputLabel); 
+    }
 
     FileName outputCubeFileName(ui.GetFileName("TO"));
 
@@ -442,19 +444,20 @@ void translateLabels(FileName &inputLabel, Cube *outputCube, QString instTransFi
   outputCube->putGroup(kern);
 
   // Add an alpha cube group based on the subwindowing
-  int windowNumber = (int) archive["Window_Count"] + 1;
-  QString windowString = "Window_" + toString(windowNumber);
-  int frameletStartSample = (int) archive[windowString + "_Start_Sample"] + 1;
-  int frameletEndSample   = (int) archive[windowString + "_End_Sample"] + 1;
-  int frameletStartLine   = (int) archive[windowString + "_Start_Line"] + 1;
-  int frameletEndLine     = (int) archive[windowString + "_End_Line"] + 1;
-  AlphaCube frameletArea(2048, 2048,
-                         frameletEndSample - frameletStartSample + 1,
-                         frameletEndLine - frameletStartLine + 1,
-                         frameletStartSample - 0.5, frameletStartLine - 0.5,
-                         frameletEndSample + 0.5, frameletEndLine + 0.5);
-  frameletArea.UpdateGroup(*outputCube);
-
+  if (archive.hasKeyword("Window_Count")) {
+    int windowNumber = (int)archive["Window_Count"] + 1; 
+    QString windowString = "Window_" + toString(windowNumber);
+    int frameletStartSample = (int) archive[windowString + "_Start_Sample"] + 1;
+    int frameletEndSample   = (int) archive[windowString + "_End_Sample"] + 1;
+    int frameletStartLine   = (int) archive[windowString + "_Start_Line"] + 1;
+    int frameletEndLine     = (int) archive[windowString + "_End_Line"] + 1;
+    AlphaCube frameletArea(2048, 2048,
+                           frameletEndSample - frameletStartSample + 1,
+                           frameletEndLine - frameletStartLine + 1,
+                           frameletStartSample - 0.5, frameletStartLine - 0.5,
+                           frameletEndSample + 0.5, frameletEndLine + 0.5);
+    frameletArea.UpdateGroup(*outputCube);
+  }
 }
 
 
