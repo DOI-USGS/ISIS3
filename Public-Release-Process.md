@@ -187,7 +187,7 @@ You will now need to communicate with both the internal as well as the external 
 
 For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <gs-g-azflg_astro@usgs.gov>) informing them of internal availability. Also inform users that the isis3 symlink will be updated a week after the public release. It may be a good idea to encourage internal users to try to use conda to access the binaries/applications. 
 
-The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement.
+The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement. To create the changelog look at the commit history for the branch since the last release. The changelog and release announcement are targeted at users; so, changes targeted at developers should not be included. Two examples of changes that do not need to be included in the changelog are minor modifications to the build system and developer documentation updates.
 
 ## Step 8: Update isis3 symlink
 
