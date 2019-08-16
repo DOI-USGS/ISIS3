@@ -6,7 +6,7 @@ Testing BundleObservationSolveSettings...
 Printing PVL group with settings from the default constructor...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -16,13 +16,13 @@ Printing PVL group with settings from the default constructor...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing copy constructor...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -32,13 +32,13 @@ Testing copy constructor...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing assignment operator to set this equal to itself...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -48,13 +48,13 @@ Testing assignment operator to set this equal to itself...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing assignment operator to create a new settings object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -64,14 +64,14 @@ Testing assignment operator to create a new settings object...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing mutator methods...
 setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings()
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId>MyInstrumentId</instrumentId>
     <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -84,12 +84,12 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
             <sigma>800.0</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas/>
@@ -97,12 +97,12 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -114,12 +114,12 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -133,12 +133,12 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -154,12 +154,12 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId>MyInstrumentId</instrumentId>
     <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
@@ -175,7 +175,7 @@ setInstrument(), setInstrumentPointingSettings(), setInstrumentPositionSettings(
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing static unused enum-to-string and string-to-enum methods...
@@ -194,7 +194,7 @@ Testing XML: write XML from BundleObservationSolveSettings object...
 Testing XML: read XML to BundleObservationSolveSettings object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -204,13 +204,13 @@ Testing XML: read XML to BundleObservationSolveSettings object...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing XML: read XML to BundleObservationSolveSettings object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -222,13 +222,13 @@ Testing XML: read XML to BundleObservationSolveSettings object...
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing XML: read XML to BundleObservationSolveSettings object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesAndVelocity" numberCoefSolved="2" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -242,13 +242,13 @@ Testing XML: read XML to BundleObservationSolveSettings object...
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing XML: read XML to BundleObservationSolveSettings object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesVelocityAndAcceleration" numberCoefSolved="3" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -264,13 +264,13 @@ Testing XML: read XML to BundleObservationSolveSettings object...
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing XML: read XML to BundleObservationSolveSettings object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId>MyInstrumentId</instrumentId>
     <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
@@ -286,13 +286,13 @@ Testing XML: read XML to BundleObservationSolveSettings object...
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing XML: read XML with no attributes or values to object...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -302,7 +302,7 @@ Testing XML: read XML with no attributes or values to object...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 Testing error throws...
@@ -343,7 +343,7 @@ Testing mutators and accessors...
     Set/get solve settings using with CAMESOLVE=NONE...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas/>
@@ -351,30 +351,30 @@ Testing mutators and accessors...
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
     output bundle observation...
 0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
 0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
-  X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-  Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-  Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
- RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+  X  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				m
+  Y  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				m
+  Z  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				m
+ RA  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd
+DEC  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd
+TWI  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd
 
-  X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-  Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-  Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
- RA  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-DEC  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
+  X  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				m
+  Y  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				m
+  Z  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				m
+ RA  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd
+DEC  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd
+TWI  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd
 
     Set solve settings using with TWIST=FALSE...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId>MyInstrumentId</instrumentId>
     <instrumentPointingOptions solveOption="AllPolynomialCoefficients" numberCoefSolved="6" degree="4" solveDegree="5" solveTwist="No" solveOverExisting="Yes" interpolationType="4">
         <aprioriPointingSigmas>
@@ -390,102 +390,102 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
             <sigma>N/A</sigma>
         </aprioriPositionSigmas>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
     output bundle observation...
 0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,8.0,0.00000000,0.0,0.0,0.0,9.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,1.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,1.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,3.0,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
 0.0,0.0,0.0,8.0,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,8.0,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,8.0,N/A,0.0,0.0,0.0,9.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,1.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,3.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,1.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,3.0,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,
-  X  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
-     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
-  Y  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
-     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
-  Z  (t0)       0.00000000           0.00000000          0.00000000               8.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               9.0               N/A
-     (t2)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t6)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t7)       0.00000000           0.00000000          0.00000000              FREE               N/A
- RA  (t0)       0.00000000           0.00000000          0.00000000               1.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t2)       0.00000000           0.00000000          0.00000000               3.0               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-DEC  (t0)       0.00000000           0.00000000          0.00000000               1.0               N/A
-     (t1)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t2)       0.00000000           0.00000000          0.00000000               3.0               N/A
-     (t3)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t4)       0.00000000           0.00000000          0.00000000              FREE               N/A
-     (t5)       0.00000000           0.00000000          0.00000000              FREE               N/A
-TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t2)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t3)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t4)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t5)       0.00000000           0.00000000          0.00000000               N/A               N/A
+  X  (km)                  0.00000000	          0.00000000	          0.00000000				8.0    				N/A				m
+     (km/s)                0.00000000	          0.00000000	          0.00000000				9.0    				N/A				m/s
+     (km/s^2)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^2
+     (km/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^3
+     (km/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^4
+     (km/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^5
+     (km/s^6)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^6
+     (km/s^7)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^7
+  Y  (km)                  0.00000000	          0.00000000	          0.00000000				8.0    				N/A				m
+     (km/s)                0.00000000	          0.00000000	          0.00000000				9.0    				N/A				m/s
+     (km/s^2)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^2
+     (km/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^3
+     (km/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^4
+     (km/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^5
+     (km/s^6)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^6
+     (km/s^7)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^7
+  Z  (km)                  0.00000000	          0.00000000	          0.00000000				8.0    				N/A				m
+     (km/s)                0.00000000	          0.00000000	          0.00000000				9.0    				N/A				m/s
+     (km/s^2)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^2
+     (km/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^3
+     (km/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^4
+     (km/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^5
+     (km/s^6)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^6
+     (km/s^7)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				m/s^7
+ RA  (dd)                  0.00000000	          0.00000000	          0.00000000				1.0    				N/A				dd
+     (dd/s)                0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s
+     (dd/s^2)              0.00000000	          0.00000000	          0.00000000				3.0    				N/A				dd/s^2
+     (dd/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s^3
+     (dd/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s^4
+     (dd/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s^5
+DEC  (dd)                  0.00000000	          0.00000000	          0.00000000				1.0    				N/A				dd
+     (dd/s)                0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s
+     (dd/s^2)              0.00000000	          0.00000000	          0.00000000				3.0    				N/A				dd/s^2
+     (dd/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s^3
+     (dd/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s^4
+     (dd/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd/s^5
+TWI  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd
+     (dd/s)                0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd/s
+     (dd/s^2)              0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd/s^2
+     (dd/s^3)              0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd/s^3
+     (dd/s^4)              0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd/s^4
+     (dd/s^5)              0.00000000	          0.00000000	          0.00000000				N/A    				N/A				dd/s^5
 
-  X  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-  Y  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-  Z  (t0)       0.00000000           0.00000000          0.00000000               8.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000               9.0        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t6)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t7)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
- RA  (t0)       0.00000000           0.00000000          0.00000000               1.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000               3.0        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-DEC  (t0)       0.00000000           0.00000000          0.00000000               1.0        0.00000000
-     (t1)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t2)       0.00000000           0.00000000          0.00000000               3.0        0.00000000
-     (t3)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t4)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-     (t5)       0.00000000           0.00000000          0.00000000              FREE        0.00000000
-TWI  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t1)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t2)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t3)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t4)       0.00000000           0.00000000          0.00000000               N/A               N/A
-     (t5)       0.00000000           0.00000000          0.00000000               N/A               N/A
+  X  (km)                  0.00000000	          0.00000000	          0.00000000				8.0    				0.00000000				m
+     (km/s)                0.00000000	          0.00000000	          0.00000000				9.0    				0.00000000				m/s
+     (km/s^2)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^2
+     (km/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^3
+     (km/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^4
+     (km/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^5
+     (km/s^6)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^6
+     (km/s^7)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^7
+  Y  (km)                  0.00000000	          0.00000000	          0.00000000				8.0    				0.00000000				m
+     (km/s)                0.00000000	          0.00000000	          0.00000000				9.0    				0.00000000				m/s
+     (km/s^2)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^2
+     (km/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^3
+     (km/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^4
+     (km/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^5
+     (km/s^6)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^6
+     (km/s^7)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^7
+  Z  (km)                  0.00000000	          0.00000000	          0.00000000				8.0    				0.00000000				m
+     (km/s)                0.00000000	          0.00000000	          0.00000000				9.0    				0.00000000				m/s
+     (km/s^2)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^2
+     (km/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^3
+     (km/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^4
+     (km/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^5
+     (km/s^6)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^6
+     (km/s^7)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				m/s^7
+ RA  (dd)                  0.00000000	          0.00000000	          0.00000000				1.0    				0.00000000				dd
+     (dd/s)                0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s
+     (dd/s^2)              0.00000000	          0.00000000	          0.00000000				3.0    				0.00000000				dd/s^2
+     (dd/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s^3
+     (dd/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s^4
+     (dd/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s^5
+DEC  (dd)                  0.00000000	          0.00000000	          0.00000000				1.0    				0.00000000				dd
+     (dd/s)                0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s
+     (dd/s^2)              0.00000000	          0.00000000	          0.00000000				3.0    				0.00000000				dd/s^2
+     (dd/s^3)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s^3
+     (dd/s^4)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s^4
+     (dd/s^5)              0.00000000	          0.00000000	          0.00000000				FREE   				0.00000000				dd/s^5
+TWI  (dd)                  0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd
+     (dd/s)                0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd/s
+     (dd/s^2)              0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd/s^2
+     (dd/s^3)              0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd/s^3
+     (dd/s^4)              0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd/s^4
+     (dd/s^5)              0.00000000	          0.00000000	          0.00000000				N/A    				    N/A				dd/s^5
 
     Set solve settings using with CAMSOLVE=ALL and TWIST=TRUE...
 
 <bundleObservationSolveSettings>
-    
+
     <instrumentId></instrumentId>
     <instrumentPointingOptions solveOption="AnglesOnly" numberCoefSolved="1" degree="2" solveDegree="2" solveTwist="Yes" solveOverExisting="No" interpolationType="3">
         <aprioriPointingSigmas>
@@ -495,7 +495,7 @@ TWI  (t0)       0.00000000           0.00000000          0.00000000             
     <instrumentPositionOptions solveOption="None" numberCoefSolved="0" degree="2" solveDegree="2" solveOverHermiteSpline="No" interpolationType="3">
         <aprioriPositionSigmas/>
     </instrumentPositionOptions>
-</bundleObservationSolveSettings> 
+</bundleObservationSolveSettings>
 
 
 index =  "1"
@@ -505,18 +505,18 @@ number position param =  "0"
 number pointing param =  "3"
 parameter list:  ()
 image names:     ()
-parameter weights :     0.0     0.0     0.0     
-parameter corrections : 0.0     0.0     0.0     
-apriori sigmas :        -1.79769313486231e+308     -1.79769313486231e+308     -1.79769313486231e+308     
-adjusted sigmas :       0.0     0.0     0.0     
+parameter weights :     0.0     0.0     0.0
+parameter corrections : 0.0     0.0     0.0
+apriori sigmas :        -1.79769313486231e+308     -1.79769313486231e+308     -1.79769313486231e+308
+adjusted sigmas :       0.0     0.0     0.0
     output bundle observation...
 0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,0.0,0.0,0.0,FREE,N/A,
-  X  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-  Y  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
-  Z  (t0)       0.00000000           0.00000000          0.00000000               N/A               N/A
- RA  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
-DEC  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
-TWI  (t0)       0.00000000           0.00000000          0.00000000              FREE               N/A
+  X  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				m
+  Y  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				m
+  Z  (km)                  0.00000000	          0.00000000	          0.00000000				N/A    				N/A				m
+ RA  (dd)                  0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd
+DEC  (dd)                  0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd
+TWI  (dd)                  0.00000000	          0.00000000	          0.00000000				FREE   				N/A				dd
 
 0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,N/A,N/A,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,0.0,0.0,0.0,FREE,0.00000000,
 init exterior orientiation successful?   "Yes"
@@ -605,7 +605,7 @@ corrections:     0 0 0
 adjustedSigmas:  "N/A" "N/A" "N/A"
 nicVector:       0 0 0
 qMatrix:
- New Block 
+ New Block
 
 Residual rms: 3.53553
 
@@ -628,7 +628,7 @@ Coordinate          Value             Correction          Correction            
 aprioriSigmas:   "N/A" "N/A" "N/A"
 weights:         0 0 0
 
-BCP test 4 - Create FreePoint - solveRadius=true, apriori lat/lon/rad > 0 
+BCP test 4 - Create FreePoint - solveRadius=true, apriori lat/lon/rad > 0
                     from globals - coordinate type = Latitudinal
        FreePoint           FREE    2 of 2  3.54      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
 
@@ -703,7 +703,7 @@ Coordinate          Value             Correction          Correction            
 aprioriSigmas:   "NULL" "NULL" "NULL"
 weights:         0 0 1e+50
 
-BCP test 8 - Create ConstrainedPoint - no constraints, solveRadius=true, apriori lat/lon/rad <= 0, 
+BCP test 8 - Create ConstrainedPoint - no constraints, solveRadius=true, apriori lat/lon/rad <= 0,
      and adjustedsurface point (0, 0, 10)
 ConstrainedPoint    CONSTRAINED    0 of 0  0.00      0.00000000      0.00000000      0.01000000             N/A             N/A             N/A
 
@@ -741,7 +741,7 @@ aprioriSigmas:   "2.0" "3.0" "4.0"
 weights:         25 11.1111 62500
 
 
-BCP test 10 - Create ConstrainedPoint from constrained point with adjusted  
+BCP test 10 - Create ConstrainedPoint from constrained point with adjusted
     pt (32, 120, 1000) & apriori pt with constraints from covar, solveRadius=F...
 ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696495     26.45751311     38.45488734
 
@@ -757,7 +757,7 @@ Coordinate          Value             Correction          Correction            
     RADIUS       1.00000000           0.00000000          0.00000000          1.00000000               N/A       38.45488734
 
 
-BCP test 11 - Create ConstrainedPoint from constrained point with adjusted  surface pt (32, 120, 1000) 
+BCP test 11 - Create ConstrainedPoint from constrained point with adjusted  surface pt (32, 120, 1000)
      & apriori pt with constraints from covar, solveRadius=T...
 ConstrainedPoint    CONSTRAINED    0 of 0  0.00     32.00000000    120.00000000      1.00000000     28.65696495     26.45751311     38.45488734
 
@@ -911,8 +911,8 @@ Status: CONSTRAINED
 aprioriSigmas:   "2.0" "3.0" "4.0"
 weights:         250000 111111 62500
 
-BCP test 20 - Create ConstrainedPoint from constrained point with adjusted  
- pt (32, 120, 1000) & apriori pt from Test 10 with constraints from covar, solveRadius=F, 
+BCP test 20 - Create ConstrainedPoint from constrained point with adjusted
+ pt (32, 120, 1000) & apriori pt from Test 10 with constraints from covar, solveRadius=F,
 coordType=Rectangular...
 
 ConstrainedPoint    CONSTRAINED    0 of 0  0.00     -0.42402405      0.73443119      0.52991926     10.00000000     50.00000000     20.00000000
@@ -929,7 +929,7 @@ Status: CONSTRAINED
  BODY-FIXED-Z       0.52991926          0.00000000          0.52991926       20.00000000       20.00000000
 
 
-BCP test 21 - Test invalid coordinate type  
+BCP test 21 - Test invalid coordinate type
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 

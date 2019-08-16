@@ -40,7 +40,7 @@ namespace Isis {
    * Constructs a BundleObservation from an BundleImage, an instrument id, an observation
    * number to assign to this BundleObservation, and a target body.
    *
-   * @param image QSharedPointer to the primary image in the observation  
+   * @param image QSharedPointer to the primary image in the observation
    * @param observationNumber Observation number of the observation
    * @param instrumentId Id of the instrument for the observation
    * @param bundleTargetBody QSharedPointer to the target body of the observation
@@ -75,11 +75,11 @@ namespace Isis {
       // set the observations spice position and rotation objects from the primary image in the
       // observation (this is, by design at the moment, the first image added to the observation)
       // if the image, camera, or instrument position/orientation is null, then set to null
-      m_instrumentPosition = (image->camera() ? 
+      m_instrumentPosition = (image->camera() ?
                                (image->camera()->instrumentPosition() ?
                                  image->camera()->instrumentPosition() : NULL)
                                : NULL);
-      m_instrumentRotation = (image->camera() ? 
+      m_instrumentRotation = (image->camera() ?
                                (image->camera()->instrumentRotation() ?
                                   image->camera()->instrumentRotation() : NULL)
                                : NULL);
@@ -156,9 +156,9 @@ namespace Isis {
    * Appends a BundleImage shared pointer to the BundleObservation.
    * If the pointer is valid, then the BundleImage and its serial number will be inserted into
    * the serial number to BundleImage map.
-   * 
+   *
    * @param value The BundleImage to be appended.
-   * 
+   *
    * @see QVector::append()
    */
   void BundleObservation::append(const BundleImageQsp &value) {
@@ -172,9 +172,9 @@ namespace Isis {
   /**
    * Returns the BundleImage shared pointer associated with the given serial number.
    * If no BundleImage with that serial number is contained a NULL pointer is returned.
-   * 
+   *
    * @param cubeSerialNumber The serial number of the cube to be returned.
-   * 
+   *
    * @return @b BundleImageQsp A shared pointer to the BundleImage (NULL if not found).
    */
   BundleImageQsp BundleObservation::imageByCubeSerialNumber(QString cubeSerialNumber) {
@@ -196,7 +196,7 @@ namespace Isis {
    * @return @b bool Returns true if settings were successfully set
    *
    * @internal
-   *   @todo initParameterWeights() doesn't return false, so this methods always 
+   *   @todo initParameterWeights() doesn't return false, so this methods always
    *         returns true.
    */
   bool BundleObservation::setSolveSettings(BundleObservationSolveSettings solveSettings) {
@@ -255,7 +255,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the instrument's spice position 
+   * Accesses the instrument's spice position
    *
    * @return @b SpicePosition* Returns the SpicePosition for this observation
    */
@@ -266,7 +266,7 @@ namespace Isis {
 
   /**
    * Accesses the solve parameter weights
-   * 
+   *
    * @return @b LinearAlgebra::Vector Returns the parameter weights for solving
    */
   LinearAlgebra::Vector &BundleObservation::parameterWeights() {
@@ -275,7 +275,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the parameter corrections 
+   * Accesses the parameter corrections
    *
    * @return @b LinearAlgebra::Vector Returns the parameter corrections
    */
@@ -286,7 +286,7 @@ namespace Isis {
 
   /**
    * @internal
-   *   @todo 
+   *   @todo
    */
 //  LinearAlgebra::Vector &BundleObservation::parameterSolution() {
 //    return m_solution;
@@ -304,7 +304,7 @@ namespace Isis {
 
 
   /**
-   * Accesses the adjusted sigmas 
+   * Accesses the adjusted sigmas
    *
    * @return @b LinearAlgebra::Vector Returns the adjusted sigmas
    */
@@ -319,13 +319,13 @@ namespace Isis {
    * @return @b const BundleObservationSolveSettingsQsp Returns a pointer to the solve
    *                                                    settings for this BundleObservation
    */
-  const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() { 
+  const BundleObservationSolveSettingsQsp BundleObservation::solveSettings() {
     return m_solveSettings;
   }
 
 
   /**
-   * Initializes the exterior orientation 
+   * Initializes the exterior orientation
    *
    * @return @b bool Returns true upon successful intialization
    *
@@ -413,7 +413,7 @@ namespace Isis {
 
 
   /**
-   * Intializes the body rotation 
+   * Intializes the body rotation
    *
    * @todo check to make sure m_bundleTargetBody is valid
    */
@@ -424,13 +424,13 @@ namespace Isis {
 
     for (int i = 0; i < size(); i++) {
       BundleImageQsp image = at(i);
-      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);      
+      image->camera()->bodyRotation()->setPckPolynomial(raCoefs, decCoefs, pmCoefs);
     }
   }
 
 
   /**
-   * Updates the body rotation 
+   * Updates the body rotation
    *
    * @internal
    *   @todo Is this a duplicate of initializeBodyRotation?
@@ -497,10 +497,10 @@ namespace Isis {
 
   /**
    * Initializes the paramater weights for solving
-   * 
+   *
    * @return @b bool Returns true upon successful intialization
    *
-   * @internal  
+   * @internal
    *   @todo Don't like this, don't like this, don't like this, don't like this, don't like this.
    *         By the way, this seems klunky to me, would like to come up with a better way.
    *         Also, apriori sigmas are in two places, the BundleObservationSolveSettings AND in the
@@ -600,11 +600,11 @@ namespace Isis {
 
 
   /**
-   * Applies the parameter corrections 
+   * Applies the parameter corrections
    *
    * @param corrections Vector of corrections to apply
    *
-   * @throws IException::Unknown "Instrument position is NULL, but position solve option is 
+   * @throws IException::Unknown "Instrument position is NULL, but position solve option is
    *                              [not NoPositionFactors]"
    * @throws IException::Unknown "Instrument position is NULL, but pointing solve option is
    *                              [not NoPointingFactors]"
@@ -614,7 +614,7 @@ namespace Isis {
    *
    * @internal
    *   @todo always returns true?
-   */  
+   */
   bool BundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
 
     int index = 0;
@@ -716,7 +716,7 @@ namespace Isis {
       // update corrections
       m_corrections += corrections;
 
-    } 
+    }
     catch (IException &e) {
       QString msg = "Unable to apply parameter corrections to BundleObservation.";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -962,65 +962,59 @@ namespace Isis {
     QString adjustedSigma = "N/A";
     double correction = 0.0;
 
-    // this implies we're writing to bundleout.txt
-    if (!imageCSV) {
-      // position parameters
-      for (int i = 0; i < nPositionParameters; i++) {
-        // If not using the default position, we can correctly access sigmas and corrections
-        // members
-        if (!useDefaultPosition) {
-          correction = m_corrections(i);
-          adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
-          sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
-        }
-        if (errorPropagation) {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg(finalParameterValues[i] - correction, 17, 'f', 8).
-          arg(correction, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg(adjustedSigma, 18);
-        }
-        else {
-          qStr = QString("%1%2%3%4%5%6\n").
-          arg( parameterNamesList.at(i) ).
-          arg(finalParameterValues[i] - correction, 17, 'f', 8).
-          arg(correction, 21, 'f', 8).
-          arg(finalParameterValues[i], 20, 'f', 8).
-          arg(sigma, 18).
-          arg("N/A", 18);
-        }
-        finalqStr += qStr;
+    // position parameters
+    for (int i = 0; i < nPositionParameters; i++) {
+      // If not using the default position, we can correctly access sigmas and corrections
+      // members
+      if (!useDefaultPosition) {
+        correction = m_corrections(i);
+        adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
       }
 
-      // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
-      // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
-      // according to which parameters are solved
-      int offset = 0;
-      if (useDefaultPosition) {
-        offset = 3;
+      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",correction);
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
+      if (errorPropagation) {
+        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
       }
-      // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {
-        if (!useDefaultPointing) {
-          // If solving camera and not solving for twist, provide default values for twist to
-          // prevent bad indexing into m_corrections and m_*sigmas
-          // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
-          if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
-            correction = 0.0;
-            adjustedSigma = "N/A";
-            sigma = "N/A";
-          }
-          else {
-            correction = m_corrections(i - offset);
-            adjustedSigma = QString::number(m_adjustedSigmas(i-offset) * RAD2DEG, 'f', 8);
-            sigma = ( IsSpecial(m_aprioriSigmas[i - offset]) ? "FREE" :
-                    toString(m_aprioriSigmas[i-offset], 8) );
-          }
-        }
-        // We are using default pointing, so provide default correction and sigma values to output
-        else {
+      else {
+        sprintf(buf,"%s","N/A");
+      }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
+    }
+
+    // We need to use an offset of -3 (1 coef; X,Y,Z) if we used the default center coordinate
+    // (i.e. we did not solve for position), as m_corrections and m_*sigmas are populated
+    // according to which parameters are solved
+    int offset = 0;
+    if (useDefaultPosition) {
+      offset = 3;
+    }
+
+    // pointing parameters
+    for (int i = nPositionParameters; i < nParameters; i++) {
+      if (!useDefaultPointing) {
+        // If solving camera and not solving for twist, provide default values for twist to
+        // prevent bad indexing into m_corrections and m_*sigmas
+        // TWIST is last parameter, which corresponds to nParameters - nPointingCoefficients
+        if ( (i >= nParameters - nPointingCoefficients) && useDefaultTwist) {
           correction = 0.0;
           adjustedSigma = "N/A";
           sigma = "N/A";
@@ -1045,6 +1039,100 @@ namespace Isis {
         }
         finalqStr += qStr;
       }
+      // We are using default pointing, so provide default correction and sigma values to output
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+
+      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
+      fpOut << buf;
+      sprintf(buf,"\t\t\t");
+      fpOut << buf;
+      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      fpOut << buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut << buf;
+      if (errorPropagation) {
+        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+      }
+      else {
+        sprintf(buf,"%s","N/A");
+      }
+      fpOut<<buf;
+      sprintf(buf,"\t\t\t\t");
+      fpOut<<buf;
+      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      fpOut<<buf;
+
+    }
+
+  }
+
+  /**
+   * @brief Creates and returns a formatted QString representing the bundle coefficients and
+   * parameters in csv format.
+   *
+   * @param errorPropagation Boolean indicating whether or not to attach more information
+   *     (corrections, sigmas, adjusted sigmas...) to the output QString
+   *
+   * @return @b QString Returns a formatted QString representing the BundleObservation in
+   * csv format
+   */
+  QString BundleObservation::bundleOutputCSV(bool errorPropagation) {
+
+    QVector<double> finalParameterValues;
+    int nPositionCoefficients, nPointingCoefficients;
+    bool useDefaultPosition, useDefaultPointing,useDefaultTwist;
+
+    bundleOutputFetchData(finalParameterValues,
+                          nPositionCoefficients,nPointingCoefficients,
+                          useDefaultPosition,useDefaultPointing,useDefaultTwist);
+
+    int nPositionParameters = 3 * nPositionCoefficients;
+    int nPointingParameters = 3 * nPointingCoefficients;
+    int nParameters = nPositionParameters + nPointingParameters;
+
+    QString finalqStr = "";
+
+    // Set up default values when we are using default position
+    QString sigma = "N/A";
+    QString adjustedSigma = "N/A";
+    double correction = 0.0;
+
+    // Position parameters
+    for (int i = 0; i < nPositionParameters; i++) {
+      if (!useDefaultPosition) {
+        correction = m_corrections(i);
+        adjustedSigma = QString::number(m_adjustedSigmas[i], 'f', 8);
+        sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
+      }
+      // Provide default values for position if not solving position
+      else {
+        correction = 0.0;
+        adjustedSigma = "N/A";
+        sigma = "N/A";
+      }
+
+      finalqStr += toString(finalParameterValues[i] - correction) + ",";
+      finalqStr += toString(correction) + ",";
+      finalqStr += toString(finalParameterValues[i]) + ",";
+      finalqStr += sigma + ",";
+      if (errorPropagation) {
+        finalqStr += adjustedSigma + ",";
+      }
+      else {
+        finalqStr += "N/A,";
+      }
+
+    }
 
     }
     // this implies we're writing to images.csv
@@ -1070,7 +1158,7 @@ namespace Isis {
           qStr += sigma + ",";
           qStr += adjustedSigma + ",";
         }
-        else {       
+        else {
           qStr += toString(finalParameterValues[i] - correction) + ",";
           qStr += toString(correction) + ",";
           qStr += toString(finalParameterValues[i]) + ",";
@@ -1088,7 +1176,7 @@ namespace Isis {
         offset = 3;
       }
       // pointing parameters
-      for (int i = nPositionParameters; i < nParameters; i++) {        
+      for (int i = nPositionParameters; i < nParameters; i++) {
         if (!useDefaultPointing) {
           // Use default values if solving camera but not solving for TWIST to prevent bad indexing
           // into m_corrections and m_*sigmas
@@ -1111,7 +1199,7 @@ namespace Isis {
           sigma = "N/A";
         }
         qStr = "";
-        if (errorPropagation) {        
+        if (errorPropagation) {
           qStr += toString(finalParameterValues[i] - correction * RAD2DEG) + ",";
           qStr += toString(correction * RAD2DEG) + ",";
           qStr += toString(finalParameterValues[i]) + ",";
