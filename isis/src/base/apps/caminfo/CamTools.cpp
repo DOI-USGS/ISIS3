@@ -215,6 +215,11 @@ namespace Isis {
         g.sampRes = camera.SampleResolution();
         g.lineRes = camera.LineResolution();
 
+        g.obliqueSampRes = camera.ObliqueSampleResolution();
+        g.obliqueLineRes = camera.ObliqueLineResolution();
+        g.obliquePixelRes = camera.ObliquePixelResolution();
+        g.obliqueDetectorRes = camera.ObliqueDetectorResolution();
+
         g.solarLongitude = camera.solarLongitude().degrees();
         g.northAzimuth = camera.NorthAzimuth();
         g.offNader = camera.OffNadirAngle();
@@ -458,6 +463,11 @@ namespace Isis {
       pband += PvlKeyword("HasSouthPole", "FALSE");
     }
 
+    pband += ValidateKey("ObliqueSampleResolution", g.obliqueSampRes);
+    pband += ValidateKey("ObliqueLineResolution", g.obliqueLineRes);
+    pband += ValidateKey("ObliquePixelResolution", g.obliquePixelRes);
+    pband += ValidateKey("ObliqueDetectorResolution", g.obliqueDetectorRes);
+
     return;
   }
 
@@ -684,6 +694,10 @@ namespace Isis {
       pixelRes.AddData(b->sampRes);
       pixelRes.AddData(b->lineRes);
       groundRes.AddData(b->grRes);
+      pixelRes.AddData(b->obliqueLineRes);
+      pixelRes.AddData(b->obliqueSampRes);
+      pixelRes.AddData(b->obliquePixelRes);
+      pixelRes.AddData(b->obliqueDetectorRes);
     }
 
     double res = groundRes.Average();

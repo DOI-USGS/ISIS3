@@ -119,6 +119,10 @@ void IsisMain() {
     cg = camPvl.findGroup("LocalSolarTime", Pvl::Traverse);
     camstats->append(MakePair("LocalTimeMinimum", cg["localsolartimeMinimum"][0]));
     camstats->append(MakePair("LocalTimeMaximum", cg["localsolartimeMaximum"][0]));
+
+    cg = camPvl.findGroup("ObliqueResolution", Pvl::Traverse);
+    camstats->append(MakePair("ObliqueResolutionMinimum", cg["ObliqueResolutionMinimum"][0]));
+    camstats->append(MakePair("ObliqueResolutionMaximum", cg["ObliqueResolutionMaximum"][0]));
   }
 
   // Compute statistics for entire cube
