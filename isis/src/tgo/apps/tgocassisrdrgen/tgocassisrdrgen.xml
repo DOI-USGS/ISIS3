@@ -45,6 +45,10 @@
       Added TITLE and VERSIONID optional parameters to specify these values in the exported PDS4 label. 
       Fixed bug that disabled reading of mosaics with Archive groups. 
     </change>
+    <change name="Kristin Berry" date="2019-06-15">
+      Updated logicalID and schema to new values. Add code needed to set the pixel description in the output
+      file and to output the focal length without units as required by the cassis schema. 
+    </change>
   </history>
 
   <category>
