@@ -1368,7 +1368,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
       }
 
-      sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
+      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
       fpOut << buf;
       sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
       fpOut << buf;
@@ -1429,7 +1429,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         sigma = "N/A";
       }
 
-      sprintf(buf,"%-*s",15,parameterNamesList.at(i).toStdString().c_str() );
+      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
       fpOut << buf;
       sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
       fpOut << buf;
@@ -1454,7 +1454,6 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       fpOut<<buf;
       sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
       fpOut<<buf;
-
     }
 
   }
@@ -1524,7 +1523,6 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     if (useDefaultPosition) {
       offset = 3;
     }
-
     // pointing parameters
     for (int i = nPositionParameters; i < nParameters; i++) {
       if (!useDefaultPointing) {

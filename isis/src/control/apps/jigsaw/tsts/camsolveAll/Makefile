@@ -23,13 +23,8 @@ commands:
 	  update=yes \
 	  cksolvedegree=3 \
 	  camsolve=all \
+	  bundleout_txt=no \
 	  twist=no > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       | $(SED) 's/\(Iterations:\).*/\1/' \
-	       > $(OUTPUT)/obsmode_cholmod_bundleout.txt
 	# The above command uses sed to do the following (in order):
 	# 1. remove cube filename paths
 	# 2. remove net filename paths
@@ -44,6 +39,5 @@ commands:
 	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/obsmode_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
-	$(RM) bundleout.txt > /dev/null;
 	cathist from=$(OUTPUT)/PSP_002733_1880_RED4.crop.cub > $(OUTPUT)/PSP4.pvl;
 	cathist from=$(OUTPUT)/PSP_002733_1880_RED5.crop.cub > $(OUTPUT)/PSP5.pvl;
