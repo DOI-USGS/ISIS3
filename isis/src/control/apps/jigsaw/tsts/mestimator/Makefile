@@ -28,14 +28,8 @@ commands:
 	           max_model2_c_quantile=.98 \
 	           sigma0=1.e-3  \
 	           maxits=150 \
+		   bundleout_txt=no \
 	           spsolve=position > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       | sed 's/\-0.0000/ 0.0000/' \
-	       | sed 's/\-0.0000/ 0.0000/' \
-	       > $(OUTPUT)/mEstimator_bundleout.txt;
 	$(CAT) residuals.csv | $(SED) 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	       > $(OUTPUT)/mEstimator_residuals.csv
 	$(CAT) bundleout_images.csv | $(SED) 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
@@ -46,5 +40,5 @@ commands:
 	$(RM) residuals.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/mEstimator_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
-	$(RM) bundleout.txt > /dev/null
+
 
