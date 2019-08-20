@@ -36,7 +36,7 @@ Funded  development for ISIS is generally aligned by named projects. We organize
   - [x] Investigate methodology to write unit tests in a testing framework. The goal is to reduce test data volumes and the number of false positive failures.
   - Investigate how to write app tests. The rationale as above.
   - [x] investigate and deploy a testing framework; GTest.
-  - Investigate and deploy a CI environment to remove handcrafted build/test scripts. The goal is to reduce the number of false positive build fails due to tooling.
+  - [x] Investigate and deploy a CI environment to remove handcrafted cron scripts and remove email chain of build successes.
   - :muscle: Transition all unit tests to GTest
   - :muscle: Migrate 1+ app tests using the identified framework.
 
@@ -46,15 +46,16 @@ Funded  development for ISIS is generally aligned by named projects. We organize
   - [x] Verify MDIS-NAC/-WAC sensor models
   - [x] Implement Kaguya TC sensor model (CSM/ISIS)
   - [x] Implement Dawn FC sensor model
-  - :runner: Verify GXP functionality
-  - Implement CSM HiRISE sensor model
+  - [x] Verify GXP functionality
+  - [x] Implement CSM HiRISE sensor model
   - :muscle: CSM/ISIS integration
 
 ### SPICE / Architecture / ALE
-  - :runner: Begin ISIS rearchitecture by refactoring SpicePosition and SpiceRotation classes
+  - :runner: Begin ISIS rearchitecture by refactoring SpicePosition and SpiceRotation classes to use ALE
   - :runner: Refactor SPICE management scripts to reduce maintaince costs and rebuild institutional knowledge
-  - :muscle: Refactor all ISIS spice calls to use ALE
-  - :muscle: Refactor CSM to utilize common ALE interface
+  - :runner: Port all spiceinit calls for ISIS sensors to ALE
+  - :muscle: Refactor all SpicePosition/Rotation calls to use ALE
+  - [x] Refactor CSM to utilize common ALE interface
   - :muscle: Transition all ISIS spice selection code to ALE.
 
 ### Documentation
@@ -66,7 +67,7 @@ Funded  development for ISIS is generally aligned by named projects. We organize
   - [x] Get the community support forums turned back on
   - [x] Fully transition from RedMine (performance and usability issues) to GitHub
   - :runner: Provide support via GitHub, discussion forums, and other communication platforms
-  - :muscle: Solicit, review, and merge community PR
+  - [x] Solicit, review, and merge community PR
 
 ## Other ASC Libraries
   * PyHAT
@@ -75,12 +76,12 @@ Funded  development for ISIS is generally aligned by named projects. We organize
     - [x] Build ipynb documentation
     :muscles: QGIS plugin deploy on 3 major OSes
   * AutoCNet
-    - :runner: Add capability to tie to ground
-    - :runner: Refactor to deprecate server
-    - :runner: Improve ipynb documentation for use cases
+    - [x] Add capability to tie to ground
+    - [x] Refactor to deprecate server
+    - [x] Improve ipynb documentation for use cases
     - :muscle: Identify how to stream new images into a project
   * Plio
-    - :muscle: Solidify deploy train via conda-forge
+    - [x] Solidify deploy train via conda-forge
 
 ## Dependent Software
   * Universal Planetary Coordinates (UPC) database
