@@ -33,18 +33,18 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.6.0.1")
+set(VERSION            "3.8.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2018-10-26")
+set(VERSION_DATE              "2019-07-01")
 set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
-set(PACKAGE_BUGREPORT  "https://isis.astrogeology.usgs.gov/fixit")
+set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
 
 # Main website associated with the software package
 set(PACKAGE_URL        "https://isis.astrogeology.usgs.gov/")
@@ -186,6 +186,11 @@ endif()
  string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
+ if(NOT CMAKE_BUILD_TYPE)
+     set(CMAKE_BUILD_TYPE "RELEASE")
+ endif()
+
+ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -OG")
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)
@@ -219,11 +224,36 @@ find_package(Qt5 COMPONENTS
                 # Search this path explicitly for MacOS OpenGL Framework
                 PATHS /System/Library/Frameworks/ REQUIRED)
 
-# Some of these will have non-traditional installs with version numbers in the paths in v007
-# For these, we pass in a version number, and use it in the path suffix
-# This only applies to v007, and outside of the building, we should only expect standard installs
-# The v007-specific installs are listed beside their find_package calls below:
-find_package(Boost     1.59.0  REQUIRED)
+find_package(Boost 1.59.0 REQUIRED atomic
+                                        log
+                                        regex
+                                        log_setup
+                                        serialization
+                                        chrono
+                                        math_c99
+                                        signals
+                                        container
+                                        math_c99f
+                                        context
+                                        math_c99l
+                                        system
+                                        math_tr1
+                                        math_tr1f
+                                        math_tr1l
+                                        test_exec_monitor
+                                        date_time
+                                        thread
+                                        exception
+                                        timer
+                                        filesystem
+                                        prg_exec_monitor
+                                        program_options
+                                        unit_test_framework
+                                        iostreams
+                                        wave
+                                        random
+                                        wserialization)
+
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
@@ -231,7 +261,7 @@ find_package(Eigen             REQUIRED)
 find_package(Embree    2.15.0  REQUIRED)
 find_package(GeoTIFF   2       REQUIRED)
 find_package(GMM       5.0     REQUIRED)
-find_package(GSL       19      REQUIRED)
+find_package(GSL       2.2.1   REQUIRED)
 find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
@@ -271,7 +301,6 @@ set(ALLINCDIRS "")
 
 # Get all include dir variables
 foreach (_variableName ${_variableNames})
-#message("VAR=${_variableName}")
    if (_variableName MATCHES ".+_INCLUDE_DIR$")
      list(APPEND ALLINCDIRS "${${_variableName}}")
    elseif (_variableName MATCHES ".+_INCLUDE_PATH$")
@@ -283,9 +312,6 @@ endforeach()
 foreach (_variableName ${_variableNames})
    get_filename_component(LIBDIR "${${_variableName}}" DIRECTORY)
    if (_variableName MATCHES "^CMAKE+")
-   elseif (_variableName MATCHES ".+_LIB$")
-     list(APPEND ALLLIBDIRS "${LIBDIR}")
-     list(APPEND ALLLIBS "${${_variableName}}")
    elseif (_variableName MATCHES ".+_LIBRARY$")
      list(APPEND ALLLIBDIRS "${LIBDIR}")
      list(APPEND ALLLIBS "${${_variableName}}")

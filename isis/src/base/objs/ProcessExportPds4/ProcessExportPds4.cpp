@@ -47,6 +47,9 @@ namespace Isis {
   ProcessExportPds4::ProcessExportPds4() {
 
     m_lid = "";
+    m_versionId = "";
+    m_title = "";
+
     m_imageType = StandardImage;
 
     qSetGlobalQHashSeed(1031); // hash seed to force consistent output
@@ -61,10 +64,10 @@ namespace Isis {
     m_domDoc->appendChild(xmlHeader);
 
     // base pds4 schema location
-    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.xsd"; 
+    m_schemaLocation = "http://pds.nasa.gov/pds4/pds/v1 http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.xsd"; 
 
     QString xmlModel;
-    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1800.sch\" ";
+    xmlModel += "href=\"http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch\" ";
     xmlModel += "schematypens=\"http://purl.oclc.org/dsdl/schematron\"";
     QDomProcessingInstruction header =
         m_domDoc->createProcessingInstruction("xml-model", xmlModel);
@@ -222,7 +225,7 @@ namespace Isis {
           }
           else {
             QString timeValue = startTime.text();
-            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z");
+            PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z"); 
           }
           QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
           if (stopTime.text() == "") {
@@ -232,7 +235,6 @@ namespace Isis {
             QString timeValue = stopTime.text();
             PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z");
           }
-      
         }
       
         QDomElement obsSysNode = obsAreaNode.firstChildElement("Observing_System");
@@ -271,17 +273,15 @@ namespace Isis {
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
 
-      // move target to just below Observing_System. 
+      // Move target to just below Observing_System. 
       QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
       obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
-
     }
     else if (inputLabel->findObject("IsisCube").hasGroup("Mapping")) {
 
       translationFileName = "$base/translations/pds4ExportTargetFromMapping.trn"; 
       PvlToXmlTranslationManager targXlator(*inputLabel, translationFileName.expanded());
       targXlator.Auto(*m_domDoc);
-
     }
     else {
       throw IException(IException::Unknown, "Unable to find a target in input cube.", _FILEINFO_);
@@ -289,10 +289,106 @@ namespace Isis {
   }
 
 
+ /**
+   * This method reorders the existing m_domDoc to follow PDS4 standards and fixes time formatting
+   * if needed.
+   */
+  void ProcessExportPds4::reorder() {
+      QDomElement obsAreaNode = m_domDoc->documentElement().firstChildElement("Observation_Area");
+      if ( !obsAreaNode.isNull() ) {
+
+        // fix times
+        QDomElement timeNode = obsAreaNode.firstChildElement("Time_Coordinates");
+        if (!timeNode.isNull()) {
+          QDomElement startTime = timeNode.firstChildElement("start_date_time");
+          if (startTime.text() == "") {
+            startTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = startTime.text();
+            if (!timeValue.contains("Z")) {
+              PvlToXmlTranslationManager::resetElementValue(startTime, timeValue + "Z"); 
+            }
+          }
+
+          QDomElement stopTime  = timeNode.firstChildElement("stop_date_time"); 
+          if (stopTime.text() == "") {
+            stopTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = stopTime.text();
+            if (!timeValue.contains("Z")) {
+              PvlToXmlTranslationManager::resetElementValue(stopTime, timeValue + "Z"); 
+            }
+          }
+          QStringList xmlPath;
+          xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "geom:Geometry"
+            << "geom:Geometry_Orbiter"
+            << "geom:geometry_reference_time_utc";
+
+          QDomElement baseElement = m_domDoc->documentElement();
+          QDomElement geomRefTime = getElement(xmlPath, baseElement);
+          if (geomRefTime.text() == "") {
+            geomRefTime.setAttribute("xsi:nil", "true");
+          }
+          else {
+            QString timeValue = geomRefTime.text();
+            PvlToXmlTranslationManager::resetElementValue(geomRefTime, timeValue + "Z");
+          }
+        xmlPath.clear();
+          xmlPath << "Product_Observational"
+            << "Observation_Area"
+            << "Discipline_Area"
+            << "geom:Geometry"
+            << "geom:Image_Display_Geometry"
+            << "geom:Object_Orientation_North_East"
+            << "geom:east_azimuth";
+          QDomElement eastAzimuth = getElement(xmlPath, baseElement);
+          if (eastAzimuth.text() != "") {
+            PvlToXmlTranslationManager::resetElementValue(eastAzimuth, eastAzimuth.text(), "deg");
+          }
+        }
+
+        QDomElement investigationAreaNode = obsAreaNode.firstChildElement("Investigation_Area");
+        obsAreaNode.insertAfter(investigationAreaNode, obsAreaNode.firstChildElement("Time_Coordinates"));
+
+        QDomElement obsSystemNode = obsAreaNode.firstChildElement("Observing_System");
+        obsAreaNode.insertAfter(obsSystemNode, obsAreaNode.firstChildElement("Investigation_Area"));
+
+        QDomElement targetIdNode = obsAreaNode.firstChildElement("Target_Identification");
+        obsAreaNode.insertAfter(targetIdNode, obsAreaNode.firstChildElement("Observing_System"));
+
+        QDomElement missionAreaNode = obsAreaNode.firstChildElement("Mission_Area");
+        obsAreaNode.insertAfter(missionAreaNode, obsAreaNode.firstChildElement("Target_Identification"));
+
+        QDomElement disciplineAreaNode = obsAreaNode.firstChildElement("Discipline_Area");
+        obsAreaNode.insertAfter(disciplineAreaNode, obsAreaNode.firstChildElement("Mission_Area"));
+      }
+
+      QDomElement identificationAreaNode = m_domDoc->documentElement().firstChildElement("Identification_Area");
+      if ( !identificationAreaNode.isNull() ) {
+        QDomElement aliasListNode = identificationAreaNode.firstChildElement("Alias_List");
+        identificationAreaNode.insertAfter(aliasListNode, identificationAreaNode.firstChildElement("product_class"));
+      }
+
+      QDomElement fileAreaObservationalNode = m_domDoc->documentElement().firstChildElement("File_Area_Observational");
+      QDomElement array2DImageNode = fileAreaObservationalNode.firstChildElement("Array_2D_Image");
+      if ( !array2DImageNode.isNull() ) {
+        QDomElement descriptionNode = array2DImageNode.firstChildElement("description");
+        array2DImageNode.insertAfter(descriptionNode, array2DImageNode.firstChildElement("axis_index_order"));
+      }
+  }
+
   /**
    * Allows mission specific programs to set logical_identifier 
    * required for PDS4 labels. This value is added to the xml file 
    * by the identificationArea() method. 
+   *  
+   * The input value will be converted to all-lowercase if not already 
+   * in line with PDS4 requirements.  
    *  
    * The input string should be colon separated string with 6 
    * identifiers: 
@@ -315,11 +411,44 @@ namespace Isis {
    *            compliant labels.
    */
   void ProcessExportPds4::setLogicalId(QString lid) {
-    m_lid = lid;
+    m_lid = lid.toLower();
   }
 
 
   /**
+   * Allows mission specific programs to set version_id
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * The input string should be colon separated string with 6 
+   * identifiers: 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param versiondId The version_id value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setVersionId(QString versionId) {
+    m_versionId = versionId;
+  }
+
+
+  /**
+   * Allows mission specific programs to set the title
+   * required for PDS4 labels. This value is added to the xml file 
+   * by the identificationArea() method. 
+   *  
+   * @author 2019-03-01 Kristin Berry
+   * 
+   * @param title The title value required for PDS4 
+   *            compliant labels.
+   */
+   void ProcessExportPds4::setTitle(QString title) {
+    m_title = title;
+  }
+
+
+ /**
    * Allows mission specific programs to use specified 
    * versions of dictionaries. 
    * 
@@ -366,6 +495,16 @@ namespace Isis {
     QDomElement lidElement = identificationElement.firstChildElement("logical_identifier");
     PvlToXmlTranslationManager::resetElementValue(lidElement, m_lid);
 
+    if (m_versionId != "") {
+      QDomElement versionElement = identificationElement.firstChildElement("version_id"); 
+      PvlToXmlTranslationManager::resetElementValue(versionElement, m_versionId);
+    }
+
+    if (m_title != "") {
+      QDomElement titleElement = identificationElement.firstChildElement("title"); 
+      PvlToXmlTranslationManager::resetElementValue(titleElement, m_title);
+    }
+
     // Get export history and add <Modification_History> element.
     // These regular expressions match the pipe followed by the date from
     // the Application::Version() return value.
@@ -386,18 +525,17 @@ namespace Isis {
    * the PDS4 labels. 
    */
   void ProcessExportPds4::displaySettings() {
+    // Add header info
+    addSchema("PDS4_DISP_1B00.sch", 
+              "PDS4_DISP_1B00.xsd",
+              "xmlns:disp", 
+              "http://pds.nasa.gov/pds4/disp/v1"); 
 
     Pvl *inputLabel = InputCubes[0]->label(); 
     FileName translationFileName;
     translationFileName = "$base/translations/pds4ExportDisplaySettings.trn";
     PvlToXmlTranslationManager xlator(*inputLabel, translationFileName.expanded());
     xlator.Auto(*m_domDoc);
-
-    // Add header info
-    addSchema("PDS4_DISP_1700.sch", 
-              "PDS4_DISP_1700.xsd",
-              "xmlns:disp", 
-              "http://pds.nasa.gov/pds4/disp/v1"); 
   }
 
   
@@ -409,8 +547,8 @@ namespace Isis {
     Pvl *inputLabel = InputCubes[0]->label(); 
     if ( !inputLabel->findObject("IsisCube").hasGroup("BandBin") ) return;
     // Add header info
-    addSchema("PDS4_IMG_1900.sch", 
-              "PDS4_IMG_1900.xsd",
+    addSchema("PDS4_IMG_1A10_1510.sch", 
+              "PDS4_IMG_1A10_1510.xsd",
               "xmlns:img", 
               "http://pds.nasa.gov/pds4/img/v1"); 
     
@@ -652,6 +790,15 @@ namespace Isis {
     
   }
 
+ /**
+  * Sets the description string which describes the pixel vales in 
+  * File_Area_Observational 
+  *  
+  * @param description Description of pixel values to use.
+  */
+  void ProcessExportPds4::setPixelDescription(QString description) {
+    m_pixelDescription = description;
+  }
 
   /**
    * Create and internalize an image output label from the input 
@@ -754,7 +901,137 @@ namespace Isis {
                                                     toString(base));
         elementArrayElement.appendChild(offsetElement);
       }
+
+      // Add the Special_Constants class to define ISIS special pixel values if pixel type is
+      QDomElement specialConstantElement = m_domDoc->createElement("Special_Constants"); 
+      arrayImageElement.insertAfter(specialConstantElement,
+                                    arrayImageElement.lastChildElement("Axis_Array"));
+
+      switch (p_pixelType) {
+        case Real: 
+          { QDomElement nullElement = m_domDoc->createElement("missing_constant");
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL4, 'g', 18));
+          specialConstantElement.appendChild(nullElement);
+        
+          QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT4, 'g', 18));
+          specialConstantElement.appendChild(highInstrumentSatElement);
+
+          QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT4, 'g', 18));
+          specialConstantElement.appendChild(highRepresentationSatElement);
+
+          QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT4, 'g', 18));
+          specialConstantElement.appendChild(lowInstrumentSatElement);
+
+          QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT4, 'g', 18));
+          specialConstantElement.appendChild(lowRepresentationSatElement); 
+          break;}
+
+        case UnsignedByte:
+          { QDomElement nullElement = m_domDoc->createElement("missing_constant");
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL1, 'g', 18));
+          specialConstantElement.appendChild(nullElement);
+        
+          QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT1, 'g', 18));
+          specialConstantElement.appendChild(highInstrumentSatElement);
+
+          QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT1, 'g', 18));
+          specialConstantElement.appendChild(highRepresentationSatElement);
+
+          QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT1, 'g', 18));
+          specialConstantElement.appendChild(lowInstrumentSatElement);
+
+          QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT1, 'g', 18));
+          specialConstantElement.appendChild(lowRepresentationSatElement);
+          break; }
+
+        case SignedWord:
+          { QDomElement nullElement = m_domDoc->createElement("missing_constant");
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULL2, 'g', 18));
+          specialConstantElement.appendChild(nullElement);
+        
+          QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SAT2, 'g', 18));
+          specialConstantElement.appendChild(highInstrumentSatElement);
+
+          QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SAT2, 'g', 18));
+          specialConstantElement.appendChild(highRepresentationSatElement);
+
+          QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SAT2, 'g', 18));
+          specialConstantElement.appendChild(lowInstrumentSatElement);
+
+          QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SAT2, 'g', 18));
+          specialConstantElement.appendChild(lowRepresentationSatElement); 
+          break; }
+
+        case UnsignedWord:
+          { QDomElement nullElement = m_domDoc->createElement("missing_constant");
+          PvlToXmlTranslationManager::setElementValue(nullElement, QString::number(NULLU2, 'g', 18));
+          specialConstantElement.appendChild(nullElement);
+        
+          QDomElement highInstrumentSatElement = m_domDoc->createElement("high_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(highInstrumentSatElement, QString::number(HIGH_INSTR_SATU2, 'g', 18));
+          specialConstantElement.appendChild(highInstrumentSatElement);
+
+          QDomElement highRepresentationSatElement = m_domDoc->createElement("high_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(highRepresentationSatElement, QString::number(HIGH_REPR_SATU2, 'g', 18));
+          specialConstantElement.appendChild(highRepresentationSatElement);
+
+          QDomElement lowInstrumentSatElement = m_domDoc->createElement("low_instrument_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowInstrumentSatElement, QString::number(LOW_INSTR_SATU2, 'g', 18));
+          specialConstantElement.appendChild(lowInstrumentSatElement);
+
+          QDomElement lowRepresentationSatElement = m_domDoc->createElement("low_representation_saturation");
+          PvlToXmlTranslationManager::setElementValue(lowRepresentationSatElement, QString::number(LOW_REPR_SATU2, 'g', 18));
+          specialConstantElement.appendChild(lowRepresentationSatElement); 
+          break; }
+
+        case None: break;
+      }
+
+
+
+      if (!m_pixelDescription.isEmpty()) {
+        QDomElement descriptionElement = m_domDoc->createElement("description"); 
+        PvlToXmlTranslationManager::setElementValue(descriptionElement,
+                                                    m_pixelDescription);
+        arrayImageElement.insertAfter(descriptionElement, arrayImageElement.lastChildElement());
+      }
     }
+  }
+
+
+  /**
+   * Adds necessary information to the xml header for a pds4 class for schema which lack 
+   * schematron files (.sch) 
+   * 
+   * @param xsd Schema filename without path
+   * @param xmlns The xml namespace used 
+   * @param xmlnsURI Full URL to the xml namespace URI. Also used as the location of the sch and xsd
+   */
+  void ProcessExportPds4::addSchema(QString xsd, QString xmlns, QString xmlnsURI) {
+    // Add xmlns
+    QDomElement root = m_domDoc->documentElement();
+    root.setAttribute(xmlns, xmlnsURI);
+
+    // Add to xsi:schemaLocation
+    m_schemaLocation += " "; 
+    m_schemaLocation += xmlnsURI;
+    m_schemaLocation += " ";
+    m_schemaLocation += xmlnsURI;
+    m_schemaLocation += "/";
+    m_schemaLocation += xsd;
+    root.setAttribute("xsi:schemaLocation", m_schemaLocation);
   }
 
 
@@ -779,17 +1056,7 @@ namespace Isis {
     m_domDoc->insertAfter(header, m_domDoc->firstChild());
 
     // Add xmlns
-    QDomElement root = m_domDoc->documentElement();
-    root.setAttribute(xmlns, xmlnsURI);
-
-    // Add to xsi:schemaLocation
-    m_schemaLocation += " "; 
-    m_schemaLocation += xmlnsURI;
-    m_schemaLocation += " ";
-    m_schemaLocation += xmlnsURI;
-    m_schemaLocation += "/";
-    m_schemaLocation += xsd;
-    root.setAttribute("xsi:schemaLocation", m_schemaLocation);
+    addSchema(xsd, xmlns, xmlnsURI);
   }
 
 
@@ -904,8 +1171,8 @@ namespace Isis {
         !(inputLabel->findObject("IsisCube").hasGroup("Mapping"))) return;
     PvlGroup &inputMapping = inputLabel->findGroup("Mapping", Pvl::Traverse);
 
-    addSchema("PDS4_CART_1700.sch", 
-              "PDS4_CART_1700.xsd",
+    addSchema("PDS4_CART_1900.sch", 
+              "PDS4_CART_1900.xsd",
               "xmlns:cart", 
               "http://pds.nasa.gov/pds4/cart/v1"); 
 
@@ -972,39 +1239,78 @@ namespace Isis {
       }
     }
 
-    // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
     PvlKeyword &isisLonDir = inputMapping.findKeyword("LongitudeDirection");
     QString lonDir = isisLonDir[0];
     lonDir = lonDir.toUpper();
-    if (inputMapping.hasKeyword("MaximumLongitude") && inputMapping.hasKeyword("MinimumLongitude")) {
-      double maxLon = inputMapping.findKeyword("MaximumLongitude");
-      double minLon = inputMapping.findKeyword("MinimumLongitude");
-      xmlPath.clear();
-      xmlPath << "Product_Observational" 
-              << "Observation_Area" 
-              << "Discipline_Area" 
-              << "cart:Cartography" 
-              << "cart:Map_Projection" 
-              << "cart:Spatial_Domain"
-              << "cart:Bounding_Coordinates";
-      QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
-      QDomElement eastElement = boundingCoordElement.firstChildElement("cart:east_bounding_coordinate");
-      QDomElement westElement = boundingCoordElement.firstChildElement("cart:west_bounding_coordinate");
+    
+    // Add Lat/Lon range
+    double maxLon, minLon, maxLat, minLat; 
+    InputCubes[0]->latLonRange(minLat, maxLat, minLon, maxLon); 
+    
+    xmlPath.clear();
+    xmlPath << "Product_Observational"
+            << "Observation_Area" 
+            << "Discipline_Area"
+            << "cart:Cartography" 
+            << "cart:Spatial_Domain"
+            << "cart:Bounding_Coordinates";
+    QDomElement boundingCoordElement = getElement(xmlPath, baseElement);
+    QDomElement eastElement = boundingCoordElement.firstChildElement("cart:east_bounding_coordinate");
+    QDomElement westElement = boundingCoordElement.firstChildElement("cart:west_bounding_coordinate");
+    QDomElement northElement = boundingCoordElement.firstChildElement("cart:north_bounding_coordinate");
+    QDomElement southElement = boundingCoordElement.firstChildElement("cart:south_bounding_coordinate");
 
-      // translation files currently handles Positive West case where east = min, west = max
-      // so if positive east, swap min/max
-      if(QString::compare(lonDir, "Positive East", Qt::CaseInsensitive) == 0) {
-        // west min, east max
-        PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
-        PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
-      }
+    // Translation files currently handles Positive West case where east = min, west = max
+    // so if positive east, swap min/max
+    if(QString::compare(lonDir, "PositiveEast", Qt::CaseInsensitive) == 0) {
+      // west min, east max
+      PvlToXmlTranslationManager::resetElementValue(eastElement, toString(maxLon), "deg");
+      PvlToXmlTranslationManager::resetElementValue(westElement, toString(minLon), "deg");
+    }
+    else {
+      PvlToXmlTranslationManager::resetElementValue(eastElement, toString(minLon), "deg");
+      PvlToXmlTranslationManager::resetElementValue(westElement, toString(maxLon), "deg");
     }
 
+    PvlToXmlTranslationManager::resetElementValue(northElement, toString(maxLat), "deg");
+    PvlToXmlTranslationManager::resetElementValue(southElement, toString(minLat), "deg");
 
+    // longitude_of_central_meridian and latitude_of_projection_origin need to be converted to floats.
+    xmlPath.clear();
+    xmlPath << "Product_Observational"
+            << "Observation_Area" 
+            << "Discipline_Area"
+            << "cart:Cartography" 
+            << "cart:Spatial_Reference_Information"
+            << "cart:Horizontal_Coordinate_System_Definition"
+            << "cart:Planar"
+            << "cart:Map_Projection";
+
+    // The following is necessary because the full xmlPath differs depending on the projection used.
+    QDomElement projectionElement = getElement(xmlPath, baseElement);
+    QDomElement tempElement = projectionElement.firstChildElement();
+    QDomElement nameElement = tempElement.nextSiblingElement();
+
+    QDomElement longitudeElement = nameElement.firstChildElement("cart:longitude_of_central_meridian"); 
+    QDomElement originElement = nameElement.firstChildElement("cart:latitude_of_projection_origin");
+
+    double longitudeElementValue = longitudeElement.text().toDouble(); 
+    double originElementValue = originElement.text().toDouble(); 
+
+    // Only update the ouput formatting if there are no digits after the decimal point. 
+    if (!longitudeElement.text().contains('.')) {
+      QString toset1 = QString::number(longitudeElementValue, 'f', 1); 
+      PvlToXmlTranslationManager::resetElementValue(longitudeElement, toset1, "deg"); 
+    }
+
+    if (!originElement.text().contains('.')) {
+      QString toset2 = QString::number(originElementValue, 'f', 1); 
+      PvlToXmlTranslationManager::resetElementValue(originElement, toset2, "deg");
+    }
   }
 
 
- /**
+/**
   * Convenience method to get an element given a path and its parent. 
   * 
   * @param xmlPath The XML path to the element to retrieve, 
@@ -1222,8 +1528,7 @@ namespace Isis {
         }
       }
     }
-
-    return transMap;
+    return transMap; 
   }
 
 

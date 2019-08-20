@@ -318,6 +318,10 @@ sumspice from=st_2395699394_v.lev0.cub sumfile=N2395699394.SUM  update=spice sum
       Updated the pvl.DIFF's of the input for the dawn test to ignore the 
       InstrumentPointing keyword. Fixes #5379.
     </change>
+    <change name="Kaitlyn Lee" date="2018-04-12">
+      Added a call to writeHistory() of the SumFinder class that will add a sumspice
+      entry to each input cube's History blob after a successful run. Fixes #4972.
+    </change>
   </history>
 
   <category>

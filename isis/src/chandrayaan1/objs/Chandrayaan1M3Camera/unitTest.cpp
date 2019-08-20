@@ -43,8 +43,8 @@ int main(void) {
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables. NOTE: These are only used
     // for the center of the image test, not the corners.
-    double knownLat = 61.4944183507184832;
-    double knownLon = 74.8961675572936798;
+    double knownLat = 61.50040250242506;
+    double knownLon = 74.89590535143694;
 
     Cube c("$chandrayaan1/testData/M3T20090630T083407_V03_RDN.cub", "r");
     Camera *cam = CameraFactory::Create(c);

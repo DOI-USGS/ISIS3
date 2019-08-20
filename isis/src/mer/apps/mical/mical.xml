@@ -87,6 +87,10 @@
       Changed pvl.DIFF of input for all app tests to ignore file names. Allows test to pass when not
       using default data area. Fixes #4738.
     </change>
+    <change name="Jesse Mapel" date="2019-05-15">
+      Now loads latest Mars satellites kernel because the planets kernel (de430)
+      only provides Mars Barycenter.
+    </change>
   </history>
 
   <category>

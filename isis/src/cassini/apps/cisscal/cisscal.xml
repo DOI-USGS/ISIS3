@@ -210,6 +210,9 @@
       Updated cisscal and documentation to better reflect the steps as of idl cisscal program
       version, 3.8, and added capabilities to use new dustrings files based on epoch.. Fixes #4708
     </change>
+    <change name="Adam Paqeutte" date="2019-08-07">
+      Added a version number to the cisscal label output. Currently at version 3.8.
+    </change>
   </history>
 
   <category>

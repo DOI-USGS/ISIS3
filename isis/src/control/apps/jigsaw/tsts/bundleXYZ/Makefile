@@ -29,12 +29,8 @@ commands:
 	           camera_angles_sigma=2. \
 	           control_point_coordinate_type_bundle=RECT \
 	           control_point_coordinate_type_reports=LAT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/rect-latConstrained_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -45,7 +41,7 @@ commands:
 	       > $(OUTPUT)/rect-latConstrained_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rect-latConstrained_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 
 # test rect bundle and rect output with a free network (all points free) - (sigma 0 should match lat bundle with rect output
@@ -56,12 +52,8 @@ commands:
 	           errorpropagation=yes \
 	           control_point_coordinate_type_bundle=RECT \
 	           control_point_coordinate_type_reports=RECT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/rectFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -72,7 +64,7 @@ commands:
 	       > $(OUTPUT)/rectFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rectFree_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 
 # test lat bundle and rect output with a free network (all points free) - (sigma 0 should match rect bundle with rect outpu
@@ -83,12 +75,8 @@ commands:
 	           errorpropagation=yes \
 	           control_point_coordinate_type_bundle=LAT \
 	           control_point_coordinate_type_reports=RECT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/lat-rectFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -99,7 +87,7 @@ commands:
 	       > $(OUTPUT)/lat-rectFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/lat-rectFree_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 
 # test lat bundle and rect output with some constrained points
@@ -113,12 +101,8 @@ commands:
 	           camera_angles_sigma=2. \
 	           control_point_coordinate_type_bundle=LAT \
 	           control_point_coordinate_type_reports=RECT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/lat-rectConstrained_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -129,7 +113,7 @@ commands:
 	       > $(OUTPUT)/lat-rectConstrained_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/lat-rectConstrained_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 
 # test rect bundle and rect output with some constrained points
@@ -143,12 +127,8 @@ commands:
 	           camera_angles_sigma=2. \
 	           control_point_coordinate_type_bundle=RECT \
 	           control_point_coordinate_type_reports=RECT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/rectConstrained_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -159,7 +139,7 @@ commands:
 	       > $(OUTPUT)/rectConstrained_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rectConstrained_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 
 # test rect bundle and lat output with a free network (all points free) - (sigma 0 should match lat bundle with lat output
@@ -170,12 +150,8 @@ commands:
 	           errorpropagation=yes \
 	           control_point_coordinate_type_bundle=RECT \
 	           control_point_coordinate_type_reports=LAT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/rect-latFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -186,7 +162,7 @@ commands:
 	       > $(OUTPUT)/rect-latFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/rect-latFree_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 #	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
 
@@ -198,12 +174,8 @@ commands:
 	           errorpropagation=yes \
 	           control_point_coordinate_type_bundle=LAT \
 	           control_point_coordinate_type_reports=LAT \
+		   bundleout_txt=no \
 	           file_prefix=$(OUTPUT)/ > /dev/null;
-	$(CAT) $(OUTPUT)/bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/latFree_bundleout.txt;
 	$(CAT) $(OUTPUT)/residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -214,6 +186,6 @@ commands:
 	       > $(OUTPUT)/latFree_bundleout_images.csv;
 	$(RM) $(OUTPUT)/bundleout_images.csv > /dev/null;
 	$(MV) $(OUTPUT)/bundleout_points.csv $(OUTPUT)/latFree_bundleout_points.csv > /dev/null;
-	$(RM) $(OUTPUT)/bundleout.txt print.prt > /dev/null;
+	$(RM) print.prt > /dev/null;
 	$(RM) $(OUTPUT)/residuals.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
