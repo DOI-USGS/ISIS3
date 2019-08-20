@@ -16,6 +16,7 @@
 #include "LineManager.h"
 #include "Longitude.h"
 #include "OriginalLabel.h"
+#include "PixelType.h"
 #include "ProcessExportPds.h"
 #include "Pvl.h"
 #include "PvlFormat.h"
@@ -30,6 +31,7 @@ using namespace Isis;
 using namespace std;
 
 double *g_min, *g_max;
+PixelType g_oType;
 
 pair<double, double> inputRange(Cube *inputCube);
 void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel);
@@ -41,6 +43,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();  
   ProcessExportPds p;
   Process pHist;
+
   Cube *inputCube = p.SetInputCube("FROM");
   PvlObject *isisCubeLab = inputCube->label();
 
@@ -114,14 +117,47 @@ void IsisMain() {
   pair<double, double> inRange;
   inRange = inputRange(inputCube);
   p.SetInputRange(minmin, maxmax);
-  // output bit type will be 16bit unsigned word
-  p.SetOutputType(Isis::UnsignedWord); 
-  p.SetOutputNull(Isis::NULLU2);         
-  p.SetOutputLrs(Isis::LOW_REPR_SATU2);  
-  p.SetOutputLis(Isis::LOW_INSTR_SATU2); 
-  p.SetOutputHrs(Isis::HIGH_REPR_SATU2); 
-  p.SetOutputHis(Isis::HIGH_INSTR_SATU2);
-  p.SetOutputRange(VALID_MINU2, VALID_MAXU2); 
+
+   int nbits = ui.GetInteger("BITS");
+
+   switch (nbits) {
+
+
+    case 8:
+     g_oType = Isis::UnsignedWord;
+     p.SetOutputType(g_oType);
+     p.SetOutputRange(VALID_MIN1, VALID_MAX1);
+     p.SetOutputNull(NULL1);
+     p.SetOutputLis(LOW_INSTR_SAT1);
+     p.SetOutputLrs(LOW_REPR_SAT1);
+     p.SetOutputHis(HIGH_INSTR_SAT1);
+     p.SetOutputHrs(HIGH_REPR_SAT1);
+     break;
+
+    case 16:
+     g_oType = UnsignedWord;
+     p.SetOutputType(g_oType);
+     p.SetOutputRange(VALID_MINU2, VALID_MAXU2);
+     p.SetOutputNull(NULLU2);
+     p.SetOutputLis(LOW_INSTR_SATU2);
+     p.SetOutputLrs(LOW_REPR_SATU2);
+     p.SetOutputHis(HIGH_INSTR_SATU2);
+     p.SetOutputHrs(HIGH_REPR_SATU2);
+     break;
+
+   default:
+     g_oType = UnsignedWord;
+     p.SetOutputType(g_oType);
+     p.SetOutputRange(3.0, pow(2.0, (double)(nbits)) - 1.0 - 2.0);
+     p.SetOutputNull(0);
+     p.SetOutputLrs(1);
+     p.SetOutputLis(2);
+     p.SetOutputHis(pow(2.0, (double)(nbits)) - 1.0 - 1.0);
+     p.SetOutputHrs(pow(2.0, (double)(nbits)) - 1.0);
+
+   }
+
+
   // output byte order will be MSB
   p.SetOutputEndian(Isis::Msb);
   p.setFormat(ProcessExport::BSQ);
