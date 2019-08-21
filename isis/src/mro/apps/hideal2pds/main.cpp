@@ -30,9 +30,6 @@
 using namespace Isis;
 using namespace std;
 
-double *g_min, *g_max;
-PixelType g_oType;
-
 pair<double, double> inputRange(Cube *inputCube);
 void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel);
 void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel);
@@ -43,6 +40,8 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();  
   ProcessExportPds p;
   Process pHist;
+  double *band_min, *band_max;
+
 
   Cube *inputCube = p.SetInputCube("FROM");
   PvlObject *isisCubeLab = inputCube->label();
@@ -71,8 +70,8 @@ void IsisMain() {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
   
-  g_min = new double[inputCube->bandCount()];
-  g_max = new double[inputCube->bandCount()];
+  band_min = new double[inputCube->bandCount()];
+  band_max = new double[inputCube->bandCount()];
 
   for (int band = 1; band <= inputCube->bandCount(); ++band) {
 
@@ -94,21 +93,21 @@ void IsisMain() {
       }
 
       // get the requested cumulative percentages
-      g_min[band-1] = ui.GetDouble("MINPER") == 0.0 ? hist.Minimum() : hist.Percent(ui.GetDouble("MINPER"));
-      g_max[band-1] = ui.GetDouble("MAXPER") == 100.0 ? hist.Maximum() : hist.Percent(ui.GetDouble("MAXPER"));
+      band_min[band-1] = ui.GetDouble("MINPER") == 0.0 ? hist.Minimum() : hist.Percent(ui.GetDouble("MINPER"));
+      band_max[band-1] = ui.GetDouble("MAXPER") == 100.0 ? hist.Maximum() : hist.Percent(ui.GetDouble("MAXPER"));
     }
     else {
-      g_min[band-1] = ui.GetDouble("MIN");
-      g_max[band-1] = ui.GetDouble("MAX");
+      band_min[band-1] = ui.GetDouble("MIN");
+      band_max[band-1] = ui.GetDouble("MAX");
     }
   }
 
   // Find the minimum min and maximum max for all bands
-  double minmin = g_min[0];
-  double maxmax = g_max[0];
+  double minmin = band_min[0];
+  double maxmax = band_max[0];
   for (int band = 1; band < inputCube->bandCount(); ++band) {
-    if (g_min[band] < minmin) minmin = g_min[band];
-    if (g_max[band] > maxmax) maxmax = g_max[band];
+    if (band_min[band] < minmin) minmin = band_min[band];
+    if (band_max[band] > maxmax) maxmax = band_max[band];
   }
 
   pHist.EndProcess();
@@ -118,44 +117,37 @@ void IsisMain() {
   inRange = inputRange(inputCube);
   p.SetInputRange(minmin, maxmax);
 
-   int nbits = ui.GetInteger("BITS");
-
-   switch (nbits) {
-
-
+  int nbits = ui.GetInteger("BITS");
+  switch (nbits) {
     case 8:
-     g_oType = Isis::UnsignedWord;
-     p.SetOutputType(g_oType);
-     p.SetOutputRange(VALID_MIN1, VALID_MAX1);
-     p.SetOutputNull(NULL1);
-     p.SetOutputLis(LOW_INSTR_SAT1);
-     p.SetOutputLrs(LOW_REPR_SAT1);
-     p.SetOutputHis(HIGH_INSTR_SAT1);
-     p.SetOutputHrs(HIGH_REPR_SAT1);
-     break;
+      p.SetOutputType(Isis::UnsignedWord);
+      p.SetOutputRange(VALID_MIN1, VALID_MAX1);
+      p.SetOutputNull(NULL1);
+      p.SetOutputLis(LOW_INSTR_SAT1);
+      p.SetOutputLrs(LOW_REPR_SAT1);
+      p.SetOutputHis(HIGH_INSTR_SAT1);
+      p.SetOutputHrs(HIGH_REPR_SAT1);
+      break;
 
     case 16:
-     g_oType = UnsignedWord;
-     p.SetOutputType(g_oType);
-     p.SetOutputRange(VALID_MINU2, VALID_MAXU2);
-     p.SetOutputNull(NULLU2);
-     p.SetOutputLis(LOW_INSTR_SATU2);
-     p.SetOutputLrs(LOW_REPR_SATU2);
-     p.SetOutputHis(HIGH_INSTR_SATU2);
-     p.SetOutputHrs(HIGH_REPR_SATU2);
-     break;
+      p.SetOutputType(UnsignedWord);
+      p.SetOutputRange(VALID_MINU2, VALID_MAXU2);
+      p.SetOutputNull(NULLU2);
+      p.SetOutputLis(LOW_INSTR_SATU2);
+      p.SetOutputLrs(LOW_REPR_SATU2);
+      p.SetOutputHis(HIGH_INSTR_SATU2);
+      p.SetOutputHrs(HIGH_REPR_SATU2);
+      break; 
 
-   default:
-     g_oType = UnsignedWord;
-     p.SetOutputType(g_oType);
-     p.SetOutputRange(3.0, pow(2.0, (double)(nbits)) - 1.0 - 2.0);
-     p.SetOutputNull(0);
-     p.SetOutputLrs(1);
-     p.SetOutputLis(2);
-     p.SetOutputHis(pow(2.0, (double)(nbits)) - 1.0 - 1.0);
-     p.SetOutputHrs(pow(2.0, (double)(nbits)) - 1.0);
-
-   }
+    default:
+      p.SetOutputType(UnsignedWord);
+      p.SetOutputRange(3.0, pow(2.0, (double)(nbits)) - 1.0 - 2.0);
+      p.SetOutputNull(0);
+      p.SetOutputLrs(1);
+      p.SetOutputLis(2);
+      p.SetOutputHis(pow(2.0, (double)(nbits)) - 1.0 - 1.0);
+      p.SetOutputHrs(pow(2.0, (double)(nbits)) - 1.0);
+  }
 
 
   // output byte order will be MSB
@@ -309,8 +301,8 @@ void IsisMain() {
   p.EndProcess();
   outputStream.close();
   
-  delete [] g_min;
-  delete [] g_max;
+  delete [] band_min;
+  delete [] band_max;
 }
 
 /**

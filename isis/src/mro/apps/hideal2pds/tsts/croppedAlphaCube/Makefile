@@ -19,7 +19,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) FROM=$(INPUT)/input.cub \
 	  to=$(OUTPUT)/output.img \
-		bits=16 \
+	  bits=16 \
 	  rationale_desc="user entered" \
 	  version="2.0" type=automatic \
 	  minper=.5 maxper=99.5 > /dev/null;
