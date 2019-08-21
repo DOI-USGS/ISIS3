@@ -56,6 +56,9 @@
     <change name="Makayla Shepherd" date="2015-10-06">
       Added stretch parameters. Fixes #1761.
     </change>
+    <change name="Tyler Wilson" date="2019-02-08">
+      Added an option to control the output bits.  min = 8, max =16, default = 10.  Fixes #5527.
+    </change>
   </history>
 
   <groups>
@@ -220,5 +223,30 @@
           </greaterThanOrEqual>
         </parameter>
       </group>
+      <group name="Output Controls">
+        <parameter name="BITS">
+          <type>integer</type>
+          <default>
+            <item>10</item>
+          </default>
+          <brief>
+            Number of bits for the output DN
+          </brief>
+          <description>
+            The number of bits to compress the input data to. The valid data as
+            well as the five special pixel values (NULL, LIS, LRS, HIS, HRS) will be
+            compressed into this number of bits. The output data type will be
+            automaticity choosen using this value. A value of 8 will create
+            unsigned byte output files. Values from 9 to 16 will create unsigned
+            word output files. Unused bits in the unsigned word output file will be
+            set to zero.
+          </description>
+          <minimum inclusive="yes">8</minimum>
+          <maximum inclusive="yes">16</maximum>
+        </parameter>
+
+      </group>
+
+
   </groups>
 </application>
