@@ -34,43 +34,43 @@ commands:
 	  op=modkey grp=AlphaCube key=BetaLines val=9 > /dev/null;
 	echo -e "Error Test A:" > $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST B: edit label to simulate using reduce program on number of samples
 	editlab from=$(OUTPUT)/input.cub \
 	  op=modkey grp=AlphaCube key=BetaSamples val=9 > /dev/null;
 	echo -e "\nError Test B:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST C: edit label to simulate using enlarge program on number of lines
 	editlab from=$(OUTPUT)/input.cub \
 	  op=modkey grp=AlphaCube key=BetaLines val=11 > /dev/null;
 	echo -e "\nError Test C:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST D: use edit lab to simulate using enlarge program on number of samples
 	editlab from=$(OUTPUT)/input.cub \
 	  op=modkey grp=AlphaCube key=BetaSamples val=20001 > /dev/null;
 	echo -e "\nError Test D:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST E: target is not mars
 	editlab from=$(OUTPUT)/input.cub \
 	  op=modkey grp=Instrument key=TargetName val=Invalid > /dev/null;
 	echo -e "\nError Test E:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST F: instrument id is not ideal
 	editlab from=$(OUTPUT)/input.cub \
 	  op=modkey grp=Instrument key=InstrumentId val=HIRISE > /dev/null;
 	echo -e "\nError Test F:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST G: Original instrument is not hirise
 	editlab from=$(OUTPUT)/input.cub \
 	  op=modkey grp=OriginalInstrument key=InstrumentId val=Invalid > /dev/null;
 	echo -e "\nError Test G:" >> $(OUTPUT)/error_temp.txt;
 	$(APPNAME) FROM=$(OUTPUT)/input.cub \
-	  to=$(OUTPUT)/output.img 2>> $(OUTPUT)/error_temp.txt > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 2>> $(OUTPUT)/error_temp.txt > /dev/null;
 #   TEST H: 
 #   TEST I:
 
