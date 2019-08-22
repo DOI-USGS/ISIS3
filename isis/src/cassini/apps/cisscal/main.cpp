@@ -273,7 +273,7 @@ void IsisMain() {
  *            do not subtract an offset from the exposure time.
  *            Added Sensitivity vs Time Correction after
  *            correction factors. 
- *            Matches cisscal version 3.9.
+ *            Matches cisscal version 3.9.1.
  */
 void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
   Buffer *flat = 0;
@@ -564,7 +564,7 @@ FileName gbl::FindBitweightFile() {
  *   @history 2009-05-27 Jeannie Walldren - Commented out table
  *            if-statement as done idl cisscal version 3.6.
  *   @history 2019-08-14 Kaitlyn Lee - Added check for a corrupt
- *            bias strip mean to match cisscal version 3.9.
+ *            bias strip mean to match cisscal version 3.9.1.
  */
 void gbl::ComputeBias() {
   gbl::calgrp += PvlKeyword("BiasSubtractionPerformed", "Yes");
@@ -833,7 +833,7 @@ void gbl::Linearize() {
  *            labels.
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
  *            ShutterStateId to disable dust ring correction.
- *            Matches cisscal version 3.9.
+ *            Matches cisscal version 3.9.1.
  */
 void gbl::FindDustRingParameters() {
   //  No dustring or mottle correction for WAC
@@ -1071,7 +1071,7 @@ void gbl::FindDustRingParameters() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
  *            ShutterStateId to disable flat field correction.
- *            Matches cisscal version 3.9.
+ *            Matches cisscal version 3.9.1.
  */
 FileName gbl::FindFlatFile() {
   // Disable flat field correction if ShutterStateId is Disabled
@@ -1316,7 +1316,7 @@ void gbl::FindShutterOffset() {
  *   @history 2008-11-05 Jeannie Walldren - Original version
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
  *            ShutterStateId. Updated solid angle and optics 
- *            area values. Matches cisscal version 3.9.
+ *            area values. Matches cisscal version 3.9.1.
  */
 void gbl::DivideByAreaPixel() {
   // Disable flat field correction if ShutterStateId is Disabled
@@ -1392,7 +1392,7 @@ void gbl::DivideByAreaPixel() {
  *            efficiency factor for intensity units.  Now, the
  *            method is not far off from the I/F method.
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
- *            ShutterStateId. Matches cisscal version 3.9.
+ *            ShutterStateId. Matches cisscal version 3.9.1.
  */
 
 void gbl::FindEfficiencyFactor(QString fluxunits) {
@@ -1695,7 +1695,7 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
  *   @history 2017-06-08 Cole Neubauer - removed polarization correcton
  *            factor and added Jupiter correction factor to match 3.8 update
  *   @history 2019-08--14 Kaitlyn Lee - Removed Jupiter correction factor
- *            since it was removed in the 3.9 update.
+ *            since it was removed in the 3.9.1 update.
  */
 void gbl::FindCorrectionFactors() {
   // Disable correction factor if ShutterStateId is Disabled
@@ -1826,6 +1826,10 @@ void gbl::FindSensitivityCorrection() {
   else if(gbl::cissLab->InstrumentId() == "ISSWA") {
     gbl::sensVsTimeCorr = 1.0 + (9.28360e-11 * (imgNumber - imgNumberS17));
   }
+  gbl::calgrp += PvlKeyword("SensitivityCorrectionPerformed", "Yes");
+  gbl::calgrp.findKeyword("SensitivityCorrectionPerformed").addComment("Sensitivity vs Time Correction Parameters");
+  gbl::sensCorrection = true;
+  gbl::calgrp += PvlKeyword("SensVsTimeCorr", toString(gbl::sensVsTimeCorr));
 }
 
 
