@@ -113,8 +113,8 @@
         Step 7: Divide by Correction Factor
       </strong>
       This step is implemented in order to force theory and observation to match.
-      It consists of 2 processes.  First, the image is divided by its correction factor. This step requires no user defined
-      parameters. It uses a correction factor file found
+      It consists of 2 processes.  First, the image is divided by its correction factor. 
+      This step requires no user defined parameters. It uses a correction factor file found
       in the Cassini calibration correction directory.
       Second, a sensitivity vs time correction is completed.
       A sensitivity value is calculated based off of the instrument Id and
@@ -137,7 +137,7 @@
       method requires large regions of dark sky pixels present for all lines and
       uses an image mean to construct a 2-Hz signal.
 
-      The second omited step is <strong>A-B pixel pairs correction</strong>
+      The second omitted step is <strong>A-B pixel pairs correction</strong>
       (also referred to as anti-blooming correction or bright/dark pixel pair
       removal). In the IDL program, this correction is only performed if the
       labels of the image indicate that the AntiBloomingStateFlag is "On" and
@@ -215,10 +215,10 @@
       Added a version number to the cisscal label output. Currently at version 3.8.
     </change>
     <change name="Kaitlyn Lee" date="2019-08-14">
-      Updated to IDL version 3.9. Removed jupiter correction, added
+      Updated to match IDL version 3.9.1. Removed jupiter correction, added
       checks for ShutterStateId, added check for bias mean strip,
       updated values in divideByAreaPixel, and added sensitivity vs
-      time correction. Fixes 3351.
+      time correction. Fixes #3351.
     </change>
   </history>
 
