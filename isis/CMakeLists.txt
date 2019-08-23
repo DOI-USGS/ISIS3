@@ -182,15 +182,19 @@ if(NOT APPLE)
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
- # Append CPP flags set in the third party lib file to the string set in this file.
- string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
- set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+# Append CPP flags set in the third party lib file to the string set in this file.
+string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
- if(NOT CMAKE_BUILD_TYPE)
-     set(CMAKE_BUILD_TYPE "RELEASE")
- endif()
+if(NOT CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE "RELEASE")
+endif()
 
- set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -OG")
+if(APPLE)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+else()
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -OG")
+endif()
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)
@@ -284,7 +288,7 @@ find_package(Threads)
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
-find_package(OpenGL REQUIRED)
+  find_package(OpenGL REQUIRED)
 endif(APPLE)
 
 if(pybindings)
