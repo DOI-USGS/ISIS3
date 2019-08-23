@@ -56,29 +56,30 @@ namespace Isis {
    */
   void CissLabels::ReadLabels(Pvl &lab) {
     // Get values out of the instrument group
-    PvlGroup &inst    = lab.findGroup("Instrument", Pvl::Traverse);
-    p_ABflag                = (QString) inst["AntiBloomingStateFlag"];   //valid values: On, Off, Unknown
-    p_biasStripMean         = (double) inst["BiasStripMean"];           //valid values: real numbers
-    p_compressionRatio      = (QString) inst["CompressionRatio"];        //valid values: NotCompressed or real number
-    p_compressionType       = (QString) inst["CompressionType"];         //valid values: Lossy, Lossless, NotCompressed
-    p_dataConversionType    = (QString) inst["DataConversionType"];      //valid values: 12Bit, 8LSB, Table
-    p_delayedReadoutFlag    = (QString) inst["DelayedReadoutFlag"];      //valid values: Yes, No, Unknown
-    p_exposureDuration      = (double) inst["ExposureDuration"];        //valid values: real numbers
-    p_flightSoftwareVersion = (QString) inst["FlightSoftwareVersionId"]; //valid values: Unknown, 1.2, 1.3, 1.4
-    p_gainModeId            = (int)    inst["GainModeId"];              //valid values: 12, 29, 95, 215
-    p_gainState             = (int)    inst["GainState"];               //valid values: 0, 1, 2, 3
-    p_instrumentDataRate    = (double) inst["InstrumentDataRate"];      //valid values: 60.9, 121.9, 182.8, 243.7, 304.6, 365.6, -999.0
-    p_instrumentModeId      = (QString) inst["InstrumentModeId"];        //valid values: Full, Sum2, Sum4
-    p_instrumentId          = (QString) inst["InstrumentId"];            //valid values: ISSNA, ISSWA
-    p_readoutCycleIndex     = (QString) inst["ReadoutCycleIndex"];       //valid values: Unknown or integers 0-15
-    p_readoutOrder          = (int)    inst["ReadoutOrder"];            //valid values: 0 or 1
-    p_shutterModeId         = (QString) inst["ShutterModeId"];           //valid values: BothSim, NacOnly, WacOnly
-    p_summingMode           = (int)    inst["SummingMode"];             //valid values: 1, 2, 4
-    p_frontOpticsTemp       = toDouble(inst["OpticsTemperature"][0]);  //valid values: real numbers
+    PvlGroup &inst          = lab.findGroup("Instrument", Pvl::Traverse);
+    p_ABflag                = (QString) inst["AntiBloomingStateFlag"];    //valid values: On, Off, Unknown
+    p_biasStripMean         = (double) inst["BiasStripMean"];             //valid values: real numbers
+    p_compressionRatio      = (QString) inst["CompressionRatio"];         //valid values: NotCompressed or real number
+    p_compressionType       = (QString) inst["CompressionType"];          //valid values: Lossy, Lossless, NotCompressed
+    p_dataConversionType    = (QString) inst["DataConversionType"];       //valid values: 12Bit, 8LSB, Table
+    p_delayedReadoutFlag    = (QString) inst["DelayedReadoutFlag"];       //valid values: Yes, No, Unknown
+    p_exposureDuration      = (double) inst["ExposureDuration"];          //valid values: real numbers
+    p_flightSoftwareVersion = (QString) inst["FlightSoftwareVersionId"];  //valid values: Unknown, 1.2, 1.3, 1.4
+    p_gainModeId            = (int)    inst["GainModeId"];                //valid values: 12, 29, 95, 215
+    p_gainState             = (int)    inst["GainState"];                 //valid values: 0, 1, 2, 3
+    p_instrumentDataRate    = (double) inst["InstrumentDataRate"];        //valid values: 60.9, 121.9, 182.8, 243.7, 304.6, 365.6, -999.0
+    p_instrumentModeId      = (QString) inst["InstrumentModeId"];         //valid values: Full, Sum2, Sum4
+    p_instrumentId          = (QString) inst["InstrumentId"];             //valid values: ISSNA, ISSWA
+    p_readoutCycleIndex     = (QString) inst["ReadoutCycleIndex"];        //valid values: Unknown or integers 0-15
+    p_readoutOrder          = (int)    inst["ReadoutOrder"];              //valid values: 0 or 1
+    p_shutterModeId         = (QString) inst["ShutterModeId"];            //valid values: BothSim, NacOnly, WacOnly
+    p_shutterStateId        = (QString) inst["ShutterStateId"];           //valid values: Enabled or Disabled
+    p_summingMode           = (int)    inst["SummingMode"];               //valid values: 1, 2, 4
+    p_frontOpticsTemp       = toDouble(inst["OpticsTemperature"][0]);     //valid values: real numbers
     p_imageTime             = (QString) inst["ImageTime"];
-    p_targetName            = (QString) inst["TargetName"];           // valid values: may change overtime, any subject of a Cassini image
+    p_targetName            = (QString) inst["TargetName"];               // valid values: may change overtime, any subject of a Cassini image
     // Get values out of the archive group
-    PvlGroup &arch    = lab.findGroup("Archive", Pvl::Traverse);
+    PvlGroup &arch          = lab.findGroup("Archive", Pvl::Traverse);
     p_imageNumber           = (double) arch["ImageNumber"];
     // Get values out of the bandbin group
     PvlGroup &bandbin = lab.findGroup("BandBin", Pvl::Traverse);
