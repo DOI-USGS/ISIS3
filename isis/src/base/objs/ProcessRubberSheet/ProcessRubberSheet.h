@@ -200,13 +200,11 @@ namespace Isis {
 
       void transformPatch (double startingSample, double endingSample,
                            double startingLine, double endingLine,
-                           Brick &obrick, Portal &iportal,
-                           Transform &trans, Interpolator &interp);
+                           Portal &iportal, Transform &trans, Interpolator &interp);
 
       void splitPatch (double startingSample, double endingSample,
                        double startingLine, double endingLine,
-                       Brick &obrick, Portal &iportal,
-                       Transform &trans, Interpolator &interp);
+                       Portal &iportal, Transform &trans, Interpolator &interp);
 #if 0
       void transformPatch (double startingSample, double endingSample,
                            double startingLine, double endingLine);

@@ -146,6 +146,8 @@ namespace Isis {
    *                          parallaxy, shadowx, shadowy.  Fixes #1296
    *   @history 2013-02-22 Janet Barrett, Modified the CamTools::collect method to allow a
    *                          footprint blob option. Fixes #1452.
+   *   @history 2019-04-22 Kaitlyn Lee -  Added oblique sample, line, pixel,
+   *                          and detector resolutions. Fixes #2205.
    */
   class BandGeometry {
 
@@ -215,7 +217,9 @@ namespace Isis {
           lowerLeftLongitude(Null), lowerLeftLatitude(Null),
           lowerRightLongitude(Null), lowerRightLatitude(Null),
           upperRightLongitude(Null), upperRightLatitude(Null),
-          hasLongitudeBoundary(false), hasNorthPole(false), hasSouthPole(false) { }
+          hasLongitudeBoundary(false), hasNorthPole(false), hasSouthPole(false),
+          obliqueSampRes(Null), obliqueLineRes(Null), 
+          obliquePixelRes(Null), obliqueDetectorRes(Null) { }
         ~GProperties() { }
 
         int lines, samples, bands;
@@ -243,6 +247,7 @@ namespace Isis {
         double lowerRightLongitude, lowerRightLatitude;
         double upperRightLongitude, upperRightLatitude;
         bool hasLongitudeBoundary, hasNorthPole, hasSouthPole;
+        double obliqueSampRes, obliqueLineRes, obliquePixelRes, obliqueDetectorRes;
       };
 
       typedef std::vector<GProperties> BandPropertiesList;

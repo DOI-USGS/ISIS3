@@ -350,15 +350,14 @@ namespace Isis {
    *
    * @return string
    */
-  QString iTime::SecondString() const {
+  QString iTime::SecondString(int precision) const {
     ostringstream osec;
     osec.setf(ios::fixed);
-    osec << setprecision(8) << Second();
+    osec << setprecision(precision) << Second();
     QString sSeconds(osec.str().c_str());
     sSeconds = sSeconds.remove(QRegExp("(\\.0*|0*)$"));
 
     if(sSeconds.isEmpty()) sSeconds = "0";
-
     return sSeconds;
   }
 
@@ -416,7 +415,7 @@ namespace Isis {
    *
    * @return string The internalized time, in UTC format
    */
-  QString iTime::UTC() const {
+  QString iTime::UTC(int precision) const {
     QString utc = YearString() + "-" ;
     if(Month() < 10) utc += "0" + MonthString() + "-";
     else utc += MonthString() + "-";
@@ -430,9 +429,9 @@ namespace Isis {
     if(Minute() < 10) utc += "0" + MinuteString() + ":";
     else utc += MinuteString() + ":";
 
-    if(Second() < 10) utc += "0" + SecondString();
-    else utc += SecondString();
-
+    if(Second() < 10) utc += "0" + SecondString(precision);
+    else utc += SecondString(precision);
+    
     return utc;
   }
 

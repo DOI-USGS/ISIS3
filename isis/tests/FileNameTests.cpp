@@ -157,33 +157,33 @@ TEST(FileName, HighestVersion) {
 
 TEST(FileName, NewVersion) {
   std::ofstream fileStream;
-  fileStream.open("test000001.cub");
+  fileStream.open("NewVersion000001.cub");
   fileStream << "test";
   fileStream.close();
-  fileStream.open("test000002.cub");
+  fileStream.open("NewVersion000002.cub");
   fileStream << "test";
   fileStream.close();
 
-  FileName file("test??????.cub");
-  EXPECT_EQ("./test000003.cub", file.newVersion().expanded());
-  remove("test000001.cub");
-  remove("test000002.cub");
-  remove("test000003.cub");
+  FileName file("NewVersion??????.cub");
+  EXPECT_EQ("./NewVersion000003.cub", file.newVersion().expanded());
+  remove("NewVersion000001.cub");
+  remove("NewVersion000002.cub");
+  remove("NewVersion000003.cub");
 }
 
 TEST(FileName, FileExists) {
   std::ofstream fileStream;
-  fileStream.open("test000001.cub");
+  fileStream.open("FileExists000001.cub");
   fileStream << "test";
   fileStream.close();
 
-  FileName realFile("test000001.cub");
+  FileName realFile("FileExists000001.cub");
   EXPECT_TRUE(realFile.fileExists());
 
   FileName fakeFile("test.cub");
   EXPECT_FALSE(fakeFile.fileExists());
 
-  remove("test000001.cub");
+  remove("FileExists000001.cub");
 }
 
 TEST(FileName, CreateTempFile) {

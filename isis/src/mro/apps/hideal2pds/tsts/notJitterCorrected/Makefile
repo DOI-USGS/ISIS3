@@ -19,7 +19,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) FROM=$(INPUT)/input.cub \
-	  to=$(OUTPUT)/output.img > /dev/null;
+	  to=$(OUTPUT)/output.img bits=16 > /dev/null;
 	pds2hideal from=$(OUTPUT)/output.lbl \
 	  to=$(OUTPUT)/hideal2pds2hideal.cub > /dev/null;
 	tabledump from=$(OUTPUT)/hideal2pds2hideal.cub \

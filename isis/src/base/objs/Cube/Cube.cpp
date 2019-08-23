@@ -49,6 +49,7 @@
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
+#include "TProjection.h"
 
 using namespace std;
 
@@ -2132,6 +2133,98 @@ namespace Isis {
     m_labelFile = new QFile(m_tempCube->expanded());
   }
 
+
+/**
+ * Returns the latitude and longitude range for the Cube. More accurate than the minimum and
+ * maximum latitude and longitude from the mapping group.
+ *
+ * @param[out] minLatitude minimum latitude present in the cube
+ * @param[out] maxLatitude maximum latitude present in the cube
+ * @param[out] minLongitude minimum longitude present in the cube
+ * @param[out] maxLongitude maximum longitude present in the cube
+ */
+  void Cube::latLonRange(double &minLatitude, double &maxLatitude, double &minLongitude, double &
+                         maxLongitude) {
+    Camera *cam;
+    TProjection *proj;
+
+    bool isGood = false;
+    bool useProj = true;
+
+    if (hasGroup("Instrument")) {
+      useProj = false;
+    }
+
+    // setup camera or projection
+    if (useProj) {
+     try {
+       proj = (TProjection *) projection();
+     }
+     catch(IException &e) {
+       QString msg = "Cannot calculate lat/lon range without a camera or projection";
+       throw IException(e, IException::User, msg, _FILEINFO_);
+     }
+    }
+    else {
+      try {
+        cam = camera();
+      }
+      catch(IException &e) {
+        QString msg = "Unable to create camera when calculating a lat/lon range.";
+        throw IException(e, IException::User, msg, _FILEINFO_);
+      }
+    }
+
+    // Iterate over all samp/line combos in cube
+    minLatitude = 99999;
+    minLongitude = 99999;
+    maxLatitude = -99999;
+    maxLongitude = -99999;
+
+    for (double sample = 0.5; sample < sampleCount() + 0.5; sample++) {
+    // Checks to see if the point is in outer space
+      for (double line = 0.5; line < lineCount() + 0.5; line++) {
+        if (useProj) {
+          isGood = proj->SetWorld(sample, line);
+        }
+        else {
+          isGood = cam->SetImage(sample, line);
+        }
+
+        double lat, lon;
+        if (isGood) {
+          if (useProj) {
+            lat = proj->UniversalLatitude();
+            lon = proj->UniversalLongitude();
+          }
+          else {
+            lat = cam->UniversalLatitude();
+            lon = cam->UniversalLongitude();
+          }
+
+          // update mix/max lat/lons
+          if (lat < minLatitude) {
+            minLatitude = lat;
+          }
+          else if (lat > maxLatitude) {
+            maxLatitude = lat;
+          }
+
+          if (lon < minLongitude) {
+            minLongitude = lon;
+          }
+          else if (lon > maxLongitude) {
+            maxLongitude = lon;
+          }
+        }
+      }
+    }
+    if ( (minLatitude == 99999) || (minLongitude == 99999) || (maxLatitude == -99999) ||
+    (maxLongitude == -99999) ) {
+      QString msg = "Unable to calculate a minimum or maximum latitutde or longitude.";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+  }
 
   /**
    * Write the Pvl labels to the cube's label file. Excess data in the attached
