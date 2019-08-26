@@ -12,6 +12,9 @@
 !TestPreferences
 !*/3rdParty/Makefile
 
+# Unignore version file
+!version
+
 *.cub
 *.o
 *.so
