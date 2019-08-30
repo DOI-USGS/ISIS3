@@ -25,7 +25,7 @@
 
 # Planning & Design
 
-## [Tutorials](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops)
+# [Tutorials](https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops)
 
 ### Fundamentals
 * [Introduction to ISIS](https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS)
