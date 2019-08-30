@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   Core Base and Multiplier - ISIS - Astrogeology Support and Issue Tracking
+  </title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+  <meta content="Redmine" name="description"/>
+  <meta content="issue,bug,tracker" name="keywords"/>
+  <meta content="authenticity_token" name="csrf-param"/>
+  <meta content="PvwqeBOvTqMgT+Z793DtTnMAZAct09gbZtoP4Q4wKn6/Wxa40bZPyYdrd0w5Ciz+3YRtNHuDVeUERKSJ2dFTRA==" name="csrf-token"/>
+  <link href="favicon.ico" rel="shortcut icon"/>
+  <link href="stylesheets/jquery/jquery-ui-1.11.0.css" media="all" rel="stylesheet"/>
+  <link href="themes/astro/stylesheets/application.css" media="all" rel="stylesheet"/>
+  <link href="stylesheets/responsive.css" media="all" rel="stylesheet"/>
+  <script src="javascripts/jquery-1.11.1-ui-1.11.0-ujs-3.1.4.js">
+  </script>
+  <script src="javascripts/application.js">
+  </script>
+  <script src="javascripts/responsive.js">
+  </script>
+  <script>
+   //<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved text that will be lost if you leave this page.'); });
+//]]>
+  </script>
+  <script src="themes/astro/javascripts/theme.js">
+  </script>
+  <link href="plugin_assets/redmine_ldap_sync/stylesheets/ldap_sync.css" media="screen" rel="stylesheet"/>
+  <link href="plugin_assets/redmine_agile/stylesheets/redmine_agile.css" media="screen" rel="stylesheet"/>
+  <script src="plugin_assets/redmine_checklists/javascripts/checklists.js">
+  </script>
+  <link href="plugin_assets/redmine_checklists/stylesheets/checklists.css" media="screen" rel="stylesheet"/>
+  <!-- page specific tags -->
+ </head>
+ <body class="theme-Astro project-isis controller-wiki action-show">
+  <div id="wrapper">
+   <div id="wrapper2">
+    <div id="wrapper3">
+      </div>
+     <div class="" id="main">
+		<div id="sidebar">
+            <h1>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki">Home</a>
+				</h1>
+				<h2>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">Tutorials</a>
+				</h2>
+				<h3>
+				Fundamentals</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				</ul>
+				<h3>
+				General Image Processing</h3>
+				<ul>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
+				</ul>
+				<h3>
+				Cartography</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">SPICE</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">Camera Geometry</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">Learning About Map Projections</a></li>
+				</ul>
+				<h3>
+				Advanced</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">Image Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">Automatic Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">Autoseed</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">Multi-Instrument Registration</a></li>
+				</ul>
+				<h3>
+				Mission Specific ISIS3 Processing</h3>
+				<ul>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">Mars Reconnaissance Orbiter (MRO)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">HiRISE - High Resolution Imaging Science Experiment</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">CTX (Context Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">Mars Global Surveyor (MGS)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">MOC (Mars Orbiter Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">Mars Viking Orbiter Mission</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">Narrow and Wide Angle Camera</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">Cassini-Huygens Mision</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">ISS (Imaging Science SubSystem)</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">RADAR - Imaging, Altimeter, Scatterometer, Radiometer</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">VIMS (Visual and Infrared Mapping Spectrometer)</a></li>
+				</ul>
+				</li>
+				<li>Working with Lunar Reconnaissance Orbiter (LRO)
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">MiniRF - Miniature Radio Frequency instrument</a></li>
+				</ul>
+				</li>
+				</ul>
+				<h3>
+				Programming in ISIS3</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">Exercises 1</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">Exercises 2</a></li>
+				</ul>
+				<h3>
+				Demonstration Material</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				</ul>
+				<h3>Workshops</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Training_2016">ISIS Training 2016</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Planetary_Data_Workshop_June_2012">Planetary Data Workshop June 2012</a></li>
+				</ul>
+
+		</div>
+      <div id="content">
+       <div class="contextual">
+       </div>
+       <div class="wiki wiki-page">
+        <a name="Core-Base-and-Multiplier">
+        </a>
+        <h1>
+         Core Base and Multiplier
+         <a class="wiki-anchor" href="#Core-Base-and-Multiplier">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <ul class="toc">
+         <li>
+          <a href="#Core-Base-and-Multiplier">
+           Core Base and Multiplier
+          </a>
+          <ul>
+           <li>
+            <a href="#Core-Base-and-Multiplier-Basics">
+             Core Base and Multiplier Basics
+            </a>
+           </li>
+           <li>
+            <a href="#Important-Notes">
+             Important Notes:
+            </a>
+           </li>
+           <li>
+            <a href="#Core-Base-and-Multiplier-and-ISIS3">
+             Core Base and Multiplier and ISIS3
+            </a>
+           </li>
+           <li>
+            <a href="#Processing-Considerations">
+             Processing Considerations
+            </a>
+           </li>
+           <li>
+            <a href="#Original-Image">
+             Original Image
+            </a>
+           </li>
+           <li>
+            <a href="#Low-Saturation-Image">
+             Low Saturation Image
+            </a>
+           </li>
+           <li>
+            <a href="#High-Saturation-Image">
+             High Saturation Image
+            </a>
+           </li>
+           <li>
+            <a href="#Wide-Saturation-Image">
+             Wide Saturation Image
+            </a>
+           </li>
+           <li>
+            <a href="#Tips">
+             Tips
+            </a>
+           </li>
+           <li>
+            <a href="#Related-ISIS3-Applications">
+             Related ISIS3 Applications
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#The-Effect-on-Image-Data">
+           The Effect on Image Data
+          </a>
+         </li>
+         <li>
+          <a href="#Core-Base-and-Multiplier-Summary">
+           Core Base and Multiplier Summary
+          </a>
+         </li>
+        </ul>
+        <p>
+         <a name="Core-Base-and-Multiplier-Basics">
+         </a>
+        </p>
+        <h2>
+         Core Base and Multiplier Basics
+         <a class="wiki-anchor" href="#Core-Base-and-Multiplier-Basics">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         Recall that a
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Digital_Number">
+          Digital Number (DN)
+         </a>
+         is the content of a pixel. These numbers are used to represent real world values such as:
+        </p>
+        <ul>
+         <li>
+          <strong>
+           Radiance
+          </strong>
+          - A measurement describing the amount of electromagnetic energy emitted from an area of a planet.
+         </li>
+         <li>
+          <strong>
+           Reflectance
+          </strong>
+          - The ratio of reflected energy to incoming energy
+         </li>
+         <li>
+          <strong>
+           Elevation
+          </strong>
+          - The height above or below a fixed point on the surface of a body
+         </li>
+         <li>
+          <strong>
+           Emissivity
+          </strong>
+          - A measure describing a substances ability to absorb and radiate electromagnetic energy.
+         </li>
+        </ul>
+        <p>
+         Let's assume we have an 8-bit cube with values representing the elevation in meters. Unfortunately 8-bit pixels have a range of 0 to 255, which is very restrictive for elevation. ISIS deals with this problem by using a Core Base and Multiplier. Each DN is really treated as a floating point number in all ISIS programs.
+        </p>
+        <p>
+         In the example below, use mouse to examine the values in an 8-bit elevation cube, then change the multiplier and base notice how the values change.
+        </p>
+        <p>
+         <em>
+          Click the questions to see the answers.
+         </em>
+        </p>
+        <p>
+         <strong>
+          Change the multiplier to 100
+         </strong>
+         . Re-examine the image.
+         <a class="collapsible collapsed" href="#" id="collapse-5a546886-show" onclick="$('#collapse-5a546886-show, #collapse-5a546886-hide').toggle(); $('#collapse-5a546886').fadeToggle(150);; return false;">
+          Do the elevations range from 0 to 25500 meters?
+         </a>
+         <a class="collapsible" href="#" id="collapse-5a546886-hide" onclick="$('#collapse-5a546886-show, #collapse-5a546886-hide').toggle(); $('#collapse-5a546886').fadeToggle(150);; return false;" style="display:none;">
+          Do the elevations range from 0 to 25500 meters?
+         </a>
+        </p>
+        <div class="collapsed-text" id="collapse-5a546886" style="display:none;">
+         <p>
+          Yes, The DNs range from 0 (black) to 25500 (white) representing the elevation in meters.
+         </p>
+        </div>
+        <p>
+        </p>
+        <p>
+         <strong>
+          Change the base to -500
+         </strong>
+         .
+         <a class="collapsible collapsed" href="#" id="collapse-d66fd8ec-show" onclick="$('#collapse-d66fd8ec-show, #collapse-d66fd8ec-hide').toggle(); $('#collapse-d66fd8ec').fadeToggle(150);; return false;">
+          What is the range of pixel values?
+         </a>
+         <a class="collapsible" href="#" id="collapse-d66fd8ec-hide" onclick="$('#collapse-d66fd8ec-show, #collapse-d66fd8ec-hide').toggle(); $('#collapse-d66fd8ec').fadeToggle(150);; return false;" style="display:none;">
+          What is the range of pixel values?
+         </a>
+        </p>
+        <div class="collapsed-text" id="collapse-d66fd8ec" style="display:none;">
+         <p>
+          The DNs range from -500 (black) to 25000 (white).
+         </p>
+        </div>
+        <p>
+        </p>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-multiplier">
+        </div>
+        <p>
+        </p>
+        <a name="Important-Notes">
+        </a>
+        <h2>
+         Important Notes:
+         <a class="wiki-anchor" href="#Important-Notes">
+          ¶
+         </a>
+        </h2>
+        <ul>
+         <li>
+          The equation applied to 8-bit and 16-bit cubes is DN = Base + (stored value * Multiplier).
+         </li>
+         <li>
+          Base and Multiplier are not used for 32-bit cubes.
+         </li>
+         <li>
+          It is much easier to think of all ISIS cubes as 32-bit even though they may be stored as 8-bit or 16-bit.
+         </li>
+        </ul>
+        <p>
+        </p>
+        <a name="Core-Base-and-Multiplier-and-ISIS3">
+        </a>
+        <h2>
+         Core Base and Multiplier and ISIS3
+         <a class="wiki-anchor" href="#Core-Base-and-Multiplier-and-ISIS3">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         Within ISIS3, every software application dealing with an image cube uses the bit-type of the data and the Base and Multiplier in order to generate a
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Digital_Number">
+          Digital Number (DN)
+         </a>
+         that represents the data. For example, if a cube holds elevation data, the DN of each pixel is the elevation in measurable units (e.g. meters, feet, etc.) of that point on the surface. All ISIS3 applications use the floating point values (i.e., with the base and multiplier applied to the stored pixel value) in their calculations.
+        </p>
+        <p>
+         The values stored in the Base and Multiplier keywords in the cube label (located in the Pixels Group) are applied to the stored values in 8-bit and 16-bit cubes of the image cube in order to generate DN values using the following equation:
+        </p>
+        <p>
+         <strong>
+          DN value = Base + (Multiplier * stored value)
+         </strong>
+        </p>
+        <p>
+         For example, radiance values in a radiometrically calibrated cube are displayed as floating point values (regardless of the stored value) representing radiance from the surface in radiance units (e.g. µw/(cm2sr)). If the output calibrated image file is an 8-bit cube (i.e. values ranging from 0 to 255), the Base and Multiplier are applied to shift and scale the stored values in order to represent the actual floating point radiance values.
+        </p>
+        <p>
+         The resulting DNs will vary slightly between 8-bit and 16-bit cubes due to the different number and range of values that can be stored within each bit-type.
+        </p>
+        <p>
+         For 32-bit cubes, the Base and Multiplier keywords are not used because each pixel DN already directly represents actual floating point value. Processing image data within ISIS3 in 32-bit avoids processing-induced saturation of pixel DN's and bin compression problems.
+        </p>
+        <a name="Processing-Considerations">
+        </a>
+        <h2>
+         Processing Considerations
+         <a class="wiki-anchor" href="#Processing-Considerations">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         Choose the Output Range Carefully
+        </p>
+        <p>
+         When processing image data with 8-bit or 16-bit output, you must anticipate the output DN range of the cube you will be creating. This is particularly important if the input DN range will be changed significantly after processing through an ISIS3 application, such as a radiometric calibration application or ratio.
+        </p>
+        <p>
+         The ISIS3 software automatically computes the Base and Multiplier values based on the provided range of valid output DNs you set for 8- or 16-bit output image cubes. Take care in setting the output range, otherwise valid data may be lost:
+        </p>
+        <ul>
+         <li>
+          <strong>
+           Minimum too high
+          </strong>
+          : Output DNs falling below the MIN value will be set to low saturation
+         </li>
+         <li>
+          <strong>
+           Maximum too low
+          </strong>
+          : Output DNs falling above the MAX value will be set to high saturation
+         </li>
+         <li>
+          <strong>
+           Range too wide
+          </strong>
+          : Output DNs will be binned (a subrange of DNs are all combine into one DN), reducing the number of discrete DNs in the output
+         </li>
+        </ul>
+        <p>
+         The following examples are gross exaggerations, and are meant only to illustrate some problems you may see creating 8-bit and 16-bit output cubes.
+        </p>
+        <a name="Original-Image">
+        </a>
+        <h2>
+         Original Image
+         <a class="wiki-anchor" href="#Original-Image">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         <a class="thumbnail" href="attachments/download/886/Original_sample.png" title="Original Image">
+          <img alt="Original_sample.png" src="attachments/thumbnail/886/300.png"/>
+         </a>
+         <br/>
+         <strong>
+          Original Image
+         </strong>
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/887/Original_sample_histogram.png" title="Original Image Histogram">
+          <img alt="Original_sample_histogram.png" src="attachments/thumbnail/887/300.png"/>
+         </a>
+         <br/>
+         <strong>
+          Histogram of original image.
+         </strong>
+         <br/>
+         Notice the pixel values are well distributed over the range.
+        </p>
+        <p>
+         <strong>
+          <em>
+           Statistics
+          </em>
+         </strong>
+        </p>
+        <p>
+         The following statistics were generated by the
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/stats/stats.html">
+          <strong>
+           stats
+          </strong>
+         </a>
+         application.
+        </p>
+        <pre> Group = Results
+  From              = original.cub
+  Average           = 125.24218105453
+  StandardDeviation = 22.665000770265
+  Variance          = 513.70225991612
+  Median            = 124.90322580645
+  Mode              = 126.88172043011
+  Skew              = 0.044865021383909
+  Minimum           = 1.0
+  Maximum           = 254.0
+  TotalPixels       = 40000
+  ValidPixels       = 39999
+  NullPixels        = 0
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 1
+ End_Group
+</pre>
+        <a name="Low-Saturation-Image">
+        </a>
+        <h2>
+         Low Saturation Image
+         <a class="wiki-anchor" href="#Low-Saturation-Image">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         In this example the range is set to 1:254. By default, the pixels the
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+          <strong>
+           highpass
+          </strong>
+         </a>
+         application generates have values that are centered around 0. Since there will be values less than 1 in the file, setting the minimum of the output range to 1 will cause all of the pixels with values less than 1 to be set to
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         . In this example, over half our pixels have been set to NULL, needlessly throwing out what should be valid data.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/888/Lowsaturation_sample.png" title="Low Saturation">
+          <img alt="Lowsaturation_sample.png" src="attachments/thumbnail/888/300.png"/>
+         </a>
+         <br/>
+         <strong>
+          Low Saturation
+         </strong>
+        </p>
+        <p>
+         <strong>
+          <em>
+           Command Line
+          </em>
+         </strong>
+        </p>
+        <pre> highpass
+  from=original.cub
+  to=lowsaturation+8bit+1:254
+  lines=31 samples=31
+</pre>
+        <p>
+         <strong>
+          <em>
+           Statistics
+          </em>
+         </strong>
+        </p>
+        <pre> Group = Results
+  From              = lowsaturation.cub
+  Average           = 11.533880695352
+  StandardDeviation = 9.9256794761932
+  Variance          = 98.519113064124
+  Median            = 8.9423264907136
+  Mode              = 1.9775171065494
+  Skew              = 0.78328769658181
+  Minimum           = 1.0
+  Maximum           = 126.0
+  TotalPixels       = 40000
+  ValidPixels       = 19731
+  NullPixels        = 20268
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 1
+ End_Group
+</pre>
+        <a name="High-Saturation-Image">
+        </a>
+        <h2>
+         High Saturation Image
+         <a class="wiki-anchor" href="#High-Saturation-Image">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         In this example the range is set to -123:1. Like above, by default, the pixels the
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+          <strong>
+           highpass
+          </strong>
+         </a>
+         application generates have values that are centered around 0. Since there will be values greater than 1 in the file, setting the maximum of the output range to 1 will cause all of the pixels with values greater than 1 to be set to
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/High_Representation_Saturation">
+          High Representation Saturation (HRS)
+         </a>
+         . In this example, nearly half our pixels have been set to HRS, needlessly throwing out what should be valid data.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/889/Highsaturation_sample.png" title="High Saturation">
+          <img alt="Highsaturation_sample.png" src="attachments/thumbnail/889/300.png"/>
+         </a>
+         <br/>
+         <strong>
+          High Saturation
+         </strong>
+        </p>
+        <p>
+         <strong>
+          <em>
+           Command Line
+          </em>
+         </strong>
+        </p>
+        <pre> highpass
+  from=original.cub
+  **to=highsaturation+8bit+-123:1**
+  lines=31 samples=31
+</pre>
+        <p>
+         <strong>
+          <em>
+           Statistics
+          </em>
+         </strong>
+        </p>
+        <pre> Group = Results
+  From              = highsaturation.cub
+  Average           = -10.640719301463
+  StandardDeviation = 10.791846466594
+  Variance          = 116.46395015854
+  Median            = -7.8135106000765
+  Mode              = -1.4146604383805
+  Skew              = -0.78592909289581
+  Minimum           = -122.50988142293
+  Maximum           = 0.9999999999954
+  TotalPixels       = 40000
+  ValidPixels       = 21278
+  NullPixels        = 1
+  LisPixels         = 0
+  LrsPixels         = 0
+  HisPixels         = 0
+  HrsPixels         = 18721
+ End_Group
+</pre>
+        <a name="Wide-Saturation-Image">
+        </a>
+        <h2>
+         Wide Saturation Image
+         <a class="wiki-anchor" href="#Wide-Saturation-Image">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         In this example the range is set to -2500:2500. Unlike the above examples, this range encompasses the entire range of the output data, however, the range is much wider than necessary. In order to squeeze all the 5,001 possible values into the 256 possible values that can be stored in our 8-bit output file, ranges of values are combined into a single value that represents that range. Instead of getting a nice distribution of values across the range (like in our original image), now there's only a handful of values representing our data set - this effect is called
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Binning">
+          binning
+         </a>
+         . The effects of binning are most obvious in the image histogram - compare the histogram graph on the left to the histogram graph of the original image above.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/890/Widesaturation_sample.png" title="Wide Saturation">
+          <img alt="Widesaturation_sample.png" src="attachments/thumbnail/890/300.png"/>
+         </a>
+         <br/>
+         <strong>
+          Wide Saturation
+         </strong>
+        </p>
+        <p>
+         <strong>
+          <em>
+           Command Line
+          </em>
+         </strong>
+        </p>
+        <pre> highpass
+  from=original.cub
+  **to=widesaturation+8bit+-2500:2500**
+  lines=31 samples=31
+</pre>
+        <p>
+         <strong>
+          <em>
+           Histogram Statistics
+          </em>
+         </strong>
+        </p>
+        <p>
+         The following statistics were generated by the
+         <strong>
+          hist
+         </strong>
+         application, which also generates the comma-delimited data used to generate the histogram shown left.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/891/Widesaturation_sample_histogram.png" title="Wide Saturation Histogram">
+          <img alt="Widesaturation_sample_histogram.png" src="attachments/thumbnail/891/400.png"/>
+         </a>
+         <br/>
+         <strong>
+          Histogram of wide saturation image.
+         </strong>
+         <br/>
+         Notice that all pixels are in one of a few bins, not well distributed over the range as they should be.
+        </p>
+        <pre> Cube:           widesaturation.cub
+ Band:           1
+ Average:        -0.00419971
+ Std Deviation:  16.5516
+ Variance:       273.957
+ Median:         9.92006
+ Mode:           9.92006
+ Skew:           -1.79878
+ Minimum:        -128.458
+ Maximum:        128.458
+
+ Total Pixels:    40000
+ Valid Pixels:    39999
+ Null Pixels:     0
+ Lis Pixels:      0
+ Lrs Pixels:      0
+ His Pixels:      0
+ Hrs Pixels:      1
+</pre>
+        <a name="Tips">
+        </a>
+        <h2>
+         Tips
+         <a class="wiki-anchor" href="#Tips">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <ul>
+         <li>
+          ISIS3 does not require the base and multiplier to be the same in all input cubes (unlike older versions of ISIS)
+         </li>
+         <li>
+          If you're uncertain what the DN range of your output cube will be when you run an application, run the application so it generates a standard 32-bit cube and run
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/stats/stats.html">
+           <strong>
+            stats
+           </strong>
+          </a>
+          on the new cube.
+         </li>
+         <li>
+          In general, we recommend always working with 32-bit cubes. If you don't reduce the bit-type to 8-bit or 16-bit, you don't need to worry about saturation, binning, or loss of accuracy while working.
+         </li>
+        </ul>
+        <a name="Related-ISIS3-Applications">
+        </a>
+        <h2>
+         Related ISIS3 Applications
+         <a class="wiki-anchor" href="#Related-ISIS3-Applications">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         See the following ISIS3 documentation for information about the applications discussed here:
+        </p>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/stats/stats.html">
+           <strong>
+            stats
+           </strong>
+          </a>
+          - Get statistics about a cube
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/hist/hist.html">
+           <strong>
+            hist
+           </strong>
+          </a>
+          - Get histogram data and statistics about a cube
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+           <strong>
+            highpass
+           </strong>
+          </a>
+          - high pass filter
+         </li>
+        </ul>
+        <a name="The-Effect-on-Image-Data">
+        </a>
+        <h1>
+         The Effect on Image Data
+         <a class="wiki-anchor" href="#The-Effect-on-Image-Data">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <p>
+         If the Base is 0 and Multiplier is 1, the DN values will be the same as the stored values. In this case, values will range from 0 to 255 for an 8-bit cube, and -32768 to 32767 for a 16-bit cube. If these two keywords are not 0 and 1, then the DN range will vary based on whatever you specified for the range when you ran the application. The number of unique values will still be 256 for an 8-bit cube, 65,536 for a 16-bit cube, and ~4 billion for a 32-bit cube.
+        </p>
+        <pre> cubeatt from=file_32bit to=file_8bit+8bit:1:254
+ cubeatt from=file_32bit to=file_8bit+8bit+0:1.0
+</pre>
+        <a name="Core-Base-and-Multiplier-Summary">
+        </a>
+        <h1>
+         Core Base and Multiplier Summary
+         <a class="wiki-anchor" href="#Core-Base-and-Multiplier-Summary">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <p>
+         The base and multiplier are used to convert 8-bit and 16-bit cube pixel values stored on disk to a digital number (DN). Once converted the DN may represent measurements like radiance or reflectance. 32-bit pixels are not converted using the base and multiplier. They already represent the true measurement.
+        </p>
+        <p>
+         <strong>
+          DN = Base + (stored value * Multiplier)
+         </strong>
+        </p>
+        <p>
+         Be very careful when specifying the bit type for an output cube. Specifying a smaller bit type can cause a loss of data. Specifying a larger bit type will not cause you to lose any data, but will increase the size of the output cube.
+        </p>
+       </div>
+       <div class="attachments">
+        <div class="contextual">
+        </div>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/886/Original_sample.png">
+          Original_sample.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/886/Original_sample.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (118 KB)
+         </span>
+         <span class="author">
+          Curtis Rose, 2016-05-31 01:34 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/887/Original_sample_histogram.png">
+          Original_sample_histogram.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/887/Original_sample_histogram.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (18.2 KB)
+         </span>
+         <span class="author">
+          Curtis Rose, 2016-05-31 01:34 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/888/Lowsaturation_sample.png">
+          Lowsaturation_sample.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/888/Lowsaturation_sample.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (118 KB)
+         </span>
+         <span class="author">
+          Curtis Rose, 2016-05-31 01:34 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/889/Highsaturation_sample.png">
+          Highsaturation_sample.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/889/Highsaturation_sample.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (118 KB)
+         </span>
+         <span class="author">
+          Curtis Rose, 2016-05-31 01:35 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/890/Widesaturation_sample.png">
+          Widesaturation_sample.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/890/Widesaturation_sample.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (118 KB)
+         </span>
+         <span class="author">
+          Curtis Rose, 2016-05-31 01:35 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/891/Widesaturation_sample_histogram.png">
+          Widesaturation_sample_histogram.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/891/Widesaturation_sample_histogram.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (12.8 KB)
+         </span>
+         <span class="author">
+          Curtis Rose, 2016-05-31 01:35 PM
+         </span>
+        </p>
+       </div>
+       <div style="clear:both;">
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>

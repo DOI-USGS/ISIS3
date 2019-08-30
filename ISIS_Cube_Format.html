@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   Isis Cube Format - ISIS - Astrogeology Support and Issue Tracking
+  </title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+  <meta content="Redmine" name="description"/>
+  <meta content="issue,bug,tracker" name="keywords"/>
+  <meta content="authenticity_token" name="csrf-param"/>
+  <meta content="c4otFh5dHb+p3/UGa1SJUmbOZTW9OevaE7zcXcDuhwFSQ546o81paE6F/jYJoOGTHz+uNsm5ZgbL8UCdMjLuWw==" name="csrf-token"/>
+  <link href="favicon.ico" rel="shortcut icon"/>
+  <link href="stylesheets/jquery/jquery-ui-1.11.0.css" media="all" rel="stylesheet"/>
+  <link href="themes/astro/stylesheets/application.css" media="all" rel="stylesheet"/>
+  <link href="stylesheets/responsive.css" media="all" rel="stylesheet"/>
+  <script src="javascripts/jquery-1.11.1-ui-1.11.0-ujs-3.1.4.js">
+  </script>
+  <script src="javascripts/application.js">
+  </script>
+  <script src="javascripts/responsive.js">
+  </script>
+  <script>
+   //<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved text that will be lost if you leave this page.'); });
+//]]>
+  </script>
+  <script src="themes/astro/javascripts/theme.js">
+  </script>
+  <link href="plugin_assets/redmine_ldap_sync/stylesheets/ldap_sync.css" media="screen" rel="stylesheet"/>
+  <link href="plugin_assets/redmine_agile/stylesheets/redmine_agile.css" media="screen" rel="stylesheet"/>
+  <script src="plugin_assets/redmine_checklists/javascripts/checklists.js">
+  </script>
+  <link href="plugin_assets/redmine_checklists/stylesheets/checklists.css" media="screen" rel="stylesheet"/>
+  <!-- page specific tags -->
+ </head>
+ <body class="theme-Astro project-isis controller-wiki action-show">
+  <div id="wrapper">
+   <div id="wrapper2">
+    <div id="wrapper3">
+     <div class="" id="main">
+		<div id="sidebar">
+            <h1>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki">Home</a>
+				</h1>
+				<h2>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">Tutorials</a>
+				</h2>
+				<h3>
+				Fundamentals</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				</ul>
+				<h3>
+				General Image Processing</h3>
+				<ul>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
+				</ul>
+				<h3>
+				Cartography</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">SPICE</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">Camera Geometry</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">Learning About Map Projections</a></li>
+				</ul>
+				<h3>
+				Advanced</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">Image Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">Automatic Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">Autoseed</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">Multi-Instrument Registration</a></li>
+				</ul>
+				<h3>
+				Mission Specific ISIS3 Processing</h3>
+				<ul>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">Mars Reconnaissance Orbiter (MRO)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">HiRISE - High Resolution Imaging Science Experiment</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">CTX (Context Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">Mars Global Surveyor (MGS)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">MOC (Mars Orbiter Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">Mars Viking Orbiter Mission</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">Narrow and Wide Angle Camera</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">Cassini-Huygens Mision</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">ISS (Imaging Science SubSystem)</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">RADAR - Imaging, Altimeter, Scatterometer, Radiometer</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">VIMS (Visual and Infrared Mapping Spectrometer)</a></li>
+				</ul>
+				</li>
+				<li>Working with Lunar Reconnaissance Orbiter (LRO)
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">MiniRF - Miniature Radio Frequency instrument</a></li>
+				</ul>
+				</li>
+				</ul>
+				<h3>
+				Programming in ISIS3</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">Exercises 1</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">Exercises 2</a></li>
+				</ul>
+				<h3>
+				Demonstration Material</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				</ul>
+				<h3>Workshops</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Training_2016">ISIS Training 2016</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Planetary_Data_Workshop_June_2012">Planetary Data Workshop June 2012</a></li>
+				</ul>
+
+			</div>
+      <div id="content">
+       <div class="contextual">
+       </div>
+       <div class="wiki wiki-page">
+			<h1>
+			ISIS3 Cube Format
+			<a class="wiki-anchor" href="#ISIS3-Cube-Format">
+			¶
+			</a>
+			</h1>
+        <ul class="toc">
+         <li>
+          <a href="#ISIS3-Cube-Format">
+           ISIS3 Cube Format
+          </a>
+          <ul>
+           <li>
+            <a href="#What-Is-A-Cube">
+             What Is A Cube?
+            </a>
+            <ul>
+             <li>
+              <a href="#Interactive-Cube-Demonstration">
+               Interactive Cube Demonstration
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Cube-Demo">
+             Cube Demo
+            </a>
+           </li>
+           <li>
+            <a href="#What-Are-Pixels">
+             What Are Pixels?
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Bit-Type-Basics">
+           Bit Type Basics
+          </a>
+          <ul>
+           <li>
+            <ul>
+             <li>
+              <a href="#Glossary-amp-Review">
+               Glossary &amp; Review
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Pixel-Values-Digital-Numbers">
+             Pixel Values: Digital Numbers
+            </a>
+           </li>
+           <li>
+            <a href="#Core-Base-and-Multiplier-Basics">
+             Core Base and Multiplier Basics
+            </a>
+           </li>
+           <li>
+            <a href="#Sub-Pixel-Definition">
+             Sub-Pixel Definition
+            </a>
+           </li>
+           <li>
+            <a href="#Summary">
+             Summary
+            </a>
+           </li>
+          </ul>
+         </li>
+        </ul>
+        <a name="ISIS3-Cube-Format">
+        </a>
+        <a name="What-Is-A-Cube">
+        </a>
+        <h2>
+         What Is A Cube?
+         <a class="wiki-anchor" href="#What-Is-A-Cube">
+          ¶
+         </a>
+        </h2>
+        <p>
+         A cube is a 3-dimensional image with axis: samples, lines, and bands. The physical dimensions of a cube are called the number of samples (NS), number of lines (NL), and number of bands (NB). Typically, the sample and line dimensions are used to represent spatial information while the band dimension represents spectral information. See the table below for examples of the line, sample, and band dimensions of a few data sets from planetary missions.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/1098/Cube.png" title="Dimensions of an ISIS3 Cube">
+          <img alt="Cube.png" src="attachments/thumbnail/1098.png"/>
+         </a>
+        </p>
+        <blockquote>
+         <p>
+          Illustration of an ISIS3 image cube, showing the three dimensions of an ISIS3 image: width (samples), height (lines), and depth (bands)
+         </p>
+        </blockquote>
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Instrument/Camera
+           </th>
+           <th>
+            # Lines
+           </th>
+           <th>
+            # Samples
+           </th>
+           <th>
+            # Bands
+           </th>
+           <th>
+            Bands
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            Mars Odyssey - Thermal Emission Imaging System, Infrared (THEMIS-IR)
+           </td>
+           <td>
+            240
+           </td>
+           <td>
+            320
+           </td>
+           <td>
+            10
+           </td>
+           <td>
+            All 10 are Infrared, ranging from 6.78 to 14.88 microns
+           </td>
+          </tr>
+          <tr>
+           <td>
+            Mars Odyssey - Thermal Emission Imaging System, Visible Imaging Subsystem (THEMIS-VIS)
+           </td>
+           <td>
+            1024
+           </td>
+           <td>
+            1024
+           </td>
+           <td>
+            5
+           </td>
+           <td>
+            visible
+           </td>
+          </tr>
+          <tr>
+           <td>
+            Viking Orbiter
+           </td>
+           <td>
+            1056
+           </td>
+           <td>
+            1204
+           </td>
+           <td>
+            1 ?
+           </td>
+           <td>
+            blue, minus-blue, violet, green, red, clear
+           </td>
+          </tr>
+          <tr>
+           <td>
+            Mars Global Surveyor - Mars Oribiter Camera Wide Angle (MOC-WA)
+           </td>
+           <td>
+            *
+           </td>
+           <td>
+            3456
+           </td>
+           <td>
+            1
+           </td>
+           <td>
+            bandwidth encompases visible and near-infrared
+           </td>
+          </tr>
+          <tr>
+           <td>
+            Galileo Near-Infrared Mapping Spectrometer (NIMS)
+           </td>
+           <td>
+            *
+           </td>
+           <td>
+            20
+           </td>
+           <td>
+            408
+           </td>
+           <td>
+            visible to infrared
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <a name="Interactive-Cube-Demonstration">
+        </a>
+        <h3>
+         Interactive Cube Demonstration
+         <a class="wiki-anchor" href="#Interactive-Cube-Demonstration">
+          ¶
+         </a>
+        </h3>
+        <a name="Cube-Demo">
+        </a>
+        <h2>
+         Cube Demo
+         <a class="wiki-anchor" href="#Cube-Demo">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-cube">
+        </div>
+        <p>
+        </p>
+        <a name="What-Are-Pixels">
+        </a>
+        <h2>
+         What Are Pixels?
+         <a class="wiki-anchor" href="#What-Are-Pixels">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-pixels">
+        </div>
+        <p>
+        </p>
+        <p>
+         The individual cells within a cube are called pixels. Each pixel in a cube has a location, which is similar to rectangular coordinates (i.e.., (samples, lines, bands)). A cube can be as small as one sample, by one line, by one band (1,1,1). If we had a cube of this size, it would contain only one pixel. A cube can be as large as thousands of samples, by thousands of lines, by thousands of bands. A cube with dimensions (1000, 1000, 1000) would contain one billion pixels.
+        </p>
+        <p>
+         Move your mouse cursor over the cube (above) and pay attention to the sample/line positions of each pixel shown below the cube:
+        </p>
+        <ul>
+         <li>
+          <p>
+           Did you notice that sample 1 is on the left edge of the image and line 1 is on the top edge. Therefore, to figure out the coordinates of a pixel, count lines and samples staring with 1,1 in the upper left corner and move down and to the right.
+          </p>
+         </li>
+         <li>
+          <p>
+           How many samples and lines are in this cube?
+          </p>
+         </li>
+        </ul>
+        <p>
+         <a name="Bit-Type-Basics">
+         </a>
+        </p>
+        <h1>
+         Bit Type Basics
+         <a class="wiki-anchor" href="#Bit-Type-Basics">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <p>
+         Computers store values in base-2 or binary (see glossary below). Values are generally limited to 8, 16, or 32 binary digits, or bits. We refer to the number of bits per value as the bit type. Understanding the bit type and related attributes of an ISIS image cube is important for a variety of reasons. For instance, changing the bit type affects the file size, and a cube's bit type determines the range and number of values that can be stored in a cube.
+        </p>
+        <p>
+         There are three bit types utilized in ISIS:
+        </p>
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Bit Type
+           </th>
+           <th>
+            Name
+           </th>
+           <th>
+            Number of Bytes
+           </th>
+           <th>
+            Range
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            8
+           </td>
+           <td>
+            Unsigned Byte
+           </td>
+           <td>
+            1
+           </td>
+           <td>
+            0 to 255
+           </td>
+          </tr>
+          <tr>
+           <td>
+            16
+           </td>
+           <td>
+            Signed Word
+           </td>
+           <td>
+            2
+           </td>
+           <td>
+            -32768 to 32767
+           </td>
+          </tr>
+          <tr>
+           <td>
+            32
+           </td>
+           <td>
+            Real
+           </td>
+           <td>
+            4
+           </td>
+           <td>
+            -3.40282E+38 to 3.04282E+38
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <p>
+         As shown in the illustration below, there are 8 bits in 1 byte, and 16 bits in 2 bytes. A 16-bit value is called a word.
+        </p>
+        <p>
+         <img alt="Bit-byte-word" src="attachments/download/882/Bit-byte-word.jpg"/>
+        </p>
+        <p>
+         There are 8 bits in 1 byte, and 16 bits in 2 bytes. A 16-bit value is called a word.
+        </p>
+        <p>
+         There are 256 possible values (called digital numbers, or DNs) that can be represented in an 8-bit file. If all the bits above are set to 1, the output DN value would be 255. The values 0 to 255 are derived by setting different bit positions to 0 or 1. The example below shows the binary number stored by the computer, and the corresponding DN value the user would see on a computer monitor.
+        </p>
+        <table>
+         <thead>
+          <tr>
+           <th>
+            Binary Number
+           </th>
+           <th>
+            DN Value
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            00000000
+           </td>
+           <td>
+            0
+           </td>
+          </tr>
+          <tr>
+           <td>
+            00000001
+           </td>
+           <td>
+            1
+           </td>
+          </tr>
+          <tr>
+           <td>
+            00000010
+           </td>
+           <td>
+            2
+           </td>
+          </tr>
+          <tr>
+           <td>
+            ...
+           </td>
+           <td>
+            ...
+           </td>
+          </tr>
+          <tr>
+           <td>
+            11111110
+           </td>
+           <td>
+            254
+           </td>
+          </tr>
+          <tr>
+           <td>
+            11111111
+           </td>
+           <td>
+            255
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <p>
+         As you increase the number of bits, the number of possible DN values that can be represented also increases.
+        </p>
+        <a name="Glossary-amp-Review">
+        </a>
+        <h3>
+         Glossary &amp; Review
+         <a class="wiki-anchor" href="#Glossary-amp-Review">
+          ¶
+         </a>
+        </h3>
+        <ul>
+         <li>
+          <strong>
+           Binary
+          </strong>
+          :  Refers to the base-2 numeral system. For an in depth discussion of the binary numeral system, see
+          <a class="external" href="http://en.wikipedia.org/wiki/Binary_numeral_system">
+           this Wikipedia encyclopedia entry for Binary numeral system
+          </a>
+          .
+         </li>
+         <li>
+          <strong>
+           Bit
+          </strong>
+          : Is short for binary digit, which in a computer is the smallest unit of storage. Bits are either "0" or "1".
+         </li>
+         <li>
+          <strong>
+           Byte
+          </strong>
+          : Is short for binary term. A byte is a collection of computer bits. On many modern computers, a byte is a group of eight bits. Typically, computers handle and store information in binary (base-2), and a group of eight bits represents an eight digit binary number.
+         </li>
+         <li>
+          <strong>
+           Bit type
+          </strong>
+          : Refers to how many bits there are per single meaningful value in an image cube file.
+         </li>
+         <li>
+          <strong>
+           DN
+          </strong>
+          : An abbreviation of digital number. For images, particularly ISIS cubes, a DN is also referred to as a pixel.
+         </li>
+        </ul>
+        <p>
+        </p>
+        <a name="Pixel-Values-Digital-Numbers">
+        </a>
+        <h2>
+         Pixel Values: Digital Numbers
+         <a class="wiki-anchor" href="#Pixel-Values-Digital-Numbers">
+          ¶
+         </a>
+        </h2>
+        <p>
+         Each pixel contains a numerical value, often referred to as the digital number (
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          DN
+         </a>
+         ). Low DNs typically show up as black in the image and high DN as white. DNs represent real world values such as:
+        </p>
+        <ul>
+         <li>
+          Radiance - A measurement describing the amount of electromagnetic energy emitted from an area of a planet
+         </li>
+         <li>
+          Reflectance - The ratio of reflected energy to incoming energy
+         </li>
+         <li>
+          Elevation - The height above or below a fixed point on the surface of a body
+         </li>
+         <li>
+          Emissivity - A measure describing a substances ability to absorb and radiate electromagnetic energy
+         </li>
+        </ul>
+        <a name="Core-Base-and-Multiplier-Basics">
+        </a>
+        <h2>
+         Core Base and Multiplier Basics
+         <a class="wiki-anchor" href="#Core-Base-and-Multiplier-Basics">
+          ¶
+         </a>
+        </h2>
+        <p>
+         Recall that a
+         <a class="external" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          [digital Number]
+         </a>
+         is the content of a pixel. These numbers are used to represent real world values such as:
+        </p>
+        <ul>
+         <li>
+          Radiance - A measurement describing the amount of electromagnetic energy emitted from an area of a planet.
+         </li>
+         <li>
+          Reflectance - The ratio of reflected energy to incoming energy
+         </li>
+         <li>
+          Elevation - The height above or below a fixed point on the surface of a body
+         </li>
+         <li>
+          Emissivity - A measure describing a substances ability to absorb and radiate electromagnetic energy.
+         </li>
+        </ul>
+        <p>
+         Let's assume we have an 8-bit cube with values representing the elevation in meters. Unfortunately 8-bit pixels have a range of 0 to 255, which is very restrictive for elevation. ISIS3 deals with this problem by using a Core Base and Multiplier. Each DN is really treated as a floating point number in all ISIS3 programs.
+        </p>
+        <p>
+         In the example to the right, use mouse to examine the values in an 8-bit elevation cube, then change the multiplier and base notice how the values change.
+        </p>
+        <p>
+         Hold your mouse over the questions to see the answers
+        </p>
+        <p>
+         Change the multiplier to 100. Re-examine the image. Do the elevations range from 0 to 25500 meters?
+        </p>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-multiplier">
+        </div>
+        <p>
+        </p>
+        <a name="Sub-Pixel-Definition">
+        </a>
+        <h2>
+         Sub-Pixel Definition
+         <a class="wiki-anchor" href="#Sub-Pixel-Definition">
+          ¶
+         </a>
+        </h2>
+        <p>
+         ISIS3 programs and users often need to interact at the sub-pixel level. That is, fractional pixel positions. The integral sample/line position is defined to be the center of a pixel.
+         <br/>
+         In the example to the right, use mouse to examine the pixel positions in a cube. Hold your mouse over the question to see the answer.
+        </p>
+        <ul>
+         <li>
+          <a class="wiki-page new" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/What_is_the_sample_position_on_the_left_edge_of_the_cube?parent=Isis_Cube_Format">
+           What is the sample position on the left edge of the cube?
+          </a>
+         </li>
+         <li>
+          <a class="wiki-page new" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/What_is_the_sample_position_on_the_right_edge_of_the_first_pixel?parent=Isis_Cube_Format">
+           What is the sample position on the right edge of the first pixel?
+          </a>
+         </li>
+         <li>
+          <a class="wiki-page new" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/What_is_the_line_position_on_the_bottom_edge_of_the_cube?parent=Isis_Cube_Format">
+           What is the line position on the bottom edge of the cube?
+          </a>
+         </li>
+        </ul>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-subpixels">
+        </div>
+        <p>
+        </p>
+        <a name="Summary">
+        </a>
+        <h2>
+         Summary
+         <a class="wiki-anchor" href="#Summary">
+          ¶
+         </a>
+        </h2>
+        <p>
+         Cubes are made up of individual pixels. Each pixel usually represents some area of a planet, moon, astroid or other body. Pixels hold a DN (digital number). That number can be one, two or four bytes long depending on the accuracy necessary to represent the data. DNs can be modified by a "Base" and "Multiplier". The columns of a cube are called samples, the rows are called lines and a plane of samples and lines is called a band.
+        </p>
+       </div>
+       <div class="attachments">
+        <div class="contextual">
+        </div>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/1098/Cube.png">
+          Cube.png
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/1098/Cube.png" title="View">
+          View
+         </a>
+         <span class="size">
+          (44.8 KB)
+         </span>
+         <span class="author">
+          Adam Paquette, 2016-06-10 12:19 PM
+         </span>
+        </p>
+       </div>
+       <div style="clear:both;">
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>

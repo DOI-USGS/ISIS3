@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   Example ISIS Demos - ISIS - Astrogeology Support and Issue Tracking
+  </title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+  <meta content="Redmine" name="description"/>
+  <meta content="issue,bug,tracker" name="keywords"/>
+  <meta content="authenticity_token" name="csrf-param"/>
+  <meta content="Jfwo5xjVA0k15xrng/X+KJ8SINl2SOpzJvziL2Yy4zenHlz0sRMcfs0BsPzwq4InnweQF3GUL31ReGoGajJX7Q==" name="csrf-token"/>
+  <link href="favicon.ico" rel="shortcut icon"/>
+  <link href="stylesheets/jquery/jquery-ui-1.11.0.css" media="all" rel="stylesheet"/>
+  <link href="themes/astro/stylesheets/application.css" media="all" rel="stylesheet"/>
+  <link href="stylesheets/responsive.css" media="all" rel="stylesheet"/>
+  <script src="javascripts/jquery-1.11.1-ui-1.11.0-ujs-3.1.4.js">
+  </script>
+  <script src="javascripts/application.js">
+  </script>
+  <script src="javascripts/responsive.js">
+  </script>
+  <script>
+   //<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved text that will be lost if you leave this page.'); });
+//]]>
+  </script>
+  <script src="themes/astro/javascripts/theme.js">
+  </script>
+  <link href="plugin_assets/redmine_ldap_sync/stylesheets/ldap_sync.css" media="screen" rel="stylesheet"/>
+  <link href="plugin_assets/redmine_agile/stylesheets/redmine_agile.css" media="screen" rel="stylesheet"/>
+  <script src="plugin_assets/redmine_checklists/javascripts/checklists.js">
+  </script>
+  <link href="plugin_assets/redmine_checklists/stylesheets/checklists.css" media="screen" rel="stylesheet"/>
+  <!-- page specific tags -->
+ </head>
+ <body class="theme-Astro project-isis controller-wiki action-show">
+     <div class="" id="main">
+		<div id="sidebar">
+            <h1>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki">Home</a>
+				</h1>
+				<h2>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">Tutorials</a>
+				</h2>
+				<h3>
+				Fundamentals</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				</ul>
+				<h3>
+				General Image Processing</h3>
+				<ul>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
+				</ul>
+				<h3>
+				Cartography</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">SPICE</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">Camera Geometry</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">Learning About Map Projections</a></li>
+				</ul>
+				<h3>
+				Advanced</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">Image Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">Automatic Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">Autoseed</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">Multi-Instrument Registration</a></li>
+				</ul>
+				<h3>
+				Mission Specific ISIS3 Processing</h3>
+				<ul>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">Mars Reconnaissance Orbiter (MRO)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">HiRISE - High Resolution Imaging Science Experiment</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">CTX (Context Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">Mars Global Surveyor (MGS)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">MOC (Mars Orbiter Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">Mars Viking Orbiter Mission</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">Narrow and Wide Angle Camera</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">Cassini-Huygens Mision</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">ISS (Imaging Science SubSystem)</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">RADAR - Imaging, Altimeter, Scatterometer, Radiometer</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">VIMS (Visual and Infrared Mapping Spectrometer)</a></li>
+				</ul>
+				</li>
+				<li>Working with Lunar Reconnaissance Orbiter (LRO)
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">MiniRF - Miniature Radio Frequency instrument</a></li>
+				</ul>
+				</li>
+				</ul>
+				<h3>
+				Programming in ISIS3</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">Exercises 1</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">Exercises 2</a></li>
+				</ul>
+				<h3>
+				Demonstration Material</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				</ul>
+				<h3>Workshops</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Training_2016">ISIS Training 2016</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Planetary_Data_Workshop_June_2012">Planetary Data Workshop June 2012</a></li>
+				</ul>
+
+		</div>
+      <div id="content">
+       <div class="contextual">
+       </div>
+       <div class="wiki wiki-page">
+        <a name="Example-ISIS-Demos">
+        </a>
+        <h1>
+         Example ISIS Demos
+         <a class="wiki-anchor" href="#Example-ISIS-Demos">
+          ¶
+         </a>
+        </h1>
+        <a name="Image-Data-Size-Calculator">
+        </a>
+        <h2>
+         Image Data Size Calculator
+         <a class="wiki-anchor" href="#Image-Data-Size-Calculator">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-image-data-size">
+        </div>
+        <p>
+        </p>
+        <a name="Cube-Demo">
+        </a>
+        <h2>
+         Cube Demo
+         <a class="wiki-anchor" href="#Cube-Demo">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-cube">
+        </div>
+        <p>
+        </p>
+        <a name="Pixel-Demo">
+        </a>
+        <h2>
+         Pixel Demo
+         <a class="wiki-anchor" href="#Pixel-Demo">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-pixels">
+        </div>
+        <p>
+        </p>
+        <a name="Multiplier-Demo">
+        </a>
+        <h2>
+         Multiplier Demo
+         <a class="wiki-anchor" href="#Multiplier-Demo">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-multiplier">
+        </div>
+        <p>
+        </p>
+        <a name="Subpixels-Demo">
+        </a>
+        <h2>
+         Subpixels Demo
+         <a class="wiki-anchor" href="#Subpixels-Demo">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-subpixels">
+        </div>
+        <p>
+        </p>
+        <a name="Special-Pixels-Demo">
+        </a>
+        <h2>
+         Special Pixels Demo
+         <a class="wiki-anchor" href="#Special-Pixels-Demo">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-special-pixels">
+        </div>
+        <p>
+        </p>
+        <a name="Destripe">
+        </a>
+        <h2>
+         Destripe
+         <a class="wiki-anchor" href="#Destripe">
+          ¶
+         </a>
+        </h2>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-destripe">
+        </div>
+        <p>
+        </p>
+        <p>
+         ##Seam Removal
+        </p>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-seams">
+        </div>
+        <p>
+        </p>
+       </div>
+       <div style="clear:both;">
+       </div>
+      </div>
+     </div>
+ </body>
+</html>

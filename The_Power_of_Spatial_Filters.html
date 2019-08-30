@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   The Power of Spatial Filters - ISIS - Astrogeology Support and Issue Tracking
+  </title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+  <meta content="Redmine" name="description"/>
+  <meta content="issue,bug,tracker" name="keywords"/>
+  <meta content="authenticity_token" name="csrf-param"/>
+  <meta content="QU2wX0nLjPDIyjM9x0sxgnxi5VztraPeLs9mfbDk79wQtyL3Mk/rkVmI8jzUwwG0JBwksip6o0R/UYn9QF1NJg==" name="csrf-token"/>
+  <link href="favicon.ico" rel="shortcut icon"/>
+  <link href="stylesheets/jquery/jquery-ui-1.11.0.css" media="all" rel="stylesheet"/>
+  <link href="themes/astro/stylesheets/application.css" media="all" rel="stylesheet"/>
+  <link href="stylesheets/responsive.css" media="all" rel="stylesheet"/>
+  <script src="javascripts/jquery-1.11.1-ui-1.11.0-ujs-3.1.4.js">
+  </script>
+  <script src="javascripts/application.js">
+  </script>
+  <script src="javascripts/responsive.js">
+  </script>
+  <script>
+   //<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved text that will be lost if you leave this page.'); });
+//]]>
+  </script>
+  <script src="themes/astro/javascripts/theme.js">
+  </script>
+  <link href="plugin_assets/redmine_ldap_sync/stylesheets/ldap_sync.css" media="screen" rel="stylesheet"/>
+  <link href="plugin_assets/redmine_agile/stylesheets/redmine_agile.css" media="screen" rel="stylesheet"/>
+  <script src="plugin_assets/redmine_checklists/javascripts/checklists.js">
+  </script>
+  <link href="plugin_assets/redmine_checklists/stylesheets/checklists.css" media="screen" rel="stylesheet"/>
+  <!-- page specific tags -->
+ </head>
+ <body class="theme-Astro project-isis controller-wiki action-show">
+  <div id="wrapper">
+   <div id="wrapper2">
+    <div id="wrapper3">
+     <div class="" id="main">
+		<div id="sidebar">
+            <h1>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki">Home</a>
+				</h1>
+				<h2>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">Tutorials</a>
+				</h2>
+				<h3>
+				Fundamentals</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				</ul>
+				<h3>
+				General Image Processing</h3>
+				<ul>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
+				</ul>
+				<h3>
+				Cartography</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">SPICE</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">Camera Geometry</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">Learning About Map Projections</a></li>
+				</ul>
+				<h3>
+				Advanced</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">Image Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">Automatic Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">Autoseed</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">Multi-Instrument Registration</a></li>
+				</ul>
+				<h3>
+				Mission Specific ISIS3 Processing</h3>
+				<ul>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">Mars Reconnaissance Orbiter (MRO)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">HiRISE - High Resolution Imaging Science Experiment</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">CTX (Context Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">Mars Global Surveyor (MGS)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">MOC (Mars Orbiter Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">Mars Viking Orbiter Mission</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">Narrow and Wide Angle Camera</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">Cassini-Huygens Mision</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">ISS (Imaging Science SubSystem)</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">RADAR - Imaging, Altimeter, Scatterometer, Radiometer</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">VIMS (Visual and Infrared Mapping Spectrometer)</a></li>
+				</ul>
+				</li>
+				<li>Working with Lunar Reconnaissance Orbiter (LRO)
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">MiniRF - Miniature Radio Frequency instrument</a></li>
+				</ul>
+				</li>
+				</ul>
+				<h3>
+				Programming in ISIS3</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">Exercises 1</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">Exercises 2</a></li>
+				</ul>
+				<h3>
+				Demonstration Material</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				</ul>
+				<h3>Workshops</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Training_2016">ISIS Training 2016</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Planetary_Data_Workshop_June_2012">Planetary Data Workshop June 2012</a></li>
+				</ul>
+
+			</div>
+      <div id="content">
+       <div class="contextual">
+       </div>
+       <div class="wiki wiki-page">
+        <a name="The-Power-of-Spatial-Filters">
+        </a>
+        <h1>
+         The Power of Spatial Filters
+         <a class="wiki-anchor" href="#The-Power-of-Spatial-Filters">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <ul class="toc">
+         <li>
+          <a href="#The-Power-of-Spatial-Filters">
+           The Power of Spatial Filters
+          </a>
+          <ul>
+           <li>
+            <a href="#What-is-an-image-filter">
+             What is an image filter?
+            </a>
+           </li>
+           <li>
+            <a href="#What-is-a-Box-Car">
+             What is a 'Box Car'?
+            </a>
+           </li>
+           <li>
+            <a href="#The-Low-Pass-Filter">
+             The Low Pass Filter
+            </a>
+            <ul>
+             <li>
+              <a href="#The-Basics-of-Low-Pass-Filters">
+               The Basics of Low Pass Filters
+              </a>
+             </li>
+             <li>
+              <a href="#The-Algorithm">
+               The Algorithm
+              </a>
+             </li>
+             <li>
+              <a href="#Running-ISIS3-lowpass">
+               Running ISIS3 lowpass
+              </a>
+             </li>
+             <li>
+              <a href="#Uses-of-the-Low-Pass-Filter">
+               Uses of the Low Pass Filter
+              </a>
+             </li>
+             <li>
+              <a href="#Fill-in-NULL-pixels">
+               Fill-in NULL pixels
+              </a>
+             </li>
+             <li>
+              <a href="#Similar-Filters">
+               Similar Filters
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#The-High-Pass-Filter">
+             The High Pass Filter
+            </a>
+            <ul>
+             <li>
+              <a href="#The-Basics-of-High-Pass-Filters">
+               The Basics of High Pass Filters
+              </a>
+             </li>
+             <li>
+              <a href="#The-Algorithm-2">
+               The Algorithm
+              </a>
+             </li>
+             <li>
+              <a href="#Running-ISIS3-highpass">
+               Running ISIS3 highpass
+              </a>
+             </li>
+             <li>
+              <a href="#Uses-of-the-High-Pass-Filter">
+               Uses of the High Pass Filter
+              </a>
+             </li>
+             <li>
+              <a href="#Similar-Filters-2">
+               Similar Filters
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Removing-Striping-Noise">
+             Removing Striping Noise
+            </a>
+            <ul>
+             <li>
+              <a href="#Summary-of-the-Method">
+               Summary of the Method
+              </a>
+             </li>
+             <li>
+              <a href="#Related-ISIS-Applications">
+               Related ISIS Applications
+              </a>
+             </li>
+             <li>
+              <a href="#Some-general-tips-for-choosing-the-filter-sizes">
+               Some general tips for choosing the filter sizes:
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Destriping-Exercise">
+             Destriping Exercise
+            </a>
+            <ul>
+             <li>
+              <a href="#Example-Images-and-Striping">
+               Example Images and Striping
+              </a>
+             </li>
+             <li>
+              <a href="#Challenge">
+               Challenge!
+              </a>
+             </li>
+             <li>
+              <a href="#Interactive-Destripe-Demonstration">
+               Interactive Destripe Demonstration
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Related-ISIS3-Applications">
+             Related ISIS3 Applications
+            </a>
+           </li>
+           <li>
+            <a href="#Removing-Seams-from-Mosaics">
+             Removing Seams from Mosaics
+            </a>
+            <ul>
+             <li>
+              <a href="#Summary-of-the-Method-2">
+               Summary of the Method
+              </a>
+             </li>
+             <li>
+              <a href="#Concepts">
+               Concepts
+              </a>
+             </li>
+             <li>
+              <a href="#Some-general-tips-for-choosing-the-filter-sizes-2">
+               Some general tips for choosing the filter sizes:
+              </a>
+             </li>
+             <li>
+              <a href="#Related-ISIS3-Applications-2">
+               Related ISIS3 Applications
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Seam-Removal-Exercise">
+             Seam Removal Exercise
+            </a>
+            <ul>
+             <li>
+              <a href="#Challenge-2">
+               Challenge!
+              </a>
+             </li>
+            </ul>
+           </li>
+          </ul>
+         </li>
+        </ul>
+        <a name="What-is-an-image-filter">
+        </a>
+        <h2>
+         What is an image filter?
+         <a class="wiki-anchor" href="#What-is-an-image-filter">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         <a class="thumbnail" href="attachments/download/883/Filter_Comparison.jpg" title="Filter Comparison">
+          <img alt="Filter_Comparison.jpg" src="attachments/thumbnail/883/300.png"/>
+         </a>
+        </p>
+        <pre>This image shows a portion of the original image data (upper left), 
+and the results of three different filters applied to the original: 
+low pass (upper right), high pass (lower left), and sharpen (lower right)
+</pre>
+        <p>
+         In the most basic sense, a filter is a mechanism that removes something from whatever passes through it. An image filter blocks or passes through image data based on what kind of filter it is. A low pass filter allows low frequency data, or data that does not change much from pixel to neighboring pixel, to pass through, removing the high frequency data, or data that changes rapidly from pixel to neighboring pixel. Conversely, a high pass filter  allows high frequency data to pass, removing low frequency data.
+        </p>
+        <p>
+         Image filters have a wide variety of uses, such as noise removal, edge enhancement, creating an embossed appearance, and making an image appear crisper and sharper.
+        </p>
+        <a name="What-is-a-Box-Car">
+        </a>
+        <h2>
+         What is a 'Box Car'?
+         <a class="wiki-anchor" href="#What-is-a-Box-Car">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         <a class="thumbnail" href="attachments/download/893/Boxcar_explaination.jpg" title="Box Car Filtering Illustration">
+          <img alt="Boxcar_explaination.jpg" src="attachments/thumbnail/893/300.png"/>
+         </a>
+        </p>
+        <pre>A filter processes each pixel in the image. The output pixel will be 
+at the same location as the pixel of the center of the box car. The 
+filter calculates the new output value of that pixel using all the 
+input pixels in the box car. The animation (linked below) illustrates 
+the movement of the filter application through the input image, and 
+where the box car neighborhood is located.
+</pre>
+        <p>
+         In general, image filters operate by performing a mathematical operation on each pixel using the pixels surrounding it to generate the result. For instance, a low pass filter changes the value of each pixel in the image to the average of it and the pixels in its neighborhood.
+        </p>
+        <p>
+         The filter's box car size determines how big that neighborhood is. For instance, a 3x3 box car is 3 samples (pixels wide) by 3 lines (pixels high) with the target pixel in the center of the box car. The filter moves through every pixel in the image, performing the same mathematical operation using the surrounding pixels in its neighborhood, or box car, to determine the target pixel’s new value.
+        </p>
+        <p>
+         Changing the box car size determines how features in the image are affected. In general, small box cars affect small features, large box cars affect large features, tall and narrow box cars affect vertical features, and short and wide box cars affect horizontal features.
+        </p>
+        <p>
+         <strong>
+          View Animation:
+         </strong>
+        </p>
+        <ul>
+         <li>
+          <p>
+           <em>
+            Quicktime
+           </em>
+           (
+           <a class="attachment" href="attachments/download/1083/WorkboxcarAnim_001.mov">
+            WorkboxcarAnim_001.mov
+           </a>
+           )
+          </p>
+         </li>
+         <li>
+          <p>
+           <em>
+            Windows Media
+           </em>
+           (
+           <a class="attachment" href="attachments/download/1082/WorkboxcarAnim_001.avi">
+            WorkboxcarAnim_001.avi
+           </a>
+           )
+          </p>
+         </li>
+         <li>
+          <p>
+           <em>
+            MPEG 4
+           </em>
+           (
+           <a class="attachment" href="attachments/download/1081/WorkboxcarAnim_001.mp4" download>
+            WorkboxcarAnim_001.mp4
+           </a>
+           )
+          </p>
+         </li>
+        </ul>
+        <a name="The-Low-Pass-Filter">
+        </a>
+        <h2>
+         The Low Pass Filter
+         <a class="wiki-anchor" href="#The-Low-Pass-Filter">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="The-Basics-of-Low-Pass-Filters">
+        </a>
+        <h3>
+         The Basics of Low Pass Filters
+         <a class="wiki-anchor" href="#The-Basics-of-Low-Pass-Filters">
+          ¶
+         </a>
+        </h3>
+        <p>
+         A low pass filter allows low frequency data, or data that does not change much from pixel to neighboring pixel, to pass through, removing the high frequency data, or data that changes rapidly from pixel to neighboring pixel. The visible result is the image appears blurred or smoothed. The amount of blur depends on the size of the box car. Low pass filters affect features smaller than the box car size. A small box car will cause a slight blur and reduce the amount of difference between small areas and their surrounding regions. For an image that contains a lot of noise, such a filter would smooth out the image and reduce the noise with minimal affect on large features in the image. A low pass filter with large box car will affect large features in the image, and will reduce or eliminate the smaller features.
+        </p>
+        <ul>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/899/Lowpass_original.jpg" title="Lowpass Original">
+            <img alt="Lowpass_original.jpg" src="attachments/thumbnail/899.png"/>
+           </a>
+           <br/>
+           <strong>
+            Original
+           </strong>
+           A portion of the original image
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/894/Lowpass_3x3.jpg" title="Lowpass 3x3">
+            <img alt="Lowpass_3x3.jpg" src="attachments/thumbnail/894.png"/>
+           </a>
+           <br/>
+           <strong>
+            3x3 Low Pass Results
+           </strong>
+           of a low pass filter using a 3 line by 3 sample box car setting. Note the slight softening of edges and the tiniest craters begin to fade.
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/895/Lowpass_7x7.jpg" title="Lowpass 7x7">
+            <img alt="Lowpass_7x7.jpg" src="attachments/thumbnail/895.png"/>
+           </a>
+           <br/>
+           <strong>
+            7x7 Low Pass Results
+           </strong>
+           of a low pass filter using a 7 line by 7 sample box car setting. Edges have softened, small craters are fading or obliterated.
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/898/Lowpass_21x21.jpg" title="Lowpass 21x21">
+            <img alt="Lowpass_21x21.jpg" src="attachments/thumbnail/898.png"/>
+           </a>
+           <br/>
+           <strong>
+            21x21 Low Pass Results
+           </strong>
+           of a low pass filter using a 21 line by 21 sample box car setting. The image has blurred quite a bit, small craters have been obliterated, and larger craters and features are becoming difficult to discern.
+          </p>
+         </li>
+        </ul>
+        <a name="The-Algorithm">
+        </a>
+        <h3>
+         The Algorithm
+         <a class="wiki-anchor" href="#The-Algorithm">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The mathematical operation the low pass filter performs in order to achieve these effects is to replace each pixel in the image with the average of all the pixel values in the box car.
+        </p>
+        <a name="Running-ISIS3-lowpass">
+        </a>
+        <h3>
+         Running ISIS3 lowpass
+         <a class="wiki-anchor" href="#Running-ISIS3-lowpass">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The ISIS3
+         <strong>
+          lowpass
+         </strong>
+         application allows you to set what the low and high values that will be included in this operation are and which types of pixels will be changed by the operation. See the
+         <strong>
+          lowpass
+         </strong>
+         documentation’s parameters section for a full list of parameters and their description.
+        </p>
+        <a name="Uses-of-the-Low-Pass-Filter">
+        </a>
+        <h3>
+         Uses of the Low Pass Filter
+         <a class="wiki-anchor" href="#Uses-of-the-Low-Pass-Filter">
+          ¶
+         </a>
+        </h3>
+        <p>
+         For remote sensing analysis, low pass filtering is useful for subduing or removing detail and enhancing large features or albedo. Choose the box car size based on the size of the details you wish to remove or subdue. In image processing, low pass filters can serve to remove noise, reduce resolution (without reducing the image size), or subdue details in one step of a procedure. In more complicated image processing procedures, the low pass filtered image can be used to return image hues and coloring to the resulting image after other processing procedures have removed them in the process of enhancing details.
+        </p>
+        <a name="Fill-in-NULL-pixels">
+        </a>
+        <h3>
+         Fill-in NULL pixels
+         <a class="wiki-anchor" href="#Fill-in-NULL-pixels">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The
+         <a class="external" href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html">
+          <strong>
+           lowpass
+          </strong>
+         </a>
+         application can be used to replace
+         <a class="wiki-page" href="Special_Pixels.html">
+          Special Pixels
+         </a>
+         with the average of surrounding valid pixels. The average is computed based on the boxcar size (line X sample) that is specified.
+        </p>
+        <p>
+         Example for filling-in NULL pixels:
+        </p>
+        <pre>lowpass from=input_with_nulls.cub to=output_fill.cub samples=3 lines=3 filter=outside null=yes hrs=no his=no 
+        lrs=no replacement=center
+</pre>
+        <ul>
+         <li>
+          The average of valid pixels will be computed based on the size of the boxcar (line x sample)
+         </li>
+         <li>
+          The larger the boxcar size, the 'smoother' the resulting average will be
+         </li>
+         <li>
+          If the desired output is to fill with 'details', the approach would be to fill in with small boxcar sizes (3x3, 5x5) until the special pixel value areas are filled in.
+         </li>
+         <li>
+          If any special pixels assigned to be replaced remain in the output, lowpass can be applied consecutively until the desired special pixels are completely filled with surrounding averages.
+         </li>
+        </ul>
+        <a name="Similar-Filters">
+        </a>
+        <h3>
+         Similar Filters
+         <a class="wiki-anchor" href="#Similar-Filters">
+          ¶
+         </a>
+        </h3>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/gauss/gauss.html">
+           <strong>
+            gauss
+           </strong>
+          </a>
+          uses a weighted average to compute the new value for the target pixel, with the weight based on the Gaussian distribution as a function of the distance of the boxcar pixel from the target
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/noisefilter/noisefilter.html">
+           <strong>
+            noisefilter
+           </strong>
+          </a>
+          determines what pixels are considered "noise" based on tolerances provided by the user, and replaces those noise pixels with either the average of the box car or a "null" value based on the user's choice
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/divfilter/divfilter.html">
+           <strong>
+            divfilter
+           </strong>
+          </a>
+          divides the original image values by the average of the boxcar, equivilant to dividing the original image by the low pass filter results of the same image using the
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/ratio/ratio.html">
+           <strong>
+            ratio
+           </strong>
+          </a>
+          application
+         </li>
+        </ul>
+        <a name="The-High-Pass-Filter">
+        </a>
+        <h2>
+         The High Pass Filter
+         <a class="wiki-anchor" href="#The-High-Pass-Filter">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="The-Basics-of-High-Pass-Filters">
+        </a>
+        <h3>
+         The Basics of High Pass Filters
+         <a class="wiki-anchor" href="#The-Basics-of-High-Pass-Filters">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The high pass filter allows high frequency data to pass through, suppressing low frequency data. High pass filtering can be useful for finding edges, enhancing lines and edges, or sharpening an image. Small box cars will enhance small features and details. Large box cars will allow large features to pass through, suppressing or eliminating smaller features.
+        </p>
+        <ul>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/908/Highpass_Original.jpg" title="Highpass Original">
+            <img alt="Highpass_Original.jpg" src="attachments/thumbnail/908.png"/>
+           </a>
+           <br/>
+           <strong>
+            Original
+           </strong>
+           A portion of the original image
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/905/Highpass_3x3.jpg" title="Highpass 3x3">
+            <img alt="Highpass_3x3.jpg" src="attachments/thumbnail/905.png"/>
+           </a>
+           <br/>
+           <strong>
+            3x3 High Pass Filter
+           </strong>
+           Results of a high pass filter using a 3 line by 3 sample box car setting. Edges are sharp and small features stand out, while larger features are neutral
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/906/Highpass_7x7.jpg" title="Highpass 7x7">
+            <img alt="Highpass_7x7.jpg" src="attachments/thumbnail/906.png"/>
+           </a>
+           <br/>
+           <strong>
+            7x7 High Pass Filter
+           </strong>
+           Results of a high pass filter using a 7 line by 7 sample box car setting. Edges are sharp and larger features have been enhanced, while the largest features are neutral.
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/907/Highpass_21x21.jpg" title="Highpass 21x21">
+            <img alt="Highpass_21x21.jpg" src="attachments/thumbnail/907.png"/>
+           </a>
+           <br/>
+           <strong>
+            21x21 High Pass Filter
+           </strong>
+           Results of a high pass filter using a 21 line by 21 sample box car setting. Edges are sharp and most features stand out, with only the largest changes remaining neutral.
+          </p>
+         </li>
+        </ul>
+        <a name="The-Algorithm-2">
+        </a>
+        <h3>
+         The Algorithm
+         <a class="wiki-anchor" href="#The-Algorithm-2">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The mathematical operation the high pass filter performs in order to achieve these effects is to replace each pixel in the image with the difference between it and the average of all the pixel values in the box car. This filter can be viewed as a kind of slope filter in that it highlights pixels that have values that are different from their neighboring pixels. The greater the difference, the higher or lower (visually: brighter or darker) the output value will be.
+        </p>
+        <a name="Running-ISIS3-highpass">
+        </a>
+        <h3>
+         Running ISIS3 highpass
+         <a class="wiki-anchor" href="#Running-ISIS3-highpass">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The ISIS3
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+          <strong>
+           highpass
+          </strong>
+         </a>
+         application allows you to set what the low and high values that will be included in the operation. You can also set the percentage of addback, which will add the original image (weighted by the percent addback chosen) to the high pass results. See the
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+          <strong>
+           highpass
+          </strong>
+         </a>
+         documentation’s parameters section for a full list of parameters and their descriptions.
+        </p>
+        <ul>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/908/Highpass_Original.jpg" title="Highpass Original">
+            <img alt="Highpass_Original.jpg" src="attachments/thumbnail/908.png"/>
+           </a>
+           <br/>
+           <strong>
+            Original
+           </strong>
+           A portion of the original image
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/911/Highpass_3x3_50_Addback.jpg" title="Highpass 3x3 50% Addback">
+            <img alt="Highpass_3x3_50_Addback.jpg" src="attachments/thumbnail/911.png"/>
+           </a>
+           <br/>
+           <strong>
+            3x3 High Pass Filter with 50% Addback
+           </strong>
+           Results of a high pass filter using a 3 line by 3 sample box car setting with 50% of the original image values added to the high pass results.
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/910/Highpass_3x3_100_Addback.jpg" title="Highpass 3x3 100% Addback">
+            <img alt="Highpass_3x3_100_Addback.jpg" src="attachments/thumbnail/910.png"/>
+           </a>
+           <br/>
+           <strong>
+            3x3 High Pass Filter with 100% Addback
+           </strong>
+           Results of a high pass filter using a 3 line by 3 sample box car setting with 100% of the original image values added to the high pass results. The results appear similar to the original, but sharper.
+          </p>
+         </li>
+        </ul>
+        <a name="Uses-of-the-High-Pass-Filter">
+        </a>
+        <h3>
+         Uses of the High Pass Filter
+         <a class="wiki-anchor" href="#Uses-of-the-High-Pass-Filter">
+          ¶
+         </a>
+        </h3>
+        <p>
+         For remote sensing analysis,
+         <strong>
+          high pass filtering
+         </strong>
+         is useful for reducing albedo features and enhancing structural details. Choose the box car size based on the size of the structural details you wish to enhance. In image processing, high pass filters can serve to sharpen a fuzzy image when used with addback. In more complicated image processing procedures, the high pass filtered image can be used to return image details to the resulting image after other processing procedures have removed them in the process of removing noise or artifacts.
+        </p>
+        <a name="Similar-Filters-2">
+        </a>
+        <h3>
+         Similar Filters
+         <a class="wiki-anchor" href="#Similar-Filters-2">
+          ¶
+         </a>
+        </h3>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html">
+           <strong>
+            sharpen
+           </strong>
+          </a>
+          is a specialized high pass filter that has a preset addback value of 100%, resulting in an image which looks similar to the original, but crisper and sharper
+         </li>
+        </ul>
+        <p>
+         <a name="Removing-Striping-Noise">
+         </a>
+        </p>
+        <h2>
+         Removing Striping Noise
+         <a class="wiki-anchor" href="#Removing-Striping-Noise">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="Summary-of-the-Method">
+        </a>
+        <h3>
+         Summary of the Method
+         <a class="wiki-anchor" href="#Summary-of-the-Method">
+          ¶
+         </a>
+        </h3>
+        <p>
+         Destriping is a common procedure used on images to remove distracting horizontal or vertical noise in an image. This type of destriping involves running two filters on the original image creating two new images, a low pass filtered image and a high pass filtered image, and combining the results.
+        </p>
+        <p>
+         <strong>
+          Concepts
+         </strong>
+        </p>
+        <p>
+         If both a low pass and a high pass filter of the same size are run on an image and then added together, the result will be the original image. If the filter sizes are not the same the result will not be exactly the same as the original. The goal in choosing sizes for the two filters is to create an output for each without the unwanted striping. If this is accomplished, when the filter outputs are added together the striping will have been removed or subdued. If the sizes of the two filters differ too much, artifacts may be introduced into the result. This type of procedure works very well on horizontal and vertical striping, but is not recommended for diagonal striping.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/931/Striping_Noise_Sample.jpg" title="Striping Noise Sample">
+          <img alt="Striping_Noise_Sample.jpg" src="attachments/thumbnail/931/200.png"/>
+         </a>
+        </p>
+        <pre>Striping Noise Example This Lunar Orbiter image contains horizontal striping noise 
+due to the scanning, output, and transmission phases of its collection
+</pre>
+        <a name="Related-ISIS-Applications">
+        </a>
+        <h3>
+         Related ISIS Applications
+         <a class="wiki-anchor" href="#Related-ISIS-Applications">
+          ¶
+         </a>
+        </h3>
+        <p>
+         See the following ISIS documentation for information about the applications you will need to use to perform this procedure:
+        </p>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html">
+           <strong>
+            lowpass
+           </strong>
+          </a>
+          - low pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+           <strong>
+            highpass
+           </strong>
+          </a>
+          - high pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/algebra/algebra.html">
+           <strong>
+            algebra
+           </strong>
+          </a>
+          - used to add the results of the low and high pass filters
+         </li>
+        </ul>
+        <a name="Some-general-tips-for-choosing-the-filter-sizes">
+        </a>
+        <h3>
+         Some general tips for choosing the filter sizes:
+         <a class="wiki-anchor" href="#Some-general-tips-for-choosing-the-filter-sizes">
+          ¶
+         </a>
+        </h3>
+        <ul>
+         <li>
+          <p>
+           The
+           <strong>
+            boxcar
+           </strong>
+           shapes for both the low pass and high pass filters should be similar in shape to the striping. This is not a firm rule. The filter sizes can be opposite (i.e., long and short -vs- narrow and tall).
+          </p>
+         </li>
+         <li>
+          <p>
+           The size of the
+           <strong>
+            low pass filter
+           </strong>
+           should be large enough to completely encompass the problem, plus enough extra pixels to keep the average of any boxcar from being overly effected by the striping. A good rule of thumb to start with is a low pass boxcar size twice the size of the striping.
+          </p>
+         </li>
+         <li>
+          <p>
+           The size of the
+           <strong>
+            high pass filter
+           </strong>
+           should be small enough to completely fit inside the problem, minus enough pixels to keep the average of any boxcar from being overly effected by the striping. A good rule here is to make the high pass filter boxcar size less than one half the size of the striping.
+          </p>
+         </li>
+        </ul>
+        <p>
+         <a class="thumbnail" href="attachments/download/926/Striping_closeup.jpg" title="Striping Closeup">
+          <img alt="Striping_closeup.jpg" src="attachments/thumbnail/926/200.png"/>
+         </a>
+        </p>
+        <pre>Striping Close-up: Enlarged view to show the height of the striping. The blocks in the
+scale bar along the left side of the image measure a 3 pixel by 3 pixel area. The 
+stripes are roughly 7 to 10 pixels high.
+</pre>
+        <p>
+        </p>
+        <p>
+         <a name="Destriping-Exercise">
+         </a>
+        </p>
+        <h2>
+         Destriping Exercise
+         <a class="wiki-anchor" href="#Destriping-Exercise">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="Example-Images-and-Striping">
+        </a>
+        <h3>
+         Example Images and Striping
+         <a class="wiki-anchor" href="#Example-Images-and-Striping">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The image used in this example is a sub-area of a Lunar Orbiter film strip. The scanning, output, and transmission phases introduced some striping noise.
+        </p>
+        <ul>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/965/Striping_Noise_Sample.jpg" title="Striping Noise Sample">
+            <img alt="Striping_Noise_Sample.jpg" src="attachments/thumbnail/965.png"/>
+           </a>
+           <br/>
+           <strong>
+            Striping Noise Example
+           </strong>
+           This Lunar Orbiter image contains horizontal striping noise due to the scanning, output, and transmission phases of its collection
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/966/Striping_Lowpass.jpg" title="Striping Lowpass">
+            <img alt="Striping_Lowpass.jpg" src="attachments/thumbnail/966.png"/>
+           </a>
+           <br/>
+           <strong>
+            Low pass Filter Results
+           </strong>
+           This image is the result of running a low pass filter on the original image, with a boxcar shape that is very wide but not very tall
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/967/Striping_Highpass.jpg" title="Striping Highpass">
+            <img alt="Striping_Highpass.jpg" src="attachments/thumbnail/967.png"/>
+           </a>
+           <br/>
+           <strong>
+            High pass Filter Results
+           </strong>
+           This image is the result of running a high pass filter on the original image, with a boxcar shape that is very wide and very short
+          </p>
+         </li>
+         <li>
+          <p>
+           <a class="thumbnail" href="attachments/download/968/Striping_Final.jpg" title="Striping Final">
+            <img alt="Striping_Final.jpg" src="attachments/thumbnail/968.png"/>
+           </a>
+           <br/>
+           <strong>
+            Image Sum
+           </strong>
+           This image is the result of the low pass and high pass filtered images added together
+          </p>
+         </li>
+        </ul>
+        <a name="Challenge">
+        </a>
+        <h3>
+         Challenge!
+         <a class="wiki-anchor" href="#Challenge">
+          ¶
+         </a>
+        </h3>
+        <p>
+         Do you think you can get results as good as the ones shown above? Try your hand at destriping the Lunar Orbiter image!
+        </p>
+        <a name="Interactive-Destripe-Demonstration">
+        </a>
+        <h3>
+         Interactive Destripe Demonstration
+         <a class="wiki-anchor" href="#Interactive-Destripe-Demonstration">
+          ¶
+         </a>
+        </h3>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-destripe">
+        </div>
+        <p>
+        </p>
+        <p>
+        </p>
+        <a name="Related-ISIS3-Applications">
+        </a>
+        <h2>
+         Related ISIS3 Applications
+         <a class="wiki-anchor" href="#Related-ISIS3-Applications">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         See the following ISIS3 documentation for information about the applications you will need to use to perform this procedure:
+        </p>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html">
+           <strong>
+            lowpass
+           </strong>
+          </a>
+          - low pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+           <strong>
+            highpass
+           </strong>
+          </a>
+          - high pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/algebra/algebra.html">
+           <strong>
+            algebra
+           </strong>
+          </a>
+          - used to add the results of the low and high pass filters
+         </li>
+        </ul>
+        <a name="Removing-Seams-from-Mosaics">
+        </a>
+        <h2>
+         Removing Seams from Mosaics
+         <a class="wiki-anchor" href="#Removing-Seams-from-Mosaics">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="Summary-of-the-Method-2">
+        </a>
+        <h3>
+         Summary of the Method
+         <a class="wiki-anchor" href="#Summary-of-the-Method-2">
+          ¶
+         </a>
+        </h3>
+        <p>
+         This method of seam removal involves:
+        </p>
+        <ol>
+         <li>
+          running a lowpass filter on the mosaicked images,
+         </li>
+         <li>
+          running a highpass filter on the individual images that make up the mosaic, then mosaiking the highpass products together, and
+         </li>
+         <li>
+          adding the lowpass mosaic to the highpass mosaic.
+         </li>
+        </ol>
+        <a name="Concepts">
+        </a>
+        <h3>
+         Concepts
+         <a class="wiki-anchor" href="#Concepts">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The low pass filter run on the mosaic is used to pull out the overall low frequency information (overall tone and shading, such as albedo) and the high pass filters on the individual images that make up the mosaic are used to get the high frequency information (surface feature details) and normalize the differences between images. The goal when choosing what filter size to use is to pick a filter which easily fits within all the individual images and will not suppress any more data than is necessary when added together.
+        </p>
+        <p>
+         Normally, if both a low pass and a high pass filter of the same size are run on an image and the results added together, the result will be the original image. However, if the filter sizes are not the same, the result will not be exactly the same as the original. While this procedure uses the same size boxcar for both the low pass and the high pass filters, what makes the difference here is that the low pass is run on the full mosaic and the high pass is run on the individual images.
+        </p>
+        <a name="Some-general-tips-for-choosing-the-filter-sizes-2">
+        </a>
+        <h3>
+         Some general tips for choosing the filter sizes:
+         <a class="wiki-anchor" href="#Some-general-tips-for-choosing-the-filter-sizes-2">
+          ¶
+         </a>
+        </h3>
+        <ul>
+         <li>
+          Both the lowpass and highpass filters boxcar shapes should be exactly the same.
+         </li>
+         <li>
+          The size of the filters should easily fit inside all the individual images
+         </li>
+        </ul>
+        <a name="Related-ISIS3-Applications-2">
+        </a>
+        <h3>
+         Related ISIS3 Applications
+         <a class="wiki-anchor" href="#Related-ISIS3-Applications-2">
+          ¶
+         </a>
+        </h3>
+        <p>
+         See the following ISIS3 documentation for information about the applications you will need to use to perform this procedure:
+        </p>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html">
+           <strong>
+            lowpass
+           </strong>
+          </a>
+          - low pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+           <strong>
+            highpass
+           </strong>
+          </a>
+          - high pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/mapmos/mapmos.html">
+           <strong>
+            mapmos
+           </strong>
+          </a>
+          - mosaic map projected images. Alternatively, use
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/automos/automos.html">
+           <strong>
+            automos
+           </strong>
+          </a>
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/algebra/algebra.html">
+           <strong>
+            algebra
+           </strong>
+          </a>
+          - used to add the results of the low and high pass filters
+         </li>
+        </ul>
+        <a name="Seam-Removal-Exercise">
+        </a>
+        <h2>
+         Seam Removal Exercise
+         <a class="wiki-anchor" href="#Seam-Removal-Exercise">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         The images used in this example are sub-areas of overlapping Io images.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/913/Seam_Removal_Orig.jpg" title="Original Mosaic">
+          <img alt="Seam_Removal_Orig.jpg" src="attachments/thumbnail/913/300.png"/>
+         </a>
+        </p>
+        <pre>Original Mosaic: This mosaic shows the seams where images overlap
+</pre>
+        <p>
+         <a class="thumbnail" href="attachments/download/914/Seam_Removal_Result.jpg" title="Seam Removal Result">
+          <img alt="Seam_Removal_Result.jpg" src="attachments/thumbnail/914/300.png"/>
+         </a>
+        </p>
+        <pre>Seam Removal Result: This image is the result of the low-pass filtered mosaic and mosaicked high-pass filtered images added together.
+</pre>
+        <a name="Challenge-2">
+        </a>
+        <h3>
+         Challenge!
+         <a class="wiki-anchor" href="#Challenge-2">
+          ¶
+         </a>
+        </h3>
+        <p>
+         Do you think you can get results as good as the ones shown above? Try your hand at removing the seams from the Io mosaic!
+        </p>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-seams">
+        </div>
+        <p>
+        </p>
+       </div>
+       <div class="attachments">
+        <div class="contextual">
+        </div>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/883/Filter_Comparison.jpg">
+          Filter_Comparison.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/883/Filter_Comparison.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (175 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 01:28 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/893/Boxcar_explaination.jpg">
+          Boxcar_explaination.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/893/Boxcar_explaination.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (51.6 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 01:48 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/894/Lowpass_3x3.jpg">
+          Lowpass_3x3.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/894/Lowpass_3x3.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (104 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 01:54 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/895/Lowpass_7x7.jpg">
+          Lowpass_7x7.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/895/Lowpass_7x7.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (61.8 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 01:54 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/898/Lowpass_21x21.jpg">
+          Lowpass_21x21.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/898/Lowpass_21x21.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (54.2 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 01:54 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/899/Lowpass_original.jpg">
+          Lowpass_original.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/899/Lowpass_original.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (176 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 01:54 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/905/Highpass_3x3.jpg">
+          Highpass_3x3.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/905/Highpass_3x3.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (174 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:06 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/906/Highpass_7x7.jpg">
+          Highpass_7x7.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/906/Highpass_7x7.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (176 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:07 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/907/Highpass_21x21.jpg">
+          Highpass_21x21.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/907/Highpass_21x21.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (183 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:07 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/908/Highpass_Original.jpg">
+          Highpass_Original.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/908/Highpass_Original.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (176 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:07 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/910/Highpass_3x3_100_Addback.jpg">
+          Highpass_3x3_100_Addback.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/910/Highpass_3x3_100_Addback.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (211 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:20 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/911/Highpass_3x3_50_Addback.jpg">
+          Highpass_3x3_50_Addback.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/911/Highpass_3x3_50_Addback.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (222 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:20 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/913/Seam_Removal_Orig.jpg">
+          Seam_Removal_Orig.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/913/Seam_Removal_Orig.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (137 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:34 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/914/Seam_Removal_Result.jpg">
+          Seam_Removal_Result.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/914/Seam_Removal_Result.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (82.4 KB)
+         </span>
+         <span class="author">
+          Marjorie Hahn, 2016-05-31 02:35 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/1081/WorkboxcarAnim_001.mp4" download>
+          WorkboxcarAnim_001.mp4
+         </a>
+         <span class="size">
+          (671 KB)
+         </span>
+         <span class="author">
+          Ian Humphrey, 2016-06-01 01:06 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/1082/WorkboxcarAnim_001.avi">
+          WorkboxcarAnim_001.avi
+         </a>
+         <span class="size">
+          (193 KB)
+         </span>
+         <span class="author">
+          Ian Humphrey, 2016-06-01 01:06 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/1083/WorkboxcarAnim_001.mov">
+          WorkboxcarAnim_001.mov
+         </a>
+         <span class="size">
+          (639 KB)
+         </span>
+         <span class="author">
+          Ian Humphrey, 2016-06-01 01:06 PM
+         </span>
+        </p>
+       </div>
+       <div style="clear:both;">
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>

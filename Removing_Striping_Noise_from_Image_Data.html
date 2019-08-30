@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   Removing Striping Noise from Image Data - ISIS - Astrogeology Support and Issue Tracking
+  </title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+  <meta content="Redmine" name="description"/>
+  <meta content="issue,bug,tracker" name="keywords"/>
+  <meta content="authenticity_token" name="csrf-param"/>
+  <meta content="FMSKn1bk6MfRRdCUFF1KSDqds1rfF27BdtYmi/Uk/62V8rS/8KL6ARnvs7ZbihmPpPdHGg0bpGmBaiy/erRCMg==" name="csrf-token"/>
+  <link href="favicon.ico" rel="shortcut icon"/>
+  <link href="stylesheets/jquery/jquery-ui-1.11.0.css" media="all" rel="stylesheet"/>
+  <link href="themes/astro/stylesheets/application.css" media="all" rel="stylesheet"/>
+  <link href="stylesheets/responsive.css" media="all" rel="stylesheet"/>
+  <script src="javascripts/jquery-1.11.1-ui-1.11.0-ujs-3.1.4.js">
+  </script>
+  <script src="javascripts/application.js">
+  </script>
+  <script src="javascripts/responsive.js">
+  </script>
+  <script>
+   //<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved text that will be lost if you leave this page.'); });
+//]]>
+  </script>
+  <script src="themes/astro/javascripts/theme.js">
+  </script>
+  <link href="plugin_assets/redmine_ldap_sync/stylesheets/ldap_sync.css" media="screen" rel="stylesheet"/>
+  <link href="plugin_assets/redmine_agile/stylesheets/redmine_agile.css" media="screen" rel="stylesheet"/>
+  <script src="plugin_assets/redmine_checklists/javascripts/checklists.js">
+  </script>
+  <link href="plugin_assets/redmine_checklists/stylesheets/checklists.css" media="screen" rel="stylesheet"/>
+  <!-- page specific tags -->
+ </head>
+ <body class="theme-Astro project-isis controller-wiki action-show">
+  <div id="wrapper">
+   <div id="wrapper2">
+    <div id="wrapper3">
+     <div class="" id="main">
+		<div id="sidebar">
+			<h1>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki">Home</a>
+				</h1>
+				<h2>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">Tutorials</a>
+				</h2>
+				<h3>
+				Fundamentals</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				</ul>
+				<h3>
+				General Image Processing</h3>
+				<ul>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
+				</ul>
+				<h3>
+				Cartography</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">SPICE</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">Camera Geometry</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">Learning About Map Projections</a></li>
+				</ul>
+				<h3>
+				Advanced</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">Image Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">Automatic Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">Autoseed</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">Multi-Instrument Registration</a></li>
+				</ul>
+				<h3>
+				Mission Specific ISIS3 Processing</h3>
+				<ul>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">Mars Reconnaissance Orbiter (MRO)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">HiRISE - High Resolution Imaging Science Experiment</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">CTX (Context Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">Mars Global Surveyor (MGS)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">MOC (Mars Orbiter Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">Mars Viking Orbiter Mission</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">Narrow and Wide Angle Camera</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">Cassini-Huygens Mision</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">ISS (Imaging Science SubSystem)</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">RADAR - Imaging, Altimeter, Scatterometer, Radiometer</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">VIMS (Visual and Infrared Mapping Spectrometer)</a></li>
+				</ul>
+				</li>
+				<li>Working with Lunar Reconnaissance Orbiter (LRO)
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">MiniRF - Miniature Radio Frequency instrument</a></li>
+				</ul>
+				</li>
+				</ul>
+				<h3>
+				Programming in ISIS3</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">Exercises 1</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">Exercises 2</a></li>
+				</ul>
+				<h3>
+				Demonstration Material</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				</ul>
+				<h3>Workshops</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Training_2016">ISIS Training 2016</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Planetary_Data_Workshop_June_2012">Planetary Data Workshop June 2012</a></li>
+				</ul>
+
+		</div>
+      <div id="content">
+       <div class="contextual">
+       </div>
+       <div class="wiki wiki-page">
+        <a name="Removing-Striping-Noise-from-Image-Data">
+        </a>
+        <h1>
+         Removing Striping Noise from Image Data
+         <a class="wiki-anchor" href="#Removing-Striping-Noise-from-Image-Data">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <ul class="toc">
+         <li>
+          <a href="#Removing-Striping-Noise-from-Image-Data">
+           Removing Striping Noise from Image Data
+          </a>
+          <ul>
+           <li>
+            <a href="#Removing-Striping-Noise">
+             Removing Striping Noise
+            </a>
+            <ul>
+             <li>
+              <a href="#Summary-of-the-Method">
+               Summary of the Method
+              </a>
+             </li>
+             <li>
+              <a href="#Concepts">
+               Concepts
+              </a>
+             </li>
+             <li>
+              <a href="#Related-ISIS3-Applications">
+               Related ISIS3 Applications
+              </a>
+             </li>
+             <li>
+              <a href="#Some-general-tips-for-choosing-the-filter-sizes">
+               Some general tips for choosing the filter sizes
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Destriping-Exercise">
+             Destriping Exercise
+            </a>
+            <ul>
+             <li>
+              <a href="#Example-Images-and-Striping">
+               Example Images and Striping
+              </a>
+             </li>
+             <li>
+              <a href="#Challenge">
+               Challenge!
+              </a>
+             </li>
+             <li>
+              <a href="#Interactive-Destripe-Demonstration">
+               Interactive Destripe Demonstration
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Destriping-Try-it-in-ISIS3">
+             Destriping: Try it in ISIS3!
+            </a>
+           </li>
+          </ul>
+         </li>
+        </ul>
+        <a name="Removing-Striping-Noise">
+        </a>
+        <h2>
+         Removing Striping Noise
+         <a class="wiki-anchor" href="#Removing-Striping-Noise">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="Summary-of-the-Method">
+        </a>
+        <h3>
+         Summary of the Method
+         <a class="wiki-anchor" href="#Summary-of-the-Method">
+          ¶
+         </a>
+        </h3>
+        <p>
+         Destriping is a common procedure used on images to remove distracting horizontal or vertical noise in an image. This type of destriping involves running two filters on the original image creating two new images, a low pass filtered image and a high pass filtered image, and combining the results.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/940/Striping_Noise_Sample.jpg" title="Striping_Noise_Sample.jpg">
+          <img alt="Striping_Noise_Sample.jpg" src="attachments/thumbnail/940/500.png"/>
+         </a>
+         <br/>
+         <strong>
+          Striping Noise Example
+         </strong>
+         <br/>
+         This Lunar Orbiter image contains horizontal striping noise due to the scanning, output, and transmission phases of its collection.
+        </p>
+        <a name="Concepts">
+        </a>
+        <h3>
+         Concepts
+         <a class="wiki-anchor" href="#Concepts">
+          ¶
+         </a>
+        </h3>
+        <p>
+         If both a low pass and a high pass filter of the same size are run on an image and then added together, the result will be the original image. If the filter sizes are not the same the result will not be exactly the same as the original. The goal in choosing sizes for the two filters is to create an output for each without the unwanted striping. If this is accomplished, when the filter outputs are added together the striping will have been removed or subdued. If the sizes of the two filters differ too much, artifacts may be introduced into the result. This type of procedure works very well on horizontal and vertical striping, but is not recommended for diagonal striping.
+        </p>
+        <a name="Related-ISIS3-Applications">
+        </a>
+        <h3>
+         Related ISIS3 Applications
+         <a class="wiki-anchor" href="#Related-ISIS3-Applications">
+          ¶
+         </a>
+        </h3>
+        <p>
+         See the following ISIS3 documentation for information about the applications you will need to use to perform this procedure:
+        </p>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/lowpass/lowpass.html">
+           lowpass
+          </a>
+          - low pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/highpass/highpass.html">
+           highpass
+          </a>
+          - high pass filter application
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/algebra/algebra.html">
+           algebra
+          </a>
+          - used to add the results of the low and high pass filters
+         </li>
+        </ul>
+        <a name="Some-general-tips-for-choosing-the-filter-sizes">
+        </a>
+        <h3>
+         Some general tips for choosing the filter sizes
+         <a class="wiki-anchor" href="#Some-general-tips-for-choosing-the-filter-sizes">
+          ¶
+         </a>
+        </h3>
+        <ul>
+         <li>
+          <p>
+           The
+           <strong>
+            boxcar
+           </strong>
+           shapes for both the low pass and high pass filters should be similar in shape to the striping. This is not a firm rule. The filter sizes can be opposite (i.e., long and short -vs- narrow and tall).
+          </p>
+         </li>
+         <li>
+          <p>
+           The size of the
+           <strong>
+            low pass filter
+           </strong>
+           should be large enough to completely encompass the problem, plus enough extra pixels to keep the average of any boxcar from being overly effected by the striping. A good rule of thumb to start with is a low pass boxcar size twice the size of the striping.
+          </p>
+         </li>
+         <li>
+          <p>
+           The size of the
+           <strong>
+            high pass filter
+           </strong>
+           should be small enough to completely fit inside the problem, minus enough pixels to keep the average of any boxcar from being overly effected by the striping. A good rule here is to make the high pass filter boxcar size less than one half the size of the striping.
+          </p>
+         </li>
+        </ul>
+        <p>
+         <a class="thumbnail" href="attachments/download/941/Striping_closeup.jpg" title="Striping_closeup.jpg">
+          <img alt="Striping_closeup.jpg" src="attachments/thumbnail/941/500.png"/>
+         </a>
+         <br/>
+         <strong>
+          Striping Close-up
+         </strong>
+         <br/>
+         Enlarged view to show the height of the striping. The blocks in the scale bar along the left side of the image measure a 3 pixel by 3 pixel area. The stripes are roughly 7 to 10 pixels high.
+        </p>
+        <a name="Destriping-Exercise">
+        </a>
+        <h2>
+         Destriping Exercise
+         <a class="wiki-anchor" href="#Destriping-Exercise">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="Example-Images-and-Striping">
+        </a>
+        <h3>
+         Example Images and Striping
+         <a class="wiki-anchor" href="#Example-Images-and-Striping">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The image used in this example is a sub-area of a Lunar Orbiter film strip. The scanning, output, and transmission phases introduced some striping noise.
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/940/Striping_Noise_Sample.jpg" title="Striping_Noise_Sample.jpg">
+          <img alt="Striping_Noise_Sample.jpg" src="attachments/thumbnail/940/500.png"/>
+         </a>
+         <br/>
+         <strong>
+          Striping Noise Example
+         </strong>
+         <br/>
+         This Lunar Orbiter image contains horizontal striping noise due to the scanning, output, and transmission phases of its collection
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/946/Striping_Lowpass.jpg" title="Striping_Lowpass.jpg">
+          <img alt="Striping_Lowpass.jpg" src="attachments/thumbnail/946/500.png"/>
+         </a>
+         <br/>
+         <strong>
+          Low pass Filter Results
+         </strong>
+         <br/>
+         This image is the result of running a low pass filter on the original image, with a boxcar shape that is very wide but not very tall
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/945/Striping_Highpass.jpg" title="Striping_Highpass.jpg">
+          <img alt="Striping_Highpass.jpg" src="attachments/thumbnail/945/500.png"/>
+         </a>
+         <br/>
+         <strong>
+          High pass Filter Results
+         </strong>
+         <br/>
+         This image is the result of running a high pass filter on the original image, with a boxcar shape that is very wide and very short
+        </p>
+        <p>
+         <a class="thumbnail" href="attachments/download/944/Striping_Final.jpg" title="Striping_Final.jpg">
+          <img alt="Striping_Final.jpg" src="attachments/thumbnail/944/500.png"/>
+         </a>
+         <br/>
+         <strong>
+          Image Sum
+         </strong>
+         <br/>
+         This image is the result of the low pass and high pass filtered images added together
+        </p>
+        <a name="Challenge">
+        </a>
+        <h3>
+         Challenge!
+         <a class="wiki-anchor" href="#Challenge">
+          ¶
+         </a>
+        </h3>
+        <p>
+         Do you think you can get results as good as the ones shown above? Try your hand at destriping the Lunar Orbiter image!
+        </p>
+        <a name="Interactive-Destripe-Demonstration">
+        </a>
+        <h3>
+         Interactive Destripe Demonstration
+         <a class="wiki-anchor" href="#Interactive-Destripe-Demonstration">
+          ¶
+         </a>
+        </h3>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-destripe">
+        </div>
+        <p>
+        </p>
+        <a name="Destriping-Try-it-in-ISIS3">
+        </a>
+        <h2>
+         Destriping: Try it in ISIS3!
+         <a class="wiki-anchor" href="#Destriping-Try-it-in-ISIS3">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         Think you're ready to give the destriping procedure a whirl? Download this portion of a Lunar Orbiter subframe below to the computer where you have ISIS3 installed. The mosaic was created from scanned photographic film strips collected by the Lunar Orbiter IV mission. The result of the assembly of the strips into the mosaic is a repetetive striping through the mosaic, which can be removed using the destriping procedure. Try using the procedure you just learned to radiometrically correct the mosaic by removing the striping that occurs in the mosaic.
+         <br/>
+         The mosaic is an ISIS3 cube compressed in a GZIP archive file. Use gunzip to uncompress the cube. (Data source:
+         <a class="external" href="http://astrogeology.usgs.gov/Projects/LunarOrbiterDigitization/">
+          Lunar Orbiter Digitization Project
+         </a>
+         )
+        </p>
+        <p>
+         <strong>
+          Download the Sample Data Here:
+         </strong>
+         <a class="attachment" href="attachments/download/955/LO_4090_h1.cub.gz">
+          LO_4090_h1.cub.gz
+         </a>
+        </p>
+       </div>
+       <div class="attachments">
+        <div class="contextual">
+        </div>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/940/Striping_Noise_Sample.jpg">
+          Striping_Noise_Sample.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/940/Striping_Noise_Sample.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (124 KB)
+         </span>
+         <span class="author">
+          Jesse Mapel, 2016-05-31 03:29 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/941/Striping_closeup.jpg">
+          Striping_closeup.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/941/Striping_closeup.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (28.3 KB)
+         </span>
+         <span class="author">
+          Jesse Mapel, 2016-05-31 03:34 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/944/Striping_Final.jpg">
+          Striping_Final.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/944/Striping_Final.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (123 KB)
+         </span>
+         <span class="author">
+          Jesse Mapel, 2016-05-31 03:41 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/945/Striping_Highpass.jpg">
+          Striping_Highpass.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/945/Striping_Highpass.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (123 KB)
+         </span>
+         <span class="author">
+          Jesse Mapel, 2016-05-31 03:41 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/946/Striping_Lowpass.jpg">
+          Striping_Lowpass.jpg
+         </a>
+         <a class="icon-only icon-magnifier" href="attachments/download/946/Striping_Lowpass.jpg" title="View">
+          View
+         </a>
+         <span class="size">
+          (14.6 KB)
+         </span>
+         <span class="author">
+          Jesse Mapel, 2016-05-31 03:41 PM
+         </span>
+        </p>
+        <p>
+         <a class="icon icon-attachment" href="attachments/download/955/LO_4090_h1.cub.gz">
+          LO_4090_h1.cub.gz
+         </a>
+         <span class="size">
+          (3.09 MB)
+         </span>
+         <span class="author">
+          Jesse Mapel, 2016-05-31 04:02 PM
+         </span>
+        </p>
+       </div>
+       <div style="clear:both;">
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>

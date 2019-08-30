@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   Special Pixels - ISIS - Astrogeology Support and Issue Tracking
+  </title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+  <meta content="Redmine" name="description"/>
+  <meta content="issue,bug,tracker" name="keywords"/>
+  <meta content="authenticity_token" name="csrf-param"/>
+  <meta content="ICeT55F4hNZ1QvWC+NkTCzW1VSv/Y/qly4kfF/tgI4XxNVQStklpAJRC5p6LHDa7sVyYfnxfoxSZqa/Bxl9/Sg==" name="csrf-token"/>
+  <link href="favicon.ico" rel="shortcut icon"/>
+  <link href="stylesheets/jquery/jquery-ui-1.11.0.css" media="all" rel="stylesheet"/>
+  <link href="themes/astro/stylesheets/application.css" media="all" rel="stylesheet"/>
+  <link href="stylesheets/responsive.css" media="all" rel="stylesheet"/>
+  <script src="javascripts/jquery-1.11.1-ui-1.11.0-ujs-3.1.4.js">
+  </script>
+  <script src="javascripts/application.js">
+  </script>
+  <script src="javascripts/responsive.js">
+  </script>
+  <script>
+   //<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('The current page contains unsaved text that will be lost if you leave this page.'); });
+//]]>
+  </script>
+  <script src="themes/astro/javascripts/theme.js">
+  </script>
+  <link href="plugin_assets/redmine_ldap_sync/stylesheets/ldap_sync.css" media="screen" rel="stylesheet"/>
+  <link href="plugin_assets/redmine_agile/stylesheets/redmine_agile.css" media="screen" rel="stylesheet"/>
+  <script src="plugin_assets/redmine_checklists/javascripts/checklists.js">
+  </script>
+  <link href="plugin_assets/redmine_checklists/stylesheets/checklists.css" media="screen" rel="stylesheet"/>
+  <!-- page specific tags -->
+ </head>
+ <body class="theme-Astro project-isis controller-wiki action-show">
+  <div id="wrapper">
+   <div id="wrapper2">
+    <div id="wrapper3">
+     <div class="" id="main">
+		<div id="sidebar">
+            <h1>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki">Home</a>
+				</h1>
+				<h2>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Online_Workshops">Tutorials</a>
+				</h2>
+				<h3>
+				Fundamentals</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Introduction_to_ISIS">Introduction to ISIS</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Locating_and_Ingesting_Image_Data">Locating and Ingesting Image Data</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/ISIS_Cube_Format.html">ISIS Cube Format</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types">Understanding Bit Types</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html">Core Base and Multiplier</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html">Special Pixels</a></li>
+				</ul>
+				<h3>
+				General Image Processing</h3>
+				<ul>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html">The Power of Spatial Filters</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html">Removing Striping Noise from Image Data</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/General_Utility">GeneralUtility-fx</a></li>
+				</ul>
+				<h3>
+				Cartography</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/SPICE">SPICE</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Camera_Geometry">Camera Geometry</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Learning_About_Map_Projections">Learning About Map Projections</a></li>
+				</ul>
+				<h3>
+				Advanced</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Image_Registration">Image Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Automatic_Registration">Automatic Registration</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Autoseed">Autoseed</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Multi-Instrument_Registration">Multi-Instrument Registration</a></li>
+				</ul>
+				<h3>
+				Mission Specific ISIS3 Processing</h3>
+				<ul>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_(MRO)_Data">Mars Reconnaissance Orbiter (MRO)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_HiRISE_Data">HiRISE - High Resolution Imaging Science Experiment</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Reconnaissance_Orbiter_CTX_Data">CTX (Context Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Mars_Global_Surveyor_Mission">Mars Global Surveyor (MGS)</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Orbiter_Camera_Data">MOC (Mars Orbiter Camera)</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Viking_Orbiter_Mission">Mars Viking Orbiter Mission</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Mars_Viking_Orbiter_Data">Narrow and Wide Angle Camera</a></li>
+				</ul>
+				</li>
+				<li>
+				<a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/CSS">Cassini-Huygens Mision</a>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_ISS_Data">ISS (Imaging Science SubSystem)</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_RADAR">RADAR - Imaging, Altimeter, Scatterometer, Radiometer</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Cassini_VIMS">VIMS (Visual and Infrared Mapping Spectrometer)</a></li>
+				</ul>
+				</li>
+				<li>Working with Lunar Reconnaissance Orbiter (LRO)
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Working_with_Lunar_Reconnaissance_Orbiter_MiniRF_Data">MiniRF - Miniature Radio Frequency instrument</a></li>
+				</ul>
+				</li>
+				</ul>
+				<h3>
+				Programming in ISIS3</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_1">Exercises 1</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Exercises_2">Exercises 2</a></li>
+				</ul>
+				<h3>
+				Demonstration Material</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Demo">Demonstrations of ISIS3 Interactive Tools</a></li>
+				<li><a href="https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Example_ISIS_Demos.html">Example ISIS Demos</a></li>
+				</ul>
+				<h3>Workshops</h3>
+				<ul>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/ISIS_Training_2016">ISIS Training 2016</a></li>
+				<li><a href="https://github.com/USGS-Astrogeology/ISIS3/wiki/Planetary_Data_Workshop_June_2012">Planetary Data Workshop June 2012</a></li>
+				</ul>
+
+		</div>
+      <div id="content">
+       <div class="contextual">
+       </div>
+       <div class="wiki wiki-page">
+        <a name="Special-Pixels">
+        </a>
+        <h1>
+         Special Pixels
+         <a class="wiki-anchor" href="#Special-Pixels">
+          ¶
+         </a>
+        </h1>
+        <hr/>
+        <ul class="toc">
+         <li>
+          <a href="#Special-Pixels">
+           Special Pixels
+          </a>
+          <ul>
+           <li>
+            <a href="#Introduction-to-Special-Pixels">
+             Introduction to Special Pixels
+            </a>
+            <ul>
+             <li>
+              <a href="#What-are-special-pixels">
+               What are special pixels?
+              </a>
+             </li>
+             <li>
+              <a href="#How-are-special-pixels-set">
+               How are special pixels set?
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Special-Pixels-in-ISIS3">
+             Special Pixels in ISIS3
+            </a>
+            <ul>
+             <li>
+              <a href="#How-many-special-pixel-values-exist-in-ISIS3">
+               How many special pixel values exist in ISIS3?
+              </a>
+             </li>
+             <li>
+              <a href="#Are-the-special-pixel-values-propagated-between-different-bit-types">
+               Are the special pixel values propagated between different bit types?
+              </a>
+             </li>
+             <li>
+              <a href="#Is-the-NULL-special-pixel-defined-as-0-for-all-bit-types">
+               Is the NULL special pixel defined as 0 for all bit types?
+              </a>
+             </li>
+            </ul>
+           </li>
+           <li>
+            <a href="#Interactive-Special-Pixel-Demonstration">
+             Interactive Special Pixel Demonstration
+            </a>
+           </li>
+           <li>
+            <a href="#Working-with-Special-Pixels">
+             Working with Special Pixels
+            </a>
+           </li>
+           <li>
+            <a href="#Related-ISIS3-Applications">
+             Related ISIS3 Applications
+            </a>
+           </li>
+          </ul>
+         </li>
+        </ul>
+        <a name="Introduction-to-Special-Pixels">
+        </a>
+        <h2>
+         Introduction to Special Pixels
+         <a class="wiki-anchor" href="#Introduction-to-Special-Pixels">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="What-are-special-pixels">
+        </a>
+        <h3>
+         What are special pixels?
+         <a class="wiki-anchor" href="#What-are-special-pixels">
+          ¶
+         </a>
+        </h3>
+        <p>
+         Special pixels are defined to distinguish valid pixels from non-valid pixels in ISIS3. This is very important to scientists who evaluate the density values, and draw conclusions about the physical properties of a scene.
+        </p>
+        <a name="How-are-special-pixels-set">
+        </a>
+        <h3>
+         How are special pixels set?
+         <a class="wiki-anchor" href="#How-are-special-pixels-set">
+          ¶
+         </a>
+        </h3>
+        <p>
+         There are two ways that
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          Digital Number (DN)
+         </a>
+         values are set to special pixels in ISIS3:
+        </p>
+        <ul>
+         <li>
+          <strong>
+           Instrument Special Pixels
+          </strong>
+          : These types of special pixels are set during the ingestion of the data into ISIS3 because the acquired measurement either exceeded the dynamic range of the sensor based on its inherent properties (such as sensitivity) and settings (such as gain) or the measurement wasn't collected due to an instrument or transmission error.
+          <ul>
+           <li>
+            <em>
+             Low Instrument Saturation (
+             <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+              LIS
+             </a>
+             )
+            </em>
+            : The sensor registered a value too low to be measured accurately (i.e. undersaturated).
+           </li>
+           <li>
+            <em>
+             High Instrument Saturation (
+             <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+              HIS
+             </a>
+             )
+            </em>
+            : The sensor registered a value too high to be measured accurately (i.e. oversaturated).
+           </li>
+           <li>
+            <em>
+             No Data Collected (
+             <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+              NULL
+             </a>
+             )
+            </em>
+            : The instrument did not collect a measurement due to an sensor malfunction (such as a damaged CCD element) or an error in transmission prevented the value from being recorded.
+           </li>
+          </ul>
+         </li>
+         <li>
+          <strong>
+           Representation Special Pixels
+          </strong>
+          : These types of special pixels are set due to being processed by ISIS3 applications that cause the DNs to fall outside the data range of the file, either due to settings defined by the user or the effects of the algorithms within the application.
+          <ul>
+           <li>
+            <em>
+             Low Representation Saturation (
+             <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+              LRS
+             </a>
+             )
+            </em>
+            : The resulting DN calculated by the application fall below the possible range of values (i.e. undersaturated).
+           </li>
+           <li>
+            <em>
+             High Representation Saturation (
+             <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+              HRS
+             </a>
+             )
+            </em>
+            : The resulting DN calculated by the application are higher than the possible range of values (i.e. oversaturated).
+           </li>
+           <li>
+            <em>
+             Data Removed (
+             <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+              NULL
+             </a>
+             )
+            </em>
+            : NULL values are set by an application when it removes data, such as during masking or geometric warping.
+           </li>
+          </ul>
+         </li>
+        </ul>
+        <a name="Special-Pixels-in-ISIS3">
+        </a>
+        <h2>
+         Special Pixels in ISIS3
+         <a class="wiki-anchor" href="#Special-Pixels-in-ISIS3">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <a name="How-many-special-pixel-values-exist-in-ISIS3">
+        </a>
+        <h3>
+         How many special pixel values exist in ISIS3?
+         <a class="wiki-anchor" href="#How-many-special-pixel-values-exist-in-ISIS3">
+          ¶
+         </a>
+        </h3>
+        <p>
+         There are five special pixel values defined in the ISIS3 software system for 16-bit and 32-bit data type. Each of the five special pixels is denoted by a specific value that represents that specific type of invalid data.
+         <strong>
+          Having one of these special value is the only way ISIS3 can tell that a given pixel is in fact a special pixel of a particular type.
+         </strong>
+         The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         special pixel identifies pixels where either the instrument failed to collect data, or data was removed or empty pixels created during processing. The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+          LRS (Low Representation Saturation)
+         </a>
+         and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+          HRS (High Representation Saturation)
+         </a>
+         represent saturated pixels that fall outside the minimum and maximum valid range of the file respectively. The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS (Low Instrument Saturation)
+         </a>
+         values represent pixels that fall below the lowest value the instrument can accurately record. The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+          HIS (High Instrument Saturation)
+         </a>
+         values represent pixels that exceed the highest value the instrument can accurately record. The table to the right shows each of the 5 special pixel types and their corresponding numerical representations. Note that 8-bit data can only has two special pixel types, represented by values of 0 (
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+          LRS
+         </a>
+         ) and 255 (
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+          HIS
+         </a>
+         and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+          HRS
+         </a>
+         ). Thus 8-bit data does not distinguish between
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS
+         </a>
+         , and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+          LRS
+         </a>
+         pixels nor between
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+          HIS
+         </a>
+         and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+          HRS
+         </a>
+         pixels.
+        </p>
+        <p>
+         <strong>
+          Special Pixels in ISIS3
+         </strong>
+         Visual refers to the apparent color of a special pixel in an ISIS3 display application, such as
+         <strong>
+          qview
+         </strong>
+         .
+        </p>
+        <table>
+         <thead>
+          <tr>
+           <th>
+            <strong>
+             Special Pixel Name
+            </strong>
+           </th>
+           <th>
+            <strong>
+             32-bit
+            </strong>
+            *
+           </th>
+           <th>
+            <strong>
+             16-bit
+            </strong>
+           </th>
+           <th>
+            <strong>
+             8-bit
+            </strong>
+           </th>
+           <th>
+            <strong>
+             Visual
+            </strong>
+           </th>
+          </tr>
+         </thead>
+         <tbody>
+          <tr>
+           <td>
+            NULL
+           </td>
+           <td>
+            -3.40282e+38
+           </td>
+           <td>
+            -32768
+           </td>
+           <td>
+            0
+           </td>
+           <td>
+            black
+           </td>
+          </tr>
+          <tr>
+           <td>
+            Low Representation Saturation (LRS)
+           </td>
+           <td>
+            -3.40282e+38
+           </td>
+           <td>
+            -32767
+           </td>
+           <td>
+            0
+           </td>
+           <td>
+            black
+           </td>
+          </tr>
+          <tr>
+           <td>
+            Low Instrument Saturation (LIS)
+           </td>
+           <td>
+            -3.40282e+38
+           </td>
+           <td>
+            -32766
+           </td>
+           <td>
+            0
+           </td>
+           <td>
+            black
+           </td>
+          </tr>
+          <tr>
+           <td>
+            High Instrument Saturation (HIS)
+           </td>
+           <td>
+            -3.40282e+38
+           </td>
+           <td>
+            -32765
+           </td>
+           <td>
+            255
+           </td>
+           <td>
+            white
+           </td>
+          </tr>
+          <tr>
+           <td>
+            High Representation Saturation (HRS)
+           </td>
+           <td>
+            -3.40282e+38
+           </td>
+           <td>
+            -32764
+           </td>
+           <td>
+            255
+           </td>
+           <td>
+            white
+           </td>
+          </tr>
+         </tbody>
+        </table>
+        <ul>
+         <li>
+          * The 32-bit values representing different special pixels do differ just like those representing the 16-bit valus. However, the variations are on the last digit, and thus are not visible in this display since it does not show all 38 digits.
+         </li>
+        </ul>
+        <a name="Are-the-special-pixel-values-propagated-between-different-bit-types">
+        </a>
+        <h3>
+         Are the special pixel values propagated between different bit types?
+         <a class="wiki-anchor" href="#Are-the-special-pixel-values-propagated-between-different-bit-types">
+          ¶
+         </a>
+        </h3>
+        <p>
+         The special pixel values are converted without loss of information between 16-bit and 32-bit data. See the chart above to see what the values are set to after conversion from one bit type to the other. For example, if a pixel in 16-bit data with a DN of -32766 (thus representing an
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS
+         </a>
+         pixel) is converted to 32-bit data, its DN value will be changed to that value representing an LIS pixel in 32-bit format. If the image is converted from 16-bit or 32-bit to an 8-bit data type, then all the
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+          LRS
+         </a>
+         , and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         special pixel have their values set to 0, and all
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+          HIS
+         </a>
+         and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+          HRS
+         </a>
+         special pixels have their values set to 255. Note that this conversion results in a loss of information, as it is no longer possible to distinguish between
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+          LRS
+         </a>
+         , and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         pixels since they all have the same pixel value of 0. Similarly, converting from 16-bit or 32-bit to 8-bit will make it impossible to distinguish between
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+          HIS
+         </a>
+         and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+          HRS
+         </a>
+         pixels. Why?
+        </p>
+        <a name="Is-the-NULL-special-pixel-defined-as-0-for-all-bit-types">
+        </a>
+        <h3>
+         Is the NULL special pixel defined as 0 for all bit types?
+         <a class="wiki-anchor" href="#Is-the-NULL-special-pixel-defined-as-0-for-all-bit-types">
+          ¶
+         </a>
+        </h3>
+        <p>
+         No. The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          DN
+         </a>
+         value 0 is defined as
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         only in an 8-bit file. For the 16-bit and 32-bit data, 0 is a valid
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          DN
+         </a>
+         !
+        </p>
+        <a name="Interactive-Special-Pixel-Demonstration">
+        </a>
+        <h2>
+         Interactive Special Pixel Demonstration
+         <a class="wiki-anchor" href="#Interactive-Special-Pixel-Demonstration">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         <script type="text/javascript">
+          if (typeof window.isisDemosLoaded == 'undefined') {    var isisDemosLoaded = true;    $.getScript("themes/astro/javascripts/easeljs-0.8.1.min.js")       .done( function(s,t) {$.getScript("themes/astro/javascripts/isisDemos.js");});}
+         </script>
+        </p>
+        <div class="app-container" id="isis-special-pixels">
+        </div>
+        <p>
+        </p>
+        <a name="Working-with-Special-Pixels">
+        </a>
+        <h2>
+         Working with Special Pixels
+         <a class="wiki-anchor" href="#Working-with-Special-Pixels">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <p>
+         Q:
+         <em>
+          How do I find out if there are any special pixels in my file?
+         </em>
+         <br/>
+         A: Statistics:
+         <strong>
+          hist
+         </strong>
+         &amp;
+         <strong>
+          stats
+         </strong>
+        </p>
+        <p>
+         There are two programs
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/stats/stats.html">
+          <strong>
+           stats
+          </strong>
+         </a>
+         and
+         <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/hist/hist.html">
+          <strong>
+           hist
+          </strong>
+         </a>
+         that will provide statistics about the pixels of an image. The output from stats looks like:
+        </p>
+        <pre>Group = Results
+    From                    = Intro2isis.cub
+    Band                    = 1
+    Average                 = 61.770642254011
+    StandardDeviation       = 8.0295403784653
+    Variance                = 64.473518689404
+    Median                  = 62.0
+    Mode                    = 66.0
+    Skew                    = -0.085692730285373
+    Minimum                 = 2.0
+    Maximum                 = 252.0
+    Sum                     = 76029592.0
+    TotalPixels             = 1271424
+    ValidPixels             = 1230837
+    OverValidMaximumPixels  = 0
+    UnderValidMinimumPixels = 0
+    NullPixels              = 40587
+    LisPixels               = 0
+    LrsPixels               = 0
+    HisPixels               = 0
+    HrsPixels               = 0
+End_Group
+</pre>
+        <p>
+         <strong>
+          View your image:
+          <a class="external" href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html">
+           qview
+          </a>
+         </strong>
+        </p>
+        <p>
+         You can also display the image on a monitor using the program
+         <a class="external" href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html">
+          <strong>
+           qview
+          </strong>
+         </a>
+         , and position the cursor over a very dark pixel. The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          DN
+         </a>
+         displayed on the screen will either be
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/NULL">
+          NULL
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LIS">
+          LIS
+         </a>
+         ,
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/LRS">
+          LRS
+         </a>
+         , or a very low
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/DN">
+          DN
+         </a>
+         value. The
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HIS">
+          HIS
+         </a>
+         and
+         <a class="wiki-page" href="https://github.com/USGS-Astrogeology/ISIS3/wiki/HRS">
+          HRS
+         </a>
+         pixels will be displayed as white pixels on a monitor.
+        </p>
+        <a name="Related-ISIS3-Applications">
+        </a>
+        <h2>
+         Related ISIS3 Applications
+         <a class="wiki-anchor" href="#Related-ISIS3-Applications">
+          ¶
+         </a>
+        </h2>
+        <hr/>
+        <ul>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/hist/hist.html">
+           <strong>
+            hist
+           </strong>
+          </a>
+         </li>
+         <li>
+          <a class="external" href="https://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/stats/stats.html">
+           <strong>
+            stats
+           </strong>
+          </a>
+         </li>
+         <li>
+          <a class="external" href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html">
+           <strong>
+            qview
+           </strong>
+          </a>
+         </li>
+         <li>
+          <a class="external" href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/isis2ascii/isis2ascii.html">
+           <strong>
+            isis2ascii
+           </strong>
+          </a>
+         </li>
+        </ul>
+       </div>
+       <div style="clear:both;">
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </body>
+</html>
