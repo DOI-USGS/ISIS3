@@ -1,0 +1,1 @@
+## This page has moved. Please see https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Removing_Striping_Noise_from_Image_Data.html
