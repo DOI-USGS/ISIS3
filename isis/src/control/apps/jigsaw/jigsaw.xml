@@ -273,6 +273,10 @@
       coordinate type for reports was set to Rectangular and vice versa.  
       References #501.
     </change>
+    <change name="Tyler Wilson" date="2019-05-17">
+      Cleaned up the bundleout.txt file and added new information in the header.
+      Fixes #3267.
+    </change>
   </history>
 
   <groups>

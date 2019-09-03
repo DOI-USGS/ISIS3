@@ -33,14 +33,14 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.8.0")
+set(VERSION            "3.9.0")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2019-07-01")
+set(VERSION_DATE              "2019-08-26")
 set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
@@ -182,10 +182,19 @@ if(NOT APPLE)
                                                -Wl,-rpath,$ENV{CONDA_PREFIX}/lib)
 endif()
 
- # Append CPP flags set in the third party lib file to the string set in this file.
- string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
- set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
+# Append CPP flags set in the third party lib file to the string set in this file.
+string(REPLACE ";" " " FLAGS_STR "${thirdPartyCppFlags}")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${FLAGS_STR}" )
 
+if(NOT CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE "RELEASE")
+endif()
+
+if(APPLE)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+else()
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -OG")
+endif()
 
 # Paths to required executables
 find_program(XALAN Xalan REQUIRED)
@@ -281,7 +290,7 @@ find_package(Threads)
 
 # In this case, we specify the version numbers being searched for in the non-traditional installs.
 if(APPLE)
-find_package(OpenGL REQUIRED)
+  find_package(OpenGL REQUIRED)
 endif(APPLE)
 
 if(pybindings)

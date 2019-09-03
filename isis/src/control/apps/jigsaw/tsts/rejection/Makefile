@@ -21,17 +21,12 @@ commands:
 	           rejection_multiplier=3.0 \
 	           spsolve=position \
 	           spacecraft_position_sigma=1000.0 \
+		   bundleout_txt=no \
 	           camera_angles_sigma=2.0 > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	       | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	       | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	       > $(OUTPUT)/apollo_rejection_bundleout.txt;
 	$(CAT) residuals.csv \
 	       | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	       > $(OUTPUT)/apollo_rejection_residuals.csv;
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_rejection_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt > /dev/null;
 	$(RM) print.prt > /dev/null;
 	$(RM) bundleout_images.csv > /dev/null;
 	$(RM) residuals.csv > /dev/null;
