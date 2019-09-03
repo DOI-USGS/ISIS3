@@ -249,6 +249,8 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         random
                                         wserialization)
 
+find_package(Ale               REQUIRED)
+find_package(Json              REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)

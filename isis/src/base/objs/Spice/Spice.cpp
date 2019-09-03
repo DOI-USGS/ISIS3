@@ -29,6 +29,8 @@
 
 #include <getSpkAbCorrState.hpp>
 
+#include <ale.h>
+
 #include "Constants.h"
 #include "Distance.h"
 #include "EllipsoidShape.h"
@@ -43,6 +45,7 @@
 #include "ShapeModel.h"
 #include "SpacecraftPosition.h"
 #include "Target.h"
+#include "Blob.h"
 
 using namespace std;
 
@@ -90,6 +93,14 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
+    std::cout << "whatever" << std::endl; 
+    std::string aleIsdStr = ale::load(cube.fileName().toStdString());
+    std::cout << "succesful call" << std::endl;
+    std::cout << "ALE ISD: " <<  aleIsdStr << std::endl;
+    
+    Blob aleBlob("AleIsd", "Isd");
+    aleBlob.ReadString(QString::fromStdString(aleIsdStr));  
+    cube.write(aleBlob);
 
     init(lab, !hasTables);
   }
@@ -100,7 +111,16 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) {
+  Spice::Spice(Cube &cube, bool noTables) { 
+    std::cout << "whatever" << std::endl;
+    std::string aleIsdStr = ale::load(cube.fileName().toStdString());
+    std::cout << "Got output" << std::endl;
+    std::cout << "ALE ISD: " <<  aleIsdStr << std::endl;
+     
+    Blob aleBlob("AleIsd", "Isd");
+    aleBlob.ReadString(QString::fromStdString(aleIsdStr)); 
+    cube.write(aleBlob);
+  
     init(*cube.label(), noTables);
   }
 
