@@ -93,12 +93,6 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    std::string aleIsdStr = ale::load(cube.fileName().toStdString());
-    
-    Blob aleBlob("AleIsd", "Isd");
-    aleBlob.ReadString(QString::fromStdString(aleIsdStr));  
-    cube.write(aleBlob);
-
     init(lab, !hasTables);
   }
 
@@ -109,12 +103,6 @@ namespace Isis {
    * @param noTables Indicates the use of tables.
    */
   Spice::Spice(Cube &cube, bool noTables) { 
-    std::string aleIsdStr = ale::load(cube.fileName().toStdString());
-     
-    Blob aleBlob("AleIsd", "Isd");
-    aleBlob.ReadString(QString::fromStdString(aleIsdStr)); 
-    cube.write(aleBlob);
-  
     init(*cube.label(), noTables);
   }
 
