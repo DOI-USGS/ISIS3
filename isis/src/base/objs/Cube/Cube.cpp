@@ -771,7 +771,6 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
-    std::cout << "in cube::read(blob) " << std::endl;
     // Write an attached blob
     if (m_attached) {
       QMutexLocker locker(m_mutex);
