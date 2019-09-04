@@ -490,8 +490,9 @@ bool tryKernels(Cube *icube, Process &p,
           i ++;
         }
       }
-
+      std::cout << "Getting stored naif keywords" << std::endl;
       *icube->label() += cam->getStoredNaifKeywords();
+      std::cout << "done" << std::endl;
     }
     //modify Kernels group only
     else {
@@ -518,14 +519,15 @@ bool tryKernels(Cube *icube, Process &p,
         }
       }
     }
-
+    
+    std::cout << "writing history" << std::endl;
     p.WriteHistory(*icube);
   }
   catch(IException &) {
     icube->putGroup(originalKernels);
     return false;
   }
-
+  std::cout << "tryKernels - END" << std::endl;
   return true;
 }
 

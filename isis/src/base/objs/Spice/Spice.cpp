@@ -30,6 +30,8 @@
 #include <getSpkAbCorrState.hpp>
 
 #include <ale.h>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include "Constants.h"
 #include "Distance.h"
@@ -59,12 +61,13 @@ namespace Isis {
    */
 
   // TODO: DOCUMENT EVERYTHING
+  /*
   Spice::Spice(Pvl &lab) {
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
 
     init(lab, !hasTables);
-  }
+  }*/
 
 
   /**
@@ -93,13 +96,8 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    std::string aleIsdStr = ale::load(cube.fileName().toStdString());
     
-    Blob aleBlob("AleIsd", "Isd");
-    aleBlob.ReadString(QString::fromStdString(aleIsdStr));  
-    cube.write(aleBlob);
-
-    init(lab, !hasTables);
+    init(cube, !hasTables);
   }
 
   /**
@@ -108,14 +106,8 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) { 
-    std::string aleIsdStr = ale::load(cube.fileName().toStdString());
-     
-    Blob aleBlob("AleIsd", "Isd");
-    aleBlob.ReadString(QString::fromStdString(aleIsdStr)); 
-    cube.write(aleBlob);
-  
-    init(*cube.label(), noTables);
+  Spice::Spice(Cube &cube, bool noTables) {  
+    init(cube, noTables);
   }
 
   /**
@@ -131,7 +123,7 @@ namespace Isis {
    * @internal
    *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null.
    */
-  void Spice::init(Pvl &lab, bool noTables) {
+  void Spice::init(Cube &cube, bool noTables) {
     NaifStatus::CheckErrors();
 
     // Initialize members
@@ -166,7 +158,9 @@ namespace Isis {
     m_naifKeywords = new PvlObject("NaifKeywords");
 
     // m_sky = false;
-
+    
+    Pvl &lab = *cube.label();
+   
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -183,14 +177,51 @@ namespace Isis {
     }
     else {
       *m_endTimePadding = 0.0;
-    }
+    }  
 
-    m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    // We should remove this completely in the near future 
+    // m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    m_usingNaif = true; 
 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
+      std::string aleIsdStr = ale::load(cube.fileName().toStdString(), "", "isis");
+      std::cout << "ISD: " << aleIsdStr << std::endl;
+      
+      json isd = json::parse(aleIsdStr);  
+      
+      std::cout << "Parsed isd" << std::endl;
+      json aleNaifKeywords = isd["NaifKeywords"]; 
+      m_naifKeywords = new PvlObject("NaifKeywords");
+      
+      for(json::iterator it = aleNaifKeywords.begin(); it!=aleNaifKeywords.end();it++) {
+          std::cout << it.key() << ":" << it.value() << std::endl;
+          if (it.value().is_array()) {
+            PvlKeyword arr_keyword;
+            
+            arr_keyword.setName(QString::fromStdString(it.key()));
+
+            for(json::iterator ar = it.value().begin(); ar!=it.value().end();ar++) {
+              arr_keyword += QString::number(ar->get<double>());
+            }
+            
+            *m_naifKeywords += arr_keyword;
+            std::cout << arr_keyword << std::endl;
+          } 
+          else if(it.value().is_number()) {
+           *m_naifKeywords += PvlKeyword(QString::fromStdString(it.key()), QString::number(it->get<double>())); 
+          }
+          else if(it.value().is_boolean()){
+            QString value = it->get<bool>() ? "true" : "false";
+            *m_naifKeywords += PvlKeyword(QString::fromStdString(it.key()), value);
+          }
+          else {
+          *m_naifKeywords += PvlKeyword(QString::fromStdString(it.key()), QString::fromStdString(it.value()));
+          }
+      }
+      std::cout << *m_naifKeywords << std::endl;
       if (noTables) {
         load(kernels["TargetPosition"], noTables);
         load(kernels["InstrumentPosition"], noTables);
