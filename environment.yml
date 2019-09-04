@@ -6,8 +6,8 @@ channels:
 dependencies:
   - ale>=0.3.2
   - armadillo
-  - blas=1.1
-  - bullet=2.86.1
+  - blas
+  - bullet
   - bz2file
   - bzip2
   - cmake >=3.10
