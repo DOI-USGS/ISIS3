@@ -4,11 +4,13 @@ channels:
   - defaults
 
 dependencies:
+  - ale
   - armadillo
   - blas
   - bullet
   - bz2file
   - bzip2
+  - cmake >=3.10
   - cspice
   - curl
   - doxygen
@@ -35,13 +37,14 @@ dependencies:
   - mysql-connector-c
   - nanoflann
   - ninja
+  - nlohmann_json
   - conda-forge/label/gcc7::nn
   - opencv=3.3.0
   - openssl
   - pcl
   - pip
   - protobuf>=3.5.2
-  - python
+  - python>=3.6
   - qhull
   - qt=5.9.6
   - qwt=6.1.3
@@ -61,18 +64,3 @@ dependencies:
   - xorg-libx11
   - xorg-libxi
   - zlib
-
-  - cmake>=3.10
-  - eigen
-  - jupyter
-  - nlohmann_json
-  - numba
-  - numpy
-  - openblas
-  - pvl
-  - python-dateutil
-  - scipy
-  - spiceypy
-  - quaternion
-  - pyyaml
-  - networkx
