@@ -32,6 +32,9 @@
 #include "Table.h"
 #include "PolynomialUnivariate.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 namespace Isis {
   class NumericalApproximation;
 
@@ -233,6 +236,7 @@ namespace Isis {
       void LoadCache(double startTime, double endTime, int size);
       void LoadCache(double time);
       void LoadCache(Table &table);
+      void LoadCache(json &isd);   
 
       Table LineCache(const QString &tableName);
       Table LoadHermiteCache(const QString &tableName);

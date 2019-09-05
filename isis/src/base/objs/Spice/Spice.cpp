@@ -395,6 +395,9 @@ namespace Isis {
     if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
+    } 
+    else {
+      m_instrumenPosition->LoadCache(isd);
     }
 
     NaifStatus::CheckErrors();

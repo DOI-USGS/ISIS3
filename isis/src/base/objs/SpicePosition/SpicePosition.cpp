@@ -337,6 +337,26 @@ namespace Isis {
   }
 
 
+  void SpicePosition::LoadCache(json &isd) {
+    if (p_source != Spice) {
+        throw IException(IException::Programmer, "SpicePosition::LoadCache(json) only support Spice source", _FILEINFO_);
+    } 
+    
+    json isdPos = isd["InstrumentPosition"];
+
+    // Load the full cache time information from the label if available
+    p_fullCacheStartTime = isdPos["SpkTableStartTime"].get<double>();
+    p_fullCacheEndTime = isdPos["SpkTableEndTime"].get<double>();
+
+    p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>();
+    
+    p_cache = isdPos["Positions"].get<std::vector<std::vector<double>>>();
+    p_cacheVelocity = isdPos["Velocities"].get<std::vector<std::vector<double>>>();
+    p_cacheTime = isdPos["EphemerisTimes"].get<std::vector<double>>();
+    
+    p_source = Memcache; 
+  }
+
   /** Cache J2000 positions using a table file.
    *
    * This method will load an internal cache with coordinates from an
