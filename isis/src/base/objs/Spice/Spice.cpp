@@ -29,6 +29,8 @@
 
 #include <getSpkAbCorrState.hpp>
 
+#include <ale.h>
+
 #include "Constants.h"
 #include "Distance.h"
 #include "EllipsoidShape.h"
@@ -43,6 +45,7 @@
 #include "ShapeModel.h"
 #include "SpacecraftPosition.h"
 #include "Target.h"
+#include "Blob.h"
 
 using namespace std;
 
@@ -90,7 +93,6 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-
     init(lab, !hasTables);
   }
 
@@ -100,7 +102,7 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) {
+  Spice::Spice(Cube &cube, bool noTables) { 
     init(*cube.label(), noTables);
   }
 

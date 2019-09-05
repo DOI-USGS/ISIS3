@@ -79,15 +79,18 @@ namespace Isis {
       void Read(const QString &file);
       void Read(const QString &file, const Pvl &pvlLabels);
       virtual void Read(const Pvl &pvl, std::istream &is);
-
+      void ReadString(const QString &write_string);
+      
       void Write(const QString &file);
       void Write(Pvl &pvl, std::fstream &stm,
                  const QString &detachedFileName = "");
-
+      
+    
     protected:
       void Find(const Pvl &pvl);
-      virtual void ReadInit();
+      virtual void ReadInit(); 
       virtual void ReadData(std::istream &is);
+      
       virtual void WriteInit();
       virtual void WriteData(std::fstream &os);
 
