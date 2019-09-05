@@ -258,6 +258,8 @@ find_package(Boost 1.59.0 REQUIRED atomic
                                         random
                                         wserialization)
 
+find_package(Ale               REQUIRED)
+find_package(Json              REQUIRED)
 find_package(Bullet    2.86    REQUIRED)
 find_package(Cholmod   4.4.5   REQUIRED)
 find_package(CSPICE    65      REQUIRED)
@@ -270,7 +272,7 @@ find_package(HDF5      1.8.15  REQUIRED)
 find_package(Jama      125     REQUIRED)
 find_package(NN                REQUIRED)
 find_package(OpenCV    3.1.0   REQUIRED)
-find_package(PCL       1.8     REQUIRED)
+find_package(PCL       1.9     REQUIRED)
 find_package(Protobuf  2.6.1   REQUIRED)
 find_package(Qwt       6       REQUIRED)
 find_package(SuperLU   4.3     REQUIRED)
