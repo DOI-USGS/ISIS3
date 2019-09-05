@@ -71,7 +71,7 @@ window):
     collected by space exploration missions to create seamless,
     cartographically accurate, global image maps for use by the
     planetary science community for research and mapping. See our
-    [Map-a-Planet](http://www.mapaplanet.com) site to view these
+    [Map-a-Planet](https://astrogeology.usgs.gov/tools/map-a-planet-2) site to view these
     products.
 
 ![Mars Hemisphere Mosaic](attachments/download/1092/Mars_hemi.gif)
