@@ -30,8 +30,10 @@
 #include <getSpkAbCorrState.hpp>
 
 #include <ale.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
 
 #include "Constants.h"
 #include "Distance.h"
@@ -78,7 +80,6 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    
     init(cube, !hasTables);
   }
 
