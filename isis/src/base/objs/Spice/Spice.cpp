@@ -31,6 +31,10 @@
 
 #include <ale.h>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+
 #include "Constants.h"
 #include "Distance.h"
 #include "EllipsoidShape.h"
@@ -50,23 +54,6 @@
 using namespace std;
 
 namespace Isis {
-  /**
-   * Constructs a Spice object and loads SPICE kernels using information from the
-   * label object. The constructor expects an Instrument and Kernels group to be
-   * in the labels.
-   *
-   * @param lab Label containing Instrument and Kernels groups.
-   */
-
-  // TODO: DOCUMENT EVERYTHING
-  Spice::Spice(Pvl &lab) {
-    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
-    bool hasTables = (kernels["TargetPosition"][0] == "Table");
-
-    init(lab, !hasTables);
-  }
-
-
   /**
    * Constructs a Spice object and loads SPICE kernels using information from the
    * label object. The constructor expects an Instrument and Kernels group to be
@@ -93,7 +80,7 @@ namespace Isis {
     Pvl &lab = *cube.label();
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
-    init(lab, !hasTables);
+    init(cube, !hasTables);
   }
 
   /**
@@ -102,8 +89,8 @@ namespace Isis {
    * @param lab  Pvl labels.
    * @param noTables Indicates the use of tables.
    */
-  Spice::Spice(Cube &cube, bool noTables) { 
-    init(*cube.label(), noTables);
+  Spice::Spice(Cube &cube, bool noTables) {  
+    init(cube, noTables);
   }
 
   /**
@@ -119,7 +106,7 @@ namespace Isis {
    * @internal
    *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null.
    */
-  void Spice::init(Pvl &lab, bool noTables) {
+  void Spice::init(Cube &cube, bool noTables) {
     NaifStatus::CheckErrors();
 
     // Initialize members
@@ -154,7 +141,9 @@ namespace Isis {
     m_naifKeywords = new PvlObject("NaifKeywords");
 
     // m_sky = false;
-
+    
+    Pvl &lab = *cube.label();
+   
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -171,14 +160,23 @@ namespace Isis {
     }
     else {
       *m_endTimePadding = 0.0;
-    }
+    }  
 
-    m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    // We should remove this completely in the near future 
+    // m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    m_usingNaif = true; 
 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
+      std::string aleIsdStr = ale::load(cube.fileName().toStdString(), "", "isis");
+      
+      json isd = json::parse(aleIsdStr);  
+      
+      json aleNaifKeywords = isd["NaifKeywords"]; 
+      m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords); 
+
       if (noTables) {
         load(kernels["TargetPosition"], noTables);
         load(kernels["InstrumentPosition"], noTables);

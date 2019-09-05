@@ -14,6 +14,7 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+
 #include "BasisFunction.h"
 #include "IException.h"
 #include "IString.h"
@@ -399,6 +400,24 @@ namespace Isis {
    */
   void SpiceRotation::LoadCache(double time) {
     LoadCache(time, time, 1);
+  }
+
+
+  void SpiceRotation::LoadCache(json &isd){
+    // Clear any existing cached data to make it reentrant (KJB 2011-07-20).
+    p_timeFrames.clear();
+    p_TC.clear();
+    p_cache.clear();
+    p_cacheTime.clear();
+    p_cacheAv.clear();
+    p_hasAngularVelocity = false;
+ 
+  
+  
+  
+  
+  
+  
   }
 
 
