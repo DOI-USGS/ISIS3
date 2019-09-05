@@ -58,24 +58,6 @@ namespace Isis {
    * in the labels.
    *
    * @param lab Label containing Instrument and Kernels groups.
-   */
-
-  // TODO: DOCUMENT EVERYTHING
-  /*
-  Spice::Spice(Pvl &lab) {
-    PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
-    bool hasTables = (kernels["TargetPosition"][0] == "Table");
-
-    init(lab, !hasTables);
-  }*/
-
-
-  /**
-   * Constructs a Spice object and loads SPICE kernels using information from the
-   * label object. The constructor expects an Instrument and Kernels group to be
-   * in the labels.
-   *
-   * @param lab Label containing Instrument and Kernels groups.
    *
    * @internal
    * @history 2005-10-07 Jim Torson  -   Modified the constructor so it can
@@ -188,40 +170,12 @@ namespace Isis {
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
       std::string aleIsdStr = ale::load(cube.fileName().toStdString(), "", "isis");
-      std::cout << "ISD: " << aleIsdStr << std::endl;
       
       json isd = json::parse(aleIsdStr);  
       
-      std::cout << "Parsed isd" << std::endl;
       json aleNaifKeywords = isd["NaifKeywords"]; 
-      m_naifKeywords = new PvlObject("NaifKeywords");
-      
-      for(json::iterator it = aleNaifKeywords.begin(); it!=aleNaifKeywords.end();it++) {
-          std::cout << it.key() << ":" << it.value() << std::endl;
-          if (it.value().is_array()) {
-            PvlKeyword arr_keyword;
-            
-            arr_keyword.setName(QString::fromStdString(it.key()));
+      m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords); 
 
-            for(json::iterator ar = it.value().begin(); ar!=it.value().end();ar++) {
-              arr_keyword += QString::number(ar->get<double>());
-            }
-            
-            *m_naifKeywords += arr_keyword;
-            std::cout << arr_keyword << std::endl;
-          } 
-          else if(it.value().is_number()) {
-           *m_naifKeywords += PvlKeyword(QString::fromStdString(it.key()), QString::number(it->get<double>())); 
-          }
-          else if(it.value().is_boolean()){
-            QString value = it->get<bool>() ? "true" : "false";
-            *m_naifKeywords += PvlKeyword(QString::fromStdString(it.key()), value);
-          }
-          else {
-          *m_naifKeywords += PvlKeyword(QString::fromStdString(it.key()), QString::fromStdString(it.value()));
-          }
-      }
-      std::cout << *m_naifKeywords << std::endl;
       if (noTables) {
         load(kernels["TargetPosition"], noTables);
         load(kernels["InstrumentPosition"], noTables);

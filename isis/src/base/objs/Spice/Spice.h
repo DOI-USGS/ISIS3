@@ -294,7 +294,6 @@ namespace Isis {
   class Spice {
     public:
       // constructors
-      // Spice(Pvl &cubeLabel);
       Spice(Cube &cube);
       Spice(Cube &cube, bool noTables);
 
