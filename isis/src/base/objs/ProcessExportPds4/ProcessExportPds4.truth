@@ -29,11 +29,11 @@ Testing default CaSSIS export
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -61,11 +61,11 @@ Testing default CaSSIS export
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -97,11 +97,11 @@ Testing export pixel types
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -126,11 +126,11 @@ Testing export pixel types
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-32768</missing_constant>
+    <high_instrument_saturation>-32765</high_instrument_saturation>
+    <high_representation_saturation>-32764</high_representation_saturation>
+    <low_instrument_saturation>-32766</low_instrument_saturation>
+    <low_representation_saturation>-32767</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -157,11 +157,11 @@ Testing export pixel types
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -190,53 +190,16 @@ Testing export pixel types
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>0</missing_constant>
+    <high_instrument_saturation>65534</high_instrument_saturation>
+    <high_representation_saturation>65535</high_representation_saturation>
+    <low_instrument_saturation>2</low_instrument_saturation>
+    <low_representation_saturation>1</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
 </Product_Observational>
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<Product_Observational>0</offset>
-   <axes>2</axes>
-   <axis_index_order>Last Index Fastest</axis_index_order>
-   <Axis_Array>
-    <axis_name>Sample</axis_name>
-    <elements>2048</elements>
-    <sequence_number>1</sequence_number>
-   </Axis_Array>
-   <Axis_Array>
-    <axis_name>Line</axis_name>
-    <elements>254</elements>
-    <sequence_number>2</sequence_number>
-   </Axis_Array>
-   <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
-   </Special_Constants>
-  </Array_2D_Image>
- </File_Area_Observational>
-</Product_Observational>
-<?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
@@ -262,11 +225,48 @@ Testing export pixel types
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>0</missing_constant>
+    <high_instrument_saturation>65534</high_instrument_saturation>
+    <high_representation_saturation>65535</high_representation_saturation>
+    <low_instrument_saturation>2</low_instrument_saturation>
+    <low_representation_saturation>1</low_representation_saturation>
+   </Special_Constants>
+  </Array_2D_Image>
+ </File_Area_Observational>
+</Product_Observational>
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/img/v1/PDS4_IMG_1A10_1510.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/disp/v1/PDS4_DISP_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://pds.nasa.gov/pds4/pds/v1/PDS4_PDS_1B00.sch" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<Product_Observational>0</offset>
+   <axes>2</axes>
+   <axis_index_order>Last Index Fastest</axis_index_order>
+   <Axis_Array>
+    <axis_name>Sample</axis_name>
+    <elements>2048</elements>
+    <sequence_number>1</sequence_number>
+   </Axis_Array>
+   <Axis_Array>
+    <axis_name>Line</axis_name>
+    <elements>254</elements>
+    <sequence_number>2</sequence_number>
+   </Axis_Array>
+   <Special_Constants>
+    <missing_constant>0</missing_constant>
+    <high_instrument_saturation>255</high_instrument_saturation>
+    <high_representation_saturation>255</high_representation_saturation>
+    <low_instrument_saturation>0</low_instrument_saturation>
+    <low_representation_saturation>0</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -296,11 +296,11 @@ Testing missing start and end times
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>
@@ -331,11 +331,11 @@ Testing exporting a map projected product
     <sequence_number>2</sequence_number>
    </Axis_Array>
    <Special_Constants>
-    <missing_constant>-1.79769313486231491e+308</missing_constant>
-    <high_instrument_saturation>-1.79769313486231551e+308</high_instrument_saturation>
-    <high_representation_saturation>-1.79769313486231571e+308</high_representation_saturation>
-    <low_instrument_saturation>-1.79769313486231531e+308</low_instrument_saturation>
-    <low_representation_saturation>-1.79769313486231511e+308</low_representation_saturation>
+    <missing_constant>-3.40282265508890445e+38</missing_constant>
+    <high_instrument_saturation>-3.40282326356119256e+38</high_instrument_saturation>
+    <high_representation_saturation>-3.4028234663852886e+38</high_representation_saturation>
+    <low_instrument_saturation>-3.40282306073709653e+38</low_instrument_saturation>
+    <low_representation_saturation>-3.40282285791300049e+38</low_representation_saturation>
    </Special_Constants>
   </Array_2D_Image>
  </File_Area_Observational>

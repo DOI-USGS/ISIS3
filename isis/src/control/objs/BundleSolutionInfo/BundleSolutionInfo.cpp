@@ -10,6 +10,7 @@
 #include <QXmlStreamWriter>
 
 #include "BundleResults.h"
+#include "Control.h"
 #include "ControlList.h"
 #include "ControlMeasure.h"
 #include "ControlNet.h"
@@ -22,6 +23,7 @@
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 #include "StatCumProbDistDynCalc.h"
+#include "Statistics.h"
 #include "XmlStackedHandlerReader.h"
 
 namespace Isis {
@@ -44,6 +46,7 @@ namespace Isis {
     m_name = m_runTime;
     m_inputControlNetFileName = new FileName(controlNetworkFileName);
     m_outputControl = NULL;
+    m_outputControlName="";
     m_settings = inputSettings;
     m_statisticsResults = new BundleResults(outputStatistics);
     m_images = new QList<ImageList *>(imgList);
@@ -67,6 +70,7 @@ namespace Isis {
     m_name = m_runTime;
     m_inputControlNetFileName = NULL;
     m_outputControl = NULL;
+    m_outputControlName="";
     m_statisticsResults = NULL;
     // what about the rest of the member data ? should we set defaults ??? CREATE INITIALIZE METHOD
     m_images = new QList<ImageList *>;
@@ -197,6 +201,7 @@ namespace Isis {
       delete m_outputControl;
     }
     m_outputControl = new Control(newOutputFileName.expanded());
+    m_outputControlName = newOutputFileName.expanded();
   }
 
 
@@ -269,7 +274,11 @@ namespace Isis {
    * @return @b QString The name of the output control network.
    */
   QString BundleSolutionInfo::outputControlNetFileName() const {
-    return m_outputControl->fileName();
+
+    if (m_outputControl)
+      return m_outputControl->fileName();
+    else
+      return m_outputControlName;
   }
 
 
@@ -281,7 +290,26 @@ namespace Isis {
   void BundleSolutionInfo::setOutputControl(Control *outputControl) {
     m_outputControl = outputControl;
   }
-
+    
+  
+  /**
+   * Sets m_outputControlName
+   *
+   * @param name QString of the new value
+   */
+  void BundleSolutionInfo::setOutputControlName(QString name) {
+    m_outputControlName = name;
+  }
+  
+  
+  /**
+   * Returns m_outputControlName
+   *
+   * @returns QString of the value
+   */
+  QString BundleSolutionInfo::outputControlName() const {
+    return m_outputControlName;
+  }
 
   /**
    * Returns bundle output Control object.
@@ -544,21 +572,34 @@ namespace Isis {
     sprintf(buf, "\n                       Run Time: %s",
                   Isis::iTime::CurrentLocalTime().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n               Network Filename: %s",
+    sprintf(buf, "\n                       Network Filename: %s",
                   m_inputControlNetFileName->expanded().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n                     Network Id: %s",
+
+    sprintf(buf,"\n                       Cube List: %s",
+                m_settings->cubeList().toStdString().c_str() );
+
+    fpOut << buf;
+
+    sprintf(buf, "\n                       Output Network Filename: %s",
+                              outputControlName().toStdString().c_str() );
+    fpOut << buf;
+    sprintf(buf,"\n                       Output File Prefix: %s",
+                m_settings->outputFilePrefix().toStdString().c_str() );
+    fpOut <<buf;   
+
+    sprintf(buf, "\n                       Network Id: %s",
                   m_statisticsResults->outputControlNet()->GetNetworkId().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n            Network Description: %s",\
+    sprintf(buf, "\n                       Network Description: %s",\
                   m_statisticsResults->outputControlNet()->Description().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n                         Target: %s",
+    sprintf(buf, "\n                       Target: %s",
                   m_statisticsResults->outputControlNet()->GetTarget().toLatin1().data());
     fpOut << buf;
-    sprintf(buf, "\n\n                   Linear Units: kilometers");
+    sprintf(buf, "\n\n                       Linear Units: kilometers");
     fpOut << buf;
-    sprintf(buf, "\n                  Angular Units: decimal degrees");
+    sprintf(buf, "\n                       Angular Units: decimal degrees");
     fpOut << buf;
     sprintf(buf, "\n\nINPUT: SOLVE OPTIONS\n====================\n");
     fpOut << buf;
@@ -1003,11 +1044,21 @@ namespace Isis {
 
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMeasures\t\t\t\t\t\t\t\tRMS(pixels)\n");
+    fpOut << buf;
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t******************************  "
+                "**************************************************\n");
+    fpOut << buf;
+
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|Accepted\t\t|\t\tTotal|\t|Samples\t\t|\t\t"
+                "Lines\t\t|\t\tTotal|\n");
+    fpOut << buf;
 
     int numMeasures;
     int numRejectedMeasures;
     int numUsed;
     int imageIndex = 0;
+    Statistics rmsSamplesTotal,rmsLinesTotal,rmsTotals;
 
     for (int i = 0; i < numObservations; i++) {
 
@@ -1023,33 +1074,39 @@ namespace Isis {
                                         rmsImageLineResiduals()[imageIndex].Rms();
         double rmsLandSResiduals =  m_statisticsResults->
                                         rmsImageResiduals()[imageIndex].Rms();
+        rmsSamplesTotal.AddData(rmsSampleResiduals);
+        rmsLinesTotal.AddData(rmsLineResiduals);
+        rmsTotals.AddData(rmsLandSResiduals);
 
-        numMeasures =         m_statisticsResults->outputControlNet()->
-                                  GetNumberOfValidMeasuresInImage(
-                                      bundleImage->serialNumber());
+        numMeasures = m_statisticsResults->outputControlNet()->GetNumberOfValidMeasuresInImage
+            (bundleImage->serialNumber());
 
         numRejectedMeasures = m_statisticsResults->outputControlNet()->
-                                  GetNumberOfJigsawRejectedMeasuresInImage(
-                                      bundleImage->serialNumber());
+            GetNumberOfJigsawRejectedMeasuresInImage(bundleImage->serialNumber());
 
-        numUsed =             numMeasures - numRejectedMeasures;
+        numUsed = numMeasures - numRejectedMeasures;
 
-        if (numUsed == numMeasures) {
-          sprintf(buf, "%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                  bundleImage->fileName().toLatin1().data(),
-                  (numMeasures-numRejectedMeasures), numMeasures,
-                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-        }
-        else {
-          sprintf(buf, "%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                  bundleImage->fileName().toLatin1().data(),
-                  (numMeasures-numRejectedMeasures), numMeasures,
-                  rmsSampleResiduals, rmsLineResiduals, rmsLandSResiduals);
-        }
+        sprintf(buf,"%-*s\t\t\t\t\t",45,bundleImage->fileName().toLatin1().data());
+        fpOut << buf;
+
+        sprintf(buf,"%*d\t\t\t%*d\t\t\t",5,numUsed,5,numMeasures);
+        fpOut << buf;
+
+        sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf \n",
+                rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
+
         fpOut << buf;
         imageIndex++;
       }
     }
+
+    sprintf(buf,"\nTotal RMS:");
+    fpOut << buf;
+    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+    fpOut << buf;
+    sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf\n",
+    rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
+    fpOut << buf;
 
     return true;
   }
@@ -1127,9 +1184,8 @@ namespace Isis {
         sprintf(buf,",");
         fpOut << buf;
 
-
         QString observationString =
-            observation->formatBundleOutputString(errorProp,true);
+            observation->bundleOutputCSV(errorProp);
 
         //Removes trailing commas
         if (observationString.right(1)==",") {
@@ -1137,6 +1193,7 @@ namespace Isis {
         }
 
         fpOut << (const char*) observationString.toLatin1().data();
+
         sprintf(buf,"\n");
         fpOut << buf;
         imgIndex++;
@@ -1147,7 +1204,6 @@ namespace Isis {
     fpOut.close();
     return true;
   }
-
 
 
   /**
@@ -1167,7 +1223,7 @@ namespace Isis {
 
     m_txtBundleOutputFilename = ofname;
 
-    char buf[1056];
+    char buf[4096];
     BundleObservationQsp observation;
 
     int nObservations = m_statisticsResults->observations().size();
@@ -1184,9 +1240,9 @@ namespace Isis {
       sprintf(buf, "\nTARGET BODY\n==========================\n");
       fpOut << buf;
 
-      sprintf(buf, "\n   Target         Initial              Total               "
-                   "Final             Initial           Final\n"
-                   "Parameter         Value              Correction           "
+      sprintf(buf, "\n   Target         Initial            Total               "
+                   "Final           Initial           Final\n"
+                   "Parameter         Value            Correction           "
                    "Value             Accuracy          Accuracy\n");
       fpOut << buf;
 
@@ -1220,16 +1276,19 @@ namespace Isis {
         sprintf(buf, "\nImage Serial Number: %s\n", image->serialNumber().toLatin1().data());
         fpOut << buf;
 
-        sprintf(buf, "\n    Image         Initial              Total               "
-                     "Final             Initial           Final\n"
-                     "Parameter         Value              Correction            "
-                     "Value             Accuracy          Accuracy\n");
+        sprintf(buf,"Image         Initial                     Total                  "
+                    "Final                                      Accuracy\n");
+        fpOut << buf;
+        sprintf(buf,"Parameter         Value                       Correction"
+                    "             Value                      Initial           "
+                    "Final           Units\n");
         fpOut << buf;
 
-        QString observationString =
-            observation->formatBundleOutputString(berrorProp);
-        fpOut << (const char*)observationString.toLatin1().data();
+        sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+                    "***************************************\n");
+        fpOut << buf;
 
+        observation->bundleOutputString(fpOut,berrorProp);
         // Build list of images and parameters for correlation matrix.
         foreach ( QString image, observation->imageNames() ) {
           imagesAndParameters.insert( image, observation->parameterList() );

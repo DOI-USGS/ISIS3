@@ -18,12 +18,8 @@ commands:
 	  cnet=$(INPUT)/color-tlb.net \
 	  onet=$(OUTPUT)/color-tlb-out.net \
 	  camera_angles_sigma=10 \
+	  bundleout_txt=no \
 	  > /dev/null;
-	$(CAT) bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | $(SED) 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  | $(SED) s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/hold_bundleout.txt;
 	$(CAT) residuals.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/hold_residuals.csv;
@@ -32,4 +28,4 @@ commands:
 	       > bundleout_images1.csv;  
 	$(MV) bundleout_points.csv $(OUTPUT)/hold_bundleout_points.csv;
 	$(MV) bundleout_images1.csv $(OUTPUT)/hold_bundleout_images.csv;
-	$(RM) bundleout.txt bundleout_images.csv residuals.csv $(OUTPUT)/cubes.lis $(OUTPUT)/hold-green.lis;
+	$(RM) bundleout_images.csv residuals.csv $(OUTPUT)/cubes.lis $(OUTPUT)/hold-green.lis;

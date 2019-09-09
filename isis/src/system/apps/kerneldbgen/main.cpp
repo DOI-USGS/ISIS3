@@ -1,5 +1,6 @@
 #include "Isis.h"
 #include "SpiceDbGen.h"
+#include "FileList.h"
 #include "iTime.h"
 
 using namespace std;
@@ -37,16 +38,16 @@ void IsisMain() {
   }
   PvlObject selections(kernelType);
 
-  // Specify whether to use SPICE segments (made up of SPICE intervals) 
-  // or SPICE intervals for the SPICE database. Naif referes to this as "coverage level" 
-  QString coverageLevel; 
+  // Specify whether to use SPICE segments (made up of SPICE intervals)
+  // or SPICE intervals for the SPICE database. Naif referes to this as "coverage level"
+  QString coverageLevel;
   if (ui.GetString("LEVEL") == "SEGMENT") {
-    coverageLevel = "SEGMENT"; 
+    coverageLevel = "SEGMENT";
   }
   else if (ui.GetString("LEVEL") == "INTERVAL") {
-    coverageLevel = "INTERVAL"; 
+    coverageLevel = "INTERVAL";
   }
-  sdg.setCoverageLevel(coverageLevel); 
+  sdg.setCoverageLevel(coverageLevel);
 
   selections += PvlKeyword("RunTime", iTime::CurrentLocalTime());
   selections.addGroup(dependency);
@@ -65,7 +66,7 @@ void IsisMain() {
   //}
   double startOffset = ui.GetDouble("STARTOFFSET");
   double endOffset = ui.GetDouble("ENDOFFSET");
-  
+
   if (ui.GetString("PREDICTFILTER") != "none" &&
       ui.GetString("PREDICTDIR") != "none") {
     QString location = "";
@@ -74,6 +75,15 @@ void IsisMain() {
     std::vector<QString> filter;
     ui.GetString("PREDICTFILTER", filter);
     PvlObject result = sdg.Direct("Predicted", location, filter, startOffset, endOffset);
+    PvlObject::PvlGroupIterator grp = result.beginGroup();
+    while(grp != result.endGroup()) {
+      selections.addGroup(*grp);
+      grp++;
+    }
+  }
+  else if (ui.WasEntered("PREDICTLIST")) {
+    FileList kernList(ui.GetFileName("PREDICTLIST"));
+    PvlObject result = sdg.Direct("Predicted", kernList, startOffset, endOffset);
     PvlObject::PvlGroupIterator grp = result.beginGroup();
     while(grp != result.endGroup()) {
       selections.addGroup(*grp);
@@ -95,6 +105,15 @@ void IsisMain() {
       grp++;
     }
   }
+  else if (ui.WasEntered("RECONLIST")) {
+    FileList kernList(ui.GetFileName("RECONLIST"));
+    PvlObject result = sdg.Direct("Reconstructed", kernList, startOffset, endOffset);
+    PvlObject::PvlGroupIterator grp = result.beginGroup();
+    while(grp != result.endGroup()) {
+      selections.addGroup(*grp);
+      grp++;
+    }
+  }
 
   if (ui.GetString("SMITHEDDIR") != "none" &&
       ui.GetString("SMITHEDFILTER") != "none") {
@@ -110,12 +129,23 @@ void IsisMain() {
       grp++;
     }
   }
+  else if (ui.WasEntered("SMITHEDLIST")) {
+    FileList kernList(ui.GetFileName("SMITHEDLIST"));
+    PvlObject result = sdg.Direct("Smithed", kernList, startOffset, endOffset);
+    PvlObject::PvlGroupIterator grp = result.beginGroup();
+    while(grp != result.endGroup()) {
+      selections.addGroup(*grp);
+      grp++;
+    }
+  }
 
   //if (filter == ""){
-  if (!ui.WasEntered("PREDICTFILTER") && !ui.WasEntered("RECONFILTER") &&
-      !ui.WasEntered("SMITHEDFILTER")) {
+  if (!(ui.WasEntered("PREDICTFILTER") || ui.WasEntered("PREDICTLIST")) &&
+      !(ui.WasEntered("RECONFILTER")   || ui.WasEntered("RECONLIST")) &&
+      !(ui.WasEntered("SMITHEDFILTER") || ui.WasEntered("SMITHEDLIST"))) {
     QString message =
-      "You must enter a filter AND directory for at least one type of kernel";
+      "No kernel selection arguments were entered. A directory and filter or a "
+      "list must be entered for at least one quality of kernel.";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
