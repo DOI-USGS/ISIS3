@@ -92,7 +92,7 @@ namespace Isis {
         }
         else if(it.value().is_null()) {
           keyword.setName(QString::fromStdString(it.key()));
-          keyword.setValue(QStreing("Null"));
+          keyword.setValue(QString("Null"));
         }
         else {
           keyword.setName(QString::fromStdString(it.key()));
