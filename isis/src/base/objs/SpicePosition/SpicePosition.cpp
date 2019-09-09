@@ -337,24 +337,37 @@ namespace Isis {
   }
 
 
-  void SpicePosition::LoadCache(json &isd) {
+  void SpicePosition::LoadCache(json &isdPos) {
     if (p_source != Spice) {
         throw IException(IException::Programmer, "SpicePosition::LoadCache(json) only support Spice source", _FILEINFO_);
     } 
-    
-    json isdPos = isd["InstrumentPosition"];
 
     // Load the full cache time information from the label if available
     p_fullCacheStartTime = isdPos["SpkTableStartTime"].get<double>();
     p_fullCacheEndTime = isdPos["SpkTableEndTime"].get<double>();
-
-    p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>();
-    
-    p_cache = isdPos["Positions"].get<std::vector<std::vector<double>>>();
-    p_cacheVelocity = isdPos["Velocities"].get<std::vector<std::vector<double>>>();
+    p_fullCacheSize = isdPos["SpkTableOriginalSize"].get<double>(); 
     p_cacheTime = isdPos["EphemerisTimes"].get<std::vector<double>>();
+
+    for (auto it = isdPos["Positions"].begin(); it != isdPos["Positions"].end(); it++) {
+      std::vector<double> pos = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+      p_cache.push_back(pos);
+    }
     
-    p_source = Memcache; 
+    p_cacheVelocity.clear(); 
+    
+    bool hasVelocityKey = isdPos.find("Velocities") != isdPos.end();
+    
+    if (hasVelocityKey) {
+      for (auto it = isdPos["Velocities"].begin(); it != isdPos["Velocities"].end(); it++) {
+        std::vector<double> vel = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>()};
+        p_cacheVelocity.push_back(vel);
+      }
+    }
+
+    p_hasVelocity = !p_cacheVelocity.empty();
+    p_source = Memcache;
+
+    SetEphemerisTime(p_cacheTime[0]);
   }
 
   /** Cache J2000 positions using a table file.
@@ -1237,11 +1250,11 @@ namespace Isis {
    */
   void SpicePosition::SetEphemerisTimeMemcache() {
     // If the cache has only one position return it
+    std::cout << p_coordinate.size() << std::endl;
     if(p_cache.size() == 1) {
       p_coordinate[0] = p_cache[0][0];
       p_coordinate[1] = p_cache[0][1];
       p_coordinate[2] = p_cache[0][2];
-
       if(p_hasVelocity) {
         p_velocity[0] = p_cacheVelocity[0][0];
         p_velocity[1] = p_cacheVelocity[0][1];
@@ -1283,6 +1296,7 @@ namespace Isis {
         p_velocity[2] = (p2[2] - p1[2]) * mult + p1[2];
       }
     }
+
   }
 
 

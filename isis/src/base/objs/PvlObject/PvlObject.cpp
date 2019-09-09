@@ -76,7 +76,6 @@ namespace Isis {
 
     for(auto it = jsonobj.begin(); it != jsonobj.end(); it++) {
         PvlKeyword keyword;
-
         if (it.value().is_array()) { 
           keyword.setName(QString::fromStdString(it.key()));
           for(auto ar = it.value().begin(); ar!=it.value().end();ar++) {

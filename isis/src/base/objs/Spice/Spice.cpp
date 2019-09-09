@@ -166,14 +166,14 @@ namespace Isis {
     // m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
     m_usingNaif = true; 
 
+    json isd; 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
       std::string aleIsdStr = ale::load(cube.fileName().toStdString(), "", "isis");
       
-      json isd = json::parse(aleIsdStr);  
-      
+      isd = json::parse(aleIsdStr);  
       json aleNaifKeywords = isd["NaifKeywords"]; 
       m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords); 
 
@@ -224,7 +224,7 @@ namespace Isis {
     }
     else {
       *m_naifKeywords = lab.findObject("NaifKeywords");
-
+      
       // Moved the construction of the Target after the NAIF kenels have been loaded or the 
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
       // that are defined in kernels and not just body codes build into spicelib
@@ -356,6 +356,11 @@ namespace Isis {
         solarLongitude();
       }
     }
+    else {
+      m_sunPosition->LoadCache(isd["SunPosition"]);
+      m_bodyRotation->LoadCache(isd["BodyRotation"]);
+      solarLongitude();
+    }
 
     //  We can't assume InstrumentPointing & InstrumentPosition exist, old
     //  files may be around with the old keywords, SpacecraftPointing &
@@ -370,7 +375,7 @@ namespace Isis {
     }
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
-    // with the old keywords should be re-run through spiceinit.
+    // with the old keywords should be re-run through spiceinit. 
     if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
       if (m_instrumentRotation) {
         delete m_instrumentRotation;
@@ -383,6 +388,9 @@ namespace Isis {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
+    else {
+     m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
+    }
 
     if (kernels["InstrumentPosition"].size() == 0) {
       throw IException(IException::Unknown,
@@ -393,11 +401,11 @@ namespace Isis {
     if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
-    } 
-    else {
-      m_instrumenPosition->LoadCache(isd);
     }
-
+    else {
+      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
+    }
+    
     NaifStatus::CheckErrors();
   }
 
@@ -1229,6 +1237,7 @@ namespace Isis {
 
     SpiceBoolean found;
     SpiceDouble subB[3];
+    
     surfpt_c(originB, usB, a, b, c, subB, &found);
 
     SpiceDouble mylon, mylat;
