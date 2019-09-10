@@ -1272,7 +1272,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         correctionUnitListRA,correctionUnitListDEC,correctionUnitListTWI,
         correctionUnitList;
 
-    QString str("%1(%2)  ");
+    QString str("%1(%2)");
 
     if (nPositionCoefficients > 0) {
       for (int j = 0; j < nPositionCoefficients;j++) {
@@ -1368,30 +1368,30 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         sigma = ( IsSpecial(m_aprioriSigmas[i]) ? "FREE" : toString(m_aprioriSigmas[i], 8) );
       }
 
-      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
+      sprintf(buf,"%s",parameterNamesList.at(i).toStdString().c_str() );
       fpOut << buf;
-      sprintf(buf,"%20.8lf\t",finalParameterValues[i] - correction);
+      sprintf(buf,"%20.8lf  ",finalParameterValues[i] - correction);
       fpOut << buf;
-      sprintf(buf,"%20.8lf\t",correction);
+      sprintf(buf,"%20.8lf  ",correction);
       fpOut << buf;
-      sprintf(buf,"%20.8lf\t",finalParameterValues[i]);
+      sprintf(buf,"%23.8lf  ",finalParameterValues[i]);
       fpOut << buf;
-      sprintf(buf,"\t\t\t");
+      sprintf(buf,"            ");
       fpOut << buf;
-      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      sprintf(buf,"%s",sigma.toStdString().c_str());
       fpOut << buf;
-      sprintf(buf,"\t\t\t\t");
+      sprintf(buf,"            ");
       fpOut << buf;
       if (errorPropagation) {
-        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+        sprintf(buf,"%s",adjustedSigma.toStdString().c_str());
       }
       else {
         sprintf(buf,"%s","N/A");
       }
       fpOut<<buf;
-      sprintf(buf,"\t\t\t\t");
+      sprintf(buf,"        ");
       fpOut<<buf;
-      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      sprintf(buf,"%s\n",correctionUnitList.at(i).toStdString().c_str() );
       fpOut<<buf;
 
     }
@@ -1429,30 +1429,30 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         sigma = "N/A";
       }
 
-      sprintf(buf,"%-*s",17,parameterNamesList.at(i).toStdString().c_str() );
+      sprintf(buf,"%s",parameterNamesList.at(i).toStdString().c_str() );
       fpOut << buf;
-      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
+      sprintf(buf,"%20.8lf  ",(finalParameterValues[i]*RAD2DEG - correction*RAD2DEG));
       fpOut << buf;
-      sprintf(buf,"%20.8lf\t",(correction*RAD2DEG));
+      sprintf(buf,"%20.8lf  ",(correction*RAD2DEG));
       fpOut << buf;
-      sprintf(buf,"%20.8lf\t",(finalParameterValues[i]*RAD2DEG));
+      sprintf(buf,"%23.8lf  ",(finalParameterValues[i]*RAD2DEG));
       fpOut << buf;
-      sprintf(buf,"\t\t\t");
+      sprintf(buf,"            ");
       fpOut << buf;
-      sprintf(buf,"%-*s",7,sigma.toStdString().c_str());
+      sprintf(buf,"%s",sigma.toStdString().c_str());
       fpOut << buf;
-      sprintf(buf,"\t\t\t\t");
+      sprintf(buf,"               ");
       fpOut << buf;
       if (errorPropagation) {
-        sprintf(buf,"%*s",7,adjustedSigma.toStdString().c_str());
+        sprintf(buf,"%s",adjustedSigma.toStdString().c_str());
       }
       else {
         sprintf(buf,"%s","N/A");
       }
       fpOut<<buf;
-      sprintf(buf,"\t\t\t\t");
+      sprintf(buf,"        ");
       fpOut<<buf;
-      sprintf(buf,"%-*s\n",10,correctionUnitList.at(i).toStdString().c_str() );
+      sprintf(buf,"%s\n",correctionUnitList.at(i).toStdString().c_str() );
       fpOut<<buf;
     }
 
