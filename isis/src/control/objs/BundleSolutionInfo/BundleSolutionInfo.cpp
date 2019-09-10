@@ -1044,14 +1044,14 @@ namespace Isis {
 
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tMeasures\t\t\t\t\t\t\t\tRMS(pixels)\n");
+    sprintf(buf,"                                      Measures                        RMS(pixels)\n");
     fpOut << buf;
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t******************************  "
-                "**************************************************\n");
+    sprintf(buf,"                              ************************  "
+                "**************************************\n");
     fpOut << buf;
 
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t|Accepted\t\t|\t\tTotal|\t|Samples\t\t|\t\t"
-                "Lines\t\t|\t\tTotal|\n");
+    sprintf(buf,"                              |Accepted    |    Total|   |Samples    |    "
+                "Lines    |    Total|\n");
     fpOut << buf;
 
     int numMeasures;
@@ -1086,13 +1086,13 @@ namespace Isis {
 
         numUsed = numMeasures - numRejectedMeasures;
 
-        sprintf(buf,"%-*s\t\t\t\t\t",45,bundleImage->fileName().toLatin1().data());
+        sprintf(buf,"%30s" ,bundleImage->fileName().toLatin1().data());
         fpOut << buf;
 
-        sprintf(buf,"%*d\t\t\t%*d\t\t\t",5,numUsed,5,numMeasures);
+        sprintf(buf,"%5d            %5d      ",numUsed,numMeasures);
         fpOut << buf;
 
-        sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf \n",
+        sprintf(buf,"%-15.4lf%-15.4lf%-15.4lf \n",
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
 
         fpOut << buf;
@@ -1102,9 +1102,9 @@ namespace Isis {
 
     sprintf(buf,"\nTotal RMS:");
     fpOut << buf;
-    sprintf(buf,"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+    sprintf(buf,"                                                ");
     fpOut << buf;
-    sprintf(buf,"%-15.4lf\t\t%-15.4lf\t\t%-15.4lf\n",
+    sprintf(buf,"%-15.4lf%-15.4lf%-15.4lf\n",
     rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
     fpOut << buf;
 
