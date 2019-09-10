@@ -189,12 +189,12 @@ version 2 and another set for version 3.
 -----
 
 The [ISIS Support
-Center](https://isis.astrogeology.usgs.govprojects/isis) is our online
+Center](https://github.com/USGS-Astrogeology/ISIS3/issues) is our online
 knowledge base, bug tracking, announcements, and user support center. If
 you need help, want to get the latest news, find out about the status of
 a bug (i.e. software glitch), or just want to learn more and interact
 with other ISIS3 users, the [ISIS Support
-Center](https://isis.astrogeology.usgs.govprojects/isis) is the place to
+Center](https://github.com/USGS-Astrogeology/ISIS3/issues) is the place to
 go\! The ISIS Support Center provides access to help on ISIS3.
 
 [![IsisSupport.png](attachments/thumbnail/1091/300.png)](attachments/download/1091/IsisSupport.png "IsisSupport.png")
