@@ -164,6 +164,8 @@ namespace Isis {
    *                           csv file with BundleObservation::bundleOutputCSV.
    *                           BundleObservation::formatBundleOutputString was removed
    *                           from ISIS3 because it had become unmaintainable.
+   *   @history 2019-06-03 Adam Paquette - Updated the header for the bundleout.txt file for
+   *                           more human readable formatting in the bundleout.txt file.
    *
    */
   class BundleSolutionInfo : public QObject {

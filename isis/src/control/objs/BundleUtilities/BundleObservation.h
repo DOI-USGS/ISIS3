@@ -91,6 +91,8 @@ namespace Isis {
    *                            formatBundleOutputString but with reduced code duplication.
    *   @history 2019-08-15  Adam Paquette - Readded the formatBundleOutputString function
    *                            and added deprication warnings to formatBundleOutputString.
+   *   @history 2019-09-10  Adam Paquette - Changed how bundleOutputString formats the text
+   *                            that is written to the bundleout.txt file.
    *
    */
   class BundleObservation : public QVector<BundleImageQsp> {
