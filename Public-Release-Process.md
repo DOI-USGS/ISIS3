@@ -62,7 +62,7 @@ Please keep in mind that conda may be a little finicky when building for other s
   * Run the command ```conda env list```. If conda is setup properly, this will display a list of available conda environments. If instead you see a ```Command not found``` error or the active base environment (noted by an asterisk) is not the version of conda you are wanting to use, you will need to setup the version of conda you wish to use by running the command ```source /<path-to-anaconda-version>/etc/profile.d/conda.sh```.
 * In your base Anaconda environment (just confirm no environments have been activated), run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
-  * You can check by running ```anaconda login```, ```conda build -h```, and ```conda verify -h```, respectively.
+  * You can check by running ```anaconda login```, ```conda build -h```, and ```conda-verify -h```, respectively.
 * If this fails, try activating the base environment: ```conda activate```
 * If you do not already have an up-to-date clone of ISIS3 which includes changes made earlier in this document, 
 clone ISIS3 as isis3mgr, and checkout the branch and/or tag to be built.
