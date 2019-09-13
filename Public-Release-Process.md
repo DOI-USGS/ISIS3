@@ -180,12 +180,6 @@ For the internal announcement, send an email to all of astro (GS-G-AZflg Astro <
 
 The external announcement will be made via AstroDiscuss. Visit AstroDiscuss and create a new topic. Again, you may make use of [past announcements](https://astrodiscuss.usgs.gov/t/the-public-release-for-isis3-7-0-is-now-available/176) to template your announcement. To create the changelog look at the commit history for the branch since the last release. The changelog and release announcement are targeted at users; so, changes targeted at developers should not be included. Two examples of changes that do not need to be included in the changelog are minor modifications to the build system and developer documentation updates.
 
-## Step 8: Update isis3 symlink
-
-After a week, if there are no critical issues with the public build, update the internal symlink for isis3 to the new internal build.
-
-As isis3mgr update the `isis3` symlink in `/usgs/pkgs/` to point to the latest public version on the following systems: astrovm4, prog26, prog28, and prog29.
-
 ## Problems
 If you test the conda environment you created for the ISIS build, i.e., isis3.7.1, on prog26 as isis3mgr and get the following warning:
 ```
