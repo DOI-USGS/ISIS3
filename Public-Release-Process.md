@@ -64,8 +64,11 @@ Please keep in mind that conda may be a little finicky when building for other s
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda-verify -h```, respectively.
 * If this fails, try activating the base environment: ```conda activate```
+* If any of these packages are still unavailable, they can be installed as follows: 
+`conda install -c anaconda conda-build` 
+`conda install -c anaconda conda-verify`
 * If you do not already have an up-to-date clone of ISIS3 which includes changes made earlier in this document, 
-clone ISIS3 as isis3mgr, and checkout the branch and/or tag to be built.
+clone ISIS3 as isis3mgr, and checkout the branch to be built.
 * From the root of the ISIS3 repo run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
