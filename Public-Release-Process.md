@@ -116,21 +116,7 @@ and
 
 ## Step 5: Create Internal Builds/Installs for Astro
 
-This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus. 
-
-The builds should be created for each of the prog machines (prog24, prog26, prog28 and prog29) and should be saved in /usgs/pkgs/. The process can be handled with the same script that the current nightly builds use. The script can be found at /usgs/cpkgs/isis3/isis3mgr_scripts and is entitled buildIsisCmakeAllSys. It is best to run this script from a screen session so as not to have it interrupted by any network issues. Run these commands as isis3mgr from one of the prog machines:
-
-```screen -RD```
-
-This starts your screen session. You can exit screen by holding `<cntrl><A><D>`, and return to the same screen session with the previous command. 
-
-```buildIsisCmakeAllSys -t <tag version> -b <branch name> --no-test /usgs/pkgs/<isis version>```
-
-This command will run the script, building on all of the prog machines at once. The `<tag version>` value should be whatever Tag Version you set for the release on the GitHub repository, and the `<isis version>` value should be the version of ISIS you are building. (The `<isis version>` will generally be the same as your `<tag version>`.)
-
-Keep in mind that this script will build on prog24, so the build will be accessible via the astrovms as well.
-
-***While we are in the process of getting Astro caught-up with the process of using conda for our internal builds of ISIS, this building process still needs to be maintained until we officially make the official switch.***
+This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus. As of 8/23/19, conda environments are the only supported way to access ISIS binaries internally, so it's not necessary to make builds for the `/usgs/pkgs` area as part of the release process any more.
 
 Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Note that this will need to be done once for Linux, and once for Mac.
 
