@@ -65,6 +65,7 @@ Please keep in mind that conda may be a little finicky when building for other s
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda-verify --help```, respectively.
 * If this fails, try activating the base environment: ```conda activate```
 * If any of these packages are still unavailable, they can be installed as follows: 
+`conda install anaconda-client`
 `conda install -c anaconda conda-build` 
 `conda install -c anaconda conda-verify`
 * If you do not already have an up-to-date clone of ISIS3 which includes changes made earlier in this document, 
