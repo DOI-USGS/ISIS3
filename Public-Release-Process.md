@@ -64,13 +64,15 @@ Please keep in mind that conda may be a little finicky when building for other s
 * Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda verify -h```, respectively.
 * If this fails, try activating the base environment: ```conda activate```
+* If you do not already have an up-to-date clone of ISIS3 which includes changes made earlier in this document, 
+clone ISIS3 as isis3mgr, and checkout the branch and/or tag to be built.
 * From the root of the ISIS3 repo run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
 * This command will take several minutes to run. Be looking for an "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output to confirm a good build.
   * Make a note of this output. It will contain the location of your compressed .tar.bz2 file containing your build.
   * You may also get a bunch of warnings during the building process, this is okay for now.
-* Save the tar.bz2 file produced by the previous command in /work/projects/conda-bld/. (Each OS will have it's own directory within here; be sure to save each OS-specific build in it's repsective directory). This ensures that we have a backup of all files that have been uploaded into Anaconda Cloud.
+* Save the tar.bz2 file produced by the previous command in /work/projects/conda-bld/. (Each OS will have it's own directory within here; be sure to save each OS-specific build in it's respective directory). This ensures that we have a backup of all files that have been uploaded into Anaconda Cloud.
 
 ## Step 3: Upload the Build to Anaconda Cloud
 
