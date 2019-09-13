@@ -15,7 +15,7 @@ In this step, we will prepare the local repository to build from as well as upda
     * alpha - from the dev branch (not yet available)
     * beta - release candidate RC
     * stable - stable public release 
-* Update the isis/CMakeLists.txt file to reflect the proper version number, release date, and release stage.
+* Update the isis/CMakeLists.txt file to reflect the proper version number, release date, and release stage. NOTE: Do not add the _RC#
 * Until the build process is updated to pull from github tarballs, update the recipe/meta.yaml at this stage as well: 
     * build number: should be set to 0
     * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
