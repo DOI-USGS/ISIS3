@@ -72,11 +72,12 @@ int main(int argc, char *argv[]) {
 
     for (int i = 2; i < 7; i++) {
       try {
+        FileName fname = trackingTable2.pixelToFileName(i);
         cout << "FileName with pixel value " << i << ": "
-             << trackingTable2.pixelToFileName(i).name() << endl;
+             << fname.name() << endl;
       }
       catch (IException &e) {
-        cout << "FileName with pixel value " << i 
+        cout << "FileName with pixel value " << i
              << ": does not exist and an exception is thrown." << endl;
         e.print();
       }
