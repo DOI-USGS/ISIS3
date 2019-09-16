@@ -799,7 +799,6 @@ namespace Isis {
     }
     catch (IException &e) {
       noConfigFile = true;
-      std::cerr << e.what() << std::endl;
     }
     if (noConfigFile) {
       FileName kernelDb(directory + "/kernels.????.db");
