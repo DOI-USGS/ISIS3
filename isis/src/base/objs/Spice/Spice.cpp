@@ -163,8 +163,7 @@ namespace Isis {
     }  
 
     // We should remove this completely in the near future 
-    // m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
-    m_usingNaif = true; 
+    m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
 
     json isd; 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
