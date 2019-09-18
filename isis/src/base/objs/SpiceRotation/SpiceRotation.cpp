@@ -14,6 +14,8 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+
+
 #include "BasisFunction.h"
 #include "IException.h"
 #include "IString.h"
@@ -399,6 +401,64 @@ namespace Isis {
    */
   void SpiceRotation::LoadCache(double time) {
     LoadCache(time, time, 1);
+  }
+
+
+  void SpiceRotation::LoadCache(json &isdRot){
+    if (p_source != Spice) {
+        throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only support Spice source", _FILEINFO_);
+    }  
+
+    p_timeFrames.clear();
+    p_TC.clear();
+    p_cache.clear();
+    p_cacheTime.clear();
+    p_cacheAv.clear();
+    p_hasAngularVelocity = false;
+    m_frameType = PCK;  
+
+    // Load the full cache time information from the label if available
+    p_fullCacheStartTime = isdRot["CkTableStartTime"].get<double>();
+    p_fullCacheEndTime = isdRot["CkTableEndTime"].get<double>();
+    p_fullCacheSize = isdRot["CkTableOriginalSize"].get<double>(); 
+    p_cacheTime = isdRot["EphemerisTimes"].get<std::vector<double>>(); 
+    p_timeFrames = isdRot["TimeDependentFrames"].get<std::vector<int>>();
+    
+    m_raPole.resize(3);
+    m_raPole[0].setDegrees(0);
+    m_raPole[0].setDegrees(0);
+    m_raPole[0].setDegrees(0);
+    
+    m_decPole.resize(3);
+    m_decPole[0].setDegrees(0);
+    m_decPole[0].setDegrees(0);
+    m_decPole[0].setDegrees(0);
+    
+    m_pm.resize(3);
+    m_pm[0].setDegrees(0);
+    m_pm[0].setDegrees(0);
+    m_pm[0].setDegrees(0);
+    
+    for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
+        std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
+        p_cache.push_back(quat);
+    }
+    
+    bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
+    bool hasConstantRotation = isdRot.find("ConstantRotation") != isdRot.end();
+    
+    if (hasConstantFrames) {
+      p_constantFrames = isdRot["ConstantFrames"].get<std::vector<int>>();
+      p_TC = isdRot["ConstantRotation"].get<std::vector<double>>();
+       
+    }
+    else {
+      p_TC.resize(9);
+      ident_c((SpiceDouble( *)[3]) &p_TC[0]); 
+    }
+    
+    p_source = Memcache;
+    SetEphemerisTime(p_cacheTime[0]);
   }
 
 
@@ -1224,7 +1284,6 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     std::vector<double> jVec;
-
     if (rVec.size() == 3) {
       double TJ[3][3];
       mxm_c((SpiceDouble *) &p_TC[0], (SpiceDouble *) &p_CJ[0], TJ);
@@ -1250,7 +1309,6 @@ namespace Isis {
 
       mxvg_c(stateJT, (SpiceDouble *) &rVec[0], 6, 6, (SpiceDouble *) &jVec[0]);
     }
-
     NaifStatus::CheckErrors();
     return (jVec);
   }
@@ -3065,18 +3123,12 @@ namespace Isis {
   void SpiceRotation::setEphemerisTimeMemcache() {
     // If the cache has only one rotation, set it
     NaifStatus::CheckErrors();
-
     if (p_cache.size() == 1) {
-      /*        p_quaternion = p_cache[0];*/
       p_CJ = p_cache[0];
-//         p_CJ = p_quaternion.ToMatrix();
-
       if (p_hasAngularVelocity) {
         p_av = p_cacheAv[0];
       }
-
     }
-
     // Otherwise determine the interval to interpolate
     else {
       std::vector<double>::iterator pos;
@@ -3172,7 +3224,6 @@ namespace Isis {
    SpiceInt j2000 = J2000Code;
 
    SpiceDouble time = p_et + p_timeBias;
-
    // Make sure the constant frame is loaded.  This method also does the frame trace.
    if (p_timeFrames.size() == 0) InitConstantRotation(p_et);
    int toFrame = p_timeFrames[0];
@@ -3216,6 +3267,7 @@ namespace Isis {
      // Transpose to obtain row-major order
      xpose_c((SpiceDouble( *)[3]) &p_CJ[0], (SpiceDouble( *)[3]) &p_CJ[0]);
    }
+
    NaifStatus::CheckErrors();
   }
 

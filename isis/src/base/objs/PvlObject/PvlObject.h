@@ -29,6 +29,10 @@
 
 #include <QMetaType>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+
 template<typename T> class QList;
 
 namespace Isis {
@@ -76,6 +80,7 @@ namespace Isis {
       PvlObject();
       PvlObject(const QString &name);
       PvlObject(const PvlObject &other);
+      PvlObject(const QString &name, const json &jsonobj);
 
       friend std::ostream &operator<<(std::ostream &os, Isis::PvlObject &object);
       friend std::istream &operator>>(std::istream &is, PvlObject &result);

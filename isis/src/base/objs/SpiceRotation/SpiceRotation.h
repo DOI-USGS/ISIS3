@@ -29,6 +29,10 @@
 //#include <SpiceZfc.h>
 //#include <SpiceZmc.h>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+
 #include "Angle.h"
 #include "Table.h"
 #include "PolynomialUnivariate.h"
@@ -347,6 +351,8 @@ namespace Isis {
       void LoadCache(double time);
 
       void LoadCache(Table &table);
+
+      void LoadCache(json &isd);
 
       Table LineCache(const QString &tableName);
 
