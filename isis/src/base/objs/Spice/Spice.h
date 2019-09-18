@@ -294,7 +294,6 @@ namespace Isis {
   class Spice {
     public:
       // constructors
-      Spice(Pvl &cubeLabel);
       Spice(Cube &cube);
       Spice(Cube &cube, bool noTables);
 
@@ -393,7 +392,7 @@ namespace Isis {
       Spice(const Spice &other);
       Spice &operator=(const Spice &other);
 
-      void init(Pvl &lab, bool noTables);
+      void init(Cube &cube, bool noTables);
 
       void load(PvlKeyword &key, bool notab);
       void computeSolarLongitude(iTime et);
