@@ -187,7 +187,6 @@ namespace Isis {
         if ( kernels.hasKeyword("SpacecraftClock")) {
           load(kernels["SpacecraftClock"], noTables);
         }
-
         m_usingAle = true;
       } 
       catch(std::invalid_argument &e) {
