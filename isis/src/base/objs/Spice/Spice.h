@@ -334,7 +334,8 @@ namespace Isis {
       SpicePosition *instrumentPosition() const;
       SpiceRotation *bodyRotation() const;
       SpiceRotation *instrumentRotation() const;
-
+      
+      bool isUsingAle();
       bool hasKernels(Pvl &lab);
       bool isTimeSet(); 
 

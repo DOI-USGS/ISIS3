@@ -410,6 +410,18 @@ bool tryKernels(Cube *icube, Process &p,
     try {
       cam = icube->camera();
       currentKernels = icube->group("Kernels");
+      
+      PvlKeyword source("Source");
+
+      if (cam->isUsingAle()) {
+        source.setValue("ale");
+      }
+      else {
+        source.setValue("isis");
+      }
+
+      currentKernels += source;
+      icube->putGroup(currentKernels);   
       Application::Log(currentKernels);
     }
     catch(IException &e) {

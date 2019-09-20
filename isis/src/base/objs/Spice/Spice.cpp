@@ -164,6 +164,7 @@ namespace Isis {
 
     // We should remove this completely in the near future 
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    m_usingAle = false; 
 
     json isd; 
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
@@ -178,7 +179,7 @@ namespace Isis {
         json props;
         props["kernels"] = kernel_pvl.str();
 
-        isd = json::parse(ale::loads(cube.fileName().toStdString(), props.dump(), "isis"));
+        isd = ale::load(cube.fileName().toStdString(), props.dump(), "isis");
         json aleNaifKeywords = isd["NaifKeywords"];
         m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
         
@@ -188,12 +189,10 @@ namespace Isis {
           load(kernels["SpacecraftClock"], noTables);
         }
         m_usingAle = true;
-        PvlKeyword source("Source", "ale");
-        kernels += source;
+        
       } 
-      catch(std::invalid_argument &e) {
+      catch(...) {
          // Backup to stadnard ISIS implementation
-         m_usingAle = false; 
          if (noTables) {
           load(kernels["TargetPosition"], noTables);
           load(kernels["InstrumentPosition"], noTables);
@@ -219,11 +218,13 @@ namespace Isis {
           load(kernels["Extra"], noTables);
         }
 
-        PvlKeyword source("Source", "isis");
-        kernels += source;
+        // Still need to load clock kernels for now 
+        load(kernels["LeapSecond"], noTables);
+        if ( kernels.hasKeyword("SpacecraftClock")) {
+          load(kernels["SpacecraftClock"], noTables);
+        }
       }
      
-      cube.putGroup(kernels);
       // Moved the construction of the Target after the NAIF kenels have been loaded or the 
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
       // that are defined in kernels and not just body codes build into spicelib
@@ -374,7 +375,7 @@ namespace Isis {
         solarLongitude();
       }
     }
-    else {
+    else if (m_usingAle) {
       m_sunPosition->LoadCache(isd["SunPosition"]);
       m_bodyRotation->LoadCache(isd["BodyRotation"]);
       solarLongitude();
@@ -406,7 +407,7 @@ namespace Isis {
       Table t("InstrumentPointing", lab.fileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
-    else {
+    else if (m_usingAle) {
      m_instrumentRotation->LoadCache(isd["InstrumentPointing"]);
     }
 
@@ -420,7 +421,7 @@ namespace Isis {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
-    else {
+    else if (m_usingAle) {
       m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
     }
     
@@ -1519,5 +1520,8 @@ namespace Isis {
   SpiceRotation *Spice::instrumentRotation() const {
     return m_instrumentRotation;
   }
-
+  
+  bool Spice::isUsingAle(){
+    return m_usingAle;
+  }
 }
