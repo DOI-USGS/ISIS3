@@ -353,6 +353,9 @@ bool tryKernels(Cube *icube, Process &p,
   }
 
   // Get rid of old keywords from previously inited cubes
+  if (currentKernels.hasKeyword("Source"))
+    currentKernels.deleteKeyword("Source");
+  
   if (currentKernels.hasKeyword("SpacecraftPointing"))
     currentKernels.deleteKeyword("SpacecraftPointing");
 

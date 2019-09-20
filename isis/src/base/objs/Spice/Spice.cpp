@@ -188,6 +188,8 @@ namespace Isis {
           load(kernels["SpacecraftClock"], noTables);
         }
         m_usingAle = true;
+        PvlKeyword source("Source", "ale");
+        kernels += source;
       } 
       catch(std::invalid_argument &e) {
          // Backup to stadnard ISIS implementation
@@ -216,8 +218,12 @@ namespace Isis {
         if (kernels.hasKeyword("Extra")) {
           load(kernels["Extra"], noTables);
         }
+
+        PvlKeyword source("Source", "isis");
+        kernels += source;
       }
      
+      cube.putGroup(kernels);
       // Moved the construction of the Target after the NAIF kenels have been loaded or the 
       // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
       // that are defined in kernels and not just body codes build into spicelib
@@ -1170,7 +1176,7 @@ namespace Isis {
     // Read from PvlObject that is our naif keywords
     QVariant result;
 
-    if (m_naifKeywords->hasKeyword(key) && m_usingAle) {
+    if (m_naifKeywords->hasKeyword(key) && (!m_usingNaif || m_usingAle)) {
       PvlKeyword &storedKeyword = m_naifKeywords->findKeyword(key);
 
       try {
