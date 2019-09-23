@@ -189,11 +189,10 @@ namespace Isis {
           load(kernels["SpacecraftClock"], noTables);
         }
         m_usingAle = true;
-        
       } 
       catch(...) {
-         // Backup to stadnard ISIS implementation
-         if (noTables) {
+        // Backup to stadnard ISIS implementation
+        if (noTables) {
           load(kernels["TargetPosition"], noTables);
           load(kernels["InstrumentPosition"], noTables);
           load(kernels["InstrumentPointing"], noTables);
@@ -211,17 +210,17 @@ namespace Isis {
         if (kernels.hasKeyword("InstrumentAddendum")) {
           load(kernels["InstrumentAddendum"], noTables);
         }
-        
-        // Modified to load extra kernels last to allow overriding default values
-        // (2010-04-07) (DAC)
-        if (kernels.hasKeyword("Extra")) {
-          load(kernels["Extra"], noTables);
-        }
-
+ 
         // Still need to load clock kernels for now 
         load(kernels["LeapSecond"], noTables);
         if ( kernels.hasKeyword("SpacecraftClock")) {
           load(kernels["SpacecraftClock"], noTables);
+        }       
+
+        // Modified to load extra kernels last to allow overriding default values
+        // (2010-04-07) (DAC)
+        if (kernels.hasKeyword("Extra")) {
+          load(kernels["Extra"], noTables);
         }
       }
      
