@@ -334,7 +334,8 @@ namespace Isis {
       SpicePosition *instrumentPosition() const;
       SpiceRotation *bodyRotation() const;
       SpiceRotation *instrumentRotation() const;
-
+      
+      bool isUsingAle();
       bool hasKernels(Pvl &lab);
       bool isTimeSet(); 
 
@@ -435,6 +436,9 @@ namespace Isis {
 
       bool m_usingNaif; /**< Indicates whether we are reading values from the 
                              NaifKeywords PvlObject in cube*/
+
+      bool m_usingAle; /**< Indicate whether we are reading values from an ISD returned 
+                            from ALE */
   };
 }
 
