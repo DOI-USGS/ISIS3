@@ -402,6 +402,66 @@ namespace Isis {
   }
 
 
+  void SpiceRotation::LoadCache(json &isdRot){
+    if (p_source != Spice) {
+        throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only support Spice source", _FILEINFO_);
+    }
+
+    p_timeFrames.clear();
+    p_TC.clear();
+    p_cache.clear();
+    p_cacheTime.clear();
+    p_cacheAv.clear();
+    p_hasAngularVelocity = false;
+    m_frameType = PCK;
+
+    // Load the full cache time information from the label if available
+    p_fullCacheStartTime = isdRot["CkTableStartTime"].get<double>();
+    p_fullCacheEndTime = isdRot["CkTableEndTime"].get<double>();
+    p_fullCacheSize = isdRot["CkTableOriginalSize"].get<double>();
+    p_cacheTime = isdRot["EphemerisTimes"].get<std::vector<double>>();
+    p_timeFrames = isdRot["TimeDependentFrames"].get<std::vector<int>>();
+
+    m_raPole.resize(3);
+    m_raPole[0].setDegrees(0);
+    m_raPole[0].setDegrees(0);
+    m_raPole[0].setDegrees(0);
+
+    m_decPole.resize(3);
+    m_decPole[0].setDegrees(0);
+    m_decPole[0].setDegrees(0);
+    m_decPole[0].setDegrees(0);
+
+    m_pm.resize(3);
+    m_pm[0].setDegrees(0);
+    m_pm[0].setDegrees(0);
+    m_pm[0].setDegrees(0);
+
+    for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
+        std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
+        Quaternion q(quat);
+        std::vector<double> CJ = q.ToMatrix();
+        p_cache.push_back(CJ);
+    }
+
+    bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
+    bool hasConstantRotation = isdRot.find("ConstantRotation") != isdRot.end();
+
+    if (hasConstantFrames) {
+      p_constantFrames = isdRot["ConstantFrames"].get<std::vector<int>>();
+      p_TC = isdRot["ConstantRotation"].get<std::vector<double>>();
+
+    }
+    else {
+      p_TC.resize(9);
+      ident_c((SpiceDouble( *)[3]) &p_TC[0]);
+    }
+
+    p_source = Memcache;
+    SetEphemerisTime(p_cacheTime[0]);
+  }
+
+
   /**
    * Cache J2000 rotations using a table file.
    *
@@ -485,6 +545,7 @@ namespace Isis {
     }
 
     if (m_frameType  == PCK) {
+      std::cout << "Loading PCK stuff" << std::endl;
       loadPCFromTable(table.Label());
     }
 
@@ -1931,9 +1992,9 @@ namespace Isis {
  }
 
   void SpiceRotation::SetCacheTime(std::vector<double> cacheTime) {
-    // Do not reset the cache times if they are already loaded. 
+    // Do not reset the cache times if they are already loaded.
     if (p_cacheTime.size() <= 0) {
-      p_cacheTime = cacheTime; 
+      p_cacheTime = cacheTime;
     }
   }
 
@@ -2488,7 +2549,7 @@ namespace Isis {
       if (p_fullCacheSize > 1)
         cacheSlope = (p_fullCacheEndTime - p_fullCacheStartTime) / (double)(p_fullCacheSize - 1);
       for (int i = 0; i < p_fullCacheSize; i++)
-        p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope); 
+        p_cacheTime.push_back(p_fullCacheStartTime + (double) i * cacheSlope);
       if (p_source == Nadir) {
         p_minimizeCache = No;
       }
