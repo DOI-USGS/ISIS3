@@ -547,7 +547,6 @@ namespace Isis {
     }
 
     if (m_frameType  == PCK) {
-      std::cout << "Loading PCK stuff" << std::endl;
       loadPCFromTable(table.Label());
     }
 
