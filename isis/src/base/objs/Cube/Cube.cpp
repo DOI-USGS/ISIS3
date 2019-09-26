@@ -770,7 +770,7 @@ namespace Isis {
       string msg = "The cube must be opened in read/write mode, not readOnly";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-
+    
     // Write an attached blob
     if (m_attached) {
       QMutexLocker locker(m_mutex);

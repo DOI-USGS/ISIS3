@@ -14,6 +14,8 @@
 #include <SpiceZfc.h>
 #include <SpiceZmc.h>
 
+
+
 #include "BasisFunction.h"
 #include "IException.h"
 #include "IString.h"
@@ -1285,7 +1287,6 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     std::vector<double> jVec;
-
     if (rVec.size() == 3) {
       double TJ[3][3];
       mxm_c((SpiceDouble *) &p_TC[0], (SpiceDouble *) &p_CJ[0], TJ);
@@ -1311,7 +1312,6 @@ namespace Isis {
 
       mxvg_c(stateJT, (SpiceDouble *) &rVec[0], 6, 6, (SpiceDouble *) &jVec[0]);
     }
-
     NaifStatus::CheckErrors();
     return (jVec);
   }
@@ -3126,18 +3126,12 @@ namespace Isis {
   void SpiceRotation::setEphemerisTimeMemcache() {
     // If the cache has only one rotation, set it
     NaifStatus::CheckErrors();
-
     if (p_cache.size() == 1) {
-      /*        p_quaternion = p_cache[0];*/
       p_CJ = p_cache[0];
-//         p_CJ = p_quaternion.ToMatrix();
-
       if (p_hasAngularVelocity) {
         p_av = p_cacheAv[0];
       }
-
     }
-
     // Otherwise determine the interval to interpolate
     else {
       std::vector<double>::iterator pos;
@@ -3233,7 +3227,6 @@ namespace Isis {
    SpiceInt j2000 = J2000Code;
 
    SpiceDouble time = p_et + p_timeBias;
-
    // Make sure the constant frame is loaded.  This method also does the frame trace.
    if (p_timeFrames.size() == 0) InitConstantRotation(p_et);
    int toFrame = p_timeFrames[0];
@@ -3277,6 +3270,7 @@ namespace Isis {
      // Transpose to obtain row-major order
      xpose_c((SpiceDouble( *)[3]) &p_CJ[0], (SpiceDouble( *)[3]) &p_CJ[0]);
    }
+
    NaifStatus::CheckErrors();
   }
 
