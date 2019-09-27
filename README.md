@@ -2,6 +2,7 @@
 
 [![Join the chat at https://gitter.im/USGS-Astrogeology/isis3_cmake](https://badges.gitter.im/USGS-Astrogeology/isis3_cmake.svg)](https://gitter.im/USGS-Astrogeology/isis3_cmake?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join the discourse at https://astrodiscuss.usgs.gov](https://img.shields.io/discourse/https/astrodiscuss.usgs.gov/topics.svg?style=flat)](https://astrodiscuss.usgs.gov/)
+[![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 
 ## Table of Contents
 
@@ -31,10 +32,10 @@ This installation guide is for ISIS3 users interested in installing ISIS3 (3.6.0
 
         #Activate the environment
         #Depending on your version of Anaconda use one of the following:
-        
+
         #Anaconda 3.4 and up:
         conda activate isis3
-        
+
         #Prior to Anaconda 3.4:
         source activate isis3
 
