@@ -40,8 +40,8 @@ set(PACKAGE_VERSION    ${VERSION})
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2019-09-13")
-set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
+set(VERSION_DATE              "2019-09-27")
+set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
