@@ -18,10 +18,11 @@ PvlGroup tolerances;
 PvlGroup ignoreKeys;
 PvlGroup ignoreFilePaths;
 
-void compareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2);
-void compareObjects(const PvlObject &pvl1, const PvlObject &pvl2);
-void compareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2);
-
+void compareKeywords(PvlKeyword &pvl1, PvlKeyword &pvl2);
+void compareObjects(PvlObject &pvl1, PvlObject &pvl2);
+void compareGroups(PvlGroup &pvl1, PvlGroup &pvl2);
+void removeIngoredKeys(PvlContainer &pvl1, PvlContainer &pvl2);
+  
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
@@ -31,8 +32,8 @@ void IsisMain() {
   differenceReason = "";
   filesMatch = true;
 
-  const Pvl file1(ui.GetFileName("FROM"));
-  const Pvl file2(ui.GetFileName("FROM2"));
+  Pvl file1(ui.GetFileName("FROM"));
+  Pvl file2(ui.GetFileName("FROM2"));
 
   if ( ui.WasEntered("DIFF") ) {
     Pvl diffFile(ui.GetFileName("DIFF"));
@@ -72,7 +73,7 @@ void IsisMain() {
   differenceReason = "";
 }
 
-void compareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
+void compareKeywords(PvlKeyword &pvl1, PvlKeyword &pvl2) { 
   if ( pvl1.name().compare(pvl2.name()) != 0 ) {
     filesMatch = false;
     differenceReason = "Keyword '" + pvl1.name() + "' does not match keyword '" + pvl2.name() + "'";
@@ -181,7 +182,10 @@ void compareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   }
 }
 
-void compareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
+void compareObjects(PvlObject &pvl1, PvlObject &pvl2) {
+  
+  removeIngoredKeys(pvl1, pvl2);
+  
   if ( pvl1.name().compare(pvl2.name()) != 0 ) {
     filesMatch = false;
     differenceReason = "Object " + pvl1.name() + " does not match " +
@@ -224,7 +228,22 @@ void compareObjects(const PvlObject &pvl1, const PvlObject &pvl2) {
   }
 }
 
-void compareGroups(const PvlGroup &pvl1, const PvlGroup &pvl2) {
+void removeIngoredKeys(PvlContainer &pvl1, PvlContainer &pvl2) {
+  for (auto it=ignoreKeys.begin(); it!=ignoreKeys.end();it++ ) {
+      if (pvl1.hasKeyword(it->name()) && ignoreKeys[it->name()][0] != "false") {
+        pvl1 -= *it;    
+      }
+
+      if (pvl2.hasKeyword(it->name()) && ignoreKeys[it->name()][0] != "false") {
+        pvl2 -= *it;    
+      }
+    }
+}
+
+
+void compareGroups(PvlGroup &pvl1, PvlGroup &pvl2) {
+  removeIngoredKeys(pvl1, pvl2);
+
   if ( pvl1.keywords() != pvl2.keywords() ) {
     filesMatch = false;
     return;
