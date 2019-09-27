@@ -73,7 +73,7 @@ void IsisMain() {
   differenceReason = "";
 }
 
-void compareKeywords(PvlKeyword &pvl1, PvlKeyword &pvl2) {
+void compareKeywords(PvlKeyword &pvl1, PvlKeyword &pvl2) { 
   if ( pvl1.name().compare(pvl2.name()) != 0 ) {
     filesMatch = false;
     differenceReason = "Keyword '" + pvl1.name() + "' does not match keyword '" + pvl2.name() + "'";
@@ -183,7 +183,9 @@ void compareKeywords(PvlKeyword &pvl1, PvlKeyword &pvl2) {
 }
 
 void compareObjects(PvlObject &pvl1, PvlObject &pvl2) {
-
+  
+  removeIngoredKeys(pvl1, pvl2);
+  
   if ( pvl1.name().compare(pvl2.name()) != 0 ) {
     filesMatch = false;
     differenceReason = "Object " + pvl1.name() + " does not match " +
