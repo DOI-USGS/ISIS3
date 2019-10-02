@@ -1,12 +1,15 @@
 #include <iostream>
 #include <iomanip>
 
+#include <nlohmann/json.hpp>
+
 #include "FileName.h"
 #include "IString.h"
 #include "Preference.h"
 #include "SpicePosition.h"
 #include "Table.h"
 
+using json = nlohmann::json;
 using namespace Isis;
 using namespace std;
 
@@ -96,7 +99,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  // Now use LineCache method 
+  // Now use LineCache method
   cout << "Testing line cache..." << endl;
   tab = pos.LineCache("Test2");
   SpicePosition pos3(-94, 499);
@@ -112,7 +115,7 @@ int main(int argc, char *argv[]) {
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
- 
+
 
   // Also test Extrapolate method
   cout << "Testing extrapolation..." << std::endl;
@@ -201,7 +204,7 @@ int main(int argc, char *argv[]) {
   record[6] = -69382512.160519;
   table += record;
 
-  // Add table label 
+  // Add table label
   table.Label() += PvlKeyword("CacheType", "HermiteSpline");
   table.Label() += PvlKeyword("SpkTableStartTime");
   table.Label()["SpkTableStartTime"].addValue(toString(-69382819.360519));
@@ -224,7 +227,7 @@ int main(int argc, char *argv[]) {
     cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
   }
   cout << endl;
-  
+
 
   // Test polynomial over Hermite cubic spline
   cout << "Testing with polynomial function over Hermite..." << endl;
@@ -242,7 +245,7 @@ int main(int argc, char *argv[]) {
   abcPos3.push_back(0.00014653);
   abcPos3.push_back(0.0);
   abcPos3.push_back(0.0);
-  pos4.SetPolynomial(abcPos1, abcPos2, abcPos3, 
+  pos4.SetPolynomial(abcPos1, abcPos2, abcPos3,
                      SpicePosition::PolyFunctionOverHermiteConstant);
 
    cout << "Source = " << pos.GetSource() << endl;
@@ -281,12 +284,39 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Test radar  nan case when et = baseTime and attempt to calculate velocity partial for first
-  // coefficient 
+  // coefficient
   cout << "Test calculation of first coefficient for spacecraft velocity" << endl;
   std::vector<double> dvelocity(3,0.);
   pos.SetEphemerisTime((startTime + endTime) / 2.);
   dvelocity = pos.VelocityPartial(SpicePosition::WRT_X, 0);
   cout << "  Velocity vector for center time = (" << dvelocity[0] <<  "," << dvelocity[1] <<"," << dvelocity[2] << ")"<< endl;
+
+  cout <<endl;
+
+  // Test loading cache from an ALE ISD
+  cout << "Test loading cache from an ALE ISD with velocities" << endl;
+  json aleIsd;
+  aleIsd["SpkTableStartTime"] = -10.0;
+  aleIsd["SpkTableEndTime"] = -10.0;
+  aleIsd["SpkTableOriginalSize"] = 3;
+  aleIsd["EphemerisTimes"] = {-10.0, 0.0, 10.0};
+  aleIsd["Positions"] = {{-1.0, -1.0, -1.0},
+                         { 0.0,  0.0,  0.0},
+                         { 1.0,  1.0,  1.0}};
+  aleIsd["Velocities"] = {{1.0,  1.0,  1.0},
+                          {1.0,  1.0,  1.0},
+                          {1.0,  1.0,  1.0}};
+  SpicePosition alePos(-94, 499);
+  alePos.LoadCache(aleIsd);
+  cout << "Source = " << pos.GetSource() << endl;
+  for(int t = -10; t <= 10; t++) {
+   pos4.SetEphemerisTime(t);
+   vector<double> p = pos4.Coordinate();
+   vector<double> v = pos4.Velocity();
+   cout << "Time           = " << t << endl;
+   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+   cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
+ }
 
   cout <<endl;
 }
