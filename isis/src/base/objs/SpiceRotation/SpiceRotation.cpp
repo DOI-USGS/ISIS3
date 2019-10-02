@@ -27,6 +27,8 @@
 #include "Table.h"
 #include "TableField.h"
 
+using json = nlohmann::json;
+
 // Declarations for bindings for Naif Spicelib routines that do not have
 // a wrapper
 extern int refchg_(integer *frame1, integer *frame2, doublereal *et,

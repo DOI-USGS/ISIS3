@@ -17,6 +17,8 @@
 #include "PolynomialUnivariate.h"
 #include "TableField.h"
 
+using json = nlohmann::json;
+
 namespace Isis {
   /**
    * Construct an empty SpicePosition class using valid body codes.
