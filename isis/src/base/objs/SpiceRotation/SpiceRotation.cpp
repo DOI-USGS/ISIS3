@@ -404,6 +404,15 @@ namespace Isis {
   }
 
 
+  /**
+   * Load the cached data from an ALE ISD.
+   *
+   * The SpiceRotation object must be set to a SPICE source before loading the
+   * cache.
+   *
+   * @param isdRot The ALE ISD as a JSON object.
+   *
+   */
   void SpiceRotation::LoadCache(json &isdRot){
     if (p_source != Spice) {
         throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only support Spice source", _FILEINFO_);
@@ -415,7 +424,7 @@ namespace Isis {
     p_cacheTime.clear();
     p_cacheAv.clear();
     p_hasAngularVelocity = false;
-    m_frameType = PCK;
+    m_frameType = CK;
 
     // Load the full cache time information from the label if available
     p_fullCacheStartTime = isdRot["CkTableStartTime"].get<double>();
@@ -447,7 +456,6 @@ namespace Isis {
     }
 
     bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
-    bool hasConstantRotation = isdRot.find("ConstantRotation") != isdRot.end();
 
     if (hasConstantFrames) {
       p_constantFrames = isdRot["ConstantFrames"].get<std::vector<int>>();
