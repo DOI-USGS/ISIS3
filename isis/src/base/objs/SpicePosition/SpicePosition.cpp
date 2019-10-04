@@ -350,7 +350,7 @@ namespace Isis {
    */
   void SpicePosition::LoadCache(json &isdPos) {
     if (p_source != Spice) {
-        throw IException(IException::Programmer, "SpicePosition::LoadCache(json) only support Spice source", _FILEINFO_);
+        throw IException(IException::Programmer, "SpicePosition::LoadCache(json) only supports Spice source", _FILEINFO_);
     }
 
     // Load the full cache time information from the label if available

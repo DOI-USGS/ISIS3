@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 
 #include "FileName.h"
+#include "IException.h"
 #include "IString.h"
 #include "Preference.h"
 #include "SpicePosition.h"
@@ -293,30 +294,57 @@ int main(int argc, char *argv[]) {
 
   cout <<endl;
 
-  // Test loading cache from an ALE ISD
+  // Test loading cache from an ALE ISD without velocities
   cout << "Test loading cache from an ALE ISD with velocities" << endl;
-  json aleIsd;
-  aleIsd["SpkTableStartTime"] = -10.0;
-  aleIsd["SpkTableEndTime"] = -10.0;
-  aleIsd["SpkTableOriginalSize"] = 3;
-  aleIsd["EphemerisTimes"] = {-10.0, 0.0, 10.0};
-  aleIsd["Positions"] = {{-1.0, -1.0, -1.0},
-                         { 0.0,  0.0,  0.0},
-                         { 1.0,  1.0,  1.0}};
-  aleIsd["Velocities"] = {{1.0,  1.0,  1.0},
-                          {1.0,  1.0,  1.0},
-                          {1.0,  1.0,  1.0}};
+  json aleIsd = {{"SpkTableStartTime"    , -10.0},
+                 {"SpkTableEndTime"      , 10.0},
+                 {"SpkTableOriginalSize" , 3},
+                 {"EphemerisTimes"       , {-10.0, 0.0, 10.0}},
+                 {"Positions"            , {{-10.0, -10.0, -10.0},
+                                            {0.0,  0.0,  0.0},
+                                            {10.0,  10.0,  10.0}}}};
   SpicePosition alePos(-94, 499);
   alePos.LoadCache(aleIsd);
-  cout << "Source = " << pos.GetSource() << endl;
+  cout << "Source = " << alePos.GetSource() << endl;
+  cout << "Has velocity? " << (alePos.HasVelocity() ? "Yes" : "No") << endl;
   for(int t = -10; t <= 10; t++) {
-   pos4.SetEphemerisTime(t);
-   vector<double> p = pos4.Coordinate();
-   vector<double> v = pos4.Velocity();
+   alePos.SetEphemerisTime(t);
+   vector<double> p = alePos.Coordinate();
+   cout << "Time           = " << t << endl;
+   cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+ }
+
+  cout <<endl;
+
+  // Test loading cache from an ALE ISD with velocities
+  cout << "Test loading cache from an ALE ISD with velocities" << endl;
+  json aleVelIsd = aleIsd;
+  aleVelIsd["Velocities"] = {{1.0, 1.0, 1.0},
+                             {1.0, 1.0, 1.0},
+                             {1.0, 1.0, 1.0}};
+  SpicePosition aleVelPos(-94, 499);
+  aleVelPos.LoadCache(aleVelIsd);
+  cout << "Source = " << aleVelPos.GetSource() << endl;
+  cout << "Has velocity? " << (aleVelPos.HasVelocity() ? "Yes" : "No") << endl;
+  for(int t = -10; t <= 10; t++) {
+   aleVelPos.SetEphemerisTime(t);
+   vector<double> p = aleVelPos.Coordinate();
+   vector<double> v = aleVelPos.Velocity();
    cout << "Time           = " << t << endl;
    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
    cout << "Velocity (J) = " << v[0] << " " << v[1] << " " << v[2] << endl;
  }
+
+  cout <<endl;
+
+  // Test loading cache from an ALE ISD with non-SPICE SpicePosition
+  cout << "Test loading cache from an ALE ISD with non-SPICE SpicePosition" << endl;
+  try {
+    pos5.LoadCache(aleIsd);
+  }
+  catch (IException &e) {
+    e.print();
+  }
 
   cout <<endl;
 }
