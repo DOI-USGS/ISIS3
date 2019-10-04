@@ -417,7 +417,7 @@ namespace Isis {
    */
   void SpiceRotation::LoadCache(json &isdRot){
     if (p_source != Spice) {
-        throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only support Spice source", _FILEINFO_);
+        throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only supports Spice source", _FILEINFO_);
     }
 
     p_timeFrames.clear();
@@ -434,21 +434,6 @@ namespace Isis {
     p_fullCacheSize = isdRot["CkTableOriginalSize"].get<double>();
     p_cacheTime = isdRot["EphemerisTimes"].get<std::vector<double>>();
     p_timeFrames = isdRot["TimeDependentFrames"].get<std::vector<int>>();
-
-    m_raPole.resize(3);
-    m_raPole[0].setDegrees(0);
-    m_raPole[0].setDegrees(0);
-    m_raPole[0].setDegrees(0);
-
-    m_decPole.resize(3);
-    m_decPole[0].setDegrees(0);
-    m_decPole[0].setDegrees(0);
-    m_decPole[0].setDegrees(0);
-
-    m_pm.resize(3);
-    m_pm[0].setDegrees(0);
-    m_pm[0].setDegrees(0);
-    m_pm[0].setDegrees(0);
 
     for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
         std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
