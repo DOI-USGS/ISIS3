@@ -2,6 +2,7 @@
 #define PositionMemCache_h
 
 #include "Position.h"
+
 namespace Isis {
   class PositionMemCache:Position {
     public:
