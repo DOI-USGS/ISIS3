@@ -31,6 +31,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "SpiceManager.h"
+#include "Position.h"
 #include "IException.h"
 
 namespace Isis {
@@ -64,17 +65,17 @@ namespace Isis {
    *                           Sky (it was previously only computed when the
    *                           center reference pixel intersected the target).
    *   @history 2009-09-18 Debbie A. Cook - corrected pxlscl and explen in MdisGeometry
-   *   @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to 
+   *   @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to
    *                           ensure it is restricted to the 0-360 degree domain.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis
    *                           coding standards.  References #972..
-   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References  
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References
    *                           #775 and #1114.
    *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
    *                           References #775.
    *   @history 2015-07-22 Kristin Berry -  Added NaifStatus::CheckErrors() to see if any NAIF
    *                           errors were signaled. References #2248.
-   *   @history 2016-05-10 Jeannie Backer - Replaced call to NAIF routine bodn2c with call to static 
+   *   @history 2016-05-10 Jeannie Backer - Replaced call to NAIF routine bodn2c with call to static
    *                           method Isis::Target::lookupNaifBodyCode. Reference #3934
    */
   class MdisGeometry {
@@ -197,4 +198,3 @@ namespace Isis {
 
 }     // namespace Isis
 #endif
-

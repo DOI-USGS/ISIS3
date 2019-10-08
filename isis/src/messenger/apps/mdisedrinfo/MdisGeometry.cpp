@@ -112,7 +112,7 @@ namespace Isis {
 
     //  Get the target and check for validity
     PvlKeyword &target = label.findKeyword("TargetName", PvlObject::Traverse);
-    
+
     try {
       Target::lookupNaifBodyCode(target);
       return (true);
@@ -924,7 +924,7 @@ namespace Isis {
 
     // Compute distance and position from spacecraft to sun
     // This is the J2000 target to sun reference
-    SpicePosition *sunpos = _camera->sunPosition();
+    Position *sunpos = _camera->sunPosition();
     std::vector<double> jVec = sunpos->Coordinate();
 
     //  J2000 spacecraft to sun reference
@@ -977,7 +977,7 @@ namespace Isis {
     SpiceDouble stateJ[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
     spkez_c(sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
-    NaifStatus::CheckErrors(); 
+    NaifStatus::CheckErrors();
 
     // Stage result and negate as it needs to be relative to Messenger
     vector<double> scvel;
@@ -1024,7 +1024,7 @@ namespace Isis {
       geom += format("SUB_SOLAR_LATITUDE", sslat, "DEG");
       geom += format("SUB_SOLAR_LONGITUDE", sslon, "DEG");
 
-      SpicePosition *sunpos = _camera->sunPosition();
+      Position *sunpos = _camera->sunPosition();
       std::vector<double> jVec = sunpos->Coordinate();
       double solar_dist = vnorm_c(&jVec[0]);
 
@@ -1201,5 +1201,3 @@ namespace Isis {
     return (QString::fromStdString(strcnv.str().c_str()));
   }
 }  // namespace Isis
-
-

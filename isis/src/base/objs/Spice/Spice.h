@@ -32,6 +32,7 @@
 #include "ShapeModel.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
+#include "PositionFactory.h"
 
 namespace Isis {
   class Cube;
@@ -87,7 +88,7 @@ namespace Isis {
    *                           labels
    *   @history 2003-10-28 Jeff Anderson - Changed SpaceCraft to Spacecraft in
    *                           labels and method names
-   *   @history 2003-11-03 Jeff Anderson - Added SubSolarPoint and 
+   *   @history 2003-11-03 Jeff Anderson - Added SubSolarPoint and
    *                           SubSpacecraftPoint methods
    *   @history 2003-11-12 Jeff Anderson - Added Target method
    *   @history 2004-01-14 Jeff Anderson - Changed how the SPK, CK, and
@@ -239,7 +240,7 @@ namespace Isis {
    *                           implementations to cpp file. Changed Resolution()
    *                           method to lower camel case. Added documentation.
    *                           Fixes #1181.
-   *   @history 2012-10-31 Kris Becker - Added implementation for swapping of 
+   *   @history 2012-10-31 Kris Becker - Added implementation for swapping of
    *                           observer/target and light time correction to
    *                           surface. Fixes (mostly) #0909, #1136 and #1223.
    *   @history 2012-12-10 Kris Becker - A newly designed class,
@@ -275,21 +276,21 @@ namespace Isis {
    *                           build into spicelib. References #3934
    *   @history 2016-10-19 Kristin Berry - Added exception to Spice::time() to throw if m_et is
    *                           NULL. Also added isTimeSet(), a function that will return true if
-   *                           m_et is set. References #4476. 
+   *                           m_et is set. References #4476.
    *   @history 2016-10-21 Jeannie Backer - Reorder method signatures and member variable
    *                           declarations to fit ISIS coding standards. References #4476.
    *   @history 2018-06-07 Debbie A Cook - Added BODY_CODE to Naif keywords.  This code
    *                           is used in the target body radii keyword name.  Isis retrieves this code
-   *                           from the standard PCK.  Because target bodies new to Naif are not 
+   *                           from the standard PCK.  Because target bodies new to Naif are not
    *                           included in the standard PCK, missions create a special body-specific
    *                           PCK to define the new body, including its body code.  This PCK is only
-   *                           loaded in spiceinit so the code needs to be saved so that the radii 
+   *                           loaded in spiceinit so the code needs to be saved so that the radii
    *                           keyword can be created to retrieve the target radii.
    *  @history 2019-04-16 Kristin Berry - Added a parameter to getClockTime called clockTicks which
    *                           defaults to false. When set to true, this indicates that the input value
    *                           is in encoded clock ticks, rather than a full spacecraft clock time
    *                           string. As such, when used sct2e_c is used to convert to an ET rather
-   *                           than scs2e_c. 
+   *                           than scs2e_c.
    */
   class Spice {
     public:
@@ -325,19 +326,20 @@ namespace Isis {
       QString targetName() const;
 
       iTime getClockTime(QString clockValue,
-                         int sclkCode = -1, 
+                         int sclkCode = -1,
                          bool clockTicks=false);
       SpiceDouble getDouble(const QString &key, int index = 0);
       SpiceInt getInteger(const QString &key,   int index = 0);
       QString getString(const QString &key,     int index = 0);
 
-      SpicePosition *sunPosition() const;
+      Position *sunPosition() const;
       SpicePosition *instrumentPosition() const;
       SpiceRotation *bodyRotation() const;
       SpiceRotation *instrumentRotation() const;
 
+      bool isUsingAle();
       bool hasKernels(Pvl &lab);
-      bool isTimeSet(); 
+      bool isTimeSet();
 
       SpiceInt naifBodyCode() const;
       SpiceInt naifSpkCode() const;
@@ -413,7 +415,7 @@ namespace Isis {
 
       SpicePosition *m_instrumentPosition; //!< Instrument spice position
       SpiceRotation *m_instrumentRotation; //!< Instrument spice rotation
-      SpicePosition *m_sunPosition; //!< Sun spice position
+      Position *m_sunPosition; //!< Sun spice position
       SpiceRotation *m_bodyRotation; //!< Body spice rotation
 
       bool m_allowDownsizing; //!< Indicates whether to allow downsizing
@@ -428,14 +430,17 @@ namespace Isis {
       SpiceInt *m_ikCode;          //!< Instrument kernel (IK) code
       SpiceInt *m_sclkCode;        //!< Spacecraft clock correlation kernel (SCLK) code
       SpiceInt *m_spkBodyCode;     //!< Spacecraft and planet ephemeris kernel (SPK) body code
-      SpiceInt *m_bodyFrameCode;   /**< Naif's BODY_FRAME_CODE value. It is read 
-                                        from the labels, if it exists. Otherwise, 
+      SpiceInt *m_bodyFrameCode;   /**< Naif's BODY_FRAME_CODE value. It is read
+                                        from the labels, if it exists. Otherwise,
                                         it's calculated by the init() method.*/
 
       PvlObject *m_naifKeywords; //!< NaifKeywords PvlObject from cube
 
-      bool m_usingNaif; /**< Indicates whether we are reading values from the 
+      bool m_usingNaif; /**< Indicates whether we are reading values from the
                              NaifKeywords PvlObject in cube*/
+
+      bool m_usingAle; /**< Indicate whether we are reading values from an ISD returned
+                            from ALE */
   };
 }
 

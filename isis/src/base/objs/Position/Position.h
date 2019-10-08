@@ -38,11 +38,11 @@ using json = nlohmann::json;
 namespace Isis {
   class NumericalApproximation;
 
-  class SpicePosition {
+  class Position {
     public:
       //??? jw
       /**
-       * This enum indicates the status of the object.  The class 
+       * This enum indicates the status of the object.  The class
        * expects functions to be after MemCache in the list.
        */
       enum Source { Spice,       //!< Object is reading directly from the kernels
@@ -53,10 +53,10 @@ namespace Isis {
                     //                table and adding nth degree polynomial
                   };
 
-      SpicePosition(int targetCode, int observerCode);
+      Position(int targetCode, int observerCode);
 
       //! Destructor
-      virtual ~SpicePosition();
+      virtual ~Position();
 
       virtual void SetTimeBias(double timeBias);
       virtual double GetTimeBias() const;
@@ -91,11 +91,11 @@ namespace Isis {
       virtual void LoadCache(double startTime, double endTime, int size);
       virtual void LoadCache(double time);
       virtual void LoadCache(Table &table);
-      virtual void LoadCache(json &isd);   
+      virtual void LoadCache(json &isd);
 
       virtual Table LineCache(const QString &tableName);
       virtual Table LoadHermiteCache(const QString &tableName);
- 
+
       virtual void ReloadCache();
       virtual void ReloadCache(Table &table);
 
@@ -141,15 +141,15 @@ namespace Isis {
 
       virtual double DPolynomial(const int coeffIndex);
 
-      virtual std::vector<double> CoordinatePartial(SpicePosition::PartialType partialVar, int coeffIndex);
+      virtual std::vector<double> CoordinatePartial(Position::PartialType partialVar, int coeffIndex);
 
-      virtual std::vector<double> VelocityPartial(SpicePosition::PartialType partialVar, int coeffIndex);
+      virtual std::vector<double> VelocityPartial(Position::PartialType partialVar, int coeffIndex);
       enum OverrideType {NoOverrides, ScaleOnly, BaseAndScale};
       virtual void Memcache2HermiteCache(double tolerance);
       virtual std::vector<double> Extrapolate(double timeEt);
       virtual std::vector<double> HermiteCoordinate();
     protected:
-      virtual void SetEphemerisTimeMemcache();
+      void SetEphemerisTimeMemcache();
       virtual void SetEphemerisTimeHermiteCache();
       virtual void SetEphemerisTimeSpice();
       virtual void SetEphemerisTimePolyFunction();
@@ -159,13 +159,13 @@ namespace Isis {
 
       //======================================================================
       // New methods support for light time correction and swap of observer/target
-      SpicePosition(int targetCode, int observerCode, bool swapObserverTarget);
+      Position(int targetCode, int observerCode, bool swapObserverTarget);
       virtual int getObserverCode() const;
       virtual int getTargetCode() const;
       virtual double getAdjustedEphemerisTime() const;
-      virtual void computeStateVector(double et, int target, int observer, 
-                              const QString &refFrame, 
-                              const QString &abcorr, 
+      virtual void computeStateVector(double et, int target, int observer,
+                              const QString &refFrame,
+                              const QString &abcorr,
                               double state[6], bool &hasVelocity,
                               double &lightTime) const;
       virtual void setStateVector(const double state[6], const bool &hasVelocity);

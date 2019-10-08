@@ -101,7 +101,7 @@ namespace Isis {
    * @param noTables Indicates the use of tables.
    */
   Spice::Spice(Cube &cube, bool noTables) {
-    init(*cube.label(), noTables);
+    init(cube, noTables);
   }
 
   /**
@@ -153,6 +153,8 @@ namespace Isis {
 
     // m_sky = false;
 
+    Pvl &lab = *cube.label();
+
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.findGroup("Kernels", Pvl::Traverse);
 
@@ -171,48 +173,75 @@ namespace Isis {
       *m_endTimePadding = 0.0;
     }
 
+    // We should remove this completely in the near future
     m_usingNaif = !lab.hasObject("NaifKeywords") || noTables;
+    m_usingAle = false;
 
+    json isd;
     //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
     //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
     //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
-      if (noTables) {
-        load(kernels["TargetPosition"], noTables);
-        load(kernels["InstrumentPosition"], noTables);
-        load(kernels["InstrumentPointing"], noTables);
+      try {
+        // try using ALE
+        std::ostringstream kernel_pvl;
+        kernel_pvl << kernels;
+
+        json props;
+        props["kernels"] = kernel_pvl.str();
+
+        isd = ale::load(cube.fileName().toStdString(), props.dump(), "isis");
+        json aleNaifKeywords = isd["NaifKeywords"];
+        m_naifKeywords = new PvlObject("NaifKeywords", aleNaifKeywords);
+
+        // Still need to load clock kernels for now
+        load(kernels["LeapSecond"], noTables);
+        if ( kernels.hasKeyword("SpacecraftClock")) {
+          load(kernels["SpacecraftClock"], noTables);
+        }
+        m_usingAle = true;
       }
+      catch(...) {
+        // Backup to stadnard ISIS implementation
+        if (noTables) {
+          load(kernels["TargetPosition"], noTables);
+          load(kernels["InstrumentPosition"], noTables);
+          load(kernels["InstrumentPointing"], noTables);
+        }
 
       if (kernels.hasKeyword("Frame")) {
         load(kernels["Frame"], noTables);
       }
 
-      load(kernels["TargetAttitudeShape"], noTables);
-      if (kernels.hasKeyword("Instrument")) {
-        load(kernels["Instrument"], noTables);
-      }
-      // Always load after instrument
-      if (kernels.hasKeyword("InstrumentAddendum")) {
-        load(kernels["InstrumentAddendum"], noTables);
-      }
-      load(kernels["LeapSecond"], noTables);
-      if ( kernels.hasKeyword("SpacecraftClock")) {
-        load(kernels["SpacecraftClock"], noTables);
+        load(kernels["TargetAttitudeShape"], noTables);
+        if (kernels.hasKeyword("Instrument")) {
+          load(kernels["Instrument"], noTables);
+        }
+        // Always load after instrument
+        if (kernels.hasKeyword("InstrumentAddendum")) {
+          load(kernels["InstrumentAddendum"], noTables);
+        }
+
+        // Still need to load clock kernels for now
+        load(kernels["LeapSecond"], noTables);
+        if ( kernels.hasKeyword("SpacecraftClock")) {
+          load(kernels["SpacecraftClock"], noTables);
+        }
+
+        // Modified to load extra kernels last to allow overriding default values
+        // (2010-04-07) (DAC)
+        if (kernels.hasKeyword("Extra")) {
+          load(kernels["Extra"], noTables);
+        }
       }
 
-      // Modified to load extra kernels last to allow overriding default values
-      // (2010-04-07) (DAC)
-      if (kernels.hasKeyword("Extra")) {
-        load(kernels["Extra"], noTables);
-      }
-
-      // Moved the construction of the Target after the NAIF kenels have been loaded or the 
-      // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
+      // Moved the construction of the Target after the NAIF kenels have been loaded or the
+      // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code below has been refactored
       m_target = new Target(this, lab);
 
-      // This should not be here. Consider having spiceinit add the necessary rings kernels to the 
+      // This should not be here. Consider having spiceinit add the necessary rings kernels to the
       // Extra parameter if the user has set the shape model to RingPlane.
       // If Target is Saturn and ShapeModel is RingPlane, load the extra rings pck file
       //  which changes the prime meridian values to report longitudes with respect to
@@ -225,8 +254,8 @@ namespace Isis {
     else {
       *m_naifKeywords = lab.findObject("NaifKeywords");
 
-      // Moved the construction of the Target after the NAIF kenels have been loaded or the 
-      // NAIF keywords have been pulled from the cube labels, so we can find target body codes 
+      // Moved the construction of the Target after the NAIF kenels have been loaded or the
+      // NAIF keywords have been pulled from the cube labels, so we can find target body codes
       // that are defined in kernels and not just body codes build into spicelib
       // TODO: Move this below the else once the rings code above has been refactored
       m_target = new Target(this, lab);
@@ -309,7 +338,7 @@ namespace Isis {
           QString naifTarget = "IAU_" + m_target->name().toUpper();
           namfrm_c(naifTarget.toLatin1().data(), &frameCode);
           if (frameCode == 0) {
-            QString msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
+            QString msg = "Can not find NAIF BODY_FRAME_CODE for target ["
                          + m_target->name() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
@@ -328,17 +357,17 @@ namespace Isis {
 
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
 
-    //  Set up for observer/target and light time correction to between s/c 
+    //  Set up for observer/target and light time correction to between s/c
     // and target body.
     LightTimeCorrectionState ltState(*m_ikCode, this);
     ltState.checkSpkKernelsForAberrationCorrection();
 
     vector<Distance> radius = m_target->radii();
     Distance targetRadius((radius[0] + radius[2])/2.0);
-    m_instrumentPosition = new SpacecraftPosition(*m_spkCode, *m_spkBodyCode,
-                                                  ltState, targetRadius);
+    m_instrumentPosition = PositionFactory::spacecraftPosition(*m_spkCode, *m_spkBodyCode,
+                                                               ltState, targetRadius);
 
-    m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
+    m_sunPosition = PositionFactory::positionSpice(10, m_target->naifBodyCode());
 
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
@@ -393,6 +422,9 @@ namespace Isis {
     if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.fileName(), lab);
       m_instrumentPosition->LoadCache(t);
+    }
+    else if (m_usingAle) {
+      m_instrumentPosition->LoadCache(isd["InstrumentPosition"]);
     }
 
     NaifStatus::CheckErrors();
@@ -802,9 +834,9 @@ namespace Isis {
     * spacecraft and sun positions.
     *
     * @return @b iTime the currently set ephemeris time
-    *  
-    * @throws IException::Programmer "Unable to retrieve the time Spice::setTime must be called 
-    *         first." 
+    *
+    * @throws IException::Programmer "Unable to retrieve the time Spice::setTime must be called
+    *         first."
     */
   iTime Spice::time() const {
     if (m_et == NULL) {
@@ -853,7 +885,7 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Spice::radii(Distance r[3]) const {
-    for (int i = 0; i < 3; i++) 
+    for (int i = 0; i < 3; i++)
        r[i] =m_target->radii()[i];
   }
 
@@ -905,7 +937,7 @@ namespace Isis {
   }
 
   /**
-   * This returns the NAIF body frame code. It is read from the labels, if it 
+   * This returns the NAIF body frame code. It is read from the labels, if it
    * exists. Otherwise, it's calculated by the init() method.
    *
    * @return @b SpiceInt NAIF body frame code
@@ -967,10 +999,10 @@ namespace Isis {
 
   /**
    * This converts the spacecraft clock ticks value (clockValue) to an iTime.
-   *  
-   * If the clock ticks value is provided directly, rather than the spacecraft 
-   * clock string, set clockTicks=true.  
-   *  
+   *
+   * If the clock ticks value is provided directly, rather than the spacecraft
+   * clock string, set clockTicks=true.
+   *
    * Use this when possible because naif calls (such as scs2e_c) cannot be
    *   called when not using naif.
    */
@@ -988,10 +1020,10 @@ namespace Isis {
       SpiceDouble timeOutput;
       NaifStatus::CheckErrors();
       if (clockTicks) {
-        sct2e_c(sclkCode, (SpiceDouble) clockValue.toDouble(), &timeOutput); 
+        sct2e_c(sclkCode, (SpiceDouble) clockValue.toDouble(), &timeOutput);
       }
       else {
-        scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput); 
+        scs2e_c(sclkCode, clockValue.toLatin1().data(), &timeOutput);
       }
       NaifStatus::CheckErrors();
       storedClockTime = timeOutput;
@@ -1436,9 +1468,9 @@ namespace Isis {
 
   /**
    * Returns true if time has been initialized.
-   * 
+   *
    * @author 2016-10-19 Kristin Berry
-   * 
+   *
    * @return @b bool true if time has been set
    */
   bool Spice::isTimeSet(){
@@ -1453,7 +1485,7 @@ namespace Isis {
    * @internal
    *   @history 2011-02-09 Steven Lambright - Original version.
    */
-  SpicePosition *Spice::sunPosition() const {
+  Position *Spice::sunPosition() const {
     return m_sunPosition;
   }
 
@@ -1490,4 +1522,7 @@ namespace Isis {
     return m_instrumentRotation;
   }
 
+  bool Spice::isUsingAle(){
+    return m_usingAle;
+  }
 }
