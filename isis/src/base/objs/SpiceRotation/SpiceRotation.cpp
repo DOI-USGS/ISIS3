@@ -27,6 +27,8 @@
 #include "Table.h"
 #include "TableField.h"
 
+using json = nlohmann::json;
+
 // Declarations for bindings for Naif Spicelib routines that do not have
 // a wrapper
 extern int refchg_(integer *frame1, integer *frame2, doublereal *et,
@@ -404,9 +406,18 @@ namespace Isis {
   }
 
 
+  /**
+   * Load the cached data from an ALE ISD.
+   *
+   * The SpiceRotation object must be set to a SPICE source before loading the
+   * cache.
+   *
+   * @param isdRot The ALE ISD as a JSON object.
+   *
+   */
   void SpiceRotation::LoadCache(json &isdRot){
     if (p_source != Spice) {
-        throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only support Spice source", _FILEINFO_);
+        throw IException(IException::Programmer, "SpiceRotation::LoadCache(json) only supports Spice source", _FILEINFO_);
     }
 
     p_timeFrames.clear();
@@ -415,7 +426,7 @@ namespace Isis {
     p_cacheTime.clear();
     p_cacheAv.clear();
     p_hasAngularVelocity = false;
-    m_frameType = PCK;
+    m_frameType = CK;
 
     // Load the full cache time information from the label if available
     p_fullCacheStartTime = isdRot["CkTableStartTime"].get<double>();
@@ -423,21 +434,6 @@ namespace Isis {
     p_fullCacheSize = isdRot["CkTableOriginalSize"].get<double>();
     p_cacheTime = isdRot["EphemerisTimes"].get<std::vector<double>>();
     p_timeFrames = isdRot["TimeDependentFrames"].get<std::vector<int>>();
-
-    m_raPole.resize(3);
-    m_raPole[0].setDegrees(0);
-    m_raPole[0].setDegrees(0);
-    m_raPole[0].setDegrees(0);
-
-    m_decPole.resize(3);
-    m_decPole[0].setDegrees(0);
-    m_decPole[0].setDegrees(0);
-    m_decPole[0].setDegrees(0);
-
-    m_pm.resize(3);
-    m_pm[0].setDegrees(0);
-    m_pm[0].setDegrees(0);
-    m_pm[0].setDegrees(0);
 
     for (auto it = isdRot["Quaternions"].begin(); it != isdRot["Quaternions"].end(); it++) {
         std::vector<double> quat = {it->at(0).get<double>(), it->at(1).get<double>(), it->at(2).get<double>(), it->at(3).get<double>()};
@@ -447,7 +443,6 @@ namespace Isis {
     }
 
     bool hasConstantFrames = isdRot.find("ConstantFrames") != isdRot.end();
-    bool hasConstantRotation = isdRot.find("ConstantRotation") != isdRot.end();
 
     if (hasConstantFrames) {
       p_constantFrames = isdRot["ConstantFrames"].get<std::vector<int>>();

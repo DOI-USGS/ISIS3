@@ -150,43 +150,6 @@ namespace Isis {
     return p_blobName;
   }
 
-  void Blob::ReadString(const QString &write_string){
-    // Read the binary data
-    if (p_buffer != NULL) delete [] p_buffer;
-    p_buffer = new char[p_nbytes];
-    
-    size_t len = write_string.length();
-    const char* c_string = write_string.toStdString().c_str(); 
-    std::strcpy(p_buffer, c_string);
-  }
-
-
-  /**
-   * Read binary data from an input stream into the Blob object.
-   *
-   * @param stream The input stream to read from.
-   *
-   * @throws IException::Io - Error reading data from stream
-   */
-  void Blob::ReadData(std::istream &stream) {
-    // Read the binary data
-    if (p_buffer != NULL) delete [] p_buffer;
-    p_buffer = new char[p_nbytes];
-
-    streampos sbyte = p_startByte - 1;
-    stream.seekg(sbyte, std::ios::beg);
-    if (!stream.good()) {
-      QString msg = "Error preparing to read data from " + p_type +
-                   " [" + p_blobName + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    stream.read(p_buffer, p_nbytes);
-    if (!stream.good()) {
-      QString msg = "Error reading data from " + p_type + " [" + p_blobName + "]";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-  }
   /** 
    *  Accessor method that returns the number of bytes in the blob data.
    *  
@@ -367,7 +330,32 @@ namespace Isis {
   void Blob::ReadInit(){
   }
 
+  /**
+   * Read binary data from an input stream into the Blob object.
+   *
+   * @param stream The input stream to read from.
+   *
+   * @throws IException::Io - Error reading data from stream
+   */
+  void Blob::ReadData(std::istream &stream) {
+    // Read the binary data
+    if (p_buffer != NULL) delete [] p_buffer;
+    p_buffer = new char[p_nbytes];
 
+    streampos sbyte = p_startByte - 1;
+    stream.seekg(sbyte, std::ios::beg);
+    if (!stream.good()) {
+      QString msg = "Error preparing to read data from " + p_type +
+                   " [" + p_blobName + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
+    stream.read(p_buffer, p_nbytes);
+    if (!stream.good()) {
+      QString msg = "Error reading data from " + p_type + " [" + p_blobName + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+  }
 
   /**
    * Write the blob data out to a file.
