@@ -665,10 +665,10 @@ namespace Isis {
     if (!m_sunPosition->IsCached()) {
       int sunPositionCacheSize = cacheSize;
       if (cacheSize > 2) sunPositionCacheSize = 2;
-      m_sunPosition->LoadCache(
-          startTime.Et() - *m_startTimePadding,
-          endTime.Et() + *m_endTimePadding,
-          sunPositionCacheSize);
+      m_sunPosition = PositionFactory::fromSpiceToMemCache(m_sunPosition,
+                                                           startTime.Et() - *m_startTimePadding,
+                                                           endTime.Et() + *m_endTimePadding,
+                                                           sunPositionCacheSize);
     }
 
     // Save the time and cache size

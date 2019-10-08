@@ -239,11 +239,18 @@ namespace Isis {
    *                      individual methods for each Source type
    *                      to make software more readable.
    */
-  const std::vector<double> &Position::SetEphemerisTime(double et) {
+  std::vector<std::vector<double>> Position::SetEphemerisTime(double et) {
     NaifStatus::CheckErrors();
+    std::vector<std::vector<double>> ephemerisData;
 
     // Save the time
-    if(et == p_et) return p_coordinate;
+    if (et == p_et) {
+      ephemerisData = {p_coordinate, {0.0, 0.0, 0.0}};
+      if (p_hasVelocity) {
+        ephemerisData = {p_coordinate, p_velocity};
+      }
+      return ephemerisData;
+    }
     p_et = et;
 
     // Read from the cache
@@ -266,7 +273,11 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Return the coordinate
-    return p_coordinate;
+    ephemerisData = {p_coordinate, {0.0, 0.0, 0.0}};
+    if (p_hasVelocity) {
+      ephemerisData = {p_coordinate, p_velocity};
+    }
+    return ephemerisData;
   }
 
 
@@ -1749,6 +1760,22 @@ namespace Isis {
       double et = p_fullCacheStartTime + (double) i * cacheSlope;
       p_cacheTime.push_back(et);
     }
+  }
+
+  std::vector<double> Position::LoadTimeCache(int startTime, int endTime, int size) {
+    // Loop and load the time cache
+    double cacheSlope = 0.0;
+    std::vector<double> cacheTime;
+
+    if(size > 1)
+      cacheSlope = (endTime - startTime) / (double)(size - 1);
+
+    for(int i = 0; i < size; i++) {
+      double et = startTime + (double) i * cacheSlope;
+      cacheTime.push_back(et);
+    }
+
+    return cacheTime;
   }
 
   /** Compute and return the coordinate at the center time

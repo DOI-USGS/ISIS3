@@ -4,7 +4,7 @@ namespace Isis {
 
   PositionSpice::PositionSpice(int targetCode, int observerCode) : Position(targetCode, observerCode) {}
 
-  void PositionSpice::SetEphemerisTimeSpice(double et) {
+  std::vector<std::vector<double>> PositionSpice::SetEphemerisTime(double et) {
     double state[6];
     bool hasVelocity;
     double lt;
@@ -18,6 +18,11 @@ namespace Isis {
     // Set the internal state
     setStateVector(state, hasVelocity);
     setLightTime(lt);
-    return;
+    std::vector<std::vector<double>> ephemerisData;
+    ephemerisData.push_back(p_coordinate);
+    if (p_hasVelocity) {
+      ephemerisData.push_back(p_velocity);
+    }
+    return ephemerisData;
   }
 }

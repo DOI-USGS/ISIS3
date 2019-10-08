@@ -65,7 +65,7 @@ namespace Isis {
       virtual QString GetAberrationCorrection() const;
       virtual double GetLightTime() const;
 
-      virtual const std::vector<double> &SetEphemerisTime(double et);
+      virtual std::vector<std::vector<double>> SetEphemerisTime(double et);
       enum PartialType {WRT_X, WRT_Y, WRT_Z};
 
       //! Return the current ephemeris time
@@ -148,8 +148,12 @@ namespace Isis {
       virtual void Memcache2HermiteCache(double tolerance);
       virtual std::vector<double> Extrapolate(double timeEt);
       virtual std::vector<double> HermiteCoordinate();
+      std::vector<double> LoadTimeCache(int startTime, int endTime, int size);
+
+      virtual int getObserverCode() const;
+      virtual int getTargetCode() const;
     protected:
-      void SetEphemerisTimeMemcache();
+      virtual void SetEphemerisTimeMemcache();
       virtual void SetEphemerisTimeHermiteCache();
       virtual void SetEphemerisTimeSpice();
       virtual void SetEphemerisTimePolyFunction();
@@ -160,8 +164,6 @@ namespace Isis {
       //======================================================================
       // New methods support for light time correction and swap of observer/target
       Position(int targetCode, int observerCode, bool swapObserverTarget);
-      virtual int getObserverCode() const;
-      virtual int getTargetCode() const;
       virtual double getAdjustedEphemerisTime() const;
       virtual void computeStateVector(double et, int target, int observer,
                               const QString &refFrame,
@@ -170,16 +172,11 @@ namespace Isis {
                               double &lightTime) const;
       virtual void setStateVector(const double state[6], const bool &hasVelocity);
       virtual void setLightTime(const double &lightTime);
-      //======================================================================
-
-    private:
-      void init(int targetCode, int observerCode,
-                const bool &swapObserverTarget = false);
-      void ClearCache();
-      void LoadTimeCache();
-      void CacheLabel(Table &table);
-      double ComputeVelocityInTime(PartialType var);
-
+      std::vector<double> p_cacheTime;    //!< iTime for corresponding position
+      std::vector<std::vector<double> > p_cache;         //!< Cached positions
+      std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
+      std::vector<double> p_coordinate;   //!< J2000 position at time et
+      std::vector<double> p_velocity;     //!< J2000 velocity at time et
       int p_targetCode;                   //!< target body code
       int p_observerCode;                 //!< observer body code
 
@@ -187,8 +184,6 @@ namespace Isis {
       QString p_aberrationCorrection; //!< Light time correction to apply
 
       double p_et;                        //!< Current ephemeris time
-      std::vector<double> p_coordinate;   //!< J2000 position at time et
-      std::vector<double> p_velocity;     //!< J2000 velocity at time et
 
       //! Hermite spline for x coordinate if Source == HermiteCache
       NumericalApproximation *p_xhermite;
@@ -198,9 +193,6 @@ namespace Isis {
       NumericalApproximation *p_zhermite;
 
       Source p_source;                    //!< Enumerated value for the location of the SPK information used
-      std::vector<double> p_cacheTime;    //!< iTime for corresponding position
-      std::vector<std::vector<double> > p_cache;         //!< Cached positions
-      std::vector<std::vector<double> > p_cacheVelocity; //!< Cached velocities
       std::vector<double> p_coefficients[3];             //!< Coefficients of polynomials fit to 3 coordinates
 
       double p_baseTime;                  //!< Base time used in fit equations
@@ -220,6 +212,15 @@ namespace Isis {
       // Variables support observer/target swap and light time correction
       bool   m_swapObserverTarget;  ///!< Swap traditional order
       double m_lt;                 ///!<  Light time correction
+      //======================================================================
+
+    private:
+      void init(int targetCode, int observerCode,
+                const bool &swapObserverTarget = false);
+      void ClearCache();
+      void LoadTimeCache();
+      void CacheLabel(Table &table);
+      double ComputeVelocityInTime(PartialType var);
   };
 };
 
