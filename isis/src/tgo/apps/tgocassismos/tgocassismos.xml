@@ -58,6 +58,9 @@
       Added the StopTime keyword to the output Mosaic PVL group, as stop_date_time is required for 
       PDS4 export. 
     </change>
+    <change name="Kristin Berry" date="2019-06-15">
+     Added the Archive group of the first cube to the output mosaic, as it is required for PDS4 export.
+    </change>
   </history>
 
   <groups>

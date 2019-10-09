@@ -23,11 +23,12 @@ Instrument Data Rate         = 365.6
 Instrument ID                = ISSWA
 Readout Cycle Index          = 0
 Shutter Mode ID              = WacOnly
+Shutter State ID             = Enabled
 Summing Mode                 = 1
 
 ISSNA,Lossy,Table,CAS-ISS2,NacOnly,Sum2 test...
 IsNarrowAngle?                 1
-Bias Strip Mean              = 120.75
+Bias Strip Mean              = 1041.25
 Compression Ratio            = 18.437473
 Compression Type             = Lossy
 Data Conversion Type         = Table
@@ -46,11 +47,12 @@ Instrument Data Rate         = 182.784
 Instrument ID                = ISSNA
 Readout Cycle Index          = 15
 Shutter Mode ID              = NacOnly
+Shutter State ID             = Enabled
 Summing Mode                 = 2
 
 ISSNA,Lossless,Table,CAS-ISS4,BothSim,Sum4 test...
 IsNarrowAngle?                 1
-Bias Strip Mean              = 30
+Bias Strip Mean              = 108
 Compression Ratio            = 3.721945
 Compression Type             = Lossless
 Data Conversion Type         = Table
@@ -69,6 +71,7 @@ Instrument Data Rate         = 182.784
 Instrument ID                = ISSNA
 Readout Cycle Index          = 15
 Shutter Mode ID              = BothSim
+Shutter State ID             = Enabled
 Summing Mode                 = 4
 
 ISSNA,Lossless,8LSB,CAS-ISS,NacOnly,Full test...
@@ -92,5 +95,6 @@ Instrument Data Rate         = 182.8
 Instrument ID                = ISSNA
 Readout Cycle Index          = 15
 Shutter Mode ID              = NacOnly
+Shutter State ID             = Enabled
 Summing Mode                 = 1
 

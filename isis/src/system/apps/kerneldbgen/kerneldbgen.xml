@@ -153,8 +153,11 @@
       Fixes #5272.
     </change>
     <change name="Kristin Berry" date="2018-05-09">
-      Added the LEVEL=(SEGMENT*, INTERVAL) option to specify the time coverage level to be used for the generated database. SPICE segements are made up of SPICE intervals. 
-      Segments (the only option in the past) are now the default, but interval can be selected if needed. Fixes #5410. 
+      Added the LEVEL=(SEGMENT*, INTERVAL) option to specify the time coverage level to be used for the generated database. SPICE segements are made up of SPICE intervals.
+      Segments (the only option in the past) are now the default, but interval can be selected if needed. Fixes #5410.
+    </change>
+    <change name="Jesse Mapel" date="2019-08-13">
+      Added the ability to use a list of kernels instead of a location and filters. Fixes #3390.
     </change>
   </history>
 
@@ -232,25 +235,25 @@
           <item>SEGMENT</item>
         </default>
         <brief>
-           The level of time-granularity for the time-coverage interval to be output to the SPICE database. 
+           The level of time-granularity for the time-coverage interval to be output to the SPICE database.
         </brief>
         <description>
         </description>
         <list>
           <option value="SEGMENT">
             <brief>
-              SPICE Segment             
+              SPICE Segment
             </brief>
             <description>
-              The coarsest level of time granularity, a SPICE segment is composed of SPICE intervals.              
+              The coarsest level of time granularity, a SPICE segment is composed of SPICE intervals.
             </description>
           </option>
           <option value="INTERVAL">
             <brief>
-              SPICE Interval 
+              SPICE Interval
             </brief>
             <description>
-              A finer level of time granularity. 
+              A finer level of time granularity.
             </description>
           </option>
         </list>
@@ -291,6 +294,27 @@
           to ASCII order and added to the list of available kernels.
         </description>
       </parameter>
+      <parameter name="PREDICTLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Prioritized list of predict quality kernels
+        </brief>
+        <description>
+          This parameter is used to specify a file list that contains the
+          kernel or kernels to be identified as predicted. The order of the
+          kernels in the file list will be retained with kernels later in the
+          list taking precedence when multiple kernels cover the same time
+          range.
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+        <exclusions>
+          <item>PREDICTDIR</item>
+          <item>PREDICTFILTER</item>
+        </exclusions>
+      </parameter>
     </group>
     <group name="Reconstructed">
       <parameter name="RECONDIR">
@@ -326,6 +350,27 @@
         <default>
           <item>none</item>
         </default>
+      </parameter>
+      <parameter name="RECONLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Prioritized list of reconstructed quality kernels
+        </brief>
+        <description>
+          This parameter is used to specify a file list that contains the
+          kernel or kernels to be identified as reconstructed. The order of the
+          kernels in the file list will be retained with kernels later in the
+          list taking precedence when multiple kernels cover the same time
+          range.
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+        <exclusions>
+          <item>RECONDIR</item>
+          <item>RECONFILTER</item>
+        </exclusions>
       </parameter>
     </group>
     <group name="Smithed">
@@ -363,6 +408,27 @@
           <item>none</item>
         </default>
       </parameter>
+      <parameter name="SMITHEDLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Prioritized list of smithed quality kernels
+        </brief>
+        <description>
+          This parameter is used to specify a file list that contains the
+          kernel or kernels to be identified as smithed. The order of the
+          kernels in the file list will be retained with kernels later in the
+          list taking precedence when multiple kernels cover the same time
+          range.
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+        <exclusions>
+          <item>SMITHEDDIR</item>
+          <item>SMITHEDFILTER</item>
+        </exclusions>
+      </parameter>
     </group>
     <group name="Offset">
       <parameter name="STARTOFFSET">
@@ -372,9 +438,9 @@
         </brief>
         <minimum inclusive="yes">0.0</minimum>
         <description>
-          This parameter is used to specify the amount of offset (in seconds) to apply to the 
+          This parameter is used to specify the amount of offset (in seconds) to apply to the
           StartTime value for each kernel that is used to populate the db file. This value will be
-          subtracted from the value found in the kernel. If left as 0.0, no offset will be applied, and 
+          subtracted from the value found in the kernel. If left as 0.0, no offset will be applied, and
           the Time will be copied over as written in the kernel.
         </description>
         <default>
@@ -388,7 +454,7 @@
         </brief>
         <minimum inclusive="yes">0.0</minimum>
         <description>
-          This parameter is used to specify the amount of offset (in seconds) to apply to the 
+          This parameter is used to specify the amount of offset (in seconds) to apply to the
           EndTime value for each kernel that is used to populate the db file. This value will be
           added to the value found in the kernel. If left as 0.0, no offset will be applied, and the
           Time will be copied over as written in the kernel.

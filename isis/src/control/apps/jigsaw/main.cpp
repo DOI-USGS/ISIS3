@@ -57,6 +57,7 @@ void IsisMain() {
   // retrieve settings from jigsaw gui
   
   BundleSettingsQsp settings = bundleSettings(ui);
+  settings->setCubeList(cubeList);
   BundleAdjust *bundleAdjustment = NULL;
   try {
     // Get the held list if entered and prep for bundle adjustment
@@ -80,8 +81,8 @@ void IsisMain() {
 
     QObject::connect( bundleAdjustment, SIGNAL( statusUpdate(QString) ),
                       bundleAdjustment, SLOT( outputBundleStatus(QString) ) );
-    BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();
-    
+    BundleSolutionInfo *bundleSolution = bundleAdjustment->solveCholeskyBR();    
+    bundleSolution->setOutputControlName( FileName(ui.GetFileName("ONET")).expanded() );
     cout << "\nGenerating report files\n" << endl;
 
     // write output files

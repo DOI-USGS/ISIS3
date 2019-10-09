@@ -78,6 +78,9 @@ namespace Isis {
    *   @history 2019-03-01 Kristin Berry - Added ability to set version_id and title, added
    *                           Special_Constants to define ISIS special pixel values, fixed east/west
    *                           bounding coordinates swap bug. Fixes git issue #2635.
+   *   @history 2019-06-15 Kristin Berry - Added a new addSchema() function for cases in which a
+   *                           schematron file is not available and added setPixelDescription to
+   *                           set a pixel description for the output image. 
    */
 
   class ProcessExportPds4: public Isis::ProcessExport {
@@ -115,11 +118,13 @@ namespace Isis {
       void setTitle(QString title);
       void setSchemaLocation(QString schema);
       void setImageType(ImageType imageType);
-
+      void setPixelDescription(QString description); 
       static void translateUnits(QDomDocument &label,
                                  QString transMapFile = "$base/translations/pds4ExportUnits.pvl");
       void reorder();
-      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI) ;
+      void addSchema(QString sch, QString xsd, QString xmlns, QString xmlnsURI);
+      void addSchema(QString xsd, QString xmlns, QString xmlnsURI);
+
     protected:
       void identificationArea();
       void standardInstrument();
@@ -139,6 +144,7 @@ namespace Isis {
       QString m_versionId;                  //!< QString with specified version id.
       QString m_title;                      //!< QString with specified title. 
       ImageType m_imageType;                //!< Type of image data to be written.
+      QString m_pixelDescription;           //!< Description of pixel values.
 
   };
 }

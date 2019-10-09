@@ -18,7 +18,7 @@
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "3.7.1" %}
+{% set version = "3.9.0_RC2" %}
 
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
@@ -31,7 +31,7 @@ package:
 
 source:
   git_url: 'https://github.com/USGS-Astrogeology/ISIS3.git'
-  git_tag: '3.7.1'
+  git_tag: {{ version }}
   # url: 'https://github.com/USGS-Astrogeology/ISIS3/archive/{{ version }}.tar.gz'
   # sha256 is the prefered checksum -- you can get it for a file with:
   # `openssl sha256 <file name>`. Simply run this command with the .tar.gz

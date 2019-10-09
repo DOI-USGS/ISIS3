@@ -1879,9 +1879,10 @@ namespace Isis {
     // REMOVE
 
     // Compute the look vector in instrument coordinates based on time of observation and apriori
-    // lat/lon/radius
+    // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
+    // bool argument was added CameraGroundMap::GetXY to turn off the test.
     if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
-                                            &computedX, &computedY))) {
+                                            &computedX, &computedY, false))) {
       QString msg = "Unable to map apriori surface point for measure ";
       msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
       throw IException(IException::User, msg, _FILEINFO_);
