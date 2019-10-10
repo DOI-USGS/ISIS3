@@ -29,6 +29,9 @@
 //#include <SpiceZfc.h>
 //#include <SpiceZmc.h>
 
+#include <nlohmann/json.hpp>
+
+
 #include "Angle.h"
 #include "Table.h"
 #include "PolynomialUnivariate.h"
@@ -348,6 +351,8 @@ namespace Isis {
 
       void LoadCache(Table &table);
 
+      void LoadCache(nlohmann::json &isd);
+
       Table LineCache(const QString &tableName);
 
       void ReloadCache();
@@ -392,7 +397,7 @@ namespace Isis {
       double GetTimeScale();
 
       void SetOverrideBaseTime(double baseTime, double timeScale);
-      void SetCacheTime(std::vector<double> cacheTime); 
+      void SetCacheTime(std::vector<double> cacheTime);
 
       // Derivative methods
       double DPolynomial(const int coeffIndex);
