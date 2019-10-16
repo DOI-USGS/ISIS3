@@ -1,28 +1,117 @@
-node {
-    withEnv(["ISISROOT=" + "${workspace}" + "/build/", "ISIS3TESTDATA=/usgs/cpkgs/isis3/testData/", "ISIS3DATA=/usgs/cpkgs/isis3/data/"]) {
-        stage ("Checkout") {
-            checkout scm
-            sh 'git clone https://github.com/abseil/googletest.git gtest'
-        }
+node("centos && isis") {
 
-        stage ("Build") {
-            conda config --prepend channels anaconda
-            conda config --append channels conda-forge
-            conda config --append channels usgs-astrogeology
-            conda config --prepend default_channels anaconda
-            conda env create -n isis3 -f environment.yml
-            source activate isis3
-            mkdir -p ./install ./build && cd build
-            cmake -GNinja -DJP2KFLAG=OFF -Dpybindings=OFF -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData ../isis
-       }
-               
-       stage("Test") {
-            set +e
-            ninja -j8 && ninja install
-            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
-            ctest -V -R _unit_ --timeout 500
-            ctest -V -R _app_ --timeout 500
-            ctest -V -R _module_ --timeout 500
+    def build_ok = true
+
+    stage("Report") {
+        def container_os = sh(script: '''grep -Po '(?<=PRETTY_NAME=").*(?=")' /etc/os-release''', returnStdout: true).trim()
+        def container_mounts = sh(script: 'df -h', returnStdout: true).trim()
+        println "Container OS: ${container_os}"
+        println "Container Mounts:"
+        println "${container_mounts}"
+    }
+    stage("Checkout") {
+        checkout scm: [$class: 'GitSCM', branches: [[name: '*/${GIT_BRANCH}']], userRemoteConfigs: [[url: '${GIT_URL}']]]
+    }
+    stage("SetupEnvironment"){
+        dir("ISIS3") {
+            sh "git submodule update --init --recursive"
+            sh "conda config --set ssl_verify false"
+            // sh "conda config --set channel_alias https://astro-bin.wr.usgs.gov/artifactory/conda"
+            // sh "conda config --set ssl_verify false"
+            sh "conda env create -n testEnvCentos -f environment_gcc4.yml"
+            sh "source activate testEnvCentos"
+            sh "conda install -c conda-forge vim"
+            sh "conda install -c conda-forge findutils"
         }
     }
+    stage("Build") {
+        dir("ISIS3") {
+            sh "mkdir build install"
+              dir("build") {
+                sh """
+                    source activate testEnvCentos
+                    conda update -n base -c defaults conda
+                    cmake -DCMAKE_INSTALL_PREFIX=../install -Disis3Data=/usgs/cpkgs/isis3/data -Disis3TestData=/usgs/cpkgs/isis3/testData -DJP2KFLAG=ON -Dpybindings=OFF -DCMAKE_BUILD_TYPE=RELEASE -GNinja ../isis
+                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                    ninja -j4 install
+                """
+            }
+        }
+    }
+    try{
+        stage("UnitTests") {
+            dir("ISIS3") {
+                dir("build") {
+                    sh """
+                        source activate testEnvCentos
+                        source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                        ctest -R _unit_ -j4 -VV
+                    """
+                }
+            }
+        }
+    }
+    catch(e) {
+        build_ok = false
+        echo e.toString()
+    }
+    try{
+        stage("AppTests") {
+            dir("ISIS3") {
+                dir("build") {
+                    sh """
+                        source activate testEnvCentos
+                        source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                        ctest -R _app_ -j4 -VV
+                    """
+                }
+            }
+        }
+    }
+    catch(e) {
+        build_ok = false
+        echo e.toString()
+    }
+    try{
+        stage("ModuleTests") {
+            dir("ISIS3") {
+                dir("build") {
+                    sh """
+                        source activate testEnvCentos
+                        source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                        ctest -j4 -VV -R _module_
+                    """
+                }
+            }
+        }
+    }
+    catch(e) {
+        build_ok = false
+        echo e.toString()
+    }
+    try{
+        stage("GTests") {
+            dir("ISIS3") {
+                dir("build") {
+                    sh """
+                        source activate testEnvCentos
+                        source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                        ctest -j4 -VV -R "." -E "(_app_|_unit_|_module_)"
+                    """
+                }
+            }
+        }
+    }
+    catch(e) {
+        build_ok = false
+        echo e.toString()
+    }
+
+    if(build_ok) {
+        currentBuild.result = "SUCCESS"
+    }
+    else {
+        currentBuild.result = "FAILURE"
+    }
+
 }
