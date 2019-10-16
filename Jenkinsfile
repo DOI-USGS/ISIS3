@@ -10,7 +10,7 @@ node("centos && isis") {
         println "${container_mounts}"
     }
     stage("Checkout") {
-        checkout scm: [$class: 'GitSCM', branches: [[name: '*/${GIT_BRANCH}']], userRemoteConfigs: [[url: '${GIT_URL}']]]
+        checkout scm
     }
     stage("SetupEnvironment"){
         dir("ISIS3") {
