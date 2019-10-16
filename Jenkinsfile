@@ -14,6 +14,7 @@ node("centos && isis") {
     }
     stage("SetupEnvironment"){
         dir("ISIS3") {
+            sh "pwd"
             // sh "git submodule update --init"
             sh "conda config --set ssl_verify false"
             // sh "conda config --set channel_alias https://astro-bin.wr.usgs.gov/artifactory/conda"
