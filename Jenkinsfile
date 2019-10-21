@@ -10,11 +10,12 @@ node("centos && isis") {
         println "${container_mounts}"
     }
     stage("Checkout") {
+        sh "git clone --recurse-submodules --depth 50 https://github.com/USGS-Astrogeology/ISIS3.git"
         sh "git checkout -f ${env.BRANCH_NAME}"
     }
     stage("SetupEnvironment"){
         dir("ISIS3") {
-            sh "ls -l"
+            sh "ls"
             sh "git submodule update --recursive --init"
             sh "conda config --set ssl_verify false"
             // sh "conda config --set channel_alias https://astro-bin.wr.usgs.gov/artifactory/conda"
