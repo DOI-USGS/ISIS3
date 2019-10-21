@@ -10,7 +10,7 @@ node("centos && isis") {
         println "${container_mounts}"
     }
     stage("Checkout") {
-        checkout scm
+        checkout "git checkout -f ${env.BRANCH_NAME}"
     }
     stage("SetupEnvironment"){
         dir("ISIS3") {
