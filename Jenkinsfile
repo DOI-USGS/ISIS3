@@ -12,7 +12,8 @@ node("centos && isis") {
     stage("Checkout") {
         sh "git clone --recurse-submodules --depth 50 https://github.com/USGS-Astrogeology/ISIS3.git"
         dir("ISIS3") {
-            sh "git checkout ${env.BRANCH_NAME}"
+            sh "git branch"
+            // sh "git checkout ${env.BRANCH_NAME}"
         }
     }
     stage("SetupEnvironment"){
