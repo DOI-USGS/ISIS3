@@ -10,12 +10,13 @@ node("centos && isis") {
         println "${container_mounts}"
     }
     stage("Checkout") {
-        sh "git clone --recurse-submodules --depth 50 https://github.com/USGS-Astrogeology/ISIS3.git"
-        dir("ISIS3") {
-            sh "git fetch --all"
-            sh "git branch -r"
-            sh "git checkout -f ${env.BRANCH_NAME}"
-        }
+        checkout scm
+        // sh "git clone --recurse-submodules --depth 50 https://github.com/USGS-Astrogeology/ISIS3.git"
+        // dir("ISIS3") {
+          //  sh "git fetch --all"
+          //  sh "git branch -r"
+          //  sh "git checkout -f ${env.BRANCH_NAME}"
+      //  }
     }
     stage("SetupEnvironment"){
         dir("ISIS3") {
