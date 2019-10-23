@@ -21,10 +21,10 @@ node("centos && isis") {
     stage("SetupEnvironment"){
         dir("ISIS3") {
             sh "conda config --set ssl_verify false"
-            sh "ls -l"
+            sh "ls"
             // sh "conda config --set channel_alias https://astro-bin.wr.usgs.gov/artifactory/conda"
             // sh "conda config --set ssl_verify false"
-            sh "conda env create -f environment_gcc4.yml -n testEnvCentos"
+            sh "conda env create --name testEnvCentos --file environment_gcc4.yml "
             sh "source activate testEnvCentos"
             sh "conda install -c conda-forge vim"
             sh "conda install -c conda-forge findutils"
