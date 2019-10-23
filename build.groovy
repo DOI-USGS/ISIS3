@@ -1,6 +1,7 @@
 // vim: ft=groovy
 
 def isisDataPath = '/isisData/data'
+
 def isisTestDataPath = "/isisData/testData"
 
 def isisEnv = [
