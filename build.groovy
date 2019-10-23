@@ -90,6 +90,25 @@ node("${env.OS.toLowerCase()}") {
             }
 
             if (build_ok) {
+
+                try{
+                    stage("UnitTests") {
+                        dir("ISIS3") {
+                            dir("build") {
+                                sh """
+                                    source activate testEnvCentos
+                                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                                    ctest -R _unit_ -j4 -VV
+                                """
+                            }
+                        }
+                    }
+                }
+                catch(e) {
+                    build_ok = false
+                    echo e.toString()
+                }
+                
                 try{
                     stage("AppTests") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
