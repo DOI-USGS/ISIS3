@@ -79,7 +79,7 @@ node("${env.OS.toLowerCase()}") {
                         source activate isis
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
-                        python ${env.ISIS_SRC_DIR}/isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
+                        python ./isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
                     """
                 }
             }
@@ -108,7 +108,7 @@ node("${env.OS.toLowerCase()}") {
                     build_ok = false
                     echo e.toString()
                 }
-                
+
                 try{
                     stage("AppTests") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
