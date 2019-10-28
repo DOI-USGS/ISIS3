@@ -81,7 +81,7 @@ node("${env.OS.toLowerCase()}") {
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
                         sh 'pwd'
-                        python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
+                        python /isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
                     """
                 }
             }
