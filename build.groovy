@@ -8,7 +8,7 @@ def isisTestDataPath = "/isisData/testData"
 
 def isisEnv = [
     "ISIS3DATA=${isisDataPath}",
-    "ISIS3TESTDATA=${isisTestDataPath}"
+    "ISIS3TESTDATA=${isisTestDataPath}",
     "ISIS3MGRSCRIPTS=${isisMgrScripts}"
 ]
 
