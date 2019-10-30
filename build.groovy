@@ -2,11 +2,14 @@
 
 def isisDataPath = '/isisData/data'
 
+def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
+
 def isisTestDataPath = "/isisData/testData"
 
 def isisEnv = [
     "ISIS3DATA=${isisDataPath}",
     "ISIS3TESTDATA=${isisTestDataPath}"
+    "ISIS3MGRSCRIPTS=${isisMgrScripts}"
 ]
 
 def cmakeFlags = [
@@ -96,9 +99,10 @@ node("${env.OS.toLowerCase()}") {
                     stage("UnitTests") {
                         dir("ISIS3") {
                             dir("build") {
+                            env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                 sh """
                                     source activate isis
-                                    source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                                    source /isisData/data/isis3mgr_scripts/initIsisCmake.sh .
                                     ctest -R _unit_ -j4 -VV
                                 """
                             }
@@ -115,7 +119,7 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
                         sh """
                             source activate isis
-                            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                            source /isisData/data/isis3mgr_scripts/initIsisCmake.sh .
                             ctest -R _app_ -j4 -VV
                         """
                     }
@@ -131,7 +135,7 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running module tests on ${env.OS}"
                         sh """
                             source activate isis
-                            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                            source /isisData/data/isis3mgr_scripts/nitIsisCmake.sh .
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -147,7 +151,7 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running gtests on ${env.OS}"
                         sh """
                             source activate isis
-                            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
+                            source /isisData/data/isis3mgr_scripts/initIsisCmake.sh .
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
