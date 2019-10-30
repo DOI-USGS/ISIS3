@@ -5,7 +5,7 @@
 
 using namespace Isis;
 
-class Type : public testing::TestWithParam<Column::Type> {
+class Types : public testing::TestWithParam<Column::Type> {
 };
 
 class TypeError : public testing::TestWithParam<Column::Type> {
@@ -39,35 +39,35 @@ TEST(Column, InitConstructor) {
   EXPECT_EQ(column.DataType(), Column::Pixel);
 }
 
-//Tests SetName function
-TEST(Column, SetName) {
+//Tests SetName & Name functions
+TEST(Column, Name) {
   Column column;
   column.SetName("Test Column");
 
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, column.Name(), QString("Test Column"));
 }
 
-//Tests SetWidth function
-TEST(Column, SetWidth) {
+//Tests SetWidth & Width functions
+TEST(Column, Width) {
   Column column;
   column.SetWidth(100);
 
   EXPECT_DOUBLE_EQ(column.Width(), 100);
 }
 
-//Tests SetType function with every member of the Type enum
-TEST_P(Type, SetType) {
+//Tests SetType & DataType functions with every member of the Type enum
+TEST_P(Types, Type) {
   Column column;
   column.SetType(GetParam());
 
   EXPECT_EQ(column.DataType(), GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(Column, Type, ::testing::Values(
+INSTANTIATE_TEST_CASE_P(Column, Types, ::testing::Values(
   Column::NoType, Column::Integer, Column::Real, Column::String, Column::Pixel));
 
-//Tests SetAlignment function with every member of the Align enum
-TEST_P(Align, SetAlignment) {
+//Tests SetAlignment & Alignment functions with every member of the Align enum
+TEST_P(Align, Alignment) {
   Column column;
   column.SetAlignment(GetParam());
 
@@ -77,9 +77,9 @@ TEST_P(Align, SetAlignment) {
 INSTANTIATE_TEST_CASE_P(Column, Align, ::testing::Values(
   Column::NoAlign, Column::Right, Column::Left, Column::Decimal));
 
-//Tests SetPrecision function with Real type and Pixel type.
+//Tests SetPrecision & Precision functions with Real type and Pixel type.
 //These are the only two types expected to work with SetPrecision
-TEST(Column, SetPrecision) {
+TEST(Column, Precision) {
   Column column;
   column.SetType(Column::Real);
   column.SetPrecision(10);
@@ -88,47 +88,6 @@ TEST(Column, SetPrecision) {
   column.SetType(Column::Pixel);
   column.SetPrecision(15);
   EXPECT_DOUBLE_EQ(column.Precision(), 15);
-}
-
-//Tests Name getter function
-TEST(Column, Name) {
-  Column column;
-  column.SetName("Test Column");
-
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, column.Name(), QString("Test Column"));
-}
-
-//Tests width getter function
-TEST(Column, Width) {
-  Column column;
-  column.SetWidth(15);
-
-  EXPECT_DOUBLE_EQ(column.Width(), 15);
-}
-
-//Tests DataType getter function
-TEST(Column, DataType) {
-  Column column;
-  column.SetType(Column::Pixel);
-
-  EXPECT_EQ(column.DataType(), Column::Pixel);
-}
-
-//Tests Alignment getter function
-TEST(Column, Alignment) {
-  Column column;
-  column.SetAlignment(Column::Left);
-
-  EXPECT_EQ(column.Alignment(), Column::Left);
-}
-
-//Tests Precision getter function
-TEST(Column, Precision) {
-  Column column;
-  column.SetType(Column::Real);
-  column.SetPrecision(100);
-
-  EXPECT_DOUBLE_EQ(column.Precision(), 100);
 }
 
 //Tests that SetName's exceptions are working correctly
