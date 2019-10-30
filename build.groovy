@@ -97,7 +97,7 @@ node("${env.OS.toLowerCase()}") {
                         dir("ISIS3") {
                             dir("build") {
                                 sh """
-                                    source activate testEnvCentos
+                                    source activate isis
                                     source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                                     ctest -R _unit_ -j4 -VV
                                 """
@@ -115,6 +115,7 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
                         sh """
                             source activate isis
+                            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                             ctest -R _app_ -j4 -VV
                         """
                     }
@@ -130,6 +131,7 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running module tests on ${env.OS}"
                         sh """
                             source activate isis
+                            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -145,6 +147,7 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running gtests on ${env.OS}"
                         sh """
                             source activate isis
+                            source /usgs/cpkgs/isis3/isis3mgr_scripts/initIsisCmake.sh .
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
