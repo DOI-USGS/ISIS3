@@ -102,7 +102,12 @@ node("${env.OS.toLowerCase()}") {
                             env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                 sh """
                                     source activate isis
-                                    source /isisData/data/isis3mgr_scripts/initIsisCmake.sh .
+                                    echo $ISIS3TESTDATA
+                                    echo $ISIS3DATA
+                                    # environment variables
+                                    export ISISROOT=`pwd`
+                                    export ISIS3TESTDATA="/isisData/testData"
+                                    export ISIS3DATA='/isisData/data'
                                     ctest -R _unit_ -j4 -VV
                                 """
                             }
@@ -119,7 +124,12 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running app tests on ${env.OS}"
                         sh """
                             source activate isis
-                            source /isisData/data/isis3mgr_scripts/initIsisCmake.sh .
+                            echo $ISIS3TESTDATA
+                            echo $ISIS3DATA
+                            # environment variables
+                            export ISISROOT=`pwd`
+                            export ISIS3TESTDATA="/isisData/testData"
+                            export ISIS3DATA='/isisData/data'
                             ctest -R _app_ -j4 -VV
                         """
                     }
@@ -135,7 +145,12 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running module tests on ${env.OS}"
                         sh """
                             source activate isis
-                            source /isisData/data/isis3mgr_scripts/nitIsisCmake.sh .
+                            echo $ISIS3TESTDATA
+                            echo $ISIS3DATA
+                            # environment variables
+                            export ISISROOT=`pwd`
+                            export ISIS3TESTDATA="/isisData/testData"
+                            export ISIS3DATA='/isisData/data'
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -151,7 +166,12 @@ node("${env.OS.toLowerCase()}") {
                         env.STAGE_STATUS = "Running gtests on ${env.OS}"
                         sh """
                             source activate isis
-                            source /isisData/data/isis3mgr_scripts/initIsisCmake.sh .
+                            echo $ISIS3TESTDATA
+                            echo $ISIS3DATA
+                            # environment variables
+                            export ISISROOT=`pwd`
+                            export ISIS3TESTDATA="/isisData/testData"
+                            export ISIS3DATA='/isisData/data'
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
