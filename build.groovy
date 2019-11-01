@@ -104,10 +104,15 @@ node("${env.OS.toLowerCase()}") {
                                     source activate isis
                                     echo $ISIS3TESTDATA
                                     echo $ISIS3DATA
+                                    which catlab
+
                                     # environment variables
                                     export ISISROOT=`pwd`
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
+                                    export PATH=$PWD/bin:$PATH
+                                    which catlab
+
                                     ctest -R _unit_ -j4 -VV
                                 """
                             }
@@ -126,10 +131,15 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            which catlab
+
                             # environment variables
                             export ISISROOT=`pwd`
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
+                            export PATH=$PWD/bin:$PATH
+                            which catlab
+
                             ctest -R _app_ -j4 -VV
                         """
                     }
@@ -147,10 +157,14 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            which catlab
+
                             # environment variables
                             export ISISROOT=`pwd`
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
+                            export PATH=$PWD/bin:$PATH
+                            which catlab
                             ctest -R _module_ -j4 -VV
                         """
                     }
@@ -168,10 +182,14 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            which catlab
+
                             # environment variables
                             export ISISROOT=`pwd`
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
+                            export PATH=$PWD/bin:$PATH
+                            which catlab
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                         """
                     }
