@@ -35,7 +35,9 @@ The webhook is now working on the new publicly accessible Jenkins server. This u
 ## Multibranch Instructions
 
 Setup Branches:
-1. Navigate to https://astroservices.usgs.gov/jenkins/job/USGS-Astrogeology/configure and login. Once you are here:
+1. Copy the Jenkinsfile and build.groovy files into your branch from https://github.com/USGS-Astrogeology/ISIS3/tree/jenkins and push them, these are both required as Jenkins uses them both. 
+
+2. Navigate to https://astroservices.usgs.gov/jenkins/job/USGS-Astrogeology/configure and login. Once you are here:
  <b> Include your branch in builds
  - Navigate to "Projects" box
  - In the "Behaviors" section find the section "Filter by name (with wildcards)"
