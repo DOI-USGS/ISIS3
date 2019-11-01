@@ -81,7 +81,6 @@ node("${env.OS.toLowerCase()}") {
                     env.STAGE_STATUS = "Building ISIS on ${env.OS}"
                     sh """
                         source activate isis
-                        cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${env.CONDA_PREFIX}")
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
                         python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
