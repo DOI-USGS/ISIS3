@@ -104,7 +104,6 @@ node("${env.OS.toLowerCase()}") {
                                     source activate isis
                                     echo $ISIS3TESTDATA
                                     echo $ISIS3DATA
-                                    which catlab
 
                                     # environment variables
                                     export ISISROOT=`pwd`
@@ -132,7 +131,6 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
-                            which catlab
 
                             # environment variables
                             export ISISROOT=`pwd`
@@ -160,7 +158,6 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
-                            which catlab
 
                             # environment variables
                             export ISISROOT=`pwd`
@@ -187,7 +184,6 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
-                            which catlab
 
                             # environment variables
                             export ISISROOT=`pwd`
