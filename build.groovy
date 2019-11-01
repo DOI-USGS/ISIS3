@@ -16,6 +16,7 @@ def cmakeFlags = [
     "-DJP2KFLAG=OFF",
     "-Dpybindings=OFF",
     "-DCMAKE_BUILD_TYPE=RELEASE"
+    "-DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX"
 ]
 
 def build_ok = true
@@ -55,7 +56,7 @@ node("${env.OS.toLowerCase()}") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
         isisEnv.add("ISISROOT=${pwd()}/build")
-        cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+        // cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
     }
 
     stage("Create environment") {
@@ -110,10 +111,11 @@ node("${env.OS.toLowerCase()}") {
                                     export ISISROOT=`pwd`
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
-                                    export PATH=$PWD/bin:$PATH
+                                    export PATH=`pwd`/bin:$PATH
                                     which catlab
 
                                     ctest -R _unit_ -j4 -VV
+                                    source deactivate
                                 """
                             }
                         }
@@ -137,10 +139,12 @@ node("${env.OS.toLowerCase()}") {
                             export ISISROOT=`pwd`
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=$PWD/bin:$PATH
+                            export PATH=`pwd`/bin:$PATH
                             which catlab
 
                             ctest -R _app_ -j4 -VV
+                            source deactivate
+
                         """
                     }
                 }
@@ -163,9 +167,11 @@ node("${env.OS.toLowerCase()}") {
                             export ISISROOT=`pwd`
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=$PWD/bin:$PATH
+                            export PATH=`pwd`/bin:$PATH
                             which catlab
                             ctest -R _module_ -j4 -VV
+                            source deactivate
+
                         """
                     }
                 }
@@ -188,9 +194,12 @@ node("${env.OS.toLowerCase()}") {
                             export ISISROOT=`pwd`
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=$PWD/bin:$PATH
+                            export PATH=`pwd`/bin:$PATH
                             which catlab
+
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
+                            source deactivate
+
                         """
                     }
                 }
