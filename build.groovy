@@ -15,7 +15,7 @@ def isisEnv = [
 def cmakeFlags = [
     "-DJP2KFLAG=OFF",
     "-Dpybindings=OFF",
-    "-DCMAKE_BUILD_TYPE=RELEASE"
+    "-DCMAKE_BUILD_TYPE=RELEASE",
     "-DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX"
 ]
 
