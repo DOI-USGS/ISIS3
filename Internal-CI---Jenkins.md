@@ -29,4 +29,42 @@ As of 5.16.19: The jenkins repository has been restructured so that each contain
 The containers all mount the standard path to the ISIS3 test data area. The `ISISROOT` is set to the current build directory inside of the checked out repo.
 
 ## Webhook
-5.13.19 - The web hook is currently a work in progress.
+<b> New Jenkins URL: </b> https://astroservices.usgs.gov/jenkins/
+The webhook is now working on the new publicly accessible Jenkins server. This updates on pull requests and on push to ISIS branches that are specified.
+
+## Multibranch Instructions
+
+Setup Branches:
+1. Navigate to https://astroservices.usgs.gov/jenkins/job/USGS-Astrogeology/configure and login. Once you are here:
+ <b> Include your branch in builds
+ - Navigate to "Projects" box
+ - In the "Behaviors" section find the section "Filter by name (with wildcards)"
+ - In the text box enter your branch at the end (it is space separated)
+ - Done!
+
+ <b> Include your branch in webhook
+ - Navigate to "Automatic branch project triggering" box
+ - In the "Branch names to build automatically" section
+ - Enter your branch into this box which is seperated by vertical bars (ex. branch1|branch2)
+ - You are now configured with the webhook.
+
+2. Navigate to each of the OS Jenkins Configurations:
+   - https://astroservices.usgs.gov/jenkins/job/ISIS-Builds/job/CentOS/configure
+   - https://astroservices.usgs.gov/jenkins/job/ISIS-Builds/job/Fedora/configure
+   - https://astroservices.usgs.gov/jenkins/job/ISIS-Builds/job/Ubuntu/configure
+   - For each OS:
+     1. Navigate to the Pipeline sections
+     2. Find "Branches to build"
+     3. Click the button "Add Branch"
+     4. In the new Branch Specifier Box, enter the name of your branch
+     5. You are all set to run jobs!
+
+<b> NOTE: </b> We can have this done automatically in the future, with any branch that has a Jenkinsfile in it, but as of now every branch has a Jenkinsfile, so therefore it will trigger every branch.
+
+The flow for the multibranch is as follows:
+
+1. When you build from https://astroservices.usgs.gov/jenkins/job/USGS-Astrogeology/job/ISIS3/ this will spawn three parallel jobs one for each OS currently: centOS, Fedora, and Ubuntu. Pushing or PR should trigger this automatically.
+
+2. You can then check the status of each individual OS build at: https://astroservices.usgs.gov/jenkins/job/ISIS-Builds/
+
+3. On these builds it uses the 'build.groovy' script so to make changes, you must make changes to that script.
