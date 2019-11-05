@@ -57,32 +57,11 @@ void IsisMain() {
     int MCP = label->findGroup("Instrument", Pvl::Traverse)["MCPGainModeID"];
     // Two possible MCP gains for filter A
     if(wave == "A") {
-      if(MCP == 156) {
-        abscoef = 0.00105;
-      }
-      else if(MCP == 159) {
-        abscoef = 0.00089;
-      }
-      else {
-        QString message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
-        throw IException(IException::Unknown, message, _FILEINFO_);
-      }
+        abscoef = ((-5.33333333333333 * pow(10, -5) * MCP) + 0.00937);
     }
     // Three possiblities for filter D
     else if(wave == "D") {
-      if(MCP == 151) {
-        abscoef = 0.001655;
-      }
-      else if(MCP == 154) {
-        abscoef = 0.001375;
-      }
-      else if(MCP == 158) {
-        abscoef = 0.00097;
-      }
-      else {
-        QString message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
-        throw IException(IException::User, message, _FILEINFO_);
-      }
+        abscoef = ((-9.75301204819275 * pow(10, -5) * MCP) + 0.0163866265);
     }
     // Other filters not supported for preset K value
     else {
