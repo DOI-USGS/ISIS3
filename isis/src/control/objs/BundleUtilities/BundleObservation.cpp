@@ -1272,32 +1272,35 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
         correctionUnitListRA,correctionUnitListDEC,correctionUnitListTWI,
         correctionUnitList;
 
-    QString str("%1(%2)");
-    int padding = -4;
+    QString str("%1(%2)  ");
+    QString str2("%1(%2) ");
+    QString strN("%1(%2)");
+
 
     if (nPositionCoefficients > 0) {
       for (int j = 0; j < nPositionCoefficients;j++) {
         if (j == 0) {
-          parameterNamesListX.append(str.arg("X", padding - 2).arg("km"));
-          parameterNamesListY.append(str.arg("Y", padding - 2).arg("km"));
-          parameterNamesListZ.append(str.arg("Z", padding - 2 ).arg("km"));
+          parameterNamesListX.append(str.arg("  X  ").arg("km"));
+          parameterNamesListY.append(str.arg("  Y  ").arg("km"));
+          parameterNamesListZ.append(str.arg("  Z  ").arg("km"));
           correctionUnitListX.append("m");
           correctionUnitListY.append("m");
           correctionUnitListZ.append("m");
         } //end inner-if
 
         else if (j==1) {
-          parameterNamesListX.append( str.arg("", padding - 1).arg("km/s") );
-          parameterNamesListY.append( str.arg("", padding - 1).arg("km/s") );
-          parameterNamesListZ.append( str.arg("", padding - 1).arg("km/s") );
+          parameterNamesListX.append( str2.arg("    ").arg("km/s") );
+          parameterNamesListY.append( str2.arg("    ").arg("km/s") );
+          parameterNamesListZ.append( str2.arg("    ").arg("km/s") );
           correctionUnitListX.append("m/s");
           correctionUnitListY.append("m/s");
           correctionUnitListZ.append("m/s");
         }
         else {
-          parameterNamesListX.append(str.arg("", padding).arg("km/s^"+toString(j) ));
-          parameterNamesListY.append(str.arg("", padding).arg("km/s^"+toString(j) ));
-          parameterNamesListZ.append(str.arg("", padding).arg("km/s^"+toString(j) ));
+          QString str("%1(%2)");
+          parameterNamesListX.append(strN.arg("   ").arg("km/s^"+toString(j) ) );
+          parameterNamesListY.append(strN.arg("   ").arg("km/s^"+toString(j) ) );
+          parameterNamesListZ.append(strN.arg("   ").arg("km/s^"+toString(j) ) );
           correctionUnitListX.append("m/s^"+toString(j));
           correctionUnitListY.append("m/s^"+toString(j));
           correctionUnitListZ.append("m/s^"+toString(j));
@@ -1308,26 +1311,26 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
     if (nPointingCoefficients > 0) {
       for (int j = 0; j < nPointingCoefficients;j++) {
         if (j == 0) {
-          parameterNamesListRA.append(str.arg("RA", padding - 2).arg("dd"));
-          parameterNamesListDEC.append(str.arg("DEC", padding - 2).arg("dd"));
-          parameterNamesListTWI.append(str.arg("TWI", padding - 2).arg("dd"));
+          parameterNamesListRA.append(str.arg(" RA  ").arg("dd"));
+          parameterNamesListDEC.append(str.arg("DEC  ").arg("dd"));
+          parameterNamesListTWI.append(str.arg("TWI  ").arg("dd"));
           correctionUnitListRA.append("dd");
           correctionUnitListDEC.append("dd");
           correctionUnitListTWI.append("dd");
         } //end inner-if
 
         else if (j==1) {
-          parameterNamesListRA.append( str.arg("", padding - 1).arg("dd/s") );
-          parameterNamesListDEC.append( str.arg("", padding - 1).arg("dd/s") );
-          parameterNamesListTWI.append( str.arg("", padding - 1).arg("dd/s") );
+          parameterNamesListRA.append( str2.arg("    ").arg("dd/s") );
+          parameterNamesListDEC.append( str2.arg("    ").arg("dd/s") );
+          parameterNamesListTWI.append( str2.arg("    ").arg("dd/s") );
           correctionUnitListRA.append("dd/s");
           correctionUnitListDEC.append("dd/s");
           correctionUnitListTWI.append("dd/s");
         }
         else {
-          parameterNamesListRA.append(str.arg("", padding).arg("dd/s^"+toString(j)) );
-          parameterNamesListDEC.append(str.arg("", padding).arg("dd/s^"+toString(j)) );
-          parameterNamesListTWI.append(str.arg("", padding).arg("dd/s^"+toString(j)) );
+          parameterNamesListRA.append(strN.arg("   ").arg("dd/s^"+toString(j) ) );
+          parameterNamesListDEC.append(strN.arg("   ").arg("dd/s^"+toString(j) ) );
+          parameterNamesListTWI.append(strN.arg("   ").arg("dd/s^"+toString(j) ) );
           correctionUnitListRA.append("dd/s^"+toString(j));
           correctionUnitListDEC.append("dd/s^"+toString(j));
           correctionUnitListTWI.append("dd/s^"+toString(j));
@@ -1379,7 +1382,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       fpOut << buf;
       sprintf(buf,"            ");
       fpOut << buf;
-      sprintf(buf,"%.8s",sigma.toStdString().c_str());
+      sprintf(buf,"%6s",sigma.toStdString().c_str());
       fpOut << buf;
       sprintf(buf,"            ");
       fpOut << buf;
@@ -1440,7 +1443,7 @@ QString BundleObservation::formatBundleOutputString(bool errorPropagation, bool 
       fpOut << buf;
       sprintf(buf,"            ");
       fpOut << buf;
-      sprintf(buf,"%.8s",sigma.toStdString().c_str());
+      sprintf(buf,"%6s",sigma.toStdString().c_str());
       fpOut << buf;
       sprintf(buf,"            ");
       fpOut << buf;
