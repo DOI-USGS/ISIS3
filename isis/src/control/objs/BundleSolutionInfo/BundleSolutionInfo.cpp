@@ -1042,6 +1042,8 @@ namespace Isis {
       }
     }
 
+    // Loop over the observations to find the longest file path/name in the
+    // bunch
     int filePadding = 0;
 
     for (int i = 0; i < numObservations; i++) {
@@ -1052,17 +1054,22 @@ namespace Isis {
       }
     }
 
-    int headerPadding = 11;
-    int labelPadding = 74;
-
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
+
+    // Pad each element in the table with the space for the longest image
+    // path/name then padd it the length of the element + 1
     QString header("Measures                            RMS(pixels)");
-    sprintf(buf,"%*s\n", header.length() + headerPadding + filePadding, header.toLatin1().data());
+    // This is padded by an extra 11 to move it center to the table
+    sprintf(buf,"%*s\n", header.length() + 11 + filePadding, header.toLatin1().data());
     fpOut << buf;
-    sprintf(buf,"%*s\n", labelPadding + filePadding, "***************************   *******************************************");
+
+    QString dividers("***************************   *******************************************");
+    sprintf(buf,"%*s\n", dividers.length() + 1 + filePadding, dividers.toLatin1().data());
     fpOut << buf;
-    sprintf(buf,"%*s\n", labelPadding + filePadding, "|  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |");
+
+    QString fields("|  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |");
+    sprintf(buf,"%*s\n", fields.length() + 1 + filePadding, fields.toLatin1().data());
     fpOut << buf;
 
     int numMeasures;
@@ -1101,7 +1108,6 @@ namespace Isis {
         QStringList List;
         List = filename.split("/");
 
-        // sprintf(buf,"%-*s" ,filePadding + 1, List.at(List.size() - 1).toLatin1().data());
         sprintf(buf,"%-*s" ,filePadding + 1, bundleImage->fileName().toLatin1().data());
         fpOut << buf;
 
@@ -1116,6 +1122,8 @@ namespace Isis {
       }
     }
 
+    // Do something similar to above but left justify the string and add a 33
+    // character buffer
     sprintf(buf,"%*s", -(filePadding + 33), "\nTotal RMS:");
     fpOut << buf;
     sprintf(buf,"%13.4lf %13.4lf %13.4lf\n",
