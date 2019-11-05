@@ -1042,16 +1042,27 @@ namespace Isis {
       }
     }
 
+    int filePadding = 0;
+
+    for (int i = 0; i < numObservations; i++) {
+      BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(0);
+
+      if (bundleImage->fileName().length() > filePadding) {
+        filePadding = bundleImage->fileName().length();
+      }
+    }
+
+    int headerPadding = 11;
+    int labelPadding = 74;
+
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
-    sprintf(buf,"                                      Measures                        RMS(pixels)\n");
+    QString header("Measures                            RMS(pixels)");
+    sprintf(buf,"%*s\n", header.length() + headerPadding + filePadding, header.toLatin1().data());
     fpOut << buf;
-    sprintf(buf,"                              ************************  "
-                "**************************************\n");
+    sprintf(buf,"%*s\n", labelPadding + filePadding, "***************************   *******************************************");
     fpOut << buf;
-
-    sprintf(buf,"                              |Accepted    |    Total|   |Samples    |    "
-                "Lines    |    Total|\n");
+    sprintf(buf,"%*s\n", labelPadding + filePadding, "|  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |");
     fpOut << buf;
 
     int numMeasures;
@@ -1086,13 +1097,18 @@ namespace Isis {
 
         numUsed = numMeasures - numRejectedMeasures;
 
-        sprintf(buf,"%30s" ,bundleImage->fileName().toLatin1().data());
+        QString filename = bundleImage->fileName();
+        QStringList List;
+        List = filename.split("/");
+
+        // sprintf(buf,"%-*s" ,filePadding + 1, List.at(List.size() - 1).toLatin1().data());
+        sprintf(buf,"%-*s" ,filePadding + 1, bundleImage->fileName().toLatin1().data());
         fpOut << buf;
 
-        sprintf(buf,"%5d            %5d      ",numUsed,numMeasures);
+        sprintf(buf, " %12d %12d     ", numUsed, numMeasures);
         fpOut << buf;
 
-        sprintf(buf,"%-15.4lf%-15.4lf%-15.4lf \n",
+        sprintf(buf,"%13.4lf %13.4lf %13.4lf \n",
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
 
         fpOut << buf;
@@ -1100,11 +1116,9 @@ namespace Isis {
       }
     }
 
-    sprintf(buf,"\nTotal RMS:");
+    sprintf(buf,"%*s", -(filePadding + 33), "\nTotal RMS:");
     fpOut << buf;
-    sprintf(buf,"                                                ");
-    fpOut << buf;
-    sprintf(buf,"%-15.4lf%-15.4lf%-15.4lf\n",
+    sprintf(buf,"%13.4lf %13.4lf %13.4lf\n",
     rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
     fpOut << buf;
 
