@@ -9,13 +9,16 @@
       camera. It does so through the use of some constants based on offset and
       flat images based on filter type. There are six possible offsets, with the
       resultant change being anywhere between eight and fifty to the DN. There
-      are four flat images, one for each of the four possible filters. 
-      Information for this program came from JGR Vol 108, A radiometric 
+      are four flat images, one for each of the four possible filters.
+      Information for this program came from JGR Vol 108, A radiometric
       calibration for the Clementine Hires camera: Robinson, Malaret, White.
   </description>
   <history>
     <change name="Mackenzie Boyd" date="2009-08-03">
       Original version
+    </change>
+    <change name="Austin Sanders" date="2019-11-06">
+      Replaced lookup tables with calibration equations.
     </change>
   </history>
 
@@ -110,7 +113,7 @@
         </brief>
         <description>
             The K value is the absolute coefficient per wavelength and MCP gain
-            state. This is an average of several possible K values, the default 
+            state. This is an average of several possible K values, the default
             should not be used when possible as it is an average.
         </description>
       </parameter>
