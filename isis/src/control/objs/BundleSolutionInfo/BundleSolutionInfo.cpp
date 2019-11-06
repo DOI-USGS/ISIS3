@@ -1047,10 +1047,15 @@ namespace Isis {
     int filePadding = 0;
 
     for (int i = 0; i < numObservations; i++) {
-      BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(0);
 
-      if (bundleImage->fileName().length() > filePadding) {
-        filePadding = bundleImage->fileName().length();
+      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+
+      for (int j = 0; j < numImagesInObservation; j++) {
+        BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
+
+        if (bundleImage->fileName().length() > filePadding) {
+          filePadding = bundleImage->fileName().length();
+        }
       }
     }
 
