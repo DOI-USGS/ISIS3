@@ -44,7 +44,7 @@ namespace Isis {
         Latitude startLat;
         Latitude endLat;
 
-      if (mappingGroup["LongitudeDirection"][0] == "PositiveWest") {
+      if (tproj->IsPositiveWest()) {
         Longitude temp = lonMin;
         lonMin = lonMax;
         lonMax = temp;
@@ -195,7 +195,7 @@ namespace Isis {
               double y = 0;
               
               bool valid;
-              if (mappingGroup["LongitudeDirection"][0] == "PositiveWest") {
+              if (tproj->IsPositiveWest()) {
                 valid = tproj->SetGround(lat.degrees(), lon.positiveWest(Angle::Degrees));
               }
               else {
@@ -291,7 +291,7 @@ namespace Isis {
               double y = 0;
                 
               bool valid;
-              if (mappingGroup["LongitudeDirection"][0] == "PositiveWest") {
+              if (tproj->IsPositiveWest()) {
                 valid = tproj->SetGround(lat.degrees(), lon.positiveWest(Angle::Degrees));
               }
               else {
