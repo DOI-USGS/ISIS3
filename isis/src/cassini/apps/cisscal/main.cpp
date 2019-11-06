@@ -121,9 +121,6 @@ void IsisMain() {
   // instead the bitweightCorrected vector is used as the initial values before
   // the rest of the calibration steps are performed.
   gbl::incube = secondpass.SetInputCube("FROM"); // Calibrate() parameter in[0]
-  // we need to set output cube at the beginning of the program to check right
-  // away for CubeCustomization IsisPreference and throw an error, if necessary.
-  Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
 
   // resize 2dimensional vectors
   gbl::bitweightCorrected.resize(gbl::incube->sampleCount());
@@ -208,6 +205,10 @@ void IsisMain() {
                      _FILEINFO_);
   }
 
+  // we need to set output cube at the beginning of the program to check right
+  // away for CubeCustomization IsisPreference and throw an error, if necessary.
+  Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
+
   //Linearity Correction
   gbl::Linearize();
 
@@ -272,7 +273,7 @@ void IsisMain() {
  *            check for ShutterStateId, and if it is Disabled,
  *            do not subtract an offset from the exposure time.
  *            Added Sensitivity vs Time Correction after
- *            correction factors. 
+ *            correction factors.
  *            Matches cisscal version 3.9.1.
  */
 void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
@@ -1315,7 +1316,7 @@ void gbl::FindShutterOffset() {
  * @internal
  *   @history 2008-11-05 Jeannie Walldren - Original version
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
- *            ShutterStateId. Updated solid angle and optics 
+ *            ShutterStateId. Updated solid angle and optics
  *            area values. Matches cisscal version 3.9.1.
  */
 void gbl::DivideByAreaPixel() {
@@ -1333,8 +1334,8 @@ void gbl::DivideByAreaPixel() {
   //  OpticsArea is (Diameter of Primary Mirror)^2 * Pi/4
   //      Optics areas below come from radii in "Final Report, Design
   //      and Analysis of Filters for the Cassini Narrow and Wide
-  //      Optics" by David Hasenauer, May 19, 1994.  
-     
+  //      Optics" by David Hasenauer, May 19, 1994.
+
   //  We will adjust here for the effects of SUM modes
   //  (which effectively give pixels of 4 or 16 times normal size)
 
