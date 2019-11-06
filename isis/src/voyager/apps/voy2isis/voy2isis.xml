@@ -65,7 +65,7 @@
     </change>
     <change name="Kristin Berry" date="2019-11-06">
       Added the INSTRUMENT parameter to allow the specification of the InstrumentId 
-      when it cannot be determined from the labels. 
+      when it cannot be determined from the labels. Fixed #3426
     </change>
   </history>
 
