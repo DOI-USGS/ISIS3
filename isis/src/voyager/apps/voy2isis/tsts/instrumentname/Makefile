@@ -1,3 +1,4 @@
+# history - Added to test the instrument option. 
 APPNAME = voy2isis
 
 include $(ISISROOT)/make/isismake.tsts

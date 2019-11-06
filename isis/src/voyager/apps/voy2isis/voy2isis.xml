@@ -7,17 +7,20 @@
   </brief>
 
   <description>
+      <p>
     This program will take in raw image files from the Voyager spacecraft
     mission and import them into Isis formatted cubes.  The input files are
     compressed Planetary Data System (PDS) formatted Voyager Experiment 
     Data Record (EDR) files.  The output cube will contain tranlated labels in 
     pvl format with instrument, archive, bandbin, kernel, and nominal reseau 
     information.
-
+      </p>
+      <p>
     Some input images from the PDS archive may be missing a value for INSTRUMENT_NAME in their header.
-    For these images, the name of the instrument can be specified as NARROW_ANGLE_CAMERA 
-    (NAC) or WIDE_ANGLE_CAMERA (WAC) using the optional INSTRUMENT parameter. 
+    For these images, the name of the instrument can be specified as NAC (NARROW_ANGLE_CAMERA)
+     or WAC (WIDE_ANGLE_CAMERA) using the optional INSTRUMENT parameter. 
     Users are encouraged to find this information in the pds data volume index.tab file.
+      </p>
   </description>
 
   <history>
