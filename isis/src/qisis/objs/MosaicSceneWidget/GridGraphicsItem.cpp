@@ -43,8 +43,12 @@ namespace Isis {
         Latitude maxLat;
         Latitude startLat;
         Latitude endLat;
+      
 
       if (tproj->IsPositiveWest()) {
+        // GridGraphicsItem is written assuming positive east 
+        // for all angles. On positive West, lons come in swapped so we 
+        // need to account for this.
         Longitude temp = lonMin;
         lonMin = lonMax;
         lonMax = temp;
@@ -195,6 +199,9 @@ namespace Isis {
               double y = 0;
               
               bool valid;
+
+              // Set ground according to lon direction to get correct X,Y values 
+              // when drawing lines. 
               if (tproj->IsPositiveWest()) {
                 valid = tproj->SetGround(lat.degrees(), lon.positiveWest(Angle::Degrees));
               }
@@ -289,7 +296,9 @@ namespace Isis {
             while (!atMaxLat) {
               double x = 0;
               double y = 0;
-                
+              
+              // Set ground according to lon direction to get correct X,Y values 
+              // when drawing lines.  
               bool valid;
               if (tproj->IsPositiveWest()) {
                 valid = tproj->SetGround(lat.degrees(), lon.positiveWest(Angle::Degrees));
