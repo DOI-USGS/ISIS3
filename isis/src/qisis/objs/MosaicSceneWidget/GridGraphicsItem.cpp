@@ -48,8 +48,6 @@ namespace Isis {
         Longitude temp = lonMin;
         lonMin = lonMax;
         lonMax = temp;
-        //lonMin.setPositiveWest(-1*lonMin.positiveWest(Angle::Degrees), Angle::Degrees);
-        //lonMax.setPositiveWest(-1*lonMax.positiveWest(Angle::Degrees), Angle::Degrees);
       }
       
       if (mappingGroup["LatitudeType"][0] == "Planetographic") {
@@ -195,7 +193,6 @@ namespace Isis {
 
               double x = 0;
               double y = 0;
-
               
               bool valid;
               if (mappingGroup["LongitudeDirection"][0] == "PositiveWest") {
