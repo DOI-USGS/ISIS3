@@ -48,22 +48,25 @@ void IsisMain() {
   double dataOffset[] = { -49.172, -41.0799, -32.8988, -24.718, -16.98, -8.0};
   offset = dataOffset[index];
 
-  // Computer the K value to convert to I/F.  The K value per MCP and wavelength
-  // were obtained from JGR publication Vol 108, A radiometric calibration for the
-  // Clementine HIRES camera: Robinson, Malart, White, page 17
+  // Compute the K value to convert to I/F. The functions for K value per MCP
+  //  gain state and filter are based on Robinson, M. S., Malaret, E.,
+  //  and White, T. ( 2003), A radiometric calibration for the Clementine HIRES
+  //  camera, J. Geophys. Res., 108, 5028, doi:10.1029/2000JE001241, E4.
+  //  The functions were determined by fitting a line to the data in Table 5 (A filter)
+  //  or Table 6 (D filter) of Robinson et al., as described on page 11.
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("KFROM").compare("COMPUTED") == 0) {
     wave = wave.toUpper();
     int MCP = label->findGroup("Instrument", Pvl::Traverse)["MCPGainModeID"];
-    // Two possible MCP gains for filter A
+    // Linear fit of values in Table 5
     if(wave == "A") {
         abscoef = ((-5.33333333333333 * pow(10, -5) * MCP) + 0.00937);
     }
-    // Three possiblities for filter D
+    // Linear fit of values in Table 6
     else if(wave == "D") {
         abscoef = ((-9.75301204819275 * pow(10, -5) * MCP) + 0.0163866265);
     }
-    // Other filters not supported for preset K value
+    // Other filters not supported for calculated K value
     else {
       QString message = "Image is of filter [" + wave + "], not supported type A or D, enter your own K value";
       throw IException(IException::User, message, _FILEINFO_);
