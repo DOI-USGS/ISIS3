@@ -51,15 +51,31 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output
     // "Latitude off by: " and "Longitude off by: " values directly into these variables.
-    double knownLat = 58.3498029142273396;
-    double knownLon = 311.458498980458671;
+    double knownLat = 58.3524398749999;
+    double knownLon = 311.457363494321;
 
     qDebug() << "Testing TC2 w L2B0 image...";
-    Cube c("$kaguya/testData/TC2W2B0_01_02735N583E3115.cub", "r");
+    Cube c("/home/pgiroux/KaguyaTestCubes/TC2W2B0_01_02735N583E3115.cub", "r");
     KaguyaTcCamera *cam = (KaguyaTcCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
     qDebug() << "";
+
+    // // LAUREN'S TESTING STUFF
+    // double lookDirection[3];
+    // cam->LookDirection(lookDirection);
+    // std::vector<double> lookDirectionJ2000 = cam->lookDirectionJ2000();
+    // std::vector<double> lookDirectionBodyFixed = cam->lookDirectionBodyFixed();
+    // double FocalLength = cam->FocalLength();
+    //
+    // double scale = FocalLength/lookDirection[2];
+    // double calc_bore_x = scale*lookDirection[0];
+    // double calc_bore_y = scale*lookDirection[1];
+    //
+    // qDebug() << calc_bore_x << endl;
+    // qDebug() << calc_bore_y << endl;
+    // // END OF LAUREN'S TESTING STUFF
+
 
     // Test kernel IDs
     qDebug() << "Kernel IDs: ";
@@ -114,10 +130,10 @@ int main(void) {
     qDebug() << "";
     qDebug() << "";
     qDebug() << "Testing TC1 s L2B0 image...";
-    knownLat = -82.0214347373044603;
-    knownLon = 46.4180177580203335;
+    knownLat = -82.0195024182112;
+    knownLon = 46.4153943800818;
 
-    Cube c2("$kaguya/testData/TC1S2B0_01_06691S820E0465.cub", "r");
+    Cube c2("/home/pgiroux/KaguyaTestCubes/TC1S2B0_01_06691S820E0465.cub", "r");
     KaguyaTcCamera *cam2 = (KaguyaTcCamera *) CameraFactory::Create(c2);
     qDebug() << "FileName: " << FileName(c2.fileName()).name();
     qDebug() << "CK Frame: " << cam2->instrumentRotation()->Frame();

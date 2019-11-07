@@ -54,9 +54,8 @@ namespace Isis {
     }
 
     // add boresight x and y to coefficients vector
-    p_odkx.push_back(p_camera->getDouble(boresightkey, 0));
-    p_odky.push_back(p_camera->getDouble(boresightkey, 1));
-
+    p_odkx[0] = p_odkx[0] + p_camera->getDouble(boresightkey, 0);
+    p_odky[0] = p_odky[0] + p_camera->getDouble(boresightkey, 1);
   }
 
 
@@ -114,8 +113,8 @@ namespace Isis {
     double r = qSqrt(r2);
     double r3 = r2 * r;
 
-    double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3 + p_odkx[4]; //add boresight offset
-    double dr_y = p_odky[0] + p_odky[1] * r + p_odky[2] * r2 + p_odky[3] * r3 + p_odky[4]; //add boresight offset
+    double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3; //add boresight offset
+    double dr_y = p_odky[0] + p_odky[1] * r + p_odky[2] * r2 + p_odky[3] * r3; //add boresight offset
 
     p_undistortedFocalPlaneX = x + dr_x;
     p_undistortedFocalPlaneY = y + dr_y;
