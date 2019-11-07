@@ -28,14 +28,14 @@
 #include "KaguyaTcCameraDistortionMap.h"
 
 namespace Isis {
-  /** 
+  /**
    * Kaguya TC Camera distortion map constructor
    *
    * Create a camera distortion map for Kaguya's TC1 and TC2
-   * This class maps between distorted and undistorted 
-   * focal plane x/y's. The default mapping is the identity, that is, 
-   * the focal plane x/y and undistorted focal plane x/y will be 
-   * identical. 
+   * This class maps between distorted and undistorted
+   * focal plane x/y's. The default mapping is the identity, that is,
+   * the focal plane x/y and undistorted focal plane x/y will be
+   * identical.
    *
    * @param parent        the parent camera that will use this distortion map
    * @param zDirection    the direction of the focal plane Z-axis
@@ -46,12 +46,17 @@ namespace Isis {
       : CameraDistortionMap(parent) {
     QString odtxkey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_X";
     QString odtykey = "INS" + toString(naifIkCode) + "_DISTORTION_COEF_Y";
-    
+    QString boresightkey = "INS" + toString(naifIkCode) + "_BORESIGHT";
+
     for(int i = 0; i < 4; ++i) {
       p_odkx.push_back(p_camera->getDouble(odtxkey, i));
       p_odky.push_back(p_camera->getDouble(odtykey, i));
     }
-  }    
+
+    // add boresight x and y to coefficients vector
+    p_odkx[0] = p_odkx[0] + p_camera->getDouble(boresightkey, 0);
+    p_odky[0] = p_odky[0] + p_camera->getDouble(boresightkey, 1);
+  }
 
 
 
@@ -62,7 +67,7 @@ namespace Isis {
   }
 
 
-  /** 
+  /**
    * Compute undistorted focal plane x/y
    *
    * Compute undistorted focal plane x/y given a distorted focal plane x/y.
@@ -71,12 +76,12 @@ namespace Isis {
    * implementation uses a polynomial distortion if the SetDistortion method
    * is invoked.  After calling this method, you can obtain the undistorted
    * x/y via the UndistortedFocalPlaneX and UndistortedFocalPlaneY methods
-   *  
+   *
    * This implements the following distortion correction from the IK for the terrain camera,
    * see: SEL_TC_V01.TI
-   *  
-   * r2 = x^2 + y^2 
-   *  
+   *
+   * r2 = x^2 + y^2
+   *
    * Distortion coefficients information:
    *  INS<INSTID>_DISTORTION_COEF_X  = ( a0, a1, a2, a3)
    *  INS<INSTID>_DISTORTION_COEF_Y  = ( b0, b1, b2, b3),
@@ -105,21 +110,20 @@ namespace Isis {
     double y = dy;
 
     double r2 = x*x + y*y;
-    double r = qSqrt(r2); 
-    double r3 = r2 * r; 
+    double r = qSqrt(r2);
+    double r3 = r2 * r;
 
-    // Apply distortion correction
-    double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3;
-    double dr_y = p_odky[0] + p_odky[1] * r + p_odky[2] * r2 + p_odky[3] * r3;
+    double dr_x = p_odkx[0] + p_odkx[1] * r + p_odkx[2] * r2 + p_odkx[3] * r3; //add boresight offset
+    double dr_y = p_odky[0] + p_odky[1] * r + p_odky[2] * r2 + p_odky[3] * r3; //add boresight offset
 
-    p_undistortedFocalPlaneX = x + dr_x; 
+    p_undistortedFocalPlaneX = x + dr_x;
     p_undistortedFocalPlaneY = y + dr_y;
 
     return true;
   }
 
 
-  /** 
+  /**
    * Compute distorted focal plane x/y
    *
    * Compute distorted focal plane x/y given an undistorted focal plane x/y.
@@ -165,7 +169,7 @@ namespace Isis {
       xx = xt * xt;
       yy = yt * yt;
       rr = xx + yy;
-      r = qSqrt(rr); 
+      r = qSqrt(rr);
       rrr = rr * r;
 
       // Radial distortion
@@ -203,4 +207,3 @@ namespace Isis {
     return bConverged;
   }
 }
-
