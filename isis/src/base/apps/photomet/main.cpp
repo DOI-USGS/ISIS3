@@ -1760,8 +1760,8 @@ void IsisMain() {
 
   if ((normName == "TOPO" || normName == "MIXED") && angleSource == "DEM") {
     QString message = "The " + normName + " Normalized model is not recommended for use with the " + angleSource + " Angle Source option";
-    PvlGroup warning("Warning");
-    warning.addKeyword(PvlKeyword("Warning",message),Pvl::Replace);
+    PvlGroup warning("Warnings");
+    warning.addKeyword(PvlKeyword("Warning",message));
     Application::Log(warning);
   }
   // Get camera information if needed
