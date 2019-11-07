@@ -55,7 +55,7 @@ int main(void) {
     double knownLon = 311.457363494321;
 
     qDebug() << "Testing TC2 w L2B0 image...";
-    Cube c("/home/pgiroux/KaguyaTestCubes/TC2W2B0_01_02735N583E3115.cub", "r");
+    Cube c("$kaguya/testData/TC2W2B0_01_02735N583E3115.cub", "r");
     KaguyaTcCamera *cam = (KaguyaTcCamera *) CameraFactory::Create(c);
     qDebug() << "FileName: " << FileName(c.fileName()).name();
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
@@ -117,7 +117,7 @@ int main(void) {
     knownLat = -82.0195024182112;
     knownLon = 46.4153943800818;
 
-    Cube c2("/home/pgiroux/KaguyaTestCubes/TC1S2B0_01_06691S820E0465.cub", "r");
+    Cube c2("$kaguya/testData/TC1S2B0_01_06691S820E0465.cub", "r");
     KaguyaTcCamera *cam2 = (KaguyaTcCamera *) CameraFactory::Create(c2);
     qDebug() << "FileName: " << FileName(c2.fileName()).name();
     qDebug() << "CK Frame: " << cam2->instrumentRotation()->Frame();
