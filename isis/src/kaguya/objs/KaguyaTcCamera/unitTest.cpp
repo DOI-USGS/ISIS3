@@ -61,22 +61,6 @@ int main(void) {
     qDebug() << "CK Frame: " << cam->instrumentRotation()->Frame();
     qDebug() << "";
 
-    // // LAUREN'S TESTING STUFF
-    // double lookDirection[3];
-    // cam->LookDirection(lookDirection);
-    // std::vector<double> lookDirectionJ2000 = cam->lookDirectionJ2000();
-    // std::vector<double> lookDirectionBodyFixed = cam->lookDirectionBodyFixed();
-    // double FocalLength = cam->FocalLength();
-    //
-    // double scale = FocalLength/lookDirection[2];
-    // double calc_bore_x = scale*lookDirection[0];
-    // double calc_bore_y = scale*lookDirection[1];
-    //
-    // qDebug() << calc_bore_x << endl;
-    // qDebug() << calc_bore_y << endl;
-    // // END OF LAUREN'S TESTING STUFF
-
-
     // Test kernel IDs
     qDebug() << "Kernel IDs: ";
     qDebug() << "CK Frame ID = " << cam->CkFrameId();

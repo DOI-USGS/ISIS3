@@ -1758,12 +1758,6 @@ void IsisMain() {
   // determine how photometric angles should be calculated
   angleSource = ui.GetString("ANGLESOURCE");
 
-  if ((normName == "TOPO" || normName == "MIXED") && angleSource == "DEM") {
-    QString message = "The " + normName + " Normalized model is not recommended for use with the " + angleSource + " Angle Source option";
-    PvlGroup warning("Warning");
-    warning.addKeyword(PvlKeyword("Warning",message),Pvl::Replace);
-    Application::Log(warning);
-  }
   // Get camera information if needed
   if (angleSource == "ELLIPSOID" || angleSource == "DEM" ||
       angleSource == "CENTER_FROM_IMAGE") {
@@ -1945,7 +1939,7 @@ void photomet(Buffer &in, Buffer &out) {
       trimInc = cam->IncidenceAngle();
       trimEma = cam->EmissionAngle();
     }
-
+    
     if(trimInc > maxinc || trimEma > maxema) {
         out[i] = NULL8;
     }
