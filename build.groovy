@@ -109,7 +109,7 @@ node("${env.OS.toLowerCase()}") {
                                     export ISISROOT=`pwd`
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
-                                    export PATH=`pwd`/bin:$PATH
+                                    export PATH=`pwd`../install/bin:$PATH
                                     catlab -Help
 
                                     ctest -R _unit_ -j4 -VV
