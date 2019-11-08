@@ -15,7 +15,7 @@
       division.  The user may choose between intensity units and I/F for the DN
       to flux conversion.
 
-      If you are trying to run run cisscal on a cube ingested/created with an ISIS
+      If you are trying to run cisscal on a cube ingested/created with an ISIS
       version less than 3.9 and are getting these errors:
       **ERROR** PVL Keyword [ShutterStateId] does not exist in [Group = Instrument].
       **ERROR** Labels do not appear contain a valid Cassini ISS instrument.
