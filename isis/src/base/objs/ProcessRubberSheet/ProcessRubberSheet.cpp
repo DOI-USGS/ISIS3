@@ -932,7 +932,7 @@ namespace Isis {
       return;
     }
 
-    // If at least one of the 4 input tile corners did NOT transform, spit it
+    // If at least one of the 4 input tile corners did NOT transform, split it
     if (isamps.size() < 4) {
       splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
