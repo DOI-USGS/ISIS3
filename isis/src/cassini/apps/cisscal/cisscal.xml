@@ -230,8 +230,8 @@
       time correction. Fixes #3351.
     </change>
     <change name="Adam Paquette" date="2019-11-06">
-      Moved output cube instantiation from the beginning of the script to after
-      the dark subtraction and bit weight corrections have been performed.
+      Removed the cube when either an associated bitweight file is not present,
+      or the dark current calculation fails.
       Fixes #3446.
     </change>
   </history>

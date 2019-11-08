@@ -121,6 +121,9 @@ void IsisMain() {
   // instead the bitweightCorrected vector is used as the initial values before
   // the rest of the calibration steps are performed.
   gbl::incube = secondpass.SetInputCube("FROM"); // Calibrate() parameter in[0]
+  // we need to set output cube at the beginning of the program to check right
+  // away for CubeCustomization IsisPreference and throw an error, if necessary.
+  Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
 
   // resize 2dimensional vectors
   gbl::bitweightCorrected.resize(gbl::incube->sampleCount());
@@ -166,6 +169,8 @@ void IsisMain() {
   else { // Bitweight correction
     FileName bitweightFile = gbl::FindBitweightFile();
     if(!bitweightFile.fileExists()) { // bitweight file not found, stop calibration
+      // Remove the output cube since it will be empty at this point
+      outcube->close(true);
       throw IException(IException::Io,
                        "Unable to calibrate image. BitweightFile ***"
                        + bitweightFile.expanded() + "*** not found.", _FILEINFO_);
@@ -200,14 +205,12 @@ void IsisMain() {
   }
   catch(IException &e) { // cannot perform dark current, stop calibration
     e.print();
+    // Remove the output cube since it will be empty at this point
+    outcube->close(true);
     throw IException(e, IException::Unknown,
                      "Unable to calibrate image. Dark current calculations failed.",
                      _FILEINFO_);
   }
-
-  // we need to set output cube at the beginning of the program to check right
-  // away for CubeCustomization IsisPreference and throw an error, if necessary.
-  Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
 
   //Linearity Correction
   gbl::Linearize();
