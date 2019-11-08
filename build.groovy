@@ -110,7 +110,7 @@ node("${env.OS.toLowerCase()}") {
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
                                     export PATH=`pwd`/bin:$PATH
-                                    echo $(catlab -Help)
+                                    catlab -Help
 
                                     ctest -R _unit_ -j4 -VV
                                     source deactivate
