@@ -106,7 +106,7 @@ node("${env.OS.toLowerCase()}") {
                                     echo $ISIS3DATA
 
                                     # environment variables
-                                    export ISISROOT=`pwd`
+                                    export ISISROOT=`pwd`/../../../install/
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
                                     export PATH=`pwd`/../../../install/bin:$PATH
