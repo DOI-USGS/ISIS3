@@ -370,7 +370,9 @@ void IsisMain() {
 
   if (!inst.hasKeyword("VariableExposureDuration") || !inst.hasKeyword("FrameNumber")) {
     QString msg = "The instrument keywords VariableExposureDuration and FrameNumber"
-                  "must exist to calibrate this MARCI file";
+                  "must exist to calibrate this MARCI file. Prior to isis3.10.0 these" 
+                  "keywords were not added by marci2isis; you may need to rerun isis3.10+"
+                  "marci2isis on your images.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
