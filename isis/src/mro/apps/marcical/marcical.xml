@@ -46,7 +46,7 @@ K.D. Supulver, and P.C. Thomas
     </change>
     <change name="Stuart Sides" date="2019-11-08">
       Modified to use the exposure duration from the new label keywords added by
-      marci2isis. 
+      marci2isis. Related #2034
     </change>
   </history>
 
