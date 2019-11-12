@@ -206,10 +206,15 @@ void IsisMain() {
     reverse(exptime.begin(),exptime.end());
   }
 
-  // If exptime < 2, no additional exposure durations were found in the varexp file and
-  // this will only use the single ExposureDuration on the label. 
+  // If exptime < 2, no additional exposure durations were found in the varexp file, so
+  // assume a single exposure duration and warn the user. 
+  // Using single exposure duration is correct in many cases, but there is no way to check 
+  // using only the information in the label. 
   if (exptime.size() < 2) {
     PvlGroup missing("NoExposureTimeDataFound");
+    PvlKeyword message("Message", "No variable exposure information found in the varexp file."
+                                  " Assuming exposure time is fixed for [" + inFile.toString() +  "]" );
+    missing.addKeyword(message); 
     missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
     Application::Log(missing);
   }
