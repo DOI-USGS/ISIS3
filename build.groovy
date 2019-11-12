@@ -106,14 +106,10 @@ node("${env.OS.toLowerCase()}") {
                                     echo $PATH
 
                                     # environment variables
-                                    export ISISROOT=`pwd`/../../install/
+                                    export ISISROOT=${env.ISISROOT}
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
                                     export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-                                    
-                                    pwd
-                                    ls -lrt . 
-                                    ls -lrt /home/jenkins/.conda/envs/isis/bin
 
                                     ctest -R _unit_ -j4 -VV
                                     source deactivate
@@ -134,15 +130,15 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            echo $PATH
 
                             # environment variables
-                            export ISISROOT=`pwd`
+                            export ISISROOT=${env.ISISROOT}
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/bin:$PATH
-                            which catlab
-
-                            ctest -R _app_ -j4 -VV
+                            export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+ 
+                            ctest -r _app_ -j4 -vv
                             source deactivate
 
                         """
@@ -161,13 +157,14 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            echo $PATH
 
                             # environment variables
-                            export ISISROOT=`pwd`
+                            export ISISROOT=${env.ISISROOT}
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/bin:$PATH
-                            which catlab
+                            export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+
                             ctest -R _module_ -j4 -VV
                             source deactivate
 
