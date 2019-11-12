@@ -5,6 +5,7 @@
 #include "MultivariateStatistics.h"
 #include "OriginalLabel.h"
 #include "IException.h"
+#include "CSVReader.h"
 
 using namespace std;
 using namespace Isis;
@@ -153,8 +154,94 @@ void IsisMain() {
     isisCube.findGroup("Instrument").addKeyword(PvlKeyword("Framelets", framelets[i]));
 
     outputCubes[i]->write(origLabel);
-    delete outputCubes[i];
   }
+
+  QString prodId = outputCubes[0]->label()->findGroup("Archive", Pvl::Traverse)["ProductId"][0]; 
+  prodId = prodId.toUpper();
+  vector<int> frameseq;
+  vector<double> exptime;
+  // Populate with first values
+  Pvl *isisLabelInitial = outputCubes[0]->label();
+  PvlGroup &instInitial = isisLabelInitial->findGroup("Instrument", Pvl::Traverse);
+  double exposure = instInitial["ExposureDuration"][0].toDouble() * 1000.0;
+  frameseq.push_back(0);
+  exptime.push_back(exposure); 
+
+  QString varExpFile = "$mro/calibration/marci/varexp.tab";
+  
+  // Load the MARCI exposure duration calibration tables.
+  bool header=false;
+  int skip=0;
+  FileName csvfile(varExpFile);
+    
+  CSVReader csv(csvfile.expanded(), header, skip);
+    // There may be multiple entries in the file for this productID,
+    // so we *must* loop through the entire file.
+  for(int i = 0 ; i < csv.rows() ; i++) {
+      CSVReader::CSVAxis row = csv.getRow(i);
+      // The productId in the file is encapsulated by double quotes.
+      QString fileProdId = row[0];
+      // This is garbage code, but my compiler isn't allowing me to escape the double quotes
+      int prodIdLastIndex = fileProdId.size() - 1 ;
+      fileProdId.remove(prodIdLastIndex,1);
+      fileProdId.remove(0,1);
+      // Now, compare product ids from the input image and from the calibration table.
+      if(fileProdId == prodId ) {
+        if((row.dim1() - 1) != 2) {
+          QString msg = "This appears to be a malformed calibration file."; 
+                  msg += " There are not enough columns in the CSV";
+                  msg += " file to perform the exposure time correction.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        // Build the two vectors, exptime and frame. We'll relate those to each other
+        // back in main(). Remember that a productID may have multiple entries in the table.
+        frameseq.push_back(toInt(row[1]));
+        exptime.push_back(toDouble(row[2]));
+      }
+  }
+
+  if (flip && exptime.size() > 0) {
+    reverse(frameseq.begin(),frameseq.end());
+    reverse(exptime.begin(),exptime.end());
+  }
+
+    if (exptime.size() == 0) {
+      // a little excessive to do this every time? 
+      PvlGroup missing("NoExposureTimeDataFound");
+      missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
+      Application::Log(missing);
+    }
+        
+
+  // Translate labels to every image and close output cubes before calling EndProcess
+
+    // Add these values to the label
+    for(unsigned int i = 0; i < outputCubes.size(); i++) {
+        Pvl *isisLabel = outputCubes[i]->label();
+        PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
+
+//        double exposure = inst["ExposureDuration"][0].toDouble() * 1000.0;
+        PvlKeyword varExposure("VariableExposureDuration");
+//        varExposure.addValue(QString::number(exposure), "ms"); 
+        PvlKeyword frameNumber("FrameNumber");
+//        frameNumber.addValue("0");
+
+        for (int i=0; i < exptime.size(); i++) {
+          varExposure.addValue( QString::number(exptime[i]), "ms" );
+          frameNumber.addValue( QString::number(frameseq[i]) );
+        }
+/*      if (exptime.size() != 0) {
+        // Add these values to the label
+        // loop now
+        varExposure.addValue( QString::number(exptime[0]), "ms" );
+        varExposure.addValue( QString::number(exptime[1]), "ms" );
+        frameNumber.addValue( QString::number(frameseq[0]) );
+        frameNumber.addValue( QString::number(frameseq[1]) );
+      }*/
+      inst.addKeyword(frameNumber);
+      inst.addKeyword(varExposure);
+      delete outputCubes[i];
+    }
 
   outputCubes.clear();
 
