@@ -6,6 +6,7 @@
 #include "OriginalLabel.h"
 #include "IException.h"
 #include "CSVReader.h"
+#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
@@ -164,6 +165,7 @@ void IsisMain() {
   Pvl *isisLabelInitial = outputCubes[0]->label();
   PvlGroup &instInitial = isisLabelInitial->findGroup("Instrument", Pvl::Traverse);
   double exposure = instInitial["ExposureDuration"][0].toDouble() * 1000.0;
+
   frameseq.push_back(0);
   exptime.push_back(exposure); 
 
@@ -205,13 +207,14 @@ void IsisMain() {
     reverse(exptime.begin(),exptime.end());
   }
 
-    if (exptime.size() == 0) {
-      PvlGroup missing("NoExposureTimeDataFound");
-      missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
-      Application::Log(missing);
-    }
+  // If exptime < 2, no additional exposure durations were found in the varexp file and
+  // this will only use the single ExposureDuration on the label. 
+  if (exptime.size() < 2) {
+    PvlGroup missing("NoExposureTimeDataFound");
+    missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
+    Application::Log(missing);
+  }
         
-
   // Translate labels to every image and close output cubes before calling EndProcess
 
     // Add these values to the label
