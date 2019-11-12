@@ -105,7 +105,6 @@ node("${env.OS.toLowerCase()}") {
                                     echo $ISIS3TESTDATA
                                     echo $ISIS3DATA
                                     echo $PATH
-                                    echo $CONDA_PREFIX
 
                                     # environment variables
                                     export ISISROOT=`pwd`/../../../install/
