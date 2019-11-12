@@ -32,7 +32,7 @@
     </change>
     <change name="Austin Sanders" date="2019-11-06">
       Replaced lookup tables with calibration equations.
-      See description for more detailed information.
+      See description for more detailed information. Issue #3495
     </change>
   </history>
 
