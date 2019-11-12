@@ -34,7 +34,7 @@
 * [Understanding Bit Types](https://github.com/USGS-Astrogeology/ISIS3/wiki/Understanding_Bit_Types)
 * [Core Base and Multiplier](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Core_Base_and_Multiplier.html)
 * [Special Pixels](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/Special_Pixels.html)
-* [FAQ])(https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ)
+* [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ)
 
 ### General Image Processing
 * [The Power of Spatial Filters](https://USGS-Astrogeology.github.io/ISIS3/gh-pages/The_Power_of_Spatial_Filters.html)
