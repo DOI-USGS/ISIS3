@@ -33,15 +33,16 @@ set(PACKAGE            "ISIS")
 set(PACKAGE_NAME       "USGS ISIS")
 
 # Version number
-set(VERSION            "3.9.0")
+set(VERSION            "3.9.1")
 set(PACKAGE_VERSION    ${VERSION})
 
 # Full name and version number
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${VERSION}")
 
 # Other release information
-set(VERSION_DATE              "2019-09-13")
-set(RELEASE_STAGE             "beta") # (alpha, beta, stable)
+string(TIMESTAMP VERSION_DATE "%Y-%m-%d" UTC)
+# set(VERSION_DATE              "2019-09-13")
+set(RELEASE_STAGE             "stable") # (alpha, beta, stable)
 
 # Define to the address where bug reports for this package should be sent.
 set(PACKAGE_BUGREPORT  "https://github.com/USGS-Astrogeology/ISIS3/issues")
@@ -443,6 +444,9 @@ execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
 set(sourceXmlFolder ${CMAKE_BINARY_DIR}/bin/xml)
 execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/xml)
 
+# Create the version file
+configure_file(${CMAKE_SOURCE_DIR}/cmake/version.in ${CMAKE_BINARY_DIR}/version)
+
 # Set up install of the templates folder.
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/templates DESTINATION .)
 
@@ -487,13 +491,12 @@ add_custom_target(clean_source COMMAND rm -rf "${CMAKE_BINARY_DIR}/*" "${CMAKE_I
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/IsisPreferences   ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/scripts           ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/../LICENSE.txt    ${CMAKE_BINARY_DIR})
-EXECUTE_PROCESS(COMMAND cp -f  ${CMAKE_SOURCE_DIR}/version           ${CMAKE_BINARY_DIR})
 EXECUTE_PROCESS(COMMAND cp -rf ${CMAKE_SOURCE_DIR}/make              ${CMAKE_BINARY_DIR})
 
 # Copy the files on make install as well
 install(FILES     ${CMAKE_SOURCE_DIR}/IsisPreferences DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(FILES     ${CMAKE_SOURCE_DIR}/../LICENSE.txt  DESTINATION  ${CMAKE_INSTALL_PREFIX})
-install(FILES     ${CMAKE_SOURCE_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
+install(FILES     ${CMAKE_BINARY_DIR}/version         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts         DESTINATION  ${CMAKE_INSTALL_PREFIX})
 
 # Trigger all post-install behavior.
