@@ -100,7 +100,7 @@ node("${env.OS.toLowerCase()}") {
                         dir("${env.ISISROOT}") {
                             env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                 sh """
-                                    source activate isis
+                                    conda activate isis
                                     echo $ISIS3TESTDATA
                                     echo $ISIS3DATA
                                     echo $PATH
@@ -109,8 +109,7 @@ node("${env.OS.toLowerCase()}") {
                                     export ISISROOT=`pwd`/../../../install/
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
-                                    export PATH=`pwd`/../../../install/bin:/home/jenkins/.conda/envs/isis/bin:${env.PATH}
-                                    catlab -Help
+                                    export PATH=`pwd`/../../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
                                     
                                     pwd
                                     ls -lrt . 
