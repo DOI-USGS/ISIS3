@@ -206,7 +206,6 @@ void IsisMain() {
   }
 
     if (exptime.size() == 0) {
-      // a little excessive to do this every time? 
       PvlGroup missing("NoExposureTimeDataFound");
       missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
       Application::Log(missing);
