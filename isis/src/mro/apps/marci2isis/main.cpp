@@ -6,7 +6,6 @@
 #include "OriginalLabel.h"
 #include "IException.h"
 #include "CSVReader.h"
-#include "iTime.h"
 
 using namespace std;
 using namespace Isis;
