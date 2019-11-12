@@ -97,8 +97,7 @@ node("${env.OS.toLowerCase()}") {
 
                 try{
                     stage("UnitTests") {
-                        dir("ISIS3") {
-                            dir("build") {
+                        dir("${env.ISISROOT}") {
                             env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                 sh """
                                     source activate isis
@@ -110,13 +109,17 @@ node("${env.OS.toLowerCase()}") {
                                     export ISISROOT=`pwd`/../../../install/
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
-                                    export PATH=`pwd`/../../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                                    export PATH=`pwd`/../../../install/bin:/home/jenkins/.conda/envs/isis/bin:${env.PATH}
                                     catlab -Help
+                                    
+                                    pwd
+                                    ls -lrt . 
+                                    ls -lrt /home/jenkins/.conda/envs/isis/bin
 
                                     ctest -R _unit_ -j4 -VV
                                     source deactivate
                                 """
-                            }
+                          
                         }
                     }
                 }
