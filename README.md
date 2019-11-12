@@ -6,7 +6,13 @@
 
 ## Table of Contents
 
+* [FAQ](README.md##FAQ)
 * [Installation](README.md##Installation)
+* [ISIS Data Area](README.md##The ISIS Data Area)
+* [Installing Older Versions of ISIS](README.md##Installing older versions of ISIS)
+
+## FAQ
+We maintain a list of frequently encountered questions and issues. Before opening a new issue, please take a look at the [FAQ](https://github.com/USGS-Astrogeology/ISIS3/wiki/FAQ).
 
 ## Installation
 
@@ -123,7 +129,7 @@ To build and compile ISIS3 requires following the instructions listed below, whi
 -   [Building ISIS3 documentation](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#building-isis3-documentation)
 -   [What to do if you encounter any problems](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake#problems)
 
-## The ISIS3 Data Area
+## The ISIS Data Area
 
 ### Ancillary Data
 
