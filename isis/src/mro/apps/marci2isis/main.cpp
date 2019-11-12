@@ -220,24 +220,13 @@ void IsisMain() {
         Pvl *isisLabel = outputCubes[i]->label();
         PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
 
-//        double exposure = inst["ExposureDuration"][0].toDouble() * 1000.0;
         PvlKeyword varExposure("VariableExposureDuration");
-//        varExposure.addValue(QString::number(exposure), "ms"); 
         PvlKeyword frameNumber("FrameNumber");
-//        frameNumber.addValue("0");
 
         for (int i=0; i < exptime.size(); i++) {
           varExposure.addValue( QString::number(exptime[i]), "ms" );
           frameNumber.addValue( QString::number(frameseq[i]) );
         }
-/*      if (exptime.size() != 0) {
-        // Add these values to the label
-        // loop now
-        varExposure.addValue( QString::number(exptime[0]), "ms" );
-        varExposure.addValue( QString::number(exptime[1]), "ms" );
-        frameNumber.addValue( QString::number(frameseq[0]) );
-        frameNumber.addValue( QString::number(frameseq[1]) );
-      }*/
       inst.addKeyword(frameNumber);
       inst.addKeyword(varExposure);
       delete outputCubes[i];
