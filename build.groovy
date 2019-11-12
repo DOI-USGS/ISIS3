@@ -110,8 +110,7 @@ node("${env.OS.toLowerCase()}") {
                                     export ISISROOT=`pwd`/../../../install/
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA='/isisData/data'
-                                    export PATH=`pwd`/../../../install/bin:$PATH
-                                    export PATH=/home/jenkins/.conda/envs/isis/bin:$PATH
+                                    export PATH=`pwd`/../../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
                                     catlab -Help
 
                                     ctest -R _unit_ -j4 -VV
