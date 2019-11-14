@@ -17,9 +17,10 @@ node {
                 build 'ISIS-Builds/Ubuntu'
             }
         }
+        'mac' : {
+            stage('Mac') {
+            label 'mac'
+            }
+        }
     )
-}
-
-node('dmz-progmac'){
-    echo 'Foo'
 }
