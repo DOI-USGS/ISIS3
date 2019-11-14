@@ -1,29 +1,24 @@
 // vim: ft=groovy
 
-node {
-    parallel(
-        'centos': {
-            stage('CentOS') {
-                build 'ISIS-Builds/CentOS'
-            }
-        },
-        'fedora': {
-            stage('Fedora') {
+pipeline {
+    parallel {
+      stage('CentOS') {
+            build 'ISIS-Builds/CentOS'
+      }
+      stage('Fedora') {
                 build 'ISIS-Builds/Fedora'
-            }
-        },
-        'ubuntu': {
-            stage('Ubuntu') {
+      }
+      stage('Ubuntu') {
                 build 'ISIS-Builds/Ubuntu'
-            }
-        },
-        'timmy': {
-            stage('Timmy') {
+      }
+      stage('Timmy') {
                 agent { 
                     label "dmz-progmac" 
                 }
                 steps {echo "Foo"}
-            }
-        }
-    )
+      }
+    }
 }
+
+    
+        
