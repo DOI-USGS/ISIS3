@@ -16,6 +16,11 @@ node {
             stage('Ubuntu') {
                 build 'ISIS-Builds/Ubuntu'
             }
+        },
+        'mac' : {
+            stage('Mac') {
+                build 'dmz-progmac'
+            }
         }
     )
 }
