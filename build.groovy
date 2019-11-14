@@ -114,7 +114,7 @@ node("${env.OS.toLowerCase()}") {
                                     ctest -R _unit_ -j4 -VV
                                     source deactivate
                                 """
-                          
+
                         }
                     }
                 }
@@ -137,8 +137,8 @@ node("${env.OS.toLowerCase()}") {
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
                             export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
- 
-                            ctest -r _app_ -j4 -VV
+
+                            ctest -r appjit_app_test -j4 -VV
                             source deactivate
 
                         """
