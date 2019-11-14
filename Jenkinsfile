@@ -18,8 +18,9 @@ node {
             }
         },
         'mac': {
+            agent { label 'dmz-progmac' }
             stage('Mac') {
-                agent { label 'mac' }
+                agent { label 'dmz-progmac' }
                 sh """echo Foo"""
             }
         }
