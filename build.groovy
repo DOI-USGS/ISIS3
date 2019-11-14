@@ -138,7 +138,7 @@ node("${env.OS.toLowerCase()}") {
                             export ISIS3DATA='/isisData/data'
                             export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
-                            ctest -r appjit_app_test -j4 -VV
+                            ctest -R appjit_app_test -j4 -VV
                             source deactivate
 
                         """
