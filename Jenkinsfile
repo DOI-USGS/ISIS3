@@ -18,8 +18,14 @@ node {
             }
         }
         'mac' : {
+
             stage('Mac') {
-            label 'mac'
+                agent {
+                    label "mac"
+                }
+                steps {
+                    echo "Foo"
+                }
             }
         }
     )
