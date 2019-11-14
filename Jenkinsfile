@@ -1,6 +1,5 @@
-// vim: ft=groovy
-
 pipeline {
+ stages{
     parallel {
       stage('CentOS') {
             build 'ISIS-Builds/CentOS'
@@ -12,13 +11,9 @@ pipeline {
                 build 'ISIS-Builds/Ubuntu'
       }
       stage('Timmy') {
-                agent { 
-                    label "dmz-progmac" 
-                }
-                steps {echo "Foo"}
+        agent { label "dmz-progmac" }
+        steps {echo "Foo"}
       }
-    }
+   }
+ }
 }
-
-    
-        
