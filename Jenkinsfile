@@ -17,14 +17,10 @@ node {
                 build 'ISIS-Builds/Ubuntu'
             }
         },
-        'mac' : {
+        'mac': {
             stage('Mac') {
-                agent {
-                    label 'mac'
-                }
-                steps {
-                    echo "Foo"
-                }
+                agent { label 'mac' }
+                sh """echo Foo"""
             }
         }
     )
