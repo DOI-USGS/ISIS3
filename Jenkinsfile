@@ -17,8 +17,8 @@ node {
                 build 'ISIS-Builds/Ubuntu'
             }
         },
-        'mac': {
-            stage('Mac') {
+        'timmy': {
+            stage('Timmy') {
                 agent { 
                     label "dmz-progmac" 
                 }
