@@ -55,7 +55,7 @@ node("${env.OS.toLowerCase()}") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
         isisEnv.add("ISISROOT=${pwd()}/build")
-        cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+        cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/build/ISIS3/install")
     }
 
     stage("Create environment") {
@@ -108,8 +108,9 @@ node("${env.OS.toLowerCase()}") {
                                     # environment variables
                                     export ISISROOT=${env.ISISROOT}
                                     export ISIS3TESTDATA="/isisData/testData"
-                                    export ISIS3DATA='/isisData/data'
-                                    export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                                    export ISIS3DATA="/isisData/data"
+                                    export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                                    echo $PATH
 
                                     catlab -HELP
                                     tabledump -HELP
@@ -139,7 +140,7 @@ node("${env.OS.toLowerCase()}") {
                             export ISISROOT=${env.ISISROOT}
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
                             catlab -HELP
                             tabledump -HELP
@@ -169,7 +170,7 @@ node("${env.OS.toLowerCase()}") {
                             export ISISROOT=${env.ISISROOT}
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
+                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
                             catlab -HELP
                             tabledump -HELP
@@ -199,7 +200,7 @@ node("${env.OS.toLowerCase()}") {
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
                             export PATH=`pwd`/bin:$PATH
-                            which catlab
+                            catlab -HELP
 
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                             source deactivate
