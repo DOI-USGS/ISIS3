@@ -20,6 +20,6 @@ node {
     )
 }
 
-node('mac'){
+node('dmz-progmac'){
     echo 'Foo'
 }
