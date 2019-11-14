@@ -111,6 +111,7 @@ node("${env.OS.toLowerCase()}") {
                                     export ISIS3DATA='/isisData/data'
                                     export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
+                                    catlab -HELP
                                     tabledump -HELP
 
                                     ctest -R _unit_ -j4 -VV
@@ -140,6 +141,7 @@ node("${env.OS.toLowerCase()}") {
                             export ISIS3DATA='/isisData/data'
                             export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
+                            catlab -HELP
                             tabledump -HELP
 
                             ctest -R _app_ -j4 -VV
@@ -169,6 +171,7 @@ node("${env.OS.toLowerCase()}") {
                             export ISIS3DATA='/isisData/data'
                             export PATH=`pwd`/../../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
+                            catlab -HELP
                             tabledump -HELP
 
                             ctest -R _module_ -j4 -VV
