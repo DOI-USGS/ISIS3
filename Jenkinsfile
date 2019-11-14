@@ -20,7 +20,7 @@ node {
         'mac' : {
             stage('Mac') {
                 agent {
-                    label "mac"
+                    label 'mac'
                 }
                 steps {
                     echo "Foo"
