@@ -16,9 +16,8 @@ node {
             stage('Ubuntu') {
                 build 'ISIS-Builds/Ubuntu'
             }
-        }
+        },
         'mac' : {
-
             stage('Mac') {
                 agent {
                     label "mac"
