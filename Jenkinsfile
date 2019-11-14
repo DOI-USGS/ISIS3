@@ -1,5 +1,6 @@
 pipeline {
  stages{
+  stage ('Work'){
     parallel {
       stage('CentOS') {
             build 'ISIS-Builds/CentOS'
@@ -15,5 +16,5 @@ pipeline {
         steps {echo "Foo"}
       }
    }
- }
+  }}
 }
