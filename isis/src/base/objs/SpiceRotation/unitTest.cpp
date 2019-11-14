@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   QString mocbc(dir + "moc.bc");
   QString mocbsp(dir + "moc.bsp");
   QString de(dir + "de405.bsp");
-  QString pck("$base/kernels/pck/pck00009.tpc");
+  QString pck(dir + "../../kernels/pck/pck00009.tpc");
   QString cgFK(dir + "ROS_V29.TF");
   QString cgCK(dir + "CATT_DV_145_02_______00216.BC");
   //QString mocadd(dir+"mocAddendum.ti");
