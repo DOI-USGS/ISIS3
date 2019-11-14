@@ -21,6 +21,5 @@ node {
 }
 
 node('dmz-progmac'){
-    label 'mac'
     echo 'Foo'
 }
