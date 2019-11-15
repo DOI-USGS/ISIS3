@@ -18,7 +18,7 @@ node {
             }
         },
         'mac' : {
-            stage('Mac') {
+            stage('mac') {
                 label 'mac'
                 echo "Foo"
                 sleep 10
