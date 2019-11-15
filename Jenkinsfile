@@ -4,9 +4,8 @@ pipeline
 {
     stages
     {
-        stage('Mac)
+        stage('Mac')
         {
-           
             agent{ label 'mac'}
             steps{
                 echo "Foo"
