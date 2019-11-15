@@ -195,13 +195,13 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            echo $PATH
 
                             # environment variables
-                            export ISISROOT=`pwd`
+                            export ISISROOT=${env.ISISROOT}
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/bin:$PATH
-                            catlab -HELP
+                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                             source deactivate
