@@ -2,12 +2,16 @@
 
 pipeline 
 {
-agent any
     stages
     {
-        stage('CentOS')
+        stage('Mac)
         {
-            build 'ISIS-Builds/CentOS'
+           
+            agent{ label 'mac'}
+            steps{
+                echo "Foo"
+                sleep 20
+            }
         }
     }
 }
