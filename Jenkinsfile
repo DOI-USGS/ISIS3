@@ -5,7 +5,7 @@ pipeline
     agent any
     stages
     {
-        stage('Do it')
+        stage('CI')
         {
             parallel
             {
@@ -13,8 +13,7 @@ pipeline
                 {
                     agent{ label 'mac'}
                     steps{
-                        echo "Foo"
-                        sleep 20
+                        build 'ISIS-Builds/Mac'
                     }
                 }
                 stage('CentOS')
