@@ -54,7 +54,7 @@ node("${env.OS.toLowerCase()}") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
-        echo ${pwd()}
+        echo pwd()
         isisEnv.add("ISISROOT=${pwd()}/build/ISIS3/build")
         cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/build/ISIS3/install")
     }
