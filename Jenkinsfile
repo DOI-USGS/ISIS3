@@ -13,6 +13,10 @@ pipeline
                 sleep 20
             }
         }
+        stage('CentOS')
+        {
+            build 'ISIS-Builds/CentOS'
+        }
     }
 }
 
