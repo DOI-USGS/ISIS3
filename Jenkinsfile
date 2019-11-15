@@ -1,31 +1,27 @@
 // vim: ft=groovy
 
-pipeline 
-{
-    stages
-    {
-        stage("do stuff")
-        {
-        parallel
-        {
-            stage('CentOS')
-            {
+node {
+    parallel(
+        'centos': {
+            stage('CentOS') {
                 build 'ISIS-Builds/CentOS'
             }
-            stage('Fedora')
-            {
+        },
+        'fedora': {
+            stage('Fedora') {
                 build 'ISIS-Builds/Fedora'
             }
-            stage('Ubuntu')
-            {
-                build 'ISIS-Builds/Fedora'
+        },
+        'ubuntu': {
+            stage('Ubuntu') {
+                build 'ISIS-Builds/Ubuntu'
             }
-            stage('Mac')
-            {
+        },
+        'mac' : {
+            stage('Mac') {
                 label 'mac'
-                echo "Foo"
-                sleep 10
+                build 'ISIS-Builds/mac'
             }
-        }}
-    }
+        }
+    )
 }
