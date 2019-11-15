@@ -15,7 +15,10 @@ pipeline
         }
         stage('CentOS')
         {
-            build 'ISIS-Builds/CentOS'
+            steps
+            {
+                build 'ISIS-Builds/CentOS'
+            }
         }
     }
 }
