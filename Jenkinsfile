@@ -19,9 +19,14 @@ node {
         },
         'mac' : {
             stage('mac') {
-                label 'mac'
-                echo "Foo"
-                sleep 10
+                agent
+                {
+                    label 'mac'
+                }
+                steps{
+                    echo "Foo"
+                    sleep 10
+                }
             }
         }
     )
