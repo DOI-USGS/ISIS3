@@ -54,6 +54,7 @@ node("${env.OS.toLowerCase()}") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
+        echo ${pwd()}
         isisEnv.add("ISISROOT=${pwd()}/build/ISIS3/build")
         cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/build/ISIS3/install")
     }
@@ -103,15 +104,14 @@ node("${env.OS.toLowerCase()}") {
                                     source activate isis
                                     echo $ISIS3TESTDATA
                                     echo $ISIS3DATA
-                                    echo $PATH
 
                                     # environment variables
                                     export ISISROOT=${env.ISISROOT}
                                     export ISIS3TESTDATA="/isisData/testData"
                                     export ISIS3DATA="/isisData/data"
                                     export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-                                    echo $PATH
 
+                                    automos -HELP
                                     catlab -HELP
                                     tabledump -HELP
 
