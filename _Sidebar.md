@@ -7,7 +7,7 @@
 # Development References
 * [Building](https://github.com/USGS-Astrogeology/ISIS3/wiki/Developing-ISIS3-with-cmake)
 * [Writing Tests](https://github.com/USGS-Astrogeology/ISIS3/wiki/Writing-ISIS3-Tests-Using-Gtest-and-Ctest)
-* [Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
+* [Start Contributing](https://github.com/USGS-Astrogeology/ISIS3/wiki/How-to-Start-Contributing)
 * [Public Release Process](https://github.com/USGS-Astrogeology/ISIS3/wiki/Public-Release-Process)
 * [Continuous Integration](https://github.com/USGS-Astrogeology/ISIS3/wiki/Internal-CI---Jenkins)
 
