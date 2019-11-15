@@ -20,7 +20,8 @@ node {
         'mac' : {
             stage('Mac') {
                 label 'mac'
-                build 'ISIS-Builds/mac'
+                echo "Foo"
+                sleep 10
             }
         }
     )
