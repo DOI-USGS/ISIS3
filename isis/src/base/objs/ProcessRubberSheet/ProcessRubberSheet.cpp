@@ -901,10 +901,6 @@ namespace Isis {
       osamps.push_back(tsamp);
       olines.push_back(tline);
     }
-    else {
-      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
-      return;
-    }
 
     // Upper right control point
     if (trans.Xform(tsamp,tline,esamp,sline)) {
@@ -912,10 +908,6 @@ namespace Isis {
       ilines.push_back(sline);
       osamps.push_back(tsamp);
       olines.push_back(tline);
-    }
-    else {
-      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
-      return;
     }
 
     // Lower left control point
@@ -925,10 +917,6 @@ namespace Isis {
       osamps.push_back(tsamp);
       olines.push_back(tline);
     }
-    else {
-      splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
-      return;
-    }
 
     // Lower right control point
     if (trans.Xform(tsamp,tline,esamp,eline)) {
@@ -937,7 +925,15 @@ namespace Isis {
       osamps.push_back(tsamp);
       olines.push_back(tline);
     }
-    else {
+
+    // If none of the 4 input tile corners transformed inside the output cube, give up on this tile
+    // NOTE: Probably should split if the tile is large
+    if (isamps.size() == 0) {
+      return;
+    }
+
+    // If at least one of the 4 input tile corners did NOT transform, split it
+    if (isamps.size() < 4) {
       splitPatch(ssamp, esamp, sline, eline, iportal, trans, interp);
       return;
     }

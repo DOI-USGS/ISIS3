@@ -25,6 +25,10 @@
       <change name="Tracie Sucharski" date="2013-06-05">
         Added keywords to the Archive group in labels.
       </change>
+      <change name="Kristin Berry" date="2019-11-09">
+        Added keywords to the labels for variable exposure duration and the frame sequence. 
+	References #2034
+      </change>
     </history>
 
     <category>

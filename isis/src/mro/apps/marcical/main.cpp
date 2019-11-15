@@ -160,7 +160,7 @@ void IsisMain() {
   CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
   Cube icube;
 
-  if(inAtt.bands().size() != 0) {
+  if (inAtt.bands().size() != 0) {
     icube.setVirtualBands(inAtt.bands());
   }
 
@@ -169,21 +169,21 @@ void IsisMain() {
   // Make sure it is a Marci cube
   FileName inFileName = ui.GetFileName("FROM");
   try {
-    if(icube.group("Instrument")["InstrumentID"][0] != "Marci") {
+    if (icube.group("Instrument")["InstrumentID"][0] != "Marci") {
       throw IException();
     }
 
-    if(!icube.group("Archive").hasKeyword("SampleBitModeId")) {
+    if (!icube.group("Archive").hasKeyword("SampleBitModeId")) {
       throw IException();
     }
   }
-  catch(IException &) {
+  catch (IException &) {
     QString msg = "This program is intended for use on MARCI images only. [";
     msg += inFileName.expanded() + "] does not appear to be a MARCI image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(icube.group("Archive")["SampleBitModeId"][0] != "SQROOT") {
+  if (icube.group("Archive")["SampleBitModeId"][0] != "SQROOT") {
     QString msg = "Sample bit mode [" + icube.group("Archive")["SampleBitModeId"][0] + "] is not supported.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -195,7 +195,7 @@ void IsisMain() {
   vector<double> decimation;
 
   // Decimation is described in the MRO MARCI Instrument and Calibration document pg. 63
-  for(int i = 0; i < 6; i++) {
+  for (int i = 0; i < 6; i++) {
     // Decimation is 1.0 for bands 1-6
     decimation.push_back(1.0);
   }
@@ -204,7 +204,7 @@ void IsisMain() {
   iTime start(startTime);
   iTime changeTime("November 6, 2006 21:30:00 UTC");
 
-  if(start < changeTime) {
+  if (start < changeTime) {
     decimation.push_back(1.0);
   }
   else {
@@ -217,7 +217,7 @@ void IsisMain() {
 
   // Create the stretch pairs
   stretch.ClearPairs();
-  for(int i = 0; i < stretchPairs.LineCount(); i++) {
+  for (int i = 0; i < stretchPairs.LineCount(); i++) {
     QString line;
     stretchPairs.GetLine(line, true);
     int temp1 = toInt(line.split(" ").first());
@@ -237,17 +237,17 @@ void IsisMain() {
   vector< pair<double, double> > calibrationCoeffs;
 
   // Check our coefficient file
-  if(calibrationData.objects() != 7) {
+  if (calibrationData.objects() != 7) {
     QString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
     msg += " only [" + QString::number(calibrationData.objects()) + "] objects were found";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   // Read it, make sure it's ordered
-  for(int obj = 0; obj < calibrationData.objects(); obj ++) {
+  for (int obj = 0; obj < calibrationData.objects(); obj ++) {
     PvlObject calObj = calibrationData.object(obj);
 
-    if((int)calObj["FilterNumber"] != obj + 1) {
+    if ((int)calObj["FilterNumber"] != obj + 1) {
       QString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -263,10 +263,10 @@ void IsisMain() {
   int flipped = toInt(icube.group("Instrument")["DataFlipped"][0]);
 
   // Read in the flat files
-  for(int band = 0; band < 7; band++) {
+  for (int band = 0; band < 7; band++) {
     QString filePattern = "$mro/calibration/marci/";
 
-    if(band < 5) {
+    if (band < 5) {
       filePattern += "vis";
     }
     else {
@@ -274,8 +274,8 @@ void IsisMain() {
     }
 
     // UV cubes are always summing mode = 8, we can assume this rule will never
-    //   be broken
-    if(band >= 5 && summing != 8) {
+    // be broken
+    if (band >= 5 && summing != 8) {
       continue;
     }
 
@@ -321,8 +321,8 @@ void IsisMain() {
 
   PvlKeyword filtNames = icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"];
   int numFilters = filtNames.size();
-  for(int i = 0; i < filtNames.size(); i++) {
-    if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
+  for (int i = 0; i < filtNames.size(); i++) {
+    if (filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
     }
     else {
@@ -339,13 +339,13 @@ void IsisMain() {
   PvlKeyword &colOff = icube.label()->findGroup("Instrument", Pvl::Traverse)["ColorOffset"];
   int colorOffset = toInt(colOff[0]);
 
-  for(int filter = 0; filter < numFilters; filter++) {
-    if(colorOffset > 0) {
+  for (int filter = 0; filter < numFilters; filter++) {
+    if (colorOffset > 0) {
       // find the filter num
       int filtNum = 0;
       int numKnownFilters = sizeof(knownFilters) / sizeof(QString);
       
-      while(filtNum < numKnownFilters &&
+      while (filtNum < numKnownFilters &&
             (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][filter] != knownFilters[filtNum]) {
         filtNum ++;
       }
@@ -364,48 +364,32 @@ void IsisMain() {
   prodId = prodId.toUpper();
   vector<int> frameseq;
   vector<double> exptime;
-  QString varExpFile = "$mro/calibration/marci/varexp.tab";
-  
-  // Load the MARCI exposure duration calibration tables.
-  bool header=false;
-  int skip=0;
-  FileName csvfile(varExpFile);
-    
-  CSVReader csv(csvfile.expanded(), header, skip);
-    // There may be multiple entries in the file for this productID,
-    // so we *must* loop through the entire file.
-  for(int i = 0 ; i < csv.rows() ; i++) {
-      CSVReader::CSVAxis row = csv.getRow(i);
-      // The productId in the file is encapsulated by double quotes.
-      QString fileProdId = row[0];
-      //This is garbage code, but my compiler isn't allowing me to escape the double quotes
-      int prodIdLastIndex = fileProdId.size() - 1 ;
-      fileProdId.remove(prodIdLastIndex,1);
-      fileProdId.remove(0,1);
-      // Now, compare product ids from the input image and from the calibration table.
-      if(fileProdId == prodId ) {
-        if((row.dim1() - 1) != 2) {
-          QString msg = "This appears to be a malformed calibration file."; 
-                  msg += " There are not enough columns in the CSV";
-                  msg += " file to perform the exposure time correction.";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-        // Build the two vectors, exptime and frame. We'll relate those to each other
-        // back in main(). Remember that a productID may have multiple entries in the table.
-        frameseq.push_back(toInt(row[1]));
-        exptime.push_back(toDouble(row[2]));
-      }
+
+  // Get the exposure duration(s) and coorisponding frame number(s) (zero based) from the label
+  PvlGroup inst = icube.group("Instrument");
+
+  if (!inst.hasKeyword("VariableExposureDuration") || !inst.hasKeyword("FrameNumber")) {
+    QString msg = "The instrument keywords VariableExposureDuration and FrameNumber"
+                  "must exist to calibrate this MARCI file. Prior to isis3.10.0 these" 
+                  "keywords were not added by marci2isis; you may need to rerun isis3.10+"
+                  "marci2isis on your images.";
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (flipped && exptime.size() > 0) {
-    reverse(frameseq.begin(),frameseq.end());
-    reverse(exptime.begin(),exptime.end());
-  }
-
-  if (exptime.size() == 0) {
-    PvlGroup missing("NoExposureTimeDataFound");
-    missing.addKeyword(PvlKeyword("FileNotFoundInVarexpFile", prodId), Pvl::Replace);
-    Application::Log(missing);
+  // The previous version of marcical read the first exposure duration and frame number from
+  // the label and the other durations/frames (if any) from the mission's varexp.tab file.
+  // In order to minimize the changes to this code while modifying it to use the keywords instead of
+  // reading the varexp.tab file directly, the duration/frame where the frame is zero are dropped from 
+  // the array when converting them from the keywords. This calibration code should be 
+  // able to be simplified significantly by not removing the frameNumber=0 exposure/frame and
+  // removing the first frame ifs in the calibration code below.
+  PvlKeyword expTimesKey = inst["VariableExposureDuration"];
+  PvlKeyword frameNumbersKey = inst["FrameNumber"];
+  for (int i=0; i<expTimesKey.size(); i++) {
+    if (toInt(frameNumbersKey[i]) != 0) {
+      exptime.push_back(toDouble(expTimesKey[i]));
+      frameseq.push_back(toInt(frameNumbersKey[i]));
+    }
   }
 
   bool iof = ui.GetBoolean("IOF");
@@ -413,7 +397,7 @@ void IsisMain() {
   Camera *cam = NULL;
   double solarDist = Isis::Null;
 
-  if(iof) {
+  if (iof) {
     cam = icube.camera();
     cam->SetImage(icubeMgr.size() / 2.0, 0.5 + (16 / 2) / summing);
     solarDist = cam->SolarDistance();
@@ -439,17 +423,26 @@ void IsisMain() {
     ocube.read(ocubeMgr);
 
     int fcubeIndex = filter[ocubeMgr.Band()-1] - 1;
+    // First time through the loop or the Mgr finished with one band and has incremented to the next
     if (band != ocubeMgr.Band()) {
       band = ocubeMgr.Band();
       line = 0;
       if (!flipped) {
+        // Question: for the first time thru the do loop maxOffset is set above to the max of padding, but
+        // for the first framelet of the second band maxOffset seems to be left over from the previous itteration
+        // Seems like something might be wrong here.
         frame = 0;
         exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
       } 
       else {
         maxOffset = padding[band-1];
         frame = (icube.lineCount() - maxOffset) / filterHeight - 1;
-        exposure = exptime[0];
+        if (exptime.size() > 0) {
+          exposure = exptime[0];
+        }
+        else {
+          exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+        }
       }
       seqno = 0;
     }
@@ -467,7 +460,13 @@ void IsisMain() {
       if (!flipped) {
         if (seqno < fsize) {
           if (frame >= frameseq[seqno]) {
-            exposure = exptime[seqno];
+            if (exptime.size() > 0) {
+              exposure = exptime[seqno];
+            }
+            else {
+              exposure = ((double)icube.label()->findGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+            }
+            // Exposure duration for the UV filters are calculated from the non-UV exposure duration 
             if ((QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "LONG_UV" ||
                  (QString)icube.label()->findGroup("BandBin", Pvl::Traverse)["FilterName"][band-1] == "SHORT_UV") {
               exposure = ifdelay - 57.763 - exposure;
@@ -493,11 +492,11 @@ void IsisMain() {
       }
     }
 
-    for(int i = 0; i < ocubeMgr.size(); i++) {
-      if(IsSpecial((*fcubeMgrs[fcubeIndex])[i]) || (*fcubeMgrs[fcubeIndex])[i] == 0.0) {
+    for (int i = 0; i < ocubeMgr.size(); i++) {
+      if (IsSpecial((*fcubeMgrs[fcubeIndex])[i]) || (*fcubeMgrs[fcubeIndex])[i] == 0.0) {
         ocubeMgr[i] = Isis::Null;
       }
-      else if(IsSpecial(icubeMgr[i])) {
+      else if (IsSpecial(icubeMgr[i])) {
         ocubeMgr[i] = icubeMgr[i];
       }
       else {
@@ -506,7 +505,7 @@ void IsisMain() {
         ocubeMgr[i] = ocubeMgr[i] / exposure / (summing * decimation[fcubeIndex]) / calibrationCoeffs[fcubeIndex].first;
 
         // Convert to I/F?
-        if(iof) {
+        if (iof) {
           ocubeMgr[i] /= calibrationCoeffs[fcubeIndex].second / Isis::PI / (solarDist * solarDist);
         }
       }
@@ -519,16 +518,16 @@ void IsisMain() {
 
     bool newFramelet = false;
 
-    for(int i = 0; i < (int)fcubeMgrs.size(); i++) {
+    for (int i = 0; i < (int)fcubeMgrs.size(); i++) {
       (*fcubeMgrs[i]) ++;
 
-      if(fcubeMgrs[i]->end()) {
+      if (fcubeMgrs[i]->end()) {
         fcubeMgrs[i]->SetLine(1, 1);
         newFramelet = true;
       }
     }
 
-    if(newFramelet && cam != NULL) {
+    if (newFramelet && cam != NULL) {
       // center the cameras position on the new framelet to keep the solar distance accurate
       cam->SetBand(icubeMgr.Band());
       cam->SetImage(icubeMgr.size() / 2.0 + 0.5, (icubeMgr.Line() - 0.5) + (16 / 2) / summing);
@@ -536,19 +535,19 @@ void IsisMain() {
     }
 
     prog.CheckStatus();
-  }
-  while(!ocubeMgr.end());
+  } while (!ocubeMgr.end());
+
 
   // Propagate labels and objects (in case of spice data)
   PvlObject &inCubeObj = icube.label()->findObject("IsisCube");
   PvlObject &outCubeObj = ocube.label()->findObject("IsisCube");
 
-  for(int g = 0; g < inCubeObj.groups(); g++) {
+  for (int g = 0; g < inCubeObj.groups(); g++) {
     outCubeObj.addGroup(inCubeObj.group(g));
   }
 
-  for(int o = 0; o < icube.label()->objects(); o++) {
-    if(icube.label()->object(o).isNamed("Table")) {
+  for (int o = 0; o < icube.label()->objects(); o++) {
+    if (icube.label()->object(o).isNamed("Table")) {
       Blob t(icube.label()->object(o)["Name"], icube.label()->object(o).name());
       icube.read(t);
       ocube.write(t);
@@ -558,7 +557,7 @@ void IsisMain() {
   // The cube still owns this
   cam = NULL;
 
-  for(int i = 0; i < (int)flatcubes.size(); i++) {
+  for (int i = 0; i < (int)flatcubes.size(); i++) {
     delete fcubeMgrs[i];
     delete flatcubes[i];
   }
