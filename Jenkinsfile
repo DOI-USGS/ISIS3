@@ -4,6 +4,8 @@ pipeline
 {
     stages
     {
+        stage("do stuff")
+        {
         parallel
         {
             stage('CentOS')
@@ -24,6 +26,6 @@ pipeline
                 echo "Foo"
                 sleep 10
             }
-        }
+        }}
     }
 }
