@@ -5,35 +5,38 @@ pipeline
     agent any
     stages
     {
-        parallel
+        stage
         {
-            stage('Mac')
+            parallel
             {
-                agent{ label 'mac'}
-                steps{
-                    echo "Foo"
-                    sleep 20
-                }
-            }
-            stage('CentOS')
-            {
-                steps
+                stage('Mac')
                 {
-                    build 'ISIS-Builds/CentOS'
+                    agent{ label 'mac'}
+                    steps{
+                        echo "Foo"
+                        sleep 20
+                    }
                 }
-            }
-            stage('Fedora')
-            {
-                steps
+                stage('CentOS')
                 {
-                    build 'ISIS-Builds/Fedora'
+                    steps
+                    {
+                        build 'ISIS-Builds/CentOS'
+                    }
                 }
-            }
-            stage('Ubuntu')
-            {
-                steps
+                stage('Fedora')
                 {
-                    build 'ISIS-Builds/Ubuntu'
+                    steps
+                    {
+                        build 'ISIS-Builds/Fedora'
+                    }
+                }
+                stage('Ubuntu')
+                {
+                    steps
+                    {
+                        build 'ISIS-Builds/Ubuntu'
+                    }
                 }
             }
         }
