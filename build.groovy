@@ -6,7 +6,7 @@ def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
 
 def isisTestDataPath = "/isisData/testData"
 
-def kakaduIncDir = "/isisData/kakdu"
+def kakaduIncDir = "/isisData/kakadu"
 
 def isisEnv = [
     "ISIS3DATA=${isisDataPath}",
