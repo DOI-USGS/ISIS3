@@ -54,9 +54,8 @@ node("${env.OS.toLowerCase()}") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
-        echo pwd()
-        isisEnv.add("ISISROOT=${pwd()}/build/ISIS3/build")
-        cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/build/ISIS3/install")
+        isisEnv.add("ISISROOT=${pwd()}/ISIS3/build")
+        cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/ISIS3/install")
     }
 
     stage("Create environment") {
@@ -82,6 +81,8 @@ node("${env.OS.toLowerCase()}") {
                     env.STAGE_STATUS = "Building ISIS on ${env.OS}"
                     sh """
                         source activate isis
+                        echo `ls ../`
+                        echo `pwd`
                         cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                         ninja -j4 install
                         python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
