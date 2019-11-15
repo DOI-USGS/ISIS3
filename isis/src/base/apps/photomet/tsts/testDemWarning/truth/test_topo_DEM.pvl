@@ -1,0 +1,19 @@
+Group = NormalizationModelParametersUsed
+  NORMNAME = TOPO
+  INCREF   = 0.0
+  THRESH   = 30.0
+  ALBEDO   = 1.0
+End_Group
+
+Group = AtmosphericModelParametersUsed
+End_Group
+
+Group = PhotometricModelParametersUsed
+  PHTNAME = MINNAERT
+  K       = 0.5
+End_Group
+
+Group = Warning
+  Warning = "The TOPO Normalized model is not recommended for use with the DEM
+             Angle Source option"
+End_Group
