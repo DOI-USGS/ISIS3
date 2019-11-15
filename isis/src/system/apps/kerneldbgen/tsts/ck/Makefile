@@ -22,5 +22,9 @@ commands:
 	  sclk=\$$mro/kernels/sclk/MRO_SCLKSCET.00006.tsc \
 	  lsk=\$$base/kernels/lsk/naif0008.tls > /dev/null; \
 	grep "mro_sc_2005" $(OUTPUT)/kernel.db.pvl > $(OUTPUT)/kernelFileNamesWithPath.txt;
-	$(SED) s+.*/++ $(OUTPUT)/kernelFileNamesWithPath.txt > $(OUTPUT)/orderedKernelFileNames.txt;
+	$(SED) s+.*/++ $(OUTPUT)/kernelFileNamesWithPath.txt > $(OUTPUT)/kernelFileNamesWhitespace.txt;
+	# Remove whitespace - this is needed in the rare circumstance that the input file path
+	# is exactly 66 characters in length
+	$(SED) 's/^[[:space:]]*//g' $(OUTPUT)/kernelFileNamesWhitespace.txt > $(OUTPUT)/orderedKernelFileNames.txt;
 	$(RM) $(OUTPUT)/kernelFileNamesWithPath.txt;
+	$(RM) $(OUTPUT)/kernelFileNamesWhitespace.txt;
