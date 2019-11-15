@@ -1,8 +1,8 @@
 // vim: ft=groovy
 
 pipeline 
-agent any
 {
+agent any
     stages
     {
         stage('CentOS')
