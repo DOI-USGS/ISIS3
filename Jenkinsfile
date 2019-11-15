@@ -5,7 +5,7 @@ pipeline
     agent any
     stages
     {
-        stage
+        stage('Do it')
         {
             parallel
             {
