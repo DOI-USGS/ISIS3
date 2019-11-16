@@ -169,6 +169,8 @@ void IsisMain() {
   else { // Bitweight correction
     FileName bitweightFile = gbl::FindBitweightFile();
     if(!bitweightFile.fileExists()) { // bitweight file not found, stop calibration
+      // Remove the output cube since it will be empty at this point
+      outcube->close(true);
       throw IException(IException::Io,
                        "Unable to calibrate image. BitweightFile ***"
                        + bitweightFile.expanded() + "*** not found.", _FILEINFO_);
@@ -203,6 +205,8 @@ void IsisMain() {
   }
   catch(IException &e) { // cannot perform dark current, stop calibration
     e.print();
+    // Remove the output cube since it will be empty at this point
+    outcube->close(true);
     throw IException(e, IException::Unknown,
                      "Unable to calibrate image. Dark current calculations failed.",
                      _FILEINFO_);
@@ -272,7 +276,7 @@ void IsisMain() {
  *            check for ShutterStateId, and if it is Disabled,
  *            do not subtract an offset from the exposure time.
  *            Added Sensitivity vs Time Correction after
- *            correction factors. 
+ *            correction factors.
  *            Matches cisscal version 3.9.1.
  */
 void gbl::Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
@@ -1315,7 +1319,7 @@ void gbl::FindShutterOffset() {
  * @internal
  *   @history 2008-11-05 Jeannie Walldren - Original version
  *   @history 2019-08-14 Kaitlyn Lee - Added check for
- *            ShutterStateId. Updated solid angle and optics 
+ *            ShutterStateId. Updated solid angle and optics
  *            area values. Matches cisscal version 3.9.1.
  */
 void gbl::DivideByAreaPixel() {
@@ -1333,8 +1337,8 @@ void gbl::DivideByAreaPixel() {
   //  OpticsArea is (Diameter of Primary Mirror)^2 * Pi/4
   //      Optics areas below come from radii in "Final Report, Design
   //      and Analysis of Filters for the Cassini Narrow and Wide
-  //      Optics" by David Hasenauer, May 19, 1994.  
-     
+  //      Optics" by David Hasenauer, May 19, 1994.
+
   //  We will adjust here for the effects of SUM modes
   //  (which effectively give pixels of 4 or 16 times normal size)
 

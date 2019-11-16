@@ -1042,16 +1042,39 @@ namespace Isis {
       }
     }
 
+    // Loop over the observations to find the longest file path/name in the
+    // bunch
+    int filePadding = 0;
+
+    for (int i = 0; i < numObservations; i++) {
+
+      int numImagesInObservation = m_statisticsResults->observations().at(i)->size();
+
+      for (int j = 0; j < numImagesInObservation; j++) {
+        BundleImageQsp bundleImage = m_statisticsResults->observations().at(i)->at(j);
+
+        if (bundleImage->fileName().length() > filePadding) {
+          filePadding = bundleImage->fileName().length();
+        }
+      }
+    }
+
     sprintf(buf, "\nIMAGE MEASURES SUMMARY\n==========================\n\n");
     fpOut << buf;
-    sprintf(buf,"                                      Measures                        RMS(pixels)\n");
-    fpOut << buf;
-    sprintf(buf,"                              ************************  "
-                "**************************************\n");
+
+    // Pad each element in the table with the space for the longest image
+    // path/name then padd it the length of the element + 1
+    QString header("Measures                            RMS(pixels)");
+    // This is padded by an extra 11 to move it center to the table
+    sprintf(buf,"%*s\n", header.length() + 11 + filePadding, header.toLatin1().data());
     fpOut << buf;
 
-    sprintf(buf,"                              |Accepted    |    Total|   |Samples    |    "
-                "Lines    |    Total|\n");
+    QString dividers("***************************   *******************************************");
+    sprintf(buf,"%*s\n", dividers.length() + 1 + filePadding, dividers.toLatin1().data());
+    fpOut << buf;
+
+    QString fields("|  Accepted  |   Total    |   |   Samples   |    Lines    |    Total    |");
+    sprintf(buf,"%*s\n", fields.length() + 1 + filePadding, fields.toLatin1().data());
     fpOut << buf;
 
     int numMeasures;
@@ -1086,13 +1109,17 @@ namespace Isis {
 
         numUsed = numMeasures - numRejectedMeasures;
 
-        sprintf(buf,"%30s" ,bundleImage->fileName().toLatin1().data());
+        QString filename = bundleImage->fileName();
+        QStringList List;
+        List = filename.split("/");
+
+        sprintf(buf,"%-*s" ,filePadding + 1, bundleImage->fileName().toLatin1().data());
         fpOut << buf;
 
-        sprintf(buf,"%5d            %5d      ",numUsed,numMeasures);
+        sprintf(buf, " %12d %12d     ", numUsed, numMeasures);
         fpOut << buf;
 
-        sprintf(buf,"%-15.4lf%-15.4lf%-15.4lf \n",
+        sprintf(buf,"%13.4lf %13.4lf %13.4lf \n",
                 rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
 
         fpOut << buf;
@@ -1100,11 +1127,11 @@ namespace Isis {
       }
     }
 
-    sprintf(buf,"\nTotal RMS:");
+    // Do something similar to above but left justify the string and add a 33
+    // character buffer
+    sprintf(buf,"%*s", -(filePadding + 33), "\nTotal RMS:");
     fpOut << buf;
-    sprintf(buf,"                                                ");
-    fpOut << buf;
-    sprintf(buf,"%-15.4lf%-15.4lf%-15.4lf\n",
+    sprintf(buf,"%13.4lf %13.4lf %13.4lf\n",
     rmsSamplesTotal.Rms(),rmsLinesTotal.Rms(),rmsTotals.Rms());
     fpOut << buf;
 
