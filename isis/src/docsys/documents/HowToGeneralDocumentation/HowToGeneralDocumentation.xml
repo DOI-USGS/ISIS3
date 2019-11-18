@@ -56,7 +56,7 @@
         </p>
         <p>
           ISIS documentation is part of the source code distribution, resides in an organized structure, and in part is automatically
-          generated from text files written in the ISIS XML languages. Additionally, a copy of the documentation is published to the ISIS web site, therefore
+          generated from text files written in the ISIS XML languages. A copy of the documentation is published to the ISIS web site, therefore
           the ISIS web site and the ISIS documentation are identical. In this document, the term "web site" will refer to the complete ISIS
           documentation.
         </p>
