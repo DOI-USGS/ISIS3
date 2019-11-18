@@ -229,7 +229,7 @@ void IsisMain() {
         PvlKeyword varExposure("VariableExposureDuration");
         PvlKeyword frameNumber("FrameNumber");
 
-        for (int i=0; i < exptime.size(); i++) {
+        for (unsigned int i=0; i < exptime.size(); i++) {
           varExposure.addValue( QString::number(exptime[i]), "ms" );
           frameNumber.addValue( QString::number(frameseq[i]) );
         }
