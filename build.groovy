@@ -6,6 +6,8 @@ def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
 
 def isisTestDataPath = "/isisData/testData"
 
+def kakaduIncDir = "/isisData/kakadu"
+
 def isisEnv = [
     "ISIS3DATA=${isisDataPath}",
     "ISIS3TESTDATA=${isisTestDataPath}",
@@ -13,7 +15,8 @@ def isisEnv = [
 ]
 
 def cmakeFlags = [
-    "-DJP2KFLAG=OFF",
+    "-DJP2KFLAG=ON",
+    "-DKAKADU_INCLUDE_DIR=${kakaduIncDir}",
     "-Dpybindings=OFF",
     "-DCMAKE_BUILD_TYPE=RELEASE"
 ]
