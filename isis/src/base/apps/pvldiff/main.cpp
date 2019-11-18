@@ -134,8 +134,8 @@ void compareKeywords(PvlKeyword &pvl1, PvlKeyword &pvl2) {
     if ( ignoreFilePaths.hasKeyword(pvl1.name()) &&
          (((ignoreFilePaths[pvl1.name()].size() > 1 && ignoreFilePaths[pvl1.name()][i] == "true") ||
          (ignoreFilePaths[pvl1.name()].size() == 1 && ignoreFilePaths[pvl1.name()][0] == "true"))) ) {
-      val1 =  val1.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
-      val2 =  val2.replace(QRegularExpression("(\\/[\\w\\-\\. ]*)+\\/"), "");
+      val1 =  val1.replace(QRegularExpression("(\[\\w\\-\\$\\. ]*)+\\/"), "");
+      val2 =  val2.replace(QRegularExpression("(\[\\w\\-\\$\\. ]*)+\\/"), "");
     }
 
 
