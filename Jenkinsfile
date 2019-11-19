@@ -1,20 +1,42 @@
 // vim: ft=groovy
 
-node {
-    parallel(
-        'centos': {
-            stage('CentOS') {
-                build 'ISIS-Builds/CentOS'
-            }
-        },
-        'fedora': {
-            stage('Fedora') {
-                build 'ISIS-Builds/Fedora'
-            }
-        },
-        'ubuntu': {
-            stage('Ubuntu') {
-                build 'ISIS-Builds/Ubuntu'
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('CI')
+        {
+            parallel
+            {
+                stage('Mac')
+                {
+                    agent{ label 'mac'}
+                    steps{
+                        build 'ISIS-Builds/Mac'
+                    }
+                }
+                stage('CentOS')
+                {
+                    steps
+                    {
+                        build 'ISIS-Builds/CentOS'
+                    }
+                }
+                stage('Fedora')
+                {
+                    steps
+                    {
+                        build 'ISIS-Builds/Fedora'
+                    }
+                }
+                stage('Ubuntu')
+                {
+                    steps
+                    {
+                        build 'ISIS-Builds/Ubuntu'
+                    }
+                }
             }
         }
     )

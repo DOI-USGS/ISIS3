@@ -6,6 +6,8 @@ def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
 
 def isisTestDataPath = "/isisData/testData"
 
+def kakaduIncDir = "/isisData/kakadu"
+
 def isisEnv = [
     "ISIS3DATA=${isisDataPath}",
     "ISIS3TESTDATA=${isisTestDataPath}",
@@ -13,7 +15,8 @@ def isisEnv = [
 ]
 
 def cmakeFlags = [
-    "-DJP2KFLAG=OFF",
+    "-DJP2KFLAG=ON",
+    "-DKAKADU_INCLUDE_DIR=${kakaduIncDir}",
     "-Dpybindings=OFF",
     "-DCMAKE_BUILD_TYPE=RELEASE"
 ]
@@ -195,13 +198,13 @@ node("${env.OS.toLowerCase()}") {
                             source activate isis
                             echo $ISIS3TESTDATA
                             echo $ISIS3DATA
+                            echo $PATH
 
                             # environment variables
-                            export ISISROOT=`pwd`
+                            export ISISROOT=${env.ISISROOT}
                             export ISIS3TESTDATA="/isisData/testData"
                             export ISIS3DATA='/isisData/data'
-                            export PATH=`pwd`/bin:$PATH
-                            catlab -HELP
+                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
 
                             ctest -R "." -E "(_app_|_unit_|_module_)" -j4 -VV
                             source deactivate

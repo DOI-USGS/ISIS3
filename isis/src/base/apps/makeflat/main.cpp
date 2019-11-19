@@ -498,7 +498,7 @@ void IsisMain() {
   PvlGroup excludedFiles("ExcludedFiles");
   for(currImage = 0; currImage < inList.size(); currImage++) {
     if(Excluded(currImage)) {
-      excludedFiles += PvlKeyword("File", inList[currImage].toString());
+      excludedFiles += PvlKeyword("File", inList[currImage].original());
     }
   }
 
