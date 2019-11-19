@@ -4,49 +4,51 @@ This document explains the release process for Official Releases, Release Candid
 
 ## Step 1: Check current false positive test failures
 
-In this step, we check the currently failing tests. This is primarily an issue on the Mac OS where the timeout on the test execution is being hit. This is currently a judgement call on whether or not the tests are false-positives. This decision should be made by 2+ developers on the development team.
+In this step, we check the currently failing tests. This is currently a judgement call on whether or not the tests are false-positives. This decision should be made by 2+ developers on the development team.
 
 ## Step 2: Set Up the Local and Remote Repositories
-
 In this step, we will prepare the local repository to build from as well as update the remote repository hosted on GitHub. Keep in mind that you will be building from this repo on other systems and plan accordingly by cloning this repo into a directory that you will still have access to as you switch between the machines.
 
-* Clone a fresh copy of the ISIS3 repository from GitHub as isis3mgr
-* Update the isis/CMakeLists.txt file to reflect the proper version number and release stage. NOTE: Do not add the _RC#
-* Until the build process is updated to pull from github tarballs, update the recipe/meta.yaml at this stage as well: 
-    * build number: should be set to 0
-    * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
-    * If you are building a Release Candidate, please include "_RCx". For example, for the first ISIS3.6.1 release candidate, it would be: "3.6.1_RC1". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC1), but the conda build system requires an underscore.
-    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis1".
-  * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
+### Part A: Setup Repository
+* Create a fresh branch off of the dev branch (e.g.: `git checkout -b 3.9.1prep upstream/dev`).
+
+### Part B: Update isis/CMakeLists.txt
+* Update the VERSION variable to the latest version number. NOTE: Do not add the _RC#
+* Update the RELEASE_STAGE variable:
+    * 'stable' is for full releases.
+    * 'beta' is for RC's.
+    * 'alpha' is for developer release or custom mission builds.
+
+### Part C: Update recipe/meta.yaml
+* Update the version variable to the version of ISIS you are building.
+    * If you are building a standard release, use the same version number as in [Part B].(#Part_B:_Update_isis/CMakeLists.txt)
+    * If you are building a release candidate, include "_RCx". 
+        * For the first ISIS3.6.1 release candidate, it would be: "3.6.1_RC1".
+    * If you are creating a custom build, include a unique tag. 
+        * For a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis1".
+* Ensure the build_number is set to 0.
+  * The build number should be incremented for each build produced at the **same version** of source code and should always begin at 0 for each release version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
 
+### Part D: Create a Pull Request
 * Make a pull request with your local changes into the repository.
-  * Once, the PR has been reviewed and merged move onto the next step.
 
-* Make a github release and tag for the build 
-  * The release "Tag version" should be the \<version\> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0, you should set your Release/Tag "Tag version" to 3.6.0 (**note**: no 'v' prefix to the version number.)
-    * ***Please note that the recipe/meta.yaml file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
-  * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
-  * Release Candidate or mission-specific release "Tag version" convention: version XX.YY.ZZ_<mission#/"RC#"><release> (ex. 3.6.1_cassis2 or 3.6.1_RC3)
-
-### The following section will apply after building from the release tarball is functioning: 
-
-* Download the release zip file to some location
-* Get the metadata necessary for a release (meta.yaml file):
-  * sha256 hash: `openssl sha256 *.zip`
-  * version: from the tag created above
-  * build number: should be set to 0
-* Update the recipes/meta.yaml file within the repo to include proper version number so that the tarball created in step 2 is being targeted. Update the sha256 and check the build number. This number should be `0` with a new version being release). The build number may need to increment if the version number is staying the same and a new  and build number
-  * The version should be the version of ISIS you are building. Refer [here](https://semver.org/) for information on semantic versioning.
-    * If you are building a Release Candidate, please include "_RC". For example, for the ISIS3.6.1 release candidate, it would be: "3.6.1_RC". Our semantic versioning would call for a hyphen (ISIS3.6.1-RC), but the conda build system requires an underscore.
-    * If you are creating a custom build, please include a unique tag. For example, for a custom ISIS3.6.1 CaSSIS build, it would be: "3.6.1_cassis".
-  * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
-  * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
-  * Now that the meta.yaml has been updated, go ahead and PR the updated meta.yaml to the dev branch.
+### Part E: Make Github Release
+Once the PR has been reviewed and merged:
+* Draft a new github release. 
+  * Tag the release. 
+      * The release "Tag version" must be the \<version\> from the meta.yaml file you modified in [Part C](#Part_C:_Update_recipe/meta.yaml).
+      * Mission and non-standard builds (including release candidates) must be tagged as pre-release.
+  * Name the release.
+      * If it is a standard release, name it "ISISX.Y.Z Public Release".
+      * If it is a release candidate, name it "ISISX.Y.Z Release Candidate N".
+  * Describe the release.
+      * If it is a standard release, description should state "The official release for ISIS version X.Y.Z".
+      * If it is a release candidate, description should state "[First/Second/Third/...] release candidate for ISIS X.Y.Z".
 
 ## Step 3: Create the Builds for Anaconda Cloud
 
-In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28, Ubuntu 18 LTS), and one for Mac (built on prog26, Mac OS 10.13). (Missions may need certain builds and not others. Communicate with your team as to what they are going to need.) Repeat this and the upload process process for each necessary system. You will need to be isis3mgr for this step since prog26 needs /jessetest in the PATH.
+In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28, Ubuntu 18 LTS), and one for Mac (built on prog26, Mac OS 10.13). Missions may need certain builds and not others. Communicate with your team as to what they are going to need. Repeat this and the upload process process for each necessary system. You will need to be isis3mgr for this step since prog26 needs /jessetest in the PATH.
 
 Please keep in mind that conda may be a little finicky when building for other systems. You must use an OS-specific version of the software, confirm that there exists only one version in your system PATH variable, and that all commands run use that version exclusively. Fortunately, much of the output from conda commands will state the path to the version it is using explicitly.
 
@@ -71,7 +73,7 @@ clone ISIS3 as isis3mgr, and checkout the branch to be built.
   * You may also get a bunch of warnings during the building process, this is okay for now.
 * Save the tar.bz2 file produced by the previous command in /work/projects/conda-bld/. (Each OS will have it's own directory within here; be sure to save each OS-specific build in it's respective directory). This ensures that we have a backup of all files that have been uploaded into Anaconda Cloud.
 
-## Step 3: Upload the Build to Anaconda Cloud
+## Step 4: Upload the Build to Anaconda Cloud
 
 In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. The location of the .tar.bz2 file to be uploaded should have been displayed at the end of the ```conda build``` command from above. In case you missed this message, you may also run this command to see the location: ```conda build recipe/ --output```. Keep in mind that this does not confirm that the file actually exists - only where it _would_ be saved with a successful build.
 
@@ -97,7 +99,7 @@ If, however, this is a custom build and/or a Release Candidate, you will need to
 
 Remember to always ensure that custom builds include a label flag or the file will be uploaded by default with the "main" tag on Anaconda Cloud and users may receive a build not intended as a main release by default.
 
-## Step 4: Update Data and TestData Areas on rsync Servers
+## Step 5: Update Data and TestData Areas on rsync Servers
 
 This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes.
 
