@@ -1,6 +1,7 @@
 // vim: ft=groovy
 
 pipeline
+
 {
     agent any
     stages
