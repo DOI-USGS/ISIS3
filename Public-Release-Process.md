@@ -20,6 +20,9 @@ In this step, we will prepare the local repository to build from as well as upda
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
 
+* Make a pull request with your local changes into the repository.
+  * Once, the PR has been reviewed and merged move onto the next step.
+
 * Make a github release and tag for the build 
   * The release "Tag version" should be the \<version\> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0, you should set your Release/Tag "Tag version" to 3.6.0 (**note**: no 'v' prefix to the version number.)
     * ***Please note that the recipe/meta.yaml file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
