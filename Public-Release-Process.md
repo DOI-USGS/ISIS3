@@ -20,12 +20,6 @@ In this step, we will prepare the local repository to build from as well as upda
   * The build number should be incremented for each build produced at the same version of source code, and should always begin at 0 for each version. 
   * ****Please note that this step is important as this is how the file to be uploaded to Anaconda Cloud is named by conda build. If a file with the same name already exists on USGS-Astrogeology channel in Anaconda Cloud, it will be overwritten with the new upload.****
 
-* As isis3mgr, do a manual build and run the tests for all supported systems (this is happening in the nightly CI-builds). This may be done using the buildIsisCmakeAllSys script. Make sure you are building in /usgs/pkgs or in another area that is unique to each machine, otherwise the builds will be overwritten. Example: `buildIsisCmakeAllSys -q -b dev /usgs/pkgs/isis3.8.0_RC1-test`
-  * This includes all systems tested nightly: Fedora 28 (prog29), Ubuntu 18.4 (prog28), CentOS (prog24), and MacOS 10.13 (prog27).
-  * (This step should no longer be necessary once Jenkins has been properly set-up as tests will run before each merge)
-* Once tests are passing, push the changes back up to the designated branch.
-  * For public releases or Release Candidates, this will simply be the "dev" branch and will require someone else merge for you.
-  * (This step is optional for custom builds.)
 * Make a github release and tag for the build 
   * The release "Tag version" should be the \<version\> from the meta.yaml file you modified above. This is how the conda build system knows what tar.gz file to pull from the repo. (For example, if your version was 3.6.0, you should set your Release/Tag "Tag version" to 3.6.0 (**note**: no 'v' prefix to the version number.)
     * ***Please note that the recipe/meta.yaml file does not currently make use of this tag due to unresolved issues with the gtest submodule, but we would like to transition to this method for building in the future. The code to implement this exists in the recipe/build.sh file as a comment, but conda-build still makes use of the repository and the branch to clone the repository currently.***
