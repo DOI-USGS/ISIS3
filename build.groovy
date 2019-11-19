@@ -1,6 +1,6 @@
 // vim: ft=groovy
 
-def isisDataPath = '/isisData/data'
+def isisDataPath = '/isisData/data' 
 
 def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
 
