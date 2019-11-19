@@ -18,7 +18,7 @@
 #       A Public Release for ISIS3.6.1:                        {% set version = "3.6.1" %}
 #       A Release Candidate for ISIS3.6.1:                     {% set version = "3.6.1_RC" %}
 #       A custom build of ISIS3.6.1 for the CaSSIS mission:    {% set version = "3.6.1_cassis" %}
-{% set version = "3.9.0_RC2" %}
+{% set version = "3.9.1" %}
 
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
@@ -78,9 +78,8 @@ requirements:
   - ninja==1.7.2
   - nn
   - openblas==0.2.19
-  - opencv==3.2.0|3.3.0
+  - opencv
   - openssl==1.0.2n
-  - patchelf==0.9
   - pcl==1.8.1
   - pip==9.0.1
   - protobuf==3.5.2
@@ -110,7 +109,6 @@ requirements:
   - bullet==2.86.1
   - bz2file==0.98
   - bzip2==1.0.6
-  - cmake==3.9.1
   - cspice==66
   - curl==7.60.0
   - doxygen==1.8.14
@@ -124,7 +122,6 @@ requirements:
   - hdf5==1.8.18
   - icu==58.2
   - jama==125
-  - jasper=1
   - jpeg==9b
   - kakadu==1
   - krb5==1.14.2
@@ -132,17 +129,14 @@ requirements:
   - libprotobuf==3.5.2
   - libtiff=>4.0.9
   - libxml2==2.9.7
-  - make
   - mesalib==17.2.0
   - mysql==5.7.20
   - mysql-connector-c==6.1.6
   - nanoflann==1.2.2
-  - ninja==1.7.2
   - conda-forge/label/gcc7::nn
   - openblas==0.2.19
-  - opencv==3.2.0|3.3.0
+  - opencv
   - openssl==1.0.2n
-  - patchelf==0.9
   - pcl==1.8.1
   - pip==9.0.1
   - protobuf==3.5.2
