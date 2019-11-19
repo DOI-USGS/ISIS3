@@ -48,30 +48,36 @@ Once the PR has been reviewed and merged:
 
 ## Step 3: Create the Builds for Anaconda Cloud
 
-In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. Keep in mind that there will usually be two default public builds: one for Linux (built on prog28, Ubuntu 18 LTS), and one for Mac (built on prog26, Mac OS 10.13). Missions may need certain builds and not others. Communicate with your team as to what they are going to need. Repeat this and the upload process process for each necessary system. You will need to be isis3mgr for this step since prog26 needs /jessetest in the PATH.
+In this step, we will create the build(s) for Anaconda Cloud using the conda-build system. There are two builds for standard releases: one for Linux (built on Ubuntu 18 LTS), and one for Mac (built on Mac OS 10.13). Missions may only need one build and not the other. Communicate with your team as to what they need. Repeat this and the upload process process for each necessary system.
 
-Please keep in mind that conda may be a little finicky when building for other systems. You must use an OS-specific version of the software, confirm that there exists only one version in your system PATH variable, and that all commands run use that version exclusively. Fortunately, much of the output from conda commands will state the path to the version it is using explicitly.
+Anaconda leverages caching in many places which can cause issues. If you are getting unexpected issues, try a different installation and/or a different machine.
 
-* ssh into the prog machine that you are creating the build from and ensure you are using a bash shell.
-* Ensure you have a version of conda setup, and if not, set it up. Keep in mind that there exists versions for use building-wide in /usgs/cpkgs/ (though for the Mac system, you will probably want to use the version in /jessetest/miniconda/).
-  * Run the command ```conda env list```. If conda is setup properly, this will display a list of available conda environments. If instead you see a ```Command not found``` error or the active base environment (noted by an asterisk) is not the version of conda you are wanting to use, you will need to setup the version of conda you wish to use by running the command ```source /<path-to-anaconda-version>/etc/profile.d/conda.sh```.
-* In your base Anaconda environment (just confirm no environments have been activated), run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build
-* Ensure that you have anaconda-client, conda-build, and conda-verify installed in your build environment
+### Part A: Operating System
+* Ensure the OS on the machine you are building the release on is the appropriate operating system (Mac OS 10.13 or Ubuntu 18 LTS).
+    * If you do not have access to a Mac OS 10.13, you can ssh into prog26.
+    * If you do not have access to a Ubuntu 18 LTS, you can ssh into prog28.
+
+### Part B: Setup Anaconda
+* Run `conda clean --all` to clean out your package cache and ensure you pull fresh packages for the build.
+* Activate the base environment: ```conda activate```.
+* Ensure that you have anaconda-client, conda-build, and conda-verify installed in your base environment
   * You can check by running ```anaconda login```, ```conda build -h```, and ```conda-verify --help```, respectively.
-* If this fails, try activating the base environment: ```conda activate```
-* If any of these packages are still unavailable, they can be installed as follows: 
+    * If any of these packages are not in your base environment, they can be installed using the following commands: 
 `conda install anaconda-client`
 `conda install -c anaconda conda-build` 
 `conda install -c anaconda conda-verify`
-* If you do not already have an up-to-date clone of ISIS3 which includes changes made earlier in this document, 
-clone ISIS3 as isis3mgr, and checkout the branch to be built.
-* From the root of the ISIS3 repo run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
+
+### Part C: Run the Build
+* Go to the root of the repository you set up in [Step 2 Part A](#Part_A:_Setup_Repository). Make sure it is up to date.
+    * Switch to the dev branch ```git checkout dev```
+    * Ensure you are at the head of the dev branch ```git pull upstream dev```
+* Run ```conda build recipe/ -c usgs-astrogeology -c conda-forge --no-test```
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
-* This command will take several minutes to run. Be looking for an "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output to confirm a good build.
-  * Make a note of this output. It will contain the location of your compressed .tar.bz2 file containing your build.
-  * You may also get a bunch of warnings during the building process, this is okay for now.
-* Save the tar.bz2 file produced by the previous command in /work/projects/conda-bld/. (Each OS will have it's own directory within here; be sure to save each OS-specific build in it's respective directory). This ensures that we have a backup of all files that have been uploaded into Anaconda Cloud.
+* If the build was successful you will see "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output. Note the location of compressed .tar.bz2 file containing your build.
+* Back up the build by copying the .tar.bz2 to:
+  * /work/projects/conda-bld/osx-64/ for Mac OS 10.13 
+  * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS
 
 ## Step 4: Upload the Build to Anaconda Cloud
 
