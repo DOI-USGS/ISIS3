@@ -9,13 +9,6 @@ pipeline
         {
             parallel
             {
-                stage('Mac')
-                {
-                    agent{ label 'mac'}
-                    steps{
-                        build 'ISIS-Builds/Mac'
-                    }
-                }
                 stage('CentOS')
                 {
                     steps
