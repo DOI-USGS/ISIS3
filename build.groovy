@@ -57,7 +57,7 @@ def my_func() {
     println("My Function")
 }
 
-node("${env.OS.toLowerCase()}") {
+node("centos") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
