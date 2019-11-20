@@ -53,10 +53,6 @@ def setGitHubBuildStatus(status) {
     ])
 }
 
-def my_func() {
-    println("My Function")
-}
-
 node("centos") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
