@@ -5,11 +5,6 @@ pipeline
     agent any
 
     stages {
-        stage ("Checkout") {
-            steps {
-                checkout scm
-            }
-        }
         stage ("Create Environment") {
             steps {
                 script {
