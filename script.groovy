@@ -1,7 +1,6 @@
 // vim: ft=groovy
 
 def myFunc(machine) {
-    env.STAGE_STATUS = "Creating conda environment"
     sh '''
         # Use the conda cache running on the Jenkins host
         conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
