@@ -121,7 +121,7 @@ and
 
 ***This entire step will be outdated with the upcoming migration to GitLab for our external data storage and CI integration.***
 
-## Step 5: Create Internal Builds/Installs for Astro
+## Step 6: Create Internal Builds/Installs for Astro
 
 This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus. As of 8/23/19, conda environments are the only supported way to access ISIS binaries internally, so it's not necessary to make builds for the `/usgs/pkgs` area as part of the release process any more.
 
@@ -162,7 +162,7 @@ Confirm that the environment has been set-up properly by deactivating it, reacti
 
 ***Don't forget to go back and do the other OS!***
 
-## Step 6: Update Documentation
+## Step 7: Update Documentation
 
 ***This step only need-be done with official public releases***
 
@@ -174,7 +174,7 @@ This step will update the ISIS documentation on our external web site for our us
 
 You may run into permission issues if isis3mgr does not own these files (you were not isis3mgr when you originally pulled this version of the repo). Additionally, you may be asked to provide credentials if you run the ```make wwwdoc``` command as anyone other than isis3mgr.
 
-## Step 7: Communicate Availability of Build
+## Step 8: Communicate Availability of Build
 
 You will now need to communicate with both the internal as well as the external users about a new version being available. (Feel free to use past announcements as a template.)
 
