@@ -53,7 +53,7 @@ def setGitHubBuildStatus(status) {
     ])
 }
 
-node("centos") {
+node("fedora") {
     stage ("Checkout") {
         env.STAGE_STATUS = "Checking out ISIS"
         checkout scm
