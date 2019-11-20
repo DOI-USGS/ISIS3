@@ -3,5 +3,5 @@
 node
 {
     def rootDir = pwd()
-    def build_script = load "${rootDir}/build.groovy"
+    def build_script = load "${rootDir}/script.groovy"
 }
