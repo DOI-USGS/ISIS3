@@ -7,12 +7,10 @@ pipeline
     {
         stage('Testing')
         {
+            def rootDir = pwd()
+            def build_script = load "${rootDir}/build.groovy"
             steps
             {
-                println("Apple")
-                def rootDir = pwd()
-                def build_script = load "${rootDir}/build.groovy"
-
                 script
                 {
                     build_script.my_func()
