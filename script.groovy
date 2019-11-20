@@ -2,6 +2,7 @@
 
 def myFunc() {
     println("IN MY FUNCTION")
+    sh "echo ${scm}"
     checkout scm
 }
 
