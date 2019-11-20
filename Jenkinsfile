@@ -10,10 +10,12 @@ pipeline
         }
         stage ("Create Environment") {
             steps {
-                def rootDir = pwd()
-                def build_script = load "${rootDir}/script.groovy"
+                script {
+                    def rootDir = pwd()
+                    def build_script = load "${rootDir}/script.groovy"
 
-                build_script.myFunc(centos)
+                    build_script.myFunc(centos)
+                }
             }
         }
     }
