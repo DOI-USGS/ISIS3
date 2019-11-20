@@ -233,5 +233,3 @@ node("fedora") {
         }
     }
 }
-
-return this
