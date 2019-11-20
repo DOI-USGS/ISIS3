@@ -7,7 +7,7 @@ pipeline
     {
         stage('Testing')
         {
-            echo "Apple"
+            println("Apple")
             def rootDir = pwd()
             def build_script = load "${rootDir}/build.groovy"
 
