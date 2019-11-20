@@ -1,10 +1,10 @@
 // vim: ft=groovy
 
-node
+pipeline
 {
     def rootDir = pwd()
     def build_script = load "${rootDir}/script.groovy"
-    
+
     stages {
         stage ("Checkout") {
             env.STAGE_STATUS = "Checking out ISIS"
