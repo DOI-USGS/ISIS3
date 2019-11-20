@@ -5,39 +5,13 @@ pipeline
     agent any
     stages
     {
-        stage('CI')
+        stage('Testing')
         {
-            parallel
-            {
-                stage('Mac')
-                {
-                    agent{ label 'mac'}
-                    steps{
-                        build 'ISIS-Builds/Mac'
-                    }
-                }
-                stage('CentOS')
-                {
-                    steps
-                    {
-                        build 'ISIS-Builds/CentOS'
-                    }
-                }
-                stage('Fedora')
-                {
-                    steps
-                    {
-                        build 'ISIS-Builds/Fedora'
-                    }
-                }
-                stage('Ubuntu')
-                {
-                    steps
-                    {
-                        build 'ISIS-Builds/Ubuntu'
-                    }
-                }
-            }
+            echo "Apple"
+            def rootDir = pwd()
+            def build_script = load "${rootDir}/build.groovy"
+
+            build_script.my_func()
         }
     }
 }
