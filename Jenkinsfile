@@ -4,9 +4,9 @@ pipeline
 {
     stages {
         stage ("Checkout") {
-            checkout scm
-            isisEnv.add("ISISROOT=${pwd()}/build")
-            cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+            steps {
+                checkout scm
+            }
         }
         stage ("Create Environment") {
             steps {
