@@ -4,6 +4,8 @@ node
 {
     def rootDir = pwd()
 
+    checkout scm
+
     sh "ls -la ${pwd()}"
     sh "git log"
 
