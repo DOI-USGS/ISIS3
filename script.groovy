@@ -5,4 +5,6 @@ def myFunc() {
     checkout scm
 }
 
+checkout scm
+
 return this
