@@ -1,6 +1,6 @@
 // vim: ft=groovy
 
-def myFunc() {
+def myFunc(scm) {
     println("IN MY FUNCTION")
     sh "echo ${scm}"
     checkout scm
