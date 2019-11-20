@@ -6,6 +6,7 @@ node
 
     checkout scm
 
+    sh "echo ${scm}"
     sh "ls -la ${pwd()}"
     sh "git log"
 
