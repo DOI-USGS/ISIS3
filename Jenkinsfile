@@ -5,5 +5,5 @@ node
     def rootDir = pwd()
     def build_script = load "${rootDir}/script.groovy"
 
-    build_script.myFunc()
+    build_script.myFunc(scm)
 }
