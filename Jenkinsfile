@@ -7,15 +7,16 @@ pipeline
         stage ("CI") {
             steps {
                 script {
-                    def labels = ['centos'] // labels for Jenkins node types we will build on
+                    def labels = ['CentOS', Fedora] // labels for Jenkins node types we will build on
                     def builders = [:]
 
                     for (x in labels) {
                         def label = x // Need to bind the label variable before the closure - can't do 'for (label in labels)'
+                        def lower_label = x.toLowerCase()
 
                         // Create a map to pass in to the 'parallel' step so we can fire all the builds at once
-                        builders[label] = {
-                            node(label) {
+                        builders[lower_label] = {
+                            node(lower_label) {
                                 stage ("${label}") {
                                     env.STAGE_STATUS = "Checking out ISIS"
                                     checkout scm
