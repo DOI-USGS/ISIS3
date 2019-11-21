@@ -17,7 +17,7 @@ pipeline
                             node(label) {
                                 stage("Create environment") {
                                     env.STAGE_STATUS = "Creating conda environment"
-                                    ls -lah ${pwd()}
+                                    sh 'ls -lah ${pwd()}'
                                     sh '''
                                       # Use the conda cache running on the Jenkins host
                                       conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
