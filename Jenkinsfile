@@ -11,6 +11,9 @@ pipeline
                     def rootDir = pwd()
                     def build_script = load "${rootDir}/script.groovy"
 
+                    echo "${rootDir}"
+                    echo "${build_script}"
+
                     build_script.myFunc("centos")
                 }
             }

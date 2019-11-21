@@ -14,3 +14,5 @@ def myFunc(machine) {
         sh 'conda env update -n isis_${machine} -f environment.yml --prune'
     }
 }
+
+return this
