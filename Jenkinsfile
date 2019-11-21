@@ -1,21 +1,19 @@
 // vim: ft=groovy
 
-node {
-    parallel(
-        'centos': {
-            stage('CentOS') {
-                build 'ISIS-Builds/CentOS'
-            }
-        },
-        'fedora': {
-            stage('Fedora') {
-                build 'ISIS-Builds/Fedora'
-            }
-        },
-        'ubuntu': {
-            stage('Ubuntu') {
-                build 'ISIS-Builds/Ubuntu'
+pipeline
+{
+    agent any
+
+    stages {
+        stage ("Create Environment") {
+            steps {
+                script {
+                    def rootDir = pwd()
+                    def build_script = load "${rootDir}/script.groovy"
+
+                    build_script.myFunc("centos")
+                }
             }
         }
-    )
+    }
 }
