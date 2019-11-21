@@ -19,24 +19,22 @@ pipeline
                             node(lower_label) {
                                 stage ("${label}") {
 
-                                    steps {
-                                        env.STAGE_STATUS = "Checking out ISIS"
-                                        checkout scm
+                                    env.STAGE_STATUS = "Checking out ISIS"
+                                    checkout scm
 
-                                        env.STAGE_STATUS = "Creating conda environment"
-                                        sh 'ls -lah ${PWD}'
-                                        sh '''
-                                          # Use the conda cache running on the Jenkins host
-                                          conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
-                                          conda config --set always_yes True
-                                          conda create -n isis python=3
-                                        '''
+                                    env.STAGE_STATUS = "Creating conda environment"
+                                    sh 'ls -lah ${PWD}'
+                                    sh '''
+                                      # Use the conda cache running on the Jenkins host
+                                      conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
+                                      conda config --set always_yes True
+                                      conda create -n isis python=3
+                                    '''
 
-                                        if (label == "centos") {
-                                          sh 'conda env update -n isis -f environment_gcc4.yml --prune'
-                                        } else {
-                                          sh 'conda env update -n isis -f environment.yml --prune'
-                                        }
+                                    if (label == "centos") {
+                                      sh 'conda env update -n isis -f environment_gcc4.yml --prune'
+                                    } else {
+                                      sh 'conda env update -n isis -f environment.yml --prune'
                                     }
                                 }
                             }
