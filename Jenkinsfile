@@ -19,8 +19,6 @@ pipeline
                             node(lower_label) {
                                 stage ("${label}") {
 
-                                    agent { label '${lower_label}'}
-
                                     steps {
                                         env.STAGE_STATUS = "Checking out ISIS"
                                         checkout scm
