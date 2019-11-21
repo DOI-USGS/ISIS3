@@ -7,7 +7,7 @@ pipeline
         stage ("CI") {
             steps {
                 script {
-                    def labels = ['centos'] // labels for Jenkins node types we will build on
+                    def labels = ['centos', 'fedora'] // labels for Jenkins node types we will build on
                     def builders = [:]
                     for (x in labels) {
                         def label = x // Need to bind the label variable before the closure - can't do 'for (label in labels)'
@@ -24,7 +24,7 @@ pipeline
                                       conda create -n isis python=3
                                     '''
 
-                                    if (env.OS.toLowerCase() == "centos") {
+                                    if (label == "centos") {
                                       sh 'conda env update -n isis -f environment_gcc4.yml --prune'
                                     } else {
                                       sh 'conda env update -n isis -f environment.yml --prune'
