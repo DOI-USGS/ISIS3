@@ -7,7 +7,7 @@ pipeline
         stage ("CI") {
             steps {
                 script {
-                    def labels = ['CentOS', Fedora] // labels for Jenkins node types we will build on
+                    def labels = ['CentOS', 'Fedora'] // labels for Jenkins node types we will build on
                     def builders = [:]
 
                     for (x in labels) {
