@@ -7,7 +7,7 @@ pipeline
         stage ("CI") {
             steps {
                 script {
-                    def labels = ['centos', 'fedora'] // labels for Jenkins node types we will build on
+                    def labels = ['centos'] // labels for Jenkins node types we will build on
                     def builders = [:]
                     for (x in labels) {
                         def label = x // Need to bind the label variable before the closure - can't do 'for (label in labels)'
@@ -15,6 +15,12 @@ pipeline
                         // Create a map to pass in to the 'parallel' step so we can fire all the builds at once
                         builders[label] = {
                             node(label) {
+                                stage ("Checkout") {
+                                    env.STAGE_STATUS = "Checking out ISIS"
+                                    checkout scm
+                                    isisEnv.add("ISISROOT=${pwd()}/build")
+                                    cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
+                                }
                                 stage("Create environment") {
                                     env.STAGE_STATUS = "Creating conda environment"
                                     sh 'ls -lah ${PWD}'
