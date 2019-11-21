@@ -18,8 +18,6 @@ pipeline
                                 stage ("Checkout") {
                                     env.STAGE_STATUS = "Checking out ISIS"
                                     checkout scm
-                                    isisEnv.add("ISISROOT=${pwd()}/build")
-                                    cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
                                 }
                                 stage("Create environment") {
                                     env.STAGE_STATUS = "Creating conda environment"
