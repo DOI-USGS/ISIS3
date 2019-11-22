@@ -8,10 +8,10 @@ pipeline
             steps {
                 script {
                     echo "${pwd()}/script.groovy"
-                    sh 'ls -lah ${pwd()}'
-                    def goorvy_utilities = load "${pwd()}/script.groovy"
+                    sh 'ls -lah ${PWD}'
+                    def groovy_utilities = load "${pwd()}/script.groovy"
 
-                    echo "${goorvy_utilities.cmakeFlags}"
+                    echo "${groovy_utilities.cmakeFlags}"
 
                     def labels = ['CentOS', 'Fedora'] // labels for Jenkins node types we will build on
                     def builders = [:]
