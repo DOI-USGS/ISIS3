@@ -11,7 +11,7 @@ pipeline
                     sh 'ls -lah ${PWD}'
                     def groovy_utilities = load "${pwd()}/script.groovy"
 
-                    echo "${cmakeFlags}"
+                    echo "${groovy_utilities.cmakeFlags}"
 
                     def labels = ['CentOS', 'Fedora'] // labels for Jenkins node types we will build on
                     def builders = [:]
