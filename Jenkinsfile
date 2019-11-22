@@ -88,6 +88,8 @@ pipeline
                                                 dir("${env.ISISROOT}") {
                                                     env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                                         sh """
+                                                            source activate isis
+
                                                             automos -HELP
                                                             catlab -HELP
                                                             tabledump -HELP
