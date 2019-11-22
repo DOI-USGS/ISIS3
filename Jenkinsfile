@@ -7,9 +7,11 @@ pipeline
         stage ("CI") {
             steps {
                 script {
+                    echo "${pwd()}/script.groovy"
+                    sh 'ls -lah ${pwd()}'
                     def goorvy_utilities = load "${pwd()}/script.groovy"
 
-                    echo "${groovy_utilities.cmakeFlags}"
+                    echo "${goorvy_utilities.cmakeFlags}"
 
                     def labels = ['CentOS', 'Fedora'] // labels for Jenkins node types we will build on
                     def builders = [:]
