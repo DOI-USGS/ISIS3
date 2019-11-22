@@ -33,7 +33,7 @@ pipeline
                     def build_ok = true
                     def errors = []
 
-                    def labels = ['CentOS', 'Mac'] // labels for Jenkins node types we will build on
+                    def labels = ['CentOS'] // labels for Jenkins node types we will build on
                     def builders = [:]
 
                     for (x in labels) {
