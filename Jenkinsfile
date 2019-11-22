@@ -66,17 +66,15 @@ pipeline
                                     withEnv(isisEnv) {
                                         dir("${env.ISISROOT}") {
                                             try {
-                                                stage ("Build") {
-                                                    env.STAGE_STATUS = "Building ISIS on ${env.OS}"
-                                                    sh """
-                                                        source activate isis
-                                                        echo `ls ../`
-                                                        echo `pwd`
-                                                        cmake -GNinja ${cmakeFlags.join(' ')} ../isis
-                                                        ninja -j4 install
-                                                        python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
-                                                    """
-                                                }
+                                                env.STAGE_STATUS = "Building ISIS on ${env.OS}"
+                                                sh """
+                                                    source activate isis
+                                                    echo `ls ../`
+                                                    echo `pwd`
+                                                    cmake -GNinja ${cmakeFlags.join(' ')} ../isis
+                                                    ninja -j4 install
+                                                    python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
+                                                """
                                             }
                                             catch(e) {
                                                 build_ok = false
