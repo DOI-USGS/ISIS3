@@ -49,7 +49,6 @@ pipeline
                                     checkout scm
 
                                     env.STAGE_STATUS = "Creating conda environment"
-                                    sh 'ls -lah ${PWD}'
                                     sh '''
                                       # Use the conda cache running on the Jenkins host
                                       conda config --set channel_alias http://dmz-jenkins.wr.usgs.gov
@@ -69,7 +68,8 @@ pipeline
                                                 env.STAGE_STATUS = "Building ISIS on ${env.OS}"
                                                 sh """
                                                     source activate isis
-                                                    echo `ls ../`
+                                                    ls ../
+                                                    ls .
                                                     echo `pwd`
                                                     cmake -GNinja ${cmakeFlags.join(' ')} ../isis
                                                     ninja -j4 install
