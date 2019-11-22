@@ -7,11 +7,31 @@ pipeline
         stage ("CI") {
             steps {
                 script {
-                    echo "${pwd()}/script.groovy"
-                    sh 'ls -lah ${PWD}'
                     def groovy_utilities = load "${pwd()}/script.groovy"
 
-                    echo "${groovy_utilities.cmakeFlags}"
+                    def isisDataPath = '/isisData/data'
+
+                    def isisMgrScripts = '/isisData/data/isis3mgr_scripts'
+
+                    def isisTestDataPath = "/isisData/testData"
+
+                    def kakaduIncDir = "/isisData/kakadu"
+
+                    def isisEnv = [
+                        "ISIS3DATA=${isisDataPath}",
+                        "ISIS3TESTDATA=${isisTestDataPath}",
+                        "ISIS3MGRSCRIPTS=${isisMgrScripts}"
+                    ]
+
+                    def cmakeFlags = [
+                        "-DJP2KFLAG=ON",
+                        "-DKAKADU_INCLUDE_DIR=${kakaduIncDir}",
+                        "-Dpybindings=OFF",
+                        "-DCMAKE_BUILD_TYPE=RELEASE"
+                    ]
+
+                    def build_ok = true
+                    def errors = []
 
                     def labels = ['CentOS', 'Fedora'] // labels for Jenkins node types we will build on
                     def builders = [:]
@@ -41,6 +61,29 @@ pipeline
                                       sh 'conda env update -n isis -f environment_gcc4.yml --prune'
                                     } else {
                                       sh 'conda env update -n isis -f environment.yml --prune'
+                                    }
+
+                                    withEnv(isisEnv) {
+                                        dir("${env.ISISROOT}") {
+                                            try {
+                                                stage ("Build") {
+                                                    env.STAGE_STATUS = "Building ISIS on ${env.OS}"
+                                                    sh """
+                                                        source activate isis
+                                                        echo `ls ../`
+                                                        echo `pwd`
+                                                        cmake -GNinja ${cmakeFlags.join(' ')} ../isis
+                                                        ninja -j4 install
+                                                        python ../isis/scripts/isis3VarInit.py --data-dir ${env.ISIS3DATA} --test-dir ${env.ISIS3TESTDATA}
+                                                    """
+                                                }
+                                            }
+                                            catch(e) {
+                                                build_ok = false
+                                                errors.add(env.STAGE_STATUS)
+                                                println e.toString()
+                                            }
+                                        }
                                     }
                                 }
                             }
