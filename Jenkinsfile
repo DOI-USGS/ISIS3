@@ -82,6 +82,18 @@ pipeline
                                                 println e.toString()
                                             }
                                         }
+
+                                        if(build_ok) {
+                                            currentBuild.result = "SUCCESS"
+                                        }
+                                        else {
+                                            currentBuild.result = "FAILURE"
+                                            def comment = "Failed during:\n"
+                                            errors.each {
+                                                comment += "- ${it}\n"
+                                            }
+                                            setGitHubBuildStatus(comment)
+                                        }
                                     }
                                 }
                             }
