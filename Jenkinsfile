@@ -47,6 +47,8 @@ pipeline
 
                                     env.STAGE_STATUS = "Checking out ISIS"
                                     checkout scm
+                                    isisEnv.add("ISISROOT=${pwd()}/build")
+                                    cmakeFlags.add("-DCMAKE_INSTALL_PREFIX=${pwd()}/install")
 
                                     env.STAGE_STATUS = "Creating conda environment"
                                     sh '''
