@@ -56,8 +56,7 @@
         </p>
         <p>
           ISIS documentation is part of the source code distribution, resides in an organized structure, and in part is automatically
-          generated from text files written in the ISIS XML languages. When ISIS is installed on a system, a complete copy of the
-          documentation is installed with the software. Additionally, a copy of the documentation is published to the ISIS web site, therefore
+          generated from text files written in the ISIS XML languages. A copy of the documentation is published to the ISIS web site, therefore
           the ISIS web site and the ISIS documentation are identical. In this document, the term "web site" will refer to the complete ISIS
           documentation.
         </p>
@@ -107,15 +106,15 @@
 
         <h3>Where do Documents go in the ISIS structure?</h3>
         <p>
-            Documents live in $ISISROOT/src/docsys/documents/. Each Document (its metadata and files) should be in its
+            Documents live in $ISISROOT/../isis/src/docsys/documents/. Each Document (its metadata and files) should be in its
             own directory, and subcomponents should reside in a directory named <tt>assets</tt>. The XML metadata file should
             be named the same as the directory with a .xml extension. For example, this Document:
         </p>
 
         <ul>
-          <li>resides in $ISISROOT/src/docsys/documents/HowToGeneralDocumentation/</li>
+          <li>resides in $ISISROOT/../isis/src/docsys/documents/HowToGeneralDocumentation/</li>
           <li>its metadata file is HowToGeneralDocumentation.xml</li>
-          <li>all the images on this page are in the $ISISROOT/src/docsys/documents/HowToGeneralDocumentation/assets/ directory</li>
+          <li>all the images on this page are in the $ISISROOT/../isis/src/docsys/documents/HowToGeneralDocumentation/assets/ directory</li>
         </ul>
 
         <!-- WRITING A DOCUMENT XML METATDATA FILE -->
@@ -332,7 +331,7 @@
                                            of the following elements:</li>
                                            <ol>
                                              <li><b>URL:</b> web, ftp, or other electronic address e.g. http://astrogeology.usgs.gov</li>
-                                             <li><b>source:</b> file name of a Document that resides in $ISISROOT/src/docsys/documents/. If this Document is a web page
+                                             <li><b>source:</b> file name of a Document that resides in $ISISROOT/../isis/src/docsys/documents/. If this Document is a web page
                                                                            that will be generated from the metadata file, this is the target file name for the web page.</li>
                                            </ol>
 
@@ -386,6 +385,8 @@
     <change name="Deborah Lee Soltesz" date="2003-01-29">Created</change>
     <change name="Deborah Lee Soltesz" date="2003-03-04">Revisions based on review by Stuart Sides</change>
     <change name="Deborah Lee Soltesz" date="2003-04-01">Added explanations for new items category:tutorial and audience:intermediate</change>
+    <change name="Kristin Berry" date="2019-11-14">Updated to change path to ISIS documentation source after update to cmake build system and remove reference to 
+    documentation being distributed with an ISIS build, as this is no longer the case.</change>
   </history>
 
 </documentation>

@@ -88,7 +88,7 @@ namespace Isis {
     size_t num_triangles = 0;
 
     if (m_mesh) {
-      for(size_t i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
+      for(int i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
         num_triangles += m_mesh->getIndexedMeshArray()[i].m_numTriangles;
       }
     }
@@ -106,7 +106,7 @@ namespace Isis {
     size_t num_vertices = 0;
 
     if (m_mesh) {
-      for(size_t i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
+      for(int i = 0; i < m_mesh->getIndexedMeshArray().size(); i++) {
         num_vertices += m_mesh->getIndexedMeshArray()[i].m_numVertices;
       }
     }
