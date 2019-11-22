@@ -88,22 +88,11 @@ pipeline
                                                 dir("${env.ISISROOT}") {
                                                     env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                                         sh """
-                                                            source activate isis
-                                                            echo $ISIS3TESTDATA
-                                                            echo $ISIS3DATA
-
-                                                            # environment variables
-                                                            export ISISROOT=${env.ISISROOT}
-                                                            export ISIS3TESTDATA="/isisData/testData"
-                                                            export ISIS3DATA="/isisData/data"
-                                                            export PATH=`pwd`/../install/bin:/home/jenkins/.conda/envs/isis/bin:$PATH
-
                                                             automos -HELP
                                                             catlab -HELP
                                                             tabledump -HELP
 
                                                             ctest -R _unit_ -j4 -VV
-                                                            source deactivate
                                                         """
 
                                                 }
