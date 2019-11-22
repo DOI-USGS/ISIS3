@@ -75,90 +75,66 @@ Anaconda leverages caching in many places which can cause issues. If you are get
   * The -c options are to give conda a channel priority. Without these, conda will always attempt to download from the default Anaconda channel first. (Unlike the environment.yml files, channel priority cannot be defined within the meta.yaml.)
   * Since we do not have testing set-up through conda, the “--no-test” flag must be set in order to avoid errors. (By default, conda looks for a run_test file and will throw an error if it can not be located.)
 * If the build was successful you will see "If you want to upload package(s) to anaconda.org later, type:  ..." message towards the end of the build output. Note the location of compressed .tar.bz2 file containing your build.
+  * If you missed the location in the command print out, use ```conda build recipe/ --output``` to reprint. This command does not confirm the file exists - only where it *would* be saved with a successful build.
 * Back up the build by copying the .tar.bz2 to:
-  * /work/projects/conda-bld/osx-64/ for Mac OS 10.13 
-  * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS
+  * /work/projects/conda-bld/osx-64/ for Mac OS 10.13. 
+  * /work/projects/conda-bld/linux-64/ for Ubuntu 18 LTS.
 
 ## Step 4: Upload the Build to Anaconda Cloud
 
-In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. The location of the .tar.bz2 file to be uploaded should have been displayed at the end of the ```conda build``` command from above. In case you missed this message, you may also run this command to see the location: ```conda build recipe/ --output```. Keep in mind that this does not confirm that the file actually exists - only where it _would_ be saved with a successful build.
+In this step, we will upload the build(s) that we just created into the Anaconda Cloud to distribute them to our users. Uploading the .tar.bz2 file requires one command, however, non-standard builds (release candidates or custom builds), must be uploaded with a label. 
 
-Before uploading the build, make sure the base environment is still activated. If not, run: ```conda activate```
-
-Though uploading the files involves only one command each, the command will be slightly different depending on how you would like to distribute the build and should be repeated for all builds that were produced.
-
-If this is not a special release, but is instead a standard public release, you will use the command:
-
-```anaconda upload -u usgs-astrogeology <path-to-the-.tar.bz2-file>```
-
-This will upload the build with the "main" label and will be the default build users would download from Anaconda Cloud.
-
-If, however, this is a custom build and/or a Release Candidate, you will need to include a label tag in your upload command. 
-
-* For an Release Candidate, that command would be:
-
-```anaconda upload -u usgs-astrogeology -l RC <path-to-the-.tar.bz2-file>```
-
-* For a special CaSSIS build that we would want to give the unique label of "cassis":
-
-```anaconda upload -u usgs-astrogeology -l cassis <path-to-the-.tar.bz2-file>```
-
-Remember to always ensure that custom builds include a label flag or the file will be uploaded by default with the "main" tag on Anaconda Cloud and users may receive a build not intended as a main release by default.
+* For a standard release, use the command ```anaconda upload -u usgs-astrogeology <path-to-the-.tar.bz2-file>```.
+* For an Release Candidate, use the command ```anaconda upload -u usgs-astrogeology -l RC <path-to-the-.tar.bz2-file>```.
+* For a custom build, specify a custom label and use the command ```anaconda upload -u usgs-astrogeology -l <custom-label> <path-to-the-.tar.bz2-file>```.
+   * For example, when generating a custom build for the CaSSIS team, we would use the "cassis" label and the command ```anaconda upload -u usgs-astrogeology -l cassis <path-to-the-.tar.bz2-file>```.
 
 ## Step 5: Update Data and TestData Areas on rsync Servers
 
 This step covers how to update the data on the rysnc servers. This is where our external users will have access to the data necessary for running ISIS. One server is located on campus, while the other server is located in Phoenix. These commands must be run as isis3mgr for permission purposes.
 
-***Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc). Adding a `-n` flag to your rsync command can be useful to see what files would be copied over without actually copying them to ensure your command is correct.***
+***Please pay careful attention to where you are rsync'ing the data to on the remote servers. It is going to depend on the type of build you just completed (Public Release, Release Candidate, custom build, etc). ***
 
-The rsync command for the local and remote servers are:
+### Part A: Update the Local Server
+* Conduct a dry run using the command ```rsync -rtpvln /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/``` and ensure that the output is reasonable. You should see kernel updates for active missions and a smaller number of other updates made by developers.
 
-```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```
+* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/```.
 
-and
 
-```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist:/work1/dist/isis3/<isis3data or mission specific>/data/```
+### Part B: Update the Remote Server
+* Conduct a dry run using the command ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
 
-***This entire step will be outdated with the upcoming migration to GitLab for our external data storage and CI integration.***
+* Actually copy the files using ```rsync -rtpvl /usgs/cpkgs/isis3/data/ isisdist.astrogeology.usgs.gov:/work1/dist/isis3/<isis3data or mission specific>/data/```.
 
 ## Step 6: Create Internal Builds/Installs for Astro
 
-This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus. As of 8/23/19, conda environments are the only supported way to access ISIS binaries internally, so it's not necessary to make builds for the `/usgs/pkgs` area as part of the release process any more.
+This step covers creating the builds and the installation environments of ISIS for our internal users here on the ASC campus using the shared anaconda installs. Setting up the conda environments involve installing the conda build of ISIS that we just pushed up to Anaconda, and will follow the instructions found in the README.MD of the isis3 repository. This will need to be done once for Linux, and once for Mac.
 
-Setting up the conda environments will involve installing the conda build of ISIS that we just pushed up to Anaconda, and will basically follow the general instructions of installing ISIS that can be found in the README.MD of the isis3 repository, with a few minor modifications. Note that this will need to be done once for Linux, and once for Mac.
+* Ensure that you have the proper build of conda set-up. 
+    * For Linux: ```source /usgs/cpkgs/anaconda3_linux/etc/profile.d/conda.sh```.
+    * For MacOS: ```source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh```.
 
-Ensure that you have the proper build of conda set-up. For Linux:
-
-```source /usgs/cpkgs/anaconda3_linux/etc/profile.d/conda.sh```
-
-For MacOS:
-
-```source /usgs/cpkgs/anaconda3_macOS/etc/profile.d/conda.sh```
-
-Then run the following commands:
-
+* Run the following commands to set up the environment:
 ```
-   conda create -n <isis version> python=3.6
+   conda deactivate 
 
-   conda activate <isis version>
+   conda create -n isis<isis version> python=3.6
+
+   conda activate isis<isis version>
 
    conda config --env --add channels conda-forge
 
    conda config --env --add channels usgs-astrogeology
-
-   # For Public Releases
-   conda install -c usgs-astrogeology isis3
-
-   # For Release Candidates
-   conda install -c usgs-astrogeology/label/RC isis3
-
-   # For Custom Builds, simply use the same label that you used to upload to Anaconda
-   conda install -c usgs-astrogeology/label/<label> isis3
-
-   python $CONDA_PREFIX/scripts/isis3VarInit.py -d /usgs/cpkgs/isis3/data -t /usgs/cpkgs/isis3/testData
 ```
+* Install the isis release
+    * For Public Releases: `conda install -c usgs-astrogeology isis3`.
+    * For Release Candidates: `conda install -c usgs-astrogeology/label/RC isis3`.
+    * For Custom Builds: `conda install -c usgs-astrogeology/label/<custom-label> isis3` using the custom label that you used to upload to Anaconda in [Step 4](#step-4-upload-the-build-to-anaconda-cloud).
 
-Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running a simple application of your choice.
+* Set up the environment variables using `python $CONDA_PREFIX/scripts/isis3VarInit.py -d /usgs/cpkgs/isis3/data -t /usgs/cpkgs/isis3/testData`.
+
+
+Confirm that the environment has been set-up properly by deactivating it, reactivating it, and running an application of your choice.
 
 ***Don't forget to go back and do the other OS!***
 
