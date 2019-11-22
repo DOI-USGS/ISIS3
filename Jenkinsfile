@@ -56,7 +56,7 @@ pipeline
                                       conda create -n isis python=3
                                     '''
 
-                                    if (label == "centos") {
+                                    if (lower_label == "centos") {
                                       sh 'conda env update -n isis -f environment_gcc4.yml --prune'
                                     } else {
                                       sh 'conda env update -n isis -f environment.yml --prune'
