@@ -67,7 +67,7 @@ pipeline
                                     withEnv(isisEnv) {
                                         dir("${env.ISISROOT}") {
                                             try {
-                                                env.STAGE_STATUS = "Building ISIS on ${env.OS}"
+                                                env.STAGE_STATUS = "Building ISIS on ${label}"
                                                 sh """
                                                     source activate isis
                                                     cmake -GNinja ${cmakeFlags.join(' ')} ../isis
@@ -89,6 +89,14 @@ pipeline
                                                     env.STAGE_STATUS = "Running unit tests on ${env.OS}"
                                                         sh """
                                                             source activate isis
+                                                            echo $ISIS3TESTDATA
+                                                            echo $ISIS3DATA
+
+                                                            # environment variables
+                                                            export ISISROOT=${env.ISISROOT}
+                                                            export ISIS3TESTDATA="/isisData/testData"
+                                                            export ISIS3DATA="/isisData/data"
+                                                            export PATH=`pwd`/../install/bin:$PATH
 
                                                             automos -HELP
                                                             catlab -HELP
